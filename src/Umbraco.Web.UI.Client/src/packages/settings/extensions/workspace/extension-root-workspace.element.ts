@@ -47,14 +47,14 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 	}
 
 	async #removeExtension(extension: ManifestTypes) {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: 'Unload extension',
 			confirmLabel: 'Unload',
 			content: html`<p>Are you sure you want to unload the extension <strong>${extension.alias}</strong>?</p>`,
 			color: 'danger',
 		});
 
-		await modalHandler?.onSubmit();
+		await modalContext?.onSubmit();
 		umbExtensionsRegistry.unregister(extension.alias);
 	}
 

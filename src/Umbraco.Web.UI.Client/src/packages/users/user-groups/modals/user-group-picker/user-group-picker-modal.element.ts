@@ -52,13 +52,13 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 	}
 
 	#submit() {
-		this.modalHandler?.submit({
+		this.modalContext?.submit({
 			selection: this.#selectionManager.getSelection(),
 		});
 	}
 
 	#close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	render() {

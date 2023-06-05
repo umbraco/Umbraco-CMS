@@ -16,13 +16,13 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 	#selectionManager = new UmbSelectionManagerBase();
 
 	#submit() {
-		this.modalHandler?.submit({
+		this.modalContext?.submit({
 			selection: this.#selectionManager.getSelection(),
 		});
 	}
 
 	#close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	connectedCallback(): void {

@@ -134,7 +134,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		this.#logViewerContext?.setFilterExpression('');
 	}
 
-	#modalHandler?: UmbModalContext;
+	modalContext?: UmbModalContext;
 
 	#saveSearch(savedSearch: SavedLogSearchResponseModel) {
 		this.#logViewerContext?.saveSearch(savedSearch);
@@ -145,8 +145,8 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	#openSaveSearchDialog() {
-		this.#modalHandler = this._modalContext?.open(UMB_LOG_VIEWER_SAVE_SEARCH_MODAL, { query: this._inputQuery });
-		this.#modalHandler?.onSubmit().then((savedSearch) => {
+		this.modalContext = this._modalContext?.open(UMB_LOG_VIEWER_SAVE_SEARCH_MODAL, { query: this._inputQuery });
+		this.modalContext?.onSubmit().then((savedSearch) => {
 			if (savedSearch) {
 				this.#saveSearch(savedSearch);
 				this._isQuerySaved = true;

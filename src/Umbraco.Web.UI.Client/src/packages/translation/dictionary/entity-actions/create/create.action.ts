@@ -39,13 +39,13 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 
 		// TODO: how can we get the current entity detail in the modal? Passing the observable
 		// feels a bit hacky. Works, but hacky.
-		const modalHandler = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, {
+		const modalContext = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, {
 			unique: this.unique,
 			parentName: this.#sectionSidebarContext.headline,
 		});
 
 		// TODO: get type from modal result
-		const { name } = await modalHandler.onSubmit();
+		const { name } = await modalContext.onSubmit();
 		if (!name) return;
 
 		const { data } = await this.repository.createScaffold(this.unique, name);

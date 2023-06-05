@@ -29,14 +29,14 @@ export class UmbTrashEntityAction<
 		if (data) {
 			const item = data[0];
 
-			const modalHandler = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
+			const modalContext = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
 				headline: `Trash ${item.name}`,
 				content: 'Are you sure you want to move this item to the recycle bin?',
 				color: 'danger',
 				confirmLabel: 'Trash',
 			});
 
-			modalHandler?.onSubmit().then(() => {
+			modalContext?.onSubmit().then(() => {
 				this.repository?.trash([this.unique]);
 			});
 		}

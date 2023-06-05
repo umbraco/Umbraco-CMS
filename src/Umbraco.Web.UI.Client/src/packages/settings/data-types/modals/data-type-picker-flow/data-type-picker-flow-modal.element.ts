@@ -22,7 +22,7 @@ interface GroupedItems<T> {
 @customElement('umb-data-type-picker-flow-modal')
 export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalHandler?: UmbModalContext<UmbDataTypePickerFlowModalData, UmbDataTypePickerFlowModalResult>;
+	modalContext?: UmbModalContext<UmbDataTypePickerFlowModalData, UmbDataTypePickerFlowModalResult>;
 
 	@property({ type: Object })
 	public get data(): UmbDataTypePickerFlowModalData | undefined {
@@ -157,11 +157,11 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	}
 
 	private _close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	private _submit() {
-		this.modalHandler?.submit({ selection: this._selection });
+		this.modalContext?.submit({ selection: this._selection });
 	}
 
 	render() {

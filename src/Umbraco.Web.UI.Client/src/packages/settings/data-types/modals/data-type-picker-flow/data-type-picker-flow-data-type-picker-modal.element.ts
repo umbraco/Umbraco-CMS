@@ -59,20 +59,20 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 
 	private _handleClick(dataType: FolderTreeItemResponseModel) {
 		if (dataType.id) {
-			this.modalHandler?.submit({ dataTypeId: dataType.id });
+			this.modalContext?.submit({ dataTypeId: dataType.id });
 		}
 	}
 
 	private _handleCreate() {
-		this.modalHandler?.submit({ createNewWithPropertyEditorUiAlias: this._propertyEditorUiAlias });
+		this.modalContext?.submit({ createNewWithPropertyEditorUiAlias: this._propertyEditorUiAlias });
 	}
 
 	private _close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	@property({ attribute: false })
-	modalHandler?: UmbModalContext<
+	modalContext?: UmbModalContext<
 		UmbDataTypePickerFlowDataTypePickerModalData,
 		UmbDataTypePickerFlowDataTypePickerModalResult
 	>;

@@ -152,14 +152,14 @@ ${this._content}`;
 	}
 
 	#openMasterTemplatePicker() {
-		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			selection: [this.#masterTemplateId],
 			pickableFilter: (item) => {
 				return item.id !== null && item.id !== this.#templateWorkspaceContext?.getEntityId();
 			},
 		});
 
-		modalHandler?.onSubmit().then((data) => {
+		modalContext?.onSubmit().then((data) => {
 			if (!data.selection) return;
 			this.#setMasterTemplateId(data.selection[0] ?? '');
 		});

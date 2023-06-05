@@ -28,10 +28,10 @@ export default class UmbImportDictionaryEntityAction extends UmbEntityActionBase
 		// TODO: what to do if modal service is not available?
 		if (!this.#modalContext) return;
 
-		const modalHandler = this.#modalContext?.open(UMB_IMPORT_DICTIONARY_MODAL, { unique: this.unique });
+		const modalContext = this.#modalContext?.open(UMB_IMPORT_DICTIONARY_MODAL, { unique: this.unique });
 
 		// TODO: get type from modal result
-		const { temporaryFileId, parentId } = await modalHandler.onSubmit();
+		const { temporaryFileId, parentId } = await modalContext.onSubmit();
 		if (!temporaryFileId) return;
 
 		const result = await this.repository?.import(temporaryFileId, parentId);

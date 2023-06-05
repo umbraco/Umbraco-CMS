@@ -80,11 +80,11 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	}
 
 	private _submit() {
-		this.modalHandler?.submit({ index: this._index, link: this._link });
+		this.modalContext?.submit({ index: this._index, link: this._link });
 	}
 
 	private _close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	render() {

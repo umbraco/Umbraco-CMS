@@ -134,9 +134,9 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	}
 
 	/* TODO: modals being part of the extension registry now means that a modal element can change over time.
-	 It makes this code a bit more complex. The main idea is to have the element as part of the modalHandler so it is possible to dispatch events from within the modal element to the one that opened it.
+	 It makes this code a bit more complex. The main idea is to have the element as part of the modalContext so it is possible to dispatch events from within the modal element to the one that opened it.
 	 Now when the element is an observable it makes it more complex because this host needs to subscribe to updates to the element, instead of just having a reference to it.
-	 If we find a better generic solution to communicate between the modal and the implementor, then we can remove the element as part of the modalHandler. */
+	 If we find a better generic solution to communicate between the modal and the implementor, then we can remove the element as part of the modalContext. */
 	#observeModal(modalAlias: string) {
 		if (this.#host) {
 			new UmbObserverController(
@@ -162,7 +162,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 
 		if (innerElement) {
 			innerElement.data = this.data;
-			innerElement.modalHandler = this;
+			innerElement.modalContext = this;
 			innerElement.manifest = manifest;
 		}
 

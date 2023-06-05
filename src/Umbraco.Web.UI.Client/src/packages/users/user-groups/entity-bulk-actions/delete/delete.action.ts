@@ -23,14 +23,14 @@ export class UmbDeleteUserGroupEntityBulkAction extends UmbEntityBulkActionBase<
 	async execute() {
 		if (!this.#modalContext || this.selection.length === 0) return;
 
-		const modalHandler = this.#modalContext.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this.#modalContext.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Delete user groups?`,
 			content: html`Are you sure you want to delete selected user groups?`,
 			confirmLabel: 'Delete',
 		});
 
-		await modalHandler.onSubmit();
+		await modalContext.onSubmit();
 
 		//TODO: How should we handle bulk actions? right now we send a request per item we want to change.
 		//TODO: For now we have to reload the page to see the update

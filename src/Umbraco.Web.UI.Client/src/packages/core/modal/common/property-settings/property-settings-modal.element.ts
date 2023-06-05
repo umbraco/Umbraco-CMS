@@ -84,7 +84,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 		this._returnData.validation!.mandatoryMessage = formData.get('mandatory-message')?.toString() || '';
 
-		this.modalHandler?.submit(this._returnData);
+		this.modalContext?.submit(this._returnData);
 	}
 
 	#onNameChange(event: UUIInputEvent) {

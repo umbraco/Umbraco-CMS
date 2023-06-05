@@ -6,13 +6,13 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-change-password-modal')
 export class UmbChangePasswordModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalHandler?: UmbModalContext;
+	modalContext?: UmbModalContext;
 
 	@property()
 	data?: UmbChangePasswordModalData;
 
 	private _close() {
-		this.modalHandler?.submit();
+		this.modalContext?.submit();
 	}
 
 	private _handleSubmit(e: SubmitEvent) {

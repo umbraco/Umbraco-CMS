@@ -1,4 +1,4 @@
-import { html , customElement, query } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbExportDictionaryModalData, UmbExportDictionaryModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
@@ -12,7 +12,7 @@ export class UmbExportDictionaryModalElement extends UmbModalBaseElement<
 	private _form!: HTMLFormElement;
 
 	#handleClose() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	#submitForm() {
@@ -27,7 +27,7 @@ export class UmbExportDictionaryModalElement extends UmbModalBaseElement<
 
 		const formData = new FormData(form);
 
-		this.modalHandler?.submit({ includeChildren: (formData.get('includeDescendants') as string) === 'on' });
+		this.modalContext?.submit({ includeChildren: (formData.get('includeDescendants') as string) === 'on' });
 	}
 
 	render() {

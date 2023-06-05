@@ -37,12 +37,12 @@ export class UmbInputListBaseElement extends UmbLitElement {
 	private _openPicker() {
 		if (!this.pickerToken) return;
 
-		const modalHandler = this._modalContext?.open(this.pickerToken, {
+		const modalContext = this._modalContext?.open(this.pickerToken, {
 			multiple: this.multiple,
 			selection: this.value,
 		});
 
-		modalHandler?.onSubmit().then((data: UmbPickerModalResult) => {
+		modalContext?.onSubmit().then((data: UmbPickerModalResult) => {
 			if (data) {
 				this.value = data.selection?.filter((id) => id !== null && id !== undefined) as Array<string>;
 				this.selectionUpdated();

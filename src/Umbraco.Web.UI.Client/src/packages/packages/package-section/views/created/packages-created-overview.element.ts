@@ -108,14 +108,14 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 
 	async #deletePackage(p: PackageDefinitionResponseModel) {
 		if (!p.id) return;
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Remove ${p.name}?`,
 			content: 'Are you sure you want to delete this package',
 			confirmLabel: 'Delete',
 		});
 
-		await modalHandler?.onSubmit();
+		await modalContext?.onSubmit();
 
 		const { error } = await tryExecuteAndNotify(this, PackageResource.deletePackageCreatedById({ id: p.id }));
 		if (error) return;

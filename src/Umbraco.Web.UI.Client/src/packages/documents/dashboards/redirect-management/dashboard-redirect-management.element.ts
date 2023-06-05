@@ -68,7 +68,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private _removeRedirectHandler(data: RedirectUrlResponseModel) {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: 'Delete',
 			content: html`
 				<div style="width:300px">
@@ -81,7 +81,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			color: 'danger',
 			confirmLabel: 'Delete',
 		});
-		modalHandler?.onSubmit().then(() => {
+		modalContext?.onSubmit().then(() => {
 			this._removeRedirect(data);
 		});
 	}
@@ -98,13 +98,13 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private _disableRedirectHandler() {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: 'Disable URL tracker',
 			content: html`Are you sure you want to disable the URL tracker?`,
 			color: 'danger',
 			confirmLabel: 'Disable',
 		});
-		modalHandler?.onSubmit().then(() => {
+		modalContext?.onSubmit().then(() => {
 			this._toggleRedirect();
 		});
 	}

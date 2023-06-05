@@ -18,7 +18,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	#onSubmitCallback?: (data: UmbModalTokenResult) => void;
 	#onRejectCallback?: () => void;
 
-	#modalHandler: UmbModalContext<UmbModalTokenData, UmbModalTokenResult> | undefined;
+	#modalContext: UmbModalContext<UmbModalTokenData, UmbModalTokenResult> | undefined;
 	#routeBuilder?: UmbModalRouteBuilder;
 	#urlBuilderCallback: ((urlBuilder: UmbModalRouteBuilder) => void) | undefined;
 
@@ -62,7 +62,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	 * Returns true if the modal is currently active.
 	 */
 	public get active() {
-		return !!this.#modalHandler;
+		return !!this.#modalContext;
 	}
 
 	public open(params: { [key: string]: string | number }, prepend?: string) {
@@ -74,8 +74,8 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	/**
 	 * Returns the modal handler if the modal is currently active. Otherwise its undefined.
 	 */
-	public get modalHandler() {
-		return this.#modalHandler;
+	public get modalContext() {
+		return this.#modalContext;
 	}
 
 	public observeRouteBuilder(callback: (urlBuilder: UmbModalRouteBuilder) => void) {
@@ -102,11 +102,11 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 
 	#onSubmit = (data: UmbModalTokenResult) => {
 		this.#onSubmitCallback?.(data);
-		this.#modalHandler = undefined;
+		this.#modalContext = undefined;
 	};
 	#onReject = () => {
 		this.#onRejectCallback?.();
-		this.#modalHandler = undefined;
+		this.#modalContext = undefined;
 	};
 
 	routeSetup(router: IRouterSlot, modalContext: UmbModalManagerContext, params: Params) {
@@ -115,9 +115,9 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 
 		const modalData = this.#onSetupCallback ? this.#onSetupCallback(params) : undefined;
 		if (modalData !== false) {
-			this.#modalHandler = modalContext.open(this.#modalAlias, modalData, this.modalConfig, router);
-			this.#modalHandler.onSubmit().then(this.#onSubmit, this.#onReject);
-			return this.#modalHandler;
+			this.#modalContext = modalContext.open(this.#modalAlias, modalData, this.modalConfig, router);
+			this.#modalContext.onSubmit().then(this.#onSubmit, this.#onReject);
+			return this.#modalContext;
 		}
 		return null;
 	}

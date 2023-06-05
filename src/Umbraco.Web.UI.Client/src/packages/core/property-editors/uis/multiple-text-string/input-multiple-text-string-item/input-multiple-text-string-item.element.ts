@@ -45,14 +45,14 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 	}
 
 	#onDelete() {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: `Delete ${this.value || 'item'}`,
 			content: 'Are you sure you want to delete this item?',
 			color: 'danger',
 			confirmLabel: 'Delete',
 		});
 
-		modalHandler?.onSubmit().then(() => {
+		modalContext?.onSubmit().then(() => {
 			this.dispatchEvent(new UmbDeleteEvent());
 		});
 	}

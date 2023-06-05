@@ -68,14 +68,14 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 	openPicker(pickerData?: Partial<UmbPickerModalData<ItemType>>) {
 		if (!this.modalManager) throw new Error('Modal manager context is not initialized');
 
-		const modalHandler = this.modalManager.open(this.modalAlias, {
+		const modalContext = this.modalManager.open(this.modalAlias, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this.getSelection()],
 			pickableFilter: this.pickableFilter,
 			...pickerData,
 		});
 
-		modalHandler?.onSubmit().then(({ selection }: any) => {
+		modalContext?.onSubmit().then(({ selection }: any) => {
 			this.setSelection(selection);
 			this.host.dispatchEvent(new UmbChangeEvent());
 			// TODO: we only want to request items that are not already in the selectedItems array
@@ -90,14 +90,14 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 		const item = this.#itemManager.getItems().find((item) => this.#getUnique(item) === unique);
 		if (!item) throw new Error('Could not find item with unique: ' + unique);
 
-		const modalHandler = this.modalManager?.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this.modalManager?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',
 			confirmLabel: 'Remove',
 		});
 
-		await modalHandler?.onSubmit();
+		await modalContext?.onSubmit();
 		this.#removeItem(unique);
 	}
 

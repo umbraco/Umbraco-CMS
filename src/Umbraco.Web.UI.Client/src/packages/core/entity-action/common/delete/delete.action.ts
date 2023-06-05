@@ -29,14 +29,14 @@ export class UmbDeleteEntityAction<
 		if (data) {
 			const item = data[0];
 
-			const modalHandler = this.#modalContext.open(UMB_CONFIRM_MODAL, {
+			const modalContext = this.#modalContext.open(UMB_CONFIRM_MODAL, {
 				headline: `Delete ${item.name}`,
 				content: 'Are you sure you want to delete this item?',
 				color: 'danger',
 				confirmLabel: 'Delete',
 			});
 
-			await modalHandler.onSubmit();
+			await modalContext.onSubmit();
 			await this.repository?.delete(this.unique);
 		}
 	}

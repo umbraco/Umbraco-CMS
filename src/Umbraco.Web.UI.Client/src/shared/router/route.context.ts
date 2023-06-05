@@ -51,9 +51,9 @@ export class UmbRouteContext {
 			component: EmptyDiv,
 			setup: (component, info) => {
 				if (!this.#modalContext) return;
-				const modalHandler = modalRegistration.routeSetup(this.#modalRouter, this.#modalContext, info.match.params);
-				if (modalHandler) {
-					modalHandler.onSubmit().then(
+				const modalContext = modalRegistration.routeSetup(this.#modalRouter, this.#modalContext, info.match.params);
+				if (modalContext) {
+					modalContext.onSubmit().then(
 						() => {
 							this.#removeModalPath(info);
 						},

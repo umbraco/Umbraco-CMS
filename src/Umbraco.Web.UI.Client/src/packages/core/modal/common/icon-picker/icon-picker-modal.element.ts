@@ -61,11 +61,11 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	}
 
 	private _close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	private _submit() {
-		this.modalHandler?.submit({ color: this._currentColor, icon: this._currentIcon });
+		this.modalContext?.submit({ color: this._currentColor, icon: this._currentIcon });
 	}
 
 	private _onColorChange(e: UUIColorSwatchesEvent) {

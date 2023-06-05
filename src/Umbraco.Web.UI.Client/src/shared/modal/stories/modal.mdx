@@ -190,9 +190,9 @@ class MyElement extends UmbElementMixin(LitElement) {
 	#onClick() {
 		const data = {'data goes here'};
 		const options {'options go here'};
-		const modalHandler = this.#modalManagerContext?.open(MY_MODAL_TOKEN), data, options);
+		const modalContext = this.#modalManagerContext?.open(MY_MODAL_TOKEN), data, options);
 
-		modalHandler?.onSubmit().then((data) => {
+		modalContext?.onSubmit().then((data) => {
 			// if modal submitted, then data is supplied here.
 		});
 	}
@@ -248,16 +248,16 @@ import type { UmbModalHandler } from '@umbraco-cms/modal';
 class MyDialog extends UmbElementMixin(LitElement) {
 	// the modal handler will be injected into the element when the modal is opened.
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<MyModalData, MyModalResult>;
+	modalContext?: UmbModalHandler<MyModalData, MyModalResult>;
 
 	private _handleCancel() {
-		this._modalHandler?.close();
+		this.modalContext?.close();
 	}
 
 	private _handleSubmit() {
 		/* Optional data of any type can be applied to the submit method to pass it
 		   to the modal parent through the onSubmit promise. */
-		this._modalHandler?.submit({ myReturnData: 'hello world' });
+		this.modalContext?.submit({ myReturnData: 'hello world' });
 	}
 
 	render() {

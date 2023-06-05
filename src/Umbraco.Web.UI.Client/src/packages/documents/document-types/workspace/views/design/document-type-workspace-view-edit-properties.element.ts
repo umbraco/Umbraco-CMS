@@ -8,7 +8,7 @@ import {
 	DocumentTypePropertyTypeResponseModel,
 	PropertyTypeResponseModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UMB_PROPERTY_SETTINGS_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import './document-type-workspace-view-edit-property.element.js';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 const SORTER_CONFIG: UmbSorterConfig<DocumentTypePropertyTypeResponseModel> = {
@@ -107,9 +107,9 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		console.log('property id:', property.id!, property);
 
 		// TODO: route modal..
-		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_SETTINGS_MODAL);
+		const modalContext = this.#modalContext?.open(UMB_PROPERTY_SETTINGS_MODAL);
 
-		modalHandler?.onSubmit().then((result) => {
+		modalContext?.onSubmit().then((result) => {
 			console.log(result);
 		});
 		*/

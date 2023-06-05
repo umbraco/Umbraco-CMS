@@ -11,7 +11,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 @customElement('umb-folder-modal')
 export class UmbFolderModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalHandler?: UmbModalContext<UmbFolderModalData, UmbFolderModalResult>;
+	modalContext?: UmbModalContext<UmbFolderModalData, UmbFolderModalResult>;
 
 	private _data?: UmbFolderModalData;
 	@property({ type: Object, attribute: false })
@@ -87,7 +87,7 @@ export class UmbFolderModalElement extends UmbLitElement {
 	private _formElement?: HTMLFormElement;
 
 	#onCancel() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	#submitForm() {
@@ -119,7 +119,7 @@ export class UmbFolderModalElement extends UmbLitElement {
 		}
 
 		if (!error) {
-			this.modalHandler?.submit();
+			this.modalContext?.submit();
 		}
 	}
 

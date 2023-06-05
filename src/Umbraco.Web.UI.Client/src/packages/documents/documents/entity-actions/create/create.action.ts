@@ -45,12 +45,12 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 
 	private async _openModal(parentId: string | null, parentName?: string) {
 		if (!this.#modalContext) return;
-		const modalHandler = this.#modalContext.open(UMB_ALLOWED_DOCUMENT_TYPES_MODAL, {
+		const modalContext = this.#modalContext.open(UMB_ALLOWED_DOCUMENT_TYPES_MODAL, {
 			parentId: parentId,
 			parentName: parentName,
 		});
 
-		const { documentTypeKey } = await modalHandler.onSubmit();
+		const { documentTypeKey } = await modalContext.onSubmit();
 
 		// TODO: how do we want to generate these urls?
 		history.pushState(

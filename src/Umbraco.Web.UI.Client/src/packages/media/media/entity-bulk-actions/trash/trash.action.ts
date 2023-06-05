@@ -29,7 +29,7 @@ export class UmbMediaTrashEntityBulkAction extends UmbEntityBulkActionBase<UmbMe
 
 		if (data) {
 			// TODO: use correct markup
-			const modalHandler = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
+			const modalContext = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
 				headline: `Deleting ${this.selection.length} items`,
 				content: html`
 					This will delete the following files:
@@ -41,7 +41,7 @@ export class UmbMediaTrashEntityBulkAction extends UmbEntityBulkActionBase<UmbMe
 				confirmLabel: 'Delete',
 			});
 
-			await modalHandler.onSubmit();
+			await modalContext.onSubmit();
 			await this.repository?.trash(this.selection);
 		}
 	}

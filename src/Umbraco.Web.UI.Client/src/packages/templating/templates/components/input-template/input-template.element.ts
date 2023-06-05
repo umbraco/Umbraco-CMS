@@ -106,12 +106,12 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 
 	#openPicker() {
 		// TODO: Change experience, so its not multi selectable. But instead already picked templates should be unpickable. (awaiting general picker features for such)
-		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			multiple: true,
 			selection: [...this.selectedIds],
 		});
 
-		modalHandler?.onSubmit().then((data) => {
+		modalContext?.onSubmit().then((data) => {
 			if (!data.selection) return;
 			this.selectedIds = data.selection;
 			this.dispatchEvent(new CustomEvent('change'));

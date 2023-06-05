@@ -70,13 +70,13 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 		}
 	}
 	private async _onReloadCacheHandler() {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: 'Reload',
 			content: html` Trigger a in-memory and local file cache reload on all servers. `,
 			color: 'danger',
 			confirmLabel: 'Continue',
 		});
-		modalHandler?.onSubmit().then(() => {
+		modalContext?.onSubmit().then(() => {
 			this._reloadMemoryCache();
 		});
 	}
@@ -93,13 +93,13 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	}
 
 	private async _onRebuildCacheHandler() {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalContex = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: 'Rebuild',
 			content: html` Rebuild content in cmsContentNu database table. Expensive.`,
 			color: 'danger',
 			confirmLabel: 'Continue',
 		});
-		modalHandler?.onSubmit().then(() => {
+		modalContex?.onSubmit().then(() => {
 			this._rebuildDatabaseCache();
 		});
 	}

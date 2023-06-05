@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-current-user-modal')
 export class UmbCurrentUserModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalHandler?: UmbModalContext;
+	modalContext?: UmbModalContext;
 
 	@state()
 	private _currentUser?: UmbLoggedInUser;
@@ -35,7 +35,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	}
 
 	private _close() {
-		this.modalHandler?.submit();
+		this.modalContext?.submit();
 	}
 
 	private _logout() {

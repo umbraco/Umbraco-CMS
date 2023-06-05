@@ -134,10 +134,10 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		if (!this.#modalContext) return;
 		if (!this.#repo) return;
 
-		const modalHandler = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, { unique: null });
+		const modalContext = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, { unique: null });
 
 		// TODO: get type from modal result
-		const { name } = await modalHandler.onSubmit();
+		const { name } = await modalContext.onSubmit();
 		if (!name) return;
 
 		const { data } = await this.#repo.createScaffold(null);

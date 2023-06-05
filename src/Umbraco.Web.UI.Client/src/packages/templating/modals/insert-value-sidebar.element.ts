@@ -1,16 +1,16 @@
 import { getUmbracoFieldSnippet } from '../utils.js';
-import { UUITextStyles , UUIComboboxElement, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, UUIComboboxElement, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-insert-value-sidebar')
 export default class UmbInsertValueSidebarElement extends UmbModalBaseElement<object, string> {
 	private _close() {
-		this.modalHandler?.submit();
+		this.modalContext?.submit();
 	}
 
 	private _submit() {
-		this.modalHandler?.submit(this.output);
+		this.modalContext?.submit(this.output);
 	}
 
 	@state()

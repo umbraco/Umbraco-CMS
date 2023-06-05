@@ -24,8 +24,8 @@ export class UmbMoveDataTypeEntityAction extends UmbEntityActionBase<UmbDataType
 		if (!this.#modalManagerContext) throw new Error('Modal manager context is not available');
 		if (!this.repository) throw new Error('Repository is not available');
 
-		const modalHandler = this.#modalManagerContext?.open(UMB_DATA_TYPE_PICKER_MODAL);
-		const { selection } = await modalHandler.onSubmit();
+		const modalContext = this.#modalManagerContext?.open(UMB_DATA_TYPE_PICKER_MODAL);
+		const { selection } = await modalContext.onSubmit();
 		await this.repository.move(this.unique, selection[0]);
 	}
 }

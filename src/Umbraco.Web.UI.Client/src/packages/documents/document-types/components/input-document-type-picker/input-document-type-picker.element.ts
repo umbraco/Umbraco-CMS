@@ -70,25 +70,25 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of ids) of our this._selectedIds, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
 			multiple: true,
 			selection: [...this._selectedIds],
 		});
 
-		modalHandler?.onSubmit().then(({ selection }: any) => {
+		modalContext?.onSubmit().then(({ selection }: any) => {
 			this._setSelection(selection);
 		});
 	}
 
 	private async _removeItem(item: DocumentTypeResponseModel) {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',
 			confirmLabel: 'Remove',
 		});
 
-		await modalHandler?.onSubmit();
+		await modalContext?.onSubmit();
 		const newSelection = this._selectedIds.filter((value) => value !== item.id);
 		this._setSelection(newSelection);
 	}

@@ -49,14 +49,14 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	async #onDelete() {
 		if (!this.#modalContext || !this.#workspaceContext) return;
 
-		const modalHandler = this.#modalContext.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this.#modalContext.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Delete user group ${this._userGroup?.name}?`,
 			content: html`Are you sure you want to delete <b>${this._userGroup?.name}</b> user group?`,
 			confirmLabel: 'Delete',
 		});
 
-		await modalHandler.onSubmit();
+		await modalContext.onSubmit();
 
 		if (!this._userGroup || !this._userGroup.id) return;
 

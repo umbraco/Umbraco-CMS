@@ -15,7 +15,7 @@ export abstract class UmbModalBaseElement<
 	public manifest?: ModalManifestType;
 
 	@property({ attribute: false })
-	public modalHandler?: UmbModalContext<ModalDataType, ModalResultType>;
+	public modalContext?: UmbModalContext<ModalDataType, ModalResultType>;
 
 	@property({ type: Object, attribute: false })
 	public data?: ModalDataType;

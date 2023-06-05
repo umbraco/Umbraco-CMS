@@ -27,17 +27,17 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 	#embedResult!: OEmbedResult;
 
 	@property({ attribute: false })
-	modalHandler?: UmbModalContext<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>;
+	modalContext?: UmbModalContext<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>;
 
 	@property({ type: Object })
 	data?: UmbEmbeddedMediaModalData;
 
 	#handleConfirm() {
-		this.modalHandler?.submit({ selection: this.#embedResult });
+		this.modalContext?.submit({ selection: this.#embedResult });
 	}
 
 	#handleCancel() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	@state()

@@ -6,17 +6,17 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-confirm-modal')
 export class UmbConfirmModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalHandler?: UmbModalContext<UmbConfirmModalData, UmbConfirmModalResult>;
+	modalContext?: UmbModalContext<UmbConfirmModalData, UmbConfirmModalResult>;
 
 	@property({ type: Object })
 	data?: UmbConfirmModalData;
 
 	private _handleConfirm() {
-		this.modalHandler?.submit();
+		this.modalContext?.submit();
 	}
 
 	private _handleCancel() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	render() {

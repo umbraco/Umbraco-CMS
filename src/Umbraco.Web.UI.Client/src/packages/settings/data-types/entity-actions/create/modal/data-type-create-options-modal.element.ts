@@ -13,7 +13,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-data-type-create-options-modal')
 export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalHandler?: UmbModalContext<UmbDataTypeCreateOptionsModalData>;
+	modalContext?: UmbModalContext<UmbDataTypeCreateOptionsModalData>;
 
 	@property({ type: Object })
 	data?: UmbDataTypeCreateOptionsModalData;
@@ -32,16 +32,16 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_MODAL, {
 			repositoryAlias: DATA_TYPE_REPOSITORY_ALIAS,
 		});
-		folderModalHandler?.onSubmit().then(() => this.modalHandler?.submit());
+		folderModalHandler?.onSubmit().then(() => this.modalContext?.submit());
 	}
 
 	// close the modal when navigating to data type
 	#onNavigate() {
-		this.modalHandler?.submit();
+		this.modalContext?.submit();
 	}
 
 	#onCancel() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	render() {

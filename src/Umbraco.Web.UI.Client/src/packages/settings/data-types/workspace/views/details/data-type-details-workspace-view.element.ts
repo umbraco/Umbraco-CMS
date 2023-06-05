@@ -128,11 +128,11 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 	private _openPropertyEditorUIPicker() {
 		if (!this._dataType) return;
 
-		const modalHandler = this._modalContext?.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
 			selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
 		});
 
-		modalHandler?.onSubmit().then(({ selection }) => {
+		modalContext?.onSubmit().then(({ selection }) => {
 			this._selectPropertyEditorUI(selection[0]);
 		});
 	}

@@ -8,7 +8,7 @@ export interface UmbModalExtensionElement<
 > extends HTMLElement {
 	manifest?: ModalManifestType;
 
-	modalHandler?: UmbModalContext<UmbModalData, UmbModalResult>;
+	modalContext?: UmbModalContext<UmbModalData, UmbModalResult>;
 
 	data?: UmbModalData;
 }

@@ -97,10 +97,10 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	}
 
 	private _onFieldFilterClick() {
-		const modalHandler = this._modalContext?.open(UMB_EXAMINE_FIELDS_SETTINGS_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_EXAMINE_FIELDS_SETTINGS_MODAL, {
 			...this._exposedFields,
 		});
-		modalHandler?.onSubmit().then(({ fields } = {}) => {
+		modalContext?.onSubmit().then(({ fields } = {}) => {
 			if (!fields) return;
 			this._exposedFields = fields;
 		});

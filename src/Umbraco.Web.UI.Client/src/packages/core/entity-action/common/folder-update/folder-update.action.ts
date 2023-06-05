@@ -24,11 +24,11 @@ export class UmbFolderUpdateEntityAction<
 	async execute() {
 		if (!this.repository || !this.#modalContext) return;
 
-		const modalHandler = this.#modalContext.open(UMB_FOLDER_MODAL, {
+		const modalContext = this.#modalContext.open(UMB_FOLDER_MODAL, {
 			repositoryAlias: this.repositoryAlias,
 			unique: this.unique,
 		});
 
-		await modalHandler.onSubmit();
+		await modalContext.onSubmit();
 	}
 }
