@@ -180,6 +180,10 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
             target.StartContentId = contentId;
         }
+        else
+        {
+            target.StartContentId = null;
+        }
 
         if (source.MediaStartNodeId is not null)
         {
@@ -191,6 +195,9 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             }
 
             target.StartMediaId = mediaId;
+        }else
+        {
+            target.StartMediaId = null;
         }
 
         return Attempt.Succeed(UserGroupOperationStatus.Success);
