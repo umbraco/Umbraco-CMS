@@ -120,11 +120,14 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
                 container => container.ParentId!.Value,
                 container => requestModel.Containers.First(c => c.Id == container.ParentId).Name!);
 
+        // FIXME: when refactoring for media and member types, this needs to be some kind of abstract implementation - media and member types do not support publishing
+        const bool supportsPublishing = true;
+
         // update properties and groups
         PropertyGroup[] propertyGroups = requestModel.Containers.Select(container =>
             {
                 PropertyGroup propertyGroup = contentType.PropertyGroups.FirstOrDefault(group => group.Key == container.Id) ??
-                                              new PropertyGroup(false);
+                                              new PropertyGroup(supportsPublishing);
                 // NOTE: eventually group.Type should be a string to make the client more flexible; for now we'll have to parse the string value back to its expected enum
                 propertyGroup.Type = Enum.Parse<PropertyGroupType>(container.Type);
                 propertyGroup.Name = container.Name;
@@ -176,8 +179,6 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
 
                 if (propertyGroup.PropertyTypes == null || propertyGroup.PropertyTypes.SequenceEqual(properties) is false)
                 {
-                    // FIXME: when refactoring for media and member types, this needs to be some kind of abstract implementation - media and member types do not support publishing
-                    const bool supportsPublishing = true;
                     propertyGroup.PropertyTypes = new PropertyTypeCollection(supportsPublishing, properties);
                 }
 
