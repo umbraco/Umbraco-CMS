@@ -25,6 +25,13 @@ public interface IUserGroupPresentationFactory
     Task<IEnumerable<UserGroupResponseModel>> CreateMultipleAsync(IEnumerable<IUserGroup> userGroups);
 
     /// <summary>
+    /// Creates multiple <see cref="UserGroupResponseModel"/> base on multiple <see cref="UserGroup"/>
+    /// </summary>
+    /// <param name="userGroups"></param>
+    /// <returns></returns>
+    Task<IEnumerable<UserGroupResponseModel>> CreateMultipleAsync(IEnumerable<IReadOnlyUserGroup> userGroups);
+
+    /// <summary>
     /// Creates an <see cref="IUserGroup"/> based on a <see cref="CreateUserGroupRequestModel"/>
     /// </summary>
     /// <param name="requestModel"></param>

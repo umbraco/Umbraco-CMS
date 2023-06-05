@@ -16,6 +16,7 @@ public class ResetCache : MigrationBase
         RebuildCache = true;
         var distCacheFolderAbsolutePath = _hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData + "/DistCache");
         var nuCacheFolderAbsolutePath = _hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData + "/NuCache");
+
         DeleteAllFilesInFolder(distCacheFolderAbsolutePath);
         DeleteAllFilesInFolder(nuCacheFolderAbsolutePath);
     }
