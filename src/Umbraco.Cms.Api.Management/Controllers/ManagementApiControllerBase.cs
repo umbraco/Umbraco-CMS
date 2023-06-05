@@ -1,13 +1,16 @@
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.Filters;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
+[Authorize(Policy = "New" + AuthorizationPolicies.BackOfficeAccess)]
 [MapToApi(ManagementApiConfiguration.ApiName)]
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
 public class ManagementApiControllerBase : Controller
@@ -44,6 +47,6 @@ public class ManagementApiControllerBase : Controller
     protected static Guid CurrentUserKey(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         //FIXME - Throw if no current user, when we are able to get the current user
-        return backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? Core.Constants.Security.SuperUserKey;
+        return backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? throw new InvalidOperationException("No backoffice user found");
     }
 }

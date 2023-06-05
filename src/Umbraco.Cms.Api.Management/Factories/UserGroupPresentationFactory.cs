@@ -53,12 +53,50 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
         };
     }
+    /// <inheritdoc />
+    public async Task<UserGroupResponseModel> CreateAsync(IReadOnlyUserGroup userGroup)
+    {
+        // TODO figure out how to reuse code from Task<UserGroupResponseModel> CreateAsync(IUserGroup userGroup) instead of copying
+        Guid? contentStartNodeKey = GetKeyFromId(userGroup.StartContentId, UmbracoObjectTypes.Document);
+        Guid? mediaStartNodeKey = GetKeyFromId(userGroup.StartMediaId, UmbracoObjectTypes.Media);
+        Attempt<IEnumerable<string>, UserGroupOperationStatus> languageIsoCodesMappingAttempt = await MapLanguageIdsToIsoCodeAsync(userGroup.AllowedLanguages);
+
+        // We've gotten this data from the database, so the mapping should not fail
+        if (languageIsoCodesMappingAttempt.Success is false)
+        {
+            throw new InvalidOperationException($"Unknown language ID in User Group: {userGroup.Name}");
+        }
+
+        return new UserGroupResponseModel
+        {
+            Name = userGroup.Name ?? string.Empty,
+            Id = userGroup.Key,
+            DocumentStartNodeId = contentStartNodeKey,
+            MediaStartNodeId = mediaStartNodeKey,
+            Icon = userGroup.Icon,
+            Languages = languageIsoCodesMappingAttempt.Result,
+            HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
+            Permissions = userGroup.PermissionNames,
+            Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
+        };
+    }
 
     /// <inheritdoc />
     public async Task<IEnumerable<UserGroupResponseModel>> CreateMultipleAsync(IEnumerable<IUserGroup> userGroups)
     {
         var userGroupViewModels = new List<UserGroupResponseModel>();
         foreach (IUserGroup userGroup in userGroups)
+        {
+            userGroupViewModels.Add(await CreateAsync(userGroup));
+        }
+
+        return userGroupViewModels;
+    }
+    /// <inheritdoc />
+    public async Task<IEnumerable<UserGroupResponseModel>> CreateMultipleAsync(IEnumerable<IReadOnlyUserGroup> userGroups)
+    {
+        var userGroupViewModels = new List<UserGroupResponseModel>();
+        foreach (IReadOnlyUserGroup userGroup in userGroups)
         {
             userGroupViewModels.Add(await CreateAsync(userGroup));
         }
@@ -180,6 +218,10 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
             target.StartContentId = contentId;
         }
+        else
+        {
+            target.StartContentId = null;
+        }
 
         if (source.MediaStartNodeId is not null)
         {
@@ -191,6 +233,10 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             }
 
             target.StartMediaId = mediaId;
+        }
+        else
+        {
+            target.StartMediaId = null;
         }
 
         return Attempt.Succeed(UserGroupOperationStatus.Success);

@@ -1,4 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.User;
+using Umbraco.Cms.Api.Management.ViewModels.User.Current;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -10,21 +12,25 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public class UserPresentationFactory : IUserPresentationFactory
 {
+
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
     private readonly MediaFileManager _mediaFileManager;
     private readonly IImageUrlGenerator _imageUrlGenerator;
+    private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
 
     public UserPresentationFactory(
         IEntityService entityService,
         AppCaches appCaches,
         MediaFileManager mediaFileManager,
-        IImageUrlGenerator imageUrlGenerator)
+        IImageUrlGenerator imageUrlGenerator,
+        IUserGroupPresentationFactory userGroupPresentationFactory)
     {
         _entityService = entityService;
         _appCaches = appCaches;
         _mediaFileManager = mediaFileManager;
         _imageUrlGenerator = imageUrlGenerator;
+        _userGroupPresentationFactory = userGroupPresentationFactory;
     }
 
     public UserResponseModel CreateResponseModel(IUser user)
@@ -97,7 +103,34 @@ public class UserPresentationFactory : IUserPresentationFactory
         return model;
     }
 
-    private SortedSet<Guid> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)
+    public async Task<CurrentUserResponseModel> CreateCurrentUserResponseModelAsync(IUser user)
+    {
+        var presentationUser = CreateResponseModel(user);
+        var presentationGroups = await _userGroupPresentationFactory.CreateMultipleAsync(user.Groups);
+        var languages = presentationGroups.SelectMany(x => x.Languages).Distinct().ToArray();
+        var mediaStartNodeKeys = GetKeysFromIds(user.CalculateMediaStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Media);
+        var documentStartNodeKeys = GetKeysFromIds(user.CalculateContentStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Document);
+
+        var permissions = presentationGroups.SelectMany(x => x.Permissions).Distinct().ToHashSet();
+        var hasAccessToAllLanguages = presentationGroups.Any(x => x.HasAccessToAllLanguages);
+
+        return await Task.FromResult(new CurrentUserResponseModel()
+        {
+            Id = presentationUser.Id,
+            Email = presentationUser.Email,
+            Name = presentationUser.Name,
+            UserName = presentationUser.UserName,
+            Languages = languages,
+            AvatarUrls = presentationUser.AvatarUrls,
+            LanguageIsoCode = presentationUser.LanguageIsoCode,
+            MediaStartNodeIds = mediaStartNodeKeys,
+            ContentStartNodeIds = documentStartNodeKeys,
+            Permissions = permissions,
+            HasAccessToAllLanguages = hasAccessToAllLanguages
+        });
+    }
+
+    private ISet<Guid> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)
     {
         IEnumerable<Guid>? keys = ids?
             .Select(x => _entityService.GetKey(x, type))
@@ -105,7 +138,9 @@ public class UserPresentationFactory : IUserPresentationFactory
             .Select(x => x.Result);
 
         return keys is null
-            ? new SortedSet<Guid>()
-            : new SortedSet<Guid>(keys);
+            ? new HashSet<Guid>()
+            : new HashSet<Guid>(keys);
     }
+
+
 }

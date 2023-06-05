@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
@@ -13,6 +14,7 @@ public class StatusServerController : ServerControllerBase
 
     public StatusServerController(IRuntimeState runtimeState) => _runtimeState = runtimeState;
 
+    [AllowAnonymous]
     [HttpGet("status")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
