@@ -19,7 +19,7 @@ import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/back
 /**
  * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.
  */
-export type UmbModalHandler<ModalData extends object = object, ModalResult = any> = Omit<
+export type UmbModalContext<ModalData extends object = object, ModalResult = any> = Omit<
 	UmbModalContextClass<ModalData, ModalResult>,
 	'submit'
 > &
@@ -110,7 +110,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 		new UmbContextProviderController(
 			host,
 			UMB_MODAL_CONTEXT_TOKEN,
-			this as unknown as UmbModalHandler<ModalData, ModalResult>
+			this as unknown as UmbModalContext<ModalData, ModalResult>
 		);
 	}
 
@@ -201,4 +201,4 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	}
 }
 
-export const UMB_MODAL_CONTEXT_TOKEN = new UmbContextToken<UmbModalHandler>('UmbModalContext');
+export const UMB_MODAL_CONTEXT_TOKEN = new UmbContextToken<UmbModalContext>('UmbModalContext');

@@ -14,7 +14,7 @@ import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/
 import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UmbModalManagerContext,
-	UmbModalHandler,
+	UmbModalContext,
 	UmbModalToken,
 } from '@umbraco-cms/backoffice/modal';
 
@@ -134,7 +134,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		this.#logViewerContext?.setFilterExpression('');
 	}
 
-	#modalHandler?: UmbModalHandler;
+	#modalHandler?: UmbModalContext;
 
 	#saveSearch(savedSearch: SavedLogSearchResponseModel) {
 		this.#logViewerContext?.saveSearch(savedSearch);

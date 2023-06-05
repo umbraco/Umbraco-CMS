@@ -5,7 +5,7 @@ import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalResult,
-	UmbModalHandler,
+	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -76,7 +76,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 	}
 
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalResult>;
+	modalHandler?: UmbModalContext<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalResult>;
 
 	private _submit() {
 		this.modalHandler?.submit({ selection: this._selection });

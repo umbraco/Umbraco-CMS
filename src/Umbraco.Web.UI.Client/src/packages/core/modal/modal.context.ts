@@ -1,4 +1,4 @@
-import { UmbModalHandler, UmbModalContextClass } from './modal-handler.js';
+import { UmbModalContext, UmbModalContextClass } from './modal-handler.js';
 import type { UmbModalToken } from './token/modal-token.js';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
@@ -18,7 +18,7 @@ export interface UmbModalConfig {
 export class UmbModalManagerContext {
 	host: UmbControllerHostElement;
 	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
-	#modals = new BehaviorSubject(<Array<UmbModalHandler>>[]);
+	#modals = new BehaviorSubject(<Array<UmbModalContext>>[]);
 	public readonly modals = this.#modals.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
@@ -45,7 +45,7 @@ export class UmbModalManagerContext {
 			modalAlias,
 			data,
 			config
-		) as unknown as UmbModalHandler<ModalData, ModalResult>;
+		) as unknown as UmbModalContext<ModalData, ModalResult>;
 
 		modalHandler.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 
@@ -76,10 +76,10 @@ export class UmbModalManagerContext {
 	/**
 	 * Handles the close-end event
 	 * @private
-	 * @param {UmbModalHandler} modalHandler
+	 * @param {UmbModalContext} modalHandler
 	 * @memberof UmbModalContext
 	 */
-	#onCloseEnd(modalHandler: UmbModalHandler<any, any>) {
+	#onCloseEnd(modalHandler: UmbModalContext<any, any>) {
 		modalHandler.modalElement.removeEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 		this.#remove(modalHandler.key);
 	}

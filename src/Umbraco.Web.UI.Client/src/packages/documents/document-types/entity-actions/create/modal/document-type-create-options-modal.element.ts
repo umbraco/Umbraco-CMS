@@ -4,7 +4,7 @@ import { html, customElement, property } from '@umbraco-cms/backoffice/external/
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbModalManagerContext,
-	UmbModalHandler,
+	UmbModalContext,
 	UMB_FOLDER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
@@ -13,7 +13,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-document-type-create-options-modal')
 export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbDocumentTypeCreateOptionsModalData>;
+	modalHandler?: UmbModalContext<UmbDocumentTypeCreateOptionsModalData>;
 
 	@property({ type: Object })
 	data?: UmbDocumentTypeCreateOptionsModalData;

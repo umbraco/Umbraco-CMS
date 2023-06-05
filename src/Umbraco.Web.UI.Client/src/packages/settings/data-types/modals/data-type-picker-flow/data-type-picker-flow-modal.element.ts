@@ -8,7 +8,7 @@ import {
 	UMB_WORKSPACE_MODAL,
 	UmbDataTypePickerFlowModalData,
 	UmbDataTypePickerFlowModalResult,
-	UmbModalHandler,
+	UmbModalContext,
 	UmbModalRouteBuilder,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
@@ -22,7 +22,7 @@ interface GroupedItems<T> {
 @customElement('umb-data-type-picker-flow-modal')
 export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbDataTypePickerFlowModalData, UmbDataTypePickerFlowModalResult>;
+	modalHandler?: UmbModalContext<UmbDataTypePickerFlowModalData, UmbDataTypePickerFlowModalResult>;
 
 	@property({ type: Object })
 	public get data(): UmbDataTypePickerFlowModalData | undefined {

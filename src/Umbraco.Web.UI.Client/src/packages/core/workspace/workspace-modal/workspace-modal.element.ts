@@ -1,12 +1,12 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, CSSResultGroup, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalHandler, UmbWorkspaceData, UmbWorkspaceResult } from '@umbraco-cms/backoffice/modal';
+import { UmbModalContext, UmbWorkspaceData, UmbWorkspaceResult } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-workspace-modal')
 export class UmbWorkspaceModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler;
+	modalHandler?: UmbModalContext;
 
 	@property()
 	data?: UmbWorkspaceData;

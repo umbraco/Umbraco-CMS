@@ -5,7 +5,7 @@ import {
 	OEmbedStatus,
 	UmbEmbeddedMediaModalData,
 	UmbEmbeddedMediaModalResult,
-	UmbModalHandler,
+	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -27,7 +27,7 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 	#embedResult!: OEmbedResult;
 
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>;
+	modalHandler?: UmbModalContext<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>;
 
 	@property({ type: Object })
 	data?: UmbEmbeddedMediaModalData;

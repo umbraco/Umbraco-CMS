@@ -2,7 +2,7 @@ import { UmbDataTypeRepository } from '../../repository/data-type.repository.js'
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
-	UmbModalHandler,
+	UmbModalContext,
 	UmbDataTypePickerFlowDataTypePickerModalData,
 	UmbDataTypePickerFlowDataTypePickerModalResult,
 } from '@umbraco-cms/backoffice/modal';
@@ -72,7 +72,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 	}
 
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<
+	modalHandler?: UmbModalContext<
 		UmbDataTypePickerFlowDataTypePickerModalData,
 		UmbDataTypePickerFlowDataTypePickerModalResult
 	>;

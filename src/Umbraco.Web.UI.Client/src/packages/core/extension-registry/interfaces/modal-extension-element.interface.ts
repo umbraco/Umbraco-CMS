@@ -1,5 +1,5 @@
 import type { ManifestModal } from '../models/index.js';
-import type { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbModalExtensionElement<
 	UmbModalData extends object = object,
@@ -8,7 +8,7 @@ export interface UmbModalExtensionElement<
 > extends HTMLElement {
 	manifest?: ModalManifestType;
 
-	modalHandler?: UmbModalHandler<UmbModalData, UmbModalResult>;
+	modalHandler?: UmbModalContext<UmbModalData, UmbModalResult>;
 
 	data?: UmbModalData;
 }

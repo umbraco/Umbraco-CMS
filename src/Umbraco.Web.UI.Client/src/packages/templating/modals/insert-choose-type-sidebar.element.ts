@@ -7,7 +7,7 @@ import {
 	UmbModalManagerContext,
 	UmbModalToken,
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
-	UmbModalHandler,
+	UmbModalContext,
 	UMB_DICTIONARY_ITEM_PICKER_MODAL,
 	UmbDictionaryItemPickerModalResult,
 } from '@umbraco-cms/backoffice/modal';
@@ -53,7 +53,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		});
 	}
 
-	#openModal?: UmbModalHandler;
+	#openModal?: UmbModalContext;
 
 	#openInsertValueSidebar() {
 		this.#openModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL);

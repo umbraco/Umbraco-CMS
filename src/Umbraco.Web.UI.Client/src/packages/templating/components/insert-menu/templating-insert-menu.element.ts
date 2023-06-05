@@ -14,7 +14,7 @@ import {
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
 	UmbDictionaryItemPickerModalResult,
 	UmbModalManagerContext,
-	UmbModalHandler,
+	UmbModalContext,
 	UmbModalToken,
 	UmbPartialViewPickerModalResult,
 } from '@umbraco-cms/backoffice/modal';
@@ -35,7 +35,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 	private _modalContext?: UmbModalManagerContext;
 
-	#openModal?: UmbModalHandler;
+	#openModal?: UmbModalContext;
 
 	#dictionaryRepository = new UmbDictionaryRepository(this);
 

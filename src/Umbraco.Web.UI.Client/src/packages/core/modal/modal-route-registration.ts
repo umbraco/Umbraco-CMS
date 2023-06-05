@@ -1,4 +1,4 @@
-import { UmbModalHandler } from './modal-handler.js';
+import { UmbModalContext } from './modal-handler.js';
 import { UmbModalConfig, UmbModalManagerContext } from './modal.context.js';
 import { UmbModalToken } from './token/modal-token.js';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
@@ -18,7 +18,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	#onSubmitCallback?: (data: UmbModalTokenResult) => void;
 	#onRejectCallback?: () => void;
 
-	#modalHandler: UmbModalHandler<UmbModalTokenData, UmbModalTokenResult> | undefined;
+	#modalHandler: UmbModalContext<UmbModalTokenData, UmbModalTokenResult> | undefined;
 	#routeBuilder?: UmbModalRouteBuilder;
 	#urlBuilderCallback: ((urlBuilder: UmbModalRouteBuilder) => void) | undefined;
 
