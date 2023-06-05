@@ -1,5 +1,4 @@
-﻿using Asp.Versioning;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
@@ -95,6 +94,14 @@ public abstract class UserControllerBase : ManagementApiControllerBase
             UserOperationStatus.InvalidIsoCode => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid ISO code")
                 .WithDetail("The specified ISO code is invalid.")
+                .Build()),
+            UserOperationStatus.MediaNodeNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("Media node not found")
+                .WithDetail("The specified media node was not found.")
+                .Build()),
+            UserOperationStatus.ContentNodeNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("Content node not found")
+                .WithDetail("The specified content node was not found.")
                 .Build()),
             UserOperationStatus.Forbidden => Forbid(),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user operation status."),

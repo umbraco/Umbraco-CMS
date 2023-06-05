@@ -25,5 +25,7 @@ public enum UserOperationStatus
     InvalidIsoCode,
     ContentStartNodeNotFound,
     MediaStartNodeNotFound,
+    ContentNodeNotFound,
+    MediaNodeNotFound,
     UnknownFailure,
 }
