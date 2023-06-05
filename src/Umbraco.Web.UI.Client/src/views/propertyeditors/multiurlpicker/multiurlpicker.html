@@ -33,7 +33,7 @@
             <span ng-if="model.config.minNumber && model.config.maxNumber && model.config.minNumber !== model.config.maxNumber">
                 <span ng-if="renderModel.length < model.config.maxNumber">Add between {{model.config.minNumber}} and {{model.config.maxNumber}} items</span>
                 <span ng-if="renderModel.length > model.config.maxNumber">
-                    <localize key="validation_maxCount">You can only have</localize> {{model.config.maxNumber}} <localize key="validation_itemsSelected"> items selected</localize>
+                    <localize key="validation_maxCount">You can only have</localize> {{model.config.maxNumber}} <localize key="validation_itemsSelected"> item(s) selected</localize>
                 </span>
             </span>
 

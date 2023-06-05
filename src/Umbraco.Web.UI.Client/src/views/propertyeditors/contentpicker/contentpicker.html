@@ -34,9 +34,9 @@
 
             <!-- Both min and max items -->
             <span ng-if="minNumberOfItems && maxNumberOfItems && minNumberOfItems !== maxNumberOfItems">
-                <span ng-if="renderModel.length < maxNumberOfItems">Add between {{minNumberOfItems}} and {{maxNumberOfItems}} items</span>
+                <span ng-if="renderModel.length < maxNumberOfItems">Add between {{minNumberOfItems}} and {{maxNumberOfItems}} item(s)</span>
                 <span ng-if="renderModel.length > maxNumberOfItems">
-                    <localize key="validation_maxCount">You can only have</localize> {{maxNumberOfItems}} <localize key="validation_itemsSelected"> items selected</localize>
+                    <localize key="validation_maxCount">You can only have</localize> {{maxNumberOfItems}} <localize key="validation_itemsSelected"> item(s) selected</localize>
                 </span>
             </span>
 
@@ -44,7 +44,7 @@
             <span ng-if="minNumberOfItems && maxNumberOfItems && minNumberOfItems === maxNumberOfItems">
                 <span ng-if="renderModel.length < maxNumberOfItems">Add {{minNumberOfItems - renderModel.length}} item(s)</span>
                 <span ng-if="renderModel.length > maxNumberOfItems">
-                    <localize key="validation_maxCount">You can only have</localize> {{maxNumberOfItems}} <localize key="validation_itemsSelected"> items selected</localize>
+                    <localize key="validation_maxCount">You can only have</localize> {{maxNumberOfItems}} <localize key="validation_itemsSelected"> item(s) selected</localize>
                 </span>
             </span>
 
@@ -52,7 +52,7 @@
             <span ng-if="!minNumberOfItems && maxNumberOfItems">
                 <span ng-if="renderModel.length < maxNumberOfItems">Add up to {{maxNumberOfItems}} items</span>
                 <span ng-if="renderModel.length > maxNumberOfItems">
-                    <localize key="validation_maxCount">You can only have</localize> {{maxNumberOfItems}} <localize key="validation_itemsSelected">items selected</localize>
+                    <localize key="validation_maxCount">You can only have</localize> {{maxNumberOfItems}} <localize key="validation_itemsSelected">item(s) selected</localize>
                 </span>
             </span>
 
@@ -71,12 +71,12 @@
 
         <div ng-messages="contentPickerForm.minCount.$error" show-validation-on-submit>
             <div class="help-inline" ng-message="minCount">
-                <localize key="validation_minCount">You need to add at least</localize> {{minNumberOfItems}} <localize key="validation_items">items</localize>
+                <localize key="validation_minCount">You need to add at least</localize> {{minNumberOfItems}} <localize key="validation_items">item(s)</localize>
             </div>
         </div>
         <div ng-messages="contentPickerForm.maxCount.$error" show-validation-on-submit>
             <div class="help-inline" ng-message="maxCount">
-                <localize key="validation_maxCount">You can only have</localize> {{maxNumberOfItems}} <localize key="validation_itemsSelected">items selected</localize>
+                <localize key="validation_maxCount">You can only have</localize> {{maxNumberOfItems}} <localize key="validation_itemsSelected">item(s) selected</localize>
             </div>
         </div>
 
