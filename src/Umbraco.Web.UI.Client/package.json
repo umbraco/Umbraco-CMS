@@ -11,6 +11,8 @@
 		"./element-api": "./dist-cms/libs/element-api/index.js",
 		"./extension-api": "./dist-cms/libs/extension-api/index.js",
 		"./observable-api": "./dist-cms/libs/observable-api/index.js",
+		"./auth": "./dist-cms/shared/auth/index.js",
+		"./context": "./dist-cms/shared/context/index.js",
 		"./events": "./dist-cms/shared/umb-events/index.js",
 		"./models": "./dist-cms/shared/models/index.js",
 		"./repository": "./dist-cms/shared/repository/index.js",
