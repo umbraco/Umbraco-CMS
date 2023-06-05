@@ -11,15 +11,16 @@ import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { ManifestModal, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.
  */
 export type UmbModalHandler<ModalData extends object = object, ModalResult = any> = Omit<
-	UmbModalHandlerClass<ModalData, ModalResult>,
+	UmbModalContextClass<ModalData, ModalResult>,
 	'submit'
 > &
 	OptionalSubmitArgumentIfUndefined<ModalResult>;
@@ -40,8 +41,9 @@ type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
 	  };
 
 // TODO: consider splitting this into two separate handlers
-// TODO: Rename to become a controller.
-export class UmbModalHandlerClass<ModalData extends object = object, ModalResult = unknown> extends UmbController {
+export class UmbModalContextClass<ModalData extends object = object, ModalResult = unknown> {
+	#host: UmbControllerHostElement;
+
 	private _submitPromise: Promise<ModalResult>;
 	private _submitResolver?: (value: ModalResult) => void;
 	private _submitRejecter?: () => void;
@@ -56,8 +58,6 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 	public type: UmbModalType = 'dialog';
 	public size: UUIModalSidebarSize = 'small';
 
-	private modalAlias: string; //TEMP... TODO: Remove this.
-
 	constructor(
 		host: UmbControllerHostElement,
 		router: IRouterSlot | null,
@@ -65,9 +65,8 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		data?: ModalData,
 		config?: UmbModalConfig
 	) {
-		super(host);
+		this.#host = host;
 		this.key = config?.key || UmbId.new();
-		this.modalAlias = modalAlias.toString();
 
 		if (modalAlias instanceof UmbModalToken) {
 			this.type = modalAlias.getDefaultConfig()?.type || this.type;
@@ -107,13 +106,12 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		}
 		this.modalElement.appendChild(this.#modalRouterElement);
 		this.#observeModal(modalAlias.toString(), combinedData);
-	}
 
-	public hostConnected() {
-		// Not much to do now..?
-	}
-	public hostDisconnected() {
-		// Not much to do now..?
+		new UmbContextProviderController(
+			host,
+			UMB_MODAL_CONTEXT_TOKEN,
+			this as unknown as UmbModalHandler<ModalData, ModalResult>
+		);
 	}
 
 	#createContainerElement() {
@@ -166,9 +164,9 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 	 Now when the element is an observable it makes it more complex because this host needs to subscribe to updates to the element, instead of just having a reference to it.
 	 If we find a better generic solution to communicate between the modal and the implementor, then we can remove the element as part of the modalHandler. */
 	#observeModal(modalAlias: string, data?: ModalData) {
-		if (this.host) {
+		if (this.#host) {
 			new UmbObserverController(
-				this.host,
+				this.#host,
 				umbExtensionsRegistry.getByTypeAndAlias('modal', modalAlias),
 				async (manifest) => {
 					this.#removeInnerElement();
@@ -178,7 +176,8 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 							this.#appendInnerElement(innerElement);
 						}
 					}
-				}
+				},
+				'_observeModalExtension'
 			);
 		}
 	}
@@ -201,3 +200,5 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		// TODO: Make sure to clean up..
 	}
 }
+
+export const UMB_MODAL_CONTEXT_TOKEN = new UmbContextToken<UmbModalHandler>('UmbModalContext');
