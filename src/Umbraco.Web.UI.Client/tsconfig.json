@@ -65,13 +65,24 @@
 			"@umbraco-cms/backoffice/workspace": ["src/packages/core/workspace"],
 			"@umbraco-cms/backoffice/property-editor": ["src/packages/core/property-editor"],
 
-			// DOCUMENT MANAGEMENT
-			// Document
-			"@umbraco-cms/backoffice/document": ["src/packages/documents/documents"],
+			"@umbraco-cms/backoffice/document": ["./src/packages/documents/documents/index.ts"],
+			"@umbraco-cms/backoffice/document-blueprint": ["./src/packages/documents/document-blueprints/index.ts"],
+			"@umbraco-cms/backoffice/document-type": ["./src/packages/documents/document-types/index.ts"],
+			"@umbraco-cms/backoffice/media/media": ["./src/packages/media/media/index.ts"],
+			"@umbraco-cms/backoffice/media/media-type": ["./src/packages/media/media-types/index.ts"],
+			"@umbraco-cms/backoffice/member": ["./src/packages/members/members/index.ts"],
+			"@umbraco-cms/backoffice/member-group": ["./src/packages/members/member-groups/index.ts"],
+			"@umbraco-cms/backoffice/member-type": ["./src/packages/members/member-types/index.ts"],
+			"@umbraco-cms/backoffice/package": ["./src/packages/packages/package/index.ts"],
 
-			// SETTINGS
-			"@umbraco-cms/backoffice/data-type": ["src/packages/settings/data-types"],
-			"@umbraco-cms/backoffice/themes": ["src/packages/settings/themes"],
+			"@umbraco-cms/backoffice/data-type": ["./src/packages/settings/data-types/index.ts"],
+			"@umbraco-cms/backoffice/language": ["./src/packages/settings/languages/index.ts"],
+			"@umbraco-cms/backoffice/relation-type": ["./src/packages/settings/relation-types/index.ts"],
+			"@umbraco-cms/backoffice/themes": ["./src/packages/settings/themes/index.ts"],
+			"@umbraco-cms/backoffice/tags": ["./src/packages/tags/index.ts"],
+			"@umbraco-cms/backoffice/partial-view": ["./src/packages/templating/partial-views/index.ts"],
+			"@umbraco-cms/backoffice/stylesheet": ["./src/packages/templating/stylesheets/index.ts"],
+			"@umbraco-cms/backoffice/template": ["./src/packages/templating/templates/index.ts"],
 
 			// USERS
 			"@umbraco-cms/backoffice/user-group": ["src/packages/users/user-groups"],
