@@ -33,7 +33,7 @@ import {
 
 const requestor = new FetchRequestor();
 
-const TOKEN_RESPONSE_NAME = 'umb:tokenResponse';
+const TOKEN_RESPONSE_NAME = 'umb:userAuthTokenResponse';
 
 /**
  * This class is needed to prevent the hash from being parsed as part of the query string.
