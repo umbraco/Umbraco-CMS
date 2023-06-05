@@ -58,22 +58,20 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 
 		this.observe(this._installerContext.settings, (settings) => {
 
-			this._databases = settings?.databases ?? [];
+			const databases = settings?.databases?.length ? [...settings.databases] : [];
 
 			// Sort the databases array if not empty and by sortOrder if it exists
-			if (this._databases.length > 0) {
-				const databasesCopy = [...this._databases];
-				databasesCopy.sort((a, b) => {
-				  if (a.sortOrder === undefined) {
+			databases.sort((a, b) => {
+				if (a.sortOrder === undefined) {
 					return -1;
-				  }
-				  if (b.sortOrder === undefined) {
+				}
+				if (b.sortOrder === undefined) {
 					return 1;
-				  }
-				  return a.sortOrder - b.sortOrder;
-				});
-				this._databases = databasesCopy;
-			}
+				}
+				return a.sortOrder - b.sortOrder;
+			});
+
+			this._databases = databases;
 
 			// If there is an isConfigured database in the databases array then we can skip the database selection step
 			// and just use that.

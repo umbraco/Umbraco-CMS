@@ -1,6 +1,8 @@
 import esbuild from 'rollup-plugin-esbuild';
 import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+import css from 'rollup-plugin-import-css';
+import webWorkerLoader from 'rollup-plugin-web-worker-loader';
 import { readdirSync, lstatSync, rmSync, cpSync, copyFileSync } from 'fs';
 
 /* TODO Temp solution. I can't find a way for rollup to overwrite the external folder that is already created
@@ -45,18 +47,21 @@ const exclude = [];
 const allowed = externals.filter((module) => !exclude.includes(module.name));
 
 // TODO: Minify code
-export default allowed
+const libraries = allowed
 	.map((module) => {
-		/** @type {import('rollup').RollupOptions[]} */
-		return [
-			{
-				input: `./src/external/${module.name}/index.ts`,
-				output: {
-					dir: `./dist-cms/external/${module.name}`,
-					format: 'es',
-				},
-				plugins: [nodeResolve(), commonjs(), esbuild()],
+		/** @type {import('rollup').RollupOptions} */
+		return {
+			input: `./src/external/${module.name}/index.ts`,
+			output: {
+				dir: `./dist-cms/external/${module.name}`,
+				format: 'es',
 			},
-		];
-	})
-	.flat();
+			plugins: [nodeResolve(), webWorkerLoader({ target: 'browser', pattern: /^(.+)\?worker$/ }), commonjs(), css(), esbuild({ minify: true, sourceMap: true })],
+		}
+	});
+
+/** @type {import('rollup').RollupOptions[]} */
+export default [
+	...libraries,
+]
+
