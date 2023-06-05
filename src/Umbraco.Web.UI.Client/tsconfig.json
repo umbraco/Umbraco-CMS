@@ -20,7 +20,6 @@
 		"paths": {
 			"@umbraco-cms/backoffice/external/lit": ["src/external/lit"],
 			"@umbraco-cms/backoffice/external/openid": ["src/external/openid"],
-			"@umbraco-cms/backoffice/backend-api": ["src/external/backend-api"],
 			"@umbraco-cms/backoffice/external/rxjs": ["src/external/rxjs"],
 			"@umbraco-cms/backoffice/external/router-slot": ["src/external/router-slot"],
 			"@umbraco-cms/backoffice/external/uuid": ["src/external/uuid"],
@@ -28,6 +27,7 @@
 			"@umbraco-cms/backoffice/external/uui": ["src/external/uui"],
 			"@umbraco-cms/backoffice/external/monaco-editor": ["src/external/monaco-editor"],
 
+			"@umbraco-cms/backoffice/backend-api": ["src/external/backend-api"],
 			"@umbraco-cms/backoffice/context-api": ["src/libs/context-api"],
 			"@umbraco-cms/backoffice/controller-api": ["src/libs/controller-api"],
 			"@umbraco-cms/backoffice/element-api": ["src/libs/element-api"],
@@ -36,12 +36,12 @@
 
 			// SHARED
 			"@umbraco-cms/backoffice/events": ["src/shared/umb-events"],
+			"@umbraco-cms/backoffice/icon": ["src/shared/icon-registry"],
 			"@umbraco-cms/backoffice/models": ["src/shared/models"],
 			"@umbraco-cms/backoffice/repository": ["src/shared/repository"],
 			"@umbraco-cms/backoffice/resources": ["src/shared/resources"],
 			"@umbraco-cms/backoffice/router": ["src/shared/router"],
 			"@umbraco-cms/backoffice/utils": ["src/shared/utils"],
-			"@umbraco-cms/backoffice/icon": ["src/shared/icon-registry"],
 
 			// CORE
 			"@umbraco-cms/backoffice/action": ["src/packages/core/action"],

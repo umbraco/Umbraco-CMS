@@ -32,7 +32,6 @@ export default {
 					imports: {
 						'src/': './src/',
 
-						'@umbraco-cms/backoffice/backend-api': './src/external/backend-api/index.ts',
 						'@umbraco-cms/backoffice/external/uui': './src/external/uui/index.ts',
 						'@umbraco-cms/backoffice/external/lit': './src/external/lit/index.ts',
 						'@umbraco-cms/backoffice/external/openid': './src/external/openid/index.ts',
@@ -42,6 +41,7 @@ export default {
 						'@umbraco-cms/backoffice/external/lodash': './src/external/lodash/index.ts',
 						'@umbraco-cms/backoffice/external/monaco-editor': './src/external/monaco-editor/index.ts',
 
+						'@umbraco-cms/backoffice/backend-api': './src/external/backend-api/index.ts',
 						'@umbraco-cms/backoffice/context-api': './src/libs/context-api/index.ts',
 						'@umbraco-cms/backoffice/controller-api': './src/libs/controller-api/index.ts',
 						'@umbraco-cms/backoffice/element-api': './src/libs/element-api/index.ts',
@@ -49,12 +49,12 @@ export default {
 						'@umbraco-cms/backoffice/observable-api': './src/libs/observable-api/index.ts',
 
 						'@umbraco-cms/backoffice/events': './src/shared/umb-events/index.ts',
+						'@umbraco-cms/backoffice/icon': './src/shared/icon-registry/index.ts',
 						'@umbraco-cms/backoffice/models': './src/shared/models/index.ts',
 						'@umbraco-cms/backoffice/repository': './src/shared/repository/index.ts',
 						'@umbraco-cms/backoffice/resources': './src/shared/resources/index.ts',
 						'@umbraco-cms/backoffice/router': './src/shared/router/index.ts',
 						'@umbraco-cms/backoffice/utils': './src/shared/utils/index.ts',
-						'@umbraco-cms/backoffice/icon': './src/shared/icon-registry/index.ts',
 
 						'@umbraco-cms/internal/lit-element': './src/shared/lit-element/index.ts',
 						'@umbraco-cms/internal/modal': './src/shared/modal/index.ts',
