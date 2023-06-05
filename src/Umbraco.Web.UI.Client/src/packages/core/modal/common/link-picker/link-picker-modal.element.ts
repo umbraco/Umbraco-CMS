@@ -1,6 +1,6 @@
 import { UmbTreeElement } from '../../../tree/tree.element.js';
 import { css, html, nothing, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles , UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUITextStyles, UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbLinkPickerConfig,
 	UmbLinkPickerLink,
@@ -89,7 +89,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 	render() {
 		return html`
-			<umb-workspace-editor headline="Select Link">
+			<umb-body-layout headline="Select Link">
 				<uui-box>
 					<div class="url-link">${this._renderLinkUrlInput()} ${this._renderAnchorInput()}</div>
 
@@ -119,7 +119,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-workspace-editor>
+			</umb-body-layout>
 		`;
 	}
 

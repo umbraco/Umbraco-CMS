@@ -1,4 +1,9 @@
-import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import {
+	UUIBooleanInputEvent,
+	UUIInputEvent,
+	UUISelectEvent,
+	UUITextStyles,
+} from '@umbraco-cms/backoffice/external/uui';
 import { PropertyValueMap, css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbPropertySettingsModalResult, UmbPropertySettingsModalData } from '@umbraco-cms/backoffice/modal';
@@ -64,10 +69,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		requestAnimationFrame(() => {
 			(this.shadowRoot!.querySelector('#nameInput') as HTMLElement).focus();
 		});
-	}
-
-	#onClose() {
-		this.modalHandler?.reject();
 	}
 
 	#onSubmit(event: SubmitEvent) {
@@ -175,11 +176,14 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		this.requestUpdate('_returnData');
 	}
 
+	// TODO: This would conceptually be a Property Editor Workspace, should be changed at one point in the future.
+	// For now this is hacky made available by giving the element an fixed alias.
+	// This would allow for workspace views and workspace actions.
 	render() {
 		return html`
 			<uui-form>
 				<form @submit="${this.#onSubmit}">
-					<umb-workspace-editor headline="Property settings">
+					<umb-workspace-editor alias="Umb.Workspace.PropertyEditor" headline="Property settings">
 						<div id="content">
 							<uui-box>
 								<div class="container">
@@ -225,7 +229,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 							</uui-box>
 						</div>
 						<div slot="actions">
-							<uui-button label="Close" @click=${this.#onClose}></uui-button>
 							<uui-button label="Submit" look="primary" color="positive" type="submit"></uui-button>
 						</div>
 					</umb-workspace-editor>
