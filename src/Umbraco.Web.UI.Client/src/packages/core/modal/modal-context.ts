@@ -55,6 +55,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	public readonly innerElement = this.#innerElement.asObservable();
 
 	public readonly key: string;
+	public readonly data: ModalData;
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
 
@@ -77,7 +78,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 		this.size = config?.size || this.size;
 
 		const defaultData = modalAlias instanceof UmbModalToken ? modalAlias.getDefaultData() : undefined;
-		const combinedData = { ...defaultData, ...data } as ModalData;
+		this.data = Object.freeze({ ...defaultData, ...data } as ModalData);
 
 		// TODO: Consider if its right to use Promises, or use another event based system? Would we need to be able to cancel an event, to then prevent the closing..?
 		this.#submitPromise = new Promise((resolve, reject) => {
@@ -105,7 +106,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 			this.#modalRouterElement.parent = router;
 		}
 		this.modalElement.appendChild(this.#modalRouterElement);
-		this.#observeModal(modalAlias.toString(), combinedData);
+		this.#observeModal(modalAlias.toString());
 
 		// Note, We are doing the Typing dance here because of the way we are correcting the submit method attribute type.
 		new UmbContextProviderController(
@@ -132,39 +133,11 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 		return modalDialogElement;
 	}
 
-	async #createInnerElement(manifest: ManifestModal, data?: ModalData) {
-		// TODO: add inner fallback element if no extension element is found
-		const innerElement = (await createExtensionElement(manifest)) as any;
-
-		if (innerElement) {
-			innerElement.data = data;
-			//innerElement.observable = this.#dataObservable;
-			innerElement.modalHandler = this;
-			innerElement.manifest = manifest;
-		}
-
-		return innerElement;
-	}
-
-	// note, this methods is private  argument is not defined correctly here, but requires to be fix by appending the OptionalSubmitArgumentIfUndefined type when newing up this class.
-	private submit(result?: ModalResult) {
-		this.#submitResolver?.(result as ModalResult);
-		this.modalElement.close();
-	}
-
-	public reject() {
-		this.modalElement.close();
-	}
-
-	public onSubmit(): Promise<ModalResult> {
-		return this.#submitPromise;
-	}
-
 	/* TODO: modals being part of the extension registry now means that a modal element can change over time.
 	 It makes this code a bit more complex. The main idea is to have the element as part of the modalHandler so it is possible to dispatch events from within the modal element to the one that opened it.
 	 Now when the element is an observable it makes it more complex because this host needs to subscribe to updates to the element, instead of just having a reference to it.
 	 If we find a better generic solution to communicate between the modal and the implementor, then we can remove the element as part of the modalHandler. */
-	#observeModal(modalAlias: string, data?: ModalData) {
+	#observeModal(modalAlias: string) {
 		if (this.#host) {
 			new UmbObserverController(
 				this.#host,
@@ -172,7 +145,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 				async (manifest) => {
 					this.#removeInnerElement();
 					if (manifest) {
-						const innerElement = await this.#createInnerElement(manifest, data);
+						const innerElement = await this.#createInnerElement(manifest);
 						if (innerElement) {
 							this.#appendInnerElement(innerElement);
 						}
@@ -181,6 +154,20 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 				'_observeModalExtension'
 			);
 		}
+	}
+
+	async #createInnerElement(manifest: ManifestModal) {
+		// TODO: add inner fallback element if no extension element is found
+		const innerElement = (await createExtensionElement(manifest)) as any;
+
+		if (innerElement) {
+			innerElement.data = this.data;
+			//innerElement.observable = this.#dataObservable;
+			innerElement.modalHandler = this;
+			innerElement.manifest = manifest;
+		}
+
+		return innerElement;
 	}
 
 	#appendInnerElement(element: HTMLElement) {
@@ -194,6 +181,35 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 			this.#modalRouterElement.removeChild(innerElement);
 			this.#innerElement.next(undefined);
 		}
+	}
+
+	// note, this methods is private  argument is not defined correctly here, but requires to be fix by appending the OptionalSubmitArgumentIfUndefined type when newing up this class.
+	/**
+	 * Submits this modal, returning with a result to the initiator of the modal.
+	 * @public
+	 * @memberof UmbModalContext
+	 */
+	private submit(result?: ModalResult) {
+		this.#submitResolver?.(result as ModalResult);
+		this.modalElement.close();
+	}
+
+	/**
+	 * Closes this modal
+	 * @public
+	 * @memberof UmbModalContext
+	 */
+	public reject() {
+		this.modalElement.close();
+	}
+
+	/**
+	 * Gives a Promise which will be resolved when this modal is submitted.
+	 * @public
+	 * @memberof UmbModalContext
+	 */
+	public onSubmit(): Promise<ModalResult> {
+		return this.#submitPromise;
 	}
 }
 

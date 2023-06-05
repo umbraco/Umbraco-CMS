@@ -1,5 +1,5 @@
-import { UmbModalContext, UmbModalContextClass } from './modal-context.js';
 import type { UmbModalToken } from './token/modal-token.js';
+import { UmbModalContext, UmbModalContextClass } from './index.js';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
@@ -28,10 +28,12 @@ export class UmbModalManagerContext {
 	/**
 	 * Opens a modal or sidebar modal
 	 * @public
-	 * @param {(string | HTMLElement)} element
-	 * @param {UmbModalOptions<unknown>} [options]
+	 * @param {(string | UmbModalToken)} modalAlias
+	 * @param {ModalData} data
+	 * @param {UmbModalConfig} config
+	 * @param {IRouterSlot | null} router
 	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalContext
+	 * @memberof UmbModalManagerContext
 	 */
 	public open<ModalData extends object = object, ModalResult = unknown>(
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
@@ -59,10 +61,9 @@ export class UmbModalManagerContext {
 	 * Closes a modal or sidebar modal
 	 * @private
 	 * @param {string} key
-	 * @memberof UmbModalContext
+	 * @memberof UmbModalManagerContext
 	 */
 	public close(key: string) {
-		console.log('close', key, this.#modals);
 		const modal = this.#modals.getValue().find((modal) => modal.key === key);
 		if (modal) {
 			modal.reject();
@@ -76,12 +77,12 @@ export class UmbModalManagerContext {
 	/**
 	 * Handles the close-end event
 	 * @private
-	 * @param {UmbModalContext} modalHandler
-	 * @memberof UmbModalContext
+	 * @param {UmbModalContext} modalContext
+	 * @memberof UmbModalManagerContext
 	 */
-	#onCloseEnd(modalHandler: UmbModalContext<any, any>) {
-		modalHandler.modalElement.removeEventListener('close-end', () => this.#onCloseEnd(modalHandler));
-		this.#remove(modalHandler.key);
+	#onCloseEnd(modalContext: UmbModalContext<any, any>) {
+		modalContext.modalElement.removeEventListener('close-end', () => this.#onCloseEnd(modalContext));
+		this.#remove(modalContext.key);
 	}
 }
 
