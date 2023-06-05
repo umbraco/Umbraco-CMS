@@ -8,6 +8,8 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
@@ -102,8 +104,33 @@ public class DeliveryApiTests
         content.SetupGet(c => c.ContentType).Returns(contentType);
         content.SetupGet(c => c.Properties).Returns(properties);
         content.SetupGet(c => c.ItemType).Returns(contentType.ItemType);
+        content.Setup(c => c.IsPublished(It.IsAny<string?>())).Returns(true);
     }
 
     protected string DefaultUrlSegment(string name, string? culture = null)
         => $"{name.ToLowerInvariant().Replace(" ", "-")}{(culture.IsNullOrWhiteSpace() ? string.Empty : $"-{culture}")}";
+
+    protected ApiContentRouteBuilder CreateContentRouteBuilder(
+        IPublishedUrlProvider publishedUrlProvider,
+        IOptions<GlobalSettings> globalSettings,
+        IVariationContextAccessor? variationContextAccessor = null,
+        IPublishedSnapshotAccessor? publishedSnapshotAccessor = null,
+        IRequestPreviewService? requestPreviewService = null,
+        IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null)
+    {
+        if (requestHandlerSettingsMonitor == null)
+        {
+            var mock = new Mock<IOptionsMonitor<RequestHandlerSettings>>();
+            mock.SetupGet(m => m.CurrentValue).Returns(new RequestHandlerSettings());
+            requestHandlerSettingsMonitor = mock.Object;
+        }
+
+        return new ApiContentRouteBuilder(
+            publishedUrlProvider,
+            globalSettings,
+            variationContextAccessor ?? Mock.Of<IVariationContextAccessor>(),
+            publishedSnapshotAccessor ?? Mock.Of<IPublishedSnapshotAccessor>(),
+            requestPreviewService ?? Mock.Of<IRequestPreviewService>(),
+        requestHandlerSettingsMonitor);
+    }
 }

@@ -45,5 +45,10 @@ public static class UmbracoExamineFieldNames
         ///     The content culture
         /// </summary>
         public const string Culture = "culture";
+
+        /// <summary>
+        ///     Whether or not the content exists in a published state
+        /// </summary>
+        public const string Published = "published";
     }
 }

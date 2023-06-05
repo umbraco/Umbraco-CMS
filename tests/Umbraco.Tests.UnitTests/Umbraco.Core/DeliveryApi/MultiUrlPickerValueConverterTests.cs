@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -260,7 +259,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
 
     private MultiUrlPickerValueConverter MultiUrlPickerValueConverter()
     {
-        var routeBuilder = new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings(), Mock.Of<IVariationContextAccessor>(), Mock.Of<IPublishedSnapshotAccessor>());
+        var routeBuilder = CreateContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings());
         return new MultiUrlPickerValueConverter(
             PublishedSnapshotAccessor,
             Mock.Of<IProfilingLogger>(),
