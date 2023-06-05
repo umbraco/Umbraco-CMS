@@ -39,6 +39,7 @@ export class UmbUserCollectionElement extends UmbLitElement {
 				<umb-user-collection-header slot="header"></umb-user-collection-header>
 				<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>
 			</umb-body-layout>
+			<!-- This should go in the footer slot -->
 			<umb-collection-selection-actions></umb-collection-selection-actions>
 		`;
 	}

@@ -29,7 +29,7 @@ export class UmbBodyLayoutElement extends LitElement {
 	 * Renders a headline in the header.
 	 * @public
 	 * @type {string}
-	 * @attr {string} clear-header - renders the header without background and borders.
+	 * @attr {boolean} clear-header - renders the header without background and borders.
 	 * @default ''
 	 */
 
