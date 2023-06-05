@@ -3,6 +3,13 @@
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Core.Cache.DistributedCacheBinder</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
     <Target>T:Umbraco.Cms.Infrastructure.Migrations.PostMigrations.ClearCsrfCookies</Target>
     <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
     <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
