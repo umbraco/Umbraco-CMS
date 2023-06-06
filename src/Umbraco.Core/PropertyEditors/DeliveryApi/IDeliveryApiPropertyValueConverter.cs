@@ -30,6 +30,7 @@ public interface IDeliveryApiPropertyValueConverter : IPropertyValueConverter
     /// <param name="referenceCacheLevel">The reference cache level.</param>
     /// <param name="inter">The intermediate value.</param>
     /// <param name="preview">A value indicating whether conversion should take place in preview mode.</param>
+    /// <param name="expanding">A value indicating whether the property value should be expanded (if applicable).</param>
     /// <returns>The result of the conversion.</returns>
     /// <remarks>
     ///     <para>
@@ -43,5 +44,9 @@ public interface IDeliveryApiPropertyValueConverter : IPropertyValueConverter
     ///         the cache levels of property values. It is not meant to be used by the converter.
     ///     </para>
     /// </remarks>
-    object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
+    object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding);
+
+    [Obsolete($"Use the {nameof(ConvertIntermediateToDeliveryApiObject)} that supports property expansion. Will be removed in V14.")]
+    object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+            => ConvertIntermediateToDeliveryApiObject(owner, propertyType, referenceCacheLevel, inter, preview, false);
 }

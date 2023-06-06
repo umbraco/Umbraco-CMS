@@ -35,7 +35,7 @@ public class MemberGroupPickerValueConverter : PropertyValueConverterBase, IDeli
 
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(string[]);
 
-    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
         var memberGroupIds = inter?
             .ToString()?
