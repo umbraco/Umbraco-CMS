@@ -26,7 +26,13 @@ export class UmbBundleExtensionInitializer {
 
 		if (js) {
 			Object.keys(js).forEach((key) => {
-				this.#extensionRegistry.registerMany(js[key]);
+				const value = js[key];
+
+				if (Array.isArray(value)) {
+					this.#extensionRegistry.registerMany(value);
+				} else if (typeof value === 'object') {
+					this.#extensionRegistry.register(value);
+				}
 			});
 		}
 	}
