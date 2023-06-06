@@ -31,7 +31,7 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 	}
 
 	requestTreeRoot(): Promise<{ data?: UmbTreeRootEntityModel | undefined; error?: ProblemDetailsModel | undefined }> {
-		throw new Error('Method not implemented.');
+		//throw new Error('Method not implemented.');
 		return {data: undefined, error: undefined} as any;
 	}
 

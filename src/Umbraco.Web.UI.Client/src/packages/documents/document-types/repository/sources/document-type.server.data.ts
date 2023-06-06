@@ -115,6 +115,12 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocu
 	async update(id: string, documentType: UpdateDocumentTypeRequestModel) {
 		if (!id) throw new Error('Id is missing');
 
+		documentType = {...documentType};
+
+		// TODO: Hack to remove some props that ruins the document-type post end-point.
+		(documentType as any).$type = undefined;
+		(documentType as any).id = undefined;
+
 		return tryExecuteAndNotify(this.#host, DocumentTypeResource.putDocumentTypeById({ id, requestBody: documentType }));
 	}
 
@@ -129,16 +135,8 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocu
 			throw new Error('Id is missing');
 		}
 
-		return tryExecuteAndNotify(
-			this.#host,
-			fetch('/umbraco/management/api/v1/document-type/trash', {
-				method: 'POST',
-				body: JSON.stringify([id]),
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}).then((res) => res.json())
-		);
+		// TODO: Hack the type to avoid type-error here:
+		return tryExecuteAndNotify(this.#host, DocumentTypeResource.deleteDocumentTypeById({ id })) as any;
 	}
 
 	/**

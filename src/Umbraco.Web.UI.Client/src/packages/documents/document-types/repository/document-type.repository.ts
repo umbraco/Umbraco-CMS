@@ -167,22 +167,28 @@ export class UmbDocumentTypeRepository
 	// Could potentially be general methods:
 
 	async create(documentType: ItemType) {
+
 		if (!documentType || !documentType.id) throw new Error('Template is missing');
 		await this.#init;
 
 		const { error } = await this.#detailDataSource.insert(documentType);
 
 		if (!error) {
-			const treeItem = createTreeItem(documentType);
-			this.#treeStore?.appendItems([treeItem]);
+
 
 			const notification = { data: { message: `Document Type created` } };
 			this.#notificationContext?.peek('positive', notification);
 
-			// TODO: we currently don't use the detail store for anything.
-			// Consider to look up the data before fetching from the server
-			this.#detailStore?.append(documentType);
-			// TODO: Update tree store with the new item? or ask tree to request the new item?
+			await this.requestRootTreeItems();
+
+			const notificationNotice = { data: { message: `Alpha version does not enable continuing editing a newly created document-type. Please relocated the item in the tree.` } };
+			this.#notificationContext?.peek('danger', notificationNotice);
+
+			// TODO: currently we cannot put this data into our store, cause we don't have the right ID, as the server currently changes it (and other ids of it, container-id and property-id)
+			//this.#detailStore?.append(documentType);
+
+			//const treeItem = createTreeItem(documentType);
+			//this.#treeStore?.appendItems([treeItem]);
 		}
 
 		return { error };
