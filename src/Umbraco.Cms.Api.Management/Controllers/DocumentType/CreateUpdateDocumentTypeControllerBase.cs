@@ -174,6 +174,7 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
 
                 if (properties.Any() is false && parentContainerNamesById.ContainsKey(container.Id) is false)
                 {
+                    // FIXME: if at all possible, retain empty containers (bad DX to remove stuff that's been attempted saved)
                     return null;
                 }
 
