@@ -72,11 +72,6 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 				width: 100%;
 				padding: var(--uui-size-layout-1);
 			}
-			#main {
-				display: flex;
-				flex-direction: column;
-				padding: var(--uui-size-layout-1);
-			}
 			#main:not(:first-child) {
 				padding-top: var(--uui-size-1);
 			}

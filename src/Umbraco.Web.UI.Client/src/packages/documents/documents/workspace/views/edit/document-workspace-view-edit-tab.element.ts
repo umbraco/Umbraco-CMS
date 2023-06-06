@@ -76,15 +76,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				padding: var(--uui-size-layout-1);
-			}
-		`,
-	];
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbDocumentWorkspaceViewEditTabElement;

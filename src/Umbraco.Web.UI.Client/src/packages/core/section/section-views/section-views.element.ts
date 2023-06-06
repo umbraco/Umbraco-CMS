@@ -122,7 +122,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 		return html`
 			${this._routes.length > 0
 				? html`
-						<umb-body-layout>
+						<umb-body-layout no-padding>
 							<div id="header" slot="header">${this.#renderDashboards()} ${this.#renderViews()}</div>
 							<umb-router-slot
 								.routes=${this._routes}

@@ -57,14 +57,7 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 		`;
 	}
 
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-box {
-				margin: var(--uui-size-layout-1);
-			}
-		`,
-	];
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbTreePickerModalElement;

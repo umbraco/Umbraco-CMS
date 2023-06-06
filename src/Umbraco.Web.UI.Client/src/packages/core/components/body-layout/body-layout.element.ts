@@ -10,7 +10,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 
-//TODO: Add the following attributes to JSDocs: header-shadow, header-clear
+//TODO: Add the following attributes to JSDocs: header-shadow, header-clear, no-padding
 
 /**
  * @element umb-body-layout
@@ -78,7 +78,7 @@ export class UmbBodyLayoutElement extends LitElement {
 		return html`
 			<div
 				id="header"
-				style="display:${this.headline ||
+				style="display: ${this.headline ||
 				this._headerSlotHasChildren ||
 				this._tabsSlotHasChildren ||
 				this._actionsMenuSlotHasChildren
@@ -159,6 +159,11 @@ export class UmbBodyLayoutElement extends LitElement {
 				background-color: transparent;
 				border-color: transparent;
 			}
+			:host([header-clear]:not([no-padding])) #main:not(*[style='display: none'] + *) {
+				/* The following styling is only applied if the clear-header IS present, 
+				the no-padding attribute is NOT present, and the header is NOT hidden */
+				padding-top: var(--uui-size-space-1);
+			}
 
 			:host([header-shadow][scrolling]) #header {
 				/* This should be using the uui-shadows but for now they are too drastic for this use case */
@@ -175,10 +180,14 @@ export class UmbBodyLayoutElement extends LitElement {
 			}
 
 			#main {
-				display: flex;
+				display: block;
 				flex: 1;
 				flex-direction: column;
 				overflow-y: auto;
+				padding: var(--uui-size-layout-1);
+			}
+			:host([no-padding]) #main {
+				padding: 0;
 			}
 		`,
 	];
