@@ -58,7 +58,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/audit-log/{id}": {
@@ -122,7 +127,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/audit-log/type/{logType}": {
@@ -178,7 +188,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/culture": {
@@ -218,7 +233,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/data-type": {
@@ -267,7 +287,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/data-type/{id}": {
@@ -305,7 +330,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -340,7 +370,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -388,7 +423,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/data-type/{id}/copy": {
@@ -438,7 +478,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/data-type/{id}/is-used": {
@@ -472,7 +517,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/data-type/{id}/move": {
@@ -512,7 +562,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/data-type/{id}/references": {
@@ -553,7 +608,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/data-type/folder": {
@@ -589,7 +649,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/data-type/folder/{id}": {
@@ -627,7 +692,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -652,7 +722,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -690,7 +765,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/data-type/item": {
@@ -731,7 +811,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/data-type/children": {
@@ -787,7 +872,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/data-type/root": {
@@ -835,7 +925,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/dictionary": {
@@ -875,7 +970,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -932,7 +1032,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/dictionary/{id}": {
@@ -970,7 +1075,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -1005,7 +1115,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -1053,7 +1168,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/dictionary/{id}/export": {
@@ -1096,7 +1216,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/dictionary/{id}/move": {
@@ -1146,7 +1271,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/dictionary/import": {
@@ -1195,7 +1325,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/dictionary/item": {
@@ -1236,7 +1371,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/dictionary/children": {
@@ -1284,7 +1424,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/dictionary/root": {
@@ -1324,7 +1469,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/document-blueprint/item": {
@@ -1365,7 +1515,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/document-blueprint/root": {
@@ -1405,7 +1560,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/document-type": {
@@ -1434,7 +1594,12 @@
           "400": {
             "description": "Bad Request"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/document-type/{id}": {
@@ -1472,7 +1637,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -1508,7 +1678,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -1549,7 +1724,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/document-type/item": {
@@ -1590,7 +1770,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/document-type/children": {
@@ -1646,7 +1831,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/document-type/root": {
@@ -1694,7 +1884,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/document": {
@@ -1736,7 +1931,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/document/{id}": {
@@ -1774,7 +1974,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -1802,7 +2007,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -1843,7 +2053,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/document/{id}/copy": {
@@ -1896,7 +2111,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/document/{id}/domains": {
@@ -1920,7 +2140,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -1955,7 +2180,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/document/{id}/move": {
@@ -1998,7 +2228,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/document/{id}/notifications": {
@@ -2039,7 +2274,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -2077,7 +2317,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/document/item": {
@@ -2133,7 +2378,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/recycle-bin/document/children": {
@@ -2184,7 +2434,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/recycle-bin/document/root": {
@@ -2227,7 +2482,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/document/children": {
@@ -2290,7 +2550,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/document/root": {
@@ -2345,7 +2610,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/health-check-group": {
@@ -2385,7 +2655,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/health-check-group/{name}": {
@@ -2422,7 +2697,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/health-check-group/{name}/check": {
@@ -2459,7 +2739,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/health-check/execute-action": {
@@ -2506,7 +2791,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/help": {
@@ -2576,7 +2866,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/indexer": {
@@ -2614,7 +2909,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/indexer/{indexName}": {
@@ -2658,7 +2958,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/indexer/{indexName}/rebuild": {
@@ -2698,7 +3003,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/install/settings": {
@@ -2864,7 +3174,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -2911,7 +3226,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/language/{isoCode}": {
@@ -2948,7 +3268,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -2989,7 +3314,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -3036,7 +3366,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/language/item": {
@@ -3076,7 +3411,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/log-viewer/level": {
@@ -3116,7 +3456,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/log-viewer/level-count": {
@@ -3168,7 +3513,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/log-viewer/log": {
@@ -3248,7 +3598,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/log-viewer/message-template": {
@@ -3314,7 +3669,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/log-viewer/saved-search": {
@@ -3354,7 +3714,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -3398,7 +3763,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/log-viewer/saved-search/{name}": {
@@ -3435,7 +3805,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -3459,7 +3834,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/log-viewer/validate-logs-size": {
@@ -3500,7 +3880,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/media-type/{id}": {
@@ -3538,7 +3923,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/media-type/item": {
@@ -3579,7 +3969,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/media-type/children": {
@@ -3635,7 +4030,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/media-type/root": {
@@ -3683,7 +4083,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/media": {
@@ -3725,7 +4130,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/media/{id}": {
@@ -3763,7 +4173,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -3791,7 +4206,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -3832,7 +4252,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/media/{id}/move": {
@@ -3875,7 +4300,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/media/item": {
@@ -3924,7 +4354,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/recycle-bin/media/children": {
@@ -3975,7 +4410,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/recycle-bin/media/root": {
@@ -4018,7 +4458,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/media/children": {
@@ -4074,7 +4519,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/media/item": {
@@ -4125,7 +4575,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/media/root": {
@@ -4173,7 +4628,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/member-group/item": {
@@ -4214,7 +4674,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/member-group/root": {
@@ -4254,7 +4719,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/member-type/item": {
@@ -4295,7 +4765,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/member-type/root": {
@@ -4335,7 +4810,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/member/item": {
@@ -4376,7 +4856,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/models-builder/build": {
@@ -4399,7 +4884,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/models-builder/dashboard": {
@@ -4423,7 +4913,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/models-builder/status": {
@@ -4447,7 +4942,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/object-types": {
@@ -4487,7 +4987,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/package/{name}/run-migration": {
@@ -4523,7 +5028,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/package/created": {
@@ -4563,7 +5073,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -4610,7 +5125,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/package/created/{id}": {
@@ -4648,7 +5168,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -4673,7 +5198,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -4711,7 +5241,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/package/created/{id}/download": {
@@ -4746,7 +5281,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/package/manifest": {
@@ -4773,7 +5313,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/package/migration-status": {
@@ -4813,7 +5358,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/partial-view": {
@@ -4846,7 +5396,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -4880,7 +5435,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -4900,7 +5460,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -4924,7 +5489,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/partial-view/folder": {
@@ -4946,7 +5516,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -4970,7 +5545,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -4990,7 +5570,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/partial-view/item": {
@@ -5030,7 +5615,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/partial-view/snippet": {
@@ -5070,7 +5660,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/partial-view/snippet/{name}": {
@@ -5104,7 +5699,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/partial-view/children": {
@@ -5151,7 +5751,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/partial-view/root": {
@@ -5191,7 +5796,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/profiling/status": {
@@ -5215,7 +5825,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -5239,7 +5854,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/property-type/is-used": {
@@ -5286,7 +5906,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/published-cache/collect": {
@@ -5299,7 +5924,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/published-cache/rebuild": {
@@ -5312,7 +5942,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/published-cache/reload": {
@@ -5325,7 +5960,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/published-cache/status": {
@@ -5345,7 +5985,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/redirect-management": {
@@ -5400,7 +6045,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/redirect-management/{id}": {
@@ -5447,7 +6097,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -5469,7 +6124,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/redirect-management/status": {
@@ -5493,7 +6153,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -5513,7 +6178,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/relation-type": {
@@ -5559,7 +6229,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/relation-type/{id}": {
@@ -5597,7 +6272,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -5629,7 +6309,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -5695,7 +6380,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/relation-type/item": {
@@ -5736,7 +6426,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/relation-type/root": {
@@ -5776,7 +6471,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/relation/{id}": {
@@ -5814,7 +6514,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/relation/child-relation/{childId}": {
@@ -5869,7 +6574,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/relation/type/{id}": {
@@ -5918,7 +6628,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/script": {
@@ -5951,7 +6666,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -5985,7 +6705,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -6005,7 +6730,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -6029,7 +6759,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/script/folder": {
@@ -6051,7 +6786,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -6075,7 +6815,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -6095,7 +6840,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/script/item": {
@@ -6135,7 +6885,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/script/children": {
@@ -6182,7 +6937,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/script/root": {
@@ -6222,7 +6982,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/searcher": {
@@ -6260,7 +7025,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/searcher/{searcherName}/query": {
@@ -6323,7 +7093,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/security/back-office/authorize": {
@@ -6430,7 +7205,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/static-file/item": {
@@ -6470,7 +7250,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/static-file/children": {
@@ -6517,7 +7302,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/static-file/root": {
@@ -6557,7 +7347,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/stylesheet": {
@@ -6590,7 +7385,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -6624,7 +7424,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -6644,7 +7449,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -6668,7 +7478,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/stylesheet/all": {
@@ -6708,7 +7523,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/stylesheet/folder": {
@@ -6730,7 +7550,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -6754,7 +7579,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -6774,7 +7604,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/stylesheet/item": {
@@ -6814,7 +7649,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/stylesheet/rich-text/extract-rules": {
@@ -6851,7 +7691,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/stylesheet/rich-text/interpolate-rules": {
@@ -6888,7 +7733,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/stylesheet/rich-text/rules": {
@@ -6924,7 +7774,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/stylesheet/children": {
@@ -6971,7 +7826,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/stylesheet/root": {
@@ -7011,7 +7871,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tag": {
@@ -7072,7 +7937,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/telemetry": {
@@ -7110,7 +7980,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/telemetry/level": {
@@ -7134,7 +8009,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -7168,7 +8048,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/template": {
@@ -7217,7 +8102,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/template/{id}": {
@@ -7255,7 +8145,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -7290,7 +8185,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -7338,7 +8238,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/template/item": {
@@ -7379,7 +8284,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/template/query/execute": {
@@ -7416,7 +8326,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/template/query/settings": {
@@ -7440,7 +8355,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/template/scaffold": {
@@ -7467,7 +8387,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/template/children": {
@@ -7515,7 +8440,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tree/template/root": {
@@ -7555,7 +8485,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/temporaryfile": {
@@ -7615,7 +8550,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/temporaryfile/{id}": {
@@ -7670,7 +8610,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -7712,7 +8657,70 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tour": {
+      "get": {
+        "tags": [
+          "Tour"
+        ],
+        "operationId": "GetTour",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserTourStatusesResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Tour"
+        ],
+        "operationId": "PostTour",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/SetTourStatusRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tracked-reference/{id}": {
@@ -7769,7 +8777,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tracked-reference/descendants/{parentId}": {
@@ -7824,7 +8837,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/tracked-reference/item": {
@@ -7884,7 +8902,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/upgrade/authorize": {
@@ -7917,7 +8940,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/upgrade/settings": {
@@ -7951,7 +8979,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/user-group": {
@@ -7997,7 +9030,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "get": {
         "tags": [
@@ -8035,7 +9073,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/user-group/{id}": {
@@ -8073,7 +9116,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -8098,7 +9146,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -8136,7 +9189,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/user-group/item": {
@@ -8177,7 +9235,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/user": {
@@ -8227,7 +9290,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "get": {
         "tags": [
@@ -8265,7 +9333,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/user/{id}": {
@@ -8303,7 +9376,12 @@
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -8325,7 +9403,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -8360,7 +9443,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/user/avatar/{id}": {
@@ -8384,7 +9472,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -8429,7 +9522,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/user/change-password/{id}": {
@@ -8466,7 +9564,299 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/user/current": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetUserCurrent",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CurrentUserResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/user/current/avatar": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "PostUserCurrentAvatar",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/SetAvatarRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/user/current/change-password": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "PostUserCurrentChangePassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ChangePasswordUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/user/current/data": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetUserCurrentData",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserDataResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/user/current/logins": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetUserCurrentLogins",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/LinkedLoginsRequestModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/user/current/permissions": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetUserCurrentPermissions",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/UserPermissionsResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/user/current/permissions/document": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetUserCurrentPermissionsDocument",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/UserPermissionsResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/user/current/permissions/media": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetUserCurrentPermissionsMedia",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/UserPermissionsResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/user/disable": {
@@ -8502,7 +9892,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/user/enable": {
@@ -8538,7 +9933,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/user/filter": {
@@ -8616,7 +10016,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/user/invite": {
@@ -8652,7 +10057,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/user/item": {
@@ -8693,7 +10103,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/user/set-user-groups": {
@@ -8719,7 +10134,12 @@
           "200": {
             "description": "Success"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/user/unlock": {
@@ -8755,7 +10175,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     }
   },
@@ -9638,6 +11063,79 @@
           }
         },
         "additionalProperties": false
+      },
+      "CurrentUserResponseModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "languageIsoCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "contentStartNodeIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "mediaStartNodeIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "avatarUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hasAccessToAllLanguages": {
+            "type": "boolean"
+          },
+          "permissions": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "CurrentUserResponseModel": "#/components/schemas/CurrentUserResponseModel"
+          }
+        }
       },
       "DataTypeItemResponseModel": {
         "type": "object",
@@ -10900,6 +12398,34 @@
         "properties": {
           "isoCode": {
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LinkedLoginModel": {
+        "type": "object",
+        "properties": {
+          "providerName": {
+            "type": "string"
+          },
+          "providerKey": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LinkedLoginsRequestModel": {
+        "type": "object",
+        "properties": {
+          "linkedLogins": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/LinkedLoginModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
@@ -12944,6 +14470,15 @@
         },
         "additionalProperties": false
       },
+      "SetTourStatusRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TourStatusModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "SnippetItemResponseModel": {
         "type": "object",
         "properties": {
@@ -13358,6 +14893,21 @@
           },
           "content": {
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TourStatusModel": {
+        "type": "object",
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "completed": {
+            "type": "boolean"
+          },
+          "disabled": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -13815,6 +15365,34 @@
         },
         "additionalProperties": false
       },
+      "UserDataModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserDataResponseModel": {
+        "type": "object",
+        "properties": {
+          "userData": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/UserDataModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "UserGroupBaseModel": {
         "type": "object",
         "properties": {
@@ -13955,6 +15533,38 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "UserPermissionModel": {
+        "type": "object",
+        "properties": {
+          "nodeKey": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserPermissionsResponseModel": {
+        "type": "object",
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/UserPermissionModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
       },
       "UserPresentationBaseModel": {
         "type": "object",
@@ -14098,6 +15708,25 @@
         "type": "integer",
         "format": "int32"
       },
+      "UserTourStatusesResponseModel": {
+        "type": "object",
+        "properties": {
+          "tourStatuses": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/TourStatusModel"
+                },
+                {
+                  "$ref": "#/components/schemas/SetTourStatusRequestModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "ValueModelBaseModel": {
         "required": [
           "$type"
@@ -14240,10 +15869,5 @@
         }
       }
     }
-  },
-  "security": [
-    {
-      "OAuth": [ ]
-    }
-  ]
+  }
 }

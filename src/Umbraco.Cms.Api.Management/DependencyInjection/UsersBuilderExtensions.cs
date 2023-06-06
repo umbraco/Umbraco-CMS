@@ -13,7 +13,8 @@ internal static class UsersBuilderExtensions
         builder.Services.AddTransient<IUserPresentationFactory, UserPresentationFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-            .Add<UsersViewModelsMapDefinition>();
+            .Add<UsersViewModelsMapDefinition>()
+            .Add<CurrentUserViewModelsMapDefinition>();
 
         return builder;
     }

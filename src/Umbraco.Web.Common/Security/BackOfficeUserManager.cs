@@ -330,4 +330,16 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
 
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, token);
     }
+
+    public async Task<Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus>> GetLoginsAsync(IUser user)
+    {
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString());
+        if (identityUser is null)
+        {
+            return Attempt.FailWithStatus<ICollection<IIdentityUserLogin>, UserOperationStatus>(UserOperationStatus.UserNotFound, Array.Empty<IIdentityUserLogin>());
+        }
+
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, identityUser.Logins);
+    }
+
 }

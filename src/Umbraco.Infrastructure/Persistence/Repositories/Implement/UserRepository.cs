@@ -485,6 +485,25 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             groups2languages = new Dictionary<int, IGrouping<int, UserGroup2LanguageDto>>();
         }
 
+        // get groups2permissions
+        sql = SqlContext.Sql()
+            .Select<UserGroup2PermissionDto>()
+            .From<UserGroup2PermissionDto>()
+            .WhereIn<UserGroup2PermissionDto>(x => x.UserGroupId, groupIds);
+
+        Dictionary<int, IGrouping<int, UserGroup2PermissionDto>> groups2permissions;
+        try
+        {
+            groups2permissions = Database.Fetch<UserGroup2PermissionDto>(sql)
+                .GroupBy(x => x.UserGroupId)
+                .ToDictionary(x => x.Key, x => x);
+        }
+        catch
+        {
+            // If we get an error, the table has not been made in the database yet, set the list to an empty one
+            groups2permissions = new Dictionary<int, IGrouping<int, UserGroup2PermissionDto>>();
+        }
+
         // map groups
 
         foreach (User2UserGroupDto? user2Group in user2Groups)
@@ -523,6 +542,16 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             {
                 group.UserGroup2LanguageDtos = list.ToList(); // groups2apps is distinct
             }
+        }
+
+        // map group permissions
+        foreach (UserGroupDto? group in groups.Values)
+        {
+            if (groups2permissions.TryGetValue(group.Id, out IGrouping<int, UserGroup2PermissionDto>? list))
+            {
+                group.UserGroup2PermissionDtos = list.ToList(); // groups2apps is distinct
+            }
+
         }
     }
 

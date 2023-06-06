@@ -25,6 +25,7 @@ public static class UserGroupExtensions
             group.AllowedLanguages,
             group.AllowedSections,
             group.Permissions,
+            group.PermissionNames,
             group.HasAccessToAllLanguages);
     }
 

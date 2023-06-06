@@ -33,7 +33,7 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
         swaggerGenOptions.SelectSubTypesUsing(_umbracoJsonTypeInfoResolver.FindSubTypes);
 
         swaggerGenOptions.AddSecurityDefinition(
-             "Backoffice User",
+            ManagementApiConfiguration.ApiSecurityName,
              new OpenApiSecurityScheme
              {
                  In = ParameterLocation.Header,
@@ -51,17 +51,7 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
                  }
              });
 
-         swaggerGenOptions.AddSecurityRequirement(new OpenApiSecurityRequirement
-         {
-             // this weird looking construct works because OpenApiSecurityRequirement
-             // is a specialization of Dictionary<,>
-             {
-                 new OpenApiSecurityScheme
-                 {
-                     Reference = new OpenApiReference { Id = "OAuth", Type = ReferenceType.SecurityScheme }
-                 },
-                 new List<string>()
-             }
-         });
+        // Sets Security requirement on backoffice apis
+        swaggerGenOptions.OperationFilter<BackOfficeSecurityRequirementsOperationFilter>();
     }
 }

@@ -20,7 +20,8 @@ public class ChangePasswordUserController : UserControllerBase
 
     public ChangePasswordUserController(
         IUserService userService,
-        IUmbracoMapper mapper, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IUmbracoMapper mapper,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _userService = userService;
         _mapper = mapper;
@@ -29,6 +30,7 @@ public class ChangePasswordUserController : UserControllerBase
 
     [HttpPost("change-password/{id:guid}")]
     [MapToApiVersion("1.0")]
+    [ProducesErrorResponseType(typeof(ChangePasswordUserResponseModel))]
     public async Task<IActionResult> ChangePassword(Guid id, ChangePasswordUserRequestModel model)
     {
         var passwordModel = new ChangeUserPasswordModel

@@ -2,6 +2,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -44,6 +45,7 @@ public class BackOfficeController : ManagementApiControllerBase
 
     // FIXME: this is a temporary solution to get the new backoffice auth rolling.
     //        once the old backoffice auth is no longer necessary, clean this up and merge with 2FA handling etc.
+    [AllowAnonymous]
     [HttpPost("login")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Login(LoginRequestModel model)
@@ -68,6 +70,7 @@ public class BackOfficeController : ManagementApiControllerBase
         public required string Password { get; init; }
     }
 
+    [AllowAnonymous]
     [HttpGet("authorize")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Authorize()
