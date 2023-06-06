@@ -63,7 +63,7 @@ public partial class EventAggregator : IEventAggregator
         where TNotification : INotification
         where TNotificationHandler : INotificationHandler
     {
-        foreach (var notificationsByType in notifications.ToLookup(x => x.GetType()))
+        foreach (var notificationsByType in ChunkByType(notifications))
         {
             var notificationHandler = _notificationHandlers.GetOrAdd(notificationsByType.Key, x =>
             {
@@ -82,7 +82,7 @@ public partial class EventAggregator : IEventAggregator
         where TNotification : INotification
         where TNotificationHandler : INotificationHandler
     {
-        foreach (var notificationsByType in notifications.ToLookup(x => x.GetType()))
+        foreach (var notificationsByType in ChunkByType(notifications))
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -121,6 +121,53 @@ public partial class EventAggregator : IEventAggregator
 
             await handler(notifications, cancellationToken).ConfigureAwait(false);
         }
+    }
+
+    private static IEnumerable<IGrouping<Type, T>> ChunkByType<T>(IEnumerable<T> source)
+        where T : notnull
+    {
+        IEnumerator<T> enumerator = source.GetEnumerator();
+
+        if (!enumerator.MoveNext())
+        {
+            // Skip empty source
+            yield break;
+        }
+
+        // Create first grouping
+        Type previousType = enumerator.Current.GetType();
+        var grouping = new ChunkGrouping<Type, T>(previousType)
+        {
+            enumerator.Current
+        };
+
+        // Return chunks when type changes
+        while (enumerator.MoveNext())
+        {
+            // Check against previous type
+            Type currentType = enumerator.Current.GetType();
+            if (previousType != currentType)
+            {
+                yield return grouping;
+
+                // Reinitialize to ensure we're always adding to groupings of the same type
+                previousType = currentType;
+                grouping = new ChunkGrouping<Type, T>(previousType);
+            }
+
+            grouping.Add(enumerator.Current);
+        }
+
+        // Return final grouping
+        yield return grouping;
+    }
+
+    private sealed class ChunkGrouping<TKey, TElement> : List<TElement>, IGrouping<TKey, TElement>
+    {
+        public TKey Key { get; }
+
+        public ChunkGrouping(TKey key)
+            => Key = key;
     }
 }
 
