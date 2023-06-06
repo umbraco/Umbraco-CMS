@@ -95,7 +95,12 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		if (!documentType || !documentType.id) return false;
 
 		//const value = documentType as CreateDocumentTypeRequestModel & { id: string };
-		await this.#contentTypeRepository.create(documentType);
+		const { data } = await this.#contentTypeRepository.create(documentType);
+
+		if (!data) return false;
+
+		await this.loadType(data.id)
+
 		return true;
 	}
 

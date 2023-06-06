@@ -101,7 +101,7 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocu
 			this.#host,
 			DocumentTypeResource.postDocumentType({
 				requestBody: documentType,
-			})
+			}),
 		);
 	}
 

@@ -171,24 +171,32 @@ export class UmbDocumentTypeRepository
 		if (!documentType || !documentType.id) throw new Error('Template is missing');
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.insert(documentType);
+		const { error, data } = await this.#detailDataSource.insert(documentType);
 
-		if (!error) {
+		if (!error && data) {
 
+			const splitResultUrl = data.split("/");
+			const newId = splitResultUrl[splitResultUrl.length - 1];
 
-			const notification = { data: { message: `Document Type created` } };
-			this.#notificationContext?.peek('positive', notification);
+			// Temporary hack while we are not in control of IDs:
 
-			await this.requestRootTreeItems();
+			const newDocument = {...(await this.requestById(newId)).data, $type: ''};
 
-			const notificationNotice = { data: { message: `Alpha version does not enable continuing editing a newly created document-type. Please relocated the item in the tree.` } };
-			this.#notificationContext?.peek('danger', notificationNotice);
+			if(newDocument) {
 
-			// TODO: currently we cannot put this data into our store, cause we don't have the right ID, as the server currently changes it (and other ids of it, container-id and property-id)
-			//this.#detailStore?.append(documentType);
+				const notification = { data: { message: `Document Type created` } };
+				this.#notificationContext?.peek('positive', notification);
 
-			//const treeItem = createTreeItem(documentType);
-			//this.#treeStore?.appendItems([treeItem]);
+				await this.requestRootTreeItems();
+
+				// TODO: currently we cannot put this data into our store, cause we don't have the right ID, as the server currently changes it (and other ids of it, container-id and property-id)
+				//this.#detailStore?.append(newDocument);
+
+				//const treeItem = createTreeItem(newDocument);
+				//this.#treeStore?.appendItems([treeItem]);
+
+				return { data: newDocument };
+			}
 		}
 
 		return { error };
