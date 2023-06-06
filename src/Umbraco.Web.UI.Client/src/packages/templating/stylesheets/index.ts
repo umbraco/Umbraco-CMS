@@ -6,3 +6,4 @@ export interface StylesheetDetails extends FileSystemTreeItemPresentationModel {
 }
 
 export const STYLESHEET_ENTITY_TYPE = 'stylesheet';
+export * from './repository/index.js';

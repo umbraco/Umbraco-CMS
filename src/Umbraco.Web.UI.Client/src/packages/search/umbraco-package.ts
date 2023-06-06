@@ -4,6 +4,6 @@ export const extensions = [
 		name: 'Search Entry Point',
 		alias: 'Umb.EntryPoint.Search',
 		type: 'entryPoint',
-		loader: () => import('./index.js'),
+		loader: () => import('./package-entry-point.js'),
 	},
 ];

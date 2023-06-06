@@ -62,6 +62,8 @@ export class UmbExtensionRegistry<
 	}
 
 	register(manifest: ManifestTypes | ManifestKind<ManifestTypes>): void {
+		// TODO: Consider if we need to implement some safety features here, like checking if the object has a 'type' and/or 'alias'?
+
 		if (manifest.type === 'kind') {
 			this.defineKind(manifest as ManifestKind<ManifestTypes>);
 			return;
