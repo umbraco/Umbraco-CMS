@@ -5,7 +5,7 @@ import {
 	OEmbedStatus,
 	UmbEmbeddedMediaModalData,
 	UmbEmbeddedMediaModalResult,
-	UmbModalHandler,
+	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -27,17 +27,17 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 	#embedResult!: OEmbedResult;
 
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>;
+	modalContext?: UmbModalContext<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>;
 
 	@property({ type: Object })
 	data?: UmbEmbeddedMediaModalData;
 
 	#handleConfirm() {
-		this.modalHandler?.submit({ selection: this.#embedResult });
+		this.modalContext?.submit({ selection: this.#embedResult });
 	}
 
 	#handleCancel() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	@state()
@@ -159,7 +159,7 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-editor headline="Embed">
+			<umb-body-layout headline="Embed">
 				<uui-box>
 					<umb-workspace-property-layout label="URL" orientation="vertical">
 						<div slot="editor">
@@ -222,7 +222,7 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 					look="primary"
 					label="Submit"
 					@click=${this.#handleConfirm}></uui-button>
-			</umb-workspace-editor>
+			</umb-body-layout>
 		`;
 	}
 

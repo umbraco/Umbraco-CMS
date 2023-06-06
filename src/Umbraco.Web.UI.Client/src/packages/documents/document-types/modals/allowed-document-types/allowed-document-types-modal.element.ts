@@ -44,7 +44,7 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	}
 
 	private _handleCancel() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	#onClick(event: PointerEvent) {
@@ -52,7 +52,7 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 		const target = event.target as HTMLButtonElement;
 		const documentTypeKey = target.dataset.id;
 		if (!documentTypeKey) throw new Error('No document type id found');
-		this.modalHandler?.submit({ documentTypeKey });
+		this.modalContext?.submit({ documentTypeKey });
 	}
 
 	render() {

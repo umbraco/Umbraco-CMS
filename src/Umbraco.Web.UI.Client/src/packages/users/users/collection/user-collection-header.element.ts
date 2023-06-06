@@ -1,19 +1,20 @@
 import { UmbUserCollectionContext } from './user-collection.context.js';
-import { UUITextStyles ,
+import {
+	UUITextStyles,
 	UUIBooleanInputEvent,
 	UUICheckboxElement,
 	UUIRadioGroupElement,
 	UUIRadioGroupEvent,
 } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import {
 	UMB_CREATE_USER_MODAL,
 	UMB_INVITE_USER_MODAL,
-	UMB_MODAL_CONTEXT_TOKEN,
-	UmbModalContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -34,7 +35,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	@state()
 	private _orderBy?: UserOrderModel;
 
-	#modalContext?: UmbModalContext;
+	#modalContext?: UmbModalManagerContext;
 	#collectionContext?: UmbUserCollectionContext;
 	#inputTimer?: NodeJS.Timeout;
 	#inputTimerAmount = 500;
@@ -42,7 +43,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;
 		});
 

@@ -1,18 +1,18 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, CSSResultGroup, html, nothing , customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalHandler, UmbChangePasswordModalData } from '@umbraco-cms/backoffice/modal';
+import { css, CSSResultGroup, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbModalContext, UmbChangePasswordModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-change-password-modal')
 export class UmbChangePasswordModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler;
+	modalContext?: UmbModalContext;
 
 	@property()
 	data?: UmbChangePasswordModalData;
 
 	private _close() {
-		this.modalHandler?.submit();
+		this.modalContext?.submit();
 	}
 
 	private _handleSubmit(e: SubmitEvent) {

@@ -23,8 +23,7 @@ export default class MyPackageViewCustom extends HTMLElement {
 	}
 
 	onClick() {
-		console.log(this.modalHandler);
-		this.modalHandler.close();
+		this.modalContext.close();
 	}
 }
 

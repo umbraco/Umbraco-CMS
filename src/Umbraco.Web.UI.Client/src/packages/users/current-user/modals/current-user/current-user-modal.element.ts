@@ -1,14 +1,14 @@
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user.store.js';
 import type { UmbLoggedInUser } from '../../types.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, CSSResultGroup, html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
+import { css, CSSResultGroup, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-current-user-modal')
 export class UmbCurrentUserModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler;
+	modalContext?: UmbModalContext;
 
 	@state()
 	private _currentUser?: UmbLoggedInUser;
@@ -35,7 +35,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	}
 
 	private _close() {
-		this.modalHandler?.submit();
+		this.modalContext?.submit();
 	}
 
 	private _logout() {
@@ -44,7 +44,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-editor headline="${this._currentUser?.name || ''}">
+			<umb-body-layout headline="${this._currentUser?.name || ''}">
 				<div id="main">
 					<umb-extension-slot id="userProfileApps" type="userProfileApp"></umb-extension-slot>
 				</div>
@@ -52,7 +52,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
 					<uui-button @click=${this._logout} look="primary" color="danger">Logout</uui-button>
 				</div>
-			</umb-workspace-editor>
+			</umb-body-layout>
 		`;
 	}
 

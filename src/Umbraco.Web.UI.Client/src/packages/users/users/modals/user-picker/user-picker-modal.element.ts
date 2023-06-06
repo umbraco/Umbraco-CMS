@@ -1,6 +1,6 @@
 import { UmbUserRepository } from '../../repository/user.repository.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbUserPickerModalData, UmbUserPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -49,11 +49,11 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 	}
 
 	#submit() {
-		this.modalHandler?.submit({ selection: this.#selectionManager.getSelection() });
+		this.modalContext?.submit({ selection: this.#selectionManager.getSelection() });
 	}
 
 	#close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	render() {

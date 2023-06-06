@@ -2,7 +2,11 @@ import { UmbDocumentTypeWorkspaceContext } from './document-type-workspace.conte
 import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_ICON_PICKER_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-document-type-workspace-editor')
 export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
@@ -21,7 +25,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _alias?: string;
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
@@ -31,7 +35,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 			this.#observeDocumentType();
 		});
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}
@@ -67,12 +71,12 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	private async _handleIconClick() {
-		const modalHandler = this._modalContext?.open(UMB_ICON_PICKER_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_ICON_PICKER_MODAL, {
 			icon: this._icon,
 			color: this._iconColorAlias,
 		});
 
-		modalHandler?.onSubmit().then((saved) => {
+		modalContext?.onSubmit().then((saved) => {
 			if (saved.icon) this.#workspaceContext?.setIcon(saved.icon);
 			// TODO: save color ALIAS as well
 		});

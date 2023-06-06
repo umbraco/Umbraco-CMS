@@ -3,7 +3,11 @@ import { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_CONFIRM_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-packages-created-overview')
 export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
@@ -21,7 +25,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 	@state()
 	private _total?: number;
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
@@ -31,7 +35,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 		super.connectedCallback();
 		this.#getPackages();
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}
@@ -104,14 +108,14 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 
 	async #deletePackage(p: PackageDefinitionResponseModel) {
 		if (!p.id) return;
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Remove ${p.name}?`,
 			content: 'Are you sure you want to delete this package',
 			confirmLabel: 'Delete',
 		});
 
-		await modalHandler?.onSubmit();
+		await modalContext?.onSubmit();
 
 		const { error } = await tryExecuteAndNotify(this, PackageResource.deletePackageCreatedById({ id: p.id }));
 		if (error) return;

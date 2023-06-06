@@ -60,12 +60,12 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 	snippetMethods = [getRenderBodySnippet, getRenderSectionSnippet, getAddSectionSnippet];
 
 	#close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	#submit() {
 		const value = this.selectedCheckbox?.snippet;
-		if (this.selectedCheckbox?.validate()) this.modalHandler?.submit({ value: value ?? '' });
+		if (this.selectedCheckbox?.validate()) this.modalContext?.submit({ value: value ?? '' });
 	}
 
 	render() {
