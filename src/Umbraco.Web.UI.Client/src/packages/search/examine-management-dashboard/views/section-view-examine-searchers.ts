@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,
@@ -222,9 +222,6 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-			}
-			uui-box {
-				margin-top: var(--uui-size-space-5);
 			}
 
 			uui-box p {

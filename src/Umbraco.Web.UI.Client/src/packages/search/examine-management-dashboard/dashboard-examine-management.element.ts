@@ -1,6 +1,6 @@
 import { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers.js';
 import { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers.js';
-import { html, css, nothing , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -38,21 +38,51 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 	private _activePath = '';
 
 	render() {
-		return html` ${this._routerPath && this._activePath !== ''
-				? html` <a href=${this._routerPath}> &larr; Back to overview </a> `
-				: nothing}
-			<umb-router-slot
-				.routes=${this._routes}
-				@init=${(event: UmbRouterSlotInitEvent) => {
-					this._routerPath = event.target.absoluteRouterPath;
-				}}
-				@change=${(event: UmbRouterSlotChangeEvent) => {
-					this._activePath = event.target.localActiveViewPath || '';
-				}}></umb-router-slot>`;
+		return html`
+			<umb-body-layout clear-header>
+				${this.#renderHeader()}
+				<div id="main">
+					<umb-router-slot
+						.routes=${this._routes}
+						@init=${(event: UmbRouterSlotInitEvent) => {
+							this._routerPath = event.target.absoluteRouterPath;
+						}}
+						@change=${(event: UmbRouterSlotChangeEvent) => {
+							this._activePath = event.target.localActiveViewPath || '';
+						}}></umb-router-slot>
+				</div>
+			</umb-body-layout>
+		`;
+	}
+
+	#renderHeader() {
+		return this._routerPath && this._activePath !== ''
+			? html`
+					<div id="header" slot="header">
+						<a href=${this._routerPath}> &larr; Back to overview </a>
+					</div>
+			  `
+			: nothing;
 	}
 
 	static styles = [
 		css`
+			#header {
+				display: flex;
+				width: 100%;
+				padding: var(--uui-size-layout-1);
+			}
+			#main {
+				display: flex;
+				flex-direction: column;
+				padding: var(--uui-size-layout-1);
+			}
+			#main:not(:first-child) {
+				padding-top: var(--uui-size-1);
+			}
+			umb-body-layout {
+				--umb-header-layout-height: fit-content;
+			}
 			a {
 				color: var(--uui-color-text);
 				background: transparent;

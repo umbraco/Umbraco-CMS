@@ -118,7 +118,6 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				padding: var(--uui-size-layout-1);
 			}
 
 			uui-box + uui-box {
