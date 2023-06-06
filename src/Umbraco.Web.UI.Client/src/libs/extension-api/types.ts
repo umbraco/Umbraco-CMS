@@ -1,5 +1,5 @@
-import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbExtensionRegistry } from './registry/extension.registry.js';
+import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
