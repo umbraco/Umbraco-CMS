@@ -1,4 +1,4 @@
-import { html , customElement, query , when } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, query, when } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbCreateDictionaryModalData, UmbCreateDictionaryModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
@@ -22,7 +22,7 @@ export class UmbCreateDictionaryModalElement extends UmbModalBaseElement<
 	}
 
 	#handleCancel() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	#submitForm() {
@@ -37,7 +37,7 @@ export class UmbCreateDictionaryModalElement extends UmbModalBaseElement<
 
 		const formData = new FormData(form);
 
-		this.modalHandler?.submit({
+		this.modalContext?.submit({
 			name: formData.get('name') as string,
 		});
 	}

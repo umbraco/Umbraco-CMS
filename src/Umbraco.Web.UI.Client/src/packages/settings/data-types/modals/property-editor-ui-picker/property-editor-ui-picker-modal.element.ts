@@ -5,7 +5,7 @@ import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalResult,
-	UmbModalHandler,
+	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -29,6 +29,9 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 
 	@state()
 	private _submitLabel = 'Select';
+
+	@property({ attribute: false })
+	modalContext?: UmbModalContext<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalResult>;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -72,14 +75,11 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 	}
 
 	private _close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
-	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalResult>;
-
 	private _submit() {
-		this.modalHandler?.submit({ selection: this._selection });
+		this.modalContext?.submit({ selection: this._selection });
 	}
 
 	render() {

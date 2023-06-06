@@ -1,5 +1,5 @@
-import { UmbModalHandler, UmbModalHandlerClass } from './modal-handler.js';
 import type { UmbModalToken } from './token/modal-token.js';
+import { UmbModalContext, UmbModalContextClass } from './index.js';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
@@ -15,12 +15,10 @@ export interface UmbModalConfig {
 	size?: UUIModalSidebarSize;
 }
 
-// TODO: we should find a way to easily open a modal without adding custom methods to this context. It would result in a better separation of concerns.
-// TODO: move all layouts into their correct "silo" folders. User picker should live with users etc.
-export class UmbModalContext {
+export class UmbModalManagerContext {
 	host: UmbControllerHostElement;
 	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
-	#modals = new BehaviorSubject(<Array<UmbModalHandler>>[]);
+	#modals = new BehaviorSubject(<Array<UmbModalContext>>[]);
 	public readonly modals = this.#modals.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
@@ -30,10 +28,12 @@ export class UmbModalContext {
 	/**
 	 * Opens a modal or sidebar modal
 	 * @public
-	 * @param {(string | HTMLElement)} element
-	 * @param {UmbModalOptions<unknown>} [options]
+	 * @param {(string | UmbModalToken)} modalAlias
+	 * @param {ModalData} data
+	 * @param {UmbModalConfig} config
+	 * @param {IRouterSlot | null} router
 	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalContext
+	 * @memberof UmbModalManagerContext
 	 */
 	public open<ModalData extends object = object, ModalResult = unknown>(
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
@@ -41,30 +41,29 @@ export class UmbModalContext {
 		config?: UmbModalConfig,
 		router: IRouterSlot | null = null
 	) {
-		const modalHandler = new UmbModalHandlerClass(
+		const modalContext = new UmbModalContextClass(
 			this.host,
 			router,
 			modalAlias,
 			data,
 			config
-		) as unknown as UmbModalHandler<ModalData, ModalResult>;
+		) as unknown as UmbModalContext<ModalData, ModalResult>;
 
-		modalHandler.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
+		modalContext.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalContext));
 
 		this.#modals.next(
-			appendToFrozenArray(this.#modals.getValue(), modalHandler, (entry) => entry.key === modalHandler.key)
+			appendToFrozenArray(this.#modals.getValue(), modalContext, (entry) => entry.key === modalContext.key)
 		);
-		return modalHandler;
+		return modalContext;
 	}
 
 	/**
 	 * Closes a modal or sidebar modal
 	 * @private
 	 * @param {string} key
-	 * @memberof UmbModalContext
+	 * @memberof UmbModalManagerContext
 	 */
 	public close(key: string) {
-		console.log('close', key, this.#modals);
 		const modal = this.#modals.getValue().find((modal) => modal.key === key);
 		if (modal) {
 			modal.reject();
@@ -78,13 +77,13 @@ export class UmbModalContext {
 	/**
 	 * Handles the close-end event
 	 * @private
-	 * @param {UmbModalHandler} modalHandler
-	 * @memberof UmbModalContext
+	 * @param {UmbModalContext} modalContext
+	 * @memberof UmbModalManagerContext
 	 */
-	#onCloseEnd(modalHandler: UmbModalHandler<any, any>) {
-		modalHandler.modalElement.removeEventListener('close-end', () => this.#onCloseEnd(modalHandler));
-		this.#remove(modalHandler.key);
+	#onCloseEnd(modalContext: UmbModalContext<any, any>) {
+		modalContext.modalElement.removeEventListener('close-end', () => this.#onCloseEnd(modalContext));
+		this.#remove(modalContext.key);
 	}
 }
 
-export const UMB_MODAL_CONTEXT_TOKEN = new UmbContextToken<UmbModalContext>('UmbModalContext');
+export const UMB_MODAL_MANAGER_CONTEXT_TOKEN = new UmbContextToken<UmbModalManagerContext>('UmbModalManagerContext');

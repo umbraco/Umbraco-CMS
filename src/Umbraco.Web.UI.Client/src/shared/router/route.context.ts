@@ -7,7 +7,7 @@ import {
 	UmbContextToken,
 } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_MODAL_CONTEXT_TOKEN, UmbModalRouteRegistration } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalRouteRegistration } from '@umbraco-cms/backoffice/modal';
 
 const EmptyDiv = document.createElement('div');
 
@@ -15,7 +15,7 @@ export class UmbRouteContext {
 	#mainRouter: IRouterSlot;
 	#modalRouter: IRouterSlot;
 	#modalRegistrations: UmbModalRouteRegistration[] = [];
-	#modalContext?: typeof UMB_MODAL_CONTEXT_TOKEN.TYPE;
+	#modalContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
 	#contextRoutes: UmbRoute[] = [];
 	#routerBasePath?: string;
 	#routerActiveLocalPath?: string;
@@ -25,7 +25,7 @@ export class UmbRouteContext {
 		this.#mainRouter = mainRouter;
 		this.#modalRouter = modalRouter;
 		new UmbContextProviderController(host, UMB_ROUTE_CONTEXT_TOKEN, this);
-		new UmbContextConsumerController(host, UMB_MODAL_CONTEXT_TOKEN, (context) => {
+		new UmbContextConsumerController(host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (context) => {
 			this.#modalContext = context;
 			this.#generateContextRoutes();
 		});
@@ -51,9 +51,9 @@ export class UmbRouteContext {
 			component: EmptyDiv,
 			setup: (component, info) => {
 				if (!this.#modalContext) return;
-				const modalHandler = modalRegistration.routeSetup(this.#modalRouter, this.#modalContext, info.match.params);
-				if (modalHandler) {
-					modalHandler.onSubmit().then(
+				const modalContext = modalRegistration.routeSetup(this.#modalRouter, this.#modalContext, info.match.params);
+				if (modalContext) {
+					modalContext.onSubmit().then(
 						() => {
 							this.#removeModalPath(info);
 						},

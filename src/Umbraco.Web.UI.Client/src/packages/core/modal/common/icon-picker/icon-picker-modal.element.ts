@@ -1,4 +1,4 @@
-import icons from '../../../../../shared/icon-registry/icons/icons.json' assert { type: "json" };
+import icons from '../../../../../shared/icon-registry/icons/icons.json' assert { type: 'json' };
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import { css, html, styleMap, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -61,11 +61,11 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	}
 
 	private _close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	private _submit() {
-		this.modalHandler?.submit({ color: this._currentColor, icon: this._currentIcon });
+		this.modalContext?.submit({ color: this._currentColor, icon: this._currentIcon });
 	}
 
 	private _onColorChange(e: UUIColorSwatchesEvent) {
@@ -81,7 +81,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 
 	render() {
 		return html`
-			<umb-workspace-editor headline="Select Icon">
+			<umb-body-layout headline="Select Icon">
 				<div id="container">
 					${this.renderSearchbar()}
 					<hr />
@@ -102,7 +102,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 				<uui-button slot="actions" color="positive" look="primary" @click="${this._submit}" label="Submit">
 					Submit
 				</uui-button>
-			</umb-workspace-editor>
+			</umb-body-layout>
 		`;
 	}
 

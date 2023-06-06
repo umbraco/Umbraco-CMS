@@ -1,6 +1,6 @@
 import { UmbUserGroupInputElement } from '../../../user-groups/components/input-user-group/user-group-input.element.js';
 import { UmbUserRepository } from '../../repository/user.repository.js';
-import { css, html, nothing , customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import type { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -57,7 +57,7 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 	}
 
 	private _closeModal() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	private _resetForm() {

@@ -1,6 +1,6 @@
 import { UmbLanguageRepository } from '../../repository/language.repository.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
@@ -37,11 +37,11 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	}
 
 	#submit() {
-		this.modalHandler?.submit({ selection: this.#selectionManager.getSelection() });
+		this.modalContext?.submit({ selection: this.#selectionManager.getSelection() });
 	}
 
 	#close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	render() {

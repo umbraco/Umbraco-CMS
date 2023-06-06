@@ -1,6 +1,6 @@
 import { css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { UmbFolderModalData, UmbFolderModalResult, UmbModalHandler } from '@umbraco-cms/backoffice/modal';
+import { UmbFolderModalData, UmbFolderModalResult, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionClass, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
@@ -11,7 +11,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 @customElement('umb-folder-modal')
 export class UmbFolderModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbFolderModalData, UmbFolderModalResult>;
+	modalContext?: UmbModalContext<UmbFolderModalData, UmbFolderModalResult>;
 
 	private _data?: UmbFolderModalData;
 	@property({ type: Object, attribute: false })
@@ -87,7 +87,7 @@ export class UmbFolderModalElement extends UmbLitElement {
 	private _formElement?: HTMLFormElement;
 
 	#onCancel() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	#submitForm() {
@@ -119,7 +119,7 @@ export class UmbFolderModalElement extends UmbLitElement {
 		}
 
 		if (!error) {
-			this.modalHandler?.submit();
+			this.modalContext?.submit();
 		}
 	}
 
