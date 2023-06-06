@@ -10,6 +10,8 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 
+//TODO: Add the following attributes to JSDocs: header-shadow, header-clear
+
 /**
  * @element umb-body-layout
  * @description Layout element to arrange elements in a body layout. A general layout for most views.
@@ -25,21 +27,14 @@ import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
  */
 @customElement('umb-body-layout')
 export class UmbBodyLayoutElement extends LitElement {
-	/**
-	 * Renders a headline in the header.
-	 * @public
-	 * @type {string}
-	 * @attr {boolean} clear-header - renders the header without background and borders.
-	 * @default ''
-	 */
-
-	@query('#main') scrollContainer?: HTMLElement;
+	@query('#main')
+	private _scrollContainer?: HTMLElement;
 
 	@property()
 	public headline = '';
 
-	@property({ type: Boolean, reflect: true, attribute: 'scroll-shadow' })
-	public scrollShadow = false;
+	@property({ type: Boolean, reflect: true, attribute: 'header-shadow' })
+	public headerShadow = false;
 
 	@state()
 	private _headerSlotHasChildren = false;
@@ -62,21 +57,21 @@ export class UmbBodyLayoutElement extends LitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		if (this.scrollShadow) {
+		if (this.headerShadow) {
 			requestAnimationFrame(() => {
-				this.scrollContainer?.addEventListener('scroll', this.#onScroll);
+				this._scrollContainer?.addEventListener('scroll', this.#onScroll);
 			});
 		}
 	}
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
-		this.scrollContainer?.removeEventListener('scroll', this.#onScroll);
+		this._scrollContainer?.removeEventListener('scroll', this.#onScroll);
 	}
 
 	#onScroll = () => {
-		if (!this.scrollContainer) return;
-		this.toggleAttribute('scrolling', this.scrollContainer.scrollTop > 0);
+		if (!this._scrollContainer) return;
+		this.toggleAttribute('scrolling', this._scrollContainer.scrollTop > 0);
 	};
 
 	render() {
@@ -155,17 +150,17 @@ export class UmbBodyLayoutElement extends LitElement {
 				z-index: 1;
 			}
 
-			:host([scroll-shadow]) #header {
+			:host([header-shadow]) #header {
 				transition: box-shadow 150ms ease-in-out;
 				box-shadow: 0 -1px 0px 0px rgba(0, 0, 0, 0.8);
 			}
 
-			:host([clear-header]) #header {
+			:host([header-clear]) #header {
 				background-color: transparent;
 				border-color: transparent;
 			}
 
-			:host([scroll-shadow][scrolling]) #header {
+			:host([header-shadow][scrolling]) #header {
 				/* This should be using the uui-shadows but for now they are too drastic for this use case */
 				box-shadow: 0 1px 15px 0 rgba(0, 0, 0, 0.3);
 			}

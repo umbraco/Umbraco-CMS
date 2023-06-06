@@ -35,7 +35,7 @@ export class UmbUserCollectionElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-body-layout clear-header scroll-shadow>
+			<umb-body-layout header-clear header-shadow>
 				<umb-user-collection-header slot="header"></umb-user-collection-header>
 				<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>
 				<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>
