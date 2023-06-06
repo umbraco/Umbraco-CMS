@@ -433,7 +433,7 @@ public class MacroRenderer : IMacroRenderer
     /// </summary>
     private Attempt<MacroContent?> ExecuteMacroWithErrorWrapper(MacroModel macro, string msgIn, string msgOut, Func<MacroContent> getMacroContent, Func<string> msgErr)
     {
-        using (_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<MacroRenderer>(msgIn, msgOut))
+        using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<MacroRenderer>(msgIn, msgOut))
         {
             return ExecuteProfileMacroWithErrorWrapper(macro, msgIn, getMacroContent, msgErr);
         }
