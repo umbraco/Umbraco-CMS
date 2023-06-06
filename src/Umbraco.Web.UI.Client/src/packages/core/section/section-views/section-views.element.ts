@@ -140,7 +140,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	}
 
 	#renderDashboards() {
-		return html`
+		return this._dashboards.length > 0 ? html`
 			<uui-tab-group id="dashboards">
 				${this._dashboards.map(
 					(dashboard) => html`
@@ -153,11 +153,11 @@ export class UmbSectionViewsElement extends UmbLitElement {
 					`
 				)}
 			</uui-tab-group>
-		`;
+		` : '';
 	}
 
 	#renderViews() {
-		return html`
+		return this._views.length > 0 ? html`
 			<uui-tab-group id="views">
 				${this._views.map(
 					(view) => html`
@@ -171,7 +171,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 					`
 				)}
 			</uui-tab-group>
-		`;
+		` : '';
 	}
 
 	static styles = [
@@ -192,6 +192,10 @@ export class UmbSectionViewsElement extends UmbLitElement {
 				align-items: center;
 				height: var(--umb-header-layout-height);
 				box-sizing: border-box;
+			}
+
+			#dashboards {
+				margin: 0 var(--uui-size-layout-1);
 			}
 
 			#views {
