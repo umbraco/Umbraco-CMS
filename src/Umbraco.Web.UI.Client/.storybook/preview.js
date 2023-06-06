@@ -17,7 +17,7 @@ import customElementManifests from '../dist-cms/custom-elements.json';
 import { UmbIconRegistry } from '../src/shared/icon-registry/icon.registry';
 import { onUnhandledRequest } from '../src/mocks';
 import { handlers } from '../src/mocks/browser-handlers';
-import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../src/packages/core/modal';
+import { UMB_MODAL_CONTEXT_TOKEN, UmbModalManagerContext } from '../src/packages/core/modal';
 import { UmbLitElement } from '../src/shared/lit-element';
 
 import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
@@ -35,7 +35,7 @@ class UmbStoryBookElement extends UmbLitElement {
 		super();
 		this._umbIconRegistry.attach(this);
 		this._registerExtensions(documentManifests);
-		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
+		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalManagerContext(this));
 	}
 
 	_registerExtensions(manifests) {
