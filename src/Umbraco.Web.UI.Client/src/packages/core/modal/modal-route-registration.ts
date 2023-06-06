@@ -1,5 +1,5 @@
-import { UmbModalHandler } from './modal-handler.js';
-import { UmbModalConfig, UmbModalContext } from './modal.context.js';
+import { UmbModalContext } from './modal-context.js';
+import { UmbModalConfig, UmbModalManagerContext } from './modal-manager.context.js';
 import { UmbModalToken } from './token/modal-token.js';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
@@ -18,7 +18,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	#onSubmitCallback?: (data: UmbModalTokenResult) => void;
 	#onRejectCallback?: () => void;
 
-	#modalHandler: UmbModalHandler<UmbModalTokenData, UmbModalTokenResult> | undefined;
+	#modalContext: UmbModalContext<UmbModalTokenData, UmbModalTokenResult> | undefined;
 	#routeBuilder?: UmbModalRouteBuilder;
 	#urlBuilderCallback: ((urlBuilder: UmbModalRouteBuilder) => void) | undefined;
 
@@ -62,20 +62,20 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	 * Returns true if the modal is currently active.
 	 */
 	public get active() {
-		return !!this.#modalHandler;
+		return !!this.#modalContext;
 	}
 
-	public open(params: { [key: string]: string | number }) {
+	public open(params: { [key: string]: string | number }, prepend?: string) {
 		if (this.active) return;
 
-		window.history.pushState({}, '', this.#routeBuilder?.(params));
+		window.history.pushState({}, '', this.#routeBuilder?.(params) + (prepend ? `/${prepend}` : ''));
 	}
 
 	/**
 	 * Returns the modal handler if the modal is currently active. Otherwise its undefined.
 	 */
-	public get modalHandler() {
-		return this.#modalHandler;
+	public get modalContext() {
+		return this.#modalContext;
 	}
 
 	public observeRouteBuilder(callback: (urlBuilder: UmbModalRouteBuilder) => void) {
@@ -102,22 +102,22 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 
 	#onSubmit = (data: UmbModalTokenResult) => {
 		this.#onSubmitCallback?.(data);
-		this.#modalHandler = undefined;
+		this.#modalContext = undefined;
 	};
 	#onReject = () => {
 		this.#onRejectCallback?.();
-		this.#modalHandler = undefined;
+		this.#modalContext = undefined;
 	};
 
-	routeSetup(router: IRouterSlot, modalContext: UmbModalContext, params: Params) {
+	routeSetup(router: IRouterSlot, modalContext: UmbModalManagerContext, params: Params) {
 		// If already open, don't do anything:
 		if (this.active) return;
 
 		const modalData = this.#onSetupCallback ? this.#onSetupCallback(params) : undefined;
 		if (modalData !== false) {
-			this.#modalHandler = modalContext.open(this.#modalAlias, modalData, this.modalConfig, router);
-			this.#modalHandler.onSubmit().then(this.#onSubmit, this.#onReject);
-			return this.#modalHandler;
+			this.#modalContext = modalContext.open(this.#modalAlias, modalData, this.modalConfig, router);
+			this.#modalContext.onSubmit().then(this.#onSubmit, this.#onReject);
+			return this.#modalContext;
 		}
 		return null;
 	}

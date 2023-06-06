@@ -1,4 +1,4 @@
-import { html, css , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbCreateDocumentModalResultData, UmbExamineFieldsSettingsModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
@@ -12,7 +12,7 @@ export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
 	private _fields?: UmbExamineFieldsSettingsModalData;
 
 	private _handleClose() {
-		this.modalHandler?.submit({ fields: this._fields });
+		this.modalContext?.submit({ fields: this._fields });
 	}
 
 	disconnectedCallback(): void {

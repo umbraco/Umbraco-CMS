@@ -4,9 +4,13 @@ import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
-	UmbPropertyEditorUIPickerModalData,
-	UmbPropertyEditorUIPickerModalResult,
-	UmbModalHandler,
+	UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL,
+	UMB_WORKSPACE_MODAL,
+	UmbDataTypePickerFlowModalData,
+	UmbDataTypePickerFlowModalResult,
+	UmbModalContext,
+	UmbModalRouteBuilder,
+	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -18,18 +22,18 @@ interface GroupedItems<T> {
 @customElement('umb-data-type-picker-flow-modal')
 export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalResult>;
+	modalContext?: UmbModalContext<UmbDataTypePickerFlowModalData, UmbDataTypePickerFlowModalResult>;
 
 	@property({ type: Object })
-	public get data(): UmbPropertyEditorUIPickerModalData | undefined {
+	public get data(): UmbDataTypePickerFlowModalData | undefined {
 		return this._data;
 	}
-	public set data(value: UmbPropertyEditorUIPickerModalData | undefined) {
+	public set data(value: UmbDataTypePickerFlowModalData | undefined) {
 		this._data = value;
 		this._selection = this.data?.selection ?? [];
 		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
 	}
-	private _data?: UmbPropertyEditorUIPickerModalData | undefined;
+	private _data?: UmbDataTypePickerFlowModalData | undefined;
 
 	@state()
 	private _groupedDataTypes?: GroupedItems<EntityTreeItemResponseModel>;
@@ -43,16 +47,57 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	@state()
 	private _submitLabel = 'Select';
 
+	@state()
+	private _dataTypePickerModalRouteBuilder?: UmbModalRouteBuilder;
+
+	private _createDataTypeModal: UmbModalRouteRegistrationController;
+
 	#repository;
 	#dataTypes: Array<EntityTreeItemResponseModel> = [];
 	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 	#currentFilterQuery = '';
 
+	//UMB_DATA_TYPE_PICKER_FLOW_UI_PICKER_MODAL;
+
 	constructor() {
 		super();
 		this.#repository = new UmbDataTypeRepository(this);
 
+		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL)
+			.addAdditionalPath(':uiAlias')
+			.onSetup((routingInfo) => {
+				return {
+					propertyEditorUiAlias: routingInfo.uiAlias,
+				};
+			})
+			.onSubmit((submitData) => {
+				if (submitData.dataTypeId) {
+					this._select(submitData.dataTypeId);
+				} else if (submitData.createNewWithPropertyEditorUiAlias) {
+					this._createDataType(submitData.createNewWithPropertyEditorUiAlias);
+				}
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._dataTypePickerModalRouteBuilder = routeBuilder;
+				this.requestUpdate('_dataTypePickerModalRouteBuilder');
+			});
+
+		this._createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath(':uiAlias')
+			.onSetup((params) => {
+				return { entityType: 'data-type', preset: { propertyEditorUiAlias: params.uiAlias } };
+			})
+			.onSubmit((submitData) => {
+				console.log('submitData', submitData);
+			});
+
 		this.#init();
+	}
+
+	private _createDataType(propertyEditorUiAlias: string) {
+		// TODO: Could be nice with a more pretty way to prepend to the URL:
+		// Open create modal:
+		this._createDataTypeModal.open({ uiAlias: propertyEditorUiAlias }, 'create/null');
 	}
 
 	async #init() {
@@ -70,10 +115,6 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 			this.#propertyEditorUIs = propertyEditorUIs;
 			this._performFiltering();
 		});
-	}
-
-	private _handleUIClick(propertyEditorUi: ManifestPropertyEditorUi) {
-		alert('To BE DONE.');
 	}
 
 	private _handleDataTypeClick(dataType: EntityTreeItemResponseModel) {
@@ -116,11 +157,11 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	}
 
 	private _close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	private _submit() {
-		this.modalHandler?.submit({ selection: this._selection });
+		this.modalContext?.submit({ selection: this._selection });
 	}
 
 	render() {
@@ -191,16 +232,20 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 
 	private _renderGroupUIs(uis: Array<ManifestPropertyEditorUi>) {
 		return html` <ul id="item-grid">
-			${repeat(
-				uis,
-				(propertyEditorUI) => propertyEditorUI.alias,
-				(propertyEditorUI) => html` <li class="item">
-					<button type="button" @click="${() => this._handleUIClick(propertyEditorUI)}">
-						<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
-						${propertyEditorUI.meta.label || propertyEditorUI.name}
-					</button>
-				</li>`
-			)}
+			${this._dataTypePickerModalRouteBuilder
+				? repeat(
+						uis,
+						(propertyEditorUI) => propertyEditorUI.alias,
+						(propertyEditorUI) => html` <li class="item">
+							<uui-button
+								type="button"
+								href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
+								<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
+								${propertyEditorUI.meta.label || propertyEditorUI.name}
+							</uui-button>
+						</li>`
+				  )
+				: ''}
 		</ul>`;
 	}
 
@@ -240,21 +285,8 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				cursor: pointer;
 			}
 
-			#item-grid .item[selected] button {
-				background: var(--uui-color-selected);
-				color: var(--uui-color-selected-contrast);
-			}
-
-			#item-grid .item button {
-				background: none;
-				border: none;
-				cursor: pointer;
+			#item-grid .item uui-button {
 				padding: var(--uui-size-space-3);
-				display: flex;
-				align-items: center;
-				flex-direction: column;
-				justify-content: center;
-				font-size: 0.8rem;
 				height: 100%;
 				width: 100%;
 				color: var(--uui-color-interactive);

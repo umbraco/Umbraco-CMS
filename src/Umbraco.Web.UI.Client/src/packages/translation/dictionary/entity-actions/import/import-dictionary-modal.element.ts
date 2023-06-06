@@ -1,5 +1,5 @@
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
-import { css, html , customElement, query, state , when } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbImportDictionaryModalData, UmbImportDictionaryModalResult } from '@umbraco-cms/backoffice/modal';
 import { ImportDictionaryRequestModel } from '@umbraco-cms/backoffice/backend-api';
@@ -42,14 +42,14 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	async #importDictionary() {
 		if (!this._uploadedDictionaryTempId) return;
 
-		this.modalHandler?.submit({
+		this.modalContext?.submit({
 			temporaryFileId: this._uploadedDictionaryTempId,
 			parentId: this._selection[0],
 		});
 	}
 
 	#handleClose() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	#submitForm() {

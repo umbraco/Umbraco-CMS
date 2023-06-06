@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbModalContext,
-	UMB_MODAL_CONTEXT_TOKEN,
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_PROPERTY_EDITOR_UI_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -38,12 +38,12 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 	private _data: Array<any> = [];
 
 	private _workspaceContext?: UmbDataTypeWorkspaceContext;
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 
@@ -128,11 +128,11 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 	private _openPropertyEditorUIPicker() {
 		if (!this._dataType) return;
 
-		const modalHandler = this._modalContext?.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
 			selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
 		});
 
-		modalHandler?.onSubmit().then(({ selection }) => {
+		modalContext?.onSubmit().then(({ selection }) => {
 			this._selectPropertyEditorUI(selection[0]);
 		});
 	}
@@ -197,6 +197,11 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 		css`
 			:host {
 				display: block;
+				margin: var(--uui-size-layout-1);
+				padding-bottom: var(--uui-size-layout-1);
+			}
+
+			uui-box {
 				padding: var(--uui-size-layout-1);
 			}
 		`,

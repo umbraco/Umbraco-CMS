@@ -35,6 +35,8 @@
 			"@umbraco-cms/backoffice/observable-api": ["src/libs/observable-api"],
 
 			// SHARED
+			"@umbraco-cms/backoffice/auth": ["src/shared/auth"],
+			"@umbraco-cms/backoffice/context": ["src/shared/context"],
 			"@umbraco-cms/backoffice/events": ["src/shared/umb-events"],
 			"@umbraco-cms/backoffice/icon": ["src/shared/icon-registry"],
 			"@umbraco-cms/backoffice/models": ["src/shared/models"],

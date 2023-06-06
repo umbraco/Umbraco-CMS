@@ -1,7 +1,11 @@
-import { html , customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_ICON_PICKER_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
@@ -16,11 +20,11 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 	@property({ type: Array, attribute: false })
 	public config?: UmbDataTypePropertyCollection;
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}

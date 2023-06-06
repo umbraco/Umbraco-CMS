@@ -1,6 +1,10 @@
-import { css, html, nothing , customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles, FormControlMixin, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_CONFIRM_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -30,25 +34,25 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 	@query('#input')
 	protected _input?: UUIInputElement;
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}
 
 	#onDelete() {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: `Delete ${this.value || 'item'}`,
 			content: 'Are you sure you want to delete this item?',
 			color: 'danger',
 			confirmLabel: 'Delete',
 		});
 
-		modalHandler?.onSubmit().then(() => {
+		modalContext?.onSubmit().then(() => {
 			this.dispatchEvent(new UmbDeleteEvent());
 		});
 	}

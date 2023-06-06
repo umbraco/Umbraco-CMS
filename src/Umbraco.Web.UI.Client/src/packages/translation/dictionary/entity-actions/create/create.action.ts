@@ -4,7 +4,11 @@ import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@um
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CREATE_DICTIONARY_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_CREATE_DICTIONARY_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 
 // TODO: temp import
 import './create-dictionary-modal-layout.element.js';
@@ -12,14 +16,14 @@ import './create-dictionary-modal-layout.element.js';
 export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryRepository> {
 	static styles = [UUITextStyles];
 
-	#modalContext?: UmbModalContext;
+	#modalContext?: UmbModalManagerContext;
 
 	#sectionSidebarContext!: UmbSectionSidebarContext;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 
-		new UmbContextConsumerController(this.host, UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		new UmbContextConsumerController(this.host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;
 		});
 
@@ -35,13 +39,13 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 
 		// TODO: how can we get the current entity detail in the modal? Passing the observable
 		// feels a bit hacky. Works, but hacky.
-		const modalHandler = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, {
+		const modalContext = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, {
 			unique: this.unique,
 			parentName: this.#sectionSidebarContext.headline,
 		});
 
 		// TODO: get type from modal result
-		const { name } = await modalHandler.onSubmit();
+		const { name } = await modalContext.onSubmit();
 		if (!name) return;
 
 		const { data } = await this.repository.createScaffold(this.unique, name);

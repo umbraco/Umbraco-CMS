@@ -7,7 +7,11 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_CONFIRM_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UmbModalManagerContext,
+} from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
@@ -18,7 +22,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	private _userKeys?: Array<string>;
 
 	#workspaceContext?: UmbUserGroupWorkspaceContext;
-	#modalContext?: UmbModalContext;
+	#modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
@@ -29,7 +33,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 			this.observe(this.#workspaceContext.userIds, (userKeys) => (this._userKeys = userKeys));
 		});
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;
 		});
 	}
@@ -45,14 +49,14 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	async #onDelete() {
 		if (!this.#modalContext || !this.#workspaceContext) return;
 
-		const modalHandler = this.#modalContext.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this.#modalContext.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Delete user group ${this._userGroup?.name}?`,
 			content: html`Are you sure you want to delete <b>${this._userGroup?.name}</b> user group?`,
 			confirmLabel: 'Delete',
 		});
 
-		await modalHandler.onSubmit();
+		await modalContext.onSubmit();
 
 		if (!this._userGroup || !this._userGroup.id) return;
 

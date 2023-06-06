@@ -48,6 +48,8 @@ export default {
 						'@umbraco-cms/backoffice/extension-api': './src/libs/extension-api/index.ts',
 						'@umbraco-cms/backoffice/observable-api': './src/libs/observable-api/index.ts',
 
+						'@umbraco-cms/backoffice/auth': './src/shared/auth/index.ts',
+						'@umbraco-cms/backoffice/context': './src/shared/context/index.ts',
 						'@umbraco-cms/backoffice/events': './src/shared/umb-events/index.ts',
 						'@umbraco-cms/backoffice/icon': './src/shared/icon-registry/index.ts',
 						'@umbraco-cms/backoffice/models': './src/shared/models/index.ts',

@@ -2,19 +2,19 @@ import type { UmbDocumentRepository } from '../../repository/document.repository
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
-	UmbModalContext,
-	UMB_MODAL_CONTEXT_TOKEN,
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_ALLOWED_DOCUMENT_TYPES_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
-	#modalContext?: UmbModalContext;
+	#modalContext?: UmbModalManagerContext;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 
-		new UmbContextConsumerController(this.host, UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		new UmbContextConsumerController(this.host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;
 		});
 	}
@@ -45,12 +45,12 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 
 	private async _openModal(parentId: string | null, parentName?: string) {
 		if (!this.#modalContext) return;
-		const modalHandler = this.#modalContext.open(UMB_ALLOWED_DOCUMENT_TYPES_MODAL, {
+		const modalContext = this.#modalContext.open(UMB_ALLOWED_DOCUMENT_TYPES_MODAL, {
 			parentId: parentId,
 			parentName: parentName,
 		});
 
-		const { documentTypeKey } = await modalHandler.onSubmit();
+		const { documentTypeKey } = await modalContext.onSubmit();
 
 		// TODO: how do we want to generate these urls?
 		history.pushState(
