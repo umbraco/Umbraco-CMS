@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+import type { IUmbAuth } from './auth.interface.js';
 import {
 	BaseTokenRequestHandler,
 	BasicQueryStringUtils,
@@ -31,6 +32,8 @@ import {
 } from '@umbraco-cms/backoffice/external/openid';
 
 const requestor = new FetchRequestor();
+
+const TOKEN_RESPONSE_NAME = 'umb:userAuthTokenResponse';
 
 /**
  * This class is needed to prevent the hash from being parsed as part of the query string.
@@ -78,7 +81,7 @@ class UmbNoHashQueryStringUtils extends BasicQueryStringUtils {
  *   a. This will redirect the user to the authorization endpoint of the server
  * 4. After login, get the latest token before each request to the server by calling the `performWithFreshTokens` method
  */
-export class UmbAuthFlow {
+export class UmbAuthFlow implements IUmbAuth {
 	// handlers
 	readonly #notifier: AuthorizationNotifier;
 	readonly #authorizationHandler: RedirectRequestHandler;
@@ -155,7 +158,7 @@ export class UmbAuthFlow {
 	async setInitialState() {
 		// Ensure there is a connection to the server
 		await this.fetchServiceConfiguration();
-		const tokenResponseJson = await this.#storageBackend.getItem('tokenResponse');
+		const tokenResponseJson = await this.#storageBackend.getItem(TOKEN_RESPONSE_NAME);
 		if (tokenResponseJson) {
 			const response = new TokenResponse(JSON.parse(tokenResponseJson));
 			if (response.isValid()) {
@@ -238,7 +241,7 @@ export class UmbAuthFlow {
 		// forget all cached token state
 		this.#accessTokenResponse = undefined;
 		this.#refreshToken = undefined;
-		await this.#storageBackend.removeItem('tokenResponse');
+		await this.#storageBackend.removeItem(TOKEN_RESPONSE_NAME);
 	}
 
 	/**
@@ -282,7 +285,7 @@ export class UmbAuthFlow {
 	 */
 	async #saveTokenState() {
 		if (this.#accessTokenResponse) {
-			await this.#storageBackend.setItem('tokenResponse', JSON.stringify(this.#accessTokenResponse.toJson()));
+			await this.#storageBackend.setItem(TOKEN_RESPONSE_NAME, JSON.stringify(this.#accessTokenResponse.toJson()));
 		}
 	}
 

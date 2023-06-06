@@ -1,3 +1,5 @@
+import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
+import { UMB_APP } from '@umbraco-cms/backoffice/context';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user.store.js';
 import type { UmbLoggedInUser } from '../../types.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
@@ -15,12 +17,24 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 
 	private _currentUserStore?: UmbCurrentUserStore;
 
+	#auth?: typeof UMB_AUTH.TYPE;
+
+	#appContext?: typeof UMB_APP.TYPE;
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (instance) => {
 			this._currentUserStore = instance;
 			this._observeCurrentUser();
+		});
+
+		this.consumeContext(UMB_AUTH, (instance) => {
+			this.#auth = instance;
+		});
+
+		this.consumeContext(UMB_APP, (instance) => {
+			this.#appContext = instance;
 		});
 
 		this._observeCurrentUser();
@@ -38,8 +52,13 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 		this.modalContext?.submit();
 	}
 
-	private _logout() {
-		alert('implement log out');
+	private async _logout() {
+		if (!this.#auth) return;
+		this.#auth.performWithFreshTokens;
+		await this.#auth.signOut();
+		let newUrl = this.#appContext ? `${this.#appContext.getBackofficePath()}/login` : '/';
+		newUrl = newUrl.replace(/\/\//g, '/');
+		location.href = newUrl;
 	}
 
 	render() {
