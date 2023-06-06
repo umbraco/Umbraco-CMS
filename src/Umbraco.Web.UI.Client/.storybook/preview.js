@@ -4,23 +4,21 @@ import '../src/css/umb-css.css';
 import 'element-internals-polyfill';
 import '@umbraco-ui/uui';
 
+import { handlers } from '../src/mocks/browser-handlers';
 import { html } from 'lit';
 import { initialize, mswDecorator } from 'msw-storybook-addon';
+import { onUnhandledRequest } from '../src/mocks';
 import { setCustomElements } from '@storybook/web-components';
 
+import { UMB_MODAL_CONTEXT_TOKEN, UmbModalManagerContext } from '../src/packages/core/modal';
 import { UmbDataTypeStore } from '../src/packages/settings/data-types/repository/data-type.store.ts';
-import { UmbDocumentTypeStore } from '../src/packages/documents/document-types/repository/document-type.store.ts';
 import { UmbDocumentStore } from '../src/packages/documents/documents/repository/document.store.ts';
 import { UmbDocumentTreeStore } from '../src/packages/documents/documents/repository/document.tree.store.ts';
-
-import customElementManifests from '../dist-cms/custom-elements.json';
-import { UmbIconRegistry } from '../src/shared/icon-registry/icon.registry';
-import { onUnhandledRequest } from '../src/mocks';
-import { handlers } from '../src/mocks/browser-handlers';
-import { UMB_MODAL_CONTEXT_TOKEN, UmbModalManagerContext } from '../src/packages/core/modal';
-import { UmbLitElement } from '../src/shared/lit-element';
-
+import { UmbDocumentTypeStore } from '../src/packages/documents/document-types/repository/document-type.store.ts';
 import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
+import { UmbIconRegistry } from '../src/shared/icon-registry/icon.registry';
+import { UmbLitElement } from '../src/shared/lit-element';
+import customElementManifests from '../dist-cms/custom-elements.json';
 
 import '../src/libs/context-api/provide/context-provider.element';
 import '../src/libs/controller-api/controller-host-initializer.element.ts';

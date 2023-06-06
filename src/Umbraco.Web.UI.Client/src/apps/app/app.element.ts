@@ -1,6 +1,6 @@
+import type { UmbAppErrorElement } from './app-error.element.js';
 import { UMB_AUTH, UmbAuthFlow } from '@umbraco-cms/backoffice/auth';
 import { UMB_APP, UmbAppContext } from '@umbraco-cms/backoffice/context';
-import type { UmbAppErrorElement } from './app-error.element.js';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
 import { UmbIconRegistry } from '@umbraco-cms/backoffice/icon';
