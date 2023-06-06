@@ -46,7 +46,7 @@ public sealed class HtmlUrlParser
             return text;
         }
 
-        using (DisposableTimer? timer = _profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration(
+        using (DisposableTimer? timer = !(_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug)) ? null : _profilingLogger.DebugDuration(
                    typeof(IOHelper),
                    "ResolveUrlsFromTextString starting",
                    "ResolveUrlsFromTextString complete"))

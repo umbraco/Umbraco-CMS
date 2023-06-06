@@ -88,7 +88,7 @@ public class LogScrubber : RecurringHostedServiceBase
 
         // Ensure we use an explicit scope since we are running on a background thread.
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
-        using (_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
+        using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
         {
             _auditService.CleanLogs((int)_settings.MaxLogAge.TotalMinutes);
             _ = scope.Complete();

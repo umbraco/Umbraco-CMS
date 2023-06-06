@@ -89,7 +89,7 @@ public class KeepAlive : RecurringHostedServiceBase
             return;
         }
 
-        using (_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
+        using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
         {
             var umbracoAppUrl = _hostingEnvironment.ApplicationMainUrl?.ToString();
             if (umbracoAppUrl.IsNullOrWhiteSpace())

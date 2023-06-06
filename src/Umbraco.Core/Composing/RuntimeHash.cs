@@ -45,7 +45,7 @@ public class RuntimeHash : IRuntimeHash
     /// </remarks>
     private string GetFileHash(IEnumerable<(FileSystemInfo fileOrFolder, bool scanFileContent)> filesAndFolders)
     {
-        using (_logger.IsEnabled(Logging.LogLevel.Debug) ? null : _logger.DebugDuration<RuntimeHash>("Determining hash of code files on disk", "Hash determined"))
+        using (!_logger.IsEnabled(Logging.LogLevel.Debug) ? null : _logger.DebugDuration<RuntimeHash>("Determining hash of code files on disk", "Hash determined"))
         {
             // get the distinct file infos to hash
             var uniqInfos = new HashSet<string>();

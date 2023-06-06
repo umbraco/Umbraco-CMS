@@ -79,7 +79,7 @@ public class NestedContentSingleValueConverter : NestedContentValueConverterBase
     /// <inheritdoc />
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        using (_proflog.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _proflog.DebugDuration<NestedContentSingleValueConverter>(
+        using (!_proflog.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _proflog.DebugDuration<NestedContentSingleValueConverter>(
                    $"ConvertPropertyToNestedContent ({propertyType.DataType.Id})"))
         {
             var value = (string?)inter;

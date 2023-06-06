@@ -18,7 +18,7 @@ public class
     {
         IProfilingLogger logger = factory.GetRequiredService<IProfilingLogger>();
 
-        using (logger.IsEnabled(Logging.LogLevel.Debug) ? null : logger.DebugDuration<ComponentCollectionBuilder>(
+        using (!logger.IsEnabled(Logging.LogLevel.Debug) ? null : logger.DebugDuration<ComponentCollectionBuilder>(
                    $"Creating components. (log when >{LogThresholdMilliseconds}ms)", "Created."))
         {
             return base.CreateItems(factory);

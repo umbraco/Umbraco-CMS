@@ -120,7 +120,7 @@ public class HealthCheckNotifier : RecurringHostedServiceBase
         // checks can be making service/database calls so we want to ensure the CallContext/Ambient scope
         // isn't used since that can be problematic.
         using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
-        using (_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
+        using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
         {
             // Don't notify for any checks that are disabled, nor for any disabled just for notifications.
             Guid[] disabledCheckIds = _healthChecksSettings.Notification.DisabledChecks
