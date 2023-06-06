@@ -9,6 +9,7 @@ on:
     branches: [main]
     paths:
       - 'src/**'
+      - 'devops/publish/**'
       - 'package.json'
       - 'package-lock.json'
       - 'tsconfig.json'
