@@ -13,6 +13,7 @@ import {
 	UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 type ItemType = DocumentTypeResponseModel & {$type: string};
 
@@ -129,7 +130,13 @@ export class UmbDocumentTypeRepository
 		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
 
-		return await this.#detailDataSource.createScaffold(parentId);
+		const { data } = await this.#detailDataSource.createScaffold(parentId);
+
+		if (data) {
+			this.#detailStore?.append(data);
+		}
+
+		return { data };
 	}
 
 	async requestById(id: string) {

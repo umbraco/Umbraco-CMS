@@ -1,7 +1,8 @@
-import type { UmbDataSource, DataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { CreateDocumentTypeRequestModel, DocumentTypeResource, DocumentTypeResponseModel, UpdateDocumentTypeRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 /**
  * A data source for the Document Type that fetches data from the server
@@ -47,9 +48,11 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocu
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async createScaffold(parentId: string | null) {
-		const data: CreateDocumentTypeRequestModel = {
-			//id: UmbId.new(),
+		// TODO: Type hack to append $type and parentId to the DocumentTypeResponseModel.
+		const data: DocumentTypeResponseModel & {$type: string, parentId: string | null} = {
 			$type: '',
+			id: UmbId.new(),
+			parentId: parentId,
 			name: '',
 			alias: '',
 			description: '',
@@ -62,7 +65,11 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocu
 			compositions: [],
 			allowedTemplateIds: [],
 			defaultTemplateId: null,
-			cleanup: undefined,
+			cleanup: {
+				preventCleanup: false,
+				keepAllVersionsNewerThanDays: null,
+				keepLatestVersionPerDayForDays: null,
+			},
 			properties: [],
 			containers: [],
 		};
