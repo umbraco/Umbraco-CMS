@@ -142,6 +142,8 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 
 			#icon {
 				font-size: calc(var(--uui-size-layout-3) / 2);
+				margin-right: var(--uui-size-space-2);
+				margin-left: calc(var(--uui-size-space-4) * -1);
 			}
 		`,
 	];
