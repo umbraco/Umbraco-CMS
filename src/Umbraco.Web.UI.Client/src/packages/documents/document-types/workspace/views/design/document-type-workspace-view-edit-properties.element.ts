@@ -6,7 +6,7 @@ import { UmbSorterController, UmbSorterConfig } from '@umbraco-cms/backoffice/so
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	DocumentTypePropertyTypeResponseModel,
-	PropertyTypeResponseModelBaseModel,
+	PropertyTypeModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import './document-type-workspace-view-edit-property.element.js';
@@ -78,7 +78,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper(this);
 
 	@state()
-	_propertyStructure: Array<PropertyTypeResponseModelBaseModel> = [];
+	_propertyStructure: Array<PropertyTypeModelBaseModel> = [];
 
 	#modalContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
 

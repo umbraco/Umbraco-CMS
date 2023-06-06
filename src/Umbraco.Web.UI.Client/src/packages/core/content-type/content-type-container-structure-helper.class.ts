@@ -2,7 +2,7 @@ import {
 	PropertyContainerTypes,
 	UmbContentTypePropertyStructureManager,
 } from './content-type-structure-manager.class.js';
-import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
@@ -20,12 +20,12 @@ export class UmbContentTypeContainerStructureHelper {
 
 	// Containers defined in data might be more than actual containers to display as we merge them by name.
 	// Direct containers are the containers defining the total of this container(Multiple containers with the same name and type)
-	private _directContainers: PropertyTypeContainerResponseModelBaseModel[] = [];
+	private _directContainers: PropertyTypeContainerModelBaseModel[] = [];
 	// Owner containers are containers owned by the owner Document Type (The specific one up for editing)
-	private _ownerContainers: PropertyTypeContainerResponseModelBaseModel[] = [];
+	private _ownerContainers: PropertyTypeContainerModelBaseModel[] = [];
 
 	// State containing the merged containers (only one pr. name):
-	#containers = new UmbArrayState<PropertyTypeContainerResponseModelBaseModel>([], (x) => x.id);
+	#containers = new UmbArrayState<PropertyTypeContainerModelBaseModel>([], (x) => x.id);
 	readonly containers = this.#containers.asObservable();
 
 	#hasProperties = new UmbBooleanState(false);
@@ -159,7 +159,7 @@ export class UmbContentTypeContainerStructureHelper {
 		);
 	}
 
-	private _insertGroupContainers = (groupContainers: PropertyTypeContainerResponseModelBaseModel[]) => {
+	private _insertGroupContainers = (groupContainers: PropertyTypeContainerModelBaseModel[]) => {
 		groupContainers.forEach((group) => {
 			if (group.name !== null && group.name !== undefined) {
 				if (!this.#containers.getValue().find((x) => x.name === group.name)) {
@@ -188,7 +188,7 @@ export class UmbContentTypeContainerStructureHelper {
 
 	async partialUpdateContainer(
 		containerId?: string,
-		partialUpdate?: Partial<PropertyTypeContainerResponseModelBaseModel>
+		partialUpdate?: Partial<PropertyTypeContainerModelBaseModel>
 	) {
 		await this.#init;
 		if (!this.#structure || !containerId || !partialUpdate) return;

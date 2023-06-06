@@ -1,8 +1,7 @@
-import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import { DocumentTypeResource, DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbDataSource, DataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import { CreateDocumentTypeRequestModel, DocumentTypeResource, DocumentTypeResponseModel, UpdateDocumentTypeRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 
 /**
  * A data source for the Document Type that fetches data from the server
@@ -10,7 +9,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
  * @class UmbDocumentTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, any, DocumentTypeResponseModel> {
+export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocumentTypeRequestModel, any, UpdateDocumentTypeRequestModel, DocumentTypeResponseModel> {
 	#host: UmbControllerHostElement;
 
 	/**
@@ -48,8 +47,9 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, 
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async createScaffold(parentId: string | null) {
-		const data: DocumentTypeResponseModel = {
-			id: UmbId.new(),
+		const data: CreateDocumentTypeRequestModel = {
+			//id: UmbId.new(),
+			$type: '',
 			name: '',
 			alias: '',
 			description: '',
@@ -76,28 +76,15 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, 
 	 * @return {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async insert(document: DocumentTypeResponseModel) {
-		if (!document.id) throw new Error('ID is missing');
+	async insert(document: CreateDocumentTypeRequestModel) {
+		if (!document) throw new Error('Document is missing');
+		//if (!document.id) throw new Error('ID is missing');
 
-		let body: string;
-
-		try {
-			body = JSON.stringify(document);
-		} catch (error) {
-			console.error(error);
-			return Promise.reject();
-		}
-		//return tryExecuteAndNotify(this.#host, DocumentTypeResource.postDocument(payload));
-		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<string>(
+		return tryExecuteAndNotify(
 			this.#host,
-			fetch('/umbraco/management/api/v1/document-type', {
-				method: 'POST',
-				body: body,
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}) as any
+			DocumentTypeResource.postDocumentType({
+				requestBody: document,
+			})
 		);
 	}
 

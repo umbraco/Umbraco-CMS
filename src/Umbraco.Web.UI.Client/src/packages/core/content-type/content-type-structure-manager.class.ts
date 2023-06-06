@@ -2,8 +2,8 @@ import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	DocumentTypePropertyTypeResponseModel,
-	PropertyTypeContainerResponseModelBaseModel,
-	PropertyTypeResponseModelBaseModel,
+	PropertyTypeContainerModelBaseModel,
+	PropertyTypeModelBaseModel,
 	DocumentTypeResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
@@ -35,7 +35,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		x.flatMap((x) => x.containers ?? [])
 	);
 
-	#containers = new UmbArrayState<PropertyTypeContainerResponseModelBaseModel>([], (x) => x.id);
+	#containers = new UmbArrayState<PropertyTypeContainerModelBaseModel>([], (x) => x.id);
 
 	constructor(host: UmbControllerHostElement, typeRepository: R) {
 		this.#host = host;
@@ -171,7 +171,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		await this.#init;
 		contentTypeId = contentTypeId ?? this.#ownerDocumentTypeId!;
 
-		const container: PropertyTypeContainerResponseModelBaseModel = {
+		const container: PropertyTypeContainerModelBaseModel = {
 			id: UmbId.new(),
 			parentId: parentId,
 			name: 'New',
@@ -190,7 +190,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	async updateContainer(
 		documentTypeId: string | null,
 		groupKey: string,
-		partialUpdate: Partial<PropertyTypeContainerResponseModelBaseModel>
+		partialUpdate: Partial<PropertyTypeContainerModelBaseModel>
 	) {
 		await this.#init;
 		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
@@ -216,7 +216,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		await this.#init;
 		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
 
-		const property: PropertyTypeResponseModelBaseModel = {
+		const property: PropertyTypeModelBaseModel = {
 			id: UmbId.new(),
 			containerId: containerId,
 			alias: '',
@@ -245,7 +245,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		return property;
 	}
 
-	async insertProperty(documentTypeId: string | null, property: PropertyTypeResponseModelBaseModel) {
+	async insertProperty(documentTypeId: string | null, property: PropertyTypeModelBaseModel) {
 		await this.#init;
 		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
 
@@ -270,7 +270,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	async updateProperty(
 		documentTypeId: string | null,
 		propertyId: string,
-		partialUpdate: Partial<PropertyTypeResponseModelBaseModel>
+		partialUpdate: Partial<PropertyTypeModelBaseModel>
 	) {
 		await this.#init;
 		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
@@ -349,7 +349,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	}
 
 	containersOfParentKey(
-		parentId: PropertyTypeContainerResponseModelBaseModel['parentId'],
+		parentId: PropertyTypeContainerModelBaseModel['parentId'],
 		containerType: PropertyContainerTypes
 	) {
 		return this.#containers.getObservablePart((data) => {

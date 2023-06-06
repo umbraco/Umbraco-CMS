@@ -6,16 +6,19 @@ import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
+	CreateDocumentTypeRequestModel,
 	DocumentTypeResponseModel,
 	EntityTreeItemResponseModel,
 	FolderTreeItemResponseModel,
+	UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
-type ItemType = DocumentTypeResponseModel;
+type ItemType = DocumentTypeResponseModel & {$type: string};
 
 export class UmbDocumentTypeRepository
-	implements UmbTreeRepository<EntityTreeItemResponseModel>, UmbDetailRepository<ItemType>
+	implements UmbTreeRepository<EntityTreeItemResponseModel>,
+	UmbDetailRepository<CreateDocumentTypeRequestModel, any, UpdateDocumentTypeRequestModel, DocumentTypeResponseModel>
 {
 	#init!: Promise<unknown>;
 
@@ -126,12 +129,7 @@ export class UmbDocumentTypeRepository
 		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
 
-		const { data } = await this.#detailDataSource.createScaffold(parentId);
-
-		if (data) {
-			this.#detailStore?.append(data);
-		}
-		return { data };
+		return await this.#detailDataSource.createScaffold(parentId);
 	}
 
 	async requestById(id: string) {

@@ -13,10 +13,9 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
-type ItemType = DocumentResponseModel;
-
 export class UmbDocumentRepository
-	implements UmbTreeRepository<DocumentTreeItemResponseModel>, UmbDetailRepository<ItemType>
+	implements UmbTreeRepository<DocumentTreeItemResponseModel>,
+	UmbDetailRepository<CreateDocumentRequestModel, any, UpdateDocumentRequestModel, DocumentResponseModel>
 {
 	#init!: Promise<unknown>;
 

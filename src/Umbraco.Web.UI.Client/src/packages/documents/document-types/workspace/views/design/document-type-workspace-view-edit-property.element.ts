@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -11,18 +11,18 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('document-type-workspace-view-edit-property')
 export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
-	private _property?: PropertyTypeResponseModelBaseModel | undefined;
+	private _property?: PropertyTypeModelBaseModel | undefined;
 	/**
 	 * Property, the data object for the property.
-	 * @type {PropertyTypeResponseModelBaseModel}
+	 * @type {PropertyTypeModelBaseModel}
 	 * @attr
 	 * @default undefined
 	 */
 	@property({ type: Object })
-	public get property(): PropertyTypeResponseModelBaseModel | undefined {
+	public get property(): PropertyTypeModelBaseModel | undefined {
 		return this._property;
 	}
-	public set property(value: PropertyTypeResponseModelBaseModel | undefined) {
+	public set property(value: PropertyTypeModelBaseModel | undefined) {
 		const oldValue = this._property;
 		this._property = value;
 		this.#modalRegistration.setUniquePathValue('propertyId', value?.id?.toString());
@@ -60,7 +60,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			});
 	}
 
-	_partialUpdate(partialObject: PropertyTypeResponseModelBaseModel) {
+	_partialUpdate(partialObject: PropertyTypeModelBaseModel) {
 		this.dispatchEvent(new CustomEvent('partial-property-update', { detail: partialObject }));
 	}
 
