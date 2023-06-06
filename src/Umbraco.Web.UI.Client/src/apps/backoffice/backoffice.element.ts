@@ -3,7 +3,10 @@ import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extension-api';
+import {
+	UmbBundleExtensionInitializer,
+	UmbEntryPointExtensionInitializer,
+} from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './components/index.js';
@@ -31,6 +34,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
+		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbExtensionInitializer(this, umbExtensionsRegistry);
 		this.#extensionInitializer.setLocalPackages(CORE_PACKAGES);

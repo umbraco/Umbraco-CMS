@@ -1,5 +1,5 @@
-import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UmbTemplateRepository } from '../repository/template.repository.js';
+import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
 	createObservablePart,

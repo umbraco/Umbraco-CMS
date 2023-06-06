@@ -1,6 +1,6 @@
 import type { UmbUserGroupRepository } from '../../repository/user-group.repository.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -52,18 +52,18 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 	}
 
 	#submit() {
-		this.modalHandler?.submit({
+		this.modalContext?.submit({
 			selection: this.#selectionManager.getSelection(),
 		});
 	}
 
 	#close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	render() {
 		return html`
-			<umb-workspace-editor headline="Select user groups">
+			<umb-body-layout headline="Select user groups">
 				<uui-box>
 					${this._userGroups.map(
 						(item) => html`
@@ -82,7 +82,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 					<uui-button label="Close" @click=${this.#close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
 				</div>
-			</umb-workspace-editor>
+			</umb-body-layout>
 		`;
 	}
 

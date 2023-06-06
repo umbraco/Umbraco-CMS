@@ -52,11 +52,11 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 		if (!this._template?.id) return;
 
 		this.#saveTemplate();
-		this.modalHandler?.submit({ id: this._template.id });
+		this.modalContext?.submit({ id: this._template.id });
 	}
 
 	private _close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	#codeEditorInput(e: UmbInputEvent) {

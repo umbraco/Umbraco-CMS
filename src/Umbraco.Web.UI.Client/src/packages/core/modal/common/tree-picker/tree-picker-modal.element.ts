@@ -30,11 +30,11 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 	}
 
 	#submit() {
-		this.modalHandler?.submit({ selection: this._selection });
+		this.modalContext?.submit({ selection: this._selection });
 	}
 
 	#close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	render() {

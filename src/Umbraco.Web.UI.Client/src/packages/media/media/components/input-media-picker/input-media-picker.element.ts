@@ -2,8 +2,8 @@ import { UmbMediaRepository } from '../../repository/media.repository.js';
 import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import {
-	UmbModalContext,
-	UMB_MODAL_CONTEXT_TOKEN,
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_CONFIRM_MODAL,
 	UMB_MEDIA_TREE_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
@@ -70,7 +70,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 	@state()
 	private _items?: Array<EntityTreeItemResponseModel>;
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 	private _pickedItemsObserver?: UmbObserverController<EntityTreeItemResponseModel[]>;
 	private _repository = new UmbMediaRepository(this);
 
@@ -88,7 +88,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 			() => !!this.max && this._selectedIds.length > this.max
 		);
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}
@@ -117,25 +117,25 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of ids) of our this._selectedIds, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedIds],
 		});
 
-		modalHandler?.onSubmit().then(({ selection }: any) => {
+		modalContext?.onSubmit().then(({ selection }: any) => {
 			this._setSelection(selection);
 		});
 	}
 
 	private _removeItem(item: EntityTreeItemResponseModel) {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',
 			confirmLabel: 'Remove',
 		});
 
-		modalHandler?.onSubmit().then(() => {
+		modalContext?.onSubmit().then(() => {
 			const newSelection = this._selectedIds.filter((value) => value !== item.id);
 			this._setSelection(newSelection);
 		});

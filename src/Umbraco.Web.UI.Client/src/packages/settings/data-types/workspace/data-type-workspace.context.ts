@@ -28,7 +28,10 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	async createScaffold(parentId: string | null) {
-		const { data } = await this.repository.createScaffold(parentId);
+		let { data } = await this.repository.createScaffold(parentId);
+		if (this.modalContext) {
+			data = { ...data, ...this.modalContext.data.preset };
+		}
 		this.setIsNew(true);
 		// TODO: This is a hack to get around the fact that the data is not typed correctly.
 		// Create and response models are different. We need to look into this.
@@ -80,8 +83,8 @@ export class UmbDataTypeWorkspaceContext
 		} else {
 			await this.repository.save(this.#data.value.id, this.#data.value);
 		}
-		// If it went well, then its not new anymore?.
-		this.setIsNew(false);
+
+		this.saveComplete(this.#data.value);
 	}
 
 	async delete(id: string) {

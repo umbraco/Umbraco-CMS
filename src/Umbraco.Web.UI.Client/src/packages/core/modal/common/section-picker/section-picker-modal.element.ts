@@ -16,13 +16,13 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 	#selectionManager = new UmbSelectionManagerBase();
 
 	#submit() {
-		this.modalHandler?.submit({
+		this.modalContext?.submit({
 			selection: this.#selectionManager.getSelection(),
 		});
 	}
 
 	#close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	connectedCallback(): void {
@@ -40,7 +40,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 
 	render() {
 		return html`
-			<umb-workspace-editor headline="Select sections">
+			<umb-body-layout headline="Select sections">
 				<uui-box>
 					${this._sections.map(
 						(item) => html`
@@ -57,7 +57,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 					<uui-button label="Close" @click=${this.#close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
 				</div>
-			</umb-workspace-editor>
+			</umb-body-layout>
 		`;
 	}
 

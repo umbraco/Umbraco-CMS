@@ -16,7 +16,11 @@ import {
 	UmbContextDebugRequest,
 } from '@umbraco-cms/backoffice/context-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbModalContext, UMB_CONTEXT_DEBUGGER_MODAL, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalManagerContext,
+	UMB_CONTEXT_DEBUGGER_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+} from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-debug')
 export class UmbDebugElement extends UmbLitElement {
@@ -32,11 +36,11 @@ export class UmbDebugElement extends UmbLitElement {
 	@state()
 	private _debugPaneOpen = false;
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}

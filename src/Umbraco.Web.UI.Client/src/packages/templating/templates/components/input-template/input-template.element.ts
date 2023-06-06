@@ -1,12 +1,12 @@
 import { UmbTemplateCardElement } from '../template-card/template-card.element.js';
 import { UmbTemplateRepository } from '../../repository/template.repository.js';
-import { css, html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_TEMPLATE_PICKER_MODAL,
 	UMB_TEMPLATE_MODAL,
-	UmbModalContext,
-	UMB_MODAL_CONTEXT_TOKEN,
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -69,7 +69,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 		super.value = newId;
 	}
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 	private _templateRepository: UmbTemplateRepository = new UmbTemplateRepository(this);
 
 	@state()
@@ -78,7 +78,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}
@@ -106,12 +106,12 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 
 	#openPicker() {
 		// TODO: Change experience, so its not multi selectable. But instead already picked templates should be unpickable. (awaiting general picker features for such)
-		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			multiple: true,
 			selection: [...this.selectedIds],
 		});
 
-		modalHandler?.onSubmit().then((data) => {
+		modalContext?.onSubmit().then((data) => {
 			if (!data.selection) return;
 			this.selectedIds = data.selection;
 			this.dispatchEvent(new CustomEvent('change'));

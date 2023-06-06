@@ -32,7 +32,6 @@ export default {
 					imports: {
 						'src/': './src/',
 
-						'@umbraco-cms/backoffice/backend-api': './src/external/backend-api/index.ts',
 						'@umbraco-cms/backoffice/external/uui': './src/external/uui/index.ts',
 						'@umbraco-cms/backoffice/external/lit': './src/external/lit/index.ts',
 						'@umbraco-cms/backoffice/external/openid': './src/external/openid/index.ts',
@@ -42,19 +41,22 @@ export default {
 						'@umbraco-cms/backoffice/external/lodash': './src/external/lodash/index.ts',
 						'@umbraco-cms/backoffice/external/monaco-editor': './src/external/monaco-editor/index.ts',
 
+						'@umbraco-cms/backoffice/backend-api': './src/external/backend-api/index.ts',
 						'@umbraco-cms/backoffice/context-api': './src/libs/context-api/index.ts',
 						'@umbraco-cms/backoffice/controller-api': './src/libs/controller-api/index.ts',
 						'@umbraco-cms/backoffice/element-api': './src/libs/element-api/index.ts',
 						'@umbraco-cms/backoffice/extension-api': './src/libs/extension-api/index.ts',
 						'@umbraco-cms/backoffice/observable-api': './src/libs/observable-api/index.ts',
 
+						'@umbraco-cms/backoffice/auth': './src/shared/auth/index.ts',
+						'@umbraco-cms/backoffice/context': './src/shared/context/index.ts',
 						'@umbraco-cms/backoffice/events': './src/shared/umb-events/index.ts',
+						'@umbraco-cms/backoffice/icon': './src/shared/icon-registry/index.ts',
 						'@umbraco-cms/backoffice/models': './src/shared/models/index.ts',
 						'@umbraco-cms/backoffice/repository': './src/shared/repository/index.ts',
 						'@umbraco-cms/backoffice/resources': './src/shared/resources/index.ts',
 						'@umbraco-cms/backoffice/router': './src/shared/router/index.ts',
 						'@umbraco-cms/backoffice/utils': './src/shared/utils/index.ts',
-						'@umbraco-cms/backoffice/icon': './src/shared/icon-registry/index.ts',
 
 						'@umbraco-cms/internal/lit-element': './src/shared/lit-element/index.ts',
 						'@umbraco-cms/internal/modal': './src/shared/modal/index.ts',
@@ -81,13 +83,27 @@ export default {
 						'@umbraco-cms/backoffice/property-editor': './src/packages/core/property-editor/index.ts',
 
 						'@umbraco-cms/backoffice/document': './src/packages/documents/documents/index.ts',
+						'@umbraco-cms/backoffice/document-blueprint': './src/packages/documents/document-blueprints/index.ts',
+						'@umbraco-cms/backoffice/document-type': './src/packages/documents/document-types/index.ts',
+						'@umbraco-cms/backoffice/media': './src/packages/media/media/index.ts',
+						'@umbraco-cms/backoffice/media-type': './src/packages/media/media-types/index.ts',
+						'@umbraco-cms/backoffice/member': './src/packages/members/members/index.ts',
+						'@umbraco-cms/backoffice/member-group': './src/packages/members/member-groups/index.ts',
+						'@umbraco-cms/backoffice/member-type': './src/packages/members/member-types/index.ts',
+						'@umbraco-cms/backoffice/package': './src/packages/packages/package/index.ts',
 
 						'@umbraco-cms/backoffice/data-type': './src/packages/settings/data-types/index.ts',
+						'@umbraco-cms/backoffice/language': './src/packages/settings/languages/index.ts',
+						'@umbraco-cms/backoffice/relation-type': './src/packages/settings/relation-types/index.ts',
 						'@umbraco-cms/backoffice/themes': './src/packages/settings/themes/index.ts',
+						'@umbraco-cms/backoffice/tags': './src/packages/tags/index.ts',
+						'@umbraco-cms/backoffice/partial-view': './src/packages/templating/partial-views/index.ts',
+						'@umbraco-cms/backoffice/stylesheet': './src/packages/templating/stylesheets/index.ts',
+						'@umbraco-cms/backoffice/template': './src/packages/templating/templates/index.ts',
 
 						'@umbraco-cms/backoffice/user-group': './src/packages/users/user-groups/index.ts',
-						"@umbraco-cms/backoffice/current-user": "./src/packages/users/current-user/index.ts",
-						"@umbraco-cms/backoffice/users": "./src/packages/users/users/index.ts",
+						'@umbraco-cms/backoffice/current-user': './src/packages/users/current-user/index.ts',
+						'@umbraco-cms/backoffice/users': './src/packages/users/users/index.ts',
 
 						'@umbraco-cms/backoffice/code-editor': './src/packages/templating/code-editor/index.ts',
 

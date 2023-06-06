@@ -1,8 +1,9 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
 /**
  * @element umb-workspace-footer
@@ -17,6 +18,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-workspace-footer')
 export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 	private _alias = '';
+
 	/**
 	 * Alias of the workspace. The Layout will render the workspace actions that are registered for this workspace alias.
 	 * @public
@@ -36,12 +38,31 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 		}
 	}
 
+	@state()
+	_withinModal = false;
+
+	#modalContext?: UmbModalContext;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (context) => {
+			this.#modalContext = context;
+		});
+	}
+
+	private _onClose = () => {
+		this.#modalContext?.reject();
+	};
+
 	// TODO: Some event/callback from umb-extension-slot that can be utilized to hide the footer, if empty.
 	render() {
 		return html`
 			<umb-footer-layout>
 				<slot></slot>
 				<slot name="actions" slot="actions"></slot>
+				${this.#modalContext
+					? html`<uui-button slot="actions" label="Close" @click=${this._onClose}></uui-button>`
+					: ''}
 				<umb-extension-slot
 					slot="actions"
 					type="workspaceAction"
