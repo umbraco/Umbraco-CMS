@@ -293,13 +293,6 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 				transform: translateX(50%);
 			}
 
-			#main {
-				display: flex;
-				flex-direction: column;
-				padding: var(--uui-size-layout-1);
-				padding-top: var(--uui-size-1);
-			}
-
 			uui-table {
 				table-layout: fixed;
 			}
