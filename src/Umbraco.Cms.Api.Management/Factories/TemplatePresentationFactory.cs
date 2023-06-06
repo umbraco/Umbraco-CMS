@@ -20,7 +20,13 @@ public class TemplatePresentationFactory : ITemplatePresentationFactory
 
     public async Task<TemplateResponseModel> CreateTemplateResponseModelAsync(ITemplate template)
     {
-        TemplateResponseModel responseModel = _mapper.Map<TemplateResponseModel>(template)!;
+        TemplateResponseModel responseModel = new()
+        {
+            Id = template.Key,
+            Name = template.Name ?? string.Empty,
+            Alias = template.Alias,
+            Content = template.Content
+        };
 
         if (template.MasterTemplateAlias is not null)
         {
