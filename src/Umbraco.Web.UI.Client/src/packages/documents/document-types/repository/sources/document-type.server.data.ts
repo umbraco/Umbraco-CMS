@@ -49,12 +49,13 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocu
 	 */
 	async createScaffold(parentId: string | null) {
 		// TODO: Type hack to append $type and parentId to the DocumentTypeResponseModel.
-		const data: DocumentTypeResponseModel & {$type: string, parentId: string | null} = {
-			$type: '',
+		//, parentId: string | null
+		const data: DocumentTypeResponseModel & {$type: string} = {
+			$type: 'string',
 			id: UmbId.new(),
-			parentId: parentId,
+			//parentId: parentId,
 			name: '',
-			alias: '',
+			alias: 'new-document-type',
 			description: '',
 			icon: 'umb:document',
 			allowedAsRoot: false,
@@ -77,53 +78,44 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocu
 		return { data };
 	}
 
+
+
+
 	/**
-	 * Inserts a new Document on the server
-	 * @param {Document} document
+	 * Inserts a new Document Type on the server
+	 * @param {CreateDocumentTypeRequestModel} documentType
 	 * @return {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async insert(document: CreateDocumentTypeRequestModel) {
-		if (!document) throw new Error('Document is missing');
+	async insert(documentType: CreateDocumentTypeRequestModel) {
+		if (!documentType) throw new Error('Document is missing');
 		//if (!document.id) throw new Error('ID is missing');
+
+		documentType = {...documentType};
+
+		// TODO: Hack to remove some props that ruins the document-type post end-point.
+		(documentType as any).$type = undefined;
+		(documentType as any).id = undefined;
 
 		return tryExecuteAndNotify(
 			this.#host,
 			DocumentTypeResource.postDocumentType({
-				requestBody: document,
+				requestBody: documentType,
 			})
 		);
 	}
 
 	/**
-	 * Updates a Document on the server
-	 * @param {Document} Document
+	 * Updates a Document Type on the server
+	 * @param {string} id
+	 * @param {Document} documentType
 	 * @return {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async update(id: string, document: any) {
+	async update(id: string, documentType: UpdateDocumentTypeRequestModel) {
 		if (!id) throw new Error('Id is missing');
 
-		let body: string;
-
-		try {
-			body = JSON.stringify(document);
-		} catch (error) {
-			console.error(error);
-			return Promise.reject();
-		}
-
-		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DocumentTypeResponseModel>(
-			this.#host,
-			fetch(`/umbraco/management/api/v1/document-type/${document.id}`, {
-				method: 'PUT',
-				body: body,
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}) as any
-		);
+		return tryExecuteAndNotify(this.#host, DocumentTypeResource.putDocumentTypeById({ id, requestBody: documentType }));
 	}
 
 	/**

@@ -13,7 +13,6 @@ import {
 	UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 
 type ItemType = DocumentTypeResponseModel & {$type: string};
 
