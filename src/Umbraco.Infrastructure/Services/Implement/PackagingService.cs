@@ -1,10 +1,13 @@
 using System.Xml.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
 using File = System.IO.File;
 
@@ -23,6 +26,7 @@ public class PackagingService : IPackagingService
     private readonly IManifestParser _manifestParser;
     private readonly IPackageInstallation _packageInstallation;
     private readonly PackageMigrationPlanCollection _packageMigrationPlans;
+    private readonly ICoreScopeProvider _coreScopeProvider;
 
     public PackagingService(
         IAuditService auditService,
@@ -31,7 +35,8 @@ public class PackagingService : IPackagingService
         IEventAggregator eventAggregator,
         IManifestParser manifestParser,
         IKeyValueService keyValueService,
-        PackageMigrationPlanCollection packageMigrationPlans)
+        PackageMigrationPlanCollection packageMigrationPlans,
+        ICoreScopeProvider coreScopeProvider)
     {
         _auditService = auditService;
         _createdPackages = createdPackages;
@@ -40,6 +45,28 @@ public class PackagingService : IPackagingService
         _manifestParser = manifestParser;
         _keyValueService = keyValueService;
         _packageMigrationPlans = packageMigrationPlans;
+        _coreScopeProvider = coreScopeProvider;
+    }
+
+    [Obsolete("Use the ctor which is not obsolete, scheduled for removal in v15")]
+    public PackagingService(
+        IAuditService auditService,
+        ICreatedPackagesRepository createdPackages,
+        IPackageInstallation packageInstallation,
+        IEventAggregator eventAggregator,
+        IManifestParser manifestParser,
+        IKeyValueService keyValueService,
+        PackageMigrationPlanCollection packageMigrationPlans)
+    : this(
+        auditService,
+        createdPackages,
+        packageInstallation,
+        eventAggregator,
+        manifestParser,
+        keyValueService,
+        packageMigrationPlans,
+        StaticServiceProvider.Instance.GetRequiredService<ICoreScopeProvider>())
+    {
     }
 
     #region Installation
@@ -93,6 +120,7 @@ public class PackagingService : IPackagingService
 
     public void DeleteCreatedPackage(int id, int userId = Constants.Security.SuperUserId)
     {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         PackageDefinition? package = GetCreatedPackageById(id);
         if (package == null)
         {
@@ -101,21 +129,44 @@ public class PackagingService : IPackagingService
 
         _auditService.Add(AuditType.PackagerUninstall, userId, -1, "Package", $"Created package '{package.Name}' deleted. Package id: {package.Id}");
         _createdPackages.Delete(id);
+
+        scope.Complete();
     }
 
-    public IEnumerable<PackageDefinition?> GetAllCreatedPackages() => _createdPackages.GetAll();
+    public IEnumerable<PackageDefinition?> GetAllCreatedPackages()
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+        return _createdPackages.GetAll();
+    }
 
-    public PackageDefinition? GetCreatedPackageById(int id) => _createdPackages.GetById(id);
+    public PackageDefinition? GetCreatedPackageById(int id)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+        return _createdPackages.GetById(id);
+    }
 
-    public bool SaveCreatedPackage(PackageDefinition definition) => _createdPackages.SavePackage(definition);
+    public bool SaveCreatedPackage(PackageDefinition definition)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
-    public string ExportCreatedPackage(PackageDefinition definition) => _createdPackages.ExportPackage(definition);
+        var success = _createdPackages.SavePackage(definition);
+        scope.Complete();
+        return success;
+    }
+
+    public string ExportCreatedPackage(PackageDefinition definition)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+        return _createdPackages.ExportPackage(definition);
+    }
 
     public InstalledPackage? GetInstalledPackageByName(string packageName)
         => GetAllInstalledPackages().Where(x => x.PackageName?.InvariantEquals(packageName) ?? false).FirstOrDefault();
 
     public IEnumerable<InstalledPackage> GetAllInstalledPackages()
     {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+
         IReadOnlyDictionary<string, string?>? keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
 
         var installedPackages = new List<InstalledPackage>();
@@ -145,7 +196,7 @@ public class PackagingService : IPackagingService
 
                 installedPackages.Add(installedPackage);
             }
-            
+
             if (installedPackage.Version is null &&
                 plan.GetType().Assembly.TryGetInformationalVersion(out string? version))
             {
