@@ -6,12 +6,12 @@ using ContentTypeSort = Umbraco.Cms.Api.Management.ViewModels.ContentType.Conten
 
 namespace Umbraco.Cms.Api.Management.Mapping.ContentType;
 
-public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeResponseModel, TPropertyTypeContainerResponseModel>
+public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeModel, TPropertyTypeContainerModel>
     where TContentType : IContentTypeBase
-    where TPropertyTypeResponseModel : PropertyTypeResponseModelBase, new()
-    where TPropertyTypeContainerResponseModel : PropertyTypeContainerResponseModelBase, new()
+    where TPropertyTypeModel : PropertyTypeModelBase, new()
+    where TPropertyTypeContainerModel : PropertyTypeContainerModelBase, new()
 {
-    protected IEnumerable<TPropertyTypeResponseModel> MapPropertyTypes(TContentType source)
+    protected IEnumerable<TPropertyTypeModel> MapPropertyTypes(TContentType source)
     {
         // create a mapping table between properties and their associated groups
         var groupKeysByPropertyKeys = source
@@ -21,7 +21,7 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeRespon
             .ToDictionary(map => map.PropertyTypeKey, map => map.GroupKey);
 
         return source.PropertyTypes.Select(propertyType =>
-                new TPropertyTypeResponseModel
+                new TPropertyTypeModel
                 {
                     Id = propertyType.Key,
                     SortOrder = propertyType.SortOrder,
@@ -49,7 +49,7 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeRespon
             .ToArray();
     }
 
-    protected IEnumerable<TPropertyTypeContainerResponseModel> MapPropertyTypeContainers(TContentType source)
+    protected IEnumerable<TPropertyTypeContainerModel> MapPropertyTypeContainers(TContentType source)
     {
         // create a mapping table between property group aliases and keys
         var groupKeysByGroupAliases = source
@@ -67,13 +67,13 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeRespon
         return source
             .PropertyGroups
             .Select(propertyGroup =>
-                new TPropertyTypeContainerResponseModel
+                new TPropertyTypeContainerModel
                 {
                     Id = propertyGroup.Key,
                     ParentId = ParentGroupKey(propertyGroup),
                     Type = propertyGroup.Type.ToString(),
                     SortOrder = propertyGroup.SortOrder,
-                    Name = propertyGroup.Name,
+                    Name = propertyGroup.Name ?? "-",
                 })
             .ToArray();
     }

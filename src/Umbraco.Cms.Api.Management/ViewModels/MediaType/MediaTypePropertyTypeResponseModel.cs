@@ -2,6 +2,6 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.MediaType;
 
-public class MediaTypePropertyTypeResponseModel : PropertyTypeResponseModelBase
+public class MediaTypePropertyTypeResponseModel : PropertyTypeModelBase
 {
 }
