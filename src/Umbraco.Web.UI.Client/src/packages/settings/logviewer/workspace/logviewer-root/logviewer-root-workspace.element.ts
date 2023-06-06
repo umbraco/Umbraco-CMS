@@ -148,7 +148,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-body-layout>
+			<umb-body-layout no-padding>
 				<div id="header" slot="header">
 					<h3 id="headline">
 						${this._activePath === 'overview' ? 'Log Overview for Selected Time Period' : 'Log search'}
