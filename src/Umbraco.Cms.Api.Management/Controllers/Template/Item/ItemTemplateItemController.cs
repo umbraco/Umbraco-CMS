@@ -12,13 +12,13 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template.Item;
 [ApiVersion("1.0")]
 public class ItemTemplateItemController : TemplateItemControllerBase
 {
-    private readonly IEntityService _entityService;
     private readonly IUmbracoMapper _mapper;
+    private readonly ITemplateService _templateService;
 
-    public ItemTemplateItemController(IEntityService entityService, IUmbracoMapper mapper)
+    public ItemTemplateItemController(IUmbracoMapper mapper, ITemplateService templateService)
     {
-        _entityService = entityService;
         _mapper = mapper;
+        _templateService = templateService;
     }
 
     [HttpGet("item")]
@@ -26,8 +26,10 @@ public class ItemTemplateItemController : TemplateItemControllerBase
     [ProducesResponseType(typeof(IEnumerable<TemplateItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Item([FromQuery(Name = "id")] SortedSet<Guid> ids)
     {
-        IEnumerable<IEntitySlim> templates = _entityService.GetAll(UmbracoObjectTypes.Template, ids.ToArray());
-        List<TemplateItemResponseModel> responseModels = _mapper.MapEnumerable<IEntitySlim, TemplateItemResponseModel>(templates);
+        // This is far from ideal, that we pick out the entire model, however, we must do this to get the alias.
+        // This is (for one) needed for when specifying master template, since alias + .cshtml
+        IEnumerable<ITemplate> templates = await _templateService.GetAllAsync(ids.ToArray());
+        List<TemplateItemResponseModel> responseModels = _mapper.MapEnumerable<ITemplate, TemplateItemResponseModel>(templates);
         return Ok(responseModels);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -18,6 +19,7 @@ public class TemplateService : RepositoryService, ITemplateService
     private readonly IAuditRepository _auditRepository;
     private readonly ITemplateContentParserService _templateContentParserService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly IDefaultViewContentProvider _defaultViewContentProvider;
 
     public TemplateService(
         ICoreScopeProvider provider,
@@ -27,7 +29,8 @@ public class TemplateService : RepositoryService, ITemplateService
         ITemplateRepository templateRepository,
         IAuditRepository auditRepository,
         ITemplateContentParserService templateContentParserService,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IDefaultViewContentProvider defaultViewContentProvider)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _shortStringHelper = shortStringHelper;
@@ -35,6 +38,7 @@ public class TemplateService : RepositoryService, ITemplateService
         _auditRepository = auditRepository;
         _templateContentParserService = templateContentParserService;
         _userIdKeyResolver = userIdKeyResolver;
+        _defaultViewContentProvider = defaultViewContentProvider;
     }
 
     /// <inheritdoc />
@@ -100,13 +104,24 @@ public class TemplateService : RepositoryService, ITemplateService
         {
             // file might already be on disk, if so grab the content to avoid overwriting
             template.Content = GetViewContent(template.Alias) ?? template.Content;
-            return await SaveAsync(template, AuditType.New, userKey);
+            return await SaveAsync(template, AuditType.New, userKey, () => ValidateCreate(template));
         }
         catch (PathTooLongException ex)
         {
             LoggerFactory.CreateLogger<TemplateService>().LogError(ex, "The template path was too long. Consider making the template alias shorter.");
             return Attempt.FailWithStatus(TemplateOperationStatus.InvalidAlias, template);
         }
+    }
+
+    private TemplateOperationStatus ValidateCreate(ITemplate templateToCreate)
+    {
+        ITemplate? existingTemplate = GetAsync(templateToCreate.Alias).GetAwaiter().GetResult();
+        if (existingTemplate is not null)
+        {
+            return TemplateOperationStatus.DuplicateAlias;
+        }
+
+        return TemplateOperationStatus.Success;
     }
 
     /// <inheritdoc />
@@ -116,6 +131,17 @@ public class TemplateService : RepositoryService, ITemplateService
         {
             return await Task.FromResult(_templateRepository.GetAll(aliases).OrderBy(x => x.Name));
         }
+    }
+
+    /// <inheritdoc />
+    public Task<IEnumerable<ITemplate>> GetAllAsync(params Guid[] keys)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IQuery<ITemplate> query = Query<ITemplate>().Where(x => keys.Contains(x.Key));
+        IEnumerable<ITemplate> templates = _templateRepository.Get(query).OrderBy(x => x.Name);
+
+        return Task.FromResult(templates);
     }
 
     /// <inheritdoc />
@@ -156,6 +182,19 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
+    public async Task<string> GetScaffoldAsync(Guid? masterTemplateKey)
+    {
+        string? masterAlias = null;
+        if (masterTemplateKey is not null)
+        {
+            ITemplate? masterTemplate = await GetAsync(masterTemplateKey.Value);
+            masterAlias = masterTemplate?.Alias;
+        }
+
+        return _defaultViewContentProvider.GetDefaultFileContent(masterAlias);
+    }
+
+    /// <inheritdoc />
     public async Task<IEnumerable<ITemplate>> GetDescendantsAsync(int masterTemplateId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -171,9 +210,23 @@ public class TemplateService : RepositoryService, ITemplateService
             AuditType.Save,
             userKey,
             // fail the attempt if the template does not exist within the scope
-            () => _templateRepository.Exists(template.Id)
-                ? TemplateOperationStatus.Success
-                : TemplateOperationStatus.TemplateNotFound);
+            () => ValidateUpdate(template));
+
+    private TemplateOperationStatus ValidateUpdate(ITemplate templateToUpdate)
+    {
+        ITemplate? existingTemplate = GetAsync(templateToUpdate.Alias).GetAwaiter().GetResult();
+        if (existingTemplate is not null && existingTemplate.Key != templateToUpdate.Key)
+        {
+            return TemplateOperationStatus.DuplicateAlias;
+        }
+
+        if (_templateRepository.Exists(templateToUpdate.Id) is false)
+        {
+            return TemplateOperationStatus.TemplateNotFound;
+        }
+
+        return TemplateOperationStatus.Success;
+    }
 
     private async Task<Attempt<ITemplate, TemplateOperationStatus>> SaveAsync(ITemplate template, AuditType auditType, Guid userKey, Func<TemplateOperationStatus>? scopeValidator = null)
     {

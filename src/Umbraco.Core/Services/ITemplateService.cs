@@ -8,8 +8,14 @@ public interface ITemplateService : IService
     /// <summary>
     ///     Gets a list of all <see cref="ITemplate" /> objects
     /// </summary>
-    /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
+    /// <returns>An enumerable list of <see cref="ITemplate" />.</returns>
     Task<IEnumerable<ITemplate>> GetAllAsync(params string[] aliases);
+
+    /// <summary>
+    ///     Gets a list of all <see cref="ITemplate" /> objects
+    /// </summary>
+    /// <returns>An enumerable list of <see cref="ITemplate" />.</returns>
+    Task<IEnumerable<ITemplate>> GetAllAsync(Guid[] keys);
 
     /// <summary>
     ///     Gets a list of all <see cref="ITemplate" /> objects
@@ -37,6 +43,13 @@ public interface ITemplateService : IService
     /// <param name="id">The guid identifier of the template.</param>
     /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
     Task<ITemplate?> GetAsync(Guid id);
+
+    /// <summary>
+    /// Gets the scaffold code for a template.
+    /// </summary>
+    /// <param name="masterTemplateKey"></param>
+    /// <returns></returns>
+    Task<string> GetScaffoldAsync(Guid? masterTemplateKey);
 
     /// <summary>
     ///     Gets the template descendants

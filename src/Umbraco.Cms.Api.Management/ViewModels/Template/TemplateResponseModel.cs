@@ -3,4 +3,6 @@
 public class TemplateResponseModel : TemplateModelBase, INamedEntityPresentationModel
 {
     public Guid Id { get; set; }
+
+    public Guid? MasterTemplateId { get; set; }
 }

@@ -1,8 +1,8 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Template;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
@@ -12,12 +12,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template;
 public class ByKeyTemplateController : TemplateControllerBase
 {
     private readonly ITemplateService _templateService;
-    private readonly IUmbracoMapper _umbracoMapper;
+    private readonly ITemplatePresentationFactory _templatePresentationFactory;
 
-    public ByKeyTemplateController(ITemplateService templateService, IUmbracoMapper umbracoMapper)
+    public ByKeyTemplateController(
+        ITemplateService templateService,
+        ITemplatePresentationFactory templatePresentationFactory)
     {
         _templateService = templateService;
-        _umbracoMapper = umbracoMapper;
+        _templatePresentationFactory = templatePresentationFactory;
     }
 
     [HttpGet("{id:guid}")]
@@ -29,6 +31,6 @@ public class ByKeyTemplateController : TemplateControllerBase
         ITemplate? template = await _templateService.GetAsync(id);
         return template == null
             ? NotFound()
-            : Ok(_umbracoMapper.Map<TemplateResponseModel>(template));
+            : Ok(await _templatePresentationFactory.CreateTemplateResponseModelAsync(template));
     }
 }

@@ -25,6 +25,10 @@ public class TemplateControllerBase : ManagementApiControllerBase
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the template operation.")
                 .Build()),
+            TemplateOperationStatus.DuplicateAlias => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Duplicate alias")
+                .WithDetail("A template with that alias already exists.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown template operation status")
         };
 }
