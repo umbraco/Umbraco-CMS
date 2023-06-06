@@ -45,14 +45,13 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 						<umb-log-viewer-search-input></umb-log-viewer-search-input>
 					</div>
 				</div>
-				<div id="main">
-					<uui-box>
-						${this._canShowLogs
-							? html`<umb-log-viewer-messages-list></umb-log-viewer-messages-list>`
-							: html`<umb-log-viewer-to-many-logs-warning
-									id="to-many-logs-warning"></umb-log-viewer-to-many-logs-warning>`}
-					</uui-box>
-				</div>
+
+				<uui-box>
+					${this._canShowLogs
+						? html`<umb-log-viewer-messages-list></umb-log-viewer-messages-list>`
+						: html`<umb-log-viewer-to-many-logs-warning
+								id="to-many-logs-warning"></umb-log-viewer-to-many-logs-warning>`}
+				</uui-box>
 			</umb-body-layout>
 		`;
 	}
@@ -75,13 +74,6 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				width: 100%;
 				padding: var(--uui-size-layout-1);
 				padding-bottom: var(--uui-size-layout-1);
-			}
-
-			#main {
-				display: flex;
-				flex-direction: column;
-				padding: var(--uui-size-layout-1);
-				padding-top: var(--uui-size-1);
 			}
 
 			#levels-container,
