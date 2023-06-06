@@ -4,10 +4,10 @@
 
 import type { ContentTypeCompositionModel } from './ContentTypeCompositionModel';
 import type { ContentTypeSortModel } from './ContentTypeSortModel';
-import type { MediaTypePropertyTypeContainerResponseModel } from './MediaTypePropertyTypeContainerResponseModel';
-import type { MediaTypePropertyTypeResponseModel } from './MediaTypePropertyTypeResponseModel';
+import type { CreateDocumentTypePropertyTypeContainerRequestModel } from './CreateDocumentTypePropertyTypeContainerRequestModel';
+import type { CreateDocumentTypePropertyTypeRequestModel } from './CreateDocumentTypePropertyTypeRequestModel';
 
-export type ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaTypePropertyTypeContainerResponseModel = {
+export type CreateContentTypeRequestModelBaseCreateDocumentTypePropertyTypeRequestModelCreateDocumentTypePropertyTypeContainerRequestModel = {
     alias?: string;
     name?: string;
     description?: string | null;
@@ -16,10 +16,9 @@ export type ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaT
     variesByCulture?: boolean;
     variesBySegment?: boolean;
     isElement?: boolean;
-    properties?: Array<MediaTypePropertyTypeResponseModel>;
-    containers?: Array<MediaTypePropertyTypeContainerResponseModel>;
+    properties?: Array<CreateDocumentTypePropertyTypeRequestModel>;
+    containers?: Array<CreateDocumentTypePropertyTypeContainerRequestModel>;
     allowedContentTypes?: Array<ContentTypeSortModel>;
     compositions?: Array<ContentTypeCompositionModel>;
-    id?: string;
 };
 
