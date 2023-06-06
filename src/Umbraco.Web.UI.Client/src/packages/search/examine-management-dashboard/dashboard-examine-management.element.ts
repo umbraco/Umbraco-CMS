@@ -39,7 +39,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-body-layout header-clear>
+			<umb-body-layout header-clear header-shadow>
 				${this.#renderHeader()}
 				<div id="main">
 					<umb-router-slot
