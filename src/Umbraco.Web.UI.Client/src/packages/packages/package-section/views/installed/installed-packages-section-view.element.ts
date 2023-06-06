@@ -1,4 +1,4 @@
-import { UmbPackageRepository } from '../../../repository/package.repository.js';
+import { UmbPackageRepository } from '../../../package/repository/package.repository.js';
 import type { UmbPackageWithMigrationStatus } from '../../../types.js';
 import { html, css, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';

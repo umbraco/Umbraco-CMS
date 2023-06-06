@@ -12,7 +12,7 @@ export type UmbPropertyEditorUIPickerModalResult = {
 export const UMB_PROPERTY_EDITOR_UI_PICKER_MODAL = new UmbModalToken<
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalResult
->('Umb.Modal.PropertyEditorUIPicker', {
+>('Umb.Modal.PropertyEditorUiPicker', {
 	type: 'sidebar',
 	size: 'small',
 });

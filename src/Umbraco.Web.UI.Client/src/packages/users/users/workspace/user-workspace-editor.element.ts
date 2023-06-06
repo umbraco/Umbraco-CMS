@@ -16,7 +16,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 
 import { UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/modal';
-import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -34,7 +34,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	private _user?: UserResponseModel;
 
 	#currentUserStore?: UmbCurrentUserStore;
-	#modalContext?: UmbModalContext;
+	#modalContext?: UmbModalManagerContext;
 	#languages = []; //TODO Add languages
 	#workspaceContext?: UmbUserWorkspaceContext;
 

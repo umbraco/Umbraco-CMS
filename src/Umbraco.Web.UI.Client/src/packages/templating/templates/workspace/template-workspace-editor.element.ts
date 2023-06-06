@@ -1,11 +1,15 @@
-import camelCase from 'lodash-es/camelCase.js';
-import { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element.js';
+import type { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element.js';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element.js';
-import type { UmbCodeEditorElement } from '../../../core/components/code-editor/code-editor.element.js';
-import { UmbTemplateWorkspaceContext } from './template-workspace.context.js';
+import type { UmbTemplateWorkspaceContext } from './template-workspace.context.js';
+import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
+import { camelCase } from '@umbraco-cms/backoffice/external/lodash';
 import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_MODAL_CONTEXT_TOKEN, UMB_TEMPLATE_PICKER_MODAL, UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_TEMPLATE_PICKER_MODAL,
+	UmbModalManagerContext,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -39,7 +43,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 
@@ -101,7 +105,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		this._codeEditor?.insert(value);
 	}
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	#openInsertSectionModal() {
 		const sectionModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL);
@@ -148,14 +152,14 @@ ${this._content}`;
 	}
 
 	#openMasterTemplatePicker() {
-		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			selection: [this.#masterTemplateId],
 			pickableFilter: (item) => {
 				return item.id !== null && item.id !== this.#templateWorkspaceContext?.getEntityId();
 			},
 		});
 
-		modalHandler?.onSubmit().then((data) => {
+		modalContext?.onSubmit().then((data) => {
 			if (!data.selection) return;
 			this.#setMasterTemplateId(data.selection[0] ?? '');
 		});

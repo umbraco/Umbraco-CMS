@@ -5,7 +5,11 @@ import {
 	UUIPaginationEvent,
 } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_CONFIRM_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	RedirectManagementResource,
@@ -43,11 +47,11 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	@query('uui-pagination')
 	private _pagination?: UUIPaginationElement;
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (_instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (_instance) => {
 			this._modalContext = _instance;
 		});
 	}
@@ -64,7 +68,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private _removeRedirectHandler(data: RedirectUrlResponseModel) {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: 'Delete',
 			content: html`
 				<div style="width:300px">
@@ -77,7 +81,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			color: 'danger',
 			confirmLabel: 'Delete',
 		});
-		modalHandler?.onSubmit().then(() => {
+		modalContext?.onSubmit().then(() => {
 			this._removeRedirect(data);
 		});
 	}
@@ -94,13 +98,13 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private _disableRedirectHandler() {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: 'Disable URL tracker',
 			content: html`Are you sure you want to disable the URL tracker?`,
 			color: 'danger',
 			confirmLabel: 'Disable',
 		});
-		modalHandler?.onSubmit().then(() => {
+		modalContext?.onSubmit().then(() => {
 			this._toggleRedirect();
 		});
 	}

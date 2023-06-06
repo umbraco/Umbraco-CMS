@@ -1,6 +1,6 @@
-import { UmbCodeEditor } from '../../../components/code-editor/index.js';
+import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { css, html, ifDefined, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles , UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UUITextStyles, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTemplateModalData, UmbTemplateModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbInputEvent } from '@umbraco-cms/backoffice/events';
 import { TemplateResource, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -18,7 +18,7 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 	_template?: TemplateResponseModel;
 
 	@query('umb-code-editor')
-	_codeEditor?: UmbCodeEditor;
+	_codeEditor?: UmbCodeEditorElement;
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -52,11 +52,11 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 		if (!this._template?.id) return;
 
 		this.#saveTemplate();
-		this.modalHandler?.submit({ id: this._template.id });
+		this.modalContext?.submit({ id: this._template.id });
 	}
 
 	private _close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	#codeEditorInput(e: UmbInputEvent) {

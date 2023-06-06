@@ -1,5 +1,5 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { PropertyValueMap, css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 
@@ -13,7 +13,7 @@ export class UmbTemplateAliasInputElement extends UmbLitElement {
         <input placeholder="Enter alias..." .value=${this.value} ?disabled=${!this.isOpen} @input=${
 			this.#setValue
 		}></input>
-        
+
         `;
 	}
 

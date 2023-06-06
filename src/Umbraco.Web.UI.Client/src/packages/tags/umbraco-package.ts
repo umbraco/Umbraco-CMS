@@ -5,6 +5,6 @@ export const extensions = [
 		name: 'Tags Management Entry Point',
 		alias: 'Umb.EntryPoint.TagsManagement',
 		type: 'entryPoint',
-		loader: () => import('./index.js'),
+		loader: () => import('./package-entry-point.js'),
 	},
 ];

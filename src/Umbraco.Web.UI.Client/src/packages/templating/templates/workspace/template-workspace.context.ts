@@ -1,4 +1,5 @@
 import { UmbTemplateRepository } from '../repository/template.repository.js';
+import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
 	createObservablePart,
@@ -6,8 +7,8 @@ import {
 	UmbDeepState,
 	UmbObjectState,
 } from '@umbraco-cms/backoffice/observable-api';
-import { TemplateItemResponseModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { TemplateItemResponseModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository, TemplateResponseModel> {
 	#data = new UmbDeepState<TemplateResponseModel | undefined>(undefined);
@@ -29,7 +30,7 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 
 	async #loadCodeEditor() {
 		try {
-			await import('../../../core/components/code-editor/index.js');
+			await loadCodeEditor();
 			this.#isCodeEditorReady.next(true);
 		} catch (error) {
 			console.error(error);

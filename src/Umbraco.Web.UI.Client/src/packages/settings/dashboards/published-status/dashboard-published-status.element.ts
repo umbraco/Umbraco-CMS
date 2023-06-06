@@ -1,6 +1,10 @@
 import { UUIButtonState, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_CONFIRM_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { PublishedCacheResource } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -22,12 +26,12 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	@state()
 	private _buttonStateCollect: UUIButtonState = undefined;
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}
@@ -66,13 +70,13 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 		}
 	}
 	private async _onReloadCacheHandler() {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: 'Reload',
 			content: html` Trigger a in-memory and local file cache reload on all servers. `,
 			color: 'danger',
 			confirmLabel: 'Continue',
 		});
-		modalHandler?.onSubmit().then(() => {
+		modalContext?.onSubmit().then(() => {
 			this._reloadMemoryCache();
 		});
 	}
@@ -89,13 +93,13 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	}
 
 	private async _onRebuildCacheHandler() {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalContex = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: 'Rebuild',
 			content: html` Rebuild content in cmsContentNu database table. Expensive.`,
 			color: 'danger',
 			confirmLabel: 'Continue',
 		});
-		modalHandler?.onSubmit().then(() => {
+		modalContex?.onSubmit().then(() => {
 			this._rebuildDatabaseCache();
 		});
 	}

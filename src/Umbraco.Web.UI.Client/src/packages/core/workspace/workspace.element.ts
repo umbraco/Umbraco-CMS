@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -9,7 +9,7 @@ export class UmbWorkspaceElement extends UmbLitElement {
 	entityType = '';
 
 	render() {
-		if (!this.entityType) nothing;
+		if (!this.entityType) return nothing;
 		return html`<umb-extension-slot
 			type="workspace"
 			.filter=${(manifest: ManifestWorkspace) => manifest.meta.entityType === this.entityType}></umb-extension-slot>`;
