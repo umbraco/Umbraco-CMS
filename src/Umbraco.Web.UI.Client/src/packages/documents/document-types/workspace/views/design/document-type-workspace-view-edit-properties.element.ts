@@ -107,7 +107,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		return html`<div id="property-list">
 				${repeat(
 					this._propertyStructure,
-					(property) => property.alias ?? '' + property.containerId ?? '' + (property as any).sortOrder ?? '',
+					(property) => property.id ?? '' + property.containerId ?? '' + (property as any).sortOrder ?? '',
 					(property) =>
 						html`<document-type-workspace-view-edit-property
 							class="property"

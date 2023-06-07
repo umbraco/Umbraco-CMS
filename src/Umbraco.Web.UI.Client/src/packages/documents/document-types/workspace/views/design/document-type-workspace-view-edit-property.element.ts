@@ -1,8 +1,9 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { generateAlias } from '@umbraco-cms/backoffice/utils';
 
 /**
  *  @element document-type-workspace-view-edit-property
@@ -84,20 +85,55 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			: '';
 	}
 
+	@state()
+	private _aliasLocked = true;
+
+	#onToggleAliasLock() {
+		this._aliasLocked = !this._aliasLocked;
+	}
+
+	#onNameChange(event: UUIInputEvent) {
+		if (event instanceof UUIInputEvent) {
+			const target = event.composedPath()[0] as UUIInputElement;
+
+			if (typeof target?.value === 'string') {
+
+				const oldName = this.property?.name ?? '';
+				const oldAlias = this.property?.alias ?? '';
+				const newName = event.target.value.toString();
+				if (this._aliasLocked) {
+					const expectedOldAlias = generateAlias(oldName ?? '');
+					// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.)
+					if (expectedOldAlias === oldAlias) {
+						this._singleValueUpdate('alias', generateAlias(newName ?? ''));
+					}
+				}
+				this._singleValueUpdate('name', newName);
+			}
+		}
+	}
+
 	renderEditableProperty() {
 		return this.property
 			? html`
 					<div id="header">
 						<uui-input
 							.value=${this.property.name}
-							@input=${(e: CustomEvent) => {
-								if (e.target) this._singleValueUpdate('name', (e.target as HTMLInputElement).value);
-							}}></uui-input>
-						<uui-input-lock
+							@input=${this.#onNameChange}></uui-input>
+						<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
+						<uui-input
+							name="alias"
 							.value=${this.property.alias}
+							?disabled=${this._aliasLocked}
 							@input=${(e: CustomEvent) => {
 								if (e.target) this._singleValueUpdate('alias', (e.target as HTMLInputElement).value);
-							}}></uui-input-lock>
+							}}
+							>
+							<!-- TODO: validation for bad characters -->
+							<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
+								<uui-icon name=${this._aliasLocked ? 'umb:lock' : 'umb:unlocked'}></uui-icon>
+							</div>
+						</uui-input>
 						<slot name="property-action-menu"></slot>
 						<p>
 							<uui-textarea
@@ -179,6 +215,17 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 
 			#editor {
 				background-color: var(--uui-color-background);
+			}
+
+
+			#alias-lock {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+			}
+			#alias-lock uui-icon {
+				margin-bottom: 2px;
 			}
 		`,
 	];
