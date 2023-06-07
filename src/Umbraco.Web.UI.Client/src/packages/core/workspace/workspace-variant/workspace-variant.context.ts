@@ -53,7 +53,7 @@ export class UmbWorkspaceVariantContext {
 			this._observeVariant();
 		});
 
-		this.index.subscribe(() => {
+		new UmbObserverController(host, this.#index, () => {
 			this._observeVariant();
 		});
 	}

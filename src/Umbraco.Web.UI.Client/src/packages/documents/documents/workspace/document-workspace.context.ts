@@ -118,12 +118,14 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	setName(name: string, variantId?: UmbVariantId) {
+		console.log("setname", name, variantId)
 		const oldVariants = this.#draft.getValue()?.variants || [];
 		const variants = partialUpdateFrozenArray(
 			oldVariants,
 			{ name },
 			variantId ? (x) => variantId.compare(x) : () => true
 		);
+		console.log(variants);
 		this.#draft.update({ variants });
 	}
 

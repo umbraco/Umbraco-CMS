@@ -164,17 +164,18 @@ export class UmbDocumentRepository
 		const { error } = await this.#detailDataSource.insert(item);
 
 		if (!error) {
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server
+			this.#store?.append(item);
+			// TODO: Update tree store with the new item? or ask tree to request the new item?
+
+			// TODO: Revisit this call, as we should be able to update tree on client.
+			await this.requestRootTreeItems();
+
 			const notification = { data: { message: `Document created` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 
-		const result = await this.requestRootTreeItems();
-		console.log("requested root tree items", result);
-
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		this.#store?.append(item);
-		// TODO: Update tree store with the new item? or ask tree to request the new item?
 
 		return { error };
 	}
@@ -194,6 +195,9 @@ export class UmbDocumentRepository
 			this.#store?.append(item);
 			//this.#treeStore?.updateItem(item.id, { name: item.name });// Port data to tree store.
 			// TODO: would be nice to align the stores on methods/methodNames.
+
+			// TODO: Revisit this call, as we should be able to update tree on client.
+			await this.requestRootTreeItems();
 
 			const notification = { data: { message: `Document saved` } };
 			this.#notificationContext?.peek('positive', notification);
