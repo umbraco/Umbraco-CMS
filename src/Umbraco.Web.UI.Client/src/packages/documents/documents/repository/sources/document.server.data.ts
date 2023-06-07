@@ -65,7 +65,7 @@ export class UmbDocumentServerDataSource
 			values: [],
 			variants: [
 				{
-					$type: '',
+					$type: 'DocumentVariantRequestModel',
 					state: ContentStateModel.DRAFT,
 					publishDate: null,
 					culture: null,
