@@ -312,16 +312,20 @@ internal class ContentMapDefinition : IMapDefinition
         {
             foreach (Tab<ContentPropertyDisplay> tab in variant.Tabs)
             {
-                if (tab.Properties != null)
+                if (tab.Properties == null)
                 {
-                    foreach (ContentPropertyDisplay property in tab.Properties)
+                    continue;
+                }
+
+                foreach (ContentPropertyDisplay property in tab.Properties)
+                {
+                    if (string.IsNullOrEmpty(property.Description))
                     {
-                        if (!string.IsNullOrEmpty(property.Description))
-                        {
-                            var description = markdown.Transform(property.Description);
-                            property.Description = linkCheck.Replace(description, evaluator);
-                        }
+                        continue;
                     }
+
+                    var description = markdown.Transform(property.Description);
+                    property.Description = linkCheck.Replace(description, evaluator);
                 }
             }
         }
