@@ -9,9 +9,9 @@ export const handlers = [
 		const data = await req.json();
 		if (!data) return;
 
-		umbDocumentTypeData.insert(data);
+		const created = umbDocumentTypeData.insert(data);
 
-		return res(ctx.status(200));
+		return res(ctx.status(200), ctx.set({'location': created}));
 	}),
 
 	rest.put(umbracoPath(`/document-type/:id`), async (req, res, ctx) => {
