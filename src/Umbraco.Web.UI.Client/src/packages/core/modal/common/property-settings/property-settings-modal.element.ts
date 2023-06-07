@@ -53,7 +53,9 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		super.connectedCallback();
 		this._returnData = JSON.parse(JSON.stringify(this.data));
 
-		const regEx = this._returnData.validation?.regEx ?? '';
+		this._returnData.validation ??= {};
+
+		const regEx = this._returnData.validation.regEx ?? '';
 		const newlySelected = this._customValidationOptions.find((option) => {
 			option.selected = option.value === regEx;
 			return option.selected;
