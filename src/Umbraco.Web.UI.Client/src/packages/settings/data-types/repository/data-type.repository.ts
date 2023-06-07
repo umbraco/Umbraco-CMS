@@ -251,6 +251,7 @@ export class UmbDataTypeRepository
 			// TODO: would be nice to align the stores on methods/methodNames.
 			this.#detailStore?.remove([id]);
 			this.#treeStore?.removeItem(id);
+			this.#itemStore?.removeItem(id);
 
 			const notification = { data: { message: `Data Type deleted` } };
 			this.#notificationContext?.peek('positive', notification);
