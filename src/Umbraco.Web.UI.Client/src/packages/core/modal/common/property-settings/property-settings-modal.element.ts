@@ -152,11 +152,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 	#onToggleAliasLock() {
 		this._aliasLocked = !this._aliasLocked;
-
-		if (this._aliasLocked) {
-			this._returnData.alias = generateAlias(this._returnData.alias ?? '');
-			this.requestUpdate('_returnData');
-		}
 	}
 
 	#onValidationRegExChange(event: UUIInputEvent) {
