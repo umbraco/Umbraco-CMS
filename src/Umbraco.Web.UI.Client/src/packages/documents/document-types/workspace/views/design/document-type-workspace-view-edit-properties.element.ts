@@ -80,8 +80,6 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	@state()
 	_propertyStructure: Array<PropertyTypeModelBaseModel> = [];
 
-	#modalContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
-
 	constructor() {
 		super();
 
@@ -90,7 +88,6 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				(workspaceContext as UmbDocumentTypeWorkspaceContext).structure
 			);
 		});
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => (this.#modalContext = instance));
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._propertyStructure = propertyStructure;
 			this.#propertySorter.setModel(this._propertyStructure);
@@ -101,18 +98,9 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		const property = await this._propertyStructureHelper.addProperty(this._containerId);
 		if (!property) return;
 
-		// TODO: Figure out how we from this location can get into the routeable modal..
-		/*
-		// Take id and parse to modal:
-		console.log('property id:', property.id!, property);
+		// TODO: Figure out how we from this location can get into the route modal, via URL.
+		// The modal is registered by the document-type-workspace-view-edit-property element, therefor a bit hard to get the URL from here.
 
-		// TODO: route modal..
-		const modalContext = this.#modalContext?.open(UMB_PROPERTY_SETTINGS_MODAL);
-
-		modalContext?.onSubmit().then((result) => {
-			console.log(result);
-		});
-		*/
 	}
 
 	render() {

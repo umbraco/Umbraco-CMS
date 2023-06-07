@@ -96,7 +96,6 @@ export class UmbTreeElement extends UmbLitElement {
 
 		if (asObservable) {
 			this.#rootItemsObserver = this.observe(asObservable(), (rootItems) => {
-				console.log("#rootItemsObserver", rootItems)
 				const oldValue = this._items;
 				this._items = rootItems;
 				this.requestUpdate('_items', oldValue);
