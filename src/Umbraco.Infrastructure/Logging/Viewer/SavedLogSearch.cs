@@ -1,13 +1,12 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
-namespace Umbraco.Cms.Core.Logging.Viewer
+namespace Umbraco.Cms.Core.Logging.Viewer;
+
+public class SavedLogSearch
 {
-    public class SavedLogSearch
-    {
-        [JsonProperty("name")]
-        public string Name { get; set; }
+    [JsonProperty("name")]
+    public required string Name { get; set; }
 
-        [JsonProperty("query")]
-        public string Query { get; set; }
-    }
+    [JsonProperty("query")]
+    public required string Query { get; set; }
 }

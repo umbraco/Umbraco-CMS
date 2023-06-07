@@ -55,7 +55,7 @@ umb-block-card {
     .__showcase {
         position: relative;
         width: 100%;
-        padding-bottom: 10/16*100%;
+        padding-bottom: (10 / 16 * 100%);
         background-color: @gray-12;
         
         background-size: contain;
@@ -103,15 +103,12 @@ umb-block-card {
             font-weight: bold;
             font-size: 14px;
             color: @ui-action-type;
-            margin-left: 16px;
-            margin-bottom: -1px;
+            margin: 0 16px -1px;
         }
         .__subname {
             color: @gray-4;
             font-size: 12px;
-            margin-left: 16px;
-            margin-top: 1px;
-            margin-bottom: -1px;
+            margin: 1px 16px -1px;
             line-height: 1.5em;
         }
     }
@@ -127,17 +124,21 @@ umb-block-card {
     .__actions {
         position: absolute;
         top: 10px;
-        right: 0;
+        right: 10px;
         opacity: 0;
         transition: opacity 120ms;
+        margin-right: 10px;
+
         .__action {
-            display: inline-block;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
             border-radius: 50%;
             width: 28px;
             height: 28px;
-            margin-right: 10px;
             background-color: white;
             color:@ui-action-type;
+
             &:hover {
                 color: @ui-action-type-hover;
             }

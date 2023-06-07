@@ -1,31 +1,49 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
+using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models;
+
+/// <summary>
+/// Represents a single connection string.
+/// </summary>
+public class ConnectionStrings // TODO: Rename to [Umbraco]ConnectionString (since v10 this only contains a single connection string)
 {
     /// <summary>
-    /// Typed configuration options for connection strings.
+    ///     The default provider name when not present in configuration.
     /// </summary>
-    [UmbracoOptions("ConnectionStrings", BindNonPublicProperties = true)]
-    public class ConnectionStrings
-    {
-        // Backing field for UmbracoConnectionString to load from configuration value with key umbracoDbDSN.
-        // Attributes cannot be applied to map from keys that don't match, and have chosen to retain the key name
-        // used in configuration for older Umbraco versions.
-        // See: https://stackoverflow.com/a/54607296/489433
-#pragma warning disable SA1300  // Element should begin with upper-case letter
-#pragma warning disable IDE1006 // Naming Styles
-        private string umbracoDbDSN
-#pragma warning restore IDE1006 // Naming Styles
-#pragma warning restore SA1300  // Element should begin with upper-case letter
-        {
-            get => UmbracoConnectionString?.ConnectionString;
-            set => UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, value);
-        }
+    public const string DefaultProviderName = "Microsoft.Data.SqlClient";
 
-        /// <summary>
-        /// Gets or sets a value for the Umbraco database connection string..
-        /// </summary>
-        public ConfigConnectionString UmbracoConnectionString { get; set; } = new ConfigConnectionString(Constants.System.UmbracoConnectionName, null);
-    }
+    /// <summary>
+    ///     The DataDirectory placeholder.
+    /// </summary>
+    public const string DataDirectoryPlaceholder = Constants.System.DataDirectoryPlaceholder;
+
+    /// <summary>
+    ///     The postfix used to identify a connection strings provider setting.
+    /// </summary>
+    public const string ProviderNamePostfix = ConfigurationExtensions.ProviderNamePostfix;
+
+    /// <summary>
+    /// Gets or sets the name.
+    /// </summary>
+    /// <value>
+    /// The name.
+    /// </value>
+    [Obsolete("This property will be removed in Umbraco 12, because this class is now using named options.")]
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// Gets or sets the connection string.
+    /// </summary>
+    /// <value>
+    /// The connection string.
+    /// </value>
+    public string? ConnectionString { get; set; }
+
+    /// <summary>
+    /// Gets or sets the name of the provider.
+    /// </summary>
+    /// <value>
+    /// The name of the provider.
+    /// </value>
+    public string? ProviderName { get; set; }
 }

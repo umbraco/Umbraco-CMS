@@ -1,8 +1,7 @@
-﻿namespace Umbraco.Cms.Core.Deploy
+namespace Umbraco.Cms.Core.Deploy;
+
+public enum Direction
 {
-    public enum Direction
-    {
-        ToArtifact,
-        FromArtifact
-    }
+    ToArtifact,
+    FromArtifact,
 }

@@ -1,14 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure.HostedServices;
 
@@ -43,12 +41,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 
             _mockIOHelper = new Mock<IIOHelper>();
             _mockIOHelper.Setup(x => x.GetTempFolders())
-                .Returns(new DirectoryInfo[] { new DirectoryInfo(_testPath) });
+                .Returns(new DirectoryInfo[] { new(_testPath) });
             _mockIOHelper.Setup(x => x.CleanFolder(It.IsAny<DirectoryInfo>(), It.IsAny<TimeSpan>()))
                 .Returns(CleanFolderResult.Success());
 
             var mockLogger = new Mock<ILogger<TempFileCleanup>>();
-            var mockProfilingLogger = new Mock<IProfilingLogger>();
 
             return new TempFileCleanup(_mockIOHelper.Object, mockMainDom.Object, mockLogger.Object);
         }

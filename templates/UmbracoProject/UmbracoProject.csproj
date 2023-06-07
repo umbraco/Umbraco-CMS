@@ -1,35 +1,34 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace Condition="'$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">Umbraco.Cms.Web.UI</RootNamespace>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
-        <RootNamespace Condition="'$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">Umbraco.Cms.Web.UI</RootNamespace>
-    </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Cms" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Umbraco.Cms" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
-        <PackageReference Include="Umbraco.Cms.SqlCe" Version="UMBRACO_VERSION_FROM_TEMPLATE" Condition="'$(UseSqlCe)' == 'true'" />
-        <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" Condition="'$(UseSqlCe)' == 'true'" />
-    </ItemGroup>
+  <ItemGroup>
+    <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
+    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
+  </ItemGroup>
 
-    <!-- Force Windows to use ICU. Otherwise Windows 10 2019H1+ will do it, but older Windows 10 and most, if not all, Windows Server editions will run NLS -->
-    <ItemGroup>
-      <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
-      <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux')) Or $(RuntimeIdentifier.StartsWith('win')) Or ('$(RuntimeIdentifier)' == '' And !$([MSBuild]::IsOSPlatform('osx')))" />
-    </ItemGroup>
+  <PropertyGroup>
+    <!-- Razor files are needed for the backoffice to work correctly -->
+    <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
+  </PropertyGroup>
 
-    <Import Project="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\build\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.targets" Condition="'$(PackageProjectName)' != ''" />
-    <ItemGroup Condition="'$(PackageProjectName)' != ''">
-        <ProjectReference Include="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.csproj" />
-    </ItemGroup>
-
-    <PropertyGroup>
-        <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
-    </PropertyGroup>
-
-    <!-- Keep this as false if ModelsBuilder mode is InMemoryAuto -->
-    <PropertyGroup>
-        <RazorCompileOnBuild>false</RazorCompileOnBuild>
-        <RazorCompileOnPublish>false</RazorCompileOnPublish>
-    </PropertyGroup>
-
+  <PropertyGroup>
+    <!-- Remove RazorCompileOnBuild and RazorCompileOnPublish when not using ModelsMode InMemoryAuto -->
+    <RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnPublish>false</RazorCompileOnPublish>
+  </PropertyGroup>
+  
+  <Import Project="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\buildTransitive\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.targets" Condition="'$(PackageProjectName)' != ''" />
+  <ItemGroup Condition="'$(PackageProjectName)' != ''">
+    <ProjectReference Include="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.csproj" />
+  </ItemGroup>
 </Project>

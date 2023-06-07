@@ -1,11 +1,11 @@
-app.config(function ($routeProvider) {
+window.app.config(function ($routeProvider) {
     
     /**
      * This determines if the route can continue depending on authentication and initialization requirements
      * @param {boolean} authRequired If true, it checks if the user is authenticated and will resolve successfully
         otherwise the route will fail and the $routeChangeError event will execute, in that handler we will redirect to the rejected
         path that is resolved from this method and prevent default (prevent the route from executing)
-     * @returns {promise} 
+     * @returns {promise}
      */
     var canRoute = function(authRequired) {
 

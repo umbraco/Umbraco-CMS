@@ -50,7 +50,8 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
         $scope.datePickerConfig = {
             enableTime: $scope.model.config.pickTime,
             dateFormat: dateFormat,
-            time_24hr: true
+            time_24hr: true,
+            clickOpens: !$scope.readonly
         };
 
         // Don't show calendar if date format has been set to only time
@@ -105,7 +106,7 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
                 setDate(momentDate);
             }
             setDatePickerVal();
-            flatPickr.setDate($scope.model.value, false);
+            flatPickr.setDate($scope.model.datetimePickerValue, false);
         }
     }
     
@@ -142,26 +143,29 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
     }
 
     function updateModelValue(momentDate) {
-        if ($scope.hasDatetimePickerValue) {
-            if ($scope.model.config.pickTime) {
-                //check if we are supposed to offset the time
-                if ($scope.model.value && Object.toBoolean($scope.model.config.offsetTime) && Umbraco.Sys.ServerVariables.application.serverTimeOffset !== undefined) {
-                    $scope.model.value = dateHelper.convertToServerStringTime(momentDate, Umbraco.Sys.ServerVariables.application.serverTimeOffset);
-                    $scope.serverTime = dateHelper.convertToServerStringTime(momentDate, Umbraco.Sys.ServerVariables.application.serverTimeOffset, "YYYY-MM-DD HH:mm:ss Z");
-                }
-                else {
-                    $scope.model.value = momentDate.format("YYYY-MM-DD HH:mm:ss");
-                }
-            }
-            else {
-                $scope.model.value = momentDate.format("YYYY-MM-DD");
-            }
+      var curMoment = moment($scope.model.value);
+      if ($scope.hasDatetimePickerValue) {
+        if ($scope.model.config.pickTime) {
+          //check if we are supposed to offset the time
+          if ($scope.model.value && Object.toBoolean($scope.model.config.offsetTime) && Umbraco.Sys.ServerVariables.application.serverTimeOffset !== undefined) {
+            $scope.model.value = dateHelper.convertToServerStringTime(momentDate, Umbraco.Sys.ServerVariables.application.serverTimeOffset);
+            $scope.serverTime = dateHelper.convertToServerStringTime(momentDate, Umbraco.Sys.ServerVariables.application.serverTimeOffset, "YYYY-MM-DD HH:mm:ss Z");
+          }
+          else {
+            $scope.model.value = momentDate.format("YYYY-MM-DD HH:mm:ss");
+          }
         }
         else {
-            $scope.model.value = null;
+          $scope.model.value = momentDate.format("YYYY-MM-DD");
         }
+      }
+      else {
+        $scope.model.value = null;
+      }
 
+      if (!curMoment.isSame(momentDate)) {
         setDirty();
+      }
     }
 
     function setDirty() {
@@ -182,7 +186,7 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
             }
             else {
                 //create a normal moment , no offset required
-                var dateVal = $scope.model.value ? moment($scope.model.value, "YYYY-MM-DD HH:mm:ss") : moment();
+                dateVal = $scope.model.value ? moment($scope.model.value, "YYYY-MM-DD HH:mm:ss") : moment();
             }
             $scope.model.datetimePickerValue = dateVal.format($scope.model.config.format);
         }

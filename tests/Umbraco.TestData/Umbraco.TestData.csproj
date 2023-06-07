@@ -1,14 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <IsPackable>false</IsPackable>
     <RootNamespace>Umbraco.TestData</RootNamespace>
-    <TargetFramework>net5.0</TargetFramework>
     <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="33.1.1" />
+    <PackageReference Include="Bogus" Version="34.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,5 +15,4 @@
     <ProjectReference Include="..\..\src\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
-
 </Project>

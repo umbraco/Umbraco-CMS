@@ -248,6 +248,7 @@ csharp_preserve_single_line_blocks = true
 ##########################################
 
 [*.{cs,csx,cake,vb,vbx}]
+dotnet_diagnostic.CS1591.severity = suggestion
 
 ##########################################
 # Styles
@@ -282,7 +283,7 @@ dotnet_naming_style.internal_error_style.required_suffix = ____INTERNAL_ERROR___
 
 # All public/protected/protected_internal constant fields must be PascalCase
 # https://docs.microsoft.com/dotnet/standard/design-guidelines/field
-dotnet_naming_symbols.public_protected_constant_fields_group.applicable_accessibilities = public, protected, protected_internal
+dotnet_naming_symbols.public_protected_constant_fields_group.applicable_accessibilities = public, protected, protected_internal, internal, private
 dotnet_naming_symbols.public_protected_constant_fields_group.required_modifiers         = const
 dotnet_naming_symbols.public_protected_constant_fields_group.applicable_kinds           = field
 dotnet_naming_rule.public_protected_constant_fields_must_be_pascal_case_rule.symbols    = public_protected_constant_fields_group
@@ -356,24 +357,13 @@ dotnet_naming_rule.parameters_rule.symbols              = parameters_group
 dotnet_naming_rule.parameters_rule.style                = camel_case_style
 dotnet_naming_rule.parameters_rule.severity             = warning
 
-# Private static fields use camelCase and start with s_
-dotnet_naming_symbols.private_static_field_symbols.applicable_accessibilities                        = private
-dotnet_naming_symbols.private_static_field_symbols.required_modifiers                                = static, shared
-dotnet_naming_symbols.private_static_field_symbols.applicable_kinds                                  = field
-dotnet_naming_rule.private_static_fields_must_be_camel_cased_and_prefixed_with_s_underscore.symbols  = private_static_field_symbols
-dotnet_naming_rule.private_static_fields_must_be_camel_cased_and_prefixed_with_s_underscore.style    = camel_case_and_prefix_with_s_underscore_style
-dotnet_naming_rule.private_static_fields_must_be_camel_cased_and_prefixed_with_s_underscore.severity = warning
-dotnet_naming_style.camel_case_and_prefix_with_s_underscore_style.required_prefix                    = s_
-dotnet_naming_style.camel_case_and_prefix_with_s_underscore_style.capitalization                     = camel_case
-
 # Instance fields use camelCase and are prefixed with  '_'
-dotnet_naming_symbols.private_field_symbols.applicable_accessibilities                               = private
-dotnet_naming_symbols.private_field_symbols.applicable_kinds                                         = field
-dotnet_naming_rule.private_instance_fields_must_be_camel_cased_and_prefixed_with_underscore.symbols  = private_field_symbols
-dotnet_naming_rule.private_instance_fields_must_be_camel_cased_and_prefixed_with_underscore.style    = camel_case_and_prefix_with_underscore_style
-dotnet_naming_rule.private_instance_fields_must_be_camel_cased_and_prefixed_with_underscore.severity = warning
-dotnet_naming_style.camel_case_and_prefix_with_underscore_style.required_prefix                      = _
-dotnet_naming_style.camel_case_and_prefix_with_underscore_style.capitalization                       = camel_case
+dotnet_naming_rule.instance_fields_should_be_camel_case.severity = warning
+dotnet_naming_rule.instance_fields_should_be_camel_case.symbols = instance_fields
+dotnet_naming_rule.instance_fields_should_be_camel_case.style = instance_field_style
+dotnet_naming_symbols.instance_fields.applicable_kinds = field
+dotnet_naming_style.instance_field_style.capitalization = camel_case
+dotnet_naming_style.instance_field_style.required_prefix = _
 
 ##########################################
 # License

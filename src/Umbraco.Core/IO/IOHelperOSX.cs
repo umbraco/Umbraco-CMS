@@ -1,28 +1,38 @@
-﻿using System;
-using System.IO;
-using System.Linq;
 using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Cms.Core.IO
+namespace Umbraco.Cms.Core.IO;
+
+public class IOHelperOSX : IOHelper
 {
-    public class IOHelperOSX : IOHelper
+    public IOHelperOSX(IHostingEnvironment hostingEnvironment)
+        : base(hostingEnvironment)
     {
-        public IOHelperOSX(IHostingEnvironment hostingEnvironment) : base(hostingEnvironment)
+    }
+
+    public override bool PathStartsWith(string path, string root, params char[] separators)
+    {
+        // either it is identical to root,
+        // or it is root + separator + anything
+        if (separators == null || separators.Length == 0)
         {
+            separators = new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
         }
 
-        public override bool IsPathFullyQualified(string path) => Path.IsPathRooted(path);
-
-        public override bool PathStartsWith(string path, string root, params char[] separators)
+        if (!path.StartsWith(root, StringComparison.OrdinalIgnoreCase))
         {
-            // either it is identical to root,
-            // or it is root + separator + anything
-
-            if (separators == null || separators.Length == 0) separators = new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
-            if (!path.StartsWith(root, StringComparison.OrdinalIgnoreCase)) return false;
-            if (path.Length == root.Length) return true;
-            if (path.Length < root.Length) return false;
-            return separators.Contains(path[root.Length]);
+            return false;
         }
+
+        if (path.Length == root.Length)
+        {
+            return true;
+        }
+
+        if (path.Length < root.Length)
+        {
+            return false;
+        }
+
+        return separators.Contains(path[root.Length]);
     }
 }

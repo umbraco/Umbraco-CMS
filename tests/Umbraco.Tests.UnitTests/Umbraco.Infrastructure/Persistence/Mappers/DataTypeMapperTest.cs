@@ -1,54 +1,53 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
-using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers;
+
+[TestFixture]
+public class DataTypeMapperTest
 {
-    [TestFixture]
-    public class DataTypeMapperTest
+    [Test]
+    public void Can_Map_Id_Property()
     {
-        [Test]
-        public void Can_Map_Id_Property()
-        {
-            // Act
-            string column = new DataTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Id");
+        // Act
+        var column = new DataTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Id");
 
-            // Assert
-            Assert.That(column, Is.EqualTo("[umbracoNode].[id]"));
-        }
+        // Assert
+        Assert.That(column, Is.EqualTo("[umbracoNode].[id]"));
+    }
 
-        [Test]
-        public void Can_Map_Key_Property()
-        {
-            // Act
-            string column = new DataTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Key");
+    [Test]
+    public void Can_Map_Key_Property()
+    {
+        // Act
+        var column = new DataTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Key");
 
-            // Assert
-            Assert.That(column, Is.EqualTo("[umbracoNode].[uniqueId]"));
-        }
+        // Assert
+        Assert.That(column, Is.EqualTo("[umbracoNode].[uniqueId]"));
+    }
 
-        [Test]
-        public void Can_Map_DatabaseType_Property()
-        {
-            // Act
-            string column = new DataTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("DatabaseType");
+    [Test]
+    public void Can_Map_DatabaseType_Property()
+    {
+        // Act
+        var column = new DataTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("DatabaseType");
 
-            // Assert
-            Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.DataType}].[dbType]"));
-        }
+        // Assert
+        Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.DataType}].[dbType]"));
+    }
 
-        [Test]
-        public void Can_Map_PropertyEditorAlias_Property()
-        {
-            // Act
-            string column = new DataTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("EditorAlias");
+    [Test]
+    public void Can_Map_PropertyEditorAlias_Property()
+    {
+        // Act
+        var column = new DataTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("EditorAlias");
 
-            // Assert
-            Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.DataType}].[propertyEditorAlias]"));
-        }
+        // Assert
+        Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.DataType}].[propertyEditorAlias]"));
     }
 }

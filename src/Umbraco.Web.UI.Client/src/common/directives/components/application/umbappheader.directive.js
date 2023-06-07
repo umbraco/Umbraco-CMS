@@ -97,6 +97,8 @@
                     if(anchorLink) {
                         anchorLink.focus();
                     }
+                    const anchorButton = element[0].querySelector('#umbraco-logo-mark');
+                    anchorButton.classList.add("active");
                 });
             };
             scope.keepLogoModal = function() {
@@ -108,6 +110,8 @@
                     scope.logoModal.timer = $timeout(function () {
                         scope.logoModal.show = false;
                     }, 100);
+                  const anchorButton = element[0].querySelector('#umbraco-logo-mark');
+                  anchorButton.classList.remove("active");
                 }
             };
             scope.stopClickEvent = function($event) {
@@ -120,6 +124,20 @@
                     scope.logoModal.show = false;
                 } else {
                     scope.showLogoModal();
+                }
+            };
+
+            scope.skipToMenu = function() {
+                document.querySelector('#applications a').focus();
+            };
+
+            scope.skipToContent = function() {
+                var focusableElements = document.querySelectorAll('.umb-app-content a, .umb-app-content button');
+                for(var i=0; i < focusableElements.length; i++){
+                    if(focusableElements[i].offsetParent !== null) {
+                        focusableElements[i].focus();
+                        break;
+                    }
                 }
             };
 

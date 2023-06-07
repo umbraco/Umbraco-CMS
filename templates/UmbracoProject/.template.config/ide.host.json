@@ -1,51 +1,59 @@
 {
-  "$schema": "http://json.schemastore.org/vs-2017.3.host",
+  "$schema": "https://json.schemastore.org/ide.host.json",
   "order": 0,
   "icon": "../../icon.png",
   "description": {
     "id": "UmbracoProject",
-    "text": "Umbraco Web Application - An empty Umbraco CMS web application"
+    "text": "Umbraco Web Application - An empty Umbraco CMS web application."
   },
   "symbolInfo": [
     {
       "id": "UmbracoVersion",
-      "isVisible": "true"
+      "isVisible": true
     },
     {
       "id": "UseHttpsRedirect",
-      "isVisible": "true"
+      "isVisible": true,
+      "persistenceScope": "templateGroup"
     },
     {
-      "id": "UseSqlCe",
-      "isVisible": "true"
+      "id": "ExcludeGitignore",
+      "isVisible": true,
+      "persistenceScope": "templateGroup"
     },
     {
-      "id": "SkipRestore",
-      "isVisible": "true"
-    },
-    {
-      "id": "UnattendedUserName",
-      "isVisible": "true"
-    },
-    {
-      "id": "UnattendedUserEmail",
-      "isVisible": "true"
-    },
-    {
-      "id": "UnattendedUserPassword",
-      "isVisible": "true"
+      "id": "MinimalGitignore",
+      "isVisible": true,
+      "persistenceScope": "templateGroup"
     },
     {
       "id": "ConnectionString",
-      "isVisible": "true"
+      "isVisible": true
+    },
+    {
+      "id": "ConnectionStringProviderName",
+      "isVisible": true
+    },
+    {
+      "id": "DevelopmentDatabaseType",
+      "isVisible": true,
+      "persistenceScope": "templateGroup"
+    },
+    {
+      "id": "UnattendedUserName",
+      "isVisible": true
+    },
+    {
+      "id": "UnattendedUserEmail",
+      "isVisible": true
+    },
+    {
+      "id": "UnattendedUserPassword",
+      "isVisible": true
     },
     {
       "id": "NoNodesViewPath",
-      "isVisible": "true"
-    },
-    {
-      "id": "PackageProjectName",
-      "isVisible": "true"
+      "isVisible": true
     }
   ]
 }

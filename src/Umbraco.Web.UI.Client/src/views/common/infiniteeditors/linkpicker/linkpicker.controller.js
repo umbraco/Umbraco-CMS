@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
-    function ($scope, eventsService, entityResource, mediaResource, mediaHelper, udiParser, userService, localizationService, editorService) {
+    function ($scope, eventsService, entityResource, mediaResource, udiParser, userService, localizationService, editorService) {
 
         var vm = this;
         var dialogOptions = $scope.model;
@@ -20,6 +20,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                     $scope.model.title = value;
                 });
         }
+        
         $scope.customTreeParams = dialogOptions.dataTypeKey ? "dataTypeKey=" + dialogOptions.dataTypeKey : "";
         $scope.dialogTreeApi = {};
         $scope.model.target = {};
@@ -127,6 +128,13 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
             eventsService.emit("dialogs.linkPicker.select", args);
 
             if ($scope.currentNode) {
+                if ($scope.currentNode.id == args.node.id && $scope.currentNode.selected) {
+                    $scope.model.target = {};
+                    $scope.currentNode.selected = false;
+
+                    return;
+                }
+
                 //un-select if there's a current one selected
                 $scope.currentNode.selected = false;
             }

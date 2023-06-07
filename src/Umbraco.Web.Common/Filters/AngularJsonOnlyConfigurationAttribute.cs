@@ -1,4 +1,4 @@
-﻿using System.Buffers;
+using System.Buffers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
@@ -7,49 +7,47 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Umbraco.Cms.Web.Common.Formatters;
 
-namespace Umbraco.Cms.Web.Common.Filters
+namespace Umbraco.Cms.Web.Common.Filters;
+
+/// <summary>
+///     Applying this attribute to any controller will ensure that it only contains one json formatter compatible with the
+///     angular json vulnerability prevention.
+/// </summary>
+public class AngularJsonOnlyConfigurationAttribute : TypeFilterAttribute
 {
-    /// <summary>
-    /// Applying this attribute to any controller will ensure that it only contains one json formatter compatible with the angular json vulnerability prevention.
-    /// </summary>
-    public class AngularJsonOnlyConfigurationAttribute : TypeFilterAttribute
+    public AngularJsonOnlyConfigurationAttribute()
+        : base(typeof(AngularJsonOnlyConfigurationFilter)) =>
+        Order = 1; // Must be low, to be overridden by other custom formatters, but higher then all framework stuff.
+
+    private class AngularJsonOnlyConfigurationFilter : IResultFilter
     {
-        public AngularJsonOnlyConfigurationAttribute() : base(typeof(AngularJsonOnlyConfigurationFilter))
+        private readonly ArrayPool<char> _arrayPool;
+        private readonly MvcOptions _options;
+
+        public AngularJsonOnlyConfigurationFilter(ArrayPool<char> arrayPool, IOptionsSnapshot<MvcOptions> options)
         {
-            Order = 1; // Must be low, to be overridden by other custom formatters, but higher then all framework stuff.
+            _arrayPool = arrayPool;
+            _options = options.Value;
         }
 
-        private class AngularJsonOnlyConfigurationFilter : IResultFilter
+        public void OnResultExecuted(ResultExecutedContext context)
         {
-            private readonly ArrayPool<char> _arrayPool;
-            private readonly IOptions<MvcOptions> _options;
+        }
 
-            public AngularJsonOnlyConfigurationFilter(ArrayPool<char> arrayPool, IOptions<MvcOptions> options)
+        public void OnResultExecuting(ResultExecutingContext context)
+        {
+            if (context.Result is ObjectResult objectResult)
             {
-                _arrayPool = arrayPool;
-                _options = options;
-            }
-
-            public void OnResultExecuted(ResultExecutedContext context)
-            {
-            }
-
-            public void OnResultExecuting(ResultExecutingContext context)
-            {
-                if (context.Result is ObjectResult objectResult)
+                var serializerSettings = new JsonSerializerSettings
                 {
-                    var serializerSettings = new JsonSerializerSettings()
-                    {
-                        ContractResolver = new DefaultContractResolver(),
-                        Converters = {new VersionConverter()}
-                    };
+                    ContractResolver = new DefaultContractResolver(),
+                    Converters = { new VersionConverter() },
+                };
 
-                    objectResult.Formatters.Clear();
-                    objectResult.Formatters.Add(new AngularJsonMediaTypeFormatter(serializerSettings, _arrayPool, _options.Value));
-                }
+                objectResult.Formatters.Clear();
+                objectResult.Formatters.Add(
+                    new AngularJsonMediaTypeFormatter(serializerSettings, _arrayPool, _options));
             }
         }
     }
-
-
 }

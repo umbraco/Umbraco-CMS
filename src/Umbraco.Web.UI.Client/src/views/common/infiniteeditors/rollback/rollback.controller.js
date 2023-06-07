@@ -57,7 +57,7 @@
             });
 
             // Load in diff library
-            assetsService.loadJs('lib/jsdiff/diff.min.js', $scope).then(function () {
+            assetsService.loadJs('lib/jsdiff/diff.js', $scope).then(function () {
 
                 getVersions().then(function(){
                     vm.loading = false;
@@ -73,11 +73,13 @@
             getVersions();
         }
 
+        function canRollback(version) {
+            return !version.currentDraftVersion;
+        }
+
         function changeVersion(version) {
 
-            const canRollback = !version.currentDraftVersion && !version.currentPublishedVersion;
-
-            if (canRollback === false) {
+            if (canRollback(version) === false) {
                 return;
             }
 
@@ -92,6 +94,7 @@
                 vm.loadingDiff = true;
                 const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
 
+                vm.previousVersion = null;
                 contentResource.getRollbackVersion(version.versionId, culture)
                     .then(function(data) {
                         vm.previousVersion = data;
@@ -99,8 +102,11 @@
                         vm.previousVersion.displayValue = version.displayValue + ' - ' + version.username;
                         createDiff(vm.currentVersion, vm.previousVersion);
 
+                        const changed = (part) => part.added || part.removed;
+                        vm.diffHasChanges = vm.diff.name.some(changed) || vm.diff.properties.some((property) => property.diff.some(changed));
+
                         vm.loadingDiff = false;
-                        vm.rollbackButtonDisabled = false;
+                        vm.rollbackButtonDisabled = !vm.diffHasChanges;
                     }, function () {
                         vm.loadingDiff = false;
                     });
@@ -131,11 +137,14 @@
 
                     // get current backoffice user and format dates
                     userService.getCurrentUser().then(function (currentUser) {
-                        vm.previousVersions = data.items.map(version => {
-                            var timestampFormatted = dateHelper.getLocalDate(version.versionDate, currentUser.locale, 'LLL');
-                            version.displayValue = timestampFormatted;
-                            return version;
-                        });
+                        vm.previousVersions = data.items
+                            // we don't ever want to show the draft version in the rollback list
+                            .filter(version => version.currentDraftVersion === false)
+                            .map(version => {
+                                var timestampFormatted = dateHelper.getLocalDate(version.versionDate, currentUser.locale, 'LLL');
+                                version.displayValue = timestampFormatted;
+                                return version;
+                            });
                     });
                 });
         }
@@ -148,7 +157,7 @@
             vm.diff.properties = [];
 
             // find diff in name
-            vm.diff.name = JsDiff.diffWords(currentVersion.name, previousVersion.name);
+            vm.diff.name = Diff.diffWords(currentVersion.name, previousVersion.name);
 
             // extract all properties from the tabs and create new object for the diff
             currentVersion.tabs.forEach(function (tab) {
@@ -173,7 +182,7 @@
                         // copy existing properties, so it doesn't manipulate existing properties on page
                         oldProperty = Utilities.copy(oldProperty);
                         property = Utilities.copy(property);
-                        
+
                         // we have to make properties storing values as object into strings (Grid, nested content, etc.)
                         if (property.value instanceof Object) {
                             property.value = JSON.stringify(property.value, null, 1);
@@ -188,14 +197,14 @@
                         // diff requires a string
                         property.value = property.value ? property.value + '' : '';
                         oldProperty.value = oldProperty.value ? oldProperty.value + '' : '';
-                        
+
                         const diffProperty = {
                             'alias': property.alias,
                             'label': property.label,
-                            'diff': property.isObject ? JsDiff.diffJson(property.value, oldProperty.value) : JsDiff.diffWords(property.value, oldProperty.value),
+                            'diff': property.isObject ? Diff.diffJson(property.value, oldProperty.value) : Diff.diffWords(property.value, oldProperty.value),
                             'isObject': property.isObject || oldProperty.isObject
                         };
-                        
+
                         vm.diff.properties.push(diffProperty);
                     }
                 });

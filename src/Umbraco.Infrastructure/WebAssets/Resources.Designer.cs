@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -67,19 +67,18 @@ namespace Umbraco.Cms.Infrastructure.WebAssets {
         ///    &apos;lib/jquery-ui/jquery-ui.min.js&apos;,
         ///    &apos;lib/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js&apos;,
         ///
-        ///    &apos;lib/angular/angular.js&apos;,
+        ///    &apos;lib/angular/angular.min.js&apos;,
         ///    &apos;lib/underscore/underscore-min.js&apos;,
         ///
         ///    &apos;lib/moment/moment.min.js&apos;,
-        ///    &apos;lib/flatpickr/flatpickr.js&apos;,
+        ///    &apos;lib/flatpickr/flatpickr.min.js&apos;,
         ///
         ///    &apos;lib/animejs/anime.min.js&apos;,
         ///
-        ///    &apos;lib/angular-route/angular-route.js&apos;,
-        ///    &apos;lib/angular-cookies/angular-cookies.js&apos;,
+        ///    &apos;lib/angular-route/angular-route.min.js&apos;,
+        ///    &apos;lib/angular-cookies/angular-cookies.min.js&apos;,
         ///    &apos;lib/angular-aria/angular-aria.min.js&apos;,
-        ///    &apos;lib/angular-touch/angular-touch.js&apos;,
-        ///    &apos;lib/ [rest of string was truncated]&quot;;.
+        ///    &apos;lib/angular-touch/angular-touch [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string JsInitialize {
             get {
@@ -111,17 +110,17 @@ namespace Umbraco.Cms.Infrastructure.WebAssets {
         /// <summary>
         ///   Looks up a localized string similar to [
         ///    &apos;lib/jquery/jquery.min.js&apos;,
-        ///    &apos;lib/angular/angular.js&apos;,
+        ///    &apos;lib/angular/angular.min.js&apos;,
         ///    &apos;lib/underscore/underscore-min.js&apos;,
         ///    &apos;lib/umbraco/Extensions.js&apos;,
-        ///    &apos;js/utilities.js&apos;,
-        ///    &apos;js/app.js&apos;,
-        ///    &apos;js/umbraco.resources.js&apos;,
-        ///    &apos;js/umbraco.services.js&apos;,
-        ///    &apos;js/umbraco.interceptors.js&apos;,
+        ///    &apos;js/utilities.min.js&apos;,
+        ///    &apos;js/app.min.js&apos;,
+        ///    &apos;js/umbraco.resources.min.js&apos;,
+        ///    &apos;js/umbraco.services.min.js&apos;,
+        ///    &apos;js/umbraco.interceptors.min.js&apos;,
         ///    &apos;ServerVariables&apos;,
         ///    &apos;lib/signalr/signalr.min.js&apos;,
-        ///    &apos;js/umbraco.preview.js&apos;
+        ///    &apos;js/umbraco.preview.min.js&apos;
         ///]
         ///.
         /// </summary>
@@ -152,13 +151,11 @@ namespace Umbraco.Cms.Infrastructure.WebAssets {
         ///   Looks up a localized string similar to [
         ///    &apos;lib/tinymce/tinymce.min.js&apos;,
         ///
-        ///    &apos;lib/tinymce/plugins/paste/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/anchor/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/charmap/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/table/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/lists/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/advlist/plugin.min.js&apos;,
-        ///    &apos;lib/tinymce/plugins/hr/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/autolink/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/directionality/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/t [rest of string was truncated]&quot;;.

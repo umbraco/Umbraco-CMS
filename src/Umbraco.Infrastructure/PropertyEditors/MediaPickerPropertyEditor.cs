@@ -1,9 +1,8 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -11,65 +10,85 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Cms.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors;
+
+/// <summary>
+///     Represents a media picker property editor.
+/// </summary>
+/// <remarks>
+///     Named "(legacy)" as it's best to use the NEW Media Picker aka MediaPicker3
+/// </remarks>
+[DataEditor(
+    Constants.PropertyEditors.Aliases.MediaPicker,
+    EditorType.PropertyValue | EditorType.MacroParameter,
+    "Media Picker (legacy)",
+    "mediapicker",
+    ValueType = ValueTypes.Text,
+    Group = Constants.PropertyEditors.Groups.Media,
+    Icon = Constants.Icons.MediaImage,
+    IsDeprecated = false,
+    ValueEditorIsReusable = true)]
+[Obsolete("Please use the MediaPicker3 instead, will be removed in V13")]
+public class MediaPickerPropertyEditor : DataEditor
 {
-    /// <summary>
-    /// Represents a media picker property editor.
-    /// </summary>
-    /// <remarks>
-    /// Named "(legacy)" as it's best to use the NEW Media Picker aka MediaPicker3
-    /// </remarks>
-    [DataEditor(
-        Constants.PropertyEditors.Aliases.MediaPicker,
-        EditorType.PropertyValue | EditorType.MacroParameter,
-        "Media Picker (legacy)",
-        "mediapicker",
-        ValueType = ValueTypes.Text,
-        Group = Constants.PropertyEditors.Groups.Media,
-        Icon = Constants.Icons.MediaImage,
-        IsDeprecated = false)]
-    public class MediaPickerPropertyEditor : DataEditor
+    private readonly IEditorConfigurationParser _editorConfigurationParser;
+    private readonly IIOHelper _ioHelper;
+
+    // Scheduled for removal in v12
+    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+    public MediaPickerPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        IIOHelper ioHelper)
+        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
-        private readonly IIOHelper _ioHelper;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MediaPickerPropertyEditor"/> class.
-        /// </summary>
-        public MediaPickerPropertyEditor(
-            IDataValueEditorFactory dataValueEditorFactory,
-            IIOHelper ioHelper)
-            : base(dataValueEditorFactory)
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MediaPickerPropertyEditor" /> class.
+    /// </summary>
+    public MediaPickerPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        IIOHelper ioHelper,
+        IEditorConfigurationParser editorConfigurationParser)
+        : base(dataValueEditorFactory)
+    {
+        _ioHelper = ioHelper;
+        _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
+    }
+
+    /// <inheritdoc />
+    protected override IConfigurationEditor CreateConfigurationEditor() =>
+        new MediaPickerConfigurationEditor(_ioHelper, _editorConfigurationParser);
+
+    protected override IDataValueEditor CreateValueEditor() =>
+        DataValueEditorFactory.Create<MediaPickerPropertyValueEditor>(Attribute!);
+
+    public class MediaPickerPropertyValueEditor : DataValueEditor, IDataValueReference
+    {
+        public MediaPickerPropertyValueEditor(
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            DataEditorAttribute attribute)
+            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute) =>
+            SupportsReadOnly = true;
+
+        public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {
-            _ioHelper = ioHelper;
-        }
+            var asString = value is string str ? str : value?.ToString();
 
-        /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new MediaPickerConfigurationEditor(_ioHelper);
-
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MediaPickerPropertyValueEditor>(Attribute);
-
-        public class MediaPickerPropertyValueEditor : DataValueEditor, IDataValueReference
-        {
-            public MediaPickerPropertyValueEditor(
-                ILocalizedTextService localizedTextService,
-                IShortStringHelper shortStringHelper,
-                IJsonSerializer jsonSerializer,
-                IIOHelper ioHelper,
-                DataEditorAttribute attribute)
-                : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+            if (string.IsNullOrEmpty(asString))
             {
+                yield break;
             }
 
-            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            foreach (var udiStr in asString.Split(','))
             {
-                var asString = value is string str ? str : value?.ToString();
-
-                if (string.IsNullOrEmpty(asString)) yield break;
-
-                foreach (var udiStr in asString.Split(','))
+                if (UdiParser.TryParse(udiStr, out Udi? udi))
                 {
-                    if (UdiParser.TryParse(udiStr, out var udi))
-                        yield return new UmbracoEntityReference(udi);
+                    yield return new UmbracoEntityReference(udi);
                 }
             }
         }

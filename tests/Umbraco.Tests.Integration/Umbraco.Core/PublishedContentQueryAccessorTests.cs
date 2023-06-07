@@ -1,45 +1,39 @@
-using System;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Core
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Core;
+
+[TestFixture]
+public class PublishedContentQueryAccessorTests : UmbracoTestServerTestBase
 {
-    [TestFixture]
-    public class PublishedContentQueryAccessorTests : UmbracoTestServerTestBase
+    [Test]
+    public async Task PublishedContentQueryAccessor_WithRequestScope_WillProvideQuery()
     {
-        [Test]
-        public async Task PublishedContentQueryAccessor_WithRequestScope_WillProvideQuery()
-        {
-            HttpResponseMessage result = await Client.GetAsync("/demo-published-content-query-accessor");
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
-        }
+        var result = await Client.GetAsync("/demo-published-content-query-accessor");
+        Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
     }
+}
 
-    public class PublishedContentQueryAccessorTestController : Controller
+public class PublishedContentQueryAccessorTestController : Controller
+{
+    private readonly IPublishedContentQueryAccessor _accessor;
+
+    public PublishedContentQueryAccessorTestController(IPublishedContentQueryAccessor accessor) => _accessor = accessor;
+
+    [HttpGet("demo-published-content-query-accessor")]
+    public IActionResult Test()
     {
-        private readonly IPublishedContentQueryAccessor _accessor;
+        var success = _accessor.TryGetValue(out var query);
 
-        public PublishedContentQueryAccessorTestController(IPublishedContentQueryAccessor accessor)
+        if (!success || query == null)
         {
-            _accessor = accessor;
+            throw new ApplicationException("It doesn't work");
         }
 
-        [HttpGet("demo-published-content-query-accessor")]
-        public IActionResult Test()
-        {
-            var success = _accessor.TryGetValue(out IPublishedContentQuery query);
-
-            if (!success || query == null)
-            {
-                throw new ApplicationException("It doesn't work");
-            }
-
-            return Ok();
-        }
+        return Ok();
     }
 }

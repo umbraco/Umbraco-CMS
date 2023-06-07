@@ -15,7 +15,7 @@ catch (Exception ex)
     public static string EditorView(dynamic contentItem)
     {
         string view = contentItem.editor.render != null ? contentItem.editor.render.ToString() : contentItem.editor.view.ToString();
-        view = view.ToLower().Replace(".html", ".cshtml");
+        view = view.Replace(".html", ".cshtml");
 
         if (!view.Contains("/"))
         {

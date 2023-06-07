@@ -1,19 +1,15 @@
-﻿using System;
 using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.Dashboards
+namespace Umbraco.Cms.Core.Dashboards;
+
+[Weight(50)]
+public class HealthCheckDashboard : IDashboard
 {
-    [Weight(50)]
-    public class HealthCheckDashboard : IDashboard
-    {
-        public string Alias => "settingsHealthCheck";
+    public string Alias => "settingsHealthCheck";
 
-        public string[] Sections => new [] { "settings" };
+    public string[] Sections => new[] { Constants.Applications.Settings };
 
-        public string View => "views/dashboard/settings/healthcheck.html";
+    public string View => "views/dashboard/settings/healthcheck.html";
 
-        public IAccessRule[] AccessRules => Array.Empty<IAccessRule>();
-    }
-
-
+    public IAccessRule[] AccessRules => Array.Empty<IAccessRule>();
 }

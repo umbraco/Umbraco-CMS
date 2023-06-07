@@ -110,6 +110,7 @@ function mediaEditController($scope, $routeParams, $location, $http, $q, appStat
         editorState.set($scope.content);
 
         bindEvents();
+        $scope.contentForm.$dirty = false;
     }
 
     function bindEvents() {
@@ -174,6 +175,10 @@ function mediaEditController($scope, $routeParams, $location, $http, $q, appStat
     }
 
     $scope.save = function () {
+
+        if($scope.page.saveButtonState == "busy"){
+            return;
+        }
 
         if (formHelper.submitForm({ scope: $scope })) {
 

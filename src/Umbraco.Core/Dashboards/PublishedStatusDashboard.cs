@@ -1,19 +1,15 @@
-﻿using System;
 using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.Dashboards
+namespace Umbraco.Cms.Core.Dashboards;
+
+[Weight(30)]
+public class PublishedStatusDashboard : IDashboard
 {
-    [Weight(30)]
-    public class PublishedStatusDashboard : IDashboard
-    {
-        public string Alias => "settingsPublishedStatus";
+    public string Alias => "settingsPublishedStatus";
 
-        public string[] Sections => new [] { "settings" };
+    public string[] Sections => new[] { Constants.Applications.Settings };
 
-        public string View => "views/dashboard/settings/publishedstatus.html";
+    public string View => "views/dashboard/settings/publishedstatus.html";
 
-        public IAccessRule[] AccessRules => Array.Empty<IAccessRule>();
-    }
-
-
+    public IAccessRule[] AccessRules => Array.Empty<IAccessRule>();
 }

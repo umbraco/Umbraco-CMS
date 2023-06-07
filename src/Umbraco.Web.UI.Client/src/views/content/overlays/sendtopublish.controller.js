@@ -44,6 +44,10 @@
             
         }
 
+        function allowSendToPublish (variant) {
+            return variant.allowedActions.includes("H");
+        }
+
         function changeSelection() {
             var firstSelected = vm.variants.find(v => v.save);
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
@@ -62,13 +66,15 @@
             // * it's editor is in a $dirty state
             // * it has pending saves
             // * it is unpublished
-            return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges");
+            variant.notAllowed = allowSendToPublish(variant) === false && variant.active;
+            return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges") && (allowSendToPublish(variant) || variant.active);
         }
 
         //when this dialog is closed, reset all 'save' flags
         $scope.$on('$destroy', function () {
             vm.variants.forEach(variant => {
                 variant.save = false;
+                variant.notAllowed = false;
             });
         });
 

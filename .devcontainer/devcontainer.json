@@ -1,41 +1,75 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.158.0/containers/dotnet-mssql
+// https://github.com/microsoft/vscode-dev-containers/tree/main/containers/dotnet
 {
-	"name": "C# (.NET) and MS SQL",
+	"name": "C# (.NET) Umbraco & SMTP4Dev",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspace",
-
+	
+	
 	// Set *default* container specific settings.json values on container create.
-	"settings": {
-		"terminal.integrated.shell.linux": "/bin/bash",
-		"mssql.connections": [
-			{
-				"server": "localhost,1433",
-				"database": "",
-				"authenticationType": "SqlLogin",
-				"user": "sa",
-				"password": "P@ssw0rd",
-				"emptyPasswordInput": false,
-				"savePassword": false,
-				"profileName": "mssql-container"
-			}
-		],
-		"omnisharp.defaultLaunchSolution": "umbraco-netcore-only.sln",
+	"settings": {		
+		"omnisharp.defaultLaunchSolution": "umbraco.sln",
 		"omnisharp.enableDecompilationSupport": true,
 		"omnisharp.enableRoslynAnalyzers": true
 	},
 
+	"features": {
+		// Workaround until the image is updated to include the latest version of .NET Core - .NET7
+		// https://github.com/devcontainers/templates/issues/38#issuecomment-1310803259		
+		"ghcr.io/devcontainers/features/dotnet:1": {
+			"version": "7"
+		},
+
+		// Adds SSH support to the container
+		// Allowing the Github CLI `gh codespace ssh` to work
+		"ghcr.io/devcontainers/features/sshd:1": {
+			"version": "latest"
+		},
+
+		// Adds SQLite feature from apt install
+		// Also adds the SQLite VSCode extension
+		"ghcr.io/warrenbuckley/codespace-features/sqlite:1": {}
+	},
+
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
-		"ms-dotnettools.csharp",
-		"ms-mssql.mssql"
+		"ms-dotnettools.csharp"
+	],
+	
+	// This is used in the prebuilds - so dotnet build (nuget restore and node stuff) is done
+	"updateContentCommand": "dotnet build umbraco.sln && dotnet dev-certs https --trust",
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locallAdd	"forwardPorts": [9000, 5000, 25],
+	// Port needed to help discover SMTP4Dev
+	"forwardPorts": [
+		5000
 	],
 
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// 1433 for SQL if you want to connect from local into the one running inside the container
-	// Can connect to the SQL Server running in the image on local with 'host.docker.internal' as hostname
-	"forwardPorts": [1433, 9000, 5000, 25],
+	"portsAttributes": {
+		"5000": {
+			"label": "SMTP4Dev",
+			"protocol": "http",
+			"onAutoForward": "notify"
+		},
+		"9000": {
+			"label": "Umbraco HTTP",
+			"protocol": "http",
+			"onAutoForward": "notify"
+		},
+		"44331": {
+			"label": "Umbraco HTTPS",
+			"protocol": "https",
+			"onAutoForward": "notify"
+		}
+	},
+	"customizations": {
+		"codespaces": {
+		  "openFiles": [
+			".github/codespaces-readme.md"
+		  ]
+		}
+	}
 
 	// [Optional] To reuse of your local HTTPS dev cert:
 	//
@@ -56,6 +90,4 @@
 	//      2. Drag ~/.aspnet/https/aspnetapp.pfx into the root of the file explorer
 	//      3. Open a terminal in VS Code and run "mkdir -p /home/vscode/.aspnet/https && mv aspnetapp.pfx /home/vscode/.aspnet/https"
 
-	// postCreateCommand.sh parameters: $1=SA password, $2=dacpac path, $3=sql script(s) path
-	"postCreateCommand": "bash .devcontainer/mssql/postCreateCommand.sh 'P@ssw0rd' './bin/Debug/' './.devcontainer/mssql/'"	
 }

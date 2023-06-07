@@ -1,17 +1,17 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
-namespace Umbraco.Cms.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent;
+
+[DebuggerDisplay("{Content?.Name} ({Score})")]
+public class PublishedSearchResult
 {
-    [DebuggerDisplay("{Content?.Name} ({Score})")]
-    public class PublishedSearchResult
+    public PublishedSearchResult(IPublishedContent content, float score)
     {
-        public PublishedSearchResult(IPublishedContent content, float score)
-        {
-            Content = content;
-            Score = score;
-        }
-
-        public IPublishedContent Content { get; }
-        public float Score { get; }
+        Content = content;
+        Score = score;
     }
+
+    public IPublishedContent Content { get; }
+
+    public float Score { get; }
 }

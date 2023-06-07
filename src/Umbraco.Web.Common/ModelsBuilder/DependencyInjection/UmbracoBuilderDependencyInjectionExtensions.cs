@@ -1,20 +1,22 @@
-using System.Linq;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.Razor.Compilation;
+using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
+using Microsoft.AspNetCore.Razor.Language;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
-using Umbraco.Cms.Infrastructure.WebAssets;
-using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.ModelsBuilder;
+using Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
 /*
  * OVERVIEW:
@@ -62,106 +64,105 @@ using Umbraco.Cms.Web.Common.ModelsBuilder;
  *    requires re-resolving the original services from a pre-built DI container. In effect this re-creates these
  *    services from scratch which means there is no caches.
  *
- * ... Option C works, we will use that but need to verify how this affects memory since ideally the old services will be GC'd.
+ * ... Option C worked, however after a breaking change from dotnet, we cannot go with this options any longer.
+ * The reason for this is that when the default RuntimeViewCompiler loads in the assembly using Assembly.Load,
+ * This will not work for us since this loads the compiled views into the default AssemblyLoadContext,
+ * and our compiled models are loaded in the collectible UmbracoAssemblyLoadContext, and as per the breaking change
+ * you're no longer allowed reference a collectible load context from a non-collectible one
+ * That is the non-collectible compiled views are not allowed to reference the collectible InMemoryAuto models.
+ * https://learn.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/7.0/collectible-assemblies
  *
- * Option C, how its done:
- * - Before we add our custom razor services to the container, we make a copy of the services collection which is the snapshot of registered services
- *   with razor defaults before ours are added.
- * - We replace the default implementation of IRazorViewEngine with our own. This is a wrapping service that wraps the default RazorViewEngine instance.
- *   The ctor for this service takes in a Factory method to re-construct the default RazorViewEngine and all of it's dependency graph.
- * - When the models change, the Factory is invoked and the default razor services are all re-created, thus clearing their caches and the newly
- *   created instance is wrapped. The RazorViewEngine is the only service that needs to be replaced and wrapped for this to work because it's dependency
- *   graph includes all of the above mentioned services, all the way up to the RazorProjectEngine and it's LazyMetadataReferenceFeature.
+ * So what do we do then?
+ * We've had to go with option a unfortunately, and we've cloned the above classes
+ * There has had to be some modifications to the ViewCompiler (CollectibleRuntimeViewCompiler)
+ * First off we've added a new class InMemoryAssemblyLoadContextManager, the role of this class is to ensure that
+ * no one will take a reference to the assembly load context (you cannot unload an assembly load context if there's any references to it).
+ * This means that both the InMemoryAutoFactory and the ViewCompiler uses the LoadContextManager to load their assemblies.
+ * This serves another purpose being that it keeps track of the location of the models assembly.
+ * This means that we no longer use the RazorReferencesManager to resolve that specific dependency, but instead add and explicit dependency to the models assembly.
+ *
+ * With this our assembly load context issue is solved, however the caching issue still persists now that we no longer use the RefreshingRazorViewEngine
+ * To clear these caches another class the RuntimeCompilationCacheBuster has been introduced,
+ * this keeps a reference to the CollectibleRuntimeViewCompiler and the RazorViewEngine and is injected into the InMemoryModelsFactory to clear the caches when rebuilding modes.
+ * In order to avoid having to copy all the RazorViewEngine code the cache buster uses reflection to call the internal ClearCache method of the RazorViewEngine.
  */
 
-namespace Umbraco.Extensions
+namespace Umbraco.Extensions;
+
+/// <summary>
+///     Extension methods for <see cref="IUmbracoBuilder" /> for the common Umbraco functionality
+/// </summary>
+public static class UmbracoBuilderDependencyInjectionExtensions
 {
     /// <summary>
-    /// Extension methods for <see cref="IUmbracoBuilder"/> for the common Umbraco functionality
+    ///     Adds umbraco's embedded model builder support
     /// </summary>
-    public static class UmbracoBuilderDependencyInjectionExtensions
+    public static IUmbracoBuilder AddModelsBuilder(this IUmbracoBuilder builder)
     {
-        /// <summary>
-        /// Adds umbraco's embedded model builder support
-        /// </summary>
-        public static IUmbracoBuilder AddModelsBuilder(this IUmbracoBuilder builder)
+        var umbServices = new UniqueServiceDescriptor(typeof(UmbracoServices), typeof(UmbracoServices), ServiceLifetime.Singleton);
+        if (builder.Services.Contains(umbServices))
         {
-            var umbServices = new UniqueServiceDescriptor(typeof(UmbracoServices), typeof(UmbracoServices), ServiceLifetime.Singleton);
-            if (builder.Services.Contains(umbServices))
-            {
-                // if this ext method is called more than once just exit
-                return builder;
-            }
+            // if this ext method is called more than once just exit
+            return builder;
+        }
 
-            builder.Services.Add(umbServices);
+        builder.Services.Add(umbServices);
 
+        if (builder.Config.GetRuntimeMode() == RuntimeMode.BackofficeDevelopment)
+        {
+            // Configure services to allow InMemoryAuto mode
             builder.AddInMemoryModelsRazorEngine();
 
-            // TODO: I feel like we could just do builder.AddNotificationHandler<ModelsBuilderNotificationHandler>() and it
-            // would automatically just register for all implemented INotificationHandler{T}?
-            builder.AddNotificationHandler<TemplateSavingNotification, ModelsBuilderNotificationHandler>();
-            builder.AddNotificationHandler<ServerVariablesParsingNotification, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<ModelBindingErrorNotification, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, OutOfDateModelsStatus>();
+            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
+        }
+
+        if (builder.Config.GetRuntimeMode() != RuntimeMode.Production)
+        {
+            // Configure service to allow models generation
+            builder.AddNotificationHandler<ServerVariablesParsingNotification, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<TemplateSavingNotification, ModelsBuilderNotificationHandler>();
+
             builder.AddNotificationHandler<UmbracoApplicationStartingNotification, AutoModelsNotificationHandler>();
             builder.AddNotificationHandler<UmbracoRequestEndNotification, AutoModelsNotificationHandler>();
             builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
             builder.AddNotificationHandler<DataTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
+        }
 
-            builder.Services.AddSingleton<ModelsGenerator>();
-            builder.Services.AddSingleton<OutOfDateModelsStatus>();
-            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, OutOfDateModelsStatus>();
-            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
-            builder.Services.AddSingleton<ModelsGenerationError>();
+        builder.Services.TryAddSingleton<IModelsBuilderDashboardProvider, NoopModelsBuilderDashboardProvider>();
+
+        // Register required services for ModelsBuilderDashboardController
+        builder.Services.AddSingleton<IModelsGenerator, ModelsGenerator>();
+        // TODO: Remove in v13 - this is only here in case someone is already using this generator directly
+        builder.Services.AddSingleton<ModelsGenerator>();
+        builder.Services.AddSingleton<OutOfDateModelsStatus>();
+        builder.Services.AddSingleton<ModelsGenerationError>();
+
+        return builder;
+    }
+
+    // See notes in RefreshingRazorViewEngine for information on what this is doing.
+    private static IUmbracoBuilder AddInMemoryModelsRazorEngine(this IUmbracoBuilder builder)
+    {
+        // We should only add/replace these services when models builder is InMemory, otherwise we'll cause issues.
+        // Since these services expect the ModelsMode to be InMemoryAuto
+        if (builder.Config.GetModelsMode() is ModelsMode.InMemoryAuto)
+        {
+            builder.Services.AddSingleton<UmbracoRazorReferenceManager>();
+            builder.Services.AddSingleton<CompilationOptionsProvider>();
+            builder.Services.AddSingleton<IViewCompilerProvider, UmbracoViewCompilerProvider>();
+            builder.Services.AddSingleton<RuntimeCompilationCacheBuster>();
+            builder.Services.AddSingleton<InMemoryAssemblyLoadContextManager>();
 
             builder.Services.AddSingleton<InMemoryModelFactory>();
-
-            // This is what the community MB would replace, all of the above services are fine to be registered
-            // even if the community MB is in place.
-            builder.Services.AddSingleton<IPublishedModelFactory>(factory =>
-            {
-                ModelsBuilderSettings config = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
-                if (config.ModelsMode == ModelsMode.InMemoryAuto)
-                {
-                    return factory.GetRequiredService<InMemoryModelFactory>();
-                }
-                else
-                {
-                    return factory.CreateDefaultPublishedModelFactory();
-                }
-            });
-
-
-            if (!builder.Services.Any(x=>x.ServiceType == typeof(IModelsBuilderDashboardProvider)))
-            {
-                builder.Services.AddUnique<IModelsBuilderDashboardProvider, NoopModelsBuilderDashboardProvider>();
-            }
-
+            // Register the factory as IPublishedModelFactory
+            builder.Services.AddSingleton<IPublishedModelFactory, InMemoryModelFactory>();
             return builder;
         }
 
-        private static IUmbracoBuilder AddInMemoryModelsRazorEngine(this IUmbracoBuilder builder)
-        {
-            // See notes in RefreshingRazorViewEngine for information on what this is doing.
-
-            // copy the current collection, we need to use this later to rebuild a container
-            // to re-create the razor compiler provider
-            var initialCollection = new ServiceCollection
-            {
-                builder.Services
-            };
-
-            // Replace the default with our custom engine
-            builder.Services.AddSingleton<IRazorViewEngine>(
-                s => new RefreshingRazorViewEngine(
-                        () =>
-                        {
-                            // re-create the original container so that a brand new IRazorPageActivator
-                            // is produced, if we don't re-create the container then it will just return the same instance.
-                            ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
-                            return recreatedServices.GetRequiredService<IRazorViewEngine>();
-                        }, s.GetRequiredService<InMemoryModelFactory>()));
-
-            return builder;
-        }
+        // This is what the community MB would replace, all of the above services are fine to be registered
+        builder.Services.AddSingleton<IPublishedModelFactory>(factory => factory.CreateDefaultPublishedModelFactory());
+        return builder;
     }
 }

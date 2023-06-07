@@ -1,22 +1,22 @@
-﻿using NPoco;
+using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
+
+[TableName(Constants.DatabaseSchema.Tables.LogViewerQuery)]
+[PrimaryKey("id")]
+[ExplicitColumns]
+internal class LogViewerQueryDto
 {
-    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.LogViewerQuery)]
-    [PrimaryKey("id")]
-    [ExplicitColumns]
-    internal class LogViewerQueryDto
-    {
-        [Column("id")]
-        [PrimaryKeyColumn]
-        public int Id { get; set; }
+    [Column("id")]
+    [PrimaryKeyColumn]
+    public int Id { get; set; }
 
-        [Column("name")]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_LogViewerQuery_name")]
-        public string Name { get; set; }
+    [Column("name")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_LogViewerQuery_name")]
+    public required string Name { get; set; }
 
-        [Column("query")]
-        public string Query { get; set; }
-    }
+    [Column("query")]
+    public required string Query { get; set; }
 }

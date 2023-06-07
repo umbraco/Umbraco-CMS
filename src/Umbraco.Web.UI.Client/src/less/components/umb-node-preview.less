@@ -7,7 +7,8 @@
 }
 
 .umb-editor-wrapper .umb-node-preview {
-    .umb-property-editor--limit-width();
+  word-break: break-word;
+  .umb-property-editor--limit-width();
 }
 
 .umb-node-preview:last-of-type {
@@ -38,7 +39,6 @@
 
 .umb-node-preview__content {
     flex: 1 1 auto;
-    margin-right: 25px;
     overflow: hidden;
 }
 
@@ -108,6 +108,15 @@
     text-decoration: none;
 }
 
+.umb-node-preview-add:disabled {
+    cursor: not-allowed;
+
+    &:hover {
+        border-color: @ui-action-discreet-border;
+        color: @ui-action-discreet-type;
+    }
+}
+
 .umb-editor-wrapper .umb-node-preview-add {
     .umb-property-editor--limit-width();
 }
@@ -120,4 +129,11 @@
     .umb-node-preview-add {
         max-width: none;
     }
+}
+
+//  Single
+.umb-node-preview[single] {
+    border: 1px solid @gray-9;
+    padding: 12px 15px;
+    border-radius: @baseBorderRadius;
 }

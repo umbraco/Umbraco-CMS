@@ -1,5 +1,5 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState', 'assetsService', 'eventsService', 'tourService', 'localStorageService', 'navigationService', 'localizationService',
+window.app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState', 'assetsService', 'eventsService', 'tourService', 'localStorageService', 'navigationService', 'localizationService',
     function ($rootScope, $route, $location, $cookies, urlHelper, appState, assetsService, eventsService, tourService, localStorageService, navigationService, localizationService) {
 
         //This sets the default jquery ajax headers to include our csrf token, we
@@ -8,7 +8,7 @@ app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState
         $.ajaxSetup({
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("X-UMB-XSRF-TOKEN", $cookies["UMB-XSRF-TOKEN"]);
-                // This is a standard header that should be sent for all ajax requests and is required for 
+                // This is a standard header that should be sent for all ajax requests and is required for
                 // how the server handles auth rejections, etc... see https://github.com/dotnet/aspnetcore/blob/a2568cbe1e8dd92d8a7976469100e564362f778e/src/Security/Authentication/Cookies/src/CookieAuthenticationEvents.cs#L106-L107
                 xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
                 var queryStrings = urlHelper.getQueryStringParams();
@@ -63,7 +63,6 @@ app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState
             appState.setGlobalState("isReady", true);
             //send the ready event with the included returnToPath,returnToSearch data
             eventsService.emit("app.ready", data);
-            returnToPath = null, returnToSearch = null;
         }
 
         var currentRouteParams = null;
@@ -119,8 +118,15 @@ app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState
                 event.preventDefault();
                 var returnPath = null;
                 if (rejection.path == "/login" || rejection.path.startsWith("/login/")) {
+                  // Check if a ReturnUrl is present on the querystring and redirect to it if set
+                  var queryStrings = urlHelper.getQueryStringParams();
+                  if (typeof queryStrings.ReturnUrl !== 'undefined' && queryStrings.ReturnUrl.length > 0) {
+                    returnPath = queryStrings.ReturnUrl;
+                  }
+                  else {
                     //Set the current path before redirecting so we know where to redirect back to
-                    returnPath = encodeURIComponent($location.url());
+                    returnPath = encodeURIComponent(window.location.href.replace(window.location.origin, ''));                    
+                  }
                 }
                 $location.path(rejection.path)
                 if (returnPath) {

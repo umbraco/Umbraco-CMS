@@ -1,23 +1,22 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors;
+
+/// <summary>
+///     Indicates the level of a value.
+/// </summary>
+public enum PropertyValueLevel
 {
     /// <summary>
-    /// Indicates the level of a value.
+    ///     The source value, i.e. what is in the database.
     /// </summary>
-    public enum PropertyValueLevel
-    {
-        /// <summary>
-        /// The source value, i.e. what is in the database.
-        /// </summary>
-        Source,
+    Source,
 
-        /// <summary>
-        /// The conversion intermediate value.
-        /// </summary>
-        Inter,
+    /// <summary>
+    ///     The conversion intermediate value.
+    /// </summary>
+    Inter,
 
-        /// <summary>
-        /// The converted value.
-        /// </summary>
-        Object
-    }
+    /// <summary>
+    ///     The converted value.
+    /// </summary>
+    Object,
 }

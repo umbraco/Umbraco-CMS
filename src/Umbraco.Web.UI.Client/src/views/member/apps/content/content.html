@@ -22,7 +22,7 @@
         </div>
         <div class="umb-group-panel__content" data-element="tab-content-{{group.type === 'Group' ? group.parentAlias : group.alias}}">
             <umb-property
-                data-element="property-{{group.alias}}"
+                data-element="property-{{property.alias}}"
                 ng-repeat="property in group.properties  track by property.alias"
                 property="property">
                 <umb-property-editor model="property"></umb-property-editor>

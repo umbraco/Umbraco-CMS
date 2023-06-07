@@ -142,6 +142,9 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                         //update editor state to what is current
                         editorState.set(args.content);
 
+                        //needs to be manually set for infinite editing mode
+                        args.scope.isNew = args.content.id === 0 && args.scope.isNew;
+
                         return $q.reject(err);
                     });
             }
@@ -504,6 +507,37 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                     return null;
             }
 
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.contentEditingHelper#getPermissionsForContent
+         * @methodOf umbraco.services.contentEditingHelper
+         * @function
+         *
+         * @description
+         * Returns a object with permissions for user.
+         */
+        getPermissionsForContent: function () {
+
+            // Just ensure we do have an editorState
+            if (!editorState.current) return null;
+            
+            // Fetch current node allowed actions for the current user
+            // This is the current node & not each individual child node in the list
+            const currentUserPermissions = editorState.current.allowedActions || [];
+
+            // Create a nicer model rather than the funky & hard to remember permissions strings
+            const currentNodePermissions = {
+                canCopy: currentUserPermissions.includes('O'), //Magic Char = O
+                canCreate: currentUserPermissions.includes('C'), //Magic Char = C
+                canDelete: currentUserPermissions.includes('D'), //Magic Char = D
+                canMove: currentUserPermissions.includes('M'), //Magic Char = M
+                canPublish: currentUserPermissions.includes('U'), //Magic Char = U
+                canUnpublish: currentUserPermissions.includes('Z') //Magic Char = Z
+            };
+            
+            return currentNodePermissions;
         },
 
         /**

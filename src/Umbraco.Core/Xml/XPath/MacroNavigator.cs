@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Xml;
 using System.Xml.XPath;
 
@@ -66,10 +63,10 @@ namespace Umbraco.Cms.Core.Xml.XPath
 #endif
 
         [Conditional("DEBUG")]
-        void DebugEnter(string name)
+        private void DebugEnter(string name)
         {
 #if DEBUG
-            Debug("");
+            Debug(string.Empty);
             DebugState(":");
             Debug(name);
             _tabs = Math.Min(Tabs.Length, _tabs + 2);
@@ -77,7 +74,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
         }
 
         [Conditional("DEBUG")]
-        void DebugCreate(MacroNavigator nav)
+        private void DebugCreate(MacroNavigator nav)
         {
 #if DEBUG
             Debug("Create: [MacroNavigator::{0}]", nav._uid);
@@ -103,16 +100,19 @@ namespace Umbraco.Cms.Core.Xml.XPath
         }
 
         [Conditional("DEBUG")]
-        void DebugReturn(string format, params object[] args)
+        private void DebugReturn(string format, params object[] args)
         {
 #if DEBUG
             Debug("=> " + format, args);
-            if (_tabs > 0) _tabs -= 2;
+            if (_tabs > 0)
+            {
+                _tabs -= 2;
+            }
 #endif
         }
 
         [Conditional("DEBUG")]
-        void DebugState(string s = " =>")
+        private void DebugState(string s = " =>")
         {
 #if DEBUG
             string position;
@@ -123,25 +123,28 @@ namespace Umbraco.Cms.Core.Xml.XPath
                     position = "At macro.";
                     break;
                 case StatePosition.Parameter:
-                    position = string.Format("At parameter '{0}'.",
-                        _macro.Parameters[_state.ParameterIndex].Name);
+                    position = string.Format("At parameter '{0}'.", _macro.Parameters[_state.ParameterIndex].Name);
                     break;
                 case StatePosition.ParameterAttribute:
-                    position = string.Format("At parameter attribute '{0}/{1}'.",
+                    position = string.Format(
+                        "At parameter attribute '{0}/{1}'.",
                         _macro.Parameters[_state.ParameterIndex].Name,
-                        _macro.Parameters[_state.ParameterIndex].Attributes[_state.ParameterAttributeIndex].Key);
+                        _macro.Parameters[_state.ParameterIndex].Attributes?[_state.ParameterAttributeIndex].Key);
                     break;
                 case StatePosition.ParameterNavigator:
-                    position = string.Format("In parameter '{0}{1}' navigator.",
+                    position = string.Format(
+                        "In parameter '{0}{1}' navigator.",
                         _macro.Parameters[_state.ParameterIndex].Name,
-                        _macro.Parameters[_state.ParameterIndex].WrapNavigatorInNodes ? "/nodes" : "");
+                        _macro.Parameters[_state.ParameterIndex].WrapNavigatorInNodes ? "/nodes" : string.Empty);
                     break;
                 case StatePosition.ParameterNodes:
-                    position = string.Format("At parameter '{0}/nodes'.",
+                    position = string.Format(
+                        "At parameter '{0}/nodes'.",
                         _macro.Parameters[_state.ParameterIndex].Name);
                     break;
                 case StatePosition.ParameterText:
-                    position = string.Format("In parameter '{0}' text.",
+                    position = string.Format(
+                        "In parameter '{0}' text.",
                         _macro.Parameters[_state.ParameterIndex].Name);
                     break;
                 case StatePosition.Root:
@@ -156,7 +159,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
         }
 
 #if DEBUG
-        void Debug(string format, params object[] args)
+        private void Debug(string format, params object[] args)
         {
             // remove comments to write
 
@@ -192,29 +195,34 @@ namespace Umbraco.Cms.Core.Xml.XPath
                 StringValue = value;
             }
 
-            public MacroParameter(string name, XPathNavigator navigator,
+            public MacroParameter(
+                string name,
+                XPathNavigator navigator,
                 int maxNavigatorDepth = int.MaxValue,
                 bool wrapNavigatorInNodes = false,
-                IEnumerable<KeyValuePair<string, string>> attributes = null)
+                IEnumerable<KeyValuePair<string, string>>? attributes = null)
             {
                 Name = name;
                 MaxNavigatorDepth = maxNavigatorDepth;
                 WrapNavigatorInNodes = wrapNavigatorInNodes;
                 if (attributes != null)
                 {
-                    var a = attributes.ToArray();
+                    KeyValuePair<string, string>[] a = attributes.ToArray();
                     if (a.Length > 0)
+                    {
                         Attributes = a;
+                    }
                 }
+
                 NavigatorValue = navigator; // should not be empty
             }
 
             public string Name { get; private set; }
-            public string StringValue { get; private set; }
-            public XPathNavigator NavigatorValue { get; private set; }
+            public string? StringValue { get; private set; }
+            public XPathNavigator? NavigatorValue { get; private set; }
             public int MaxNavigatorDepth { get; private set; }
             public bool WrapNavigatorInNodes { get; private set; }
-            public KeyValuePair<string, string>[] Attributes { get; private set; }
+            public KeyValuePair<string, string>[]? Attributes { get; private set; }
         }
 
         #endregion
@@ -248,8 +256,8 @@ namespace Umbraco.Cms.Core.Xml.XPath
                         isEmpty = _macro.Parameters.Length == 0;
                         break;
                     case StatePosition.Parameter:
-                        var parameter = _macro.Parameters[_state.ParameterIndex];
-                        var nav = parameter.NavigatorValue;
+                        MacroParameter parameter = _macro.Parameters[_state.ParameterIndex];
+                        XPathNavigator? nav = parameter.NavigatorValue;
                         if (parameter.WrapNavigatorInNodes || nav != null)
                         {
                             isEmpty = false;
@@ -259,9 +267,10 @@ namespace Umbraco.Cms.Core.Xml.XPath
                             var s = _macro.Parameters[_state.ParameterIndex].StringValue;
                             isEmpty = s == null;
                         }
+
                         break;
                     case StatePosition.ParameterNavigator:
-                        isEmpty = _state.ParameterNavigator.IsEmptyElement;
+                        isEmpty = _state.ParameterNavigator?.IsEmptyElement ?? true;
                         break;
                     case StatePosition.ParameterNodes:
                         isEmpty = _macro.Parameters[_state.ParameterIndex].NavigatorValue == null;
@@ -328,10 +337,10 @@ namespace Umbraco.Cms.Core.Xml.XPath
                         name = _macro.Parameters[_state.ParameterIndex].Name;
                         break;
                     case StatePosition.ParameterAttribute:
-                        name = _macro.Parameters[_state.ParameterIndex].Attributes[_state.ParameterAttributeIndex].Key;
+                        name = _macro.Parameters[_state.ParameterIndex].Attributes?[_state.ParameterAttributeIndex].Key ?? string.Empty;
                         break;
                     case StatePosition.ParameterNavigator:
-                        name = _state.ParameterNavigator.Name;
+                        name = _state.ParameterNavigator?.Name ?? string.Empty;
                         break;
                     case StatePosition.ParameterNodes:
                         name = "nodes";
@@ -400,7 +409,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
             switch (_state.Position)
             {
                 case StatePosition.ParameterNavigator:
-                    succ = _state.ParameterNavigator.MoveToFirstAttribute();
+                    succ = _state.ParameterNavigator?.MoveToFirstAttribute() ?? false;
                     break;
                 case StatePosition.Parameter:
                     if (_macro.Parameters[_state.ParameterIndex].Attributes != null)
@@ -410,7 +419,11 @@ namespace Umbraco.Cms.Core.Xml.XPath
                         succ = true;
                         DebugState();
                     }
-                    else succ = false;
+                    else
+                    {
+                        succ = false;
+                    }
+
                     break;
                 case StatePosition.ParameterAttribute:
                 case StatePosition.ParameterNodes:
@@ -452,8 +465,8 @@ namespace Umbraco.Cms.Core.Xml.XPath
                     }
                     break;
                 case StatePosition.Parameter:
-                    var parameter = _macro.Parameters[_state.ParameterIndex];
-                    var nav = parameter.NavigatorValue;
+                    MacroParameter parameter = _macro.Parameters[_state.ParameterIndex];
+                    XPathNavigator? nav = parameter.NavigatorValue;
                     if (parameter.WrapNavigatorInNodes)
                     {
                         _state.Position = StatePosition.ParameterNodes;
@@ -479,8 +492,12 @@ namespace Umbraco.Cms.Core.Xml.XPath
                             DebugState();
                             succ = true;
                         }
-                        else succ = false;
+                        else
+                        {
+                            succ = false;
+                        }
                     }
+
                     break;
                 case StatePosition.ParameterNavigator:
                     if (_state.ParameterNavigatorDepth == _macro.Parameters[_state.ParameterIndex].MaxNavigatorDepth)
@@ -490,7 +507,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
                     else
                     {
                         // move to first doc child => increment depth, else (property child) do nothing
-                        succ = _state.ParameterNavigator.MoveToFirstChild();
+                        succ = _state.ParameterNavigator?.MoveToFirstChild() ?? false;
                         if (succ && IsDoc(_state.ParameterNavigator))
                         {
                             ++_state.ParameterNavigatorDepth;
@@ -502,12 +519,16 @@ namespace Umbraco.Cms.Core.Xml.XPath
                     if (_macro.Parameters[_state.ParameterIndex].NavigatorValue != null)
                     {
                         // never use the raw parameter's navigator
-                        _state.ParameterNavigator = _macro.Parameters[_state.ParameterIndex].NavigatorValue.Clone();
+                        _state.ParameterNavigator = _macro.Parameters[_state.ParameterIndex].NavigatorValue?.Clone();
                         _state.Position = StatePosition.ParameterNavigator;
                         succ = true;
                         DebugState();
                     }
-                    else succ = false;
+                    else
+                    {
+                        succ = false;
+                    }
+
                     break;
                 case StatePosition.ParameterAttribute:
                 case StatePosition.ParameterText:
@@ -594,13 +615,13 @@ namespace Umbraco.Cms.Core.Xml.XPath
                     break;
                 case StatePosition.ParameterNavigator:
                     var wasDoc = IsDoc(_state.ParameterNavigator);
-                    succ = _state.ParameterNavigator.MoveToNext();
+                    succ = _state.ParameterNavigator?.MoveToNext() ?? false;
                     if (succ && !wasDoc && IsDoc(_state.ParameterNavigator))
                     {
                         // move to first doc child => increment depth, else (another property child) do nothing
                         if (_state.ParameterNavigatorDepth == _macro.Parameters[_state.ParameterIndex].MaxNavigatorDepth)
                         {
-                            _state.ParameterNavigator.MoveToPrevious();
+                            _state.ParameterNavigator?.MoveToPrevious();
                             succ = false;
                         }
                         else
@@ -652,7 +673,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
                     break;
                 case StatePosition.ParameterNavigator:
                     var wasDoc = IsDoc(_state.ParameterNavigator);
-                    succ = _state.ParameterNavigator.MoveToPrevious();
+                    succ = _state.ParameterNavigator?.MoveToPrevious() ?? false;
                     if (succ && wasDoc && !IsDoc(_state.ParameterNavigator))
                     {
                         // move from doc child back to property child => decrement depth
@@ -688,11 +709,13 @@ namespace Umbraco.Cms.Core.Xml.XPath
             switch (_state.Position)
             {
                 case StatePosition.ParameterNavigator:
-                    succ = _state.ParameterNavigator.MoveToNextAttribute();
+                    succ = _state.ParameterNavigator?.MoveToNextAttribute() ?? false;
                     break;
                 case StatePosition.ParameterAttribute:
-                    if (_state.ParameterAttributeIndex == _macro.Parameters[_state.ParameterIndex].Attributes.Length - 1)
+                    if (_state.ParameterAttributeIndex == _macro.Parameters[_state.ParameterIndex].Attributes?.Length - 1)
+                    {
                         succ = false;
+                    }
                     else
                     {
                         ++_state.ParameterAttributeIndex;
@@ -745,7 +768,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
                     break;
                 case StatePosition.ParameterNavigator:
                     var wasDoc = IsDoc(_state.ParameterNavigator);
-                    succ = _state.ParameterNavigator.MoveToParent();
+                    succ = _state.ParameterNavigator?.MoveToParent() ?? false;
                     if (succ)
                     {
                         // move from doc child => decrement depth
@@ -847,7 +870,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
                         type = XPathNodeType.Element;
                         break;
                     case StatePosition.ParameterNavigator:
-                        type = _state.ParameterNavigator.NodeType;
+                        type = _state.ParameterNavigator?.NodeType ?? XPathNodeType.Root;
                         break;
                     case StatePosition.ParameterAttribute:
                         type = XPathNodeType.Attribute;
@@ -888,7 +911,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
                 DebugEnter("Value");
                 string value;
 
-                XPathNavigator nav;
+                XPathNavigator? nav;
                 switch (_state.Position)
                 {
                     case StatePosition.Parameter:
@@ -906,15 +929,17 @@ namespace Umbraco.Cms.Core.Xml.XPath
                         }
                         break;
                     case StatePosition.ParameterAttribute:
-                        value = _macro.Parameters[_state.ParameterIndex].Attributes[_state.ParameterAttributeIndex].Value;
+                        value = _macro.Parameters[_state.ParameterIndex].Attributes?[_state.ParameterAttributeIndex].Value ?? string.Empty;
                         break;
                     case StatePosition.ParameterNavigator:
-                        value = _state.ParameterNavigator.Value;
+                        value = _state.ParameterNavigator?.Value ?? string.Empty;
                         break;
                     case StatePosition.ParameterNodes:
                         nav = _macro.Parameters[_state.ParameterIndex].NavigatorValue;
                         if (nav == null)
+                        {
                             value = string.Empty;
+                        }
                         else
                         {
                             nav = nav.Clone(); // never use the raw parameter's navigator
@@ -923,7 +948,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
                         }
                         break;
                     case StatePosition.ParameterText:
-                        value = _macro.Parameters[_state.ParameterIndex].StringValue;
+                        value = _macro.Parameters[_state.ParameterIndex].StringValue ?? string.Empty;
                         break;
                     case StatePosition.Macro:
                     case StatePosition.Root:
@@ -938,19 +963,31 @@ namespace Umbraco.Cms.Core.Xml.XPath
             }
         }
 
-        private static bool IsDoc(XPathNavigator nav)
+        private static bool IsDoc(XPathNavigator? nav)
         {
+            if (nav is null)
+            {
+                return false;
+            }
             if (nav.NodeType != XPathNodeType.Element)
+            {
                 return false;
+            }
 
-            var clone = nav.Clone();
+            XPathNavigator clone = nav.Clone();
             if (!clone.MoveToFirstAttribute())
+            {
                 return false;
+            }
+
             do
             {
                 if (clone.Name == "isDoc")
+                {
                     return true;
-            } while (clone.MoveToNextAttribute());
+                }
+            }
+            while (clone.MoveToNextAttribute());
 
             return false;
         }
@@ -967,7 +1004,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
             ParameterText,
             ParameterNodes,
             ParameterNavigator
-        };
+        }
 
         // gets the state
         // for unit tests only
@@ -1002,7 +1039,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
 
                 if (Position == StatePosition.ParameterNavigator)
                 {
-                    ParameterNavigator = other.ParameterNavigator.Clone();
+                    ParameterNavigator = other.ParameterNavigator?.Clone();
                     ParameterNavigatorDepth = other.ParameterNavigatorDepth;
                     ParameterAttributeIndex = other.ParameterAttributeIndex;
                 }
@@ -1023,11 +1060,15 @@ namespace Umbraco.Cms.Core.Xml.XPath
             public int ParameterAttributeIndex { get; set; }
 
             // gets or sets the element navigator
-            public XPathNavigator ParameterNavigator { get; set; }
+            public XPathNavigator? ParameterNavigator { get; set; }
 
             // gets a value indicating whether this state is at the same position as another one.
             public bool IsSamePosition(State other)
             {
+                if (other.ParameterNavigator is null || ParameterNavigator is null)
+                {
+                    return false;
+                }
                 return other.Position == Position
                     && (Position != StatePosition.ParameterNavigator || other.ParameterNavigator.IsSamePosition(ParameterNavigator))
                     && other.ParameterIndex == ParameterIndex

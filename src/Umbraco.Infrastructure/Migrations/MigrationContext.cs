@@ -1,55 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Cms.Infrastructure.Migrations
+namespace Umbraco.Cms.Infrastructure.Migrations;
+
+/// <summary>
+///     Implements <see cref="IMigrationContext" />.
+/// </summary>
+internal class MigrationContext : IMigrationContext
 {
+    private readonly List<Type> _postMigrations = new();
+
     /// <summary>
-    /// Implements <see cref="IMigrationContext"/>.
+    ///     Initializes a new instance of the <see cref="MigrationContext" /> class.
     /// </summary>
-    internal class MigrationContext : IMigrationContext
+    public MigrationContext(MigrationPlan plan, IUmbracoDatabase? database, ILogger<MigrationContext> logger)
     {
-        private readonly List<Type> _postMigrations = new List<Type>();
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MigrationContext"/> class.
-        /// </summary>
-        public MigrationContext(MigrationPlan plan, IUmbracoDatabase database, ILogger<MigrationContext> logger)
-        {
-            Plan = plan;
-            Database = database ?? throw new ArgumentNullException(nameof(database));
-            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _postMigrations.AddRange(plan.PostMigrationTypes);
-        }
-
-        /// <inheritdoc />
-        public ILogger<IMigrationContext> Logger { get; }
-
-        public MigrationPlan Plan { get; }
-
-        /// <inheritdoc />
-        public IUmbracoDatabase Database { get; }
-
-        /// <inheritdoc />
-        public ISqlContext SqlContext => Database.SqlContext;
-
-        /// <inheritdoc />
-        public int Index { get; set; }
-
-        /// <inheritdoc />
-        public bool BuildingExpression { get; set; }
-
-        // this is only internally exposed
-        public IReadOnlyList<Type> PostMigrations => _postMigrations;
-
-        /// <inheritdoc />
-        public void AddPostMigration<TMigration>()
-            where TMigration : MigrationBase
-        {
-            // just adding - will be de-duplicated when executing
-            _postMigrations.Add(typeof(TMigration));
-        }
+        Plan = plan;
+        Database = database ?? throw new ArgumentNullException(nameof(database));
+        Logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
+
+    // this is only internally exposed
+    [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase")]
+    internal IReadOnlyList<Type> PostMigrations => _postMigrations;
+
+    /// <inheritdoc />
+    public ILogger<IMigrationContext> Logger { get; }
+
+    public MigrationPlan Plan { get; }
+
+    /// <inheritdoc />
+    public IUmbracoDatabase Database { get; }
+
+    /// <inheritdoc />
+    public ISqlContext SqlContext => Database.SqlContext;
+
+    /// <inheritdoc />
+    public int Index { get; set; }
+
+    /// <inheritdoc />
+    public bool BuildingExpression { get; set; }
+
+
+    /// <inheritdoc />
+    [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase, and a UmbracoPlanExecutedNotification.")]
+    public void AddPostMigration<TMigration>()
+        where TMigration : MigrationBase =>
+
+        // just adding - will be de-duplicated when executing
+        _postMigrations.Add(typeof(TMigration));
 }

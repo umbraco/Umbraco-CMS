@@ -1,191 +1,271 @@
-using System;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.PublishedCache
+namespace Umbraco.Cms.Core.PublishedCache;
+
+internal class PublishedElementPropertyBase : PublishedPropertyBase
 {
-    internal class PublishedElementPropertyBase : PublishedPropertyBase
+    protected readonly IPublishedElement Element;
+
+    // define constant - determines whether to use cache when previewing
+    // to store eg routes, property converted values, anything - caching
+    // means faster execution, but uses memory - not sure if we want it
+    // so making it configurable.
+    private const bool FullCacheWhenPreviewing = true;
+    private readonly object _locko = new();
+    private readonly IPublishedSnapshotAccessor? _publishedSnapshotAccessor;
+    private readonly object? _sourceValue;
+    protected readonly bool IsMember;
+    protected readonly bool IsPreviewing;
+    private CacheValues? _cacheValues;
+
+    private bool _interInitialized;
+    private object? _interValue;
+    private string? _valuesCacheKey;
+
+    public PublishedElementPropertyBase(
+        IPublishedPropertyType propertyType,
+        IPublishedElement element,
+        bool previewing,
+        PropertyCacheLevel referenceCacheLevel,
+        object? sourceValue = null,
+        IPublishedSnapshotAccessor? publishedSnapshotAccessor = null)
+        : base(propertyType, referenceCacheLevel)
     {
-        private readonly object _locko = new object();
-        private readonly object _sourceValue;
-        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+        _sourceValue = sourceValue;
+        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        Element = element;
+        IsPreviewing = previewing;
+        IsMember = propertyType.ContentType?.ItemType == PublishedItemType.Member;
+    }
 
-        protected readonly IPublishedElement Element;
-        protected readonly bool IsPreviewing;
-        protected readonly bool IsMember;
+    // used to cache the CacheValues of this property
+    // ReSharper disable InconsistentlySynchronizedField
+    internal string ValuesCacheKey => _valuesCacheKey ??= PropertyCacheValues(Element.Key, Alias, IsPreviewing);
 
-        private bool _interInitialized;
-        private object _interValue;
-        private CacheValues _cacheValues;
-        private string _valuesCacheKey;
+    public static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing) =>
+        "PublishedSnapshot.Property.CacheValues[" + (previewing ? "D:" : "P:") + contentUid + ":" + typeAlias + "]";
 
-        // define constant - determines whether to use cache when previewing
-        // to store eg routes, property converted values, anything - caching
-        // means faster execution, but uses memory - not sure if we want it
-        // so making it configurable.
-        private const bool FullCacheWhenPreviewing = true;
-
-        public PublishedElementPropertyBase(IPublishedPropertyType propertyType, IPublishedElement element, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null, IPublishedSnapshotAccessor publishedSnapshotAccessor = null)
-            : base(propertyType, referenceCacheLevel)
+    // ReSharper restore InconsistentlySynchronizedField
+    public override bool HasValue(string? culture = null, string? segment = null)
+    {
+        var hasValue = PropertyType.IsValue(_sourceValue, PropertyValueLevel.Source);
+        if (hasValue.HasValue)
         {
-            _sourceValue = sourceValue;
-            _publishedSnapshotAccessor = publishedSnapshotAccessor;
-            Element = element;
-            IsPreviewing = previewing;
-            IsMember = propertyType.ContentType.ItemType == PublishedItemType.Member;
+            return hasValue.Value;
         }
 
-        public override bool HasValue(string culture = null, string segment = null)
+        GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
+
+        lock (_locko)
         {
-            var hasValue = PropertyType.IsValue(_sourceValue, PropertyValueLevel.Source);
-            if (hasValue.HasValue) return hasValue.Value;
-
-            GetCacheLevels(out var cacheLevel, out var referenceCacheLevel);
-
-            lock (_locko)
+            var value = GetInterValue();
+            hasValue = PropertyType.IsValue(value, PropertyValueLevel.Inter);
+            if (hasValue.HasValue)
             {
-                var value = GetInterValue();
-                hasValue = PropertyType.IsValue(value, PropertyValueLevel.Inter);
-                if (hasValue.HasValue) return hasValue.Value;
-
-                var cacheValues = GetCacheValues(cacheLevel);
-                if (!cacheValues.ObjectInitialized)
-                {
-                    cacheValues.ObjectValue = PropertyType.ConvertInterToObject(Element, referenceCacheLevel, value, IsPreviewing);
-                    cacheValues.ObjectInitialized = true;
-                }
-                value = cacheValues.ObjectValue;
-                return PropertyType.IsValue(value, PropertyValueLevel.Object) ?? false;
+                return hasValue.Value;
             }
-        }
 
-        // used to cache the CacheValues of this property
-        // ReSharper disable InconsistentlySynchronizedField
-        internal string ValuesCacheKey => _valuesCacheKey
-            ?? (_valuesCacheKey = PropertyCacheValues(Element.Key, Alias, IsPreviewing));
-        // ReSharper restore InconsistentlySynchronizedField
-
-        protected class CacheValues
-        {
-            public bool ObjectInitialized;
-            public object ObjectValue;
-            public bool XPathInitialized;
-            public object XPathValue;
-        }
-
-        public static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing) => "PublishedSnapshot.Property.CacheValues[" + (previewing ? "D:" : "P:") + contentUid + ":" + typeAlias + "]";
-
-        private void GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
-        {
-            // based upon the current reference cache level (ReferenceCacheLevel) and this property
-            // cache level (PropertyType.CacheLevel), determines both the actual cache level for the
-            // property, and the new reference cache level.
-
-            // if the property cache level is 'shorter-termed' that the reference
-            // then use it and it becomes the new reference, else use Content and
-            // don't change the reference.
-            //
-            // examples:
-            // currently (reference) caching at published snapshot, property specifies
-            // elements, ok to use element. OTOH, currently caching at elements,
-            // property specifies snapshot, need to use snapshot.
-            //
-            if (PropertyType.CacheLevel > ReferenceCacheLevel || PropertyType.CacheLevel == PropertyCacheLevel.None)
+            CacheValues cacheValues = GetCacheValues(cacheLevel);
+            if (!cacheValues.ObjectInitialized)
             {
-                cacheLevel = PropertyType.CacheLevel;
-                referenceCacheLevel = cacheLevel;
+                cacheValues.ObjectValue =
+                    PropertyType.ConvertInterToObject(Element, referenceCacheLevel, value, IsPreviewing);
+                cacheValues.ObjectInitialized = true;
             }
-            else
-            {
-                cacheLevel = PropertyCacheLevel.Element;
-                referenceCacheLevel = ReferenceCacheLevel;
-            }
+
+            value = cacheValues.ObjectValue;
+            return PropertyType.IsValue(value, PropertyValueLevel.Object) ?? false;
+        }
+    }
+
+    public override object? GetSourceValue(string? culture = null, string? segment = null) => _sourceValue;
+
+    private void GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
+        => GetCacheLevels(PropertyType.CacheLevel, out cacheLevel, out referenceCacheLevel);
+
+    private void GetDeliveryApiCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
+        => GetCacheLevels(PropertyType.DeliveryApiCacheLevel, out cacheLevel, out referenceCacheLevel);
+
+    private void GetCacheLevels(PropertyCacheLevel propertyTypeCacheLevel, out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
+    {
+        // based upon the current reference cache level (ReferenceCacheLevel) and this property
+        // cache level (PropertyType.CacheLevel), determines both the actual cache level for the
+        // property, and the new reference cache level.
+
+        // if the property cache level is 'shorter-termed' that the reference
+        // then use it and it becomes the new reference, else use Content and
+        // don't change the reference.
+        //
+        // examples:
+        // currently (reference) caching at published snapshot, property specifies
+        // elements, ok to use element. OTOH, currently caching at elements,
+        // property specifies snapshot, need to use snapshot.
+        if (propertyTypeCacheLevel > ReferenceCacheLevel || propertyTypeCacheLevel == PropertyCacheLevel.None)
+        {
+            cacheLevel = propertyTypeCacheLevel;
+            referenceCacheLevel = cacheLevel;
+        }
+        else
+        {
+            cacheLevel = PropertyCacheLevel.Element;
+            referenceCacheLevel = ReferenceCacheLevel;
+        }
+    }
+
+    private IAppCache? GetSnapshotCache()
+    {
+        // cache within the snapshot cache, unless previewing, then use the snapshot or
+        // elements cache (if we don't want to pollute the elements cache with short-lived
+        // data) depending on settings
+        // for members, always cache in the snapshot cache - never pollute elements cache
+        if (_publishedSnapshotAccessor is null)
+        {
+            return null;
         }
 
-        private IAppCache GetSnapshotCache()
+        if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot))
         {
-            // cache within the snapshot cache, unless previewing, then use the snapshot or
-            // elements cache (if we don't want to pollute the elements cache with short-lived
-            // data) depending on settings
-            // for members, always cache in the snapshot cache - never pollute elements cache
-            if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
-            {
-                return null;
-            }
-            return (IsPreviewing == false || FullCacheWhenPreviewing) && IsMember == false
-                ? publishedSnapshot.ElementsCache
-                : publishedSnapshot.SnapshotCache;
+            return null;
         }
 
-        private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
+        return (IsPreviewing == false || FullCacheWhenPreviewing) && IsMember == false
+            ? publishedSnapshot!.ElementsCache
+            : publishedSnapshot!.SnapshotCache;
+    }
+
+    private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
+    {
+        CacheValues cacheValues;
+        switch (cacheLevel)
         {
-            CacheValues cacheValues;
-            switch (cacheLevel)
-            {
-                case PropertyCacheLevel.None:
-                    // never cache anything
-                    cacheValues = new CacheValues();
-                    break;
-                case PropertyCacheLevel.Element:
-                    // cache within the property object itself, ie within the content object
-                    cacheValues = _cacheValues ?? (_cacheValues = new CacheValues());
-                    break;
-                case PropertyCacheLevel.Elements:
-                    // cache within the elements  cache, depending...
-                    var snapshotCache = GetSnapshotCache();
-                    cacheValues = (CacheValues) snapshotCache?.Get(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
-                    break;
-                case PropertyCacheLevel.Snapshot:
-                    var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-                    // cache within the snapshot cache
-                    var facadeCache = publishedSnapshot.SnapshotCache;
-                    cacheValues = (CacheValues) facadeCache?.Get(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
-                    break;
-                default:
-                    throw new InvalidOperationException("Invalid cache level.");
-            }
-            return cacheValues;
+            case PropertyCacheLevel.None:
+                // never cache anything
+                cacheValues = new CacheValues();
+                break;
+            case PropertyCacheLevel.Element:
+                // cache within the property object itself, ie within the content object
+                cacheValues = _cacheValues ??= new CacheValues();
+                break;
+            case PropertyCacheLevel.Elements:
+                // cache within the elements  cache, depending...
+                IAppCache? snapshotCache = GetSnapshotCache();
+                cacheValues = (CacheValues?)snapshotCache?.Get(ValuesCacheKey, () => new CacheValues()) ??
+                              new CacheValues();
+                break;
+            case PropertyCacheLevel.Snapshot:
+                IPublishedSnapshot? publishedSnapshot = _publishedSnapshotAccessor?.GetRequiredPublishedSnapshot();
+
+                // cache within the snapshot cache
+                IAppCache? facadeCache = publishedSnapshot?.SnapshotCache;
+                cacheValues = (CacheValues?)facadeCache?.Get(ValuesCacheKey, () => new CacheValues()) ??
+                              new CacheValues();
+                break;
+            default:
+                throw new InvalidOperationException("Invalid cache level.");
         }
 
-        private object GetInterValue()
-        {
-            if (_interInitialized) return _interValue;
+        return cacheValues;
+    }
 
-            _interValue = PropertyType.ConvertSourceToInter(Element, _sourceValue, IsPreviewing);
-            _interInitialized = true;
+    private object? GetInterValue()
+    {
+        if (_interInitialized)
+        {
             return _interValue;
         }
 
-        public override object GetSourceValue(string culture = null, string segment = null) => _sourceValue;
+        _interValue = PropertyType.ConvertSourceToInter(Element, _sourceValue, IsPreviewing);
+        _interInitialized = true;
+        return _interValue;
+    }
 
-        public override object GetValue(string culture = null, string segment = null)
+    public override object? GetValue(string? culture = null, string? segment = null)
+    {
+        GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
+
+        lock (_locko)
         {
-            GetCacheLevels(out var cacheLevel, out var referenceCacheLevel);
-
-            lock (_locko)
+            CacheValues cacheValues = GetCacheValues(cacheLevel);
+            if (cacheValues.ObjectInitialized)
             {
-                var cacheValues = GetCacheValues(cacheLevel);
-                if (cacheValues.ObjectInitialized) return cacheValues.ObjectValue;
-                cacheValues.ObjectValue = PropertyType.ConvertInterToObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
-                cacheValues.ObjectInitialized = true;
                 return cacheValues.ObjectValue;
             }
+
+            cacheValues.ObjectValue =
+                PropertyType.ConvertInterToObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
+            cacheValues.ObjectInitialized = true;
+            return cacheValues.ObjectValue;
         }
+    }
 
-        public override object GetXPathValue(string culture = null, string segment = null)
+    public override object? GetXPathValue(string? culture = null, string? segment = null)
+    {
+        GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
+
+        lock (_locko)
         {
-            GetCacheLevels(out var cacheLevel, out var referenceCacheLevel);
-
-            lock (_locko)
+            CacheValues cacheValues = GetCacheValues(cacheLevel);
+            if (cacheValues.XPathInitialized)
             {
-                var cacheValues = GetCacheValues(cacheLevel);
-                if (cacheValues.XPathInitialized) return cacheValues.XPathValue;
-                cacheValues.XPathValue = PropertyType.ConvertInterToXPath(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
-                cacheValues.XPathInitialized = true;
                 return cacheValues.XPathValue;
             }
+
+            cacheValues.XPathValue =
+                PropertyType.ConvertInterToXPath(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
+            cacheValues.XPathInitialized = true;
+            return cacheValues.XPathValue;
         }
+    }
+
+    public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
+    {
+        GetDeliveryApiCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
+
+        lock (_locko)
+        {
+            CacheValues cacheValues = GetCacheValues(cacheLevel);
+
+            object? GetDeliveryApiObject() => PropertyType.ConvertInterToDeliveryApiObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
+            return expanding
+                ? GetDeliveryApiExpandedObject(cacheValues, GetDeliveryApiObject)
+                : GetDeliveryApiDefaultObject(cacheValues, GetDeliveryApiObject);
+        }
+    }
+
+    private object? GetDeliveryApiDefaultObject(CacheValues cacheValues, Func<object?> getValue)
+    {
+        if (cacheValues.DeliveryApiDefaultObjectInitialized == false)
+        {
+            cacheValues.DeliveryApiDefaultObjectValue = getValue();
+            cacheValues.DeliveryApiDefaultObjectInitialized = true;
+        }
+
+        return cacheValues.DeliveryApiDefaultObjectValue;
+    }
+
+    private object? GetDeliveryApiExpandedObject(CacheValues cacheValues, Func<object?> getValue)
+    {
+        if (cacheValues.DeliveryApiExpandedObjectInitialized == false)
+        {
+            cacheValues.DeliveryApiExpandedObjectValue = getValue();
+            cacheValues.DeliveryApiExpandedObjectInitialized = true;
+        }
+
+        return cacheValues.DeliveryApiExpandedObjectValue;
+    }
+
+    protected class CacheValues
+    {
+        public bool ObjectInitialized;
+        public object? ObjectValue;
+        public bool XPathInitialized;
+        public object? XPathValue;
+        public bool DeliveryApiDefaultObjectInitialized;
+        public object? DeliveryApiDefaultObjectValue;
+        public bool DeliveryApiExpandedObjectInitialized;
+        public object? DeliveryApiExpandedObjectValue;
     }
 }

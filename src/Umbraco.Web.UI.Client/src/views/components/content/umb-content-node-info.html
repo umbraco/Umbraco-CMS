@@ -48,6 +48,7 @@
 
             <umb-box-header title-key="{{historyLabelKey}}" ng-if="historyLabelKey">
                 <umb-button
+                    ng-if="node.allowedActions.includes('K')"
                     ng-hide="node.trashed || node.id === 0"
                     type="button"
                     button-style="outline"
@@ -163,7 +164,7 @@
                 <umb-control-group ng-if="disableTemplates == false" data-element="node-info-template" label="@template_template" alias="template">
 
                     <div class="flex items-center">
-                        <select class="input-block-level"
+                        <select class="input-block-level mb0"
                                 id="template"
                                 ng-model="node.template"
                                 ng-options="key as value for (key, value) in availableTemplates"

@@ -34,10 +34,10 @@
         </div>
         <!-- Listview body section -->
         <div class="umb-table-body">
-            <div class="umb-table-row -selectable umb-outline"
+            <div class="umb-table-row umb-outline"
                  ng-repeat="item in vm.items track by $index"
                  ng-init="item.icon = vm.getIcon(item)"
-                 ng-class="{'-selected':item.selected, '-light':!item.published && item.updater != null}"
+                 ng-class="{'-selected':item.selected, '-light':!item.published && item.updater != null, '-selectable': vm.allowSelect !== false }"
                  ng-click="vm.selectItem(item, $index, $event)">
 
                 <div class="umb-table-cell">
@@ -57,10 +57,10 @@
                     </umb-variant-state>
                 </div>
                 <div class="umb-table-cell" ng-repeat="column in vm.itemProperties track by column.alias">
-                    <span title="{{column.header}}: {{item[column.alias]}}">
+                    <span title="{{column.header}}: {{item[column.alias].expression ? item[column.alias].expression({value: item[column.alias].value}) : item[column.alias]}}">
 
                         <div ng-if="!column.isSensitive">
-                            {{item[column.alias]}}
+                            {{item[column.alias].expression ? item[column.alias].expression({value: item[column.alias].value}) : item[column.alias]}}
                         </div>
 
                         <em ng-show="column.isSensitive" class="muted">

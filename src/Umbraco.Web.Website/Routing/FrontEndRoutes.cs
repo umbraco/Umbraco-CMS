@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -11,89 +10,93 @@ using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Collections;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.Website.Routing
+namespace Umbraco.Cms.Web.Website.Routing;
+
+/// <summary>
+///     Creates routes for surface controllers
+/// </summary>
+public sealed class FrontEndRoutes : IAreaRoutes
 {
+    private readonly UmbracoApiControllerTypeCollection _apiControllers;
+    private readonly IRuntimeState _runtimeState;
+    private readonly SurfaceControllerTypeCollection _surfaceControllerTypeCollection;
+    private readonly string _umbracoPathSegment;
+
     /// <summary>
-    /// Creates routes for surface controllers
+    ///     Initializes a new instance of the <see cref="FrontEndRoutes" /> class.
     /// </summary>
-    public sealed class FrontEndRoutes : IAreaRoutes
+    public FrontEndRoutes(
+        IOptions<GlobalSettings> globalSettings,
+        IHostingEnvironment hostingEnvironment,
+        IRuntimeState runtimeState,
+        SurfaceControllerTypeCollection surfaceControllerTypeCollection,
+        UmbracoApiControllerTypeCollection apiControllers)
     {
-        private readonly GlobalSettings _globalSettings;
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IRuntimeState _runtimeState;
-        private readonly SurfaceControllerTypeCollection _surfaceControllerTypeCollection;
-        private readonly UmbracoApiControllerTypeCollection _apiControllers;
-        private readonly string _umbracoPathSegment;
+        _runtimeState = runtimeState;
+        _surfaceControllerTypeCollection = surfaceControllerTypeCollection;
+        _apiControllers = apiControllers;
+        _umbracoPathSegment = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FrontEndRoutes"/> class.
-        /// </summary>
-        public FrontEndRoutes(
-            IOptions<GlobalSettings> globalSettings,
-            IHostingEnvironment hostingEnvironment,
-            IRuntimeState runtimeState,
-            SurfaceControllerTypeCollection surfaceControllerTypeCollection,
-            UmbracoApiControllerTypeCollection apiControllers)
+    /// <inheritdoc />
+    public void CreateRoutes(IEndpointRouteBuilder endpoints)
+    {
+        switch (_runtimeState.Level)
         {
-            _globalSettings = globalSettings.Value;
-            _hostingEnvironment = hostingEnvironment;
-            _runtimeState = runtimeState;
-            _surfaceControllerTypeCollection = surfaceControllerTypeCollection;
-            _apiControllers = apiControllers;
-            _umbracoPathSegment = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment);
+            case RuntimeLevel.Install:
+            case RuntimeLevel.Upgrade:
+            case RuntimeLevel.Run:
+
+                AutoRouteSurfaceControllers(endpoints);
+                AutoRouteFrontEndApiControllers(endpoints);
+                break;
+            case RuntimeLevel.BootFailed:
+            case RuntimeLevel.Unknown:
+            case RuntimeLevel.Boot:
+                break;
         }
 
-        /// <inheritdoc/>
-        public void CreateRoutes(IEndpointRouteBuilder endpoints)
-        {
-            if (_runtimeState.Level != RuntimeLevel.Run)
-            {
-                return;
-            }
 
-            AutoRouteSurfaceControllers(endpoints);
-            AutoRouteFrontEndApiControllers(endpoints);
+    }
+
+    /// <summary>
+    ///     Auto-routes all front-end surface controllers
+    /// </summary>
+    private void AutoRouteSurfaceControllers(IEndpointRouteBuilder endpoints)
+    {
+        foreach (Type controller in _surfaceControllerTypeCollection)
+        {
+            // exclude front-end api controllers
+            PluginControllerMetadata meta = PluginController.GetMetadata(controller);
+
+            endpoints.MapUmbracoSurfaceRoute(
+                meta.ControllerType,
+                _umbracoPathSegment,
+                meta.AreaName);
         }
+    }
 
-        /// <summary>
-        /// Auto-routes all front-end surface controllers
-        /// </summary>
-        private void AutoRouteSurfaceControllers(IEndpointRouteBuilder endpoints)
+    /// <summary>
+    ///     Auto-routes all front-end api controllers
+    /// </summary>
+    private void AutoRouteFrontEndApiControllers(IEndpointRouteBuilder endpoints)
+    {
+        foreach (Type controller in _apiControllers)
         {
-            foreach (Type controller in _surfaceControllerTypeCollection)
+            PluginControllerMetadata meta = PluginController.GetMetadata(controller);
+
+            // exclude back-end api controllers
+            if (meta.IsBackOffice)
             {
-                // exclude front-end api controllers
-                PluginControllerMetadata meta = PluginController.GetMetadata(controller);
-
-                endpoints.MapUmbracoSurfaceRoute(
-                    meta.ControllerType,
-                    _umbracoPathSegment,
-                    meta.AreaName);
+                continue;
             }
-        }
 
-        /// <summary>
-        /// Auto-routes all front-end api controllers
-        /// </summary>
-        private void AutoRouteFrontEndApiControllers(IEndpointRouteBuilder endpoints)
-        {
-            foreach (Type controller in _apiControllers)
-            {
-                PluginControllerMetadata meta = PluginController.GetMetadata(controller);
-
-                // exclude back-end api controllers
-                if (meta.IsBackOffice)
-                {
-                    continue;
-                }
-
-                endpoints.MapUmbracoApiRoute(
-                    meta.ControllerType,
-                    _umbracoPathSegment,
-                    meta.AreaName,
-                    meta.IsBackOffice,
-                    defaultAction: string.Empty); // no default action (this is what we had before)
-            }
+            endpoints.MapUmbracoApiRoute(
+                meta.ControllerType,
+                _umbracoPathSegment,
+                meta.AreaName,
+                meta.IsBackOffice,
+                string.Empty); // no default action (this is what we had before)
         }
     }
 }

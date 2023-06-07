@@ -1,0 +1,13 @@
+<div
+  class="umb-marketplace-view-wrapper clearfix"
+  ng-controller="Umbraco.Editors.Packages.MarketplaceController as vm"
+>
+  <iframe
+    ng-if="::vm.marketplaceUrl"
+    ng-src="{{ ::vm.marketplaceUrl }}"
+    class="umb-marketplace-view"
+    title="Umbraco Marketplace"
+    allowfullscreen
+    allow="geolocation; autoplay; clipboard-write; encrypted-media"
+  ></iframe>
+</div>

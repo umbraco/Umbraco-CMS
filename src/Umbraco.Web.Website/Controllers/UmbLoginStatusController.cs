@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
@@ -11,51 +10,64 @@ using Umbraco.Cms.Web.Common.Models;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.Website.Controllers
+namespace Umbraco.Cms.Web.Website.Controllers;
+
+[UmbracoMemberAuthorize]
+public class UmbLoginStatusController : SurfaceController
 {
-    [UmbracoMemberAuthorize]
-    public class UmbLoginStatusController : SurfaceController
+    private readonly IMemberSignInManager _signInManager;
+
+    public UmbLoginStatusController(
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IUmbracoDatabaseFactory databaseFactory,
+        ServiceContext services,
+        AppCaches appCaches,
+        IProfilingLogger profilingLogger,
+        IPublishedUrlProvider publishedUrlProvider,
+        IMemberSignInManager signInManager)
+        : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
+        => _signInManager = signInManager;
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [ValidateUmbracoFormRouteString]
+    public async Task<IActionResult> HandleLogout([Bind(Prefix = "logoutModel")] PostRedirectModel model)
     {
-        private readonly IMemberSignInManager _signInManager;
-
-        public UmbLoginStatusController(
-            IUmbracoContextAccessor umbracoContextAccessor,
-            IUmbracoDatabaseFactory databaseFactory,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger profilingLogger,
-            IPublishedUrlProvider publishedUrlProvider,
-            IMemberSignInManager signInManager)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
-            => _signInManager = signInManager;
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [ValidateUmbracoFormRouteString]
-        public async Task<IActionResult> HandleLogout([Bind(Prefix = "logoutModel")]PostRedirectModel model)
+        if (ModelState.IsValid == false)
         {
-            if (ModelState.IsValid == false)
-            {
-                return CurrentUmbracoPage();
-            }
+            return CurrentUmbracoPage();
+        }
 
-            var isLoggedIn = HttpContext.User?.Identity?.IsAuthenticated ?? false;
+        MergeRouteValuesToModel(model);
 
-            if (isLoggedIn)
-            {
-                await _signInManager.SignOutAsync();
-            }
+        var isLoggedIn = HttpContext.User.Identity?.IsAuthenticated ?? false;
 
-            TempData["LogoutSuccess"] = true;
+        if (isLoggedIn)
+        {
+            await _signInManager.SignOutAsync();
+        }
 
-            // If there is a specified path to redirect to then use it.
-            if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
-            {
-                return Redirect(model.RedirectUrl);
-            }
+        TempData["LogoutSuccess"] = true;
 
-            // Redirect to current page by default.
-            return RedirectToCurrentUmbracoPage();
+        // If there is a specified path to redirect to then use it.
+        if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
+        {
+            return Redirect(model.RedirectUrl!);
+        }
+
+        // Redirect to current page by default.
+        return RedirectToCurrentUmbracoPage();
+    }
+
+    /// <summary>
+    ///     We pass in values via encrypted route values so they cannot be tampered with and merge them into the model for use
+    /// </summary>
+    /// <param name="model"></param>
+    private void MergeRouteValuesToModel(PostRedirectModel model)
+    {
+        if (RouteData.Values.TryGetValue(nameof(PostRedirectModel.RedirectUrl), out var redirectUrl) && redirectUrl is not null)
+        {
+            model.RedirectUrl = redirectUrl.ToString();
         }
     }
 }

@@ -1,29 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
-        <ContentTargetFolders>.</ContentTargetFolders>
-        <Product>UmbracoPackage</Product>
-        <PackageId>UmbracoPackage</PackageId>
-        <Title>UmbracoPackage</Title>
-        <Description>...</Description>
-        <Product>...</Product>
-        <PackageTags>umbraco plugin package</PackageTags>
-        <RootNamespace>UmbracoPackage</RootNamespace>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ContentTargetFolders>.</ContentTargetFolders>
+    <Product>UmbracoPackage</Product>
+    <PackageId>UmbracoPackage</PackageId>
+    <Title>UmbracoPackage</Title>
+    <Description>...</Description>
+    <PackageTags>umbraco plugin package</PackageTags>
+    <RootNamespace Condition="'$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">UmbracoPackage</RootNamespace>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Umbraco.Cms.Web.Website" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
-        <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Cms.Web.Website" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+    <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Content Include="App_Plugins\UmbracoPackage\**\*.*">
-            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-        </Content>
-        <None Include="build\**\*.*">
-            <Pack>true</Pack>
-            <PackagePath>buildTransitive</PackagePath>
-        </None>
-    </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Plugins\UmbracoPackage\**" ExcludeFromSingleFile="true" CopyToPublishDirectory="Always" />
+    <None Include="buildTransitive\**" Pack="true" PackagePath="buildTransitive" />
+  </ItemGroup>
 </Project>

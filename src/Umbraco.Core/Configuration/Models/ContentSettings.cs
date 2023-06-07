@@ -1,23 +1,21 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using Umbraco.Cms.Core.Macros;
 
-namespace Umbraco.Cms.Core.Configuration.Models
-{
-    /// <summary>
-    /// Typed configuration options for content settings.
-    /// </summary>
-    [UmbracoOptions(Constants.Configuration.ConfigContent)]
-    public class ContentSettings
-    {
+namespace Umbraco.Cms.Core.Configuration.Models;
 
-        internal const bool StaticResolveUrlsFromTextString = false;
-        internal const string StaticDefaultPreviewBadge =
-            @"
+/// <summary>
+///     Typed configuration options for content settings.
+/// </summary>
+[UmbracoOptions(Constants.Configuration.ConfigContent)]
+public class ContentSettings
+{
+    internal const bool StaticResolveUrlsFromTextString = false;
+
+    internal const string StaticDefaultPreviewBadge =
+        @"
             <div id=""umbracoPreviewBadge"" class=""umbraco-preview-badge"">
                 <span class=""umbraco-preview-badge__header"">Preview mode</span>
                 <a href=""{0}/preview/?id={2}"" class=""umbraco-preview-badge__a open"" title=""Open preview in BackOffice"">
@@ -151,98 +149,129 @@ namespace Umbraco.Cms.Core.Configuration.Models
             </style>
             <script type=""text/javascript"" data-umbraco-path=""{0}"" src=""{0}/js/umbraco.websitepreview.min.js""></script>";
 
-        internal const string StaticMacroErrors = "Inline";
-        internal const string StaticDisallowedUploadFiles = "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd,xamlx";
-        internal const bool StaticShowDeprecatedPropertyEditors = false;
-        internal const string StaticLoginBackgroundImage = "assets/img/login.jpg";
-        internal const string StaticLoginLogoImage = "assets/img/application/umbraco_logo_white.svg";
-        internal const bool StaticHideBackOfficeLogo = false;
-        internal const bool StaticDisableDeleteWhenReferenced = false;
-        internal const bool StaticDisableUnpublishWhenReferenced = false;
+    internal const string StaticMacroErrors = "Inline";
+    internal const string StaticDisallowedUploadFiles = "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd,xamlx";
+    internal const bool StaticShowDeprecatedPropertyEditors = false;
+    internal const string StaticLoginBackgroundImage = "assets/img/login.svg";
+    internal const string StaticLoginLogoImage = "assets/img/application/umbraco_logo_white.svg";
+    internal const bool StaticHideBackOfficeLogo = false;
+    internal const bool StaticDisableDeleteWhenReferenced = false;
+    internal const bool StaticDisableUnpublishWhenReferenced = false;
+    internal const bool StaticAllowEditInvariantFromNonDefault = false;
+    internal const bool StaticShowDomainWarnings = true;
 
-        /// <summary>
-        /// Gets or sets a value for the content notification settings.
-        /// </summary>
-        public ContentNotificationSettings Notifications { get; set; } = new ContentNotificationSettings();
+    /// <summary>
+    ///     Gets or sets a value for the content notification settings.
+    /// </summary>
+    public ContentNotificationSettings Notifications { get; set; } = new();
 
-        /// <summary>
-        /// Gets or sets a value for the content imaging settings.
-        /// </summary>
-        public ContentImagingSettings Imaging { get; set; } = new ContentImagingSettings();
+    /// <summary>
+    ///     Gets or sets a value for the content imaging settings.
+    /// </summary>
+    public ContentImagingSettings Imaging { get; set; } = new();
 
-        /// <summary>
-        /// Gets or sets a value indicating whether URLs should be resolved from text strings.
-        /// </summary>
-        [DefaultValue(StaticResolveUrlsFromTextString)]
-        public bool ResolveUrlsFromTextString { get; set; } = StaticResolveUrlsFromTextString;
+    /// <summary>
+    ///     Gets or sets a value indicating whether URLs should be resolved from text strings.
+    /// </summary>
+    [DefaultValue(StaticResolveUrlsFromTextString)]
+    public bool ResolveUrlsFromTextString { get; set; } = StaticResolveUrlsFromTextString;
 
-        /// <summary>
-        /// Gets or sets a value for the collection of error pages.
-        /// </summary>
-        public ContentErrorPage[] Error404Collection { get; set; } = Array.Empty<ContentErrorPage>();
+    /// <summary>
+    ///     Gets or sets a value for the collection of error pages.
+    /// </summary>
+    public ContentErrorPage[] Error404Collection { get; set; } = Array.Empty<ContentErrorPage>();
 
-        /// <summary>
-        /// Gets or sets a value for the preview badge mark-up.
-        /// </summary>
-        [DefaultValue(StaticDefaultPreviewBadge)]
-        public string PreviewBadge { get; set; } = StaticDefaultPreviewBadge;
+    /// <summary>
+    ///     Gets or sets a value for the preview badge mark-up.
+    /// </summary>
+    [DefaultValue(StaticDefaultPreviewBadge)]
+    public string PreviewBadge { get; set; } = StaticDefaultPreviewBadge;
 
-        /// <summary>
-        /// Gets or sets a value for the macro error behaviour.
-        /// </summary>
-        [DefaultValue(StaticMacroErrors)]
-        public MacroErrorBehaviour MacroErrors { get; set; } = Enum<MacroErrorBehaviour>.Parse(StaticMacroErrors);
+    /// <summary>
+    ///     Gets or sets a value for the macro error behaviour.
+    /// </summary>
+    [DefaultValue(StaticMacroErrors)]
+    public MacroErrorBehaviour MacroErrors { get; set; } = Enum<MacroErrorBehaviour>.Parse(StaticMacroErrors);
 
-        /// <summary>
-        /// Gets or sets a value for the collection of file extensions that are disallowed for upload.
-        /// </summary>
-        [DefaultValue(StaticDisallowedUploadFiles)]
-        public IEnumerable<string> DisallowedUploadFiles { get; set; } = StaticDisallowedUploadFiles.Split(',');
+    /// <summary>
+    ///     Gets or sets a value for the collection of file extensions that are disallowed for upload.
+    /// </summary>
+    [DefaultValue(StaticDisallowedUploadFiles)]
+    [Obsolete("Please use DisAllowedUploadedFileExtensions instead, scheduled for removal in V13")]
+    public IEnumerable<string> DisallowedUploadFiles { get; set; } = StaticDisallowedUploadFiles.Split(',');
 
-        /// <summary>
-        /// Gets or sets a value for the collection of file extensions that are allowed for upload.
-        /// </summary>
-        public IEnumerable<string> AllowedUploadFiles { get; set; } = Array.Empty<string>();
+    /// <summary>
+    ///     Gets or sets a value for the collection of file extensions that are allowed for upload.
+    /// </summary>
+    [Obsolete("Please use AllowedUploadedFileExtensions instead, scheduled for removal in V13")]
+    public IEnumerable<string> AllowedUploadFiles { get; set; } = Array.Empty<string>();
 
-        /// <summary>
-        /// Gets or sets a value indicating whether deprecated property editors should be shown.
-        /// </summary>
-        [DefaultValue(StaticShowDeprecatedPropertyEditors)]
-        public bool ShowDeprecatedPropertyEditors { get; set; } = StaticShowDeprecatedPropertyEditors;
+    /// <summary>
+    ///     Gets or sets a value indicating whether deprecated property editors should be shown.
+    /// </summary>
+    [DefaultValue(StaticShowDeprecatedPropertyEditors)]
+    public bool ShowDeprecatedPropertyEditors { get; set; } = StaticShowDeprecatedPropertyEditors;
 
-        /// <summary>
-        /// Gets or sets a value for the path to the login screen background image.
-        /// </summary>
-        [DefaultValue(StaticLoginBackgroundImage)]
-        public string LoginBackgroundImage { get; set; } = StaticLoginBackgroundImage;
+    /// <summary>
+    ///     Gets or sets a value for the path to the login screen background image.
+    /// </summary>
+    [DefaultValue(StaticLoginBackgroundImage)]
+    public string LoginBackgroundImage { get; set; } = StaticLoginBackgroundImage;
 
-        /// <summary>
-        /// Gets or sets a value for the path to the login screen logo image.
-        /// </summary>
-        [DefaultValue(StaticLoginLogoImage)]
-        public string LoginLogoImage { get; set; } = StaticLoginLogoImage;
+    /// <summary>
+    ///     Gets or sets a value for the path to the login screen logo image.
+    /// </summary>
+    [DefaultValue(StaticLoginLogoImage)]
+    public string LoginLogoImage { get; set; } = StaticLoginLogoImage;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.
-        /// </summary>
-        [DefaultValue(StaticHideBackOfficeLogo)]
-        public bool HideBackOfficeLogo { get; set; } = StaticHideBackOfficeLogo;
+    /// <summary>
+    ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.
+    /// </summary>
+    [DefaultValue(StaticHideBackOfficeLogo)]
+    public bool HideBackOfficeLogo { get; set; } = StaticHideBackOfficeLogo;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether to disable the deletion of items referenced by other items.
-        /// </summary>
-        [DefaultValue(StaticDisableDeleteWhenReferenced)]
-        public bool DisableDeleteWhenReferenced { get; set; } = StaticDisableDeleteWhenReferenced;
+    /// <summary>
+    ///     Gets or sets a value indicating whether to disable the deletion of items referenced by other items.
+    /// </summary>
+    [DefaultValue(StaticDisableDeleteWhenReferenced)]
+    public bool DisableDeleteWhenReferenced { get; set; } = StaticDisableDeleteWhenReferenced;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether to disable the unpublishing of items referenced by other items.
-        /// </summary>
-        [DefaultValue(StaticDisableUnpublishWhenReferenced)]
-        public bool DisableUnpublishWhenReferenced { get; set; } = StaticDisableUnpublishWhenReferenced;
+    /// <summary>
+    ///     Gets or sets a value indicating whether to disable the unpublishing of items referenced by other items.
+    /// </summary>
+    [DefaultValue(StaticDisableUnpublishWhenReferenced)]
+    public bool DisableUnpublishWhenReferenced { get; set; } = StaticDisableUnpublishWhenReferenced;
 
-        /// <summary>
-        /// Get or sets the model representing the global content version cleanup policy
-        /// </summary>
-        public ContentVersionCleanupPolicySettings ContentVersionCleanupPolicy { get; set; } = new ContentVersionCleanupPolicySettings();
-    }
+    /// <summary>
+    ///     Get or sets the model representing the global content version cleanup policy
+    /// </summary>
+    public ContentVersionCleanupPolicySettings ContentVersionCleanupPolicy { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to allow editing invariant properties from a non-default language variation.
+    /// </summary>
+    [DefaultValue(StaticAllowEditInvariantFromNonDefault)]
+    public bool AllowEditInvariantFromNonDefault { get; set; } = StaticAllowEditInvariantFromNonDefault;
+
+    /// <summary>
+    ///     Gets or sets a value for the collection of file extensions that are allowed for upload.
+    /// </summary>
+    public string[] AllowedUploadedFileExtensions { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    ///     Gets or sets a value for the collection of file extensions that are disallowed for upload.
+    /// </summary>
+    [DefaultValue(StaticDisallowedUploadFiles)]
+    public string[] DisallowedUploadedFileExtensions { get; set; } = StaticDisallowedUploadFiles.Split(',');
+
+    /// <summary>
+    /// Gets or sets the allowed external host for media. If empty only relative paths are allowed.
+    /// </summary>
+    public string[] AllowedMediaHosts { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to show domain warnings.
+    /// </summary>
+    [DefaultValue(StaticShowDomainWarnings)]
+    public bool ShowDomainWarnings { get; set; } = StaticShowDomainWarnings;
 }

@@ -1,60 +1,60 @@
-using System;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.BackOffice.Install
+namespace Umbraco.Cms.Web.BackOffice.Install;
+
+/// <summary>
+/// Specifies the authorization filter that verifies whether the runtime level is <see cref="RuntimeLevel.Install" />, or <see cref="RuntimeLevel.Upgrade" /> and a user is logged in.
+/// </summary>
+public class InstallAuthorizeAttribute : TypeFilterAttribute
 {
-    /// <summary>
-    /// Ensures authorization occurs for the installer if it has already completed.
-    /// If install has not yet occurred then the authorization is successful.
-    /// </summary>
-    public class InstallAuthorizeAttribute : TypeFilterAttribute
+    public InstallAuthorizeAttribute()
+        : base(typeof(InstallAuthorizeFilter))
+    { }
+
+    private class InstallAuthorizeFilter : IAsyncAuthorizationFilter
     {
-        public InstallAuthorizeAttribute() : base(typeof(InstallAuthorizeFilter))
+        private readonly ILogger<InstallAuthorizeFilter> _logger;
+        private readonly IRuntimeState _runtimeState;
+        private readonly LinkGenerator _linkGenerator;
+        private readonly IHostingEnvironment _hostingEnvironment;
+
+        public InstallAuthorizeFilter(IRuntimeState runtimeState, ILogger<InstallAuthorizeFilter> logger, LinkGenerator linkGenerator, IHostingEnvironment hostingEnvironment)
         {
+            _runtimeState = runtimeState;
+            _logger = logger;
+            _linkGenerator = linkGenerator;
+            _hostingEnvironment = hostingEnvironment;
         }
 
-        private class InstallAuthorizeFilter : IAuthorizationFilter
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
-            private readonly IRuntimeState _runtimeState;
-            private readonly ILogger<InstallAuthorizeFilter> _logger;
-
-            public InstallAuthorizeFilter(
-                IRuntimeState runtimeState,
-                ILogger<InstallAuthorizeFilter> logger)
+            if (_runtimeState.EnableInstaller() == false)
             {
-                _runtimeState = runtimeState;
-                _logger = logger;
+                // Only authorize when the installer is enabled
+                context.Result = new ForbidResult(new AuthenticationProperties()
+                {
+                    RedirectUri = _linkGenerator.GetUmbracoBackOfficeUrl(_hostingEnvironment)
+                });
             }
-
-            public void OnAuthorization(AuthorizationFilterContext authorizationFilterContext)
+            else if (_runtimeState.Level == RuntimeLevel.Upgrade && (await context.HttpContext.AuthenticateBackOfficeAsync()).Succeeded == false)
             {
-                if (!IsAllowed(authorizationFilterContext))
+                // Redirect to authorize upgrade
+                var authorizeUpgradePath = _linkGenerator.GetPathByAction(nameof(BackOfficeController.AuthorizeUpgrade), ControllerExtensions.GetControllerName<BackOfficeController>(), new
                 {
-                    authorizationFilterContext.Result = new ForbidResult();
-                }
-            }
-
-            private bool IsAllowed(AuthorizationFilterContext authorizationFilterContext)
-            {
-                try
-                {
-                    // if not configured (install or upgrade) then we can continue
-                    // otherwise we need to ensure that a user is logged in
-                    return _runtimeState.EnableInstaller()
-                           || (authorizationFilterContext.HttpContext.User?.Identity?.IsAuthenticated ?? false);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "An error occurred determining authorization");
-                    return false;
-                }
+                    area = Constants.Web.Mvc.BackOfficeArea,
+                    redir = _linkGenerator.GetInstallerUrl()
+                });
+                context.Result = new LocalRedirectResult(authorizeUpgradePath ?? "/");
             }
         }
     }
-
 }

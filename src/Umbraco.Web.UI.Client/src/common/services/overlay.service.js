@@ -10,7 +10,7 @@
 
     function overlayService(eventsService, backdropService, focusLockService) {
 
-        var currentOverlay = null;
+        let currentOverlay = null;
 
         /**
          * @ngdoc method

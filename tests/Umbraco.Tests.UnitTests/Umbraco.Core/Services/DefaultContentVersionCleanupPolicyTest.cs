@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoFixture.NUnit3;
@@ -8,7 +7,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Infrastructure.Services.Implement;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 using ContentVersionCleanupPolicySettings = Umbraco.Cms.Core.Models.ContentVersionCleanupPolicySettings;
 
@@ -17,7 +16,8 @@ namespace Umbraco.Tests.Services
     [TestFixture]
     public class DefaultContentVersionCleanupPolicyTest
     {
-        [Test, AutoMoqData]
+        [Test]
+        [AutoMoqData]
         public void Apply_AllOlderThanKeepSettings_AllVersionsReturned(
             [Frozen] Mock<IDocumentVersionRepository> documentVersionRepository,
             [Frozen] Mock<IOptions<ContentSettings>> contentSettings,
@@ -37,8 +37,8 @@ namespace Umbraco.Tests.Services
                 {
                     EnableCleanup = true,
                     KeepAllVersionsNewerThanDays = 0,
-                    KeepLatestVersionPerDayForDays = 0
-                }
+                    KeepLatestVersionPerDayForDays = 0,
+                },
             });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
@@ -52,7 +52,8 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(2, results.Count);
         }
 
-        [Test, AutoMoqData]
+        [Test]
+        [AutoMoqData]
         public void Apply_OverlappingKeepSettings_KeepAllVersionsNewerThanDaysTakesPriority(
             [Frozen] Mock<IDocumentVersionRepository> documentVersionRepository,
             [Frozen] Mock<IOptions<ContentSettings>> contentSettings,
@@ -72,8 +73,8 @@ namespace Umbraco.Tests.Services
                 {
                     EnableCleanup = true,
                     KeepAllVersionsNewerThanDays = 2,
-                    KeepLatestVersionPerDayForDays = 2
-                }
+                    KeepLatestVersionPerDayForDays = 2,
+                },
             });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
@@ -87,7 +88,8 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(0, results.Count);
         }
 
-        [Test, AutoMoqData]
+        [Test]
+        [AutoMoqData]
         public void Apply_WithinInKeepLatestPerDay_ReturnsSinglePerContentPerDay(
             [Frozen] Mock<IDocumentVersionRepository> documentVersionRepository,
             [Frozen] Mock<IOptions<ContentSettings>> contentSettings,
@@ -102,12 +104,12 @@ namespace Umbraco.Tests.Services
                 new ContentVersionMeta(versionId: 4, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddDays(-1).AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 5, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddDays(-1).AddHours(-2), false, false, false, null),
                 new ContentVersionMeta(versionId: 6, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddDays(-1).AddHours(-1), false, false, false, null),
+
                 // another content
                 new ContentVersionMeta(versionId: 7, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 8, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
                 new ContentVersionMeta(versionId: 9, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
             };
-
 
             contentSettings.Setup(x => x.Value).Returns(new ContentSettings()
             {
@@ -115,8 +117,8 @@ namespace Umbraco.Tests.Services
                 {
                     EnableCleanup = true,
                     KeepAllVersionsNewerThanDays = 0,
-                    KeepLatestVersionPerDayForDays = 3
-                }
+                    KeepLatestVersionPerDayForDays = 3,
+                },
             });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
@@ -140,7 +142,8 @@ namespace Umbraco.Tests.Services
             });
         }
 
-        [Test, AutoMoqData]
+        [Test]
+        [AutoMoqData]
         public void Apply_HasOverridePolicy_RespectsPreventCleanup(
             [Frozen] Mock<IDocumentVersionRepository> documentVersionRepository,
             [Frozen] Mock<IOptions<ContentSettings>> contentSettings,
@@ -151,6 +154,7 @@ namespace Umbraco.Tests.Services
                 new ContentVersionMeta(versionId: 1, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 2, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
                 new ContentVersionMeta(versionId: 3, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
+
                 // another content & type
                 new ContentVersionMeta(versionId: 4, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 5, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
@@ -163,14 +167,14 @@ namespace Umbraco.Tests.Services
                 {
                     EnableCleanup = true,
                     KeepAllVersionsNewerThanDays = 0,
-                    KeepLatestVersionPerDayForDays = 0
-                }
+                    KeepLatestVersionPerDayForDays = 0,
+                },
             });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
                 .Returns(new ContentVersionCleanupPolicySettings[]
                 {
-                    new ContentVersionCleanupPolicySettings{ ContentTypeId = 2, PreventCleanup = true }
+                    new() { ContentTypeId = 2, PreventCleanup = true },
                 });
 
             documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())
@@ -181,7 +185,8 @@ namespace Umbraco.Tests.Services
             Assert.True(results.All(x => x.ContentTypeId == 1));
         }
 
-        [Test, AutoMoqData]
+        [Test]
+        [AutoMoqData]
         public void Apply_HasOverridePolicy_RespectsKeepAll(
             [Frozen] Mock<IDocumentVersionRepository> documentVersionRepository,
             [Frozen] Mock<IOptions<ContentSettings>> contentSettings,
@@ -192,6 +197,7 @@ namespace Umbraco.Tests.Services
                 new ContentVersionMeta(versionId: 1, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 2, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
                 new ContentVersionMeta(versionId: 3, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
+
                 // another content & type
                 new ContentVersionMeta(versionId: 4, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 5, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
@@ -204,14 +210,14 @@ namespace Umbraco.Tests.Services
                 {
                     EnableCleanup = true,
                     KeepAllVersionsNewerThanDays = 0,
-                    KeepLatestVersionPerDayForDays = 0
-                }
+                    KeepLatestVersionPerDayForDays = 0,
+                },
             });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
                 .Returns(new ContentVersionCleanupPolicySettings[]
                 {
-                    new ContentVersionCleanupPolicySettings{ ContentTypeId = 2, PreventCleanup = false, KeepAllVersionsNewerThanDays = 3 }
+                    new() { ContentTypeId = 2, PreventCleanup = false, KeepAllVersionsNewerThanDays = 3 },
                 });
 
             documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())
@@ -222,7 +228,8 @@ namespace Umbraco.Tests.Services
             Assert.True(results.All(x => x.ContentTypeId == 1));
         }
 
-        [Test, AutoMoqData]
+        [Test]
+        [AutoMoqData]
         public void Apply_HasOverridePolicy_RespectsKeepLatest(
             [Frozen] Mock<IDocumentVersionRepository> documentVersionRepository,
             [Frozen] Mock<IOptions<ContentSettings>> contentSettings,
@@ -233,10 +240,12 @@ namespace Umbraco.Tests.Services
                 new ContentVersionMeta(versionId: 1, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 2, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
                 new ContentVersionMeta(versionId: 3, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
+
                 // another content
                 new ContentVersionMeta(versionId: 4, contentId: 2, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 5, contentId: 2, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
                 new ContentVersionMeta(versionId: 6, contentId: 2, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
+
                 // another content & type
                 new ContentVersionMeta(versionId: 7, contentId: 3, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 8, contentId: 3, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
@@ -249,14 +258,14 @@ namespace Umbraco.Tests.Services
                 {
                     EnableCleanup = true,
                     KeepAllVersionsNewerThanDays = 0,
-                    KeepLatestVersionPerDayForDays = 0
-                }
+                    KeepLatestVersionPerDayForDays = 0,
+                },
             });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
                 .Returns(new ContentVersionCleanupPolicySettings[]
                 {
-                    new ContentVersionCleanupPolicySettings{ ContentTypeId = 2, PreventCleanup = false, KeepLatestVersionPerDayForDays = 3 }
+                    new() { ContentTypeId = 2, PreventCleanup = false, KeepLatestVersionPerDayForDays = 3 },
                 });
 
             documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())

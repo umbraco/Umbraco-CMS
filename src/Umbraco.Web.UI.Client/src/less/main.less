@@ -165,7 +165,7 @@ h6.-black {
     }
 }
 
-umb-property:last-of-type .umb-control-group {
+umb-property:last-of-type > .umb-property > ng-form > .umb-control-group {
     &::after {
         margin-top: 0px;
         height: 0;
@@ -216,6 +216,8 @@ umb-property:last-of-type .umb-control-group {
 .umb-control-group .control-header {
     
     .control-label {
+        white-space: break-spaces;
+        overflow-wrap: break-word;
         float: left;
     }
 
@@ -239,13 +241,13 @@ umb-property:last-of-type .umb-control-group {
 .form-horizontal .umb-control-group .control-header {
     float: left;
     width: 160px;
-    padding-top: 5px;
     padding-bottom: 0;
     text-align: left;
-    margin-bottom: 5px;
+    margin-bottom: 12px;
 
     .control-label {
-        width: auto;
+        width: 100%;
+        box-sizing: border-box;
         padding-top: 0;
         text-align: left;
     }
@@ -259,6 +261,11 @@ umb-property:last-of-type .umb-control-group {
     .form-horizontal .umb-control-group .control-header {
         float: none;
         width: 100%;
+
+        .control-label {
+            width: auto;
+        }
+
         &::after {
             content: "";
             display: table;
@@ -277,6 +284,11 @@ umb-property:last-of-type .umb-control-group {
             clear: both;
         }
     }
+
+    & .control-label {
+        width: auto;
+    }
+
     & > .controls {
         margin-left: 0;
     }

@@ -1,65 +1,63 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Packaging
+namespace Umbraco.Cms.Core.Packaging;
+
+public class PendingPackageMigrations
 {
-    public class PendingPackageMigrations
+    private readonly ILogger<PendingPackageMigrations> _logger;
+    private readonly PackageMigrationPlanCollection _packageMigrationPlans;
+
+    public PendingPackageMigrations(
+        ILogger<PendingPackageMigrations> logger,
+        PackageMigrationPlanCollection packageMigrationPlans)
     {
-        private readonly ILogger<PendingPackageMigrations> _logger;
-        private readonly PackageMigrationPlanCollection _packageMigrationPlans;
+        _logger = logger;
+        _packageMigrationPlans = packageMigrationPlans;
+    }
 
-        public PendingPackageMigrations(
-            ILogger<PendingPackageMigrations> logger,
-            PackageMigrationPlanCollection packageMigrationPlans)
+    /// <summary>
+    ///     Returns what package migration names are pending
+    /// </summary>
+    /// <param name="keyValues">
+    ///     These are the key/value pairs from the keyvalue storage of migration names and their final values
+    /// </param>
+    /// <returns></returns>
+    public IReadOnlyList<string> GetPendingPackageMigrations(IReadOnlyDictionary<string, string?>? keyValues)
+    {
+        var packageMigrationPlans = _packageMigrationPlans.ToList();
+
+        var pendingMigrations = new List<string>(packageMigrationPlans.Count);
+
+        foreach (PackageMigrationPlan plan in packageMigrationPlans)
         {
-            _logger = logger;
-            _packageMigrationPlans = packageMigrationPlans;
-        
-        }
-
-        /// <summary>
-        /// Returns what package migration names are pending
-        /// </summary>
-        /// <param name="keyValues">
-        /// These are the key/value pairs from the keyvalue storage of migration names and their final values
-        /// </param>
-        /// <returns></returns>
-        public IReadOnlyList<string> GetPendingPackageMigrations(IReadOnlyDictionary<string, string> keyValues)
-        {
-            var packageMigrationPlans = _packageMigrationPlans.ToList();
-
-            var pendingMigrations = new List<string>(packageMigrationPlans.Count);
-
-            foreach (PackageMigrationPlan plan in packageMigrationPlans)
+            string? currentMigrationState = null;
+            var planKeyValueKey = Constants.Conventions.Migrations.KeyValuePrefix + plan.Name;
+            if (keyValues?.TryGetValue(planKeyValueKey, out var value) ?? false)
             {
-                string currentMigrationState = null;
-                var planKeyValueKey = Constants.Conventions.Migrations.KeyValuePrefix + plan.Name;
-                if (keyValues.TryGetValue(planKeyValueKey, out var value))
-                {
-                    currentMigrationState = value;
+                currentMigrationState = value;
 
-                    if (!plan.FinalState.InvariantEquals(value))
-                    {
-                        // Not equal so we need to run
-                        pendingMigrations.Add(plan.Name);
-                    }
-                }
-                else
+                if (!plan.FinalState.InvariantEquals(value))
                 {
-                    // If there is nothing in the DB then we need to run
+                    // Not equal so we need to run
                     pendingMigrations.Add(plan.Name);
                 }
-
-                _logger.LogDebug("Final package migration for {PackagePlan} state is {FinalMigrationState}, database contains {DatabaseState}",
-                    plan.Name,
-                    plan.FinalState,
-                    currentMigrationState ?? "<null>");
             }
-
-            return pendingMigrations;
+            else
+            {
+                // If there is nothing in the DB then we need to run
+                pendingMigrations.Add(plan.Name);
+            }
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(
+                "Final package migration for {PackagePlan} state is {FinalMigrationState}, database contains {DatabaseState}",
+                plan.Name,
+                plan.FinalState,
+                currentMigrationState ?? "<null>");
+            }
         }
+
+        return pendingMigrations;
     }
 }
