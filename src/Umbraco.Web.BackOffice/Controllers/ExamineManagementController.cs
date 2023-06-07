@@ -266,8 +266,10 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
     private void Indexer_IndexOperationComplete(object? sender, EventArgs e)
     {
         var indexer = (IIndex?)sender;
-
-        _logger.LogDebug("Logging operation completed for index {IndexName}", indexer?.Name);
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug("Logging operation completed for index {IndexName}", indexer?.Name);
+        }
 
         if (indexer is not null)
         {

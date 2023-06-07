@@ -59,8 +59,11 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         IDictionary<string, string?>? items = auth.Properties?.Items;
         if (auth.Principal == null || items == null)
         {
-            Logger.LogDebug(
+            if (Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                Logger.LogDebug(
                 "The external login authentication failed. No user Principal or authentication items was resolved.");
+            }
             return null;
         }
 

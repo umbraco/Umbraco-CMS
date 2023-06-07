@@ -84,7 +84,10 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
         ConnectionStrings umbracoConnectionString = connectionStrings.CurrentValue;
         if (!umbracoConnectionString.IsConnectionStringConfigured())
         {
-            logger.LogDebug("Missing connection string, defer configuration.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                logger.LogDebug("Missing connection string, defer configuration.");
+            }
             return; // not configured
         }
 
@@ -197,7 +200,10 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
 
     private SqlContext Initialize()
     {
-        _logger.LogDebug("Initializing.");
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug("Initializing.");
+        }
 
         if (ConnectionString.IsNullOrWhiteSpace())
         {
@@ -261,8 +267,10 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
             throw new NullReferenceException(
                 "The call to UmbracoDatabaseFactory.Config yielded a null UmbracoDatabaseFactory instance.");
         }
-
-        _logger.LogDebug("Initialized.");
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug("Initialized.");
+        }
 
         return new SqlContext(_sqlSyntax, _databaseType, _pocoDataFactory, _mappers);
     }

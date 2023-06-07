@@ -60,10 +60,16 @@ public class ContentVersionCleanup : RecurringHostedServiceBase
         switch (_serverRoleAccessor.CurrentServerRole)
         {
             case ServerRole.Subscriber:
-                _logger.LogDebug("Does not run on subscriber servers");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Does not run on subscriber servers");
+                }
                 return Task.CompletedTask;
             case ServerRole.Unknown:
-                _logger.LogDebug("Does not run on servers with unknown role");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Does not run on servers with unknown role");
+                }
                 return Task.CompletedTask;
             case ServerRole.Single:
             case ServerRole.SchedulingPublisher:
@@ -74,7 +80,10 @@ public class ContentVersionCleanup : RecurringHostedServiceBase
         // Ensure we do not run if not main domain, but do NOT lock it
         if (!_mainDom.IsMainDom)
         {
-            _logger.LogDebug("Does not run if not MainDom");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Does not run if not MainDom");
+            }
             return Task.FromResult(false); // do NOT repeat, going down
         }
 
@@ -86,7 +95,10 @@ public class ContentVersionCleanup : RecurringHostedServiceBase
         }
         else
         {
-            _logger.LogDebug("Task complete, no items were Deleted");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Task complete, no items were Deleted");
+            }
         }
 
         return Task.FromResult(true);
