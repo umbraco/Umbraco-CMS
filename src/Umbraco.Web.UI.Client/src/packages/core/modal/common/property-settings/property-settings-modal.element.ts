@@ -45,9 +45,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	@state()
 	protected _returnData!: UmbPropertySettingsModalResult;
 
-	constructor() {
-		super();
-	}
 
 	connectedCallback(): void {
 		super.connectedCallback();
