@@ -71,6 +71,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 			.onSubmit((submitData) => {
 				if (submitData.dataTypeId) {
 					this._select(submitData.dataTypeId);
+					this._submit();
 				} else if (submitData.createNewWithPropertyEditorUiAlias) {
 					this._createDataType(submitData.createNewWithPropertyEditorUiAlias);
 				}
@@ -120,6 +121,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	private _handleDataTypeClick(dataType: EntityTreeItemResponseModel) {
 		if (dataType.id) {
 			this._select(dataType.id);
+			this._submit();
 		}
 	}
 
@@ -170,7 +172,6 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>
-					<uui-button label="${this._submitLabel}" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
