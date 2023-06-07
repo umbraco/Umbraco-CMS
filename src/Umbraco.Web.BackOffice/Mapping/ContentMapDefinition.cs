@@ -334,17 +334,17 @@ internal class ContentMapDefinition : IMapDefinition
     private string AddRelNoReferrer(Match m)
     {
         string result = m.Value;
-        if (result.IndexOf("rel=", StringComparison.Ordinal) == -1)
+        if (!result.Contains("rel=", StringComparison.Ordinal))
         {
             result = result.Replace(">", " rel=\"noreferrer\">");
         }
 
-        if (result.IndexOf("class=", StringComparison.Ordinal) == -1)
+        if (!result.Contains("class=", StringComparison.Ordinal))
         {
             result = result.Replace(">", " class=\"underline\">");
         }
 
-        if (result.IndexOf("target=", StringComparison.Ordinal) == -1)
+        if (!result.Contains("target=", StringComparison.Ordinal))
         {
             result = result.Replace(">", " target=\"_blank\">");
         }
