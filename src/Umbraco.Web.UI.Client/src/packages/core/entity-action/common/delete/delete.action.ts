@@ -11,25 +11,25 @@ import { UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/
 export class UmbDeleteEntityAction<
 	T extends UmbDetailRepository & UmbItemRepository<any>
 > extends UmbEntityActionBase<T> {
-	#modalContext?: UmbModalManagerContext;
+	#modalManager?: UmbModalManagerContext;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 
 		new UmbContextConsumerController(this.host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
-			this.#modalContext = instance;
+			this.#modalManager = instance;
 		});
 	}
 
 	async execute() {
-		if (!this.repository || !this.#modalContext) return;
+		if (!this.repository || !this.#modalManager) return;
 
 		const { data } = await this.repository.requestItems([this.unique]);
 
 		if (data) {
 			const item = data[0];
 
-			const modalContext = this.#modalContext.open(UMB_CONFIRM_MODAL, {
+			const modalContext = this.#modalManager.open(UMB_CONFIRM_MODAL, {
 				headline: `Delete ${item.name}`,
 				content: 'Are you sure you want to delete this item?',
 				color: 'danger',

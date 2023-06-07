@@ -27,7 +27,7 @@ export class UmbDataTypeWorkspaceContext
 		}
 	}
 
-	async createScaffold(parentId: string | null) {
+	async create(parentId: string | null) {
 		let { data } = await this.repository.createScaffold(parentId);
 		if (this.modalContext) {
 			data = { ...data, ...this.modalContext.data.preset };
@@ -78,7 +78,7 @@ export class UmbDataTypeWorkspaceContext
 		if (!this.#data.value) return;
 		if (!this.#data.value.id) return;
 
-		if (this.isNew) {
+		if (this.getIsNew()) {
 			await this.repository.create(this.#data.value);
 		} else {
 			await this.repository.save(this.#data.value.id, this.#data.value);

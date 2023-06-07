@@ -6,16 +6,19 @@ import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
+	CreateDocumentTypeRequestModel,
 	DocumentTypeResponseModel,
 	EntityTreeItemResponseModel,
 	FolderTreeItemResponseModel,
+	UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
-type ItemType = DocumentTypeResponseModel;
+type ItemType = DocumentTypeResponseModel & {$type: string};
 
 export class UmbDocumentTypeRepository
-	implements UmbTreeRepository<EntityTreeItemResponseModel>, UmbDetailRepository<ItemType>
+	implements UmbTreeRepository<EntityTreeItemResponseModel>,
+	UmbDetailRepository<CreateDocumentTypeRequestModel, any, UpdateDocumentTypeRequestModel, DocumentTypeResponseModel>
 {
 	#init!: Promise<unknown>;
 
@@ -131,6 +134,7 @@ export class UmbDocumentTypeRepository
 		if (data) {
 			this.#detailStore?.append(data);
 		}
+
 		return { data };
 	}
 
@@ -163,22 +167,38 @@ export class UmbDocumentTypeRepository
 	// Could potentially be general methods:
 
 	async create(documentType: ItemType) {
+
 		if (!documentType || !documentType.id) throw new Error('Template is missing');
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.insert(documentType);
+		const { error, data } = await this.#detailDataSource.insert(documentType);
 
-		if (!error) {
-			const treeItem = createTreeItem(documentType);
-			this.#treeStore?.appendItems([treeItem]);
+		if (!error && data) {
 
-			const notification = { data: { message: `Document Type created` } };
-			this.#notificationContext?.peek('positive', notification);
+			// TODO: The parts here is a hack, when we can trust the IDs we send, then this should be removed/changed:
 
-			// TODO: we currently don't use the detail store for anything.
-			// Consider to look up the data before fetching from the server
-			this.#detailStore?.append(documentType);
-			// TODO: Update tree store with the new item? or ask tree to request the new item?
+			const splitResultUrl = data.split("/");
+			const newId = splitResultUrl[splitResultUrl.length - 1];
+
+			// Temporary hack while we are not in control of IDs:
+
+			const newDocument = {...(await this.requestById(newId)).data, $type: ''};
+
+			if(newDocument) {
+
+				const notification = { data: { message: `Document Type created` } };
+				this.#notificationContext?.peek('positive', notification);
+
+				await this.requestRootTreeItems();
+
+				// TODO: currently we cannot put this data into our store, cause we don't have the right ID, as the server currently changes it (and other ids of it, container-id and property-id)
+				//this.#detailStore?.append(newDocument);
+
+				//const treeItem = createTreeItem(newDocument);
+				//this.#treeStore?.appendItems([treeItem]);
+
+				return { data: newDocument };
+			}
 		}
 
 		return { error };

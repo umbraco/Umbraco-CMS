@@ -3,7 +3,7 @@ import { css, html, customElement, property, state, repeat } from '@umbraco-cms/
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 import './document-type-workspace-view-edit-properties.element.js';
@@ -48,7 +48,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	_groupStructureHelper = new UmbContentTypeContainerStructureHelper(this);
 
 	@state()
-	_groups: Array<PropertyTypeContainerResponseModelBaseModel> = [];
+	_groups: Array<PropertyTypeContainerModelBaseModel> = [];
 
 	@state()
 	_hasProperties = false;

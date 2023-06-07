@@ -1,30 +1,46 @@
 import { UmbDocumentTypeWorkspaceContext } from './document-type-workspace.context.js';
-import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import { UmbRoute, UmbRouterSlotInitEvent, generateRoutePathBuilder } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbDocumentTypeWorkspaceContext(this);
-	#element = new UmbDocumentTypeWorkspaceEditorElement();
+	#routerPath? = '';
 
 	@state()
 	_routes: UmbRoute[] = [
 		{
 			path: 'create/:parentId',
-			component: () => this.#element,
+			component: import('./document-type-workspace-editor.element.js'),
 			setup: (_component, info) => {
 				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
-				this.#workspaceContext.createScaffold(parentId);
+				this.#workspaceContext.create(parentId);
+
+				// Navigate to edit route when language is created:
+				this.observe(
+					this.#workspaceContext.isNew,
+					(isNew) => {
+						if (isNew === false) {
+							const id = this.#workspaceContext.getEntityId();
+							if (this.#routerPath && id) {
+								const routeBasePath = this.#routerPath.endsWith('/') ? this.#routerPath : this.#routerPath + '/';
+								// TODO: Revisit if this is the right way to change URL:
+								const newPath = generateRoutePathBuilder(routeBasePath + 'edit/:id')({ id });
+								window.history.pushState({}, '', newPath);
+							}
+						}
+					},
+					'_observeIsNew'
+				);
 			},
 		},
 		{
 			path: 'edit/:id',
-			component: () => this.#element,
+			component: import('./document-type-workspace-editor.element.js'),
 			setup: (_component, info) => {
-				console.log('Setup for edit/id');
+				this.removeControllerByUnique('_observeIsNew');
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);
 			},
@@ -32,7 +48,9 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	];
 
 	render() {
-		return html` <umb-router-slot .routes=${this._routes}></umb-router-slot> `;
+		return html` <umb-router-slot .routes=${this._routes} @init=${(event: UmbRouterSlotInitEvent) => {
+			this.#routerPath = event.target.absoluteRouterPath;
+		}}></umb-router-slot> `;
 	}
 
 	static styles = [UUITextStyles];

@@ -1110,26 +1110,46 @@ class UmbDocumentTypeData extends UmbEntityData<DocumentTypeResponseModel> {
 		super(data);
 	}
 
+	// TODO: Can we do this smarter so we don't need to make this for each mock data:
+	insert(item: DocumentTypeResponseModel) {
+		const result = super.insert(item);
+		this.treeData.push(createDocumentTypeTreeItem(result));
+		return result;
+	}
+
+	update(item: DocumentTypeResponseModel) {
+		const result = super.save(item);
+		this.treeData = this.treeData.map((x) => {
+			if(x.id === result.id) {
+				return createDocumentTypeTreeItem(result);
+			} else {
+				return x;
+			}
+		});
+		return result;
+	}
+
 	getTreeRoot(): Array<DocumentTypeTreeItemResponseModel> {
 		const rootItems = this.treeData.filter((item) => item.parentId === null);
-		return rootItems.map((item) => createDocumentTypeTreeItem(item));
+		const result = rootItems.map((item) => createDocumentTypeTreeItem(item));
+		return result;
 	}
 
 	getTreeItemChildren(id: string): Array<DocumentTypeTreeItemResponseModel> {
 		const childItems = this.treeData.filter((item) => item.parentId === id);
-		return childItems.map((item) => createDocumentTypeTreeItem(item));
+		return childItems.map((item) => item);
 	}
 
 	getTreeItem(ids: Array<string>): Array<DocumentTypeTreeItemResponseModel> {
 		const items = this.treeData.filter((item) => ids.includes(item.id ?? ''));
-		return items.map((item) => createDocumentTypeTreeItem(item));
+		return items.map((item) => item);
 	}
 
 	getAllowedTypesOf(id: string): Array<DocumentTypeTreeItemResponseModel> {
 		const documentType = this.getById(id);
 		const allowedTypeKeys = documentType?.allowedContentTypes?.map((documentType) => documentType.id) ?? [];
 		const items = this.treeData.filter((item) => allowedTypeKeys.includes(item.id ?? ''));
-		return items.map((item) => createDocumentTypeTreeItem(item));
+		return items.map((item) => item);
 	}
 }
 

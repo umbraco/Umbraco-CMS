@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { PropertyTypeResponseModelBaseModel } from './PropertyTypeResponseModelBaseModel';
+import type { PropertyTypeModelBaseModel } from './PropertyTypeModelBaseModel';
 
-export type DocumentTypePropertyTypeResponseModel = PropertyTypeResponseModelBaseModel;
+export type DocumentTypePropertyTypeResponseModel = PropertyTypeModelBaseModel;
 

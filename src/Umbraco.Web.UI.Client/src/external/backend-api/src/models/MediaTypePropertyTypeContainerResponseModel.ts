@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { PropertyTypeContainerResponseModelBaseModel } from './PropertyTypeContainerResponseModelBaseModel';
+import type { PropertyTypeContainerModelBaseModel } from './PropertyTypeContainerModelBaseModel';
 
-export type MediaTypePropertyTypeContainerResponseModel = PropertyTypeContainerResponseModelBaseModel;
+export type MediaTypePropertyTypeContainerResponseModel = PropertyTypeContainerModelBaseModel;
 
