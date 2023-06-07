@@ -88,7 +88,6 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				return { entityType: 'data-type', preset: { propertyEditorUiAlias: params.uiAlias } };
 			})
 			.onSubmit((submitData) => {
-				console.log('submitData', submitData);
 				this._select(submitData.id);
 				this._submit();
 
