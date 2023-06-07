@@ -323,6 +323,16 @@ namespace Umbraco.Cms.Core.Services.Implement
             return await Task.FromResult(dataTypes);
         }
 
+        /// <inheritdoc />
+        public async Task<IEnumerable<IDataType>> GetByEditorUiAlias(string editorUiAlias)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            IQuery<IDataType> query = Query<IDataType>().Where(x => x.EditorUiAlias == editorUiAlias);
+            IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
+            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
+            return await Task.FromResult(dataTypes);
+        }
+
         /// <summary>
         /// Gets all <see cref="IDataType"/> objects or those with the ids passed in
         /// </summary>
