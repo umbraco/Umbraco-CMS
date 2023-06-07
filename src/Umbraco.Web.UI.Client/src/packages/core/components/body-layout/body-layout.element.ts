@@ -40,6 +40,9 @@ export class UmbBodyLayoutElement extends LitElement {
 	private _headerSlotHasChildren = false;
 
 	@state()
+	private _navigationSlotHasChildren = false;
+
+	@state()
 	private _tabsSlotHasChildren = false;
 
 	@state()
@@ -81,25 +84,34 @@ export class UmbBodyLayoutElement extends LitElement {
 				style="display: ${this.headline ||
 				this._headerSlotHasChildren ||
 				this._tabsSlotHasChildren ||
-				this._actionsMenuSlotHasChildren
+				this._actionsMenuSlotHasChildren ||
+				this._navigationSlotHasChildren
 					? ''
 					: 'none'}">
 				${this.headline ? html`<h3 id="headline">${this.headline}</h3>` : nothing}
 
 				<slot
+					id="header-slot"
 					name="header"
 					@slotchange=${(e: Event) => {
 						this._headerSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
 				<slot
-					id="tabs"
+					id="tabs-slot"
 					name="tabs"
 					@slotchange=${(e: Event) => {
 						this._tabsSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
 				<slot
-					id="action-menu"
+					id="action-menu-slot"
 					name="action-menu"
+					@slotchange=${(e: Event) => {
+						this._actionsMenuSlotHasChildren = this.#hasNodes(e);
+					}}></slot>
+
+				<slot
+					id="navigation-slot"
+					name="navigation"
 					@slotchange=${(e: Event) => {
 						this._actionsMenuSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
@@ -170,13 +182,28 @@ export class UmbBodyLayoutElement extends LitElement {
 				box-shadow: 0 1px 15px 0 rgba(0, 0, 0, 0.3);
 			}
 
+			#header-slot,
+			#tabs-slot,
+			#action-menu-slot,
+			#navigation-slot {
+				display: flex;
+				height: 100%;
+				align-items: center;
+			}
+
+			#header-slot {
+				padding: 0 var(--uui-size-layout-1);
+				flex-grow: 1;
+			}
+
+			#navigation-slot,
+			#tabs-slot {
+				margin-left: auto;
+			}
+
 			#headline {
 				display: block;
 				margin: 0 var(--uui-size-layout-1);
-			}
-
-			#tabs {
-				margin-left: auto;
 			}
 
 			#main {

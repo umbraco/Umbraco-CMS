@@ -125,7 +125,6 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 			#header {
 				display: flex;
 				flex: 1 1 auto;
-				margin: 0 var(--uui-size-layout-1);
 			}
 
 			#name {

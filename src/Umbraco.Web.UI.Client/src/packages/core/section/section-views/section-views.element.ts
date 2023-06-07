@@ -119,59 +119,61 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`
-			${this._routes.length > 0
-				? html`
-						<umb-body-layout no-padding>
-							<div id="header" slot="header">${this.#renderDashboards()} ${this.#renderViews()}</div>
-							<umb-router-slot
-								.routes=${this._routes}
-								@init=${(event: UmbRouterSlotInitEvent) => {
-									this._routerPath = event.target.absoluteRouterPath;
-								}}
-								@change=${(event: UmbRouterSlotChangeEvent) => {
-									this._activePath = event.target.localActiveViewPath;
-								}}>
-							</umb-router-slot>
-						</umb-body-layout>
-				  `
-				: nothing}
-		`;
+		return this._routes.length > 0
+			? html`
+					<umb-body-layout no-padding>
+						${this.#renderDashboards()} ${this.#renderViews()}
+						<umb-router-slot
+							.routes=${this._routes}
+							@init=${(event: UmbRouterSlotInitEvent) => {
+								this._routerPath = event.target.absoluteRouterPath;
+							}}
+							@change=${(event: UmbRouterSlotChangeEvent) => {
+								this._activePath = event.target.localActiveViewPath;
+							}}>
+						</umb-router-slot>
+					</umb-body-layout>
+			  `
+			: html`${nothing}`;
 	}
 
 	#renderDashboards() {
-		return this._dashboards.length > 0 ? html`
-			<uui-tab-group id="dashboards">
-				${this._dashboards.map(
-					(dashboard) => html`
-						<uui-tab
-							.label="${dashboard.meta.label || dashboard.name}"
-							href="${this._routerPath}/dashboard/${dashboard.meta.pathname}"
-							?active="${this._activePath === 'dashboard/' + dashboard.meta.pathname}">
-							${dashboard.meta.label || dashboard.name}
-						</uui-tab>
-					`
-				)}
-			</uui-tab-group>
-		` : '';
+		return this._dashboards.length > 0
+			? html`
+					<uui-tab-group slot="header" id="dashboards">
+						${this._dashboards.map(
+							(dashboard) => html`
+								<uui-tab
+									.label="${dashboard.meta.label || dashboard.name}"
+									href="${this._routerPath}/dashboard/${dashboard.meta.pathname}"
+									?active="${this._activePath === 'dashboard/' + dashboard.meta.pathname}">
+									${dashboard.meta.label || dashboard.name}
+								</uui-tab>
+							`
+						)}
+					</uui-tab-group>
+			  `
+			: '';
 	}
 
 	#renderViews() {
-		return this._views.length > 0 ? html`
-			<uui-tab-group id="views">
-				${this._views.map(
-					(view) => html`
-						<uui-tab
-							.label="${view.meta.label || view.name}"
-							href="${this._routerPath}/view/${view.meta.pathname}"
-							?active="${this._activePath === 'view/' + view.meta.pathname}">
-							<uui-icon slot="icon" name=${view.meta.icon}></uui-icon>
-							${view.meta.label || view.name}
-						</uui-tab>
-					`
-				)}
-			</uui-tab-group>
-		` : '';
+		return this._views.length > 0
+			? html`
+					<uui-tab-group slot="navigation" id="views">
+						${this._views.map(
+							(view) => html`
+								<uui-tab
+									.label="${view.meta.label || view.name}"
+									href="${this._routerPath}/view/${view.meta.pathname}"
+									?active="${this._activePath === 'view/' + view.meta.pathname}">
+									<uui-icon slot="icon" name=${view.meta.icon}></uui-icon>
+									${view.meta.label || view.name}
+								</uui-tab>
+							`
+						)}
+					</uui-tab-group>
+			  `
+			: '';
 	}
 
 	static styles = [
@@ -184,22 +186,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 				height: 100%;
 			}
 
-			#header {
-				background-color: var(--uui-color-surface);
-				border-bottom: 1px solid var(--uui-color-divider-standalone);
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				height: var(--umb-header-layout-height);
-				box-sizing: border-box;
-			}
-
-			#dashboards {
-				margin: 0 var(--uui-size-layout-1);
-			}
-
 			#views {
-				justify-content: flex-end;
 				--uui-tab-divider: var(--uui-color-divider-standalone);
 			}
 
