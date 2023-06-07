@@ -22,6 +22,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
+using Guid = System.Guid;
 using UserProfile = Umbraco.Cms.Core.Models.Membership.UserProfile;
 
 namespace Umbraco.Cms.Core.Services;
@@ -1066,7 +1067,7 @@ internal class UserService : RepositoryService, IUserService
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize);
 
-        SortedSet<string>? excludeUserGroupAliases = new();
+        HashSet<string> excludeUserGroupAliases = new();
         if (baseFilter.ExcludeUserGroups is not null)
         {
             Attempt<IEnumerable<string>, UserOperationStatus> userGroupKeyConversionAttempt =
@@ -1078,7 +1079,7 @@ internal class UserService : RepositoryService, IUserService
                 return Attempt.FailWithStatus<PagedModel<IUser>?, UserOperationStatus>(UserOperationStatus.MissingUserGroup, null);
             }
 
-            excludeUserGroupAliases = new SortedSet<string>(userGroupKeyConversionAttempt.Result);
+            excludeUserGroupAliases = new HashSet<string>(userGroupKeyConversionAttempt.Result);
         }
 
         IEnumerable<IUser> result = _userRepository.GetPagedResultsByQuery(
@@ -1119,7 +1120,7 @@ internal class UserService : RepositoryService, IUserService
         UserFilter mergedFilter = filter.Merge(baseFilter);
 
         // TODO: We should have a repository method that accepts keys so we don't have to do this conversion
-        SortedSet<string>? excludedUserGroupAliases = null;
+        HashSet<string>? excludedUserGroupAliases = null;
         if (mergedFilter.ExcludeUserGroups is not null)
         {
             Attempt<IEnumerable<string>, UserOperationStatus> userGroupKeyConversionAttempt =
@@ -1131,7 +1132,7 @@ internal class UserService : RepositoryService, IUserService
                 return Attempt.FailWithStatus(UserOperationStatus.MissingUserGroup, new PagedModel<IUser>());
             }
 
-            excludedUserGroupAliases = new SortedSet<string>(userGroupKeyConversionAttempt.Result);
+            excludedUserGroupAliases = new HashSet<string>(userGroupKeyConversionAttempt.Result);
         }
 
         string[]? includedUserGroupAliases = null;
@@ -1156,17 +1157,17 @@ internal class UserService : RepositoryService, IUserService
             }
         }
 
-        SortedSet<UserState>? includeUserStates = null;
+        ISet<UserState>? includeUserStates = null;
 
         // The issue is that this is a limiting filter we have to ensure that it still follows our rules
         // So I'm not allowed to ask for the disabled users if the setting has been flipped
-        if (baseFilter.IncludeUserStates is null || baseFilter.IncludeUserStates.IsCollectionEmpty())
+        if (baseFilter.IncludeUserStates is null || baseFilter.IncludeUserStates.Count == 0)
         {
             includeUserStates = filter.IncludeUserStates;
         }
         else
         {
-            includeUserStates = new SortedSet<UserState>(filter.IncludeUserStates!);
+            includeUserStates = new HashSet<UserState>(filter.IncludeUserStates!);
             includeUserStates.IntersectWith(baseFilter.IncludeUserStates);
 
             // This means that we've only chosen to include a user state that is not allowed, so we'll return an empty result
@@ -1221,12 +1222,12 @@ internal class UserService : RepositoryService, IUserService
         // Only admins can see admins
         if (performingUser.IsAdmin() is false)
         {
-            filter.ExcludeUserGroups = new SortedSet<Guid> { Constants.Security.AdminGroupKey };
+            filter.ExcludeUserGroups = new HashSet<Guid> { Constants.Security.AdminGroupKey };
         }
 
         if (_securitySettings.HideDisabledUsersInBackOffice)
         {
-            filter.IncludeUserStates = new SortedSet<UserState> { UserState.Active, UserState.Invited, UserState.LockedOut, UserState.Inactive };
+            filter.IncludeUserStates = new HashSet<UserState> { UserState.Active, UserState.Invited, UserState.LockedOut, UserState.Inactive };
         }
 
         return filter;

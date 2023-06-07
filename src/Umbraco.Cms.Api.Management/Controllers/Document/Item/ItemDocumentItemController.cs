@@ -34,7 +34,7 @@ public class ItemDocumentItemController : DocumentItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item([FromQuery(Name = "id")] SortedSet<Guid> ids, Guid? dataTypeId = null, string? culture = null)
+    public async Task<ActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids, Guid? dataTypeId = null, string? culture = null)
     {
         IEnumerable<IDocumentEntitySlim> documents = _entityService.GetAll(UmbracoObjectTypes.Document, ids.ToArray()).Select(x => x as IDocumentEntitySlim).Where(x => x is not null)!;
 

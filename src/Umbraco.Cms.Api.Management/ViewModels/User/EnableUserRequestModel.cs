@@ -2,5 +2,5 @@
 
 public class EnableUserRequestModel
 {
-    public SortedSet<Guid> UserIds { get; set; } = new();
+    public ISet<Guid> UserIds { get; set; } = new HashSet<Guid>();
 }

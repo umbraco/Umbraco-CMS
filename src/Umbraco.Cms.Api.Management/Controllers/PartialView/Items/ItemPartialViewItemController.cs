@@ -22,7 +22,7 @@ public class ItemPartialViewItemController : PartialViewItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<PartialViewItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "id")] SortedSet<string> paths)
+    public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<string> paths)
     {
         IEnumerable<PartialViewItemResponseModel> responseModels = _fileItemPresentationModelFactory.CreatePartialViewResponseModels(paths, _fileSystem);
         return Ok(responseModels);

@@ -8,5 +8,5 @@ public class UserPresentationBase
 
     public string Name { get; set; } = string.Empty;
 
-    public SortedSet<Guid> UserGroupIds { get; set; } = new();
+    public ISet<Guid> UserGroupIds { get; set; } = new HashSet<Guid>();
 }

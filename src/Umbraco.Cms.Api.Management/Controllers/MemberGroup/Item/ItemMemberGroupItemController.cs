@@ -25,7 +25,7 @@ public class ItemMemberGroupItemController : MemberGroupItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MemberGroupItemReponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "id")] SortedSet<Guid> ids)
+    public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IEnumerable<IEntitySlim> memberGroups = _entityService.GetAll(UmbracoObjectTypes.MemberGroup, ids.ToArray());
         List<MemberGroupItemReponseModel> responseModel = _mapper.MapEnumerable<IEntitySlim, MemberGroupItemReponseModel>(memberGroups);

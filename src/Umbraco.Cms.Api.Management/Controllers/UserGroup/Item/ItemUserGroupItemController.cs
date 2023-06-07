@@ -23,7 +23,7 @@ public class ItemUserGroupItemController : UserGroupItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<UserGroupItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "id")] SortedSet<Guid> ids)
+    public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IEnumerable<IUserGroup> userGroups = await _userGroupService.GetAsync(ids);
         List<UserGroupItemResponseModel> responseModels = _mapper.MapEnumerable<IUserGroup, UserGroupItemResponseModel>(userGroups);
