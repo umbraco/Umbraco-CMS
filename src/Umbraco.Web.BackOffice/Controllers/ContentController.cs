@@ -459,7 +459,7 @@ public class ContentController : ContentControllerBase
     [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
     public ActionResult<ContentItemDisplayWithSchedule?> GetById(int id)
     {
-          IContent? foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
+        IContent? foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
         if (foundContent == null)
         {
             return HandleContentNotFound(id);
