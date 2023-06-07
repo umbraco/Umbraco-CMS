@@ -139,7 +139,7 @@ export class UmbContentTypePropertyStructureHelper {
 	async partialUpdateProperty(propertyKey?: string, partialUpdate?: Partial<DocumentTypePropertyTypeResponseModel>) {
 		await this.#init;
 		if (!this.#structure || !propertyKey || !partialUpdate) return;
-
+		console.log("partial update", propertyKey, partialUpdate);
 		return await this.#structure.updateProperty(null, propertyKey, partialUpdate);
 	}
 }
