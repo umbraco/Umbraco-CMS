@@ -59,6 +59,7 @@ export class UmbDocumentServerDataSource
 		const data: DocumentResponseModel = {
 			urls: [],
 			templateId: null,
+			parentId: null,
 			id: UmbId.new(),
 			contentTypeId: documentTypeId,
 			values: [],

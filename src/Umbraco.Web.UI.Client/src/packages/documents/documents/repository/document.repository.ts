@@ -168,6 +168,9 @@ export class UmbDocumentRepository
 			this.#notificationContext?.peek('positive', notification);
 		}
 
+		const result = await this.requestRootTreeItems();
+		console.log("requested root tree items", result);
+
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
 		this.#store?.append(item);

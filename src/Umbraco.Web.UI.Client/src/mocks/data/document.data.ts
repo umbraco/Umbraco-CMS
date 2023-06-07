@@ -638,6 +638,7 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 	}
 
 	getTreeRoot(): PagedDocumentTreeItemResponseModel {
+		console.log("getTreeRoot", this.treeData)
 		const items = this.treeData.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => item);
 		const total = items.length;

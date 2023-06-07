@@ -18,7 +18,7 @@ export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => 
 		hasChildren: item.hasChildren,
 		id: item.id,
 		isContainer: item.isContainer,
-		parentId: item.parentId,
+		parentId: item.parentId ?? null,
 	};
 };
 
@@ -32,6 +32,7 @@ export const createFolderTreeItem = (item: any): FolderTreeItemResponseModel => 
 
 // TODO: remove isTrashed type extension when we have found a solution to trashed items
 export const createContentTreeItem = (item: any): ContentTreeItemResponseModel & { isTrashed: boolean } => {
+	// TODO: There we have to adapt to variants as part of the tree model:
 	return {
 		...createEntityTreeItem(item),
 		noAccess: item.noAccess,
@@ -45,13 +46,17 @@ export const createDocumentTreeItem = (
 ): DocumentTreeItemResponseModel & { isTrashed: boolean } => {
 	return {
 		...createContentTreeItem(item),
-		/*
-		noAccess: item.noAccess,
-		isProtected: item.isProtected,
-		isPublished: item.isPublished,
-		isEdited: item.isEdited,
-		isTrashed: item.isTrashed,
-		*/
+		$type: "DocumentTreeItemViewModel",
+		type: "document",
+		icon: "document",// TODO: Should get this from document type...
+		name: item.variants?.[0].name ?? '',
+		noAccess: false,
+		isProtected: false,
+		isPublished: false,
+		isEdited: false,
+		isTrashed: false,
+		hasChildren: false,
+		isContainer: false,
 	};
 };
 

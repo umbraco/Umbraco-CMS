@@ -42,7 +42,7 @@ export class UmbTreeElement extends UmbLitElement {
 		this.#treeContext.setMultiple(newVal);
 	}
 
-	// TODO: what is the best name for this functionatliy?
+	// TODO: what is the best name for this functionality?
 	private _hideTreeRoot = false;
 	@property({ type: Boolean, attribute: 'hide-tree-root' })
 	get hideTreeRoot() {
@@ -96,8 +96,10 @@ export class UmbTreeElement extends UmbLitElement {
 
 		if (asObservable) {
 			this.#rootItemsObserver = this.observe(asObservable(), (rootItems) => {
+				console.log("#rootItemsObserver", rootItems)
+				const oldValue = this._items;
 				this._items = rootItems;
-				this.requestUpdate();
+				this.requestUpdate('_items', oldValue);
 			});
 		}
 	}
