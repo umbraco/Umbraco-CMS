@@ -15,6 +15,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	UmbPropertySettingsModalResult
 > {
 	//TODO: Should these options come from the server?
+	// TODO: Or should they come from a extension point?
 	@state() private _customValidationOptions = [
 		{
 			name: 'No validation',
