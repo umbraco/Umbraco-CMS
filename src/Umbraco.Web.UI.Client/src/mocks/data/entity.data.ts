@@ -38,7 +38,7 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 
 		this.data.push(item);
 
-		return '/header/location/id/'+item.id;
+		return item;
 	}
 
 	save(saveItem: T) {

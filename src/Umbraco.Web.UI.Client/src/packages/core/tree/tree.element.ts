@@ -116,7 +116,8 @@ export class UmbTreeElement extends UmbLitElement {
 		return html`
 			${repeat(
 				this._items,
-				(item, index) => index,
+				// TODO: use unique here:
+				(item, index) => item.name + '___' + index,
 				(item) => html`<umb-tree-item .item=${item}></umb-tree-item>`
 			)}
 		`;

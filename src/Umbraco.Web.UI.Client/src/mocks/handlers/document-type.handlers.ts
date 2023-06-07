@@ -9,9 +9,12 @@ export const handlers = [
 		const data = await req.json();
 		if (!data) return;
 
+		// TODO: This is something that is missing in the Full model, but which we need to for the tree model. This should be fixed in the Full model.
+		data.parentId ??= null;
+
 		const created = umbDocumentTypeData.insert(data);
 
-		return res(ctx.status(200), ctx.set({'location': created}));
+		return res(ctx.status(200), ctx.set({'location': '/header/location/id/'+created.id}));
 	}),
 
 	rest.put(umbracoPath(`/document-type/:id`), async (req, res, ctx) => {
