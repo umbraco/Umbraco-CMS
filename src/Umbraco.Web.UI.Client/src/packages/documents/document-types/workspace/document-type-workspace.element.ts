@@ -16,7 +16,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 			component: import('./document-type-workspace-editor.element.js'),
 			setup: (_component, info) => {
 				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
-				this.#workspaceContext.createScaffold(parentId);
+				this.#workspaceContext.create(parentId);
 
 				// Navigate to edit route when language is created:
 				this.observe(

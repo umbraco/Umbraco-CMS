@@ -8,7 +8,7 @@ export interface UmbDetailRepository<
 	UpdateRequestType = any,
 	ResponseType = any
 > {
-	createScaffold(parentId: string | null): Promise<DataSourceResponse<CreateRequestType>>;
+	createScaffold(parentId: string | null, preset?: Partial<CreateRequestType>): Promise<DataSourceResponse<CreateRequestType>>;
 	requestById(id: string): Promise<DataSourceResponse<ResponseType | undefined>>;
 	byId(id: string): Promise<Observable<ResponseType | undefined>>;
 	create(data: CreateRequestType): Promise<DataSourceResponse<CreateResponseType>>;

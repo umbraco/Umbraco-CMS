@@ -123,10 +123,10 @@ export class UmbDocumentRepository
 
 	// DETAILS:
 
-	async createScaffold(documentTypeKey: string) {
+	async createScaffold(documentTypeKey: string, preset?: Partial<CreateDocumentRequestModel>) {
 		if (!documentTypeKey) throw new Error('Document type id is missing');
 		await this.#init;
-		return this.#detailDataSource.createScaffold(documentTypeKey);
+		return this.#detailDataSource.createScaffold(documentTypeKey, preset);
 	}
 
 	async requestById(id: string) {
