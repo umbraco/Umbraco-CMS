@@ -27,7 +27,7 @@ export class UmbDataTypeWorkspaceContext
 		}
 	}
 
-	async createScaffold(parentId: string | null) {
+	async create(parentId: string | null) {
 		let { data } = await this.repository.createScaffold(parentId);
 		if (this.modalContext) {
 			data = { ...data, ...this.modalContext.data.preset };
