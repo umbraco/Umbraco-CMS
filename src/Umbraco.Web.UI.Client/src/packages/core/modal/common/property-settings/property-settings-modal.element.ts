@@ -81,10 +81,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		const isValid = form.checkValidity();
 		if (!isValid) return;
 
-		const formData = new FormData(form);
-
-		this._returnData.validation!.mandatoryMessage = formData.get('mandatory-message')?.toString() || '';
-
 		this.modalContext?.submit(this._returnData);
 	}
 
