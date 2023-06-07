@@ -11,10 +11,10 @@ import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { ManifestModal, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextProvider, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.
@@ -41,15 +41,17 @@ type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
 	  };
 
 // TODO: consider splitting this into two separate handlers
-export class UmbModalContextClass<ModalData extends object = object, ModalResult = unknown> {
+export class UmbModalContextClass<ModalData extends object = object, ModalResult = unknown> implements UmbControllerInterface {
 	#host: UmbControllerHostElement;
 
 	#submitPromise: Promise<ModalResult>;
 	#submitResolver?: (value: ModalResult) => void;
 	#submitRejecter?: () => void;
 
+	private _modalExtensionObserver?: UmbObserverController<ManifestModal | undefined>;
 	public readonly modalElement: UUIModalDialogElement | UUIModalSidebarElement;
 	#modalRouterElement: UmbRouterSlotElement = document.createElement('umb-router-slot');
+	#modalContextProvider;
 
 	#innerElement = new BehaviorSubject<HTMLElement | undefined>(undefined);
 	public readonly innerElement = this.#innerElement.asObservable();
@@ -58,6 +60,10 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	public readonly data: ModalData;
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
+
+	public get unique() {
+		return 'umbModalContext:'+this.key;
+	}
 
 	constructor(
 		host: UmbControllerHostElement,
@@ -108,12 +114,23 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 		this.modalElement.appendChild(this.#modalRouterElement);
 		this.#observeModal(modalAlias.toString());
 
-		// Note, We are doing the Typing dance here because of the way we are correcting the submit method attribute type.
-		new UmbContextProviderController(
-			host,
+		// Not using a controller, cause we want to use the modal as the provider, this is a UUI element. So its a bit of costume implementation:
+		this.#modalContextProvider = new UmbContextProvider(
+			this.modalElement,
 			UMB_MODAL_CONTEXT_TOKEN,
+
+		// Note, We are doing the Typing dance here because of the way we are correcting the submit method attribute type.
 			this as unknown as UmbModalContext<ModalData, ModalResult>
 		);
+
+		this.#host.addController(this);
+	}
+
+	hostConnected(): void {
+		this.#modalContextProvider.hostConnected();
+	}
+	hostDisconnected(): void {
+		this.#modalContextProvider.hostDisconnected();
 	}
 
 	#createContainerElement() {
@@ -139,7 +156,8 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	 If we find a better generic solution to communicate between the modal and the implementor, then we can remove the element as part of the modalContext. */
 	#observeModal(modalAlias: string) {
 		if (this.#host) {
-			new UmbObserverController(
+			this._modalExtensionObserver?.destroy();
+			this._modalExtensionObserver = new UmbObserverController(
 				this.#host,
 				umbExtensionsRegistry.getByTypeAndAlias('modal', modalAlias),
 				async (manifest) => {
@@ -150,8 +168,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 							this.#appendInnerElement(innerElement);
 						}
 					}
-				},
-				'_observeModalExtension'
+				}
 			);
 		}
 	}
@@ -209,6 +226,14 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	 */
 	public onSubmit(): Promise<ModalResult> {
 		return this.#submitPromise;
+	}
+
+
+
+	destroy(): void {
+		this.#innerElement.complete();
+		this._modalExtensionObserver?.destroy();
+		this._modalExtensionObserver = undefined;
 	}
 }
 
