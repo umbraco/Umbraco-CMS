@@ -18,7 +18,7 @@ export class UmbUserCollectionElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-body-layout header-clear header-shadow>
+			<umb-body-layout header-transparent>
 				<umb-user-group-collection-header slot="header"></umb-user-group-collection-header>
 				<umb-user-group-collection-view></umb-user-group-collection-view>
 				<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>

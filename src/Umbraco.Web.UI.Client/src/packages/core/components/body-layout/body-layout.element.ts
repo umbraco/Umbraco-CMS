@@ -10,7 +10,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 
-//TODO: Add the following attributes to JSDocs: header-shadow, header-clear, no-padding
+//TODO: Add the following attributes to JSDocs: header-transparent, no-padding
 
 /**
  * @element umb-body-layout
@@ -33,8 +33,8 @@ export class UmbBodyLayoutElement extends LitElement {
 	@property()
 	public headline = '';
 
-	@property({ type: Boolean, reflect: true, attribute: 'header-shadow' })
-	public headerShadow = false;
+	@property({ type: Boolean, reflect: true, attribute: 'header-transparent' })
+	public headerTransparent = false;
 
 	@state()
 	private _headerSlotHasChildren = false;
@@ -60,7 +60,7 @@ export class UmbBodyLayoutElement extends LitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		if (this.headerShadow) {
+		if (this.headerTransparent) {
 			requestAnimationFrame(() => {
 				this._scrollContainer?.addEventListener('scroll', this.#onScroll);
 			});
@@ -162,22 +162,19 @@ export class UmbBodyLayoutElement extends LitElement {
 				z-index: 1;
 			}
 
-			:host([header-shadow]) #header {
+			:host([header-transparent]) #header {
+				background-color: transparent;
+				border-color: transparent;
 				transition: box-shadow 150ms ease-in-out;
 				box-shadow: 0 -1px 0px 0px rgba(0, 0, 0, 0.8);
 			}
-
-			:host([header-clear]) #header {
-				background-color: transparent;
-				border-color: transparent;
-			}
-			:host([header-clear]:not([no-padding])) #main:not(*[style='display: none'] + *) {
+			:host([header-transparent]:not([no-padding])) #main:not(*[style='display: none'] + *) {
 				/* The following styling is only applied if the clear-header IS present, 
 				the no-padding attribute is NOT present, and the header is NOT hidden */
 				padding-top: var(--uui-size-space-1);
 			}
 
-			:host([header-shadow][scrolling]) #header {
+			:host([header-transparent][scrolling]) #header {
 				/* This should be using the uui-shadows but for now they are too drastic for this use case */
 				box-shadow: 0 1px 15px 0 rgba(0, 0, 0, 0.3);
 			}
