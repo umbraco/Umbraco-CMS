@@ -115,6 +115,7 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	async create(parentId: string | null) {
+
 		const { data } = await this.structure.createScaffold(parentId);
 		if (!data) return undefined;
 

@@ -46,9 +46,18 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 
 	#observeDocumentType() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.name, (name) => (this._name = name));
-		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias));
-		this.observe(this.#workspaceContext.icon, (icon) => (this._icon = icon));
+		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeName');
+		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias), '_observeAlias');
+		this.observe(this.#workspaceContext.icon, (icon) => (this._icon = icon), '_observeIcon');
+
+		this.observe(this.#workspaceContext.isNew, (isNew) => {
+			if(isNew) {
+				// TODO: Would be good with a more general way to bring focus to the name input.
+				(this.shadowRoot?.querySelector('#name') as HTMLElement)?.focus();
+			}
+			this.removeControllerByUnique('_observeIsNew');
+		}, '_observeIsNew');
+
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
