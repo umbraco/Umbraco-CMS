@@ -57,8 +57,6 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 	#currentFilterQuery = '';
 
-	//UMB_DATA_TYPE_PICKER_FLOW_UI_PICKER_MODAL;
-
 	constructor() {
 		super();
 		this.#repository = new UmbDataTypeRepository(this);
