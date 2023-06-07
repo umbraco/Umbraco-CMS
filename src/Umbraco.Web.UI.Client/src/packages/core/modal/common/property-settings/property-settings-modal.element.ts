@@ -332,26 +332,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 				font-size: 0.8rem;
 				line-height: 1;
 			}
-			.appearance.selected .appearance-label {
-				font-weight: bold;
-			}
-			.appearance:not(.selected):hover {
-				border-color: var(--uui-color-border-emphasis);
-				cursor: pointer;
-				opacity: 1;
-			}
-			.appearance.selected {
-				border-color: var(--uui-color-selected);
-				opacity: 1;
-			}
-			.appearance.selected::after {
-				content: '';
-				position: absolute;
-				inset: 0;
-				border-radius: 6px;
-				opacity: 0.1;
-				background-color: var(--uui-color-selected);
-			}
 			.appearance.left {
 				flex-grow: 1;
 			}
@@ -362,6 +342,30 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 				display: flex;
 				width: 100%;
 				color: var(--uui-color-text);
+			}
+			.appearance.selected .appearance-label {
+				font-weight: bold;
+			}
+			.appearance:not(.selected):hover {
+				border-color: var(--uui-color-border-emphasis);
+				cursor: pointer;
+				opacity: 1;
+			}
+			.appearance.selected {
+				border-color: var(--uui-color-selected);
+				color: var(--uui-color-selected);
+				opacity: 1;
+			}
+			.appearance.selected svg {
+				color: var(--uui-color-selected);
+			}
+			.appearance.selected::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				border-radius: 6px;
+				opacity: 0.1;
+				background-color: var(--uui-color-selected);
 			}
 			hr {
 				border: none;
