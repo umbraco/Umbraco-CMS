@@ -8,14 +8,13 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbDocumentTypeWorkspaceContext(this);
-	#element = new UmbDocumentTypeWorkspaceEditorElement();
 	#routerPath? = '';
 
 	@state()
 	_routes: UmbRoute[] = [
 		{
 			path: 'create/:parentId',
-			component: () => this.#element,
+			component: import('./document-type-workspace-editor.element.js'),
 			setup: (_component, info) => {
 				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
 				this.#workspaceContext.createScaffold(parentId);
@@ -40,7 +39,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 		},
 		{
 			path: 'edit/:id',
-			component: () => this.#element,
+			component: import('./document-type-workspace-editor.element.js'),
 			setup: (_component, info) => {
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);
