@@ -175,6 +175,8 @@ export class UmbDocumentTypeRepository
 
 		if (!error && data) {
 
+			// TODO: The parts here is a hack, when we can trust the IDs we send, then this should be removed/changed:
+
 			const splitResultUrl = data.split("/");
 			const newId = splitResultUrl[splitResultUrl.length - 1];
 
