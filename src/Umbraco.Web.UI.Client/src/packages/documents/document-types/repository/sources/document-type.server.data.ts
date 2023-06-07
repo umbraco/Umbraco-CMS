@@ -55,7 +55,7 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocu
 			id: UmbId.new(),
 			//parentId: parentId,
 			name: '',
-			alias: 'new-document-type',
+			alias: '',
 			description: '',
 			icon: 'umb:document',
 			allowedAsRoot: false,
@@ -96,6 +96,14 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocu
 		// TODO: Hack to remove some props that ruins the document-type post end-point.
 		(documentType as any).$type = undefined;
 		(documentType as any).id = undefined;
+
+		// TODO: Investigate if this matters (should go away anyway when we have the end-point accepts us defining the ids.)
+		documentType.properties = documentType.properties?.map((prop) => {
+			return {
+				...prop,
+				id: undefined,
+			}
+		});
 
 		return tryExecuteAndNotify(
 			this.#host,
