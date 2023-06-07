@@ -128,7 +128,7 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 		}
 	}
 
-	async createScaffold(parentId: string | null = null) {
+	async create(parentId: string | null = null) {
 		const { data } = await this.repository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);

@@ -6,7 +6,7 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type {
 	DataTypeResponseModel,
 	DataTypePropertyPresentationModel,
-	PropertyTypeResponseModelBaseModel,
+	PropertyTypeModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -15,10 +15,10 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
-	public get property(): PropertyTypeResponseModelBaseModel | undefined {
+	public get property(): PropertyTypeModelBaseModel | undefined {
 		return this._property;
 	}
-	public set property(value: PropertyTypeResponseModelBaseModel | undefined) {
+	public set property(value: PropertyTypeModelBaseModel | undefined) {
 		const oldProperty = this._property;
 		this._property = value;
 		if (this._property?.dataTypeId !== oldProperty?.dataTypeId) {
@@ -26,7 +26,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			this._observeProperty();
 		}
 	}
-	private _property?: PropertyTypeResponseModelBaseModel;
+	private _property?: PropertyTypeModelBaseModel;
 
 	@state()
 	private _propertyEditorUiAlias?: string;

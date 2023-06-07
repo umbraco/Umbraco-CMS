@@ -53,7 +53,7 @@ export class UmbMediaWorkspaceContext
 		}
 	}
 
-	async createScaffold(parentId: string | null) {
+	async create(parentId: string | null) {
 		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);

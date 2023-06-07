@@ -13,10 +13,9 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
-type ItemType = DocumentResponseModel;
-
 export class UmbDocumentRepository
-	implements UmbTreeRepository<DocumentTreeItemResponseModel>, UmbDetailRepository<ItemType>
+	implements UmbTreeRepository<DocumentTreeItemResponseModel>,
+	UmbDetailRepository<CreateDocumentRequestModel, any, UpdateDocumentRequestModel, DocumentResponseModel>
 {
 	#init!: Promise<unknown>;
 
@@ -124,10 +123,10 @@ export class UmbDocumentRepository
 
 	// DETAILS:
 
-	async createScaffold(documentTypeKey: string) {
+	async createScaffold(documentTypeKey: string, preset?: Partial<CreateDocumentRequestModel>) {
 		if (!documentTypeKey) throw new Error('Document type id is missing');
 		await this.#init;
-		return this.#detailDataSource.createScaffold(documentTypeKey);
+		return this.#detailDataSource.createScaffold(documentTypeKey, preset);
 	}
 
 	async requestById(id: string) {

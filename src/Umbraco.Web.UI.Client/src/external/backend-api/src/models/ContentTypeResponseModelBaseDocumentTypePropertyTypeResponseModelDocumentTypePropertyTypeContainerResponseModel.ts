@@ -8,7 +8,6 @@ import type { DocumentTypePropertyTypeContainerResponseModel } from './DocumentT
 import type { DocumentTypePropertyTypeResponseModel } from './DocumentTypePropertyTypeResponseModel';
 
 export type ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel = {
-    id?: string;
     alias?: string;
     name?: string;
     description?: string | null;
@@ -21,5 +20,6 @@ export type ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDoc
     containers?: Array<DocumentTypePropertyTypeContainerResponseModel>;
     allowedContentTypes?: Array<ContentTypeSortModel>;
     compositions?: Array<ContentTypeCompositionModel>;
+    id?: string;
 };
 

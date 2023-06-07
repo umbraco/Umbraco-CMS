@@ -23,7 +23,7 @@ export class UmbUserGroupWorkspaceContext
 		this.#userRepository = new UmbUserRepository(host);
 	}
 
-	async createScaffold() {
+	async create() {
 		const { data } = await this.repository.createScaffold(null);
 		this.setIsNew(true);
 		// TODO: Should the data be the base model or the presentation model?

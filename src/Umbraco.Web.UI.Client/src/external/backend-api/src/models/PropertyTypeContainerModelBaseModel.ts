@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type PropertyTypeContainerResponseModelBaseModel = {
+export type PropertyTypeContainerModelBaseModel = {
     id?: string;
     parentId?: string | null;
     name?: string | null;

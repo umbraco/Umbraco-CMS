@@ -22,7 +22,7 @@ export class UmbPartialViewsWorkspaceElement extends UmbLitElement {
 			component: () => this.#element,
 			setup: async (component: PageComponent, info: IRoutingInfo) => {
 				const parentKey = info.match.params.parentKey;
-				this.#partialViewsWorkspaceContext.createScaffold(parentKey);
+				this.#partialViewsWorkspaceContext.create(parentKey);
 			},
 		},
 		{

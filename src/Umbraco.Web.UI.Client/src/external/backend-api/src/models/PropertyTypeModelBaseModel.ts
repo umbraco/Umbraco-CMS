@@ -5,7 +5,7 @@
 import type { PropertyTypeAppearanceModel } from './PropertyTypeAppearanceModel';
 import type { PropertyTypeValidationModel } from './PropertyTypeValidationModel';
 
-export type PropertyTypeResponseModelBaseModel = {
+export type PropertyTypeModelBaseModel = {
     id?: string;
     containerId?: string | null;
     sortOrder?: number;
