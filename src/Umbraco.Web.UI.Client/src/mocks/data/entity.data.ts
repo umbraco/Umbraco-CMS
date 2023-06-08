@@ -46,7 +46,7 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 	save(id: string, saveItem: T) {
 
 		// We need the ID in our data:
-		saveItem = {...saveItem, id: id}
+		saveItem = {...saveItem, id: id};
 
 		const foundIndex = this.data.findIndex((item) => item.id === id);
 		if (foundIndex !== -1) {
