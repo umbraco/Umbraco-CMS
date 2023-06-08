@@ -45,12 +45,14 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 
 	save(id: string, saveItem: T) {
 
+		// We need the ID in our data:
+		saveItem = {...saveItem, id: id}
 
 		const foundIndex = this.data.findIndex((item) => item.id === id);
 		if (foundIndex !== -1) {
 			// update
 			this.data[foundIndex] = saveItem;
-			//this.updateData(saveItem);// This does not seem to do anything...
+			//this.updateData(id, saveItem);// This does not seem to do anything...
 		} else {
 			// new
 			this.data.push(saveItem);
@@ -71,7 +73,7 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			item.isTrashed = true;
-			this.updateData(item);
+			this.updateData(id, item);
 			trashedItems.push(item);
 		});
 
@@ -94,8 +96,8 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 		return deletedKeys;
 	}
 
-	updateData(updateItem: T) {
-		const itemIndex = this.data.findIndex((item) => item.id === updateItem.id);
+	updateData(id: string, updateItem: T) {
+		const itemIndex = this.data.findIndex((item) => item.id === id);
 		const item = this.data[itemIndex];
 		if (!item) return;
 
