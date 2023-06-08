@@ -70,13 +70,9 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 			#header {
 				display: flex;
 				width: 100%;
-				padding: var(--uui-size-layout-1);
 			}
 			#main:not(:first-child) {
 				padding-top: var(--uui-size-1);
-			}
-			umb-body-layout {
-				--umb-header-layout-height: fit-content;
 			}
 			a {
 				color: var(--uui-color-text);
