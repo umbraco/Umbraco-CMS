@@ -86,11 +86,11 @@ public class SqlServerDatabaseProviderMetadata : IDatabaseProviderMetadata
     {
         if (databaseModel.IntegratedAuth)
         {
-            connectionString += "Integrated Security=true;";
+            connectionString += "Integrated Security=true";
         }
         else
         {
-            connectionString += $"User Id={databaseModel.Login};Password={databaseModel.Password};";
+            connectionString += $"User Id={databaseModel.Login};Password={databaseModel.Password}";
         }
 
         return connectionString;
@@ -100,7 +100,7 @@ public class SqlServerDatabaseProviderMetadata : IDatabaseProviderMetadata
     {
         if (databaseModel.TrustServerCertificate)
         {
-            connectionString += "TrustServerCertificate=true;";
+            connectionString += ";TrustServerCertificate=true;";
         }
 
         return connectionString;
