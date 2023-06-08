@@ -4,13 +4,13 @@ namespace Umbraco.Cms.Core.Models.Membership;
 
 public class UserFilter
 {
-    public SortedSet<Guid>? IncludedUserGroups { get; set; }
+    public ISet<Guid>? IncludedUserGroups { get; set; }
 
-    public SortedSet<Guid>? ExcludeUserGroups { get; set; }
+    public ISet<Guid>? ExcludeUserGroups { get; set; }
 
-    public SortedSet<UserState>? IncludeUserStates { get; set; }
+    public ISet<UserState>? IncludeUserStates { get; set; }
 
-    public SortedSet<string>? NameFilters { get; set; }
+    public ISet<string>? NameFilters { get; set; }
 
 
     /// <summary>
@@ -27,9 +27,9 @@ public class UserFilter
             NameFilters = MergeSet(NameFilters, target.NameFilters)
         };
 
-    private SortedSet<T>? MergeSet<T>(SortedSet<T>? source, SortedSet<T>? target)
+    private ISet<T>? MergeSet<T>(ISet<T>? source, ISet<T>? target)
     {
-        var set = new SortedSet<T>();
+        var set = new HashSet<T>();
 
         if (source is not null)
         {

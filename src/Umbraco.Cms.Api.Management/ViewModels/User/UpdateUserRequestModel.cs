@@ -4,7 +4,7 @@ public class UpdateUserRequestModel : UserPresentationBase
 {
     public string LanguageIsoCode { get; set; } = string.Empty;
 
-    public SortedSet<Guid> ContentStartNodeIds { get; set; } = new();
+    public ISet<Guid> ContentStartNodeIds { get; set; } = new HashSet<Guid>();
 
-    public SortedSet<Guid> MediaStartNodeIds { get; set; } = new();
+    public ISet<Guid> MediaStartNodeIds { get; set; } = new HashSet<Guid>();
 }

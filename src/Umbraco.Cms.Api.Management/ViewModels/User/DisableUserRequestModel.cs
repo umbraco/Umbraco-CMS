@@ -2,5 +2,5 @@
 
 public class DisableUserRequestModel
 {
-    public SortedSet<Guid> UserIds { get; set; } = new();
+    public HashSet<Guid> UserIds { get; set; } = new();
  }

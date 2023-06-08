@@ -23,7 +23,7 @@ public class ItemsLanguageEntityController : LanguageEntityControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<LanguageItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Items([FromQuery(Name = "isoCode")] SortedSet<string> isoCodes)
+    public async Task<ActionResult> Items([FromQuery(Name = "isoCode")] HashSet<string> isoCodes)
     {
         IEnumerable<ILanguage> languages = await _languageService.GetMultipleAsync(isoCodes);
         List<LanguageItemResponseModel> entityResponseModels = _mapper.MapEnumerable<ILanguage, LanguageItemResponseModel>(languages);

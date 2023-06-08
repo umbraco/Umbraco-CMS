@@ -23,7 +23,7 @@ public class ItemStylesheetItemController : StylesheetItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<ScriptItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "path")] SortedSet<string> paths)
+    public async Task<IActionResult> Item([FromQuery(Name = "path")] HashSet<string> paths)
     {
         IEnumerable<StylesheetItemResponseModel> responseModels = _fileItemPresentationModelFactory.CreateStylesheetItemResponseModels(paths, _fileSystem);
         return Ok(responseModels);
