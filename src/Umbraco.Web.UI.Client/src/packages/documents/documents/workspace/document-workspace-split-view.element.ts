@@ -16,24 +16,10 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		console.log('##SPLIT VIEW');
-
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context as UmbDocumentWorkspaceContext;
 			this._observeActiveVariantInfo();
 		});
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-
-		console.log('##SPLIT VIEW CONNECTED');
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-
-		console.log('##SPLIT VIEW DISCONNECTED!');
 	}
 
 	private _observeActiveVariantInfo() {
