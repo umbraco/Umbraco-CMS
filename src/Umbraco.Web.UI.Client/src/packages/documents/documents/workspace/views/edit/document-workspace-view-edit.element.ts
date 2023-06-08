@@ -1,4 +1,5 @@
 import { UmbDocumentWorkspaceContext } from '../../document-workspace.context.js';
+import type { UmbDocumentWorkspaceViewEditTabElement } from './document-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
@@ -12,7 +13,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
-import UmbDocumentWorkspaceViewEditTabElement from './document-workspace-view-edit-tab.element.js';
 
 @customElement('umb-document-workspace-view-edit')
 export class UmbDocumentWorkspaceViewEditElement
