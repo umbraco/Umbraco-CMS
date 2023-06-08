@@ -76,7 +76,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async create(documentTypeKey: string, parentId: string | null) {
-		const { data } = await this.repository.createScaffold(documentTypeKey, {parentId});
+		const { data } = await this.repository.createScaffold(documentTypeKey, { parentId });
 		if (!data) return undefined;
 
 		this.setIsNew(true);
@@ -101,6 +101,10 @@ export class UmbDocumentWorkspaceContext
 
 	getEntityType() {
 		return 'document';
+	}
+
+	getContentTypeId() {
+		return this.getData().contentTypeId;
 	}
 
 	getVariant(variantId: UmbVariantId) {
@@ -174,12 +178,14 @@ export class UmbDocumentWorkspaceContext
 		if (this.getIsNew()) {
 			// TODO: typescript hack until we get the create type
 			const value = this.#draft.value as CreateDocumentRequestModel & { id: string };
-			await this.repository.create(value);
+			if ((await this.repository.create(value)).data !== undefined) {
+				this.setIsNew(false);
+			}
 		} else {
 			await this.repository.save(this.#draft.value.id, this.#draft.value);
 		}
-		// If it went well, then its not new anymore?.
-		this.setIsNew(false);
+
+		this.saveComplete(this.getData());
 	}
 
 	async delete(id: string) {

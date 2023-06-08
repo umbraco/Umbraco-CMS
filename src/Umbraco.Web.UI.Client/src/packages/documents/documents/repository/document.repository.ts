@@ -14,8 +14,9 @@ import {
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 export class UmbDocumentRepository
-	implements UmbTreeRepository<DocumentTreeItemResponseModel>,
-	UmbDetailRepository<CreateDocumentRequestModel, any, UpdateDocumentRequestModel, DocumentResponseModel>
+	implements
+		UmbTreeRepository<DocumentTreeItemResponseModel>,
+		UmbDetailRepository<CreateDocumentRequestModel, any, UpdateDocumentRequestModel, DocumentResponseModel>
 {
 	#init!: Promise<unknown>;
 
@@ -174,8 +175,9 @@ export class UmbDocumentRepository
 
 			const notification = { data: { message: `Document created` } };
 			this.#notificationContext?.peek('positive', notification);
-		}
 
+			return { data: item };
+		}
 
 		return { error };
 	}

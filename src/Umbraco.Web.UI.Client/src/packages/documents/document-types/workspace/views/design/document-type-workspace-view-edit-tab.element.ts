@@ -96,25 +96,23 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				(group) => group.id ?? '' + group.name,
 				(group) => html`
 					<uui-box>
-						${ this._groupStructureHelper.isOwnerChildContainer(group.id!) ?
-							html`
-								<div slot="header">
-									<uui-input
-										label='Group name'
-										placeholder="Enter a group name"
-										value=${group.name ?? ''}
-										@change=${
-											(e: InputEvent) => {
-												const newName = (e.target as HTMLInputElement).value;
-												this._groupStructureHelper.updateContainerName(group.id!, group.parentId ?? null, newName);
-											}
-										}>
-									</uui-input>
-								</div>
-							`
-							:
-							html`<h5 slot="header">${group.name ?? '(Inherited)'}</h5>`
-					}
+						${
+							this._groupStructureHelper.isOwnerChildContainer(group.id!)
+								? html`
+										<div slot="header">
+											<uui-input
+												label="Group name"
+												placeholder="Enter a group name"
+												value=${group.name ?? ''}
+												@change=${(e: InputEvent) => {
+													const newName = (e.target as HTMLInputElement).value;
+													this._groupStructureHelper.updateContainerName(group.id!, group.parentId ?? null, newName);
+												}}>
+											</uui-input>
+										</div>
+								  `
+								: html`<div slot="header"><b>${group.name ?? ''}</b> (Inherited)</div>`
+						}
 					</div>
 					<umb-document-type-workspace-view-edit-properties
 						container-id=${group.id}
