@@ -82,6 +82,7 @@ export class UmbInstallerLayoutElement extends LitElement {
 			}
 
 			#box {
+				overflow: auto; /*  temp fix. Scrolling should be handled by each slotted element */
 				container: box / inline-size;
 				box-sizing: border-box;
 				width: 100%;
