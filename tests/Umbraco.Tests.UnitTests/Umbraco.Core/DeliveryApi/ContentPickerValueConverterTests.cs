@@ -18,7 +18,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             PublishedSnapshotAccessor,
             new ApiContentBuilder(
                 nameProvider ?? new ApiContentNameProvider(),
-                new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings(), Mock.Of<IVariationContextAccessor>(), Mock.Of<IPublishedSnapshotAccessor>()),
+                CreateContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings()),
                 CreateOutputExpansionStrategyAccessor()));
 
     [Test]
@@ -34,6 +34,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             publishedPropertyType.Object,
             PropertyCacheLevel.Element,
             new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key),
+            false,
             false) as IApiContent;
 
         Assert.NotNull(result);
@@ -59,6 +60,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             publishedPropertyType.Object,
             PropertyCacheLevel.Element,
             new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key),
+            false,
             false) as IApiContent;
 
         Assert.NotNull(result);
@@ -95,6 +97,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             publishedPropertyType.Object,
             PropertyCacheLevel.Element,
             new GuidUdi(Constants.UdiEntityType.Document, key),
+            false,
             false) as IApiContent;
 
         Assert.NotNull(result);

@@ -88,7 +88,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
             ? typeof(IRichTextElement)
             : typeof(RichTextModel);
 
-    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
         var sourceString = inter?.ToString();
         if (sourceString.IsNullOrWhiteSpace())

@@ -301,7 +301,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public object? ConvertInterToDeliveryApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        public object? ConvertInterToDeliveryApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
         {
             if (!_initialized)
             {
@@ -311,7 +311,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             // use the converter if any, else just return the inter value
             return _converter != null
                 ? _converter is IDeliveryApiPropertyValueConverter deliveryApiPropertyValueConverter
-                    ? deliveryApiPropertyValueConverter.ConvertIntermediateToDeliveryApiObject(owner, this, referenceCacheLevel, inter, preview)
+                    ? deliveryApiPropertyValueConverter.ConvertIntermediateToDeliveryApiObject(owner, this, referenceCacheLevel, inter, preview, expanding)
                     : _converter.ConvertIntermediateToObject(owner, this, referenceCacheLevel, inter, preview)
                 : inter;
         }

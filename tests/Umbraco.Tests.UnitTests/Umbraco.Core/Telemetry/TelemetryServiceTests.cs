@@ -1,10 +1,9 @@
-using System.Collections.Generic;
-using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry;
@@ -21,11 +20,11 @@ public class TelemetryServiceTests
         var siteIdentifierServiceMock = new Mock<ISiteIdentifierService>();
         var usageInformationServiceMock = new Mock<IUsageInformationService>();
         var sut = new TelemetryService(
+            Mock.Of<IPackagingService>(),
             version,
             siteIdentifierServiceMock.Object,
             usageInformationServiceMock.Object,
-            Mock.Of<IMetricsConsentService>(),
-            Mock.Of<IPackageManifestService>());
+            Mock.Of<IMetricsConsentService>());
         Guid guid;
 
         await sut.GetTelemetryReportDataAsync();
@@ -37,11 +36,11 @@ public class TelemetryServiceTests
     {
         var version = CreateUmbracoVersion(9, 3, 1);
         var sut = new TelemetryService(
+            Mock.Of<IPackagingService>(),
             version,
             CreateSiteIdentifierService(false),
             Mock.Of<IUsageInformationService>(),
-            Mock.Of<IMetricsConsentService>(),
-            Mock.Of<IPackageManifestService>());
+            Mock.Of<IMetricsConsentService>());
 
         var result = await sut.GetTelemetryReportDataAsync();
         Assert.IsNull(result);
@@ -55,11 +54,11 @@ public class TelemetryServiceTests
         var metricsConsentService = new Mock<IMetricsConsentService>();
         metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Detailed);
         var sut = new TelemetryService(
+            Mock.Of<IPackagingService>(),
             version,
             CreateSiteIdentifierService(),
             Mock.Of<IUsageInformationService>(),
-            metricsConsentService.Object,
-            Mock.Of<IPackageManifestService>());
+            metricsConsentService.Object);
 
         var result = await sut.GetTelemetryReportDataAsync();
 
@@ -71,23 +70,24 @@ public class TelemetryServiceTests
     public async Task CanGatherPackageTelemetry()
     {
         var version = CreateUmbracoVersion(9, 1, 1);
-        var versionPackageName = "VersionPackage";
+        var versionPackageId = "VersionPackageId";
+        var versionPackageName = "VersionPackageName";
         var packageVersion = "1.0.0";
-        var noVersionPackageName = "NoVersionPackage";
-        PackageManifest[] manifests =
+        var noVersionPackageName = "NoVersionPackageName";
+        InstalledPackage[] installedPackages =
         {
-            new() { Name = versionPackageName, Version = packageVersion, Extensions = Array.Empty<object>()},
-            new() { Name = noVersionPackageName, Extensions = Array.Empty<object>() },
+            new() { PackageId = versionPackageId, PackageName = versionPackageName, Version = packageVersion },
+            new() { PackageName = noVersionPackageName },
         };
-        var packageManifestService = CreatePackageManifestService(manifests);
+        var packagingService = CreatePackagingService(installedPackages);
         var metricsConsentService = new Mock<IMetricsConsentService>();
         metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Detailed);
         var sut = new TelemetryService(
+            packagingService,
             version,
             CreateSiteIdentifierService(),
             Mock.Of<IUsageInformationService>(),
-            metricsConsentService.Object,
-            packageManifestService);
+            metricsConsentService.Object);
 
         var result = await sut.GetTelemetryReportDataAsync();
 
@@ -96,12 +96,14 @@ public class TelemetryServiceTests
         {
             Assert.AreEqual(2, result.Packages.Count());
             var versionPackage = result.Packages.FirstOrDefault(x => x.Name == versionPackageName);
+            Assert.AreEqual(versionPackageId, versionPackage.Id);
             Assert.AreEqual(versionPackageName, versionPackage.Name);
             Assert.AreEqual(packageVersion, versionPackage.Version);
 
             var noVersionPackage = result.Packages.FirstOrDefault(x => x.Name == noVersionPackageName);
+            Assert.AreEqual(null, noVersionPackage.Id);
             Assert.AreEqual(noVersionPackageName, noVersionPackage.Name);
-            Assert.AreEqual(string.Empty, noVersionPackage.Version);
+            Assert.AreEqual(null, noVersionPackage.Version);
         });
     }
 
@@ -109,20 +111,20 @@ public class TelemetryServiceTests
     public async Task RespectsAllowPackageTelemetry()
     {
         var version = CreateUmbracoVersion(9, 1, 1);
-        PackageManifest[] manifests =
+        InstalledPackage[] installedPackages =
         {
-            new() { Name = "DoNotTrack", AllowTelemetry = false, Extensions = Array.Empty<object>() },
-            new() { Name = "TrackingAllowed", AllowTelemetry = true, Extensions = Array.Empty<object>() },
+            new() { PackageName = "DoNotTrack", AllowPackageTelemetry = false},
+            new() { PackageName = "TrackingAllowed", AllowPackageTelemetry = true },
         };
-        var packageManifestService = CreatePackageManifestService(manifests);
+        var packagingService = CreatePackagingService(installedPackages);
         var metricsConsentService = new Mock<IMetricsConsentService>();
         metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Detailed);
         var sut = new TelemetryService(
+            packagingService,
             version,
             CreateSiteIdentifierService(),
             Mock.Of<IUsageInformationService>(),
-            metricsConsentService.Object,
-            packageManifestService);
+            metricsConsentService.Object);
 
         var result = await sut.GetTelemetryReportDataAsync();
 
@@ -134,11 +136,11 @@ public class TelemetryServiceTests
         });
     }
 
-    private IPackageManifestService CreatePackageManifestService(IEnumerable<PackageManifest> manifests)
+    private IPackagingService CreatePackagingService(IEnumerable<InstalledPackage> installedPackages)
     {
-        var mock = new Mock<IPackageManifestService>();
-        mock.Setup(x => x.GetPackageManifestsAsync()).Returns(Task.FromResult(manifests));
-        return mock.Object;
+        var packagingServiceMock = new Mock<IPackagingService>();
+        packagingServiceMock.Setup(x => x.GetAllInstalledPackages()).Returns(installedPackages);
+        return packagingServiceMock.Object;
     }
 
     private IUmbracoVersion CreateUmbracoVersion(int major, int minor, int patch, string prerelease = "", string build = "")

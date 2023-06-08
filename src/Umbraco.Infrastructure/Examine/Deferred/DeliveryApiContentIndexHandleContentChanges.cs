@@ -71,56 +71,57 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
     private void Reindex(IContent content, IIndex index)
     {
         // get the currently indexed cultures for the content
-        var existingIndexCultures = index
+        CulturePublishStatus[] existingCultures = index
             .Searcher
             .CreateQuery()
             .Field(UmbracoExamineFieldNames.DeliveryApiContentIndex.Id, content.Id.ToString())
-            .SelectField(UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture)
+            .SelectFields(new HashSet<string>
+            {
+                UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture,
+                UmbracoExamineFieldNames.DeliveryApiContentIndex.Published
+            })
             .Execute()
-            .SelectMany(f => f.GetValues(UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture))
+            .Select(f => new CulturePublishStatus
+            {
+                Culture = f.GetValues(UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture).Single(),
+                Published = f.GetValues(UmbracoExamineFieldNames.DeliveryApiContentIndex.Published).Single()
+            })
             .ToArray();
 
         // index the content
-        var indexedCultures = UpdateIndex(content, index);
+        CulturePublishStatus[] indexedCultures = UpdateIndex(content, index);
         if (indexedCultures.Any() is false)
         {
-            // we likely got here because unpublishing triggered a "refresh branch" notification, now we
+            // we likely got here because a removal triggered a "refresh branch" notification, now we
             // need to delete every last culture of this content and all descendants
             RemoveFromIndex(content.Id, index);
             return;
         }
 
-        // if any of the content cultures did not exist in the index before, nor will any of its published descendants
-        // in those cultures be at this point, so make sure those are added as well
-        if (indexedCultures.Except(existingIndexCultures).Any())
+        // if the published state changed of any culture, chances are there are similar changes ot the content descendants
+        // that need to be reflected in the index, so we'll reindex all descendants
+        var changedCulturePublishStatus = indexedCultures.Intersect(existingCultures).Count() != existingCultures.Length;
+        if (changedCulturePublishStatus)
         {
             ReindexDescendants(content, index);
         }
-
-        // ensure that any unpublished cultures are removed from the index
-        var unpublishedCultures = existingIndexCultures.Except(indexedCultures).ToArray();
-        if (unpublishedCultures.Any() is false)
-        {
-            return;
-        }
-
-        var idsToDelete = unpublishedCultures
-            .Select(culture => DeliveryApiContentIndexUtilites.IndexId(content, culture)).ToArray();
-        RemoveFromIndex(idsToDelete, index);
     }
 
-    private string[] UpdateIndex(IContent content, IIndex index)
+    private CulturePublishStatus[] UpdateIndex(IContent content, IIndex index)
     {
         ValueSet[] valueSets = _deliveryApiContentIndexValueSetBuilder.GetValueSets(content).ToArray();
         if (valueSets.Any() is false)
         {
-            return Array.Empty<string>();
+            return Array.Empty<CulturePublishStatus>();
         }
 
         index.IndexItems(valueSets);
         return valueSets
-            .SelectMany(v => v.GetValues("culture").Select(c => c.ToString()))
-            .WhereNotNull()
+            .Select(v => new CulturePublishStatus
+            {
+                Culture = v.GetValue(UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture).ToString()!,
+                Published = v.GetValue(UmbracoExamineFieldNames.DeliveryApiContentIndex.Published).ToString()!
+            })
             .ToArray();
     }
 
@@ -134,4 +135,48 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
                     UpdateIndex(descendant, index);
                 }
             });
+
+    private class CulturePublishStatus : IEquatable<CulturePublishStatus>
+    {
+        public required string Culture { get; set; }
+
+        public required string Published { get; set; }
+
+        public bool Equals(CulturePublishStatus? other)
+        {
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return Culture == other.Culture && Published == other.Published;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType())
+            {
+                return false;
+            }
+
+            return Equals((CulturePublishStatus)obj);
+        }
+
+        public override int GetHashCode() => HashCode.Combine(Culture, Published);
+    }
 }
