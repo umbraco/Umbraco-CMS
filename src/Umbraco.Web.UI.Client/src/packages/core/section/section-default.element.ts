@@ -19,8 +19,19 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-section-default')
 export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectionExtensionElement {
+
 	@property()
-	public manifest?: ManifestSection;
+	private _manifest?: ManifestSection | undefined;
+	public get manifest(): ManifestSection | undefined {
+		return this._manifest;
+	}
+	public set manifest(value: ManifestSection | undefined) {
+		const oldValue = this._manifest;
+		if(oldValue === value) return;
+		this._manifest = value;
+		this.#observeSectionSidebarApps();
+		this.requestUpdate('manifest', oldValue);
+	}
 
 	@state()
 	private _routes?: Array<UmbRoute>;
@@ -31,7 +42,6 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	constructor() {
 		super();
 		this.#createRoutes();
-		this.#observeSectionSidebarApps();
 	}
 
 	#createRoutes() {
@@ -60,11 +70,13 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 				.extensionsOfType('sectionSidebarApp')
 				.pipe(
 					map((manifests) =>
-						manifests.filter((manifest) => manifest.conditions.sections.includes(this.manifest?.alias ?? ''))
+						manifests.filter((manifest) => manifest.conditions.sections.includes(this._manifest?.alias ?? ''))
 					)
 				),
 			(manifests) => {
+				const oldValue = this._menus;
 				this._menus = manifests;
+				this.requestUpdate('_menu', oldValue);
 			}
 		);
 	}
