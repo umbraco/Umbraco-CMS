@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
 	css,
-	nothing,
 	repeat,
 	TemplateResult,
 	customElement,
@@ -49,8 +48,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	public defaultElement = '';
 
 	@property()
-	public renderMethod: (extension: InitializedExtension) => TemplateResult<1 | 2> | HTMLElement | null = (extension) =>
-		extension.component;
+	public renderMethod?: (extension: InitializedExtension) => TemplateResult<1 | 2> | HTMLElement | null;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -61,12 +59,16 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry?.extensionsOfType(this.type).pipe(map((extensions) => extensions.filter(this.filter))),
 			async (extensions) => {
+
+				const oldValue = this._extensions;
 				const oldLength = this._extensions.length;
 				this._extensions = this._extensions.filter((current) =>
 					extensions.find((incoming) => incoming.alias === current.alias)
 				);
+
 				if (this._extensions.length !== oldLength) {
-					this.requestUpdate('_extensions');
+
+					this.requestUpdate('_extensions', oldValue);
 				}
 
 				extensions.forEach(async (extension) => {
@@ -78,6 +80,8 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 							component: null,
 						};
 						this._extensions.push(extensionObject);
+						// sort:
+						this._extensions.sort((a, b) => b.weight - a.weight);
 						let component;
 
 						if (isManifestElementableType(extension)) {
@@ -88,19 +92,17 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 							// TODO: Lets make an console.error in this case?
 						}
 						if (component) {
+
 							this.#assignProps(component);
 							(component as any).manifest = extension;
 							extensionObject.component = component;
 
-							// sort:
-							// TODO: Make sure its right to have highest last?
-							this._extensions.sort((a, b) => b.weight - a.weight);
 						} else {
 							// Remove cause we could not get the component, so we will get rid of this.
 							//this._extensions.splice(this._extensions.indexOf(extensionObject), 1);
 							// Actually not, because if, then the same extension would come around again in next update.
 						}
-						this.requestUpdate('_extensions');
+						this.requestUpdate('_extensions', oldValue);
 					}
 				});
 			}
@@ -124,7 +126,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		return repeat(
 			this._extensions,
 			(ext) => ext.alias,
-			(ext) => this.renderMethod(ext) || nothing
+			(ext) => this.renderMethod ? this.renderMethod(ext) : ext.component
 		);
 	}
 

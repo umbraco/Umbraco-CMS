@@ -1,7 +1,7 @@
 import type { UmbWorkspaceElement } from '../workspace/workspace.element.js';
 import type { UmbSectionViewsElement } from './section-views/section-views.element.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing , customElement, property, state, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	ManifestSection,
@@ -28,10 +28,10 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	@state()
 	private _menus?: Array<Omit<ManifestSectionSidebarApp, 'kind'>>;
 
-	connectedCallback() {
-		super.connectedCallback();
-		this.#observeSectionSidebarApps();
+	constructor() {
+		super();
 		this.#createRoutes();
+		this.#observeSectionSidebarApps();
 	}
 
 	#createRoutes() {
@@ -60,7 +60,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 				.extensionsOfType('sectionSidebarApp')
 				.pipe(
 					map((manifests) =>
-						manifests.filter((manifest) => manifest.conditions.sections.includes(this.manifest?.alias || ''))
+						manifests.filter((manifest) => manifest.conditions.sections.includes(this.manifest?.alias ?? ''))
 					)
 				),
 			(manifests) => {
@@ -78,7 +78,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 							<umb-extension-slot
 								type="sectionSidebarApp"
 								.filter=${(items: ManifestSectionSidebarApp) =>
-									items.conditions.sections.includes(this.manifest?.alias || '')}></umb-extension-slot>
+									items.conditions.sections.includes(this.manifest?.alias ?? '')}></umb-extension-slot>
 						</umb-section-sidebar>
 				  `
 				: nothing}
