@@ -78,17 +78,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
-			:host {
-				display: block;
-				color: var(--uui-color-text);
-			}
-			:host,
-			umb-workspace-editor {
-				width: 100%;
-				height: 100%;
-			}
 			#main {
-				padding: var(--uui-size-space-5);
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-3);

@@ -53,7 +53,7 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 			<div id="header">
 				<uui-label title=${this.alias}>${this.label}</uui-label>
 				<slot name="property-action-menu"></slot>
-				<p>${this.description}</p>
+				<div id="description">${this.description}</div>
 				<slot name="description"></slot>
 			</div>
 			<div>
@@ -94,8 +94,8 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 				padding-top: 0;
 			}
 
-			p {
-				margin-bottom: 0;
+			#description {
+				color: var(--uui-color-text-alt);
 			}
 
 			#header {

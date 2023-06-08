@@ -184,8 +184,10 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 
 	render() {
 		return html`
-			<div id="workspace-tab-bar">${this._routerPath ? this.renderTabsNavigation() : ''}${this.renderActions()}</div>
-			<uui-scroll-container>
+			<umb-body-layout header-fit-height>
+				<div id="header" slot="header">
+					${this._routerPath ? this.renderTabsNavigation() : ''}${this.renderActions()}
+				</div>
 				<umb-router-slot
 					.routes=${this._routes}
 					@init=${(event: UmbRouterSlotInitEvent) => {
@@ -195,7 +197,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 						this._activePath = event.target.absoluteActiveViewPath || '';
 					}}>
 				</umb-router-slot>
-			</uui-scroll-container>
+			</umb-body-layout>
 		`;
 	}
 
@@ -211,12 +213,11 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			}
 
 			/* TODO: This should be replaced with a general workspace bar — naming is hard */
-			#workspace-tab-bar {
-				padding: 0 var(--uui-size-layout-1);
+			#header {
+				width: 100%;
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
-				background-color: var(--uui-color-surface);
 				flex-wrap: nowrap;
 			}
 		`,

@@ -202,7 +202,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 			}
 
 			uui-box {
-				padding: var(--uui-size-layout-1);
+				margin-top: var(--uui-size-layout-1);
 			}
 		`,
 	];

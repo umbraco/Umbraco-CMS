@@ -223,9 +223,6 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 			:host {
 				display: block;
 			}
-			uui-box {
-				margin-top: var(--uui-size-space-5);
-			}
 
 			uui-box p {
 				margin-top: 0;

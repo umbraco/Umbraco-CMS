@@ -156,48 +156,54 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<div class="actions">
-				${this._trackerStatus
-					? html`<div>
-								<uui-input
-									id="search-input"
-									placeholder="Original URL"
-									label="input for search"
-									@keypress="${this._inputHandler}">
-								</uui-input>
+		return html`
+			<umb-body-layout header-transparent>
+				<div slot="header" id="header">
+					${this._trackerStatus
+						? html`<div>
+									<uui-input
+										id="search-input"
+										placeholder="Original URL"
+										label="input for search"
+										@keypress="${this._inputHandler}">
+									</uui-input>
+									<uui-button
+										id="search-button"
+										look="primary"
+										color="positive"
+										label="search"
+										.state="${this._buttonState}"
+										@click="${this._searchHandler}">
+										Search<uui-icon name="umb:search"></uui-icon>
+									</uui-button>
+								</div>
 								<uui-button
-									id="search-button"
-									look="primary"
-									color="positive"
-									label="search"
-									.state="${this._buttonState}"
-									@click="${this._searchHandler}">
-									Search<uui-icon name="umb:search"></uui-icon>
-								</uui-button>
-							</div>
-							<uui-button
-								label="Disable URL tracker"
-								look="outline"
-								color="danger"
-								@click="${this._disableRedirectHandler}">
-								Disable URL tracker
-							</uui-button> `
-					: html`<uui-button
-							label="Enable URL tracker"
-							look="primary"
-							color="positive"
-							@click="${this._toggleRedirect}">
-							Enable URL tracker
-					  </uui-button>`}
-			</div>
+									label="Disable URL tracker"
+									look="outline"
+									color="danger"
+									@click="${this._disableRedirectHandler}">
+									Disable URL tracker
+								</uui-button> `
+						: html`<uui-button
+								label="Enable URL tracker"
+								look="primary"
+								color="positive"
+								@click="${this._toggleRedirect}">
+								Enable URL tracker
+						  </uui-button>`}
+				</div>
 
-			${this._total && this._total > 0
-				? html`<div class="wrapper ${this._trackerStatus ? 'trackerEnabled' : 'trackerDisabled'}">
-						${this.renderTable()}
-				  </div>`
-				: this._filter?.length
-				? this._renderZeroResults()
-				: this.renderNoRedirects()} `;
+				<div id="main">
+					${this._total && this._total > 0
+						? html`<div class="wrapper ${this._trackerStatus ? 'trackerEnabled' : 'trackerDisabled'}">
+								${this.renderTable()}
+						  </div>`
+						: this._filter?.length
+						? this._renderZeroResults()
+						: this.renderNoRedirects()}
+				</div>
+			</umb-body-layout>
+		`;
 	}
 
 	private _renderZeroResults() {
@@ -276,17 +282,18 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				padding: var(--uui-size-layout-1);
+				height: 100%;
 			}
 
-			.actions {
+			#header {
 				display: flex;
 				gap: var(--uui-size-space-1);
 				justify-content: space-between;
-				margin-bottom: var(--uui-size-space-4);
+				width: 100%;
+				padding: 0 var(--uui-size-layout-1);
 			}
 
-			.actions uui-icon {
+			#header uui-icon {
 				transform: translateX(50%);
 			}
 
