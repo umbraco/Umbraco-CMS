@@ -10,16 +10,17 @@ import './document-type-workspace-view-edit-properties.element.js';
 
 @customElement('umb-document-type-workspace-view-edit-tab')
 export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
-	private _ownerTabId?: string | undefined;
+	private _ownerTabId?: string | null;
 
 	@property({ type: String })
-	public get ownerTabId(): string | undefined {
+	public get ownerTabId(): string | null | undefined {
 		return this._ownerTabId;
 	}
-	public set ownerTabId(value: string | undefined) {
+	public set ownerTabId(value: string | null | undefined) {
 		if (value === this._ownerTabId) return;
 		const oldValue = this._ownerTabId;
 		this._ownerTabId = value;
+		this._groupStructureHelper.setOwnerId(value);
 		this.requestUpdate('ownerTabId', oldValue);
 	}
 
@@ -37,11 +38,15 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		this.requestUpdate('tabName', oldValue);
 	}
 
+	@state()
+	private _noTabName?: boolean;
+
 	@property({ type: Boolean })
 	public get noTabName(): boolean {
 		return this._groupStructureHelper.getIsRoot();
 	}
 	public set noTabName(value: boolean) {
+		this._noTabName = value;
 		this._groupStructureHelper.setIsRoot(value);
 	}
 
@@ -61,9 +66,11 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		});
 		this.observe(this._groupStructureHelper.containers, (groups) => {
 			this._groups = groups;
+			this.requestUpdate('_groups');
 		});
 		this.observe(this._groupStructureHelper.hasProperties, (hasProperties) => {
 			this._hasProperties = hasProperties;
+			this.requestUpdate('_hasProperties');
 		});
 	}
 
@@ -74,7 +81,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 	render() {
 		return html`
-			${this._hasProperties
+			${this._noTabName
 				? html`
 						<uui-box>
 							<umb-document-type-workspace-view-edit-properties
@@ -86,8 +93,29 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				: ''}
 			${repeat(
 				this._groups,
-				(group) => group.name,
-				(group) => html` <uui-box .headline=${group.name || ''}>
+				(group) => group.id ?? '' + group.name,
+				(group) => html`
+					<uui-box>
+						${ this._groupStructureHelper.isOwnerChildContainer(group.id!) ?
+							html`
+								<div slot="header">
+									<uui-input
+										label='Group name'
+										placeholder="Enter a group name"
+										value=${group.name ?? ''}
+										@change=${
+											(e: InputEvent) => {
+												const newName = (e.target as HTMLInputElement).value;
+												this._groupStructureHelper.updateContainerName(group.id!, group.parentId ?? null, newName);
+											}
+										}>
+									</uui-input>
+								</div>
+							`
+							:
+							html`<h5 slot="header">${group.name ?? '(Inherited)'}</h5>`
+					}
+					</div>
 					<umb-document-type-workspace-view-edit-properties
 						container-id=${group.id}
 						container-type="Group"

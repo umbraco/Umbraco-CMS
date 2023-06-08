@@ -179,7 +179,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 		const container: PropertyTypeContainerModelBaseModel = {
 			id: UmbId.new(),
-			parentId: parentId,
+			parentId: parentId ?? null,
 			name: '',
 			type: type,
 			sortOrder: sortOrder ?? 0,
@@ -193,8 +193,8 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		return container;
 	}
 
-	makeContainerNameUniqueForOwnerDocument(newName: string, containerType: PropertyContainerTypes = 'Tab') {
-		const ownerRootContainers = this.ownerRootContainers(containerType)
+	makeContainerNameUniqueForOwnerDocument(newName: string, containerType: PropertyContainerTypes = 'Tab', parentId: string | null = null) {
+		const ownerRootContainers = this.getOwnerContainers(containerType, parentId)
 
 		let changedName = newName;
 		if(ownerRootContainers) {
@@ -209,7 +209,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 	async updateContainer(
 		documentTypeId: string | null,
-		groupKey: string,
+		containerId: string,
 		partialUpdate: Partial<PropertyTypeContainerModelBaseModel>
 	) {
 		await this.#init;
@@ -217,7 +217,8 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 		const frozenContainers = this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.containers ?? [];
 
-		const containers = partialUpdateFrozenArray(frozenContainers, partialUpdate, (x) => x.id === groupKey);
+
+		const containers = partialUpdateFrozenArray(frozenContainers, partialUpdate, (x) => x.id === containerId);
 
 		this.#documentTypes.updateOne(documentTypeId, { containers });
 	}
@@ -372,8 +373,12 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		return this.ownerDocumentTypeObservablePart((x) => x.containers?.filter((x) => x.type === containerType) ?? []);
 	}
 
-	ownerRootContainers(containerType: PropertyContainerTypes) {
-		return this.getOwnerDocumentType()?.containers?.filter((x) => x.parentId === null && x.type === containerType);
+	getOwnerContainers(containerType: PropertyContainerTypes, parentId: string | null = null) {
+		return this.getOwnerDocumentType()?.containers?.filter((x) => x.parentId === parentId && x.type === containerType);
+	}
+
+	isOwnerContainer(containerId: string) {
+		return this.getOwnerDocumentType()?.containers?.filter((x) => x.id === containerId);
 	}
 
 	containersOfParentKey(

@@ -22,7 +22,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	private _routes: UmbRoute[] = [];
 
 	@state()
-	_tabs: Array<PropertyTypeContainerModelBaseModel> = [];
+	_tabs?: Array<PropertyTypeContainerModelBaseModel>;
 
 	@state()
 	private _routerPath?: string;
@@ -67,17 +67,18 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	}
 
 	private _createRoutes() {
+		if (!this._workspaceContext || !this._tabs) return;
 		const routes: UmbRoute[] = [];
 
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
-				const tabName = tab.name;
+				const tabName = tab.name ?? '';
 				routes.push({
-					path: `tab/${encodeFolderName(tabName || '').toString()}`,
+					path: `tab/${encodeFolderName(tabName).toString()}`,
 					component: () => import('./document-type-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
-						(component as UmbDocumentTypeWorkspaceViewEditTabElement).tabName = tabName ?? '';
-						(component as UmbDocumentTypeWorkspaceViewEditTabElement).ownerTabId = tab.id;
+						(component as UmbDocumentTypeWorkspaceViewEditTabElement).tabName = tabName;
+						(component as UmbDocumentTypeWorkspaceViewEditTabElement).ownerTabId = this._workspaceContext?.structure.isOwnerContainer(tab.id!) ? tab.id : undefined;
 					},
 				});
 			});
@@ -123,8 +124,6 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 
 	#tabNameChanged(event: InputEvent, tab: PropertyTypeContainerModelBaseModel) {
 
-		console.log(event.target)
-
 		let newName = (event.target as HTMLInputElement).value;
 
 		if(newName === '') {
@@ -138,7 +137,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			(event.target as HTMLInputElement).value = newName;
 		}
 
-		this._tabsStructureHelper.partialUpdateContainer(tab.id, {
+		this._tabsStructureHelper.partialUpdateContainer(tab.id!, {
 			name: newName,
 		});
 
@@ -147,6 +146,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	}
 
 	renderTabsNavigation() {
+		if(!this._tabs) return;
 		const contentTabActive = this._routerPath + '/' === this._activePath;
 		return html`<uui-tab-group>
 				<uui-tab
