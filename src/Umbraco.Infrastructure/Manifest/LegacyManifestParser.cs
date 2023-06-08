@@ -1,3 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Runtime.Loader;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -17,7 +20,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Manifest;
 
 /// <summary>
-///     Parses the Main.js file and replaces all tokens accordingly.
+/// Parses the Main.js file and replaces all tokens accordingly.
 /// </summary>
 public class LegacyManifestParser : ILegacyManifestParser
 {
@@ -39,7 +42,7 @@ public class LegacyManifestParser : ILegacyManifestParser
     private string _path = null!;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="LegacyManifestParser" /> class.
+    /// Initializes a new instance of the <see cref="LegacyManifestParser" /> class.
     /// </summary>
     public LegacyManifestParser(
         AppCaches appCaches,
@@ -163,10 +166,7 @@ public class LegacyManifestParser : ILegacyManifestParser
     /// </summary>
     public LegacyPackageManifest ParseManifest(string text)
     {
-        if (text == null)
-        {
-            throw new ArgumentNullException(nameof(text));
-        }
+        ArgumentNullException.ThrowIfNull(text);
 
         if (string.IsNullOrWhiteSpace(text))
         {
@@ -177,17 +177,33 @@ public class LegacyManifestParser : ILegacyManifestParser
             text,
             new DataEditorConverter(_dataValueEditorFactory, _ioHelper, _localizedTextService, _shortStringHelper, _jsonSerializer),
             new ValueValidatorConverter(_validators),
-            new DashboardAccessRuleConverter());
+            new DashboardAccessRuleConverter())!;
+
+        if (string.IsNullOrEmpty(manifest.Version))
+        {
+            string? assemblyName = manifest.VersionAssemblyName;
+            if (string.IsNullOrEmpty(assemblyName))
+            {
+                // Fallback to package ID
+                assemblyName = manifest.PackageId;
+            }
+
+            if (!string.IsNullOrEmpty(assemblyName) &&
+                TryGetAssemblyInformationalVersion(assemblyName, out string? version))
+            {
+                manifest.Version = version;
+            }
+        }
 
         // scripts and stylesheets are raw string, must process here
-        for (var i = 0; i < manifest!.Scripts.Length; i++)
+        for (var i = 0; i < manifest.Scripts.Length; i++)
         {
-            manifest.Scripts[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Scripts[i])!;
+            manifest.Scripts[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Scripts[i]);
         }
 
         for (var i = 0; i < manifest.Stylesheets.Length; i++)
         {
-            manifest.Stylesheets[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Stylesheets[i])!;
+            manifest.Stylesheets[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Stylesheets[i]);
         }
 
         foreach (LegacyManifestContentAppDefinition contentApp in manifest.ContentApps)
@@ -197,7 +213,7 @@ public class LegacyManifestParser : ILegacyManifestParser
 
         foreach (LegacyManifestDashboard dashboard in manifest.Dashboards)
         {
-            dashboard.View = _ioHelper.ResolveRelativeOrVirtualUrl(dashboard.View)!;
+            dashboard.View = _ioHelper.ResolveRelativeOrVirtualUrl(dashboard.View);
         }
 
         foreach (GridEditor gridEditor in manifest.GridEditors)
@@ -215,6 +231,22 @@ public class LegacyManifestParser : ILegacyManifestParser
         }
 
         return manifest;
+    }
+
+    private bool TryGetAssemblyInformationalVersion(string name, [NotNullWhen(true)] out string? version)
+    {
+        foreach (Assembly assembly in AssemblyLoadContext.Default.Assemblies)
+        {
+            AssemblyName assemblyName = assembly.GetName();
+            if (string.Equals(assemblyName.Name, name, StringComparison.OrdinalIgnoreCase) &&
+                assembly.TryGetInformationalVersion(out version))
+            {
+                return true;
+            }
+        }
+
+        version = null;
+        return false;
     }
 
     /// <summary>

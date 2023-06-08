@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry.Models;
 using Umbraco.Extensions;
@@ -15,61 +16,27 @@ namespace Umbraco.Cms.Core.Telemetry;
 /// <inheritdoc />
 internal class TelemetryService : ITelemetryService
 {
+    private readonly IPackagingService _packagingService;
     private readonly IMetricsConsentService _metricsConsentService;
     private readonly ISiteIdentifierService _siteIdentifierService;
     private readonly IUmbracoVersion _umbracoVersion;
     private readonly IUsageInformationService _usageInformationService;
-    private readonly IPackageManifestService _packageManifestService;
-
-    [Obsolete("Please use the constructor that does not take an IManifestParser. Will be removed in V15.")]
-    public TelemetryService(
-        ILegacyManifestParser legacyManifestParser,
-        IUmbracoVersion umbracoVersion,
-        ISiteIdentifierService siteIdentifierService,
-        IUsageInformationService usageInformationService,
-        IMetricsConsentService metricsConsentService)
-        : this(
-            legacyManifestParser,
-            umbracoVersion,
-            siteIdentifierService,
-            usageInformationService,
-            metricsConsentService,
-            StaticServiceProvider.Instance.GetRequiredService<IPackageManifestService>())
-    {
-    }
-
-    [Obsolete("Please use the constructor that does not take an IManifestParser. Will be removed in V15.")]
-    public TelemetryService(
-        ILegacyManifestParser legacyManifestParser,
-        IUmbracoVersion umbracoVersion,
-        ISiteIdentifierService siteIdentifierService,
-        IUsageInformationService usageInformationService,
-        IMetricsConsentService metricsConsentService,
-        IPackageManifestService packageManifestService)
-        : this(
-            umbracoVersion,
-            siteIdentifierService,
-            usageInformationService,
-            metricsConsentService,
-            packageManifestService)
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TelemetryService" /> class.
     /// </summary>
     public TelemetryService(
+        IPackagingService packagingService,
         IUmbracoVersion umbracoVersion,
         ISiteIdentifierService siteIdentifierService,
         IUsageInformationService usageInformationService,
-        IMetricsConsentService metricsConsentService,
-        IPackageManifestService packageManifestService)
+        IMetricsConsentService metricsConsentService)
     {
+        _packagingService = packagingService;
         _umbracoVersion = umbracoVersion;
         _siteIdentifierService = siteIdentifierService;
         _usageInformationService = usageInformationService;
         _metricsConsentService = metricsConsentService;
-        _packageManifestService = packageManifestService;
     }
 
     [Obsolete("Please use GetTelemetryReportDataAsync. Will be removed in V15.")]
@@ -100,6 +67,8 @@ internal class TelemetryService : ITelemetryService
         ? null
         : _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
 
+
+
     private async Task<IEnumerable<PackageTelemetry>?> GetPackageTelemetryAsync()
     {
         if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
@@ -107,14 +76,24 @@ internal class TelemetryService : ITelemetryService
             return null;
         }
 
-        IEnumerable<PackageManifest> manifests = await _packageManifestService.GetPackageManifestsAsync();
+        List<PackageTelemetry> packages = new();
+        IEnumerable<InstalledPackage> installedPackages = _packagingService.GetAllInstalledPackages();
 
-        return manifests
-            .Where(manifest => manifest.AllowTelemetry)
-            .Select(manifest => new PackageTelemetry
+        foreach (InstalledPackage installedPackage in installedPackages)
+        {
+            if (installedPackage.AllowPackageTelemetry is false)
             {
-                Name = manifest.Name,
-                Version = manifest.Version ?? string.Empty
+                continue;
+            }
+
+            packages.Add(new PackageTelemetry
+            {
+                Id = installedPackage.PackageId,
+                Name = installedPackage.PackageName,
+                Version = installedPackage.Version,
             });
+        }
+
+        return packages;
     }
 }

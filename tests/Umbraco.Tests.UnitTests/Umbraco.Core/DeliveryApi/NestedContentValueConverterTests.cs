@@ -44,8 +44,8 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
             .Setup(p => p.ConvertSourceToInter(It.IsAny<IPublishedElement>(), It.IsAny<object>(), It.IsAny<bool>()))
             .Returns((IPublishedElement owner, object? source, bool preview) => source);
         publishedPropertyType
-            .Setup(p => p.ConvertInterToDeliveryApiObject(It.IsAny<IPublishedElement>(), PropertyCacheLevel.Element, It.IsAny<object>(), It.IsAny<bool>()))
-            .Returns((IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview) => inter?.ToString());
+            .Setup(p => p.ConvertInterToDeliveryApiObject(It.IsAny<IPublishedElement>(), PropertyCacheLevel.Element, It.IsAny<object>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .Returns((IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding) => inter?.ToString());
         _publishedPropertyType = publishedPropertyType.Object;
 
         var publishedContentType = new Mock<IPublishedContentType>();
@@ -69,7 +69,7 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
     public void NestedContentSingleValueConverter_WithOneItem_ConvertsItemToListOfElements()
     {
         var nestedContentValue = "[{\"ncContentTypeAlias\": \"contentType1\",\"key\": \"1E68FB92-727A-4473-B10C-FA108ADCF16F\",\"prop1\": \"Hello, world\"}]";
-        var result = _nestedContentSingleValueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, nestedContentValue, false) as IEnumerable<IApiElement>;
+        var result = _nestedContentSingleValueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, nestedContentValue, false, false) as IEnumerable<IApiElement>;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(1, result.Count());
@@ -83,7 +83,7 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
     public void NestedContentSingleValueConverter_WithMultipleItems_ConvertsFirstItemToListOfElements()
     {
         var nestedContentValue = "[{\"ncContentTypeAlias\": \"contentType1\",\"key\": \"1E68FB92-727A-4473-B10C-FA108ADCF16F\",\"prop1\": \"Hello, world\"},{\"ncContentTypeAlias\": \"contentType1\",\"key\": \"40F59DD9-7E9F-4053-BD32-89FB086D18C9\",\"prop1\": \"One more\"}]";
-        var result = _nestedContentSingleValueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, nestedContentValue, false) as IEnumerable<IApiElement>;
+        var result = _nestedContentSingleValueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, nestedContentValue, false, false) as IEnumerable<IApiElement>;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(1, result.Count());
@@ -96,7 +96,7 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
     [Test]
     public void NestedContentSingleValueConverter_WithNoData_ReturnsEmptyArray()
     {
-        var result = _nestedContentSingleValueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, null, false) as IEnumerable<IApiElement>;
+        var result = _nestedContentSingleValueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, null, false, false) as IEnumerable<IApiElement>;
 
         Assert.IsNotNull(result);
         Assert.IsEmpty(result);
@@ -111,7 +111,7 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
     public void NestedContentManyValueConverter_WithOneItem_ConvertsItemToListOfElements()
     {
         var nestedContentValue = "[{\"ncContentTypeAlias\": \"contentType1\",\"key\": \"1E68FB92-727A-4473-B10C-FA108ADCF16F\",\"prop1\": \"Hello, world\"}]";
-        var result = _nestedContentManyValueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, nestedContentValue, false) as IEnumerable<IApiElement>;
+        var result = _nestedContentManyValueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, nestedContentValue, false, false) as IEnumerable<IApiElement>;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(1, result.Count());
@@ -126,7 +126,7 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
     public void NestedContentManyValueConverter_WithMultipleItems_ConvertsAllItemsToElements()
     {
         var nestedContentValue = "[{\"ncContentTypeAlias\": \"contentType1\",\"key\": \"1E68FB92-727A-4473-B10C-FA108ADCF16F\",\"prop1\": \"Hello, world\"},{\"ncContentTypeAlias\": \"contentType1\",\"key\": \"40F59DD9-7E9F-4053-BD32-89FB086D18C9\",\"prop1\": \"One more\"}]";
-        var result = _nestedContentManyValueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, nestedContentValue, false) as IEnumerable<IApiElement>;
+        var result = _nestedContentManyValueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, nestedContentValue, false, false) as IEnumerable<IApiElement>;
 
         Assert.IsNotNull(result);
         Assert.AreEqual(2, result.Count());
@@ -145,7 +145,7 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
     [Test]
     public void NestedContentManyValueConverter_WithNoData_ReturnsEmptyArray()
     {
-        var result = _nestedContentManyValueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, null, false) as IEnumerable<IApiElement>;
+        var result = _nestedContentManyValueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, null, false, false) as IEnumerable<IApiElement>;
 
         Assert.IsNotNull(result);
         Assert.IsEmpty(result);

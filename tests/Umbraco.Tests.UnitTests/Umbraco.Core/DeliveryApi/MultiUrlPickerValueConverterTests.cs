@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -35,7 +34,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 Udi = new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key)
             }
         });
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var link = result.First();
@@ -67,7 +66,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 Udi = new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key)
             }
         });
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var link = result.First();
@@ -108,7 +107,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 Url = "https://umbraco.com/"
             }
         });
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(3, result.Count());
 
@@ -152,7 +151,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 Url = "https://umbraco.com/"
             }
         });
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var link = result.First();
@@ -182,7 +181,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 Target = "_blank"
             }
         });
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var link = result.First();
@@ -212,7 +211,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 QueryString = "?something=true"
             }
         });
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var link = result.First();
@@ -235,7 +234,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
 
         var valueConverter = MultiUrlPickerValueConverter();
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.IsEmpty(result);
     }
@@ -251,7 +250,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
 
         var valueConverter = MultiUrlPickerValueConverter();
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.IsEmpty(result);
     }
@@ -260,7 +259,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
 
     private MultiUrlPickerValueConverter MultiUrlPickerValueConverter()
     {
-        var routeBuilder = new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings(), Mock.Of<IVariationContextAccessor>(), Mock.Of<IPublishedSnapshotAccessor>());
+        var routeBuilder = CreateContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings());
         return new MultiUrlPickerValueConverter(
             PublishedSnapshotAccessor,
             Mock.Of<IProfilingLogger>(),
