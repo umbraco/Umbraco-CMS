@@ -101,16 +101,11 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-				padding-bottom: var(--uui-size-layout-1); // To enforce some distance to the bottom of the scroll-container.
-			}
-			uui-box {
-				margin-top: var(--uui-size-layout-1);
+			#add {
+				width: 100%;
 			}
 
-			#add {
+			#add:not(:first-child) {
 				width: 100%;
 				margin-top: var(--uui-size-layout-1);
 			}
