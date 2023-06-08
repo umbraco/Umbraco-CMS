@@ -83,15 +83,13 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			});
 		}
 
-		if (this._hasRootGroups) {
-			routes.push({
-				path: '',
-				component: () => import('./document-type-workspace-view-edit-tab.element.js'),
-				setup: (component) => {
-					(component as UmbDocumentTypeWorkspaceViewEditTabElement).noTabName = true;
-				},
-			});
-		}
+		routes.push({
+			path: '',
+			component: () => import('./document-type-workspace-view-edit-tab.element.js'),
+			setup: (component) => {
+				(component as UmbDocumentTypeWorkspaceViewEditTabElement).noTabName = true;
+			},
+		});
 
 		if (routes.length !== 0) {
 			routes.push({
@@ -117,17 +115,15 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	}
 
 	renderTabsNavigation() {
+		const contentTabActive = this._routerPath + '/' === this._activePath;
 		return html`<uui-tab-group>
-			${this._hasRootGroups
-				? html`
-						<uui-tab
-							label="Content"
-							.active=${this._routerPath + '/' === this._activePath}
-							href=${this._routerPath + '/'}
-							>Content</uui-tab
-						>
-				  `
-				: ''}
+				<uui-tab
+					class=${this._hasRootGroups || contentTabActive ? '' : 'content-tab-is-empty'}
+					label="Content"
+					.active=${contentTabActive}
+					href=${this._routerPath + '/'}
+					>Content</uui-tab
+				>
 			${repeat(
 				this._tabs,
 				(tab) => tab.id! + tab.name,
@@ -219,6 +215,14 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				align-items: center;
 				justify-content: space-between;
 				flex-wrap: nowrap;
+			}
+
+			.content-tab-is-empty {
+				height: 31px;
+				align-self: center;
+				border-radius: 3px;
+				--uui-tab-text: var(--uui-color-text-alt);
+				border: dashed 1px var(--uui-color-border-emphasis);
 			}
 		`,
 	];
