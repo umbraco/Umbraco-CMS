@@ -7,12 +7,12 @@ export class UmbVariantId {
 	public readonly segment: string | null = null;
 
 	constructor(variantData: { culture?: string | null; segment?: string | null }) {
-		this.culture = variantData.culture || null;
-		this.segment = variantData.segment || null;
+		this.culture = (variantData.culture === 'invariant' ? null : variantData.culture) ?? null;
+		this.segment = variantData.segment ?? null;
 	}
 
 	public compare(obj: { culture?: string | null; segment?: string | null }): boolean {
-		return this.culture === (obj.culture || null) && this.segment === (obj.segment || null);
+		return this.equal(new UmbVariantId(obj));
 	}
 
 	public equal(variantId: UmbVariantId): boolean {

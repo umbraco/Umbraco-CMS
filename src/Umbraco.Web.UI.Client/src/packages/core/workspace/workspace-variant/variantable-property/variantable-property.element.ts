@@ -2,17 +2,17 @@ import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../workspace-variant.contex
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-variantable-property')
 export class UmbVariantablePropertyElement extends UmbLitElement {
-	private _property?: PropertyTypeResponseModelBaseModel | undefined;
+	private _property?: PropertyTypeModelBaseModel | undefined;
 	@property({ type: Object, attribute: false })
-	public get property(): PropertyTypeResponseModelBaseModel | undefined {
+	public get property(): PropertyTypeModelBaseModel | undefined {
 		return this._property;
 	}
-	public set property(property: PropertyTypeResponseModelBaseModel | undefined) {
+	public set property(property: PropertyTypeModelBaseModel | undefined) {
 		this._property = property;
 		this._updatePropertyVariantId();
 	}

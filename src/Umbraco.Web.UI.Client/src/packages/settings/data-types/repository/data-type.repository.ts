@@ -227,7 +227,9 @@ export class UmbDataTypeRepository
 			// Consider notify a workspace if a template is updated in the store while someone is editing it.
 			// TODO: would be nice to align the stores on methods/methodNames.
 			// this.#detailStore?.append(dataType);
+			// TODO: This is parsing on the full models to the tree and item store. Those should only contain the data they need. I don't know, at this point, if thats a repository or store responsibility.
 			this.#treeStore?.updateItem(id, updatedDataType);
+			this.#itemStore?.updateItem(id, updatedDataType);
 
 			const notification = { data: { message: `Data Type saved` } };
 			this.#notificationContext?.peek('positive', notification);
@@ -249,6 +251,7 @@ export class UmbDataTypeRepository
 			// TODO: would be nice to align the stores on methods/methodNames.
 			this.#detailStore?.remove([id]);
 			this.#treeStore?.removeItem(id);
+			this.#itemStore?.removeItem(id);
 
 			const notification = { data: { message: `Data Type deleted` } };
 			this.#notificationContext?.peek('positive', notification);

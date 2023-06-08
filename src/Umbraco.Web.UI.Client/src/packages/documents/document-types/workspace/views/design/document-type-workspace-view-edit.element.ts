@@ -5,7 +5,7 @@ import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { encodeFolderName, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -22,7 +22,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	private _routes: UmbRoute[] = [];
 
 	@state()
-	_tabs: Array<PropertyTypeContainerResponseModelBaseModel> = [];
+	_tabs: Array<PropertyTypeContainerModelBaseModel> = [];
 
 	@state()
 	private _routerPath?: string;

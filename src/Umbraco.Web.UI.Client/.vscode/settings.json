@@ -5,8 +5,10 @@
 		"Backoffice",
 		"combobox",
 		"Elementable",
+		"Niels",
 		"pickable",
 		"templating",
+		"umbraco",
 		"variantable"
 	],
 	"exportall.config.folderListener": [],

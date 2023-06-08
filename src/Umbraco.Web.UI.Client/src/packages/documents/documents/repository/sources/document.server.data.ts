@@ -55,16 +55,17 @@ export class UmbDocumentServerDataSource
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async createScaffold(documentTypeId: string) {
+	async createScaffold(documentTypeId: string, preset?: Partial<CreateDocumentRequestModel>) {
 		const data: DocumentResponseModel = {
 			urls: [],
 			templateId: null,
+			parentId: null,
 			id: UmbId.new(),
 			contentTypeId: documentTypeId,
 			values: [],
 			variants: [
 				{
-					$type: '',
+					$type: 'DocumentVariantRequestModel',
 					state: ContentStateModel.DRAFT,
 					publishDate: null,
 					culture: null,
@@ -74,6 +75,7 @@ export class UmbDocumentServerDataSource
 					updateDate: undefined,
 				},
 			],
+			...preset,
 		};
 
 		return { data };

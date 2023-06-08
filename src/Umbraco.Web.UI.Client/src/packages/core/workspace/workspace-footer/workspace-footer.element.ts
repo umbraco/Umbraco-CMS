@@ -41,17 +41,18 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 	@state()
 	_withinModal = false;
 
-	#modalContext?: UmbModalContext;
+	@state()
+	_modalContext?: UmbModalContext;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (context) => {
-			this.#modalContext = context;
+			this._modalContext = context;
 		});
 	}
 
 	private _onClose = () => {
-		this.#modalContext?.reject();
+		this._modalContext?.reject();
 	};
 
 	// TODO: Some event/callback from umb-extension-slot that can be utilized to hide the footer, if empty.
@@ -59,10 +60,10 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 		return html`
 			<umb-footer-layout>
 				<slot></slot>
-				<slot name="actions" slot="actions"></slot>
-				${this.#modalContext
+				${this._modalContext
 					? html`<uui-button slot="actions" label="Close" @click=${this._onClose}></uui-button>`
 					: ''}
+				<slot name="actions" slot="actions"></slot>
 				<umb-extension-slot
 					slot="actions"
 					type="workspaceAction"

@@ -9,7 +9,7 @@ import {
 	UmbRouterSlotInitEvent,
 } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -25,7 +25,7 @@ export class UmbDocumentWorkspaceViewEditElement
 	private _routes: UmbRoute[] = [];
 
 	@state()
-	_tabs: Array<PropertyTypeContainerResponseModelBaseModel> = [];
+	_tabs: Array<PropertyTypeContainerModelBaseModel> = [];
 
 	@state()
 	private _routerPath?: string;

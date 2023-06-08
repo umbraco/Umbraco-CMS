@@ -1,12 +1,6 @@
+import type { DataSourceResponse, UmbDataSourceErrorResponse } from './data-source/index.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 
-export interface UmbRepositoryErrorResponse {
-	error?: ProblemDetailsModel;
-}
-export interface UmbRepositoryResponse<T> extends UmbRepositoryErrorResponse {
-	data?: T;
-}
 
 export interface UmbDetailRepository<
 	CreateRequestType = any,
@@ -14,10 +8,10 @@ export interface UmbDetailRepository<
 	UpdateRequestType = any,
 	ResponseType = any
 > {
-	createScaffold(parentId: string | null): Promise<UmbRepositoryResponse<CreateRequestType>>;
-	requestById(id: string): Promise<UmbRepositoryResponse<ResponseType | undefined>>;
+	createScaffold(parentId: string | null, preset?: Partial<CreateRequestType>): Promise<DataSourceResponse<CreateRequestType>>;
+	requestById(id: string): Promise<DataSourceResponse<ResponseType | undefined>>;
 	byId(id: string): Promise<Observable<ResponseType | undefined>>;
-	create(data: CreateRequestType): Promise<UmbRepositoryResponse<CreateResponseType>>;
-	save(id: string, data: UpdateRequestType): Promise<UmbRepositoryErrorResponse>;
-	delete(id: string): Promise<UmbRepositoryErrorResponse>;
+	create(data: CreateRequestType): Promise<DataSourceResponse<CreateResponseType>>;
+	save(id: string, data: UpdateRequestType): Promise<UmbDataSourceErrorResponse>;
+	delete(id: string): Promise<UmbDataSourceErrorResponse>;
 }
