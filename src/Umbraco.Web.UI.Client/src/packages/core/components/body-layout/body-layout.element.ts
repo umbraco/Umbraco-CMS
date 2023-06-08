@@ -10,7 +10,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 
-//TODO: Add the following attributes to JSDocs: header-transparent, no-padding, header-height-fit
+//TODO: Add the following attributes to JSDocs: header-transparent, main-no-padding, header-no-padding, header-height-fit
 
 /**
  * @element umb-body-layout
@@ -161,9 +161,9 @@ export class UmbBodyLayoutElement extends LitElement {
 				transition: box-shadow 150ms ease-in-out;
 				box-shadow: 0 -1px 0px 0px rgba(0, 0, 0, 0.8);
 			}
-			:host([header-transparent]:not([no-padding])) #main:not(*[style='display: none'] + *) {
+			:host([header-transparent]:not([main-no-padding])) #main:not(*[style='display: none'] + *) {
 				/* The following styling is only applied if the clear-header IS present, 
-				the no-padding attribute is NOT present, and the header is NOT hidden */
+				the main-no-padding attribute is NOT present, and the header is NOT hidden */
 				padding-top: var(--uui-size-space-1);
 			}
 
@@ -203,7 +203,7 @@ export class UmbBodyLayoutElement extends LitElement {
 				overflow-y: auto;
 				padding: var(--uui-size-layout-1);
 			}
-			:host([no-padding]) #main {
+			:host([main-no-padding]) #main {
 				padding: 0;
 			}
 		`,
