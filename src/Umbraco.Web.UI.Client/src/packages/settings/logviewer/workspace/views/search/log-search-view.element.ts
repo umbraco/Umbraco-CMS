@@ -32,7 +32,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-body-layout header-transparent header-height-fit>
+			<umb-body-layout header-transparent header-fit-height>
 				<div id="header" slot="header">
 					<div id="levels-container">
 						<umb-log-viewer-log-level-filter-menu></umb-log-viewer-log-level-filter-menu>

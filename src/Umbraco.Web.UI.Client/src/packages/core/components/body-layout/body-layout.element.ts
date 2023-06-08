@@ -10,7 +10,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 
-//TODO: Add the following attributes to JSDocs: header-transparent, main-no-padding, header-no-padding, header-height-fit
+//TODO: Add the following attributes to JSDocs: header-transparent, main-no-padding, header-no-padding, header-fit-height
 
 /**
  * @element umb-body-layout
@@ -160,10 +160,10 @@ export class UmbBodyLayoutElement extends LitElement {
 				/* This should be using the uui-shadows but for now they are too drastic for this use case */
 				box-shadow: 0 1px 15px 0 rgba(0, 0, 0, 0.2);
 			}
-			:host([header-height-fit][header-transparent]:not([header-no-padding])) #header-slot {
+			:host([header-fit-height][header-transparent]:not([header-no-padding])) #header-slot {
 				padding: var(--uui-size-layout-1);
 			}
-			:host([header-height-fit]) #header {
+			:host([header-fit-height]) #header {
 				height: fit-content;
 			}
 			#header-slot {

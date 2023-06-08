@@ -184,7 +184,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 
 	render() {
 		return html`
-			<umb-body-layout header-height-fit>
+			<umb-body-layout header-fit-height>
 				<div id="header" slot="header">
 					${this._routerPath ? this.renderTabsNavigation() : ''}${this.renderActions()}
 				</div>
