@@ -95,6 +95,7 @@ export class UmbInstallerLayoutElement extends LitElement {
 				display: block;
 				padding: var(--uui-size-layout-4) var(--uui-size-layout-4) var(--uui-size-layout-2) var(--uui-size-layout-4);
 				height: 100%;
+				width: 100%;
 				max-width: 400px;
 				margin: 0 auto;
 			}
