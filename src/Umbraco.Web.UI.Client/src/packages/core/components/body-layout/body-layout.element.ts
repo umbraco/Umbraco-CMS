@@ -172,6 +172,14 @@ export class UmbBodyLayoutElement extends LitElement {
 				box-shadow: 0 1px 15px 0 rgba(0, 0, 0, 0.3);
 			}
 
+			:host([main-no-padding]) #main {
+				padding: 0;
+			}
+
+			:host([header-height-fit][header-transparent]) #header-slot {
+				padding: var(--uui-size-layout-1);
+			}
+
 			#header-slot,
 			#tabs-slot,
 			#action-menu-slot,
@@ -179,6 +187,7 @@ export class UmbBodyLayoutElement extends LitElement {
 				display: flex;
 				height: 100%;
 				align-items: center;
+				box-sizing: border-box;
 			}
 
 			#header-slot {
@@ -202,9 +211,6 @@ export class UmbBodyLayoutElement extends LitElement {
 				flex-direction: column;
 				overflow-y: auto;
 				padding: var(--uui-size-layout-1);
-			}
-			:host([main-no-padding]) #main {
-				padding: 0;
 			}
 		`,
 	];

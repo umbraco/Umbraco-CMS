@@ -68,8 +68,6 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				flex-direction: column;
 				gap: var(--uui-size-space-4);
 				width: 100%;
-				padding: var(--uui-size-layout-1);
-				padding-bottom: var(--uui-size-layout-1);
 			}
 
 			#levels-container,
