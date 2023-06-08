@@ -52,7 +52,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 			? html`<div id="splitViews">
 						${repeat(
 							this._variants,
-							(view) => view.index,
+							(view) => view.index + '_' + this._variants!.length,
 							(view) => html`
 								<umb-workspace-variant
 									alias="Umb.Workspace.Document"

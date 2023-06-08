@@ -75,7 +75,6 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	private _activePath?: string;
 
 	private _observeWorkspaceViews() {
-		// TODO: Make collection as a kind of workspaceEditorView.
 		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfTypes<ManifestWorkspaceEditorView>(['workspaceEditorView', 'workspaceViewCollection'])
@@ -85,7 +84,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			(workspaceViews) => {
 				this._workspaceViews = workspaceViews;
 				this._createRoutes();
-			}
+			},
+			'_observeWorkspaceViews'
 		);
 	}
 
