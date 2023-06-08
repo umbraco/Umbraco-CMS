@@ -19,10 +19,12 @@ export const handlers = [
 	}),
 
 	rest.put(umbracoPath(`/document-type/:id`), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 		const data = await req.json();
 		if (!data) return;
 
-		const saved = umbDocumentTypeData.save(data);
+		const saved = umbDocumentTypeData.save(id, data);
 
 		return res(ctx.status(200), ctx.json(saved));
 	}),
@@ -40,7 +42,7 @@ export const handlers = [
 		const data = req.body;
 		if (!data) return;
 
-		const saved = umbDocumentTypeData.save(data);
+		const saved = umbDocumentTypeData.save(data.id!, data);
 
 		return res(ctx.status(200), ctx.json(saved));
 	}),

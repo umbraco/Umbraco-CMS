@@ -61,11 +61,13 @@ export const handlers = [
 	}),
 
 	rest.put<LanguageResponseModel>(umbracoPath('/language/:id'), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 		const data = await req.json();
 
 		if (!data) return;
 
-		umbLanguagesData.save([data]);
+		umbLanguagesData.save(id, [data]);
 
 		return res(ctx.status(200));
 	}),

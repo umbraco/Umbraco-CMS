@@ -53,19 +53,23 @@ export const handlers = [
 	}),
 
 	rest.post(umbracoPath('/relation-type/:id'), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 		const data = await req.json();
 		if (!data) return;
 
-		const saved = umbRelationTypeData.save(data);
+		const saved = umbRelationTypeData.save(id, data);
 
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
 	rest.put(umbracoPath('/relation-type/:id'), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 		const data = await req.json();
 		if (!data) return;
 
-		const saved = umbRelationTypeData.save(data);
+		const saved = umbRelationTypeData.save(id, data);
 
 		return res(ctx.status(200), ctx.json(saved));
 	}),

@@ -18,8 +18,8 @@ class UmbUsersData extends UmbData<UserResponseModel> {
 		return this.data.find((user) => user.id === id);
 	}
 
-	save(saveItem: UserResponseModel) {
-		const foundIndex = this.data.findIndex((item) => item.id === saveItem.id);
+	save(id:string, saveItem: UserResponseModel) {
+		const foundIndex = this.data.findIndex((item) => item.id === id);
 		if (foundIndex !== -1) {
 			// update
 			this.data[foundIndex] = saveItem;

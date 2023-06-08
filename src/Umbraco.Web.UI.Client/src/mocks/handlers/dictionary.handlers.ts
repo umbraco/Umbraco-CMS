@@ -94,7 +94,7 @@ export const handlers = [
 			},
 		];
 
-		const value = umbDictionaryData.save(data);
+		const value = umbDictionaryData.save(data.id, data);
 
 		const createdResult = {
 			value,
@@ -112,7 +112,7 @@ export const handlers = [
 		if (!id) return;
 
 		const dataToSave = JSON.parse(data[0].value);
-		const saved = umbDictionaryData.save(dataToSave);
+		const saved = umbDictionaryData.save(dataToSave.id, dataToSave);
 
 		return res(ctx.status(200), ctx.json(saved));
 	}),
@@ -184,7 +184,7 @@ export const handlers = [
 		if (!file || !importResponse.id) return;
 
 		importResponse.parentId = req.url.searchParams.get('parentId') ?? null;
-		umbDictionaryData.save(importResponse);
+		umbDictionaryData.save(importResponse.id, importResponse);
 
 		// build the path to the new item => reflects the expected server response
 		const path = ['-1'];
