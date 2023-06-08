@@ -175,6 +175,13 @@ public interface IDataTypeService : IService
     /// <returns>Collection of <see cref="IDataType" /> configured for the property editor</returns>
     Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string propertyEditorAlias);
 
+    /// <summary>
+    ///     Gets all <see cref="IDataType" /> for a given editor UI alias
+    /// </summary>
+    /// <param name="editorUiAlias">The UI Alias to query by.</param>
+    /// <returns>Collection of <see cref="IDataType" /> which has the UI alias.</returns>
+    Task<IEnumerable<IDataType>> GetByEditorUiAlias(string editorUiAlias);
+
     [Obsolete("Please use MoveAsync instead. Will be removed in V15")]
     Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId);
 
