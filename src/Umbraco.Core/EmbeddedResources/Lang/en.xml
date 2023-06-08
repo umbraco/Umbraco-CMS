@@ -2275,7 +2275,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="items">items</key>
     <key alias="urls">URL(s)</key>
     <key alias="urlsSelected">URL(s) selected</key>
-    <key alias="itemsSelected">items selected</key>
+    <key alias="itemsSelected">item(s) selected</key>
     <key alias="invalidDate">Invalid date</key>
     <key alias="invalidNumber">Not a number</key>
     <key alias="invalidNumberStepSize">Not a valid numeric step size</key>
