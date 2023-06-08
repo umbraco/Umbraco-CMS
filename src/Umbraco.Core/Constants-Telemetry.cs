@@ -29,5 +29,6 @@ public static partial class Constants
         public static string DatabaseProvider = "DatabaseProvider";
         public static string CurrentServerRole = "CurrentServerRole";
         public static string RuntimeMode = "RuntimeMode";
+        public static string BackofficeExternalLoginProviderCount = "BackofficeExternalLoginProviderCount";
     }
 }
