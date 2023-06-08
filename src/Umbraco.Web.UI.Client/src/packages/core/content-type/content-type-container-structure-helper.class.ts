@@ -114,7 +114,7 @@ export class UmbContentTypeContainerStructureHelper {
 				this.#structure.containersByNameAndType(this._ownerName, this._ownerType),
 				(ownerALikeContainers) => {
 					this.#containers.next([]);
-					this._ownerContainers = ownerALikeContainers.filter(x => x.id === this._ownerId) || [];
+					this._ownerContainers = ownerALikeContainers.filter((x) => x.id === this._ownerId) || [];
 					this._ownerAlikeContainers = ownerALikeContainers || [];
 					if (this._ownerAlikeContainers.length > 0) {
 						this._observeChildContainerProperties();
@@ -211,26 +211,20 @@ export class UmbContentTypeContainerStructureHelper {
 		return await this.#structure.removeContainer(null, groupId);
 	}
 
-	async partialUpdateContainer(
-		containerId: string,
-		partialUpdate: Partial<PropertyTypeContainerModelBaseModel>
-	) {
+	async partialUpdateContainer(containerId: string, partialUpdate: Partial<PropertyTypeContainerModelBaseModel>) {
 		await this.#init;
 		if (!this.#structure || !containerId || !partialUpdate) return;
 
 		return await this.#structure.updateContainer(null, containerId, partialUpdate);
 	}
 
-	async updateContainerName(
-		containerId: string,
-		containerParentId: string | null,
-		name: string
-	) {
+	async updateContainerName(containerId: string, containerParentId: string | null, name: string) {
 		await this.#init;
 		if (!this.#structure) return;
 
-		const newName = this.#structure.makeContainerNameUniqueForOwnerDocument(name, this._childType, containerParentId) ?? name;
+		const newName =
+			this.#structure.makeContainerNameUniqueForOwnerDocument(name, this._childType, containerParentId) ?? name;
 
-		return await this.partialUpdateContainer(containerId, {name: newName});
+		return await this.partialUpdateContainer(containerId, { name: newName });
 	}
 }

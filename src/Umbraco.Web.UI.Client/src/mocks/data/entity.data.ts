@@ -24,8 +24,7 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 	}
 
 	insert(item: T) {
-
-		console.log('insert', item)
+		console.log('insert', item);
 
 		// TODO: Remove this fix when all types come with an ID them selfs.
 		if (!item.id) {
@@ -44,9 +43,8 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 	}
 
 	save(id: string, saveItem: T) {
-
 		// We need the ID in our data:
-		saveItem = {...saveItem, id: id};
+		saveItem = { ...saveItem, id: id };
 
 		const foundIndex = this.data.findIndex((item) => item.id === id);
 		if (foundIndex !== -1) {
@@ -100,7 +98,6 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 		const itemIndex = this.data.findIndex((item) => item.id === id);
 		const item = this.data[itemIndex];
 		if (!item) return;
-
 
 		// TODO: revisit this code, seems like something we can solve smarter/type safer now:
 		const itemKeys = Object.keys(item);
