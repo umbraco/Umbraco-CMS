@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 ///     Tests the standard indexing capabilities
 /// </summary>
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
 public class IndexTest : ExamineBaseTest
 {
     [Test]
