@@ -109,6 +109,9 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				width: 100%;
 				margin-top: var(--uui-size-layout-1);
 			}
+			uui-box:not(:first-child) {
+				margin-top: var(--uui-size-layout-1);
+			}
 		`,
 	];
 }
