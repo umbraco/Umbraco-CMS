@@ -107,40 +107,42 @@ export class UmbDocumentWorkspaceViewEditElement
 
 	render() {
 		return html`
-			${this._routerPath && this._tabs.length > 1
-				? html` <uui-tab-group>
-						${this._hasRootGroups && this._tabs.length > 1
-							? html`
-									<uui-tab
-										label="Content"
-										.active=${this._routerPath + '/' === this._activePath}
-										href=${this._routerPath + '/'}
-										>Content</uui-tab
-									>
-							  `
-							: ''}
-						${repeat(
-							this._tabs,
-							(tab) => tab.name,
-							(tab) => {
-								const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
-								return html`<uui-tab label=${tab.name!} .active=${path === this._activePath} href=${path}
-									>${tab.name}</uui-tab
-								>`;
-							}
-						)}
-				  </uui-tab-group>`
-				: ''}
+			<umb-body-layout header-fit-height>
+				${this._routerPath && this._tabs.length > 1
+					? html` <uui-tab-group slot="header">
+							${this._hasRootGroups && this._tabs.length > 1
+								? html`
+										<uui-tab
+											label="Content"
+											.active=${this._routerPath + '/' === this._activePath}
+											href=${this._routerPath + '/'}
+											>Content</uui-tab
+										>
+								  `
+								: ''}
+							${repeat(
+								this._tabs,
+								(tab) => tab.name,
+								(tab) => {
+									const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
+									return html`<uui-tab label=${tab.name!} .active=${path === this._activePath} href=${path}
+										>${tab.name}</uui-tab
+									>`;
+								}
+							)}
+					  </uui-tab-group>`
+					: ''}
 
-			<umb-router-slot
-				.routes=${this._routes}
-				@init=${(event: UmbRouterSlotInitEvent) => {
-					this._routerPath = event.target.absoluteRouterPath;
-				}}
-				@change=${(event: UmbRouterSlotChangeEvent) => {
-					this._activePath = event.target.absoluteActiveViewPath || '';
-				}}>
-			</umb-router-slot>
+				<umb-router-slot
+					.routes=${this._routes}
+					@init=${(event: UmbRouterSlotInitEvent) => {
+						this._routerPath = event.target.absoluteRouterPath;
+					}}
+					@change=${(event: UmbRouterSlotChangeEvent) => {
+						this._activePath = event.target.absoluteActiveViewPath || '';
+					}}>
+				</umb-router-slot>
+			</umb-body-layout>
 		`;
 	}
 
@@ -149,6 +151,7 @@ export class UmbDocumentWorkspaceViewEditElement
 		css`
 			:host {
 				display: block;
+				height: 100%;
 				--uui-tab-background: var(--uui-color-surface);
 			}
 		`,

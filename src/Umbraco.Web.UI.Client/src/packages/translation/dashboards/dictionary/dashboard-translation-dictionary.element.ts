@@ -146,42 +146,41 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 	}
 
 	render() {
-		return html` <div id="dictionary-top-bar">
-				<uui-button type="button" look="outline" label="Create dictionary item" @click=${this.#create}
-					>Create dictionary item</uui-button
-				>
-				<uui-input
-					@keyup="${this.#filter}"
-					placeholder="Type to filter..."
-					label="Type to filter dictionary"
-					id="searchbar">
-					<div slot="prepend">
-						<uui-icon name="search" id="searchbar_icon"></uui-icon>
-					</div>
-				</uui-input>
-			</div>
-			${when(
-				this._tableItemsFiltered.length,
-				() => html` <umb-table
-					.config=${this._tableConfig}
-					.columns=${this.#tableColumns}
-					.items=${this._tableItemsFiltered}></umb-table>`,
-				() => html`<umb-empty-state>There were no dictionary items found.</umb-empty-state>`
-			)}`;
+		return html`
+			<umb-body-layout header-transparent>
+				<div id="header" slot="header">
+					<uui-button type="button" look="outline" label="Create dictionary item" @click=${this.#create}
+						>Create dictionary item</uui-button
+					>
+					<uui-input
+						@keyup="${this.#filter}"
+						placeholder="Type to filter..."
+						label="Type to filter dictionary"
+						id="searchbar">
+						<div slot="prepend">
+							<uui-icon name="search" id="searchbar_icon"></uui-icon>
+						</div>
+					</uui-input>
+				</div>
+				${when(
+					this._tableItemsFiltered.length,
+					() => html` <umb-table
+						.config=${this._tableConfig}
+						.columns=${this.#tableColumns}
+						.items=${this._tableItemsFiltered}></umb-table>`,
+					() => html`<umb-empty-state>There were no dictionary items found.</umb-empty-state>`
+				)}
+			</umb-body-layout>
+		`;
 	}
 
 	static styles = [
 		UUITextStyles,
 		css`
-			:host {
-				display: block;
-				padding: var(--uui-size-layout-1);
-			}
-
-			#dictionary-top-bar {
-				margin-bottom: var(--uui-size-space-5);
+			#header {
 				display: flex;
 				justify-content: space-between;
+				width: 100%;
 			}
 
 			umb-table {

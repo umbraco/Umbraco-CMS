@@ -1,6 +1,6 @@
 import { UmbWorkspaceVariantContext } from './workspace-variant.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -61,7 +61,6 @@ export class UmbWorkspaceVariantContentElement extends UmbLitElement {
 			}
 
 			#header {
-				margin: 0 var(--uui-size-layout-1);
 				flex: 1 1 auto;
 			}
 		`,

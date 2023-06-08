@@ -1,6 +1,6 @@
 import { UmbLanguageRepository } from '../../repository/language.repository.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -105,18 +105,18 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	// TODO: Generate the href or retrieve it from something?
 	render() {
 		return html`
-			<umb-body-layout headline="Languages">
-				<div id="main">
-					<div>
-						<uui-button
-							label="Add language"
-							look="outline"
-							color="default"
-							href="section/settings/workspace/language/create"></uui-button>
-					</div>
+			<umb-body-layout main-no-padding headline="Languages">
+				<umb-body-layout header-transparent>
+					<uui-button
+						slot="header"
+						label="Add language"
+						look="outline"
+						color="default"
+						href="section/settings/workspace/language/create"></uui-button>
+
 					<!--- TODO: investigate if it's possible to use a collection component here --->
 					<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
-				</div>
+				</umb-body-layout>
 			</umb-body-layout>
 		`;
 	}
@@ -124,14 +124,11 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			:host {
+			umb-table {
+				/* Why is this needed? */
+				height: fit-content;
 				display: block;
-				width: 100%;
-				height: 100%;
-			}
-
-			#main {
-				margin: var(--uui-size-layout-1);
+				padding: 0;
 			}
 		`,
 	];

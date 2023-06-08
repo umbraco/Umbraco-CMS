@@ -1,6 +1,6 @@
 import { UmbUserGroupCollectionContext } from './user-group-collection.context.js';
-import { UUITextStyles , UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -26,32 +26,16 @@ export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<div id="sticky-top">
-				<div id="collection-top-bar">
-					<uui-button @click=${this.#onCreate} label="Create group" look="outline"></uui-button>
-					<uui-input @input=${this.#onSearch} label="search" id="input-search"></uui-input>
-				</div>
-			</div>
+			<uui-button @click=${this.#onCreate} label="Create group" look="outline"></uui-button>
+			<uui-input @input=${this.#onSearch} label="search" id="input-search"></uui-input>
 		`;
 	}
 	static styles = [
 		UUITextStyles,
 		css`
-			#sticky-top {
-				position: sticky;
-				top: 0px;
-				z-index: 1;
-				box-shadow: 0 1px 3px rgba(0, 0, 0, 0), 0 1px 2px rgba(0, 0, 0, 0);
-				transition: 250ms box-shadow ease-in-out;
-			}
-
-			#sticky-top.header-shadow {
-				box-shadow: var(--uui-shadow-depth-2);
-			}
-
-			#collection-top-bar {
-				padding: var(--uui-size-space-4) var(--uui-size-layout-1);
-				background-color: var(--uui-color-background);
+			:host {
+				height: 100%;
+				width: 100%;
 				display: flex;
 				justify-content: space-between;
 				white-space: nowrap;

@@ -126,7 +126,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 		return html`
 			${this._workspaceViews.length > 1
 				? html`
-						<uui-tab-group slot="tabs">
+						<uui-tab-group slot="navigation">
 							${repeat(
 								this._workspaceViews,
 								(view) => view.alias,
@@ -148,7 +148,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-body-layout>
+			<umb-body-layout main-no-padding>
 				<div id="header" slot="header">
 					<h3 id="headline">
 						${this._activePath === 'overview' ? 'Log Overview for Selected Time Period' : 'Log search'}

@@ -1,6 +1,6 @@
 import { getLookAndColorFromUserStatus } from '../../../../utils.js';
 import { UmbUserCollectionContext } from '../../user-collection.context.js';
-import { css, html, nothing , customElement, state , repeat , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -107,8 +107,6 @@ export class UmbUserCollectionGridViewElement extends UmbLitElement {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 				gap: var(--uui-size-space-4);
-				margin: var(--uui-size-layout-1);
-				margin-top: var(--uui-size-space-2);
 			}
 
 			uui-card-user {

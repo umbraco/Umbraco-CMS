@@ -84,8 +84,6 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 			}
 
 			#nameInput {
-				/* TODO: can this be applied from layout slot CSS? */
-				margin: 0 var(--uui-size-layout-1);
 				flex: 1 1 auto;
 			}
 		`,
