@@ -32,7 +32,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-body-layout header-transparent>
+			<umb-body-layout header-transparent header-height-fit>
 				<div id="header" slot="header">
 					<div id="levels-container">
 						<umb-log-viewer-log-level-filter-menu></umb-log-viewer-log-level-filter-menu>
@@ -59,10 +59,6 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			umb-body-layout {
-				--umb-header-layout-height: fit-content;
-			}
-
 			uui-box {
 				--uui-box-default-padding: 0;
 			}

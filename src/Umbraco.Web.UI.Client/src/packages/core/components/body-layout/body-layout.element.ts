@@ -10,7 +10,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 
-//TODO: Add the following attributes to JSDocs: header-transparent, no-padding
+//TODO: Add the following attributes to JSDocs: header-transparent, no-padding, header-height-fit
 
 /**
  * @element umb-body-layout
@@ -41,9 +41,6 @@ export class UmbBodyLayoutElement extends LitElement {
 
 	@state()
 	private _navigationSlotHasChildren = false;
-
-	@state()
-	private _tabsSlotHasChildren = false;
 
 	@state()
 	private _actionsMenuSlotHasChildren = false;
@@ -83,7 +80,6 @@ export class UmbBodyLayoutElement extends LitElement {
 				id="header"
 				style="display: ${this.headline ||
 				this._headerSlotHasChildren ||
-				this._tabsSlotHasChildren ||
 				this._actionsMenuSlotHasChildren ||
 				this._navigationSlotHasChildren
 					? ''
@@ -97,21 +93,14 @@ export class UmbBodyLayoutElement extends LitElement {
 						this._headerSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
 				<slot
-					id="tabs-slot"
-					name="tabs"
+					id="navigation-slot"
+					name="navigation"
 					@slotchange=${(e: Event) => {
-						this._tabsSlotHasChildren = this.#hasNodes(e);
+						this._actionsMenuSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
 				<slot
 					id="action-menu-slot"
 					name="action-menu"
-					@slotchange=${(e: Event) => {
-						this._actionsMenuSlotHasChildren = this.#hasNodes(e);
-					}}></slot>
-
-				<slot
-					id="navigation-slot"
-					name="navigation"
 					@slotchange=${(e: Event) => {
 						this._actionsMenuSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
@@ -160,6 +149,10 @@ export class UmbBodyLayoutElement extends LitElement {
 				border-bottom: 1px solid var(--uui-color-border);
 				box-sizing: border-box;
 				z-index: 1;
+			}
+
+			:host([header-height-fit]) #header {
+				height: fit-content;
 			}
 
 			:host([header-transparent]) #header {
