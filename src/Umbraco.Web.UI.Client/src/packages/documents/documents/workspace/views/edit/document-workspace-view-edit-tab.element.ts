@@ -31,6 +31,17 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		this._groupStructureHelper.setIsRoot(value);
 	}
 
+	private _ownerTabId?: string | null;
+	@property({ type: String })
+	public get ownerTabId(): string | null | undefined {
+		return this._ownerTabId;
+	}
+	public set ownerTabId(value: string | null | undefined) {
+		if (value === this._ownerTabId) return;
+		this._ownerTabId = value;
+		this._groupStructureHelper.setOwnerId(value);
+	}
+
 	_groupStructureHelper = new UmbContentTypeContainerStructureHelper(this);
 
 	@state()
