@@ -1,6 +1,14 @@
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, PropertyValueMap , customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	PropertyValueMap,
+	customElement,
+	property,
+	query,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { LogLevelModel, LogMessagePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { query as getQuery, toQueryString } from '@umbraco-cms/backoffice/router';
@@ -212,22 +220,44 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 				margin-bottom: var(--uui-size-space-3);
 			}
 
-			summary:hover,
-			#properties-list {
-				background-color: var(--uui-color-background);
+			summary:hover {
+				background-color: var(--uui-color-surface-emphasis);
+				color: var(--uui-color-interactive-emphasis);
 			}
 
 			#properties-list {
-				margin: 0;
 				padding: 0;
 				list-style: none;
-				margin-bottom: var(--uui-size-space-3);
 			}
 
 			.property {
 				padding: 10px 20px;
 				display: flex;
 				border-top: 1px solid var(--uui-color-border);
+			}
+
+			.property:first-child {
+				border-top: transparent;
+			}
+
+			#properties-list,
+			pre {
+				margin: 0 var(--uui-size-layout-1);
+				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-background);
+				margin-bottom: var(--uui-size-space-3);
+			}
+
+			pre {
+				border-left: 4px solid #d42054;
+				color: #303033;
+				display: block;
+				font-family: Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
+				line-height: 20px;
+				overflow-x: auto;
+				padding: 9.5px;
+				white-space: pre-wrap;
 			}
 
 			summary > div {
@@ -249,6 +279,9 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 			#message {
 				flex: 6 0 14ch;
 				word-break: break-all;
+			}
+			#search-button {
+				margin-left: var(--uui-size-layout-1);
 			}
 
 			.property-name,
@@ -281,20 +314,6 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 
 			.search-item {
 				width: 100%;
-			}
-
-			pre {
-				background-color: var(--uui-color-background);
-				border-top: 1px solid #d8d7d9;
-				border-left: 4px solid #d42054;
-				color: #303033;
-				display: block;
-				font-family: Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
-				line-height: 20px;
-				margin: 0;
-				overflow-x: auto;
-				padding: 9.5px;
-				white-space: pre-wrap;
 			}
 		`,
 	];

@@ -18,8 +18,8 @@ import {
 	UmbDetailRepository,
 	UmbItemDataSource,
 	UmbItemRepository,
-	UmbRepositoryErrorResponse,
-	UmbRepositoryResponse,
+	UmbDataSourceErrorResponse,
+	DataSourceResponse,
 } from '@umbraco-cms/backoffice/repository';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
@@ -69,7 +69,7 @@ export class UmbUserGroupRepository
 			}).asPromise(),
 		]);
 	}
-	createScaffold(parentId: string | null): Promise<UmbRepositoryResponse<UserGroupBaseModel>> {
+	createScaffold(parentId: string | null): Promise<DataSourceResponse<UserGroupBaseModel>> {
 		return this.#detailSource.createScaffold(parentId);
 	}
 
@@ -113,7 +113,7 @@ export class UmbUserGroupRepository
 		throw new Error('Method not implemented.');
 	}
 
-	async create(userGroupRequestData: any): Promise<UmbRepositoryResponse<any>> {
+	async create(userGroupRequestData: any): Promise<DataSourceResponse<any>> {
 		if (!userGroupRequestData) throw new Error('Data is missing');
 
 		const { data, error } = await this.#detailSource.insert(userGroupRequestData);
@@ -144,7 +144,7 @@ export class UmbUserGroupRepository
 		return { data, error };
 	}
 
-	async delete(id: string): Promise<UmbRepositoryErrorResponse> {
+	async delete(id: string): Promise<UmbDataSourceErrorResponse> {
 		if (!id) throw new Error('UserGroup id is missing');
 
 		const { error } = await this.#detailSource.delete(id);

@@ -114,7 +114,8 @@ export class UmbDocumentTypeWorkspaceContext
 		this.structure.updateOwnerDocumentType({ defaultTemplateId });
 	}
 
-	async createScaffold(parentId: string | null) {
+	async create(parentId: string | null) {
+
 		const { data } = await this.structure.createScaffold(parentId);
 		if (!data) return undefined;
 

@@ -42,7 +42,7 @@ export class UmbTreeElement extends UmbLitElement {
 		this.#treeContext.setMultiple(newVal);
 	}
 
-	// TODO: what is the best name for this functionatliy?
+	// TODO: what is the best name for this functionality?
 	private _hideTreeRoot = false;
 	@property({ type: Boolean, attribute: 'hide-tree-root' })
 	get hideTreeRoot() {
@@ -76,10 +76,11 @@ export class UmbTreeElement extends UmbLitElement {
 
 	#rootItemsObserver?: UmbObserverController<Array<TreeItemPresentationModel>>;
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	constructor() {
+		super();
 		this.#requestTreeRoot();
 	}
+
 
 	async #requestTreeRoot() {
 		if (!this.#treeContext?.requestTreeRoot) throw new Error('Tree does not support root');
@@ -96,8 +97,9 @@ export class UmbTreeElement extends UmbLitElement {
 
 		if (asObservable) {
 			this.#rootItemsObserver = this.observe(asObservable(), (rootItems) => {
+				const oldValue = this._items;
 				this._items = rootItems;
-				this.requestUpdate();
+				this.requestUpdate('_items', oldValue);
 			});
 		}
 	}
@@ -116,7 +118,8 @@ export class UmbTreeElement extends UmbLitElement {
 		return html`
 			${repeat(
 				this._items,
-				(item, index) => index,
+				// TODO: use unique here:
+				(item, index) => item.name + '___' + index,
 				(item) => html`<umb-tree-item .item=${item}></umb-tree-item>`
 			)}
 		`;

@@ -68,7 +68,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	public open(params: { [key: string]: string | number }, prepend?: string) {
 		if (this.active) return;
 
-		window.history.pushState({}, '', this.#routeBuilder?.(params) + (prepend ? `/${prepend}` : ''));
+		window.history.pushState({}, '', this.#routeBuilder?.(params) + (prepend ? `${prepend}` : ''));
 	}
 
 	/**

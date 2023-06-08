@@ -4,17 +4,21 @@
 import type { ChangePasswordUserRequestModel } from '../models/ChangePasswordUserRequestModel';
 import type { CreateUserRequestModel } from '../models/CreateUserRequestModel';
 import type { CreateUserResponseModel } from '../models/CreateUserResponseModel';
+import type { CurrentUserResponseModel } from '../models/CurrentUserResponseModel';
 import type { DirectionModel } from '../models/DirectionModel';
 import type { DisableUserRequestModel } from '../models/DisableUserRequestModel';
 import type { EnableUserRequestModel } from '../models/EnableUserRequestModel';
 import type { InviteUserRequestModel } from '../models/InviteUserRequestModel';
+import type { LinkedLoginsRequestModel } from '../models/LinkedLoginsRequestModel';
 import type { PagedUserResponseModel } from '../models/PagedUserResponseModel';
 import type { SetAvatarRequestModel } from '../models/SetAvatarRequestModel';
 import type { UnlockUsersRequestModel } from '../models/UnlockUsersRequestModel';
 import type { UpdateUserGroupsOnUserRequestModel } from '../models/UpdateUserGroupsOnUserRequestModel';
 import type { UpdateUserRequestModel } from '../models/UpdateUserRequestModel';
+import type { UserDataResponseModel } from '../models/UserDataResponseModel';
 import type { UserItemResponseModel } from '../models/UserItemResponseModel';
 import type { UserOrderModel } from '../models/UserOrderModel';
+import type { UserPermissionsResponseModel } from '../models/UserPermissionsResponseModel';
 import type { UserResponseModel } from '../models/UserResponseModel';
 import type { UserStateModel } from '../models/UserStateModel';
 
@@ -188,6 +192,127 @@ export class UserResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getUserCurrent(): CancelablePromise<CurrentUserResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/user/current',
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postUserCurrentAvatar({
+        requestBody,
+    }: {
+        requestBody?: SetAvatarRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/user/current/avatar',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postUserCurrentChangePassword({
+        requestBody,
+    }: {
+        requestBody?: ChangePasswordUserRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/user/current/change-password',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getUserCurrentData(): CancelablePromise<UserDataResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/user/current/data',
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getUserCurrentLogins(): CancelablePromise<LinkedLoginsRequestModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/user/current/logins',
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getUserCurrentPermissions({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<UserPermissionsResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/user/current/permissions',
+            query: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getUserCurrentPermissionsDocument({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<UserPermissionsResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/user/current/permissions/document',
+            query: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getUserCurrentPermissionsMedia({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<UserPermissionsResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/user/current/permissions/media',
+            query: {
+                'id': id,
+            },
         });
     }
 

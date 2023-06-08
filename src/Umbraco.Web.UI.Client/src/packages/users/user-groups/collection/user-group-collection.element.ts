@@ -18,11 +18,11 @@ export class UmbUserCollectionElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-scroll-container>
-				<umb-user-group-collection-header></umb-user-group-collection-header>
+			<umb-body-layout header-transparent>
+				<umb-user-group-collection-header slot="header"></umb-user-group-collection-header>
 				<umb-user-group-collection-view></umb-user-group-collection-view>
-			</uui-scroll-container>
-			<umb-collection-selection-actions></umb-collection-selection-actions>
+				<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>
+			</umb-body-layout>
 		`;
 	}
 

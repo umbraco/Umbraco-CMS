@@ -149,11 +149,8 @@ export class UmbCollectionToolbarElement extends UmbLitElement {
 		css`
 			:host {
 				display: flex;
-				gap: var(--uui-size-3);
+				gap: var(--uui-size-space-5);
 				width: 100%;
-				padding: var(--uui-size-space-4) var(--uui-size-space-6);
-				align-items: center;
-				box-sizing: border-box;
 			}
 
 			uui-popover {

@@ -15,6 +15,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	UmbPropertySettingsModalResult
 > {
 	//TODO: Should these options come from the server?
+	// TODO: Or should they come from a extension point?
 	@state() private _customValidationOptions = [
 		{
 			name: 'No validation',
@@ -44,15 +45,14 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	@state()
 	protected _returnData!: UmbPropertySettingsModalResult;
 
-	constructor() {
-		super();
-	}
 
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._returnData = JSON.parse(JSON.stringify(this.data));
 
-		const regEx = this._returnData.validation?.regEx ?? '';
+		this._returnData.validation ??= {};
+
+		const regEx = this._returnData.validation.regEx ?? '';
 		const newlySelected = this._customValidationOptions.find((option) => {
 			option.selected = option.value === regEx;
 			return option.selected;
@@ -79,10 +79,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 		const isValid = form.checkValidity();
 		if (!isValid) return;
-
-		const formData = new FormData(form);
-
-		this._returnData.validation!.mandatoryMessage = formData.get('mandatory-message')?.toString() || '';
 
 		this.modalContext?.submit(this._returnData);
 	}
@@ -152,11 +148,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 	#onToggleAliasLock() {
 		this._aliasLocked = !this._aliasLocked;
-
-		if (this._aliasLocked) {
-			this._returnData.alias = generateAlias(this._returnData.alias ?? '');
-			this.requestUpdate('_returnData');
-		}
 	}
 
 	#onValidationRegExChange(event: UUIInputEvent) {
@@ -238,34 +229,32 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	}
 
 	#renderAlignLeftIcon() {
-		return html`<div
+		return html`<button
+			type="button"
 			@click=${this.#setAppearanceNormal}
-			@keydown=${() => ''}
 			class="appearance left ${this._returnData.appearance?.labelOnTop ? '' : 'selected'}">
-			<svg width="260" height="32" viewBox="0 0 260 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<rect width="89" height="14" rx="7" fill="currentColor" />
-				<rect x="121" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
-				<rect x="121" y="46" width="108" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
-				<rect x="121" y="23" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
+			<svg width="200" height="48" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<rect width="94" height="14" rx="6" fill="currentColor" />
+				<rect y="22" width="64" height="9" rx="4" fill="currentColor" fill-opacity="0.4" />
+				<rect x="106" width="94" height="60" rx="5" fill="currentColor" fill-opacity="0.4" />
 			</svg>
 			<label class="appearance-label"> Label on the left </label>
-		</div>`;
+		</button>`;
 	}
 
 	#renderAlignTopIcon() {
 		return html`
-			<div
+			<button
+				type="button"
 				@click=${this.#setAppearanceTop}
-				@keydown=${() => ''}
 				class="appearance top ${this._returnData.appearance?.labelOnTop ? 'selected' : ''}">
-				<svg width="139" height="48" viewBox="0 0 139 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<rect width="89" height="14" rx="7" fill="currentColor" />
-					<rect y="30" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
-					<rect y="76" width="108" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
-					<rect y="53" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
+				<svg width="140" height="48" viewBox="0 0 140 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<rect width="90" height="14" rx="6" fill="currentColor" />
+					<rect y="22" width="64" height="9" rx="4" fill="currentColor" fill-opacity="0.4" />
+					<rect y="42" width="140" height="36" rx="5" fill="currentColor" fill-opacity="0.4" />
 				</svg>
 				<label class="appearance-label"> Label on top </label>
-			</div>
+			</button>
 		`;
 	}
 
@@ -328,10 +317,11 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 			.appearance {
 				position: relative;
 				display: flex;
-				border: 2px solid var(--uui-color-border-standalone);
+				border: 1px solid var(--uui-color-border-standalone);
+				background-color: transparent;
 				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 				align-items: center;
-				border-radius: 6px;
+				border-radius: var(--uui-border-radius);
 				opacity: 0.8;
 				flex-direction: column;
 				justify-content: space-between;
@@ -340,26 +330,8 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 			.appearance-label {
 				font-size: 0.8rem;
 				line-height: 1;
-			}
-			.appearance.selected .appearance-label {
 				font-weight: bold;
-			}
-			.appearance:not(.selected):hover {
-				border-color: var(--uui-color-border-emphasis);
-				cursor: pointer;
-				opacity: 1;
-			}
-			.appearance.selected {
-				border-color: var(--uui-color-selected);
-				opacity: 1;
-			}
-			.appearance.selected::after {
-				content: '';
-				position: absolute;
-				inset: 0;
-				border-radius: 6px;
-				opacity: 0.1;
-				background-color: var(--uui-color-selected);
+				pointer-events: none;
 			}
 			.appearance.left {
 				flex-grow: 1;
@@ -371,6 +343,28 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 				display: flex;
 				width: 100%;
 				color: var(--uui-color-text);
+			}
+			.appearance:not(.selected):hover {
+				border-color: var(--uui-color-border-emphasis);
+				cursor: pointer;
+				opacity: 1;
+			}
+			.appearance.selected {
+				background-color: var(--uui-color-surface);
+				border-color: var(--uui-color-selected);
+				color: var(--uui-color-selected);
+				opacity: 1;
+			}
+			.appearance.selected svg {
+				color: var(--uui-color-selected);
+			}
+			.appearance.selected::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				border-radius: 6px;
+				opacity: 0.1;
+				background-color: var(--uui-color-selected);
 			}
 			hr {
 				border: none;

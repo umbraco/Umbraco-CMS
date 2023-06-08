@@ -56,8 +56,9 @@ export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTree
 			}
 
 			#status-symbol {
-				width: 8px;
-				height: 8px;
+				width: 5px;
+				height: 5px;
+				border: 1px solid white;
 				background-color: blue;
 				display: block;
 				position: absolute;
