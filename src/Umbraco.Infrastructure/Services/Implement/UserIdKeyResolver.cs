@@ -85,10 +85,8 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
                 .From<UserDto>()
                 .Where<UserDto>(x => x.Id == id);
 
-            string? guidString = await scope.Database.ExecuteScalarAsync<string?>(query);
-            Guid fetchedKey = guidString is not null
-                ? new Guid(guidString)
-                : throw new InvalidOperationException("No user found with the specified id");
+            Guid fetchedKey = scope.Database.ExecuteScalar<Guid?>(query)
+                              ?? throw new InvalidOperationException("No user found with the specified id");
 
             _idToKey[id] = fetchedKey;
 
