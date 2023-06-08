@@ -1,7 +1,7 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { encodeFolderName, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -111,7 +111,39 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		this._workspaceContext?.structure.removeContainer(null, tabId);
 	}
 	async #addTab() {
-		this._workspaceContext?.structure.createContainer(null, null, 'Tab');
+		const tab = await this._workspaceContext?.structure.createContainer(null, null, 'Tab');
+		if(tab) {
+			const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
+			window.history.replaceState(null, '', path);
+			setTimeout(() => {
+				(this.shadowRoot?.querySelector('uui-tab[active] uui-input') as (UUIInputElement | undefined))?.focus();
+			}, 100);
+		}
+	}
+
+	#tabNameChanged(event: InputEvent, tab: PropertyTypeContainerModelBaseModel) {
+
+		console.log(event.target)
+
+		let newName = (event.target as HTMLInputElement).value;
+
+		if(newName === '') {
+			newName = 'Unnamed';
+		}
+
+		const changedName = this._workspaceContext?.structure.makeContainerNameUniqueForOwnerDocument(newName, 'Tab')
+		// Check if it collides with another tab name of this same document-type, if so adjust name:
+		if(changedName) {
+			newName = changedName;
+			(event.target as HTMLInputElement).value = newName;
+		}
+
+		this._tabsStructureHelper.partialUpdateContainer(tab.id, {
+			name: newName,
+		});
+
+		// Update the current URL, so we are still on this specific tab:
+		window.history.replaceState(null, '', this._routerPath + '/tab/' + encodeFolderName(newName));
 	}
 
 	renderTabsNavigation() {
@@ -129,22 +161,16 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				(tab) => tab.id! + tab.name,
 				(tab) => {
 					const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
-					return html`<uui-tab label=${tab.name!} .active=${path === this._activePath} href=${path}>
-						${path === this._activePath && this._tabsStructureHelper.isOwnerContainer(tab.id!)
+					const tabActive = path === this._activePath;
+					return html`<uui-tab label=${tab.name!} .active=${tabActive} href=${path}>
+						${tabActive && this._tabsStructureHelper.isOwnerContainer(tab.id!)
 							? html` <uui-input
 									label="Tab name"
 									look="placeholder"
 									value=${tab.name!}
 									placeholder="Enter a name"
-									@change=${(e: InputEvent) => {
-										const newName = (e.target as HTMLInputElement).value;
-										this._tabsStructureHelper.partialUpdateContainer(tab.id, {
-											name: newName,
-										});
-
-										// Update the current URL, so we are still on this specific tab:
-										window.history.replaceState(null, '', this._routerPath + '/tab/' + encodeFolderName(newName));
-									}}>
+									@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
+									@blur=${(e: InputEvent) => this.#tabNameChanged(e, tab)}>
 									<uui-button
 										label="Remove tab"
 										class="trash"
