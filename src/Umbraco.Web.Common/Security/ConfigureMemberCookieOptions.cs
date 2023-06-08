@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
@@ -46,6 +47,14 @@ public sealed class ConfigureMemberCookieOptions : IConfigureNamedOptions<Cookie
                 ctx.HttpContext.SetPrincipalForRequest(ctx.Principal);
 
                 return Task.CompletedTask;
+            },
+            OnValidatePrincipal = async ctx =>
+            {
+                // We need to resolve the BackOfficeSecurityStampValidator per request as a requirement (even in aspnetcore they do this)
+                MemberSecurityStampValidator securityStampValidator =
+                    ctx.HttpContext.RequestServices.GetRequiredService<MemberSecurityStampValidator>();
+
+                await securityStampValidator.ValidateAsync(ctx);
             },
             OnRedirectToAccessDenied = ctx =>
             {
