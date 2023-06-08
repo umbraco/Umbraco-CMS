@@ -122,6 +122,11 @@ public interface IPublishedPropertyType
     /// <param name="referenceCacheLevel">The reference cache level.</param>
     /// <param name="inter">The intermediate value.</param>
     /// <param name="preview">A value indicating whether content should be considered draft.</param>
+    /// <param name="expanding">A value indicating whether the property value should be expanded.</param>
     /// <returns>The object value.</returns>
-    object? ConvertInterToDeliveryApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
+    object? ConvertInterToDeliveryApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding);
+
+    [Obsolete($"Use the {nameof(ConvertInterToDeliveryApiObject)} that supports property expansion. Will be removed in V14.")]
+    object? ConvertInterToDeliveryApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        => ConvertInterToDeliveryApiObject(owner, referenceCacheLevel, inter, preview, false);
 }

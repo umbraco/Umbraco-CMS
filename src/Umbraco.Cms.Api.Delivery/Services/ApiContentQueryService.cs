@@ -1,9 +1,10 @@
 using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.New.Cms.Core.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
 
@@ -15,6 +16,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
     private readonly SortHandlerCollection _sortHandlers;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IApiContentQueryProvider _apiContentQueryProvider;
+    private readonly IRequestPreviewService _requestPreviewService;
 
     public ApiContentQueryService(
         IRequestStartItemProviderAccessor requestStartItemProviderAccessor,
@@ -22,7 +24,8 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         FilterHandlerCollection filterHandlers,
         SortHandlerCollection sortHandlers,
         IVariationContextAccessor variationContextAccessor,
-        IApiContentQueryProvider apiContentQueryProvider)
+        IApiContentQueryProvider apiContentQueryProvider,
+        IRequestPreviewService requestPreviewService)
     {
         _requestStartItemProviderAccessor = requestStartItemProviderAccessor;
         _selectorHandlers = selectorHandlers;
@@ -30,6 +33,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         _sortHandlers = sortHandlers;
         _variationContextAccessor = variationContextAccessor;
         _apiContentQueryProvider = apiContentQueryProvider;
+        _requestPreviewService = requestPreviewService;
     }
 
     /// <inheritdoc/>
@@ -45,7 +49,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         }
 
         var filterOptions = new List<FilterOption>();
-        foreach (var filter in filters)
+        foreach (var filter in filters.Where(filter => filter.IsNullOrWhiteSpace() is false))
         {
             FilterOption? filterOption = GetFilterOption(filter);
             if (filterOption is null)
@@ -58,7 +62,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         }
 
         var sortOptions = new List<SortOption>();
-        foreach (var sort in sorts)
+        foreach (var sort in sorts.Where(sort => sort.IsNullOrWhiteSpace() is false))
         {
             SortOption? sortOption = GetSortOption(sort);
             if (sortOption is null)
@@ -71,8 +75,9 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         }
 
         var culture = _variationContextAccessor.VariationContext?.Culture ?? string.Empty;
+        var isPreview = _requestPreviewService.IsPreview();
 
-        PagedModel<Guid> result = _apiContentQueryProvider.ExecuteQuery(selectorOption, filterOptions, sortOptions, culture, skip, take);
+        PagedModel<Guid> result = _apiContentQueryProvider.ExecuteQuery(selectorOption, filterOptions, sortOptions, culture, isPreview, skip, take);
         return Attempt.SucceedWithStatus(ApiContentQueryOperationStatus.Success, result);
     }
 

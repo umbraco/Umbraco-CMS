@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Extensions;
@@ -11,6 +12,7 @@ public static class IOHelperExtensions
     /// <param name="ioHelper"></param>
     /// <param name="path"></param>
     /// <returns></returns>
+    [return: NotNullIfNotNull("path")]
     public static string? ResolveRelativeOrVirtualUrl(this IIOHelper ioHelper, string? path)
     {
         if (string.IsNullOrWhiteSpace(path))
