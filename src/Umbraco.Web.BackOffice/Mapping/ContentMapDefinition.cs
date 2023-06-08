@@ -167,6 +167,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.Updater = source.Updater;
         target.Urls = source.Urls;
         target.Variants = context.MapEnumerable<ContentVariantDisplay, ContentVariantScheduleDisplay>(source.Variants);
+        target.VersionId = source.VersionId;
 
         foreach (BackOfficeNotification backOfficeNotification in source.Notifications)
         {
@@ -245,6 +246,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.Updater = source.Updater;
         target.Urls = source.Urls;
         target.Variants = source.Variants;
+        target.VersionId = source.VersionId;
     }
 
     // Umbraco.Code.MapAll
@@ -298,6 +300,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.Updater = _commonMapper.GetCreator(source, context);
         target.Urls = GetUrls(source);
         target.Variants = _contentVariantMapper.Map<TVariant>(source, context);
+        target.VersionId = source.VersionId;
 
         target.ContentDto = new ContentPropertyCollectionDto
         {

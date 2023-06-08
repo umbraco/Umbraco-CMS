@@ -52,4 +52,13 @@ public class ContentVersionDto
     [Column("preventCleanup")]
     [Constraint(Default = "0")]
     public bool PreventCleanup { get; set; }
+
+    /// <summary>
+    /// Gets or sets the status of the content version - a node can have one current version
+    /// but can have multiple alternate versions. Current is the only version displayed in the
+    /// Backoffice, but alternates can be created and persisted.
+    /// </summary>
+    [Column("alternate")]
+    [Constraint(Default = "0")]
+    public bool Alternate { get; set; }
 }

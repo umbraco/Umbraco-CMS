@@ -61,7 +61,7 @@ internal class ContentItemBinder : IModelBinder
         bindingContext.Result = ModelBindingResult.Success(model);
     }
 
-    protected virtual IContent? GetExisting(ContentItemSave model) => _contentService.GetById(model.Id);
+    protected virtual IContent? GetExisting(ContentItemSave model) => _contentService.GetVersion(model.VersionId);
 
     private IContent CreateNew(ContentItemSave model)
     {

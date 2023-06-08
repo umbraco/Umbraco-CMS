@@ -35,6 +35,10 @@ public class ContentItemDisplay<TVariant> :
     [Required]
     public int Id { get; set; }
 
+    [DataMember(Name = "versionId", IsRequired = true)]
+    [Required]
+    public int VersionId { get; set; }
+
     [DataMember(Name = "udi")]
     [ReadOnly(true)]
     public Udi? Udi { get; set; }

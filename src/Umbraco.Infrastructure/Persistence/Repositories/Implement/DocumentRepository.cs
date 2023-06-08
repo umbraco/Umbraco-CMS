@@ -1082,9 +1082,10 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         // whatever we do, we must check that we are saving the current version
         ContentVersionDto? version = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>()
             .From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == entity.VersionId)).FirstOrDefault();
-        if (version == null || !version.Current)
+
+        if (version == null || (!version.Current && !version.Alternate))
         {
-            throw new InvalidOperationException("Cannot save a non-current version.");
+            throw new InvalidOperationException("Cannot save a non-current or non-alternate version.");
         }
 
         // update
