@@ -174,8 +174,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 			:host {
 				height: 100%;
 				width: 100%;
-				padding: 0 var(--uui-size-layout-1);
-				background-color: var(--uui-color-background);
 				display: flex;
 				justify-content: space-between;
 				white-space: nowrap;
