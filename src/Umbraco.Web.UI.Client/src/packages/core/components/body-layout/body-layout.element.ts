@@ -150,34 +150,37 @@ export class UmbBodyLayoutElement extends LitElement {
 				box-sizing: border-box;
 				z-index: 1;
 			}
-
-			:host([header-height-fit]) #header {
-				height: fit-content;
-			}
-
 			:host([header-transparent]) #header {
 				background-color: transparent;
 				border-color: transparent;
 				transition: box-shadow 150ms ease-in-out;
-				box-shadow: 0 -1px 0px 0px rgba(0, 0, 0, 0.8);
+				box-shadow: 0 -1px 0px 0px rgba(0, 0, 0, 0.5);
 			}
+			:host([header-transparent][scrolling]) #header {
+				/* This should be using the uui-shadows but for now they are too drastic for this use case */
+				box-shadow: 0 1px 15px 0 rgba(0, 0, 0, 0.2);
+			}
+			:host([header-height-fit][header-transparent]:not([header-no-padding])) #header-slot {
+				padding: var(--uui-size-layout-1);
+			}
+			:host([header-height-fit]) #header {
+				height: fit-content;
+			}
+			#header-slot {
+				padding: 0 var(--uui-size-layout-1);
+				flex-grow: 1;
+			}
+			:host([header-no-padding]) #header-slot {
+				padding: 0;
+			}
+
 			:host([header-transparent]:not([main-no-padding])) #main:not(*[style='display: none'] + *) {
 				/* The following styling is only applied if the clear-header IS present, 
 				the main-no-padding attribute is NOT present, and the header is NOT hidden */
 				padding-top: var(--uui-size-space-1);
 			}
-
-			:host([header-transparent][scrolling]) #header {
-				/* This should be using the uui-shadows but for now they are too drastic for this use case */
-				box-shadow: 0 1px 15px 0 rgba(0, 0, 0, 0.3);
-			}
-
 			:host([main-no-padding]) #main {
 				padding: 0;
-			}
-
-			:host([header-height-fit][header-transparent]) #header-slot {
-				padding: var(--uui-size-layout-1);
 			}
 
 			#header-slot,
@@ -188,11 +191,6 @@ export class UmbBodyLayoutElement extends LitElement {
 				height: 100%;
 				align-items: center;
 				box-sizing: border-box;
-			}
-
-			#header-slot {
-				padding: 0 var(--uui-size-layout-1);
-				flex-grow: 1;
 			}
 
 			#navigation-slot,
