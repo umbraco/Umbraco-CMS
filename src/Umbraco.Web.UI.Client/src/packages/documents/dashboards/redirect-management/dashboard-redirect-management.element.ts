@@ -157,7 +157,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-body-layout header-transparent header-shadow>
+			<umb-body-layout header-transparent>
 				<div slot="header" id="header">
 					${this._trackerStatus
 						? html`<div>
