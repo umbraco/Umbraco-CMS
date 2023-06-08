@@ -3,7 +3,7 @@ import { manifests as createManifests } from './create/manifests.js';
 import {
 	UmbCopyEntityAction,
 	UmbMoveEntityAction,
-	UmbTrashEntityAction,
+	UmbDeleteEntityAction,
 	UmbSortChildrenOfEntityAction,
 } from '@umbraco-cms/backoffice/entity-action';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
@@ -13,14 +13,14 @@ const entityType = 'document-type';
 const entityActions: Array<ManifestEntityAction> = [
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.DocumentType.Trash',
-		name: 'Trash Document-Type Entity Action',
+		alias: 'Umb.EntityAction.DocumentType.Delete',
+		name: 'Delete Document-Type Entity Action',
 		weight: 900,
 		meta: {
 			icon: 'umb:trash',
-			label: 'Trash',
+			label: 'Delete (TBD)',
 			repositoryAlias: DOCUMENT_TYPE_REPOSITORY_ALIAS,
-			api: UmbTrashEntityAction,
+			api: UmbDeleteEntityAction,
 		},
 		conditions: {
 			entityTypes: [entityType],

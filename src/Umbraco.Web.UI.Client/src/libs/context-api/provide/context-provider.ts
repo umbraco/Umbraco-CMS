@@ -86,6 +86,6 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 
 	destroy(): void {
 		// I want to make sure to call this, but for now it was too overwhelming to require the destroy method on context instances.
-		(this.#instance as any).destroy?.();
+		(this.#instance as any)?.destroy?.();
 	}
 }

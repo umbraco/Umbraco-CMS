@@ -46,7 +46,7 @@ export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<UmbTemp
 		}
 	}
 
-	async createScaffold(parentKey: string | null) {
+	async create(parentKey: string | null) {
 		const { data } = await this.repository.createScaffold(parentKey);
 		if (!data) return;
 		this.setIsNew(true);

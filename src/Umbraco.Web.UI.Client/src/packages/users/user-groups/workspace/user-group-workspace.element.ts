@@ -16,7 +16,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 			path: 'create',
 			component: () => this.#element,
 			setup: (component, info) => {
-				this.#workspaceContext.createScaffold();
+				this.#workspaceContext.create();
 			},
 		},
 		{

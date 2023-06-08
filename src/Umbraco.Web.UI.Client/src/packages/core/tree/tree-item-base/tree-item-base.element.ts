@@ -76,7 +76,9 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 		if (!asObservable) return;
 
 		this.observe(asObservable(), (childItems) => {
+			const oldValue = this._childItems;
 			this._childItems = childItems;
+			this.requestUpdate('_childItems', oldValue);
 		});
 	}
 

@@ -1,6 +1,6 @@
 import { UmbUserGroupCollectionContext } from './user-group-collection.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -127,13 +127,6 @@ export class UmbUserGroupCollectionViewElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			:host {
-				height: 100%;
-				display: flex;
-				flex-direction: column;
-				margin: var(--uui-size-layout-1);
-			}
-
 			umb-table {
 				padding: 0;
 			}

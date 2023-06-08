@@ -47,7 +47,7 @@ export class UmbPropertyEditorUIBlockGridInnerTestElement extends UmbLitElement 
 		return html`<div>
 			inner: ${this.name}
 
-			<uui-tab-group slot="tabs">
+			<uui-tab-group slot="navigation">
 				<uui-tab
 					label="INNER TAB 1"
 					href="${this._routerPath}/inner-1"

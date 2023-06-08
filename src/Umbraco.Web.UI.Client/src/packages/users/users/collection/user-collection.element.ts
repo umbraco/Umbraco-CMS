@@ -35,12 +35,12 @@ export class UmbUserCollectionElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-scroll-container>
-				<umb-user-collection-header></umb-user-collection-header>
+			<umb-body-layout header-transparent>
+				<umb-user-collection-header slot="header"></umb-user-collection-header>
 				<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>
-			</uui-scroll-container>
-
-			<umb-collection-selection-actions></umb-collection-selection-actions>
+				<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>
+			</umb-body-layout>
+			<!-- This should go in the footer slot -->
 		`;
 	}
 

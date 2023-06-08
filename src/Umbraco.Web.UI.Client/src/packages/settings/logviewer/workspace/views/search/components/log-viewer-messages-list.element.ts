@@ -1,6 +1,6 @@
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
-import { UUIScrollContainerElement, UUIPaginationElement , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUIScrollContainerElement, UUIPaginationElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DirectionModel, LogMessageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -95,9 +95,9 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<uui-box>
-			<p style="font-weight: bold;">Total items: ${this._logsTotal}</p>
-			<div id="message-list-header">
+		// TODO: the table should scroll instead of the whole main div
+		return html`
+			<div id="header" slot="header">
 				<div id="timestamp">
 					Timestamp
 					<uui-button compact @click=${this.#sortLogs} label="Sort logs">
@@ -110,30 +110,41 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 				<div id="machine">Machine name</div>
 				<div id="message">Message</div>
 			</div>
-			${this._isLoading
-				? html`<umb-empty-state size="small"
-						><span id="empty"> <uui-loader-circle></uui-loader-circle>Loading log messages... </span></umb-empty-state
-				  >`
-				: html`${this.#renderLogs()}${this._renderPagination()}`}
-		</uui-box>`;
+			<div id="main">
+				${this._isLoading
+					? html`<umb-empty-state size="small"
+							><span id="empty"> <uui-loader-circle></uui-loader-circle>Loading log messages... </span></umb-empty-state
+					  >`
+					: html`${this.#renderLogs()}${this._renderPagination()}`}
+			</div>
+		`;
 	}
 
 	static styles = [
 		UUITextStyles,
 		css`
 			:host {
-				display: block;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
 			}
-			#message-list-header {
+			#header {
 				display: flex;
 				font-weight: 600;
+				width: 100%;
 			}
 
-			#message-list-header > div {
+			#header > div {
 				box-sizing: border-box;
 				padding: 10px 20px;
 				display: flex;
 				align-items: center;
+			}
+
+			#main {
+				display: flex;
+				flex-direction: column;
+				width: 100%;
 			}
 
 			#timestamp {

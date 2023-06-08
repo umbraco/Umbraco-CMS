@@ -3,7 +3,7 @@ import { css, html, customElement, property, state, repeat } from '@umbraco-cms/
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 import './document-type-workspace-view-edit-properties.element.js';
@@ -48,7 +48,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	_groupStructureHelper = new UmbContentTypeContainerStructureHelper(this);
 
 	@state()
-	_groups: Array<PropertyTypeContainerResponseModelBaseModel> = [];
+	_groups: Array<PropertyTypeContainerModelBaseModel> = [];
 
 	@state()
 	_hasProperties = false;
@@ -101,17 +101,15 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-				padding-bottom: var(--uui-size-layout-1); // To enforce some distance to the bottom of the scroll-container.
-			}
-			uui-box {
-				margin-top: var(--uui-size-layout-1);
-			}
-
 			#add {
 				width: 100%;
+			}
+
+			#add:not(:first-child) {
+				width: 100%;
+				margin-top: var(--uui-size-layout-1);
+			}
+			uui-box:not(:first-child) {
 				margin-top: var(--uui-size-layout-1);
 			}
 		`,
