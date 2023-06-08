@@ -152,7 +152,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		return html`
 			${!this.hideNavigation && this._workspaceViews.length > 1
 				? html`
-						<uui-tab-group slot="tabs">
+						<uui-tab-group slot="navigation">
 							${repeat(
 								this._workspaceViews,
 								(view) => view.alias,

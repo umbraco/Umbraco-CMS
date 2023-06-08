@@ -79,7 +79,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 			? html`<div>
 					umb-property-editor-ui-block-grid, inner routing test:
 
-					<uui-tab-group slot="tabs">
+					<uui-tab-group slot="navigation">
 						<uui-tab
 							label="TAB 1"
 							href="${this._routerPath + '/'}modal-1"
