@@ -27,7 +27,6 @@ export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
 				(await this.repository.requestById(value)).asObservable(),
 				(dataType) => {
 					if (dataType) {
-						console.log('got', dataType);
 						this.name = dataType.name ?? '';
 						this.propertyEditorUiAlias = dataType.propertyEditorUiAlias ?? '';
 						this.propertyEditorModelAlias = dataType.propertyEditorAlias ?? '';
