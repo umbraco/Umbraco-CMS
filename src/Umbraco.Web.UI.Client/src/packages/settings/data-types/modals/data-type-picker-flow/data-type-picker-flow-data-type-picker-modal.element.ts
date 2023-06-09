@@ -103,7 +103,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 								(dataType) =>
 									dataType.id
 										? html` <li class="item">
-												<uui-button type="button" @click="${() => this._handleClick(dataType)}">
+												<uui-button label="dataType.name" type="button" @click="${() => this._handleClick(dataType)}">
 													<div class="item-content">
 														<uui-icon name="${dataType.icon ?? 'umb:bug'}" class="icon"></uui-icon>
 														${dataType.name}

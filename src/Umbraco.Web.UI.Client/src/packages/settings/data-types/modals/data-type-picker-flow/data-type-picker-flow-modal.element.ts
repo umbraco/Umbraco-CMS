@@ -179,9 +179,9 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	private _renderGrid() {
 		return this.#currentFilterQuery
 			? html`
-					<h5>Available configurations</h5>
+					<h5 class="configuration-name">Available configurations</h5>
 					${this._renderDataTypes()}
-					<h5>Create a new configuration</h5>
+					<h5 class="configuration-name">Create a new configuration</h5>
 					${this._renderUIs()}
 			  `
 			: html`${this._renderUIs()}`;
@@ -201,7 +201,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		return this._groupedDataTypes
 			? html` ${Object.entries(this._groupedDataTypes).map(
 					([key, value]) =>
-						html` <h4>${key}</h4>
+						html` <h4 class="category-name">${key}</h4>
 							${this._renderGroupDataTypes(value)}`
 			  )}`
 			: '';
@@ -213,10 +213,12 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				dataTypes,
 				(dataType) => dataType.id,
 				(dataType) => html`<li class="item" ?selected=${this._selection.includes(dataType.id!)}>
-					<button type="button" @click="${() => this._handleDataTypeClick(dataType)}">
-						<uui-icon name="${dataType.icon}" class="icon"></uui-icon>
-						${dataType.name}
-					</button>
+					<uui-button label=${dataType.name} type="button" @click="${() => this._handleDataTypeClick(dataType)}">
+						<div class="item-content">
+							<uui-icon name="${dataType.icon ?? 'umb:bug'}" class="icon"></uui-icon>
+							${dataType.name}
+						</div>
+					</uui-button>
 				</li>`
 			)}
 		</ul>`;
@@ -225,7 +227,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	private _renderUIs() {
 		return html` ${Object.entries(this._groupedPropertyEditorUIs).map(
 			([key, value]) =>
-				html` <h4 id="category-name">${key}</h4>
+				html` <h4 class="category-name">${key}</h4>
 					${this._renderGroupUIs(value)}`
 		)}`;
 	}
@@ -239,6 +241,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 						(propertyEditorUI) => html` <li class="item">
 							<uui-button
 								type="button"
+								label="${propertyEditorUI.meta.label || propertyEditorUI.name}"
 								href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
 								<div class="item-content">
 									<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
@@ -319,11 +322,19 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				margin: auto;
 			}
 
-			#category-name {
+			.category-name {
 				text-align: center;
 				display: block;
 				text-transform: capitalize;
-				font-size: 1.2rem;
+				font-size: 0.9rem;
+			}
+
+			.configuration-name {
+				text-align: center;
+				font-weight: bold;
+				display: block;
+				text-transform: capitalize;
+				font-size: 1rem;
 			}
 		`,
 	];
