@@ -57,7 +57,6 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		if (!this._installerContext) return;
 
 		this.observe(this._installerContext.settings, (settings) => {
-
 			const databases = settings?.databases?.length ? [...settings.databases] : [];
 
 			// Sort the databases array if not empty and by sortOrder if it exists
