@@ -7,6 +7,8 @@ import '@umbraco-ui/uui';
 import { html } from 'lit';
 import { setCustomElements } from '@storybook/web-components';
 
+import { startMockServiceWorker } from '../src/mocks';
+
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalManagerContext } from '../src/packages/core/modal';
 import { UmbDataTypeStore } from '../src/packages/settings/data-types/repository/data-type.store.ts';
 import { UmbDocumentStore } from '../src/packages/documents/documents/repository/document.store.ts';
@@ -15,7 +17,6 @@ import { UmbDocumentTypeStore } from '../src/packages/documents/document-types/r
 import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
 import { UmbIconRegistry } from '../src/shared/icon-registry/icon.registry';
 import { UmbLitElement } from '../src/shared/lit-element';
-import { startMockServiceWorker } from '../src/mocks';
 import customElementManifests from '../dist-cms/custom-elements.json';
 
 import '../src/libs/context-api/provide/context-provider.element';
@@ -25,7 +26,7 @@ import '../src/packages/core/components';
 import { manifests as documentManifests } from '../src/packages/documents';
 
 // MSW
-startMockServiceWorker();
+startMockServiceWorker({ serviceWorker: { url: (import.meta.env.VITE_BASE_PATH ?? '/') + 'mockServiceWorker.js' } });
 
 class UmbStoryBookElement extends UmbLitElement {
 	_umbIconRegistry = new UmbIconRegistry();
