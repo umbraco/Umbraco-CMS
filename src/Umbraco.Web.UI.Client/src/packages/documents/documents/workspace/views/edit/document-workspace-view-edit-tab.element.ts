@@ -87,7 +87,14 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [UUITextStyles, css``];
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-box:not(:first-child) {
+				margin-top: var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbDocumentWorkspaceViewEditTabElement;
