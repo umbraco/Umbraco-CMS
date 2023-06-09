@@ -1,5 +1,5 @@
 import { UmbDataTypeRepository } from '../../repository/data-type.repository.js';
-import { css, html, repeat, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, repeat, customElement, property, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -177,14 +177,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	}
 
 	private _renderGrid() {
-		return this.#currentFilterQuery
-			? html`
-					<h5 class="configuration-name">Available configurations</h5>
-					${this._renderDataTypes()}
-					<h5 class="configuration-name">Create a new configuration</h5>
-					${this._renderUIs()}
-			  `
-			: html`${this._renderUIs()}`;
+		return this.#currentFilterQuery ? this._renderFilteredList() : this._renderUIs();
 	}
 
 	private _renderFilter() {
@@ -197,39 +190,54 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		</uui-input>`;
 	}
 
-	private _renderDataTypes() {
-		return this._groupedDataTypes
-			? html` ${Object.entries(this._groupedDataTypes).map(
-					([key, value]) =>
-						html` <h4 class="category-name">${key}</h4>
-							${this._renderGroupDataTypes(value)}`
-			  )}`
-			: '';
+	private _renderFilteredList() {
+		if (!this._groupedDataTypes) return nothing;
+		const dataTypesEntries = Object.entries(this._groupedDataTypes);
+
+		if (!this._groupedPropertyEditorUIs) return nothing;
+
+		const editorUIEntries = Object.entries(this._groupedPropertyEditorUIs);
+
+		if (dataTypesEntries.length === 0 && editorUIEntries.length === 0) {
+			return html`Nothing matches your search, try another search term.`;
+		}
+
+		return html`
+			${when(
+				dataTypesEntries.length > 0,
+				() => html` <h5 class="configuration-name">Available configurations</h5>
+					${this._renderDataTypes()}`
+			)}
+			${when(
+				editorUIEntries.length > 0,
+				() => html` <h5 class="configuration-name">Create a new configuration</h5>
+					${this._renderUIs()}`
+			)}
+		`;
 	}
 
-	private _renderGroupDataTypes(dataTypes: Array<EntityTreeItemResponseModel>) {
-		return html` <ul id="item-grid">
-			${repeat(
-				dataTypes,
-				(dataType) => dataType.id,
-				(dataType) => html`<li class="item" ?selected=${this._selection.includes(dataType.id!)}>
-					<uui-button label=${dataType.name} type="button" @click="${() => this._handleDataTypeClick(dataType)}">
-						<div class="item-content">
-							<uui-icon name="${dataType.icon ?? 'umb:bug'}" class="icon"></uui-icon>
-							${dataType.name}
-						</div>
-					</uui-button>
-				</li>`
-			)}
-		</ul>`;
+	private _renderDataTypes() {
+		if (!this._groupedDataTypes) return nothing;
+
+		const entries = Object.entries(this._groupedDataTypes);
+
+		return entries.map(
+			([key, value]) =>
+				html` <h4 class="category-name">${key}</h4>
+					${this._renderGroupDataTypes(value)}`
+		);
 	}
 
 	private _renderUIs() {
-		return html` ${Object.entries(this._groupedPropertyEditorUIs).map(
+		if (!this._groupedPropertyEditorUIs) return nothing;
+
+		const entries = Object.entries(this._groupedPropertyEditorUIs);
+
+		return entries.map(
 			([key, value]) =>
 				html` <h4 class="category-name">${key}</h4>
 					${this._renderGroupUIs(value)}`
-		)}`;
+		);
 	}
 
 	private _renderGroupUIs(uis: Array<ManifestPropertyEditorUi>) {
@@ -251,6 +259,23 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 						</li>`
 				  )
 				: ''}
+		</ul>`;
+	}
+
+	private _renderGroupDataTypes(dataTypes: Array<EntityTreeItemResponseModel>) {
+		return html` <ul id="item-grid">
+			${repeat(
+				dataTypes,
+				(dataType) => dataType.id,
+				(dataType) => html`<li class="item" ?selected=${this._selection.includes(dataType.id!)}>
+					<uui-button label=${dataType.name} type="button" @click="${() => this._handleDataTypeClick(dataType)}">
+						<div class="item-content">
+							<uui-icon name="${dataType.icon ?? 'umb:bug'}" class="icon"></uui-icon>
+							${dataType.name}
+						</div>
+					</uui-button>
+				</li>`
+			)}
 		</ul>`;
 	}
 
