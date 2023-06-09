@@ -23,7 +23,13 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		return this.#router.routes;
 	}
 	public set routes(value: UmbRoute[] | undefined) {
-		this.#router.routes = value || [];
+		value ??= [];
+		const oldValue = this.#router.routes;
+		if (
+			value.filter((route) => (oldValue ? oldValue.findIndex((r) => r.path === route.path) === -1 : true)).length > 0
+		) {
+			this.#router.routes = value;
+		}
 	}
 
 	@property()

@@ -110,6 +110,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 						return createExtensionElement(manifest);
 					},
 					setup: (component) => {
+						// TODO: We could just always parse it on and instead we should make a element interface for the workspace views.
 						if (this.componentHasManifest(component)) {
 							component.manifest = manifest;
 						}
