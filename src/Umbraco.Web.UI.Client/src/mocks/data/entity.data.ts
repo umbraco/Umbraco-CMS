@@ -24,8 +24,6 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 	}
 
 	insert(item: T) {
-		console.log('insert', item);
-
 		// TODO: Remove this fix when all types come with an ID them selfs.
 		if (!item.id) {
 			item.id = UmbId.new();
