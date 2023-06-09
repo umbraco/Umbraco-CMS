@@ -1,5 +1,5 @@
 import { UmbDataTypeRepository } from '../../repository/data-type.repository.js';
-import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbModalContext,
@@ -89,36 +89,41 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 	}
 
 	private _renderDataTypes() {
-		return html` <ul id="item-grid">
-			${this._dataTypes
-				? repeat(
-						this._dataTypes,
-						(dataType) => dataType.id,
-						(dataType) =>
-							dataType.id
-								? html` <li class="item">
-										<uui-button type="button" @click="${() => this._handleClick(dataType)}">
-											<div class="item-content">
-												<uui-icon name="${dataType.icon ?? 'umb:bug'}" class="icon"></uui-icon>
-												${dataType.name}
-											</div>
-										</uui-button>
-								  </li>`
-								: ''
-				  )
-				: ''}
-		</ul>`;
+		const shouldRender = this._dataTypes && this._dataTypes.length > 0;
+		console.log(this._dataTypes, 'yo', shouldRender);
+
+		return when(
+			shouldRender,
+			() =>
+				html`<ul id="item-grid">
+					${this._dataTypes
+						? repeat(
+								this._dataTypes,
+								(dataType) => dataType.id,
+								(dataType) =>
+									dataType.id
+										? html` <li class="item">
+												<uui-button type="button" @click="${() => this._handleClick(dataType)}">
+													<div class="item-content">
+														<uui-icon name="${dataType.icon ?? 'umb:bug'}" class="icon"></uui-icon>
+														${dataType.name}
+													</div>
+												</uui-button>
+										  </li>`
+										: ''
+						  )
+						: ''}
+				</ul>`
+		);
 	}
 	private _renderCreate() {
 		return html`
-			<div class="item">
-				<uui-button id="create-button" type="button" look="placeholder" @click="${() => this._handleCreate()}">
-					<div class="item-content">
-						<uui-icon name="umb:add" class="icon"></uui-icon>
-						Create new
-					</div>
-				</uui-button>
-			</div>
+			<uui-button id="create-button" type="button" look="placeholder" @click="${() => this._handleCreate()}">
+				<div class="content">
+					<uui-icon name="umb:add" class="icon"></uui-icon>
+					Create new
+				</div>
+			</uui-button>
 		`;
 	}
 
@@ -188,7 +193,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 				height: 100%;
 				width: 100%;
 			}
-			.item .icon {
+			.icon {
 				font-size: 2em;
 				margin: auto;
 			}
@@ -199,9 +204,28 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 				text-transform: capitalize;
 				font-size: 1.2rem;
 			}
-			.item:has(#create-button) {
-				margin-top: var(--uui-size-layout-1);
+			#create-button {
 				max-width: 100px;
+				--uui-button-padding-left-factor: 0;
+				--uui-button-padding-right-factor: 0;
+				--uui-button-padding-top-factor: 0;
+				--uui-button-padding-bottom-factor: 0;
+				width: 100%;
+				height: 100%;
+			}
+			#create-button .content {
+				text-align: center;
+				box-sizing: border-box;
+
+				padding: var(--uui-size-space-2);
+
+				display: grid;
+				grid-template-rows: 40px 1fr;
+				height: 100%;
+				width: 100%;
+			}
+			#create-button:not(:first-child) {
+				margin-top: var(--uui-size-layout-1);
 			}
 		`,
 	];
