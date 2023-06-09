@@ -12,12 +12,14 @@ import './document-type-workspace-view-edit-properties.element.js';
 export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	private _ownerTabId?: string | null;
 
+	// TODO: get rid of this:
 	@property({ type: String })
 	public get ownerTabId(): string | null | undefined {
 		return this._ownerTabId;
 	}
 	public set ownerTabId(value: string | null | undefined) {
 		if (value === this._ownerTabId) return;
+		console.log('ownerTabId', value);
 		const oldValue = this._ownerTabId;
 		this._ownerTabId = value;
 		this._groupStructureHelper.setOwnerId(value);
@@ -81,7 +83,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 	render() {
 		return html`
-			${this._noTabName
+			${!this._noTabName
 				? html`
 						<uui-box>
 							<umb-document-type-workspace-view-edit-properties

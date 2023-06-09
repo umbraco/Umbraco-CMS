@@ -78,7 +78,8 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 					component: () => import('./document-type-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
 						(component as UmbDocumentTypeWorkspaceViewEditTabElement).tabName = tabName;
-						(component as UmbDocumentTypeWorkspaceViewEditTabElement).ownerTabId = this._workspaceContext?.structure.isOwnerContainer(tab.id!) ? tab.id : undefined;
+						(component as UmbDocumentTypeWorkspaceViewEditTabElement).ownerTabId =
+							this._workspaceContext?.structure.isOwnerContainer(tab.id!) ? tab.id : undefined;
 					},
 				});
 			});
@@ -89,6 +90,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			component: () => import('./document-type-workspace-view-edit-tab.element.js'),
 			setup: (component) => {
 				(component as UmbDocumentTypeWorkspaceViewEditTabElement).noTabName = true;
+				(component as UmbDocumentTypeWorkspaceViewEditTabElement).ownerTabId = null;
 			},
 		});
 
@@ -113,26 +115,25 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	}
 	async #addTab() {
 		const tab = await this._workspaceContext?.structure.createContainer(null, null, 'Tab');
-		if(tab) {
+		if (tab) {
 			const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
 			window.history.replaceState(null, '', path);
 			setTimeout(() => {
-				(this.shadowRoot?.querySelector('uui-tab[active] uui-input') as (UUIInputElement | undefined))?.focus();
+				(this.shadowRoot?.querySelector('uui-tab[active] uui-input') as UUIInputElement | undefined)?.focus();
 			}, 100);
 		}
 	}
 
 	#tabNameChanged(event: InputEvent, tab: PropertyTypeContainerModelBaseModel) {
-
 		let newName = (event.target as HTMLInputElement).value;
 
-		if(newName === '') {
+		if (newName === '') {
 			newName = 'Unnamed';
 		}
 
-		const changedName = this._workspaceContext?.structure.makeContainerNameUniqueForOwnerDocument(newName, 'Tab')
+		const changedName = this._workspaceContext?.structure.makeContainerNameUniqueForOwnerDocument(newName, 'Tab');
 		// Check if it collides with another tab name of this same document-type, if so adjust name:
-		if(changedName) {
+		if (changedName) {
 			newName = changedName;
 			(event.target as HTMLInputElement).value = newName;
 		}
@@ -146,16 +147,16 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	}
 
 	renderTabsNavigation() {
-		if(!this._tabs) return;
+		if (!this._tabs) return;
 		const contentTabActive = this._routerPath + '/' === this._activePath;
 		return html`<uui-tab-group>
-				<uui-tab
-					class=${this._hasRootGroups || contentTabActive ? '' : 'content-tab-is-empty'}
-					label="Content"
-					.active=${contentTabActive}
-					href=${this._routerPath + '/'}
-					>Content</uui-tab
-				>
+			<uui-tab
+				class=${this._hasRootGroups || contentTabActive ? '' : 'content-tab-is-empty'}
+				label="Content"
+				.active=${contentTabActive}
+				href=${this._routerPath + '/'}
+				>Content</uui-tab
+			>
 			${repeat(
 				this._tabs,
 				(tab) => tab.id! + tab.name,

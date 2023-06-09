@@ -97,6 +97,7 @@ export class UmbDocumentWorkspaceViewEditElement
 				component: () => import('./document-workspace-view-edit-tab.element.js'),
 				setup: (component) => {
 					(component as UmbDocumentWorkspaceViewEditTabElement).noTabName = true;
+					(component as UmbDocumentWorkspaceViewEditTabElement).ownerTabId = null;
 				},
 			});
 		}
