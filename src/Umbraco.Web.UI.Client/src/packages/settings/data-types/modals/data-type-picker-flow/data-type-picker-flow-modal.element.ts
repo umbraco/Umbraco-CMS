@@ -314,13 +314,11 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				height: 100%;
 				width: 100%;
 			}
-
 			#item-grid .item .icon {
 				font-size: 2em;
 				margin: auto;
-				/* width: fit-content;
-				height: fit-content; */
 			}
+
 			#category-name {
 				text-align: center;
 				display: block;
