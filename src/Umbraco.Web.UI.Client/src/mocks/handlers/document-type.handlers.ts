@@ -15,7 +15,7 @@ export const handlers = [
 		const created = umbDocumentTypeData.insert(data);
 
 		// TODO: remove this hack, as we get the right end-point, in that case we will be in control of the Ids. (I choose this URL to make it clear thats its a hack/mocked URL)
-		return res(ctx.status(200), ctx.set({'location': '/header/location/id/'+created.id}));
+		return res(ctx.status(200), ctx.set({ location: '/header/location/id/' + created.id }));
 	}),
 
 	rest.put(umbracoPath(`/document-type/:id`), async (req, res, ctx) => {

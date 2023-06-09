@@ -4,7 +4,6 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 
 //import { data } from '../../../../../core/mocks/data/relation-type.data.js';
 
-
 import './relation-type-workspace-view-relation-type.element.js';
 //import { UmbRelationTypeWorkspaceContext } from '../../workspace-relation-type.context.js';
 

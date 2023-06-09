@@ -1,8 +1,22 @@
 import type { UmbInputDocumentPickerElement } from '../../../documents/documents/components/input-document-picker/input-document-picker.element.js';
 import type { UmbInputMediaPickerElement } from '../../../media/media/components/input-media-picker/input-media-picker.element.js';
 import type { UmbInputLanguagePickerElement } from '../../../settings/languages/components/input-language-picker/input-language-picker.element.js';
-import { UUITextStyles , UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, property, query, state , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import {
+	UUITextStyles,
+	UUIBooleanInputEvent,
+	UUIInputElement,
+	UUIInputEvent,
+} from '@umbraco-cms/backoffice/external/uui';
+import {
+	css,
+	html,
+	nothing,
+	customElement,
+	property,
+	query,
+	state,
+	ifDefined,
+} from '@umbraco-cms/backoffice/external/lit';
 // TODO: update to module imports when ready
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';

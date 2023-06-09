@@ -1,5 +1,10 @@
 import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import { CreateDocumentTypeRequestModel, DocumentTypeResource, DocumentTypeResponseModel, UpdateDocumentTypeRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	CreateDocumentTypeRequestModel,
+	DocumentTypeResource,
+	DocumentTypeResponseModel,
+	UpdateDocumentTypeRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -10,7 +15,10 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
  * @class UmbDocumentTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocumentTypeRequestModel, any, UpdateDocumentTypeRequestModel, DocumentTypeResponseModel> {
+export class UmbDocumentTypeServerDataSource
+	implements
+		UmbDataSource<CreateDocumentTypeRequestModel, any, UpdateDocumentTypeRequestModel, DocumentTypeResponseModel>
+{
 	#host: UmbControllerHostElement;
 
 	/**
@@ -50,7 +58,7 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocu
 	async createScaffold(parentId: string | null) {
 		// TODO: Type hack to append $type and parentId to the DocumentTypeResponseModel.
 		//, parentId: string | null
-		const data: DocumentTypeResponseModel & {$type: string} = {
+		const data: DocumentTypeResponseModel & { $type: string } = {
 			$type: 'string',
 			id: UmbId.new(),
 			//parentId: parentId,
@@ -78,9 +86,6 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocu
 		return { data };
 	}
 
-
-
-
 	/**
 	 * Inserts a new Document Type on the server
 	 * @param {CreateDocumentTypeRequestModel} documentType
@@ -91,7 +96,7 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocu
 		if (!documentType) throw new Error('Document is missing');
 		//if (!document.id) throw new Error('ID is missing');
 
-		documentType = {...documentType};
+		documentType = { ...documentType };
 
 		// TODO: Hack to remove some props that ruins the document-type post end-point.
 		(documentType as any).$type = undefined;
@@ -102,14 +107,14 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocu
 			return {
 				...prop,
 				id: undefined,
-			}
+			};
 		});
 
 		return tryExecuteAndNotify(
 			this.#host,
 			DocumentTypeResource.postDocumentType({
 				requestBody: documentType,
-			}),
+			})
 		);
 	}
 
@@ -123,7 +128,7 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<CreateDocu
 	async update(id: string, documentType: UpdateDocumentTypeRequestModel) {
 		if (!id) throw new Error('Id is missing');
 
-		documentType = {...documentType};
+		documentType = { ...documentType };
 
 		// TODO: Hack to remove some props that ruins the document-type post end-point.
 		(documentType as any).$type = undefined;

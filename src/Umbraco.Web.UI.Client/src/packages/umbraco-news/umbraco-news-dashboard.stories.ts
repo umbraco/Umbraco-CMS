@@ -4,7 +4,6 @@ import { Meta, Story } from '@storybook/web-components';
 import type { UmbUmbracoNewsDashboardElement } from './umbraco-news-dashboard.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-
 export default {
 	title: 'Dashboards/Umbraco News',
 	component: 'umb-umbraco-news-dashboard',

@@ -1,5 +1,5 @@
 import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
-import { html , customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  *  @element umb-ref-data-type

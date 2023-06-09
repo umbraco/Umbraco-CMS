@@ -45,7 +45,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	@state()
 	protected _returnData!: UmbPropertySettingsModalResult;
 
-
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._returnData = JSON.parse(JSON.stringify(this.data));

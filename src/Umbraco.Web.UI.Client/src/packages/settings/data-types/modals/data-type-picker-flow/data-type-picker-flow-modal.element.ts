@@ -89,7 +89,6 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 			.onSubmit((submitData) => {
 				this._select(submitData.id);
 				this._submit();
-
 			});
 
 		this.#init();

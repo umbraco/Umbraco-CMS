@@ -76,15 +76,21 @@ export class UmbRouteContext {
 	}
 
 	#generateModalRoutes() {
+		const newModals = this.#modalRegistrations.filter(
+			(x) => !this.#modalRoutes.find((route) => x.key === route.__modalKey)
+		);
+		const routesToRemove = this.#modalRoutes.filter(
+			(route) => !this.#modalRegistrations.find((x) => x.key === route.__modalKey)
+		);
 
-		const newModals = this.#modalRegistrations.filter(x => !this.#modalRoutes.find(route => x.key === route.__modalKey));
-		const routesToRemove = this.#modalRoutes.filter(route => !this.#modalRegistrations.find(x => x.key === route.__modalKey));
+		const cleanedRoutes = this.#modalRoutes.filter((route) => !routesToRemove.includes(route));
 
-		const cleanedRoutes = this.#modalRoutes.filter(route => !routesToRemove.includes(route));
-
-		this.#modalRoutes = [...cleanedRoutes, ...newModals.map((modalRegistration) => {
-			return this.#generateRoute(modalRegistration);
-		})];
+		this.#modalRoutes = [
+			...cleanedRoutes,
+			...newModals.map((modalRegistration) => {
+				return this.#generateRoute(modalRegistration);
+			}),
+		];
 
 		// Add an empty route, so there is a route for the router to react on when no modals are open.
 		this.#modalRoutes.push({

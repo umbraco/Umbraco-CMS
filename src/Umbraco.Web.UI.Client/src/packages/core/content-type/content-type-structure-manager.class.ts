@@ -36,7 +36,8 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		x.flatMap((x) => x.containers ?? [])
 	);
 
-	#containers: UmbArrayState<PropertyTypeContainerModelBaseModel> = new UmbArrayState<PropertyTypeContainerModelBaseModel>([], (x) => x.id);
+	#containers: UmbArrayState<PropertyTypeContainerModelBaseModel> =
+		new UmbArrayState<PropertyTypeContainerModelBaseModel>([], (x) => x.id);
 
 	constructor(host: UmbControllerHostElement, typeRepository: R) {
 		this.#host = host;
@@ -100,7 +101,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 		if (!data) return false;
 
-		await this.loadType(data.id)
+		await this.loadType(data.id);
 
 		return true;
 	}
@@ -193,12 +194,16 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		return container;
 	}
 
-	makeContainerNameUniqueForOwnerDocument(newName: string, containerType: PropertyContainerTypes = 'Tab', parentId: string | null = null) {
-		const ownerRootContainers = this.getOwnerContainers(containerType, parentId)
+	makeContainerNameUniqueForOwnerDocument(
+		newName: string,
+		containerType: PropertyContainerTypes = 'Tab',
+		parentId: string | null = null
+	) {
+		const ownerRootContainers = this.getOwnerContainers(containerType, parentId);
 
 		let changedName = newName;
-		if(ownerRootContainers) {
-			while(ownerRootContainers.find((tab) => tab.name === changedName)) {
+		if (ownerRootContainers) {
+			while (ownerRootContainers.find((tab) => tab.name === changedName)) {
 				changedName = incrementString(changedName);
 			}
 
@@ -216,7 +221,6 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
 
 		const frozenContainers = this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.containers ?? [];
-
 
 		const containers = partialUpdateFrozenArray(frozenContainers, partialUpdate, (x) => x.id === containerId);
 

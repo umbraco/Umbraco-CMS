@@ -1,4 +1,4 @@
-import { html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import '../../../components/input-radio-button-list/input-radio-button-list.element.js';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';

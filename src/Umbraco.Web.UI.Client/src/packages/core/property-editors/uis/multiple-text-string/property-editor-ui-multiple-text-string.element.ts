@@ -3,7 +3,7 @@ import {
 	UmbInputMultipleTextStringElement,
 	MultipleTextStringValue,
 } from './input-multiple-text-string/input-multiple-text-string.element.js';
-import { html , customElement, property, state , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';

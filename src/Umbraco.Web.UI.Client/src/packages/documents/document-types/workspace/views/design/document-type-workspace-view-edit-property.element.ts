@@ -97,7 +97,6 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-
 				const oldName = this.property?.name ?? '';
 				const oldAlias = this.property?.alias ?? '';
 				const newName = event.target.value.toString();
@@ -117,9 +116,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 		return this.property
 			? html`
 					<div id="header">
-						<uui-input
-							.value=${this.property.name}
-							@input=${this.#onNameChange}></uui-input>
+						<uui-input .value=${this.property.name} @input=${this.#onNameChange}></uui-input>
 						<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
 						<uui-input
 							name="alias"
@@ -127,8 +124,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 							?disabled=${this._aliasLocked}
 							@input=${(e: CustomEvent) => {
 								if (e.target) this._singleValueUpdate('alias', (e.target as HTMLInputElement).value);
-							}}
-							>
+							}}>
 							<!-- TODO: validation for bad characters -->
 							<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
 								<uui-icon name=${this._aliasLocked ? 'umb:lock' : 'umb:unlocked'}></uui-icon>
@@ -216,7 +212,6 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			#editor {
 				background-color: var(--uui-color-background);
 			}
-
 
 			#alias-lock {
 				display: flex;

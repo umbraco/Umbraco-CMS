@@ -109,7 +109,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 			);
 		}
 		const oldValue = this.#uniquePaths.get(identifier);
-		if(oldValue === value) return;
+		if (oldValue === value) return;
 
 		this.#uniquePaths.set(identifier, value);
 		this.#registerModal();

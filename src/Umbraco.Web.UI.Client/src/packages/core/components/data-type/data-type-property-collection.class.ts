@@ -12,7 +12,7 @@ export class UmbDataTypePropertyCollection extends Array<DataTypePropertyPresent
 	static get [Symbol.species](): ArrayConstructor {
 		return Array;
 	}
-	
+
 	getValueByAlias<T>(alias: string): T | undefined {
 		const property = this.getByAlias(alias);
 

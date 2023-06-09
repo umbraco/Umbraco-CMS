@@ -7,7 +7,6 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 // import { data } from '../../../../../../core/mocks/data/document.data.js';
 // import { UmbNodeContext } from '../../node.context.js';
 
-
 export default {
 	title: 'Workspaces/Documents/Views/Info',
 	component: 'umb-document-info-workspace-view',
