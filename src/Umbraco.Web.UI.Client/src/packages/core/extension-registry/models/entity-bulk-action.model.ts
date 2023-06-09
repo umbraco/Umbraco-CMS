@@ -32,5 +32,16 @@ export interface MetaEntityBulkAction {
 }
 
 export interface ConditionsEntityBulkAction {
+
+	/**
+	 * The entity type this action is for
+	 * 
+	 * @examples [
+	 * "document",
+	 * "media",
+	 * "user",
+	 * "user-group"
+	 * ]
+	 */
 	entityType: string;
 }
