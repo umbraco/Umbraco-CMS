@@ -104,8 +104,8 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	}
 	public set items(items: MultipleTextStringValue) {
 		// TODO: when we have a way to overwrite the missing value validator we can remove this
-		this.value = items.length > 0 ? 'some value' : '';
-		this._items = items || [];
+		this.value = items?.length > 0 ? 'some value' : '';
+		this._items = items ?? [];
 	}
 
 	// TODO: Some inputs might not have a value that is either FormDataEntryValue or FormData.

@@ -1,5 +1,5 @@
-import { html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles , UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
@@ -31,6 +31,7 @@ export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implemen
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
+	// TODO: This should use the given value:
 	render() {
 		return html`<umb-input-eye-dropper
 			@change="${this._onChange}"

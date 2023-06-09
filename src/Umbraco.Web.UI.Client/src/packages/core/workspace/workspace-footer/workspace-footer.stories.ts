@@ -5,7 +5,6 @@ import { Meta, Story } from '@storybook/web-components';
 import type { UmbWorkspaceFooterLayoutElement } from './workspace-footer.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-
 export default {
 	title: 'Workspaces/Shared/Footer Layout',
 	component: 'umb-workspace-footer',

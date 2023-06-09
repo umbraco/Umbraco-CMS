@@ -30,9 +30,11 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 	}
 
 	private _openModal() {
+		// TODO: Modal should know the current selected one, and bring back the newly selected one.
 		this._modalContext?.open(UMB_ICON_PICKER_MODAL);
 	}
 
+	// TODO: We should show the current picked icon.
 	render() {
 		return html`
 			<uui-button

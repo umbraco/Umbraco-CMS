@@ -1,4 +1,4 @@
-import { html, nothing , customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	ManifestMenuItemTreeKind,

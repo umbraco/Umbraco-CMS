@@ -41,7 +41,9 @@ type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
 	  };
 
 // TODO: consider splitting this into two separate handlers
-export class UmbModalContextClass<ModalData extends object = object, ModalResult = unknown> implements UmbControllerInterface {
+export class UmbModalContextClass<ModalData extends object = object, ModalResult = unknown>
+	implements UmbControllerInterface
+{
 	#host: UmbControllerHostElement;
 
 	#submitPromise: Promise<ModalResult>;
@@ -62,7 +64,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	public readonly size: UUIModalSidebarSize = 'small';
 
 	public get unique() {
-		return 'umbModalContext:'+this.key;
+		return 'umbModalContext:' + this.key;
 	}
 
 	constructor(
@@ -119,7 +121,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 			this.modalElement,
 			UMB_MODAL_CONTEXT_TOKEN,
 
-		// Note, We are doing the Typing dance here because of the way we are correcting the submit method attribute type.
+			// Note, We are doing the Typing dance here because of the way we are correcting the submit method attribute type.
 			this as unknown as UmbModalContext<ModalData, ModalResult>
 		);
 
@@ -227,8 +229,6 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	public onSubmit(): Promise<ModalResult> {
 		return this.#submitPromise;
 	}
-
-
 
 	destroy(): void {
 		this.#innerElement.complete();

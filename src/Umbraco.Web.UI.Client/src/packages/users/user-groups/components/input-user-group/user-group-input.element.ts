@@ -1,5 +1,5 @@
 import { UmbUserGroupPickerContext } from './user-group-input.context.js';
-import { css, html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UserGroupItemResponseModel } from '@umbraco-cms/backoffice/backend-api';

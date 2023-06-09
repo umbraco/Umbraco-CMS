@@ -46,9 +46,9 @@ export const createDocumentTreeItem = (
 ): DocumentTreeItemResponseModel & { isTrashed: boolean } => {
 	return {
 		...createContentTreeItem(item),
-		$type: "DocumentTreeItemViewModel",
-		type: "document",
-		icon: "document",// TODO: Should get this from document type...
+		$type: 'DocumentTreeItemViewModel',
+		type: 'document',
+		icon: 'document', // TODO: Should get this from document type...
 		name: item.variants?.[0].name ?? '',
 		noAccess: false,
 		isProtected: false,
@@ -63,7 +63,7 @@ export const createDocumentTreeItem = (
 export const createDocumentTypeTreeItem = (item: DocumentTypeResponseModel): DocumentTypeTreeItemResponseModel => {
 	return {
 		...createEntityTreeItem(item),
-		type: "document-type",
+		type: 'document-type',
 		isElement: item.isElement,
 	};
 };

@@ -1,4 +1,4 @@
-import { html , customElement } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-media-menu-item')

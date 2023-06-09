@@ -159,7 +159,8 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', this._propertyEditorUiAlias),
 			(manifest) => {
 				this._gotEditorUI(manifest);
-			}
+			},
+			'_observePropertyEditorUI'
 		);
 	}
 

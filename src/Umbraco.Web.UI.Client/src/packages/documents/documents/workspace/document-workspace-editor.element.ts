@@ -13,9 +13,6 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	private splitViewElement = new UmbDocumentWorkspaceSplitViewElement();
 
 	@state()
-	_unique?: string;
-
-	@state()
 	_routes?: Array<UmbRoute>;
 
 	@state()
@@ -38,17 +35,25 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 
 	#observeVariants() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.variants, (variants) => {
-			this._availableVariants = variants;
-			this._generateRoutes();
-		});
+		this.observe(
+			this.#workspaceContext.variants,
+			(variants) => {
+				this._availableVariants = variants;
+				this._generateRoutes();
+			},
+			'_observeVariants'
+		);
 	}
 
 	#observeSplitViews() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.splitView.activeVariantsInfo, (variants) => {
-			this._workspaceSplitViews = variants;
-		});
+		this.observe(
+			this.#workspaceContext.splitView.activeVariantsInfo,
+			(variants) => {
+				this._workspaceSplitViews = variants;
+			},
+			'_observeSplitViews'
+		);
 	}
 
 	private _handleVariantFolderPart(index: number, folderPart: string) {
@@ -110,10 +115,8 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	};
 
 	render() {
-		return this._routes
-			? html`<umb-router-slot .routes=${this._routes} @init=${this._gotWorkspaceRoute}
-					>${this.splitViewElement}</umb-router-slot
-			  >`
+		return this._routes && this._routes.length > 0
+			? html`<umb-router-slot .routes=${this._routes} @init=${this._gotWorkspaceRoute}></umb-router-slot>`
 			: '';
 	}
 

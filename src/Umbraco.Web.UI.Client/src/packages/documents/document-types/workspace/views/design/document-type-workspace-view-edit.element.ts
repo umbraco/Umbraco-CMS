@@ -1,7 +1,7 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { encodeFolderName, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -22,7 +22,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	private _routes: UmbRoute[] = [];
 
 	@state()
-	_tabs: Array<PropertyTypeContainerModelBaseModel> = [];
+	_tabs?: Array<PropertyTypeContainerModelBaseModel>;
 
 	@state()
 	private _routerPath?: string;
@@ -67,33 +67,39 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	}
 
 	private _createRoutes() {
+		if (!this._workspaceContext || !this._tabs) return;
 		const routes: UmbRoute[] = [];
 
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
-				const tabName = tab.name;
+				const tabName = tab.name ?? '';
 				routes.push({
-					path: `tab/${encodeFolderName(tabName || '').toString()}`,
+					path: `tab/${encodeFolderName(tabName).toString()}`,
 					component: () => import('./document-type-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
-						(component as UmbDocumentTypeWorkspaceViewEditTabElement).tabName = tabName ?? '';
-						(component as UmbDocumentTypeWorkspaceViewEditTabElement).ownerTabId = tab.id;
+						(component as UmbDocumentTypeWorkspaceViewEditTabElement).tabName = tabName;
+						(component as UmbDocumentTypeWorkspaceViewEditTabElement).ownerTabId =
+							this._workspaceContext?.structure.isOwnerContainer(tab.id!) ? tab.id : undefined;
 					},
 				});
 			});
 		}
 
+		routes.push({
+			path: 'root',
+			component: () => import('./document-type-workspace-view-edit-tab.element.js'),
+			setup: (component) => {
+				(component as UmbDocumentTypeWorkspaceViewEditTabElement).noTabName = true;
+				(component as UmbDocumentTypeWorkspaceViewEditTabElement).ownerTabId = null;
+			},
+		});
+
 		if (this._hasRootGroups) {
 			routes.push({
 				path: '',
-				component: () => import('./document-type-workspace-view-edit-tab.element.js'),
-				setup: (component) => {
-					(component as UmbDocumentTypeWorkspaceViewEditTabElement).noTabName = true;
-				},
+				redirectTo: 'root',
 			});
-		}
-
-		if (routes.length !== 0) {
+		} else if (routes.length !== 0) {
 			routes.push({
 				path: '',
 				redirectTo: routes[0]?.path,
@@ -113,42 +119,65 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		this._workspaceContext?.structure.removeContainer(null, tabId);
 	}
 	async #addTab() {
-		this._workspaceContext?.structure.createContainer(null, null, 'Tab');
+		const tab = await this._workspaceContext?.structure.createContainer(null, null, 'Tab');
+		if (tab) {
+			const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
+			window.history.replaceState(null, '', path);
+			setTimeout(() => {
+				(this.shadowRoot?.querySelector('uui-tab[active] uui-input') as UUIInputElement | undefined)?.focus();
+			}, 100);
+		}
+	}
+
+	#tabNameChanged(event: InputEvent, tab: PropertyTypeContainerModelBaseModel) {
+		let newName = (event.target as HTMLInputElement).value;
+
+		if (newName === '') {
+			newName = 'Unnamed';
+		}
+
+		const changedName = this._workspaceContext?.structure.makeContainerNameUniqueForOwnerDocument(newName, 'Tab');
+		// Check if it collides with another tab name of this same document-type, if so adjust name:
+		if (changedName) {
+			newName = changedName;
+			(event.target as HTMLInputElement).value = newName;
+		}
+
+		this._tabsStructureHelper.partialUpdateContainer(tab.id!, {
+			name: newName,
+		});
+
+		// Update the current URL, so we are still on this specific tab:
+		window.history.replaceState(null, '', this._routerPath + '/tab/' + encodeFolderName(newName));
 	}
 
 	renderTabsNavigation() {
+		if (!this._tabs) return;
+		const rootTabPath = this._routerPath + '/root';
+		const rootTabActive = rootTabPath === this._activePath;
 		return html`<uui-tab-group>
-			${this._hasRootGroups
-				? html`
-						<uui-tab
-							label="Content"
-							.active=${this._routerPath + '/' === this._activePath}
-							href=${this._routerPath + '/'}
-							>Content</uui-tab
-						>
-				  `
-				: ''}
+			<uui-tab
+				class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
+				label="Content"
+				.active=${rootTabActive}
+				href=${rootTabPath}
+				>Content</uui-tab
+			>
 			${repeat(
 				this._tabs,
 				(tab) => tab.id! + tab.name,
 				(tab) => {
 					const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
-					return html`<uui-tab label=${tab.name!} .active=${path === this._activePath} href=${path}>
-						${path === this._activePath && this._tabsStructureHelper.isOwnerContainer(tab.id!)
+					const tabActive = path === this._activePath;
+					return html`<uui-tab label=${tab.name!} .active=${tabActive} href=${path}>
+						${tabActive && this._tabsStructureHelper.isOwnerContainer(tab.id!)
 							? html` <uui-input
 									label="Tab name"
 									look="placeholder"
 									value=${tab.name!}
 									placeholder="Enter a name"
-									@change=${(e: InputEvent) => {
-										const newName = (e.target as HTMLInputElement).value;
-										this._tabsStructureHelper.partialUpdateContainer(tab.id, {
-											name: newName,
-										});
-
-										// Update the current URL, so we are still on this specific tab:
-										window.history.replaceState(null, '', this._routerPath + '/tab/' + encodeFolderName(newName));
-									}}>
+									@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
+									@blur=${(e: InputEvent) => this.#tabNameChanged(e, tab)}>
 									<uui-button
 										label="Remove tab"
 										class="trash"
@@ -171,11 +200,11 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 
 	renderActions() {
 		return html`<div class="tab-actions">
-			<uui-button label="Compositions" look="outline" compact>
+			<uui-button label="Compositions" compact>
 				<uui-icon name="umb:merge"></uui-icon>
 				Compositions
 			</uui-button>
-			<uui-button label="Recorder" look="outline" compact>
+			<uui-button label="Recorder" compact>
 				<uui-icon name="umb:navigation"></uui-icon>
 				Recorder
 			</uui-button>
@@ -219,6 +248,14 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				align-items: center;
 				justify-content: space-between;
 				flex-wrap: nowrap;
+			}
+
+			.content-tab-is-empty {
+				height: 31px;
+				align-self: center;
+				border-radius: 3px;
+				--uui-tab-text: var(--uui-color-text-alt);
+				border: dashed 1px var(--uui-color-border-emphasis);
 			}
 		`,
 	];

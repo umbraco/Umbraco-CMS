@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, property, state , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

@@ -7,7 +7,6 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 // import { data } from '../../../../../../core/mocks/data/media.data.js';
 // import { UmbNodeContext } from '../../node.context.js';
 
-
 export default {
 	title: 'Workspaces/Media/Views/Info',
 	component: 'umb-media-info-workspace-view',

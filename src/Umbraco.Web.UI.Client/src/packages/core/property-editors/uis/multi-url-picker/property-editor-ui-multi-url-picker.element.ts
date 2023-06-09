@@ -1,4 +1,4 @@
-import { html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbInputMultiUrlElement } from '@umbraco-cms/backoffice/components';
@@ -77,7 +77,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 			.ignoreUserStartNodes=${this._ignoreUserStartNodes}
 			.max=${this._maxNumber}
 			.min=${this._minNumber}
-			.urls="${this.value}"></umb-input-multi-url>`;
+			.urls="${this.value ?? []}"></umb-input-multi-url>`;
 	}
 
 	static styles = [UUITextStyles];

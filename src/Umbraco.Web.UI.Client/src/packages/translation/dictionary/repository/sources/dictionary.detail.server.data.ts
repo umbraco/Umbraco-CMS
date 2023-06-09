@@ -39,7 +39,7 @@ export class UmbDictionaryDetailServerDataSource
 			parentId,
 			name: '',
 			translations: [],
-			...preset
+			...preset,
 		};
 
 		return { data };

@@ -1,5 +1,5 @@
 import { UmbWorkspaceAction } from './index.js';
-import { css, html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';

@@ -1,5 +1,5 @@
 import { UmbDocumentWorkspaceContext } from '../../document-workspace.context.js';
-import { css, html , customElement, property, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

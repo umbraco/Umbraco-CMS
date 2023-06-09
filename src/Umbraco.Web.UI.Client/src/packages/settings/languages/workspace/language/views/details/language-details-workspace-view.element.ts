@@ -1,8 +1,8 @@
 import { UmbLanguageWorkspaceContext } from '../../language-workspace.context.js';
 import type { UmbInputCultureSelectElement } from '../../../../../cultures/components/input-culture-select/input-culture-select.element.js';
 import type { UmbInputLanguagePickerElement } from '../../../../components/input-language-picker/input-language-picker.element.js';
-import { UUIBooleanInputEvent, UUIToggleElement , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, state , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UUIBooleanInputEvent, UUIToggleElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 // TODO: set up import alias for these modules
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

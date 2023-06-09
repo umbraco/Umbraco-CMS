@@ -1,5 +1,5 @@
 import { UmbTagsInputElement } from '../../components/tags-input/tags-input.element.js';
-import { html , customElement, property, state , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';

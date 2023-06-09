@@ -1,6 +1,12 @@
 import { UmbRelationTypeWorkspaceContext } from '../../relation-type-workspace.context.js';
-import { UUITextStyles , UUIBooleanInputEvent, UUIRadioGroupElement, UUIRadioGroupEvent, UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import {
+	UUITextStyles,
+	UUIBooleanInputEvent,
+	UUIRadioGroupElement,
+	UUIRadioGroupEvent,
+	UUIToggleElement,
+} from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';

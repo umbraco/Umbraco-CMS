@@ -1,4 +1,4 @@
-import { html, LitElement , customElement } from '@umbraco-cms/backoffice/external/lit';
+import { html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-document-blueprint-root-workspace')
 export class UmbDocumentBlueprintRootWorkspaceElement extends LitElement {

@@ -1,6 +1,6 @@
 import type { MediaDetails } from '../index.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,

@@ -4,7 +4,6 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 
 //import { data } from '../../../../../core/mocks/data/data-type.data.js';
 
-
 import './data-type-details-workspace-view.element.js';
 //import { UmbDataTypeWorkspaceContext } from '../../workspace-data-type.context.js';
 

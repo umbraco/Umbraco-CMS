@@ -1,6 +1,6 @@
 import { UmbPropertyValueChangeEvent } from '../../index.js';
-import { html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles , InputType } from '@umbraco-cms/backoffice/external/uui';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, InputType } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';

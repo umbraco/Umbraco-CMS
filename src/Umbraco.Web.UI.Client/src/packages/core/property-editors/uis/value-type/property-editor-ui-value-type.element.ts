@@ -1,4 +1,4 @@
-import { html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -11,8 +11,21 @@ import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/comp
 
 @customElement('umb-property-editor-ui-value-type')
 export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+	private _value: string | undefined = undefined;
 	@property()
-	value = '';
+	public get value(): string | undefined {
+		return this._value;
+	}
+	public set value(value: string | undefined) {
+		this._value = value;
+
+		const selected = this._options.filter((option) => {
+			return (option.selected = option.value === this.value);
+		});
+		if (selected.length === 0) {
+			this._options[0].selected = true;
+		}
+	}
 
 	@state()
 	private _options: Array<Option> = [
@@ -24,16 +37,6 @@ export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implement
 		{ name: 'Big Integer', value: 'BIGINT' },
 		{ name: 'Long String', value: 'TEXT' },
 	];
-
-	constructor() {
-		super();
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		const index = this._options.findIndex((option) => option.value === this.value);
-		index > 0 ? (this._options[index].selected = true) : (this._options[0].selected = true);
-	}
 
 	@property({ type: Array, attribute: false })
 	public config?: UmbDataTypePropertyCollection;

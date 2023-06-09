@@ -1,6 +1,6 @@
 import { UmbDocumentTypeWorkspaceContext } from './document-type-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbRoute, UmbRouterSlotInitEvent, generateRoutePathBuilder } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -48,9 +48,13 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	];
 
 	render() {
-		return html` <umb-router-slot .routes=${this._routes} @init=${(event: UmbRouterSlotInitEvent) => {
-			this.#routerPath = event.target.absoluteRouterPath;
-		}}></umb-router-slot> `;
+		return html`
+			<umb-router-slot
+				.routes=${this._routes}
+				@init=${(event: UmbRouterSlotInitEvent) => {
+					this.#routerPath = event.target.absoluteRouterPath;
+				}}></umb-router-slot>
+		`;
 	}
 
 	static styles = [UUITextStyles];

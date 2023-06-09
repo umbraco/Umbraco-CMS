@@ -37,6 +37,7 @@ export class UmbDictionaryWorkspaceContext
 	setPropertyValue(isoCode: string, translation: string) {
 		if (!this.#data.value) return;
 
+		// TODO: This can use some of our own methods, to make it simpler. see appendToFrozenArray()
 		// update if the code already exists
 		const updatedValue =
 			this.#data.value.translations?.map((translationItem) => {

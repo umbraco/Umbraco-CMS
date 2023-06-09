@@ -7,7 +7,6 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 //import { data } from '../../../../../core/mocks/data/relation-type.data.js';
 //import { UmbRelationTypeContext } from '../../relation-type.context.js';
 
-
 export default {
 	title: 'Workspaces/Relation Type/Views/Relation',
 	component: 'umb-workspace-view-relation-type-relation',

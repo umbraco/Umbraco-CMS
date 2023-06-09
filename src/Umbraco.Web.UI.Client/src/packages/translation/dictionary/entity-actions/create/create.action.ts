@@ -48,7 +48,7 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 		const { name } = await modalContext.onSubmit();
 		if (!name) return;
 
-		const { data } = await this.repository.createScaffold(this.unique, {name});
+		const { data } = await this.repository.createScaffold(this.unique, { name });
 
 		// TODO => get location header to route to new item
 		console.log(data);

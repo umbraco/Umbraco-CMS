@@ -81,7 +81,6 @@ export class UmbTreeElement extends UmbLitElement {
 		this.#requestTreeRoot();
 	}
 
-
 	async #requestTreeRoot() {
 		if (!this.#treeContext?.requestTreeRoot) throw new Error('Tree does not support root');
 
