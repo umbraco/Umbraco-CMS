@@ -116,10 +116,17 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 		return this.property
 			? html`
 					<div id="header">
-						<uui-input .value=${this.property.name} @input=${this.#onNameChange}></uui-input>
+						<uui-input
+							name="label"
+							id="label-input"
+							placeholder="Label..."
+							.value=${this.property.name}
+							@input=${this.#onNameChange}></uui-input>
 						<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
 						<uui-input
 							name="alias"
+							id="alias-input"
+							placeholder="Alias..."
 							.value=${this.property.alias}
 							?disabled=${this._aliasLocked}
 							@input=${(e: CustomEvent) => {
@@ -133,6 +140,9 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 						<slot name="property-action-menu"></slot>
 						<p>
 							<uui-textarea
+								name="description"
+								id="description-input"
+								placeholder="Enter a description..."
 								.value=${this.property.description}
 								@input=${(e: CustomEvent) => {
 									if (e.target) this._singleValueUpdate('description', (e.target as HTMLInputElement).value);
@@ -212,6 +222,25 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			#editor {
 				background-color: var(--uui-color-background);
 			}
+			#alias-input,
+			#label-input,
+			#description-input {
+				width: 100%;
+			}
+
+			#alias-input {
+				border-color: transparent;
+				background: var(--uui-color-surface);
+			}
+
+			#label-input {
+				font-weight: bold; /* TODO: UUI Input does not support bold text yet */
+				--uui-input-border-color: transparent;
+			}
+			#label-input input {
+				font-weight: bold;
+				--uui-input-border-color: transparent;
+			}
 
 			#alias-lock {
 				display: flex;
@@ -221,6 +250,11 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			}
 			#alias-lock uui-icon {
 				margin-bottom: 2px;
+				/* margin: 0; */
+			}
+			#description-input {
+				--uui-textarea-border-color: transparent;
+				font-weight: 0.5rem; /* TODO: Cant change font size of UUI textarea yet */
 			}
 		`,
 	];

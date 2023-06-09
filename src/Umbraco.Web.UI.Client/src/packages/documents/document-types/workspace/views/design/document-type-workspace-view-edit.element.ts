@@ -200,11 +200,11 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 
 	renderActions() {
 		return html`<div class="tab-actions">
-			<uui-button label="Compositions" look="outline" compact>
+			<uui-button label="Compositions" compact>
 				<uui-icon name="umb:merge"></uui-icon>
 				Compositions
 			</uui-button>
-			<uui-button label="Recorder" look="outline" compact>
+			<uui-button label="Recorder" compact>
 				<uui-icon name="umb:navigation"></uui-icon>
 				Recorder
 			</uui-button>

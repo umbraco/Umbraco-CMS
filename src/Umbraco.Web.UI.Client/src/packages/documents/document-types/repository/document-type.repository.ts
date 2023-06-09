@@ -149,7 +149,7 @@ export class UmbDocumentTypeRepository
 			this.#detailStore?.append(data);
 		}
 
-		return { data, error };
+		return { data, error, asObservable: () => this.#detailStore!.byId(id) };
 	}
 
 	async byId(id: string) {

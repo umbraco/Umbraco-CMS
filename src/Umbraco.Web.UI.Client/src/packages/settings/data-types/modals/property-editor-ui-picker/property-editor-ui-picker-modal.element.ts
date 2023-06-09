@@ -136,7 +136,10 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 			}
 
 			#filter-icon {
+				height: 100%;
 				padding-left: var(--uui-size-space-2);
+				display: flex;
+				color: var(--uui-color-border);
 			}
 
 			#item-grid {
