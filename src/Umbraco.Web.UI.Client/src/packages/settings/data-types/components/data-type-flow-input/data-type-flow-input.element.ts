@@ -34,7 +34,11 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 	}
 	set value(dataTypeId: string) {
 		super.value = dataTypeId ?? '';
-		this._ids = super.value.split(',');
+		this._ids = super.value
+			.split(',')
+			.map((tag) => tag.trim())
+			.filter((id) => id.length !== 0);
+		console.log(this._ids);
 	}
 
 	#editDataTypeModal?: UmbModalRouteRegistrationController;
