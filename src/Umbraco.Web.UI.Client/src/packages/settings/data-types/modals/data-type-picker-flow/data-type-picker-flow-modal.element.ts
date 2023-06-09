@@ -89,7 +89,6 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 			.onSubmit((submitData) => {
 				this._select(submitData.id);
 				this._submit();
-
 			});
 
 		this.#init();
@@ -238,12 +237,10 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 						uis,
 						(propertyEditorUI) => propertyEditorUI.alias,
 						(propertyEditorUI) => html` <li class="item">
-							<uui-button
-								type="button"
-								href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
+							<a type="button" href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
 								<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
 								${propertyEditorUI.meta.label || propertyEditorUI.name}
-							</uui-button>
+							</a>
 						</li>`
 				  )
 				: ''}
@@ -259,25 +256,27 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 			}
 
 			#filter-icon {
+				height: 100%;
 				padding-left: var(--uui-size-space-2);
+				display: flex;
+				color: var(--uui-color-border);
 			}
 
 			#item-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
 				margin: 0;
 				padding: 0;
-				grid-gap: var(--uui-size-space-4);
 			}
 
 			#item-grid .item {
-				display: flex;
-				align-items: flex-start;
-				justify-content: center;
 				list-style: none;
 				height: 100%;
+				width: 100%;
 				border: 1px solid transparent;
 				border-radius: var(--uui-border-radius);
+				box-sizing: border-box;
+				color: var(--uui-color-interactive);
 			}
 
 			#item-grid .item:hover {
@@ -286,17 +285,28 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				cursor: pointer;
 			}
 
-			#item-grid .item uui-button {
-				padding: var(--uui-size-space-3);
+			#item-grid .item a {
+				border: none;
+				padding: 0;
+				margin: 0;
+				color: inherit;
+				text-decoration: none;
+				text-align: center;
+				box-sizing: border-box;
+
+				padding: var(--uui-size-space-2);
+
+				display: grid;
+				grid-template-rows: 40px 1fr;
 				height: 100%;
 				width: 100%;
-				color: var(--uui-color-interactive);
-				border-radius: var(--uui-border-radius);
 			}
 
 			#item-grid .item .icon {
 				font-size: 2em;
-				margin-bottom: var(--uui-size-space-2);
+				margin: auto;
+				/* width: fit-content;
+				height: fit-content; */
 			}
 		`,
 	];
