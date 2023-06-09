@@ -6,8 +6,7 @@ using Umbraco.Cms.Core.Models.DeliveryApi;
 namespace Umbraco.Cms.Api.Delivery.Json;
 
 // see https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism?pivots=dotnet-7-0
-// TODO: if this type resolver is to be used for extendable content models (custom IApiContent implementations) we need to work out an extension model for known derived types
-internal sealed class DeliveryApiJsonTypeResolver : DefaultJsonTypeInfoResolver
+public class DeliveryApiJsonTypeResolver : DefaultJsonTypeInfoResolver
 {
     public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
     {
