@@ -8,8 +8,8 @@ import { PropertyValueMap, css, html, nothing, customElement, state } from '@umb
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbPropertySettingsModalResult, UmbPropertySettingsModalData } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
-@customElement('umb-property-settings-modal')
 // TODO: Could base take a token to get its types?.
+@customElement('umb-property-settings-modal')
 export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	UmbPropertySettingsModalData,
 	UmbPropertySettingsModalResult
@@ -19,7 +19,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	@state() private _customValidationOptions = [
 		{
 			name: 'No validation',
-			value: '',
+			value: null,
 			selected: true,
 		},
 		{
@@ -51,7 +51,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 		this._returnData.validation ??= {};
 
-		const regEx = this._returnData.validation.regEx ?? '';
+		const regEx = this._returnData.validation.regEx ?? null;
 		const newlySelected = this._customValidationOptions.find((option) => {
 			option.selected = option.value === regEx;
 			return option.selected;
@@ -115,12 +115,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		this.requestUpdate('_returnData');
 	}
 
-	#onCustomValidationChange(event: UUISelectEvent) {
-		const regEx = event.target.value.toString();
-		this._returnData.validation!.regEx = regEx;
-		this.requestUpdate('_returnData');
-	}
-
 	#onMandatoryChange(event: UUIBooleanInputEvent) {
 		const value = event.target.checked;
 		this._returnData.validation!.mandatory = value;
@@ -152,17 +146,31 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		this._aliasLocked = !this._aliasLocked;
 	}
 
+	#onCustomValidationChange(event: UUISelectEvent) {
+		const regEx = event.target.value || event.target.value === '' ? event.target.value.toString() : null;
+
+		this._customValidationOptions.forEach((option) => {
+			option.selected = option.value === regEx;
+		});
+		console.log(this._customValidationOptions);
+
+		this._returnData.validation!.regEx = regEx ?? null;
+		this.requestUpdate('_returnData');
+		this.requestUpdate('_customValidationOptions');
+	}
+
 	#onValidationRegExChange(event: UUIInputEvent) {
-		const regEx = event.target.value.toString();
-		const newlySelected = this._customValidationOptions.find((option) => {
+		const regEx = event.target.value || event.target.value === '' ? event.target.value.toString() : null;
+		const betterChoice = this._customValidationOptions.find((option) => {
 			option.selected = option.value === regEx;
 			return option.selected;
 		});
-		if (newlySelected === undefined) {
+		if (betterChoice === undefined) {
 			this._customValidationOptions[4].selected = true;
 		}
 		this._returnData.validation!.regEx = regEx;
 		this.requestUpdate('_returnData');
+		this.requestUpdate('_customValidationOptions');
 	}
 	#onValidationMessageChange(event: UUIInputEvent) {
 		this._returnData.validation!.regExMessage = event.target.value.toString();
@@ -289,7 +297,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 				@change=${this.#onCustomValidationChange}
 				.options=${this._customValidationOptions}></uui-select>
 
-			${this._returnData.validation?.regEx !== ''
+			${this._returnData.validation?.regEx !== null
 				? html`
 						<uui-input
 							name="pattern"
