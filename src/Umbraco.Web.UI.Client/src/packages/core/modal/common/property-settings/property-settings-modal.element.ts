@@ -45,7 +45,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	@state()
 	protected _returnData!: UmbPropertySettingsModalResult;
 
-
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._returnData = JSON.parse(JSON.stringify(this.data));
@@ -59,6 +58,9 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		});
 		if (newlySelected === undefined) {
 			this._customValidationOptions[4].selected = true;
+			this._returnData.validation.regEx = this._customValidationOptions[4].value;
+		} else {
+			this._returnData.validation.regEx = regEx;
 		}
 	}
 
@@ -67,7 +69,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 		// TODO: Make a general way to put focus on a input in a modal. (also make sure it only happens if its the top-most-modal.)
 		requestAnimationFrame(() => {
-			(this.shadowRoot!.querySelector('#nameInput') as HTMLElement).focus();
+			(this.shadowRoot!.querySelector('#name-input') as HTMLElement).focus();
 		});
 	}
 
@@ -178,8 +180,9 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 						<div id="content">
 							<uui-box>
 								<div class="container">
+									<!-- TODO: Align styling across this and the property of document type workspace editor, or consider if this can go away for a different UX flow -->
 									<uui-input
-										id="nameInput"
+										id="name-input"
 										name="name"
 										@input=${this.#onNameChange}
 										.value=${this._returnData.name}
@@ -187,6 +190,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 										<!-- TODO: validation for bad characters -->
 									</uui-input>
 									<uui-input
+										id="alias-input"
 										name="alias"
 										@input=${this.#onAliasChange}
 										.value=${this._returnData.alias}
@@ -198,6 +202,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 										</div>
 									</uui-input>
 									<uui-textarea
+										id="description-input"
 										name="description"
 										placeholder="Enter description..."
 										.value=${this._returnData.description}></uui-textarea>
@@ -308,6 +313,41 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 			#content {
 				padding: var(--uui-size-layout-1);
 			}
+			#alias-input,
+			#label-input,
+			#description-input {
+				width: 100%;
+			}
+
+			#alias-input {
+				border-color: transparent;
+				background: var(--uui-color-surface);
+			}
+
+			#label-input {
+				font-weight: bold; /* TODO: UUI Input does not support bold text yet */
+				--uui-input-border-color: transparent;
+			}
+			#label-input input {
+				font-weight: bold;
+				--uui-input-border-color: transparent;
+			}
+
+			#alias-lock {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+			}
+			#alias-lock uui-icon {
+				margin-bottom: 2px;
+				/* margin: 0; */
+			}
+			#description-input {
+				--uui-textarea-border-color: transparent;
+				font-weight: 0.5rem; /* TODO: Cant change font size of UUI textarea yet */
+			}
+
 			#appearances {
 				display: flex;
 				gap: var(--uui-size-layout-1);
