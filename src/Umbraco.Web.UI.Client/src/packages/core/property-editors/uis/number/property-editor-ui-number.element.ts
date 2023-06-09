@@ -32,7 +32,7 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 
 	render() {
 		return html`<uui-input
-			.value=${this.value}
+			.value=${this.value ?? 0}
 			type="number"
 			max="${ifDefined(this._max)}"
 			min="${ifDefined(this._min)}"

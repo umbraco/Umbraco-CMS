@@ -31,6 +31,7 @@ export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implemen
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
+	// TODO: This should use the given value:
 	render() {
 		return html`<umb-input-eye-dropper
 			@change="${this._onChange}"

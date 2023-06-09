@@ -16,7 +16,7 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 		return this.#value;
 	}
 	public set value(value: Array<string>) {
-		this.#value = value || [];
+		this.#value = value ?? [];
 	}
 
 	@property({ type: Array, attribute: false })

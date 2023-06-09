@@ -15,7 +15,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	public get value(): Array<string> {
 		return this._value;
 	}
-	public set value(value: Array<string>) {
+	public set value(value: Array<string> | undefined) {
 		this._value = value || [];
 	}
 

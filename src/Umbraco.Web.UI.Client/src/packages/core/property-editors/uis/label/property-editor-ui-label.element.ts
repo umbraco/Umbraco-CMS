@@ -19,7 +19,7 @@ export class UmbPropertyEditorUILabelElement extends UmbLitElement implements Um
 	public config?: UmbDataTypePropertyCollection;
 
 	render() {
-		return html`${this.value}`;
+		return html`${this.value ?? ''}`;
 	}
 
 	static styles = [UUITextStyles];

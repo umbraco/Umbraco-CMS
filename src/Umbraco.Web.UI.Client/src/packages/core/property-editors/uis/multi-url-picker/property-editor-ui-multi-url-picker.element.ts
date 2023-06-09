@@ -77,7 +77,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 			.ignoreUserStartNodes=${this._ignoreUserStartNodes}
 			.max=${this._maxNumber}
 			.min=${this._minNumber}
-			.urls="${this.value}"></umb-input-multi-url>`;
+			.urls="${this.value ?? []}"></umb-input-multi-url>`;
 	}
 
 	static styles = [UUITextStyles];

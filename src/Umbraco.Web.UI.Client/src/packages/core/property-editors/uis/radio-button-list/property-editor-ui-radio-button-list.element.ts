@@ -19,8 +19,8 @@ export class UmbPropertyEditorUIRadioButtonListElement
 	public get value(): string {
 		return this.#value;
 	}
-	public set value(value: string) {
-		this.#value = value || '';
+	public set value(value: string | undefined) {
+		this.#value = value?.trim() || '';
 	}
 
 	@property({ type: Array, attribute: false })

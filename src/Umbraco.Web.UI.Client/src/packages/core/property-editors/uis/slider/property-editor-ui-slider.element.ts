@@ -1,4 +1,4 @@
-import UmbInputSliderElement from '../../../components/input-slider/input-slider.element.js';
+import { UmbInputSliderElement } from '../../../components/input-slider/input-slider.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -11,10 +11,12 @@ import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/comp
 @customElement('umb-property-editor-ui-slider')
 export class UmbPropertyEditorUISliderElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
 	@property()
-	value: {
-		to?: number;
-		from?: number;
-	} = {};
+	value:
+		| {
+				to?: number;
+				from?: number;
+		  }
+		| undefined = undefined;
 
 	@state()
 	_enableRange?: boolean;
@@ -57,6 +59,7 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
+	// TODO: This does not seem to take current value into account?
 	render() {
 		return html`<umb-input-slider
 			.initVal1="${this._initVal1 ?? 0}"

@@ -47,7 +47,7 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 	render() {
 		return html` <uui-textarea
 			label="Textarea"
-			.value=${this.value}
+			.value=${this.value ?? ''}
 			maxlength="${ifDefined(this._maxChars)}"
 			rows="${ifDefined(this._rows)}"
 			@input=${this.onInput}

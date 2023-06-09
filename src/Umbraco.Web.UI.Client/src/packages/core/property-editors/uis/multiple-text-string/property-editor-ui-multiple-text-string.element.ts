@@ -68,7 +68,7 @@ export class UmbPropertyEditorUIMultipleTextStringElement
 
 	render() {
 		return html`<umb-input-multiple-text-string
-			.items="${this.value}"
+			.items="${this.value ?? []}"
 			min="${ifDefined(this._limitMin)}"
 			max="${ifDefined(this._limitMax)}"
 			@change=${this.#onChange}
