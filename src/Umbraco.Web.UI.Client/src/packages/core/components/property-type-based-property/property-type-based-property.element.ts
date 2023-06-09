@@ -79,7 +79,8 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			this._workspaceContext.propertyValueByAlias(this._property.alias, this._propertyVariantId),
 			(value) => {
 				this._value = value;
-			}
+			},
+			'_observePropertyValue'
 		);
 	}
 
