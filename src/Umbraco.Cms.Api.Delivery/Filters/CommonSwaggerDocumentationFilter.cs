@@ -5,7 +5,7 @@ using Umbraco.Cms.Api.Delivery.Configuration;
 
 namespace Umbraco.Cms.Api.Delivery.Filters;
 
-public class AddCompleteSwaggerDocumentationFilter : IOperationFilter, IParameterFilter
+public class CommonSwaggerDocumentationFilter : IOperationFilter, IParameterFilter
 {
     private const string DocumentationReference =
         $"*For more information, see the [Query parameters]({DeliveryApiConfiguration.ApiDocumentationArticleLink}#query-parameters) section in our dedicated documentation article.*";

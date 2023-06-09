@@ -19,7 +19,7 @@ public class ConfigureUmbracoDeliveryApiSwaggerGenOptions: IConfigureOptions<Swa
                 Description = $"You can find out more about the Content Delivery API on [our documentation platform]({DeliveryApiConfiguration.ApiDocumentationArticleLink})."
             });
 
-        swaggerGenOptions.OperationFilter<AddCompleteSwaggerDocumentationFilter>();
-        swaggerGenOptions.ParameterFilter<AddCompleteSwaggerDocumentationFilter>();
+        swaggerGenOptions.OperationFilter<CommonSwaggerDocumentationFilter>();
+        swaggerGenOptions.ParameterFilter<CommonSwaggerDocumentationFilter>();
     }
 }
