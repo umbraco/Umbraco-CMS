@@ -50,7 +50,7 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 		if (foundIndex !== -1) {
 			// update
 			this.data[foundIndex] = saveItem;
-			//this.updateData(id, saveItem);// This does not seem to do anything...
+			//this.updateData(saveItem);// This does not seem to do anything...
 		} else {
 			// new
 			this.data.push(saveItem);
@@ -71,7 +71,7 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			item.isTrashed = true;
-			this.updateData(id, item);
+			this.updateData(item);
 			trashedItems.push(item);
 		});
 
