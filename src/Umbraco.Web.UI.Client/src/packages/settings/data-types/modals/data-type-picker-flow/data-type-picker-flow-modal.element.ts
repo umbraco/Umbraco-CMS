@@ -167,7 +167,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-body-layout headline="Select editor">
+			<umb-body-layout headline="Select editor" class="uui-text">
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>
@@ -205,12 +205,12 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		return html`
 			${when(
 				dataTypesEntries.length > 0,
-				() => html` <h5 class="configuration-name">Available configurations</h5>
+				() => html` <h5 class="choice-type-headline">Available configurations</h5>
 					${this._renderDataTypes()}`
 			)}
 			${when(
 				editorUIEntries.length > 0,
-				() => html` <h5 class="configuration-name">Create a new configuration</h5>
+				() => html` <h5 class="choice-type-headline">Create a new configuration</h5>
 					${this._renderUIs()}`
 			)}
 		`;
@@ -221,9 +221,10 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 
 		const entries = Object.entries(this._groupedDataTypes);
 
+		// TODO: Fix so we can have Data Types grouped. (or choose not to group them)
 		return entries.map(
 			([key, value]) =>
-				html` <h4 class="category-name">${key}</h4>
+				html` <h5 class="category-name">${key === 'undefined' ? 'Uncategorized' : key}</h5>
 					${this._renderGroupDataTypes(value)}`
 		);
 	}
@@ -235,7 +236,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 
 		return entries.map(
 			([key, value]) =>
-				html` <h4 class="category-name">${key}</h4>
+				html` <h5 class="category-name">${key === 'undefined' ? 'Uncategorized' : key}</h5>
 					${this._renderGroupUIs(value)}`
 		);
 	}
@@ -302,7 +303,6 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 			}
 
 			#item-grid:not(:last-child) {
-				border-bottom: 1px solid var(--uui-color-divider);
 				padding-bottom: var(--uui-size-space-5);
 			}
 
@@ -348,16 +348,12 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 			}
 
 			.category-name {
-				display: block;
 				text-transform: capitalize;
-				font-size: 0.9rem;
 			}
 
-			.configuration-name {
-				font-weight: bold;
-				display: block;
+			.choice-type-headline {
 				text-transform: capitalize;
-				font-size: 1rem;
+				border-bottom: 1px solid var(--uui-color-divider);
 			}
 		`,
 	];
