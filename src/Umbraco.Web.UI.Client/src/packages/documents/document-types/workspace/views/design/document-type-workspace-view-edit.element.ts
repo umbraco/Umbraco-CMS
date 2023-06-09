@@ -86,7 +86,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		}
 
 		routes.push({
-			path: '',
+			path: 'root',
 			component: () => import('./document-type-workspace-view-edit-tab.element.js'),
 			setup: (component) => {
 				(component as UmbDocumentTypeWorkspaceViewEditTabElement).noTabName = true;
@@ -94,7 +94,12 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			},
 		});
 
-		if (routes.length !== 0) {
+		if (this._hasRootGroups) {
+			routes.push({
+				path: '',
+				redirectTo: 'root',
+			});
+		} else if (routes.length !== 0) {
 			routes.push({
 				path: '',
 				redirectTo: routes[0]?.path,
@@ -148,13 +153,14 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 
 	renderTabsNavigation() {
 		if (!this._tabs) return;
-		const contentTabActive = this._routerPath + '/' === this._activePath;
+		const rootTabPath = this._routerPath + '/root';
+		const rootTabActive = rootTabPath === this._activePath;
 		return html`<uui-tab-group>
 			<uui-tab
-				class=${this._hasRootGroups || contentTabActive ? '' : 'content-tab-is-empty'}
+				class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
 				label="Content"
-				.active=${contentTabActive}
-				href=${this._routerPath + '/'}
+				.active=${rootTabActive}
+				href=${rootTabPath}
 				>Content</uui-tab
 			>
 			${repeat(
