@@ -24,7 +24,7 @@ public class ImageSharpImageUrlGeneratorTests
     private static readonly ImageUrlGenerationOptions.CropCoordinates _crop = new ImageUrlGenerationOptions.CropCoordinates(0.58729977382575338m, 0.055768992440203169m, 0m, 0.32457553600198386m);
     private static readonly ImageUrlGenerationOptions.FocalPointPosition _focus1 = new ImageUrlGenerationOptions.FocalPointPosition(0.96m, 0.80827067669172936m);
     private static readonly ImageUrlGenerationOptions.FocalPointPosition _focus2 = new ImageUrlGenerationOptions.FocalPointPosition(0.4275m, 0.41m);
-    private static readonly ImageSharpImageUrlGenerator _generator = new ImageSharpImageUrlGenerator(new string[0]);
+    private static readonly ImageSharpImageUrlGenerator _generator = new ImageSharpImageUrlGenerator(Array.Empty<string>(), Options.Create(new ImageSharpMiddlewareOptions()));
 
     [Test]
     public void GivenMediaPath_AndNoOptions_ReturnsMediaPath()
@@ -310,11 +310,16 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrl_HMACSecurityKey()
     {
-        var requestAuthorizationUtilities = new RequestAuthorizationUtilities(
-            Options.Create(new ImageSharpMiddlewareOptions()
+        var middleWareOptions = Options.Create(new ImageSharpMiddlewareOptions()
+        {
+            HMACSecretKey = new byte[]
             {
-                HMACSecretKey = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 }
-            }),
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+            }
+        });
+
+        var requestAuthorizationUtilities = new RequestAuthorizationUtilities(
+            middleWareOptions,
             new QueryCollectionRequestParser(),
             new[]
             {
@@ -323,14 +328,15 @@ public class ImageSharpImageUrlGeneratorTests
             new CommandParser(Enumerable.Empty<ICommandConverter>()),
             new ServiceCollection().BuildServiceProvider());
 
-        var generator = new ImageSharpImageUrlGenerator(new string[0], requestAuthorizationUtilities);
+        var generator = new ImageSharpImageUrlGenerator(new string[0], middleWareOptions, requestAuthorizationUtilities);
         var options = new ImageUrlGenerationOptions(MediaPath)
         {
             Width = 400,
             Height = 400,
         };
 
-        Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2", generator.GetImageUrl(options));
+        var actual = generator.GetImageUrl(options);
+        Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2", actual);
 
         // CacheBusterValue isn't included in HMAC generation
         options.CacheBusterValue = "not-included-in-hmac";
