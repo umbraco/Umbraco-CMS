@@ -67,6 +67,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	public set defaultId(newId: string) {
 		this._defaultId = newId;
 		super.value = newId;
+		this.#observePickedTemplates();
 	}
 
 	private _modalContext?: UmbModalManagerContext;
@@ -87,9 +88,11 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 		this.observe(
 			await this._templateRepository.itemsLegacy(this._selectedIds),
 			(data) => {
+				const oldValue = this._pickedTemplates;
 				this._pickedTemplates = data;
+				this.requestUpdate('_pickedTemplates', oldValue);
 			},
-			'_templateRepositoryTreeItems'
+			'_pickedTemplates'
 		);
 	}
 
