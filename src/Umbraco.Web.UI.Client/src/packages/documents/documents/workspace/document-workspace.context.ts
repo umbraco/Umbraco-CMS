@@ -9,6 +9,7 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import type { CreateDocumentRequestModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
+	appendToFrozenArray,
 	partialUpdateFrozenArray,
 	UmbObjectState,
 	UmbObserverController,
@@ -159,12 +160,12 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 	setPropertyValue(alias: string, value: unknown, variantId?: UmbVariantId) {
-		const partialEntry = { value };
+		const entry = { $type: 'DocumentValueModel', ...variantId?.toObject(), alias, value };
 		const currentData = this.#draft.value;
 		if (currentData) {
-			const values = partialUpdateFrozenArray(
+			const values = appendToFrozenArray(
 				currentData.values || [],
-				partialEntry,
+				entry,
 				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true)
 			);
 			this.#draft.update({ values });
