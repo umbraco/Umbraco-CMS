@@ -225,7 +225,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	private _renderUIs() {
 		return html` ${Object.entries(this._groupedPropertyEditorUIs).map(
 			([key, value]) =>
-				html` <h4>${key}</h4>
+				html` <h4 id="category-name">${key}</h4>
 					${this._renderGroupUIs(value)}`
 		)}`;
 	}
@@ -237,7 +237,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 						uis,
 						(propertyEditorUI) => propertyEditorUI.alias,
 						(propertyEditorUI) => html` <li class="item">
-							<a type="button" href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
+							<a href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
 								<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
 								${propertyEditorUI.meta.label || propertyEditorUI.name}
 							</a>
@@ -267,6 +267,11 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
 				margin: 0;
 				padding: 0;
+			}
+
+			#item-grid:not(:last-child) {
+				border-bottom: 1px solid var(--uui-color-divider);
+				padding-bottom: var(--uui-size-space-5);
 			}
 
 			#item-grid .item {
@@ -307,6 +312,12 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				margin: auto;
 				/* width: fit-content;
 				height: fit-content; */
+			}
+			#category-name {
+				text-align: center;
+				display: block;
+				text-transform: capitalize;
+				font-size: 1.2rem;
 			}
 		`,
 	];
