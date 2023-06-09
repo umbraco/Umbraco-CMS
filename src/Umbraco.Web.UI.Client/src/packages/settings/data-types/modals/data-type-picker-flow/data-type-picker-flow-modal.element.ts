@@ -348,14 +348,12 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 			}
 
 			.category-name {
-				text-align: center;
 				display: block;
 				text-transform: capitalize;
 				font-size: 0.9rem;
 			}
 
 			.configuration-name {
-				text-align: center;
 				font-weight: bold;
 				display: block;
 				text-transform: capitalize;
