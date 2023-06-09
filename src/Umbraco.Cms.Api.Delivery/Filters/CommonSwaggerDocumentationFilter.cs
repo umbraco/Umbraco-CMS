@@ -20,7 +20,7 @@ public class AddCompleteSwaggerDocumentationFilter : IOperationFilter, IParamete
             In = ParameterLocation.Query,
             Required = false,
             Description = DocumentationReference,
-            Schema = new OpenApiSchema { Type = "String" },
+            Schema = new OpenApiSchema { Type = "string" },
             Examples = new Dictionary<string, OpenApiExample>
             {
                 { "Expand none", new OpenApiExample { Value = new OpenApiString("") } },
@@ -34,6 +34,46 @@ public class AddCompleteSwaggerDocumentationFilter : IOperationFilter, IParamete
                     new OpenApiExample { Value = new OpenApiString("property:alias1,alias2") }
                 }
             }
+        });
+
+        operation.Parameters.Add(new OpenApiParameter
+        {
+            Name = "Accept-Language",
+            In = ParameterLocation.Header,
+            Required = false,
+            Schema = new OpenApiSchema { Type = "string" },
+            Examples = new Dictionary<string, OpenApiExample>
+            {
+                { "Default", new OpenApiExample { Value = new OpenApiString("") } },
+                { "English culture", new OpenApiExample { Value = new OpenApiString("en-us") } }
+            }
+        });
+
+        operation.Parameters.Add(new OpenApiParameter
+        {
+            Name = "Api-Key",
+            In = ParameterLocation.Header,
+            Required = false,
+            Description = "API key specified through configuration to authorize access to the API.",
+            Schema = new OpenApiSchema { Type = "string" }
+        });
+
+        operation.Parameters.Add(new OpenApiParameter
+        {
+            Name = "Preview",
+            In = ParameterLocation.Header,
+            Required = false,
+            Description = "Whether to request draft content.",
+            Schema = new OpenApiSchema { Type = "boolean" }
+        });
+
+        operation.Parameters.Add(new OpenApiParameter
+        {
+            Name = "Start-Item",
+            In = ParameterLocation.Header,
+            Required = false,
+            Description = "URL segment or GUID of a root content item.",
+            Schema = new OpenApiSchema { Type = "string" }
         });
     }
 
