@@ -166,7 +166,6 @@
 		"eslint-plugin-storybook": "^0.6.12",
 		"eslint-plugin-wc": "^1.4.0",
 		"msw": "^1.1.0",
-		"msw-storybook-addon": "^1.8.0",
 		"openapi-typescript-codegen": "^0.24.0",
 		"playwright-msw": "^2.1.0",
 		"plop": "^3.1.1",
