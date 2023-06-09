@@ -165,6 +165,8 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	}
 
 	private _gotEditorUI(manifest?: ManifestPropertyEditorUi | null) {
+		this._propertyContext.setEditor(undefined);
+
 		if (!manifest) {
 			// TODO: if propertyEditorUiAlias didn't exist in store, we should do some nice fail UI.
 			return;
@@ -177,6 +179,8 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 				oldValue?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
 
 				this._element = el as ManifestPropertyEditorUi['ELEMENT_TYPE'];
+
+				this._propertyContext.setEditor(this._element);
 
 				this._valueObserver?.destroy();
 				this._configObserver?.destroy();

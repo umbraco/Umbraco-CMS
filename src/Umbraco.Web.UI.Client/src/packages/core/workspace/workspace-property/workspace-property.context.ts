@@ -1,4 +1,6 @@
 import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface.js';
+import { UmbPropertyEditorExtensionElement } from '../../extension-registry/interfaces/property-editor-ui-extension-element.interface.js';
+import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -36,6 +38,15 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 	public readonly description = this._data.getObservablePart((data) => data.description);
 	public readonly value = this._data.getObservablePart((data) => data.value);
 	public readonly config = this._data.getObservablePart((data) => data.config);
+
+	private _editor = new BehaviorSubject<UmbPropertyEditorExtensionElement | undefined>(undefined);
+	public readonly editor = this._editor.asObservable();
+	setEditor(editor: UmbPropertyEditorExtensionElement | undefined) {
+		this._editor.next(editor ?? undefined);
+	}
+	getEditor() {
+		return this._editor.getValue();
+	}
 
 	#workspaceVariantId?: UmbVariantId;
 
