@@ -14,11 +14,12 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
-type ItemType = DocumentTypeResponseModel & {$type: string};
+type ItemType = DocumentTypeResponseModel & { $type: string };
 
 export class UmbDocumentTypeRepository
-	implements UmbTreeRepository<EntityTreeItemResponseModel>,
-	UmbDetailRepository<CreateDocumentTypeRequestModel, any, UpdateDocumentTypeRequestModel, DocumentTypeResponseModel>
+	implements
+		UmbTreeRepository<EntityTreeItemResponseModel>,
+		UmbDetailRepository<CreateDocumentTypeRequestModel, any, UpdateDocumentTypeRequestModel, DocumentTypeResponseModel>
 {
 	#init!: Promise<unknown>;
 
@@ -148,7 +149,7 @@ export class UmbDocumentTypeRepository
 			this.#detailStore?.append(data);
 		}
 
-		return { data, error };
+		return { data, error, asObservable: () => this.#detailStore!.byId(id) };
 	}
 
 	async byId(id: string) {
@@ -167,25 +168,22 @@ export class UmbDocumentTypeRepository
 	// Could potentially be general methods:
 
 	async create(documentType: ItemType) {
-
 		if (!documentType || !documentType.id) throw new Error('Template is missing');
 		await this.#init;
 
 		const { error, data } = await this.#detailDataSource.insert(documentType);
 
 		if (!error && data) {
-
 			// TODO: The parts here is a hack, when we can trust the IDs we send, then this should be removed/changed:
 
-			const splitResultUrl = data.split("/");
+			const splitResultUrl = data.split('/');
 			const newId = splitResultUrl[splitResultUrl.length - 1];
 
 			// Temporary hack while we are not in control of IDs:
 
-			const newDocument = {...(await this.requestById(newId)).data, $type: ''};
+			const newDocument = { ...(await this.requestById(newId)).data, $type: '' };
 
-			if(newDocument) {
-
+			if (newDocument) {
 				const notification = { data: { message: `Document Type created` } };
 				this.#notificationContext?.peek('positive', notification);
 
