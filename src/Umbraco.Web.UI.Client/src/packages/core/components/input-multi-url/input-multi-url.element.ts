@@ -91,7 +91,7 @@ export class UmbInputMultiUrlElement extends FormControlMixin(UmbLitElement) {
 	 */
 	@property({ attribute: false })
 	set urls(data: Array<UmbLinkPickerLink>) {
-		if (!data) return;
+		data ??= [];
 		this._urls = [...data]; // Unfreeze data coming from State, so we can manipulate it.
 		super.value = this._urls.map((x) => x.url).join(',');
 	}

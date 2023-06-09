@@ -625,10 +625,10 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 		return result;
 	}
 
-	update(item: DocumentResponseModel) {
-		const result = super.save(item);
+	update(id: string, item: DocumentResponseModel) {
+		const result = super.save(id, item);
 		this.treeData = this.treeData.map((x) => {
-			if(x.id === result.id) {
+			if (x.id === result.id) {
 				return createDocumentTreeItem(result);
 			} else {
 				return x;

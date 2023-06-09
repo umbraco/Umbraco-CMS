@@ -1,7 +1,15 @@
 import type { UmbWorkspaceElement } from '../workspace/workspace.element.js';
 import type { UmbSectionViewsElement } from './section-views/section-views.element.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, property, state, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	nothing,
+	customElement,
+	property,
+	state,
+	PropertyValueMap,
+} from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	ManifestSection,
@@ -19,7 +27,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-section-default')
 export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectionExtensionElement {
-
 	@property()
 	private _manifest?: ManifestSection | undefined;
 	public get manifest(): ManifestSection | undefined {
@@ -27,7 +34,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	}
 	public set manifest(value: ManifestSection | undefined) {
 		const oldValue = this._manifest;
-		if(oldValue === value) return;
+		if (oldValue === value) return;
 		this._manifest = value;
 		this.#observeSectionSidebarApps();
 		this.requestUpdate('manifest', oldValue);

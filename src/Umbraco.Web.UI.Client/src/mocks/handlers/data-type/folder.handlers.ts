@@ -24,10 +24,12 @@ export const folderHandlers = [
 	}),
 
 	rest.put(umbracoPath(`${slug}/folder/:id`), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 		const data = await req.json();
 		if (!data) return;
 
-		umbDataTypeData.save(data);
+		umbDataTypeData.save(id, data);
 
 		return res(ctx.status(200));
 	}),

@@ -1,5 +1,14 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, LitElement, nothing , repeat , customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	LitElement,
+	nothing,
+	repeat,
+	customElement,
+	query,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 
 export type SearchItem = {
 	name: string;

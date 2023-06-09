@@ -51,11 +51,15 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 		const { data } = await this.#documentTypeRepository.requestRootTreeItems();
 		if (!data) return;
 
-		const allFullModels: Array<DocumentTypeResponseModel & {$type: ''}> = [];
+		const allFullModels: Array<DocumentTypeResponseModel & { $type: '' }> = [];
 		await Promise.all(
 			data.items.map((item) => {
 				if (item.id) {
-					return this.#documentTypeRepository.requestById(item.id).then((result) => {if(result.data) {allFullModels.push({$type: '', ...result.data})}});
+					return this.#documentTypeRepository.requestById(item.id).then((result) => {
+						if (result.data) {
+							allFullModels.push({ $type: '', ...result.data });
+						}
+					});
 				}
 				return Promise.resolve();
 			})

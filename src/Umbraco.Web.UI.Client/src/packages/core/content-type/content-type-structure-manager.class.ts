@@ -15,6 +15,7 @@ import {
 	appendToFrozenArray,
 	filterFrozenArray,
 } from '@umbraco-cms/backoffice/observable-api';
+import { incrementString } from '@umbraco-cms/backoffice/utils';
 
 export type PropertyContainerTypes = 'Group' | 'Tab';
 
@@ -35,7 +36,8 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		x.flatMap((x) => x.containers ?? [])
 	);
 
-	#containers = new UmbArrayState<PropertyTypeContainerModelBaseModel>([], (x) => x.id);
+	#containers: UmbArrayState<PropertyTypeContainerModelBaseModel> =
+		new UmbArrayState<PropertyTypeContainerModelBaseModel>([], (x) => x.id);
 
 	constructor(host: UmbControllerHostElement, typeRepository: R) {
 		this.#host = host;
@@ -99,7 +101,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 		if (!data) return false;
 
-		await this.loadType(data.id)
+		await this.loadType(data.id);
 
 		return true;
 	}
@@ -178,8 +180,8 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 		const container: PropertyTypeContainerModelBaseModel = {
 			id: UmbId.new(),
-			parentId: parentId,
-			name: 'New',
+			parentId: parentId ?? null,
+			name: '',
 			type: type,
 			sortOrder: sortOrder ?? 0,
 		};
@@ -192,9 +194,27 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		return container;
 	}
 
+	makeContainerNameUniqueForOwnerDocument(
+		newName: string,
+		containerType: PropertyContainerTypes = 'Tab',
+		parentId: string | null = null
+	) {
+		const ownerRootContainers = this.getOwnerContainers(containerType, parentId);
+
+		let changedName = newName;
+		if (ownerRootContainers) {
+			while (ownerRootContainers.find((tab) => tab.name === changedName)) {
+				changedName = incrementString(changedName);
+			}
+
+			return changedName === newName ? null : changedName;
+		}
+		return null;
+	}
+
 	async updateContainer(
 		documentTypeId: string | null,
-		groupKey: string,
+		containerId: string,
 		partialUpdate: Partial<PropertyTypeContainerModelBaseModel>
 	) {
 		await this.#init;
@@ -202,7 +222,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 		const frozenContainers = this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.containers ?? [];
 
-		const containers = partialUpdateFrozenArray(frozenContainers, partialUpdate, (x) => x.id === groupKey);
+		const containers = partialUpdateFrozenArray(frozenContainers, partialUpdate, (x) => x.id === containerId);
 
 		this.#documentTypes.updateOne(documentTypeId, { containers });
 	}
@@ -343,6 +363,10 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		});
 	}
 
+	getRootContainers(containerType: PropertyContainerTypes) {
+		return this.#containers.getValue().filter((x) => x.parentId === null && x.type === containerType);
+	}
+
 	hasRootContainers(containerType: PropertyContainerTypes) {
 		return this.#containers.getObservablePart((data) => {
 			return data.filter((x) => x.parentId === null && x.type === containerType).length > 0;
@@ -351,6 +375,14 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 	ownerContainersOf(containerType: PropertyContainerTypes) {
 		return this.ownerDocumentTypeObservablePart((x) => x.containers?.filter((x) => x.type === containerType) ?? []);
+	}
+
+	getOwnerContainers(containerType: PropertyContainerTypes, parentId: string | null = null) {
+		return this.getOwnerDocumentType()?.containers?.filter((x) => x.parentId === parentId && x.type === containerType);
+	}
+
+	isOwnerContainer(containerId: string) {
+		return this.getOwnerDocumentType()?.containers?.filter((x) => x.id === containerId);
 	}
 
 	containersOfParentKey(

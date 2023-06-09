@@ -1,4 +1,4 @@
-import { css, html , customElement , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

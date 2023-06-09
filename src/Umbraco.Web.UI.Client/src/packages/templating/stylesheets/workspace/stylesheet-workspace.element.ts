@@ -2,7 +2,7 @@ import { serverFilePathFromUrlFriendlyPath } from '../../utils.js';
 import { UmbStylesheetWorkspaceEditElement } from './stylesheet-workspace-edit.element.js';
 import { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

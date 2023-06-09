@@ -115,13 +115,12 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	async create(parentId: string | null) {
-
 		const { data } = await this.structure.createScaffold(parentId);
 		if (!data) return undefined;
 
 		this.setIsNew(true);
 		//this.#draft.next(data);
-		return data || undefined;
+		return { data } || undefined;
 		// TODO: Is this wrong? should we return { data }??
 	}
 
@@ -131,7 +130,7 @@ export class UmbDocumentTypeWorkspaceContext
 
 		this.setIsNew(false);
 		//this.#draft.next(data);
-		return data || undefined;
+		return { data } || undefined;
 		// TODO: Is this wrong? should we return { data }??
 	}
 
@@ -146,6 +145,8 @@ export class UmbDocumentTypeWorkspaceContext
 		} else {
 			await this.structure.save();
 		}
+
+		this.saveComplete(this.getData());
 	}
 
 	public destroy(): void {

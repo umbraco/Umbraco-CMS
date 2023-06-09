@@ -140,7 +140,6 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 	}
 
 	#observeTreeManifest() {
-
 		new UmbObserverController<any>(
 			this.host,
 			umbExtensionsRegistry

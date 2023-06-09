@@ -50,14 +50,17 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias), '_observeAlias');
 		this.observe(this.#workspaceContext.icon, (icon) => (this._icon = icon), '_observeIcon');
 
-		this.observe(this.#workspaceContext.isNew, (isNew) => {
-			if(isNew) {
-				// TODO: Would be good with a more general way to bring focus to the name input.
-				(this.shadowRoot?.querySelector('#name') as HTMLElement)?.focus();
-			}
-			this.removeControllerByUnique('_observeIsNew');
-		}, '_observeIsNew');
-
+		this.observe(
+			this.#workspaceContext.isNew,
+			(isNew) => {
+				if (isNew) {
+					// TODO: Would be good with a more general way to bring focus to the name input.
+					(this.shadowRoot?.querySelector('#name') as HTMLElement)?.focus();
+				}
+				this.removeControllerByUnique('_observeIsNew');
+			},
+			'_observeIsNew'
+		);
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
@@ -66,7 +69,6 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-
 				const oldName = this._name;
 				const oldAlias = this._alias;
 				const newName = event.target.value.toString();
@@ -81,7 +83,6 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 			}
 		}
 	}
-
 
 	// TODO. find a way where we don't have to do this for all workspaces.
 	#onAliasChange(event: UUIInputEvent) {
@@ -134,8 +135,6 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 							</div>
 						</uui-input>
 					</uui-input>
-
-
 				</div>
 
 				<div slot="footer-info">
@@ -190,7 +189,6 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 				margin-right: var(--uui-size-space-2);
 				margin-left: calc(var(--uui-size-space-4) * -1);
 			}
-
 		`,
 	];
 }

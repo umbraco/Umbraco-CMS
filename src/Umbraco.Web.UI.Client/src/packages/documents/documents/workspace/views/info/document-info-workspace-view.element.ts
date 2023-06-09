@@ -2,6 +2,7 @@ import { css, html, nothing, repeat, customElement, state } from '@umbraco-cms/b
 import { UUITextStyles, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 interface HistoryNode {
 	userId?: number;
 	userAvatars?: [];
@@ -88,11 +89,25 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 	@state()
 	private _nodeName = '';
 
+	@state()
+	private _documentTypeId = '';
+
 	private _workspaceContext?: typeof UMB_ENTITY_WORKSPACE_CONTEXT.TYPE;
 	private itemsPerPage = 10;
 
+	@state()
+	private _editDocumentTypePath = '';
+
 	constructor() {
 		super();
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.onSetup(() => {
+				return { entityType: 'document-type', preset: {} };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editDocumentTypePath = routeBuilder({});
+			});
 
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (nodeContext) => {
 			this._workspaceContext = nodeContext;
@@ -104,6 +119,7 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 		if (!this._workspaceContext) return;
 
 		this._nodeName = 'TBD, with variants this is not as simple.';
+		this._documentTypeId = (this._workspaceContext as any).getContentTypeId();
 
 		/*
 		this.observe(this._workspaceContext.name, (name) => {
@@ -163,7 +179,9 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 			</div>
 			<div class="general-item">
 				<strong>Document Type</strong>
-				<span>document type picker?</span>
+				<uui-button
+					href=${this._editDocumentTypePath + 'edit/' + this._documentTypeId}
+					label="Edit Document Type"></uui-button>
 			</div>
 			<div class="general-item">
 				<strong>Template</strong>

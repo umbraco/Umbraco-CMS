@@ -4,7 +4,6 @@ import { Meta, Story } from '@storybook/web-components';
 import type { UmbDashboardRedirectManagementElement } from './dashboard-redirect-management.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-
 export default {
 	title: 'Dashboards/Redirect Management',
 	component: 'umb-dashboard-redirect-management',

@@ -1,4 +1,4 @@
-import { css, html, LitElement , customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 
 /**

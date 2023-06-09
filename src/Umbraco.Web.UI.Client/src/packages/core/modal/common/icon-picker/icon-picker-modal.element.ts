@@ -98,7 +98,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					<hr />
 					<uui-scroll-container id="icon-selection">${this.renderIconSelection()}</uui-scroll-container>
 				</div>
-				<uui-button slot="actions" look="secondary" label="close" @click="${this._close}">Close</uui-button>
+				<uui-button slot="actions" label="close" @click="${this._close}">Close</uui-button>
 				<uui-button slot="actions" color="positive" look="primary" @click="${this._submit}" label="Submit">
 					Submit
 				</uui-button>

@@ -1,4 +1,5 @@
 import { UmbDocumentWorkspaceContext } from '../../document-workspace.context.js';
+import type { UmbDocumentWorkspaceViewEditTabElement } from './document-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
@@ -25,7 +26,7 @@ export class UmbDocumentWorkspaceViewEditElement
 	private _routes: UmbRoute[] = [];
 
 	@state()
-	_tabs: Array<PropertyTypeContainerModelBaseModel> = [];
+	_tabs?: Array<PropertyTypeContainerModelBaseModel>;
 
 	@state()
 	private _routerPath?: string;
@@ -70,16 +71,21 @@ export class UmbDocumentWorkspaceViewEditElement
 	}
 
 	private _createRoutes() {
+		if (!this._tabs || !this._workspaceContext) return;
 		const routes: UmbRoute[] = [];
 
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
-				const tabName = tab.name;
+				const tabName = tab.name ?? '';
 				routes.push({
-					path: `tab/${encodeFolderName(tabName || '').toString()}`,
+					path: `tab/${encodeFolderName(tabName).toString()}`,
 					component: () => import('./document-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
-						(component as any).tabName = tabName;
+						(component as UmbDocumentWorkspaceViewEditTabElement).tabName = tabName;
+						// TODO: Consider if we can link these more simple, and not parse this on.
+						// Instead have the structure manager looking at wether one of the OwnerALikecontainers is in the owner document.
+						(component as UmbDocumentWorkspaceViewEditTabElement).ownerTabId =
+							this._workspaceContext?.structure.isOwnerContainer(tab.id!) ? tab.id : undefined;
 					},
 				});
 			});
@@ -90,7 +96,8 @@ export class UmbDocumentWorkspaceViewEditElement
 				path: '',
 				component: () => import('./document-workspace-view-edit-tab.element.js'),
 				setup: (component) => {
-					(component as any).noTabName = true;
+					(component as UmbDocumentWorkspaceViewEditTabElement).noTabName = true;
+					(component as UmbDocumentWorkspaceViewEditTabElement).ownerTabId = null;
 				},
 			});
 		}
@@ -106,6 +113,7 @@ export class UmbDocumentWorkspaceViewEditElement
 	}
 
 	render() {
+		if (!this._routes || !this._tabs) return;
 		return html`
 			<umb-body-layout header-fit-height>
 				${this._routerPath && this._tabs.length > 1

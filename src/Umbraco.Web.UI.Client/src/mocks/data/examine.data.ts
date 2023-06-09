@@ -1,4 +1,9 @@
-import { HealthStatusModel, IndexResponseModel, PagedIndexResponseModel, SearchResultResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	HealthStatusModel,
+	IndexResponseModel,
+	PagedIndexResponseModel,
+	SearchResultResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export function getIndexByName(indexName: string) {
 	return Indexers.find((index) => {

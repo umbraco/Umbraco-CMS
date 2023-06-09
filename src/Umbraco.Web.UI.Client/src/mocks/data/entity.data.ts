@@ -24,7 +24,6 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 	}
 
 	insert(item: T) {
-
 		// TODO: Remove this fix when all types come with an ID them selfs.
 		if (!item.id) {
 			item.id = UmbId.new();
@@ -41,12 +40,15 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 		return item;
 	}
 
-	save(saveItem: T) {
-		const foundIndex = this.data.findIndex((item) => item.id === saveItem.id);
+	save(id: string, saveItem: T) {
+		// We need the ID in our data:
+		saveItem = { ...saveItem, id: id };
+
+		const foundIndex = this.data.findIndex((item) => item.id === id);
 		if (foundIndex !== -1) {
 			// update
 			this.data[foundIndex] = saveItem;
-			this.updateData(saveItem);
+			//this.updateData(saveItem);// This does not seem to do anything...
 		} else {
 			// new
 			this.data.push(saveItem);

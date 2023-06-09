@@ -7,7 +7,6 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 //import { data } from '../../../../../core/mocks/data/data-type.data.js';
 //import { UmbDataTypeContext } from '../../data-type.context.js';
 
-
 export default {
 	title: 'Workspaces/Data Type/Views/Info',
 	component: 'umb-workspace-view-member-group-info',

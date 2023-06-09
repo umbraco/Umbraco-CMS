@@ -4,10 +4,7 @@ import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbSorterController, UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import {
-	DocumentTypePropertyTypeResponseModel,
-	PropertyTypeModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { DocumentTypePropertyTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import './document-type-workspace-view-edit-property.element.js';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -100,7 +97,6 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 
 		// TODO: Figure out how we from this location can get into the route modal, via URL.
 		// The modal is registered by the document-type-workspace-view-edit-property element, therefor a bit hard to get the URL from here.
-
 	}
 
 	render() {

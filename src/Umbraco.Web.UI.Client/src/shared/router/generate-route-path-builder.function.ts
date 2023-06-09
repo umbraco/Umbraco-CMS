@@ -5,11 +5,16 @@ const PARAM_IDENTIFIER = /:([^\\/]+)/g;
 
 export function generateRoutePathBuilder(path: string) {
 	return (params: { [key: string]: string | number } | null) => {
-		return '/' + stripSlash(
-				params ?
-					path.replace(PARAM_IDENTIFIER, (substring: string, ...args: string[]) => {
-						return params[args[0]].toString();
-					}
-			  ): path) + '/';
-	}
+		return (
+			'/' +
+			stripSlash(
+				params
+					? path.replace(PARAM_IDENTIFIER, (substring: string, ...args: string[]) => {
+							return params[args[0]].toString();
+					  })
+					: path
+			) +
+			'/'
+		);
+	};
 }

@@ -1,6 +1,16 @@
 import { UmbDonutSliceElement } from './donut-slice.element.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, LitElement, svg , customElement, property, query, queryAssignedElements, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	LitElement,
+	svg,
+	customElement,
+	property,
+	query,
+	queryAssignedElements,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { clamp } from '@umbraco-cms/backoffice/external/lodash';
 
 export interface Circle {

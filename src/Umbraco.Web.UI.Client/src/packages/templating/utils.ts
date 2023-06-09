@@ -4,10 +4,10 @@ export const urlFriendlyPathFromServerFilePath = (path: string) => encodeURIComp
 // TODO: we can try and make pretty urls if we want to
 export const serverFilePathFromUrlFriendlyPath = (unique: string) => decodeURIComponent(unique.replace('-', '.'));
 
-//Below are a copy of 
+//Below are a copy of
 export const getInsertDictionarySnippet = (nodeName: string) => {
-    return `@Umbraco.GetDictionaryValue("${nodeName}")`;
-}
+	return `@Umbraco.GetDictionaryValue("${nodeName}")`;
+};
 
 export const getInsertPartialSnippet = (nodeName: string) =>
 	`@await Html.PartialAsync("${nodeName.replace('.cshtml', '')}")`;
@@ -55,4 +55,3 @@ export const getUmbracoFieldSnippet = (field: string, defaultValue: string | nul
 
 	return value;
 };
-
