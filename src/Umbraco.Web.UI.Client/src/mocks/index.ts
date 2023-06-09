@@ -1,5 +1,5 @@
 const { setupWorker } = window.MockServiceWorker;
-import type { MockedRequest, setupWorker as setupWorkType, rest } from 'msw';
+import type { MockedRequest, setupWorker as setupWorkType, rest, StartOptions } from 'msw';
 import { handlers } from './browser-handlers.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
@@ -11,11 +11,12 @@ export const onUnhandledRequest = (req: MockedRequest) => {
 	}
 };
 
-export const startMockServiceWorker = () =>
+export const startMockServiceWorker = (config?: StartOptions) =>
 	worker.start({
 		onUnhandledRequest,
 		// TODO: this can not rely on a VITE variable
 		quiet: import.meta.env.VITE_MSW_QUIET === 'on',
+		...config,
 	});
 
 declare global {

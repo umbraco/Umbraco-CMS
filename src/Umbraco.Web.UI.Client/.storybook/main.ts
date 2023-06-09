@@ -22,12 +22,19 @@ const config: StorybookConfig = {
 		name: '@storybook/web-components-vite',
 		options: {},
 	},
-	staticDirs: ['../public-assets'],
+	staticDirs: ['../public-assets', '../public'],
 	typescript: {
 		check: true,
 	},
 	docs: {
 		autodocs: true,
+	},
+	managerHead(head, { configType }) {
+		const base = process.env.VITE_BASE_PATH || '/';
+		const injections = [
+			`<base href="${base}" />`, // This decide how storybook's main frame visit stories
+		];
+		return configType === 'PRODUCTION' ? `${injections.join('')}${head}` : head;
 	},
 };
 export default config;
