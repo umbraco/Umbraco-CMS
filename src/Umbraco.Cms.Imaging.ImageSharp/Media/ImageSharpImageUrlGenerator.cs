@@ -1,7 +1,9 @@
 using System.Globalization;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Media;
@@ -18,15 +20,21 @@ namespace Umbraco.Cms.Imaging.ImageSharp.Media;
 public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
 {
     private readonly RequestAuthorizationUtilities? _requestAuthorizationUtilities;
+    private readonly ImageSharpMiddlewareOptions _options;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
     /// </summary>
     /// <param name="configuration">The ImageSharp configuration.</param>
     /// <param name="requestAuthorizationUtilities">Contains helpers that allow authorization of image requests.</param>
-    public ImageSharpImageUrlGenerator(Configuration configuration, RequestAuthorizationUtilities? requestAuthorizationUtilities)
-        : this(configuration.ImageFormats.SelectMany(f => f.FileExtensions).ToArray(), requestAuthorizationUtilities)
-    { }
+    /// <param name="options"></param>
+    public ImageSharpImageUrlGenerator(
+        Configuration configuration,
+        RequestAuthorizationUtilities? requestAuthorizationUtilities,
+        IOptions<ImageSharpMiddlewareOptions> options)
+        : this(configuration.ImageFormats.SelectMany(f => f.FileExtensions).ToArray(), options, requestAuthorizationUtilities)
+    {
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
@@ -34,7 +42,7 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
     /// <param name="configuration">The ImageSharp configuration.</param>
     [Obsolete("Use ctor with all params - This will be removed in Umbraco 13.")]
     public ImageSharpImageUrlGenerator(Configuration configuration)
-        : this(configuration, StaticServiceProvider.Instance.GetService<RequestAuthorizationUtilities>())
+        : this(configuration, StaticServiceProvider.Instance.GetService<RequestAuthorizationUtilities>(), StaticServiceProvider.Instance.GetRequiredService<IOptions<ImageSharpMiddlewareOptions>>())
     { }
 
     /// <summary>
@@ -45,10 +53,11 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
     /// <remarks>
     /// This constructor is only used for testing.
     /// </remarks>
-    internal ImageSharpImageUrlGenerator(IEnumerable<string> supportedImageFileTypes, RequestAuthorizationUtilities? requestAuthorizationUtilities = null)
+    internal ImageSharpImageUrlGenerator(IEnumerable<string> supportedImageFileTypes, IOptions<ImageSharpMiddlewareOptions> options, RequestAuthorizationUtilities? requestAuthorizationUtilities = null)
     {
         SupportedImageFileTypes = supportedImageFileTypes;
         _requestAuthorizationUtilities = requestAuthorizationUtilities;
+        _options = options.Value;
     }
 
     /// <inheritdoc />
@@ -115,10 +124,17 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
             queryString.Add("v", cacheBusterValue);
         }
 
-        if (_requestAuthorizationUtilities is not null)
+        // If no secret is we'll completely skip this whole thing, in theory the ComputeHMACAsync should just return null imidiately, but still no reason to create
+        if (_options.HMACSecretKey.Length != 0 && _requestAuthorizationUtilities is not null)
         {
             var uri = QueryHelpers.AddQueryString(options.ImageUrl, queryString);
-            if (_requestAuthorizationUtilities.ComputeHMAC(uri, CommandHandling.Sanitize) is string token && !string.IsNullOrEmpty(token))
+
+            // It's important that we call the async version here.
+            // This is because if we call the synchronous version, we ImageSharp will start a new Task ever single time.
+            // This becomes a huge problem if the site is under load, and will result in massive spikes in response time.
+            // See https://github.com/SixLabors/ImageSharp.Web/blob/main/src/ImageSharp.Web/AsyncHelper.cs#L24
+            var token = _requestAuthorizationUtilities.ComputeHMACAsync(uri, CommandHandling.Sanitize).GetAwaiter().GetResult();
+            if (string.IsNullOrEmpty(token) is false)
             {
                 queryString.Add(RequestAuthorizationUtilities.TokenCommand, token);
             }
