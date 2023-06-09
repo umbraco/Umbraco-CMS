@@ -237,10 +237,14 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 						uis,
 						(propertyEditorUI) => propertyEditorUI.alias,
 						(propertyEditorUI) => html` <li class="item">
-							<a href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
-								<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
-								${propertyEditorUI.meta.label || propertyEditorUI.name}
-							</a>
+							<uui-button
+								type="button"
+								href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
+								<div class="item-content">
+									<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
+									${propertyEditorUI.meta.label || propertyEditorUI.name}
+								</div>
+							</uui-button>
 						</li>`
 				  )
 				: ''}
@@ -290,12 +294,16 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				cursor: pointer;
 			}
 
-			#item-grid .item a {
-				border: none;
-				padding: 0;
-				margin: 0;
-				color: inherit;
-				text-decoration: none;
+			#item-grid .item uui-button {
+				--uui-button-padding-left-factor: 0;
+				--uui-button-padding-right-factor: 0;
+				--uui-button-padding-top-factor: 0;
+				--uui-button-padding-bottom-factor: 0;
+				width: 100%;
+				height: 100%;
+			}
+
+			#item-grid .item .item-content {
 				text-align: center;
 				box-sizing: border-box;
 
