@@ -14,5 +14,5 @@ export const UMB_DATA_TYPE_PICKER_FLOW_MODAL = new UmbModalToken<
 	UmbDataTypePickerFlowModalResult
 >('Umb.Modal.DataTypePickerFlow', {
 	type: 'sidebar',
-	size: 'medium',
+	size: 'small',
 });
