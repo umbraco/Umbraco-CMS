@@ -2,9 +2,12 @@ import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './t
 import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store.js';
 import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.data.js';
 import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data.js';
+import { UMB_TEMPLATE_ITEM_STORE_CONTEXT_TOKEN, UmbTemplateItemStore } from './template-item.store.js';
+import { UmbTemplateItemServerDataSource } from './sources/template.item.server.data.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	UmbDetailRepository,
+	UmbItemDataSource,
 	UmbItemRepository,
 	UmbTreeDataSource,
 	UmbTreeRepository,
@@ -32,7 +35,9 @@ export class UmbTemplateRepository
 
 	#treeDataSource: UmbTreeDataSource<EntityTreeItemResponseModel>;
 	#detailDataSource: UmbTemplateDetailServerDataSource;
+	#itemSource: UmbItemDataSource<TemplateItemResponseModel>;
 
+	#itemStore?: UmbTemplateItemStore;
 	#treeStore?: UmbTemplateTreeStore;
 	#store?: UmbTemplateStore;
 
@@ -43,8 +48,13 @@ export class UmbTemplateRepository
 
 		this.#treeDataSource = new UmbTemplateTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbTemplateDetailServerDataSource(this.#host);
+		this.#itemSource = new UmbTemplateItemServerDataSource(this.#host);
 
 		this.#init = Promise.all([
+			new UmbContextConsumerController(this.#host, UMB_TEMPLATE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#itemStore = instance;
+			}),
+
 			new UmbContextConsumerController(this.#host, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
 			}),
@@ -147,17 +157,21 @@ export class UmbTemplateRepository
 			this.#store?.append(data);
 		}
 
-		return { data, error };
+		return { data, error, asObservable: () => this.#treeStore!.items([id]) };
 	}
 
-	async requestItems(id: string[]) {
+	// ITEMS:
+	async requestItems(ids: Array<string>) {
+		if (!ids) throw new Error('Ids are missing');
 		await this.#init;
 
-		if (!id) {
-			throw new Error('Id is missing');
+		const { data, error } = await this.#itemSource.getItems(ids);
+
+		if (data) {
+			this.#itemStore?.appendItems(data);
 		}
-		const { data, error } = await this.#detailDataSource.getItem(id);
-		return { data, error };
+
+		return { data, error, asObservable: () => this.#itemStore!.items(ids) };
 	}
 
 	async items(uniques: string[]): Promise<Observable<ItemResponseModelBaseModel[]>> {
