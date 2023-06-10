@@ -31,11 +31,22 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement
 		if (!this.#workspaceContext) return;
 		this.observe(
 			this.#workspaceContext.defaultTemplateId,
-			(defaultTemplateId) => (this._defaultTemplateId = defaultTemplateId)
+			(defaultTemplateId) => {
+				const oldValue = this._defaultTemplateId;
+				this._defaultTemplateId = defaultTemplateId;
+				this.requestUpdate('_defaultTemplateId', oldValue);
+			},
+			'defaultTemplate'
 		);
-		this.observe(this.#workspaceContext.allowedTemplateIds, (allowedTemplateIds) => {
-			this._allowedTemplateIds = allowedTemplateIds;
-		});
+		this.observe(
+			this.#workspaceContext.allowedTemplateIds,
+			(allowedTemplateIds) => {
+				const oldValue = this._allowedTemplateIds;
+				this._allowedTemplateIds = allowedTemplateIds;
+				this.requestUpdate('_allowedTemplateIds', oldValue);
+			},
+			'allowedTemplateIds'
+		);
 	}
 
 	#templateInputChange(e: CustomEvent) {

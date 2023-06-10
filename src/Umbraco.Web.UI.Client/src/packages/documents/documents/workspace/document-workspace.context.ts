@@ -54,15 +54,7 @@ export class UmbDocumentWorkspaceContext
 		new UmbObserverController(this.host, this.documentTypeKey, (id) => this.structure.loadType(id));
 
 		/*
-		TODO: Concept for ensure variant values:
-		new UmbObserverController(this.host, this.variants, (variants) => {
-			if (!variants) return;
-			const draft = this.#draft.getValue();
-			if (!draft) return;
-
-			// Gather all properties from all document types.
-			// Loop through all properties for each variant and insert missing value objects.
-		}
+		TODO: Make something to ensure all variants are present in data? Seems like a good idea?.
 		*/
 	}
 

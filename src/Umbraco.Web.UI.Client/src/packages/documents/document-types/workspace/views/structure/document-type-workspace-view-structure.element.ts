@@ -34,9 +34,11 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 		if (!this.#workspaceContext) return;
 		this.observe(this.#workspaceContext.allowedAsRoot, (allowedAsRoot) => (this._allowedAsRoot = allowedAsRoot));
 		this.observe(this.#workspaceContext.allowedContentTypes, (allowedContentTypes) => {
+			const oldValue = this._allowedContentTypeIDs;
 			this._allowedContentTypeIDs = allowedContentTypes
 				?.map((x) => x.id)
 				.filter((x) => x !== undefined) as Array<string>;
+			this.requestUpdate('_allowedContentTypeIDs', oldValue);
 		});
 	}
 

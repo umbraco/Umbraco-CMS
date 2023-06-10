@@ -1,7 +1,13 @@
 import { UmbTemplateRepository } from '../repository/template.repository.js';
 import { UmbTemplateTreeStore } from './template.tree.store.js';
 import { UmbTemplateStore } from './template.store.js';
-import { ManifestStore, ManifestTreeStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbTemplateItemStore } from './template-item.store.js';
+import {
+	ManifestStore,
+	ManifestTreeStore,
+	ManifestRepository,
+	ManifestItemStore,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 export const TEMPLATE_REPOSITORY_ALIAS = 'Umb.Repository.Template';
 
@@ -14,6 +20,7 @@ const repository: ManifestRepository = {
 
 export const TEMPLATE_STORE_ALIAS = 'Umb.Store.Template';
 export const TEMPLATE_TREE_STORE_ALIAS = 'Umb.Store.TemplateTree';
+export const TEMPLATE_ITEM_STORE_ALIAS = 'Umb.Store.TemplateItem';
 
 const store: ManifestStore = {
 	type: 'store',
@@ -29,4 +36,11 @@ const treeStore: ManifestTreeStore = {
 	class: UmbTemplateTreeStore,
 };
 
-export const manifests = [repository, store, treeStore];
+const itemStore: ManifestItemStore = {
+	type: 'itemStore',
+	alias: TEMPLATE_ITEM_STORE_ALIAS,
+	name: 'Template Item Store',
+	class: UmbTemplateItemStore,
+};
+
+export const manifests = [repository, store, treeStore, itemStore];
