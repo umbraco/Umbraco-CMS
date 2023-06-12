@@ -1,3 +1,4 @@
 import tinymce from 'tinymce';
-import type { EditorEvent, Editor, AstNode } from 'tinymce';
-export { tinymce, Editor, AstNode, EditorEvent };
+import type { EditorEvent, Editor, AstNode, TinyMCE } from 'tinymce';
+
+export { tinymce, Editor, AstNode, EditorEvent, TinyMCE };
