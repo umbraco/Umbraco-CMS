@@ -103,12 +103,10 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 				this.theme = themeAlias ? this.#translateTheme(themeAlias) : CodeEditorTheme.Light;
 			});
 		});
-		debugger;
 	}
 
 	firstUpdated() {
 		this.#editor = new UmbCodeEditorController(this);
-		debugger;
 	}
 
 	protected updated(_changedProperties: PropertyValues<this>): void {
