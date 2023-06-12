@@ -10,7 +10,6 @@ import {
 	UMB_CREATE_DICTIONARY_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { log } from '@openid/appauth';
 
 @customElement('umb-dashboard-translation-dictionary')
 export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
