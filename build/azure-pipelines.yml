@@ -206,6 +206,8 @@ stages:
             displayName: Run npm ci
           - script: npm run storybook:build
             displayName: Build Storybook
+            env:
+              - VITE_BASE_PATH: /v$(umbracoMajorVersion)/ui/
             workingDirectory:  $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client
           - task: ArchiveFiles@2
             displayName: Archive js Docs
