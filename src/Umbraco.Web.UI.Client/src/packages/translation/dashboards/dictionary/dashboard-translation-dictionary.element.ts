@@ -140,11 +140,14 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		const { name, parentId } = await modalContext.onSubmit();
 		if (!name || parentId === undefined) return;
 
-		const { data } = await this.#repo.createScaffold(parentId);
-		if (!data) return;
+		const { data: url } = await this.#repo.create({ name, parentId });
 
-		// TODO: Temp url construction:
-		history.pushState({}, '', `/section/translation/workspace/dictionary-item/edit/${data.id}`);
+		console.log('got url', url);
+		if (!url) return;
+		//TODO: Why do we need to extract the id like this?
+		const id = url.substring(url.lastIndexOf('/') + 1);
+
+		history.pushState({}, '', `/section/translation/workspace/dictionary-item/edit/${id}`);
 	}
 
 	render() {

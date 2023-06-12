@@ -47,10 +47,12 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 		const { name, parentId } = await modalContext.onSubmit();
 		if (!name || parentId === undefined) return;
 
-		const { data } = await this.repository.createScaffold(parentId);
-		if (!data) return;
+		const { data: url } = await this.repository.create({ name, parentId });
+		if (!url) return;
 
-		// TODO: Temp url construction:
-		history.pushState({}, '', `/section/translation/workspace/dictionary-item/edit/${data.id}`);
+		//TODO: Why do we need to extract the id like this?
+		const id = url.substring(url.lastIndexOf('/') + 1);
+
+		history.pushState({}, '', `/section/translation/workspace/dictionary-item/edit/${id}`);
 	}
 }
