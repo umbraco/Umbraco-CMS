@@ -58,7 +58,7 @@ stages:
           - task: Cache@2
             displayName: Cache node_modules
             inputs:
-              key: '"npm_client" | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/package-lock.json'
+              key: '"npm_client" | "$(Agent.OS)"| $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/package-lock.json | $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client/package-lock.json'
               restoreKeys: |
                 "npm_client" | "$(Agent.OS)"
                 "npm_client"
@@ -183,28 +183,40 @@ stages:
         displayName: Build js API Reference
         pool:
           vmImage: 'ubuntu-latest'
+        variables:
+          npm_config_cache: $(Pipeline.Workspace)/.npm_client
+          NODE_OPTIONS: --max_old_space_size=16384
+          BASE_PATH: /v$(umbracoMajorVersion)/ui
         steps:
+          - checkout: self
+            submodules: true
           - task: NodeTool@0
-            displayName: Use Node.js 10.15.0
+            displayName: Use Node.js $(nodeVersion)
             inputs:
-              versionSpec: 10.15.0 # Won't work with higher versions
-          - script: |
-              npm ci --no-fund --no-audit --prefer-offline
-              npx gulp docs
-
-              major="$(umbracoMajorVersion)"
-              echo "major version: $major"
-
-              baseUrl="https://apidocs.umbraco.com/v$major/ui/"
-              echo "baseUrl: $baseUrl"
-
-              sed -i "s|baseUrl = .*|baseUrl = '$baseUrl',|" api/index.html
-            displayName: Generate js Docs
-            workingDirectory:  $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Docs
+              versionSpec: $(nodeVersion)
+          - task: Cache@2
+            displayName: Cache node_modules
+            inputs:
+              key: '"npm_client" | "$(Agent.OS)"| $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/package-lock.json | $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client/package-lock.json'
+              restoreKeys: |
+                "npm_client" | "$(Agent.OS)"
+                "npm_client"
+              path: $(npm_config_cache)
+          - script: npm ci --no-fund --no-audit --prefer-offline
+            workingDirectory:  src/Umbraco.Web.UI.New.Client
+            displayName: Run npm ci
+          - script: npm run storybook:build
+            displayName: Build Storybook
+            env:
+              VITE_BASE_PATH: $(BASE_PATH)/
+            workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client
+          - script: sed -i "s|/umbraco/backoffice|$(BASE_PATH)/umbraco/backoffice|" assets/*.js
+            displayName: Replace BASE_PATH on assets
+            workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client/storybook-static
           - task: ArchiveFiles@2
             displayName: Archive js Docs
             inputs:
-              rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Docs/api
+              rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client/storybook-static
               includeRootFolder: false
               archiveFile: $(Build.ArtifactStagingDirectory)/ui-docs.zip
           - task: PublishPipelineArtifact@1
@@ -540,7 +552,7 @@ stages:
     displayName: Upload API Documention
     dependsOn:
       - Build
-      - Deploy_NuGet
+      - Build_Docs
     condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.uploadApiDocs}}))
     jobs:
       - job:

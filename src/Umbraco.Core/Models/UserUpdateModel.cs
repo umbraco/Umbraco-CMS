@@ -12,9 +12,9 @@ public class UserUpdateModel
 
     public string LanguageIsoCode { get; set; } = string.Empty;
 
-    public SortedSet<Guid> ContentStartNodeKeys { get; set; } = new();
+    public ISet<Guid> ContentStartNodeKeys { get; set; } = new HashSet<Guid>();
 
-    public SortedSet<Guid> MediaStartNodeKeys { get; set; } = new();
+    public ISet<Guid> MediaStartNodeKeys { get; set; } = new HashSet<Guid>();
 
     public ISet<Guid> UserGroupKeys { get; set; } = new HashSet<Guid>();
 }

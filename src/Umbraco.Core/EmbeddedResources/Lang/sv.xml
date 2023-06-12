@@ -97,6 +97,13 @@
     <key alias="smallSort">Sortera</key>
     <key alias="historyIncludingVariants">Historik (alla varianter)</key>
   </area>
+  <area alias="blockEditor">
+    <key alias="addBlock">Lägg till innehåll</key>
+    <key alias="addThis">Lägg till %0%</key>
+    <key alias="blockHasChanges">Du har gjort ändringar i detta innehåll. Är du säker på att du vill ta bort dem?</key>
+    <key alias="confirmCancelBlockCreationHeadline">Ignorera skapandet</key>
+    <key alias="confirmCancelBlockCreationMessage"><![CDATA[Är du säker på att du vill avbryta skapandet?]]></key>
+  </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Skapa en ny innehållsmall för <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Tom</key>
@@ -108,6 +115,7 @@
   </area>
   <area alias="buttons">
     <key alias="clearSelection">Rensa urval</key>
+    <key alias="confirmActionConfirm">Bekräfta</key>
     <key alias="bold">Fetstil</key>
     <key alias="deindent">Minska indrag</key>
     <key alias="formFieldInsert">Infoga formulärfält</key>
@@ -140,6 +148,7 @@
     <key alias="styleChoose">Välj stil</key>
     <key alias="styleShow">Visa stil</key>
     <key alias="tableInsert">Infoga tabell</key>
+    <key alias="submitChanges">Skicka</key>
   </area>
   <area alias="colorpicker">
     <key alias="noColors">Du har inte konfigurerat några giltiga färger</key>
@@ -204,6 +213,9 @@
     <key alias="noChanges">Inga ändringar har gjorts</key>
     <key alias="notCreated">Ej skapad</key>    
   </area>
+  <area alias="contentTypeEditor">
+    <key alias="yesDelete">Ja, ta bort</key>
+  </area>
   <area alias="create">
     <key alias="chooseNode">Var vill du skapa den nya %0%</key>
     <key alias="createUnder">Skapa innehåll under</key>
@@ -264,6 +276,7 @@
     <key alias="assignDomain">Hantera domännamn</key>
     <key alias="closeThisWindow">Stäng fönstret</key>
     <key alias="confirmdelete">Är du säker på att du vill ta bort</key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Är du säker på att du vill ta bort <strong>%0%</strong> av <strong>%1%</strong> objekt]]></key>
     <key alias="confirmdisable">Är du säker på att du vill avaktivera</key>
     <key alias="confirmlogout">Är du säker?</key>
     <key alias="confirmSure">Är du säker?</key>
@@ -389,6 +402,7 @@
     <key alias="deleting">Tar bort...</key>
     <key alias="design">Design</key>
     <key alias="dimensions">Dimensioner</key>
+    <key alias="discard">Ignorera</key>
     <key alias="down">Ner</key>
     <key alias="download">Ladda ned</key>
     <key alias="edit">Redigera</key>
@@ -668,6 +682,9 @@
     <key alias="nodePublishAll">%0% och underliggande sidor har publicerats</key>
     <key alias="publishAll">Publicera %0% och alla dess underordnade sidor</key>
     <key alias="publishHelp"><![CDATA[Klicka på <em>ok</em> för att publicera <strong>%0%</strong>. Därmed blir innehållet publikt.<br/><br /> Du kan publicera denna sida och alla dess undersidor genom att kryssa i <em>publicera alla undersidor</em>. ]]></key>
+  </area>
+  <area alias="references">
+    <key alias="labelUsedItems">Följande objekt refereras till</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">ange en extern länk</key>
@@ -1001,8 +1018,8 @@
     <key alias="writer">Skribent</key>
     <key alias="yourHistory">Din nuvarande historik</key>
     <key alias="yourProfile">Din profil</key>
-    <key alias="sortCreateDateAscending">Nyast</key>
-    <key alias="sortCreateDateDescending">Äldst</key>
+    <key alias="sortCreateDateAscending">Äldst</key>
+    <key alias="sortCreateDateDescending">Nyast</key>
     <key alias="sortLastLoginDateDescending">Senaste login</key>
   </area>
   <area alias="logViewer">

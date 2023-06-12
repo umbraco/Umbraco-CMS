@@ -50,10 +50,6 @@ tools/docfx/
 # Ignore rule for clearing out Belle (avoid rebuilding all the time)
 preserve.belle
 
-# Ignore rule for output of generated documentation files from grunt docserve
-/src/Umbraco.Web.UI.Docs/api/
-/src/Umbraco.Web.UI.Docs/package-lock.json
-
 # csharp-docs
 /build/csharp-docs/api/
 /build/csharp-docs/_site/

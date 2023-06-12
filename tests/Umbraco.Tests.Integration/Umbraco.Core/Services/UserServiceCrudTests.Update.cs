@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 public partial class UserServiceCrudTests
 {
-    private SortedSet<Guid> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)
+    private ISet<Guid> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)
     {
         IEnumerable<Guid>? keys = ids?
             .Select(x => EntityService.GetKey(x, type))
@@ -20,8 +20,8 @@ public partial class UserServiceCrudTests
             .Select(x => x.Result);
 
         return keys is null
-            ? new SortedSet<Guid>()
-            : new SortedSet<Guid>(keys);
+            ? new HashSet<Guid>()
+            : new HashSet<Guid>(keys);
     }
 
     private async Task<UserUpdateModel> MapUserToUpdateModel(IUser user)

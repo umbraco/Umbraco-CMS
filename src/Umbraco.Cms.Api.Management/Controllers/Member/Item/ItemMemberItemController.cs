@@ -23,7 +23,7 @@ public class ItemMemberItemController : MemberItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MemberItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "id")] SortedSet<Guid> ids)
+    public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IEnumerable<IMember> members = await _memberService.GetByKeysAsync(ids.ToArray());
         List<MemberItemResponseModel> responseModels = _mapper.MapEnumerable<IMember, MemberItemResponseModel>(members);

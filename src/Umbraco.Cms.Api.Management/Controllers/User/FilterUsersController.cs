@@ -47,15 +47,15 @@ public class FilterUserController : UserControllerBase
         int take = 100,
         UserOrder orderBy = UserOrder.UserName,
         Direction orderDirection = Direction.Ascending,
-        [FromQuery] SortedSet<Guid>? userGroupIds = null,
-        [FromQuery] SortedSet<UserState>? userStates = null,
+        [FromQuery] HashSet<Guid>? userGroupIds = null,
+        [FromQuery] HashSet<UserState>? userStates = null,
         string filter = "")
     {
         var userFilter = new UserFilter
         {
             IncludedUserGroups = userGroupIds,
             IncludeUserStates = userStates,
-            NameFilters = string.IsNullOrEmpty(filter) ? null : new SortedSet<string> { filter }
+            NameFilters = string.IsNullOrEmpty(filter) ? null : new HashSet<string> { filter }
         };
 
         Attempt<PagedModel<IUser>, UserOperationStatus> filterAttempt =

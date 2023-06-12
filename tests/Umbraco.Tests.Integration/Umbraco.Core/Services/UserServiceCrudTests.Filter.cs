@@ -33,7 +33,7 @@ public partial class UserServiceCrudTests
             await userService.DisableAsync(Constants.Security.SuperUserKey, new HashSet<Guid>{ createAttempt.Result.CreatedUser!.Key });
         Assert.AreEqual(UserOperationStatus.Success, disableStatus);
 
-        var filter = new UserFilter {IncludeUserStates = new SortedSet<UserState> {includeState}};
+        var filter = new UserFilter {IncludeUserStates = new HashSet<UserState> {includeState}};
 
         var filterAttempt = await userService.FilterAsync(Constants.Security.SuperUserKey, filter, 0, 1000);
         Assert.IsTrue(filterAttempt.Success);
@@ -92,7 +92,7 @@ public partial class UserServiceCrudTests
             await userService.CreateAsync(Constants.Security.SuperUserKey, nonSuperCreateModel, true);
         Assert.IsTrue(createEditorAttempt.Success);
 
-        var filter = new UserFilter {NameFilters = new SortedSet<string> {"admin"}};
+        var filter = new UserFilter {NameFilters = new HashSet<string> {"admin"}};
 
         var filterAttempt = await userService.FilterAsync(Constants.Security.SuperUserKey, filter, 0, 10000);
         Assert.IsTrue(filterAttempt.Success);
@@ -133,7 +133,7 @@ public partial class UserServiceCrudTests
         Assert.IsTrue(createEditorAttempt.Success);
         Assert.IsTrue(createAdminAttempt.Success);
 
-        var filter = new UserFilter {IncludedUserGroups = new SortedSet<Guid> {adminGroup!.Key}};
+        var filter = new UserFilter {IncludedUserGroups = new HashSet<Guid> {adminGroup!.Key}};
 
         var editorFilterAttempt =
             await userService.FilterAsync(createEditorAttempt.Result.CreatedUser!.Key, filter, 0, 10000);
@@ -172,8 +172,8 @@ public partial class UserServiceCrudTests
         Assert.IsTrue(createEditorAttempt.Success);
         Assert.IsTrue(createAdminAttempt.Success);
 
-        var filter = new UserFilter {IncludedUserGroups = new SortedSet<Guid> {adminGroup!.Key}};
- 
+        var filter = new UserFilter {IncludedUserGroups = new HashSet<Guid> {adminGroup!.Key}};
+
         var adminFilterAttempt =
             await userService.FilterAsync(createAdminAttempt.Result.CreatedUser!.Key, filter, 0, 10000);
         Assert.IsTrue(adminFilterAttempt.Success);
@@ -245,7 +245,7 @@ public partial class UserServiceCrudTests
         var writerGroup = await UserGroupService.GetAsync(Constants.Security.WriterGroupAlias);
         var filter = new UserFilter
         {
-            IncludedUserGroups = new SortedSet<Guid> { writerGroup!.Key }
+            IncludedUserGroups = new HashSet<Guid> { writerGroup!.Key }
         };
 
         var onlyWritesResult = await userService.FilterAsync(Constants.Security.SuperUserKey, filter, 0, 1000);
@@ -265,7 +265,7 @@ public partial class UserServiceCrudTests
         var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
         var filter = new UserFilter
         {
-            ExcludeUserGroups = new SortedSet<Guid> { editorGroup!.Key }
+            ExcludeUserGroups = new HashSet<Guid> { editorGroup!.Key }
         };
 
         var noEditorResult = await userService.FilterAsync(Constants.Security.SuperUserKey, filter, 0, 1000);

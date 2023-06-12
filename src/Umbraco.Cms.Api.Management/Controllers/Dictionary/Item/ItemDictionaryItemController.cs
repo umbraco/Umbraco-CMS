@@ -23,7 +23,7 @@ public class ItemDictionaryItemController : DictionaryItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DictionaryItemItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item([FromQuery(Name = "id")] SortedSet<Guid> ids)
+    public async Task<ActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IEnumerable<IDictionaryItem> dictionaryItems = await _dictionaryItemService.GetManyAsync(ids.ToArray());
 

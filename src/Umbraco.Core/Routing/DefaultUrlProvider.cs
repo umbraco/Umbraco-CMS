@@ -137,9 +137,12 @@ public class DefaultUrlProvider : IUrlProvider
     {
         if (string.IsNullOrWhiteSpace(route))
         {
-            _logger.LogDebug(
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(
                 "Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.",
                 id);
+            }
             return null;
         }
 

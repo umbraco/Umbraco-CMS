@@ -9,32 +9,25 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Items;
 
 [ApiVersion("1.0")]
-public class ItemDatatypeItemController : DatatypeItemControllerBase
+public class ByEditorUiAliasController : DatatypeItemControllerBase
 {
     private readonly IDataTypeService _dataTypeService;
     private readonly IUmbracoMapper _mapper;
 
-    public ItemDatatypeItemController(IDataTypeService dataTypeService, IUmbracoMapper mapper)
+    public ByEditorUiAliasController(
+        IDataTypeService dataTypeService,
+        IUmbracoMapper mapper)
     {
         _dataTypeService = dataTypeService;
         _mapper = mapper;
     }
 
-    [HttpGet("item")]
+    [HttpGet("item/{*alias}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<DataTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
+    [ProducesResponseType(typeof(DataTypeItemResponseModel), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ByEditorUiAlias(string alias)
     {
-        var dataTypes = new List<IDataType>();
-        foreach (Guid id in ids)
-        {
-            IDataType? dataType = await _dataTypeService.GetAsync(id);
-            if (dataType is not null)
-            {
-                dataTypes.Add(dataType);
-            }
-        }
-
+        IEnumerable<IDataType> dataTypes = await _dataTypeService.GetByEditorUiAlias(alias);
         List<DataTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IDataType, DataTypeItemResponseModel>(dataTypes);
         return Ok(responseModels);
     }
