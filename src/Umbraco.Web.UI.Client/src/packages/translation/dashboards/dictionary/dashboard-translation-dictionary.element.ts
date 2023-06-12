@@ -134,7 +134,6 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		if (!this.#modalContext) return;
 		if (!this.#repo) return;
 
-		console.log('open create:');
 		const modalContext = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, { parentId: null });
 
 		const { name, parentId } = await modalContext.onSubmit();
@@ -142,7 +141,6 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 		const { data: url } = await this.#repo.create({ name, parentId });
 
-		console.log('got url', url);
 		if (!url) return;
 		//TODO: Why do we need to extract the id like this?
 		const id = url.substring(url.lastIndexOf('/') + 1);
