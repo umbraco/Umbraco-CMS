@@ -125,14 +125,16 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 	// TODO => where has rel gone?
 	#createElemAttributes() {
 		const a: AnchorElementAttributes = Object.assign({}, this.#linkPickerData?.link, { 'data-anchor': null });
+				
+		// always need to map back to href for tinymce to render correctly
+		// do this first as checking querystring below may modify the href property
+		if (this.#linkPickerData?.link.url) {
+			a.href = this.#linkPickerData.link.url;
+		}
+
 		if (this.#linkPickerData?.link.queryString?.startsWith('#')) {
 			a['data-anchor'] = this.#linkPickerData?.link.queryString;
 			a.href += this.#linkPickerData?.link.queryString;
-		}
-
-		// always need to map back to href for tinymce to render correctly
-		if (this.#linkPickerData?.link.url) {
-			a.href = this.#linkPickerData.link.url;
 		}
 
 		return a;
