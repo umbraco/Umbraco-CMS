@@ -38,8 +38,11 @@ public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     {
         if (indexes.Count == 0)
         {
-            _logger.LogDebug(
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(
                 $"{nameof(PopulateIndexes)} called with no indexes to populate. Typically means no index is registered with this populator.");
+            }
             return;
         }
 
