@@ -5,10 +5,9 @@ import {
 	OEmbedStatus,
 	UmbEmbeddedMediaModalData,
 	UmbEmbeddedMediaModalResult,
-	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 interface UmbEmbeddedMediaModalModel {
 	url?: string;
@@ -22,15 +21,9 @@ interface UmbEmbeddedMediaModalModel {
 }
 
 @customElement('umb-embedded-media-modal')
-export class UmbEmbeddedMediaModalElement extends UmbLitElement {
+export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult> {
 	#loading = false;
 	#embedResult!: OEmbedResult;
-
-	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>;
-
-	@property({ type: Object })
-	data?: UmbEmbeddedMediaModalData;
 
 	#handleConfirm() {
 		this.modalContext?.submit({

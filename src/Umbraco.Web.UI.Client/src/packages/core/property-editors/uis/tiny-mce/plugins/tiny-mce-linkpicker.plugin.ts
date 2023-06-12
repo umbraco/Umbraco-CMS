@@ -1,10 +1,10 @@
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
 import {
-	UmbModalContext,
-	UMB_MODAL_CONTEXT_TOKEN,
 	UmbLinkPickerModalResult,
 	UMB_LINK_PICKER_MODAL,
 	UmbLinkPickerLink,
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
 
 export interface LinkListItem {
@@ -24,7 +24,7 @@ interface AnchorElementAttributes {
 }
 
 export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
-	#modalContext?: UmbModalContext;
+	#modalContext?: UmbModalManagerContext;
 
 	#linkPickerData?: UmbLinkPickerModalResult;
 
@@ -33,7 +33,7 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
 
-		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (modalContext) => {
+		this.host.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
 			this.#modalContext = modalContext;
 		});
 

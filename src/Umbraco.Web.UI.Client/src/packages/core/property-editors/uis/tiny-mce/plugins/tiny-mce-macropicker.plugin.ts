@@ -1,7 +1,7 @@
 import { AstNode } from '@umbraco-cms/backoffice/external/tinymce';
 import { MacroSyntaxData, UmbMacroService } from '@umbraco-cms/backoffice/macro';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
 interface DialogData {
 	richTextEditor: boolean;
@@ -14,12 +14,12 @@ interface DialogData {
 export default class UmbTinyMceMacroPickerPlugin extends UmbTinyMcePluginBase {
     #macroService = new UmbMacroService();
 
-	#modalContext?: UmbModalContext;
+	#modalContext?: UmbModalManagerContext;
 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
 
-		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (modalContext) => {
+		this.host.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
 			this.#modalContext = modalContext;
 		});
 

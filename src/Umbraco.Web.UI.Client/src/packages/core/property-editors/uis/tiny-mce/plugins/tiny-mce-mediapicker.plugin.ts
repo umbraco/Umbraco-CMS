@@ -1,8 +1,16 @@
 import type { UmbLoggedInUser } from '../../../../../users/current-user/types.js';
-import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../../../../users/current-user/current-user.store.js';
+import {
+	UmbCurrentUserStore,
+	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
+} from '../../../../../users/current-user/current-user.store.js';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UmbMediaTreePickerModalResult, UMB_MEDIA_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbMediaTreePickerModalResult,
+	UMB_MEDIA_TREE_PICKER_MODAL,
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+} from '@umbraco-cms/backoffice/modal';
 
 interface MediaPickerTargetData {
 	altText?: string;
@@ -24,7 +32,7 @@ interface MediaPickerResultData {
 export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 	#mediaHelper: UmbMediaHelper;
 	#currentUser?: UmbLoggedInUser;
-	#modalContext?: UmbModalContext;
+	#modalContext?: UmbModalManagerContext;
 	#currentUserStore?: UmbCurrentUserStore;
 
 	constructor(args: TinyMcePluginArguments) {
@@ -32,7 +40,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 		this.#mediaHelper = new UmbMediaHelper();
 
-		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (modalContext) => {
+		this.host.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
 			this.#modalContext = modalContext;
 		});
 

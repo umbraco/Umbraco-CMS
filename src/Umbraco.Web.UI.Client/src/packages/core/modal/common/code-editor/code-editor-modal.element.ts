@@ -13,11 +13,11 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 	_codeEditor?: UmbCodeEditorElement;
 
 	#handleConfirm() {
-		this.modalHandler?.submit({ content: this.data?.content ?? '' });
+		this.modalContext?.submit({ content: this.data?.content ?? '' });
 	}
 
 	#handleCancel() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	// TODO => debounce?
