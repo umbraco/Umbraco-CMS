@@ -551,8 +551,7 @@ stages:
       umbracoMajorVersion:  $[ stageDependencies.Build.A.outputs['determineMajorVersion.majorVersion'] ]
     displayName: Upload API Documention
     dependsOn:
-      - Build
-      - Deploy_NuGet
+      - Build_Docs
     condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.uploadApiDocs}}))
     jobs:
       - job:
