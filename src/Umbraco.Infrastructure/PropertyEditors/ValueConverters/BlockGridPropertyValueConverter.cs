@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         private BlockGridModel? ConvertIntermediateToBlockGridModel(IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
-            using (_proflog.DebugDuration<BlockGridPropertyValueConverter>($"ConvertPropertyToBlockGrid ({propertyType.DataType.Id})"))
+            using (!_proflog.IsEnabled(LogLevel.Debug) ? null : _proflog.DebugDuration<BlockGridPropertyValueConverter>($"ConvertPropertyToBlockGrid ({propertyType.DataType.Id})"))
             {
                 // Get configuration
                 BlockGridConfiguration? configuration = propertyType.DataType.ConfigurationAs<BlockGridConfiguration>();

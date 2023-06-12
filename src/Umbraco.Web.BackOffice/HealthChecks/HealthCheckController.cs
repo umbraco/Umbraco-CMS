@@ -76,7 +76,10 @@ public class HealthCheckController : UmbracoAuthorizedJsonController
 
         try
         {
-            _logger.LogDebug("Running health check: " + check.Name);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Running health check: " + check.Name);
+            }
             return await check.GetStatus();
         }
         catch (Exception ex)

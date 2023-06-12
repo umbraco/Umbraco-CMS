@@ -6,7 +6,14 @@
 function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter, localizationService) {
 
     return {
-
+        getCount: function () {
+          return umbRequestHelper.resourcePromise(
+            $http.get(
+              umbRequestHelper.getApiUrl(
+                "memberTypeApiBaseUrl",
+                "GetCount")),
+            'Failed to retrieve count');
+        },
         getAvailableCompositeContentTypes: function (contentTypeId, filterContentTypes, filterPropertyTypes) {
             if (!filterContentTypes) {
                 filterContentTypes = [];
@@ -39,7 +46,17 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter, local
                        query)),
                'Failed to retrieve data for content type id ' + contentTypeId);
         },
+        getWhereCompositionIsUsedInContentTypes: function (contentTypeId) {
+            var query = "contentTypeId=" + contentTypeId;
 
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "memberTypeApiBaseUrl",
+                        "GetWhereCompositionIsUsedInMemberTypes",
+                        query)),
+                "Failed to retrieve data for content type id " + contentTypeId);
+        },
         //return all member types
         getTypes: function () {
 

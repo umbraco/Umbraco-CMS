@@ -236,7 +236,7 @@ public class CoreRuntime : IRuntime
 
     private void AcquireMainDom()
     {
-        using DisposableTimer? timer = _profilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired.");
+        using DisposableTimer? timer = !_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired.");
 
         try
         {
@@ -257,18 +257,23 @@ public class CoreRuntime : IRuntime
             return;
         }
 
-        using DisposableTimer? timer =
+        using DisposableTimer? timer = !_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null :
             _profilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined.");
 
         try
         {
             State.DetermineRuntimeLevel();
-
-            _logger.LogDebug("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", State.Level, State.Reason);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", State.Level, State.Reason);
+            }
 
             if (State.Level == RuntimeLevel.Upgrade)
             {
-                _logger.LogDebug("Configure database factory for upgrades.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Configure database factory for upgrades.");
+                }
                 _databaseFactory.ConfigureForUpgrade();
             }
         }

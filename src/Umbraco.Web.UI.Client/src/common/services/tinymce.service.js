@@ -603,7 +603,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     createMediaPicker: function (editor, callback) {
       editor.ui.registry.addButton('umbmediapicker', {
         icon: 'image',
-        tooltip: 'Media Picker',
+        tooltip: 'Image Picker',
         stateSelector: 'img[data-udi]',
         onAction: function () {
 

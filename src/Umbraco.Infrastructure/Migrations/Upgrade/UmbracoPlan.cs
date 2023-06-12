@@ -78,7 +78,10 @@ public class UmbracoPlan : MigrationPlan
         To<V_12_0_0.UseNvarcharInsteadOfNText>("{888A0D5D-51E4-4C7E-AA0A-01306523C7FB}");
         To<V_12_0_0.ResetCache>("{539F2F83-FBA7-4C48-81A3-75081A56BB9D}");
 
-        // To 13.0.0
+        // To 12.1.0
+        To<V_12_1_0.TablesIndexesImprovement>("{1187192D-EDB5-4619-955D-91D48D738871}");
+
+        // To 14.0.0
         To<V_13_0_0.AddPropertyEditorUiAliasColumn>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
         To<V_13_0_0.MigrateDataTypeConfigurations>("{5F15A1CC-353D-4889-8C7E-F303B4766196}");
         To<V_13_0_0.AddGuidsToUserGroups>("{69E12556-D9B3-493A-8E8A-65EC89FB658D}");

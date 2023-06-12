@@ -93,17 +93,26 @@ public class HealthCheckNotifier : RecurringHostedServiceBase
         switch (_serverRegistrar.CurrentServerRole)
         {
             case ServerRole.Subscriber:
-                _logger.LogDebug("Does not run on subscriber servers.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Does not run on subscriber servers.");
+                }
                 return;
             case ServerRole.Unknown:
-                _logger.LogDebug("Does not run on servers with unknown role.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Does not run on servers with unknown role.");
+                }
                 return;
         }
 
         // Ensure we do not run if not main domain, but do NOT lock it
         if (_mainDom.IsMainDom == false)
         {
-            _logger.LogDebug("Does not run if not MainDom.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Does not run if not MainDom.");
+            }
             return;
         }
 
@@ -111,7 +120,7 @@ public class HealthCheckNotifier : RecurringHostedServiceBase
         // checks can be making service/database calls so we want to ensure the CallContext/Ambient scope
         // isn't used since that can be problematic.
         using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
-        using (_profilingLogger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
+        using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
         {
             // Don't notify for any checks that are disabled, nor for any disabled just for notifications.
             Guid[] disabledCheckIds = _healthChecksSettings.Notification.DisabledChecks
