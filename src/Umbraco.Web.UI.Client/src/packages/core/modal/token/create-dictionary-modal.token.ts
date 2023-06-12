@@ -8,6 +8,7 @@ export interface UmbCreateDictionaryModalData {
 
 export interface UmbCreateDictionaryModalResult {
 	name?: string;
+	parentId?: string;
 }
 
 export const UMB_CREATE_DICTIONARY_MODAL = new UmbModalToken<

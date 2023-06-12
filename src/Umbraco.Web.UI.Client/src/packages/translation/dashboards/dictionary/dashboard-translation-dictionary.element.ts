@@ -10,6 +10,7 @@ import {
 	UMB_CREATE_DICTIONARY_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { log } from '@openid/appauth';
 
 @customElement('umb-dashboard-translation-dictionary')
 export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
@@ -136,13 +137,16 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 		const modalContext = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, { unique: null });
 
-		// TODO: get type from modal result
-		const { name } = await modalContext.onSubmit();
+		const { name, parentId } = await modalContext.onSubmit();
 		if (!name) return;
 
-		const { data } = await this.#repo.createScaffold(null);
-		console.log(data);
-		// TODO => get location header to route to new item
+		const { data: url } = await this.#repo.create({ name, parentId });
+		if (!url) return;
+
+		//TODO: Why do we need to extract the id like this?
+		const id = url.substring(url.lastIndexOf('/') + 1);
+
+		history.pushState({}, '', `/section/translation/workspace/dictionary-item/edit/${id}`);
 	}
 
 	render() {

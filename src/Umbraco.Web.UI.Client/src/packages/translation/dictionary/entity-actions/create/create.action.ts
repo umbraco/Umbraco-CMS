@@ -44,13 +44,15 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 			parentName: this.#sectionSidebarContext.headline,
 		});
 
-		// TODO: get type from modal result
-		const { name } = await modalContext.onSubmit();
+		const { name, parentId } = await modalContext.onSubmit();
 		if (!name) return;
 
-		const { data } = await this.repository.createScaffold(this.unique, { name });
+		const { data: url } = await this.repository.create({ name, parentId });
+		if (!url) return;
 
-		// TODO => get location header to route to new item
-		console.log(data);
+		//TODO: Why do we need to extract the id like this?
+		const id = url.substring(url.lastIndexOf('/') + 1);
+
+		history.pushState({}, '', `/section/translation/workspace/dictionary-item/edit/${id}`);
 	}
 }
