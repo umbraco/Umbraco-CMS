@@ -19,7 +19,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 
 	#observeCurrentUser(): void {
 		if (!this.#auth) return;
-		this.observe(this.#auth?.currentUser, (user) => {
+		this.observe(this.#auth.currentUser, (user) => {
 			this.name = user?.name ?? '';
 		});
 	}
