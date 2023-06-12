@@ -2,13 +2,13 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { tinymce, AstNode, Editor, EditorEvent } from '@umbraco-cms/backoffice/external/tinymce';
 import {
 	UmbCurrentUserStore,
 	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
 } from '../../../users/current-user/current-user.store.js';
 import type { UmbLoggedInUser } from '../../../users/current-user/types.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
+import { tinymce, AstNode, Editor, EditorEvent } from '@umbraco-cms/backoffice/external/tinymce';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	TinyMcePluginArguments,
@@ -337,7 +337,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			this.#onChange(editor.getContent());
 		});
 
-		editor.on('init', () => editor.setContent(this.value.toString()));
+		editor.on('init', () => editor.setContent(this.value?.toString() ?? ''));
 
 		// If we can not find the insert image/media toolbar button
 		// Then we need to add an event listener to the editor

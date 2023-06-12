@@ -145,8 +145,9 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 		// as TinyMCE needs selected content for this, so instead we
 		// create a new dom element and insert it, using the chosen
 		// link name as the content.
+
 		if (this.editor.selection.getContent() !== '') {
-			this.editor.execCommand('mceInsertLink', false, this.#createElemAttributes());
+			this.editor.execCommand('CreateLink', false, this.#createElemAttributes());
 			return;
 		}
 

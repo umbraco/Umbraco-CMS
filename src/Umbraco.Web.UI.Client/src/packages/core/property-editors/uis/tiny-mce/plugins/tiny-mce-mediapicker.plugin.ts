@@ -6,7 +6,6 @@ import {
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import {
-	UmbMediaTreePickerModalResult,
 	UMB_MEDIA_TREE_PICKER_MODAL,
 	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
@@ -98,9 +97,8 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		let startNodeId;
 		let startNodeIsVirtual;
 
-		// TODO => should we transform the config from an array to an object keyed by alias?
-		if (!this.configuration?.find((x) => x.alias === 'startNodeId')) {
-			if (this.configuration?.find((x) => x.alias === 'ignoreUserStartNodes')?.value === true) {
+		if (!this.configuration?.getByAlias('startNodeId')) {
+			if (this.configuration?.getByAlias('ignoreUserStartNodes')?.value === true) {
 				startNodeId = -1;
 				startNodeIsVirtual = true;
 			} else {
@@ -118,7 +116,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 		if (!modalHandler) return;
 
-		const { selection } = await (modalHandler.onSubmit() as Promise<UmbMediaTreePickerModalResult>);
+		const { selection } = await modalHandler.onSubmit();
 		if (!selection.length) return;
 
 		this.#insertInEditor(selection[0]);

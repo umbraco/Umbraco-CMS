@@ -179,7 +179,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<UmbEmbedde
 						() => html` <umb-workspace-property-layout label="Preview" orientation="vertical">
 							<div slot="editor">
 								${when(this.#loading, () => html`<uui-loader-circle></uui-loader-circle>`)}
-								${when(this.#embedResult.markup, () => html`${unsafeHTML(this.#embedResult.markup)}`)}
+								${when(this.#embedResult?.markup, () => html`${unsafeHTML(this.#embedResult.markup)}`)}
 								${when(this._model.info, () => html` <p aria-hidden="true">${this._model.info}</p>`)}
 								${when(this._model.a11yInfo, () => html` <p class="sr-only" role="alert">${this._model.a11yInfo}</p>`)}
 							</div>
