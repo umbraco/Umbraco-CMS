@@ -3,6 +3,9 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export type { IUmbAuth } from './auth.interface.js';
 export { UmbAuthFlow } from './auth-flow.js';
+export { UmbAuthStore } from './auth.store.js';
+
+export * from './types.js';
 
 export const UMB_AUTH = new UmbContextToken<IUmbAuth>(
 	'UmbAuth',
