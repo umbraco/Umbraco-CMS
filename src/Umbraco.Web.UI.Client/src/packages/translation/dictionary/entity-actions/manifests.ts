@@ -107,7 +107,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.CreateDictionary',
 		name: 'Create Dictionary Modal',
-		loader: () => import('./create/create-dictionary-modal-layout.element.js'),
+		loader: () => import('./create/create-dictionary-modal.element.js'),
 	},
 	{
 		type: 'modal',

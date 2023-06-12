@@ -10,9 +10,6 @@ import {
 	UMB_CREATE_DICTIONARY_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 
-// TODO: temp import
-import './create-dictionary-modal-layout.element.js';
-
 export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryRepository> {
 	static styles = [UUITextStyles];
 
@@ -40,17 +37,19 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 		// TODO: how can we get the current entity detail in the modal? Passing the observable
 		// feels a bit hacky. Works, but hacky.
 		const modalContext = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, {
-			unique: this.unique,
+			parentId: this.unique,
 			parentName: this.#sectionSidebarContext.headline,
 		});
 
-		// TODO: get type from modal result
-		const { name } = await modalContext.onSubmit();
-		if (!name) return;
+		const { name, parentId } = await modalContext.onSubmit();
+		if (!name || parentId === undefined) return;
 
-		const { data } = await this.repository.createScaffold(this.unique, { name });
+		const { data: url } = await this.repository.create({ name, parentId });
+		if (!url) return;
 
-		// TODO => get location header to route to new item
-		console.log(data);
+		//TODO: Why do we need to extract the id like this?
+		const id = url.substring(url.lastIndexOf('/') + 1);
+
+		history.pushState({}, '', `/section/translation/workspace/dictionary-item/edit/${id}`);
 	}
 }
