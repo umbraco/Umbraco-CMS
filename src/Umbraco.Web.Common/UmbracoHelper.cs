@@ -174,6 +174,7 @@ public class UmbracoHelper
 
     private IPublishedContent? ContentForObject(object id) => _publishedContentQuery.Content(id);
 
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public IPublishedContent? ContentSingleAtXPath(string xpath, params XPathVariable[] vars) =>
         _publishedContentQuery.ContentSingleAtXPath(xpath, vars);
 
