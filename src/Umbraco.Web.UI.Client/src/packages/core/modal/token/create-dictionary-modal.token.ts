@@ -2,13 +2,13 @@ import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbCreateDictionaryModalData {
-	unique: string | null;
+	parentId: string | null;
 	parentName?: Observable<string | undefined>;
 }
 
 export interface UmbCreateDictionaryModalResult {
-	name?: string;
-	parentId?: string;
+	name: string;
+	parentId: string | null;
 }
 
 export const UMB_CREATE_DICTIONARY_MODAL = new UmbModalToken<

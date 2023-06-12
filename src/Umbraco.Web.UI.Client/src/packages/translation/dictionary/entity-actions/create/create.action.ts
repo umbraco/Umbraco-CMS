@@ -11,7 +11,7 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 
 // TODO: temp import
-import './create-dictionary-modal-layout.element.js';
+import './create-dictionary-modal.element.js';
 
 export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryRepository> {
 	static styles = [UUITextStyles];
@@ -40,7 +40,7 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 		// TODO: how can we get the current entity detail in the modal? Passing the observable
 		// feels a bit hacky. Works, but hacky.
 		const modalContext = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, {
-			unique: this.unique,
+			parentId: this.unique,
 			parentName: this.#sectionSidebarContext.headline,
 		});
 

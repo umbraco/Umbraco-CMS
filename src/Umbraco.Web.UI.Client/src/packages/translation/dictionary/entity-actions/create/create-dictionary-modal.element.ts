@@ -40,7 +40,7 @@ export class UmbCreateDictionaryModalElement extends UmbModalBaseElement<
 
 		this.modalContext?.submit({
 			name,
-			parentId: this.data?.unique ?? undefined,
+			parentId: this.data?.parentId ?? null,
 		});
 	}
 

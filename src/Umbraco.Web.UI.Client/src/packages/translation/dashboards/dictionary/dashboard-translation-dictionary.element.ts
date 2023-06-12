@@ -134,7 +134,8 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		if (!this.#modalContext) return;
 		if (!this.#repo) return;
 
-		const modalContext = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, { unique: null });
+		console.log('open create:');
+		const modalContext = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, { parentId: null });
 
 		const { name, parentId } = await modalContext.onSubmit();
 		if (!name || parentId === undefined) return;
