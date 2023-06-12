@@ -186,6 +186,7 @@ stages:
         variables:
           npm_config_cache: $(Pipeline.Workspace)/.npm_client
           NODE_OPTIONS: --max_old_space_size=16384
+          BASE_PATH: /v$(umbracoMajorVersion)/ui
         steps:
           - checkout: self
             submodules: true
@@ -207,8 +208,11 @@ stages:
           - script: npm run storybook:build
             displayName: Build Storybook
             env:
-              VITE_BASE_PATH: /v$(umbracoMajorVersion)/ui/
-            workingDirectory:  $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client
+              VITE_BASE_PATH: $(BASE_PATH)/
+            workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client
+          - script: sed -i "s|/umbraco/backoffice|$(BASE_PATH)/umbraco/backoffice|" assets/*.js
+            displayName: Replace BASE_PATH on assets
+            workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client/storybook-static
           - task: ArchiveFiles@2
             displayName: Archive js Docs
             inputs:
