@@ -130,6 +130,11 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 			a.href += this.#linkPickerData?.link.queryString;
 		}
 
+		// always need to map back to href for tinymce to render correctly
+		if (this.#linkPickerData?.link.url) {
+			a.href = this.#linkPickerData.link.url;
+		}
+
 		return a;
 	}
 
