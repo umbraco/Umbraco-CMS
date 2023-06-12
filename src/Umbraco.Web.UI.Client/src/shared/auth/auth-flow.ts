@@ -13,7 +13,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	BaseTokenRequestHandler,
 	BasicQueryStringUtils,
