@@ -1,5 +1,10 @@
 import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import { DocumentTypeResource, DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	CreateDocumentTypeRequestModel,
+	DocumentTypeResource,
+	DocumentTypeResponseModel,
+	UpdateDocumentTypeRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -10,7 +15,10 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
  * @class UmbDocumentTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, any, DocumentTypeResponseModel> {
+export class UmbDocumentTypeServerDataSource
+	implements
+		UmbDataSource<CreateDocumentTypeRequestModel, any, UpdateDocumentTypeRequestModel, DocumentTypeResponseModel>
+{
 	#host: UmbControllerHostElement;
 
 	/**
@@ -48,8 +56,12 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, 
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async createScaffold(parentId: string | null) {
-		const data: DocumentTypeResponseModel = {
+		// TODO: Type hack to append $type and parentId to the DocumentTypeResponseModel.
+		//, parentId: string | null
+		const data: DocumentTypeResponseModel & { $type: string } = {
+			$type: 'string',
 			id: UmbId.new(),
+			//parentId: parentId,
 			name: '',
 			alias: '',
 			description: '',
@@ -62,7 +74,11 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, 
 			compositions: [],
 			allowedTemplateIds: [],
 			defaultTemplateId: null,
-			cleanup: undefined,
+			cleanup: {
+				preventCleanup: false,
+				keepAllVersionsNewerThanDays: null,
+				keepLatestVersionPerDayForDays: null,
+			},
 			properties: [],
 			containers: [],
 		};
@@ -71,65 +87,54 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, 
 	}
 
 	/**
-	 * Inserts a new Document on the server
-	 * @param {Document} document
+	 * Inserts a new Document Type on the server
+	 * @param {CreateDocumentTypeRequestModel} documentType
 	 * @return {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async insert(document: DocumentTypeResponseModel) {
-		if (!document.id) throw new Error('ID is missing');
+	async insert(documentType: CreateDocumentTypeRequestModel) {
+		if (!documentType) throw new Error('Document is missing');
+		//if (!document.id) throw new Error('ID is missing');
 
-		let body: string;
+		documentType = { ...documentType };
 
-		try {
-			body = JSON.stringify(document);
-		} catch (error) {
-			console.error(error);
-			return Promise.reject();
-		}
-		//return tryExecuteAndNotify(this.#host, DocumentTypeResource.postDocument(payload));
-		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<string>(
+		// TODO: Hack to remove some props that ruins the document-type post end-point.
+		(documentType as any).$type = undefined;
+		(documentType as any).id = undefined;
+
+		// TODO: Investigate if this matters (should go away anyway when we have the end-point accepts us defining the ids.)
+		documentType.properties = documentType.properties?.map((prop) => {
+			return {
+				...prop,
+				id: undefined,
+			};
+		});
+
+		return tryExecuteAndNotify(
 			this.#host,
-			fetch('/umbraco/management/api/v1/document-type', {
-				method: 'POST',
-				body: body,
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}) as any
+			DocumentTypeResource.postDocumentType({
+				requestBody: documentType,
+			})
 		);
 	}
 
 	/**
-	 * Updates a Document on the server
-	 * @param {Document} Document
+	 * Updates a Document Type on the server
+	 * @param {string} id
+	 * @param {Document} documentType
 	 * @return {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async update(id: string, document: any) {
+	async update(id: string, documentType: UpdateDocumentTypeRequestModel) {
 		if (!id) throw new Error('Id is missing');
 
-		let body: string;
+		documentType = { ...documentType };
 
-		try {
-			body = JSON.stringify(document);
-		} catch (error) {
-			console.error(error);
-			return Promise.reject();
-		}
+		// TODO: Hack to remove some props that ruins the document-type post end-point.
+		(documentType as any).$type = undefined;
+		(documentType as any).id = undefined;
 
-		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DocumentTypeResponseModel>(
-			this.#host,
-			fetch(`/umbraco/management/api/v1/document-type/${document.id}`, {
-				method: 'PUT',
-				body: body,
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}) as any
-		);
+		return tryExecuteAndNotify(this.#host, DocumentTypeResource.putDocumentTypeById({ id, requestBody: documentType }));
 	}
 
 	/**
@@ -143,16 +148,8 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, 
 			throw new Error('Id is missing');
 		}
 
-		return tryExecuteAndNotify(
-			this.#host,
-			fetch('/umbraco/management/api/v1/document-type/trash', {
-				method: 'POST',
-				body: JSON.stringify([id]),
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}).then((res) => res.json())
-		);
+		// TODO: Hack the type to avoid type-error here:
+		return tryExecuteAndNotify(this.#host, DocumentTypeResource.deleteDocumentTypeById({ id })) as any;
 	}
 
 	/**

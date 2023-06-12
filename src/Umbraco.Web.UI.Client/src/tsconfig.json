@@ -6,6 +6,8 @@
     "outDir": "../dist-cms",
     "rootDir": "./",
     "composite": true,
+		"sourceMap": true,
+		"declaration": true,
     "resolveJsonModule": true,
   },
   "include": ["./**/*.ts", "./**/*.json", "./**/*.js"],

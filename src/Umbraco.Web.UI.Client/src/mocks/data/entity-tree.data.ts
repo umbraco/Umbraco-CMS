@@ -9,15 +9,15 @@ export class UmbEntityTreeData<TreeItemType extends TreeItemPresentationModel> {
 		this.#detailDatabase = detailDatabase;
 	}
 
-	move(ids: Array<string>, destinationKey: string) {
-		const destinationItem = this.#detailDatabase.getById(destinationKey);
-		if (!destinationItem) throw new Error(`Destination item with key ${destinationKey} not found`);
+	move(ids: Array<string>, destinationId: string) {
+		const destinationItem = this.#detailDatabase.getById(destinationId);
+		if (!destinationItem) throw new Error(`Destination item with key ${destinationId} not found`);
 
 		const items = this.#detailDatabase.getByIds(ids);
 		const movedItems = items.map((item) => {
 			return {
 				...item,
-				parentId: destinationKey,
+				parentId: destinationId,
 			};
 		});
 

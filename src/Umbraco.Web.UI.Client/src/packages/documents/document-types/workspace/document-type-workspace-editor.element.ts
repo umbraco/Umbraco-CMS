@@ -2,8 +2,13 @@ import { UmbDocumentTypeWorkspaceContext } from './document-type-workspace.conte
 import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_ICON_PICKER_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { generateAlias } from '@umbraco-cms/backoffice/utils';
 @customElement('umb-document-type-workspace-editor')
 export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	@state()
@@ -21,7 +26,10 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _alias?: string;
 
-	private _modalContext?: UmbModalContext;
+	@state()
+	private _aliasLocked = true;
+
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
@@ -31,31 +39,53 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 			this.#observeDocumentType();
 		});
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}
 
 	#observeDocumentType() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.name, (name) => (this._name = name));
-		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias));
-		this.observe(this.#workspaceContext.icon, (icon) => (this._icon = icon));
+		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeName');
+		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias), '_observeAlias');
+		this.observe(this.#workspaceContext.icon, (icon) => (this._icon = icon), '_observeIcon');
+
+		this.observe(
+			this.#workspaceContext.isNew,
+			(isNew) => {
+				if (isNew) {
+					// TODO: Would be good with a more general way to bring focus to the name input.
+					(this.shadowRoot?.querySelector('#name') as HTMLElement)?.focus();
+				}
+				this.removeControllerByUnique('_observeIsNew');
+			},
+			'_observeIsNew'
+		);
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
-	private _handleNameInput(event: UUIInputEvent) {
+	#onNameChange(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
+				const oldName = this._name;
+				const oldAlias = this._alias;
+				const newName = event.target.value.toString();
+				if (this._aliasLocked) {
+					const expectedOldAlias = generateAlias(oldName ?? '');
+					// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.)
+					if (expectedOldAlias === oldAlias) {
+						this.#workspaceContext?.setAlias(generateAlias(newName));
+					}
+				}
 				this.#workspaceContext?.setName(target.value);
 			}
 		}
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
-	private _handleAliasInput(event: UUIInputEvent) {
+	#onAliasChange(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
@@ -66,13 +96,17 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 		event.stopPropagation();
 	}
 
+	#onToggleAliasLock() {
+		this._aliasLocked = !this._aliasLocked;
+	}
+
 	private async _handleIconClick() {
-		const modalHandler = this._modalContext?.open(UMB_ICON_PICKER_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_ICON_PICKER_MODAL, {
 			icon: this._icon,
 			color: this._iconColorAlias,
 		});
 
-		modalHandler?.onSubmit().then((saved) => {
+		modalContext?.onSubmit().then((saved) => {
 			if (saved.icon) this.#workspaceContext?.setIcon(saved.icon);
 			// TODO: save color ALIAS as well
 		});
@@ -86,9 +120,20 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 						<uui-icon name="${this._icon}" style="color: ${this._iconColorAlias}"></uui-icon>
 					</uui-button>
 
-					<uui-input id="name" .value=${this._name} @input="${this._handleNameInput}">
-						<uui-input-lock id="alias" slot="append" .value=${this._alias} @input="${this._handleAliasInput}"></uui-input
-						></uui-input-lock>
+					<uui-input id="name" .value=${this._name} @input="${this.#onNameChange}">
+						<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
+						<uui-input
+							name="alias"
+							slot="append"
+							@input=${this.#onAliasChange}
+							.value=${this._alias}
+							placeholder="Enter alias..."
+							?disabled=${this._aliasLocked}>
+							<!-- TODO: validation for bad characters -->
+							<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
+								<uui-icon name=${this._aliasLocked ? 'umb:lock' : 'umb:unlocked'}></uui-icon>
+							</div>
+						</uui-input>
 					</uui-input>
 				</div>
 
@@ -121,7 +166,6 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 			#header {
 				display: flex;
 				flex: 1 1 auto;
-				margin: 0 var(--uui-size-layout-1);
 			}
 
 			#name {
@@ -130,14 +174,20 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 				align-items: center;
 			}
 
-			#alias {
-				height: calc(100% - 2px);
-				--uui-input-border-width: 0;
-				--uui-button-height: calc(100% -2px);
+			#alias-lock {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+			}
+			#alias-lock uui-icon {
+				margin-bottom: 2px;
 			}
 
 			#icon {
 				font-size: calc(var(--uui-size-layout-3) / 2);
+				margin-right: var(--uui-size-space-2);
+				margin-left: calc(var(--uui-size-space-4) * -1);
 			}
 		`,
 	];

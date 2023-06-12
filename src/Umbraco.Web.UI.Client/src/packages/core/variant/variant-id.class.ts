@@ -1,18 +1,20 @@
+export type variantObject = { culture?: string | null; segment?: string | null };
+
 export class UmbVariantId {
-	public static Create(variantData: { culture?: string | null; segment?: string | null }): UmbVariantId {
+	public static Create(variantData: variantObject): UmbVariantId {
 		return Object.freeze(new UmbVariantId(variantData));
 	}
 
 	public readonly culture: string | null = null;
 	public readonly segment: string | null = null;
 
-	constructor(variantData: { culture?: string | null; segment?: string | null }) {
-		this.culture = variantData.culture || null;
-		this.segment = variantData.segment || null;
+	constructor(variantData: variantObject) {
+		this.culture = (variantData.culture === 'invariant' ? null : variantData.culture) ?? null;
+		this.segment = variantData.segment ?? null;
 	}
 
-	public compare(obj: { culture?: string | null; segment?: string | null }): boolean {
-		return this.culture === (obj.culture || null) && this.segment === (obj.segment || null);
+	public compare(obj: variantObject): boolean {
+		return this.equal(new UmbVariantId(obj));
 	}
 
 	public equal(variantId: UmbVariantId): boolean {
@@ -21,6 +23,10 @@ export class UmbVariantId {
 
 	public toString(): string {
 		return (this.culture || 'invariant') + (this.segment ? `_${this.segment}` : '');
+	}
+
+	public toObject(): variantObject {
+		return { culture: this.culture, segment: this.segment };
 	}
 
 	public toDifferencesString(variantId: UmbVariantId): string {

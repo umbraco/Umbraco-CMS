@@ -1,19 +1,20 @@
 import { UmbUserCollectionContext } from './user-collection.context.js';
-import { UUITextStyles ,
+import {
+	UUITextStyles,
 	UUIBooleanInputEvent,
 	UUICheckboxElement,
 	UUIRadioGroupElement,
 	UUIRadioGroupEvent,
 } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import {
 	UMB_CREATE_USER_MODAL,
 	UMB_INVITE_USER_MODAL,
-	UMB_MODAL_CONTEXT_TOKEN,
-	UmbModalContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -34,7 +35,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	@state()
 	private _orderBy?: UserOrderModel;
 
-	#modalContext?: UmbModalContext;
+	#modalContext?: UmbModalManagerContext;
 	#collectionContext?: UmbUserCollectionContext;
 	#inputTimer?: NodeJS.Timeout;
 	#inputTimerAmount = 500;
@@ -42,7 +43,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;
 		});
 
@@ -115,80 +116,64 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<div id="sticky-top">
-				<div id="user-list-top-bar">
-					<uui-button
-						@click=${this._showInviteOrCreate}
-						label=${this._isCloud ? 'Invite' : 'Create' + ' user'}
-						look="outline"></uui-button>
-					<uui-input @input=${this._updateSearch} label="search" id="input-search"></uui-input>
-					<div>
-						<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
-						<umb-dropdown margin="8">
-							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="status">
-								State: ${this._stateFilterSelection}
-							</uui-button>
-							<div slot="dropdown" class="filter-dropdown">
-								${this._stateFilterOptions.map(
-									(option) =>
-										html`<uui-checkbox
-											label=${option}
-											@change=${this.#onStateFilterChange}
-											name="state"
-											value=${option}></uui-checkbox>`
-								)}
-							</div>
-						</umb-dropdown>
-
-						<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
-						<umb-dropdown margin="8">
-							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="order by"> Group: </uui-button>
-							<div slot="dropdown" class="filter-dropdown">
-								<uui-checkbox label="Active"></uui-checkbox>
-								<uui-checkbox label="Inactive"></uui-checkbox>
-								<uui-checkbox label="Invited"></uui-checkbox>
-								<uui-checkbox label="Disabled"></uui-checkbox>
-							</div>
-						</umb-dropdown>
-
-						<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
-						<umb-dropdown margin="8">
-							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="Order By">
-								Order By: <b>${this._orderBy}</b>
-							</uui-button>
-							<div slot="dropdown" class="filter-dropdown" name="orderBy">
-								<uui-radio-group name="radioGroup" @change=${this.#onOrderByChange}>
-									${this._orderByOptions.map((option) => html`<uui-radio label=${option} value=${option}></uui-radio>`)}
-								</uui-radio-group>
-							</div>
-						</umb-dropdown>
-
-						<uui-button label="view toggle" @click=${this._toggleViewType} compact look="outline">
-							<uui-icon name="settings"></uui-icon>
-						</uui-button>
+			<uui-button
+				@click=${this._showInviteOrCreate}
+				label=${this._isCloud ? 'Invite' : 'Create' + ' user'}
+				look="outline"></uui-button>
+			<uui-input @input=${this._updateSearch} label="search" id="input-search"></uui-input>
+			<div>
+				<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
+				<umb-dropdown margin="8">
+					<uui-button @click=${this.#onDropdownClick} slot="trigger" label="status">
+						State: ${this._stateFilterSelection}
+					</uui-button>
+					<div slot="dropdown" class="filter-dropdown">
+						${this._stateFilterOptions.map(
+							(option) =>
+								html`<uui-checkbox
+									label=${option}
+									@change=${this.#onStateFilterChange}
+									name="state"
+									value=${option}></uui-checkbox>`
+						)}
 					</div>
-				</div>
+				</umb-dropdown>
+
+				<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
+				<umb-dropdown margin="8">
+					<uui-button @click=${this.#onDropdownClick} slot="trigger" label="order by"> Group: </uui-button>
+					<div slot="dropdown" class="filter-dropdown">
+						<uui-checkbox label="Active"></uui-checkbox>
+						<uui-checkbox label="Inactive"></uui-checkbox>
+						<uui-checkbox label="Invited"></uui-checkbox>
+						<uui-checkbox label="Disabled"></uui-checkbox>
+					</div>
+				</umb-dropdown>
+
+				<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
+				<umb-dropdown margin="8">
+					<uui-button @click=${this.#onDropdownClick} slot="trigger" label="Order By">
+						Order By: <b>${this._orderBy}</b>
+					</uui-button>
+					<div slot="dropdown" class="filter-dropdown" name="orderBy">
+						<uui-radio-group name="radioGroup" @change=${this.#onOrderByChange}>
+							${this._orderByOptions.map((option) => html`<uui-radio label=${option} value=${option}></uui-radio>`)}
+						</uui-radio-group>
+					</div>
+				</umb-dropdown>
+
+				<uui-button label="view toggle" @click=${this._toggleViewType} compact look="outline">
+					<uui-icon name="settings"></uui-icon>
+				</uui-button>
 			</div>
 		`;
 	}
 	static styles = [
 		UUITextStyles,
 		css`
-			#sticky-top {
-				position: sticky;
-				top: 0px;
-				z-index: 1;
-				box-shadow: 0 1px 3px rgba(0, 0, 0, 0), 0 1px 2px rgba(0, 0, 0, 0);
-				transition: 250ms box-shadow ease-in-out;
-			}
-
-			#sticky-top.header-shadow {
-				box-shadow: var(--uui-shadow-depth-2);
-			}
-
-			#user-list-top-bar {
-				padding: var(--uui-size-space-4) var(--uui-size-layout-1);
-				background-color: var(--uui-color-background);
+			:host {
+				height: 100%;
+				width: 100%;
 				display: flex;
 				justify-content: space-between;
 				white-space: nowrap;

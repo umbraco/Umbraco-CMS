@@ -1,5 +1,5 @@
 import { UmbFileSystemTreeItemContext } from './file-system-tree-item.context.js';
-import { css, html, nothing , customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTreeItemElement } from '@umbraco-cms/backoffice/tree';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

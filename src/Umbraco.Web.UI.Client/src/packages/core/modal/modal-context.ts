@@ -1,4 +1,4 @@
-import { UmbModalConfig, UmbModalType } from './modal.context.js';
+import { UmbModalConfig, UmbModalType } from './modal-manager.context.js';
 import { UmbModalToken } from './token/modal-token.js';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import type {
@@ -11,15 +11,16 @@ import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { ManifestModal, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextProvider, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.
  */
-export type UmbModalHandler<ModalData extends object = object, ModalResult = any> = Omit<
-	UmbModalHandlerClass<ModalData, ModalResult>,
+export type UmbModalContext<ModalData extends object = object, ModalResult = any> = Omit<
+	UmbModalContextClass<ModalData, ModalResult>,
 	'submit'
 > &
 	OptionalSubmitArgumentIfUndefined<ModalResult>;
@@ -40,23 +41,31 @@ type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
 	  };
 
 // TODO: consider splitting this into two separate handlers
-// TODO: Rename to become a controller.
-export class UmbModalHandlerClass<ModalData extends object = object, ModalResult = unknown> extends UmbController {
-	private _submitPromise: Promise<ModalResult>;
-	private _submitResolver?: (value: ModalResult) => void;
-	private _submitRejecter?: () => void;
+export class UmbModalContextClass<ModalData extends object = object, ModalResult = unknown>
+	implements UmbControllerInterface
+{
+	#host: UmbControllerHostElement;
 
-	public modalElement: UUIModalDialogElement | UUIModalSidebarElement;
+	#submitPromise: Promise<ModalResult>;
+	#submitResolver?: (value: ModalResult) => void;
+	#submitRejecter?: () => void;
+
+	private _modalExtensionObserver?: UmbObserverController<ManifestModal | undefined>;
+	public readonly modalElement: UUIModalDialogElement | UUIModalSidebarElement;
 	#modalRouterElement: UmbRouterSlotElement = document.createElement('umb-router-slot');
+	#modalContextProvider;
 
 	#innerElement = new BehaviorSubject<HTMLElement | undefined>(undefined);
 	public readonly innerElement = this.#innerElement.asObservable();
 
-	public key: string;
-	public type: UmbModalType = 'dialog';
-	public size: UUIModalSidebarSize = 'small';
+	public readonly key: string;
+	public readonly data: ModalData;
+	public readonly type: UmbModalType = 'dialog';
+	public readonly size: UUIModalSidebarSize = 'small';
 
-	private modalAlias: string; //TEMP... TODO: Remove this.
+	public get unique() {
+		return 'umbModalContext:' + this.key;
+	}
 
 	constructor(
 		host: UmbControllerHostElement,
@@ -65,9 +74,8 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		data?: ModalData,
 		config?: UmbModalConfig
 	) {
-		super(host);
+		this.#host = host;
 		this.key = config?.key || UmbId.new();
-		this.modalAlias = modalAlias.toString();
 
 		if (modalAlias instanceof UmbModalToken) {
 			this.type = modalAlias.getDefaultConfig()?.type || this.type;
@@ -78,17 +86,17 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		this.size = config?.size || this.size;
 
 		const defaultData = modalAlias instanceof UmbModalToken ? modalAlias.getDefaultData() : undefined;
-		const combinedData = { ...defaultData, ...data } as ModalData;
+		this.data = Object.freeze({ ...defaultData, ...data } as ModalData);
 
 		// TODO: Consider if its right to use Promises, or use another event based system? Would we need to be able to cancel an event, to then prevent the closing..?
-		this._submitPromise = new Promise((resolve, reject) => {
-			this._submitResolver = resolve;
-			this._submitRejecter = reject;
+		this.#submitPromise = new Promise((resolve, reject) => {
+			this.#submitResolver = resolve;
+			this.#submitRejecter = reject;
 		});
 
 		this.modalElement = this.#createContainerElement();
 		this.modalElement.addEventListener('close', () => {
-			this._submitRejecter?.();
+			this.#submitRejecter?.();
 		});
 
 		/**
@@ -106,14 +114,25 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 			this.#modalRouterElement.parent = router;
 		}
 		this.modalElement.appendChild(this.#modalRouterElement);
-		this.#observeModal(modalAlias.toString(), combinedData);
+		this.#observeModal(modalAlias.toString());
+
+		// Not using a controller, cause we want to use the modal as the provider, this is a UUI element. So its a bit of costume implementation:
+		this.#modalContextProvider = new UmbContextProvider(
+			this.modalElement,
+			UMB_MODAL_CONTEXT_TOKEN,
+
+			// Note, We are doing the Typing dance here because of the way we are correcting the submit method attribute type.
+			this as unknown as UmbModalContext<ModalData, ModalResult>
+		);
+
+		this.#host.addController(this);
 	}
 
-	public hostConnected() {
-		// Not much to do now..?
+	hostConnected(): void {
+		this.#modalContextProvider.hostConnected();
 	}
-	public hostDisconnected() {
-		// Not much to do now..?
+	hostDisconnected(): void {
+		this.#modalContextProvider.hostDisconnected();
 	}
 
 	#createContainerElement() {
@@ -133,66 +152,44 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		return modalDialogElement;
 	}
 
-	async #createInnerElement(manifest: ManifestModal, data?: ModalData) {
+	/* TODO: modals being part of the extension registry now means that a modal element can change over time.
+	 It makes this code a bit more complex. The main idea is to have the element as part of the modalContext so it is possible to dispatch events from within the modal element to the one that opened it.
+	 Now when the element is an observable it makes it more complex because this host needs to subscribe to updates to the element, instead of just having a reference to it.
+	 If we find a better generic solution to communicate between the modal and the implementor, then we can remove the element as part of the modalContext. */
+	#observeModal(modalAlias: string) {
+		if (this.#host) {
+			this._modalExtensionObserver?.destroy();
+			this._modalExtensionObserver = new UmbObserverController(
+				this.#host,
+				umbExtensionsRegistry.getByTypeAndAlias('modal', modalAlias),
+				async (manifest) => {
+					this.#removeInnerElement();
+					if (manifest) {
+						const innerElement = await this.#createInnerElement(manifest);
+						if (innerElement) {
+							this.#appendInnerElement(innerElement);
+						}
+					}
+				}
+			);
+		}
+	}
+
+	async #createInnerElement(manifest: ManifestModal) {
 		// TODO: add inner fallback element if no extension element is found
 		const innerElement = (await createExtensionElement(manifest)) as any;
 
 		if (innerElement) {
-			innerElement.data = data;
-			//innerElement.observable = this.#dataObservable;
-			innerElement.modalHandler = this;
+			innerElement.data = this.data;
+			innerElement.modalContext = this;
 			innerElement.manifest = manifest;
 		}
 
 		return innerElement;
 	}
 
-	// note, this methods is private  argument is not defined correctly here, but requires to be fix by appending the OptionalSubmitArgumentIfUndefined type when newing up this class.
-	private submit(result?: ModalResult) {
-		this._submitResolver?.(result as ModalResult);
-		this.modalElement.close();
-	}
-
-	public reject() {
-		this.modalElement.close();
-	}
-
-	public onSubmit(): Promise<ModalResult> {
-		return this._submitPromise;
-	}
-
-	/* TODO: modals being part of the extension registry now means that a modal element can change over time.
-	 It makes this code a bit more complex. The main idea is to have the element as part of the modalHandler so it is possible to dispatch events from within the modal element to the one that opened it.
-	 Now when the element is an observable it makes it more complex because this host needs to subscribe to updates to the element, instead of just having a reference to it.
-	 If we find a better generic solution to communicate between the modal and the implementor, then we can remove the element as part of the modalHandler. */
-	#observeModal(modalAlias: string, data?: ModalData) {
-		if (this.host) {
-			new UmbObserverController(
-				this.host,
-				umbExtensionsRegistry.getByTypeAndAlias('modal', modalAlias),
-				async (manifest) => {
-					if (manifest) {
-						const innerElement = await this.#createInnerElement(manifest, data);
-						if (innerElement) {
-							this.#appendInnerElement(innerElement);
-							return;
-						}
-					}
-					this.#removeInnerElement();
-				}
-			);
-		}
-	}
-
 	#appendInnerElement(element: HTMLElement) {
 		this.#modalRouterElement.appendChild(element);
-		/*this.#modalRouterElement.routes = [
-			{
-				path: '',
-				component: element,
-			},
-		];
-		this.#modalRouterElement.render();*/
 		this.#innerElement.next(element);
 	}
 
@@ -204,8 +201,40 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		}
 	}
 
-	public destroy() {
-		super.destroy();
-		// TODO: Make sure to clean up..
+	// note, this methods is private  argument is not defined correctly here, but requires to be fix by appending the OptionalSubmitArgumentIfUndefined type when newing up this class.
+	/**
+	 * Submits this modal, returning with a result to the initiator of the modal.
+	 * @public
+	 * @memberof UmbModalContext
+	 */
+	private submit(result?: ModalResult) {
+		this.#submitResolver?.(result as ModalResult);
+		this.modalElement.close();
+	}
+
+	/**
+	 * Closes this modal
+	 * @public
+	 * @memberof UmbModalContext
+	 */
+	public reject() {
+		this.modalElement.close();
+	}
+
+	/**
+	 * Gives a Promise which will be resolved when this modal is submitted.
+	 * @public
+	 * @memberof UmbModalContext
+	 */
+	public onSubmit(): Promise<ModalResult> {
+		return this.#submitPromise;
+	}
+
+	destroy(): void {
+		this.#innerElement.complete();
+		this._modalExtensionObserver?.destroy();
+		this._modalExtensionObserver = undefined;
 	}
 }
+
+export const UMB_MODAL_CONTEXT_TOKEN = new UmbContextToken<UmbModalContext>('UmbModalContext');

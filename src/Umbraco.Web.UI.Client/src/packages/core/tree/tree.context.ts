@@ -44,7 +44,6 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 
 	#treeAlias?: string;
-	#treeManifestObserver?: UmbObserverController<any>;
 
 	#initResolver?: () => void;
 	#initialized = false;
@@ -141,9 +140,7 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 	}
 
 	#observeTreeManifest() {
-		this.#treeManifestObserver?.destroy();
-
-		this.#treeManifestObserver = new UmbObserverController<any>(
+		new UmbObserverController<any>(
 			this.host,
 			umbExtensionsRegistry
 				.extensionsOfType('tree')
@@ -151,7 +148,8 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 			async (treeManifest) => {
 				if (!treeManifest) return;
 				this.#observeRepository(treeManifest);
-			}
+			},
+			'_observeTreeManifest'
 		);
 	}
 
@@ -172,7 +170,8 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 				} catch (error) {
 					throw new Error('Could not create repository with alias: ' + repositoryAlias + '');
 				}
-			}
+			},
+			'_observeRepository'
 		);
 	}
 }

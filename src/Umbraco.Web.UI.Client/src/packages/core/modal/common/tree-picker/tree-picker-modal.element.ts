@@ -30,11 +30,11 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 	}
 
 	#submit() {
-		this.modalHandler?.submit({ selection: this._selection });
+		this.modalContext?.submit({ selection: this._selection });
 	}
 
 	#close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	render() {
@@ -57,14 +57,7 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 		`;
 	}
 
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-box {
-				margin: var(--uui-size-layout-1);
-			}
-		`,
-	];
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbTreePickerModalElement;

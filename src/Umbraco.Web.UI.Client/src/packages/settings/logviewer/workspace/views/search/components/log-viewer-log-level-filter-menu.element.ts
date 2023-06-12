@@ -1,6 +1,6 @@
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
-import { UUICheckboxElement , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUICheckboxElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from '@umbraco-cms/backoffice/external/lodash';
 import { LogLevelModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

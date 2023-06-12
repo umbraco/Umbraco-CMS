@@ -1,10 +1,8 @@
 import { UmbPartialViewDetailServerDataSource } from './sources/partial-views.detail.server.data.js';
 import { UmbPartialViewsTreeServerDataSource } from './sources/partial-views.tree.server.data.js';
-import { UmbPartialViewsStore, UMB_PARTIAL_VIEWS_STORE_CONTEXT_TOKEN } from './partial-views.store.js';
 import { UmbPartialViewsTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } from './partial-views.tree.store.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
@@ -18,9 +16,6 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 	#detailDataSource: UmbPartialViewDetailServerDataSource;
 
 	#treeStore?: UmbPartialViewsTreeStore;
-	#store?: UmbPartialViewsStore;
-
-	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
@@ -32,19 +27,12 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 			new UmbContextConsumerController(this.#host, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
 			}),
-
-			new UmbContextConsumerController(this.#host, UMB_PARTIAL_VIEWS_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#store = instance;
-			}),
-
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
-				this.#notificationContext = instance;
-			}),
 		]);
 	}
 
 	requestTreeRoot(): Promise<{ data?: UmbTreeRootEntityModel | undefined; error?: ProblemDetailsModel | undefined }> {
-		throw new Error('Method not implemented.');
+		//throw new Error('Method not implemented.');
+		return { data: undefined, error: undefined } as any;
 	}
 
 	requestItemsLegacy?:
@@ -61,6 +49,9 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 		throw new Error('Method not implemented.');
 	}
 
+	// TODO: This method to be done, or able to go away?
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	requestById(id: string): Promise<{ data?: any; error?: ProblemDetailsModel | undefined }> {
 		throw new Error('Method not implemented.');
 	}

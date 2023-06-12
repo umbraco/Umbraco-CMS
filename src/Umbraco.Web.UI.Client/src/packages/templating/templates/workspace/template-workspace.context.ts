@@ -1,5 +1,5 @@
-import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UmbTemplateRepository } from '../repository/template.repository.js';
+import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
 	createObservablePart,
@@ -128,7 +128,7 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 		}
 	}
 
-	async createScaffold(parentId: string | null = null) {
+	async create(parentId: string | null = null) {
 		const { data } = await this.repository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);

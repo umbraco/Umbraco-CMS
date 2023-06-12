@@ -127,10 +127,11 @@ export class UmbDictionaryRepository
 
 	// DETAILS
 
-	async createScaffold(parentId: string | null, name?: string) {
+	// TODO: consider if we want to create a specific createScaffoldWithName, to loose the coupling to the model.
+	async createScaffold(parentId: string | null, preset?: Partial<CreateDictionaryItemRequestModel>) {
 		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
-		return this.#detailSource.createScaffold(parentId, name);
+		return this.#detailSource.createScaffold(parentId, preset);
 	}
 
 	async requestById(id: string) {

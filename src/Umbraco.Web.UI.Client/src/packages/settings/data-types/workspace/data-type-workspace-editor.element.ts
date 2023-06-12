@@ -23,8 +23,27 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext as UmbDataTypeWorkspaceContext;
+			this.#observeIsNew();
 			this.#observeName();
 		});
+	}
+
+	// TODO: invent some general way for all workspaces, with a name?, to put focus on the name when new.
+	#observeIsNew() {
+		if (!this.#workspaceContext) return;
+		this.observe(
+			this.#workspaceContext.isNew,
+			(isNew) => {
+				if (isNew) {
+					// TODO: Make a general way to put focus on a input in a modal. (also make sure it only happens if its the top-most-modal.)
+					requestAnimationFrame(() => {
+						(this.shadowRoot!.querySelector('#nameInput') as HTMLElement).focus();
+					});
+				}
+				this.removeControllerByUnique('_observeIsNew');
+			},
+			'_observeIsNew'
+		);
 	}
 
 	#observeName() {
@@ -50,7 +69,7 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 	render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.DataType">
-				<uui-input slot="header" id="header" .value=${this._dataTypeName} @input="${this.#handleInput}"></uui-input>
+				<uui-input slot="header" id="nameInput" .value=${this._dataTypeName} @input="${this.#handleInput}"></uui-input>
 			</umb-workspace-editor>
 		`;
 	}
@@ -64,9 +83,7 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 				height: 100%;
 			}
 
-			#header {
-				/* TODO: can this be applied from layout slot CSS? */
-				margin: 0 var(--uui-size-layout-1);
+			#nameInput {
 				flex: 1 1 auto;
 			}
 		`,

@@ -1,4 +1,4 @@
-import { html , customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -19,7 +19,7 @@ export class UmbPropertyEditorUILabelElement extends UmbLitElement implements Um
 	public config?: UmbDataTypePropertyCollection;
 
 	render() {
-		return html`${this.value}`;
+		return html`${this.value ?? ''}`;
 	}
 
 	static styles = [UUITextStyles];

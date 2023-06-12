@@ -212,9 +212,11 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 	hostDisconnected() {
 		// TODO: Clean up??
 		this.#observer.disconnect();
-		(this.#containerElement as any)['__umbBlockGridSorterController'] = undefined;
-		this.#containerElement.removeEventListener('dragover', preventDragOver);
-		(this.#containerElement as any) = undefined;
+		if (this.#containerElement) {
+			(this.#containerElement as any)['__umbBlockGridSorterController'] = undefined;
+			this.#containerElement.removeEventListener('dragover', preventDragOver);
+			(this.#containerElement as any) = undefined;
+		}
 	}
 
 	setupItem(element: HTMLElement) {

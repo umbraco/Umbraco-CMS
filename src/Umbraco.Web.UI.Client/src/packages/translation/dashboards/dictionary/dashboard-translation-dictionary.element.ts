@@ -4,7 +4,11 @@ import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/e
 import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DictionaryOverviewResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CREATE_DICTIONARY_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_CREATE_DICTIONARY_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-dashboard-translation-dictionary')
@@ -21,7 +25,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#repo!: UmbDictionaryRepository;
 
-	#modalContext!: UmbModalContext;
+	#modalContext!: UmbModalManagerContext;
 
 	#tableItems: Array<UmbTableItem> = [];
 
@@ -32,7 +36,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		new UmbContextConsumerController(this, UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		new UmbContextConsumerController(this, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;
 		});
 	}
@@ -130,10 +134,10 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		if (!this.#modalContext) return;
 		if (!this.#repo) return;
 
-		const modalHandler = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, { unique: null });
+		const modalContext = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, { unique: null });
 
 		// TODO: get type from modal result
-		const { name } = await modalHandler.onSubmit();
+		const { name } = await modalContext.onSubmit();
 		if (!name) return;
 
 		const { data } = await this.#repo.createScaffold(null);
@@ -142,42 +146,41 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 	}
 
 	render() {
-		return html` <div id="dictionary-top-bar">
-				<uui-button type="button" look="outline" label="Create dictionary item" @click=${this.#create}
-					>Create dictionary item</uui-button
-				>
-				<uui-input
-					@keyup="${this.#filter}"
-					placeholder="Type to filter..."
-					label="Type to filter dictionary"
-					id="searchbar">
-					<div slot="prepend">
-						<uui-icon name="search" id="searchbar_icon"></uui-icon>
-					</div>
-				</uui-input>
-			</div>
-			${when(
-				this._tableItemsFiltered.length,
-				() => html` <umb-table
-					.config=${this._tableConfig}
-					.columns=${this.#tableColumns}
-					.items=${this._tableItemsFiltered}></umb-table>`,
-				() => html`<umb-empty-state>There were no dictionary items found.</umb-empty-state>`
-			)}`;
+		return html`
+			<umb-body-layout header-transparent>
+				<div id="header" slot="header">
+					<uui-button type="button" look="outline" label="Create dictionary item" @click=${this.#create}
+						>Create dictionary item</uui-button
+					>
+					<uui-input
+						@keyup="${this.#filter}"
+						placeholder="Type to filter..."
+						label="Type to filter dictionary"
+						id="searchbar">
+						<div slot="prepend">
+							<uui-icon name="search" id="searchbar_icon"></uui-icon>
+						</div>
+					</uui-input>
+				</div>
+				${when(
+					this._tableItemsFiltered.length,
+					() => html` <umb-table
+						.config=${this._tableConfig}
+						.columns=${this.#tableColumns}
+						.items=${this._tableItemsFiltered}></umb-table>`,
+					() => html`<umb-empty-state>There were no dictionary items found.</umb-empty-state>`
+				)}
+			</umb-body-layout>
+		`;
 	}
 
 	static styles = [
 		UUITextStyles,
 		css`
-			:host {
-				display: block;
-				padding: var(--uui-size-layout-1);
-			}
-
-			#dictionary-top-bar {
-				margin-bottom: var(--uui-size-space-5);
+			#header {
 				display: flex;
 				justify-content: space-between;
+				width: 100%;
 			}
 
 			umb-table {

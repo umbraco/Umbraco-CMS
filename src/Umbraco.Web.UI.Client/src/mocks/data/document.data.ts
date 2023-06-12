@@ -625,23 +625,42 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 		super(data);
 	}
 
+	// TODO: Can we do this smarter so we don't need to make this for each mock data:
+	insert(item: DocumentResponseModel) {
+		const result = super.insert(item);
+		this.treeData.push(createDocumentTreeItem(result));
+		return result;
+	}
+
+	update(id: string, item: DocumentResponseModel) {
+		const result = super.save(id, item);
+		this.treeData = this.treeData.map((x) => {
+			if (x.id === result.id) {
+				return createDocumentTreeItem(result);
+			} else {
+				return x;
+			}
+		});
+		return result;
+	}
+
 	getTreeRoot(): PagedDocumentTreeItemResponseModel {
 		const items = this.treeData.filter((item) => item.parentId === null);
-		const treeItems = items.map((item) => createDocumentTreeItem(item));
+		const treeItems = items.map((item) => item);
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
 	getTreeItemChildren(id: string): PagedDocumentTreeItemResponseModel {
 		const items = this.treeData.filter((item) => item.parentId === id);
-		const treeItems = items.map((item) => createDocumentTreeItem(item));
+		const treeItems = items.map((item) => item);
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
 	getTreeItem(ids: Array<string>): Array<DocumentTreeItemResponseModel> {
 		const items = this.treeData.filter((item) => ids.includes(item.id ?? ''));
-		return items.map((item) => createDocumentTreeItem(item));
+		return items.map((item) => item);
 	}
 }
 

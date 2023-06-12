@@ -1,5 +1,5 @@
-import { css, html , customElement, property, state , ifDefined , styleMap } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles , UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, property, state, ifDefined, styleMap } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
@@ -47,7 +47,7 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 	render() {
 		return html` <uui-textarea
 			label="Textarea"
-			.value=${this.value}
+			.value=${this.value ?? ''}
 			maxlength="${ifDefined(this._maxChars)}"
 			rows="${ifDefined(this._rows)}"
 			@input=${this.onInput}

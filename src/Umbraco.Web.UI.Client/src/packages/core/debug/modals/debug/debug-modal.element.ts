@@ -6,7 +6,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 @customElement('umb-context-debugger-modal')
 export default class UmbContextDebuggerModalElement extends UmbModalBaseElement<UmbContextDebuggerModalData> {
 	private _handleClose() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	render() {

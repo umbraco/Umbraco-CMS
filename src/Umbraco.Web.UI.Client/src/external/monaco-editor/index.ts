@@ -39,7 +39,7 @@ const initializeWorkers = () => {
 				return new tsWorker();
 			}
 			return new editorWorker();
-		}
+		},
 	};
 };
 

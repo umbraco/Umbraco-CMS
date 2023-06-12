@@ -24,7 +24,7 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 			component: () => this.#element,
 			setup: (component: PageComponent, info: IRoutingInfo) => {
 				const parentKey = info.match.params.parentKey;
-				this.#templateWorkspaceContext.createScaffold(parentKey);
+				this.#templateWorkspaceContext.create(parentKey);
 			},
 		},
 		{

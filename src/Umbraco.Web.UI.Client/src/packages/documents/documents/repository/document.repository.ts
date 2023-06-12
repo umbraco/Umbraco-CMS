@@ -13,10 +13,10 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
-type ItemType = DocumentResponseModel;
-
 export class UmbDocumentRepository
-	implements UmbTreeRepository<DocumentTreeItemResponseModel>, UmbDetailRepository<ItemType>
+	implements
+		UmbTreeRepository<DocumentTreeItemResponseModel>,
+		UmbDetailRepository<CreateDocumentRequestModel, any, UpdateDocumentRequestModel, DocumentResponseModel>
 {
 	#init!: Promise<unknown>;
 
@@ -124,10 +124,10 @@ export class UmbDocumentRepository
 
 	// DETAILS:
 
-	async createScaffold(documentTypeKey: string) {
+	async createScaffold(documentTypeKey: string, preset?: Partial<CreateDocumentRequestModel>) {
 		if (!documentTypeKey) throw new Error('Document type id is missing');
 		await this.#init;
-		return this.#detailDataSource.createScaffold(documentTypeKey);
+		return this.#detailDataSource.createScaffold(documentTypeKey, preset);
 	}
 
 	async requestById(id: string) {
@@ -145,7 +145,7 @@ export class UmbDocumentRepository
 			this.#store?.append(data);
 		}
 
-		return { data, error };
+		return { data, error, asObservable: () => this.#store!.byId(id) };
 	}
 
 	async byId(id: string) {
@@ -165,14 +165,19 @@ export class UmbDocumentRepository
 		const { error } = await this.#detailDataSource.insert(item);
 
 		if (!error) {
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server
+			this.#store?.append(item);
+			// TODO: Update tree store with the new item? or ask tree to request the new item?
+
+			// TODO: Revisit this call, as we should be able to update tree on client.
+			await this.requestRootTreeItems();
+
 			const notification = { data: { message: `Document created` } };
 			this.#notificationContext?.peek('positive', notification);
-		}
 
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		this.#store?.append(item);
-		// TODO: Update tree store with the new item? or ask tree to request the new item?
+			return { data: item };
+		}
 
 		return { error };
 	}
@@ -192,6 +197,9 @@ export class UmbDocumentRepository
 			this.#store?.append(item);
 			//this.#treeStore?.updateItem(item.id, { name: item.name });// Port data to tree store.
 			// TODO: would be nice to align the stores on methods/methodNames.
+
+			// TODO: Revisit this call, as we should be able to update tree on client.
+			await this.requestRootTreeItems();
 
 			const notification = { data: { message: `Document saved` } };
 			this.#notificationContext?.peek('positive', notification);

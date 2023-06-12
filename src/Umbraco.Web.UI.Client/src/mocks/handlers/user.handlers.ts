@@ -31,10 +31,12 @@ export const handlers = [
 	}),
 
 	rest.put(umbracoPath(`${slug}/:id`), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 		const data = await req.json();
 		if (!data) return;
 
-		const saved = umbUsersData.save(data);
+		const saved = umbUsersData.save(id, data);
 
 		return res(ctx.status(200), ctx.json(saved));
 	}),

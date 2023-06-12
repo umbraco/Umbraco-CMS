@@ -40,7 +40,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 			path: 'create',
 			component: this.#getComponentElement,
 			setup: async () => {
-				this.#languageWorkspaceContext.createScaffold();
+				this.#languageWorkspaceContext.create();
 
 				// Navigate to edit route when language is created:
 				this.observe(

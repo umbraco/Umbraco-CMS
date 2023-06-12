@@ -1,19 +1,25 @@
-import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import {
+	UUIBooleanInputEvent,
+	UUIInputEvent,
+	UUISelectEvent,
+	UUITextStyles,
+} from '@umbraco-cms/backoffice/external/uui';
 import { PropertyValueMap, css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbPropertySettingsModalResult, UmbPropertySettingsModalData } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
-@customElement('umb-property-settings-modal')
 // TODO: Could base take a token to get its types?.
+@customElement('umb-property-settings-modal')
 export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	UmbPropertySettingsModalData,
 	UmbPropertySettingsModalResult
 > {
 	//TODO: Should these options come from the server?
+	// TODO: Or should they come from a extension point?
 	@state() private _customValidationOptions = [
 		{
 			name: 'No validation',
-			value: '',
+			value: null,
 			selected: true,
 		},
 		{
@@ -39,21 +45,22 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	@state()
 	protected _returnData!: UmbPropertySettingsModalResult;
 
-	constructor() {
-		super();
-	}
-
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._returnData = JSON.parse(JSON.stringify(this.data));
 
-		const regEx = this._returnData.validation?.regEx ?? '';
+		this._returnData.validation ??= {};
+
+		const regEx = this._returnData.validation.regEx ?? null;
 		const newlySelected = this._customValidationOptions.find((option) => {
 			option.selected = option.value === regEx;
 			return option.selected;
 		});
 		if (newlySelected === undefined) {
 			this._customValidationOptions[4].selected = true;
+			this._returnData.validation.regEx = this._customValidationOptions[4].value;
+		} else {
+			this._returnData.validation.regEx = regEx;
 		}
 	}
 
@@ -62,12 +69,8 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 		// TODO: Make a general way to put focus on a input in a modal. (also make sure it only happens if its the top-most-modal.)
 		requestAnimationFrame(() => {
-			(this.shadowRoot!.querySelector('#nameInput') as HTMLElement).focus();
+			(this.shadowRoot!.querySelector('#name-input') as HTMLElement).focus();
 		});
-	}
-
-	#onClose() {
-		this.modalHandler?.reject();
 	}
 
 	#onSubmit(event: SubmitEvent) {
@@ -79,11 +82,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		const isValid = form.checkValidity();
 		if (!isValid) return;
 
-		const formData = new FormData(form);
-
-		this._returnData.validation!.mandatoryMessage = formData.get('mandatory-message')?.toString() || '';
-
-		this.modalHandler?.submit(this._returnData);
+		this.modalContext?.submit(this._returnData);
 	}
 
 	#onNameChange(event: UUIInputEvent) {
@@ -116,12 +115,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		this.requestUpdate('_returnData');
 	}
 
-	#onCustomValidationChange(event: UUISelectEvent) {
-		const regEx = event.target.value.toString();
-		this._returnData.validation!.regEx = regEx;
-		this.requestUpdate('_returnData');
-	}
-
 	#onMandatoryChange(event: UUIBooleanInputEvent) {
 		const value = event.target.checked;
 		this._returnData.validation!.mandatory = value;
@@ -151,40 +144,53 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 	#onToggleAliasLock() {
 		this._aliasLocked = !this._aliasLocked;
+	}
 
-		if (this._aliasLocked) {
-			this._returnData.alias = generateAlias(this._returnData.alias ?? '');
-			this.requestUpdate('_returnData');
-		}
+	#onCustomValidationChange(event: UUISelectEvent) {
+		const regEx = event.target.value || event.target.value === '' ? event.target.value.toString() : null;
+
+		this._customValidationOptions.forEach((option) => {
+			option.selected = option.value === regEx;
+		});
+		console.log(this._customValidationOptions);
+
+		this._returnData.validation!.regEx = regEx ?? null;
+		this.requestUpdate('_returnData');
+		this.requestUpdate('_customValidationOptions');
 	}
 
 	#onValidationRegExChange(event: UUIInputEvent) {
-		const regEx = event.target.value.toString();
-		const newlySelected = this._customValidationOptions.find((option) => {
+		const regEx = event.target.value || event.target.value === '' ? event.target.value.toString() : null;
+		const betterChoice = this._customValidationOptions.find((option) => {
 			option.selected = option.value === regEx;
 			return option.selected;
 		});
-		if (newlySelected === undefined) {
+		if (betterChoice === undefined) {
 			this._customValidationOptions[4].selected = true;
 		}
 		this._returnData.validation!.regEx = regEx;
 		this.requestUpdate('_returnData');
+		this.requestUpdate('_customValidationOptions');
 	}
 	#onValidationMessageChange(event: UUIInputEvent) {
 		this._returnData.validation!.regExMessage = event.target.value.toString();
 		this.requestUpdate('_returnData');
 	}
 
+	// TODO: This would conceptually be a Property Editor Workspace, should be changed at one point in the future.
+	// For now this is hacky made available by giving the element an fixed alias.
+	// This would allow for workspace views and workspace actions.
 	render() {
 		return html`
 			<uui-form>
 				<form @submit="${this.#onSubmit}">
-					<umb-workspace-editor headline="Property settings">
+					<umb-workspace-editor alias="Umb.Workspace.PropertyEditor" headline="Property settings">
 						<div id="content">
 							<uui-box>
 								<div class="container">
+									<!-- TODO: Align styling across this and the property of document type workspace editor, or consider if this can go away for a different UX flow -->
 									<uui-input
-										id="nameInput"
+										id="name-input"
 										name="name"
 										@input=${this.#onNameChange}
 										.value=${this._returnData.name}
@@ -192,6 +198,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 										<!-- TODO: validation for bad characters -->
 									</uui-input>
 									<uui-input
+										id="alias-input"
 										name="alias"
 										@input=${this.#onAliasChange}
 										.value=${this._returnData.alias}
@@ -203,6 +210,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 										</div>
 									</uui-input>
 									<uui-textarea
+										id="description-input"
 										name="description"
 										placeholder="Enter description..."
 										.value=${this._returnData.description}></uui-textarea>
@@ -225,7 +233,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 							</uui-box>
 						</div>
 						<div slot="actions">
-							<uui-button label="Close" @click=${this.#onClose}></uui-button>
 							<uui-button label="Submit" look="primary" color="positive" type="submit"></uui-button>
 						</div>
 					</umb-workspace-editor>
@@ -235,34 +242,32 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	}
 
 	#renderAlignLeftIcon() {
-		return html`<div
+		return html`<button
+			type="button"
 			@click=${this.#setAppearanceNormal}
-			@keydown=${() => ''}
 			class="appearance left ${this._returnData.appearance?.labelOnTop ? '' : 'selected'}">
-			<svg width="260" height="32" viewBox="0 0 260 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<rect width="89" height="14" rx="7" fill="currentColor" />
-				<rect x="121" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
-				<rect x="121" y="46" width="108" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
-				<rect x="121" y="23" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
+			<svg width="200" height="48" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<rect width="94" height="14" rx="6" fill="currentColor" />
+				<rect y="22" width="64" height="9" rx="4" fill="currentColor" fill-opacity="0.4" />
+				<rect x="106" width="94" height="60" rx="5" fill="currentColor" fill-opacity="0.4" />
 			</svg>
 			<label class="appearance-label"> Label on the left </label>
-		</div>`;
+		</button>`;
 	}
 
 	#renderAlignTopIcon() {
 		return html`
-			<div
+			<button
+				type="button"
 				@click=${this.#setAppearanceTop}
-				@keydown=${() => ''}
 				class="appearance top ${this._returnData.appearance?.labelOnTop ? 'selected' : ''}">
-				<svg width="139" height="48" viewBox="0 0 139 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<rect width="89" height="14" rx="7" fill="currentColor" />
-					<rect y="30" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
-					<rect y="76" width="108" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
-					<rect y="53" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
+				<svg width="140" height="48" viewBox="0 0 140 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<rect width="90" height="14" rx="6" fill="currentColor" />
+					<rect y="22" width="64" height="9" rx="4" fill="currentColor" fill-opacity="0.4" />
+					<rect y="42" width="140" height="36" rx="5" fill="currentColor" fill-opacity="0.4" />
 				</svg>
 				<label class="appearance-label"> Label on top </label>
-			</div>
+			</button>
 		`;
 	}
 
@@ -292,7 +297,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 				@change=${this.#onCustomValidationChange}
 				.options=${this._customValidationOptions}></uui-select>
 
-			${this._returnData.validation?.regEx !== ''
+			${this._returnData.validation?.regEx !== null
 				? html`
 						<uui-input
 							name="pattern"
@@ -316,6 +321,41 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 			#content {
 				padding: var(--uui-size-layout-1);
 			}
+			#alias-input,
+			#label-input,
+			#description-input {
+				width: 100%;
+			}
+
+			#alias-input {
+				border-color: transparent;
+				background: var(--uui-color-surface);
+			}
+
+			#label-input {
+				font-weight: bold; /* TODO: UUI Input does not support bold text yet */
+				--uui-input-border-color: transparent;
+			}
+			#label-input input {
+				font-weight: bold;
+				--uui-input-border-color: transparent;
+			}
+
+			#alias-lock {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+			}
+			#alias-lock uui-icon {
+				margin-bottom: 2px;
+				/* margin: 0; */
+			}
+			#description-input {
+				--uui-textarea-border-color: transparent;
+				font-weight: 0.5rem; /* TODO: Cant change font size of UUI textarea yet */
+			}
+
 			#appearances {
 				display: flex;
 				gap: var(--uui-size-layout-1);
@@ -325,10 +365,11 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 			.appearance {
 				position: relative;
 				display: flex;
-				border: 2px solid var(--uui-color-border-standalone);
+				border: 1px solid var(--uui-color-border-standalone);
+				background-color: transparent;
 				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 				align-items: center;
-				border-radius: 6px;
+				border-radius: var(--uui-border-radius);
 				opacity: 0.8;
 				flex-direction: column;
 				justify-content: space-between;
@@ -337,26 +378,8 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 			.appearance-label {
 				font-size: 0.8rem;
 				line-height: 1;
-			}
-			.appearance.selected .appearance-label {
 				font-weight: bold;
-			}
-			.appearance:not(.selected):hover {
-				border-color: var(--uui-color-border-emphasis);
-				cursor: pointer;
-				opacity: 1;
-			}
-			.appearance.selected {
-				border-color: var(--uui-color-selected);
-				opacity: 1;
-			}
-			.appearance.selected::after {
-				content: '';
-				position: absolute;
-				inset: 0;
-				border-radius: 6px;
-				opacity: 0.1;
-				background-color: var(--uui-color-selected);
+				pointer-events: none;
 			}
 			.appearance.left {
 				flex-grow: 1;
@@ -368,6 +391,28 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 				display: flex;
 				width: 100%;
 				color: var(--uui-color-text);
+			}
+			.appearance:not(.selected):hover {
+				border-color: var(--uui-color-border-emphasis);
+				cursor: pointer;
+				opacity: 1;
+			}
+			.appearance.selected {
+				background-color: var(--uui-color-surface);
+				border-color: var(--uui-color-selected);
+				color: var(--uui-color-selected);
+				opacity: 1;
+			}
+			.appearance.selected svg {
+				color: var(--uui-color-selected);
+			}
+			.appearance.selected::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				border-radius: 6px;
+				opacity: 0.1;
+				background-color: var(--uui-color-selected);
 			}
 			hr {
 				border: none;

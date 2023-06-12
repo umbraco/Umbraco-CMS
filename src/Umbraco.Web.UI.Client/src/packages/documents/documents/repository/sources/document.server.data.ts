@@ -55,16 +55,17 @@ export class UmbDocumentServerDataSource
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async createScaffold(documentTypeId: string) {
+	async createScaffold(documentTypeId: string, preset?: Partial<CreateDocumentRequestModel>) {
 		const data: DocumentResponseModel = {
 			urls: [],
 			templateId: null,
+			parentId: null,
 			id: UmbId.new(),
 			contentTypeId: documentTypeId,
 			values: [],
 			variants: [
 				{
-					$type: '',
+					$type: 'DocumentVariantRequestModel',
 					state: ContentStateModel.DRAFT,
 					publishDate: null,
 					culture: null,
@@ -74,6 +75,7 @@ export class UmbDocumentServerDataSource
 					updateDate: undefined,
 				},
 			],
+			...preset,
 		};
 
 		return { data };
@@ -88,7 +90,17 @@ export class UmbDocumentServerDataSource
 	async insert(document: CreateDocumentRequestModel & { id: string }) {
 		if (!document.id) throw new Error('Id is missing');
 
-		return tryExecuteAndNotify(this.#host, DocumentResource.postDocument({ requestBody: document }));
+		// TODO: Hack to remove some props that ruins the document-type post end-point.
+		const unFroozenDocument = { ...document };
+		(unFroozenDocument as any).$type = undefined;
+		(unFroozenDocument as any).id = undefined;
+
+		(unFroozenDocument.variants as any) =
+			unFroozenDocument.variants?.map((variant) => {
+				return { ...variant, $type: undefined };
+			}) ?? [];
+
+		return tryExecuteAndNotify(this.#host, DocumentResource.postDocument({ requestBody: unFroozenDocument }));
 	}
 
 	/**
@@ -100,7 +112,17 @@ export class UmbDocumentServerDataSource
 	async update(id: string, document: UpdateDocumentRequestModel) {
 		if (!id) throw new Error('Id is missing');
 
-		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentById({ id, requestBody: document }));
+		// TODO: Hack to remove some props that ruins the document-type post end-point.
+		const unFroozenDocument = { ...document };
+		(unFroozenDocument as any).$type = undefined;
+		(unFroozenDocument as any).id = undefined;
+
+		(unFroozenDocument.variants as any) =
+			unFroozenDocument.variants?.map((variant) => {
+				return { ...variant, $type: undefined };
+			}) ?? [];
+
+		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentById({ id, requestBody: unFroozenDocument }));
 	}
 
 	/**

@@ -1,8 +1,12 @@
 import type { UmbLoggedInUser } from './types.js';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './current-user.store.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, CSSResultGroup, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CURRENT_USER_MODAL } from '@umbraco-cms/backoffice/modal';
+import { css, CSSResultGroup, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_CURRENT_USER_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-current-user-header-app')
@@ -11,12 +15,12 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	private _currentUser?: UmbLoggedInUser;
 
 	private _currentUserStore?: UmbCurrentUserStore;
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 

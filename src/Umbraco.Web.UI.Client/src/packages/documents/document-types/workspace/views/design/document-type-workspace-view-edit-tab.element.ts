@@ -3,23 +3,26 @@ import { css, html, customElement, property, state, repeat } from '@umbraco-cms/
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 import './document-type-workspace-view-edit-properties.element.js';
 
 @customElement('umb-document-type-workspace-view-edit-tab')
 export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
-	private _ownerTabId?: string | undefined;
+	private _ownerTabId?: string | null;
 
+	// TODO: get rid of this:
 	@property({ type: String })
-	public get ownerTabId(): string | undefined {
+	public get ownerTabId(): string | null | undefined {
 		return this._ownerTabId;
 	}
-	public set ownerTabId(value: string | undefined) {
+	public set ownerTabId(value: string | null | undefined) {
 		if (value === this._ownerTabId) return;
+		console.log('ownerTabId', value);
 		const oldValue = this._ownerTabId;
 		this._ownerTabId = value;
+		this._groupStructureHelper.setOwnerId(value);
 		this.requestUpdate('ownerTabId', oldValue);
 	}
 
@@ -37,18 +40,22 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		this.requestUpdate('tabName', oldValue);
 	}
 
+	@state()
+	private _noTabName?: boolean;
+
 	@property({ type: Boolean })
 	public get noTabName(): boolean {
 		return this._groupStructureHelper.getIsRoot();
 	}
 	public set noTabName(value: boolean) {
+		this._noTabName = value;
 		this._groupStructureHelper.setIsRoot(value);
 	}
 
 	_groupStructureHelper = new UmbContentTypeContainerStructureHelper(this);
 
 	@state()
-	_groups: Array<PropertyTypeContainerResponseModelBaseModel> = [];
+	_groups: Array<PropertyTypeContainerModelBaseModel> = [];
 
 	@state()
 	_hasProperties = false;
@@ -61,9 +68,11 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		});
 		this.observe(this._groupStructureHelper.containers, (groups) => {
 			this._groups = groups;
+			this.requestUpdate('_groups');
 		});
 		this.observe(this._groupStructureHelper.hasProperties, (hasProperties) => {
 			this._hasProperties = hasProperties;
+			this.requestUpdate('_hasProperties');
 		});
 	}
 
@@ -74,7 +83,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 	render() {
 		return html`
-			${this._hasProperties
+			${!this._noTabName
 				? html`
 						<uui-box>
 							<umb-document-type-workspace-view-edit-properties
@@ -86,8 +95,27 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				: ''}
 			${repeat(
 				this._groups,
-				(group) => group.name,
-				(group) => html` <uui-box .headline=${group.name || ''}>
+				(group) => group.id ?? '' + group.name,
+				(group) => html`
+					<uui-box>
+						${
+							this._groupStructureHelper.isOwnerChildContainer(group.id!)
+								? html`
+										<div slot="header">
+											<uui-input
+												label="Group name"
+												placeholder="Enter a group name"
+												value=${group.name ?? ''}
+												@change=${(e: InputEvent) => {
+													const newName = (e.target as HTMLInputElement).value;
+													this._groupStructureHelper.updateContainerName(group.id!, group.parentId ?? null, newName);
+												}}>
+											</uui-input>
+										</div>
+								  `
+								: html`<div slot="header"><b>${group.name ?? ''}</b> (Inherited)</div>`
+						}
+					</div>
 					<umb-document-type-workspace-view-edit-properties
 						container-id=${group.id}
 						container-type="Group"
@@ -101,17 +129,15 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-				padding-bottom: var(--uui-size-layout-1); // To enforce some distance to the bottom of the scroll-container.
-			}
-			uui-box {
-				margin-top: var(--uui-size-layout-1);
-			}
-
 			#add {
 				width: 100%;
+			}
+
+			#add:not(:first-child) {
+				width: 100%;
+				margin-top: var(--uui-size-layout-1);
+			}
+			uui-box:not(:first-child) {
 				margin-top: var(--uui-size-layout-1);
 			}
 		`,

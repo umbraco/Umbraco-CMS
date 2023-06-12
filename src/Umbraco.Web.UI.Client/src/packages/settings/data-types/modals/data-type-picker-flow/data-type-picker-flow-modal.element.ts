@@ -1,12 +1,16 @@
 import { UmbDataTypeRepository } from '../../repository/data-type.repository.js';
-import { css, html, repeat, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, repeat, customElement, property, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
-	UmbPropertyEditorUIPickerModalData,
-	UmbPropertyEditorUIPickerModalResult,
-	UmbModalHandler,
+	UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL,
+	UMB_WORKSPACE_MODAL,
+	UmbDataTypePickerFlowModalData,
+	UmbDataTypePickerFlowModalResult,
+	UmbModalContext,
+	UmbModalRouteBuilder,
+	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -18,18 +22,18 @@ interface GroupedItems<T> {
 @customElement('umb-data-type-picker-flow-modal')
 export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalResult>;
+	modalContext?: UmbModalContext<UmbDataTypePickerFlowModalData, UmbDataTypePickerFlowModalResult>;
 
 	@property({ type: Object })
-	public get data(): UmbPropertyEditorUIPickerModalData | undefined {
+	public get data(): UmbDataTypePickerFlowModalData | undefined {
 		return this._data;
 	}
-	public set data(value: UmbPropertyEditorUIPickerModalData | undefined) {
+	public set data(value: UmbDataTypePickerFlowModalData | undefined) {
 		this._data = value;
 		this._selection = this.data?.selection ?? [];
 		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
 	}
-	private _data?: UmbPropertyEditorUIPickerModalData | undefined;
+	private _data?: UmbDataTypePickerFlowModalData | undefined;
 
 	@state()
 	private _groupedDataTypes?: GroupedItems<EntityTreeItemResponseModel>;
@@ -43,6 +47,11 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	@state()
 	private _submitLabel = 'Select';
 
+	@state()
+	private _dataTypePickerModalRouteBuilder?: UmbModalRouteBuilder;
+
+	private _createDataTypeModal: UmbModalRouteRegistrationController;
+
 	#repository;
 	#dataTypes: Array<EntityTreeItemResponseModel> = [];
 	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
@@ -52,7 +61,43 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		super();
 		this.#repository = new UmbDataTypeRepository(this);
 
+		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL)
+			.addAdditionalPath(':uiAlias')
+			.onSetup((routingInfo) => {
+				return {
+					propertyEditorUiAlias: routingInfo.uiAlias,
+				};
+			})
+			.onSubmit((submitData) => {
+				if (submitData.dataTypeId) {
+					this._select(submitData.dataTypeId);
+					this._submit();
+				} else if (submitData.createNewWithPropertyEditorUiAlias) {
+					this._createDataType(submitData.createNewWithPropertyEditorUiAlias);
+				}
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._dataTypePickerModalRouteBuilder = routeBuilder;
+				this.requestUpdate('_dataTypePickerModalRouteBuilder');
+			});
+
+		this._createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath(':uiAlias')
+			.onSetup((params) => {
+				return { entityType: 'data-type', preset: { propertyEditorUiAlias: params.uiAlias } };
+			})
+			.onSubmit((submitData) => {
+				this._select(submitData.id);
+				this._submit();
+			});
+
 		this.#init();
+	}
+
+	private _createDataType(propertyEditorUiAlias: string) {
+		// TODO: Could be nice with a more pretty way to prepend to the URL:
+		// Open create modal:
+		this._createDataTypeModal.open({ uiAlias: propertyEditorUiAlias }, 'create/null');
 	}
 
 	async #init() {
@@ -72,13 +117,10 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		});
 	}
 
-	private _handleUIClick(propertyEditorUi: ManifestPropertyEditorUi) {
-		alert('To BE DONE.');
-	}
-
 	private _handleDataTypeClick(dataType: EntityTreeItemResponseModel) {
 		if (dataType.id) {
 			this._select(dataType.id);
+			this._submit();
 		}
 	}
 
@@ -116,34 +158,26 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	}
 
 	private _close() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	private _submit() {
-		this.modalHandler?.submit({ selection: this._selection });
+		this.modalContext?.submit({ selection: this._selection });
 	}
 
 	render() {
 		return html`
-			<umb-body-layout headline="Select editor">
+			<umb-body-layout headline="Select editor" class="uui-text">
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>
-					<uui-button label="${this._submitLabel}" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
 	}
 
 	private _renderGrid() {
-		return this.#currentFilterQuery
-			? html`
-					<h5>Available configurations</h5>
-					${this._renderDataTypes()}
-					<h5>Create a new configuration</h5>
-					${this._renderUIs()}
-			  `
-			: html`${this._renderUIs()}`;
+		return this.#currentFilterQuery ? this._renderFilteredList() : this._renderUIs();
 	}
 
 	private _renderFilter() {
@@ -156,14 +190,77 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		</uui-input>`;
 	}
 
+	private _renderFilteredList() {
+		if (!this._groupedDataTypes) return nothing;
+		const dataTypesEntries = Object.entries(this._groupedDataTypes);
+
+		if (!this._groupedPropertyEditorUIs) return nothing;
+
+		const editorUIEntries = Object.entries(this._groupedPropertyEditorUIs);
+
+		if (dataTypesEntries.length === 0 && editorUIEntries.length === 0) {
+			return html`Nothing matches your search, try another search term.`;
+		}
+
+		return html`
+			${when(
+				dataTypesEntries.length > 0,
+				() => html` <h5 class="choice-type-headline">Available configurations</h5>
+					${this._renderDataTypes()}`
+			)}
+			${when(
+				editorUIEntries.length > 0,
+				() => html` <h5 class="choice-type-headline">Create a new configuration</h5>
+					${this._renderUIs()}`
+			)}
+		`;
+	}
+
 	private _renderDataTypes() {
-		return this._groupedDataTypes
-			? html` ${Object.entries(this._groupedDataTypes).map(
-					([key, value]) =>
-						html` <h4>${key}</h4>
-							${this._renderGroupDataTypes(value)}`
-			  )}`
-			: '';
+		if (!this._groupedDataTypes) return nothing;
+
+		const entries = Object.entries(this._groupedDataTypes);
+
+		// TODO: Fix so we can have Data Types grouped. (or choose not to group them)
+		return entries.map(
+			([key, value]) =>
+				html` <h5 class="category-name">${key === 'undefined' ? 'Uncategorized' : key}</h5>
+					${this._renderGroupDataTypes(value)}`
+		);
+	}
+
+	private _renderUIs() {
+		if (!this._groupedPropertyEditorUIs) return nothing;
+
+		const entries = Object.entries(this._groupedPropertyEditorUIs);
+
+		return entries.map(
+			([key, value]) =>
+				html` <h5 class="category-name">${key === 'undefined' ? 'Uncategorized' : key}</h5>
+					${this._renderGroupUIs(value)}`
+		);
+	}
+
+	private _renderGroupUIs(uis: Array<ManifestPropertyEditorUi>) {
+		return html` <ul id="item-grid">
+			${this._dataTypePickerModalRouteBuilder
+				? repeat(
+						uis,
+						(propertyEditorUI) => propertyEditorUI.alias,
+						(propertyEditorUI) => html` <li class="item">
+							<uui-button
+								type="button"
+								label="${propertyEditorUI.meta.label || propertyEditorUI.name}"
+								href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
+								<div class="item-content">
+									<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
+									${propertyEditorUI.meta.label || propertyEditorUI.name}
+								</div>
+							</uui-button>
+						</li>`
+				  )
+				: ''}
+		</ul>`;
 	}
 
 	private _renderGroupDataTypes(dataTypes: Array<EntityTreeItemResponseModel>) {
@@ -172,33 +269,12 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				dataTypes,
 				(dataType) => dataType.id,
 				(dataType) => html`<li class="item" ?selected=${this._selection.includes(dataType.id!)}>
-					<button type="button" @click="${() => this._handleDataTypeClick(dataType)}">
-						<uui-icon name="${dataType.icon}" class="icon"></uui-icon>
-						${dataType.name}
-					</button>
-				</li>`
-			)}
-		</ul>`;
-	}
-
-	private _renderUIs() {
-		return html` ${Object.entries(this._groupedPropertyEditorUIs).map(
-			([key, value]) =>
-				html` <h4>${key}</h4>
-					${this._renderGroupUIs(value)}`
-		)}`;
-	}
-
-	private _renderGroupUIs(uis: Array<ManifestPropertyEditorUi>) {
-		return html` <ul id="item-grid">
-			${repeat(
-				uis,
-				(propertyEditorUI) => propertyEditorUI.alias,
-				(propertyEditorUI) => html` <li class="item">
-					<button type="button" @click="${() => this._handleUIClick(propertyEditorUI)}">
-						<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
-						${propertyEditorUI.meta.label || propertyEditorUI.name}
-					</button>
+					<uui-button label=${dataType.name} type="button" @click="${() => this._handleDataTypeClick(dataType)}">
+						<div class="item-content">
+							<uui-icon name="${dataType.icon ?? 'umb:bug'}" class="icon"></uui-icon>
+							${dataType.name}
+						</div>
+					</uui-button>
 				</li>`
 			)}
 		</ul>`;
@@ -213,25 +289,31 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 			}
 
 			#filter-icon {
+				height: 100%;
 				padding-left: var(--uui-size-space-2);
+				display: flex;
+				color: var(--uui-color-border);
 			}
 
 			#item-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
 				margin: 0;
 				padding: 0;
-				grid-gap: var(--uui-size-space-4);
+			}
+
+			#item-grid:not(:last-child) {
+				padding-bottom: var(--uui-size-space-5);
 			}
 
 			#item-grid .item {
-				display: flex;
-				align-items: flex-start;
-				justify-content: center;
 				list-style: none;
 				height: 100%;
+				width: 100%;
 				border: 1px solid transparent;
 				border-radius: var(--uui-border-radius);
+				box-sizing: border-box;
+				color: var(--uui-color-interactive);
 			}
 
 			#item-grid .item:hover {
@@ -240,30 +322,38 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				cursor: pointer;
 			}
 
-			#item-grid .item[selected] button {
-				background: var(--uui-color-selected);
-				color: var(--uui-color-selected-contrast);
+			#item-grid .item uui-button {
+				--uui-button-padding-left-factor: 0;
+				--uui-button-padding-right-factor: 0;
+				--uui-button-padding-top-factor: 0;
+				--uui-button-padding-bottom-factor: 0;
+				width: 100%;
+				height: 100%;
 			}
 
-			#item-grid .item button {
-				background: none;
-				border: none;
-				cursor: pointer;
-				padding: var(--uui-size-space-3);
-				display: flex;
-				align-items: center;
-				flex-direction: column;
-				justify-content: center;
-				font-size: 0.8rem;
+			#item-grid .item .item-content {
+				text-align: center;
+				box-sizing: border-box;
+
+				padding: var(--uui-size-space-2);
+
+				display: grid;
+				grid-template-rows: 40px 1fr;
 				height: 100%;
 				width: 100%;
-				color: var(--uui-color-interactive);
-				border-radius: var(--uui-border-radius);
 			}
-
 			#item-grid .item .icon {
 				font-size: 2em;
-				margin-bottom: var(--uui-size-space-2);
+				margin: auto;
+			}
+
+			.category-name {
+				text-transform: capitalize;
+			}
+
+			.choice-type-headline {
+				text-transform: capitalize;
+				border-bottom: 1px solid var(--uui-color-divider);
 			}
 		`,
 	];

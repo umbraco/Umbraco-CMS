@@ -42,7 +42,7 @@ export class UmbTagRepository {
 
 		if (data) {
 			// TODO: allow to append an array of items to the store
-			// TODO: append culture? "Invariant" if null.
+			// TODO: Lone: append culture? "Invariant" if null. Niels: Actually, as of my current stand point, I think we should aim for invariant to be the value of ´null´.
 			data.items.forEach((x) => this.#tagStore?.append(x));
 		}
 

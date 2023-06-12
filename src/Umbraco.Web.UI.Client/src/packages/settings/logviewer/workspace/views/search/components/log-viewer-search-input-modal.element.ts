@@ -1,5 +1,5 @@
-import { html, css , customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles , UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { html, css, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { SavedLogSearchPresenationBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -12,11 +12,11 @@ export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElem
 	private _input!: UUIInputElement;
 
 	private _handleClose() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	private _handleSubmit() {
-		this.modalHandler?.submit({ name: this._input.value as string, query: this.data?.query });
+		this.modalContext?.submit({ name: this._input.value as string, query: this.data?.query });
 	}
 
 	@state()

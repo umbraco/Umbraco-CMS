@@ -1,14 +1,20 @@
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
-import { UUIButtonElement, UUIInputElement, UUIPopoverElement, UUISymbolExpandElement , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	UUIButtonElement,
+	UUIInputElement,
+	UUIPopoverElement,
+	UUISymbolExpandElement,
+	UUITextStyles,
+} from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { Subject, debounceTime, tap } from '@umbraco-cms/backoffice/external/rxjs';
 import { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
 import {
-	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UmbModalManagerContext,
 	UmbModalContext,
-	UmbModalHandler,
 	UmbModalToken,
 } from '@umbraco-cms/backoffice/modal';
 
@@ -49,7 +55,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
@@ -59,7 +65,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 			this.#logViewerContext?.getSavedSearches();
 		});
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 
@@ -128,7 +134,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		this.#logViewerContext?.setFilterExpression('');
 	}
 
-	#modalHandler?: UmbModalHandler;
+	modalContext?: UmbModalContext;
 
 	#saveSearch(savedSearch: SavedLogSearchResponseModel) {
 		this.#logViewerContext?.saveSearch(savedSearch);
@@ -139,8 +145,8 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	#openSaveSearchDialog() {
-		this.#modalHandler = this._modalContext?.open(UMB_LOG_VIEWER_SAVE_SEARCH_MODAL, { query: this._inputQuery });
-		this.#modalHandler?.onSubmit().then((savedSearch) => {
+		this.modalContext = this._modalContext?.open(UMB_LOG_VIEWER_SAVE_SEARCH_MODAL, { query: this._inputQuery });
+		this.modalContext?.onSubmit().then((savedSearch) => {
 			if (savedSearch) {
 				this.#saveSearch(savedSearch);
 				this._isQuerySaved = true;

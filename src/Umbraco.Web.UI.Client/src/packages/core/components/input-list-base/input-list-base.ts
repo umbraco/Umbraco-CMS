@@ -1,10 +1,10 @@
 import { html, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import {
-	UmbModalContext,
+	UmbModalManagerContext,
 	UmbModalToken,
 	UmbModalType,
-	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UmbPickerModalResult,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -25,11 +25,11 @@ export class UmbInputListBaseElement extends UmbLitElement {
 
 	// TODO: not great that we use any, any here. Investigate if we can have some interface or base modal token for this type.
 	protected pickerToken?: UmbModalToken<any, any>;
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}
@@ -37,12 +37,12 @@ export class UmbInputListBaseElement extends UmbLitElement {
 	private _openPicker() {
 		if (!this.pickerToken) return;
 
-		const modalHandler = this._modalContext?.open(this.pickerToken, {
+		const modalContext = this._modalContext?.open(this.pickerToken, {
 			multiple: this.multiple,
 			selection: this.value,
 		});
 
-		modalHandler?.onSubmit().then((data: UmbPickerModalResult) => {
+		modalContext?.onSubmit().then((data: UmbPickerModalResult) => {
 			if (data) {
 				this.value = data.selection?.filter((id) => id !== null && id !== undefined) as Array<string>;
 				this.selectionUpdated();

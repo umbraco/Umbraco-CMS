@@ -3,9 +3,7 @@ import './relation-type-workspace.element.js';
 import { Meta, Story } from '@storybook/web-components';
 import { data } from '../../../../mocks/data/relation-type.data.js';
 import type { UmbRelationTypeWorkspaceElement } from './relation-type-workspace.element.js';
-import { html , ifDefined } from '@umbraco-cms/backoffice/external/lit';
-
-
+import { html, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
 	title: 'Workspaces/Relation Type',

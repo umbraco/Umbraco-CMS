@@ -2,7 +2,7 @@ import {
 	PropertyContainerTypes,
 	UmbContentTypePropertyStructureManager,
 } from './content-type-structure-manager.class.js';
-import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
@@ -16,16 +16,17 @@ export class UmbContentTypeContainerStructureHelper {
 	private _ownerType?: PropertyContainerTypes = 'Tab';
 	private _childType?: PropertyContainerTypes = 'Group';
 	private _isRoot = false;
+	private _ownerId?: string | null;
 	private _ownerName?: string;
 
 	// Containers defined in data might be more than actual containers to display as we merge them by name.
 	// Direct containers are the containers defining the total of this container(Multiple containers with the same name and type)
-	private _directContainers: PropertyTypeContainerResponseModelBaseModel[] = [];
+	private _ownerAlikeContainers: PropertyTypeContainerModelBaseModel[] = [];
 	// Owner containers are containers owned by the owner Document Type (The specific one up for editing)
-	private _ownerContainers: PropertyTypeContainerResponseModelBaseModel[] = [];
+	private _ownerContainers: PropertyTypeContainerModelBaseModel[] = [];
 
 	// State containing the merged containers (only one pr. name):
-	#containers = new UmbArrayState<PropertyTypeContainerResponseModelBaseModel>([], (x) => x.id);
+	#containers = new UmbArrayState<PropertyTypeContainerModelBaseModel>([], (x) => x.id);
 	readonly containers = this.#containers.asObservable();
 
 	#hasProperties = new UmbBooleanState(false);
@@ -44,13 +45,13 @@ export class UmbContentTypeContainerStructureHelper {
 		this.#structure = structure;
 		this.#initResolver?.(undefined);
 		this.#initResolver = undefined;
-		this._observeDirectContainers();
+		this._observeOwnerAlikeContainers();
 	}
 
 	public setType(value?: PropertyContainerTypes) {
 		if (this._ownerType === value) return;
 		this._ownerType = value;
-		this._observeDirectContainers();
+		this._observeOwnerAlikeContainers();
 	}
 	public getType() {
 		return this._ownerType;
@@ -59,7 +60,7 @@ export class UmbContentTypeContainerStructureHelper {
 	public setContainerChildType(value?: PropertyContainerTypes) {
 		if (this._childType === value) return;
 		this._childType = value;
-		this._observeDirectContainers();
+		this._observeOwnerAlikeContainers();
 	}
 	public getContainerChildType() {
 		return this._childType;
@@ -68,7 +69,7 @@ export class UmbContentTypeContainerStructureHelper {
 	public setName(value?: string) {
 		if (this._ownerName === value) return;
 		this._ownerName = value;
-		this._observeDirectContainers();
+		this._observeOwnerAlikeContainers();
 	}
 	public getName() {
 		return this._ownerName;
@@ -77,13 +78,21 @@ export class UmbContentTypeContainerStructureHelper {
 	public setIsRoot(value: boolean) {
 		if (this._isRoot === value) return;
 		this._isRoot = value;
-		this._observeDirectContainers();
+		this._observeOwnerAlikeContainers();
 	}
 	public getIsRoot() {
 		return this._isRoot;
 	}
 
-	private _observeDirectContainers() {
+	public setOwnerId(value: string | null | undefined) {
+		if (this._ownerId === value) return;
+		this._ownerId = value;
+	}
+	public getOwnerId() {
+		return this._ownerId;
+	}
+
+	private _observeOwnerAlikeContainers() {
 		if (!this.#structure || !this._ownerType) return;
 
 		if (this._isRoot) {
@@ -103,11 +112,11 @@ export class UmbContentTypeContainerStructureHelper {
 			new UmbObserverController(
 				this.#host,
 				this.#structure.containersByNameAndType(this._ownerName, this._ownerType),
-				(ownerContainers) => {
+				(ownerALikeContainers) => {
 					this.#containers.next([]);
-					this._ownerContainers = ownerContainers || [];
-					this._directContainers = ownerContainers || [];
-					if (this._directContainers.length > 0) {
+					this._ownerContainers = ownerALikeContainers.filter((x) => x.id === this._ownerId) || [];
+					this._ownerAlikeContainers = ownerALikeContainers || [];
+					if (this._ownerAlikeContainers.length > 0) {
 						this._observeChildContainerProperties();
 						this._observeChildContainers();
 					}
@@ -120,7 +129,7 @@ export class UmbContentTypeContainerStructureHelper {
 	private _observeChildContainerProperties() {
 		if (!this.#structure) return;
 
-		this._directContainers.forEach((container) => {
+		this._ownerAlikeContainers.forEach((container) => {
 			new UmbObserverController(
 				this.#host,
 				this.#structure!.hasPropertyStructuresOf(container.id!),
@@ -135,7 +144,7 @@ export class UmbContentTypeContainerStructureHelper {
 	private _observeChildContainers() {
 		if (!this.#structure || !this._ownerName || !this._childType) return;
 
-		this._directContainers.forEach((container) => {
+		this._ownerAlikeContainers.forEach((container) => {
 			new UmbObserverController(
 				this.#host,
 				this.#structure!.containersOfParentKey(container.id, this._childType!),
@@ -159,7 +168,7 @@ export class UmbContentTypeContainerStructureHelper {
 		);
 	}
 
-	private _insertGroupContainers = (groupContainers: PropertyTypeContainerResponseModelBaseModel[]) => {
+	private _insertGroupContainers = (groupContainers: PropertyTypeContainerModelBaseModel[]) => {
 		groupContainers.forEach((group) => {
 			if (group.name !== null && group.name !== undefined) {
 				if (!this.#containers.getValue().find((x) => x.name === group.name)) {
@@ -178,21 +187,44 @@ export class UmbContentTypeContainerStructureHelper {
 		return this._ownerContainers.find((x) => x.id === containerId) !== undefined;
 	}
 
+	/**
+	 * Returns true if the container is an owner container.
+	 */
+	isOwnerChildContainer(containerId?: string) {
+		if (!this.#structure || !containerId) return;
+
+		return this.#containers.getValue().find((x) => x.id === containerId && x.parentId === this._ownerId) !== undefined;
+	}
+
 	/** Manipulate methods: */
 
-	async addContainer(parentContainerId?: string, sortOrder?: number) {
+	async addContainer(parentContainerId?: string | null, sortOrder?: number) {
 		if (!this.#structure) return;
 
 		await this.#structure.createContainer(null, parentContainerId, this._childType, sortOrder);
 	}
 
-	async partialUpdateContainer(
-		containerId?: string,
-		partialUpdate?: Partial<PropertyTypeContainerResponseModelBaseModel>
-	) {
+	async removeContainer(groupId: string) {
+		await this.#init;
+		if (!this.#structure) return;
+
+		return await this.#structure.removeContainer(null, groupId);
+	}
+
+	async partialUpdateContainer(containerId: string, partialUpdate: Partial<PropertyTypeContainerModelBaseModel>) {
 		await this.#init;
 		if (!this.#structure || !containerId || !partialUpdate) return;
 
 		return await this.#structure.updateContainer(null, containerId, partialUpdate);
+	}
+
+	async updateContainerName(containerId: string, containerParentId: string | null, name: string) {
+		await this.#init;
+		if (!this.#structure) return;
+
+		const newName =
+			this.#structure.makeContainerNameUniqueForOwnerDocument(name, this._childType, containerParentId) ?? name;
+
+		return await this.partialUpdateContainer(containerId, { name: newName });
 	}
 }

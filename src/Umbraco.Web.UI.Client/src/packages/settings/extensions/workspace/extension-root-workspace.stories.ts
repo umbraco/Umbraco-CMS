@@ -4,7 +4,6 @@ import { Meta, Story } from '@storybook/web-components';
 import type { UmbExtensionRootWorkspaceElement } from './extension-root-workspace.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-
 export default {
 	title: 'Workspaces/Extensions',
 	component: 'umb-workspace-extension-root',

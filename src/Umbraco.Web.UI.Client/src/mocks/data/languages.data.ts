@@ -30,9 +30,10 @@ class UmbLanguagesData extends UmbData<LanguageResponseModel> {
 		this.data.push(language);
 	}
 
-	save(saveItems: Array<LanguageResponseModel>) {
+	// TODO: this should and can only take a single save item.
+	save(isoCode: string, saveItems: Array<LanguageResponseModel>) {
 		saveItems.forEach((saveItem) => {
-			const foundIndex = this.data.findIndex((item) => item.isoCode === saveItem.isoCode);
+			const foundIndex = this.data.findIndex((item) => item.isoCode === isoCode);
 			if (foundIndex !== -1) {
 				// update
 				this.data[foundIndex] = saveItem;

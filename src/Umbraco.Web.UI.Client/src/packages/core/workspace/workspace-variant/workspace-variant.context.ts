@@ -39,8 +39,6 @@ export class UmbWorkspaceVariantContext {
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	variantId = this.#variantId.asObservable();
 
-	private _currentVariantObserver?: UmbObserverController<ActiveVariant>;
-
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
@@ -53,7 +51,7 @@ export class UmbWorkspaceVariantContext {
 			this._observeVariant();
 		});
 
-		this.index.subscribe(() => {
+		new UmbObserverController(host, this.#index, () => {
 			this._observeVariant();
 		});
 	}
@@ -85,8 +83,7 @@ export class UmbWorkspaceVariantContext {
 		const index = this.#index.getValue();
 		if (index === undefined) return;
 
-		this._currentVariantObserver?.destroy();
-		this._currentVariantObserver = new UmbObserverController(
+		new UmbObserverController(
 			this.#host,
 			this.#workspaceContext.splitView.activeVariantByIndex(index),
 			async (activeVariantInfo) => {
@@ -95,7 +92,7 @@ export class UmbWorkspaceVariantContext {
 				const currentVariant = await this.#workspaceContext?.getVariant(variantId);
 				this.#currentVariant.next(currentVariant);
 			},
-			'_observeVariant'
+			'_observeActiveVariant'
 		);
 	}
 

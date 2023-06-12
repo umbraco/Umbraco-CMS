@@ -1,5 +1,5 @@
 import { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
-import { css, html, nothing , customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -56,8 +56,9 @@ export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTree
 			}
 
 			#status-symbol {
-				width: 8px;
-				height: 8px;
+				width: 5px;
+				height: 5px;
+				border: 1px solid white;
 				background-color: blue;
 				display: block;
 				position: absolute;

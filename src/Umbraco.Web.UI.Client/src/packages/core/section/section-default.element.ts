@@ -1,7 +1,15 @@
 import type { UmbWorkspaceElement } from '../workspace/workspace.element.js';
 import type { UmbSectionViewsElement } from './section-views/section-views.element.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	nothing,
+	customElement,
+	property,
+	state,
+	PropertyValueMap,
+} from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	ManifestSection,
@@ -20,7 +28,17 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-section-default')
 export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectionExtensionElement {
 	@property()
-	public manifest?: ManifestSection;
+	private _manifest?: ManifestSection | undefined;
+	public get manifest(): ManifestSection | undefined {
+		return this._manifest;
+	}
+	public set manifest(value: ManifestSection | undefined) {
+		const oldValue = this._manifest;
+		if (oldValue === value) return;
+		this._manifest = value;
+		this.#observeSectionSidebarApps();
+		this.requestUpdate('manifest', oldValue);
+	}
 
 	@state()
 	private _routes?: Array<UmbRoute>;
@@ -28,9 +46,8 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	@state()
 	private _menus?: Array<Omit<ManifestSectionSidebarApp, 'kind'>>;
 
-	connectedCallback() {
-		super.connectedCallback();
-		this.#observeSectionSidebarApps();
+	constructor() {
+		super();
 		this.#createRoutes();
 	}
 
@@ -60,11 +77,13 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 				.extensionsOfType('sectionSidebarApp')
 				.pipe(
 					map((manifests) =>
-						manifests.filter((manifest) => manifest.conditions.sections.includes(this.manifest?.alias || ''))
+						manifests.filter((manifest) => manifest.conditions.sections.includes(this._manifest?.alias ?? ''))
 					)
 				),
 			(manifests) => {
+				const oldValue = this._menus;
 				this._menus = manifests;
+				this.requestUpdate('_menu', oldValue);
 			}
 		);
 	}
@@ -78,7 +97,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 							<umb-extension-slot
 								type="sectionSidebarApp"
 								.filter=${(items: ManifestSectionSidebarApp) =>
-									items.conditions.sections.includes(this.manifest?.alias || '')}></umb-extension-slot>
+									items.conditions.sections.includes(this.manifest?.alias ?? '')}></umb-extension-slot>
 						</umb-section-sidebar>
 				  `
 				: nothing}

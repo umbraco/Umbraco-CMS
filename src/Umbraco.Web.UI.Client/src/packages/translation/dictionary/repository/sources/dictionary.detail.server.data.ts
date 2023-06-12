@@ -33,12 +33,13 @@ export class UmbDictionaryDetailServerDataSource
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async createScaffold(parentId?: string | null, name?: string) {
+	async createScaffold(parentId?: string | null, preset?: Partial<CreateDictionaryItemRequestModel>) {
 		const data = {
 			id: UmbId.new(),
 			parentId,
-			name,
+			name: '',
 			translations: [],
+			...preset,
 		};
 
 		return { data };

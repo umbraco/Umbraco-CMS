@@ -17,7 +17,7 @@ export const handlers = [
 		const data = await req.json();
 		if (!data) return;
 
-		const saved = umbMediaData.save(data);
+		const saved = umbMediaData.save(data.id, data);
 
 		return res(ctx.status(200), ctx.json(saved));
 	}),

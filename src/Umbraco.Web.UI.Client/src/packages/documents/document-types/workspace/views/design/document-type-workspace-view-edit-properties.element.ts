@@ -1,14 +1,11 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
-import { css, html , customElement, property, state , repeat , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbSorterController, UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import {
-	DocumentTypePropertyTypeResponseModel,
-	PropertyTypeResponseModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { UMB_MODAL_CONTEXT_TOKEN, UMB_PROPERTY_SETTINGS_MODAL } from '@umbraco-cms/backoffice/modal';
+import { DocumentTypePropertyTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import './document-type-workspace-view-edit-property.element.js';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 const SORTER_CONFIG: UmbSorterConfig<DocumentTypePropertyTypeResponseModel> = {
@@ -78,9 +75,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper(this);
 
 	@state()
-	_propertyStructure: Array<PropertyTypeResponseModelBaseModel> = [];
-
-	#modalContext?: typeof UMB_MODAL_CONTEXT_TOKEN.TYPE;
+	_propertyStructure: Array<PropertyTypeModelBaseModel> = [];
 
 	constructor() {
 		super();
@@ -90,7 +85,6 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				(workspaceContext as UmbDocumentTypeWorkspaceContext).structure
 			);
 		});
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => (this.#modalContext = instance));
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._propertyStructure = propertyStructure;
 			this.#propertySorter.setModel(this._propertyStructure);
@@ -101,25 +95,15 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		const property = await this._propertyStructureHelper.addProperty(this._containerId);
 		if (!property) return;
 
-		// TODO: Figure out how we from this location can get into the routeable modal..
-		/*
-		// Take id and parse to modal:
-		console.log('property id:', property.id!, property);
-
-		// TODO: route modal..
-		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_SETTINGS_MODAL);
-
-		modalHandler?.onSubmit().then((result) => {
-			console.log(result);
-		});
-		*/
+		// TODO: Figure out how we from this location can get into the route modal, via URL.
+		// The modal is registered by the document-type-workspace-view-edit-property element, therefor a bit hard to get the URL from here.
 	}
 
 	render() {
 		return html`<div id="property-list">
 				${repeat(
 					this._propertyStructure,
-					(property) => property.alias ?? '' + property.containerId ?? '' + (property as any).sortOrder ?? '',
+					(property) => property.id ?? '' + property.containerId ?? '' + (property as any).sortOrder ?? '',
 					(property) =>
 						html`<document-type-workspace-view-edit-property
 							class="property"

@@ -1,19 +1,23 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, CSSResultGroup, html, repeat, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalHandler, UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalContext,
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-backoffice-modal-container')
 export class UmbBackofficeModalContainerElement extends UmbLitElement {
 	@state()
-	private _modals?: UmbModalHandler[];
+	private _modals?: UmbModalContext[];
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 			this._observeModals();
 		});
@@ -30,7 +34,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-modal-container>
-				${this._modals ? repeat(this._modals, (modalHandler) => html`${modalHandler.modalElement}`) : ''}
+				${this._modals ? repeat(this._modals, (modalContext) => html`${modalContext.modalElement}`) : ''}
 			</uui-modal-container>
 		`;
 	}

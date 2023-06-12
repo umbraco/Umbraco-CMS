@@ -1,15 +1,15 @@
 import { UmbTemplateCardElement } from '../template-card/template-card.element.js';
 import { UmbTemplateRepository } from '../../repository/template.repository.js';
-import { css, html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_TEMPLATE_PICKER_MODAL,
 	UMB_TEMPLATE_MODAL,
-	UmbModalContext,
-	UMB_MODAL_CONTEXT_TOKEN,
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { ItemResponseModelBaseModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-input-template')
 export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
@@ -49,12 +49,12 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	_selectedIds: Array<string | null> = [];
-	@property({ type: Array<string | null> })
+	_selectedIds: Array<string> = [];
+	@property({ type: Array<string> })
 	public get selectedIds() {
 		return this._selectedIds;
 	}
-	public set selectedIds(newKeys: Array<string | null>) {
+	public set selectedIds(newKeys: Array<string>) {
 		this._selectedIds = newKeys;
 		this.#observePickedTemplates();
 	}
@@ -67,29 +67,32 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	public set defaultId(newId: string) {
 		this._defaultId = newId;
 		super.value = newId;
+		this.#observePickedTemplates();
 	}
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 	private _templateRepository: UmbTemplateRepository = new UmbTemplateRepository(this);
 
 	@state()
-	_pickedTemplates: TemplateResponseModel[] = [];
+	_pickedTemplates: ItemResponseModelBaseModel[] = [];
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}
 
 	async #observePickedTemplates() {
 		this.observe(
-			await this._templateRepository.itemsLegacy(this._selectedIds),
+			(await this._templateRepository.requestItems(this._selectedIds)).asObservable(),
 			(data) => {
+				const oldValue = this._pickedTemplates;
 				this._pickedTemplates = data;
+				this.requestUpdate('_pickedTemplates', oldValue);
 			},
-			'_templateRepositoryTreeItems'
+			'_observeTemplates'
 		);
 	}
 
@@ -106,14 +109,15 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 
 	#openPicker() {
 		// TODO: Change experience, so its not multi selectable. But instead already picked templates should be unpickable. (awaiting general picker features for such)
-		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
+		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			multiple: true,
 			selection: [...this.selectedIds],
+			pickableFilter: (template: TemplateResponseModel) => template.id !== null,
 		});
 
-		modalHandler?.onSubmit().then((data) => {
+		modalContext?.onSubmit().then((data) => {
 			if (!data.selection) return;
-			this.selectedIds = data.selection;
+			this.selectedIds = data.selection.filter((x) => x !== null) as Array<string>;
 			this.dispatchEvent(new CustomEvent('change'));
 		});
 	}

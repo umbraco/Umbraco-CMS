@@ -75,7 +75,6 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	private _activePath?: string;
 
 	private _observeWorkspaceViews() {
-		// TODO: Make collection as a kind of workspaceEditorView.
 		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfTypes<ManifestWorkspaceEditorView>(['workspaceEditorView', 'workspaceViewCollection'])
@@ -85,7 +84,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			(workspaceViews) => {
 				this._workspaceViews = workspaceViews;
 				this._createRoutes();
-			}
+			},
+			'_observeWorkspaceViews'
 		);
 	}
 
@@ -110,6 +110,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 						return createExtensionElement(manifest);
 					},
 					setup: (component) => {
+						// TODO: We could just always parse it on and instead we should make a element interface for the workspace views.
 						if (this.componentHasManifest(component)) {
 							component.manifest = manifest;
 						}
@@ -130,7 +131,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-body-layout .headline=${this.headline}>
+			<umb-body-layout main-no-padding .headline=${this.headline}>
 				<slot name="header" slot="header"></slot>
 				${this.#renderViews()}
 				<slot name="action-menu" slot="action-menu"></slot>
@@ -152,7 +153,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		return html`
 			${!this.hideNavigation && this._workspaceViews.length > 1
 				? html`
-						<uui-tab-group slot="tabs">
+						<uui-tab-group slot="navigation">
 							${repeat(
 								this._workspaceViews,
 								(view) => view.alias,

@@ -27,6 +27,14 @@ export interface MetaCollectionView {
 	pathName: string;
 }
 
+/**
+ * Condition for when this collection view should be available
+ */
 export interface ConditionsCollectionView {
+	/**
+	 * Type of entity this collection view should be available for
+	 * 
+	 * @examples ["media"]
+	 */
 	entityType: string;
 }

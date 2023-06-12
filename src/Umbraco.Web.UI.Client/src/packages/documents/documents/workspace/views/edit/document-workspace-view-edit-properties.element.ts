@@ -1,9 +1,9 @@
 import { UmbDocumentWorkspaceContext } from '../../document-workspace.context.js';
-import { css, html , customElement, property, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-document-workspace-view-edit-properties')
 export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -26,7 +26,7 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper(this);
 
 	@state()
-	_propertyStructure: Array<PropertyTypeResponseModelBaseModel> = [];
+	_propertyStructure: Array<PropertyTypeModelBaseModel> = [];
 
 	constructor() {
 		super();

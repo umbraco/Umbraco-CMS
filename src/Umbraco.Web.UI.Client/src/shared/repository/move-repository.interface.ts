@@ -1,5 +1,5 @@
-import { UmbRepositoryErrorResponse } from './detail-repository.interface.js';
+import { UmbDataSourceErrorResponse } from './data-source/index.js';
 
 export interface UmbMoveRepository {
-	move(unique: string, targetUnique: string): Promise<UmbRepositoryErrorResponse>;
+	move(unique: string, targetUnique: string): Promise<UmbDataSourceErrorResponse>;
 }

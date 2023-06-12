@@ -71,6 +71,7 @@ export class UmbDataTypeRepository
 		this.#moveSource = new UmbDataTypeMoveServerDataSource(this.#host);
 		this.#copySource = new UmbDataTypeCopyServerDataSource(this.#host);
 
+		// TODO: Make a method that takes the controllers and returns a promise, just to simplify this:
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#detailStore = instance;
@@ -178,13 +179,19 @@ export class UmbDataTypeRepository
 			this.#detailStore?.append(data);
 		}
 
-		return { data, error };
+		return { data, error, asObservable: () => this.#detailStore!.byId(id) };
 	}
 
 	async byId(id: string) {
 		if (!id) throw new Error('Key is missing');
 		await this.#init;
 		return this.#detailStore!.byId(id);
+	}
+
+	async byPropertyEditorUiAlias(propertyEditorUiAlias: string) {
+		if (!propertyEditorUiAlias) throw new Error('propertyEditorUiAlias is missing');
+		await this.#init;
+		return this.#detailStore!.withPropertyEditorUiAlias(propertyEditorUiAlias);
 	}
 
 	async create(dataType: CreateDataTypeRequestModel) {
@@ -220,7 +227,9 @@ export class UmbDataTypeRepository
 			// Consider notify a workspace if a template is updated in the store while someone is editing it.
 			// TODO: would be nice to align the stores on methods/methodNames.
 			// this.#detailStore?.append(dataType);
+			// TODO: This is parsing on the full models to the tree and item store. Those should only contain the data they need. I don't know, at this point, if thats a repository or store responsibility.
 			this.#treeStore?.updateItem(id, updatedDataType);
+			this.#itemStore?.updateItem(id, updatedDataType);
 
 			const notification = { data: { message: `Data Type saved` } };
 			this.#notificationContext?.peek('positive', notification);
@@ -242,6 +251,7 @@ export class UmbDataTypeRepository
 			// TODO: would be nice to align the stores on methods/methodNames.
 			this.#detailStore?.remove([id]);
 			this.#treeStore?.removeItem(id);
+			this.#itemStore?.removeItem(id);
 
 			const notification = { data: { message: `Data Type deleted` } };
 			this.#notificationContext?.peek('positive', notification);

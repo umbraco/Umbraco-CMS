@@ -7,16 +7,18 @@ import {
 	UmbContextToken,
 } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_MODAL_CONTEXT_TOKEN, UmbModalRouteRegistration } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalRouteRegistration } from '@umbraco-cms/backoffice/modal';
 
 const EmptyDiv = document.createElement('div');
+
+type UmbRoutePlusModalKey = UmbRoute & { __modalKey: string };
 
 export class UmbRouteContext {
 	#mainRouter: IRouterSlot;
 	#modalRouter: IRouterSlot;
 	#modalRegistrations: UmbModalRouteRegistration[] = [];
-	#modalContext?: typeof UMB_MODAL_CONTEXT_TOKEN.TYPE;
-	#contextRoutes: UmbRoute[] = [];
+	#modalContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
+	#modalRoutes: UmbRoutePlusModalKey[] = [];
 	#routerBasePath?: string;
 	#routerActiveLocalPath?: string;
 	#activeModalPath?: string;
@@ -25,16 +27,16 @@ export class UmbRouteContext {
 		this.#mainRouter = mainRouter;
 		this.#modalRouter = modalRouter;
 		new UmbContextProviderController(host, UMB_ROUTE_CONTEXT_TOKEN, this);
-		new UmbContextConsumerController(host, UMB_MODAL_CONTEXT_TOKEN, (context) => {
+		new UmbContextConsumerController(host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (context) => {
 			this.#modalContext = context;
-			this.#generateContextRoutes();
+			this.#generateModalRoutes();
 		});
 	}
 
 	public registerModal(registration: UmbModalRouteRegistration) {
 		this.#modalRegistrations.push(registration);
 		this.#generateNewUrlBuilder(registration);
-		this.#generateContextRoutes();
+		this.#generateModalRoutes();
 		return registration;
 	}
 
@@ -42,18 +44,19 @@ export class UmbRouteContext {
 		const index = this.#modalRegistrations.indexOf(registrationToken);
 		if (index === -1) return;
 		this.#modalRegistrations.splice(index, 1);
-		this.#generateContextRoutes();
+		this.#generateModalRoutes();
 	}
 
-	#generateRoute(modalRegistration: UmbModalRouteRegistration): UmbRoute {
+	#generateRoute(modalRegistration: UmbModalRouteRegistration): UmbRoutePlusModalKey {
 		return {
+			__modalKey: modalRegistration.key,
 			path: '/' + modalRegistration.generateModalPath(),
 			component: EmptyDiv,
 			setup: (component, info) => {
 				if (!this.#modalContext) return;
-				const modalHandler = modalRegistration.routeSetup(this.#modalRouter, this.#modalContext, info.match.params);
-				if (modalHandler) {
-					modalHandler.onSubmit().then(
+				const modalContext = modalRegistration.routeSetup(this.#modalRouter, this.#modalContext, info.match.params);
+				if (modalContext) {
+					modalContext.onSubmit().then(
 						() => {
 							this.#removeModalPath(info);
 						},
@@ -72,19 +75,32 @@ export class UmbRouteContext {
 		}
 	}
 
-	#generateContextRoutes() {
-		this.#contextRoutes = this.#modalRegistrations.map((modalRegistration) => {
-			return this.#generateRoute(modalRegistration);
-		});
+	#generateModalRoutes() {
+		const newModals = this.#modalRegistrations.filter(
+			(x) => !this.#modalRoutes.find((route) => x.key === route.__modalKey)
+		);
+		const routesToRemove = this.#modalRoutes.filter(
+			(route) => !this.#modalRegistrations.find((x) => x.key === route.__modalKey)
+		);
+
+		const cleanedRoutes = this.#modalRoutes.filter((route) => !routesToRemove.includes(route));
+
+		this.#modalRoutes = [
+			...cleanedRoutes,
+			...newModals.map((modalRegistration) => {
+				return this.#generateRoute(modalRegistration);
+			}),
+		];
 
 		// Add an empty route, so there is a route for the router to react on when no modals are open.
-		this.#contextRoutes.push({
+		this.#modalRoutes.push({
+			__modalKey: '_empty_',
 			path: '',
 			component: EmptyDiv,
 		});
 
 		// TODO: Should we await one frame, to ensure we don't call back too much?.
-		this.#modalRouter.routes = this.#contextRoutes;
+		this.#modalRouter.routes = this.#modalRoutes;
 		this.#modalRouter.render();
 	}
 

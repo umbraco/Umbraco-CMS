@@ -5,7 +5,7 @@ import {
 	OEmbedStatus,
 	UmbEmbeddedMediaModalData,
 	UmbEmbeddedMediaModalResult,
-	UmbModalHandler,
+	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -27,13 +27,13 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 	#embedResult!: OEmbedResult;
 
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>;
+	modalContext?: UmbModalContext<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>;
 
 	@property({ type: Object })
 	data?: UmbEmbeddedMediaModalData;
 
 	#handleConfirm() {
-		this.modalHandler?.submit({
+		this.modalContext?.submit({
 			preview: this.#embedResult.markup,
 			originalWidth: this._model.width,
 			originalHeight: this._model.originalHeight,
@@ -43,7 +43,7 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 	}
 
 	#handleCancel() {
-		this.modalHandler?.reject();
+		this.modalContext?.reject();
 	}
 
 	@state()

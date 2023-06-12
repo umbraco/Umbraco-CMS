@@ -4,7 +4,7 @@ import {
 	UmbHealthCheckDashboardContext,
 } from '../health-check-dashboard.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { ensureSlash, path } from '@umbraco-cms/backoffice/router';
 import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extension-registry';
 import { HealthCheckGroupWithResultResponseModel, StatusResultTypeModel } from '@umbraco-cms/backoffice/backend-api';

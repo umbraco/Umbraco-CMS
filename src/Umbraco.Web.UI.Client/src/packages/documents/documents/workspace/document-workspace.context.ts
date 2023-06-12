@@ -9,6 +9,7 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import type { CreateDocumentRequestModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
+	appendToFrozenArray,
 	partialUpdateFrozenArray,
 	UmbObjectState,
 	UmbObserverController,
@@ -53,15 +54,7 @@ export class UmbDocumentWorkspaceContext
 		new UmbObserverController(this.host, this.documentTypeKey, (id) => this.structure.loadType(id));
 
 		/*
-		TODO: Concept for ensure variant values:
-		new UmbObserverController(this.host, this.variants, (variants) => {
-			if (!variants) return;
-			const draft = this.#draft.getValue();
-			if (!draft) return;
-
-			// Gather all properties from all document types.
-			// Loop through all properties for each variant and insert missing value objects.
-		}
+		TODO: Make something to ensure all variants are present in data? Seems like a good idea?.
 		*/
 	}
 
@@ -75,8 +68,8 @@ export class UmbDocumentWorkspaceContext
 		return data || undefined;
 	}
 
-	async createScaffold(documentTypeKey: string) {
-		const { data } = await this.repository.createScaffold(documentTypeKey);
+	async create(documentTypeKey: string, parentId: string | null) {
+		const { data } = await this.repository.createScaffold(documentTypeKey, { parentId });
 		if (!data) return undefined;
 
 		this.setIsNew(true);
@@ -101,6 +94,10 @@ export class UmbDocumentWorkspaceContext
 
 	getEntityType() {
 		return 'document';
+	}
+
+	getContentTypeId() {
+		return this.getData().contentTypeId;
 	}
 
 	getVariant(variantId: UmbVariantId) {
@@ -155,12 +152,12 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 	setPropertyValue(alias: string, value: unknown, variantId?: UmbVariantId) {
-		const partialEntry = { value };
+		const entry = { $type: 'DocumentValueModel', ...variantId?.toObject(), alias, value };
 		const currentData = this.#draft.value;
 		if (currentData) {
-			const values = partialUpdateFrozenArray(
+			const values = appendToFrozenArray(
 				currentData.values || [],
-				partialEntry,
+				entry,
 				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true)
 			);
 			this.#draft.update({ values });
@@ -174,12 +171,14 @@ export class UmbDocumentWorkspaceContext
 		if (this.getIsNew()) {
 			// TODO: typescript hack until we get the create type
 			const value = this.#draft.value as CreateDocumentRequestModel & { id: string };
-			await this.repository.create(value);
+			if ((await this.repository.create(value)).data !== undefined) {
+				this.setIsNew(false);
+			}
 		} else {
 			await this.repository.save(this.#draft.value.id, this.#draft.value);
 		}
-		// If it went well, then its not new anymore?.
-		this.setIsNew(false);
+
+		this.saveComplete(this.getData());
 	}
 
 	async delete(id: string) {

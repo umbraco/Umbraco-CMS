@@ -2,6 +2,7 @@ export * from './workspace-action/index.js';
 export * from './workspace-action-menu/index.js';
 export * from './workspace-editor/index.js';
 export * from './workspace-footer/index.js';
+export * from './workspace-modal/index.js';
 export * from './workspace-context/index.js';
 export * from './workspace-variant/index.js';
 export * from './workspace-split-view-manager.class.js';

@@ -2,10 +2,7 @@ import {
 	PropertyContainerTypes,
 	UmbContentTypePropertyStructureManager,
 } from './content-type-structure-manager.class.js';
-import {
-	DocumentTypePropertyTypeResponseModel,
-	PropertyTypeResponseModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { DocumentTypePropertyTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
@@ -116,7 +113,7 @@ export class UmbContentTypePropertyStructureHelper {
 		return await this.#structure.createProperty(null, ownerId, sortOrder);
 	}
 
-	async insertProperty(property: PropertyTypeResponseModelBaseModel, sortOrder = 0) {
+	async insertProperty(property: PropertyTypeModelBaseModel, sortOrder = 0) {
 		await this.#init;
 		if (!this.#structure) return false;
 
@@ -139,7 +136,6 @@ export class UmbContentTypePropertyStructureHelper {
 	async partialUpdateProperty(propertyKey?: string, partialUpdate?: Partial<DocumentTypePropertyTypeResponseModel>) {
 		await this.#init;
 		if (!this.#structure || !propertyKey || !partialUpdate) return;
-
 		return await this.#structure.updateProperty(null, propertyKey, partialUpdate);
 	}
 }

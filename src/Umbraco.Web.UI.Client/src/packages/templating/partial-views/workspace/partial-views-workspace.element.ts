@@ -1,6 +1,6 @@
 import { UmbPartialViewsWorkspaceContext } from './partial-views-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbRoute, IRoutingInfo, PageComponent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 
@@ -22,7 +22,7 @@ export class UmbPartialViewsWorkspaceElement extends UmbLitElement {
 			component: () => this.#element,
 			setup: async (component: PageComponent, info: IRoutingInfo) => {
 				const parentKey = info.match.params.parentKey;
-				this.#partialViewsWorkspaceContext.createScaffold(parentKey);
+				this.#partialViewsWorkspaceContext.create(parentKey);
 			},
 		},
 		{

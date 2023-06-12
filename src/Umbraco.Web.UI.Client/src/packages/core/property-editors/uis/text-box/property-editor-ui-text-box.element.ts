@@ -1,4 +1,4 @@
-import { css, html , customElement, property, state , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -30,7 +30,7 @@ export class UmbPropertyEditorUITextBoxElement extends UmbLitElement implements 
 
 	render() {
 		return html`<uui-input
-			.value=${this.value}
+			.value=${this.value ?? ''}
 			type="${this._type}"
 			maxlength="${ifDefined(this._maxChars)}"
 			@input=${this.onInput}></uui-input>`;

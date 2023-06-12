@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, LitElement , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, LitElement, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-workspace-package')
 export class UmbWorkspacePackageElement extends LitElement {

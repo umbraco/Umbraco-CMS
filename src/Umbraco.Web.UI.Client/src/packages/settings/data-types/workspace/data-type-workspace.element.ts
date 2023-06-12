@@ -1,6 +1,6 @@
 import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -12,14 +12,13 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 
 	#element = document.createElement('umb-data-type-workspace-editor');
 
-	@state()
-	_routes: UmbRoute[] = [
+	private _routes: UmbRoute[] = [
 		{
 			path: 'create/:parentId',
 			component: () => this.#element,
 			setup: (_component, info) => {
 				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
-				this.#workspaceContext.createScaffold(parentId);
+				this.#workspaceContext.create(parentId);
 			},
 		},
 		{
@@ -36,7 +35,7 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
 
-	static styles = [UUITextStyles, css``];
+	static styles = [UUITextStyles];
 }
 
 export default UmbDataTypeWorkspaceElement;

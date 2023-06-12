@@ -5,28 +5,28 @@ import 'element-internals-polyfill';
 import '@umbraco-ui/uui';
 
 import { html } from 'lit';
-import { initialize, mswDecorator } from 'msw-storybook-addon';
 import { setCustomElements } from '@storybook/web-components';
 
+import { startMockServiceWorker } from '../src/mocks';
+
+import { UMB_MODAL_CONTEXT_TOKEN, UmbModalManagerContext } from '../src/packages/core/modal';
 import { UmbDataTypeStore } from '../src/packages/settings/data-types/repository/data-type.store.ts';
-import { UmbDocumentTypeStore } from '../src/packages/documents/document-types/repository/document-type.store.ts';
 import { UmbDocumentStore } from '../src/packages/documents/documents/repository/document.store.ts';
 import { UmbDocumentTreeStore } from '../src/packages/documents/documents/repository/document.tree.store.ts';
-
-import customElementManifests from '../dist-cms/custom-elements.json';
-import { UmbIconRegistry } from '../src/shared/icon-registry/icon.registry';
-import { onUnhandledRequest } from '../src/mocks';
-import { handlers } from '../src/mocks/browser-handlers';
-import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../src/packages/core/modal';
-import { UmbLitElement } from '../src/shared/lit-element';
-
+import { UmbDocumentTypeStore } from '../src/packages/documents/document-types/repository/document-type.store.ts';
 import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
+import { UmbIconRegistry } from '../src/shared/icon-registry/icon.registry';
+import { UmbLitElement } from '../src/shared/lit-element';
+import customElementManifests from '../dist-cms/custom-elements.json';
 
 import '../src/libs/context-api/provide/context-provider.element';
 import '../src/libs/controller-api/controller-host-initializer.element.ts';
 import '../src/packages/core/components';
 
 import { manifests as documentManifests } from '../src/packages/documents';
+
+// MSW
+startMockServiceWorker({ serviceWorker: { url: (import.meta.env.VITE_BASE_PATH ?? '/') + 'mockServiceWorker.js' } });
 
 class UmbStoryBookElement extends UmbLitElement {
 	_umbIconRegistry = new UmbIconRegistry();
@@ -35,7 +35,7 @@ class UmbStoryBookElement extends UmbLitElement {
 		super();
 		this._umbIconRegistry.attach(this);
 		this._registerExtensions(documentManifests);
-		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
+		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalManagerContext(this));
 	}
 
 	_registerExtensions(manifests) {
@@ -79,12 +79,8 @@ const documentTreeStoreProvider = (story) => html`
 	>
 `;
 
-// Initialize MSW
-initialize({ onUnhandledRequest });
-
 // Provide the MSW addon decorator globally
 export const decorators = [
-	mswDecorator,
 	storybookProvider,
 	documentStoreProvider,
 	documentTreeStoreProvider,
@@ -127,11 +123,6 @@ export const parameters = {
 		matchers: {
 			color: /(background|color)$/i,
 			date: /Date$/,
-		},
-	},
-	msw: {
-		handlers: {
-			global: handlers,
 		},
 	},
 	backgrounds: {
