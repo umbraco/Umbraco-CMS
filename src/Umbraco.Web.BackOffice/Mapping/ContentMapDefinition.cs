@@ -152,6 +152,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.IsChildOfListView = source.IsChildOfListView;
         target.IsContainer = source.IsContainer;
         target.IsElement = source.IsElement;
+        target.IsAlternateVersion = source.IsAlternateVersion;
         target.Key = source.Key;
         target.Owner = source.Owner;
         target.ParentId = source.ParentId;
@@ -231,6 +232,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.IsChildOfListView = source.IsChildOfListView;
         target.IsContainer = source.IsContainer;
         target.IsElement = source.IsElement;
+        target.IsAlternateVersion = source.IsAlternateVersion;
         target.Key = source.Key;
         target.Owner = source.Owner;
         target.ParentId = source.ParentId;
@@ -285,6 +287,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.IsChildOfListView = DetermineIsChildOfListView(source, parent, context);
         target.IsContainer = source.ContentType.IsContainer;
         target.IsElement = source.ContentType.IsElement;
+        target.IsAlternateVersion = source.IsAlternateVersion;
         target.Key = source.Key;
         target.Owner = _commonMapper.GetOwner(source, context);
         target.ParentId = source.ParentId;

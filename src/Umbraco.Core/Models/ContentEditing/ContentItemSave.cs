@@ -24,6 +24,9 @@ public class ContentItemSave : IContentSave<IContent>
     [Required]
     public int VersionId { get; set; }
 
+    [DataMember(Name = "isAlternateVersion")]
+    [Required]
+    public bool IsAlternateVersion { get; set; }
 
     [DataMember(Name = "parentId", IsRequired = true)]
     [Required]

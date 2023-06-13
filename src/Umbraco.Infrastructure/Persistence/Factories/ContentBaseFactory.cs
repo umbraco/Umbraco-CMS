@@ -277,6 +277,7 @@ internal class ContentBaseFactory
             Current = true, // always building the current one
             Text = entity.Name,
             ContentDto = contentDto,
+            Alternate = entity.IsAlternateVersion,
         };
 
         return dto;

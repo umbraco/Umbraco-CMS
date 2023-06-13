@@ -369,6 +369,7 @@
                     contentTypeAlias: displayModel.contentTypeAlias,
                     parentId: displayModel.parentId,
                     versionId: displayModel.versionId,
+                    isAlternateVersion: displayModel.isAlternateVersion,
                     //set the action on the save model
                     action: action,
                     variants: _.map(displayModel.variants, function (v) {

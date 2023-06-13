@@ -107,6 +107,12 @@ public class ContentItemDisplay<TVariant> :
     public bool IsChildOfListView { get; set; }
 
     /// <summary>
+    ///     Indicates this item is not the current draft
+    /// </summary>
+    [DataMember(Name = "isAlternateVersion")]
+    public bool IsAlternateVersion { get; set; }
+
+    /// <summary>
     ///     Property for the entity's individual tree node URL
     /// </summary>
     /// <remarks>

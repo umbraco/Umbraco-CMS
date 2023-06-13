@@ -55,13 +55,14 @@ internal class ContentItemBinder : IModelBinder
         }
 
         IContent? persistedContent =
-            ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
+            ContentControllerBase.IsCreatingAction(model.Action) || (model.IsAlternateVersion && model.VersionId == 0) ? CreateNew(model) : GetExisting(model);
         BindModel(model, persistedContent!, _modelBinderHelper, _umbracoMapper);
 
         bindingContext.Result = ModelBindingResult.Success(model);
     }
 
-    protected virtual IContent? GetExisting(ContentItemSave model) => _contentService.GetVersion(model.VersionId);
+    protected virtual IContent? GetExisting(ContentItemSave model) =>
+        model.IsAlternateVersion ? _contentService.GetVersion(model.VersionId) : _contentService.GetById(model.Id);
 
     private IContent CreateNew(ContentItemSave model)
     {
@@ -81,6 +82,7 @@ internal class ContentItemBinder : IModelBinder
         ContentModelBinderHelper modelBinderHelper, IUmbracoMapper umbracoMapper)
     {
         model.PersistedContent = persistedContent;
+        model.PersistedContent.IsAlternateVersion = model.IsAlternateVersion;
 
         //create the dto from the persisted model
         if (model.PersistedContent != null)

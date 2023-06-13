@@ -356,6 +356,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             // get properties - indexed by version id
             var versionId = dto.DocumentVersionDto.Id;
 
+            content.IsAlternateVersion = dto.DocumentVersionDto.ContentVersionDto.Alternate;
+
             // TODO: shall we get published properties or not?
             //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
             var publishedVersionId = dto.PublishedVersionDto?.Id ?? 0;

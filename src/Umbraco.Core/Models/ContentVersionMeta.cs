@@ -45,6 +45,8 @@ public class ContentVersionMeta
 
     public bool PreventCleanup { get; }
 
+    public bool AlternateVersion { get; }
+
     public string? Username { get; }
 
     public override string ToString() => $"ContentVersionMeta(versionId: {VersionId}, versionDate: {VersionDate:s}";
