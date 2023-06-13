@@ -3,18 +3,31 @@ const { rest } = window.MockServiceWorker;
 import { umbUsersData } from '../data/users.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
-let isAuthenticated = true;
 const slug = '/user';
 
 export const handlers = [
-	rest.get(umbracoPath(`${slug}`), (req, res, ctx) => {
+	rest.get(umbracoPath(`${slug}/filter`), (req, res, ctx) => {
+		//TODO: Implementer filter
 		const response = umbUsersData.getAll();
 
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get(umbracoPath(`${slug}/filter`), (req, res, ctx) => {
-		//TODO: Implementer filter
+	rest.get(umbracoPath(`${slug}/current`), (_req, res, ctx) => {
+		const loggedInUser = umbUsersData.getCurrentUser();
+		return res(ctx.status(200), ctx.json(loggedInUser));
+	}),
+
+	rest.get(umbracoPath(`${slug}/sections`), (_req, res, ctx) => {
+		return res(
+			ctx.status(200),
+			ctx.json({
+				sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Settings', 'My.Section.Custom'],
+			})
+		);
+	}),
+
+	rest.get(umbracoPath(`${slug}`), (req, res, ctx) => {
 		const response = umbUsersData.getAll();
 
 		return res(ctx.status(200), ctx.json(response));
@@ -39,52 +52,5 @@ export const handlers = [
 		const saved = umbUsersData.save(id, data);
 
 		return res(ctx.status(200), ctx.json(saved));
-	}),
-	rest.post(umbracoPath('/user/login'), (_req, res, ctx) => {
-		// Persist user's authentication in the session
-		isAuthenticated = true;
-		return res(
-			// Respond with a 200 status code
-			ctx.status(201)
-		);
-	}),
-
-	rest.post(umbracoPath('/user/logout'), (_req, res, ctx) => {
-		// Persist user's authentication in the session
-		isAuthenticated = false;
-		return res(
-			// Respond with a 200 status code
-			ctx.status(201)
-		);
-	}),
-
-	rest.get(umbracoPath('/user'), (_req, res, ctx) => {
-		// Check if the user is authenticated in this session
-		if (!isAuthenticated) {
-			// If not authenticated, respond with a 403 error
-			return res(
-				ctx.status(403),
-				ctx.json({
-					errorMessage: 'Not authorized',
-				})
-			);
-		}
-		// If authenticated, return a mocked user details
-		return res(
-			ctx.status(200),
-			ctx.json({
-				username: 'admin',
-				role: 'administrator',
-			})
-		);
-	}),
-
-	rest.get(umbracoPath('/user/sections'), (_req, res, ctx) => {
-		return res(
-			ctx.status(200),
-			ctx.json({
-				sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Settings', 'My.Section.Custom'],
-			})
-		);
 	}),
 ];
