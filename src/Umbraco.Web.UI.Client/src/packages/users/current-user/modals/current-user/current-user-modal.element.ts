@@ -1,6 +1,4 @@
-import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user.store.js';
-import type { UmbLoggedInUser } from '../../types.js';
-import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { UMB_APP } from '@umbraco-cms/backoffice/context';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, CSSResultGroup, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -15,8 +13,6 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	@state()
 	private _currentUser?: UmbLoggedInUser;
 
-	private _currentUserStore?: UmbCurrentUserStore;
-
 	#auth?: typeof UMB_AUTH.TYPE;
 
 	#appContext?: typeof UMB_APP.TYPE;
@@ -24,8 +20,8 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (instance) => {
-			this._currentUserStore = instance;
+		this.consumeContext(UMB_AUTH, (instance) => {
+			this.#auth = instance;
 			this._observeCurrentUser();
 		});
 
@@ -41,9 +37,9 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	}
 
 	private async _observeCurrentUser() {
-		if (!this._currentUserStore) return;
+		if (!this.#auth) return;
 
-		this.observe(this._currentUserStore.currentUser, (currentUser) => {
+		this.observe(this.#auth.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}

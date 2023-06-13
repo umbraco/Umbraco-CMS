@@ -1,4 +1,3 @@
-import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store.js';
 import { getLookAndColorFromUserStatus } from '../../utils.js';
 import { UmbUserRepository } from '../repository/user.repository.js';
 import { UmbUserGroupInputElement } from '../../user-groups/components/input-user-group/user-group-input.element.js';
@@ -24,16 +23,17 @@ import { UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backe
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 
 @customElement('umb-user-workspace-editor')
 export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	@state()
-	private _currentUser?: any;
+	private _currentUser?: UmbLoggedInUser;
 
 	@state()
 	private _user?: UserResponseModel;
 
-	#currentUserStore?: UmbCurrentUserStore;
+	#auth?: typeof UMB_AUTH.TYPE;
 	#modalContext?: UmbModalManagerContext;
 	#languages = []; //TODO Add languages
 	#workspaceContext?: UmbUserWorkspaceContext;
@@ -43,8 +43,8 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (store) => {
-			this.#currentUserStore = store;
+		this.consumeContext(UMB_AUTH, (instance) => {
+			this.#auth = instance;
 			this.#observeCurrentUser();
 		});
 
@@ -76,8 +76,8 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#observeCurrentUser() {
-		if (!this.#currentUserStore) return;
-		this.observe(this.#currentUserStore.currentUser, (currentUser) => (this._currentUser = currentUser));
+		if (!this.#auth) return;
+		this.observe(this.#auth.currentUser, (currentUser) => (this._currentUser = currentUser));
 	}
 
 	#onUserStatusChange() {

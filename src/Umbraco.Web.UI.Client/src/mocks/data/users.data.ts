@@ -1,3 +1,4 @@
+import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { UmbData } from './data.js';
 import { PagedUserResponseModel, UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -16,6 +17,25 @@ class UmbUsersData extends UmbData<UserResponseModel> {
 
 	getById(id: string): UserResponseModel | undefined {
 		return this.data.find((user) => user.id === id);
+	}
+
+	getCurrentUser(): UmbLoggedInUser {
+		const firstUser = this.data[0];
+
+		return {
+			$type: 'CurrentUserResponseModel',
+			id: firstUser.id,
+			name: firstUser.name,
+			email: firstUser.email,
+			userName: firstUser.email,
+			avatarUrls: [],
+			hasAccessToAllLanguages: true,
+			languageIsoCode: firstUser.languageIsoCode,
+			languages: [],
+			contentStartNodeIds: firstUser.contentStartNodeIds,
+			mediaStartNodeIds: firstUser.mediaStartNodeIds,
+			permissions: [],
+		};
 	}
 
 	save(id: string, saveItem: UserResponseModel) {
@@ -96,9 +116,9 @@ export const data: Array<UserResponseModel & { type: string }> = [
 		$type: 'UserResponseModel',
 		contentStartNodeIds: [],
 		mediaStartNodeIds: [],
-		name: 'Erny Baptista',
-		email: 'ebaptista1@csmonitor.com',
-		languageIsoCode: 'Kannada',
+		name: 'Umbraco User',
+		email: 'noreply@umbraco.com',
+		languageIsoCode: 'en-US',
 		state: UserStateModel.ACTIVE,
 		lastLoginDate: '9/10/2022',
 		lastLockoutDate: '11/23/2021',

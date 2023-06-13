@@ -3,7 +3,6 @@ import { manifests as userManifests } from './users/manifests.js';
 import { manifests as userSectionManifests } from './user-section/manifests.js';
 import { manifests as currentUserManifests } from './current-user/manifests.js';
 
-import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './current-user/current-user.store.js';
 import {
 	UmbCurrentUserHistoryStore,
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
@@ -21,7 +20,6 @@ export const manifests = [...userGroupManifests, ...userManifests, ...userSectio
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	extensionRegistry.registerMany(manifests);
 
-	new UmbContextProviderController(host, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());
 	new UmbUserItemStore(host);
 	new UmbUserGroupItemStore(host);
 	new UmbContextProviderController(

@@ -13,7 +13,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-import type { IUmbAuth } from './auth.interface.js';
 import {
 	BaseTokenRequestHandler,
 	BasicQueryStringUtils,
@@ -81,7 +80,7 @@ class UmbNoHashQueryStringUtils extends BasicQueryStringUtils {
  *   a. This will redirect the user to the authorization endpoint of the server
  * 4. After login, get the latest token before each request to the server by calling the `performWithFreshTokens` method
  */
-export class UmbAuthFlow implements IUmbAuth {
+export class UmbAuthFlow {
 	// handlers
 	readonly #notifier: AuthorizationNotifier;
 	readonly #authorizationHandler: RedirectRequestHandler;
@@ -164,7 +163,6 @@ export class UmbAuthFlow implements IUmbAuth {
 			if (response.isValid()) {
 				this.#accessTokenResponse = response;
 				this.#refreshToken = this.#accessTokenResponse.refreshToken;
-				return;
 			}
 		}
 
@@ -225,7 +223,7 @@ export class UmbAuthFlow implements IUmbAuth {
 	}
 
 	/**
-	 * This method will check if the user is logged in by validting the timestamp of the stored token.
+	 * This method will check if the user is logged in by validating the timestamp of the stored token.
 	 * If no token is stored, it will return false.
 	 *
 	 * @returns true if the user is logged in, false otherwise.
