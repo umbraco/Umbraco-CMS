@@ -1090,6 +1090,12 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             throw new InvalidOperationException("Cannot save a non-current or non-alternate version.");
         }
 
+        // alt version is never current
+        if (entity.IsAlternateVersion)
+        {
+            version.Current = false;
+        }
+
         // update
         entity.UpdatingEntity();
 
@@ -1114,6 +1120,17 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                     .Where<DocumentVersionDto>(x => x.Id == entity.PublishedVersionId));
             }
 
+            // similarly, if publishing an alternate, there should be only one
+            // current version, which is set later
+            // this sets the current to false, and marks it as an alternate so
+            // that it can be loaded for editing
+            if (publishing && entity.IsAlternateVersion)
+            {
+                Database.Execute(Sql()
+                    .Update<ContentVersionDto>(u => u.Set(x => x.Current, false).Set(x => x.Alternate, true))
+                    .Where<ContentVersionDto>(x => x.NodeId == entity.Id && x.Current == true));
+            }
+
             // sanitize names
             SanitizeNames(entity, publishing);
 
@@ -1136,6 +1153,14 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
         // update the node dto
         NodeDto nodeDto = dto.ContentDto.NodeDto;
+
+        // don't update node name when saving an alternate
+        // only update on publishing
+        if (version.Alternate && !publishing)
+        {
+            nodeDto.Text = version.Text;
+        }
+
         nodeDto.ValidatePathWithException();
         Database.Update(nodeDto);
 
@@ -1151,6 +1176,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             {
                 documentVersionDto.Published = true; // now published
                 contentVersionDto.Current = false; // no more current
+                contentVersionDto.Alternate = false; // no longer alternate since it is published
             }
 
             // Ensure existing version retains current preventCleanup flag (both saving and publishing).
@@ -1166,6 +1192,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
                 contentVersionDto.Id = 0; // want a new id
                 contentVersionDto.Current = true; // current version
+                contentVersionDto.Alternate = false; // no longer alternate once published
                 contentVersionDto.Text = entity.Name;
                 contentVersionDto.PreventCleanup = false; // new draft version disregards prevent cleanup flag
                 Database.Insert(contentVersionDto);

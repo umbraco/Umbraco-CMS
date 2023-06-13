@@ -266,6 +266,8 @@ internal class ContentBaseFactory
 
     // always build the current / VersionPk dto
     // we're never going to build / save old versions (which are immutable)
+    // UNLESS we're building an alternate version, which is mutable until it is published
+
     private static ContentVersionDto BuildContentVersionDto(IContentBase entity, ContentDto contentDto)
     {
         var dto = new ContentVersionDto
@@ -274,7 +276,7 @@ internal class ContentBaseFactory
             NodeId = entity.Id,
             VersionDate = entity.UpdateDate,
             UserId = entity.WriterId,
-            Current = true, // always building the current one
+            Current = !entity.IsAlternateVersion, // always building the current one when not alternate
             Text = entity.Name,
             ContentDto = contentDto,
             Alternate = entity.IsAlternateVersion,
