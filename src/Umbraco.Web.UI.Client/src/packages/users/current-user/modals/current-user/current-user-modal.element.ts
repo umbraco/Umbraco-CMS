@@ -13,8 +13,6 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	@state()
 	private _currentUser?: UmbLoggedInUser;
 
-	private _auth?: typeof UMB_AUTH.TYPE;
-
 	#auth?: typeof UMB_AUTH.TYPE;
 
 	#appContext?: typeof UMB_APP.TYPE;
@@ -23,7 +21,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_AUTH, (instance) => {
-			this._auth = instance;
+			this.#auth = instance;
 			this._observeCurrentUser();
 		});
 
@@ -39,9 +37,9 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	}
 
 	private async _observeCurrentUser() {
-		if (!this._auth) return;
+		if (!this.#auth) return;
 
-		this.observe(this._auth.currentUser, (currentUser) => {
+		this.observe(this.#auth.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}
