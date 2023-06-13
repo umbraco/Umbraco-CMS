@@ -7,7 +7,7 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { ReplaySubject } from '@umbraco-cms/backoffice/external/rxjs';
 
-export class UmbAuthStore implements IUmbAuth {
+export class UmbAuthContext implements IUmbAuth {
 	#currentUser = new UmbObjectState<UmbLoggedInUser | undefined>(undefined);
 	readonly currentUser = this.#currentUser.asObservable();
 	readonly isLoggedIn = new ReplaySubject<boolean>(1);
