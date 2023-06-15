@@ -9,69 +9,56 @@ namespace Umbraco.Cms.Core;
 public static class Enum<T>
     where T : struct
 {
-    private static readonly List<T> Values;
-    private static readonly Dictionary<string, T> InsensitiveNameToValue;
-    private static readonly Dictionary<string, T> SensitiveNameToValue;
-    private static readonly Dictionary<int, T> IntToValue;
-    private static readonly Dictionary<T, string> ValueToName;
+    private static readonly List<T> _values;
+    private static readonly Dictionary<string, T> _insensitiveNameToValue;
+    private static readonly Dictionary<string, T> _sensitiveNameToValue;
+    private static readonly Dictionary<int, T> _intToValue;
+    private static readonly Dictionary<T, string> _valueToName;
 
     static Enum()
     {
-        Values = Enum.GetValues(typeof(T)).Cast<T>().ToList();
+        _values = Enum.GetValues(typeof(T)).Cast<T>().ToList();
 
-        IntToValue = new Dictionary<int, T>();
-        ValueToName = new Dictionary<T, string>();
-        SensitiveNameToValue = new Dictionary<string, T>();
-        InsensitiveNameToValue = new Dictionary<string, T>();
+        _intToValue = new Dictionary<int, T>();
+        _valueToName = new Dictionary<T, string>();
+        _sensitiveNameToValue = new Dictionary<string, T>();
+        _insensitiveNameToValue = new Dictionary<string, T>(StringComparer.InvariantCultureIgnoreCase);
 
-        foreach (T value in Values)
+        foreach (T value in _values)
         {
-            var name = value.ToString();
+            string? name = value.ToString();
 
-            IntToValue[Convert.ToInt32(value)] = value;
-            ValueToName[value] = name!;
-            SensitiveNameToValue[name!] = value;
-            InsensitiveNameToValue[name!.ToLowerInvariant()] = value;
+            _intToValue[Convert.ToInt32(value)] = value;
+            _valueToName[value] = name!;
+            _sensitiveNameToValue[name!] = value;
+            _insensitiveNameToValue[name!] = value;
         }
     }
 
-    public static bool IsDefined(T value) => ValueToName.Keys.Contains(value);
+    public static bool IsDefined(T value) => _valueToName.ContainsKey(value);
 
-    public static bool IsDefined(string value) => SensitiveNameToValue.Keys.Contains(value);
+    public static bool IsDefined(string value) => _sensitiveNameToValue.ContainsKey(value);
 
-    public static bool IsDefined(int value) => IntToValue.Keys.Contains(value);
+    public static bool IsDefined(int value) => _intToValue.ContainsKey(value);
 
-    public static IEnumerable<T> GetValues() => Values;
+    public static IEnumerable<T> GetValues() => _values;
 
-    public static string[] GetNames() => ValueToName.Values.ToArray();
+    public static string[] GetNames() => _valueToName.Values.ToArray();
 
-    public static string? GetName(T value) => ValueToName.TryGetValue(value, out var name) ? name : null;
+    public static string? GetName(T value) => _valueToName.TryGetValue(value, out string? name) ? name : null;
 
     public static T Parse(string value, bool ignoreCase = false)
     {
-        Dictionary<string, T> names = ignoreCase ? InsensitiveNameToValue : SensitiveNameToValue;
-        if (ignoreCase)
-        {
-            value = value.ToLowerInvariant();
-        }
+        Dictionary<string, T> names = ignoreCase ? _insensitiveNameToValue : _sensitiveNameToValue;
 
-        if (names.TryGetValue(value, out T parsed))
-        {
-            return parsed;
-        }
+        return names.TryGetValue(value, out T parsed) ? parsed : Throw();
 
-        throw new ArgumentException(
-            $"Value \"{value}\"is not a valid {typeof(T).Name} enumeration value.",
-            nameof(value));
+        T Throw() => throw new ArgumentException($"Value \"{value}\"is not a valid {typeof(T).Name} enumeration value.", nameof(value));
     }
 
     public static bool TryParse(string value, out T returnValue, bool ignoreCase = false)
     {
-        Dictionary<string, T> names = ignoreCase ? InsensitiveNameToValue : SensitiveNameToValue;
-        if (ignoreCase)
-        {
-            value = value.ToLowerInvariant();
-        }
+        Dictionary<string, T> names = ignoreCase ? _insensitiveNameToValue : _sensitiveNameToValue;
 
         return names.TryGetValue(value, out returnValue);
     }
@@ -83,7 +70,7 @@ public static class Enum<T>
             return null;
         }
 
-        if (InsensitiveNameToValue.TryGetValue(value.ToLowerInvariant(), out T parsed))
+        if (_insensitiveNameToValue.TryGetValue(value, out T parsed))
         {
             return parsed;
         }
@@ -93,7 +80,7 @@ public static class Enum<T>
 
     public static T? CastOrNull(int value)
     {
-        if (IntToValue.TryGetValue(value, out T foundValue))
+        if (_intToValue.TryGetValue(value, out T foundValue))
         {
             return foundValue;
         }
