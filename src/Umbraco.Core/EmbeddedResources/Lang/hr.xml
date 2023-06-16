@@ -479,7 +479,7 @@
     <key alias="insertlink">Umetni link</key>
     <key alias="insertMacro">Klikni za dodavanje makro</key>
     <key alias="inserttable">Umetni tablicu</key>
-    <key alias="languagedeletewarning">Ovo će obrisati jezik</key>
+    <key alias="languagedeletewarning">Ovo će izbrisati jezik i sav sadržaj povezan s jezikom</key>
     <key alias="languageChangeWarning">Promjena kulture jezika može biti skupa operacija i rezultirat će promjenama u predmemoriji sadržaja i indeksima koji se rekonstruiraju
     </key>
     <key alias="lastEdited">Zadnje uređivano</key>
