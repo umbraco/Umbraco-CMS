@@ -34,7 +34,7 @@ public class ContentBuilderTests : DeliveryApiTests
             .Setup(p => p.GetUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns((IPublishedContent content, UrlMode mode, string? culture, Uri? current) => $"url:{content.UrlSegment}");
 
-        var routeBuilder = new ApiContentRouteBuilder(publishedUrlProvider.Object, CreateGlobalSettings(), Mock.Of<IVariationContextAccessor>(), Mock.Of<IPublishedSnapshotAccessor>());
+        var routeBuilder = CreateContentRouteBuilder(publishedUrlProvider.Object, CreateGlobalSettings());
 
         var builder = new ApiContentBuilder(new ApiContentNameProvider(), routeBuilder, CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(content.Object);

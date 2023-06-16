@@ -1,4 +1,4 @@
-﻿using Umbraco.New.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
@@ -14,10 +14,11 @@ public interface IApiContentQueryProvider
     /// <param name="filterOptions">The filter options of the search criteria.</param>
     /// <param name="sortOptions">The sorting options of the search criteria.</param>
     /// <param name="culture">The requested culture.</param>
+    /// <param name="preview">Whether or not to search for preview content.</param>
     /// <param name="skip">Number of search results to skip (for pagination).</param>
     /// <param name="take">Number of search results to retrieve (for pagination).</param>
     /// <returns>A paged model containing the resulting IDs and the total number of results that matching the search criteria.</returns>
-    PagedModel<Guid> ExecuteQuery(SelectorOption selectorOption, IList<FilterOption> filterOptions, IList<SortOption> sortOptions, string culture, int skip, int take);
+    PagedModel<Guid> ExecuteQuery(SelectorOption selectorOption, IList<FilterOption> filterOptions, IList<SortOption> sortOptions, string culture, bool preview, int skip, int take);
 
     /// <summary>
     ///     Returns a selector option that can be applied to fetch "all content" (i.e. if a selector option is not present when performing a search).

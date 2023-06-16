@@ -322,7 +322,7 @@ internal class Property : PublishedPropertyBase
             // initial reference cache level always is .Content
             const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
 
-            object? GetDeliveryApiObject() => PropertyType.ConvertInterToDeliveryApiObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
+            object? GetDeliveryApiObject() => PropertyType.ConvertInterToDeliveryApiObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing, expanding);
             value = expanding
                 ? GetDeliveryApiExpandedObject(cacheValues, GetDeliveryApiObject)
                 : GetDeliveryApiDefaultObject(cacheValues, GetDeliveryApiObject);

@@ -91,7 +91,10 @@ public class ReportSiteTask : RecurringHostedServiceBase
             // Silently swallow
             // The user does not need the logs being polluted if our service has fallen over or is down etc
             // Hence only logging this at a more verbose level (which users should not be using in production)
-            _logger.LogDebug("There was a problem sending a request to the Umbraco telemetry service");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("There was a problem sending a request to the Umbraco telemetry service");
+            }
         }
     }
 }

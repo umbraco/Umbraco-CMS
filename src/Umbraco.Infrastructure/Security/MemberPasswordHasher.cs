@@ -107,8 +107,11 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
             }
             else
             {
-                _logger.LogDebug(
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug(
                     "Unable to determine member password hashing algorithm, but this can happen when member enters a wrong password, before it has be rehashed");
+                }
             }
 
             return PasswordVerificationResult.Failed;

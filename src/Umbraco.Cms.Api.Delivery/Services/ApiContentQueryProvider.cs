@@ -1,11 +1,13 @@
 ﻿using Examine;
+using Examine.Lucene.Providers;
+using Examine.Lucene.Search;
 using Examine.Search;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
-using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
 
@@ -39,7 +41,7 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             .ToDictionary(field => field.FieldName, field => field.FieldType, StringComparer.InvariantCultureIgnoreCase);
     }
 
-    public PagedModel<Guid> ExecuteQuery(SelectorOption selectorOption, IList<FilterOption> filterOptions, IList<SortOption> sortOptions, string culture, int skip, int take)
+    public PagedModel<Guid> ExecuteQuery(SelectorOption selectorOption, IList<FilterOption> filterOptions, IList<SortOption> sortOptions, string culture, bool preview, int skip, int take)
     {
         if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.DeliveryApiContentIndexName, out IIndex? index))
         {
@@ -47,7 +49,7 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             return new PagedModel<Guid>();
         }
 
-        IBooleanOperation queryOperation = BuildSelectorOperation(selectorOption, index, culture);
+        IBooleanOperation queryOperation = BuildSelectorOperation(selectorOption, index, culture, preview);
 
         ApplyFiltering(filterOptions, queryOperation);
         ApplySorting(sortOptions, queryOperation);
@@ -75,9 +77,16 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
         FieldName = UmbracoExamineFieldNames.CategoryFieldName, Values = new[] { "content" }
     };
 
-    private IBooleanOperation BuildSelectorOperation(SelectorOption selectorOption, IIndex index, string culture)
+    private IBooleanOperation BuildSelectorOperation(SelectorOption selectorOption, IIndex index, string culture, bool preview)
     {
-        IQuery query = index.Searcher.CreateQuery();
+        // Needed for enabling leading wildcards searches
+        BaseLuceneSearcher searcher = index.Searcher as BaseLuceneSearcher ?? throw new InvalidOperationException($"Index searcher must be of type {nameof(BaseLuceneSearcher)}.");
+
+        IQuery query = searcher.CreateQuery(
+            IndexTypes.Content,
+            BooleanOperation.And,
+            searcher.LuceneAnalyzer,
+            new LuceneSearchOptions { AllowLeadingWildcard = true });
 
         IBooleanOperation selectorOperation = selectorOption.Values.Length == 1
             ? query.Field(selectorOption.FieldName, selectorOption.Values.First())
@@ -85,6 +94,12 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
 
         // Item culture must be either the requested culture or "none"
         selectorOperation.And().GroupedOr(new[] { UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture }, culture.ToLowerInvariant().IfNullOrWhiteSpace(_fallbackGuidValue), "none");
+
+        // when not fetching for preview, make sure the "published" field is "y"
+        if (preview is false)
+        {
+            selectorOperation.And().Field(UmbracoExamineFieldNames.DeliveryApiContentIndex.Published, "y");
+        }
 
         return selectorOperation;
     }
@@ -103,6 +118,23 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             }
         }
 
+        void HandleContains(IQuery query, string fieldName, string[] values)
+        {
+            if (values.Length == 1)
+            {
+                // The trailing wildcard is added automatically
+                query.Field(fieldName, (IExamineValue)new ExamineValue(Examineness.ComplexWildcard, $"*{values[0]}"));
+            }
+            else
+            {
+                // The trailing wildcard is added automatically
+                IExamineValue[] examineValues = values
+                    .Select(value => (IExamineValue)new ExamineValue(Examineness.ComplexWildcard, $"*{value}"))
+                    .ToArray();
+                query.GroupedOr(new[] { fieldName }, examineValues);
+            }
+        }
+
         foreach (FilterOption filterOption in filterOptions)
         {
             var values = filterOption.Values.Any()
@@ -112,18 +144,16 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             switch (filterOption.Operator)
             {
                 case FilterOperation.Is:
-                    // TODO: test this for explicit word matching
                     HandleExact(queryOperation.And(), filterOption.FieldName, values);
                     break;
                 case FilterOperation.IsNot:
-                    // TODO: test this for explicit word matching
                     HandleExact(queryOperation.Not(), filterOption.FieldName, values);
                     break;
-                // TODO: Fix
                 case FilterOperation.Contains:
+                    HandleContains(queryOperation.And(), filterOption.FieldName, values);
                     break;
-                // TODO: Fix
                 case FilterOperation.DoesNotContain:
+                    HandleContains(queryOperation.Not(), filterOption.FieldName, values);
                     break;
                 default:
                     continue;
