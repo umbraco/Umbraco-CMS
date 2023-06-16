@@ -17,6 +17,7 @@ public static class ContentServiceExtensions
     #region RTE Anchor values
 
     private static readonly Regex AnchorRegex = new(@"<a id=\\*""(.*?)\\*"">", RegexOptions.Compiled);
+    private static readonly string[] _propertyTypesWithRte = new[] { Constants.PropertyEditors.Aliases.TinyMce, Constants.PropertyEditors.Aliases.BlockList, Constants.PropertyEditors.Aliases.BlockGrid };
 
     public static IEnumerable<IContent>? GetByIds(this IContentService contentService, IEnumerable<Udi> ids)
     {
@@ -72,17 +73,17 @@ public static class ContentServiceExtensions
 
         IContent? content = contentService.GetById(id);
 
-        var propertyTypesWithRTE = new string[] { Constants.PropertyEditors.Aliases.TinyMce, Constants.PropertyEditors.Aliases.BlockList, Constants.PropertyEditors.Aliases.BlockGrid };
-
-        if (content is not null)
+        if (content is null)
         {
-            foreach (IProperty contentProperty in content.Properties.Where(s => propertyTypesWithRTE.Contains(s.PropertyType.PropertyEditorAlias)))
+            return result;
+        }
+
+        foreach (IProperty contentProperty in content.Properties.Where(s => _propertyTypesWithRte.Contains(s.PropertyType.PropertyEditorAlias)))
+        {
+            var value = contentProperty.GetValue(culture)?.ToString();
+            if (!string.IsNullOrEmpty(value))
             {
-                var value = contentProperty.GetValue(culture)?.ToString();
-                if (!string.IsNullOrEmpty(value))
-                {
-                    result.AddRange(contentService.GetAnchorValuesFromRTEContent(value));
-                }
+                result.AddRange(contentService.GetAnchorValuesFromRTEContent(value));
             }
         }
 
