@@ -9,47 +9,47 @@ namespace Umbraco.Cms.Core;
 public static class Enum<T>
     where T : struct
 {
-    private static readonly List<T> _values;
-    private static readonly Dictionary<string, T> _insensitiveNameToValue;
-    private static readonly Dictionary<string, T> _sensitiveNameToValue;
-    private static readonly Dictionary<int, T> _intToValue;
-    private static readonly Dictionary<T, string> _valueToName;
+    private static readonly List<T> Values;
+    private static readonly Dictionary<string, T> InsensitiveNameToValue;
+    private static readonly Dictionary<string, T> SensitiveNameToValue;
+    private static readonly Dictionary<int, T> IntToValue;
+    private static readonly Dictionary<T, string> ValueToName;
 
     static Enum()
     {
-        _values = Enum.GetValues(typeof(T)).Cast<T>().ToList();
+        Values = Enum.GetValues(typeof(T)).Cast<T>().ToList();
 
-        _intToValue = new Dictionary<int, T>();
-        _valueToName = new Dictionary<T, string>();
-        _sensitiveNameToValue = new Dictionary<string, T>();
-        _insensitiveNameToValue = new Dictionary<string, T>(StringComparer.InvariantCultureIgnoreCase);
+        IntToValue = new Dictionary<int, T>();
+        ValueToName = new Dictionary<T, string>();
+        SensitiveNameToValue = new Dictionary<string, T>();
+        InsensitiveNameToValue = new Dictionary<string, T>(StringComparer.InvariantCultureIgnoreCase);
 
-        foreach (T value in _values)
+        foreach (T value in Values)
         {
             string? name = value.ToString();
 
-            _intToValue[Convert.ToInt32(value)] = value;
-            _valueToName[value] = name!;
-            _sensitiveNameToValue[name!] = value;
-            _insensitiveNameToValue[name!] = value;
+            IntToValue[Convert.ToInt32(value)] = value;
+            ValueToName[value] = name!;
+            SensitiveNameToValue[name!] = value;
+            InsensitiveNameToValue[name!] = value;
         }
     }
 
-    public static bool IsDefined(T value) => _valueToName.ContainsKey(value);
+    public static bool IsDefined(T value) => ValueToName.ContainsKey(value);
 
-    public static bool IsDefined(string value) => _sensitiveNameToValue.ContainsKey(value);
+    public static bool IsDefined(string value) => SensitiveNameToValue.ContainsKey(value);
 
-    public static bool IsDefined(int value) => _intToValue.ContainsKey(value);
+    public static bool IsDefined(int value) => IntToValue.ContainsKey(value);
 
-    public static IEnumerable<T> GetValues() => _values;
+    public static IEnumerable<T> GetValues() => Values;
 
-    public static string[] GetNames() => _valueToName.Values.ToArray();
+    public static string[] GetNames() => ValueToName.Values.ToArray();
 
-    public static string? GetName(T value) => _valueToName.TryGetValue(value, out string? name) ? name : null;
+    public static string? GetName(T value) => ValueToName.TryGetValue(value, out string? name) ? name : null;
 
     public static T Parse(string value, bool ignoreCase = false)
     {
-        Dictionary<string, T> names = ignoreCase ? _insensitiveNameToValue : _sensitiveNameToValue;
+        Dictionary<string, T> names = ignoreCase ? InsensitiveNameToValue : SensitiveNameToValue;
 
         return names.TryGetValue(value, out T parsed) ? parsed : Throw();
 
@@ -58,7 +58,7 @@ public static class Enum<T>
 
     public static bool TryParse(string value, out T returnValue, bool ignoreCase = false)
     {
-        Dictionary<string, T> names = ignoreCase ? _insensitiveNameToValue : _sensitiveNameToValue;
+        Dictionary<string, T> names = ignoreCase ? InsensitiveNameToValue : SensitiveNameToValue;
 
         return names.TryGetValue(value, out returnValue);
     }
@@ -70,7 +70,7 @@ public static class Enum<T>
             return null;
         }
 
-        if (_insensitiveNameToValue.TryGetValue(value, out T parsed))
+        if (InsensitiveNameToValue.TryGetValue(value, out T parsed))
         {
             return parsed;
         }
@@ -80,7 +80,7 @@ public static class Enum<T>
 
     public static T? CastOrNull(int value)
     {
-        if (_intToValue.TryGetValue(value, out T foundValue))
+        if (IntToValue.TryGetValue(value, out T foundValue))
         {
             return foundValue;
         }
