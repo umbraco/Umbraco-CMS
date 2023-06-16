@@ -17,7 +17,7 @@ public static class ContentServiceExtensions
 {
     #region RTE Anchor values
 
-    private static readonly Regex AnchorRegex = new("<a id=\"(.*?)\">", RegexOptions.Compiled);
+    private static readonly Regex AnchorRegex = new(@"<a id=\\*""(.*?)\\*"">", RegexOptions.Compiled);
 
     public static IEnumerable<IContent>? GetByIds(this IContentService contentService, IEnumerable<Udi> ids)
     {
@@ -69,11 +69,7 @@ public static class ContentServiceExtensions
     {
         var result = new List<string>();
 
-        //TODO : remove this hack : contentProperty.GetValue(culture) always return null when culture variable is "*"
-        if (culture == "*")
-        {
-            culture = string.Empty;
-        }
+        culture = culture is not "*" ? culture : null;
 
         IContent? content = contentService.GetById(id);
 
@@ -103,7 +99,7 @@ public static class ContentServiceExtensions
         MatchCollection matches = AnchorRegex.Matches(rteUnescaped);
         foreach (Match match in matches)
         {
-            result.Add(match.Value.Split(Constants.CharArrays.DoubleQuote)[1]);
+            result.Add(match.Groups[1].Value);
         }
 
         return result;
