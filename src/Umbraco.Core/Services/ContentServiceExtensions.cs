@@ -3,7 +3,6 @@
 
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
@@ -95,8 +94,7 @@ public static class ContentServiceExtensions
         string rteContent)
     {
         var result = new List<string>();
-        var rteUnescaped = Regex.Unescape(rteContent);
-        MatchCollection matches = AnchorRegex.Matches(rteUnescaped);
+        MatchCollection matches = AnchorRegex.Matches(rteContent);
         foreach (Match match in matches)
         {
             result.Add(match.Groups[1].Value);
