@@ -2585,7 +2585,8 @@ public class ContentService : RepositoryService, IContentService
             IContent[] contents = _documentRepository.Get(query).ToArray();
 
             var emptyingRecycleBinNotification = new ContentEmptyingRecycleBinNotification(contents, eventMessages);
-            if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification))
+            var deletingContentNotification = new ContentDeletingNotification(contents, eventMessages);
+            if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification) || scope.Notifications.PublishCancelable(deletingContentNotification))
             {
                 scope.Complete();
                 return OperationResult.Cancel(eventMessages);
