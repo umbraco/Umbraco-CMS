@@ -132,7 +132,7 @@ Let’s go through each of these properties…
 
   - section - examples include: `Content`, `Media`
   - dashboard - a view within a section. Examples include: the welcome dashboard
-  - propertyEditorUI
+  - propertyEditorUi
   - editorView
   - propertyAction
   - tree
