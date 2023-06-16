@@ -26,7 +26,7 @@ public static class Enum<T>
 
         foreach (T value in Values)
         {
-            string? name = value.ToString();
+            var name = value.ToString();
 
             IntToValue[Convert.ToInt32(value)] = value;
             ValueToName[value] = name!;
@@ -45,7 +45,7 @@ public static class Enum<T>
 
     public static string[] GetNames() => ValueToName.Values.ToArray();
 
-    public static string? GetName(T value) => ValueToName.TryGetValue(value, out string? name) ? name : null;
+    public static string? GetName(T value) => ValueToName.TryGetValue(value, out var name) ? name : null;
 
     public static T Parse(string value, bool ignoreCase = false)
     {
