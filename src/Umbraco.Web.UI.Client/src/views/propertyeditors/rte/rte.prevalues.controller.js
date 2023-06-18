@@ -59,7 +59,6 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                         const height = frag.getAttribute("height");
 
                         frag.setAttribute("viewBox", `0 0 ${width} ${height}`);
-                        frag.setAttribute("viewBox", viewBox);
                         cmd.svgIcon = $sce.trustAsHtml(frag.outerHTML);
                         cmd.icon = null;
                     }
