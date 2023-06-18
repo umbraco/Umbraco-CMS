@@ -50,22 +50,19 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                 const parser = new DOMParser();
 
                 Utilities.forEach($scope.tinyMceConfig.commands, cmd => {
+                    let icon = getTinyIcon(cmd.alias);
 
-                  console.log("cmd", cmd);
+                    if (!cmd.isCustom && icons.hasOwnProperty(icon)) {
+                        const svg = icons[icon];
+                        const frag = parser.parseFromString(svg, 'text/html').body.childNodes[0];
+                        const width = frag.getAttribute("width");
+                        const height = frag.getAttribute("height");
 
-                  let icon = getTinyIcon(cmd.alias);
-
-                  if (!cmd.isCustom && icons.hasOwnProperty(icon)) {
-                    const svg = icons[icon];
-                    const frag = parser.parseFromString(svg, 'text/html').body.childNodes[0];
-                    const width = frag.getAttribute("width");
-                    const height = frag.getAttribute("height");
-
-                    frag.setAttribute("viewBox", `0 0 ${width} ${height}`);
-                    cmd.svgIcon = $sce.trustAsHtml(frag.outerHTML);
-                    cmd.icon = null;
-                  }
-
+                        frag.setAttribute("viewBox", `0 0 ${width} ${height}`);
+                        frag.setAttribute("viewBox", viewBox);
+                        cmd.svgIcon = $sce.trustAsHtml(frag.outerHTML);
+                        cmd.icon = null;
+                    }
                 });
             });
             
@@ -118,6 +115,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
 
             switch (alias) {
                 case "ace":
+                case "code":
                     icon = "sourcecode";
                     break;
                 case "anchor":
@@ -163,11 +161,14 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                     icon = "highlight-bg-color";
                     break;
                 case "wordcount":
-                  icon = "character-count";
-                  break;
+                    icon = "character-count";
+                    break;
                 case "emoticons":
-                  icon = "emoji";
-                  break;
+                    icon = "emoji";
+                    break;
+                case "codesample":
+                    icon = "code-sample";
+                    break;
             }
 
             return icon;
