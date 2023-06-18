@@ -53,55 +53,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
 
                   console.log("cmd", cmd);
 
-                  let icon = cmd.alias;
-
-                  switch (cmd.alias) {
-                    case "ace":
-                      icon = "sourcecode";
-                      break;
-                    case "anchor":
-                      icon = "bookmark";
-                      break;
-                    case "alignleft":
-                      icon = "align-left";
-                      break;
-                    case "aligncenter":
-                      icon = "align-center";
-                      break;
-                    case "alignright":
-                      icon = "align-right";
-                      break;
-                    case "alignjustify":
-                      icon = "align-justify";
-                      break;
-                    case "charmap":
-                      icon = "insert-character";
-                      break;
-                    case "hr":
-                      icon = "horizontal-rule";
-                      break;
-                    case "bullist":
-                      icon = "unordered-list";
-                      break;
-                    case "numlist":
-                      icon = "ordered-list";
-                      break;
-                    case "strikethrough":
-                      icon = "strike-through";
-                      break;
-                    case "removeformat":
-                      icon = "remove-formatting";
-                      break;
-                    case "blockquote":
-                      icon = "quote";
-                      break;
-                    case "forecolor":
-                      icon = "text-color";
-                      break;
-                    case "hilitecolor":
-                      icon = "highlight-bg-color";
-                      break;
-                  }
+                  let icon = getTinyIcon(cmd.alias);
 
                   if (!cmd.isCustom && icons.hasOwnProperty(icon)) {
                     const svg = icons[icon];
@@ -160,7 +112,62 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
             }
         };
 
-        // map properties for specific commands
+        // Map command alias to icon name.
+        function getTinyIcon(alias) {
+            let icon = alias;
+
+            switch (alias) {
+                case "ace":
+                    icon = "sourcecode";
+                    break;
+                case "anchor":
+                    icon = "bookmark";
+                    break;
+                case "alignleft":
+                    icon = "align-left";
+                    break;
+                case "aligncenter":
+                    icon = "align-center";
+                    break;
+                case "alignright":
+                    icon = "align-right";
+                    break;
+                case "alignjustify":
+                    icon = "align-justify";
+                    break;
+                case "charmap":
+                    icon = "insert-character";
+                    break;
+                case "hr":
+                    icon = "horizontal-rule";
+                    break;
+                case "bullist":
+                    icon = "unordered-list";
+                    break;
+                case "numlist":
+                    icon = "ordered-list";
+                    break;
+                case "strikethrough":
+                    icon = "strike-through";
+                    break;
+                case "removeformat":
+                    icon = "remove-formatting";
+                    break;
+                case "blockquote":
+                    icon = "quote";
+                    break;
+                case "forecolor":
+                    icon = "text-color";
+                    break;
+                case "hilitecolor":
+                    icon = "highlight-bg-color";
+                    break;
+            }
+
+            return icon;
+        }
+
+        // Map properties for specific commands
         function getIcon(alias) {
             var icon = { name: alias, isCustom: false };
 
