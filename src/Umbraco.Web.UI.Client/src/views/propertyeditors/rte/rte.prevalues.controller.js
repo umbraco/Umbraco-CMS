@@ -92,6 +92,9 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                     case "removeformat":
                       icon = "remove-formatting";
                       break;
+                    case "blockquote":
+                      icon = "quote";
+                      break;
                     case "forecolor":
                       icon = "text-color";
                       break;
@@ -106,7 +109,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                     const width = frag.getAttribute("width");
                     const height = frag.getAttribute("height");
 
-                    frag.setAttribute("viewbox", `0 0 ${width} ${height}`);
+                    frag.setAttribute("viewBox", `0 0 ${width} ${height}`);
                     cmd.svgIcon = $sce.trustAsHtml(frag.outerHTML);
                     cmd.icon = null;
                   }
