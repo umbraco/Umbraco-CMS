@@ -162,6 +162,12 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                 case "hilitecolor":
                     icon = "highlight-bg-color";
                     break;
+                case "wordcount":
+                  icon = "character-count";
+                  break;
+                case "emoticons":
+                  icon = "emoji";
+                  break;
             }
 
             return icon;
