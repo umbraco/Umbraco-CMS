@@ -5,12 +5,21 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
 /// <summary>
-/// This filter explicitly removes all other mime types than application/json from the produced OpenAPI document when application/json is accepted.
+/// This filter explicitly removes all other mime types than application/json from a named OpenAPI document when application/json is accepted.
 /// </summary>
 public class MimeTypeDocumentFilter : IDocumentFilter
 {
+    private readonly string _documentName;
+
+    public MimeTypeDocumentFilter(string documentName) => _documentName = documentName;
+
     public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
     {
+        if (context.DocumentName != _documentName)
+        {
+            return;
+        }
+
         OpenApiOperation[] operations = swaggerDoc.Paths
             .SelectMany(path => path.Value.Operations.Values)
             .ToArray();
