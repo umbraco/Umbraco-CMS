@@ -1,5 +1,4 @@
 {
-  "$schema": "../../umbraco-package-schema.json",
   "id": "UmbracoPackage",
   "name": "UmbracoPackage",
   "allowPackageTelemetry": true,
