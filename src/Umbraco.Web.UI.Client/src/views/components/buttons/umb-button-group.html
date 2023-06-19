@@ -1,4 +1,4 @@
-<div class="btn-group umb-button-group" ng-class="{ 'dropup': direction === 'up', '-with-button-group-toggle': subButtons.length > 0 }">
+<div class="btn-group umb-button-group" ng-class="{ 'dropup': direction === 'up', '-with-button-group-toggle': subButtons.length > 0, 'btn-group-justified': blockElement }">
    <umb-button
       ng-if="defaultButton"
       alias="{{defaultButton.alias ? defaultButton.alias : 'groupPrimary' }}"
@@ -21,7 +21,7 @@
    <button
       type="button"
       data-element="button-group-toggle"
-      class="btn btn-{{buttonStyle}} dropdown-toggle umb-button-group__toggle umb-button--{{size}}"
+      class="btn {{toggleStyle}} dropdown-toggle umb-button-group__toggle {{size ? 'umb-button--' + size : undefined}}"
       ng-if="subButtons.length > 0"
       ng-click="toggleDropdown()"
       aria-haspopup="true"

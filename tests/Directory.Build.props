@@ -5,8 +5,9 @@
   <PropertyGroup>
     <!-- TODO: Update test projects to use nullable reference types and remove this to enable nullable warnings as errors (the solution default) -->
     <Nullable>annotations</Nullable>
+    <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
-  
+
   <!-- Specify rule set for all test projects -->
   <PropertyGroup>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)codeanalysis.ruleset</CodeAnalysisRuleSet>

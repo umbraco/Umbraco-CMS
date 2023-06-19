@@ -79,6 +79,7 @@ test.describe('Packages', () => {
     // Fill out package creation form
     // Waits until the element package Content is visible
     await page.locator('[key="packager_packageContent"]').isVisible();
+    await expect(page.locator('[label="@treeHeaders_documentTypes"]').locator('[text="' + rootDocTypeName + '"]')).toBeVisible();
     await page.locator("#headerName").type(packageName);
     await page.locator('.controls > .umb-node-preview-add').click();
     await page.locator('.umb-tree-item__label').first().click();

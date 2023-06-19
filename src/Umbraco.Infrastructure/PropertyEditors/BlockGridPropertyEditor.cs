@@ -1,7 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -19,11 +21,25 @@ public class BlockGridPropertyEditor : BlockGridPropertyEditorBase
 {
     private readonly IIOHelper _ioHelper;
 
+    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
     public BlockGridPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper)
-        : base(dataValueEditorFactory) =>
+        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IBlockValuePropertyIndexValueFactory>())
+    {
+
+    }
+
+
+    public BlockGridPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        IIOHelper ioHelper,
+        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
+        : base(dataValueEditorFactory, blockValuePropertyIndexValueFactory)
+    {
         _ioHelper = ioHelper;
+    }
+
 
     #region Pre Value Editor
 

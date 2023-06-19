@@ -29,12 +29,13 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class TagsPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
+    private readonly ITagPropertyIndexValueFactory _tagPropertyIndexValueFactory;
     private readonly IIOHelper _ioHelper;
     private readonly ILocalizedTextService _localizedTextService;
     private readonly ManifestValueValidatorCollection _validators;
 
     // Scheduled for removal in v12
-    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
     public TagsPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         ManifestValueValidatorCollection validators,
@@ -45,8 +46,27 @@ public class TagsPropertyEditor : DataEditor
             validators,
             ioHelper,
             localizedTextService,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>(),
+            StaticServiceProvider.Instance.GetRequiredService<ITagPropertyIndexValueFactory>())
     {
+    }
+
+    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
+    public TagsPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        ManifestValueValidatorCollection validators,
+        IIOHelper ioHelper,
+        ILocalizedTextService localizedTextService,
+        IEditorConfigurationParser editorConfigurationParser)
+        : this(
+            dataValueEditorFactory,
+            validators,
+            ioHelper,
+            localizedTextService,
+            editorConfigurationParser,
+            StaticServiceProvider.Instance.GetRequiredService<ITagPropertyIndexValueFactory>())
+    {
+
     }
 
     public TagsPropertyEditor(
@@ -54,14 +74,19 @@ public class TagsPropertyEditor : DataEditor
         ManifestValueValidatorCollection validators,
         IIOHelper ioHelper,
         ILocalizedTextService localizedTextService,
-        IEditorConfigurationParser editorConfigurationParser)
+        IEditorConfigurationParser editorConfigurationParser,
+        ITagPropertyIndexValueFactory tagPropertyIndexValueFactory)
         : base(dataValueEditorFactory)
     {
         _validators = validators;
         _ioHelper = ioHelper;
         _localizedTextService = localizedTextService;
         _editorConfigurationParser = editorConfigurationParser;
+        _tagPropertyIndexValueFactory = tagPropertyIndexValueFactory;
     }
+
+    public override IPropertyIndexValueFactory PropertyIndexValueFactory => _tagPropertyIndexValueFactory;
+
 
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<TagPropertyValueEditor>(Attribute!);

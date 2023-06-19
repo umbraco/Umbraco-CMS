@@ -10,8 +10,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.StaticAssets\Umbraco.Cms.StaticAssets.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,10 +50,10 @@
   </Target>
 
   <!-- Create and pack empty file to add TFM dependency -->
-  <Target Name="PackTargetFrameworkFile" BeforeTargets="Build">
+  <Target Name="GetTargetFrameworkPackageFiles" BeforeTargets="GenerateNuspec">
     <WriteLinesToFile File="$(IntermediateOutputPath)_._" />
     <ItemGroup>
-      <None Include="$(IntermediateOutputPath)_._" Pack="true" PackagePath="lib\$(TargetFramework)" />
+      <_PackageFiles Include="$(IntermediateOutputPath)_._" PackagePath="lib\$(TargetFramework)" />
     </ItemGroup>
   </Target>
 </Project>

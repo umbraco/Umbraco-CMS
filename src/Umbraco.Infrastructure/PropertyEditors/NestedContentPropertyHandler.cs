@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     A handler for NestedContent used to bind to notifications
 /// </summary>
+[Obsolete("Nested content is obsolete, will be removed in V13")]
 public class NestedContentPropertyHandler : ComplexPropertyEditorContentNotificationHandler
 {
     protected override string EditorAlias => Constants.PropertyEditors.Aliases.NestedContent;

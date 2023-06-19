@@ -243,6 +243,15 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
     }
 
     [Test]
+    public void Can_Get_Content_For_Unpopulated_Requested_DefaultLanguage_With_Fallback()
+    {
+        var snapshot = GetPublishedSnapshot();
+        var content = snapshot.Content.GetAtRoot().First();
+        var value = content.Value(PublishedValueFallback, "welcomeText", "fr", fallback: Fallback.ToDefaultLanguage);
+        Assert.AreEqual("Welcome", value);
+    }
+
+    [Test]
     public void Do_Not_Get_Content_Recursively_Unless_Requested()
     {
         var snapshot = GetPublishedSnapshot();

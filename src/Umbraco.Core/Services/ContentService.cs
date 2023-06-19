@@ -1146,6 +1146,8 @@ public class ContentService : RepositoryService, IContentService
 
             var allLangs = _languageRepository.GetMany().ToList();
 
+            // Change state to publishing
+            content.PublishedState = PublishedState.Publishing;
             var savingNotification = new ContentSavingNotification(content, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
@@ -2932,6 +2934,7 @@ public class ContentService : RepositoryService, IContentService
             // save
             saved.Add(content);
             _documentRepository.Save(content);
+            Audit(AuditType.Sort, userId, content.Id, "Sorting content performed by user");
         }
 
         // first saved, then sorted
@@ -2947,8 +2950,7 @@ public class ContentService : RepositoryService, IContentService
         {
             scope.Notifications.Publish(new ContentPublishedNotification(published, eventMessages));
         }
-
-        Audit(AuditType.Sort, userId, 0, "Sorting content performed by user");
+        
         return OperationResult.Succeed(eventMessages);
     }
 

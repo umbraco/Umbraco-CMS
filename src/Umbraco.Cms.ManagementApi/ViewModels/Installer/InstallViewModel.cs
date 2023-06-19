@@ -13,5 +13,5 @@ public class InstallViewModel
     public DatabaseInstallViewModel Database { get; set; } = null!;
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public TelemetryLevel TelemetryLevel { get; set; } = TelemetryLevel.Basic;
+    public TelemetryLevel TelemetryLevel { get; set; } = TelemetryLevel.Detailed;
 }

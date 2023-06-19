@@ -28,7 +28,7 @@ test.describe('Languages', () => {
 
     const doesExistDA = await umbracoApi.languages.exists(culture);
     await expect(doesExistDA).toBe(true);
-    
+
     // Cleanup
     await umbracoApi.languages.ensureCultureNotExists(culture);
   });
@@ -59,19 +59,19 @@ test.describe('Languages', () => {
     await expect(doesExistEN).toBe(true);
 
     // Delete UK Language
-    await page.locator('umb-button[label-key="general_delete"]').last().click();
-    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey('contentTypeEditor_yesDelete'));
+    await page.getByRole('button', {name: language2}).locator('[label-key=' + ConstantHelper.buttons.delete + ']').click();
+    await umbracoUi.clickDataElementByElementName('button-overlaySubmit');
 
     // Assert the da language still exists and that the uk is deleted
     // DA
     doesExistDA = await umbracoApi.languages.exists(language1);
     await expect(doesExistDA).toBe(true);
     // EN
+    await expect(page.getByRole('button', {name: language2})).not.toBeVisible();
     doesExistEN = await umbracoApi.languages.exists(language2);
     await expect(doesExistEN).toBe(false);
-    
+
     // Cleanup
     await umbracoApi.languages.ensureCultureNotExists(language1);
-    await umbracoApi.languages.ensureCultureNotExists(language2);
   });
 });

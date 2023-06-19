@@ -129,7 +129,7 @@ public class ContentFinderByUrlTests : PublishedSnapshotServiceTestBase
 
         var (finder, frequest) = await GetContentFinder(urlString);
 
-        frequest.SetDomain(new DomainAndUri(new Domain(1, "mysite", -1, "en-US", false), new Uri("http://mysite/")));
+        frequest.SetDomain(new DomainAndUri(new Domain(1, "mysite", -1, "en-US", false, 0), new Uri("http://mysite/")));
 
         var result = await finder.TryFindContent(frequest);
 
@@ -155,7 +155,7 @@ public class ContentFinderByUrlTests : PublishedSnapshotServiceTestBase
 
         var (finder, frequest) = await GetContentFinder(urlString);
 
-        frequest.SetDomain(new DomainAndUri(new Domain(1, "mysite/æøå", -1, "en-US", false), new Uri("http://mysite/æøå")));
+        frequest.SetDomain(new DomainAndUri(new Domain(1, "mysite/æøå", -1, "en-US", false, 0), new Uri("http://mysite/æøå")));
 
         var result = await finder.TryFindContent(frequest);
 

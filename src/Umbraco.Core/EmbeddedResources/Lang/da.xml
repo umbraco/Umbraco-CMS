@@ -342,6 +342,7 @@
     <key alias="createNewMember">Opret et nyt medlem</key>
     <key alias="allMembers">Alle medlemmer</key>
     <key alias="memberGroupNoProperties">Medlemgrupper har ingen yderligere egenskaber til redigering.</key>
+    <key alias="2fa">Totrinsbekræftelse</key>
   </area>
   <area alias="contentType">
     <key alias="copyFailed">Kopiering af indholdstypen fejlede</key>
@@ -388,7 +389,7 @@
     </key>
     <key alias="elementType">Element-type</key>
     <key alias="elementTypeDescription">Definerer skabelonen for et sæt at egenskaber, der kan anvendes som skema i
-      avancerede felter som f.eks. 'Block List' eller 'Nested Content'.
+      avancerede felter som f.eks. 'Block List' eller 'Block Grid'.
     </key>
     <key alias="composition">Komposition</key>
     <key alias="compositionDescription">Definerer et sæt genbrugbare egenskaber, der kan inkluderes i definitionen af
@@ -1646,7 +1647,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="allowVaryBySegment">Tillad segmentering</key>
     <key alias="elementType">Element-type</key>
     <key alias="elementHeading">Er en Element-type</key>
-    <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet.
+    <key alias="elementDescription">En Element-type er tiltænkt brug i andre Dokumenttyper, ikke i indholdstræet.
     </key>
     <key alias="elementCannotToggle">En Dokumenttype kan ikke ændres til en Element-type efter den er blevet brugt til
       at oprette en eller flere indholds elementer.
@@ -1902,6 +1903,7 @@ Mange hilsner fra Umbraco robotten
       genkende dig. Klik på cirklen ovenfor for at uploade et billede.
     </key>
     <key alias="writer">Forfatter</key>
+    <key alias="configureTwoFactor">Konfigurer totrinsbekræftelse</key>
     <key alias="change">Skift</key>
     <key alias="yourProfile">Din profil</key>
     <key alias="yourHistory">Din historik</key>
@@ -1929,11 +1931,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="sortCreateDateDescending">Ældste</key>
     <key alias="sortLastLoginDateDescending">Sidst logget ind</key>
     <key alias="noUserGroupsAdded">Ingen brugere er blevet tilføjet</key>
-    <key alias="2faDisableText">Hvis du ønsker at slå denne autentificeringsmetode fra, så skal du nu indtaste koden fra dit device:</key>
-    <key alias="2faProviderIsEnabled">Denne autentificeringsmetode er slået til</key>
-    <key alias="2faProviderIsDisabledMsg">Den valgte autentificeringsmetode er nu slået fra</key>
-    <key alias="2faProviderIsNotDisabledMsg">Der skete en ukendt fejl da denne autentificeringsmetode skulles slåes fra</key>
-    <key alias="2faDisableForUser">Er du sikker på, at du vil fjerne denne autentificeringsmetode for denne bruger?</key>
+    <key alias="2faDisableText">Hvis du ønsker at slå denne totrinsbekræftelse fra, så skal du nu indtaste koden fra din enhed:</key>
+    <key alias="2faProviderIsEnabled">Denne totrinsbekræftelse er slået til</key>
+    <key alias="2faProviderIsDisabledMsg">Den valgte totrinsbekræftelse er nu slået fra</key>
+    <key alias="2faProviderIsNotDisabledMsg">Der skete en ukendt fejl da denne totrinsbekræftelse skulles slåes fra</key>
+    <key alias="2faDisableForUser">Er du sikker på, at du vil fjerne denne totrinsbekræftelse for denne bruger?</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validering</key>
@@ -2230,7 +2232,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="allowedBlockColumnsHelp">Vælg de forskellige antal kolonner denne blok må optage i layoutet. Dette forhindre ikke blokken i at optræde i et mindre område.</key>
     <key alias="allowedBlockRows">TIlgængelige række-størrelser</key>
     <key alias="allowedBlockRowsHelp">Vælg hvor mange rækker denne blok på optage i layoutet.</key>
-    <key alias="allowBlockInRoot">Tillad på rodniveay</key>
+    <key alias="allowBlockInRoot">Tillad på rodniveau</key>
     <key alias="allowBlockInRootHelp">Gør denne blok tilgængelig i layoutets rodniveau. Hvis dette ikke er valgt, kan denne blok kun bruges inden for andre blokkes definerede områder.</key>
     <key alias="areas">Blok-områder</key>
     <key alias="areasLayoutColumns">Layout-kolonner</key>
@@ -2238,7 +2240,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="areasConfigurations">Opsætning af områder</key>
     <key alias="areasConfigurationsHelp">Hvis det skal være muligt at indsætte nye blokke indeni denne blok, skal der oprettes ét eller flere områder til at indsætte de nye blokke i.</key>
     <key alias="invalidDropPosition">Ikke tilladt placering.</key>
-    <key alias="defaultLayoutStylesheet">Standart layout stylesheet</key>
+    <key alias="defaultLayoutStylesheet">Standardlayout stylesheet</key>
     <key alias="confirmPasteDisallowedNestedBlockHeadline">Ikke tilladt indhold blev afvist</key>
     <key alias="confirmPasteDisallowedNestedBlockMessage">
       <![CDATA[Det indsatte indhold bestod af ikke tilladt del-indhold, disse dele er blevet afvist. Vil du beholde det resterene alligevel?]]></key>

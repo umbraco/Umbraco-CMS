@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.Deploy;
 /// <remarks>
 /// These extension methods will be removed in Umbraco 13.
 /// </remarks>
+[Obsolete("The grid is obsolete, will be removed in V13")]
 public static class GridCellValueConnectorExtensions
 {
     /// <summary>

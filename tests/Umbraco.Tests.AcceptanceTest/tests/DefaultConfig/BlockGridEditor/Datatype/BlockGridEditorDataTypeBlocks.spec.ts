@@ -259,7 +259,9 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
     await umbracoApi.documentTypes.ensureNameNotExists(elementNameThree);
   });
 
-  test('can create a block grid datatype with multiple groups and multiple element in each group', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a block grid datatype with multiple groups and multiple element in each group', async ({page, umbracoApi, umbracoUi},testInfo) => {
+    await testInfo.slow();
+    
     const GroupOne = 'GroupOne';
     const elementNameFourth = 'FourthElement';
     const elementFourthAlias = AliasHelper.toAlias(elementNameFourth);
@@ -581,7 +583,10 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
     await umbracoUi.navigateToDataType(blockGridName);
 
     // Drags the element from the default group to the 'MoveToHere' Group.
-    await page.locator('.umb-block-card-group').nth(0).locator('[data-content-element-type-key="' + element['key'] + '"]').dragTo(page.locator('[key="blockEditor_addBlockType"]').nth(1));
+    const dragFrom = await page.locator('.umb-block-card-group').nth(0).locator('[data-content-element-type-key="' + element['key'] + '"]');
+    const dragTo = await page.locator('[key="blockEditor_addBlockType"]').nth(1);
+    await umbracoUi.dragAndDrop(dragFrom, dragTo, 0, 0, 15);
+    
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
     // Assert
@@ -618,7 +623,10 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
     await umbracoUi.navigateToDataType(blockGridName);
 
     // Drags the group GroupMove under GroupNotMoving
-    await page.locator('.umb-block-card-group >> [icon="icon-navigation"]').nth(0).dragTo(page.locator('[key="blockEditor_addBlockType"]').nth(2));
+    const dragFrom = await page.locator('.umb-block-card-group >> [icon="icon-navigation"]').nth(0);
+    const dragTo = await page.locator('[key="blockEditor_addBlockType"]').nth(2);
+    await umbracoUi.dragAndDrop(dragFrom, dragTo, 0, 0, 15);
+    
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
     // Assert
@@ -632,7 +640,9 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
     await umbracoUi.doesDataTypeExist(blockGridName);
   });
 
-  test('can move a group with elements in a block grid editor ', async ({page, umbracoApi, umbracoUi}) => {
+  test('can move a group with elements in a block grid editor', async ({page, umbracoApi, umbracoUi}, testInfo) => {
+    await testInfo.slow();
+    
     const GroupMove = 'GroupMove';
     const GroupNotMoving = 'GroupNotMoving';
 
@@ -672,17 +682,12 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
     await umbracoUi.navigateToDataType(blockGridName);
 
     // Drags the group GroupMove under GroupNotMoving
-    await page.locator('.umb-block-card-group >> [icon="icon-navigation"]').nth(0).hover();
-    await page.mouse.down();
-    await page.mouse.move(0, -20);
-    await page.locator('[key="blockEditor_addBlockType"]').nth(2).hover({
-      position: {
-        x: 0, y: 20
-      }
-    });
-    await page.mouse.up();
+    const dragFrom = await page.locator('.umb-block-card-group >> [icon="icon-navigation"]').nth(0);
+    const dragTo = await page.locator('[key="blockEditor_addBlockType"]').nth(2);
+    await umbracoUi.dragAndDrop(dragFrom, dragTo, 20, 0, 15);
+    
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
-
+    
     // Assert
     await umbracoUi.isSuccessNotificationVisible();
     // Checks if the elements were moved with their group

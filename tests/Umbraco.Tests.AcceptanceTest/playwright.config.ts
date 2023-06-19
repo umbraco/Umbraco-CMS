@@ -36,6 +36,7 @@ const config: PlaywrightTestConfig = {
     // baseURL: 'http://localhost:44332',
     
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    // When working locally it can be a good idea to use trace: 'on-first-retry' instead of 'retain-on-failure', it can cut the local test times in half. 
     trace: 'retain-on-failure',
     ignoreHTTPSErrors: true,    
   },

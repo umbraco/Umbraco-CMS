@@ -34,7 +34,11 @@ public class NestedContentTests
         var localizationService = Mock.Of<ILocalizationService>();
 
         PropertyEditorCollection editors = null;
-        var editor = new NestedContentPropertyEditor(Mock.Of<IDataValueEditorFactory>(), Mock.Of<IIOHelper>(), Mock.Of<IEditorConfigurationParser>());
+        var editor = new NestedContentPropertyEditor(
+            Mock.Of<IDataValueEditorFactory>(),
+            Mock.Of<IIOHelper>(), 
+            Mock.Of<IEditorConfigurationParser>(),
+            Mock.Of<INestedContentPropertyIndexValueFactory>());
         editors = new PropertyEditorCollection(new DataEditorCollection(() => new DataEditor[] { editor }));
 
         var serializer = new ConfigurationEditorJsonSerializer();

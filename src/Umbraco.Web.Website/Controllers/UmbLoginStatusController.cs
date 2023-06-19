@@ -38,6 +38,8 @@ public class UmbLoginStatusController : SurfaceController
             return CurrentUmbracoPage();
         }
 
+        MergeRouteValuesToModel(model);
+
         var isLoggedIn = HttpContext.User.Identity?.IsAuthenticated ?? false;
 
         if (isLoggedIn)
@@ -55,5 +57,17 @@ public class UmbLoginStatusController : SurfaceController
 
         // Redirect to current page by default.
         return RedirectToCurrentUmbracoPage();
+    }
+
+    /// <summary>
+    ///     We pass in values via encrypted route values so they cannot be tampered with and merge them into the model for use
+    /// </summary>
+    /// <param name="model"></param>
+    private void MergeRouteValuesToModel(PostRedirectModel model)
+    {
+        if (RouteData.Values.TryGetValue(nameof(PostRedirectModel.RedirectUrl), out var redirectUrl) && redirectUrl is not null)
+        {
+            model.RedirectUrl = redirectUrl.ToString();
+        }
     }
 }

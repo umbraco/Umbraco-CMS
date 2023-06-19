@@ -1,9 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 using Umbraco.Extensions;
@@ -14,12 +15,37 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
 {
     private ModelsBuilderSettings _modelsBuilderSettings;
     private readonly ModelsGenerationError _mbErrors;
-    private readonly ModelsGenerator _modelGenerator;
+    private readonly IModelsGenerator _modelGenerator;
 
+    // TODO: Remove in v13
+    private readonly ModelsGenerator? _concreteModelGenerator;
+
+    [Obsolete("This constructor is obsolete and will be removed in v13. Use the constructor with IModelsGenerator instead.")]
+    [Browsable(false)]
     public BuildModelsBuilderController(
         IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
         ModelsGenerationError mbErrors,
         ModelsGenerator modelGenerator)
+    : this(modelsBuilderSettings, mbErrors, StaticServiceProvider.Instance.GetRequiredService<IModelsGenerator>())
+    {
+    }
+
+    [Obsolete("This constructor is obsolete and will be removed in v13. Use the constructor with only IModelsGenerator instead.")]
+    [Browsable(false)]
+    public BuildModelsBuilderController(
+        IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
+        ModelsGenerationError mbErrors,
+        ModelsGenerator concreteModelGenerator,
+        IModelsGenerator modelGenerator)
+    : this(modelsBuilderSettings, mbErrors, modelGenerator)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public BuildModelsBuilderController(
+        IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
+        ModelsGenerationError mbErrors,
+        IModelsGenerator modelGenerator)
     {
         _mbErrors = mbErrors;
         _modelGenerator = modelGenerator;

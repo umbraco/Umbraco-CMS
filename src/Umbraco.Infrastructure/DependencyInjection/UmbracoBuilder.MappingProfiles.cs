@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Infrastructure.Mapping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection;
@@ -23,6 +24,7 @@ public static partial class UmbracoBuilderExtensions
             .Add<ContentTypeMapDefinition>()
             .Add<DataTypeMapDefinition>()
             .Add<EntityMapDefinition>()
+            .Add<RelationModelMapDefinition>()
             .Add<DictionaryMapDefinition>()
             .Add<MacroMapDefinition>()
             .Add<RedirectUrlMapDefinition>()

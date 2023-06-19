@@ -11,6 +11,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     Represents the configuration editor for the media picker value editor.
 /// </summary>
+[Obsolete("Please use the MediaPicker3 instead, will be removed in V13")]
 public class MediaPickerConfigurationEditor : ConfigurationEditor<MediaPickerConfiguration>
 {
     // Scheduled for removal in v12

@@ -10,18 +10,28 @@ public class AddPrimaryKeyConstrainToContentVersionCleanupDtos : MigrationBase
 
     protected override void Migrate()
     {
-        IEnumerable<ContentVersionCleanupPolicyDto> contentVersionCleanupPolicyDtos =
-            Database
-                .Fetch<ContentVersionCleanupPolicyDto>()
-                .OrderByDescending(x => x.Updated)
-                .DistinctBy(x => x.ContentTypeId);
-
+        IEnumerable<ContentVersionCleanupPolicyDto>? contentVersionCleanupPolicyDtos = null;
         if (TableExists(ContentVersionCleanupPolicyDto.TableName))
         {
+            if (PrimaryKeyExists(ContentVersionCleanupPolicyDto.TableName, "PK_umbracoContentVersionCleanupPolicy"))
+            {
+                return;
+            }
+
+            contentVersionCleanupPolicyDtos =
+                Database
+                    .Fetch<ContentVersionCleanupPolicyDto>()
+                    .OrderByDescending(x => x.Updated)
+                    .DistinctBy(x => x.ContentTypeId);
+
             Delete.Table(ContentVersionCleanupPolicyDto.TableName).Do();
         }
 
         Create.Table<ContentVersionCleanupPolicyDto>().Do();
-        Database.InsertBatch(contentVersionCleanupPolicyDtos);
+
+        if (contentVersionCleanupPolicyDtos is not null)
+        {
+            Database.InsertBatch(contentVersionCleanupPolicyDtos);
+        }
     }
 }

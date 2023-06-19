@@ -31,6 +31,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         Group = Constants.PropertyEditors.Groups.RichContent,
         ValueEditorIsReusable = false,
         IsDeprecated = true)]
+    [Obsolete("The grid is obsolete, will be removed in V13")]
     public class GridPropertyEditor : DataEditor
     {
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;

@@ -101,11 +101,14 @@
           <div class="control-group">
             <label class="control-label" for="dbType">Database</label>
             <div class="controls -with-border">
-              <div class="input-readonly-text">
+              <div class="input-readonly-text" ng-if="installer.current.model.customInstallAvailable">
                 <strong>Provider:</strong>
                 {{installer.current.model.quickInstallSettings.displayName}}
                 <br /><strong>Name:</strong>
                 {{installer.current.model.quickInstallSettings.defaultDatabaseName}}
+              </div>
+              <div class="input-readonly-text" ng-if="!installer.current.model.customInstallAvailable">
+                A database has been pre-configured for your installation.
               </div>
             </div>
           </div>

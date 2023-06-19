@@ -1,5 +1,9 @@
 <div>
     <div class="umb-app-header">
+
+        <button type="button" class="umb-app-header__skip-button" ng-click="skipToMenu()"><localize key="general_skipToMenu">Go to menu</localize></button>
+        <button type="button" class="umb-app-header__skip-button" ng-click="skipToContent()"><localize key="general_skipToContent">Go to content</localize></button>
+
         <div class="umb-app-header__logo" ng-if="hideBackofficeLogo !== true">
             <button type="button"
                     id="umbraco-logo-mark"

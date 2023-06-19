@@ -1,10 +1,14 @@
 using System.Web;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
@@ -17,13 +21,31 @@ public class ImagesController : UmbracoAuthorizedApiController
 {
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly MediaFileManager _mediaFileManager;
+    private ContentSettings _contentSettings;
 
+    [Obsolete("Use non obsolete-constructor. Scheduled for removal in Umbraco 13.")]
     public ImagesController(
         MediaFileManager mediaFileManager,
         IImageUrlGenerator imageUrlGenerator)
+        : this(mediaFileManager,
+            imageUrlGenerator,
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>())
+    {
+
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public ImagesController(
+        MediaFileManager mediaFileManager,
+        IImageUrlGenerator imageUrlGenerator,
+        IOptionsMonitor<ContentSettings> contentSettingsMonitor)
     {
         _mediaFileManager = mediaFileManager;
         _imageUrlGenerator = imageUrlGenerator;
+        _contentSettings = contentSettingsMonitor.CurrentValue;
+
+        contentSettingsMonitor.OnChange(x => _contentSettings = x);
+
     }
 
     /// <summary>
@@ -58,7 +80,7 @@ public class ImagesController : UmbracoAuthorizedApiController
         var ext = Path.GetExtension(encodedImagePath);
 
         // check if imagePath is local to prevent open redirect
-        if (!Uri.IsWellFormedUriString(encodedImagePath, UriKind.Relative))
+        if (!IsAllowed(encodedImagePath))
         {
             return Unauthorized();
         }
@@ -90,12 +112,33 @@ public class ImagesController : UmbracoAuthorizedApiController
             ImageCropMode = ImageCropMode.Max,
             CacheBusterValue = rnd
         });
-        if (Url.IsLocalUrl(imageUrl))
+
+        if (imageUrl is not null)
         {
-            return new LocalRedirectResult(imageUrl, false);
+            return new RedirectResult(imageUrl, false);
         }
 
-        return Unauthorized();
+        return NotFound();
+    }
+
+    private bool IsAllowed(string encodedImagePath)
+    {
+        if(Uri.IsWellFormedUriString(encodedImagePath, UriKind.Relative))
+        {
+            return true;
+        }
+
+        var builder = new UriBuilder(encodedImagePath);
+
+        foreach (var allowedMediaHost in _contentSettings.AllowedMediaHosts)
+        {
+            if (string.Equals(builder.Host, allowedMediaHost, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>

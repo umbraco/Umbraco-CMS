@@ -15,6 +15,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj" />
