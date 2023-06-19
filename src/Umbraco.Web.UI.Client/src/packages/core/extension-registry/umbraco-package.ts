@@ -3,11 +3,17 @@ import type { ManifestTypes } from './models/index.js';
 /**
  * Umbraco package manifest JSON
  */
-export class UmbracoPackage {
+export interface UmbracoPackage {
+	/**
+	 * @title The unique identifier of the Umbraco package
+	 */
+	id?: string;
+
 	/**
 	 * @title The name of the Umbraco package
+	 * @required
 	 */
-	name?: string;
+	name: string;
 
 	/**
 	 * @title The version of the Umbraco package in the style of semver
@@ -23,6 +29,7 @@ export class UmbracoPackage {
 
 	/**
 	 * @title An array of Umbraco package manifest types that will be installed
+	 * @required
 	 */
-	extensions?: ManifestTypes[];
+	extensions: ManifestTypes[];
 }
