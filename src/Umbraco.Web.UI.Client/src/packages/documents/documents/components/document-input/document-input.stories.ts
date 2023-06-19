@@ -3,8 +3,8 @@ import './document-input.element.js';
 import type { UmbDocumentInputElement } from './document-input.element.js';
 
 const meta: Meta<UmbDocumentInputElement> = {
-	title: 'Components/Inputs/Document Picker',
-	component: 'umb-input-document-picker',
+	title: 'Components/Inputs/Document',
+	component: 'umb-document-Input',
 };
 
 export default meta;
