@@ -1,1 +1,1 @@
-export * from './input-document-picker/input-document-picker.element.js';
+export * from './document-input/document-input.element.js';

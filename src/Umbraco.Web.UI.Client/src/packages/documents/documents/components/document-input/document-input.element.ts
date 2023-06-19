@@ -12,8 +12,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-@customElement('umb-input-document-picker')
-export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-document-input')
+export class UmbDocumentInputElement extends FormControlMixin(UmbLitElement) {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -174,10 +174,10 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	];
 }
 
-export default UmbInputDocumentPickerElement;
+export default UmbDocumentInputElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-document-picker': UmbInputDocumentPickerElement;
+		'umb-document-input': UmbDocumentInputElement;
 	}
 }
