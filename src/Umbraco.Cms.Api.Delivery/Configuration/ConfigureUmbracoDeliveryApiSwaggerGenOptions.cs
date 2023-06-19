@@ -16,10 +16,10 @@ public class ConfigureUmbracoDeliveryApiSwaggerGenOptions: IConfigureOptions<Swa
             {
                 Title = DeliveryApiConfiguration.ApiTitle,
                 Version = "Latest",
-                Description = $"You can find out more about the Content Delivery API on [our documentation platform]({DeliveryApiConfiguration.ApiDocumentationArticleLink})."
+                Description = $"You can find out more about the {DeliveryApiConfiguration.ApiTitle} in [the documentation]({DeliveryApiConfiguration.ApiDocumentationArticleLink})."
             });
 
-        swaggerGenOptions.OperationFilter<CommonSwaggerDocumentationFilter>();
-        swaggerGenOptions.ParameterFilter<CommonSwaggerDocumentationFilter>();
+        swaggerGenOptions.OperationFilter<SwaggerDocumentationFilter>();
+        swaggerGenOptions.ParameterFilter<SwaggerDocumentationFilter>();
     }
 }

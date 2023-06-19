@@ -5,11 +5,8 @@ using Umbraco.Cms.Api.Delivery.Configuration;
 
 namespace Umbraco.Cms.Api.Delivery.Filters;
 
-public class CommonSwaggerDocumentationFilter : IOperationFilter, IParameterFilter
+public class SwaggerDocumentationFilter : IOperationFilter, IParameterFilter
 {
-    private const string DocumentationReference =
-        $"*For more information, see the [Query parameters]({DeliveryApiConfiguration.ApiDocumentationArticleLink}#query-parameters) section in our dedicated documentation article.*";
-
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
         operation.Parameters ??= new List<OpenApiParameter>();
@@ -19,7 +16,7 @@ public class CommonSwaggerDocumentationFilter : IOperationFilter, IParameterFilt
             Name = "expand",
             In = ParameterLocation.Query,
             Required = false,
-            Description = DocumentationReference,
+            Description = QueryParameterDescription("Defines the properties that should be expanded in the response"),
             Schema = new OpenApiSchema { Type = "string" },
             Examples = new Dictionary<string, OpenApiExample>
             {
@@ -41,6 +38,7 @@ public class CommonSwaggerDocumentationFilter : IOperationFilter, IParameterFilt
             Name = "Accept-Language",
             In = ParameterLocation.Header,
             Required = false,
+            Description = "Defines the language to return. Use this when querying language variant content items.",
             Schema = new OpenApiSchema { Type = "string" },
             Examples = new Dictionary<string, OpenApiExample>
             {
@@ -82,22 +80,33 @@ public class CommonSwaggerDocumentationFilter : IOperationFilter, IParameterFilt
         switch (parameter.Name)
         {
             case "fetch":
-                AddQueryParameterDocumentation(parameter, FetchQueryParameterExamples());
+                AddQueryParameterDocumentation(parameter, FetchQueryParameterExamples(), "Specifies the content items to fetch");
                 break;
             case "filter":
-                AddQueryParameterDocumentation(parameter, FilterQueryParameterExamples());
+                AddQueryParameterDocumentation(parameter, FilterQueryParameterExamples(), "Defines how to filter the fetched content items");
                 break;
             case "sort":
-                AddQueryParameterDocumentation(parameter, SortQueryParameterExamples());
+                AddQueryParameterDocumentation(parameter, SortQueryParameterExamples(), "Defines how to sort the found content items");
+                break;
+            case "skip":
+                parameter.Description = PaginationDescription(true);
+                break;
+            case "take":
+                parameter.Description = PaginationDescription(false);
                 break;
             default:
                 return;
         }
     }
 
-    private void AddQueryParameterDocumentation(OpenApiParameter parameter, Dictionary<string, OpenApiExample> examples)
+    private string QueryParameterDescription(string description)
+        => $"{description}. Refer to [the documentation]({DeliveryApiConfiguration.ApiDocumentationArticleLink}#query-parameters) for more details on this.";
+
+    private string PaginationDescription(bool skip) => $"Specifies the number of found content items to {(skip ? "skip" : "take")}. Use this to control pagination of the response.";
+
+    private void AddQueryParameterDocumentation(OpenApiParameter parameter, Dictionary<string, OpenApiExample> examples, string description)
     {
-        parameter.Description = DocumentationReference;
+        parameter.Description = QueryParameterDescription(description);
         parameter.Examples = examples;
     }
 
