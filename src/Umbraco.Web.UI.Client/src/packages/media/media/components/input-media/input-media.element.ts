@@ -11,8 +11,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-@customElement('umb-media-input')
-export class UmbMediaInputElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-media')
+export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -201,10 +201,10 @@ export class UmbMediaInputElement extends FormControlMixin(UmbLitElement) {
 	];
 }
 
-export default UmbMediaInputElement;
+export default UmbInputMediaElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-media-input': UmbMediaInputElement;
+		'umb-input-media': UmbInputMediaElement;
 	}
 }
