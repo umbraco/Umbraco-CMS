@@ -14,8 +14,8 @@ import {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-@customElement('umb-input-document-type-picker')
-export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-document-type-input')
+export class UmbDocumentTypeInputElement extends FormControlMixin(UmbLitElement) {
 	// TODO: do we need both selectedIds and value? If we just use value we follow the same pattern as native form controls.
 	private _selectedIds: Array<string> = [];
 	@property({ type: Array })
@@ -130,10 +130,10 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 	];
 }
 
-export default UmbInputDocumentTypePickerElement;
+export default UmbDocumentTypeInputElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-document-type-picker': UmbInputDocumentTypePickerElement;
+		'umb-document-type-input': UmbDocumentTypeInputElement;
 	}
 }

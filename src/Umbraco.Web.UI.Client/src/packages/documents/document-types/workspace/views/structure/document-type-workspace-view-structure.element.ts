@@ -1,5 +1,5 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
-import type { UmbInputDocumentTypePickerElement } from '../../../components/input-document-type-picker/input-document-type-picker.element.js';
+import type { UmbDocumentTypeInputElement } from '../../../components/document-type-input/document-type-input.element.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
@@ -62,10 +62,10 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 					</div>
 					<div slot="editor">
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
-						<umb-input-document-type-picker
+						<umb-document-type-input
 							.selectedIds=${this._allowedContentTypeIDs}
 							@change="${(e: CustomEvent) => {
-								const sortedContentTypesList = (e.target as UmbInputDocumentTypePickerElement).selectedIds.map(
+								const sortedContentTypesList = (e.target as UmbDocumentTypeInputElement).selectedIds.map(
 									(id, index) => ({
 										id: id,
 										sortOrder: index,
@@ -73,7 +73,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 								);
 								this.#workspaceContext?.setAllowedContentTypes(sortedContentTypesList);
 							}}">
-						</umb-input-document-type-picker>
+						</umb-document-type-input>
 					</div>
 				</umb-workspace-property-layout>
 			</uui-box>
