@@ -1,4 +1,4 @@
-import { UmbMediaInputElement } from '../../../../media/media/components/input-media/input-media.element.js';
+import { UmbInputMediaElement } from '../../../../media/media/components/input-media/input-media.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -36,7 +36,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	private _limitMax?: number;
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbMediaInputElement).selectedIds;
+		this.value = (event.target as UmbInputMediaElement).selectedIds;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
