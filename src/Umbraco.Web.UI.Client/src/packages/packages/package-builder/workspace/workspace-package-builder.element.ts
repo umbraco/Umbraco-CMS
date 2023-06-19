@@ -1,4 +1,4 @@
-import type { UmbDocumentInputElement } from '../../../documents/documents/components/document-input/document-input.element.js';
+import type { UmbInputDocumentElement } from '../../../documents/documents/components/input-document/input-document.element.js';
 import type { UmbMediaInputElement } from '../../../media/media/components/media-input/media-input.element.js';
 import type { UmbInputLanguagePickerElement } from '../../../settings/languages/components/input-language-picker/input-language-picker.element.js';
 import {
@@ -184,12 +184,12 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	#renderContentSection() {
 		return html`
 			<div slot="editor">
-				<umb-document-input
+				<umb-input-document
 					.value=${this._package.contentNodeId ?? ''}
 					max="1"
 					@change="${(e: CustomEvent) =>
-						(this._package.contentNodeId = (e.target as UmbDocumentInputElement).selectedIds[0])}">
-				</umb-document-input>
+						(this._package.contentNodeId = (e.target as UmbInputDocumentElement).selectedIds[0])}">
+				</umb-input-document>
 				<uui-checkbox
 					label="Include child nodes"
 					.checked="${this._package.contentLoadChildNodes ?? false}"
