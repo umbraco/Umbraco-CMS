@@ -86,7 +86,7 @@
 		"build:vite": "tsc && vite build --mode staging",
 		"build:for:static": "vite build",
 		"build:for:cms": "npm run build && node ./devops/build/copy-to-cms.js",
-		"build:for:npm": "npm run build && tsc-alias -f -p src/tsconfig.json",
+		"build:for:npm": "npm run build && tsc-alias -f -p src/tsconfig.json && npm run generate:jsonschema:dist && npm run wc-analyze && npm run wc-analyze:vscode",
 		"preview": "vite preview --open",
 		"test": "web-test-runner --coverage",
 		"test:watch": "web-test-runner --watch",
