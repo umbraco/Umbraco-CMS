@@ -1,15 +1,15 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbInputColorPickerElement } from './input-color-picker.element.js';
+import { UmbInputColorElement } from './input-color.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
-describe('UmbInputColorPickerElement', () => {
-	let element: UmbInputColorPickerElement;
+describe('UmbInputColorElement', () => {
+	let element: UmbInputColorElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-input-color-picker></umb-input-color-picker> `);
+		element = await fixture(html` <umb-input-color></umb-input-color> `);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbInputColorPickerElement);
+		expect(element).to.be.instanceOf(UmbInputColorElement);
 	});
 
 	it('passes the a11y audit', async () => {

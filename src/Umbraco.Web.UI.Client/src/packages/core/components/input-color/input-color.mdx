@@ -1,7 +1,7 @@
 import { Meta, Title, Primary, Controls, Story, Source } from '@storybook/blocks';
-import * as ColorPickerStories from './input-color-picker.stories';
+import * as ColorStories from './input-color.stories';
 
-<Meta of={ColorPickerStories} />
+<Meta of={ColorStories} />
 
 <Title />
 This color picker allows you to select a color from a palette.
@@ -12,14 +12,14 @@ This shows how we can override the autogen docs from StoryBook to document a com
 
 ### Primary
 
-<Story of={ColorPickerStories.Overview} />
-<Source of={ColorPickerStories.Overview} />
+<Story of={ColorStories.Overview} />
+<Source of={ColorStories.Overview} />
 
 ## Properties
 
-<Controls of={ColorPickerStories.Overview} />
+<Controls of={ColorStories.Overview} />
 
 ### Without Labels
 
-<Story of={ColorPickerStories.WithoutLabels} />
-<Source of={ColorPickerStories.WithoutLabels} dark />
+<Story of={ColorStories.WithoutLabels} />
+<Source of={ColorStories.WithoutLabels} dark />
