@@ -1,5 +1,5 @@
 import type { UmbDocumentInputElement } from '../../../documents/documents/components/document-input/document-input.element.js';
-import type { UmbInputMediaPickerElement } from '../../../media/media/components/input-media-picker/input-media-picker.element.js';
+import type { UmbMediaInputElement } from '../../../media/media/components/media-input/media-input.element.js';
 import type { UmbInputLanguagePickerElement } from '../../../settings/languages/components/input-language-picker/input-language-picker.element.js';
 import {
 	UUITextStyles,
@@ -203,10 +203,10 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	#renderMediaSection() {
 		return html`
 			<div slot="editor">
-				<umb-input-media-picker
+				<umb-media-input
 					.selectedIds=${this._package.mediaIds ?? []}
 					@change="${(e: CustomEvent) =>
-						(this._package.mediaIds = (e.target as UmbInputMediaPickerElement).selectedIds)}"></umb-input-media-picker>
+						(this._package.mediaIds = (e.target as UmbMediaInputElement).selectedIds)}"></umb-media-input>
 				<uui-checkbox
 					label="Include child nodes"
 					.checked="${this._package.mediaLoadChildNodes ?? false}"
