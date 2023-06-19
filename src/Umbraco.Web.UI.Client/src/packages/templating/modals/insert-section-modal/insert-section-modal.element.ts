@@ -127,8 +127,9 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 
 			#main {
 				box-sizing: border-box;
-				padding: var(--uui-size-space-5);
-				height: calc(100vh - 124px);
+				height: calc(
+					100dvh - var(--umb-header-layout-height) - var(--umb-footer-layout-height) - 2 * var(--uui-size-layout-1)
+				);
 			}
 
 			#main umb-insert-section-checkbox:not(:last-of-type) {

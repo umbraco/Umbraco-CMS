@@ -1,24 +1,14 @@
-import { UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_ALIAS } from './manifests.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UmbModalManagerContext,
-	UmbModalToken,
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
 	UmbModalContext,
 	UMB_DICTIONARY_ITEM_PICKER_MODAL,
 	UmbDictionaryItemPickerModalResult,
 } from '@umbraco-cms/backoffice/modal';
-
-export const UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL = new UmbModalToken(
-	UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_ALIAS,
-	{
-		type: 'sidebar',
-		size: 'small',
-	}
-);
 
 export interface ChooseInsertTypeModalData {
 	hidePartialViews?: boolean;
@@ -26,7 +16,6 @@ export interface ChooseInsertTypeModalData {
 
 export enum CodeSnippetType {
 	partialView = 'partialView',
-	umbracoField = 'umbracoField',
 	dictionaryItem = 'dictionaryItem',
 	macro = 'macro',
 }
@@ -55,13 +44,6 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	#openModal?: UmbModalContext;
 
-	#openInsertValueSidebar() {
-		this.#openModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL);
-		this.#openModal?.onSubmit().then((chosenValue) => {
-			if (chosenValue) this.modalContext?.submit({ value: chosenValue, type: CodeSnippetType.umbracoField });
-		});
-	}
-
 	#openInsertPartialViewSidebar() {
 		this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
 		this.#openModal?.onSubmit().then((partialViewPickerModalResult) => {
@@ -81,17 +63,6 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 			if (dictionaryItemPickerModalResult)
 				this.modalContext?.submit({ value: dictionaryItemPickerModalResult, type: CodeSnippetType.dictionaryItem });
 		});
-	}
-
-	//TODO: insert this when we have insert value implemented
-	#renderInsertValueButton() {
-		return html`<uui-button @click=${this.#openInsertValueSidebar} look="placeholder" label="Insert value"
-			><h3>Value</h3>
-			<p>
-				Displays the value of a named field from the current page, with options to modify the value or fallback to
-				alternative values.
-			</p></uui-button
-		>`;
 	}
 
 	//TODO: insert this when we have partial views
@@ -139,8 +110,9 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 			#main {
 				box-sizing: border-box;
-				padding: var(--uui-size-space-5);
-				height: calc(100vh - 124px);
+				height: calc(
+					100dvh - var(--umb-header-layout-height) - var(--umb-footer-layout-height) - 2 * var(--uui-size-layout-1)
+				);
 			}
 
 			#main uui-button:not(:last-of-type) {
