@@ -7,20 +7,20 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
+namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
-public class AllowedChildrenOfRootDocumentTypeController : ManagementApiControllerBase
+public class AllowedChildrenOfRootDocumentController : DocumentControllerBase
 {
     private readonly IContentTypeService _contentTypeService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public AllowedChildrenOfRootDocumentTypeController(IContentTypeService contentTypeService, IUmbracoMapper umbracoMapper)
+    public AllowedChildrenOfRootDocumentController(IContentTypeService contentTypeService, IUmbracoMapper umbracoMapper)
     {
         _contentTypeService = contentTypeService;
         _umbracoMapper = umbracoMapper;
     }
 
-    [HttpGet("allowed-children-of/root")]
+    [HttpGet("root/allowed-document-types")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentTypeResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
