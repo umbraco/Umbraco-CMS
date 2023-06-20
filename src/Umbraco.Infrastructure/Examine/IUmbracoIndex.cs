@@ -28,5 +28,5 @@ public interface IUmbracoIndex : IIndex, IIndexStats
     /// <remarks>
     ///     To retain backwards compatability, the default value is true
     /// </remarks>
-    bool SupportProtectedContent => true;
+    bool SupportProtectedContent { get; }
 }
