@@ -551,8 +551,9 @@ stages:
       umbracoMajorVersion:  $[ stageDependencies.Build.A.outputs['determineMajorVersion.majorVersion'] ]
     displayName: Upload API Documention
     dependsOn:
+      - Build
       - Build_Docs
-      - Deploy_MyGet
+      - Deploy_MyGet # Change to "Deploy_Nuget" after release of v14
     condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.uploadApiDocs}}))
     jobs:
       - job:
