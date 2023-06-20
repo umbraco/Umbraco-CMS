@@ -5,3 +5,4 @@
 export type SetAvatarRequestModel = {
     fileId?: string;
 };
+

@@ -25,10 +25,10 @@ export class StylesheetResource {
      * @throws ApiError
      */
     public static getStylesheet({
-path,
-}: {
-path?: string,
-}): CancelablePromise<StylesheetResponseModel> {
+        path,
+    }: {
+        path?: string,
+    }): CancelablePromise<StylesheetResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/stylesheet',
@@ -43,10 +43,10 @@ path?: string,
      * @throws ApiError
      */
     public static postStylesheet({
-requestBody,
-}: {
-requestBody?: CreateStylesheetRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: CreateStylesheetRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/stylesheet',
@@ -61,10 +61,10 @@ requestBody?: CreateStylesheetRequestModel,
      * @throws ApiError
      */
     public static deleteStylesheet({
-path,
-}: {
-path?: string,
-}): CancelablePromise<any> {
+        path,
+    }: {
+        path?: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/stylesheet',
@@ -79,10 +79,10 @@ path?: string,
      * @throws ApiError
      */
     public static putStylesheet({
-requestBody,
-}: {
-requestBody?: UpdateStylesheetRequestModel,
-}): CancelablePromise<any> {
+        requestBody,
+    }: {
+        requestBody?: UpdateStylesheetRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/stylesheet',
@@ -96,12 +96,12 @@ requestBody?: UpdateStylesheetRequestModel,
      * @throws ApiError
      */
     public static getStylesheetAll({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedStylesheetOverviewResponseModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedStylesheetOverviewResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/stylesheet/all',
@@ -117,10 +117,10 @@ take?: number,
      * @throws ApiError
      */
     public static getStylesheetFolder({
-path,
-}: {
-path?: string,
-}): CancelablePromise<any> {
+        path,
+    }: {
+        path?: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/stylesheet/folder',
@@ -135,10 +135,10 @@ path?: string,
      * @throws ApiError
      */
     public static postStylesheetFolder({
-requestBody,
-}: {
-requestBody?: CreatePathFolderRequestModel,
-}): CancelablePromise<any> {
+        requestBody,
+    }: {
+        requestBody?: CreatePathFolderRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/stylesheet/folder',
@@ -152,10 +152,10 @@ requestBody?: CreatePathFolderRequestModel,
      * @throws ApiError
      */
     public static deleteStylesheetFolder({
-path,
-}: {
-path?: string,
-}): CancelablePromise<any> {
+        path,
+    }: {
+        path?: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/stylesheet/folder',
@@ -170,10 +170,10 @@ path?: string,
      * @throws ApiError
      */
     public static getStylesheetItem({
-path,
-}: {
-path?: Array<string>,
-}): CancelablePromise<Array<ScriptItemResponseModel>> {
+        path,
+    }: {
+        path?: Array<string>,
+    }): CancelablePromise<Array<ScriptItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/stylesheet/item',
@@ -188,10 +188,10 @@ path?: Array<string>,
      * @throws ApiError
      */
     public static postStylesheetRichTextExtractRules({
-requestBody,
-}: {
-requestBody?: ExtractRichTextStylesheetRulesRequestModel,
-}): CancelablePromise<ExtractRichTextStylesheetRulesResponseModel> {
+        requestBody,
+    }: {
+        requestBody?: ExtractRichTextStylesheetRulesRequestModel,
+    }): CancelablePromise<ExtractRichTextStylesheetRulesResponseModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/stylesheet/rich-text/extract-rules',
@@ -205,10 +205,10 @@ requestBody?: ExtractRichTextStylesheetRulesRequestModel,
      * @throws ApiError
      */
     public static postStylesheetRichTextInterpolateRules({
-requestBody,
-}: {
-requestBody?: InterpolateRichTextStylesheetRequestModel,
-}): CancelablePromise<InterpolateRichTextStylesheetResponseModel> {
+        requestBody,
+    }: {
+        requestBody?: InterpolateRichTextStylesheetRequestModel,
+    }): CancelablePromise<InterpolateRichTextStylesheetResponseModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/stylesheet/rich-text/interpolate-rules',
@@ -222,10 +222,10 @@ requestBody?: InterpolateRichTextStylesheetRequestModel,
      * @throws ApiError
      */
     public static getStylesheetRichTextRules({
-path,
-}: {
-path?: string,
-}): CancelablePromise<(RichTextStylesheetRulesResponseModel | ExtractRichTextStylesheetRulesResponseModel)> {
+        path,
+    }: {
+        path?: string,
+    }): CancelablePromise<(RichTextStylesheetRulesResponseModel | ExtractRichTextStylesheetRulesResponseModel)> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/stylesheet/rich-text/rules',
@@ -240,14 +240,14 @@ path?: string,
      * @throws ApiError
      */
     public static getTreeStylesheetChildren({
-path,
-skip,
-take = 100,
-}: {
-path?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
+        path,
+        skip,
+        take = 100,
+    }: {
+        path?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/stylesheet/children',
@@ -264,12 +264,12 @@ take?: number,
      * @throws ApiError
      */
     public static getTreeStylesheetRoot({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/stylesheet/root',

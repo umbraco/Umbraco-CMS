@@ -8,3 +8,4 @@ export type PagedLogTemplateResponseModel = {
     total: number;
     items: Array<LogTemplateResponseModel>;
 };
+

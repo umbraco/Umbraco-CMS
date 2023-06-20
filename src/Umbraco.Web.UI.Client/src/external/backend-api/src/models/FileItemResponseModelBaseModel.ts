@@ -7,3 +7,4 @@ export type FileItemResponseModelBaseModel = {
     path?: string;
     icon?: string;
 };
+

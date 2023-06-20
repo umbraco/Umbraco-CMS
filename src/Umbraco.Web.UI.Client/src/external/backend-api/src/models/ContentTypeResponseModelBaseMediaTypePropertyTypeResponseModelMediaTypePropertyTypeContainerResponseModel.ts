@@ -22,3 +22,4 @@ export type ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaT
     compositions?: Array<ContentTypeCompositionModel>;
     id?: string;
 };
+

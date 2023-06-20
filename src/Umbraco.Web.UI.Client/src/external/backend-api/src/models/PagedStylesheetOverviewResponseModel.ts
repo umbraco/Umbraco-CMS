@@ -8,3 +8,4 @@ export type PagedStylesheetOverviewResponseModel = {
     total: number;
     items: Array<StylesheetOverviewResponseModel>;
 };
+

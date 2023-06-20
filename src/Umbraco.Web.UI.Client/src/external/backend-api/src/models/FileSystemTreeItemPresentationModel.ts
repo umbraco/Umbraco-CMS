@@ -5,6 +5,7 @@
 import type { TreeItemPresentationModel } from './TreeItemPresentationModel';
 
 export type FileSystemTreeItemPresentationModel = (TreeItemPresentationModel & {
-path?: string;
-isFolder?: boolean;
+    path?: string;
+    isFolder?: boolean;
 });
+

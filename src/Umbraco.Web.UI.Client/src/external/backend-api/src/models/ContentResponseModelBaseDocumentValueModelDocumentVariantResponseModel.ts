@@ -11,3 +11,4 @@ export type ContentResponseModelBaseDocumentValueModelDocumentVariantResponseMod
     id?: string;
     contentTypeId?: string;
 };
+

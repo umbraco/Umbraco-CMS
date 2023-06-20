@@ -7,3 +7,4 @@ export type ContentTypeCleanupModel = {
     keepAllVersionsNewerThanDays?: number | null;
     keepLatestVersionPerDayForDays?: number | null;
 };
+

@@ -5,3 +5,4 @@
 export type ExtractRichTextStylesheetRulesRequestModel = {
     content?: string;
 };
+

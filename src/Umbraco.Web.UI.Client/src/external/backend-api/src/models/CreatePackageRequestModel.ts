@@ -5,3 +5,4 @@
 import type { PackageModelBaseModel } from './PackageModelBaseModel';
 
 export type CreatePackageRequestModel = PackageModelBaseModel;
+

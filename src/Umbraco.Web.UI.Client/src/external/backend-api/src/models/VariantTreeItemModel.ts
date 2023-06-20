@@ -9,3 +9,4 @@ export type VariantTreeItemModel = {
     culture?: string | null;
     state?: PublishedStateModel;
 };
+

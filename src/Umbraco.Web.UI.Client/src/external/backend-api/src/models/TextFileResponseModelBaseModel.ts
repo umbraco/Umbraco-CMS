@@ -5,5 +5,6 @@
 import type { TextFileViewModelBaseModel } from './TextFileViewModelBaseModel';
 
 export type TextFileResponseModelBaseModel = (TextFileViewModelBaseModel & {
-path?: string;
+    path?: string;
 });
+

@@ -6,3 +6,4 @@ export type LinkedLoginModel = {
     providerName?: string;
     providerKey?: string;
 };
+

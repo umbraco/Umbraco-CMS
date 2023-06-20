@@ -5,3 +5,4 @@
 import type { DataTypeModelBaseModel } from './DataTypeModelBaseModel';
 
 export type UpdateDataTypeRequestModel = DataTypeModelBaseModel;
+

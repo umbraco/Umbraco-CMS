@@ -21,3 +21,4 @@ export type UpdateContentTypeRequestModelBaseUpdateDocumentTypePropertyTypeReque
     allowedContentTypes?: Array<ContentTypeSortModel>;
     compositions?: Array<ContentTypeCompositionModel>;
 };
+

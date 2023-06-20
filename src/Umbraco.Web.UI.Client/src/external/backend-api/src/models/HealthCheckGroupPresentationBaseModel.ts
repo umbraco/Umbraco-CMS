@@ -5,3 +5,4 @@
 export type HealthCheckGroupPresentationBaseModel = {
     name?: string;
 };
+

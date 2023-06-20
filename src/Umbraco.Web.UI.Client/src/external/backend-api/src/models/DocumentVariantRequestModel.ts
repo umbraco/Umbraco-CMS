@@ -5,5 +5,6 @@
 import type { VariantModelBaseModel } from './VariantModelBaseModel';
 
 export type DocumentVariantRequestModel = (VariantModelBaseModel & {
-$type: string;
+    $type: string;
 });
+

@@ -5,5 +5,6 @@
 import type { UpdateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel } from './UpdateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel';
 
 export type UpdateDocumentRequestModel = (UpdateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel & {
-templateId?: string | null;
+    templateId?: string | null;
 });
+

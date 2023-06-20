@@ -5,3 +5,4 @@
 export type PropertyTypeAppearanceModel = {
     labelOnTop?: boolean;
 };
+

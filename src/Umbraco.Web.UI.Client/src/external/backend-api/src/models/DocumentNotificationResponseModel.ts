@@ -6,3 +6,4 @@ export type DocumentNotificationResponseModel = {
     actionId?: string;
     subscribed?: boolean;
 };
+

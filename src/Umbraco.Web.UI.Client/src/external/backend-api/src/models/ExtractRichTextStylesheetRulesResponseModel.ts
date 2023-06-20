@@ -5,3 +5,4 @@
 import type { RichTextStylesheetRulesResponseModel } from './RichTextStylesheetRulesResponseModel';
 
 export type ExtractRichTextStylesheetRulesResponseModel = RichTextStylesheetRulesResponseModel;
+

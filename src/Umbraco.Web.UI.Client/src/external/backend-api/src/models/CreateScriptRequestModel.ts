@@ -5,3 +5,4 @@
 import type { CreateTextFileViewModelBaseModel } from './CreateTextFileViewModelBaseModel';
 
 export type CreateScriptRequestModel = CreateTextFileViewModelBaseModel;
+

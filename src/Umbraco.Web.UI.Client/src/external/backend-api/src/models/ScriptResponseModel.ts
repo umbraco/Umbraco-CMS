@@ -5,3 +5,4 @@
 import type { TextFileResponseModelBaseModel } from './TextFileResponseModelBaseModel';
 
 export type ScriptResponseModel = TextFileResponseModelBaseModel;
+

@@ -5,5 +5,6 @@
 import type { PathFolderModelBaseModel } from './PathFolderModelBaseModel';
 
 export type CreatePathFolderRequestModel = (PathFolderModelBaseModel & {
-parentPath?: string | null;
+    parentPath?: string | null;
 });
+

@@ -5,8 +5,9 @@
 import type { EntityTreeItemResponseModel } from './EntityTreeItemResponseModel';
 
 export type ContentTreeItemResponseModel = (EntityTreeItemResponseModel & {
-$type: string;
-noAccess?: boolean;
-isTrashed?: boolean;
-id?: string;
+    $type: string;
+    noAccess?: boolean;
+    isTrashed?: boolean;
+    id?: string;
 });
+

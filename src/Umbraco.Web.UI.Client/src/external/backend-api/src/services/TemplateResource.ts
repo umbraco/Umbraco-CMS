@@ -22,10 +22,10 @@ export class TemplateResource {
      * @throws ApiError
      */
     public static postTemplate({
-requestBody,
-}: {
-requestBody?: CreateTemplateRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: CreateTemplateRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/template',
@@ -44,10 +44,10 @@ requestBody?: CreateTemplateRequestModel,
      * @throws ApiError
      */
     public static getTemplateById({
-id,
-}: {
-id: string,
-}): CancelablePromise<TemplateResponseModel> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<TemplateResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/template/{id}',
@@ -65,10 +65,10 @@ id: string,
      * @throws ApiError
      */
     public static deleteTemplateById({
-id,
-}: {
-id: string,
-}): CancelablePromise<any> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/template/{id}',
@@ -87,12 +87,12 @@ id: string,
      * @throws ApiError
      */
     public static putTemplateById({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: UpdateTemplateRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateTemplateRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/template/{id}',
@@ -113,10 +113,10 @@ requestBody?: UpdateTemplateRequestModel,
      * @throws ApiError
      */
     public static getTemplateItem({
-id,
-}: {
-id?: Array<string>,
-}): CancelablePromise<Array<TemplateItemResponseModel>> {
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<TemplateItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/template/item',
@@ -131,10 +131,10 @@ id?: Array<string>,
      * @throws ApiError
      */
     public static postTemplateQueryExecute({
-requestBody,
-}: {
-requestBody?: TemplateQueryExecuteModel,
-}): CancelablePromise<TemplateQueryResultResponseModel> {
+        requestBody,
+    }: {
+        requestBody?: TemplateQueryExecuteModel,
+    }): CancelablePromise<TemplateQueryResultResponseModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/template/query/execute',
@@ -159,10 +159,10 @@ requestBody?: TemplateQueryExecuteModel,
      * @throws ApiError
      */
     public static getTemplateScaffold({
-masterTemplateId,
-}: {
-masterTemplateId?: string,
-}): CancelablePromise<TemplateScaffoldResponseModel> {
+        masterTemplateId,
+    }: {
+        masterTemplateId?: string,
+    }): CancelablePromise<TemplateScaffoldResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/template/scaffold',
@@ -180,14 +180,14 @@ masterTemplateId?: string,
      * @throws ApiError
      */
     public static getTreeTemplateChildren({
-parentId,
-skip,
-take = 100,
-}: {
-parentId?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedEntityTreeItemResponseModel> {
+        parentId,
+        skip,
+        take = 100,
+    }: {
+        parentId?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/template/children',
@@ -204,12 +204,12 @@ take?: number,
      * @throws ApiError
      */
     public static getTreeTemplateRoot({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedEntityTreeItemResponseModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/template/root',

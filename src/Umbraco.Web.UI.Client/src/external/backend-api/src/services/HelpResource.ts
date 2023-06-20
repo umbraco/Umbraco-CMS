@@ -14,18 +14,18 @@ export class HelpResource {
      * @throws ApiError
      */
     public static getHelp({
-section,
-tree,
-skip,
-take,
-baseUrl = 'https://our.umbraco.com',
-}: {
-section?: string,
-tree?: string,
-skip?: number,
-take?: number,
-baseUrl?: string,
-}): CancelablePromise<PagedHelpPageResponseModel> {
+        section,
+        tree,
+        skip,
+        take,
+        baseUrl = 'https://our.umbraco.com',
+    }: {
+        section?: string,
+        tree?: string,
+        skip?: number,
+        take?: number,
+        baseUrl?: string,
+    }): CancelablePromise<PagedHelpPageResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/help',

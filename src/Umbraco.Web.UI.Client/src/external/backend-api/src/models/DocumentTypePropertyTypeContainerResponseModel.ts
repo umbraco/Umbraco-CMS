@@ -5,3 +5,4 @@
 import type { PropertyTypeContainerModelBaseModel } from './PropertyTypeContainerModelBaseModel';
 
 export type DocumentTypePropertyTypeContainerResponseModel = PropertyTypeContainerModelBaseModel;
+

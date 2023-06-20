@@ -8,3 +8,4 @@ export type TreeItemPresentationModel = {
     icon?: string;
     hasChildren?: boolean;
 };
+

@@ -10,3 +10,4 @@ export type VariantResponseModelBaseModel = {
     createDate?: string;
     updateDate?: string;
 };
+

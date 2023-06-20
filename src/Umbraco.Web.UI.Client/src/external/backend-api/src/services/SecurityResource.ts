@@ -25,10 +25,10 @@ export class SecurityResource {
      * @throws ApiError
      */
     public static postSecurityBackOfficeLogin({
-requestBody,
-}: {
-requestBody?: LoginRequestModel,
-}): CancelablePromise<any> {
+        requestBody,
+    }: {
+        requestBody?: LoginRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/security/back-office/login',

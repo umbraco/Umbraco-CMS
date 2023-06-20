@@ -5,3 +5,4 @@
 import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
 
 export type DictionaryItemItemResponseModel = ItemResponseModelBaseModel;
+

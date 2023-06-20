@@ -19,10 +19,10 @@ export class ScriptResource {
      * @throws ApiError
      */
     public static getScript({
-path,
-}: {
-path?: string,
-}): CancelablePromise<ScriptResponseModel> {
+        path,
+    }: {
+        path?: string,
+    }): CancelablePromise<ScriptResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/script',
@@ -37,10 +37,10 @@ path?: string,
      * @throws ApiError
      */
     public static postScript({
-requestBody,
-}: {
-requestBody?: CreateScriptRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: CreateScriptRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/script',
@@ -55,10 +55,10 @@ requestBody?: CreateScriptRequestModel,
      * @throws ApiError
      */
     public static deleteScript({
-path,
-}: {
-path?: string,
-}): CancelablePromise<any> {
+        path,
+    }: {
+        path?: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/script',
@@ -73,10 +73,10 @@ path?: string,
      * @throws ApiError
      */
     public static putScript({
-requestBody,
-}: {
-requestBody?: UpdateScriptRequestModel,
-}): CancelablePromise<any> {
+        requestBody,
+    }: {
+        requestBody?: UpdateScriptRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/script',
@@ -90,10 +90,10 @@ requestBody?: UpdateScriptRequestModel,
      * @throws ApiError
      */
     public static getScriptFolder({
-path,
-}: {
-path?: string,
-}): CancelablePromise<any> {
+        path,
+    }: {
+        path?: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/script/folder',
@@ -108,10 +108,10 @@ path?: string,
      * @throws ApiError
      */
     public static postScriptFolder({
-requestBody,
-}: {
-requestBody?: CreatePathFolderRequestModel,
-}): CancelablePromise<any> {
+        requestBody,
+    }: {
+        requestBody?: CreatePathFolderRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/script/folder',
@@ -125,10 +125,10 @@ requestBody?: CreatePathFolderRequestModel,
      * @throws ApiError
      */
     public static deleteScriptFolder({
-path,
-}: {
-path?: string,
-}): CancelablePromise<any> {
+        path,
+    }: {
+        path?: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/script/folder',
@@ -143,10 +143,10 @@ path?: string,
      * @throws ApiError
      */
     public static getScriptItem({
-path,
-}: {
-path?: Array<string>,
-}): CancelablePromise<Array<ScriptItemResponseModel>> {
+        path,
+    }: {
+        path?: Array<string>,
+    }): CancelablePromise<Array<ScriptItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/script/item',
@@ -161,14 +161,14 @@ path?: Array<string>,
      * @throws ApiError
      */
     public static getTreeScriptChildren({
-path,
-skip,
-take = 100,
-}: {
-path?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
+        path,
+        skip,
+        take = 100,
+    }: {
+        path?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/script/children',
@@ -185,12 +185,12 @@ take?: number,
      * @throws ApiError
      */
     public static getTreeScriptRoot({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/script/root',

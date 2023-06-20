@@ -6,3 +6,4 @@ export type StylesheetOverviewResponseModel = {
     name?: string;
     path?: string;
 };
+

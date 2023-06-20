@@ -8,3 +8,4 @@ export type PagedSearchResultResponseModel = {
     total: number;
     items: Array<SearchResultResponseModel>;
 };
+

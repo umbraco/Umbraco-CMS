@@ -21,3 +21,4 @@ export type CreateContentTypeRequestModelBaseCreateDocumentTypePropertyTypeReque
     allowedContentTypes?: Array<ContentTypeSortModel>;
     compositions?: Array<ContentTypeCompositionModel>;
 };
+

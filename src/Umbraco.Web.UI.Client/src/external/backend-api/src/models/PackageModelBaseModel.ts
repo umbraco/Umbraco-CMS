@@ -18,3 +18,4 @@ export type PackageModelBaseModel = {
     languages?: Array<string>;
     dictionaryItems?: Array<string>;
 };
+

@@ -10,3 +10,4 @@ export type RelationResponseModel = {
     createDate?: string;
     comment?: string | null;
 };
+

@@ -5,6 +5,7 @@
 import type { FolderModelBaseModel } from './FolderModelBaseModel';
 
 export type CreateFolderRequestModel = (FolderModelBaseModel & {
-id?: string | null;
-parentId?: string | null;
+    id?: string | null;
+    parentId?: string | null;
 });
+

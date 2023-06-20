@@ -5,5 +5,6 @@
 import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
 
 export type DataTypeItemResponseModel = (ItemResponseModelBaseModel & {
-icon?: string | null;
+    icon?: string | null;
 });
+

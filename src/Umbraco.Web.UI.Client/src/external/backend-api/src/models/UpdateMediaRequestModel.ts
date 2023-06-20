@@ -5,3 +5,4 @@
 import type { UpdateContentRequestModelBaseMediaValueModelMediaVariantRequestModel } from './UpdateContentRequestModelBaseMediaValueModelMediaVariantRequestModel';
 
 export type UpdateMediaRequestModel = UpdateContentRequestModelBaseMediaValueModelMediaVariantRequestModel;
+

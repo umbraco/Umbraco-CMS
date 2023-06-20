@@ -5,3 +5,4 @@
 import type { SavedLogSearchPresenationBaseModel } from './SavedLogSearchPresenationBaseModel';
 
 export type SavedLogSearchResponseModel = SavedLogSearchPresenationBaseModel;
+

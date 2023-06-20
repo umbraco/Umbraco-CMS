@@ -16,3 +16,4 @@ export type CurrentUserResponseModel = {
     hasAccessToAllLanguages?: boolean;
     permissions?: Array<string>;
 };
+

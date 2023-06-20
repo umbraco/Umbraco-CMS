@@ -5,3 +5,4 @@
 import type { TourStatusModel } from './TourStatusModel';
 
 export type SetTourStatusRequestModel = TourStatusModel;
+

@@ -6,3 +6,4 @@ export type UserDataModel = {
     name?: string;
     data?: string;
 };
+

@@ -6,5 +6,6 @@ import type { HealthCheckModelBaseModel } from './HealthCheckModelBaseModel';
 import type { HealthCheckResultResponseModel } from './HealthCheckResultResponseModel';
 
 export type HealthCheckWithResultPresentationModel = (HealthCheckModelBaseModel & {
-results?: Array<HealthCheckResultResponseModel> | null;
+    results?: Array<HealthCheckResultResponseModel> | null;
 });
+

@@ -9,3 +9,4 @@ export type PropertyTypeContainerModelBaseModel = {
     type?: string;
     sortOrder?: number;
 };
+
