@@ -1,15 +1,15 @@
 import { Meta, StoryObj } from '@storybook/web-components';
+import type { UmbInputDateElement } from './input-date.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import './date-input.element.js';
-import type { UmbDateInputElement } from './date-input.element.js';
+import './input-date.element.js';
 
-const meta: Meta<UmbDateInputElement> = {
+const meta: Meta<UmbInputDateElement> = {
 	title: 'Components/Inputs/Date',
-	component: 'umb-date-input',
+	component: 'umb-input-date',
 };
 
 export default meta;
-type Story = StoryObj<UmbDateInputElement>;
+type Story = StoryObj<UmbInputDateElement>;
 
 export const Overview: Story = {
 	args: {
@@ -43,11 +43,11 @@ export const DatetimelocalOffset: Story = {
 		displayValue: '',
 	},
 	render: (args) =>
-		html`<umb-date-input
+		html`<umb-input-date
 			.type="${args.type}"
 			.value="${args.value}"
 			.offsetTime="${args.offsetTime}"
-			.displayValue="${args.displayValue}"></umb-date-input>`,
+			.displayValue="${args.displayValue}"></umb-input-date>`,
 };
 
 export const Datetimelocal: Story = {
@@ -58,9 +58,9 @@ export const Datetimelocal: Story = {
 		displayValue: '',
 	},
 	render: (args) =>
-		html`<umb-date-input
+		html`<umb-input-date
 			.type="${args.type}"
 			.value="${args.value}"
 			.offsetTime="${args.offsetTime}"
-			.displayValue="${args.displayValue}"></umb-date-input>`,
+			.displayValue="${args.displayValue}"></umb-input-date>`,
 };

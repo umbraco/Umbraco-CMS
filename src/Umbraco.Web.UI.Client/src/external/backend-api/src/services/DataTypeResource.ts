@@ -307,6 +307,24 @@ export class DataTypeResource {
     }
 
     /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getDataTypeItemByAlias({
+        alias,
+    }: {
+        alias: string,
+    }): CancelablePromise<DataTypeItemResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/data-type/item/{alias}',
+            path: {
+                'alias': alias,
+            },
+        });
+    }
+
+    /**
      * @returns PagedFolderTreeItemResponseModel Success
      * @throws ApiError
      */

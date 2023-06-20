@@ -1,15 +1,15 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbInputDocumentPickerElement } from './input-document-picker.element.js';
+import { UmbInputMediaElement } from './input-media.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
-describe('UmbInputDocumentPickerElement', () => {
-	let element: UmbInputDocumentPickerElement;
+describe('UmbInputMediaElement', () => {
+	let element: UmbInputMediaElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-input-document-picker></umb-input-document-picker> `);
+		element = await fixture(html` <umb-input-media></umb-input-media> `);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbInputDocumentPickerElement);
+		expect(element).to.be.instanceOf(UmbInputMediaElement);
 	});
 
 	it('passes the a11y audit', async () => {

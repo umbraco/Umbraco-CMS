@@ -1,1 +1,1 @@
-import './input-media-picker/input-media-picker.element.js';
+import './input-media/input-media.element.js';

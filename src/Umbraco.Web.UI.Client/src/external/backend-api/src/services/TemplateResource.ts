@@ -158,10 +158,17 @@ export class TemplateResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getTemplateScaffold(): CancelablePromise<TemplateScaffoldResponseModel> {
+    public static getTemplateScaffold({
+        masterTemplateId,
+    }: {
+        masterTemplateId?: string,
+    }): CancelablePromise<TemplateScaffoldResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/template/scaffold',
+            query: {
+                'masterTemplateId': masterTemplateId,
+            },
             errors: {
                 404: `Not Found`,
             },
