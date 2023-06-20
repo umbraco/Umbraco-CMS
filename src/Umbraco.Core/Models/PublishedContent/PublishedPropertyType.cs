@@ -217,23 +217,6 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public bool? IsDeliveryApiValue(object? value, PropertyValueLevel level)
-        {
-            if (!_initialized)
-            {
-                Initialize();
-            }
-
-            // if we have a Delivery API converter, use the converter
-            if (_converter == null || _converter is not IDeliveryApiPropertyValueConverter deliveryApiPropertyValueConverter)
-            {
-                return IsValue(value, level);
-            }
-
-            return deliveryApiPropertyValueConverter.IsDeliveryApiValue(value, level);
-        }
-
-        /// <inheritdoc />
         public PropertyCacheLevel CacheLevel
         {
             get

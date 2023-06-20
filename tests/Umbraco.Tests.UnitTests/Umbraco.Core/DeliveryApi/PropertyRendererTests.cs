@@ -53,12 +53,12 @@ public class PropertyRendererTests : DeliveryApiTests
     private IPublishedProperty SetupProperty(object? value, bool isValue)
     {
         var propertyTypeMock = new Mock<IPublishedPropertyType>();
-        propertyTypeMock.Setup(p => p.IsDeliveryApiValue(It.IsAny<object?>(), It.IsAny<PropertyValueLevel>())).Returns(isValue);
         propertyTypeMock.SetupGet(p => p.CacheLevel).Returns(PropertyCacheLevel.None);
         propertyTypeMock.SetupGet(p => p.DeliveryApiCacheLevel).Returns(PropertyCacheLevel.None);
 
         var propertyMock = new Mock<IPublishedProperty>();
         propertyMock.Setup(p => p.PropertyType).Returns(propertyTypeMock.Object);
+        propertyMock.Setup(p => p.HasValue(It.IsAny<string?>(), It.IsAny<string?>())).Returns(isValue);
         propertyMock
             .Setup(p => p.GetDeliveryApiValue(It.IsAny<bool>(), It.IsAny<string?>(), It.IsAny<string?>()))
             .Returns(value);

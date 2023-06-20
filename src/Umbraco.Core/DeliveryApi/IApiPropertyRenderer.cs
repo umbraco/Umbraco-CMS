@@ -4,5 +4,5 @@ namespace Umbraco.Cms.Core.DeliveryApi;
 
 public interface IApiPropertyRenderer
 {
-    object? GetPropertyValue(IPublishedProperty property, bool expanding, string? culture = null);
+    object? GetPropertyValue(IPublishedProperty property, bool expanding);
 }

@@ -84,12 +84,6 @@ public interface IPublishedPropertyType
     bool? IsValue(object? value, PropertyValueLevel level);
 
     /// <summary>
-    ///     Determines whether a value is an actual value for the Delivery API output, or not a value.
-    /// </summary>
-    /// <remarks>Used in fallback scenarios.</remarks>
-    bool? IsDeliveryApiValue(object? value, PropertyValueLevel level) => IsValue(value, level);
-
-    /// <summary>
     ///     Converts the source value into the intermediate value.
     /// </summary>
     /// <param name="owner">The published element owning the property.</param>
