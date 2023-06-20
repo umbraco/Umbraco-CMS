@@ -82,7 +82,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 	}
 
 	render() {
-		return html`<umb-date-input
+		return html`<umb-input-date
 			.type=${this._inputType}
 			@input=${this._onInput}
 			.datetime=${this._valueString}
@@ -90,7 +90,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 			.max=${this._max}
 			.step=${this._step}
 			.offsetTime=${this._offsetTime}
-			label="Pick a date or time"></umb-date-input>`;
+			label="Pick a date or time"></umb-input-date>`;
 	}
 
 	static styles = [UUITextStyles];

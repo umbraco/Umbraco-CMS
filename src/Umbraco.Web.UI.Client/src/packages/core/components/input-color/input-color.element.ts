@@ -5,14 +5,14 @@ import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
 
 /*
  * This wraps the UUI library uui-color-swatches component
- * @element umb-input-color-picker
+ * @element umb-input-color
  */
-@customElement('umb-input-color-picker')
-export class UmbInputColorPickerElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-color')
+export class UmbInputColorElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: Boolean })
 	showLabels = false;
 
-	@property()
+	@property({ type: Array })
 	swatches?: UmbSwatchDetails[];
 
 	constructor() {
@@ -47,10 +47,10 @@ export class UmbInputColorPickerElement extends FormControlMixin(UmbLitElement) 
 	static styles = [UUITextStyles];
 }
 
-export default UmbInputColorPickerElement;
+export default UmbInputColorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-color-picker': UmbInputColorPickerElement;
+		'umb-input-color': UmbInputColorElement;
 	}
 }
