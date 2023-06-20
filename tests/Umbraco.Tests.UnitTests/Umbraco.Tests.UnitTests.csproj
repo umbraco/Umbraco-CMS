@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="1.0.1" />
+    <PackageReference Include="AngleSharp" Version="1.0.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.4.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="System.Data.Odbc" Version="7.0.0" />
     <PackageReference Include="System.Data.OleDb" Version="7.0.0" />
   </ItemGroup>
