@@ -51,6 +51,7 @@
 		"./package": "./dist-cms/packages/packages/package/index.ts",
 		"./data-type": "./dist-cms/packages/settings/data-types/index.ts",
 		"./language": "./dist-cms/packages/settings/languages/index.ts",
+		"./logviewer": "./dist-cms/packages/settings/logviewer/index.js",
 		"./relation-type": "./dist-cms/packages/settings/relation-types/index.ts",
 		"./themes": "./dist-cms/packages/settings/themes/index.ts",
 		"./tags": "./dist-cms/packages/tags/index.ts",
