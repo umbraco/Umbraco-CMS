@@ -5,4 +5,3 @@
 export type DisableUserRequestModel = {
     userIds?: Array<string>;
 };
-

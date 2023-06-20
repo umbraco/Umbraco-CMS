@@ -5,4 +5,3 @@
 import type { FolderModelBaseModel } from './FolderModelBaseModel';
 
 export type PathFolderModelBaseModel = FolderModelBaseModel;
-

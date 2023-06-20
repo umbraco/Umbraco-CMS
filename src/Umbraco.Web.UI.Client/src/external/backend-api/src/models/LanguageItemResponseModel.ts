@@ -6,4 +6,3 @@ export type LanguageItemResponseModel = {
     name?: string;
     isoCode?: string;
 };
-

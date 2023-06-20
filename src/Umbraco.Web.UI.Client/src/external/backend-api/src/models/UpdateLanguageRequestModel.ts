@@ -5,4 +5,3 @@
 import type { LanguageModelBaseModel } from './LanguageModelBaseModel';
 
 export type UpdateLanguageRequestModel = LanguageModelBaseModel;
-

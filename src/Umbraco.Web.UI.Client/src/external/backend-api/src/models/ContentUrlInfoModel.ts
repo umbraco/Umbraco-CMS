@@ -6,4 +6,3 @@ export type ContentUrlInfoModel = {
     culture?: string | null;
     url?: string;
 };
-

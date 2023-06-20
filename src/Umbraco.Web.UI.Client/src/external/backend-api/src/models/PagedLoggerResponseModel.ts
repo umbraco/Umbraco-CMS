@@ -8,4 +8,3 @@ export type PagedLoggerResponseModel = {
     total: number;
     items: Array<LoggerResponseModel>;
 };
-

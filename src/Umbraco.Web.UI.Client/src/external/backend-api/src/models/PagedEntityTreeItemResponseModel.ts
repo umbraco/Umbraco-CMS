@@ -13,4 +13,3 @@ export type PagedEntityTreeItemResponseModel = {
     total: number;
     items: Array<(EntityTreeItemResponseModel | ContentTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel)>;
 };
-

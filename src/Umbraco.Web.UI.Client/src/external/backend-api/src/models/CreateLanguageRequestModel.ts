@@ -5,6 +5,5 @@
 import type { LanguageModelBaseModel } from './LanguageModelBaseModel';
 
 export type CreateLanguageRequestModel = (LanguageModelBaseModel & {
-    isoCode?: string;
+isoCode?: string;
 });
-

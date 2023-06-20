@@ -5,4 +5,3 @@
 import type { UpdateTextFileViewModelBaseModel } from './UpdateTextFileViewModelBaseModel';
 
 export type UpdateStylesheetRequestModel = UpdateTextFileViewModelBaseModel;
-

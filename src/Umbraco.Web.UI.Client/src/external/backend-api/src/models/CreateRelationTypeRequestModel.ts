@@ -5,6 +5,5 @@
 import type { RelationTypeBaseModel } from './RelationTypeBaseModel';
 
 export type CreateRelationTypeRequestModel = (RelationTypeBaseModel & {
-    id?: string | null;
+id?: string | null;
 });
-

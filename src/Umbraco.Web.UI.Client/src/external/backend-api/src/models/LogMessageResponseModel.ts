@@ -13,4 +13,3 @@ export type LogMessageResponseModel = {
     properties?: Array<LogMessagePropertyPresentationModel>;
     exception?: string | null;
 };
-

@@ -9,4 +9,3 @@ export type UpdateContentRequestModelBaseMediaValueModelMediaVariantRequestModel
     values?: Array<MediaValueModel>;
     variants?: Array<MediaVariantRequestModel>;
 };
-

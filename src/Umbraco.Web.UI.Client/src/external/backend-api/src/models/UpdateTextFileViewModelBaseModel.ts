@@ -5,6 +5,5 @@
 import type { TextFileViewModelBaseModel } from './TextFileViewModelBaseModel';
 
 export type UpdateTextFileViewModelBaseModel = (TextFileViewModelBaseModel & {
-    existingPath?: string;
+existingPath?: string;
 });
-

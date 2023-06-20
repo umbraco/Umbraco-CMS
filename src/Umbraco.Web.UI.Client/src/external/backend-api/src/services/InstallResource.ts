@@ -31,10 +31,10 @@ export class InstallResource {
      * @throws ApiError
      */
     public static postInstallSetup({
-        requestBody,
-    }: {
-        requestBody?: InstallVResponseModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: InstallVResponseModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/install/setup',
@@ -52,10 +52,10 @@ export class InstallResource {
      * @throws ApiError
      */
     public static postInstallValidateDatabase({
-        requestBody,
-    }: {
-        requestBody?: DatabaseInstallResponseModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: DatabaseInstallResponseModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/install/validate-database',

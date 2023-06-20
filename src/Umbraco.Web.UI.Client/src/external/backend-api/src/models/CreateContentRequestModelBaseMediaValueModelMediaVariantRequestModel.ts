@@ -10,4 +10,3 @@ export type CreateContentRequestModelBaseMediaValueModelMediaVariantRequestModel
     variants?: Array<MediaVariantRequestModel>;
     parentId?: string | null;
 };
-

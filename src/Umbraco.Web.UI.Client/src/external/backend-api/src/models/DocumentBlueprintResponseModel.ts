@@ -5,4 +5,3 @@
 import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
 
 export type DocumentBlueprintResponseModel = ItemResponseModelBaseModel;
-

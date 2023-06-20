@@ -22,4 +22,3 @@ export type ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDoc
     compositions?: Array<ContentTypeCompositionModel>;
     id?: string;
 };
-

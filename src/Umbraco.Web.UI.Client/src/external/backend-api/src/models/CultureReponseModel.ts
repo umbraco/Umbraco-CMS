@@ -6,4 +6,3 @@ export type CultureReponseModel = {
     name?: string;
     englishName?: string;
 };
-

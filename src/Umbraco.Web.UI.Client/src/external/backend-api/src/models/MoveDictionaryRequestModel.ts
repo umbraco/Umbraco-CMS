@@ -5,4 +5,3 @@
 export type MoveDictionaryRequestModel = {
     targetId?: string | null;
 };
-

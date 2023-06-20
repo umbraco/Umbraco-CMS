@@ -6,4 +6,3 @@ export type ObjectTypeResponseModel = {
     name?: string | null;
     id?: string;
 };
-

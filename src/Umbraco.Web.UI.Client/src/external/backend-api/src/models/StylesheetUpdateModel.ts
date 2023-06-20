@@ -5,4 +5,3 @@
 import type { TextFileUpdateModel } from './TextFileUpdateModel';
 
 export type StylesheetUpdateModel = TextFileUpdateModel;
-

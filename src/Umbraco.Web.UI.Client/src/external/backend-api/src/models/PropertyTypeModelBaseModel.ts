@@ -18,4 +18,3 @@ export type PropertyTypeModelBaseModel = {
     validation?: PropertyTypeValidationModel;
     appearance?: PropertyTypeAppearanceModel;
 };
-

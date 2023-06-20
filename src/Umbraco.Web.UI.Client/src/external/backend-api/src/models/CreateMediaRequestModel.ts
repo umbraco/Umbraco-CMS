@@ -5,6 +5,5 @@
 import type { CreateContentRequestModelBaseMediaValueModelMediaVariantRequestModel } from './CreateContentRequestModelBaseMediaValueModelMediaVariantRequestModel';
 
 export type CreateMediaRequestModel = (CreateContentRequestModelBaseMediaValueModelMediaVariantRequestModel & {
-    contentTypeId?: string;
+contentTypeId?: string;
 });
-

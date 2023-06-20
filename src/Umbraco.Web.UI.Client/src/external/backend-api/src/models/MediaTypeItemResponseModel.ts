@@ -5,6 +5,5 @@
 import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
 
 export type MediaTypeItemResponseModel = (ItemResponseModelBaseModel & {
-    icon?: string | null;
+icon?: string | null;
 });
-

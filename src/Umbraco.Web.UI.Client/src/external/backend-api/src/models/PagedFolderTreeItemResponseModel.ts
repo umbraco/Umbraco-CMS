@@ -9,4 +9,3 @@ export type PagedFolderTreeItemResponseModel = {
     total: number;
     items: Array<(FolderTreeItemResponseModel | DocumentTypeTreeItemResponseModel)>;
 };
-

@@ -6,4 +6,3 @@ export type ImportDictionaryRequestModel = {
     temporaryFileId?: string;
     parentId?: string | null;
 };
-

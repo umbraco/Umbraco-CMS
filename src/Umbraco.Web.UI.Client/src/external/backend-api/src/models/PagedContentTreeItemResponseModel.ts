@@ -9,4 +9,3 @@ export type PagedContentTreeItemResponseModel = {
     total: number;
     items: Array<(ContentTreeItemResponseModel | DocumentTreeItemResponseModel)>;
 };
-

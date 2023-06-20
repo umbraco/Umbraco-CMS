@@ -6,11 +6,10 @@ import type { ContentTreeItemResponseModel } from './ContentTreeItemResponseMode
 import type { VariantTreeItemModel } from './VariantTreeItemModel';
 
 export type DocumentTreeItemResponseModel = (ContentTreeItemResponseModel & {
-    $type: string;
-    isProtected?: boolean;
-    isPublished?: boolean;
-    isEdited?: boolean;
-    contentTypeId?: string;
-    variants?: Array<VariantTreeItemModel>;
+$type: string;
+isProtected?: boolean;
+isPublished?: boolean;
+isEdited?: boolean;
+contentTypeId?: string;
+variants?: Array<VariantTreeItemModel>;
 });
-

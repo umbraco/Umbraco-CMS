@@ -6,4 +6,3 @@ export type FieldPresentationModel = {
     name?: string;
     values?: Array<string>;
 };
-

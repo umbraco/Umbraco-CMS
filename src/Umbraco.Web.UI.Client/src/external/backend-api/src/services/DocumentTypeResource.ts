@@ -18,10 +18,10 @@ export class DocumentTypeResource {
      * @throws ApiError
      */
     public static postDocumentType({
-        requestBody,
-    }: {
-        requestBody?: CreateDocumentTypeRequestModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: CreateDocumentTypeRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/document-type',
@@ -40,10 +40,10 @@ export class DocumentTypeResource {
      * @throws ApiError
      */
     public static getDocumentTypeById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<DocumentTypeResponseModel> {
+id,
+}: {
+id: string,
+}): CancelablePromise<DocumentTypeResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document-type/{id}',
@@ -61,10 +61,10 @@ export class DocumentTypeResource {
      * @throws ApiError
      */
     public static deleteDocumentTypeById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<DocumentTypeResponseModel> {
+id,
+}: {
+id: string,
+}): CancelablePromise<DocumentTypeResponseModel> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/document-type/{id}',
@@ -82,12 +82,12 @@ export class DocumentTypeResource {
      * @throws ApiError
      */
     public static putDocumentTypeById({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: UpdateDocumentTypeRequestModel,
-    }): CancelablePromise<any> {
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: UpdateDocumentTypeRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document-type/{id}',
@@ -108,10 +108,10 @@ export class DocumentTypeResource {
      * @throws ApiError
      */
     public static getDocumentTypeItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<DocumentTypeItemResponseModel>> {
+id,
+}: {
+id?: Array<string>,
+}): CancelablePromise<Array<DocumentTypeItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document-type/item',
@@ -126,16 +126,16 @@ export class DocumentTypeResource {
      * @throws ApiError
      */
     public static getTreeDocumentTypeChildren({
-        parentId,
-        skip,
-        take = 100,
-        foldersOnly = false,
-    }: {
-        parentId?: string,
-        skip?: number,
-        take?: number,
-        foldersOnly?: boolean,
-    }): CancelablePromise<PagedDocumentTypeTreeItemResponseModel> {
+parentId,
+skip,
+take = 100,
+foldersOnly = false,
+}: {
+parentId?: string,
+skip?: number,
+take?: number,
+foldersOnly?: boolean,
+}): CancelablePromise<PagedDocumentTypeTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document-type/children',
@@ -153,14 +153,14 @@ export class DocumentTypeResource {
      * @throws ApiError
      */
     public static getTreeDocumentTypeRoot({
-        skip,
-        take = 100,
-        foldersOnly = false,
-    }: {
-        skip?: number,
-        take?: number,
-        foldersOnly?: boolean,
-    }): CancelablePromise<PagedDocumentTypeTreeItemResponseModel> {
+skip,
+take = 100,
+foldersOnly = false,
+}: {
+skip?: number,
+take?: number,
+foldersOnly?: boolean,
+}): CancelablePromise<PagedDocumentTypeTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document-type/root',
