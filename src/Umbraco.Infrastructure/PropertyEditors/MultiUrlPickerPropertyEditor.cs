@@ -43,6 +43,8 @@ public class MultiUrlPickerPropertyEditor : DataEditor
         SupportsReadOnly = true;
     }
 
+    public override IPropertyIndexValueFactory PropertyIndexValueFactory { get; } = new NoopPropertyIndexValueFactory();
+
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new MultiUrlPickerConfigurationEditor(_ioHelper, _editorConfigurationParser);
 
