@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0-preview.4.*" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.7" />
   </ItemGroup>
 
   <ItemGroup>
