@@ -129,7 +129,7 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 	}
 
 	async create(parentId: string | null = null) {
-		const { data } = await this.repository.createScaffold();
+		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.next({ ...data, id: '', name: '', alias: '', $type: 'TemplateResponseModel' });

@@ -56,8 +56,11 @@ export class UmbTemplateDetailServerDataSource
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	async createScaffold() {
-		return await tryExecuteAndNotify(this.#host, TemplateResource.getTemplateScaffold());
+	async createScaffold(masterTemplateId: string | null) {
+		return await tryExecuteAndNotify(
+			this.#host,
+			TemplateResource.getTemplateScaffold({ masterTemplateId: masterTemplateId ?? undefined })
+		);
 	}
 
 	/**

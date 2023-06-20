@@ -138,9 +138,9 @@ export class UmbTemplateRepository
 
 	//#region DETAILS:
 
-	async createScaffold() {
+	async createScaffold(parentId: string | null) {
 		await this.#init;
-		return this.#detailDataSource.createScaffold();
+		return this.#detailDataSource.createScaffold(parentId);
 	}
 
 	async requestById(id: string) {
