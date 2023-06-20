@@ -37,14 +37,11 @@ jobs:
           scope: '@umbraco-cms'
       - run: npm ci
       - run: npm run build:for:npm
-      - run: npm run generate:jsonschema:dist
-      - run: npm run wc-analyze
-      - run: npm run wc-analyze:vscode
       - name: Version and publish
         run: |
           SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-8)
           npm whoami
-          npm version 1.0.0-next.$SHA_SHORT --allow-same-version --no-git-tag-version
-          npm publish --tag latest --access public
+          npm version 14.0.0-$SHA_SHORT --allow-same-version --no-git-tag-version
+          npm publish --tag next --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
