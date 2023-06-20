@@ -819,6 +819,45 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/data-type/item/{alias}": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "GetDataTypeItemByAlias",
+        "parameters": [
+          {
+            "name": "alias",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DataTypeItemResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/data-type/children": {
       "get": {
         "tags": [
@@ -8369,6 +8408,16 @@
           "Template"
         ],
         "operationId": "GetTemplateScaffold",
+        "parameters": [
+          {
+            "name": "masterTemplateId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -14611,6 +14660,11 @@
             "$ref": "#/components/schemas/ItemResponseModelBaseModel"
           }
         ],
+        "properties": {
+          "alias": {
+            "type": "string"
+          }
+        },
         "additionalProperties": false
       },
       "TemplateModelBaseModel": {
@@ -14819,6 +14873,11 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "masterTemplateId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
           }
         },
         "additionalProperties": false,
