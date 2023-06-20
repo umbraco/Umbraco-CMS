@@ -21,7 +21,7 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
         IRuntimeState runtimeState)
         : base(loggerFactory, name, indexOptions, hostingEnvironment, runtimeState)
     {
-        PublishedValuesOnly = true;
+        PublishedValuesOnly = false;
         EnableDefaultEventHandler = false;
 
         _logger = loggerFactory.CreateLogger<DeliveryApiContentIndex>();

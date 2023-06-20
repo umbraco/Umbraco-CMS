@@ -104,8 +104,10 @@ public sealed class FileUploadCleanupFilterAttribute : TypeFilterAttribute
                                 {
                                     tempFolders.Add(dir);
                                 }
-
-                                _logger.LogDebug("Removing temp file {FileName}", f.TempFilePath);
+                                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                                {
+                                    _logger.LogDebug("Removing temp file {FileName}", f.TempFilePath);
+                                }
 
                                 try
                                 {

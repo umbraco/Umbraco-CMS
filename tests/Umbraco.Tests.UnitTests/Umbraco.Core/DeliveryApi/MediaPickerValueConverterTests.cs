@@ -29,7 +29,7 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
 
         var inter = new[] {new GuidUdi(Constants.UdiEntityType.MediaType, PublishedMedia.Key)};
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiMedia>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMedia>;
 
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
@@ -65,7 +65,7 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
 
         var inter = new[] { new GuidUdi(Constants.UdiEntityType.MediaType, PublishedMedia.Key), new GuidUdi(Constants.UdiEntityType.MediaType, otherMediaKey) };
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiMedia>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMedia>;
 
         Assert.NotNull(result);
         Assert.AreEqual(2, result.Count());

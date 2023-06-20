@@ -60,7 +60,10 @@ public class PublishedContentTypeCache : IDisposable
     /// </summary>
     public void ClearAll()
     {
-        _logger.LogDebug("Clear all.");
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug("Clear all.");
+        }
 
         try
         {
@@ -84,7 +87,10 @@ public class PublishedContentTypeCache : IDisposable
     /// <param name="id">An identifier.</param>
     public void ClearContentType(int id)
     {
-        _logger.LogDebug("Clear content type w/id {ContentTypeId}", id);
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug("Clear content type w/id {ContentTypeId}", id);
+        }
 
         try
         {
@@ -125,7 +131,10 @@ public class PublishedContentTypeCache : IDisposable
     /// <param name="id">A data type identifier.</param>
     public void ClearDataType(int id)
     {
-        _logger.LogDebug("Clear data type w/id {DataTypeId}.", id);
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug("Clear data type w/id {DataTypeId}.", id);
+        }
 
         // there is no recursion to handle here because a PublishedContentType contains *all* its
         // properties ie both its own properties and those that were inherited (it's based upon an

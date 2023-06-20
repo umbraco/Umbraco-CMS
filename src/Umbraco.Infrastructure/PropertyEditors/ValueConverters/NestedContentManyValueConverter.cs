@@ -80,7 +80,7 @@ public class NestedContentManyValueConverter : NestedContentValueConverterBase, 
     /// <inheritdoc />
     public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        using (_proflog.DebugDuration<NestedContentManyValueConverter>(
+        using (!_proflog.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _proflog.DebugDuration<NestedContentManyValueConverter>(
                    $"ConvertPropertyToNestedContent ({propertyType.DataType.Id})"))
         {
             NestedContentConfiguration? configuration =
@@ -119,7 +119,7 @@ public class NestedContentManyValueConverter : NestedContentValueConverterBase, 
 
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiElement>);
 
-    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
         var converted = ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
         if (converted is not IEnumerable<IPublishedElement> elements)

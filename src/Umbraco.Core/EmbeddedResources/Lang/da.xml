@@ -607,6 +607,8 @@
     </key>
     <key alias="indexCannotRebuild">Dette index kan ikke genbygges for det ikke har nogen</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
+    <key alias="noResults">Der blev ikke fundet nogen resultater</key>
+    <key alias="searchResultsFound">Viser %0% - %1% af %2% resultat(er) - Side %3% af %4%</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>
@@ -1927,8 +1929,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="stateInactive">Inaktiv</key>
     <key alias="sortNameAscending">Navn (A-Å)</key>
     <key alias="sortNameDescending">Navn (Å-A)</key>
-    <key alias="sortCreateDateAscending">Nyeste</key>
-    <key alias="sortCreateDateDescending">Ældste</key>
+    <key alias="sortCreateDateAscending">Ældste</key>
+    <key alias="sortCreateDateDescending">Nyeste</key>
     <key alias="sortLastLoginDateDescending">Sidst logget ind</key>
     <key alias="noUserGroupsAdded">Ingen brugere er blevet tilføjet</key>
     <key alias="2faDisableText">Hvis du ønsker at slå denne totrinsbekræftelse fra, så skal du nu indtaste koden fra din enhed:</key>

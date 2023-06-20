@@ -644,6 +644,8 @@
     </key>
     <key alias="indexCannotRebuild">This index cannot be rebuilt because it has no assigned</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
+    <key alias="noResults">No results were found</key>
+    <key alias="searchResultsFound">Showing %0% - %1% of %2% result(s) - Page %3% of %4%</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
@@ -2343,8 +2345,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="stateInactive">Inactive</key>
     <key alias="sortNameAscending">Name (A-Z)</key>
     <key alias="sortNameDescending">Name (Z-A)</key>
-    <key alias="sortCreateDateAscending">Newest</key>
-    <key alias="sortCreateDateDescending">Oldest</key>
+    <key alias="sortCreateDateAscending">Oldest</key>
+    <key alias="sortCreateDateDescending">Newest</key>
     <key alias="sortLastLoginDateDescending">Last login</key>
     <key alias="noUserGroupsAdded">No user groups have been added</key>
     <key alias="2faDisableText">If you wish to disable this two-factor provider, then you must enter the code shown on your authentication device:</key>
@@ -3010,7 +3012,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
           We will send:
           <ul>
             <li>Anonymized site ID, Umbraco version, and packages installed.</li>
-            <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li>
+            <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, and Property Editors in use.</li>
             <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
             <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li>
           </ul>

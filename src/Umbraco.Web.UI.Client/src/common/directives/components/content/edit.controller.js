@@ -676,7 +676,8 @@
             }
         };
 
-        $scope.saveAndPublish = function () {
+        $scope.saveAndPublish = function (submitButtonLabelKey) {
+            var deferred = $q.defer();
             clearNotifications($scope.content);
             if (hasVariants($scope.content)) {
                 //before we launch the dialog we want to execute all client side validations first
@@ -686,7 +687,7 @@
                         view: "views/content/overlays/publish.html",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
-                        submitButtonLabelKey: "buttons_saveAndPublish",
+                        submitButtonLabelKey: submitButtonLabelKey || "buttons_saveAndPublish",
                         submit: function (model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
@@ -700,6 +701,7 @@
                                 formHelper.showNotifications(data);
                                 clearNotifications($scope.content);
                                 overlayService.close();
+                                deferred.resolve();
                                 return $q.when(data);
                             }, function (err) {
                                 clearDirtyState($scope.content.variants);
@@ -712,16 +714,19 @@
                                 clearNotifications($scope.content);
                                 
                                 handleHttpException(err);
+                                deferred.reject(err);
                             });
                         },
                         close: function () {
                             overlayService.close();
+                            deferred.reject();
                         }
                     };
                     overlayService.open(dialog);
                 }
                 else {
                     showValidationNotification();
+                    deferred.reject();
                 }
             }
             else {
@@ -734,14 +739,19 @@
                     action: "publish"
                 }).then(function () {
                     $scope.page.buttonGroupState = "success";
+                    deferred.resolve();
                 }, function (err) {
                     $scope.page.buttonGroupState = "error";
                     handleHttpException(err);
+                    deferred.reject(err);
                 });
             }
+
+            return deferred.promise;
         };
 
-        $scope.save = function () {
+        $scope.save = function (submitButtonLabelKey) {
+            var deferred = $q.defer();
             clearNotifications($scope.content);
             // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
             if (hasVariants($scope.content)) {
@@ -750,7 +760,7 @@
                     view: "views/content/overlays/save.html",
                     variants: $scope.content.variants, //set a model property for the dialog
                     skipFormValidation: true, //when submitting the overlay form, skip any client side validation
-                    submitButtonLabelKey: "buttons_save",
+                    submitButtonLabelKey: submitButtonLabelKey || "buttons_save",
                     submit: function (model) {
                         model.submitButtonState = "busy";
                         clearNotifications($scope.content);
@@ -765,6 +775,7 @@
                             formHelper.showNotifications(data);
                             clearNotifications($scope.content);
                             overlayService.close();
+                            deferred.resolve();
                             return $q.when(data);
                         }, function (err) {
                             clearDirtyState($scope.content.variants);
@@ -783,10 +794,12 @@
 
                                 handleHttpException(err);
                             }
+                            deferred.reject();
                         })
                     },
                     close: function (oldModel) {
                         overlayService.close();
+                        deferred.reject();
                     }
                 };
 
@@ -802,6 +815,7 @@
                     skipValidation: true
                 }).then(function () {
                     $scope.page.saveButtonState = "success";
+                    deferred.resolve();
                 }, function (err) {
                     // Because this is the "save"-action, then we actually save though there was a validation error, therefor we will show success and display the validation errors politely.
                     if(err && err.data && err.data.ModelState && Object.keys(err.data.ModelState).length > 0) {
@@ -810,9 +824,11 @@
                         $scope.page.saveButtonState = "error";
                     }
                     handleHttpException(err);
+                    deferred.reject();
                 });
             }
 
+            return deferred.promise;
         };
 
         $scope.schedule = function () {
@@ -982,25 +998,35 @@
         /* publish method used in infinite editing */
         $scope.publishAndClose = function (content) {
             $scope.publishAndCloseButtonState = "busy";
-            performSave({ saveMethod: contentResource.publish, action: "publish" }).then(function () {
-                if ($scope.infiniteModel.submit) {
-                    $scope.infiniteModel.contentNode = content;
-                    $scope.infiniteModel.submit($scope.infiniteModel);
+            $scope.saveAndPublish("buttons_publishAndClose").then(
+                function() {
+                    if ($scope.infiniteModel.submit) {
+                        $scope.infiniteModel.contentNode = content;
+                        $scope.infiniteModel.submit($scope.infiniteModel);
+                    }
+                    $scope.publishAndCloseButtonState = "success";
+                },
+                function() {
+                    $scope.publishAndCloseButtonState = "error";
                 }
-                $scope.publishAndCloseButtonState = "success";
-            });
+            );
         };
 
         /* save method used in infinite editing */
         $scope.saveAndClose = function (content) {
             $scope.saveAndCloseButtonState = "busy";
-            performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function () {
-                if ($scope.infiniteModel.submit) {
-                    $scope.infiniteModel.contentNode = content;
-                    $scope.infiniteModel.submit($scope.infiniteModel);
+            $scope.save("buttons_saveAndClose").then(
+                function() {
+                    if ($scope.infiniteModel.submit) {
+                        $scope.infiniteModel.contentNode = content;
+                        $scope.infiniteModel.submit($scope.infiniteModel);
+                    }
+                    $scope.saveAndCloseButtonState = "success";
+                },
+                function() {
+                    $scope.saveAndCloseButtonState = "error";
                 }
-                $scope.saveAndCloseButtonState = "success";
-            });
+            );
         };
 
         /**

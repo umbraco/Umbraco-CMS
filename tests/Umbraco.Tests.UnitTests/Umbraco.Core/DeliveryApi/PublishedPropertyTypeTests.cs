@@ -11,7 +11,7 @@ public class PublishedPropertyTypeTests : DeliveryApiTests
     [Test]
     public void PropertyDeliveryApiValue_UsesDeliveryApiValueForDeliveryApiOutput()
     {
-        var result = DeliveryApiPropertyType.ConvertInterToDeliveryApiObject(new Mock<IPublishedElement>().Object, PropertyCacheLevel.None, null, false);
+        var result = DeliveryApiPropertyType.ConvertInterToDeliveryApiObject(new Mock<IPublishedElement>().Object, PropertyCacheLevel.None, null, false, false);
         Assert.NotNull(result);
         Assert.AreEqual("Delivery API value", result);
     }
@@ -27,7 +27,7 @@ public class PublishedPropertyTypeTests : DeliveryApiTests
     [Test]
     public void NonDeliveryApiPropertyValueConverter_PerformsFallbackToDefaultValueForDeliveryApiOutput()
     {
-        var result = DefaultPropertyType.ConvertInterToDeliveryApiObject(new Mock<IPublishedElement>().Object, PropertyCacheLevel.None, null, false);
+        var result = DefaultPropertyType.ConvertInterToDeliveryApiObject(new Mock<IPublishedElement>().Object, PropertyCacheLevel.None, null, false, false);
         Assert.NotNull(result);
         Assert.AreEqual("Default value", result);
     }
