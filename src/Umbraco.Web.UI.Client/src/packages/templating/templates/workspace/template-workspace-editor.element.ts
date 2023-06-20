@@ -12,6 +12,8 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
+import { UMB_MODAL_TEMPLATING_QUERY_BUILDER_SIDEBAR_ALIAS } from '../modals/manifests.js';
+import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/modal-tokens.js';
 
 @customElement('umb-template-workspace-editor')
 export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
@@ -165,6 +167,14 @@ ${this._content}`;
 		});
 	}
 
+	#openQueryBuilder() {
+		const modalContext = this._modalContext?.open(UMB_TEMPLATE_QUERY_BUILDER_MODAL);
+
+		modalContext?.onSubmit().then((data) => {
+			console.log(data);
+		});
+	}
+
 	#renderMasterTemplatePicker() {
 		return html`
 			<uui-button-group>
@@ -200,7 +210,7 @@ ${this._content}`;
 			<uui-input placeholder="Enter name..." slot="header" .value=${this._name} @input=${this.#onNameInput}
 				><umb-template-alias-input
 					slot="append"
-					.value=${this._alias}
+					.value=${this._alias as string}
 					@change=${this.#onAliasInput}></umb-template-alias-input
 			></uui-input>
 			<uui-box>
@@ -208,9 +218,13 @@ ${this._content}`;
 					${this.#renderMasterTemplatePicker()}
 					<div>
 						<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
-						<!-- <uui-button look="secondary" id="query-builder-button" label="Query builder">
+						<uui-button
+							look="secondary"
+							id="query-builder-button"
+							label="Query builder"
+							@click=${this.#openQueryBuilder}>
 							<uui-icon name="umb:wand"></uui-icon>Query builder
-						</uui-button> -->
+						</uui-button>
 						<uui-button
 							look="secondary"
 							id="sections-button"
