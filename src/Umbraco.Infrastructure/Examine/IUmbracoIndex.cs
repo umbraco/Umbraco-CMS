@@ -21,4 +21,12 @@ public interface IUmbracoIndex : IIndex, IIndexStats
     ///     * non-published Variants
     /// </remarks>
     bool PublishedValuesOnly { get; }
+
+    /// <summary>
+    ///     Whether the index can contain protected content
+    /// </summary>
+    /// <remarks>
+    ///     To retain backwards compatability, the default value is true
+    /// </remarks>
+    bool SupportProtectedContent => true;
 }
