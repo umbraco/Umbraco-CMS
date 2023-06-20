@@ -457,7 +457,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         httpContextMock.SetupGet(c => c.Request).Returns(httpRequestMock.Object);
         httpContextAccessorMock.SetupGet(a => a.HttpContext).Returns(httpContextMock.Object);
 
-        IOutputExpansionStrategy outputExpansionStrategy = new RequestContextOutputExpansionStrategy(httpContextAccessorMock.Object);
+        IOutputExpansionStrategy outputExpansionStrategy = new RequestContextOutputExpansionStrategy(httpContextAccessorMock.Object, new ApiPropertyRenderer(new NoopPublishedValueFallback()));
         var outputExpansionStrategyAccessorMock = new Mock<IOutputExpansionStrategyAccessor>();
         outputExpansionStrategyAccessorMock.Setup(s => s.TryGetValue(out outputExpansionStrategy)).Returns(true);
 

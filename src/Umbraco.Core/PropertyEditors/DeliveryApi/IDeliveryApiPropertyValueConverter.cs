@@ -46,6 +46,14 @@ public interface IDeliveryApiPropertyValueConverter : IPropertyValueConverter
     /// </remarks>
     object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding);
 
+    /// <summary>
+    ///     Determines whether a value is an actual value, or not a value.
+    /// </summary>
+    /// <remarks>
+    ///     Called only at Object level. Defaults to the value of <see cref="IPropertyValueConverter.IsValue"/>.
+    /// </remarks>
+    bool? IsDeliveryApiValue(object? value, PropertyValueLevel level) => IsValue(value, level);
+
     [Obsolete($"Use the {nameof(ConvertIntermediateToDeliveryApiObject)} that supports property expansion. Will be removed in V14.")]
     object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
             => ConvertIntermediateToDeliveryApiObject(owner, propertyType, referenceCacheLevel, inter, preview, false);
