@@ -17,4 +17,6 @@ public class DatabaseInstallData
     public bool UseIntegratedAuthentication { get; set; }
 
     public string? ConnectionString { get; set; }
+
+    public bool TrustServerCertificate { get; set; }
 }
