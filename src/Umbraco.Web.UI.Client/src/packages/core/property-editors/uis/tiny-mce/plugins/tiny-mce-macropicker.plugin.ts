@@ -1,7 +1,7 @@
-import { AstNode } from '@umbraco-cms/backoffice/external/tinymce';
 import { MacroSyntaxData, UmbMacroService } from '@umbraco-cms/backoffice/macro';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 
 interface DialogData {
 	richTextEditor: boolean;
@@ -30,7 +30,7 @@ export default class UmbTinyMceMacroPickerPlugin extends UmbTinyMcePluginBase {
 			this.editor.serializer.addRules('div');
 
 			/** This checks if the div is a macro container, if so, checks if its wrapped in a p tag and then unwraps it (removes p tag) */
-			this.editor.serializer.addNodeFilter('div', (nodes: AstNode[]) => {
+			this.editor.serializer.addNodeFilter('div', (nodes: Array<tinymce.AstNode>) => {
 				for (let i = 0; i < nodes.length; i++) {
 					if (
 						nodes[i].attr('class') === 'umb-macro-holder' &&

@@ -1,4 +1,3 @@
-import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbCodeEditorModalData,
@@ -7,7 +6,6 @@ import {
 	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 export default class UmbTinyMceCodeEditorPlugin extends UmbTinyMcePluginBase {
 	#modalContext?: UmbModalManagerContext;
@@ -19,7 +17,7 @@ export default class UmbTinyMceCodeEditorPlugin extends UmbTinyMcePluginBase {
 			this.#modalContext = modalContext;
 		});
 
-		this.editor.ui.registry.addButton('ace', {
+		this.editor.ui.registry.addButton('sourcecode', {
 			icon: 'sourcecode',
 			tooltip: 'View Source Code',
 			onAction: () => this.#showCodeEditor(),

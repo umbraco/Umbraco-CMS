@@ -15,7 +15,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	@property({ type: String })
 	value = '';
 
-	@property({ type: Array, attribute: false })
+	@property({ attribute: false })
 	public set config(config: UmbDataTypePropertyCollection) {
 		this.#configuration = config;
 	}

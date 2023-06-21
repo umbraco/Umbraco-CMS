@@ -1,10 +1,10 @@
 import { UmbLitElement } from "@umbraco-cms/internal/lit-element";
 import { UmbDataTypePropertyCollection } from "@umbraco-cms/backoffice/components";
+import { tinymce } from "@umbraco-cms/backoffice/external/tinymce";
 
-// TODO => editor property should be typed, but would require libs taking a dependency on TinyMCE, which is not ideal
 export class UmbTinyMcePluginBase {
     host: UmbLitElement;
-    editor: any;
+    editor: tinymce.Editor;
     configuration?: UmbDataTypePropertyCollection;
 
     constructor(arg: TinyMcePluginArguments) {
@@ -14,9 +14,8 @@ export class UmbTinyMcePluginBase {
     }
 }
 
-// TODO => editor property should be typed, but would require libs taking a dependency on TinyMCE, which is not ideal
 export interface TinyMcePluginArguments {
     host: UmbLitElement;
-	editor: any; 
+	editor: tinymce.Editor; 
 	configuration?: UmbDataTypePropertyCollection;
 }

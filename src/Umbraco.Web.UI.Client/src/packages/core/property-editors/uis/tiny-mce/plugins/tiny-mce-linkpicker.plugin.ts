@@ -7,14 +7,7 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
 
-export interface LinkListItem {
-	text: string;
-	value: string;
-	selected?: boolean;
-	menu?: unknown;
-}
-
-interface AnchorElementAttributes {
+type AnchorElementAttributes = {
 	href?: string | null;
 	title?: string | null;
 	target?: string | null;
@@ -106,7 +99,7 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 	async #openLinkPicker(currentTarget?: UmbLinkPickerLink) {
 		const modalHandler = this.#modalContext?.open(UMB_LINK_PICKER_MODAL, {
 			config: {
-				ignoreUserStartNodes: this.configuration?.find((x) => x.alias === 'ignoreUserStartNodes')?.value,
+				ignoreUserStartNodes: this.configuration?.getValueByAlias<boolean>('ignoreUserStartNodes') ?? false,
 			},
 			link: currentTarget ?? {},
 			index: null,

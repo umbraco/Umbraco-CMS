@@ -1,8 +1,3 @@
-import type { UmbLoggedInUser } from '../../../../../users/current-user/types.js';
-import {
-	UmbCurrentUserStore,
-	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
-} from '../../../../../users/current-user/current-user.store.js';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import {
@@ -10,6 +5,8 @@ import {
 	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
+import { CurrentUserResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
 
 interface MediaPickerTargetData {
 	altText?: string;
@@ -30,9 +27,9 @@ interface MediaPickerResultData {
 
 export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 	#mediaHelper: UmbMediaHelper;
-	#currentUser?: UmbLoggedInUser;
+	#currentUser?: CurrentUserResponseModel;
 	#modalContext?: UmbModalManagerContext;
-	#currentUserStore?: UmbCurrentUserStore;
+	#auth?: typeof UMB_AUTH.TYPE;
 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
@@ -43,8 +40,8 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 			this.#modalContext = modalContext;
 		});
 
-		this.host.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (currentUserStore) => {
-			this.#currentUserStore = currentUserStore;
+		this.host.consumeContext(UMB_AUTH, (instance) => {
+			this.#auth = instance;
 			this.#observeCurrentUser();
 		});
 
@@ -57,9 +54,9 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 	}
 
 	async #observeCurrentUser() {
-		if (!this.#currentUserStore) return;
+		if (!this.#auth) return;
 
-		this.host.observe(this.#currentUserStore.currentUser, (currentUser?: UmbLoggedInUser) => {
+		this.host.observe(this.#auth.currentUser, (currentUser: CurrentUserResponseModel | undefined) => {
 			this.#currentUser = currentUser;
 		});
 	}
@@ -102,8 +99,8 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 				startNodeId = -1;
 				startNodeIsVirtual = true;
 			} else {
-				startNodeId = this.#currentUser?.mediaStartNodes.length !== 1 ? -1 : this.#currentUser?.mediaStartNodes[0];
-				startNodeIsVirtual = this.#currentUser?.mediaStartNodes.length !== 1;
+				startNodeId = this.#currentUser?.mediaStartNodeIds?.length !== 1 ? -1 : this.#currentUser?.mediaStartNodeIds[0];
+				startNodeIsVirtual = this.#currentUser?.mediaStartNodeIds?.length !== 1;
 			}
 		}
 
