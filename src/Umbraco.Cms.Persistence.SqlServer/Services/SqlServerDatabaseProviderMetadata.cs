@@ -73,8 +73,37 @@ public class SqlServerDatabaseProviderMetadata : IDatabaseProviderMetadata
     }
 
     /// <inheritdoc />
-    public string GenerateConnectionString(DatabaseModel databaseModel) =>
-        databaseModel.IntegratedAuth
-            ? $"Server={databaseModel.Server};Database={databaseModel.DatabaseName};Integrated Security=true"
-            : $"Server={databaseModel.Server};Database={databaseModel.DatabaseName};User Id={databaseModel.Login};Password={databaseModel.Password}";
+    public string GenerateConnectionString(DatabaseModel databaseModel)
+    {
+        string connectionString = $"Server={databaseModel.Server};Database={databaseModel.DatabaseName};";
+        connectionString = HandleIntegratedAuthentication(connectionString, databaseModel);
+        connectionString = HandleTrustServerCertificate(connectionString, databaseModel);
+
+        return connectionString;
+    }
+
+    private string HandleIntegratedAuthentication(string connectionString, DatabaseModel databaseModel)
+    {
+        if (databaseModel.IntegratedAuth)
+        {
+            connectionString += "Integrated Security=true";
+        }
+        else
+        {
+            connectionString += $"User Id={databaseModel.Login};Password={databaseModel.Password}";
+        }
+
+        return connectionString;
+    }
+
+    private string HandleTrustServerCertificate(string connectionString, DatabaseModel databaseModel)
+    {
+        if (databaseModel.TrustServerCertificate)
+        {
+            connectionString += ";TrustServerCertificate=true;";
+        }
+
+        return connectionString;
+    }
+
 }

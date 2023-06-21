@@ -69,7 +69,7 @@ internal sealed class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryA
             FieldType.Number => FieldDefinitionTypes.Integer,
             FieldType.StringRaw => FieldDefinitionTypes.Raw,
             FieldType.StringAnalyzed => FieldDefinitionTypes.FullText,
-            FieldType.StringSortable => FieldDefinitionTypes.InvariantCultureIgnoreCase,
+            FieldType.StringSortable => FieldDefinitionTypes.FullTextSortable,
             _ => throw new ArgumentOutOfRangeException(nameof(field.FieldType))
         };
 
