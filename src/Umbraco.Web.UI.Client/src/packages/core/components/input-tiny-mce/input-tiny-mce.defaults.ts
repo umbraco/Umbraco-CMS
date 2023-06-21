@@ -29,7 +29,6 @@ export const defaultExtendedValidElements =
 
 export const defaultFallbackConfig = {
 	toolbar: [
-		'sourcecode',
 		'styles',
 		'bold',
 		'italic',

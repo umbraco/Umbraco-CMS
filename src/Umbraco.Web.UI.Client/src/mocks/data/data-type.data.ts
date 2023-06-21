@@ -576,7 +576,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 			{
 				alias: 'toolbar',
 				value: [
-					'ace',
+					'sourcecode',
 					'undo',
 					'redo',
 					'styles',

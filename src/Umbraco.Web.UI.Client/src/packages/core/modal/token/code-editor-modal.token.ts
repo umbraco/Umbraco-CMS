@@ -1,9 +1,10 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { CodeEditorLanguage } from '@umbraco-cms/backoffice/code-editor';
 
 export interface UmbCodeEditorModalData {
 	headline: string;
 	content: string;
-	language: string; // TODO => should used CodeEditorLanguage, but model is not part of libs (yet)
+	language: CodeEditorLanguage;
 	color?: 'positive' | 'danger';
 	confirmLabel?: string;
 }
