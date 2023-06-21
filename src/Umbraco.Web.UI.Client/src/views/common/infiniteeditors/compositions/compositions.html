@@ -35,6 +35,12 @@
                                          auto-focus="true">
                       </umb-search-filter>
 
+                      
+                      <umb-checkbox model="vm.hideUnavailable"
+                                    label-key="actions_toggleHideUnavalible"
+                                    class="mt2" style="display: block;">
+                      </umb-checkbox>
+
                     </div>
 
                   </div>
@@ -100,11 +106,6 @@
         </umb-editor-container>
 
         <umb-editor-footer>
-            <umb-editor-footer-content-left>
-                  <umb-checkbox model="vm.hideUnavailable"
-                                label-key="actions_toggleHideUnavalible">
-                  </umb-checkbox>
-            </umb-editor-footer-content-left>
             <umb-editor-footer-content-right>
                 <umb-button
                     type="button"
