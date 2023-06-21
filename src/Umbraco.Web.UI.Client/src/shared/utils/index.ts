@@ -5,10 +5,8 @@ export * from './media-helper.service';
 export * from './udi-service.js';
 export * from './umbraco-path.js';
 
-// TODO => tinymce property should be typed, but would require libs taking a dependency on TinyMCE, which is not ideal
 declare global {
 	interface Window {
-		tinymce: any;
 		Umbraco: any;
 	}
 }

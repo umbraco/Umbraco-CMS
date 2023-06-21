@@ -1,6 +1,6 @@
-import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-tiny-mce-dimensions-configuration')
 export class UmbPropertyEditorUITinyMceDimensionsConfigurationElement extends UmbLitElement {
-	@property()
+	@property({ type: Object })
 	value: { width?: number; height?: number } = {};
 
 	render() {

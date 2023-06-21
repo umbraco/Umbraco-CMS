@@ -1,4 +1,3 @@
-import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
@@ -11,6 +10,7 @@ import {
 	uploadImageHandler,
 	pastePreProcessHandler,
 } from './index.js';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import {
