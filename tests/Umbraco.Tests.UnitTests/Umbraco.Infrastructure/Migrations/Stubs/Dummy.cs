@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using Umbraco.Cms.Infrastructure.Migrations;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs;

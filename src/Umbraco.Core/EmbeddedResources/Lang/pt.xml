@@ -822,6 +822,8 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="usertype">Tipo de usuário</key>
     <key alias="userTypes">Tipos de usuários</key>
     <key alias="writer">Escrevente</key>
+    <key alias="sortCreateDateAscending">Mais antigo</key>
+    <key alias="sortCreateDateDescending">Mais recente</key>
   </area>
   <area alias="logViewer">
     <key alias="selectAllLogLevelFilters">Selecionar tudo</key>

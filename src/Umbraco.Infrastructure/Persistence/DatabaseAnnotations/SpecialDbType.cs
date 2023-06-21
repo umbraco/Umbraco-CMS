@@ -20,6 +20,7 @@ public struct SpecialDbType : IEquatable<SpecialDbType>
     public SpecialDbType(SpecialDbTypes specialDbTypes)
         => _dbType = specialDbTypes.ToString();
 
+    [Obsolete("Use NVARCHARMAX instead")]
     public static SpecialDbType NTEXT { get; } = new(SpecialDbTypes.NTEXT);
 
     public static SpecialDbType NCHAR { get; } = new(SpecialDbTypes.NCHAR);

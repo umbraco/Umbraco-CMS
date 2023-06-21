@@ -35,8 +35,8 @@
             shadowRoot.innerHTML = 
             `
                 <style>
-                    {{vm.stylesheet ? "@import '"+vm.stylesheet+"';" : ""}}
-                    @import 'assets/css/blockgridui.css';
+                    {{vm.stylesheet ? "@import '" + vm.stylesheet + "?umb__rnd=${Umbraco.Sys.ServerVariables.application.cacheBuster}';" : ""}}
+                    @import 'assets/css/blockgridui.css?umb__rnd=${Umbraco.Sys.ServerVariables.application.cacheBuster}';
                     :host {
                         --umb-block-grid--grid-columns: ${vm.gridColumns};
                     }

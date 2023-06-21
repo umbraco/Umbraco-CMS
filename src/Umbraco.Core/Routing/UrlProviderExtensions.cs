@@ -225,9 +225,12 @@ public static class UrlProviderExtensions
 
         if (!pcr.HasPublishedContent())
         {
-            const string logMsg = nameof(DetectCollisionAsync) +
+            if (logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                const string logMsg = nameof(DetectCollisionAsync) +
                                   " did not resolve a content item for original url: {Url}, translated to {TranslatedUrl} and culture: {Culture}";
-            logger.LogDebug(logMsg, url, uri, culture);
+                logger.LogDebug(logMsg, url, uri, culture);
+            }
 
             var urlInfo = UrlInfo.Message(textService.Localize("content", "routeErrorCannotRoute"), culture);
             return Attempt.Succeed(urlInfo);

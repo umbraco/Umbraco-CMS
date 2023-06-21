@@ -1996,8 +1996,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="stateInactive">Etkin Değil</key>
     <key alias="sortNameAscending">Ad (AZ)</key>
     <key alias="sortNameDescending">Ad (ZA)</key>
-    <key alias="sortCreateDateAscending">En yeni</key>
-    <key alias="sortCreateDateDescending">En eski</key>
+    <key alias="sortCreateDateAscending">En eski</key>
+    <key alias="sortCreateDateDescending">En yeni</key>
     <key alias="sortLastLoginDateDescending">Son giriş</key>
     <key alias="noUserGroupsAdded">Hiçbir kullanıcı grubu eklenmedi</key>
   </area>

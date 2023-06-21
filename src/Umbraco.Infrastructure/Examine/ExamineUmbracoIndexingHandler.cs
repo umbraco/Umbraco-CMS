@@ -2,9 +2,7 @@ using System.Globalization;
 using Examine;
 using Examine.Search;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Search;
@@ -17,37 +15,29 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// </summary>
 internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
 {
-    // the default enlist priority is 100
-    // enlist with a lower priority to ensure that anything "default" runs after us
-    // but greater that SafeXmlReaderWriter priority which is 60
-    private const int EnlistPriority = 80;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
     private readonly IContentValueSetBuilder _contentValueSetBuilder;
     private readonly Lazy<bool> _enabled;
     private readonly IExamineManager _examineManager;
     private readonly ILogger<ExamineUmbracoIndexingHandler> _logger;
-    private readonly IMainDom _mainDom;
     private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
     private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
-    private readonly IProfilingLogger _profilingLogger;
     private readonly IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
     private readonly ICoreScopeProvider _scopeProvider;
+    private readonly ExamineIndexingMainDomHandler _mainDomHandler;
 
     public ExamineUmbracoIndexingHandler(
-        IMainDom mainDom,
         ILogger<ExamineUmbracoIndexingHandler> logger,
-        IProfilingLogger profilingLogger,
         ICoreScopeProvider scopeProvider,
         IExamineManager examineManager,
         IBackgroundTaskQueue backgroundTaskQueue,
         IContentValueSetBuilder contentValueSetBuilder,
         IPublishedContentValueSetBuilder publishedContentValueSetBuilder,
         IValueSetBuilder<IMedia> mediaValueSetBuilder,
-        IValueSetBuilder<IMember> memberValueSetBuilder)
+        IValueSetBuilder<IMember> memberValueSetBuilder,
+        ExamineIndexingMainDomHandler mainDomHandler)
     {
-        _mainDom = mainDom;
         _logger = logger;
-        _profilingLogger = profilingLogger;
         _scopeProvider = scopeProvider;
         _examineManager = examineManager;
         _backgroundTaskQueue = backgroundTaskQueue;
@@ -55,6 +45,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         _publishedContentValueSetBuilder = publishedContentValueSetBuilder;
         _mediaValueSetBuilder = mediaValueSetBuilder;
         _memberValueSetBuilder = memberValueSetBuilder;
+        _mainDomHandler = mainDomHandler;
         _enabled = new Lazy<bool>(IsEnabled);
     }
 
@@ -64,70 +55,70 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     /// <inheritdoc />
     public void DeleteIndexForEntity(int entityId, bool keepIfUnpublished)
     {
-        var actions = DeferedActions.Get(_scopeProvider);
+        var actions = DeferredActions.Get(_scopeProvider);
         if (actions != null)
         {
-            actions.Add(new DeferedDeleteIndex(this, entityId, keepIfUnpublished));
+            actions.Add(new DeferredDeleteIndex(this, entityId, keepIfUnpublished));
         }
         else
         {
-            DeferedDeleteIndex.Execute(this, entityId, keepIfUnpublished);
+            DeferredDeleteIndex.Execute(this, entityId, keepIfUnpublished);
         }
     }
 
     /// <inheritdoc />
     public void DeleteIndexForEntities(IReadOnlyCollection<int> entityIds, bool keepIfUnpublished)
     {
-        var actions = DeferedActions.Get(_scopeProvider);
+        var actions = DeferredActions.Get(_scopeProvider);
         if (actions != null)
         {
-            actions.Add(new DeferedDeleteIndex(this, entityIds, keepIfUnpublished));
+            actions.Add(new DeferredDeleteIndex(this, entityIds, keepIfUnpublished));
         }
         else
         {
-            DeferedDeleteIndex.Execute(this, entityIds, keepIfUnpublished);
+            DeferredDeleteIndex.Execute(this, entityIds, keepIfUnpublished);
         }
     }
 
     /// <inheritdoc />
     public void ReIndexForContent(IContent sender, bool isPublished)
     {
-        var actions = DeferedActions.Get(_scopeProvider);
+        var actions = DeferredActions.Get(_scopeProvider);
         if (actions != null)
         {
-            actions.Add(new DeferedReIndexForContent(_backgroundTaskQueue, this, sender, isPublished));
+            actions.Add(new DeferredReIndexForContent(_backgroundTaskQueue, this, sender, isPublished));
         }
         else
         {
-            DeferedReIndexForContent.Execute(_backgroundTaskQueue, this, sender, isPublished);
+            DeferredReIndexForContent.Execute(_backgroundTaskQueue, this, sender, isPublished);
         }
     }
 
     /// <inheritdoc />
     public void ReIndexForMedia(IMedia sender, bool isPublished)
     {
-        var actions = DeferedActions.Get(_scopeProvider);
+        var actions = DeferredActions.Get(_scopeProvider);
         if (actions != null)
         {
-            actions.Add(new DeferedReIndexForMedia(_backgroundTaskQueue, this, sender, isPublished));
+            actions.Add(new DeferredReIndexForMedia(_backgroundTaskQueue, this, sender, isPublished));
         }
         else
         {
-            DeferedReIndexForMedia.Execute(_backgroundTaskQueue, this, sender, isPublished);
+            DeferredReIndexForMedia.Execute(_backgroundTaskQueue, this, sender, isPublished);
         }
     }
 
     /// <inheritdoc />
     public void ReIndexForMember(IMember member)
     {
-        var actions = DeferedActions.Get(_scopeProvider);
+        var actions = DeferredActions.Get(_scopeProvider);
         if (actions != null)
         {
-            actions.Add(new DeferedReIndexForMember(_backgroundTaskQueue, this, member));
+            actions.Add(new DeferredReIndexForMember(_backgroundTaskQueue, this, member));
         }
         else
         {
-            DeferedReIndexForMember.Execute(_backgroundTaskQueue, this, member);
+            DeferredReIndexForMember.Execute(_backgroundTaskQueue, this, member);
         }
     }
 
@@ -173,26 +164,10 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     /// <returns></returns>
     private bool IsEnabled()
     {
-        //let's deal with shutting down Examine with MainDom
-        var examineShutdownRegistered = _mainDom.Register(release: () =>
+        if (_mainDomHandler.IsMainDom() is false)
         {
-            using (_profilingLogger.TraceDuration<ExamineUmbracoIndexingHandler>("Examine shutting down"))
-            {
-                _examineManager.Dispose();
-            }
-        });
-
-        if (!examineShutdownRegistered)
-        {
-            _logger.LogInformation(
-                "Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
-
-            //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
-            Suspendable.ExamineEvents.SuspendIndexers(_logger);
-            return false; //exit, do not continue
+            return false;
         }
-
-        _logger.LogDebug("Examine shutdown registered with MainDom");
 
         var registeredIndexers =
             _examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);
@@ -211,57 +186,17 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
 
     #region Deferred Actions
 
-    private class DeferedActions
-    {
-        private readonly List<DeferedAction> _actions = new();
-
-        public static DeferedActions? Get(ICoreScopeProvider scopeProvider)
-        {
-            IScopeContext? scopeContext = scopeProvider.Context;
-
-            return scopeContext?.Enlist("examineEvents",
-                () => new DeferedActions(), // creator
-                (completed, actions) => // action
-                {
-                    if (completed)
-                    {
-                        actions?.Execute();
-                    }
-                }, EnlistPriority);
-        }
-
-        public void Add(DeferedAction action) => _actions.Add(action);
-
-        private void Execute()
-        {
-            foreach (DeferedAction action in _actions)
-            {
-                action.Execute();
-            }
-        }
-    }
-
-    /// <summary>
-    ///     An action that will execute at the end of the Scope being completed
-    /// </summary>
-    private abstract class DeferedAction
-    {
-        public virtual void Execute()
-        {
-        }
-    }
-
     /// <summary>
     ///     Re-indexes an <see cref="IContent" /> item on a background thread
     /// </summary>
-    private class DeferedReIndexForContent : DeferedAction
+    private class DeferredReIndexForContent : IDeferredAction
     {
         private readonly IBackgroundTaskQueue _backgroundTaskQueue;
         private readonly IContent _content;
         private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
         private readonly bool _isPublished;
 
-        public DeferedReIndexForContent(IBackgroundTaskQueue backgroundTaskQueue,
+        public DeferredReIndexForContent(IBackgroundTaskQueue backgroundTaskQueue,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IContent content, bool isPublished)
         {
             _backgroundTaskQueue = backgroundTaskQueue;
@@ -270,7 +205,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             _isPublished = isPublished;
         }
 
-        public override void Execute() =>
+        public void Execute() =>
             Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _content, _isPublished);
 
         public static void Execute(IBackgroundTaskQueue backgroundTaskQueue,
@@ -311,14 +246,14 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     /// <summary>
     ///     Re-indexes an <see cref="IMedia" /> item on a background thread
     /// </summary>
-    private class DeferedReIndexForMedia : DeferedAction
+    private class DeferredReIndexForMedia : IDeferredAction
     {
         private readonly IBackgroundTaskQueue _backgroundTaskQueue;
         private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
         private readonly bool _isPublished;
         private readonly IMedia _media;
 
-        public DeferedReIndexForMedia(IBackgroundTaskQueue backgroundTaskQueue,
+        public DeferredReIndexForMedia(IBackgroundTaskQueue backgroundTaskQueue,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IMedia media, bool isPublished)
         {
             _backgroundTaskQueue = backgroundTaskQueue;
@@ -327,7 +262,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             _isPublished = isPublished;
         }
 
-        public override void Execute() =>
+        public void Execute() =>
             Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _media, _isPublished);
 
         public static void Execute(IBackgroundTaskQueue backgroundTaskQueue,
@@ -357,13 +292,13 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     /// <summary>
     ///     Re-indexes an <see cref="IMember" /> item on a background thread
     /// </summary>
-    private class DeferedReIndexForMember : DeferedAction
+    private class DeferredReIndexForMember : IDeferredAction
     {
         private readonly IBackgroundTaskQueue _backgroundTaskQueue;
         private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
         private readonly IMember _member;
 
-        public DeferedReIndexForMember(IBackgroundTaskQueue backgroundTaskQueue,
+        public DeferredReIndexForMember(IBackgroundTaskQueue backgroundTaskQueue,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IMember member)
         {
             _examineUmbracoIndexingHandler = examineUmbracoIndexingHandler;
@@ -371,7 +306,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             _backgroundTaskQueue = backgroundTaskQueue;
         }
 
-        public override void Execute() => Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _member);
+        public void Execute() => Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _member);
 
         public static void Execute(IBackgroundTaskQueue backgroundTaskQueue,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IMember member) =>
@@ -396,14 +331,14 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             });
     }
 
-    private class DeferedDeleteIndex : DeferedAction
+    private class DeferredDeleteIndex : IDeferredAction
     {
         private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
         private readonly int _id;
         private readonly IReadOnlyCollection<int>? _ids;
         private readonly bool _keepIfUnpublished;
 
-        public DeferedDeleteIndex(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, int id,
+        public DeferredDeleteIndex(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, int id,
             bool keepIfUnpublished)
         {
             _examineUmbracoIndexingHandler = examineUmbracoIndexingHandler;
@@ -411,7 +346,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             _keepIfUnpublished = keepIfUnpublished;
         }
 
-        public DeferedDeleteIndex(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
+        public DeferredDeleteIndex(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
             IReadOnlyCollection<int> ids, bool keepIfUnpublished)
         {
             _examineUmbracoIndexingHandler = examineUmbracoIndexingHandler;
@@ -419,7 +354,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             _keepIfUnpublished = keepIfUnpublished;
         }
 
-        public override void Execute()
+        public void Execute()
         {
             if (_ids is null)
             {

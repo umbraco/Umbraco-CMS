@@ -3,10 +3,13 @@
 
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
@@ -15,23 +18,30 @@ using static Umbraco.Cms.Core.PropertyEditors.BlockListConfiguration;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<BlockListModel, BlockListItem, BlockListLayoutItem, BlockConfiguration>
+public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<BlockListModel, BlockListItem, BlockListLayoutItem, BlockConfiguration>, IDeliveryApiPropertyValueConverter
 {
     private readonly IContentTypeService _contentTypeService;
-    private readonly BlockEditorConverter _blockConverter;
-    private readonly BlockListEditorDataConverter _blockListEditorDataConverter;
     private readonly IProfilingLogger _proflog;
+    private readonly IApiElementBuilder _apiElementBuilder;
 
-    [Obsolete("Use the constructor with the IContentTypeService")]
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter) : this(proflog, blockConverter, StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>()) { }
+    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V14")]
+    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter)
+        : this(proflog, blockConverter, StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
+    {
+    }
 
+    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V14")]
     public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService)
+        : this(proflog, blockConverter, contentTypeService, StaticServiceProvider.Instance.GetRequiredService<IApiElementBuilder>())
+    {
+    }
+
+    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder)
         : base(blockConverter)
     {
         _proflog = proflog;
-        _blockConverter = blockConverter;
-        _blockListEditorDataConverter = new BlockListEditorDataConverter();
         _contentTypeService = contentTypeService;
+        _apiElementBuilder = apiElementBuilder;
     }
 
     /// <inheritdoc />
@@ -85,7 +95,45 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         // NOTE: The intermediate object is just a JSON string, we don't actually convert from source -> intermediate since source is always just a JSON string
-        using (_proflog.DebugDuration<BlockListPropertyValueConverter>(
+        using (!_proflog.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _proflog.DebugDuration<BlockListPropertyValueConverter>(
+                   $"ConvertPropertyToBlockList ({propertyType.DataType.Id})"))
+        {
+            BlockListModel? blockListModel = ConvertIntermediateToBlockListModel(owner, propertyType, referenceCacheLevel, inter, preview);
+            if (blockListModel == null)
+            {
+                return null;
+            }
+
+            return IsSingleBlockMode(propertyType.DataType) ? blockListModel.FirstOrDefault() : blockListModel;
+        }
+    }
+
+    /// <inheritdoc />
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+
+    /// <inheritdoc />
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
+        => typeof(IEnumerable<ApiBlockListModel>);
+
+    /// <inheritdoc />
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
+    {
+        BlockListModel? model = ConvertIntermediateToBlockListModel(owner, propertyType, referenceCacheLevel, inter, preview);
+
+        return new ApiBlockListModel(
+            model != null
+                ? model
+                    .Select(item => new ApiBlockItem(
+                        _apiElementBuilder.Build(item.Content),
+                        item.Settings != null ? _apiElementBuilder.Build(item.Settings) : null))
+                    .ToArray()
+                : Array.Empty<ApiBlockItem>());
+    }
+
+    private BlockListModel? ConvertIntermediateToBlockListModel(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    {
+        // NOTE: The intermediate object is just a JSON string, we don't actually convert from source -> intermediate since source is always just a JSON string
+        using (!_proflog.IsEnabled(LogLevel.Debug) ? null : _proflog.DebugDuration<BlockListPropertyValueConverter>(
                    $"ConvertPropertyToBlockList ({propertyType.DataType.Id})"))
         {
             // Get configuration
@@ -101,7 +149,7 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
 
             BlockListModel blockModel = UnwrapBlockModel(referenceCacheLevel, inter, preview, configuration.Blocks, CreateEmptyModel, CreateModel);
 
-            return IsSingleBlockMode(propertyType.DataType) ? blockModel.FirstOrDefault() : blockModel;
+            return blockModel;
         }
     }
 

@@ -2319,8 +2319,8 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <key alias="stateInactive">Inattivi</key>
     <key alias="sortNameAscending">Nome (A-Z)</key>
     <key alias="sortNameDescending">Nome (Z-A)</key>
-    <key alias="sortCreateDateAscending"><![CDATA[Più nuovi]]></key>
-    <key alias="sortCreateDateDescending"><![CDATA[Più vecchi]]></key>
+    <key alias="sortCreateDateAscending"><![CDATA[Più vecchi]]></key>
+    <key alias="sortCreateDateDescending"><![CDATA[Più nuovi]]></key>
     <key alias="sortLastLoginDateDescending">Ultimo login</key>
     <key alias="noUserGroupsAdded">Non sono stati aggiunti gruppi di utenti</key>
   </area>
@@ -2660,6 +2660,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <key alias="labelUsedByMemberTypes">Usato nei tipi di membro</key>
     <key alias="noMemberTypes">Non ci sono riferimenti a tipi di membro.</key>
     <key alias="usedByProperties">Usato da</key>
+    <key alias="labelUsedByItems">Correlato ai seguenti elementi</key>
     <key alias="labelUsedByDocuments">Usato nei documenti</key>
     <key alias="labelUsedByMembers">Usato nei membri</key>
     <key alias="labelUsedByMedia">Usato nei media</key>

@@ -410,7 +410,7 @@
     </key>
     <key alias="elementType">Element Type</key>
     <key alias="elementTypeDescription">Defines the schema for a repeating set of properties, for example, in a 'Block
-      List' or 'Nested Content' property editor.
+      List' or 'Block Grid' property editor.
     </key>
     <key alias="composition">Composition</key>
     <key alias="compositionDescription">Defines a re-usable set of properties that can be included in the definition of
@@ -503,7 +503,7 @@
     <key alias="insertlink">Insert link</key>
     <key alias="insertMacro">Click to add a Macro</key>
     <key alias="inserttable">Insert table</key>
-    <key alias="languagedeletewarning">This will delete the language</key>
+    <key alias="languagedeletewarning">This will delete the language and all content related to the language</key>
     <key alias="languageChangeWarning">Changing the culture for a language may be an expensive operation and will result
       in the content cache and indexes being rebuilt
     </key>
@@ -644,6 +644,8 @@
     </key>
     <key alias="indexCannotRebuild">This index cannot be rebuilt because it has no assigned</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
+    <key alias="noResults">No results were found</key>
+    <key alias="searchResultsFound">Showing %0% - %1% of %2% result(s) - Page %3% of %4%</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
@@ -1927,7 +1929,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="allowVaryBySegment">Allow segmentation</key>
     <key alias="elementType">Element Type</key>
     <key alias="elementHeading">Is an Element Type</key>
-    <key alias="elementDescription">An Element Type is meant to be used for instance in Nested Content, and not in the
+    <key alias="elementDescription">An Element Type is meant to be used within other Document Types, and not in the Content
       tree.
     </key>
     <key alias="elementCannotToggle">A Document Type cannot be changed to an Element Type once it has been used to
@@ -2343,8 +2345,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="stateInactive">Inactive</key>
     <key alias="sortNameAscending">Name (A-Z)</key>
     <key alias="sortNameDescending">Name (Z-A)</key>
-    <key alias="sortCreateDateAscending">Newest</key>
-    <key alias="sortCreateDateDescending">Oldest</key>
+    <key alias="sortCreateDateAscending">Oldest</key>
+    <key alias="sortCreateDateDescending">Newest</key>
     <key alias="sortLastLoginDateDescending">Last login</key>
     <key alias="noUserGroupsAdded">No user groups have been added</key>
     <key alias="2faDisableText">If you wish to disable this two-factor provider, then you must enter the code shown on your authentication device:</key>
@@ -2369,7 +2371,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="items">items</key>
     <key alias="urls">URL(s)</key>
     <key alias="urlsSelected">URL(s) selected</key>
-    <key alias="itemsSelected">items selected</key>
+    <key alias="itemsSelected">item(s) selected</key>
     <key alias="invalidDate">Invalid date</key>
     <key alias="invalidNumber">Not a number</key>
     <key alias="invalidNumberStepSize">Not a valid numeric step size</key>
@@ -3010,7 +3012,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
           We will send:
           <ul>
             <li>Anonymized site ID, Umbraco version, and packages installed.</li>
-            <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li>
+            <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, and Property Editors in use.</li>
             <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
             <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li>
           </ul>

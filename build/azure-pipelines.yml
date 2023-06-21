@@ -23,7 +23,7 @@ parameters:
     default: false
 
 variables:
-  nodeVersion: 16.17.0
+  nodeVersion: 18.16.0
   dotnetVersion: 7.x
   dotnetIncludePreviewVersions: true
   solution: umbraco.sln
@@ -94,23 +94,8 @@ stages:
               echo "##vso[task.setvariable variable=majorVersion;isOutput=true]$major"
             displayName: Set major version
             name: determineMajorVersion
-          - task: PowerShell@2
-            displayName: Prepare nupkg
-            inputs:
-              targetType: inline
-              script: |
-                $umbracoVersion = "$(Build.BuildNumber)" -replace "\+",".g"
-                $templatePaths = Get-ChildItem 'templates/**/.template.config/template.json'
-
-                foreach ($templatePath in $templatePaths) {
-                  $a = Get-Content $templatePath -Raw | ConvertFrom-Json
-                  if ($a.symbols -and $a.symbols.UmbracoVersion) {
-                    $a.symbols.UmbracoVersion.defaultValue = $umbracoVersion
-                    $a | ConvertTo-Json -Depth 32 | Set-Content $templatePath
-                  }
-                }
-
-                dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
+          - script: dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
+            displayName: Run dotnet pack
           - script: |
               sha="$(Build.SourceVersion)"
               sha=${sha:0:7}
@@ -307,7 +292,7 @@ stages:
             Linux:
               vmImage: 'ubuntu-latest'
               testDb: SqlServer
-              connectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
+              connectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=true'
         pool:
           vmImage: $(vmImage)
         variables:

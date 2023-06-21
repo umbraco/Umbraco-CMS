@@ -54,8 +54,8 @@
     <key alias="setPermissions">Sæt rettigheder</key>
     <key alias="unlock">Lås op</key>
     <key alias="createblueprint">Opret indholdsskabelon</key>
-    <key alias="resendInvite">Gensend Invitation</key>
-    <key alias="defaultValue">Standard værdi</key>
+    <key alias="resendInvite">Gensend invitation</key>
+    <key alias="defaultValue">Standardværdi</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Indhold</key>
@@ -389,7 +389,7 @@
     </key>
     <key alias="elementType">Element-type</key>
     <key alias="elementTypeDescription">Definerer skabelonen for et sæt at egenskaber, der kan anvendes som skema i
-      avancerede felter som f.eks. 'Block List' eller 'Nested Content'.
+      avancerede felter som f.eks. 'Block List' eller 'Block Grid'.
     </key>
     <key alias="composition">Komposition</key>
     <key alias="compositionDescription">Definerer et sæt genbrugbare egenskaber, der kan inkluderes i definitionen af
@@ -607,6 +607,8 @@
     </key>
     <key alias="indexCannotRebuild">Dette index kan ikke genbygges for det ikke har nogen</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
+    <key alias="noResults">Der blev ikke fundet nogen resultater</key>
+    <key alias="searchResultsFound">Viser %0% - %1% af %2% resultat(er) - Side %3% af %4%</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>
@@ -1647,7 +1649,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="allowVaryBySegment">Tillad segmentering</key>
     <key alias="elementType">Element-type</key>
     <key alias="elementHeading">Er en Element-type</key>
-    <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet.
+    <key alias="elementDescription">En Element-type er tiltænkt brug i andre Dokumenttyper, ikke i indholdstræet.
     </key>
     <key alias="elementCannotToggle">En Dokumenttype kan ikke ændres til en Element-type efter den er blevet brugt til
       at oprette en eller flere indholds elementer.
@@ -1927,8 +1929,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="stateInactive">Inaktiv</key>
     <key alias="sortNameAscending">Navn (A-Å)</key>
     <key alias="sortNameDescending">Navn (Å-A)</key>
-    <key alias="sortCreateDateAscending">Nyeste</key>
-    <key alias="sortCreateDateDescending">Ældste</key>
+    <key alias="sortCreateDateAscending">Ældste</key>
+    <key alias="sortCreateDateDescending">Nyeste</key>
     <key alias="sortLastLoginDateDescending">Sidst logget ind</key>
     <key alias="noUserGroupsAdded">Ingen brugere er blevet tilføjet</key>
     <key alias="2faDisableText">Hvis du ønsker at slå denne totrinsbekræftelse fra, så skal du nu indtaste koden fra din enhed:</key>
@@ -2232,7 +2234,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="allowedBlockColumnsHelp">Vælg de forskellige antal kolonner denne blok må optage i layoutet. Dette forhindre ikke blokken i at optræde i et mindre område.</key>
     <key alias="allowedBlockRows">TIlgængelige række-størrelser</key>
     <key alias="allowedBlockRowsHelp">Vælg hvor mange rækker denne blok på optage i layoutet.</key>
-    <key alias="allowBlockInRoot">Tillad på rodniveay</key>
+    <key alias="allowBlockInRoot">Tillad på rodniveau</key>
     <key alias="allowBlockInRootHelp">Gør denne blok tilgængelig i layoutets rodniveau. Hvis dette ikke er valgt, kan denne blok kun bruges inden for andre blokkes definerede områder.</key>
     <key alias="areas">Blok-områder</key>
     <key alias="areasLayoutColumns">Layout-kolonner</key>
@@ -2240,7 +2242,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="areasConfigurations">Opsætning af områder</key>
     <key alias="areasConfigurationsHelp">Hvis det skal være muligt at indsætte nye blokke indeni denne blok, skal der oprettes ét eller flere områder til at indsætte de nye blokke i.</key>
     <key alias="invalidDropPosition">Ikke tilladt placering.</key>
-    <key alias="defaultLayoutStylesheet">Standart layout stylesheet</key>
+    <key alias="defaultLayoutStylesheet">Standardlayout stylesheet</key>
     <key alias="confirmPasteDisallowedNestedBlockHeadline">Ikke tilladt indhold blev afvist</key>
     <key alias="confirmPasteDisallowedNestedBlockMessage">
       <![CDATA[Det indsatte indhold bestod af ikke tilladt del-indhold, disse dele er blevet afvist. Vil du beholde det resterene alligevel?]]></key>

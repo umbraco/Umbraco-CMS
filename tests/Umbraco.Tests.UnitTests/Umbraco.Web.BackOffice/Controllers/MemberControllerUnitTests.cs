@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -359,7 +358,8 @@ public class MemberControllerUnitTests
             Mock.Get(passwordChanger)
                 .Setup(x => x.ChangePasswordWithIdentityAsync(
                     It.IsAny<ChangingPasswordModel>(),
-                    umbracoMembersUserManager))
+                    umbracoMembersUserManager,
+                    null))
                 .ReturnsAsync(() => attempt);
         }
         else
@@ -368,7 +368,8 @@ public class MemberControllerUnitTests
             Mock.Get(passwordChanger)
                 .Setup(x => x.ChangePasswordWithIdentityAsync(
                     It.IsAny<ChangingPasswordModel>(),
-                    umbracoMembersUserManager))
+                    umbracoMembersUserManager,
+                    null))
                 .ReturnsAsync(() => attempt);
         }
     }
