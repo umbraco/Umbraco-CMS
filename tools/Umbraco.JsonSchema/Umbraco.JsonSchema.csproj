@@ -12,5 +12,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj" />
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
+    <PackageReference Include="Umbraco.Deploy.Core" Version="10.2.2" />
+    <PackageReference Include="Umbraco.Forms.Core" Version="10.4.0" />
   </ItemGroup>
 </Project>
