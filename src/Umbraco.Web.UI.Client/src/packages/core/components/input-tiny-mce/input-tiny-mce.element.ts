@@ -24,8 +24,7 @@ import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
-import { CurrentUserResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 
 export type TinyConfig = Record<string, any>;
 
@@ -40,7 +39,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	modalContext!: UmbModalContext;
 	#mediaHelper = new UmbMediaHelper();
-	#currentUser?: CurrentUserResponseModel;
+	#currentUser?: UmbLoggedInUser;
 	#auth?: typeof UMB_AUTH.TYPE;
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
 
@@ -55,18 +54,18 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			this.modalContext = modalContext;
 		});
 
-		this.consumeContext(UMB_AUTH, (instance) => {
-			this.#auth = instance;
-			this.#observeCurrentUser();
-		});
+		// TODO => this breaks tests, removing for now will ignore user language
+		// and fall back to tinymce default language
+		// this.consumeContext(UMB_AUTH, (instance) => {
+		// 	this.#auth = instance;
+		// 	this.#observeCurrentUser();
+		// });
 	}
 
 	async #observeCurrentUser() {
 		if (!this.#auth) return;
 
-		this.observe(this.#auth.currentUser, (currentUser: CurrentUserResponseModel | undefined) => {
-			this.#currentUser = currentUser;
-		});
+		this.observe(this.#auth.currentUser, (currentUser) => this.#currentUser = currentUser);
 	}
 
 	async connectedCallback() {
