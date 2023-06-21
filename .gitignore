@@ -92,6 +92,7 @@ preserve.belle
 
 # Tests
 /tests/Umbraco.Tests.AcceptanceTest/.env
+/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth
 /tests/Umbraco.Tests.Integration.SqlCe/DatabaseContextTests.sdf
 /tests/Umbraco.Tests.Integration.SqlCe/[Uu]mbraco/[Dd]ata/TEMP/
 /tests/Umbraco.Tests.Integration/appsettings.Tests.Local.json
