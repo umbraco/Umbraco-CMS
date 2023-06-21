@@ -36,5 +36,11 @@ const config: StorybookConfig = {
 		];
 		return configType === 'PRODUCTION' ? `${injections.join('')}${head}` : head;
 	},
+	refs: {
+		uui: {
+			title: 'Umbraco UI Library (1.3.0)',
+			url: 'https://e662ac3--62189360eeb21b003ab2f4ad.chromatic.com/',
+		},
+	},
 };
 export default config;

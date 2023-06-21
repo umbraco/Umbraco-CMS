@@ -1,3 +1,6 @@
+import type { UmbLoggedInUser } from './types.js';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+
 export interface IUmbAuth {
 	/**
 	 * Get the current user's access token.
@@ -9,6 +12,16 @@ export interface IUmbAuth {
 	 * ```
 	 */
 	performWithFreshTokens(): Promise<string>;
+
+	/**
+	 * Get the current user model of the current user.
+	 */
+	get currentUser(): Observable<UmbLoggedInUser | undefined>;
+
+	/**
+	 * Make a server request for the current user and save the state
+	 */
+	fetchCurrentUser(): Promise<UmbLoggedInUser | undefined>;
 
 	/**
 	 * Sign out the current user.

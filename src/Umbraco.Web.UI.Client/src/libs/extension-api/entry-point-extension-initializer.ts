@@ -2,14 +2,14 @@ import type { ManifestEntryPoint } from './types.js';
 import { hasInitExport } from './has-init-export.function.js';
 import { loadExtension } from './load-extension.function.js';
 import { UmbExtensionRegistry } from './registry/extension.registry.js';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbElementMixinInterface } from '@umbraco-cms/backoffice/element-api';
 
 export class UmbEntryPointExtensionInitializer {
 	#host;
 	#extensionRegistry;
 	#entryPointMap = new Map();
 
-	constructor(host: UmbControllerHostElement, extensionRegistry: UmbExtensionRegistry<ManifestEntryPoint>) {
+	constructor(host: UmbElementMixinInterface, extensionRegistry: UmbExtensionRegistry<ManifestEntryPoint>) {
 		this.#host = host;
 		this.#extensionRegistry = extensionRegistry;
 		extensionRegistry.extensionsOfType('entryPoint').subscribe((entryPoints) => {

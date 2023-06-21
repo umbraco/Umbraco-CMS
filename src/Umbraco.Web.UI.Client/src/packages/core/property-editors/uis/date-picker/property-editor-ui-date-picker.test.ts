@@ -1,16 +1,16 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbDateInputElement } from '../../../components/date-input/date-input.element.js';
+import { UmbInputDateElement } from '../../../components/input-date/input-date.element.js';
 import { UmbPropertyEditorUIDatePickerElement } from './property-editor-ui-date-picker.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 describe('UmbPropertyEditorUIDatePickerElement', () => {
 	let element: UmbPropertyEditorUIDatePickerElement;
-	let inputElement: UmbDateInputElement;
+	let inputElement: UmbInputDateElement;
 
 	beforeEach(async () => {
 		element = await fixture(html` <umb-property-editor-ui-date-picker></umb-property-editor-ui-date-picker> `);
-		inputElement = element.shadowRoot?.querySelector('umb-date-input') as UmbDateInputElement;
+		inputElement = element.shadowRoot?.querySelector('umb-input-date') as UmbInputDateElement;
 	});
 
 	it('is defined with its own instance', () => {

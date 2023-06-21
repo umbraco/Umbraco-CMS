@@ -1,5 +1,5 @@
-import type { UmbInputDocumentPickerElement } from '../../../documents/documents/components/input-document-picker/input-document-picker.element.js';
-import type { UmbInputMediaPickerElement } from '../../../media/media/components/input-media-picker/input-media-picker.element.js';
+import type { UmbInputDocumentElement } from '../../../documents/documents/components/input-document/input-document.element.js';
+import type { UmbInputMediaElement } from '../../../media/media/components/input-media/input-media.element.js';
 import type { UmbInputLanguagePickerElement } from '../../../settings/languages/components/input-language-picker/input-language-picker.element.js';
 import {
 	UUITextStyles,
@@ -184,12 +184,12 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	#renderContentSection() {
 		return html`
 			<div slot="editor">
-				<umb-input-document-picker
+				<umb-input-document
 					.value=${this._package.contentNodeId ?? ''}
 					max="1"
 					@change="${(e: CustomEvent) =>
-						(this._package.contentNodeId = (e.target as UmbInputDocumentPickerElement).selectedIds[0])}">
-				</umb-input-document-picker>
+						(this._package.contentNodeId = (e.target as UmbInputDocumentElement).selectedIds[0])}">
+				</umb-input-document>
 				<uui-checkbox
 					label="Include child nodes"
 					.checked="${this._package.contentLoadChildNodes ?? false}"
@@ -203,10 +203,10 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	#renderMediaSection() {
 		return html`
 			<div slot="editor">
-				<umb-input-media-picker
+				<umb-input-media
 					.selectedIds=${this._package.mediaIds ?? []}
 					@change="${(e: CustomEvent) =>
-						(this._package.mediaIds = (e.target as UmbInputMediaPickerElement).selectedIds)}"></umb-input-media-picker>
+						(this._package.mediaIds = (e.target as UmbInputMediaElement).selectedIds)}"></umb-input-media>
 				<uui-checkbox
 					label="Include child nodes"
 					.checked="${this._package.mediaLoadChildNodes ?? false}"

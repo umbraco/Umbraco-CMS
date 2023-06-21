@@ -33,10 +33,10 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 	}
 
 	render() {
-		return html`<umb-input-color-picker
+		return html`<umb-input-color
 			@change="${this._onChange}"
 			.swatches="${this._swatches}"
-			.showLabels="${this._showLabels}"></umb-input-color-picker>`;
+			.showLabels="${this._showLabels}"></umb-input-color>`;
 	}
 
 	static styles = [UUITextStyles];

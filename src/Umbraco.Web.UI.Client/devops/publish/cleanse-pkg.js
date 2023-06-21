@@ -13,8 +13,8 @@ delete packageJson.dependencies['router-slot'];
 // Remove all DevDependencies
 delete packageJson.devDependencies;
 
-// Rename dependencies to peerDependencies
-packageJson.peerDependencies = packageJson.dependencies;
+// Rename dependencies to optionalDependencies
+packageJson.optionalDependencies = { ...packageJson.dependencies };
 delete packageJson.dependencies;
 
 // Write the package.json back to disk

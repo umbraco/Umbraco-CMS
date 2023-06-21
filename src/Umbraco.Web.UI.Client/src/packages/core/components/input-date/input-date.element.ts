@@ -3,8 +3,8 @@ import { css, html, ifDefined, customElement, property, state } from '@umbraco-c
 import { UUITextStyles, FormControlMixin, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-@customElement('umb-date-input')
-export class UmbDateInputElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-date')
+export class UmbInputDateElement extends FormControlMixin(UmbLitElement) {
 	protected getFormElement() {
 		return undefined;
 	}
@@ -136,8 +136,8 @@ export class UmbDateInputElement extends FormControlMixin(UmbLitElement) {
 			label="Pick a date or time"
 			.type="${this.type}"
 			@change="${this.#onChange}"
-			.min="${ifDefined(this.min)}"
-			.max="${ifDefined(this.max)}"
+			min="${ifDefined(this.min)}"
+			max="${ifDefined(this.max)}"
 			.step="${this.step}"
 			.value="${this.displayValue?.replace('Z', '')}">
 		</uui-input>`;
@@ -146,10 +146,10 @@ export class UmbDateInputElement extends FormControlMixin(UmbLitElement) {
 	static styles = [UUITextStyles, css``];
 }
 
-export default UmbDateInputElement;
+export default UmbInputDateElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-date-input': UmbDateInputElement;
+		'umb-input-date': UmbInputDateElement;
 	}
 }

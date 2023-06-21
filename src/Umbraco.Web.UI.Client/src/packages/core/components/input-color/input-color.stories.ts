@@ -1,14 +1,14 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './input-color-picker.element.js';
-import type { UmbInputColorPickerElement } from './input-color-picker.element.js';
+import './input-color.element.js';
+import type { UmbInputColorElement } from './input-color.element.js';
 
-const meta: Meta<UmbInputColorPickerElement> = {
-	title: 'Components/Inputs/Color Picker',
-	component: 'umb-input-color-picker',
+const meta: Meta<UmbInputColorElement> = {
+	title: 'Components/Inputs/Color',
+	component: 'umb-input-color',
 };
 
 export default meta;
-type Story = StoryObj<UmbInputColorPickerElement>;
+type Story = StoryObj<UmbInputColorElement>;
 
 export const Overview: Story = {
 	args: {
@@ -46,6 +46,7 @@ export const WithoutLabels: Story = {
 // Perhaps a BUG ?
 export const WithValueLabels: Story = {
 	args: {
+		value: '#00ff00',
 		showLabels: true,
 		swatches: [
 			{
@@ -57,6 +58,5 @@ export const WithValueLabels: Story = {
 				value: '#00ff00',
 			},
 		],
-		value: '#00ff00',
 	},
 };

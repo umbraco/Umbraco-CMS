@@ -1,5 +1,5 @@
 import type { UmbAppErrorElement } from './app-error.element.js';
-import { UMB_AUTH, UmbAuthFlow } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH, UmbAuthFlow, UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { UMB_APP, UmbAppContext } from '@umbraco-cms/backoffice/context';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
@@ -81,7 +81,9 @@ export class UmbAppElement extends UmbLitElement {
 
 		this.#authFlow = new UmbAuthFlow(this.serverUrl, redirectUrl);
 
-		this.provideContext(UMB_AUTH, this.#authFlow);
+		const authContext = new UmbAuthContext(this, this.#authFlow);
+
+		this.provideContext(UMB_AUTH, authContext);
 
 		this.provideContext(UMB_APP, new UmbAppContext({ backofficePath: this.backofficePath, serverUrl: this.serverUrl }));
 
@@ -98,6 +100,8 @@ export class UmbAppElement extends UmbLitElement {
 				OpenAPI.TOKEN = () => this.#authFlow!.performWithFreshTokens();
 				OpenAPI.WITH_CREDENTIALS = true;
 			}
+
+			authContext.isLoggedIn.next(true);
 
 			// Initialise the router
 			this.#redirect();

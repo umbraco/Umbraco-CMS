@@ -27,10 +27,8 @@ export class DocumentTypeResource {
             url: '/umbraco/management/api/v1/document-type',
             body: requestBody,
             mediaType: 'application/json',
-						responseHeader: 'location',
             errors: {
                 400: `Bad Request`,
-                404: `Not Found`,
             },
         });
     }
