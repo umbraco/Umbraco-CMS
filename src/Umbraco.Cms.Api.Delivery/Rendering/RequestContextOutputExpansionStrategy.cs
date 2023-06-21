@@ -8,13 +8,15 @@ namespace Umbraco.Cms.Api.Delivery.Rendering;
 
 internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionStrategy
 {
+    private readonly IApiPropertyRenderer _propertyRenderer;
     private readonly bool _expandAll;
     private readonly string[] _expandAliases;
 
     private ExpansionState _state;
 
-    public RequestContextOutputExpansionStrategy(IHttpContextAccessor httpContextAccessor)
+    public RequestContextOutputExpansionStrategy(IHttpContextAccessor httpContextAccessor, IApiPropertyRenderer propertyRenderer)
     {
+        _propertyRenderer = propertyRenderer;
         (bool ExpandAll, string[] ExpanedAliases) initialState = InitialRequestState(httpContextAccessor);
         _expandAll = initialState.ExpandAll;
         _expandAliases = initialState.ExpanedAliases;
@@ -24,7 +26,7 @@ internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionSt
     public IDictionary<string, object?> MapElementProperties(IPublishedElement element)
         => element.Properties.ToDictionary(
             p => p.Alias,
-            p => p.GetDeliveryApiValue(_state == ExpansionState.Expanding));
+            p => GetPropertyValue(p, _state == ExpansionState.Expanding));
 
     public IDictionary<string, object?> MapContentProperties(IPublishedContent content)
         => content.ItemType == PublishedItemType.Content
@@ -66,7 +68,7 @@ internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionSt
                         _state = ExpansionState.Expanding;
                     }
 
-                    var value = property.GetDeliveryApiValue(_state == ExpansionState.Expanding);
+                    var value = GetPropertyValue(property, _state == ExpansionState.Expanding);
 
                     // always revert to pending after rendering the property value
                     _state = ExpansionState.Pending;
@@ -84,7 +86,7 @@ internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionSt
             _state = ExpansionState.Expanded;
             var rendered = properties.ToDictionary(
                 property => property.Alias,
-                property => property.GetDeliveryApiValue(false));
+                property => GetPropertyValue(property, false));
             _state = ExpansionState.Expanding;
             return rendered;
         }
@@ -107,6 +109,9 @@ internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionSt
                 ? toExpand.Substring(propertySpecifier.Length).Split(Constants.CharArrays.Comma)
                 : Array.Empty<string>());
     }
+
+    private object? GetPropertyValue(IPublishedProperty property, bool expanding)
+        => _propertyRenderer.GetPropertyValue(property, expanding);
 
     private enum ExpansionState
     {
