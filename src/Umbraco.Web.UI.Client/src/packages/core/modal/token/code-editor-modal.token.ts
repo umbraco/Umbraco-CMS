@@ -1,10 +1,12 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import { CodeEditorLanguage } from '@umbraco-cms/backoffice/code-editor';
 
+// TODO => investigate why exporting CodeEditorLanguage in code-editor barrel 
+// causes the schema generation task to fail... For now, language property below
+// duplicates the CodeEditorLanguage type
 export interface UmbCodeEditorModalData {
 	headline: string;
 	content: string;
-	language: CodeEditorLanguage;
+	language: 'razor' | 'typescript' | 'javascript' | 'css' | 'markdown' | 'json' | 'html';
 	color?: 'positive' | 'danger';
 	confirmLabel?: string;
 }
