@@ -70,9 +70,13 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	async connectedCallback() {
 		super.connectedCallback();
-
 		await this.#loadPlugins();
 		this.#setTinyConfig();
+	}
+
+	disconnectedCallback() {
+		super.disconnectedCallback();
+		tinymce.default.activeEditor?.destroy();
 	}
 
 	/**
