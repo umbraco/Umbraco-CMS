@@ -1,4 +1,4 @@
-import styles from 'monaco-editor/min/vs/editor/editor.main.css?inline';
+import styles from 'monaco-editor/min/vs/editor/editor.main.css';
 //eslint-disable-next-line
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker.js?worker';
 //eslint-disable-next-line
