@@ -1,10 +1,10 @@
-import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { defaultExtendedValidElements, defaultFallbackConfig, defaultStyleFormats } from './input-tiny-mce.defaults.js';
 import { pastePreProcessHandler, uploadImageHandler } from './input-tiny-mce.handlers.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
+import { renderEditor, type tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
@@ -14,13 +14,19 @@ import {
 	UmbTinyMcePluginBase,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	PropertyValueMap,
+	css,
+	customElement,
+	html,
+	property,
+	query,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
-export type TinyConfig = Record<string, any>; // TODO: define TinyConfig type
 
 // TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
 @customElement('umb-input-tiny-mce')
@@ -41,6 +47,9 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	protected getFormElement() {
 		return undefined;
 	}
+
+	@query('#editor', true)
+	private _editorElement?: HTMLElement;
 
 	constructor() {
 		super();
@@ -95,11 +104,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		}
 	}
 
-	#setTinyConfig() {
-		const target = document.createElement('div');
-		target.id = 'editor';
-		this.shadowRoot?.appendChild(target);
-
+	async #setTinyConfig() {
 		// create an object by merging the configuration onto the fallback config
 		const configurationOptions: Record<string, any> = {
 			...defaultFallbackConfig,
@@ -161,7 +166,13 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 		this.#setLanguage();
 
-		tinymce.default.init(this._tinyConfig);
+		if (this.#editorRef) {
+			this.#editorRef.destroy();
+		}
+
+		// await tinymce.default.init(this._tinyConfig);
+		const editors = await renderEditor(this._tinyConfig);
+		this.#editorRef = editors.pop();
 	}
 
 	/**
@@ -274,7 +285,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	 * @returns
 	 */
 	render() {
-		return html``;
+		return html`<div id="editor"></div>`;
 	}
 
 	static styles = [
