@@ -1,8 +1,8 @@
-import { FormControlMixin, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { defaultExtendedValidElements, defaultFallbackConfig, defaultStyleFormats } from './input-tiny-mce.defaults.js';
 import { pastePreProcessHandler, uploadImageHandler } from './input-tiny-mce.handlers.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
+import { FormControlMixin, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { renderEditor, type tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
@@ -132,7 +132,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			statusbar: false,
 			setup: (editor) => this.#editorSetup(editor),
 			target: this._editorElement,
-			toolbar_sticky: true,
 		};
 
 		// extend with configuration values
