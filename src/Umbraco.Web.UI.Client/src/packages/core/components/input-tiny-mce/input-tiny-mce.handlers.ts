@@ -1,13 +1,15 @@
-export function pastePreProcessHandler(args: { content: string }) {
+import type { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
+
+export const pastePreProcessHandler: tinymce.RawEditorOptions['paste_preprocess'] = (_editor, args) => {
 	// Remove spans
 	args.content = args.content.replace(/<\s*span[^>]*>(.*?)<\s*\/\s*span>/g, '$1');
 	// Convert b to strong.
 	args.content = args.content.replace(/<\s*b([^>]*)>(.*?)<\s*\/\s*b([^>]*)>/g, '<strong$1>$2</strong$3>');
 	// convert i to em
 	args.content = args.content.replace(/<\s*i([^>]*)>(.*?)<\s*\/\s*i([^>]*)>/g, '<em$1>$2</em$3>');
-}
+};
 
-export function uploadImageHandler(blobInfo: any, progress: (progress: number) => void) {
+export const uploadImageHandler: tinymce.RawEditorOptions['images_upload_handler'] = (blobInfo, progress) => {
 	return new Promise((resolve, reject) => {
 		const xhr = new XMLHttpRequest();
 		xhr.open('POST', window.Umbraco?.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
@@ -49,4 +51,4 @@ export function uploadImageHandler(blobInfo: any, progress: (progress: number) =
 
 		xhr.send(formData);
 	});
-}
+};
