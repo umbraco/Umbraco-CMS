@@ -19,12 +19,14 @@ const createTemplate = (dbItem: TemplateDBItem): TemplateResponseModel => {
 		name: dbItem.name,
 		alias: dbItem.alias,
 		content: dbItem.content,
+		masterTemplateId: dbItem.masterTemplateId,
 	};
 };
 
 const createTemplateItem = (dbItem: TemplateDBItem): TemplateItemResponseModel => ({
 	name: dbItem.name,
 	id: dbItem.id,
+	alias: dbItem.alias,
 });
 
 export const data: Array<TemplateDBItem> = [
@@ -70,6 +72,7 @@ export const data: Array<TemplateDBItem> = [
 		id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f72',
 		isContainer: false,
 		parentId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
+		masterTemplateId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		name: 'Child',
 		type: 'template',
 		icon: 'umb:layout',
@@ -84,6 +87,7 @@ export const data: Array<TemplateDBItem> = [
 		isContainer: false,
 		parentId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		name: 'Has Master Template',
+		masterTemplateId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		type: 'template',
 		icon: 'umb:layout',
 		hasChildren: false,
@@ -94,7 +98,11 @@ export const data: Array<TemplateDBItem> = [
 ];
 
 export const createTemplateScaffold = (masterTemplateAlias: string) => {
-	return `Template Scaffold Mock for master template: ${masterTemplateAlias}`;
+	return `@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	Layout = ${masterTemplateAlias};
+}`;
 };
 
 export const templateQuerySettings = {
@@ -169,10 +177,11 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 		return item ? createTemplateItem(item) : null;
 	}
 
-	getScaffold(): TemplateScaffoldResponseModel {
+	getScaffold(masterTemplateId: string | null = null): TemplateScaffoldResponseModel {
+		const masterTemplate = this.data.find((item) => item.id === masterTemplateId);
+
 		return {
-			content:
-				'@using Umbraco.Cms.Web.Common.PublishedModels;\r\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n@{\r\n\tLayout = null;\r\n}',
+			content: createTemplateScaffold(masterTemplate?.alias ?? 'null'),
 		};
 	}
 
