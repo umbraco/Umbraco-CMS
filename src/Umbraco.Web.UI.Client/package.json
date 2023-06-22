@@ -113,7 +113,6 @@
 		"new-extension": "plop  --plopfile ./devops/plop/plop.js",
 		"compile": "tsc",
 		"check": "npm run lint && npm run compile && npm run build-storybook",
-		"generate:tinymce": "node ./devops/tinymce/index.js",
 		"prepublishOnly": "node ./devops/publish/cleanse-pkg.js"
 	},
 	"engines": {
