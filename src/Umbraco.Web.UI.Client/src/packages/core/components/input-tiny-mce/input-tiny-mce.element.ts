@@ -62,10 +62,10 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		this.observe(this.#auth.currentUser, (currentUser) => (this.#currentUser = currentUser));
 	}
 
-	async connectedCallback() {
-		super.connectedCallback();
+	protected async firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
+		super.firstUpdated(_changedProperties);
 		await this.#loadPlugins();
-		this.#setTinyConfig();
+		await this.#setTinyConfig();
 	}
 
 	disconnectedCallback() {
