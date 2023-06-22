@@ -31,6 +31,11 @@ console.log('--- Copying UUI Fonts ---');
 cpSync('./node_modules/@umbraco-ui/uui-css/assets/fonts', './dist-cms/assets/fonts', { recursive: true });
 console.log('--- Copying src UUI Fonts done ---');
 
+// Copy TinyMCE
+console.log('--- Copying TinyMCE ---');
+cpSync('./node_modules/tinymce', './dist-cms/tinymce', { recursive: true });
+console.log('--- Copying TinyMCE done ---');
+
 const readFolders = (path) => readdirSync(path).filter((folder) => lstatSync(`${path}/${folder}`).isDirectory());
 const createModuleDescriptors = (folderName) =>
 	readFolders(`./src/${folderName}`).map((moduleName) => {

@@ -4,7 +4,7 @@ import * as tiny from 'tinymce';
 declare const tinymce: tiny.TinyMCE;
 
 const defaultConfig: tiny.RawEditorOptions = {
-	base_url: '/tinymce',
+	base_url: '/umbraco/backoffice/tinymce',
 };
 
 /* Initialize TinyMCE */

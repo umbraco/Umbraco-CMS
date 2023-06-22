@@ -17,6 +17,10 @@ export const plugins: PluginOption[] = [
 				src: 'src/assets/*.svg',
 				dest: 'umbraco/backoffice/assets',
 			},
+			{
+				src: 'node_modules/tinymce/**/*',
+				dest: 'umbraco/backoffice/tinymce'
+			}
 		],
 	}),
 	viteTSConfigPaths(),
