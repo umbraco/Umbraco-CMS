@@ -1,12 +1,14 @@
 /* Import TinyMCE */
-import tinymce, { type RawEditorOptions } from 'tinymce';
+import * as tiny from 'tinymce';
 
-const defaultConfig: RawEditorOptions = {
+declare const tinymce: tiny.TinyMCE;
+
+const defaultConfig: tiny.RawEditorOptions = {
 	base_url: '/tinymce',
 };
 
 /* Initialize TinyMCE */
-export function renderEditor(userConfig?: RawEditorOptions) {
+export function renderEditor(userConfig?: tiny.RawEditorOptions) {
 	const config = { ...defaultConfig, ...userConfig };
 	return tinymce.init(config);
 }
