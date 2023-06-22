@@ -101,10 +101,10 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		this.shadowRoot?.appendChild(target);
 
 		// create an object by merging the configuration onto the fallback config
-		const configurationOptions: TinyConfig = Object.assign(
-			defaultFallbackConfig,
-			this.configuration ? this.configuration?.toObject() : {}
-		);
+		const configurationOptions: Record<string, any> = {
+			...defaultFallbackConfig,
+			...(this.configuration ? this.configuration?.toObject() : {}),
+		};
 
 		// no auto resize when a fixed height is set
 		if (!configurationOptions.dimensions?.height) {
@@ -122,17 +122,18 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			inline_boundaries_selector: 'a[href],code,.mce-annotation,.umb-embed-holder,.umb-macro-holder',
 			menubar: false,
 			paste_remove_styles_if_webkit: true,
-			paste_preprocess: (_, args) => pastePreProcessHandler(args),
+			paste_preprocess: pastePreProcessHandler,
 			relative_urls: false,
 			resize: false,
 			statusbar: false,
-			setup: (editor: tinymce.Editor) => this.#editorSetup(editor),
-			target,
+			setup: (editor) => this.#editorSetup(editor),
+			target: this._editorElement,
 			toolbar_sticky: true,
 		};
 
 		// extend with configuration values
-		Object.assign(this._tinyConfig, {
+		this._tinyConfig = {
+			...this._tinyConfig,
 			content_css: configurationOptions.stylesheets.join(','),
 			extended_valid_elements: defaultExtendedValidElements,
 			height: configurationOptions.height ?? 500,
@@ -142,19 +143,20 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			style_formats: defaultStyleFormats,
 			valid_elements: configurationOptions.validElements,
 			width: configurationOptions.width,
-		});
+		};
 
 		// Need to check if we are allowed to UPLOAD images
 		// This is done by checking if the insert image toolbar button is available
 		if (this.#isMediaPickerEnabled()) {
-			Object.assign(this._tinyConfig, {
+			this._tinyConfig = {
+				...this._tinyConfig,
 				// Update the TinyMCE Config object to allow pasting
 				images_upload_handler: uploadImageHandler,
 				automatic_uploads: false,
 				images_replace_blob_uris: false,
 				// This allows images to be pasted in & stored as Base64 until they get uploaded to server
 				paste_data_images: true,
-			});
+			};
 		}
 
 		this.#setLanguage();
