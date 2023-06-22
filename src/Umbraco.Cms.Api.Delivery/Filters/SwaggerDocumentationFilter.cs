@@ -2,6 +2,7 @@ using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Delivery.Configuration;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Filters;
 
@@ -9,6 +10,11 @@ public class SwaggerDocumentationFilter : IOperationFilter, IParameterFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
+        if (context.MethodInfo.HasMapToApiAttribute(DeliveryApiConfiguration.ApiName) == false)
+        {
+            return;
+        }
+
         operation.Parameters ??= new List<OpenApiParameter>();
 
         operation.Parameters.Add(new OpenApiParameter
@@ -77,6 +83,11 @@ public class SwaggerDocumentationFilter : IOperationFilter, IParameterFilter
 
     public void Apply(OpenApiParameter parameter, ParameterFilterContext context)
     {
+        if (context.DocumentName != DeliveryApiConfiguration.ApiName)
+        {
+            return;
+        }
+
         switch (parameter.Name)
         {
             case "fetch":
