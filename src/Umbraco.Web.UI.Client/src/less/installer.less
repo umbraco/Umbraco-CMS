@@ -1,4 +1,4 @@
-﻿// Core variables and mixins
+// Core variables and mixins
 @import "fonts.less"; // Loading fonts
 @import "variables.less"; // Modify this for custom colors, font-sizes, etc
 @import "colors.less";
@@ -146,6 +146,10 @@ legend {
 
   &[type=checkbox] {
     width: auto;
+
+    &:focus {
+      outline: 2px solid @blueMidLight;
+    }
   }
 }
 

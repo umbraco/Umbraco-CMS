@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
@@ -786,7 +785,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         // Act
         var contentTypes = PackageDataInstallation
             .ImportDocumentType(withoutCleanupPolicy, 0)
-            .OfType<IContentTypeWithHistoryCleanup>();
+            .OfType<IContentType>();
 
         // Assert
         Assert.Multiple(() =>
@@ -805,7 +804,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         // Act
         var contentTypes = PackageDataInstallation
             .ImportDocumentType(docTypeElement, 0)
-            .OfType<IContentTypeWithHistoryCleanup>();
+            .OfType<IContentType>();
 
         // Assert
         Assert.Multiple(() =>
@@ -827,11 +826,11 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         // Act
         var contentTypes = PackageDataInstallation
             .ImportDocumentType(withCleanupPolicy, 0)
-            .OfType<IContentTypeWithHistoryCleanup>();
+            .OfType<IContentType>();
 
         var contentTypesUpdated = PackageDataInstallation
             .ImportDocumentType(withoutCleanupPolicy, 0)
-            .OfType<IContentTypeWithHistoryCleanup>();
+            .OfType<IContentType>();
 
         // Assert
         Assert.Multiple(() =>

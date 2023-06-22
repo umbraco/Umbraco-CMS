@@ -32,7 +32,7 @@ function macroService() {
                 macroAlias: alias,
                 macroParamsDictionary: {}
             };
-            while (paramMatch = paramExpression.exec(paramsChunk)) {
+            while ((paramMatch = paramExpression.exec(paramsChunk))) {
                 returnVal.macroParamsDictionary[paramMatch[1]] = paramMatch[2];
             }
             return returnVal;

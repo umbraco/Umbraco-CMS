@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
@@ -1745,13 +1747,65 @@ internal class DatabaseDataCreator
         }
     }
 
-    private void CreateLanguageData() =>
-        ConditionalInsert(
-            Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
-            "en-us",
-            new LanguageDto { Id = 1, IsoCode = "en-US", CultureName = "English (United States)", IsDefault = true },
-            Constants.DatabaseSchema.Tables.Language,
-            "id");
+    private void CreateLanguageData()
+    {
+        // For languages we support the installation of records that are additional to the default installed data.
+        // We can do this as they are specified by ISO code, which is enough to fully detail them.
+        // All other customizable install data is specified by GUID, and hence we only know about the set that are installed by default.
+        InstallDefaultDataSettings? languageInstallDefaultDataSettings = _installDefaultDataSettings.Get(Constants.Configuration.NamedOptions.InstallDefaultData.Languages);
+        if (languageInstallDefaultDataSettings?.InstallData == InstallDefaultDataOption.Values)
+        {
+            // Insert the specified languages, ensuring the first is marked as default.
+            bool isDefault = true;
+            short id = 1;
+            foreach (var isoCode in languageInstallDefaultDataSettings.Values)
+            {
+                if (!TryCreateCulture(isoCode, out CultureInfo? culture))
+                {
+                    continue;
+                }
+
+                var dto = new LanguageDto
+                {
+                    Id = id,
+                    IsoCode = culture.Name,
+                    CultureName = culture.EnglishName,
+                    IsDefault = isDefault,
+                };
+                _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", false, dto);
+                isDefault = false;
+                id++;
+            }
+        }
+        else
+        {
+            // Conditionally insert the default language.
+            if (TryCreateCulture("en-US", out CultureInfo? culture))
+            {
+                ConditionalInsert(
+                    Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
+                    culture.Name,
+                    new LanguageDto { Id = 1, IsoCode = culture.Name, CultureName = culture.EnglishName, IsDefault = true },
+                    Constants.DatabaseSchema.Tables.Language,
+                    "id");
+            }
+        }
+    }
+
+    private bool TryCreateCulture(string isoCode, [NotNullWhen(true)] out CultureInfo? culture)
+    {
+        try
+        {
+            culture = CultureInfo.GetCultureInfo(isoCode);
+            return true;
+        }
+        catch (CultureNotFoundException ex)
+        {
+            _logger.LogWarning(ex, "CultureInfo could not be created because culture '{IsoCode}' is not available. The language will not be created.", isoCode);
+            culture = null;
+            return false;
+        }
+    }
 
     private void CreateContentChildTypeData()
     {

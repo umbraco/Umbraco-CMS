@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Diagnostics;
 using System.Text;
 using NUnit.Framework;
@@ -18,7 +17,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
     {
         var requestHandlerSettings = new RequestHandlerSettings
         {
-            CharCollection = Array.Empty<CharItem>(),
+            UserDefinedCharCollection = Array.Empty<CharItem>(),
             EnableDefaultCharReplacements = false,
             ConvertUrlsToAscii = "false",
         };
@@ -47,7 +46,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
     {
         var requestHandlerSettings = new RequestHandlerSettings
         {
-            CharCollection = Array.Empty<CharItem>(),
+            UserDefinedCharCollection = Array.Empty<CharItem>(),
             EnableDefaultCharReplacements = false,
             ConvertUrlsToAscii = "false",
         };
@@ -383,7 +382,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
     {
         var requestHandlerSettings = new RequestHandlerSettings
         {
-            CharCollection = Array.Empty<CharItem>(),
+            UserDefinedCharCollection = Array.Empty<CharItem>(),
             EnableDefaultCharReplacements = false,
             ConvertUrlsToAscii = "false",
         };

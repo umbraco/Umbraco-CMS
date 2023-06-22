@@ -6,10 +6,9 @@
  * @description
  * The controller for the info view of the datatype editor
  */
-function DataTypeInfoController($scope, $routeParams, dataTypeResource, eventsService, $timeout, editorService) {
+function DataTypeInfoController($scope, $routeParams, dataTypeResource, $timeout, editorService) {
 
     var vm = this;
-    var evts = [];
     var referencesLoaded = false;
 
     vm.references = {};
@@ -48,7 +47,7 @@ function DataTypeInfoController($scope, $routeParams, dataTypeResource, eventsSe
 
     function open(id, event, type) {
         // targeting a new tab/window?
-        if (event.ctrlKey || 
+        if (event.ctrlKey ||
             event.shiftKey ||
             event.metaKey || // apple
             (event.button && event.button === 1) // middle click, >IE9 + everyone else
@@ -85,25 +84,7 @@ function DataTypeInfoController($scope, $routeParams, dataTypeResource, eventsSe
         }
     }
 
-    // load data type references when the references tab is activated
-    evts.push(eventsService.on("app.tabChange", function (event, args) {
-        $timeout(function () {
-            if (args.alias === "info") {
-                loadRelations();
-            }
-        });
-    }));
-
-    //ensure to unregister from all events!
-    $scope.$on('$destroy', function () {
-        for (var e in evts) {
-            eventsService.unsubscribe(evts[e]);
-        }
-    });
-
-   
-
-
+    loadRelations();
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.DataType.InfoController", DataTypeInfoController);

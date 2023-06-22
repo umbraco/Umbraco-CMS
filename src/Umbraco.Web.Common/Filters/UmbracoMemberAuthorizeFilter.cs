@@ -54,11 +54,20 @@ public class UmbracoMemberAuthorizeFilter : IAsyncAuthorizationFilter
 
         IMemberManager memberManager = context.HttpContext.RequestServices.GetRequiredService<IMemberManager>();
 
-        if (!await IsAuthorizedAsync(memberManager))
+        if (memberManager.IsLoggedIn())
+        {
+            if (!await IsAuthorizedAsync(memberManager))
+            {
+                context.HttpContext.SetReasonPhrase(
+                    "Resource restricted: the member is not of a permitted type or group.");
+                context.Result = new ForbidResult();
+            }
+        }
+        else
         {
             context.HttpContext.SetReasonPhrase(
-                "Resource restricted: either member is not logged on or is not of a permitted type or group.");
-            context.Result = new ForbidResult();
+                "Resource restricted: the member is not logged in.");
+            context.Result = new UnauthorizedResult();
         }
     }
 

@@ -72,7 +72,7 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
             ValueSetValidationResult validationResult = ValueSetValidator.Validate(v);
 
             return validationResult.Status;
-        }).ToList();
+        }).ToArray();
 
         var hasDeletes = false;
         var hasUpdates = false;
@@ -86,7 +86,7 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
                     hasUpdates = true;
 
                     //these are the valid ones, so just index them all at once
-                    base.PerformIndexItems(group.ToList(), onComplete);
+                    base.PerformIndexItems(group.ToArray(), onComplete);
                     break;
                 case ValueSetValidationStatus.Failed:
                     // don't index anything that is invalid
@@ -135,8 +135,10 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
             IBooleanOperation? filtered = c.NativeQuery(rawQuery);
             IOrdering? selectedFields = filtered.SelectFields(_idOnlyFieldSet);
             ISearchResults? results = selectedFields.Execute();
-
-            _logger.LogDebug("DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
+            }
 
             var toRemove = results.Select(x => x.Id).ToList();
             // delete those descendants (ensure base. is used here so we aren't calling ourselves!)

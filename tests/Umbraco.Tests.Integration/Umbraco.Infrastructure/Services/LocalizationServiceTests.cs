@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -83,6 +82,15 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Can_Get_Dictionary_Items_By_Guid_Ids()
+    {
+        var items = LocalizationService.GetDictionaryItemsByIds(_parentItemGuidId, _childItemGuidId);
+        Assert.AreEqual(2, items.Count());
+        Assert.NotNull(items.FirstOrDefault(i => i.Key == _parentItemGuidId));
+        Assert.NotNull(items.FirstOrDefault(i => i.Key == _childItemGuidId));
+    }
+
+    [Test]
     public void Can_Get_Dictionary_Item_By_Key()
     {
         var parentItem = LocalizationService.GetDictionaryItemByKey("Parent");
@@ -90,6 +98,15 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
 
         var childItem = LocalizationService.GetDictionaryItemByKey("Child");
         Assert.NotNull(childItem);
+    }
+
+    [Test]
+    public void Can_Get_Dictionary_Items_By_Keys()
+    {
+        var items = LocalizationService.GetDictionaryItemsByKeys("Parent", "Child");
+        Assert.AreEqual(2, items.Count());
+        Assert.NotNull(items.FirstOrDefault(i => i.ItemKey == "Parent"));
+        Assert.NotNull(items.FirstOrDefault(i => i.ItemKey == "Child"));
     }
 
     [Test]

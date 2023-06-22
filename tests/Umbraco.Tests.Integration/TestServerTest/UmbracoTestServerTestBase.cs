@@ -1,6 +1,4 @@
-using System;
 using System.Linq.Expressions;
-using System.Net.Http;
 using System.Reflection;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -16,12 +14,8 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.ManagementApi;
-using Umbraco.Cms.ManagementApi.Configuration;
-using Umbraco.Cms.ManagementApi.Controllers.Install;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -30,7 +24,6 @@ using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Website.Controllers;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.TestServerTest
 {
@@ -240,17 +233,12 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
                     // Adds Umbraco.Tests.Integration
                     mvcBuilder.AddApplicationPart(typeof(UmbracoTestServerTestBase).Assembly);
-
-                    // Adds Umbraco.Tests.Integration
-                    mvcBuilder.AddApplicationPart(typeof(InstallControllerBase).Assembly);
                 })
                 .AddWebServer()
                 .AddWebsite()
                 .AddUmbracoSqlServerSupport()
                 .AddUmbracoSqliteSupport()
                 .AddTestServices(TestHelper); // This is the important one!
-
-            new ManagementApiComposer().Compose(builder);
 
             CustomTestSetup(builder);
             builder.Build();
@@ -261,7 +249,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         /// </summary>
         protected virtual void ConfigureTestServices(IServiceCollection services)
         {
-            
+
         }
 
         protected void Configure(IApplicationBuilder app)

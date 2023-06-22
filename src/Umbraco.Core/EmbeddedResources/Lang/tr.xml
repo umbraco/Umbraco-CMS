@@ -2,7 +2,7 @@
 <language alias="tr" intName="Turkish" localName="Türkçe" lcid="" culture="tr-TR">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Kültür ve Ana Bilgisayar Adları</key>
@@ -257,7 +257,7 @@
     <key alias="childItems" version="7.0">Alt öğeler</key>
     <key alias="target" version="7.0">Hedef</key>
     <key alias="scheduledPublishServerTime">Bu, sunucuda şu zamana çevrilir:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_ blank">Ne bu ne anlama geliyor? </a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_ blank">Ne bu ne anlama geliyor? </a>]]></key>
     <key alias="nestedContentDeleteItem">Bu öğeyi silmek istediğinizden emin misiniz?</key>
     <key alias="nestedContentEditorNotSupported">%0% özelliği,%1% düzenleyiciyi kullanıyor ve bu, Yuvalanmış İçerik tarafından desteklenmiyor.</key>
     <key alias="nestedContentDeleteAllItems">Tüm öğeleri silmek istediğinizden emin misiniz?</key>
@@ -1319,8 +1319,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
   </area>
   <area alias="rollback">
     <key alias="changes">Değişiklikler</key>
-    <key alias="created">Oluşturuldu</key>
-    <key alias="currentVersion">Mevcut sürüm</key>
     <key alias="diffHelp"><![CDATA[Bu, mevcut sürüm ile seçili sürüm arasındaki farkları gösterir <br /> <del> Kırmızı </del> metin seçili sürümde gösterilmeyecektir. , <ins> yeşil eklendi demektir </ins>]]></key>
     <key alias="documentRolledBack">Belge geri alındı ​​</key>
     <key alias="headline">Mevcut sürümle karşılaştırmak için bir sürüm seçin</key>
@@ -1998,8 +1996,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="stateInactive">Etkin Değil</key>
     <key alias="sortNameAscending">Ad (AZ)</key>
     <key alias="sortNameDescending">Ad (ZA)</key>
-    <key alias="sortCreateDateAscending">En yeni</key>
-    <key alias="sortCreateDateDescending">En eski</key>
+    <key alias="sortCreateDateAscending">En eski</key>
+    <key alias="sortCreateDateDescending">En yeni</key>
     <key alias="sortLastLoginDateDescending">Son giriş</key>
     <key alias="noUserGroupsAdded">Hiçbir kullanıcı grubu eklenmedi</key>
   </area>
@@ -2087,7 +2085,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="helpText">
       <![CDATA[
         <p> Durum denetleyicisi, sitenizin çeşitli alanlarını en iyi uygulama ayarları, yapılandırma, olası sorunlar vb. için değerlendirir. Sorunları bir düğmeye basarak kolayca düzeltebilirsiniz.
-        Kendi sağlık kontrollerinizi ekleyebilir, <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">özel durum kontrolleri hakkında daha fazla bilgi için belgeler </a>. </p>
+        Kendi sağlık kontrollerinizi ekleyebilir, <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">özel durum kontrolleri hakkında daha fazla bilgi için belgeler </a>. </p>
         ]]>
     </key>
   </area>
@@ -2316,7 +2314,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="more">Daha fazla bilgi edinin</key>
     <key alias="bulletPointOne">
       <![CDATA[
-        Ayarlar <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">öğelerle çalışma hakkında daha fazla bilgi edinin Our Umbraco'nun Dokümantasyon bölümünde </a>
+        Ayarlar <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">öğelerle çalışma hakkında daha fazla bilgi edinin Our Umbraco'nun Dokümantasyon bölümünde </a>
     ]]>
     </key>
     <key alias="bulletPointTwo">

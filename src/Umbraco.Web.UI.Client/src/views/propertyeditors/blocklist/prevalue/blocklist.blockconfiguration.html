@@ -8,8 +8,10 @@
             ng-repeat="block in model.value"
             ng-class="{'--isOpen':vm.openBlock === block}"
             ng-click="vm.openBlockOverlay(block)">
-            <div class="__actions">
-                <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($index, $event)">
+            <div class="__actions" ng-click="$event.stopPropagation()" tabindex="-1">
+                <button type="button"
+                        class="btn-reset __action umb-outline"
+                        ng-click="vm.requestRemoveBlockByIndex($index, $event)">
                     <umb-icon icon="icon-trash" class="icon"></umb-icon>
                     <localize key="general_delete" class="sr-only">Delete</localize>
                 </button>

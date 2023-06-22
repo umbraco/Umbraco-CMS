@@ -142,6 +142,9 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                         //update editor state to what is current
                         editorState.set(args.content);
 
+                        //needs to be manually set for infinite editing mode
+                        args.scope.isNew = args.content.id === 0 && args.scope.isNew;
+
                         return $q.reject(err);
                     });
             }

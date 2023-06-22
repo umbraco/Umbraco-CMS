@@ -35,7 +35,7 @@ function ColorPickerController($scope, $timeout) {
         var items = [];
         for (var i in $scope.model.config.items) {
             var oldValue = $scope.model.config.items[i];
-            if (oldValue.hasOwnProperty("value")) {
+            if (Object.prototype.hasOwnProperty.call(oldValue, "value")) {
                 items.push({
                     value: oldValue.value,
                     label: oldValue.label,
@@ -46,7 +46,7 @@ function ColorPickerController($scope, $timeout) {
                 items.push({
                     value: oldValue,
                     label: oldValue,
-                    sortOrder: sortOrder,
+                    sortOrder: oldValue.sortOrder,
                     id: i
                 });
             }
@@ -72,7 +72,7 @@ function ColorPickerController($scope, $timeout) {
         var isValid = !$scope.model.validation.mandatory || (
             $scope.model.value != null
             && $scope.model.value != ""
-            && (!$scope.model.value.hasOwnProperty("value") || $scope.model.value.value !== "")
+            && (!Object.prototype.hasOwnProperty.call($scope.model.value, "value") || $scope.model.value.value !== "")
         );
         return {
             isValid: isValid,
@@ -96,18 +96,19 @@ function ColorPickerController($scope, $timeout) {
         }
 
         // Complex color (value and label)?
-        if (!$scope.model.value.hasOwnProperty("value"))
+        if (!Object.prototype.hasOwnProperty.call($scope.model.value, "value"))
             return;
 
         var modelColor = $scope.model.value.value;
         var modelLabel = $scope.model.value.label;
 
         // Check for a full match or partial match.
+        var item;
         var foundItem = null;
 
         // Look for a fully matching color.
         for (var key in $scope.model.config.items) {
-            var item = $scope.model.config.items[key];
+            item = $scope.model.config.items[key];
             if (item.value == modelColor && item.label == modelLabel) {
                 foundItem = item;
                 break;
@@ -116,8 +117,8 @@ function ColorPickerController($scope, $timeout) {
 
         // Look for a color with a matching value.
         if (!foundItem) {
-            for (var key in $scope.model.config.items) {
-                var item = $scope.model.config.items[key];
+            for (var valueKey in $scope.model.config.items) {
+                item = $scope.model.config.items[valueKey];
                 if (item.value == modelColor) {
                     foundItem = item;
                     break;
@@ -127,8 +128,8 @@ function ColorPickerController($scope, $timeout) {
 
         // Look for a color with a matching label.
         if (!foundItem) {
-            for (var key in $scope.model.config.items) {
-                var item = $scope.model.config.items[key];
+            for (var colorKey in $scope.model.config.items) {
+                item = $scope.model.config.items[colorKey];
                 if (item.label == modelLabel) {
                     foundItem = item;
                     break;

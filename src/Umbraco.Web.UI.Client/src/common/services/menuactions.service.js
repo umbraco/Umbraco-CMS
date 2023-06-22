@@ -32,7 +32,6 @@ function umbracoMenuActions(treeService, $location, navigationService, appState,
         
         "DisableUser": function(args) {
             localizationService.localize("defaultdialogs_confirmdisable").then(function (txtConfirmDisable) {
-                var currentMenuNode = UmbClientMgr.mainTree().getActionNode();
                 if (confirm(txtConfirmDisable + ' "' + args.entity.name + '"?\n\n')) {
                     usersResource.disableUser(args.entity.id).then(function () {
                         navigationService.syncTree({ tree: args.treeAlias, path: [args.entity.parentId, args.entity.id], forceReload: true });

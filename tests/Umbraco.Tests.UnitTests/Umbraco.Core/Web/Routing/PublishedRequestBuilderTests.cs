@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
@@ -47,7 +46,7 @@ public class PublishedRequestBuilderTests
 
         sut.SetDomain(
             new DomainAndUri(
-                new Domain(1, "test", 2, "en-AU", false), new Uri("https://example.com/en-au")));
+                new Domain(1, "test", 2, "en-AU", false, 0), new Uri("https://example.com/en-au")));
 
         Assert.IsNotNull(sut.Domain);
         Assert.IsNotNull(sut.Culture);
@@ -64,7 +63,7 @@ public class PublishedRequestBuilderTests
         var auCulture = "en-AU";
         var usCulture = "en-US";
         var domain = new DomainAndUri(
-            new Domain(1, "test", 2, auCulture, false), new Uri("https://example.com/en-au"));
+            new Domain(1, "test", 2, auCulture, false, 0), new Uri("https://example.com/en-au"));
         IReadOnlyDictionary<string, string> headers = new Dictionary<string, string> { ["Hello"] = "world" };
         var redirect = "https://test.com";
 

@@ -232,9 +232,7 @@ public static class UdiGetterExtensions
             throw new ArgumentNullException("entity");
         }
 
-        return new StringUdi(
-            Constants.UdiEntityType.Stylesheet,
-            entity.Path.TrimStart(Constants.CharArrays.ForwardSlash)).EnsureClosed();
+        return GetUdiFromPath(Constants.UdiEntityType.Stylesheet, entity.Path);
     }
 
     /// <summary>
@@ -249,8 +247,15 @@ public static class UdiGetterExtensions
             throw new ArgumentNullException("entity");
         }
 
-        return new StringUdi(Constants.UdiEntityType.Script, entity.Path.TrimStart(Constants.CharArrays.ForwardSlash))
-            .EnsureClosed();
+        return GetUdiFromPath(Constants.UdiEntityType.Script, entity.Path);
+    }
+
+    private static StringUdi GetUdiFromPath(string entityType, string path)
+    {
+        var id = path
+            .TrimStart(Constants.CharArrays.ForwardSlash)
+            .Replace("\\", "/");
+        return new StringUdi(entityType, id).EnsureClosed();
     }
 
     /// <summary>
@@ -300,7 +305,7 @@ public static class UdiGetterExtensions
             ? Constants.UdiEntityType.PartialViewMacro
             : Constants.UdiEntityType.PartialView;
 
-        return new StringUdi(entityType, entity.Path.TrimStart(Constants.CharArrays.ForwardSlash)).EnsureClosed();
+        return GetUdiFromPath(entityType, entity.Path);
     }
 
     /// <summary>

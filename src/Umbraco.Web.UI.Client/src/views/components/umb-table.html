@@ -57,10 +57,10 @@
                     </umb-variant-state>
                 </div>
                 <div class="umb-table-cell" ng-repeat="column in vm.itemProperties track by column.alias">
-                    <span title="{{column.header}}: {{item[column.alias]}}">
+                    <span title="{{column.header}}: {{item[column.alias].expression ? item[column.alias].expression({value: item[column.alias].value}) : item[column.alias]}}">
 
                         <div ng-if="!column.isSensitive">
-                            {{item[column.alias]}}
+                            {{item[column.alias].expression ? item[column.alias].expression({value: item[column.alias].value}) : item[column.alias]}}
                         </div>
 
                         <em ng-show="column.isSensitive" class="muted">

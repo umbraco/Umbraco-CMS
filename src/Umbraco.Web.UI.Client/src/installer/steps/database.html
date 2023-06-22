@@ -6,7 +6,7 @@
   </p>
 
   <form
-    name="myForm"
+    name="installerForm"
     class="form-horizontal -no-margin-bottom"
     novalidate
     ng-submit="validateAndForward();"
@@ -135,6 +135,7 @@
                   placeholder="umbraco-db-password"
                   required
                   ng-model="installer.current.model.password"
+                  spellcheck="false"
                 />
                 <small class="inline-help">Enter the database password</small>
               </div>
@@ -154,6 +155,16 @@
                 Use integrated authentication
               </label>
             </div>
+
+            <div class="controls">
+              <label class="checkbox">
+                <input
+                  type="checkbox"
+                  ng-model="installer.current.model.trustServerCertificate"
+                />
+                Trust the database certificate
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -164,8 +175,8 @@
         <button class="btn btn-info" ng-click="restart()">Go back</button>
         <button
           class="btn btn-success"
-          ng-disabled="myForm.$invalid || checking"
-          ng-class="{disabled:myForm.$invalid}"
+          ng-disabled="installerForm.$invalid || checking"
+          ng-class="{disabled:installerForm.$invalid}"
         >
           Install
         </button>

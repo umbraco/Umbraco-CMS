@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// <summary>
 ///     Embed Provider for YouTube the popular online video sharing and social media platform provider.
 /// </summary>
-public class YouTube : EmbedProviderBase
+public class YouTube : OEmbedProviderBase
 {
     public YouTube(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)
@@ -14,7 +14,7 @@ public class YouTube : EmbedProviderBase
 
     public override string ApiEndpoint => "https://www.youtube.com/oembed";
 
-    public override string[] UrlSchemeRegex => new[] { @"youtu.be/.*", @"youtube.com/watch.*" };
+    public override string[] UrlSchemeRegex => new[] { @"youtu.be/.*", @"youtube.com/watch.*", @"youtube.com/shorts/.*" };
 
     public override Dictionary<string, string> RequestParams => new()
     {

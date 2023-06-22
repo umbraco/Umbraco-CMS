@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Events;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
@@ -21,12 +21,6 @@ public class LogViewerController : BackOfficeNotificationsController
 {
     private readonly ILogLevelLoader _logLevelLoader;
     private readonly ILogViewer _logViewer;
-
-    [Obsolete]
-    public LogViewerController(ILogViewer logViewer)
-        : this(logViewer, StaticServiceProvider.Instance.GetRequiredService<ILogLevelLoader>())
-    {
-    }
 
     [ActivatorUtilitiesConstructor]
     public LogViewerController(ILogViewer logViewer, ILogLevelLoader logLevelLoader)
@@ -135,20 +129,16 @@ public class LogViewerController : BackOfficeNotificationsController
     }
 
     [HttpGet]
-    public IEnumerable<SavedLogSearch>? GetSavedSearches() => _logViewer.GetSavedSearches();
+    public IEnumerable<SavedLogSearch> GetSavedSearches() => _logViewer.GetSavedSearches();
 
     [HttpPost]
-    public IEnumerable<SavedLogSearch>? PostSavedSearch(SavedLogSearch item) =>
+    public IEnumerable<SavedLogSearch> PostSavedSearch(SavedLogSearch item) =>
         _logViewer.AddSavedSearch(item.Name, item.Query);
 
     [HttpPost]
-    public IEnumerable<SavedLogSearch>? DeleteSavedSearch(SavedLogSearch item) =>
-        _logViewer.DeleteSavedSearch(item.Name, item.Query);
+    public IEnumerable<SavedLogSearch> DeleteSavedSearch(SavedLogSearch item) =>
+        _logViewer.DeleteSavedSearch(item.Name);
 
     [HttpGet]
     public ReadOnlyDictionary<string, LogEventLevel?> GetLogLevels() => _logLevelLoader.GetLogLevelsFromSinks();
-
-    [Obsolete("Please use GetLogLevels() instead. Scheduled for removal in V11.")]
-    [HttpGet]
-    public string GetLogLevel() => _logViewer.GetLogLevel();
 }

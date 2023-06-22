@@ -16,6 +16,8 @@ public interface ICoreScope : IDisposable, IInstanceIdentifiable
     /// </remarks>
     public int Depth => -1;
 
+    public ILockingMechanism Locks { get; }
+
     /// <summary>
     ///     Gets the scope notification publisher
     /// </summary>

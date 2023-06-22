@@ -4,13 +4,13 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.Runtime;
 
@@ -33,7 +33,6 @@ public class RuntimeState : IRuntimeState
     private readonly IRuntimeModeValidationService _runtimeModeValidationService = null!;
 
     /// <summary>
-    /// The initial <see cref="RuntimeState"/>
     /// The initial <see cref="RuntimeState"/>
     /// </summary>
     public static RuntimeState Booting() => new RuntimeState() { Level = RuntimeLevel.Boot };
@@ -169,7 +168,10 @@ public class RuntimeState : IRuntimeState
         {
             // local version *does* match code version, but the database is not configured
             // install - may happen with Deploy/Cloud/etc
-            _logger.LogDebug("Database is not configured, need to install Umbraco.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Database is not configured, need to install Umbraco.");
+            }
 
             Level = RuntimeLevel.Install;
             Reason = RuntimeLevelReason.InstallNoDatabase;
@@ -207,10 +209,13 @@ public class RuntimeState : IRuntimeState
         {
             case UmbracoDatabaseState.CannotConnect:
                 {
-                    // cannot connect to configured database, this is bad, fail
-                    _logger.LogDebug("Could not connect to database.");
+                // cannot connect to configured database, this is bad, fail
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    {
+                        _logger.LogDebug("Could not connect to database.");
+                    }
 
-                    if (_globalSettings.Value.InstallMissingDatabase || _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory.ProviderName))
+                    if (_globalSettings.Value.InstallMissingDatabase || _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory))
                     {
                         // ok to install on a configured but missing database
                         Level = RuntimeLevel.Install;
@@ -232,12 +237,15 @@ public class RuntimeState : IRuntimeState
                 }
             case UmbracoDatabaseState.NeedsUpgrade:
                 {
-                    // the db version does not match... but we do have a migration table
-                    // so, at least one valid table, so we quite probably are installed & need to upgrade
+                // the db version does not match... but we do have a migration table
+                // so, at least one valid table, so we quite probably are installed & need to upgrade
 
-                    // although the files version matches the code version, the database version does not
-                    // which means the local files have been upgraded but not the database - need to upgrade
-                    _logger.LogDebug("Has not reached the final upgrade step, need to upgrade Umbraco.");
+                // although the files version matches the code version, the database version does not
+                // which means the local files have been upgraded but not the database - need to upgrade
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    {
+                        _logger.LogDebug("Has not reached the final upgrade step, need to upgrade Umbraco.");
+                    }
                     Level = _unattendedSettings.Value.UpgradeUnattended ? RuntimeLevel.Run : RuntimeLevel.Upgrade;
                     Reason = RuntimeLevelReason.UpgradeMigrations;
                 }
@@ -250,7 +258,10 @@ public class RuntimeState : IRuntimeState
 
                 if (_unattendedSettings.Value.PackageMigrationsUnattended)
                 {
-                    _logger.LogDebug("Package migrations need to execute.");
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    {
+                        _logger.LogDebug("Package migrations need to execute.");
+                    }
                     Reason = RuntimeLevelReason.UpgradePackageMigrations;
                 }
                 else
@@ -355,9 +366,10 @@ public class RuntimeState : IRuntimeState
         }
 
         FinalMigrationState = upgrader.Plan.FinalState;
-
-        _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
-
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
+        }
         return CurrentMigrationState != FinalMigrationState;
     }
 
@@ -374,8 +386,10 @@ public class RuntimeState : IRuntimeState
             {
                 break;
             }
-
-            _logger.LogDebug("Could not immediately connect to database, trying again.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Could not immediately connect to database, trying again.");
+            }
             Thread.Sleep(1000);
         }
 

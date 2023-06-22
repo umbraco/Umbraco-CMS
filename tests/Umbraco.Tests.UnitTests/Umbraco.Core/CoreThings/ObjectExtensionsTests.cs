@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Tests.Common.TestHelpers;
@@ -279,6 +280,56 @@ public class ObjectExtensionsTests
         var conv = "2016-06-07".TryConvertTo<DateTime?>();
         Assert.IsTrue(conv);
         Assert.AreEqual(new DateTime(2016, 6, 7), conv.Result);
+    }
+
+    [TestCase("d72f12a9-29db-42b4-9ffb-25a3ba4dcef5")]
+    [TestCase("D72F12A9-29DB-42B4-9FFB-25A3BA4DCEF5")]
+    public void CanConvertToGuid(string guidValue)
+    {
+        var conv = guidValue.TryConvertTo<Guid>();
+        Assert.IsTrue(conv);
+        Assert.AreEqual(Guid.Parse(guidValue), conv.Result);
+    }
+
+    [TestCase("d72f12a9-29db-42b4-9ffb-25a3ba4dcef5")]
+    [TestCase("D72F12A9-29DB-42B4-9FFB-25A3BA4DCEF5")]
+    public void CanConvertToNullableGuid(string guidValue)
+    {
+        var conv = guidValue.TryConvertTo<Guid?>();
+        Assert.IsTrue(conv);
+        Assert.AreEqual(Guid.Parse(guidValue), conv.Result);
+    }
+
+    [TestCase("d72f12a9-29db-42b4-9ffb-25a3ba4dcef5")]
+    [TestCase("D72F12A9-29DB-42B4-9FFB-25A3BA4DCEF5")]
+    public void CanConvertStringValuesToNullableGuid(string guidValue)
+    {
+        StringValues stringValues = guidValue;
+        var conv = stringValues.TryConvertTo<Guid?>();
+        Assert.IsTrue(conv);
+        Assert.AreEqual(Guid.Parse(guidValue), conv.Result);
+    }
+
+    [TestCase(10)]
+    [TestCase(0)]
+    [TestCase(-10)]
+    [TestCase(int.MinValue)]
+    [TestCase(int.MaxValue)]
+    public void CanConvertStringValuesToInt(int intValue)
+    {
+        StringValues stringValues = intValue.ToString();
+        var conv = stringValues.TryConvertTo<int>();
+        Assert.IsTrue(conv);
+        Assert.AreEqual(intValue, conv.Result);
+    }
+
+    [Test]
+    public void CanConvertStringValuesToString()
+    {
+        StringValues stringValues = "This is a string";
+        var conv = stringValues.TryConvertTo<string>();
+        Assert.IsTrue(conv);
+        Assert.AreEqual("This is a string", conv.Result);
     }
 
     [Test]

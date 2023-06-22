@@ -42,7 +42,7 @@
         ng-repeat="group in tree.root.children">
 
         <div class="umb-tree-root" data-element="tree-root" ng-class="getNodeCssClass(group)" ng-hide="hideheader === 'true'" on-right-click="altSelect(group, $event)">
-            <h5>
+            <h1>
                 <a ng-href="#/{{section}}" ng-click="select(group, $event)" class="umb-tree-root-link umb-outline" data-element="tree-root-link">
                     <umb-icon icon="icon-check"
                               class="umb-tree-icon"
@@ -51,7 +51,7 @@
                     </umb-icon>
                     {{group.name}}
                 </a>
-            </h5>
+            </h1>
 
             <umb-button-ellipsis element="tree-item-options"
                                  action="options(group, $event)"

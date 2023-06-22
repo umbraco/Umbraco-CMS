@@ -48,7 +48,7 @@ function startUpDynamicContentController($q, $timeout, $scope, dashboardResource
             {
                 title: "Documentation",
                 description: "Find the answers to your Umbraco questions",
-                url: "https://our.umbraco.com/documentation/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=documentation/"
+                url: "https://docs.umbraco.com/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=documentation/"
             },
             {
                 title: "Community",

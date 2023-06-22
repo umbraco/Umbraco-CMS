@@ -6,6 +6,11 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 public interface IPublishedValueFallback
 {
     /// <summary>
+    /// VariationContextAccessor that is not required to be implemented, therefore throws NotImplementedException as default.
+    /// </summary>
+    IVariationContextAccessor VariationContextAccessor { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
+
+    /// <summary>
     ///     Tries to get a fallback value for a property.
     /// </summary>
     /// <param name="property">The property.</param>

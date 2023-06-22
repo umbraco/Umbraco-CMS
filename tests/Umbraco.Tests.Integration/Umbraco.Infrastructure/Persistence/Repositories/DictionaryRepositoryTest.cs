@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -159,6 +158,26 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Can_Perform_GetAll_ByKeys_On_DictionaryRepository()
+    {
+        // Arrange
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository();
+
+            // Act
+            var dictionaryItems = repository.GetManyByKeys().ToArray();
+
+            // Assert
+            Assert.That(dictionaryItems, Is.Not.Null);
+            Assert.That(dictionaryItems.Any(), Is.True);
+            Assert.That(dictionaryItems.Any(x => x == null), Is.False);
+            Assert.That(dictionaryItems.Count(), Is.EqualTo(2));
+        }
+    }
+
+    [Test]
     public void Can_Perform_GetAll_With_Params_On_DictionaryRepository()
     {
         // Arrange
@@ -169,6 +188,26 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var dictionaryItems = repository.GetMany(1, 2).ToArray();
+
+            // Assert
+            Assert.That(dictionaryItems, Is.Not.Null);
+            Assert.That(dictionaryItems.Any(), Is.True);
+            Assert.That(dictionaryItems.Any(x => x == null), Is.False);
+            Assert.That(dictionaryItems.Count(), Is.EqualTo(2));
+        }
+    }
+
+    [Test]
+    public void Can_Perform_GetAll_ByKeys_With_Params_On_DictionaryRepository()
+    {
+        // Arrange
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository();
+
+            // Act
+            var dictionaryItems = repository.GetManyByKeys("Read More", "Article").ToArray();
 
             // Assert
             Assert.That(dictionaryItems, Is.Not.Null);

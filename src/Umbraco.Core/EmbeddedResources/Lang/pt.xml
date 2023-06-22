@@ -2,7 +2,7 @@
 <language alias="pt" intName="Portuguese Brazil" localName="Portuguese Brazil" lcid="" culture="pt-BR">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Gerenciar hostnames</key>
@@ -565,7 +565,6 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="removeLink">Remover Link</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">Versão atual</key>
     <key alias="diffHelp"><![CDATA[Isto mostra as diferenças entre a versão atual e a versão selecionada <br />Texto <del>vermelho</del> não será mostrado na versão selecionada; <ins>verde significa adicionado</ins>]]></key>
     <key alias="documentRolledBack">Documento foi revertido</key>
     <key alias="htmlHelp">Isto mostra a versão selecionada como html se você deseja ver as diferenças entre as 2 versões ao mesmo tempo use a visão em diff</key>
@@ -823,6 +822,8 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="usertype">Tipo de usuário</key>
     <key alias="userTypes">Tipos de usuários</key>
     <key alias="writer">Escrevente</key>
+    <key alias="sortCreateDateAscending">Mais antigo</key>
+    <key alias="sortCreateDateDescending">Mais recente</key>
   </area>
   <area alias="logViewer">
     <key alias="selectAllLogLevelFilters">Selecionar tudo</key>

@@ -94,8 +94,12 @@ public class InstallApiController : ControllerBase
 
         if (levelBeforeRestart == RuntimeLevel.Install)
         {
-            BackOfficeIdentityUser identityUser = await _backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserIdAsString);
-            _backOfficeSignInManager.SignInAsync(identityUser, false);
+            BackOfficeIdentityUser? identityUser =
+                await _backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserIdAsString);
+            if (identityUser is not null)
+            {
+                _backOfficeSignInManager.SignInAsync(identityUser, false);
+            }
         }
 
         return NoContent();
@@ -274,7 +278,7 @@ public class InstallApiController : ControllerBase
     // executes the step
     internal async Task<InstallSetupResult> ExecuteStepAsync(InstallSetupStep step, object? instruction)
     {
-        using (_proflog.TraceDuration<InstallApiController>($"Executing installation step: '{step.Name}'.", "Step completed"))
+        using (!_proflog.IsEnabled(Core.Logging.LogLevel.Verbose) ? null : _proflog.TraceDuration<InstallApiController>($"Executing installation step: '{step.Name}'.", "Step completed"))
         {
             Attempt<object?> modelAttempt = instruction.TryConvertTo(step.StepType);
             if (!modelAttempt.Success)

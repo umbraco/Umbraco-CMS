@@ -14,26 +14,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUserLogin>, IExternalLoginRepository, IExternalLoginWithKeyRepository
+internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUserLogin>, IExternalLoginWithKeyRepository
 {
     public ExternalLoginRepository(IScopeAccessor scopeAccessor, AppCaches cache,
         ILogger<ExternalLoginRepository> logger)
         : base(scopeAccessor, cache, logger)
     {
     }
-
-    /// <inheritdoc />
-    [Obsolete("Use method that takes guid as param")]
-    public void DeleteUserLogins(int memberId) => DeleteUserLogins(memberId.ToGuid());
-
-    /// <inheritdoc />
-    [Obsolete("Use method that takes guid as param")]
-    public void Save(int userId, IEnumerable<IExternalLogin> logins) => Save(userId.ToGuid(), logins);
-
-    /// <inheritdoc />
-    [Obsolete("Use method that takes guid as param")]
-    public void Save(int userId, IEnumerable<IExternalLoginToken> tokens) => Save(userId.ToGuid(), tokens);
-
     /// <summary>
     ///     Query for user tokens
     /// </summary>
@@ -109,6 +96,9 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
         // do the deletes, updates and inserts
         if (toDelete.Count > 0)
         {
+            // Before we can remove the external login, we must remove the external login tokens associated with that external login,
+            // otherwise we'll get foreign key constraint errors
+            Database.DeleteMany<ExternalLoginTokenDto>().Where(x => toDelete.Contains(x.ExternalLoginId)).Execute();
             Database.DeleteMany<ExternalLoginDto>().Where(x => toDelete.Contains(x.Id)).Execute();
         }
 

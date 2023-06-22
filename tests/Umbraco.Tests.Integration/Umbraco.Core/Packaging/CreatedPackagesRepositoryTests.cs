@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -255,7 +254,7 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
                 Assert.AreEqual(test, mediaEntry.Name);
                 Assert.IsNotNull(zipArchive.GetEntry("package.xml"));
                 Assert.AreEqual(
-                    $"<MediaItems><MediaSet><testImage id=\"{m1.Id}\" key=\"{m1.Key}\" parentID=\"-1\" level=\"1\" creatorID=\"-1\" sortOrder=\"0\" createDate=\"{m1.CreateDate:s}\" updateDate=\"{m1.UpdateDate:s}\" nodeName=\"Test File\" urlName=\"test-file\" path=\"{m1.Path}\" isDoc=\"\" nodeType=\"{mt.Id}\" nodeTypeAlias=\"testImage\" writerName=\"\" writerID=\"0\" udi=\"{m1.GetUdi()}\" mediaFilePath=\"/media/test-file.txt\"><umbracoFile><![CDATA[/media/test-file.txt]]></umbracoFile><umbracoBytes><![CDATA[100]]></umbracoBytes><umbracoExtension><![CDATA[png]]></umbracoExtension></testImage></MediaSet></MediaItems>",
+                    $"<MediaItems><MediaSet><testImage id=\"{m1.Id}\" key=\"{m1.Key}\" parentID=\"-1\" level=\"1\" creatorID=\"-1\" sortOrder=\"0\" createDate=\"{m1.CreateDate:s}\" updateDate=\"{m1.UpdateDate:s}\" nodeName=\"Test File\" urlName=\"test-file\" path=\"{m1.Path}\" isDoc=\"\" nodeType=\"{mt.Id}\" nodeTypeAlias=\"testImage\" writerName=\"Administrator\" writerID=\"-1\" udi=\"{m1.GetUdi()}\" mediaFilePath=\"/media/test-file.txt\"><umbracoFile><![CDATA[/media/test-file.txt]]></umbracoFile><umbracoBytes><![CDATA[100]]></umbracoBytes><umbracoExtension><![CDATA[png]]></umbracoExtension></testImage></MediaSet></MediaItems>",
                     packageXml.Element("umbPackage").Element("MediaItems").ToString(SaveOptions.DisableFormatting));
                 Assert.AreEqual(2, zipArchive.Entries.Count());
                 Assert.AreEqual(ZipArchiveMode.Read, zipArchive.Mode);

@@ -7,7 +7,7 @@ angular.module('umbraco.services')
 
 		function getCachedHelp(url){
 			if(helpTopics[url]){
-				return helpTopics[cacheKey];
+				return helpTopics[url];
 			}else{
 				return null;
 			}

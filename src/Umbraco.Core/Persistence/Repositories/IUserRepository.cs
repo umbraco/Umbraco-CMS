@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 
@@ -12,14 +12,6 @@ public interface IUserRepository : IReadWriteQueryRepository<int, IUser>
     /// <param name="query"></param>
     /// <returns></returns>
     int GetCountByQuery(IQuery<IUser>? query);
-
-    /// <summary>
-    ///     Checks if a user with the username exists
-    /// </summary>
-    /// <param name="username"></param>
-    /// <returns></returns>
-    [Obsolete("This method will be removed in future versions.  Please use ExistsByUserName instead.")]
-    bool Exists(string username);
 
     /// <summary>
     ///     Checks if a user with the username exists
