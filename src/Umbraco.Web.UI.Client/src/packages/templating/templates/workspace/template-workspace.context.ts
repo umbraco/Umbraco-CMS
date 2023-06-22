@@ -147,6 +147,8 @@ ${currentContent}`;
 				content: template.content,
 				alias: template.alias,
 			});
+			this.repository.requestTreeItemsOf(this.#masterTemplate.value?.id ?? '');
+
 		}
 	}
 
