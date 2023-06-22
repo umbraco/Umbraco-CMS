@@ -36,6 +36,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	#currentUser?: UmbLoggedInUser;
 	#auth?: typeof UMB_AUTH.TYPE;
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
+	#editorRef?: tinymce.Editor | null = null;
 
 	protected getFormElement() {
 		return undefined;
@@ -70,7 +71,10 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	disconnectedCallback() {
 		super.disconnectedCallback();
-		tinymce.default.activeEditor?.destroy();
+
+		if (this.#editorRef) {
+			this.#editorRef.destroy();
+		}
 	}
 
 	/**
