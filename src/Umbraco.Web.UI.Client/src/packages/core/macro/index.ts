@@ -1,1 +1,1 @@
-export * from './macro.service';
+export * from './macro.service.js';
