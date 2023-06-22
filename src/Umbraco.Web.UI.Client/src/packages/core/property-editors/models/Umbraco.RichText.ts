@@ -3,7 +3,7 @@ import type { ManifestPropertyEditorModel } from '@umbraco-cms/backoffice/extens
 export const manifest: ManifestPropertyEditorModel = {
 	type: 'propertyEditorModel',
 	name: 'Rich Text',
-	alias: 'Umbraco.RichText',
+	alias: 'Umbraco.TinyMCE',
 	meta: {
 		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.TinyMCE',
 		settings: {
