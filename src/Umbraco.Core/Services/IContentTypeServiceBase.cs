@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -71,6 +72,14 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     void Save(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId);
 
     void Delete(TItem item, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    /// Deletes an item
+    /// </summary>
+    /// <param name="key">The item to delete.</param>
+    /// <param name="performingUserKey"></param>
+    /// <returns></returns>
+    Task<ContentTypeOperationStatus> DeleteAsync(Guid key, Guid performingUserKey);
 
     void Delete(IEnumerable<TItem> item, int userId = Constants.Security.SuperUserId);
 

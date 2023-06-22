@@ -27,7 +27,7 @@ public class ByKeyDocumentTypeController : DocumentTypeControllerBase
     public async Task<IActionResult> ByKey(Guid id)
     {
         IContentType? contentType = await _contentTypeService.GetAsync(id);
-        if (contentType == null)
+        if (contentType is null)
         {
             return NotFound();
         }
