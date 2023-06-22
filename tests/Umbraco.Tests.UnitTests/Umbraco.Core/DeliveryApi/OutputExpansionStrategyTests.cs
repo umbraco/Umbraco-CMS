@@ -421,6 +421,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
 
         var valueConverterMock = new Mock<IDeliveryApiPropertyValueConverter>();
         valueConverterMock.Setup(v => v.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
+        valueConverterMock.Setup(p => p.IsValue(It.IsAny<object?>(), It.IsAny<PropertyValueLevel>())).Returns(true);
         valueConverterMock.Setup(v => v.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
         valueConverterMock.Setup(v => v.GetDeliveryApiPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
         valueConverterMock.Setup(v => v.ConvertIntermediateToDeliveryApiObject(
@@ -457,7 +458,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         httpContextMock.SetupGet(c => c.Request).Returns(httpRequestMock.Object);
         httpContextAccessorMock.SetupGet(a => a.HttpContext).Returns(httpContextMock.Object);
 
-        IOutputExpansionStrategy outputExpansionStrategy = new RequestContextOutputExpansionStrategy(httpContextAccessorMock.Object);
+        IOutputExpansionStrategy outputExpansionStrategy = new RequestContextOutputExpansionStrategy(httpContextAccessorMock.Object, new ApiPropertyRenderer(new NoopPublishedValueFallback()));
         var outputExpansionStrategyAccessorMock = new Mock<IOutputExpansionStrategyAccessor>();
         outputExpansionStrategyAccessorMock.Setup(s => s.TryGetValue(out outputExpansionStrategy)).Returns(true);
 
@@ -584,6 +585,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
                 It.IsAny<bool>()))
             .Returns(() => apiElementBuilder.Build(element.Object));
         elementValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
+        elementValueConverter.Setup(p => p.IsValue(It.IsAny<object?>(), It.IsAny<PropertyValueLevel>())).Returns(true);
         elementValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
         elementValueConverter.Setup(p => p.GetDeliveryApiPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
 

@@ -371,35 +371,35 @@ public static partial class UmbracoBuilderExtensions
 
         // Add notification handlers for DistributedCache
         builder
-            .AddNotificationHandler<DictionaryItemDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<DictionaryItemSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<LanguageSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<LanguageDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MemberSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MemberDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<PublicAccessEntrySavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<PublicAccessEntryDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<UserSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<UserDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<UserGroupWithUsersSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<UserGroupDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MemberGroupDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MemberGroupSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<DataTypeDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<DataTypeSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<TemplateDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<TemplateSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<RelationTypeDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<RelationTypeSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<DomainDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<DomainSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MacroSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MacroDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MediaTreeChangeNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<ContentTypeChangedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MediaTypeChangedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MemberTypeChangedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<ContentTreeChangeNotification, DistributedCacheBinder>()
+            .AddNotificationHandler<DictionaryItemDeletedNotification, DictionaryItemDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<DictionaryItemSavedNotification, DictionaryItemSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<LanguageSavedNotification, LanguageSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<LanguageDeletedNotification, LanguageDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MemberSavedNotification, MemberSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MemberDeletedNotification, MemberDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<PublicAccessEntrySavedNotification, PublicAccessEntrySavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<PublicAccessEntryDeletedNotification, PublicAccessEntryDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<UserSavedNotification, UserSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<UserDeletedNotification, UserDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<UserGroupWithUsersSavedNotification, UserGroupWithUsersSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<UserGroupDeletedNotification, UserGroupDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MemberGroupDeletedNotification, MemberGroupDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MemberGroupSavedNotification, MemberGroupSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<DataTypeDeletedNotification, DataTypeDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<DataTypeSavedNotification, DataTypeSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<TemplateDeletedNotification, TemplateDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<TemplateSavedNotification, TemplateSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<RelationTypeDeletedNotification, RelationTypeDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<RelationTypeSavedNotification, RelationTypeSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<DomainDeletedNotification, DomainDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<DomainSavedNotification, DomainSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MacroSavedNotification, MacroSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MacroDeletedNotification, MacroDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MediaTreeChangeNotification, MediaTreeChangeDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<ContentTypeChangedNotification, ContentTypeChangedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MediaTypeChangedNotification, MediaTypeChangedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MemberTypeChangedNotification, MemberTypeChangedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>()
             ;
 
         // add notification handlers for auditing
@@ -437,6 +437,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiPublishedContentCache, ApiPublishedContentCache>();
         builder.Services.AddSingleton<IApiRichTextElementParser, ApiRichTextElementParser>();
         builder.Services.AddSingleton<IApiRichTextMarkupParser, ApiRichTextMarkupParser>();
+        builder.Services.AddSingleton<IApiPropertyRenderer, ApiPropertyRenderer>();
 
         return builder;
     }
