@@ -29,7 +29,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	configuration?: UmbDataTypePropertyCollection;
 
 	@state()
-	private _tinyConfig: TinyConfig = {};
+	private _tinyConfig: tinymce.RawEditorOptions = {};
 
 	modalContext!: UmbModalContext;
 	#mediaHelper = new UmbMediaHelper();
@@ -115,15 +115,14 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		// set the default values that will not be modified via configuration
 		this._tinyConfig = {
 			autoresize_bottom_margin: 10,
-			base_url: '/tinymce',
 			body_class: 'umb-rte',
 			//see https://www.tiny.cloud/docs/tinymce/6/editor-important-options/#cache_suffix
-			cache_suffix: '?umb__rnd=' + window.Umbraco?.Sys.ServerVariables.application.cacheBuster,
+			cache_suffix: '?umb__rnd=' + window.Umbraco?.Sys.ServerVariables.application.cacheBuster, // TODO: Cache buster
 			contextMenu: false,
 			inline_boundaries_selector: 'a[href],code,.mce-annotation,.umb-embed-holder,.umb-macro-holder',
 			menubar: false,
 			paste_remove_styles_if_webkit: true,
-			paste_preprocess: (_: tinymce.Editor, args: { content: string }) => pastePreProcessHandler(args),
+			paste_preprocess: (_, args) => pastePreProcessHandler(args),
 			relative_urls: false,
 			resize: false,
 			statusbar: false,
@@ -257,7 +256,14 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#isMediaPickerEnabled() {
-		return this._tinyConfig.toolbar?.includes('umbmediapicker');
+		const toolbar = this._tinyConfig.toolbar;
+		if (Array.isArray(toolbar) && (toolbar as string[]).includes('umbmediapicker')) {
+			return true;
+		} else if (typeof toolbar === 'string' && toolbar.includes('umbmediapicker')) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
