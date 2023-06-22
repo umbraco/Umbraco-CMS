@@ -11,6 +11,11 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 
 	#init: Promise<unknown>;
 
+	// the init promise is used externally for recognizing when the manager is ready.
+	public get init() {
+		return this.#init;
+	}
+
 	#uniques = new UmbArrayState<string>([]);
 	uniques = this.#uniques.asObservable();
 
