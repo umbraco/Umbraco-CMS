@@ -556,7 +556,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Rich Text Editor',
 		id: 'dt-richTextEditor',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.TinyMCE',
+		propertyEditorAlias: 'Umbraco.RichText',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUi.TinyMCE',
 		values: [
 			{

@@ -8,7 +8,7 @@ const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-tiny-mce.element.js'),
 	meta: {
 		label: 'Rich Text Editor',
-		propertyEditorAlias: 'Umbraco.TinyMCE',
+		propertyEditorAlias: 'Umbraco.RichText',
 		icon: 'umb:browser-window',
 		group: 'richText',
 		settings: {
@@ -28,6 +28,30 @@ const manifest: ManifestPropertyEditorUi = {
 					alias: 'hideLabel',
 					label: 'Hide Label',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+				},
+				{
+					alias: 'toolbar',
+					label: 'Toolbar',
+					description: 'Pick the toolbar options that should be available when editing',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.ToolbarConfiguration',
+				},
+				{
+					alias: 'stylesheets',
+					label: 'Stylesheets',
+					description: 'Pick the stylesheets whose editor styles should be available when editing',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.StylesheetsConfiguration',
+				},
+				{
+					alias: 'dimensions',
+					label: 'Dimensions',
+					description: 'Set the editor dimensions',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.DimensionsConfiguration',
+				},
+				{
+					alias: 'maxImageSize',
+					label: 'Maximum size for inserted images',
+					description: 'Maximum width or height - enter 0 to disable resizing',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.MaxImageSizeConfiguration',
 				},
 			],
 		},
