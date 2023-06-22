@@ -79,7 +79,18 @@ const meta: Meta<UmbPropertyEditorUITinyMceElement> = {
 	id: 'umb-property-editor-ui-tiny-mce',
 	args: {
 		config,
-		value: 'I am a default value for the TinyMCE text editor story.',
+		value: `
+			<h2>TinyMCE</h2>
+			<p>I am a default value for the TinyMCE text editor story.</p>
+			<p>
+				<a href="https://www.tiny.cloud/docs/" target="_blank" rel="noopener noreferrer">TinyMCE documentation</a>
+			</p>
+			<p>
+				<a href="https://www.tiny.cloud/docs/quick-start/" target="_blank" rel="noopener noreferrer">TinyMCE quick start guide</a>
+			</p>
+				<a href="https://docs.umbraco.com" target="_blank" rel="noopener noreferrer">Umbraco documentation</a>
+			</p>
+		`,
 	},
 };
 
