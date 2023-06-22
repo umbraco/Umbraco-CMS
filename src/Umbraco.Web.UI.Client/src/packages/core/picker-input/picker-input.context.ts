@@ -49,7 +49,7 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 		this.selectedItems = this.#itemManager.items;
 
 		this.#init = Promise.all([
-			this.#itemManager.init,
+			this.#itemManager.#init,
 			new UmbContextConsumerController(this.host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 				this.modalManager = instance;
 			}).asPromise(),
