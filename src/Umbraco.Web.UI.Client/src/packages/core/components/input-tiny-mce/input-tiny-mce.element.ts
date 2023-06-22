@@ -1,32 +1,26 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import {
-	defaultFallbackConfig,
-	defaultExtendedValidElements,
-	defaultStyleFormats,
-	availableLanguages,
-	uriAttributeSanitizer,
-	uploadImageHandler,
-	pastePreProcessHandler,
-} from './index.js';
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
+import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { defaultExtendedValidElements, defaultFallbackConfig, defaultStyleFormats } from './input-tiny-mce.defaults.js';
+import { pastePreProcessHandler, uploadImageHandler } from './input-tiny-mce.handlers.js';
+import { availableLanguages } from './input-tiny-mce.languages.js';
+import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
+import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import {
+	ManifestTinyMcePlugin,
 	TinyMcePluginArguments,
 	UmbTinyMcePluginBase,
-	ManifestTinyMcePlugin,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
-import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 
-export type TinyConfig = Record<string, any>;
+export type TinyConfig = Record<string, any>; // TODO: define TinyConfig type
 
 // TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
 @customElement('umb-input-tiny-mce')
@@ -65,7 +59,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	async #observeCurrentUser() {
 		if (!this.#auth) return;
 
-		this.observe(this.#auth.currentUser, (currentUser) => this.#currentUser = currentUser);
+		this.observe(this.#auth.currentUser, (currentUser) => (this.#currentUser = currentUser));
 	}
 
 	async connectedCallback() {
@@ -103,7 +97,10 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		this.shadowRoot?.appendChild(target);
 
 		// create an object by merging the configuration onto the fallback config
-		const configurationOptions: TinyConfig = Object.assign(defaultFallbackConfig, this.configuration ? this.configuration?.toObject() : {});
+		const configurationOptions: TinyConfig = Object.assign(
+			defaultFallbackConfig,
+			this.configuration ? this.configuration?.toObject() : {}
+		);
 
 		// no auto resize when a fixed height is set
 		if (!configurationOptions.dimensions?.height) {
@@ -111,7 +108,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			configurationOptions.plugins.splice(configurationOptions.plugins.indexOf('autoresize'), 1);
 		}
 
-		// set the default values that will not be modified via configuration		
+		// set the default values that will not be modified via configuration
 		this._tinyConfig = {
 			autoresize_bottom_margin: 10,
 			base_url: '/tinymce',
