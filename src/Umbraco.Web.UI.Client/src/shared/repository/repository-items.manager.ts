@@ -9,7 +9,7 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;
 
-	init: Promise<unknown>;
+	#init: Promise<unknown>;
 
 	#uniques = new UmbArrayState<string>([]);
 	uniques = this.#uniques.asObservable();
@@ -29,7 +29,7 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 		this.host = host;
 		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
 
-		this.init = new UmbExtensionClassInitializer(host, 'repository', repositoryAlias, (repository) => {
+		this.#init = new UmbExtensionClassInitializer(host, 'repository', repositoryAlias, (repository) => {
 			// TODO: Some test that this repository is a items repository?
 			this.repository = repository as UmbItemRepository<ItemType>;
 		}).asPromise();
@@ -51,7 +51,7 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 	}
 
 	async #requestItems() {
-		await this.init;
+		await this.#init;
 		if (!this.repository) throw new Error('Repository is not initialized');
 		if (this.itemsObserver) this.itemsObserver.destroy();
 
