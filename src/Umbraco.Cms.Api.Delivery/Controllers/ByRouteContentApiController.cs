@@ -58,7 +58,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
             path = WebUtility.UrlDecode(path);
         }
 
-        path = path.Length == 0 ? "/" : path.TrimStart("/");
+        path = path.EnsureStartsWith("/");
 
         IPublishedContent? contentItem = GetContent(path);
         if (contentItem is not null)
@@ -78,7 +78,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     }
 
     private IPublishedContent? GetContent(string path)
-        => path.StartsWith(Constants.DeliveryApi.Routing.PreviewContentPathPrefix)
+        => path.StartsWith($"/{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}")
             ? GetPreviewContent(path)
             : GetPublishedContent(path);
 
@@ -97,7 +97,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
             return null;
         }
 
-        if (Guid.TryParse(path.AsSpan(Constants.DeliveryApi.Routing.PreviewContentPathPrefix.Length).TrimEnd("/"), out Guid contentId) is false)
+        if (Guid.TryParse(path.Trim("/").AsSpan(Constants.DeliveryApi.Routing.PreviewContentPathPrefix.Length), out Guid contentId) is false)
         {
             return null;
         }
