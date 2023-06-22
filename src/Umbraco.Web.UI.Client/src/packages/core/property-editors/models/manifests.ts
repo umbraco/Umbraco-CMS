@@ -30,9 +30,9 @@ import { manifest as trueFalse } from './Umbraco.TrueFalse.js';
 import { manifest as uploadField } from './Umbraco.UploadField.js';
 import { manifest as userPicker } from './Umbraco.UserPicker.js';
 
-import type { ManifestPropertyEditorModel } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestPropertyEditorModel> = [
+export const manifests: Array<ManifestPropertyEditorSchema> = [
 	blockGrid,
 	blockList,
 	checkboxList,

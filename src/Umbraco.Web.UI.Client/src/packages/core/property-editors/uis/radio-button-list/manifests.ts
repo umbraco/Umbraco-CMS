@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-radio-button-list.element.js'),
 	meta: {
 		label: 'Radio Button List',
-		propertyEditorAlias: 'Umbraco.RadioButtonList',
+		propertyEditorSchemaAlias: 'Umbraco.RadioButtonList',
 		icon: 'umb:target',
 		group: 'lists',
 		settings: {

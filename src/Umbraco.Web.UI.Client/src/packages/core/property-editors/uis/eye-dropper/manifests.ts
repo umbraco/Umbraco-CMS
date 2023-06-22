@@ -9,7 +9,7 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Eye Dropper Color Picker',
 		icon: 'umb:colorpicker',
 		group: 'pickers',
-		propertyEditorAlias: 'Umbraco.ColorPicker.EyeDropper',
+		propertyEditorSchemaAlias: 'Umbraco.ColorPicker.EyeDropper',
 		settings: {
 			properties: [
 				{

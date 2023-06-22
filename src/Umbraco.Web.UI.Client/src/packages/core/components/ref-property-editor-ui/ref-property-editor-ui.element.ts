@@ -26,8 +26,8 @@ export class UmbRefPropertyEditorUIElement extends UUIRefNodeElement {
 	 * @attr
 	 * @default ''
 	 */
-	@property({ type: String, attribute: 'property-editor-model-alias' })
-	propertyEditorModelAlias = '';
+	@property({ type: String, attribute: 'property-editor-schema-alias' })
+	propertyEditorSchemaAlias = '';
 
 	protected renderDetail() {
 		const details: string[] = [];
@@ -36,8 +36,8 @@ export class UmbRefPropertyEditorUIElement extends UUIRefNodeElement {
 			details.push(this.alias);
 		}
 
-		if (this.propertyEditorModelAlias !== '') {
-			details.push(this.propertyEditorModelAlias);
+		if (this.propertyEditorSchemaAlias !== '') {
+			details.push(this.propertyEditorSchemaAlias);
 		} else {
 			details.push('Property Editor Missing');
 		}

@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-upload-field.element.js'),
 	meta: {
 		label: 'Upload Field',
-		propertyEditorAlias: 'Umbraco.UploadField',
+		propertyEditorSchemaAlias: 'Umbraco.UploadField',
 		icon: 'umb:download-alt',
 		group: 'common',
 	},
