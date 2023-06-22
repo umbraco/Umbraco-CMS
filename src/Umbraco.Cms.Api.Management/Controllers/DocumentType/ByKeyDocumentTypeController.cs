@@ -26,14 +26,13 @@ public class ByKeyDocumentTypeController : DocumentTypeControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid id)
     {
-        // FIXME: create and use an async get method here.
-        IContentType? contentType = _contentTypeService.Get(id);
+        IContentType? contentType = await _contentTypeService.GetAsync(id);
         if (contentType == null)
         {
             return NotFound();
         }
 
         DocumentTypeResponseModel model = _umbracoMapper.Map<DocumentTypeResponseModel>(contentType)!;
-        return await Task.FromResult(Ok(model));
+        return Ok(model);
     }
 }

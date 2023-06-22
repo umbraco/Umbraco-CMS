@@ -32,6 +32,13 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     TItem? Get(Guid key);
 
     /// <summary>
+    /// Gets a content type.
+    /// </summary>
+    /// <param name="guid">The key of the content type.</param>
+    /// <returns>The found content type, null if none was found.</returns>
+    Task<TItem?> GetAsync(Guid guid);
+
+    /// <summary>
     ///     Gets a content type.
     /// </summary>
     TItem? Get(string alias);

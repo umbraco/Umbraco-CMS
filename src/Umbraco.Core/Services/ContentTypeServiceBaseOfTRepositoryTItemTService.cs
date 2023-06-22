@@ -307,6 +307,9 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return Repository.Get(id);
     }
 
+    /// <inheritdoc />
+    public Task<TItem?> GetAsync(Guid guid) => Task.FromResult(Get(guid));
+
     public IEnumerable<TItem> GetAll(params int[] ids)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
