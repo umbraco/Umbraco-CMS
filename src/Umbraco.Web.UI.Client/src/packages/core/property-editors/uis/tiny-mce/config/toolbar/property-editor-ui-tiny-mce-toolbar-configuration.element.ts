@@ -1,6 +1,5 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { customElement, css, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -8,7 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-tiny-mce-toolbar-configuration')
 export class UmbPropertyEditorUITinyMceToolbarConfigurationElement extends UmbLitElement {
-	
+
 
 	@property()
 	value: string[] = [];
@@ -21,7 +20,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement extends UmbLi
 			${this.value.map((v) => html`<li><uui-checkbox value=${v} checked>${v}</uui-checkbox></li>`)}
 		</ul>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -1,5 +1,4 @@
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { FormControlMixin, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { defaultExtendedValidElements, defaultFallbackConfig, defaultStyleFormats } from './input-tiny-mce.defaults.js';
 import { pastePreProcessHandler, uploadImageHandler } from './input-tiny-mce.handlers.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';

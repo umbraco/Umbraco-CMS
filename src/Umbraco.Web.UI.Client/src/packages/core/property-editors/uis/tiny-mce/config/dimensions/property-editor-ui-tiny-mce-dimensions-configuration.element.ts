@@ -1,6 +1,5 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
-import { html } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
