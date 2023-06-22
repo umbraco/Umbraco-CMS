@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import type { UmbPropertyEditorUITinyMceElement } from './property-editor-ui-tiny-mce.element.js';
 import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+
 import './property-editor-ui-tiny-mce.element.js';
 
 const config = new UmbDataTypePropertyCollection([
@@ -78,7 +79,7 @@ const meta: Meta<UmbPropertyEditorUITinyMceElement> = {
 	component: 'umb-property-editor-ui-tiny-mce',
 	id: 'umb-property-editor-ui-tiny-mce',
 	args: {
-		config,
+		config: undefined,
 		value: `
 			<h2>TinyMCE</h2>
 			<p>I am a default value for the TinyMCE text editor story.</p>
@@ -97,4 +98,10 @@ const meta: Meta<UmbPropertyEditorUITinyMceElement> = {
 export default meta;
 type Story = StoryObj<UmbPropertyEditorUITinyMceElement>;
 
-export const Overview: Story = {};
+export const Default: Story = {};
+
+export const DefaultConfig: Story = {
+	args: {
+		config,
+	},
+};
