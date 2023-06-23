@@ -60,21 +60,6 @@ const manifest: ManifestPropertyEditorUi = {
 					label: 'Hide Label',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
-				{
-					alias: 'imageUploadFolder',
-					label: 'Image Upload Folder',
-					description: 'Choose the upload location of pasted images',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaPicker',
-					config: [
-						{
-							alias: 'validationLimit',
-							value: {
-								min: 1,
-								max: 1,
-							},
-						},
-					],
-				},
 			],
 		},
 	},
