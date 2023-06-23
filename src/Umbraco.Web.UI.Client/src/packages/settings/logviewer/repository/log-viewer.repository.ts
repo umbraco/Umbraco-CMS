@@ -13,47 +13,31 @@ export class UmbLogViewerRepository {
 	#searchDataSource: UmbLogSearchesServerDataSource;
 	#messagesDataSource: UmbLogMessagesServerDataSource;
 	#notificationService?: UmbNotificationContext;
-	#initResolver?: () => void;
-	#initialized = false;
+	#init;
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 		this.#searchDataSource = new UmbLogSearchesServerDataSource(this.#host);
 		this.#messagesDataSource = new UmbLogMessagesServerDataSource(this.#host);
 
-		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+		this.#init = new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 			this.#notificationService = instance;
-			this.#checkIfInitialized();
-		});
-	}
-
-	#init() {
-		// TODO: This would only works with one user of this method. If two, the first one would be forgotten, but maybe its alright for now as I guess this is temporary.
-		return new Promise<void>((resolve) => {
-			this.#initialized ? resolve() : (this.#initResolver = resolve);
-		});
-	}
-
-	#checkIfInitialized() {
-		if (this.#notificationService) {
-			this.#initialized = true;
-			this.#initResolver?.();
-		}
+		}).asPromise();
 	}
 
 	async getSavedSearches({ skip, take }: { skip: number; take: number }) {
-		await this.#init();
+		await this.#init;
 
 		return this.#searchDataSource.getAllSavedSearches({ skip, take });
 	}
 
 	async saveSearch({ name, query }: SavedLogSearchPresenationBaseModel) {
-		await this.#init();
+		await this.#init;
 		this.#searchDataSource.postLogViewerSavedSearch({ name, query });
 	}
 
 	async removeSearch({ name }: { name: string }) {
-		await this.#init();
+		await this.#init;
 		this.#searchDataSource.deleteSavedSearchByName({ name });
 	}
 
@@ -68,13 +52,13 @@ export class UmbLogViewerRepository {
 		startDate?: string;
 		endDate?: string;
 	}) {
-		await this.#init();
+		await this.#init;
 
 		return this.#messagesDataSource.getLogViewerMessageTemplate({ skip, take, startDate, endDate });
 	}
 
 	async getLogCount({ startDate, endDate }: { startDate?: string; endDate?: string }) {
-		await this.#init();
+		await this.#init;
 
 		return this.#messagesDataSource.getLogViewerLevelCount({ startDate, endDate });
 	}
@@ -96,7 +80,7 @@ export class UmbLogViewerRepository {
 		startDate?: string;
 		endDate?: string;
 	}) {
-		await this.#init();
+		await this.#init;
 
 		return this.#messagesDataSource.getLogViewerLogs({
 			skip,
@@ -110,12 +94,12 @@ export class UmbLogViewerRepository {
 	}
 
 	async getLogLevels({ skip = 0, take = 100 }: { skip: number; take: number }) {
-		await this.#init();
+		await this.#init;
 		return this.#messagesDataSource.getLogViewerLevel({ skip, take });
 	}
 
 	async getLogViewerValidateLogsSize({ startDate, endDate }: { startDate?: string; endDate?: string }) {
-		await this.#init();
+		await this.#init;
 		return this.#messagesDataSource.getLogViewerValidateLogsSize({ startDate, endDate });
 	}
 }
