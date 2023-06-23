@@ -153,6 +153,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Imaging.ImageSh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Persistence.EFCore", "src\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj", "{9046F56E-4AC3-4603-A6A3-3ACCF632997E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Persistence.EFCore.Sqlite", "src\Umbraco.Cms.Persistence.EFCore.Sqlite\Umbraco.Cms.Persistence.EFCore.Sqlite.csproj", "{8B4771F0-8EC2-4761-BBCE-DDE073DB3B7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Persistence.EFCore.SqlServer", "src\Umbraco.Cms.Persistence.EFCore.SqlServer\Umbraco.Cms.Persistence.EFCore.SqlServer.csproj", "{9276C3F0-0DC9-46C9-BF32-9EE79D92AE02}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -311,6 +315,18 @@ Global
 		{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{8B4771F0-8EC2-4761-BBCE-DDE073DB3B7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B4771F0-8EC2-4761-BBCE-DDE073DB3B7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B4771F0-8EC2-4761-BBCE-DDE073DB3B7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B4771F0-8EC2-4761-BBCE-DDE073DB3B7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B4771F0-8EC2-4761-BBCE-DDE073DB3B7A}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B4771F0-8EC2-4761-BBCE-DDE073DB3B7A}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{9276C3F0-0DC9-46C9-BF32-9EE79D92AE02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9276C3F0-0DC9-46C9-BF32-9EE79D92AE02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9276C3F0-0DC9-46C9-BF32-9EE79D92AE02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9276C3F0-0DC9-46C9-BF32-9EE79D92AE02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9276C3F0-0DC9-46C9-BF32-9EE79D92AE02}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{9276C3F0-0DC9-46C9-BF32-9EE79D92AE02}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

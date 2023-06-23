@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Accessors;
 using Umbraco.Cms.Api.Delivery.Configuration;
@@ -11,6 +10,7 @@ using Umbraco.Cms.Api.Delivery.Services;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Persistence.EFCore.OpenIddict;
 
 namespace Umbraco.Extensions;
 
@@ -33,6 +33,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
         builder.AddUmbracoApiOpenApiUI();
 
+        builder.AddUmbracoOpenIddictDbContext();
         builder
             .Services
             .AddControllers()
@@ -47,3 +48,4 @@ public static class UmbracoBuilderExtensions
         return builder;
     }
 }
+
