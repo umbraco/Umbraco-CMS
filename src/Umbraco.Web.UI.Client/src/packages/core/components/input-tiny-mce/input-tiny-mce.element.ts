@@ -262,7 +262,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	#onChange(value: string) {
 		super.value = value;
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('change'));
 	}
 
 	#isMediaPickerEnabled() {
