@@ -26,12 +26,12 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 		}
 
 		connectedCallback() {
-			super.connectedCallback();
+			super.connectedCallback?.();
 			this.hostConnected();
 		}
 
 		disconnectedCallback() {
-			super.disconnectedCallback();
+			super.disconnectedCallback?.();
 			this.hostDisconnected();
 		}
 	}
