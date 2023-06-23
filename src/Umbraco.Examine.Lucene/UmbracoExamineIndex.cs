@@ -47,6 +47,8 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
 
     public bool PublishedValuesOnly { get; protected set; } = false;
 
+    public bool SupportProtectedContent { get; protected set; } = true;
+
     /// <summary>
     ///     override to check if we can actually initialize.
     /// </summary>
