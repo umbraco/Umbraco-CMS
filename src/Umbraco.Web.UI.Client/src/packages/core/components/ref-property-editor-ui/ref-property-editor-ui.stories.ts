@@ -15,7 +15,7 @@ export const Overview: Story = {
 	args: {
 		name: 'Custom Property Editor UI',
 		alias: 'Umb.PropertyEditorUi.CustomUI',
-		propertyEditorModelAlias: 'Umbraco.JSON',
+		propertyEditorSchemaAlias: 'Umbraco.JSON',
 	},
 };
 
@@ -23,7 +23,7 @@ export const WithDetail: Story = {
 	args: {
 		name: 'Custom Property Editor UI',
 		alias: 'Umb.PropertyEditorUi.CustomUI',
-		propertyEditorModelAlias: 'Umbraco.JSON',
+		propertyEditorSchemaAlias: 'Umbraco.JSON',
 		detail: 'With some custom details',
 	},
 };
@@ -32,14 +32,14 @@ export const WithSlots: Story = {
 	args: {
 		name: 'Custom Property Editor UI',
 		alias: 'Umb.PropertyEditorUi.CustomUI',
-		propertyEditorModelAlias: 'Umbraco.JSON',
+		propertyEditorSchemaAlias: 'Umbraco.JSON',
 		detail: 'With some custom details',
 	},
 	render: (args) => html`
 		<umb-ref-property-editor-ui
 			.name=${args.name}
 			.alias=${args.alias}
-			.propertyEditorAlias=${args.propertyEditorModelAlias}
+			.propertyEditorSchemaAlias=${args.propertyEditorSchemaAlias}
 			.detail=${args.detail}>
 			<div slot="tag"><uui-tag color="positive">10</uui-tag></div>
 			<div slot="actions">

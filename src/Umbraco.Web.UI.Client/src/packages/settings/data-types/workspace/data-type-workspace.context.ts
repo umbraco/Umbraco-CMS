@@ -55,7 +55,7 @@ export class UmbDataTypeWorkspaceContext
 		this.#data.update({ name });
 	}
 
-	setPropertyEditorAlias(alias?: string) {
+	setPropertyEditorSchemaAlias(alias?: string) {
 		this.#data.update({ propertyEditorAlias: alias });
 	}
 	setPropertyEditorUiAlias(alias?: string) {

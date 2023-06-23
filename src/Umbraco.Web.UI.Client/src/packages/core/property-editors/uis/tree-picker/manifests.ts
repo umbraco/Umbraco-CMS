@@ -10,7 +10,7 @@ const manifest: ManifestPropertyEditorUi = {
 		label: 'Tree Picker',
 		icon: 'umb:page-add',
 		group: 'pickers',
-		propertyEditorAlias: 'Umbraco.MultiNodeTreePicker',
+		propertyEditorSchemaAlias: 'Umbraco.MultiNodeTreePicker',
 		settings: {
 			properties: [
 				{

@@ -11,7 +11,7 @@ import type { ManifestMenuItem, ManifestMenuItemTreeKind } from './menu-item.mod
 import type { ManifestModal } from './modal.model.js';
 import type { ManifestPackageView } from './package-view.model.js';
 import type { ManifestPropertyAction } from './property-action.model.js';
-import type { ManifestPropertyEditorUi, ManifestPropertyEditorModel } from './property-editor.model.js';
+import type { ManifestPropertyEditorUi, ManifestPropertyEditorSchema } from './property-editor.model.js';
 import type { ManifestRepository } from './repository.model.js';
 import type { ManifestSection } from './section.model.js';
 import type { ManifestSectionSidebarApp, ManifestSectionSidebarAppMenuKind } from './section-sidebar-app.model.js';
@@ -74,7 +74,7 @@ export type ManifestTypes =
 	| ManifestModal
 	| ManifestPackageView
 	| ManifestPropertyAction
-	| ManifestPropertyEditorModel
+	| ManifestPropertyEditorSchema
 	| ManifestPropertyEditorUi
 	| ManifestRepository
 	| ManifestSection

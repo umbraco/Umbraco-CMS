@@ -8,7 +8,7 @@ const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-tiny-mce.element.js'),
 	meta: {
 		label: 'Rich Text Editor',
-		propertyEditorAlias: 'Umbraco.TinyMCE',
+		propertyEditorSchemaAlias: 'Umbraco.TinyMCE',
 		icon: 'umb:browser-window',
 		group: 'richText',
 		settings: {

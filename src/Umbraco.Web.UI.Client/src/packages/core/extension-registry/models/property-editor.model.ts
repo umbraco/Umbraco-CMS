@@ -9,7 +9,7 @@ export interface ManifestPropertyEditorUi extends ManifestElement<UmbPropertyEdi
 
 export interface MetaPropertyEditorUi {
 	label: string;
-	propertyEditorAlias: string;
+	propertyEditorSchemaAlias: string;
 	icon: string;
 	group: string;
 	settings?: PropertyEditorSettings;
@@ -17,12 +17,12 @@ export interface MetaPropertyEditorUi {
 }
 
 // Model
-export interface ManifestPropertyEditorModel extends ManifestBase {
-	type: 'propertyEditorModel';
-	meta: MetaPropertyEditorModel;
+export interface ManifestPropertyEditorSchema extends ManifestBase {
+	type: 'propertyEditorSchema';
+	meta: MetaPropertyEditorSchema;
 }
 
-export interface MetaPropertyEditorModel {
+export interface MetaPropertyEditorSchema {
 	defaultPropertyEditorUiAlias: string;
 	settings?: PropertyEditorSettings;
 }

@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-block-list-block-configuration.element.js'),
 	meta: {
 		label: 'Block List Block Configuration',
-		propertyEditorAlias: '',
+		propertyEditorSchemaAlias: '',
 		icon: 'umb:autofill',
 		group: 'common',
 	},
