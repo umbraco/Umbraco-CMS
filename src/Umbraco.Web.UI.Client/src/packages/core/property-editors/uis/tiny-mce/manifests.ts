@@ -18,6 +18,63 @@ const manifest: ManifestPropertyEditorUi = {
 					label: 'Toolbar',
 					description: 'Pick the toolbar options that should be available when editing',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.ToolbarConfiguration',
+					config: [
+						{
+							alias: 'toolbar',
+							value: [
+								{
+									alias: 'styles',
+									label: 'Styles',
+									icon: 'umb:format-color-fill',
+								},
+								{
+									alias: 'bold',
+									label: 'Bold',
+									icon: 'umb:format-bold',
+								},
+								{
+									alias: 'italic',
+									label: 'Italic',
+									icon: 'umb:format-italic',
+								},
+								{
+									alias: 'alignleft',
+									label: 'Align left',
+									icon: 'umb:align-left',
+								},
+								{
+									alias: 'aligncenter',
+									label: 'Align center',
+									icon: 'umb:align-center',
+								},
+								{
+									alias: 'alignright',
+									label: 'Align right',
+									icon: 'umb:align-right',
+								},
+								{
+									alias: 'bullist',
+									label: 'Bullet list',
+									icon: 'umb:list-bullet',
+								},
+								{
+									alias: 'numlist',
+									label: 'Numbered list',
+									icon: 'umb:list-numbered',
+								},
+								{
+									alias: 'outdent',
+									label: 'Outdent',
+									icon: 'umb:indent-left',
+								},
+								{
+									alias: 'indent',
+									label: 'Indent',
+									icon: 'umb:indent-right',
+								},
+							],
+						},
+					],
 				},
 				{
 					alias: 'stylesheets',
