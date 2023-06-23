@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Persistence.EFCore.OpenIddict;
+namespace Umbraco.Cms.Persistence.EFCore;
 
 /// <remarks>
 /// To autogenerate migrations use the following commands
@@ -15,9 +15,9 @@ namespace Umbraco.Cms.Persistence.EFCore.OpenIddict;
 /// https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/providers?tabs=dotnet-core-cli#using-one-context-type
 /// </remarks>
 
-public class UmbracoOpenIddictDbContext : DbContext
+public class UmbracoDbContext : DbContext
 {
-    public UmbracoOpenIddictDbContext(DbContextOptions<UmbracoOpenIddictDbContext> options) : base(options)
+    public UmbracoDbContext(DbContextOptions<UmbracoDbContext> options) : base(options)
     {
 
     }

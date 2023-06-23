@@ -1,14 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
-using Umbraco.Cms.Persistence.EFCore.OpenIddict;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer;
 
 public class SqlServerMigrationProvider : IMigrationProvider
 {
-    private readonly IDbContextFactory<UmbracoOpenIddictDbContext> _dbContextFactory;
-    public SqlServerMigrationProvider(IDbContextFactory<UmbracoOpenIddictDbContext> dbContextFactory)
+    private readonly IDbContextFactory<UmbracoDbContext> _dbContextFactory;
+    public SqlServerMigrationProvider(IDbContextFactory<UmbracoDbContext> dbContextFactory)
     {
         _dbContextFactory = dbContextFactory;
     }
@@ -16,13 +15,13 @@ public class SqlServerMigrationProvider : IMigrationProvider
     public string ProviderName => "Microsoft.Data.SqlClient";
     public async Task MigrateAsync(EFCoreMigration migration)
     {
-        UmbracoOpenIddictDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        UmbracoDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await context.MigrateDatabaseAsync(GetMigrationType(migration));
     }
 
     public async Task MigrateAll()
     {
-        UmbracoOpenIddictDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        UmbracoDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await context.Database.MigrateAsync();
     }
 

@@ -4,22 +4,19 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
 
-namespace Umbraco.Cms.Persistence.EFCore.OpenIddict;
+namespace Umbraco.Cms.Persistence.EFCore;
 
-public class EfCoreOpenIddictDatabaseCreator : IOpenIddictDatabaseCreator
+public class EfCoreDatabaseCreator : IEFCoreDatabaseCreator
 {
     private readonly IEnumerable<IMigrationProvider> _migrationProviders;
-    private readonly IDbContextFactory<UmbracoOpenIddictDbContext> _dbContextFactory;
     private readonly IOptions<ConnectionStrings> _options;
 
     // We need to do migrations out side of a scope due to sqlite
-    public EfCoreOpenIddictDatabaseCreator(
+    public EfCoreDatabaseCreator(
         IEnumerable<IMigrationProvider> migrationProviders,
-        IDbContextFactory<UmbracoOpenIddictDbContext> dbContextFactory,
         IOptions<ConnectionStrings> options)
     {
         _migrationProviders = migrationProviders;
-        _dbContextFactory = dbContextFactory;
         _options = options;
     }
 

@@ -1,14 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Extensions;
+using Umbraco.Cms.Persistence.EFCore;
 
-namespace Umbraco.Cms.Persistence.EFCore.OpenIddict;
+namespace Umbraco.Extensions;
 
 public static class BackOfficeAuthBuilderOpenIddictExtensions
 {
-    public static IUmbracoBuilder AddUmbracoOpenIddictDbContext(this IUmbracoBuilder builder)
+    public static IUmbracoBuilder AddUmbracoEFCoreDbContext(this IUmbracoBuilder builder)
     {
-        builder.Services.AddUmbracoEFCoreContext<UmbracoOpenIddictDbContext>((options, connectionString, providerName) =>
+        builder.Services.AddUmbracoEFCoreContext<UmbracoDbContext>((options, connectionString, providerName) =>
         {
             // Register the entity sets needed by OpenIddict.
             options.UseOpenIddict();

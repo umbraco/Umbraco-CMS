@@ -1,15 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
-using Umbraco.Cms.Persistence.EFCore.OpenIddict;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
 
 public class SqliteMigrationProvider : IMigrationProvider
 {
-    private readonly IDbContextFactory<UmbracoOpenIddictDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<UmbracoDbContext> _dbContextFactory;
 
-    public SqliteMigrationProvider(IDbContextFactory<UmbracoOpenIddictDbContext> dbContextFactory)
+    public SqliteMigrationProvider(IDbContextFactory<UmbracoDbContext> dbContextFactory)
     {
         _dbContextFactory = dbContextFactory;
     }
@@ -18,13 +17,13 @@ public class SqliteMigrationProvider : IMigrationProvider
 
     public async Task MigrateAsync(EFCoreMigration migration)
     {
-        UmbracoOpenIddictDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        UmbracoDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await context.MigrateDatabaseAsync(GetMigrationType(migration));
     }
 
     public async Task MigrateAll()
     {
-        UmbracoOpenIddictDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        UmbracoDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
         if (context.Database.CurrentTransaction is not null)
         {

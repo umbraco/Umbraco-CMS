@@ -10,7 +10,6 @@ using Umbraco.Cms.Api.Delivery.Services;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Persistence.EFCore.OpenIddict;
 
 namespace Umbraco.Extensions;
 
@@ -33,7 +32,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
         builder.AddUmbracoApiOpenApiUI();
 
-        builder.AddUmbracoOpenIddictDbContext();
+        builder.AddUmbracoEFCoreDbContext();
         builder
             .Services
             .AddControllers()

@@ -5,13 +5,12 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Umbraco.Cms.Persistence.EFCore.OpenIddict;
 
 #nullable disable
 
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 {
-    [DbContext(typeof(UmbracoOpenIddictDbContext))]
+    [DbContext(typeof(UmbracoDbContext))]
     [Migration("20230622184303_InitialCreate")]
     partial class InitialCreate
     {

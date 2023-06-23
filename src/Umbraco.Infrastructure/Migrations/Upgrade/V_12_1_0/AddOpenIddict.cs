@@ -4,17 +4,17 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_1_0;
 
 public class AddOpenIddict : UnscopedMigrationBase
 {
-    private readonly IOpenIddictDatabaseCreator _openIddictDatabaseCreator;
+    private readonly IEFCoreDatabaseCreator _iefCoreDatabaseCreator;
 
-    public AddOpenIddict(IMigrationContext context, IOpenIddictDatabaseCreator openIddictDatabaseCreator)
+    public AddOpenIddict(IMigrationContext context, IEFCoreDatabaseCreator iefCoreDatabaseCreator)
         : base(context)
     {
-        _openIddictDatabaseCreator = openIddictDatabaseCreator;
+        _iefCoreDatabaseCreator = iefCoreDatabaseCreator;
     }
 
     protected override void Migrate()
     {
-        _openIddictDatabaseCreator.ExecuteSingleMigrationAsync(EFCoreMigration.InitialCreate).GetAwaiter().GetResult();
+        _iefCoreDatabaseCreator.ExecuteSingleMigrationAsync(EFCoreMigration.InitialCreate).GetAwaiter().GetResult();
     }
 }
 

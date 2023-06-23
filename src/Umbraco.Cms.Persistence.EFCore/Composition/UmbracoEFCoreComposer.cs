@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Notifications;
-using Umbraco.Cms.Persistence.EFCore.OpenIddict;
+using Umbraco.Cms.Persistence.EFCore;
 
 namespace Umbraco.Cms.Persistence.EFCore.Composition;
 
@@ -13,7 +13,7 @@ public class UmbracoEFCoreComposer : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
     {
-        builder.Services.AddSingleton<IOpenIddictDatabaseCreator, EfCoreOpenIddictDatabaseCreator>();
+        builder.Services.AddSingleton<IEFCoreDatabaseCreator, EfCoreDatabaseCreator>();
 
         builder.AddNotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification, EFCoreCreateTablesNotificationHandler>();
         builder.AddNotificationAsyncHandler<UnattendedInstallNotification, EFCoreCreateTablesNotificationHandler>();
@@ -24,7 +24,7 @@ public class UmbracoEFCoreComposer : IComposer
             {
                 options
                     .UseEntityFrameworkCore()
-                    .UseDbContext<UmbracoOpenIddictDbContext>();
+                    .UseDbContext<UmbracoDbContext>();
             });
     }
 }
@@ -32,11 +32,11 @@ public class UmbracoEFCoreComposer : IComposer
 
 public class EFCoreCreateTablesNotificationHandler : INotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification>, INotificationAsyncHandler<UnattendedInstallNotification>
 {
-    private readonly IOpenIddictDatabaseCreator _openIddictDatabaseCreator;
+    private readonly IEFCoreDatabaseCreator _iefCoreDatabaseCreator;
 
-    public EFCoreCreateTablesNotificationHandler(IOpenIddictDatabaseCreator openIddictDatabaseCreator)
+    public EFCoreCreateTablesNotificationHandler(IEFCoreDatabaseCreator iefCoreDatabaseCreator)
     {
-        _openIddictDatabaseCreator = openIddictDatabaseCreator;
+        _iefCoreDatabaseCreator = iefCoreDatabaseCreator;
     }
 
     public async Task HandleAsync(UnattendedInstallNotification notification, CancellationToken cancellationToken)
@@ -51,6 +51,6 @@ public class EFCoreCreateTablesNotificationHandler : INotificationAsyncHandler<D
 
     private async Task HandleAsync()
     {
-        await _openIddictDatabaseCreator.ExecuteAllMigrationsAsync();
+        await _iefCoreDatabaseCreator.ExecuteAllMigrationsAsync();
     }
 }

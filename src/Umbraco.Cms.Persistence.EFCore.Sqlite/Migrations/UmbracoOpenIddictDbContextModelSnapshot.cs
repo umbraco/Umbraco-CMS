@@ -3,13 +3,13 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Umbraco.Cms.Persistence.EFCore.OpenIddict;
+using Umbraco.Cms.Persistence.EFCore;
 
 #nullable disable
 
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 {
-    [DbContext(typeof(UmbracoOpenIddictDbContext))]
+    [DbContext(typeof(UmbracoDbContext))]
     partial class UmbracoOpenIddictDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

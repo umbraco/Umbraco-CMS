@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Umbraco.Cms.Persistence.EFCore.OpenIddict;
+using Umbraco.Cms.Persistence.EFCore;
 
 #nullable disable
 
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 {
-    [DbContext(typeof(UmbracoOpenIddictDbContext))]
+    [DbContext(typeof(UmbracoDbContext))]
     partial class UmbracoOpenIddictDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
