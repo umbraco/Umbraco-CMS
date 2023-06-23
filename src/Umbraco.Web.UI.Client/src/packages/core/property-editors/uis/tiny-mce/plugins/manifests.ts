@@ -45,7 +45,7 @@ const pluginManifests: Array<ManifestTinyMcePlugin> = [
 			toolbar: [
 				{
 					alias: 'umbmediapicker',
-					label: 'Media picker',
+					label: 'Image',
 					icon: 'umb:image',
 				},
 			],
