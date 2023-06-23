@@ -1,8 +1,7 @@
+import { HTMLElementConstructor } from '../extension-api/types.js';
 import { UmbControllerHostBaseMixin } from './controller-host-base.mixin.js';
 import { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbControllerInterface } from './controller.interface.js';
-
-type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
 
 export declare class UmbControllerHostElement extends HTMLElement implements UmbControllerHost {
 	hasController(controller: UmbControllerInterface): boolean;
@@ -10,6 +9,7 @@ export declare class UmbControllerHostElement extends HTMLElement implements Umb
 	addController(controller: UmbControllerInterface): void;
 	removeControllerByUnique(unique: UmbControllerInterface['unique']): void;
 	removeController(controller: UmbControllerInterface): void;
+	getElement(): EventTarget;
 }
 
 /**
@@ -21,6 +21,10 @@ export declare class UmbControllerHostElement extends HTMLElement implements Umb
  */
 export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbControllerHostClass extends UmbControllerHostBaseMixin(superClass) implements UmbControllerHost {
+		getElement(): EventTarget {
+			return this;
+		}
+
 		connectedCallback() {
 			super.connectedCallback();
 			this.hostConnected();

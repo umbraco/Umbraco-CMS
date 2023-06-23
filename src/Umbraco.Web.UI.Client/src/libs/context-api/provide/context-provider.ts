@@ -10,8 +10,8 @@ import { UmbContextProvideEventImplementation } from './context-provide.event.js
  * @export
  * @class UmbContextProvider
  */
-export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
-	protected host: HostType;
+export class UmbContextProvider {
+	protected hostElement: EventTarget;
 
 	protected _contextAlias: string;
 	#instance: unknown;
@@ -32,8 +32,8 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 	 * @param {*} instance
 	 * @memberof UmbContextProvider
 	 */
-	constructor(host: HostType, contextAlias: string | UmbContextToken, instance: unknown) {
-		this.host = host;
+	constructor(hostElement: EventTarget, contextAlias: string | UmbContextToken, instance: unknown) {
+		this.hostElement = hostElement;
 		this._contextAlias = contextAlias.toString();
 		this.#instance = instance;
 	}
@@ -42,18 +42,18 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 	 * @memberof UmbContextProvider
 	 */
 	public hostConnected() {
-		this.host.addEventListener(umbContextRequestEventType, this._handleContextRequest);
-		this.host.dispatchEvent(new UmbContextProvideEventImplementation(this._contextAlias));
+		this.hostElement.addEventListener(umbContextRequestEventType, this._handleContextRequest);
+		this.hostElement.dispatchEvent(new UmbContextProvideEventImplementation(this._contextAlias));
 
 		// Listen to our debug event 'umb:debug-contexts'
-		this.host.addEventListener(umbDebugContextEventType, this._handleDebugContextRequest);
+		this.hostElement.addEventListener(umbDebugContextEventType, this._handleDebugContextRequest);
 	}
 
 	/**
 	 * @memberof UmbContextProvider
 	 */
 	public hostDisconnected() {
-		this.host.removeEventListener(umbContextRequestEventType, this._handleContextRequest);
+		this.hostElement.removeEventListener(umbContextRequestEventType, this._handleContextRequest);
 		// TODO: fire unprovided event.
 	}
 

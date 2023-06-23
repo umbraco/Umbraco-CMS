@@ -1,4 +1,3 @@
-import type { UmbExtensionRegistry } from './registry/extension.registry.js';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
@@ -6,7 +5,7 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ClassConstructor<T> = new (...args: any[]) => T;
+export type ClassConstructor<T = object> = new (...args: any[]) => T;
 
 export type ManifestTypeMap<ManifestTypes extends ManifestBase> = {
 	[Manifest in ManifestTypes as Manifest['type']]: Manifest;

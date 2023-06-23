@@ -1,5 +1,18 @@
-import type { ClassConstructor } from '../extension-api/types.js';
+import { ClassConstructor } from '../extension-api/types.js';
+import { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbControllerInterface } from './controller.interface.js';
+
+export declare class UmbControllerHostBaseDeclaration implements Omit<UmbControllerHost, 'getElement'> {
+	hasController(controller: UmbControllerInterface): boolean;
+	getControllers(filterMethod: (ctrl: UmbControllerInterface) => boolean): UmbControllerInterface[];
+	addController(controller: UmbControllerInterface): void;
+	removeControllerByUnique(unique: UmbControllerInterface['unique']): void;
+	removeController(controller: UmbControllerInterface): void;
+
+	hostConnected(): void;
+	hostDisconnected(): void;
+	destroy(): void;
+}
 
 /**
  * This mixin enables a class to host controllers.
@@ -104,5 +117,5 @@ export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(supe
 		}
 	}
 
-	return UmbControllerHostBaseClass;
+	return UmbControllerHostBaseClass as unknown as ClassConstructor<UmbControllerHostBaseDeclaration> & T;
 };

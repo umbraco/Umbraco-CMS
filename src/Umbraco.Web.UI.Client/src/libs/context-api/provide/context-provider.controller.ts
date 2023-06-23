@@ -1,17 +1,17 @@
 import { UmbContextToken } from '../token/context-token.js';
 import { UmbContextProvider } from './context-provider.js';
-import type { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbContextProviderController<T = unknown>
-	extends UmbContextProvider<UmbControllerHostElement>
-	implements UmbControllerInterface
-{
+export class UmbContextProviderController<T = unknown> extends UmbContextProvider implements UmbControllerInterface {
+	#host: UmbControllerHost;
+
 	public get unique() {
 		return this._contextAlias.toString();
 	}
 
-	constructor(host: UmbControllerHostElement, contextAlias: string | UmbContextToken<T>, instance: T) {
-		super(host, contextAlias, instance);
+	constructor(host: UmbControllerHost, contextAlias: string | UmbContextToken<T>, instance: T) {
+		super(host.getElement(), contextAlias, instance);
+		this.#host = host;
 
 		// If this API is already provided with this alias? Then we do not want to register this controller:
 		const existingControllers = host.getControllers((x) => x.unique === this.unique);
@@ -30,8 +30,8 @@ export class UmbContextProviderController<T = unknown>
 
 	public destroy() {
 		super.destroy();
-		if (this.host) {
-			this.host.removeController(this);
+		if (this.#host) {
+			this.#host.removeController(this);
 		}
 	}
 }

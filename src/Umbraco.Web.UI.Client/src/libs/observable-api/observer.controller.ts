@@ -1,6 +1,6 @@
 import { UmbObserver } from './observer.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbControllerInterface, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerInterface, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbObserverController<T = unknown> extends UmbObserver<T> implements UmbControllerInterface {
 	_alias?: string;
@@ -8,7 +8,7 @@ export class UmbObserverController<T = unknown> extends UmbObserver<T> implement
 		return this._alias;
 	}
 
-	constructor(host: UmbControllerHostElement, source: Observable<T>, callback: (_value: T) => void, alias?: string) {
+	constructor(host: UmbControllerHost, source: Observable<T>, callback: (_value: T) => void, alias?: string) {
 		super(source, callback);
 		this._alias = alias;
 

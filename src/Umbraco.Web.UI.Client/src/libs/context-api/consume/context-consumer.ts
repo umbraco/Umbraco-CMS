@@ -6,7 +6,7 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  * @export
  * @class UmbContextConsumer
  */
-export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = unknown> {
+export class UmbContextConsumer<T = unknown> {
 	_promise?: Promise<T>;
 	_promiseResolver?: (instance: T) => void;
 
@@ -22,13 +22,13 @@ export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = 
 
 	/**
 	 * Creates an instance of UmbContextConsumer.
-	 * @param {EventTarget} host
+	 * @param {EventTarget} hostElement
 	 * @param {string} _contextAlias
 	 * @param {UmbContextCallback} _callback
 	 * @memberof UmbContextConsumer
 	 */
 	constructor(
-		protected host: HostType,
+		protected hostElement: EventTarget,
 		_contextAlias: string | UmbContextToken<T>,
 		private _callback?: UmbContextCallback<T>
 	) {
@@ -58,7 +58,7 @@ export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = 
 	 */
 	public request() {
 		const event = new UmbContextRequestEventImplementation(this._contextAlias, this._onResponse);
-		this.host.dispatchEvent(event);
+		this.hostElement.dispatchEvent(event);
 	}
 
 	public hostConnected() {

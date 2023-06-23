@@ -6,6 +6,7 @@
 	"exports": {
 		".": null,
 		"./backend-api": "./dist-cms/external/backend-api/index.js",
+		"./class-api": "./dist-cms/libs/class-api/index.js",
 		"./context-api": "./dist-cms/libs/context-api/index.js",
 		"./controller-api": "./dist-cms/libs/controller-api/index.js",
 		"./element-api": "./dist-cms/libs/element-api/index.js",

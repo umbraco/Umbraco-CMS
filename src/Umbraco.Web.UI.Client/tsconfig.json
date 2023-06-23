@@ -28,6 +28,7 @@
 			"@umbraco-cms/backoffice/external/monaco-editor": ["src/external/monaco-editor"],
 
 			"@umbraco-cms/backoffice/backend-api": ["src/external/backend-api"],
+			"@umbraco-cms/backoffice/class-api": ["src/external/class-api"],
 			"@umbraco-cms/backoffice/context-api": ["src/libs/context-api"],
 			"@umbraco-cms/backoffice/controller-api": ["src/libs/controller-api"],
 			"@umbraco-cms/backoffice/element-api": ["src/libs/element-api"],
@@ -79,7 +80,7 @@
 
 			"@umbraco-cms/backoffice/data-type": ["./src/packages/settings/data-types/index.ts"],
 			"@umbraco-cms/backoffice/language": ["./src/packages/settings/languages/index.ts"],
-			"@umbraco-cms/backoffice/logviewer":["./src/packages/settings/logviewer/index.ts"],
+			"@umbraco-cms/backoffice/logviewer": ["./src/packages/settings/logviewer/index.ts"],
 			"@umbraco-cms/backoffice/relation-type": ["./src/packages/settings/relation-types/index.ts"],
 			"@umbraco-cms/backoffice/themes": ["./src/packages/settings/themes/index.ts"],
 			"@umbraco-cms/backoffice/tags": ["./src/packages/tags/index.ts"],
