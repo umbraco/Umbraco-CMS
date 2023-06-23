@@ -604,6 +604,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     public async Task<ContentTypeOperationStatus> DeleteAsync(Guid key, Guid performingUserKey)
     {
+        ICoreScope scope = ScopeProvider.CreateCoreScope();
+
         int performingUserId = await _userIdKeyResolver.GetAsync(performingUserKey);
 
         TItem? item = await GetAsync(key);
@@ -614,6 +616,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
 
         Delete(item, performingUserId);
+
+        scope.Complete();
         return ContentTypeOperationStatus.Success;
     }
 
