@@ -23,8 +23,38 @@ const manifest: ManifestPropertyEditorUi = {
 							alias: 'toolbar',
 							value: [
 								{
+									alias: 'removeformat',
+									label: 'Remove format',
+									icon: 'umb:format-clear',
+								},
+								{
+									alias: 'undo',
+									label: 'Undo',
+									icon: 'umb:undo',
+								},
+								{
+									alias: 'redo',
+									label: 'Redo',
+									icon: 'umb:redo',
+								},
+								{
+									alias: 'cut',
+									label: 'Cut',
+									icon: 'umb:cut',
+								},
+								{
+									alias: 'copy',
+									label: 'Copy',
+									icon: 'umb:copy',
+								},
+								{
+									alias: 'paste',
+									label: 'Paste',
+									icon: 'umb:paste',
+								},
+								{
 									alias: 'styles',
-									label: 'Styles',
+									label: 'Style select',
 									icon: 'umb:format-color-fill',
 								},
 								{
@@ -36,6 +66,16 @@ const manifest: ManifestPropertyEditorUi = {
 									alias: 'italic',
 									label: 'Italic',
 									icon: 'umb:format-italic',
+								},
+								{
+									alias: 'underline',
+									label: 'Underline',
+									icon: 'umb:format-underline',
+								},
+								{
+									alias: 'strikethrough',
+									label: 'Strikethrough',
+									icon: 'umb:format-strikethrough',
 								},
 								{
 									alias: 'alignleft',
@@ -51,6 +91,11 @@ const manifest: ManifestPropertyEditorUi = {
 									alias: 'alignright',
 									label: 'Align right',
 									icon: 'umb:align-right',
+								},
+								{
+									alias: 'alignjustify',
+									label: 'Justify full',
+									icon: 'umb:align-justify',
 								},
 								{
 									alias: 'bullist',
@@ -71,6 +116,46 @@ const manifest: ManifestPropertyEditorUi = {
 									alias: 'indent',
 									label: 'Indent',
 									icon: 'umb:indent-right',
+								},
+								{
+									alias: 'anchor',
+									label: 'Anchor',
+									icon: 'umb:anchor',
+								},
+								{
+									alias: 'table',
+									label: 'Table',
+									icon: 'umb:table',
+								},
+								{
+									alias: 'hr',
+									label: 'Horizontal rule',
+									icon: 'umb:horizontal-rule',
+								},
+								{
+									alias: 'subscript',
+									label: 'Subscript',
+									icon: 'umb:subscript',
+								},
+								{
+									alias: 'superscript',
+									label: 'Superscript',
+									icon: 'umb:superscript',
+								},
+								{
+									alias: 'charmap',
+									label: 'Character map',
+									icon: 'umb:character-map',
+								},
+								{
+									alias: 'rtl',
+									label: 'Right to left',
+									icon: 'umb:format-textdirection-r-to-l',
+								},
+								{
+									alias: 'ltr',
+									label: 'Left to right',
+									icon: 'umb:format-textdirection-l-to-r',
 								},
 							],
 						},
