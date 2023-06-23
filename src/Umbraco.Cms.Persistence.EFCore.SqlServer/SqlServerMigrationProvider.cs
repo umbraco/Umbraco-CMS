@@ -20,6 +20,12 @@ public class SqlServerMigrationProvider : IMigrationProvider
         await context.MigrateDatabaseAsync(GetMigrationType(migration));
     }
 
+    public async Task MigrateAll()
+    {
+        UmbracoOpenIddictDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        await context.Database.MigrateAsync();
+    }
+
     private static Type GetMigrationType(EFCoreMigration migration) =>
         migration switch
         {

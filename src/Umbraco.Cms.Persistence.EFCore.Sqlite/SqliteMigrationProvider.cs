@@ -22,6 +22,28 @@ public class SqliteMigrationProvider : IMigrationProvider
         await context.MigrateDatabaseAsync(GetMigrationType(migration));
     }
 
+    public async Task MigrateAll()
+    {
+        UmbracoOpenIddictDbContext context = await _dbContextFactory.CreateDbContextAsync();
+
+        if (context.Database.CurrentTransaction is not null)
+        {
+            //SUPER HACK if we are in trasaction we need to commit it and start a new.
+            context.Database.CommitTransaction();
+
+
+            await context.Database.MigrateAsync();
+
+            context.Database.BeginTransaction();
+        }
+        else
+        {
+            await context.Database.MigrateAsync();
+        }
+
+
+    }
+
     private static Type GetMigrationType(EFCoreMigration migration) =>
         migration switch
         {

@@ -1,7 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Migrations;
+using Umbraco.Cms.Infrastructure.Migrations.Notifications;
 using Umbraco.Cms.Persistence.EFCore.OpenIddict;
 
 namespace Umbraco.Cms.Persistence.EFCore.Composition;
@@ -12,6 +15,8 @@ public class UmbracoEFCoreComposer : IComposer
     {
         builder.Services.AddSingleton<IOpenIddictDatabaseCreator, EfCoreOpenIddictDatabaseCreator>();
 
+        builder.AddNotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification, EFCoreCreateTablesNotificationHandler>();
+        builder.AddNotificationAsyncHandler<UnattendedInstallNotification, EFCoreCreateTablesNotificationHandler>();
         builder.Services.AddOpenIddict()
 
             // Register the OpenIddict core components.
@@ -21,5 +26,31 @@ public class UmbracoEFCoreComposer : IComposer
                     .UseEntityFrameworkCore()
                     .UseDbContext<UmbracoOpenIddictDbContext>();
             });
+    }
+}
+
+
+public class EFCoreCreateTablesNotificationHandler : INotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification>, INotificationAsyncHandler<UnattendedInstallNotification>
+{
+    private readonly IOpenIddictDatabaseCreator _openIddictDatabaseCreator;
+
+    public EFCoreCreateTablesNotificationHandler(IOpenIddictDatabaseCreator openIddictDatabaseCreator)
+    {
+        _openIddictDatabaseCreator = openIddictDatabaseCreator;
+    }
+
+    public async Task HandleAsync(UnattendedInstallNotification notification, CancellationToken cancellationToken)
+    {
+        await HandleAsync();
+    }
+
+    public async Task HandleAsync(DatabaseSchemaAndDataCreatedNotification notification, CancellationToken cancellationToken)
+    {
+        await HandleAsync();
+    }
+
+    private async Task HandleAsync()
+    {
+        await _openIddictDatabaseCreator.ExecuteAllMigrationsAsync();
     }
 }

@@ -23,13 +23,23 @@ public class EfCoreOpenIddictDatabaseCreator : IOpenIddictDatabaseCreator
         _options = options;
     }
 
-    public async Task CreateAsync()
+    public async Task ExecuteSingleMigrationAsync(EFCoreMigration migration)
     {
         var provider = _migrationProviders.FirstOrDefault(x => x.ProviderName == _options.Value.ProviderName);
 
         if (provider is not null)
         {
-            await provider.MigrateAsync(EFCoreMigration.InitialCreate);
+            await provider.MigrateAsync(migration);
+        }
+    }
+
+    public async Task ExecuteAllMigrationsAsync()
+    {
+        var provider = _migrationProviders.FirstOrDefault(x => x.ProviderName == _options.Value.ProviderName);
+
+        if (provider is not null)
+        {
+            await provider.MigrateAll();
         }
     }
 
