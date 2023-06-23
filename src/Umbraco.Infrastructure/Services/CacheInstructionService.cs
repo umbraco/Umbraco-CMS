@@ -185,8 +185,18 @@ namespace Umbraco.Cms
                 }
             }
 
-            private CacheInstruction CreateCacheInstruction(IEnumerable<RefreshInstruction> instructions, string localIdentity) =>
-                new(0, DateTime.UtcNow, JsonConvert.SerializeObject(instructions, Formatting.None), localIdentity, instructions.Sum(x => x.JsonIdCount));
+            private CacheInstruction CreateCacheInstruction(IEnumerable<RefreshInstruction> instructions, string localIdentity)
+                => new(
+                    0,
+                    DateTime.UtcNow,
+                    JsonConvert.SerializeObject(instructions, new JsonSerializerSettings()
+                    {
+                        Formatting = Formatting.None,
+                        DefaultValueHandling = DefaultValueHandling.Ignore,
+                        NullValueHandling = NullValueHandling.Ignore,
+                    }),
+                    localIdentity,
+                    instructions.Sum(x => x.JsonIdCount));
 
             /// <summary>
             ///     Process instructions from the database.
