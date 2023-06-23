@@ -5,14 +5,13 @@ import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import { FormControlMixin, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { renderEditor, type tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
-import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
-import {
-	ManifestTinyMcePlugin,
+import type {
 	TinyMcePluginArguments,
+	UmbDataTypePropertyCollection,
 	UmbTinyMcePluginBase,
-	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extension-registry';
+} from '@umbraco-cms/backoffice/components';
+import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
+import { ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	PropertyValueMap,
 	css,
