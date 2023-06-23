@@ -26,13 +26,13 @@ public class AllowedChildrenOfRootDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AllowedChildrenOfRoot(int skip = 0, int take = 100)
     {
-        IEnumerable<IContentType> allowedChildrenOfRoot = _contentTypeService.GetAll().Where(x => x.AllowedAsRoot).ToArray();
+        PagedModel<IContentType> allowedChildrenOfRoot = await _contentTypeService.GetAllAllowedAsRootAsync(skip, take);
 
-        List<DocumentTypeResponseModel> viewModels = _umbracoMapper.MapEnumerable<IContentType, DocumentTypeResponseModel>(allowedChildrenOfRoot.Skip(skip).Take(take));
+        List<DocumentTypeResponseModel> viewModels = _umbracoMapper.MapEnumerable<IContentType, DocumentTypeResponseModel>(allowedChildrenOfRoot.Items);
 
-        var pagedViewModel = new PagedViewModel<DocumentTypeResponseModel>()
+        var pagedViewModel = new PagedViewModel<DocumentTypeResponseModel>
         {
-            Total = allowedChildrenOfRoot.Count(),
+            Total = allowedChildrenOfRoot.Total,
             Items = viewModels,
         };
 

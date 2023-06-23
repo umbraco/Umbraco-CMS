@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -29,4 +30,10 @@ public interface IContentTypeService : IContentTypeBaseService<IContentType>
     /// <param name="aliases"></param>
     /// <returns></returns>
     IEnumerable<int> GetAllContentTypeIds(string[] aliases);
+
+    /// <summary>
+    /// Returns all content types that matches the query
+    /// </summary>
+    /// <returns></returns>
+    Task<PagedModel<IContentType>> GetAllAllowedAsRootAsync(int skip, int take);
 }
