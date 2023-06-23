@@ -1,10 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using System.Globalization;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
@@ -40,17 +38,24 @@ public class MultiValuePropertyEditorTests
             Mock.Of<IEditorConfigurationParser>());
         var dataType = new DataType(checkBoxListPropertyEditor, serializer)
         {
-            Configuration = new ValueListConfiguration
-            {
-                Items = new List<ValueListConfiguration.ValueListItem>
-                {
-                    new() { Id = 4567, Value = "Value 1" },
-                    new() { Id = 1234, Value = "Value 2" },
-                    new() { Id = 8910, Value = "Value 3" },
-                },
-            },
             Id = 1,
         };
+        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new ValueListConfiguration
+                {
+                    Items = new List<ValueListConfiguration.ValueListItem>
+                    {
+                        new() { Id = 4567, Value = "Value 1" },
+                        new() { Id = 1234, Value = "Value 2" },
+                        new() { Id = 8910, Value = "Value 3" },
+                    },
+                },
+                serializer);
+
+        var configuration = dataType.ConfigurationObject as ValueListConfiguration;
+        Assert.NotNull(configuration);
+        Assert.AreEqual(3, configuration.Items.Count);
 
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         dataTypeServiceMock
@@ -72,7 +77,7 @@ public class MultiValuePropertyEditorTests
         prop.SetValue("Value 1,Value 2,Value 3");
 
         var valueEditor = dataType.Editor.GetValueEditor();
-        ((DataValueEditor)valueEditor).Configuration = dataType.Configuration;
+        ((DataValueEditor)valueEditor).ConfigurationObject = dataType.ConfigurationObject;
         var result = valueEditor.ConvertDbToString(prop.PropertyType, prop.GetValue());
 
         Assert.AreEqual("Value 1,Value 2,Value 3", result);
@@ -91,17 +96,24 @@ public class MultiValuePropertyEditorTests
             Mock.Of<IEditorConfigurationParser>());
         var dataType = new DataType(checkBoxListPropertyEditor, serializer)
         {
-            Configuration = new ValueListConfiguration
-            {
-                Items = new List<ValueListConfiguration.ValueListItem>
-                {
-                    new() { Id = 10, Value = "Value 1" },
-                    new() { Id = 1234, Value = "Value 2" },
-                    new() { Id = 11, Value = "Value 3" },
-                },
-            },
             Id = 1,
         };
+        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new ValueListConfiguration
+                {
+                    Items = new List<ValueListConfiguration.ValueListItem>
+                    {
+                        new() { Id = 4567, Value = "Value 1" },
+                        new() { Id = 1234, Value = "Value 2" },
+                        new() { Id = 8910, Value = "Value 3" },
+                    },
+                },
+                serializer);
+
+        var configuration = dataType.ConfigurationObject as ValueListConfiguration;
+        Assert.NotNull(configuration);
+        Assert.AreEqual(3, configuration.Items.Count);
 
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         dataTypeServiceMock
@@ -130,47 +142,42 @@ public class MultiValuePropertyEditorTests
     [Test]
     public void DropDownPreValueEditor_Format_Data_For_Editor()
     {
-        // editor wants ApplicationContext.Current.Services.TextService
-        // (that should be fixed with proper injection)
-        var textService = new Mock<ILocalizedTextService>();
-        textService.Setup(x => x.Localize(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<CultureInfo>(),
-                It.IsAny<IDictionary<string, string>>()))
-            .Returns("blah");
+        var dataValueEditorFactoryMock = new Mock<IDataValueEditorFactory>();
 
-        //// var appContext = new ApplicationContext(
-        ////    new DatabaseContext(TestObjects.GetIDatabaseFactoryMock(), logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()),
-        ////    new ServiceContext(
-        ////        localizedTextService: textService.Object
-        ////    ),
-        ////    Mock.Of<CacheHelper>(),
-        ////    new ProfilingLogger(logger, Mock.Of<IProfiler>()))
-        //// {
-        ////    //IsReady = true
-        //// };
-        //// Current.ApplicationContext = appContext;
-
-        var configuration = new ValueListConfiguration
+        var serializer = new ConfigurationEditorJsonSerializer();
+        var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(
+            dataValueEditorFactoryMock.Object,
+            Mock.Of<ILocalizedTextService>(),
+            Mock.Of<IIOHelper>(),
+            Mock.Of<IEditorConfigurationParser>());
+        var dataType = new DataType(checkBoxListPropertyEditor, serializer)
         {
-            Items = new List<ValueListConfiguration.ValueListItem>
-            {
-                new() { Id = 1, Value = "Item 1" },
-                new() { Id = 2, Value = "Item 2" },
-                new() { Id = 3, Value = "Item 3" },
-            },
+            Id = 1,
         };
+        var configurationEditor = dataType.Editor!.GetConfigurationEditor();
+        dataType.ConfigurationData = configurationEditor.FromConfigurationObject(
+            new ValueListConfiguration
+            {
+                Items = new List<ValueListConfiguration.ValueListItem>
+                {
+                    new() { Id = 1, Value = "Item 1" },
+                    new() { Id = 2, Value = "Item 2" },
+                    new() { Id = 3, Value = "Item 3" },
+                },
+            },
+            serializer);
 
-        var editor = new ValueListConfigurationEditor(Mock.Of<ILocalizedTextService>(), Mock.Of<IIOHelper>(), Mock.Of<IEditorConfigurationParser>());
+        var valueEditorConfiguration = configurationEditor.ToValueEditor(dataType.ConfigurationData);
 
-        var result = editor.ToConfigurationEditor(configuration);
+        var result = configurationEditor.ToConfigurationObject(valueEditorConfiguration, serializer) as ValueListConfiguration;
 
-        // 'result' is meant to be serialized, is built with anonymous objects
-        // so we cannot really test what's in it - but by serializing it
-        var json = JsonConvert.SerializeObject(result);
-        Assert.AreEqual(
-            "{\"items\":{\"1\":{\"value\":\"Item 1\",\"sortOrder\":1},\"2\":{\"value\":\"Item 2\",\"sortOrder\":2},\"3\":{\"value\":\"Item 3\",\"sortOrder\":3}}}",
-            json);
+        Assert.NotNull(result);
+        Assert.AreEqual(3, result.Items.Count);
+        Assert.AreEqual(1, result.Items[0].Id);
+        Assert.AreEqual("Item 1", result.Items[0].Value);
+        Assert.AreEqual(2, result.Items[1].Id);
+        Assert.AreEqual("Item 2", result.Items[1].Value);
+        Assert.AreEqual(3, result.Items[2].Id);
+        Assert.AreEqual("Item 3", result.Items[2].Value);
     }
 }

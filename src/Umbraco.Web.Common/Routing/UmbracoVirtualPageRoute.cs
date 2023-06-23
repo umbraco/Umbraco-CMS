@@ -61,8 +61,9 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
 
                 if (controllerType != null)
                 {
-                    // Get the controller for the endpoint
-                    var controller = httpContext.RequestServices.GetRequiredService(controllerType);
+                    // Get the controller for the endpoint. We need to fallback to ActivatorUtilities if the controller is not registered in DI.
+                    var controller = httpContext.RequestServices.GetService(controllerType)
+                                     ?? ActivatorUtilities.CreateInstance(httpContext.RequestServices, controllerType);
 
                     // Try and find the content if this is a virtual page
                     IPublishedContent? publishedContent = FindContent(

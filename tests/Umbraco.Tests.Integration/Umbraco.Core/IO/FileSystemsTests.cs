@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
@@ -68,7 +67,7 @@ public class FileSystemsTests : UmbracoIntegrationTest
         Assert.IsTrue(Directory.Exists(physPath));
     }
 
-    // FIXME: don't make sense anymore
+    // TODO: don't make sense anymore
     /*
     [Test]
     public void Cannot_Get_InvalidFileSystem()

@@ -24,7 +24,19 @@ public class DictionaryAppCache : IRequestCache
     public virtual object? Get(string key) => _items.TryGetValue(key, out var value) ? value : null;
 
     /// <inheritdoc />
-    public virtual object? Get(string key, Func<object?> factory) => _items.GetOrAdd(key, _ => factory());
+    public virtual object? Get(string key, Func<object?> factory)
+    {
+        var value = _items.GetOrAdd(key, _ => factory());
+
+        if (value is not null)
+        {
+            return value;
+        }
+
+        // do not cache null values
+        _items.TryRemove(key, out _);
+        return null;
+    }
 
     public bool Set(string key, object? value) => _items.TryAdd(key, value);
 

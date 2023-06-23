@@ -57,7 +57,7 @@ public class ColorPickerValueConverter : PropertyValueConverterBase
     }
 
     private bool UseLabel(IPublishedPropertyType propertyType) => ConfigurationEditor
-        .ConfigurationAs<ColorPickerConfiguration>(propertyType.DataType.Configuration)?.UseLabel ?? false;
+        .ConfigurationAs<ColorPickerConfiguration>(propertyType.DataType.ConfigurationObject)?.UseLabel ?? false;
 
     public class PickedColor
     {

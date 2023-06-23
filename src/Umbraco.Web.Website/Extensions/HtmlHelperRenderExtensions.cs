@@ -767,6 +767,12 @@ public static class HtmlHelperRenderExtensions
                 nameof(controllerName));
         }
 
+        // Create a new form context in order to ensure client validation is set properly when adding multiple forms in a page. More context in PR #13914.
+        html.ViewContext.FormContext = new FormContext
+        {
+            CanRenderAtEndOfForm = true
+        };
+
         IUmbracoContextAccessor umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(html);
         IUmbracoContext umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
         var formAction = umbracoContext.OriginalRequestUrl.PathAndQuery;

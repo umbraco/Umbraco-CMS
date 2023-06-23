@@ -1,9 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -39,11 +39,14 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
 
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IFileService FileService => GetRequiredService<IFileService>();
 
     private IJsonSerializer Serializer => GetRequiredService<IJsonSerializer>();
+
+    private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer =>
+        GetRequiredService<IConfigurationEditorJsonSerializer>();
 
     public PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
@@ -86,13 +89,12 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void TagsCanBeVariant()
+    public async Task TagsCanBeVariant()
     {
-        var languageService = LocalizationService;
-        var language = new LanguageBuilder()
+       var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(language); // en-US is already there
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -145,9 +147,9 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void TagsCanBecomeVariant()
+    public async Task TagsCanBecomeVariant()
     {
-        var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+        var enId = (await LanguageService.GetAsync("en-US"))!.Id;
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -221,14 +223,12 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void TagsCanBecomeInvariant()
+    public async Task TagsCanBecomeInvariant()
     {
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(language); // en-US is already there
-
-        var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -282,14 +282,12 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void TagsCanBecomeInvariant2()
+    public async Task TagsCanBecomeInvariant2()
     {
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(language); // en-US is already there
-
-        var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -329,14 +327,12 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void TagsCanBecomeInvariantByPropertyType()
+    public async Task TagsCanBecomeInvariantByPropertyType()
     {
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(language); // en-US is already there
-
-        var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -390,7 +386,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void TagsCanBecomeInvariantByPropertyTypeAndBackToVariant()
+    public async Task TagsCanBecomeInvariantByPropertyTypeAndBackToVariant()
     {
         var frValue = new string[] { "hello", "world", "some", "tags", "plus" };
         var enValue = new string[] { "hello", "world", "another", "one" };
@@ -398,7 +394,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(language); // en-US is already there
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -420,7 +416,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         propertyType.Variations = ContentVariation.Nothing;
         ContentTypeService.Save(contentType);
 
-        // FIXME: This throws due to index violations
+        // TODO: This throws due to index violations
         propertyType.Variations = ContentVariation.Culture;
         ContentTypeService.Save(contentType);
 
@@ -552,7 +548,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         tags = TagService.GetTagsForEntity(content1.Id);
         Assert.AreEqual(5, tags.Count());
 
-        // FIXME: tag & tree issue
+        // TODO: tag & tree issue
         // when we publish, we 'just' publish the top one and not the ones below = fails
         // what we should do is... NOT clear tags when unpublishing or trashing or...
         // and just update the tag service to NOT return anything related to trashed or
@@ -617,7 +613,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         var tags = TagService.GetTagsForEntity(content1.Id);
         Assert.AreEqual(0, tags.Count());
 
-        // FIXME: tag & tree issue
+        // TODO: tag & tree issue
         // when we (un)publish, we 'just' publish the top one and not the ones below = fails
         // see similar note above
         tags = TagService.GetTagsForEntity(content2.Id);
@@ -640,7 +636,10 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         // Arrange
         // set configuration
         var dataType = DataTypeService.GetDataType(1041);
-        dataType.Configuration = new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv };
+        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv },
+                ConfigurationEditorJsonSerializer);
 
         // updating the data type with the new configuration
         DataTypeService.Save(dataType);
@@ -653,7 +652,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         CreateAndAddTagsPropertyType(contentType);
         ContentTypeService.Save(contentType);
         contentType.AllowedContentTypes =
-            new[] { new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias) };
+            new[] { new ContentTypeSort(new Lazy<int>(() => contentType.Id), contentType.Key, 0, contentType.Alias) };
 
         var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
         content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
@@ -835,7 +834,10 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         // Arrange
         // set configuration
         var dataType = DataTypeService.GetDataType(1041);
-        dataType.Configuration = new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv };
+        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv },
+                ConfigurationEditorJsonSerializer);
 
         // updating the data type with the new configuration
         DataTypeService.Save(dataType);
@@ -870,7 +872,15 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         // Arrange
         // set configuration
         var dataType = DataTypeService.GetDataType(1041);
-        dataType.Configuration = new TagConfiguration { Group = "test", StorageType = TagsStorageType.Json };
+        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new TagConfiguration { Group = "test", StorageType = TagsStorageType.Json },
+                ConfigurationEditorJsonSerializer);
+
+        var configuration = dataType.ConfigurationObject as TagConfiguration;
+        Assert.NotNull(configuration);
+        Assert.AreEqual("test", configuration.Group);
+        Assert.AreEqual(TagsStorageType.Json, configuration.StorageType);
 
         // updating the data type with the new configuration
         DataTypeService.Save(dataType);

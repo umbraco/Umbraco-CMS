@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -340,7 +339,7 @@ public class ReflectionUtilitiesTests
         setterInt4(object4, 42);
         Assert.AreEqual(42, object4.IntValue);
 
-        // FIXME: the code below runs fine with ReSharper test running within VisualStudio
+        // TODO: the code below runs fine with ReSharper test running within VisualStudio
         // but it crashes when running via vstest.console.exe - unless some settings are required?
 
         // converting works
@@ -582,7 +581,7 @@ public class ReflectionUtilitiesTests
         Assert.AreEqual(44, getter3(c));
     }
 
-    // FIXME: missing tests specifying 'returned' on method, property
+    // TODO: missing tests specifying 'returned' on method, property
     [Test]
     public void DeconstructAnonymousType()
     {

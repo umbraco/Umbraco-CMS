@@ -52,6 +52,7 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<ActiveDirectorySettings>()
             .AddUmbracoOptions<MarketplaceSettings>()
             .AddUmbracoOptions<ContentSettings>()
+            .AddUmbracoOptions<DeliveryApiSettings>()
             .AddUmbracoOptions<CoreDebugSettings>()
             .AddUmbracoOptions<ExceptionFilterSettings>()
             .AddUmbracoOptions<GlobalSettings>(optionsBuilder => optionsBuilder.PostConfigure(options =>
@@ -85,7 +86,8 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<PackageMigrationSettings>()
             .AddUmbracoOptions<ContentDashboardSettings>()
             .AddUmbracoOptions<HelpPageSettings>()
-            .AddUmbracoOptions<DataTypesSettings>();
+            .AddUmbracoOptions<DataTypesSettings>()
+            .AddUmbracoOptions<PackageManifestSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();

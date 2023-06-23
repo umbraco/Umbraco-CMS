@@ -759,7 +759,7 @@ public class UsersController : BackOfficeNotificationsController
         }
 
         Attempt<PasswordChangedModel?> passwordChangeResult =
-            await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager);
+            await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager, currentUser);
 
         if (passwordChangeResult.Success)
         {
@@ -769,12 +769,12 @@ public class UsersController : BackOfficeNotificationsController
             return result;
         }
 
-        if (passwordChangeResult.Result?.ChangeError is not null)
+        if (passwordChangeResult.Result?.Error is not null)
         {
-            foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
+            foreach (var memberName in passwordChangeResult.Result.Error.MemberNames)
             {
                 ModelState.AddModelError(memberName,
-                    passwordChangeResult.Result.ChangeError.ErrorMessage ?? string.Empty);
+                    passwordChangeResult.Result.Error.ErrorMessage ?? string.Empty);
             }
         }
 

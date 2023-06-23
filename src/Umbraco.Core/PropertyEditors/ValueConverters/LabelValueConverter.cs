@@ -21,7 +21,7 @@ public class LabelValueConverter : PropertyValueConverterBase
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
     {
         LabelConfiguration? valueType =
-            ConfigurationEditor.ConfigurationAs<LabelConfiguration>(propertyType.DataType.Configuration);
+            ConfigurationEditor.ConfigurationAs<LabelConfiguration>(propertyType.DataType.ConfigurationObject);
         switch (valueType?.ValueType)
         {
             case ValueTypes.DateTime:
@@ -46,7 +46,7 @@ public class LabelValueConverter : PropertyValueConverterBase
     public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         LabelConfiguration? valueType =
-            ConfigurationEditor.ConfigurationAs<LabelConfiguration>(propertyType.DataType.Configuration);
+            ConfigurationEditor.ConfigurationAs<LabelConfiguration>(propertyType.DataType.ConfigurationObject);
         switch (valueType?.ValueType)
         {
             case ValueTypes.DateTime:

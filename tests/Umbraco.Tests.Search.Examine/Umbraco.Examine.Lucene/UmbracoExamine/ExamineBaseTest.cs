@@ -1,4 +1,3 @@
-using System;
 using System.Data;
 using Examine.Lucene.Providers;
 using Microsoft.Extensions.DependencyInjection;

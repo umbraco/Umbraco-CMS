@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -18,28 +18,28 @@ public class ContentVariantAllowedActionTests : UmbracoTestServerTestBase
 {
     private const string UsIso = "en-US";
     private const string DkIso = "da-DK";
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IUserService UserService => GetRequiredService<IUserService>();
 
     private IUmbracoMapper UmbracoMapper => GetRequiredService<IUmbracoMapper>();
 
     [SetUp]
-    public void SetUpTestDate()
+    public async Task SetUpTestDate()
     {
         var dk = new Language(DkIso, "Danish");
-        LocalizationService.Save(dk);
+        await LanguageService.CreateAsync(dk, Constants.Security.SuperUserKey);
     }
 
     [Test]
-    public void CanCheckIfUserHasAccessToLanguage()
+    public async Task CanCheckIfUserHasAccessToLanguage()
     {
         // setup user groups
         var user = UserBuilder.CreateUser();
         UserService.Save(user);
 
         var userGroup = UserGroupBuilder.CreateUserGroup();
-        var languageId = LocalizationService.GetLanguageIdByIsoCode(DkIso);
+        var languageId = (await LanguageService.GetAsync(DkIso))?.Id;
         userGroup.AddAllowedLanguage(languageId!.Value);
         UserService.Save(userGroup, new []{ user.Id});
         var currentUser = UserService.GetUserById(user.Id);

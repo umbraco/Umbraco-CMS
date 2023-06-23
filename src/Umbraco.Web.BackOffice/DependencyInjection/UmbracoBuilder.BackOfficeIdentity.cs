@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -35,21 +38,30 @@ public static partial class UmbracoBuilderExtensions
             .AddDefaultTokenProviders()
             .AddUserStore<IUserStore<BackOfficeIdentityUser>, BackOfficeUserStore>(factory => new BackOfficeUserStore(
                 factory.GetRequiredService<ICoreScopeProvider>(),
-                factory.GetRequiredService<IUserService>(),
                 factory.GetRequiredService<IEntityService>(),
                 factory.GetRequiredService<IExternalLoginWithKeyService>(),
                 factory.GetRequiredService<IOptionsSnapshot<GlobalSettings>>(),
                 factory.GetRequiredService<IUmbracoMapper>(),
                 factory.GetRequiredService<BackOfficeErrorDescriber>(),
                 factory.GetRequiredService<AppCaches>(),
-                factory.GetRequiredService<ITwoFactorLoginService>()
+                factory.GetRequiredService<ITwoFactorLoginService>(),
+                factory.GetRequiredService<IUserGroupService>(),
+                factory.GetRequiredService<IUserRepository>(),
+                factory.GetRequiredService<IRuntimeState>(),
+                factory.GetRequiredService<IEventMessagesFactory>(),
+                factory.GetRequiredService<ILogger<BackOfficeUserStore>>()
             ))
             .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
             .AddSignInManager<IBackOfficeSignInManager, BackOfficeSignInManager>()
             .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory>()
             .AddErrorDescriber<BackOfficeErrorDescriber>();
 
-        services.TryAddSingleton<IBackOfficeUserPasswordChecker, NoopBackOfficeUserPasswordChecker>();
+        // We also need to register the store as a core-friendly interface that doesn't leak technology.
+        services.AddScoped<IBackOfficeUserStore, BackOfficeUserStore>();
+        services.AddScoped<ICoreBackOfficeUserManager, BackOfficeUserManager>();
+        services.AddScoped<IInviteUriProvider, InviteUriProvider>();
+
+        services.AddSingleton<IBackOfficeUserPasswordChecker, NoopBackOfficeUserPasswordChecker>(); ;
 
         // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
         services.ConfigureOptions<ConfigureBackOfficeIdentityOptions>();
@@ -64,6 +76,8 @@ public static partial class UmbracoBuilderExtensions
 
         services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
         services.TryAddSingleton<IBackOfficeExternalLoginProviders, BackOfficeExternalLoginProviders>();
+        // We need to know in the core services if local logins is denied, so we register the providers with a core friendly interface.
+        services.TryAddSingleton<ILocalLoginSettingProvider, BackOfficeExternalLoginProviders>();
         services.TryAddSingleton<IBackOfficeTwoFactorOptions, DefaultBackOfficeTwoFactorOptions>();
 
         return new BackOfficeIdentityBuilder(services);

@@ -22,7 +22,6 @@ public class Language
     [DataMember(Name = "isMandatory")]
     public bool IsMandatory { get; set; }
 
-    [Obsolete("This will be replaced by fallback language ISO code in V13.")]
-    [DataMember(Name = "fallbackLanguageId")]
-    public int? FallbackLanguageId { get; set; }
+    [DataMember(Name = "fallbackIsoCode")]
+    public string? FallbackIsoCode { get; set; }
 }

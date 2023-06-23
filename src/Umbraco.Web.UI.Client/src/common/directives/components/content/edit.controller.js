@@ -941,15 +941,13 @@
             const openPreviewWindow = () => {
                 // Chromes popup blocker will kick in if a window is opened
                 // without the initial scoped request. This trick will fix that.
-                //
-                const previewWindow = $window.open('preview/?init=true', 'umbpreview');
+              
+              const previewWindow = $window.open(`preview/?id=${content.id}${$scope.culture ? `&culture=${$scope.culture}` : ''}`, 'umbpreview');
 
-                // Build the correct path so both /#/ and #/ work.
-                let query = 'id=' + content.id;
-                if ($scope.culture) {
-                   query += "#?culture=" + $scope.culture;
-                }
-                previewWindow.location.href = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
+              previewWindow.addEventListener('load', () => {
+                previewWindow.location.href = previewWindow.document.URL;
+              });
+
             }
 
             //The user cannot save if they don't have access to do that, in which case we just want to preview

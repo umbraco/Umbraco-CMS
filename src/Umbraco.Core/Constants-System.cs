@@ -19,6 +19,11 @@ public static partial class Constants
         public const string RootString = "-1";
 
         /// <summary>
+        ///     The GUID identifier for global system root node.
+        /// </summary>
+        public static readonly Guid? RootKey = null;
+
+        /// <summary>
         ///     The integer identifier for content's recycle bin.
         /// </summary>
         public const int RecycleBinContent = -20;
@@ -64,5 +69,15 @@ public static partial class Constants
 
         public const string UmbracoConnectionName = "umbracoDbDSN";
         public const string DefaultUmbracoPath = "~/umbraco";
+
+        /// <summary>
+        /// The DataDirectory name.
+        /// </summary>
+        public const string DataDirectoryName = "DataDirectory";
+
+        /// <summary>
+        /// The DataDirectory placeholder.
+        /// </summary>
+        public const string DataDirectoryPlaceholder = "|DataDirectory|";
     }
 }

@@ -27,10 +27,10 @@ public class ContentAppFactoryCollectionBuilder : OrderedCollectionBuilderBase<C
         // get the manifest parser just-in-time - injecting it in the ctor would mean that
         // simply getting the builder in order to configure the collection, would require
         // its dependencies too, and that can create cycles or other oddities
-        IManifestParser manifestParser = factory.GetRequiredService<IManifestParser>();
+        ILegacyManifestParser legacyManifestParser = factory.GetRequiredService<ILegacyManifestParser>();
         IIOHelper ioHelper = factory.GetRequiredService<IIOHelper>();
         return base.CreateItems(factory)
-            .Concat(manifestParser.CombinedManifest.ContentApps.Select(x =>
-                new ManifestContentAppFactory(x, ioHelper)));
+            .Concat(legacyManifestParser.CombinedManifest.ContentApps.Select(x =>
+                new LegacyManifestContentAppFactory(x, ioHelper)));
     }
 }

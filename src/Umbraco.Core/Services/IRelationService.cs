@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -169,7 +170,18 @@ public interface IRelationService : IService
     /// <param name="pageSize"></param>
     /// <param name="totalChildren"></param>
     /// <returns></returns>
-    IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null);
+    IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null);/// <summary>
+
+    /// <summary>
+    ///     Gets a paged result of <see cref="IRelation" />
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="pageIndex"></param>
+    /// <param name="pageSize"></param>
+    /// <param name="totalRecords"></param>
+    /// <param name="ordering"></param>
+    /// <returns></returns>
+    Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKey(Guid key, int skip, int take, Ordering? ordering = null);
 
     /// <summary>
     ///     Gets the Child object from a Relation as an <see cref="IUmbracoEntity" />
@@ -334,6 +346,22 @@ public interface IRelationService : IService
     void Save(IRelationType relationType);
 
     /// <summary>
+    ///     Saves a <see cref="IRelationType" />
+    /// </summary>
+    /// <param name="relationType">RelationType to Save</param>
+    /// <param name="userKey">Key of the user thats saving the relation type</param>
+    /// <returns>A <see cref="Attempt"/> with a status of whether the operations was a success or failure</returns>
+    Task<Attempt<IRelationType, RelationTypeOperationStatus>> CreateAsync(IRelationType relationType, Guid userKey);
+
+    /// <summary>
+    ///     Saves a <see cref="IRelationType" />
+    /// </summary>
+    /// <param name="relationType">RelationType to Save</param>
+    /// <param name="userKey">Key of the user thats saving the relation type</param>
+    /// <returns>A <see cref="Attempt"/> with a status of whether the operations was a success or failure</returns>
+    Task<Attempt<IRelationType, RelationTypeOperationStatus>> UpdateAsync(IRelationType relationType, Guid userKey);
+
+    /// <summary>
     ///     Deletes a <see cref="IRelation" />
     /// </summary>
     /// <param name="relation">Relation to Delete</param>
@@ -346,8 +374,22 @@ public interface IRelationService : IService
     void Delete(IRelationType relationType);
 
     /// <summary>
+    ///     Deletes a <see cref="IRelationType" />
+    /// </summary>
+    /// <param name="key">Key of the relation type to delete</param>
+    /// <param name="userKey">Key of the user that is deleting the relation type</param>
+    /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous operation.</placeholder></returns>
+    Task<Attempt<IRelationType?, RelationTypeOperationStatus>> DeleteAsync(Guid key, Guid userKey);
+
+    /// <summary>
     ///     Deletes all <see cref="IRelation" /> objects based on the passed in <see cref="IRelationType" />
     /// </summary>
     /// <param name="relationType"><see cref="IRelationType" /> to Delete Relations for</param>
     void DeleteRelationsOfType(IRelationType relationType);
+
+    /// <summary>
+    ///     Gets all allowed parent/child object types for a given <see cref="IRelationType" /> />
+    /// </summary>
+    /// <returns>All of the allowed <see cref="UmbracoObjectTypes"/>.</returns>
+    IEnumerable<UmbracoObjectTypes> GetAllowedObjectTypes();
 }

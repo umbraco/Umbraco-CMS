@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://learn.microsoft.com/en-us/dotnet/fundamentals/package-validation/diagnostic-ids -->
+<Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Web.BackOffice.Filters.FileUploadCleanupFilterAttribute</Target>
+    <Left>lib/net7.0/Umbraco.Web.BackOffice.dll</Left>
+    <Right>lib/net7.0/Umbraco.Web.BackOffice.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Web.BackOffice.Controllers.BackOfficeController.#ctor(Umbraco.Cms.Core.Security.IBackOfficeUserManager,Umbraco.Cms.Core.Services.IRuntimeState,Umbraco.Cms.Core.WebAssets.IRuntimeMinifier,Microsoft.Extensions.Options.IOptionsSnapshot{Umbraco.Cms.Core.Configuration.Models.GlobalSettings},Umbraco.Cms.Core.Hosting.IHostingEnvironment,Umbraco.Cms.Core.Services.ILocalizedTextService,Umbraco.Cms.Core.Configuration.Grid.IGridConfig,Umbraco.Cms.Web.BackOffice.Controllers.BackOfficeServerVariables,Umbraco.Cms.Core.Cache.AppCaches,Umbraco.Cms.Web.BackOffice.Security.IBackOfficeSignInManager,Umbraco.Cms.Core.Security.IBackOfficeSecurityAccessor,Microsoft.Extensions.Logging.ILogger{Umbraco.Cms.Web.BackOffice.Controllers.BackOfficeController},Umbraco.Cms.Core.Serialization.IJsonSerializer,Umbraco.Cms.Web.BackOffice.Security.IBackOfficeExternalLoginProviders,Microsoft.AspNetCore.Http.IHttpContextAccessor,Umbraco.Cms.Web.BackOffice.Security.IBackOfficeTwoFactorOptions,Umbraco.Cms.Core.Manifest.IManifestParser,Umbraco.Cms.Infrastructure.WebAssets.ServerVariablesParser,Microsoft.Extensions.Options.IOptions{Umbraco.Cms.Core.Configuration.Models.SecuritySettings})</Target>
+    <Left>lib/net7.0/Umbraco.Web.BackOffice.dll</Left>
+    <Right>lib/net7.0/Umbraco.Web.BackOffice.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Web.BackOffice.Controllers.ContentController.#ctor(Umbraco.Cms.Core.Dictionary.ICultureDictionary,Microsoft.Extensions.Logging.ILoggerFactory,Umbraco.Cms.Core.Strings.IShortStringHelper,Umbraco.Cms.Core.Events.IEventMessagesFactory,Umbraco.Cms.Core.Services.ILocalizedTextService,Umbraco.Cms.Core.PropertyEditors.PropertyEditorCollection,Umbraco.Cms.Core.Services.IContentService,Umbraco.Cms.Core.Services.IUserService,Umbraco.Cms.Core.Security.IBackOfficeSecurityAccessor,Umbraco.Cms.Core.Services.IContentTypeService,Umbraco.Cms.Core.Mapping.IUmbracoMapper,Umbraco.Cms.Core.Routing.IPublishedUrlProvider,Umbraco.Cms.Core.Services.IDomainService,Umbraco.Cms.Core.Services.IDataTypeService,Umbraco.Cms.Core.Services.ILocalizationService,Umbraco.Cms.Core.Services.IFileService,Umbraco.Cms.Core.Services.INotificationService,Umbraco.Cms.Core.Actions.ActionCollection,Umbraco.Cms.Infrastructure.Persistence.ISqlContext,Umbraco.Cms.Core.Serialization.IJsonSerializer,Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Microsoft.AspNetCore.Authorization.IAuthorizationService,Umbraco.Cms.Core.Services.IContentVersionService)</Target>
+    <Left>lib/net7.0/Umbraco.Web.BackOffice.dll</Left>
+    <Right>lib/net7.0/Umbraco.Web.BackOffice.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Web.BackOffice.Controllers.MediaController.PostAddFile(System.String,System.String,System.String,System.Collections.Generic.List{Microsoft.AspNetCore.Http.IFormFile})</Target>
+    <Left>lib/net7.0/Umbraco.Web.BackOffice.dll</Left>
+    <Right>lib/net7.0/Umbraco.Web.BackOffice.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Web.BackOffice.Controllers.TemplateController.#ctor(Umbraco.Cms.Core.Services.IFileService,Umbraco.Cms.Core.Mapping.IUmbracoMapper,Umbraco.Cms.Core.Strings.IShortStringHelper,Umbraco.Cms.Core.IO.IDefaultViewContentProvider)</Target>
+    <Left>lib/net7.0/Umbraco.Web.BackOffice.dll</Left>
+    <Right>lib/net7.0/Umbraco.Web.BackOffice.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Extensions.RuntimeMinifierExtensions.GetScriptForLoadingBackOfficeAsync(Umbraco.Cms.Core.WebAssets.IRuntimeMinifier,Umbraco.Cms.Core.Configuration.Models.GlobalSettings,Umbraco.Cms.Core.Hosting.IHostingEnvironment,Umbraco.Cms.Core.Manifest.IManifestParser)</Target>
+    <Left>lib/net7.0/Umbraco.Web.BackOffice.dll</Left>
+    <Right>lib/net7.0/Umbraco.Web.BackOffice.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+</Suppressions>

@@ -244,7 +244,7 @@ public class PropertyTypeGroupMapper<TPropertyType>
             IDataEditor? propertyEditor = _propertyEditors[propertyEditorAlias];
             IDataType? dataType = _dataTypeService.GetDataType(p.DataTypeId);
 
-            // fixme: Don't explode if we can't find this, log an error and change this to a label
+            // TODO: Don't explode if we can't find this, log an error and change this to a label
             if (propertyEditor == null)
             {
                 _logger.LogError(
@@ -255,7 +255,7 @@ public class PropertyTypeGroupMapper<TPropertyType>
             }
 
             IDictionary<string, object>? config = propertyEditor is null || dataType is null ? new Dictionary<string, object>()
-                : dataType.Editor?.GetConfigurationEditor().ToConfigurationEditor(dataType.Configuration);
+                : dataType.Editor?.GetConfigurationEditor().ToConfigurationEditor(dataType.ConfigurationData);
 
             mappedProperties.Add(new TPropertyType
             {

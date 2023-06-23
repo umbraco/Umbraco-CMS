@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -58,16 +55,16 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
         return textService.Object;
     }
 
-    private ILocalizationService GetLangService(params string[] isoCodes)
+    private ILanguageService GetLangService(params string[] isoCodes)
     {
         var allLangs = isoCodes
             .Select(CultureInfo.GetCultureInfo)
             .Select(culture => new Language(culture.Name, culture.EnglishName) { IsDefault = true, IsMandatory = true })
             .ToArray();
 
-        var langServiceMock = new Mock<ILocalizationService>();
-        langServiceMock.Setup(x => x.GetAllLanguages()).Returns(allLangs);
-        langServiceMock.Setup(x => x.GetDefaultLanguageIsoCode()).Returns(allLangs.First(x => x.IsDefault).IsoCode);
+        var langServiceMock = new Mock<ILanguageService>();
+        langServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(allLangs);
+        langServiceMock.Setup(x => x.GetDefaultIsoCodeAsync()).ReturnsAsync(allLangs.First(x => x.IsDefault).IsoCode);
 
         return langServiceMock.Object;
     }
@@ -77,7 +74,7 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         var content = ContentBuilder.CreateBasicContent(contentType);
-        content.Id = 1046; // FIXME: we are using this ID only because it's built into the test XML published cache
+        content.Id = 1046; // TODO: we are using this ID only because it's built into the test XML published cache
         content.Path = "-1,1046";
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("http://localhost:8000");
@@ -109,7 +106,7 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         var content = ContentBuilder.CreateBasicContent(contentType);
-        content.Id = 1046; // FIXME: we are using this ID only because it's built into the test XML published cache
+        content.Id = 1046; // TODO: we are using this ID only because it's built into the test XML published cache
         content.Path = "-1,1046";
         content.Published = true;
 
@@ -150,13 +147,13 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         var parent = ContentBuilder.CreateBasicContent(contentType);
-        parent.Id = 1046; // FIXME: we are using this ID only because it's built into the test XML published cache
+        parent.Id = 1046; // TODO: we are using this ID only because it's built into the test XML published cache
         parent.Name = "home";
         parent.Path = "-1,1046";
         parent.Published = true;
         var child = ContentBuilder.CreateBasicContent(contentType);
         child.Name = "sub1";
-        child.Id = 1173; // FIXME: we are using this ID only because it's built into the test XML published cache
+        child.Id = 1173; // TODO: we are using this ID only because it's built into the test XML published cache
         child.Path = "-1,1046,1173";
         child.Published = true;
 

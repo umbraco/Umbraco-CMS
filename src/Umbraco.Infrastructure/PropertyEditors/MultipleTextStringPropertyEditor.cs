@@ -3,7 +3,6 @@
 
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
@@ -101,7 +100,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
         /// </remarks>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            if (editorValue.Value is not JArray asArray || asArray.HasValues == false)
+            if (editorValue.Value is not IEnumerable<string> value)
             {
                 return null;
             }
@@ -112,40 +111,26 @@ public class MultipleTextStringPropertyEditor : DataEditor
                     $"editorValue.DataTypeConfiguration is {editorValue.DataTypeConfiguration?.GetType()} but must be {typeof(MultipleTextStringConfiguration)}");
             }
 
-            var max = config.Maximum;
+            var max = config.Max;
 
             // The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
-            IEnumerable<string?> array = asArray.OfType<JObject>()
-                .Where(x => x["value"] != null)
-                .Select(x => x["value"]!.Value<string>());
-
             // only allow the max if over 0
             if (max > 0)
             {
-                return string.Join(NewLine, array.Take(max));
+                return string.Join(NewLine, value.Take(max));
             }
 
-            return string.Join(NewLine, array);
+            return string.Join(NewLine, value);
         }
 
-        /// <summary>
-        ///     We are actually passing back an array of simple objects instead of an array of strings because in angular a
-        ///     primitive (string) value
-        ///     cannot have 2 way binding, so to get around that each item in the array needs to be an object with a string.
-        /// </summary>
-        /// <param name="property"></param>
-        /// <param name="culture"></param>
-        /// <param name="segment"></param>
-        /// <returns></returns>
-        /// <remarks>
-        ///     The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
-        /// </remarks>
         public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
-            var val = property.GetValue(culture, segment);
+            var value = property.GetValue(culture, segment);
 
-            return val?.ToString()?.Split(NewLineDelimiters, StringSplitOptions.None).Select(x => JObject.FromObject(new { value = x }))
-                ?? Array.Empty<JObject>();
+            // The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
+            return value is string stringValue
+                ? stringValue.Split(NewLineDelimiters, StringSplitOptions.None)
+                : Array.Empty<string>();
         }
     }
 
@@ -158,14 +143,11 @@ public class MultipleTextStringPropertyEditor : DataEditor
 
         public IEnumerable<ValidationResult> ValidateFormat(object? value, string valueType, string format)
         {
-            if (value is not JArray asArray)
+            if (value is not IEnumerable<string> textStrings)
             {
                 return Enumerable.Empty<ValidationResult>();
             }
 
-            IEnumerable<string?> textStrings = asArray.OfType<JObject>()
-                .Where(x => x["value"] != null)
-                .Select(x => x["value"]!.Value<string>());
             var textStringValidator = new RegexValidator(_localizedTextService);
             foreach (var textString in textStrings)
             {

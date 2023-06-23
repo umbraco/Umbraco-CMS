@@ -3,7 +3,6 @@
 
 #pragma warning disable SA1124 // Do not use regions (justification: regions are currently adding some useful organisation to this file)
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;

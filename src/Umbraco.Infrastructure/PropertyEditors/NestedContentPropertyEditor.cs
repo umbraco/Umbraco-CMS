@@ -28,6 +28,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Icon = "icon-thumbnail-list",
     ValueEditorIsReusable = false,
     IsDeprecated = true)]
+[Obsolete("Nested content is obsolete, will be removed in V13")]
 public class NestedContentPropertyEditor : DataEditor
 {
     public const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
@@ -115,9 +116,9 @@ public class NestedContentPropertyEditor : DataEditor
         }
 
         /// <inheritdoc />
-        public override object? Configuration
+        public override object? ConfigurationObject
         {
-            get => base.Configuration;
+            get => base.ConfigurationObject;
             set
             {
                 if (value == null)
@@ -132,7 +133,7 @@ public class NestedContentPropertyEditor : DataEditor
                         nameof(value));
                 }
 
-                base.Configuration = value;
+                base.ConfigurationObject = value;
 
                 HideLabel = configuration.HideLabel.TryConvertTo<bool>().Result;
             }
@@ -189,9 +190,9 @@ public class NestedContentPropertyEditor : DataEditor
                         continue;
                     }
 
-                    object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.Configuration;
+                    object? configurationObject = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.ConfigurationObject;
 
-                    result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
+                    result.AddRange(tagsProvider.GetTags(prop.Value.Value, configurationObject, languageId));
                 }
             }
 
@@ -225,7 +226,7 @@ public class NestedContentPropertyEditor : DataEditor
                         }
 
                         var tempConfig = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)
-                            ?.Configuration;
+                            ?.ConfigurationObject;
                         IDataValueEditor valEditor = propEditor.GetValueEditor(tempConfig);
                         var convValue = valEditor.ConvertDbToString(prop.Value.PropertyType, prop.Value.Value);
 
@@ -295,7 +296,7 @@ public class NestedContentPropertyEditor : DataEditor
                         var dataTypeId = prop.Value.PropertyType.DataTypeId;
                         if (!valEditors.TryGetValue(dataTypeId, out IDataValueEditor? valEditor))
                         {
-                            var tempConfig = _dataTypeService.GetDataType(dataTypeId)?.Configuration;
+                            var tempConfig = _dataTypeService.GetDataType(dataTypeId)?.ConfigurationObject;
                             valEditor = propEditor.GetValueEditor(tempConfig);
 
                             valEditors.Add(dataTypeId, valEditor);
@@ -347,7 +348,7 @@ public class NestedContentPropertyEditor : DataEditor
                 {
                     // Fetch the property types prevalue
                     var propConfiguration =
-                        _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
+                        _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.ConfigurationObject;
 
                     // Lookup the property editor
                     IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];

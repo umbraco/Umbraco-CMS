@@ -7,6 +7,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
+[Obsolete("Use IUserGroupAuthorizationService instead, should be removed alongside UserGroup controller in V13.")]
 internal class UserGroupEditorAuthorizationHelper
 {
     private readonly AppCaches _appCaches;

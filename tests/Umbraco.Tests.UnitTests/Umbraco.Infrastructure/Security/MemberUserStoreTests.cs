@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -235,14 +234,16 @@ public class MemberUserStoreTests
     public async Task GivenIDeleteUser_AndTheUserIsDeletedCorrectly_ThenIShouldGetASuccessResultAsync()
     {
         // arrange
+        var memberKey = new Guid("4B003A55-1DE9-4DEB-95A0-352FFC693D8F");
         var sut = CreateSut();
-        var fakeUser = new MemberIdentityUser(777);
+        var fakeUser = new MemberIdentityUser(777) { Key = memberKey };
         var fakeCancellationToken = CancellationToken.None;
 
         IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);
         IMember mockMember = new Member(fakeMemberType)
         {
             Id = 777,
+            Key = memberKey,
             Name = "fakeName",
             Email = "fakeemail@umbraco.com",
             Username = "fakeUsername",
@@ -250,6 +251,7 @@ public class MemberUserStoreTests
         };
 
         _mockMemberService.Setup(x => x.GetById(mockMember.Id)).Returns(mockMember);
+        _mockMemberService.Setup(x => x.GetByKey(mockMember.Key)).Returns(mockMember);
         _mockMemberService.Setup(x => x.Delete(mockMember));
 
         // act
@@ -258,7 +260,7 @@ public class MemberUserStoreTests
         // assert
         Assert.IsTrue(identityResult.Succeeded);
         Assert.IsTrue(!identityResult.Errors.Any());
-        _mockMemberService.Verify(x => x.GetById(mockMember.Id));
+        _mockMemberService.Verify(x => x.GetByKey(mockMember.Key));
         _mockMemberService.Verify(x => x.Delete(mockMember));
         _mockMemberService.VerifyNoOtherCalls();
     }

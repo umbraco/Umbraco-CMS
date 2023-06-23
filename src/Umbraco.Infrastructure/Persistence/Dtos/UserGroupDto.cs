@@ -14,11 +14,18 @@ public class UserGroupDto
     {
         UserGroup2AppDtos = new List<UserGroup2AppDto>();
         UserGroup2LanguageDtos = new List<UserGroup2LanguageDto>();
+        UserGroup2PermissionDtos = new List<UserGroup2PermissionDto>();
     }
 
     [Column("id")]
     [PrimaryKeyColumn(IdentitySeed = 6)]
     public int Id { get; set; }
+
+    [Column("key")]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    [Constraint(Default = SystemMethods.NewGuid)]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupKey")]
+    public Guid Key { get; set; }
 
     [Column("userGroupAlias")]
     [Length(200)]
@@ -70,6 +77,10 @@ public class UserGroupDto
     [ResultColumn]
     [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
     public List<UserGroup2LanguageDto> UserGroup2LanguageDtos { get; set; }
+
+    [ResultColumn]
+    [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
+    public List<UserGroup2PermissionDto> UserGroup2PermissionDtos { get; set; }
 
     /// <summary>
     ///     This is only relevant when this column is included in the results (i.e. GetUserGroupsWithUserCounts)

@@ -154,6 +154,49 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     public IUser? GetByUsername(string username, bool includeSecurityData) =>
         GetWith(sql => sql.Where<UserDto>(x => x.Login == username), includeSecurityData);
 
+    public IUser? GetForUpgradeByUsername(string username) => GetUpgradeUserWith(sql => sql.Where<UserDto>(x => x.Login == username));
+
+    public IUser? GetForUpgradeByEmail(string email) => GetUpgradeUserWith(sql => sql.Where<UserDto>(x => x.Email == email));
+
+    public IUser? GetForUpgrade(int id) => GetUpgradeUserWith(sql => sql.Where<UserDto>(x => x.Id == id));
+
+    private IUser? GetUpgradeUserWith(Action<Sql<ISqlContext>> with)
+    {
+        if (_runtimeState.Level != RuntimeLevel.Upgrade)
+        {
+            return null;
+        }
+
+        // We'll only return a user if we're in upgrade mode.
+        Sql<ISqlContext> sql = SqlContext.Sql()
+            .Select<UserDto>(
+                dto => dto.Id,
+                dto => dto.UserName,
+                dto => dto.Email,
+                dto => dto.Login,
+                dto => dto.Password,
+                dto => dto.PasswordConfig,
+                dto => dto.SecurityStampToken,
+                dto => dto.UserLanguage,
+                dto => dto.LastLockoutDate,
+                dto => dto.Disabled,
+                dto => dto.NoConsole)
+            .From<UserDto>();
+
+        with(sql);
+
+        UserDto? userDto = Database.Fetch<UserDto>(sql).FirstOrDefault();
+
+        if (userDto is null)
+        {
+            return null;
+        }
+
+        PerformGetReferencedDtos(new List<UserDto> { userDto });
+
+        return UserFactory.BuildEntity(_globalSettings, userDto);
+    }
+
     /// <summary>
     ///     Returns a user by id
     /// </summary>
@@ -265,7 +308,8 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         if (DateTime.UtcNow - found.LastValidatedUtc > _globalSettings.TimeOut)
         {
             //timeout detected, update the record
-            Logger.LogDebug("ClearLoginSession for sessionId {sessionId}", sessionId);ClearLoginSession(sessionId);
+            Logger.LogDebug("ClearLoginSession for sessionId {sessionId}", sessionId);
+            ClearLoginSession(sessionId);
             return false;
         }
 

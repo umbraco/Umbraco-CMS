@@ -16,8 +16,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.ManagementApi;
-using Umbraco.Cms.ManagementApi.Controllers.Install;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -77,10 +76,14 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
                 // Executes after the standard ConfigureServices method
                 builder.ConfigureTestServices(services =>
+                {
+                    services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
 
                     // Add a test auth scheme with a test auth handler to authn and assign the user
                     services.AddAuthentication(TestAuthHandler.TestAuthenticationScheme)
-                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.TestAuthenticationScheme, options => { }));
+                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                            TestAuthHandler.TestAuthenticationScheme, options => { });
+                });
             });
 
             Client = Factory.CreateClient(new WebApplicationFactoryClientOptions
@@ -240,6 +243,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .AddWebsite()
                 .AddUmbracoSqlServerSupport()
                 .AddUmbracoSqliteSupport()
+                .AddDeliveryApi()
                 .AddTestServices(TestHelper); // This is the important one!
 
             CustomTestSetup(builder);
@@ -251,7 +255,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         /// </summary>
         protected virtual void ConfigureTestServices(IServiceCollection services)
         {
-            
+
         }
 
         protected void Configure(IApplicationBuilder app)

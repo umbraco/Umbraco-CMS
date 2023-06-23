@@ -68,6 +68,7 @@ public class DatabaseSchemaCreator
         typeof(User2UserGroupDto),
         typeof(UserGroup2NodePermissionDto),
         typeof(UserGroup2AppDto),
+        typeof(UserGroup2PermissionDto),
         typeof(UserStartNodeDto),
         typeof(ContentNuDto),
         typeof(DocumentVersionDto),

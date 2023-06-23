@@ -124,6 +124,7 @@ public class EntityMapDefinition : IMapDefinition
     private static void Map(EntityBasic source, ContentTypeSort target, MapperContext context)
     {
         target.Alias = source.Alias;
+        target.Key = source.Key;
         target.Id = new Lazy<int>(() => Convert.ToInt32(source.Id));
     }
 

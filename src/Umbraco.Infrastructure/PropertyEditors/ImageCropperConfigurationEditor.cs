@@ -16,20 +16,19 @@ internal class ImageCropperConfigurationEditor : ConfigurationEditor<ImageCroppe
     {
     }
 
-    /// <inheritdoc />
-    public override IDictionary<string, object> ToValueEditor(object? configuration)
+    public override IDictionary<string, object> ToValueEditor(IDictionary<string, object> configuration)
     {
-        IDictionary<string, object> d = base.ToValueEditor(configuration);
-        if (!d.ContainsKey("focalPoint"))
+        IDictionary<string, object> config = base.ToValueEditor(configuration);
+        if (!config.ContainsKey("focalPoint"))
         {
-            d["focalPoint"] = new { left = 0.5, top = 0.5 };
+            config["focalPoint"] = new { left = 0.5, top = 0.5 };
         }
 
-        if (!d.ContainsKey("src"))
+        if (!config.ContainsKey("src"))
         {
-            d["src"] = string.Empty;
+            config["src"] = string.Empty;
         }
 
-        return d;
+        return config;
     }
 }

@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://learn.microsoft.com/en-us/dotnet/fundamentals/package-validation/diagnostic-ids -->
+<Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Web.Common.Profiler.WebProfiler.#ctor</Target>
+    <Left>lib/net7.0/Umbraco.Web.Common.dll</Left>
+    <Right>lib/net7.0/Umbraco.Web.Common.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Web.Common.Security.BackOfficeUserManager.#ctor(Umbraco.Cms.Core.Net.IIpResolver,Microsoft.AspNetCore.Identity.IUserStore{Umbraco.Cms.Core.Security.BackOfficeIdentityUser},Microsoft.Extensions.Options.IOptions{Umbraco.Cms.Core.Security.BackOfficeIdentityOptions},Microsoft.AspNetCore.Identity.IPasswordHasher{Umbraco.Cms.Core.Security.BackOfficeIdentityUser},System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.Identity.IUserValidator{Umbraco.Cms.Core.Security.BackOfficeIdentityUser}},System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.Identity.IPasswordValidator{Umbraco.Cms.Core.Security.BackOfficeIdentityUser}},Umbraco.Cms.Core.Security.BackOfficeErrorDescriber,System.IServiceProvider,Microsoft.AspNetCore.Http.IHttpContextAccessor,Microsoft.Extensions.Logging.ILogger{Microsoft.AspNetCore.Identity.UserManager{Umbraco.Cms.Core.Security.BackOfficeIdentityUser}},Microsoft.Extensions.Options.IOptions{Umbraco.Cms.Core.Configuration.Models.UserPasswordConfigurationSettings},Umbraco.Cms.Core.Events.IEventAggregator,Umbraco.Cms.Core.Security.IBackOfficeUserPasswordChecker)</Target>
+    <Left>lib/net7.0/Umbraco.Web.Common.dll</Left>
+    <Right>lib/net7.0/Umbraco.Web.Common.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0008</DiagnosticId>
+    <Target>T:Umbraco.Cms.Web.Common.FileProviders.WebRootFileProviderFactory</Target>
+    <Left>lib/net7.0/Umbraco.Web.Common.dll</Left>
+    <Right>lib/net7.0/Umbraco.Web.Common.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+</Suppressions>

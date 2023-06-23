@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Events;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Web.Common.Attributes;
@@ -129,15 +128,15 @@ public class LogViewerController : BackOfficeNotificationsController
     }
 
     [HttpGet]
-    public IEnumerable<SavedLogSearch>? GetSavedSearches() => _logViewer.GetSavedSearches();
+    public IEnumerable<SavedLogSearch> GetSavedSearches() => _logViewer.GetSavedSearches();
 
     [HttpPost]
-    public IEnumerable<SavedLogSearch>? PostSavedSearch(SavedLogSearch item) =>
+    public IEnumerable<SavedLogSearch> PostSavedSearch(SavedLogSearch item) =>
         _logViewer.AddSavedSearch(item.Name, item.Query);
 
     [HttpPost]
-    public IEnumerable<SavedLogSearch>? DeleteSavedSearch(SavedLogSearch item) =>
-        _logViewer.DeleteSavedSearch(item.Name, item.Query);
+    public IEnumerable<SavedLogSearch> DeleteSavedSearch(SavedLogSearch item) =>
+        _logViewer.DeleteSavedSearch(item.Name);
 
     [HttpGet]
     public ReadOnlyDictionary<string, LogEventLevel?> GetLogLevels() => _logLevelLoader.GetLogLevelsFromSinks();

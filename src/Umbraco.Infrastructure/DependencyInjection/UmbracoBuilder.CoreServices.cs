@@ -6,6 +6,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DeliveryApi.Accessors;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
@@ -29,17 +31,21 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.HealthChecks;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Mail;
+using Umbraco.Cms.Infrastructure.Manifest;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
@@ -113,8 +119,8 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
-        builder.Services.AddSingleton<IJsonSerializer, JsonNetSerializer>();
-        builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, ConfigurationEditorJsonSerializer>();
+        builder.Services.AddSingleton<IJsonSerializer, ContextualJsonSerializer>();
+        builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, ContextualConfigurationEditorJsonSerializer>();
         builder.Services.AddSingleton<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
 
         // register database builder
@@ -122,7 +128,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddTransient<DatabaseBuilder>();
 
         // register manifest parser, will be injected in collection builders where needed
-        builder.Services.AddSingleton<IManifestParser, ManifestParser>();
+        builder.Services.AddSingleton<ILegacyManifestParser, LegacyManifestParser>();
+        builder.Services.AddSingleton<IPackageManifestReader, AppPluginsFileProviderPackageManifestReader>();
+        builder.Services.AddSingleton<IPackageManifestService, PackageManifestService>();
 
         // register the manifest filter collection builder (collection is empty by default)
         builder.ManifestFilters();
@@ -175,6 +183,7 @@ public static partial class UmbracoBuilderExtensions
                 services.GetRequiredService<IEventAggregator>(),
                 services.GetService<INotificationHandler<SendEmailNotification>>(),
                 services.GetService<INotificationAsyncHandler<SendEmailNotification>>()));
+        builder.Services.AddTransient<IUserInviteSender, EmailUserInviteSender>();
 
 
         builder.Services.AddScoped<ITagQuery, TagQuery>();
@@ -210,8 +219,9 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
 
-
         builder.AddPropertyIndexValueFactories();
+
+        builder.AddDeliveryApiCoreServices();
 
         return builder;
     }
@@ -236,6 +246,7 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<ILoggingConfiguration>(),
             factory.GetRequiredService<ILogLevelLoader>(),
             Log.Logger));
+        builder.Services.AddSingleton<ILogViewerService, LogViewerService>();
 
         return builder;
     }
@@ -400,6 +411,29 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<UserDeletedNotification, AuditNotificationsHandler>()
             .AddNotificationHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
             .AddNotificationHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
+
+        return builder;
+    }
+
+    private static IUmbracoBuilder AddDeliveryApiCoreServices(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<IApiElementBuilder, ApiElementBuilder>();
+        builder.Services.AddSingleton<IApiContentBuilder, ApiContentBuilder>();
+        builder.Services.AddSingleton<IApiContentResponseBuilder, ApiContentResponseBuilder>();
+        builder.Services.AddSingleton<IApiMediaBuilder, ApiMediaBuilder>();
+        builder.Services.AddSingleton<IApiContentNameProvider, ApiContentNameProvider>();
+        builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, NoopOutputExpansionStrategyAccessor>();
+        builder.Services.AddSingleton<IRequestStartItemProviderAccessor, NoopRequestStartItemProviderAccessor>();
+        builder.Services.AddSingleton<IRequestCultureService, NoopRequestCultureService>();
+        builder.Services.AddSingleton<IRequestRoutingService, NoopRequestRoutingService>();
+        builder.Services.AddSingleton<IRequestRedirectService, NoopRequestRedirectService>();
+        builder.Services.AddSingleton<IRequestPreviewService, NoopRequestPreviewService>();
+        builder.Services.AddSingleton<IApiAccessService, NoopApiAccessService>();
+        builder.Services.AddSingleton<IApiContentQueryService, NoopApiContentQueryService>();
+        builder.Services.AddSingleton<IApiMediaUrlProvider, ApiMediaUrlProvider>();
+        builder.Services.AddSingleton<IApiContentRouteBuilder, ApiContentRouteBuilder>();
+        builder.Services.AddSingleton<IApiPublishedContentCache, ApiPublishedContentCache>();
+        builder.Services.AddSingleton<IApiRichTextParser, ApiRichTextParser>();
 
         return builder;
     }

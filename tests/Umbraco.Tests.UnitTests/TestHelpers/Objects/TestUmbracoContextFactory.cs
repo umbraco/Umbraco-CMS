@@ -7,6 +7,7 @@ using Moq;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Web.Common.AspNetCore;
@@ -68,7 +69,8 @@ public class TestUmbracoContextFactory
             hostingEnvironment,
             new UriUtility(hostingEnvironment),
             new AspNetCoreCookieManager(httpContextAccessor),
-            httpContextAccessor);
+            httpContextAccessor,
+            Mock.Of<IWebProfilerService>());
 
         return umbracoContextFactory;
     }

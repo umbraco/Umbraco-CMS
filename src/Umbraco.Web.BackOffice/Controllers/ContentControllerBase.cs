@@ -121,24 +121,11 @@ public abstract class ContentControllerBase : BackOfficeNotificationsController
             // get the property
             IProperty property = contentItem.PersistedContent.Properties[propertyDto.Alias]!;
 
-            // prepare files, if any matching property and culture
-            ContentPropertyFile[] files = contentItem.UploadedFiles
-                .Where(x => x.PropertyAlias == propertyDto.Alias && x.Culture == propertyDto.Culture &&
-                            x.Segment == propertyDto.Segment)
-                .ToArray();
-
-            foreach (ContentPropertyFile file in files)
-            {
-                file.FileName = file.FileName?.ToSafeFileName(ShortStringHelper);
-            }
-
-
             // create the property data for the property editor
-            var data = new ContentPropertyData(propertyDto.Value, propertyDto.DataType?.Configuration)
+            var data = new ContentPropertyData(propertyDto.Value, propertyDto.DataType?.ConfigurationObject)
             {
                 ContentKey = contentItem.PersistedContent!.Key,
-                PropertyTypeKey = property.PropertyType.Key,
-                Files = files
+                PropertyTypeKey = property.PropertyType.Key
             };
 
             // let the editor convert the value that was received, deal with files, etc
@@ -151,7 +138,7 @@ public abstract class ContentControllerBase : BackOfficeNotificationsController
             if (tagAttribute is not null && valueEditor is not IDataValueTags)
             {
                 TagConfiguration? tagConfiguration =
-                    ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyDto.DataType?.Configuration);
+                    ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyDto.DataType?.ConfigurationObject);
                 if (tagConfiguration is not null && tagConfiguration.Delimiter == default)
                 {
                     tagConfiguration.Delimiter = tagAttribute.Delimiter;

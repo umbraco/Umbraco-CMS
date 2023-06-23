@@ -63,7 +63,7 @@ public interface IDataEditor : IDiscoverable
     /// <summary>
     ///     Gets a configured value editor.
     /// </summary>
-    IDataValueEditor GetValueEditor(object? configuration);
+    IDataValueEditor GetValueEditor(object? configurationObject);
 
     /// <summary>
     ///     Gets an editor to edit the value editor configuration.

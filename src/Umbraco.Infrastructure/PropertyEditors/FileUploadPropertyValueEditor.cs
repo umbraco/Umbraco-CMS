@@ -5,9 +5,11 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -18,6 +20,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal class FileUploadPropertyValueEditor : DataValueEditor
 {
     private readonly MediaFileManager _mediaFileManager;
+    private readonly ITemporaryFileService _temporaryFileService;
+    private readonly IScopeProvider _scopeProvider;
     private ContentSettings _contentSettings;
 
     public FileUploadPropertyValueEditor(
@@ -27,12 +31,22 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         IShortStringHelper shortStringHelper,
         IOptionsMonitor<ContentSettings> contentSettings,
         IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper)
+        IIOHelper ioHelper,
+        ITemporaryFileService temporaryFileService,
+        IScopeProvider scopeProvider)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
+        _temporaryFileService = temporaryFileService;
+        _scopeProvider = scopeProvider;
         _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
         contentSettings.OnChange(x => _contentSettings = x);
+
+        Validators.Add(new TemporaryFileUploadValidator(
+            () => _contentSettings,
+            TryParseTemporaryFileKey,
+            TryGetTemporaryFile,
+            IsAllowedInDataTypeConfiguration));
     }
 
     /// <summary>
@@ -44,108 +58,125 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     /// <remarks>
     ///     <para>The <paramref name="currentValue" /> is used to re-use the folder, if possible.</para>
     ///     <para>
-    ///         The <paramref name="editorValue" /> is value passed in from the editor. We normally don't care what
-    ///         the editorValue.Value is set to because we are more interested in the files collection associated with it,
-    ///         however we do care about the value if we are clearing files. By default the editorValue.Value will just
-    ///         be set to the name of the file - but again, we just ignore this and deal with the file collection in
-    ///         editorValue.AdditionalData.ContainsKey("files")
-    ///     </para>
-    ///     <para>
-    ///         We only process ONE file. We understand that the current value may contain more than one file,
-    ///         and that more than one file may be uploaded, so we take care of them all, but we only store ONE file.
-    ///         Other places (FileUploadPropertyEditor...) do NOT deal with multiple files, and our logic for reusing
-    ///         folders would NOT work, etc.
+    ///         The <paramref name="editorValue" /> is value passed in from the editor. If the value is empty, we
+    ///         must delete the currently selected file (<paramref name="currentValue" />). If the value is not empty,
+    ///         it is assumed to contain a temporary file key, and we will attempt to replace the currently selected
+    ///         file with the corresponding temporary file.
     ///     </para>
     /// </remarks>
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        var currentPath = currentValue as string;
-        if (!currentPath.IsNullOrWhiteSpace())
+        var currentStringValue = currentValue as string;
+        currentStringValue = currentStringValue.NullOrWhiteSpaceAsNull();
+
+        var editorStringValue = editorValue.Value as string;
+        editorStringValue = editorStringValue.NullOrWhiteSpaceAsNull();
+
+        // no change?
+        if (editorStringValue == currentStringValue)
         {
-            currentPath = _mediaFileManager.FileSystem.GetRelativePath(currentPath!);
+            return currentValue;
         }
 
-        string? editorFile = null;
-        if (editorValue.Value != null)
+        var currentPath = currentStringValue;
+        if (currentPath.IsNullOrWhiteSpace() == false)
         {
-            editorFile = editorValue.Value as string;
+            currentPath = _mediaFileManager.FileSystem.GetRelativePath(currentPath);
         }
+
+        // resetting the current value?
+        if (editorStringValue is null && currentPath.IsNullOrWhiteSpace() is false)
+        {
+            // delete the current file and clear the value of this property
+            _mediaFileManager.FileSystem.DeleteFile(currentPath);
+            return null;
+        }
+
+        // uploading a file?
+        if (Guid.TryParse(editorStringValue, out Guid temporaryFileKey) == false)
+        {
+            return editorStringValue;
+        }
+
+        TemporaryFileModel? file = TryGetTemporaryFile(temporaryFileKey);
+        if (file == null)
+        {
+            // at this point the temporary file *should* have been validated by TemporaryFileUploadValidator, so we
+            // should never end up here. In case we do, let's attempt to at least be non-destructive by returning
+            // the current value
+            return currentValue;
+        }
+
+        // schedule temporary file for deletion
+        using IScope scope = _scopeProvider.CreateScope();
+        _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileKey, _scopeProvider);
 
         // ensure we have the required guids
-        Guid cuid = editorValue.ContentKey;
-        if (cuid == Guid.Empty)
+        Guid contentKey = editorValue.ContentKey;
+        if (contentKey == Guid.Empty)
         {
             throw new Exception("Invalid content key.");
         }
 
-        Guid puid = editorValue.PropertyTypeKey;
-        if (puid == Guid.Empty)
+        Guid propertyTypeKey = editorValue.PropertyTypeKey;
+        if (propertyTypeKey == Guid.Empty)
         {
             throw new Exception("Invalid property type key.");
         }
 
-        ContentPropertyFile[]? uploads = editorValue.Files;
-        if (uploads == null)
-        {
-            throw new Exception("Invalid files.");
-        }
-
-        ContentPropertyFile? file = uploads.Length > 0 ? uploads[0] : null;
-
-        // not uploading a file
-        if (file == null)
-        {
-            // if editorFile is empty then either there was nothing to begin with,
-            // or it has been cleared and we need to remove the file - else the
-            // value is unchanged.
-            if (string.IsNullOrWhiteSpace(editorFile) && string.IsNullOrWhiteSpace(currentPath) == false)
-            {
-                _mediaFileManager.FileSystem.DeleteFile(currentPath);
-                return null; // clear
-            }
-
-            return currentValue; // unchanged
-        }
-
         // process the file
-        var filepath = editorFile == null ? null : ProcessFile(file, editorValue.DataTypeConfiguration, cuid, puid);
-
-        // remove all temp files
-        foreach (ContentPropertyFile f in uploads)
-        {
-            File.Delete(f.TempFilePath);
-        }
+        var filepath = ProcessFile(file, editorValue.DataTypeConfiguration, contentKey, propertyTypeKey);
 
         // remove current file if replaced
-        if (currentPath != filepath && string.IsNullOrWhiteSpace(currentPath) == false)
+        if (currentPath != filepath && currentPath.IsNullOrWhiteSpace() is false)
         {
             _mediaFileManager.FileSystem.DeleteFile(currentPath);
         }
 
-        // update json and return
-        if (editorFile == null)
-        {
-            return null;
-        }
+        scope.Complete();
 
-        return filepath == null ? string.Empty : _mediaFileManager.FileSystem.GetUrl(filepath);
+        return filepath == null ? null : _mediaFileManager.FileSystem.GetUrl(filepath);
     }
 
-    private string? ProcessFile(ContentPropertyFile file, object? dataTypeConfiguration, Guid cuid, Guid puid)
+    private Guid? TryParseTemporaryFileKey(object? editorValue)
+        => editorValue is string stringValue && Guid.TryParse(stringValue, out Guid temporaryFileKey)
+            ? temporaryFileKey
+            : null;
+
+    private TemporaryFileModel? TryGetTemporaryFile(Guid temporaryFileKey)
+        => _temporaryFileService.GetAsync(temporaryFileKey).GetAwaiter().GetResult();
+
+    private bool IsAllowedInDataTypeConfiguration(string extension, object? dataTypeConfiguration)
+    {
+        if (dataTypeConfiguration is FileUploadConfiguration fileUploadConfiguration)
+        {
+            // If FileExtensions is empty and no allowed extensions have been specified, we allow everything.
+            // If there are any extensions specified, we need to check that the uploaded extension is one of them.
+            return fileUploadConfiguration.FileExtensions.IsCollectionEmpty() ||
+                   fileUploadConfiguration.FileExtensions.Any(x => x.Value?.InvariantEquals(extension) ?? false);
+        }
+
+        return false;
+    }
+
+    private string? ProcessFile(TemporaryFileModel file, object? dataTypeConfiguration, Guid contentKey, Guid propertyTypeKey)
     {
         // process the file
         // no file, invalid file, reject change
-        if (UploadFileTypeValidator.IsValidFileExtension(file.FileName, _contentSettings) is false ||
-            UploadFileTypeValidator.IsAllowedInDataTypeConfiguration(file.FileName, dataTypeConfiguration) is false)
+        // this check is somewhat redundant as the file validity has already been checked by TemporaryFileUploadValidator,
+        // but we'll retain it here as a last measure in case someone accidentally breaks the validator
+        var extension = Path.GetExtension(file.FileName).TrimStart('.');
+        if (_contentSettings.IsFileAllowedForUpload(extension) is false ||
+            IsAllowedInDataTypeConfiguration(extension, dataTypeConfiguration) is false)
         {
             return null;
         }
 
         // get the filepath
         // in case we are using the old path scheme, try to re-use numbers (bah...)
-        var filepath = _mediaFileManager.GetMediaPath(file.FileName, cuid, puid); // fs-relative path
+        var filepath = _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey); // fs-relative path
 
-        using (FileStream filestream = File.OpenRead(file.TempFilePath))
+        using (Stream filestream = file.OpenReadStream())
         {
             // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
             // since we'd need to be able to return values for other properties from these methods

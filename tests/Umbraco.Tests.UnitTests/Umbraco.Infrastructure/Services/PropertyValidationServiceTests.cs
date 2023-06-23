@@ -31,7 +31,7 @@ public class PropertyValidationServiceTests
 
         var dataTypeService = new Mock<IDataTypeService>();
         var dataType = Mock.Of<IDataType>(
-            x => x.Configuration == string.Empty // irrelevant but needs a value
+            x => x.ConfigurationObject == string.Empty // irrelevant but needs a value
                  && x.DatabaseType == ValueStorageType.Nvarchar
                  && x.EditorAlias == Constants.PropertyEditors.Aliases.TextBox);
         dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>())).Returns(() => dataType);

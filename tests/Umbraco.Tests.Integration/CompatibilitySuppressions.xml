@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://learn.microsoft.com/en-us/dotnet/fundamentals/package-validation/diagnostic-ids -->
+<Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.DataTypeServiceTests.DataTypeService_Can_Persist_New_DataTypeDefinition</Target>
+    <Left>lib/net7.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net7.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.LocalizationServiceTests.Can_Create_DictionaryItem_At_Root_With_Identity</Target>
+    <Left>lib/net7.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net7.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.UrlAndDomains.DomainAndUrlsTests.Having_three_cultures_and_set_domain_on_all_of_them</Target>
+    <Left>lib/net7.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net7.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.UrlAndDomains.DomainAndUrlsTests.Having_three_cultures_but_set_domain_on_a_non_default_language</Target>
+    <Left>lib/net7.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net7.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+</Suppressions>

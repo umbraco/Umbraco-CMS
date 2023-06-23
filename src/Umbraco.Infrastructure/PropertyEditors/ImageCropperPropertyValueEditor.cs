@@ -1,20 +1,20 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
-using File = System.IO.File;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -26,7 +26,10 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
     private readonly IDataTypeService _dataTypeService;
     private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
+    private readonly IJsonSerializer _jsonSerializer;
     private ContentSettings _contentSettings;
+    private readonly ITemporaryFileService _temporaryFileService;
+    private readonly IScopeProvider _scopeProvider;
 
     public ImageCropperPropertyValueEditor(
         DataEditorAttribute attribute,
@@ -37,14 +40,21 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         IOptionsMonitor<ContentSettings> contentSettings,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
-        IDataTypeService dataTypeService)
+        IDataTypeService dataTypeService,
+        ITemporaryFileService temporaryFileService,
+        IScopeProvider scopeProvider)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+        _jsonSerializer = jsonSerializer;
         _contentSettings = contentSettings.CurrentValue;
         _dataTypeService = dataTypeService;
+        _temporaryFileService = temporaryFileService;
+        _scopeProvider = scopeProvider;
         contentSettings.OnChange(x => _contentSettings = x);
+
+        Validators.Add(new TemporaryFileUploadValidator(() => _contentSettings, TryParseTemporaryFileKey, TryGetTemporaryFile));
     }
 
     /// <summary>
@@ -62,7 +72,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         ImageCropperValue? value;
         try
         {
-            value = JsonConvert.DeserializeObject<ImageCropperValue>(val.ToString()!);
+            value = _jsonSerializer.Deserialize<ImageCropperValue>(val.ToString()!);
         }
         catch
         {
@@ -70,7 +80,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         }
 
         IDataType? dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
-        if (dataType?.Configuration != null)
+        if (dataType?.ConfigurationObject != null)
         {
             value?.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperConfiguration>());
         }
@@ -87,8 +97,10 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
     /// <remarks>
     ///     <para>The <paramref name="currentValue" /> is used to re-use the folder, if possible.</para>
     ///     <para>
-    ///         editorValue.Value is used to figure out editorFile and, if it has been cleared, remove the old file - but
-    ///         it is editorValue.AdditionalData["files"] that is used to determine the actual file that has been uploaded.
+    ///         editorValue.Value is used to figure out editorFile and, if it has been cleared, remove the old file.
+    ///         If editorValue.Value deserializes as <see cref="ImageCropperValue"/> and the <see cref="ImageCropperValue.Src"/>
+    ///         value is a GUID, it is assumed to contain a temporary file key, and we will attempt to replace the currently
+    ///         selected file with the corresponding temporary file.
     ///     </para>
     /// </remarks>
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
@@ -97,17 +109,16 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         var currentPath = string.Empty;
         try
         {
-            var svalue = currentValue as string;
-            JObject? currentJson = string.IsNullOrWhiteSpace(svalue) ? null : JObject.Parse(svalue);
-            if (currentJson != null && currentJson.TryGetValue("src", out JToken? src))
+            if (currentValue is string currentStringValue)
             {
-                currentPath = src.Value<string>();
+                ImageCropperValue? currentImageCropperValue = _jsonSerializer.Deserialize<ImageCropperValue>(currentStringValue);
+                currentPath = currentImageCropperValue?.Src;
             }
         }
         catch (Exception ex)
         {
             // For some reason the value is invalid so continue as if there was no value there
-            _logger.LogWarning(ex, "Could not parse current db value to a JObject.");
+            _logger.LogWarning(ex, "Could not parse current db value to an ImageCropperValue object.");
         }
 
         if (string.IsNullOrWhiteSpace(currentPath) == false)
@@ -115,71 +126,47 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             currentPath = _mediaFileManager.FileSystem.GetRelativePath(currentPath);
         }
 
-        // Get the new JSON and file path
-        var editorFile = string.Empty;
-        var editorJson = (JObject?)editorValue.Value;
-        if (editorJson is not null)
-        {
-            // Populate current file
-            if (editorJson["src"] != null)
-            {
-                editorFile = editorJson["src"]?.Value<string>();
-            }
-
-            // Clean up redundant/default data
-            ImageCropperValue.Prune(editorJson);
-        }
-        else
-        {
-            editorJson = null;
-        }
+        ImageCropperValue? editorImageCropperValue = TryParseImageCropperValue(editorValue.Value);
 
         // ensure we have the required guids
-        Guid cuid = editorValue.ContentKey;
-        if (cuid == Guid.Empty)
+        Guid contentKey = editorValue.ContentKey;
+        if (contentKey == Guid.Empty)
         {
             throw new Exception("Invalid content key.");
         }
 
-        Guid puid = editorValue.PropertyTypeKey;
-        if (puid == Guid.Empty)
+        Guid propertyTypeKey = editorValue.PropertyTypeKey;
+        if (propertyTypeKey == Guid.Empty)
         {
             throw new Exception("Invalid property type key.");
         }
 
-        // editorFile is empty whenever a new file is being uploaded
-        // or when the file is cleared (in which case editorJson is null)
-        // else editorFile contains the unchanged value
-        ContentPropertyFile[]? uploads = editorValue.Files;
-        if (uploads == null)
-        {
-            throw new Exception("Invalid files.");
-        }
+        using IScope scope = _scopeProvider.CreateScope();
 
-        ContentPropertyFile? file = uploads.Length > 0 ? uploads[0] : null;
+        TemporaryFileModel? file = null;
+        Guid? temporaryFileKey = TryParseTemporaryFileKey(editorImageCropperValue);
+        if (temporaryFileKey.HasValue)
+        {
+            file = TryGetTemporaryFile(temporaryFileKey.Value);
+            _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileKey.Value, _scopeProvider);
+        }
 
         if (file == null) // not uploading a file
         {
             // if editorFile is empty then either there was nothing to begin with,
             // or it has been cleared and we need to remove the file - else the
             // value is unchanged.
-            if (string.IsNullOrWhiteSpace(editorFile) && string.IsNullOrWhiteSpace(currentPath) == false)
+            if (string.IsNullOrWhiteSpace(editorImageCropperValue?.Src) && string.IsNullOrWhiteSpace(currentPath) is false)
             {
                 _mediaFileManager.FileSystem.DeleteFile(currentPath);
                 return null; // clear
             }
 
-            return editorJson?.ToString(Formatting.None); // unchanged
+            return _jsonSerializer.Serialize(editorImageCropperValue); // unchanged
         }
 
         // process the file
-        var filepath = editorJson == null ? null : ProcessFile(file, cuid, puid);
-
-        // remove all temp files
-        foreach (ContentPropertyFile f in uploads)
-        {
-            File.Delete(f.TempFilePath);
-        }
+        var filepath = editorImageCropperValue == null ? null : ProcessFile(file, contentKey, propertyTypeKey);
 
         // remove current file if replaced
         if (currentPath != filepath && string.IsNullOrWhiteSpace(currentPath) == false)
@@ -187,14 +174,16 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             _mediaFileManager.FileSystem.DeleteFile(currentPath);
         }
 
+        scope.Complete();
+
         // update json and return
-        if (editorJson == null)
+        if (editorImageCropperValue == null)
         {
             return null;
         }
 
-        editorJson["src"] = filepath == null ? string.Empty : _mediaFileManager.FileSystem.GetUrl(filepath);
-        return editorJson.ToString(Formatting.None);
+        editorImageCropperValue.Src = filepath is null ? string.Empty : _mediaFileManager.FileSystem.GetUrl(filepath);
+        return _jsonSerializer.Serialize(editorImageCropperValue);
     }
 
     public override string ConvertDbToString(IPropertyType propertyType, object? value)
@@ -216,25 +205,63 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             ?.ConfigurationAs<ImageCropperConfiguration>();
         ImageCropperConfiguration.Crop[] crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.Crop>();
 
-        return JsonConvert.SerializeObject(
-            new { src = val, crops },
-            new JsonSerializerSettings { Formatting = Formatting.None, NullValueHandling = NullValueHandling.Ignore });
+        return _jsonSerializer.Serialize(new { src = val, crops });
     }
 
-    private string? ProcessFile(ContentPropertyFile file, Guid cuid, Guid puid)
+    private ImageCropperValue? TryParseImageCropperValue(object? editorValue)
+    {
+        // FIXME: consider creating an object deserialization method on IJsonSerializer instead of relying on deserializing serialized JSON here (and likely other places as well)
+        if (editorValue is JsonObject jsonObject)
+        {
+            try
+            {
+                ImageCropperValue? imageCropperValue = _jsonSerializer.Deserialize<ImageCropperValue>(jsonObject.ToJsonString());
+                imageCropperValue?.Prune();
+                return imageCropperValue;
+            }
+            catch (Exception ex)
+            {
+                // For some reason the value is invalid - log error and continue as if no value was saved
+                _logger.LogWarning(ex, "Could not parse editor value to an ImageCropperValue object.");
+            }
+        }
+
+        return null;
+    }
+
+    private Guid? TryParseTemporaryFileKey(object? editorValue)
+    {
+        ImageCropperValue? imageCropperValue = TryParseImageCropperValue(editorValue);
+        return imageCropperValue != null
+            ? TryParseTemporaryFileKey(imageCropperValue)
+            : null;
+    }
+
+    private Guid? TryParseTemporaryFileKey(ImageCropperValue? editorValue)
+        => Guid.TryParse(editorValue?.Src, out Guid temporaryFileKey)
+            ? temporaryFileKey
+            : null;
+
+    private TemporaryFileModel? TryGetTemporaryFile(Guid temporaryFileKey)
+        => _temporaryFileService.GetAsync(temporaryFileKey).GetAwaiter().GetResult();
+
+    private string? ProcessFile(TemporaryFileModel file, Guid contentKey, Guid propertyTypeKey)
     {
         // process the file
         // no file, invalid file, reject change
-        if (UploadFileTypeValidator.IsValidFileExtension(file.FileName, _contentSettings) == false)
+        // this check is somewhat redundant as the file validity has already been checked by TemporaryFileUploadValidator,
+        // but we'll retain it here as a last measure in case someone accidentally breaks the validator
+        var extension = Path.GetExtension(file.FileName).TrimStart('.');
+        if (_contentSettings.IsFileAllowedForUpload(extension) is false)
         {
             return null;
         }
 
         // get the filepath
         // in case we are using the old path scheme, try to re-use numbers (bah...)
-        var filepath = _mediaFileManager.GetMediaPath(file.FileName, cuid, puid); // fs-relative path
+        var filepath = _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey); // fs-relative path
 
-        using (FileStream filestream = File.OpenRead(file.TempFilePath))
+        using (Stream filestream = file.OpenReadStream())
         {
             // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
             // since we'd need to be able to return values for other properties from these methods

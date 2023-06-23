@@ -36,9 +36,7 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
     {
         base.Map(originalProp, dest, context);
 
-        var config = originalProp.PropertyType is null
-            ? null
-            : DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId)?.Configuration;
+        IDataType? dataType = DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId);
 
         // TODO: IDataValueEditor configuration - general issue
         // GetValueEditor() returns a non-configured IDataValueEditor
@@ -47,7 +45,7 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
         // - does it make any sense to use a IDataValueEditor without configuring it?
 
         // configure the editor for display with configuration
-        IDataValueEditor? valEditor = dest.PropertyEditor?.GetValueEditor(config);
+        IDataValueEditor? valEditor = dest.PropertyEditor?.GetValueEditor(dataType?.ConfigurationObject);
 
         // set the display properties after mapping
         dest.Alias = originalProp.Alias;
@@ -75,7 +73,10 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
         else
         {
             // let the property editor format the pre-values
-            dest.Config = dest.PropertyEditor.GetConfigurationEditor().ToValueEditor(config);
+            if (dataType != null)
+            {
+                dest.Config = dest.PropertyEditor.GetConfigurationEditor().ToValueEditor(dataType.ConfigurationData);
+            }
             dest.View = valEditor?.View;
         }
 

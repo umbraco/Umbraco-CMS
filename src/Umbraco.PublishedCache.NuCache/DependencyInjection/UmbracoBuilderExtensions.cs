@@ -26,7 +26,6 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddNuCache(this IUmbracoBuilder builder)
     {
-        // register the NuCache database data source
         builder.Services.TryAddSingleton<INuCacheContentRepository, NuCacheContentRepository>();
         builder.Services.TryAddSingleton<INuCacheContentService, NuCacheContentService>();
         builder.Services.TryAddSingleton<PublishedSnapshotServiceEventHandler>();

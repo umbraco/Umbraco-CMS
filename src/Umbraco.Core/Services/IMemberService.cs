@@ -248,6 +248,15 @@ public interface IMemberService : IMembershipMemberService
     IEnumerable<IMember> GetAllMembers(params int[] ids);
 
     /// <summary>
+    ///     Gets <see cref="IMember" /> objects by Ids
+    /// </summary>
+    /// <param name="ids">Ids of the Member to retrieve</param>
+    /// <returns>
+    ///     <see cref="IMember" />
+    /// </returns>
+    Task<IEnumerable<IMember>> GetByKeysAsync(params Guid[] ids);
+
+    /// <summary>
     ///     Delete Members of the specified MemberType id
     /// </summary>
     /// <param name="memberTypeId">Id of the MemberType</param>

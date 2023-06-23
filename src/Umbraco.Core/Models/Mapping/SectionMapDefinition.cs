@@ -20,7 +20,7 @@ public class SectionMapDefinition : IMapDefinition
         // this is for AutoMapper ReverseMap - but really?
         mapper.Define<Section, ContentSection>();
         mapper.Define<Section, ContentSection>();
-        mapper.Define<Section, ManifestSection>(Map);
+        mapper.Define<Section, LegacyManifestSection>(Map);
         mapper.Define<Section, MediaSection>();
         mapper.Define<Section, MembersSection>();
         mapper.Define<Section, PackagesSection>();
@@ -30,7 +30,7 @@ public class SectionMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(Section source, ManifestSection target, MapperContext context)
+    private static void Map(Section source, LegacyManifestSection target, MapperContext context)
     {
         target.Alias = source.Alias;
         target.Name = source.Name;

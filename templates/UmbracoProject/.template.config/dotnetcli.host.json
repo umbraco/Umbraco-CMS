@@ -3,7 +3,8 @@
   "symbolInfo": {
     "Framework": {
       "longName": "Framework",
-      "shortName": "F"
+      "shortName": "F",
+      "isHidden": true
     },
     "UmbracoVersion": {
       "longName": "version",
@@ -55,14 +56,15 @@
     },
     "PackageProjectName": {
       "longName": "PackageTestSiteName",
-      "shortName": "p"
+      "shortName": "p",
+      "isHidden": true
     }
   },
   "usageExamples": [
-    "dotnet new umbraco -n MyNewProject",
-    "dotnet new umbraco -n MyNewProject --no-restore",
-    "dotnet new umbraco -n MyNewProject --development-database-type SQLite",
-    "dotnet new umbraco -n MyNewProject --development-database-type LocalDB",
-    "dotnet new umbraco -n MyNewProject --friendly-name \"Friendly Admin User\" --email admin@example.com --password password1234 --connection-string \"Server=ConnectionStringHere\""
+    "dotnet new umbraco --name MyNewProject",
+    "dotnet new umbraco --name MyNewProject --no-restore",
+    "dotnet new umbraco --name MyNewProject --development-database-type SQLite",
+    "dotnet new umbraco --name MyNewProject --development-database-type LocalDB",
+    "dotnet new umbraco --name MyNewProject --friendly-name \"Administrator\" --email admin@example.com --password 1234567890 --connection-string \"Server=(local);Database=MyNewProject;Trusted_Connection=True;\""
   ]
 }

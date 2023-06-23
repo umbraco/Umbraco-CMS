@@ -1,8 +1,3 @@
-using Umbraco.Search.DependencyInjection;
-using Umbraco.Search.Examine;
-using Umbraco.Search.Examine.Lucene.DependencyInjection;
-using Umbraco.Search.Examine.TBD;
-
 namespace Umbraco.Cms.Web.UI
 {
     public class Startup
@@ -37,8 +32,7 @@ namespace Umbraco.Cms.Web.UI
             services.AddUmbraco(_env, _config)
                 .AddBackOffice()
                 .AddWebsite()
-                .AddSearchServices()
-                .AddExamineLuceneIndexes()
+                .AddDeliveryApi()
                 .AddComposers()
                 .Build();
         }
@@ -63,7 +57,6 @@ namespace Umbraco.Cms.Web.UI
                 .WithMiddleware(u =>
                 {
                     u.UseBackOffice();
-
                     u.UseWebsite();
                 })
                 .WithEndpoints(u =>

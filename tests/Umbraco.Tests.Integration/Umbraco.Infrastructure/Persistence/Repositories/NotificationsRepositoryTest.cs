@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Globalization;
 using System.Linq;
 using Moq;
@@ -147,6 +146,7 @@ public class NotificationsRepositoryTest : UmbracoIntegrationTest
             {
                 var userDto = new UserDto
                 {
+                    Key = Guid.NewGuid(),
                     Email = "test" + i,
                     Login = "test" + i,
                     Password = "test",
@@ -209,6 +209,7 @@ public class NotificationsRepositoryTest : UmbracoIntegrationTest
             {
                 var userDto = new UserDto
                 {
+                    Key = Guid.NewGuid(),
                     Email = "test" + i,
                     Login = "test" + i,
                     Password = "test",

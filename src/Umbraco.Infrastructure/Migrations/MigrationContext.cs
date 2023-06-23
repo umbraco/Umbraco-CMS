@@ -18,12 +18,11 @@ internal class MigrationContext : IMigrationContext
         Plan = plan;
         Database = database ?? throw new ArgumentNullException(nameof(database));
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _postMigrations.AddRange(plan.PostMigrationTypes);
     }
 
     // this is only internally exposed
     [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase")]
-    public IReadOnlyList<Type> PostMigrations => _postMigrations;
+    internal IReadOnlyList<Type> PostMigrations => _postMigrations;
 
     /// <inheritdoc />
     public ILogger<IMigrationContext> Logger { get; }
@@ -31,7 +30,7 @@ internal class MigrationContext : IMigrationContext
     public MigrationPlan Plan { get; }
 
     /// <inheritdoc />
-    public IUmbracoDatabase Database { get; }
+    public IUmbracoDatabase Database { get; internal set; }
 
     /// <inheritdoc />
     public ISqlContext SqlContext => Database.SqlContext;
@@ -41,6 +40,7 @@ internal class MigrationContext : IMigrationContext
 
     /// <inheritdoc />
     public bool BuildingExpression { get; set; }
+
 
     /// <inheritdoc />
     [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase, and a UmbracoPlanExecutedNotification.")]

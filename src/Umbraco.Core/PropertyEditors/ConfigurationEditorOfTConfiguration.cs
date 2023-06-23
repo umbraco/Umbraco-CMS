@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Reflection;
@@ -35,29 +35,20 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
         _editorConfigurationParser = editorConfigurationParser;
 
     /// <inheritdoc />
-    public override IDictionary<string, object> DefaultConfiguration =>
-        ToConfigurationEditor(DefaultConfigurationObject);
-
-    /// <inheritdoc />
-    public override object DefaultConfigurationObject => new TConfiguration();
-
-    /// <inheritdoc />
-    public override bool IsConfiguration(object obj)
-        => obj is TConfiguration;
-
-        /// <inheritdoc />
-    public override object FromDatabase(
-        string? configuration,
+    public override object ToConfigurationObject(
+        IDictionary<string, object> configuration,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(configuration))
+            if (configuration.Any() == false)
             {
                 return new TConfiguration();
             }
 
-            return configurationEditorJsonSerializer.Deserialize<TConfiguration>(configuration)!;
+            // TODO: quick fix for now (serialize to JSON, then deserialize to TConfiguration) - see if there is a better/more performant way (reverse of ObjectJsonExtensions.ToObjectDictionary)
+            var json = configurationEditorJsonSerializer.Serialize(configuration);
+            return configurationEditorJsonSerializer.Deserialize<TConfiguration>(json) ?? new TConfiguration();
         }
         catch (Exception e)
         {
@@ -67,31 +58,11 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
         }
     }
 
-    /// <inheritdoc />
-    public sealed override object? FromConfigurationEditor(
-        IDictionary<string, object?>? editorValues,
-        object? configuration) => FromConfigurationEditor(editorValues, (TConfiguration?)configuration);
-
-    /// <summary>
-    ///     Converts the configuration posted by the editor.
-    /// </summary>
-    /// <param name="editorValues">The configuration object posted by the editor.</param>
-    /// <param name="configuration">The current configuration object.</param>
-    public virtual TConfiguration? FromConfigurationEditor(
-        IDictionary<string, object?>? editorValues,
-        TConfiguration? configuration) =>
-        _editorConfigurationParser.ParseFromConfigurationEditor<TConfiguration>(editorValues, Fields);
-
-    /// <inheritdoc />
-    public sealed override IDictionary<string, object> ToConfigurationEditor(object? configuration) =>
-        ToConfigurationEditor((TConfiguration?)configuration);
-
-    /// <summary>
-    ///     Converts configuration values to values for the editor.
-    /// </summary>
-    /// <param name="configuration">The configuration.</param>
-    public virtual Dictionary<string, object> ToConfigurationEditor(TConfiguration? configuration) =>
-        _editorConfigurationParser.ParseToConfigurationEditor(configuration);
+    protected TConfiguration? AsConfigurationObject(IDictionary<string, object> configuration,
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer) =>
+        ToConfigurationObject(configuration, configurationEditorJsonSerializer) is TConfiguration configurationObject
+            ? configurationObject
+            : default;
 
     /// <summary>
     ///     Discovers fields from configuration properties marked with the field attribute.
@@ -125,6 +96,7 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
                     PropertyType = property.PropertyType,
                     Description = attribute.Description,
                     HideLabel = attribute.HideLabel,
+                    SortOrder = attribute.SortOrder,
                     View = attributeView,
                 };
 
@@ -149,6 +121,8 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
 
             field.PropertyName = property.Name;
             field.PropertyType = property.PropertyType;
+
+            field.SortOrder = attribute.SortOrder;
 
             if (!string.IsNullOrWhiteSpace(attribute.Key))
             {
@@ -182,6 +156,6 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
             }
         }
 
-        return fields;
+        return fields.OrderBy(x => x.SortOrder).ToList();
     }
 }

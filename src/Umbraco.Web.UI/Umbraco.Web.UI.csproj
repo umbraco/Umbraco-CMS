@@ -19,6 +19,16 @@
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AdditionalFiles Include="umbraco\UmbracoBackOffice\AuthorizeUpgrade.cshtml" />
+    <AdditionalFiles Include="umbraco\UmbracoBackOffice\Default.cshtml" />
+    <AdditionalFiles Include="umbraco\UmbracoBackOffice\Preview.cshtml" />
+    <AdditionalFiles Include="umbraco\UmbracoInstall\Index.cshtml" />
+    <AdditionalFiles Include="umbraco\UmbracoWebsite\Maintenance.cshtml" />
+    <AdditionalFiles Include="umbraco\UmbracoWebsite\NoNodes.cshtml" />
+    <AdditionalFiles Include="umbraco\UmbracoWebsite\NotFound.cshtml" />
+  </ItemGroup>
+
   <PropertyGroup>
     <!-- Razor files are needed for the backoffice to work correctly -->
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>

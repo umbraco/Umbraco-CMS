@@ -11,8 +11,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing;
 public abstract class ContentBaseSave<TPersisted> : ContentItemBasic<ContentPropertyBasic>, IContentSave<TPersisted>
     where TPersisted : IContentBase
 {
-    protected ContentBaseSave() => UploadedFiles = new List<ContentPropertyFile>();
-
     #region IContentSave
 
     /// <inheritdoc />
@@ -26,9 +24,6 @@ public abstract class ContentBaseSave<TPersisted> : ContentItemBasic<ContentProp
         get => base.Properties;
         set => base.Properties = value;
     }
-
-    [IgnoreDataMember]
-    public List<ContentPropertyFile> UploadedFiles { get; }
 
     // These need explicit implementation because we are using internal models
 

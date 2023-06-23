@@ -18,7 +18,6 @@ public class UserDto
         UserStartNodeDtos = new HashSet<UserStartNodeDto>();
     }
 
-    // TODO: We need to add a GUID for users and track external logins with that instead of the INT
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_user")]
     public int Id { get; set; }
@@ -26,6 +25,12 @@ public class UserDto
     [Column("userDisabled")]
     [Constraint(Default = "0")]
     public bool Disabled { get; set; }
+
+    [Column("key")]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    [Constraint(Default = SystemMethods.NewGuid)]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUser_userKey")]
+    public Guid Key { get; set; }
 
     [Column("userNoConsole")]
     [Constraint(Default = "0")]
@@ -111,7 +116,7 @@ public class UserDto
     /// </summary>
     [Column("tourData")]
     [NullSetting(NullSetting = NullSettings.Null)]
-    [SpecialDbType(SpecialDbTypes.NTEXT)]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     public string? TourData { get; set; }
 
     [ResultColumn]

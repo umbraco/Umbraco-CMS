@@ -61,4 +61,35 @@ public static class AppCacheExtensions
 
         return result.TryConvertTo<T>().Result;
     }
+
+    public static async Task<T?> GetCacheItemAsync<T>(
+        this IAppPolicyCache provider,
+        string cacheKey,
+        Func<Task<T?>> getCacheItemAsync,
+        TimeSpan? timeout,
+        bool isSliding = false,
+        string[]? dependentFiles = null)
+    {
+        var result = provider.Get(cacheKey);
+
+        if (result == null)
+        {
+            result = await getCacheItemAsync();
+            provider.Insert(cacheKey, () => result, timeout, isSliding, dependentFiles);
+        }
+
+        return result == null ? default : result.TryConvertTo<T>().Result;
+    }
+
+    public static async Task InsertCacheItemAsync<T>(
+        this IAppPolicyCache provider,
+        string cacheKey,
+        Func<Task<T>> getCacheItemAsync,
+        TimeSpan? timeout = null,
+        bool isSliding = false,
+        string[]? dependentFiles = null)
+    {
+        T value = await getCacheItemAsync();
+        provider.Insert(cacheKey, () => value, timeout, isSliding, dependentFiles);
+    }
 }

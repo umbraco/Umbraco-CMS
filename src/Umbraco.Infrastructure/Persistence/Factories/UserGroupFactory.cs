@@ -22,10 +22,12 @@ internal static class UserGroupFactory
         {
             userGroup.DisableChangeTracking();
             userGroup.Id = dto.Id;
+            userGroup.Key = dto.Key;
             userGroup.CreateDate = dto.CreateDate;
             userGroup.UpdateDate = dto.UpdateDate;
             userGroup.StartContentId = dto.StartContentId;
             userGroup.StartMediaId = dto.StartMediaId;
+            userGroup.PermissionNames = dto.UserGroup2PermissionDtos.Select(x => x.Permission).ToHashSet();
             userGroup.HasAccessToAllLanguages = dto.HasAccessToAllLanguages;
             if (dto.UserGroup2AppDtos != null)
             {
@@ -53,6 +55,7 @@ internal static class UserGroupFactory
     {
         var dto = new UserGroupDto
         {
+            Key = entity.Key,
             Alias = entity.Alias,
             DefaultPermissions = entity.Permissions == null ? string.Empty : string.Join(string.Empty, entity.Permissions),
             Name = entity.Name,
@@ -78,7 +81,7 @@ internal static class UserGroupFactory
 
         if (entity.HasIdentity)
         {
-            dto.Id = short.Parse(entity.Id.ToString());
+            dto.Id = entity.Id;
         }
 
         return dto;

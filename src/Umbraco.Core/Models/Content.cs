@@ -529,7 +529,7 @@ public class Content : ContentBase, IContent
 
         var clonedContent = (Content)clone;
 
-        // fixme - need to reset change tracking bits
+        // TODO: need to reset change tracking bits
 
         // if culture infos exist then deal with event bindings
         if (clonedContent._publishInfos != null)

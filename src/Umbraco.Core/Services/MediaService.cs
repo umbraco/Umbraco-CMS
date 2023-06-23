@@ -728,6 +728,8 @@ namespace Umbraco.Cms.Core.Services
                     media.CreatorId = userId;
                 }
 
+                media.WriterId = userId;
+
                 _mediaRepository.Save(media);
                 scope.Notifications.Publish(new MediaSavedNotification(media, eventMessages).WithStateFrom(savingNotification));
                 // TODO: See note about suppressing events in content service
@@ -947,7 +949,7 @@ namespace Umbraco.Cms.Core.Services
 
                 var originalPath = media.Path;
 
-                var moveEventInfo = new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia);
+                var moveEventInfo = new MoveToRecycleBinEventInfo<IMedia>(media, originalPath);
 
                 var movingToRecycleBinNotification = new MediaMovingToRecycleBinNotification(moveEventInfo, messages);
                 if (scope.Notifications.PublishCancelable(movingToRecycleBinNotification))
@@ -959,7 +961,7 @@ namespace Umbraco.Cms.Core.Services
                 PerformMoveLocked(media, Constants.System.RecycleBinMedia, null, userId, moves, true);
 
                 scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshBranch, messages));
-                MoveEventInfo<IMedia>[] moveInfo = moves.Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId)).ToArray();
+                MoveToRecycleBinEventInfo<IMedia>[] moveInfo = moves.Select(x => new MoveToRecycleBinEventInfo<IMedia>(x.Item1, x.Item2)).ToArray();
                 scope.Notifications.Publish(new MediaMovedToRecycleBinNotification(moveInfo, messages).WithStateFrom(movingToRecycleBinNotification));
                 Audit(AuditType.Move, userId, media.Id, "Move Media to recycle bin");
 
@@ -998,6 +1000,7 @@ namespace Umbraco.Cms.Core.Services
                     throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
                 }
 
+                // FIXME: Use MoveEventInfo that also takes a parent key when implementing move with parentKey.
                 var moveEventInfo = new MoveEventInfo<IMedia>(media, media.Path, parentId);
                 var movingNotification = new MediaMovingNotification(moveEventInfo, messages);
                 if (scope.Notifications.PublishCancelable(movingNotification))
@@ -1015,6 +1018,7 @@ namespace Umbraco.Cms.Core.Services
                 scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshBranch, messages));
 
                 MoveEventInfo<IMedia>[] moveInfo = moves //changes
+                    // FIXME: Use MoveEventInfo that also takes a parent key when implementing move with parentKey.
                     .Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId))
                     .ToArray();
                 scope.Notifications.Publish(new MediaMovedNotification(moveInfo, messages).WithStateFrom(movingNotification));
@@ -1322,7 +1326,7 @@ namespace Umbraco.Cms.Core.Services
                     changes.Add(new TreeChange<IMedia>(media, TreeChangeTypes.Remove));
                 }
 
-                MoveEventInfo<IMedia>[] moveInfos = moves.Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId))
+                MoveToRecycleBinEventInfo<IMedia>[] moveInfos = moves.Select(x => new MoveToRecycleBinEventInfo<IMedia>(x.Item1, x.Item2))
                     .ToArray();
                 if (moveInfos.Length > 0)
                 {

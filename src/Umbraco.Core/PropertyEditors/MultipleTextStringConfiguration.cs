@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class MultipleTextStringConfiguration
 {
     // fields are configured in the editor
-    public int Minimum { get; set; }
+    public int Min { get; set; }
 
-    public int Maximum { get; set; }
+    public int Max { get; set; }
 }

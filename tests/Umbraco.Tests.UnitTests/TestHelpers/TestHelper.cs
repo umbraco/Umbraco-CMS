@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -156,7 +155,7 @@ public static class TestHelper
     }
 
     // TODO: Move to Assertions or AssertHelper
-    // FIXME: obsolete the dateTimeFormat thing and replace with dateDelta
+    // TODO: obsolete the dateTimeFormat thing and replace with dateDelta
     public static void AssertPropertyValuesAreEqual(
         object actual,
         object expected,

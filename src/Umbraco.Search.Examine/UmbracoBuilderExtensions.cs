@@ -1,20 +1,16 @@
-using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Extensions;
-using Umbraco.Search.Diagnostics;
-using Umbraco.Search.Examine.Configuration;
-using Umbraco.Search.Examine.ValueSetBuilders;
-using Umbraco.Search.Indexing;
-using Umbraco.Search.NotificationHandlers;
 
-namespace Umbraco.Search.Examine;
+namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 
 /// <summary>
 ///     Provides extension methods to the <see cref="IUmbracoBuilder" /> class.
@@ -23,20 +19,19 @@ public static partial class UmbracoBuilderExtensions
 {
     public static IUmbracoBuilder AddExamine(this IUmbracoBuilder builder)
     {
+        // populators are not a collection: one cannot remove ours, and can only add more
+        // the container can inject IEnumerable<IIndexPopulator> and get them all
+        builder.Services.AddSingleton<IIndexPopulator, MemberIndexPopulator>();
+        builder.Services.AddSingleton<IIndexPopulator, ContentIndexPopulator>();
+        builder.Services.AddSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
+        builder.Services.AddSingleton<IIndexPopulator, MediaIndexPopulator>();
+        builder.Services.AddSingleton<IIndexPopulator, DeliveryApiContentIndexPopulator>();
 
-        builder.Services.AddSingleton<IExamineManager, ExamineManager>();
-        builder.Services.AddSingleton<ISearchProvider, ExamineSearchProvider>();
-        builder.Services.AddUnique(typeof(IUmbracoIndexesConfiguration), typeof(UmbracoIndexesConfiguration));
-        builder.Services.AddSingleton<IExamineIndexConfigurationFactory, ExamineIndexConfigurationFactory>();
-        builder.Services.AddUnique(services =>
-        {
-            var factory = services.GetRequiredService<IExamineIndexConfigurationFactory>();
-            return factory.GetConfiguration();
-        });
-        builder.Services.AddSingleton<IIndexRebuilder, IndexRebuilder>();
+        builder.Services.AddSingleton<IIndexRebuilder, ExamineIndexRebuilder>();
         builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();
-        builder.Services.AddUnique<IUmbracoExamineIndexConfig, UmbracoIndexConfig>();
-
+        builder.Services.AddSingleton<ExamineIndexingMainDomHandler>();
+        builder.Services.AddUnique<IUmbracoIndexConfig, UmbracoIndexConfig>();
+        builder.Services.AddUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
         builder.Services.AddUnique<IPublishedContentValueSetBuilder>(factory =>
             new ContentValueSetBuilder(
                 factory.GetRequiredService<PropertyEditorCollection>(),
@@ -55,10 +50,17 @@ public static partial class UmbracoBuilderExtensions
                 false));
         builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
         builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
-        builder.Services.AddSingleton<IndexRebuilder>();
+        builder.Services.AddUnique<IDeliveryApiContentIndexValueSetBuilder, DeliveryApiContentIndexValueSetBuilder>();
+        builder.Services.AddUnique<IDeliveryApiContentIndexFieldDefinitionBuilder, DeliveryApiContentIndexFieldDefinitionBuilder>();
+        builder.Services.AddUnique<IDeliveryApiContentIndexHelper, DeliveryApiContentIndexHelper>();
+        builder.Services.AddSingleton<IDeliveryApiIndexingHandler, DeliveryApiIndexingHandler>();
+        builder.Services.AddSingleton<ExamineIndexRebuilder>();
 
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, ContentTypeIndexingNotificationHandler>();
+        builder.AddNotificationHandler<ContentCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
+        builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
+        builder.AddNotificationHandler<PublicAccessCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<MediaCacheRefresherNotification, MediaIndexingNotificationHandler>();
         builder.AddNotificationHandler<MemberCacheRefresherNotification, MemberIndexingNotificationHandler>();
         builder.AddNotificationHandler<LanguageCacheRefresherNotification, LanguageIndexingNotificationHandler>();

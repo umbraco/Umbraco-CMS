@@ -26,7 +26,10 @@ public class UmbracoPlan : MigrationPlan
     /// <summary>
     /// Defines the plan.
     /// </summary>
-    protected void DefinePlan()
+    /// <remarks>
+    /// This is virtual for testing purposes.
+    /// </remarks>
+    protected virtual void DefinePlan()
     {
         // Please take great care when modifying the plan!
         //
@@ -67,5 +70,20 @@ public class UmbracoPlan : MigrationPlan
 
         // To 11.3.0
         To<V_11_3_0.AddDomainSortOrder>("{BB3889ED-E2DE-49F2-8F71-5FD8616A2661}");
+
+        // To 11.4.0
+        To<V_11_4_0.AlterKeyValueDataType>("{FFB6B9B0-F1A8-45E9-9CD7-25700577D1CA}");
+
+        // To 12.0.0
+        To<V_12_0_0.UseNvarcharInsteadOfNText>("{888A0D5D-51E4-4C7E-AA0A-01306523C7FB}");
+        To<V_12_0_0.ResetCache>("{539F2F83-FBA7-4C48-81A3-75081A56BB9D}");
+
+        // To 13.0.0
+        To<V_13_0_0.AddPropertyEditorUiAliasColumn>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
+        To<V_13_0_0.MigrateDataTypeConfigurations>("{5F15A1CC-353D-4889-8C7E-F303B4766196}");
+        To<V_13_0_0.AddGuidsToUserGroups>("{69E12556-D9B3-493A-8E8A-65EC89FB658D}");
+        To<V_13_0_0.AddUserGroup2PermisionTable>("{F2B16CD4-F181-4BEE-81C9-11CF384E6025}");
+        To<V_13_0_0.AddGuidsToUsers>("{A8E01644-9F2E-4988-8341-587EF5B7EA69}");
+        To<V_13_0_0.UpdateDefaultGuidsOfCreatedPackages>("{E073DBC0-9E8E-4C92-8210-9CB18364F46E}");
     }
 }

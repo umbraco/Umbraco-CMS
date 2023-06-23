@@ -24,7 +24,7 @@ public class BackOfficeWebAssets
     public const string UmbracoUpgradeCssBundleName = "umbraco-authorize-upgrade-css";
     private readonly CustomBackOfficeAssetsCollection _customBackOfficeAssetsCollection;
     private readonly IHostingEnvironment _hostingEnvironment;
-    private readonly IManifestParser _parser;
+    private readonly ILegacyManifestParser _parser;
     private readonly PropertyEditorCollection _propertyEditorCollection;
 
     private readonly IRuntimeMinifier _runtimeMinifier;
@@ -32,7 +32,7 @@ public class BackOfficeWebAssets
 
     public BackOfficeWebAssets(
         IRuntimeMinifier runtimeMinifier,
-        IManifestParser parser,
+        ILegacyManifestParser parser,
         PropertyEditorCollection propertyEditorCollection,
         IHostingEnvironment hostingEnvironment,
         IOptionsMonitor<GlobalSettings> globalSettings,
@@ -48,8 +48,8 @@ public class BackOfficeWebAssets
         globalSettings.OnChange(x => _globalSettings = x);
     }
 
-    public static string GetIndependentPackageBundleName(ManifestAssets manifestAssets, AssetType assetType)
-        => $"{manifestAssets.PackageName.ToLowerInvariant()}-{(assetType == AssetType.Css ? "css" : "js")}";
+    public static string GetIndependentPackageBundleName(LegacyManifestAssets legacyManifestAssets, AssetType assetType)
+        => $"{legacyManifestAssets.PackageName.ToLowerInvariant()}-{(assetType == AssetType.Css ? "css" : "js")}";
 
     public void CreateBundles()
     {
@@ -151,7 +151,7 @@ public class BackOfficeWebAssets
     }
 
     private void RegisterPackageBundlesForNoneOption(
-        IReadOnlyDictionary<BundleOptions, IReadOnlyList<ManifestAssets>>? combinedPackageManifestAssets,
+        IReadOnlyDictionary<BundleOptions, IReadOnlyList<LegacyManifestAssets>>? combinedPackageManifestAssets,
         string bundleName)
     {
         var assets = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
@@ -159,7 +159,7 @@ public class BackOfficeWebAssets
         // Create a bundle per package manifest that is declaring the matching BundleOptions
         if (combinedPackageManifestAssets?.TryGetValue(
             BundleOptions.None,
-            out IReadOnlyList<ManifestAssets>? manifestAssetList) ?? false)
+            out IReadOnlyList<LegacyManifestAssets>? manifestAssetList) ?? false)
         {
             foreach (var asset in manifestAssetList.SelectMany(x => x.Assets))
             {
@@ -176,15 +176,15 @@ public class BackOfficeWebAssets
     }
 
     private void RegisterPackageBundlesForIndependentOptions(
-        IReadOnlyDictionary<BundleOptions, IReadOnlyList<ManifestAssets>>? combinedPackageManifestAssets,
+        IReadOnlyDictionary<BundleOptions, IReadOnlyList<LegacyManifestAssets>>? combinedPackageManifestAssets,
         AssetType assetType)
     {
         // Create a bundle per package manifest that is declaring the matching BundleOptions
         if (combinedPackageManifestAssets?.TryGetValue(
             BundleOptions.Independent,
-            out IReadOnlyList<ManifestAssets>? manifestAssetList) ?? false)
+            out IReadOnlyList<LegacyManifestAssets>? manifestAssetList) ?? false)
         {
-            foreach (ManifestAssets manifestAssets in manifestAssetList)
+            foreach (LegacyManifestAssets manifestAssets in manifestAssetList)
             {
                 var bundleName = GetIndependentPackageBundleName(manifestAssets, assetType);
                 var filePaths = FormatPaths(manifestAssets.Assets.ToArray());
@@ -215,7 +215,7 @@ public class BackOfficeWebAssets
         // only include scripts with the default bundle options here
         if (_parser.CombinedManifest.Scripts.TryGetValue(
             BundleOptions.Default,
-            out IReadOnlyList<ManifestAssets>? manifestAssets))
+            out IReadOnlyList<LegacyManifestAssets>? manifestAssets))
         {
             foreach (var script in manifestAssets.SelectMany(x => x.Assets))
             {
@@ -255,7 +255,7 @@ public class BackOfficeWebAssets
         // only include css with the default bundle options here
         if (_parser.CombinedManifest.Stylesheets.TryGetValue(
             BundleOptions.Default,
-            out IReadOnlyList<ManifestAssets>? manifestAssets))
+            out IReadOnlyList<LegacyManifestAssets>? manifestAssets))
         {
             foreach (var script in manifestAssets.SelectMany(x => x.Assets))
             {

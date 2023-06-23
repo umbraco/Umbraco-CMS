@@ -7,14 +7,16 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal class BlockEditorValidator : ComplexEditorValidator
+internal class BlockEditorValidator<TValue, TLayout> : ComplexEditorValidator
+    where TValue : BlockValue<TLayout>, new()
+    where TLayout : class, IBlockLayoutItem, new()
 {
-    private readonly BlockEditorValues _blockEditorValues;
+    private readonly BlockEditorValues<TValue, TLayout> _blockEditorValues;
     private readonly IContentTypeService _contentTypeService;
 
     public BlockEditorValidator(
         IPropertyValidationService propertyValidationService,
-        BlockEditorValues blockEditorValues,
+        BlockEditorValues<TValue, TLayout> blockEditorValues,
         IContentTypeService contentTypeService)
         : base(propertyValidationService)
     {
@@ -24,7 +26,7 @@ internal class BlockEditorValidator : ComplexEditorValidator
 
     protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object? value)
     {
-        BlockEditorData? blockEditorData = _blockEditorValues.DeserializeAndClean(value);
+        BlockEditorData<TValue, TLayout>? blockEditorData = _blockEditorValues.DeserializeAndClean(value);
         if (blockEditorData != null)
         {
             // There is no guarantee that the client will post data for every property defined in the Element Type but we still

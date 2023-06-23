@@ -1176,8 +1176,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     continue;
                 }
 
-                allowedChildren?.Add(new ContentTypeSort(new Lazy<int>(() => allowedChild.Id), sortOrder,
-                    allowedChild.Alias));
+                allowedChildren?.Add(new ContentTypeSort(new Lazy<int>(() => allowedChild.Id), allowedChild.Key, sortOrder, allowedChild.Alias));
                 sortOrder++;
             }
 
@@ -1271,8 +1270,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     var configurationAttributeValue = dataTypeElement.Attribute("Configuration")?.Value;
                     if (!string.IsNullOrWhiteSpace(configurationAttributeValue))
                     {
-                        dataType.Configuration = editor.GetConfigurationEditor()
-                            .FromDatabase(configurationAttributeValue, _serializer);
+                        dataType.ConfigurationData = editor.GetConfigurationEditor().FromDatabase(configurationAttributeValue, _serializer);
                     }
 
                     dataTypes.Add(dataType);
@@ -1467,7 +1465,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         private static bool DictionaryValueIsNew(IEnumerable<IDictionaryTranslation> translations,
             XElement valueElement)
-            => translations.All(t => string.Compare(t.Language?.IsoCode,
+            => translations.All(t => string.Compare(t.LanguageIsoCode,
                                          valueElement.Attribute("LanguageCultureAlias")?.Value,
                                          StringComparison.InvariantCultureIgnoreCase) !=
                                      0);

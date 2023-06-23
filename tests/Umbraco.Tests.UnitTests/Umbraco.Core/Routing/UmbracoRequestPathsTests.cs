@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -87,8 +86,9 @@ public class UmbracoRequestPathsTests
     [TestCase("http://www.domain.com/myvdir/umbraco/api/blah", "myvdir", false)]
     [TestCase("http://www.domain.com/MyVdir/umbraco/api/blah", "/myvdir", false)]
     [TestCase("http://www.domain.com/MyVdir/Umbraco/", "myvdir", true)]
-    // NOTE: this test case is false for now - will be true once the IsBackOfficeRequest tweak from the new management API is put into UmbracoRequestPaths
-    [TestCase("http://www.domain.com/umbraco/management/api/v1.0/my/controller/action/", "", false)]
+    [TestCase("http://www.domain.com/Umbraco/management/api/", "", true)]
+    [TestCase("http://www.domain.com/Umbraco/management/api", "", false)]
+    [TestCase("http://www.domain.com/umbraco/management/api/v1.0/my/controller/action/", "", true)]
     public void Is_Back_Office_Request(string input, string virtualPath, bool expected)
     {
         var source = new Uri(input);

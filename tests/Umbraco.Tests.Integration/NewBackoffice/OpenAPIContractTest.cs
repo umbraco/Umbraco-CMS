@@ -3,6 +3,8 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Management;
+using Umbraco.Cms.Api.Management.Controllers.Install;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
@@ -20,11 +22,11 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
     {
         builder.AddMvcAndRazor(mvcBuilder =>
         {
-            // Adds Umbraco.Cms.ManagementApi
-            mvcBuilder.AddApplicationPart(typeof(ManagementApi.Controllers.Install.InstallControllerBase).Assembly);
+            // Adds Umbraco.Cms.Api.Management
+            mvcBuilder.AddApplicationPart(typeof(InstallControllerBase).Assembly);
         });
 
-        new ManagementApi.ManagementApiComposer().Compose(builder);
+        new ManagementApiComposer().Compose(builder);
     }
 
     [Test]
@@ -35,7 +37,7 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
         var officePath = GlobalSettings.GetBackOfficePath(HostingEnvironment);
 
         var urlToContract = $"{officePath}/management/api/openapi.json";
-        var swaggerPath = $"{officePath}/swagger/v1/swagger.json";
+        var swaggerPath = $"{officePath}/swagger/management/swagger.json";
         var apiContract = JObject.Parse(await Client.GetStringAsync(urlToContract));
 
         var generatedJsonString = await Client.GetStringAsync(swaggerPath);

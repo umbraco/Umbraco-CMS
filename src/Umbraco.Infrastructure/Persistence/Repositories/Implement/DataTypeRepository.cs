@@ -46,6 +46,8 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
     protected Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
 
+    public IDataType? Get(Guid key) => GetMany().FirstOrDefault(x=>x.Key == key);
+
     public IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer? container)
     {
         var parentId = -1;
@@ -63,6 +65,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
         }
 
         // used to track all the moved entities to be given to the event
+        // FIXME: Use constructor that takes parent key when this method is refactored
         var moveInfo = new List<MoveEventInfo<IDataType>> { new(toMove, toMove.Path, parentId) };
 
         var origPath = toMove.Path;
@@ -85,6 +88,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
         {
             foreach (IDataType descendant in descendants.OrderBy(x => x.Level))
             {
+                // FIXME: Use constructor that takes parent key when this method is refactored
                 moveInfo.Add(new MoveEventInfo<IDataType>(descendant, descendant.Path, descendant.ParentId));
 
                 descendant.ParentId = lastParent.Id;

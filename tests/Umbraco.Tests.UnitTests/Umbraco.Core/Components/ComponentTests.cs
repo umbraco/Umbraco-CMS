@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -44,7 +43,7 @@ public class ComponentTests
 
     private static IServiceProvider MockFactory(Action<Mock<IServiceProvider>> setup = null)
     {
-        // FIXME: use IUmbracoDatabaseFactory vs UmbracoDatabaseFactory, clean it all up!
+        // TODO: use IUmbracoDatabaseFactory vs UmbracoDatabaseFactory, clean it all up!
         var mock = new Mock<IServiceProvider>();
         ILoggerFactory loggerFactory = NullLoggerFactory.Instance;
         var logger = loggerFactory.CreateLogger("GenericLogger");
@@ -87,7 +86,7 @@ public class ComponentTests
             new TestOptionsMonitor<CoreDebugSettings>(coreDebug),
             mediaFileManager,
             loggerFactory,
-            
+
             eventAggregator);
 
         mock.Setup(x => x.GetService(typeof(ILogger))).Returns(logger);
@@ -650,7 +649,7 @@ public class ComponentTests
     {
     }
 
-    // FIXME: move to Testing
+    // TODO: move to Testing
     private static Type[] TypeArray<T1>() => new[] { typeof(T1) };
 
     private static Type[] TypeArray<T1, T2>() => new[] { typeof(T1), typeof(T2) };

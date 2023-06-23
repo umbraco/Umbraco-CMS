@@ -53,7 +53,7 @@ public class BackOfficeController : UmbracoController
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<BackOfficeController> _logger;
-    private readonly IManifestParser _manifestParser;
+    private readonly ILegacyManifestParser _legacyManifestParser;
     private readonly IRuntimeMinifier _runtimeMinifier;
     private readonly IRuntimeState _runtimeState;
     private readonly IOptions<SecuritySettings> _securitySettings;
@@ -89,7 +89,7 @@ public class BackOfficeController : UmbracoController
         IBackOfficeExternalLoginProviders externalLogins,
         IHttpContextAccessor httpContextAccessor,
         IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
-        IManifestParser manifestParser,
+        ILegacyManifestParser legacyManifestParser,
         ServerVariablesParser serverVariables,
         IOptions<SecuritySettings> securitySettings)
     {
@@ -109,7 +109,7 @@ public class BackOfficeController : UmbracoController
         _externalLogins = externalLogins;
         _httpContextAccessor = httpContextAccessor;
         _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
-        _manifestParser = manifestParser;
+        _legacyManifestParser = legacyManifestParser;
         _serverVariables = serverVariables;
         _securitySettings = securitySettings;
     }
@@ -118,19 +118,6 @@ public class BackOfficeController : UmbracoController
     [AllowAnonymous]
     public async Task<IActionResult> Default()
     {
-        // Check if we not are in an run state, if so we need to redirect
-        if (_runtimeState.Level != RuntimeLevel.Run)
-        {
-            if (_runtimeState.Level == RuntimeLevel.Upgrade)
-            {
-                return RedirectToAction(nameof(AuthorizeUpgrade), routeValues: new RouteValueDictionary()
-                {
-                    ["redir"] = _globalSettings.GetBackOfficePath(_hostingEnvironment),
-                });
-            }
-            return Redirect("/");
-        }
-
         // force authentication to occur since this is not an authorized endpoint
         AuthenticateResult result = await this.AuthenticateBackOfficeAsync();
 
@@ -227,7 +214,7 @@ public class BackOfficeController : UmbracoController
             return new LocalRedirectResult(installerUrl);
         }
 
-        var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
+        var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml");
 
         return await RenderDefaultOrProcessExternalLoginAsync(
             result,
@@ -249,7 +236,7 @@ public class BackOfficeController : UmbracoController
         var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(
             _globalSettings,
             _hostingEnvironment,
-            _manifestParser);
+            _legacyManifestParser);
 
         return new JavaScriptResult(result);
     }

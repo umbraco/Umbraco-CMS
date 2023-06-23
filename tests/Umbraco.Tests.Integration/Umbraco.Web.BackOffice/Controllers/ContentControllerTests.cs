@@ -1,10 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -16,7 +13,6 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Formatters;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers;
 
@@ -32,13 +28,15 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     [Test]
     public async Task PostSave_Validate_Existing_Content()
     {
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
 
         // Add another language
-        localizationService.Save(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -88,13 +86,15 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     [Test]
     public async Task PostSave_Validate_At_Least_One_Variant_Flagged_For_Saving()
     {
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
 
         // Add another language
-        localizationService.Save(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -156,13 +156,15 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     [Test]
     public async Task PostSave_Validate_Properties_Exist()
     {
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
 
         // Add another language
-        localizationService.Save(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -219,13 +221,15 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     [Test]
     public async Task PostSave_Simple_Invariant()
     {
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
 
         // Add another language
-        localizationService.Save(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -278,13 +282,15 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     [Test]
     public async Task PostSave_Validate_Empty_Name()
     {
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
 
         // Add another language
-        localizationService.Save(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -340,13 +346,15 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     [Test]
     public async Task PostSave_Validate_Variants_Empty_Name()
     {
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
 
         // Add another language
-        localizationService.Save(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -402,11 +410,13 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     [Test]
     public async Task PostSave_Validates_Domains_Exist()
     {
-        var localizationService = GetRequiredService<ILocalizationService>();
-        localizationService.Save(new LanguageBuilder()
+        var languageService = GetRequiredService<ILanguageService>();
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var contentTypeService = GetRequiredService<IContentTypeService>();
         var contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
@@ -450,17 +460,21 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     public async Task PostSave_Validates_All_Ancestor_Cultures_Are_Considered()
     {
         var sweIso = "sv-SE";
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
         //Create 2 new languages
-        localizationService.Save(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
-        localizationService.Save(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(sweIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var contentTypeService = GetRequiredService<IContentTypeService>();
         var contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
@@ -499,14 +513,24 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .WithAction(ContentSaveAction.PublishNew)
             .Build();
 
-        var enLanguage = localizationService.GetLanguageByIsoCode(UsIso);
-        var domainService = GetRequiredService<IDomainService>();
-        var enDomain = new UmbracoDomain("/en") {RootContentId = content.Id, LanguageId = enLanguage.Id};
-        domainService.Save(enDomain);
+        var enLanguage = await languageService.GetAsync(UsIso);
+        var dkLanguage = await languageService.GetAsync(DkIso);
 
-        var dkLanguage = localizationService.GetLanguageByIsoCode(DkIso);
-        var dkDomain = new UmbracoDomain("/dk") {RootContentId = childContent.Id, LanguageId = dkLanguage.Id};
-        domainService.Save(dkDomain);
+        var domainService = GetRequiredService<IDomainService>();
+
+        await domainService.UpdateDomainsAsync(
+            content.Key,
+            new DomainsUpdateModel
+            {
+                Domains = new[] { new DomainModel { DomainName = "/en", IsoCode = enLanguage.IsoCode } }
+            });
+
+        await domainService.UpdateDomainsAsync(
+            childContent.Key,
+            new DomainsUpdateModel
+            {
+                Domains = new[] { new DomainModel { DomainName = "/dk", IsoCode = dkLanguage.IsoCode } }
+            });
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -536,11 +560,13 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     [Test]
     public async Task PostSave_Validates_All_Cultures_Has_Domains()
     {
-        var localizationService = GetRequiredService<ILocalizationService>();
-        localizationService.Save(new LanguageBuilder()
+        var languageService = GetRequiredService<ILanguageService>();
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var contentTypeService = GetRequiredService<IContentTypeService>();
         var contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
@@ -561,10 +587,15 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .WithAction(ContentSaveAction.Publish)
             .Build();
 
-        var dkLanguage = localizationService.GetLanguageByIsoCode(DkIso);
+        var dkLanguage = await languageService.GetAsync(DkIso);
         var domainService = GetRequiredService<IDomainService>();
-        var dkDomain = new UmbracoDomain("/") {RootContentId = content.Id, LanguageId = dkLanguage.Id};
-        domainService.Save(dkDomain);
+
+        await domainService.UpdateDomainsAsync(
+            content.Key,
+            new DomainsUpdateModel
+            {
+                Domains = new[] { new DomainModel { DomainName = "/", IsoCode = dkLanguage.IsoCode } }
+            });
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -592,11 +623,13 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     [Test]
     public async Task PostSave_Checks_Ancestors_For_Domains()
     {
-        var localizationService = GetRequiredService<ILocalizationService>();
-        localizationService.Save(new LanguageBuilder()
+        var languageService = GetRequiredService<ILanguageService>();
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var contentTypeService = GetRequiredService<IContentTypeService>();
         var contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
@@ -632,15 +665,23 @@ public class ContentControllerTests : UmbracoTestServerTestBase
 
         contentService.Save(grandChild);
 
-        var dkLanguage = localizationService.GetLanguageByIsoCode(DkIso);
-        var usLanguage = localizationService.GetLanguageByIsoCode(UsIso);
+        var dkLanguage = await languageService.GetAsync(DkIso);
+        var usLanguage = await languageService.GetAsync(UsIso);
         var domainService = GetRequiredService<IDomainService>();
-        var dkDomain = new UmbracoDomain("/") {RootContentId = rootNode.Id, LanguageId = dkLanguage.Id};
 
-        var usDomain = new UmbracoDomain("/en") {RootContentId = childNode.Id, LanguageId = usLanguage.Id};
+        await domainService.UpdateDomainsAsync(
+            rootNode.Key,
+            new DomainsUpdateModel
+            {
+                Domains = new[] { new DomainModel { DomainName = "/", IsoCode = dkLanguage.IsoCode } }
+            });
 
-        domainService.Save(dkDomain);
-        domainService.Save(usDomain);
+        await domainService.UpdateDomainsAsync(
+            childNode.Key,
+            new DomainsUpdateModel
+            {
+                Domains = new[] { new DomainModel { DomainName = "/en", IsoCode = usLanguage.IsoCode } }
+            });
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 

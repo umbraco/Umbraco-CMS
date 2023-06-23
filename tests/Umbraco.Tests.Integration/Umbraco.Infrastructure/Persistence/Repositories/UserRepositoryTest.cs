@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -185,7 +184,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             // Act
             var updatedItem = repository.Get(user.Id);
 
-            // FIXME: this test cannot work, user has 2 sections but the way it's created,
+            // TODO: this test cannot work, user has 2 sections but the way it's created,
             // they don't show, so the comparison with updatedItem fails - fix!
 
             // Assert

@@ -1,4 +1,4 @@
-﻿NuCache Documentation
+NuCache Documentation
 ======================
 
 HOW IT WORKS
@@ -106,7 +106,7 @@ possible to support detached contents & properties, even those that do not have 
 int id, but again this should be refactored entirely anyway.
 
 Not doing any row-version checks (see XmlStore) when reloading from database, though it
-is maintained in the database. Two FIXME in PublishedSnapshotService. Should we do it?
+is maintained in the database. Two TODO in PublishedSnapshotService. Should we do it?
 
 There is no on-disk cache at all so everything is reloaded from the cmsContentNu table
 when the site restarts. This is pretty fast, but we should experiment with solutions to

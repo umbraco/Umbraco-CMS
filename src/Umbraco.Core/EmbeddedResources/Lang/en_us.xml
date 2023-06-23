@@ -410,7 +410,7 @@
     </key>
     <key alias="elementType">Element Type</key>
     <key alias="elementTypeDescription">Defines the schema for a repeating set of properties, for example, in a 'Block
-      List' or 'Nested Content' property editor.
+      List' or 'Block Grid' property editor.
     </key>
     <key alias="composition">Composition</key>
     <key alias="compositionDescription">Defines a re-usable set of properties that can be included in the definition of
@@ -908,6 +908,8 @@
     <key alias="header">Header</key>
     <key alias="systemField">system field</key>
     <key alias="lastUpdated">Last Updated</key>
+    <key alias="skipToMenu">Skip to menu</key>
+    <key alias="skipToContent">Skip to content</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
@@ -1925,7 +1927,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="allowVaryBySegment">Allow segmentation</key>
     <key alias="elementType">Element Type</key>
     <key alias="elementHeading">Is an Element Type</key>
-    <key alias="elementDescription">An Element Type is meant to be used for instance in Nested Content, and not in the
+    <key alias="elementDescription">An Element Type is meant to be used within other Document Types, and not in the Content
       tree.
     </key>
     <key alias="elementCannotToggle">A Document Type cannot be changed to an Element Type once it has been used to
@@ -2461,7 +2463,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="hSTSCheckHeaderNotFoundOnLocalhost">
       <![CDATA[The header <strong>Strict-Transport-Security</strong> was not found. This header should not be present on localhost.]]>
     </key>
-    <key alias="xssProtectionCheckHeaderFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was found.]]></key>
+    <key alias="xssProtectionCheckHeaderFound">
+      <![CDATA[The header <strong>X-XSS-Protection</strong> was found. <strong>It is recommended not to add this header to your website</strong>.<br />
+    You can read about this on the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection" target="_blank" rel="noopener" class="btn-link -underline">Mozilla</a> website ]]></key>
     <key alias="xssProtectionCheckHeaderNotFound">
       <![CDATA[The header <strong>X-XSS-Protection</strong> was not found.]]></key>
     <!-- The following key get these tokens passed in:

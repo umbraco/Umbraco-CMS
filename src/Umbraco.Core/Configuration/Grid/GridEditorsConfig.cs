@@ -21,19 +21,19 @@ internal class GridEditorsConfig : IGridEditorsConfig
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<GridEditorsConfig> _logger;
     private readonly IGridEditorsConfigFileProviderFactory _gridEditorsConfigFileProviderFactory;
-    private readonly IManifestParser _manifestParser;
+    private readonly ILegacyManifestParser _legacyManifestParser;
 
     public GridEditorsConfig(
         AppCaches appCaches,
         IHostingEnvironment hostingEnvironment,
-        IManifestParser manifestParser,
+        ILegacyManifestParser legacyManifestParser,
         IJsonSerializer jsonSerializer,
         ILogger<GridEditorsConfig> logger,
         IGridEditorsConfigFileProviderFactory gridEditorsConfigFileProviderFactory)
     {
         _appCaches = appCaches;
         _hostingEnvironment = hostingEnvironment;
-        _manifestParser = manifestParser;
+        _legacyManifestParser = legacyManifestParser;
         _jsonSerializer = jsonSerializer;
         _logger = logger;
         _gridEditorsConfigFileProviderFactory = gridEditorsConfigFileProviderFactory;
@@ -43,13 +43,13 @@ internal class GridEditorsConfig : IGridEditorsConfig
     public GridEditorsConfig(
         AppCaches appCaches,
         IHostingEnvironment hostingEnvironment,
-        IManifestParser manifestParser,
+        ILegacyManifestParser legacyManifestParser,
         IJsonSerializer jsonSerializer,
         ILogger<GridEditorsConfig> logger)
         : this(
               appCaches,
               hostingEnvironment,
-              manifestParser,
+              legacyManifestParser,
               jsonSerializer,
               logger,
               StaticServiceProvider.Instance.GetRequiredService<IGridEditorsConfigFileProviderFactory>())
@@ -120,7 +120,7 @@ internal class GridEditorsConfig : IGridEditorsConfig
                 }
 
                 // Add manifest editors, skip duplicates
-                foreach (GridEditor gridEditor in _manifestParser.CombinedManifest.GridEditors)
+                foreach (GridEditor gridEditor in _legacyManifestParser.CombinedManifest.GridEditors)
                 {
                     if (editors.Contains(gridEditor) == false)
                     {

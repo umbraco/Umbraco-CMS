@@ -68,7 +68,11 @@ preserve.belle
 /build/docs.zip
 /build/ui-docs.zip
 /build/csharp-docs.zip
-/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/assets
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/js
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/lib
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/views
 
 # Environment specific data
 /src/Umbraco.Web.UI.Client/[Bb]uild/

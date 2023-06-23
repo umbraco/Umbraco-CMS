@@ -75,8 +75,7 @@ public class DictionaryMapDefinition : IMapDefinition
         // add all languages and  the translations
         foreach (ILanguage lang in _localizationService.GetAllLanguages())
         {
-            var langId = lang.Id;
-            IDictionaryTranslation? translation = source.Translations?.FirstOrDefault(x => x.LanguageId == langId);
+            IDictionaryTranslation? translation = source.Translations?.FirstOrDefault(x => x.LanguageIsoCode == lang.IsoCode);
 
             target.Translations.Add(new DictionaryTranslationDisplay
             {
@@ -97,8 +96,7 @@ public class DictionaryMapDefinition : IMapDefinition
         // add all languages and  the translations
         foreach (ILanguage lang in _localizationService.GetAllLanguages())
         {
-            var langId = lang.Id;
-            IDictionaryTranslation? translation = source.Translations?.FirstOrDefault(x => x.LanguageId == langId);
+            IDictionaryTranslation? translation = source.Translations?.FirstOrDefault(x => x.LanguageIsoCode == lang.IsoCode);
 
             target.Translations.Add(
                 new DictionaryOverviewTranslationDisplay

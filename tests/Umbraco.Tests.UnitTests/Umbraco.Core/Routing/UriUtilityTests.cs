@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -10,7 +9,7 @@ using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
-// FIXME: not testing virtual directory!
+// TODO: not testing virtual directory!
 [TestFixture]
 public class UriUtilityTests
 {

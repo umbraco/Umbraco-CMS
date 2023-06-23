@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -76,5 +77,24 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
                 }
             }
         }
+
+        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
+        {
+            var value = property.GetValue(culture, segment);
+            return value is string stringValue
+                ? ParseValidUdis(stringValue.Split(Constants.CharArrays.Comma))
+                : null;
+        }
+
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
+            => editorValue.Value is IEnumerable<string> stringValues
+                ? string.Join(",", ParseValidUdis(stringValues))
+                : null;
+
+        private string[] ParseValidUdis(IEnumerable<string> stringValues)
+            => stringValues
+                .Select(s => UdiParser.TryParse(s, out Udi? udi) && udi is GuidUdi guidUdi ? guidUdi.ToString() : null)
+                .WhereNotNull()
+                .ToArray();
     }
 }

@@ -28,5 +28,5 @@ public class MissingPropertyEditor : IDataEditor
 
     public IDataValueEditor GetValueEditor() => throw new NotImplementedException();
 
-    public IDataValueEditor GetValueEditor(object? configuration) => throw new NotImplementedException();
+    public IDataValueEditor GetValueEditor(object? configurationObject) => throw new NotImplementedException();
 }

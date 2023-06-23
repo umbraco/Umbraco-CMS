@@ -78,10 +78,10 @@ public class DataValueEditorReuseTests
         // no matter what, a property editor should never reuse its data value editor when created *with* configuration
         var dataValueEditor1 = textboxPropertyEditor.GetValueEditor("config");
         Assert.NotNull(dataValueEditor1);
-        Assert.AreEqual("config", ((DataValueEditor)dataValueEditor1).Configuration);
+        Assert.AreEqual("config", ((DataValueEditor)dataValueEditor1).ConfigurationObject);
         var dataValueEditor2 = textboxPropertyEditor.GetValueEditor("config");
         Assert.NotNull(dataValueEditor2);
-        Assert.AreEqual("config", ((DataValueEditor)dataValueEditor2).Configuration);
+        Assert.AreEqual("config", ((DataValueEditor)dataValueEditor2).ConfigurationObject);
         Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
         _dataValueEditorFactoryMock.Verify(
             m => m.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()),
@@ -122,10 +122,10 @@ public class DataValueEditorReuseTests
         // no matter what, a property editor should never reuse its data value editor when created *with* configuration
         var dataValueEditor1 = blockListPropertyEditor.GetValueEditor("config");
         Assert.NotNull(dataValueEditor1);
-        Assert.AreEqual("config", ((DataValueEditor)dataValueEditor1).Configuration);
+        Assert.AreEqual("config", ((DataValueEditor)dataValueEditor1).ConfigurationObject);
         var dataValueEditor2 = blockListPropertyEditor.GetValueEditor("config");
         Assert.NotNull(dataValueEditor2);
-        Assert.AreEqual("config", ((DataValueEditor)dataValueEditor2).Configuration);
+        Assert.AreEqual("config", ((DataValueEditor)dataValueEditor2).ConfigurationObject);
         Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
         _dataValueEditorFactoryMock.Verify(
             m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>()),

@@ -128,6 +128,30 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
 
     protected override IEnumerable<string> GetDeleteClauses() => throw new NotImplementedException();
 
+    public bool HasDuplicateName(Guid parentKey, string name)
+    {
+        NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+            .From<NodeDto>()
+            .InnerJoin<NodeDto>("parent")
+            .On<NodeDto, NodeDto>(
+                (node, parent) => node.ParentId == parent.NodeId, aliasRight: "parent")
+            .Where<NodeDto>(dto => dto.Text == name &&  dto.NodeObjectType == NodeObjectTypeId)
+            .Where<NodeDto>(parent => parent.UniqueId == parentKey, alias: "parent")
+        );
+
+        return nodeDto is not null;
+    }
+
+    public bool HasDuplicateName(int parentId, string name)
+    {
+        NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+            .From<NodeDto>()
+            .Where<NodeDto>(dto => dto.Text == name &&  dto.NodeObjectType == NodeObjectTypeId && dto.ParentId == parentId)
+        );
+
+        return nodeDto is not null;
+    }
+
     protected override void PersistDeletedItem(EntityContainer entity)
     {
         if (entity == null)

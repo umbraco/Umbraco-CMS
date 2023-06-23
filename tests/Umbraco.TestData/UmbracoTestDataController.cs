@@ -309,7 +309,7 @@ public class UmbracoTestDataController : SurfaceController
         dt = new DataType(editor, serializer)
         {
             Name = name,
-            Configuration = editor.GetConfigurationEditor().DefaultConfigurationObject,
+            ConfigurationData = editor.GetConfigurationEditor().DefaultConfiguration,
             DatabaseType = ValueStorageType.Ntext
         };
 

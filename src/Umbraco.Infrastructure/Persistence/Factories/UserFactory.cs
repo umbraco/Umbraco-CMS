@@ -9,7 +9,12 @@ internal static class UserFactory
 {
     public static IUser BuildEntity(GlobalSettings globalSettings, UserDto dto)
     {
-        var guidId = dto.Id.ToGuid();
+        Guid key = dto.Key;
+        // This should only happen if the user is still not migrated to have a true key.
+        if (key == Guid.Empty)
+        {
+            key = dto.Id.ToGuid();
+        }
 
         var user = new User(globalSettings, dto.Id, dto.UserName, dto.Email, dto.Login, dto.Password,
             dto.PasswordConfig,
@@ -23,7 +28,7 @@ internal static class UserFactory
         {
             user.DisableChangeTracking();
 
-            user.Key = guidId;
+            user.Key = key;
             user.IsLockedOut = dto.NoConsole;
             user.IsApproved = dto.Disabled == false;
             user.Language = dto.UserLanguage;
@@ -54,6 +59,7 @@ internal static class UserFactory
     {
         var dto = new UserDto
         {
+            Key = entity.Key,
             Disabled = entity.IsApproved == false,
             Email = entity.Email,
             Login = entity.Username,
@@ -66,8 +72,7 @@ internal static class UserFactory
             FailedLoginAttempts = entity.FailedPasswordAttempts,
             LastLockoutDate = entity.LastLockoutDate == DateTime.MinValue ? null : entity.LastLockoutDate,
             LastLoginDate = entity.LastLoginDate == DateTime.MinValue ? null : entity.LastLoginDate,
-            LastPasswordChangeDate =
-                entity.LastPasswordChangeDate == DateTime.MinValue ? null : entity.LastPasswordChangeDate,
+            LastPasswordChangeDate = entity.LastPasswordChangeDate == DateTime.MinValue ? null : entity.LastPasswordChangeDate,
             CreateDate = entity.CreateDate,
             UpdateDate = entity.UpdateDate,
             Avatar = entity.Avatar,
@@ -110,12 +115,23 @@ internal static class UserFactory
         return dto;
     }
 
-    private static IReadOnlyUserGroup ToReadOnlyGroup(UserGroupDto group) =>
-        new ReadOnlyUserGroup(group.Id, group.Name, group.Icon,
-            group.StartContentId, group.StartMediaId, group.Alias, group.UserGroup2LanguageDtos.Select(x => x.LanguageId),
+    private static IReadOnlyUserGroup ToReadOnlyGroup(UserGroupDto group)
+    {
+        IEnumerable<string> permissions = group.DefaultPermissions is null
+            ? Enumerable.Empty<string>()
+            : group.DefaultPermissions.ToCharArray().Select(x => x.ToString());
+
+        return new ReadOnlyUserGroup(
+            group.Id,
+            group.Key,
+            group.Name,
+            group.Icon,
+            group.StartContentId,
+            group.StartMediaId,
+            group.Alias,
+            group.UserGroup2LanguageDtos.Select(x => x.LanguageId),
             group.UserGroup2AppDtos.Select(x => x.AppAlias).WhereNotNull().ToArray(),
-            group.DefaultPermissions == null
-                ? Enumerable.Empty<string>()
-                : group.DefaultPermissions.ToCharArray().Select(x => x.ToString()),
+            permissions,
             group.HasAccessToAllLanguages);
+    }
 }

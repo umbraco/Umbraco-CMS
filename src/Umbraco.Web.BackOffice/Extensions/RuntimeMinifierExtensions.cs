@@ -17,7 +17,7 @@ public static class RuntimeMinifierExtensions
         this IRuntimeMinifier minifier,
         GlobalSettings globalSettings,
         IHostingEnvironment hostingEnvironment,
-        IManifestParser manifestParser)
+        ILegacyManifestParser legacyManifestParser)
     {
         var files = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         foreach (var file in await minifier.GetJsAssetPathsAsync(BackOfficeWebAssets.UmbracoCoreJsBundleName))
@@ -31,10 +31,10 @@ public static class RuntimeMinifierExtensions
         }
 
         // process the independent bundles
-        if (manifestParser.CombinedManifest.Scripts.TryGetValue(BundleOptions.Independent,
-                out IReadOnlyList<ManifestAssets>? independentManifestAssetsList))
+        if (legacyManifestParser.CombinedManifest.Scripts.TryGetValue(BundleOptions.Independent,
+                out IReadOnlyList<LegacyManifestAssets>? independentManifestAssetsList))
         {
-            foreach (ManifestAssets manifestAssets in independentManifestAssetsList)
+            foreach (LegacyManifestAssets manifestAssets in independentManifestAssetsList)
             {
                 var bundleName =
                     BackOfficeWebAssets.GetIndependentPackageBundleName(manifestAssets, AssetType.Javascript);
@@ -58,7 +58,7 @@ public static class RuntimeMinifierExtensions
             globalSettings,
             hostingEnvironment);
 
-        result += await GetStylesheetInitializationAsync(minifier, manifestParser);
+        result += await GetStylesheetInitializationAsync(minifier, legacyManifestParser);
 
         return result;
     }
@@ -68,7 +68,7 @@ public static class RuntimeMinifierExtensions
     /// </summary>
     private static async Task<string> GetStylesheetInitializationAsync(
         IRuntimeMinifier minifier,
-        IManifestParser manifestParser)
+        ILegacyManifestParser legacyManifestParser)
     {
         var files = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         foreach (var file in await minifier.GetCssAssetPathsAsync(BackOfficeWebAssets.UmbracoCssBundleName))
@@ -77,10 +77,10 @@ public static class RuntimeMinifierExtensions
         }
 
         // process the independent bundles
-        if (manifestParser.CombinedManifest.Stylesheets.TryGetValue(BundleOptions.Independent,
-                out IReadOnlyList<ManifestAssets>? independentManifestAssetsList))
+        if (legacyManifestParser.CombinedManifest.Stylesheets.TryGetValue(BundleOptions.Independent,
+                out IReadOnlyList<LegacyManifestAssets>? independentManifestAssetsList))
         {
-            foreach (ManifestAssets manifestAssets in independentManifestAssetsList)
+            foreach (LegacyManifestAssets manifestAssets in independentManifestAssetsList)
             {
                 var bundleName = BackOfficeWebAssets.GetIndependentPackageBundleName(manifestAssets, AssetType.Css);
                 foreach (var asset in await minifier.GetCssAssetPathsAsync(bundleName))

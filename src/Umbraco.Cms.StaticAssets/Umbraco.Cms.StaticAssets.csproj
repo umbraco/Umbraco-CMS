@@ -11,12 +11,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
     <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
-    <BellePath>$(ProjectDir)wwwroot\umbraco</BellePath>
+    <BasePath>$(ProjectDir)wwwroot\umbraco</BasePath>
+    <BellePath>$(BasePath)\lib</BellePath>
+    <BackofficePath>$(BasePath)\backoffice</BackofficePath>
   </PropertyGroup>
 
   <Target Name="BuildBellePreconditions" BeforeTargets="Build">
@@ -24,11 +27,21 @@
     <Message Text="Skip BuildBelle target because '$(BellePath)' already exists" Importance="high" Condition="Exists('$(BellePath)')" />
     <Message Text="Call BuildBelle target because UmbracoBuild is empty (this is Visual Studio) and '$(BellePath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellePath)')" />
     <CallTarget Targets="BuildBelle" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellePath)')" />
+
+    <Message Text="Skip BuildBackOffice target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
+    <Message Text="Skip BuildBackOffice target because '$(BackofficePath)' already exists" Importance="high" Condition="Exists('$(BackofficePath)')" />
+    <Message Text="Call BuildBackOffice target because UmbracoBuild is empty (this is Visual Studio) and '$(BackofficePath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BackofficePath)')" />
+    <CallTarget Targets="BuildBackOffice" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BackofficePath)')" />
   </Target>
-  
+
   <Target Name="BuildBelle">
     <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm ci --no-fund --no-audit --prefer-offline" />
     <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm run build:skip-tests" />
+  </Target>
+
+  <Target Name="BuildBackOffice">
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.New.Client\" Command="npm ci --no-fund --no-audit --prefer-offline" />
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.New.Client\" Command="npm run build:for:cms" />
   </Target>
 
   <Target Name="CleanBellePreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
@@ -36,12 +49,26 @@
     <Message Text="Skip CleanBelle target because preserve.belle marker file exists" Importance="high" Condition="Exists('$(BellePath)') and Exists('$(SolutionDir)preserve.belle')" />
     <Message Text="Call CleanBelle target because '$(BellePath)' exists and preserve.belle marker file doesn't exist" Importance="high" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
     <CallTarget Targets="CleanBelle" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
+
+    <Message Text="Skip CleanBackoffice target because '$(BackofficePath)' doesn't exist" Importance="high" Condition="!Exists('$(BackofficePath)')" />
+    <Message Text="Skip CleanBackoffice target because preserve.belle marker file exists" Importance="high" Condition="Exists('$(BackofficePath)') and Exists('$(SolutionDir)preserve.belle')" />
+    <Message Text="Call CleanBackoffice target because '$(BackofficePath)' exists and preserve.belle marker file doesn't exist" Importance="high" Condition="Exists('$(BackofficePath)') and !Exists('$(SolutionDir)preserve.belle')" />
+    <CallTarget Targets="CleanBackoffice" Condition="Exists('$(BackofficePath)') and !Exists('$(SolutionDir)preserve.belle')" />
+
+
   </Target>
-  
+
   <Target Name="CleanBelle">
     <ItemGroup>
-      <BelleLib Include="$(BellePath)" />
+      <BelleDirectories Include="$(BasePath)/js;$(BasePath)/lib;$(BasePath)/assets;$(BasePath)/views" />
     </ItemGroup>
-    <RemoveDir Directories="@(BelleLib)" />
+    <RemoveDir Directories="@(BelleDirectories)" />
+  </Target>
+
+  <Target Name="CleanBackoffice">
+    <ItemGroup>
+      <BackofficeDirectories Include="$(BackofficePath);" />
+    </ItemGroup>
+    <RemoveDir Directories="@(BackofficeDirectories)" />
   </Target>
 </Project>

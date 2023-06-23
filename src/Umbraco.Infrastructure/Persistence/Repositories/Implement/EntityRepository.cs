@@ -289,6 +289,27 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
+    /// <inheritdoc />
+    public bool Exists(Guid key, Guid objectType)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .SelectCount()
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == objectType);
+
+        return Database.ExecuteScalar<int>(sql) > 0;
+    }
+
+    public bool Exists(int id, Guid objectType)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .SelectCount()
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.NodeId == id && x.NodeObjectType == objectType);
+
+        return Database.ExecuteScalar<int>(sql) > 0;
+    }
+
     public bool Exists(int id)
     {
         Sql<ISqlContext> sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);

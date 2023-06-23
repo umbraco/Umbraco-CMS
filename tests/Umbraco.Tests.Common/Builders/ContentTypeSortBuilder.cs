@@ -51,7 +51,8 @@ public class ContentTypeSortBuilder
         var id = _id ?? 1;
         var alias = _alias ?? Guid.NewGuid().ToString().ToCamelCase();
         var sortOrder = _sortOrder ?? 0;
+        var key = Guid.NewGuid();
 
-        return new ContentTypeSort(new Lazy<int>(() => id), sortOrder, alias);
+        return new ContentTypeSort(new Lazy<int>(() => id), key, sortOrder, alias);
     }
 }

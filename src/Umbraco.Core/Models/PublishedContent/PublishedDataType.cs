@@ -39,9 +39,10 @@ public class PublishedDataType
     public string EditorAlias { get; }
 
     /// <summary>
-    ///     Gets the data type configuration.
+    ///     Gets the data type configuration object.
     /// </summary>
-    public object? Configuration => _lazyConfiguration?.Value;
+    /// <seealso cref="IDataType.ConfigurationObject"/>
+    public object? ConfigurationObject => _lazyConfiguration?.Value;
 
     /// <summary>
     ///     Gets the configuration object.
@@ -51,7 +52,7 @@ public class PublishedDataType
     public T? ConfigurationAs<T>()
         where T : class
     {
-        switch (Configuration)
+        switch (ConfigurationObject)
         {
             case null:
                 return null;
@@ -60,6 +61,6 @@ public class PublishedDataType
         }
 
         throw new InvalidCastException(
-            $"Cannot cast dataType configuration, of type {Configuration.GetType().Name}, to {typeof(T).Name}.");
+            $"Cannot cast dataType configuration, of type {ConfigurationObject.GetType().Name}, to {typeof(T).Name}.");
     }
 }

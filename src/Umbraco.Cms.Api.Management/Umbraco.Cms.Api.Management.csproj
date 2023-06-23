@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Title>Umbraco CMS - Management API</Title>
+    <Description>Contains the presentation layer for the Umbraco CMS Management API.</Description>
+    <IsPackable>true</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+    <AssemblyName>Umbraco.Cms.Api.Management</AssemblyName>
+    <RootNamespace>Umbraco.Cms.Api.Management</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JsonPatch.Net" Version="2.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.2" />
+    <PackageReference Include="OpenIddict.AspNetCore" Version="4.2.0" />
+    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="4.2.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.New.Cms.Core\Umbraco.New.Cms.Core.csproj" />
+    <ProjectReference Include="..\Umbraco.New.Cms.Infrastructure\Umbraco.New.Cms.Infrastructure.csproj" />
+    <ProjectReference Include="..\Umbraco.New.Cms.Web.Common\Umbraco.New.Cms.Web.Common.csproj" />
+    <ProjectReference Include="..\Umbraco.Search\Umbraco.Search.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />
+    <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="OpenApi.json" />
+  </ItemGroup>
+</Project>

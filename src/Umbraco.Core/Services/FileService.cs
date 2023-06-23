@@ -1,15 +1,17 @@
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 using File = System.IO.File;
@@ -25,15 +27,16 @@ public class FileService : RepositoryService, IFileService
     private const string PartialViewHeader = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage";
     private const string PartialViewMacroHeader = "@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage";
     private readonly IAuditRepository _auditRepository;
-    private readonly GlobalSettings _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IPartialViewMacroRepository _partialViewMacroRepository;
     private readonly IPartialViewRepository _partialViewRepository;
     private readonly IScriptRepository _scriptRepository;
-    private readonly IShortStringHelper _shortStringHelper;
     private readonly IStylesheetRepository _stylesheetRepository;
+    private readonly ITemplateService _templateService;
     private readonly ITemplateRepository _templateRepository;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
+    [Obsolete("Use other ctor - will be removed in Umbraco 15")]
     public FileService(
         ICoreScopeProvider uowProvider,
         ILoggerFactory loggerFactory,
@@ -47,22 +50,58 @@ public class FileService : RepositoryService, IFileService
         IShortStringHelper shortStringHelper,
         IOptions<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment)
+        : this(
+            uowProvider,
+            loggerFactory,
+            eventMessagesFactory,
+            stylesheetRepository,
+            scriptRepository,
+            partialViewRepository,
+            partialViewMacroRepository,
+            auditRepository,
+            hostingEnvironment,
+            StaticServiceProvider.Instance.GetRequiredService<ITemplateService>(),
+            templateRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>(),
+            shortStringHelper,
+            globalSettings)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public FileService(
+        ICoreScopeProvider uowProvider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IStylesheetRepository stylesheetRepository,
+        IScriptRepository scriptRepository,
+        IPartialViewRepository partialViewRepository,
+        IPartialViewMacroRepository partialViewMacroRepository,
+        IAuditRepository auditRepository,
+        IHostingEnvironment hostingEnvironment,
+        ITemplateService templateService,
+        ITemplateRepository templateRepository,
+        IUserIdKeyResolver userIdKeyResolver,
+        // We need these else it will be ambigious ctors
+        IShortStringHelper shortStringHelper,
+        IOptions<GlobalSettings> globalSettings)
         : base(uowProvider, loggerFactory, eventMessagesFactory)
     {
         _stylesheetRepository = stylesheetRepository;
         _scriptRepository = scriptRepository;
-        _templateRepository = templateRepository;
         _partialViewRepository = partialViewRepository;
         _partialViewMacroRepository = partialViewMacroRepository;
         _auditRepository = auditRepository;
-        _shortStringHelper = shortStringHelper;
-        _globalSettings = globalSettings.Value;
         _hostingEnvironment = hostingEnvironment;
+        _templateService = templateService;
+        _templateRepository = templateRepository;
+        _userIdKeyResolver = userIdKeyResolver;
     }
 
     #region Stylesheets
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public IEnumerable<IStylesheet> GetStylesheets(params string[] paths)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -75,6 +114,7 @@ public class FileService : RepositoryService, IFileService
         _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public IStylesheet? GetStylesheet(string? path)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -84,6 +124,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public void SaveStylesheet(IStylesheet? stylesheet, int? userId = null)
     {
         if (stylesheet is null)
@@ -112,6 +153,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public void DeleteStylesheet(string path, int? userId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -143,6 +185,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public void CreateStyleSheetFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -153,6 +196,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetFolderService for stylesheet folder operations - will be removed in Umbraco 15")]
     public void DeleteStyleSheetFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -163,6 +207,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public Stream GetStylesheetFileContentStream(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -172,6 +217,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public void SetStylesheetFileContent(string filepath, Stream content)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -182,6 +228,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public long GetStylesheetFileSize(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -195,6 +242,7 @@ public class FileService : RepositoryService, IFileService
     #region Scripts
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     public IEnumerable<IScript> GetScripts(params string[] names)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -204,6 +252,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     public IScript? GetScript(string? name)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -213,6 +262,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     public void SaveScript(IScript? script, int? userId)
     {
         if (userId is null)
@@ -245,6 +295,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     public void DeleteScript(string path, int? userId = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -275,6 +326,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptFolderService for script folder operations - will be removed in Umbraco 15")]
     public void CreateScriptFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -285,6 +337,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptFolderService for script folder operations - will be removed in Umbraco 15")]
     public void DeleteScriptFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -295,6 +348,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     public Stream GetScriptFileContentStream(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -304,6 +358,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     public void SetScriptFileContent(string filepath, Stream content)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -314,6 +369,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     public long GetScriptFileSize(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -335,54 +391,24 @@ public class FileService : RepositoryService, IFileService
     /// <returns>
     ///     The template created
     /// </returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(
         string contentTypeAlias, string? contentTypeName, int userId = Constants.Security.SuperUserId)
     {
-        var template = new Template(_shortStringHelper, contentTypeName,
-
-            // NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
-            // want to save template file names as camelCase, the Template ctor will clean the alias as
-            // `alias.ToCleanString(CleanStringType.UnderscoreAlias)` which has been the default.
-            // This fixes: http://issues.umbraco.org/issue/U4-7953
-            contentTypeName);
-
-        EventMessages eventMessages = EventMessagesFactory.Get();
-
-        if (contentTypeAlias != null && contentTypeAlias.Length > 255)
+        // mimic old service behavior
+        if (contentTypeAlias.Length > 255)
         {
             throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
         }
 
-        // check that the template hasn't been created on disk before creating the content type
-        // if it exists, set the new template content to the existing file content
-        var content = GetViewContent(contentTypeAlias);
-        if (content != null)
-        {
-            template.Content = content;
-        }
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+        Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateForContentTypeAsync(contentTypeAlias, contentTypeName, currentUserKey).GetAwaiter().GetResult();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var savingEvent = new TemplateSavingNotification(template, eventMessages, true, contentTypeAlias!);
-            if (scope.Notifications.PublishCancelable(savingEvent))
-            {
-                scope.Complete();
-                return OperationResult.Attempt.Fail<OperationResultType, ITemplate>(
-                    OperationResultType.FailedCancelledByEvent, eventMessages, template);
-            }
-
-            _templateRepository.Save(template);
-            scope.Notifications.Publish(
-                new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingEvent));
-
-            Audit(AuditType.Save, userId, template.Id, UmbracoObjectTypes.Template.GetName());
-            scope.Complete();
-        }
-
-        return OperationResult.Attempt.Succeed<OperationResultType, ITemplate>(
-            OperationResultType.Success,
-            eventMessages,
-            template);
+        // mimic old service behavior
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        return result.Success
+            ? OperationResult.Attempt.Succeed(OperationResultType.Success, eventMessages, result.Result)
+            : OperationResult.Attempt.Succeed(OperationResultType.Failed, eventMessages, result.Result);
     }
 
     /// <summary>
@@ -394,6 +420,7 @@ public class FileService : RepositoryService, IFileService
     /// <param name="masterTemplate"></param>
     /// <param name="userId"></param>
     /// <returns></returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public ITemplate CreateTemplateWithIdentity(
         string? name,
         string? alias,
@@ -401,118 +428,80 @@ public class FileService : RepositoryService, IFileService
         ITemplate? masterTemplate = null,
         int userId = Constants.Security.SuperUserId)
     {
-        if (name == null)
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
-
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException("Name cannot be empty or contain only white-space characters", nameof(name));
-        }
-
+        // mimic old service behavior
+        ArgumentException.ThrowIfNullOrEmpty(name);
+        ArgumentException.ThrowIfNullOrEmpty(alias);
         if (name.Length > 255)
         {
             throw new ArgumentOutOfRangeException(nameof(name), "Name cannot be more than 255 characters in length.");
         }
 
-        // file might already be on disk, if so grab the content to avoid overwriting
-        var template = new Template(_shortStringHelper, name, alias) { Content = GetViewContent(alias) ?? content };
-
-        if (masterTemplate != null)
-        {
-            template.SetMasterTemplate(masterTemplate);
-        }
-
-        SaveTemplate(template, userId);
-
-        return template;
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+        Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateAsync(name, alias, content, currentUserKey).GetAwaiter().GetResult();
+        return result.Result;
     }
 
     /// <summary>
     ///     Gets a list of all <see cref="ITemplate" /> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public IEnumerable<ITemplate> GetTemplates(params string[] aliases)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _templateRepository.GetAll(aliases).OrderBy(x => x.Name);
-        }
-    }
+        => _templateService.GetAllAsync(aliases).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets a list of all <see cref="ITemplate" /> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public IEnumerable<ITemplate> GetTemplates(int masterTemplateId)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _templateRepository.GetChildren(masterTemplateId).OrderBy(x => x.Name);
-        }
-    }
+        => _templateService.GetChildrenAsync(masterTemplateId).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its alias.
     /// </summary>
     /// <param name="alias">The alias of the template.</param>
     /// <returns>The <see cref="ITemplate" /> object matching the alias, or null.</returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public ITemplate? GetTemplate(string? alias)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _templateRepository.Get(alias);
-        }
-    }
+        => _templateService.GetAsync(alias).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its identifier.
     /// </summary>
     /// <param name="id">The identifier of the template.</param>
     /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public ITemplate? GetTemplate(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _templateRepository.Get(id);
-        }
-    }
+        => _templateService.GetAsync(id).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its guid identifier.
     /// </summary>
     /// <param name="id">The guid identifier of the template.</param>
     /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public ITemplate? GetTemplate(Guid id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<ITemplate>? query = Query<ITemplate>().Where(x => x.Key == id);
-            return _templateRepository.Get(query)?.SingleOrDefault();
-        }
-    }
+        => _templateService.GetAsync(id).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets the template descendants
     /// </summary>
     /// <param name="masterTemplateId"></param>
     /// <returns></returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _templateRepository.GetDescendants(masterTemplateId);
-        }
-    }
+        => _templateService.GetDescendantsAsync(masterTemplateId).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Saves a <see cref="Template" />
     /// </summary>
     /// <param name="template"><see cref="Template" /> to save</param>
     /// <param name="userId"></param>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId)
     {
+        // mimic old service behavior
         if (template == null)
         {
             throw new ArgumentNullException(nameof(template));
@@ -524,23 +513,14 @@ public class FileService : RepositoryService, IFileService
                 "Name cannot be null, empty, contain only white-space characters or be more than 255 characters in length.");
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+        if (template.Id > 0)
         {
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new TemplateSavingNotification(template, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _templateRepository.Save(template);
-
-            scope.Notifications.Publish(
-                new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingNotification));
-
-            Audit(AuditType.Save, userId, template.Id, UmbracoObjectTypes.Template.GetName());
-            scope.Complete();
+            _templateService.UpdateAsync(template, currentUserKey).GetAwaiter().GetResult();
+        }
+        else
+        {
+            _templateService.CreateAsync(template, currentUserKey).GetAwaiter().GetResult();
         }
     }
 
@@ -549,6 +529,9 @@ public class FileService : RepositoryService, IFileService
     /// </summary>
     /// <param name="templates">List of <see cref="Template" /> to save</param>
     /// <param name="userId">Optional id of the user</param>
+    // FIXME: we need to re-implement PackageDataInstallation.ImportTemplates so it imports templates in the correct order
+    //        instead of relying on being able to save invalid templates (child templates whose master has yet to be created)
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId)
     {
         ITemplate[] templatesA = templates.ToArray();
@@ -580,87 +563,33 @@ public class FileService : RepositoryService, IFileService
     /// </summary>
     /// <param name="alias">Alias of the <see cref="ITemplate" /> to delete</param>
     /// <param name="userId"></param>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            ITemplate? template = _templateRepository.Get(alias);
-            if (template == null)
-            {
-                scope.Complete();
-                return;
-            }
-
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var deletingNotification = new TemplateDeletingNotification(template, eventMessages);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _templateRepository.Delete(template);
-
-            scope.Notifications.Publish(
-                new TemplateDeletedNotification(template, eventMessages).WithStateFrom(deletingNotification));
-
-            Audit(AuditType.Delete, userId, template.Id, UmbracoObjectTypes.Template.GetName());
-            scope.Complete();
-        }
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+        _templateService.DeleteAsync(alias, currentUserKey).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public Stream GetTemplateFileContentStream(string filepath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _templateRepository.GetFileContentStream(filepath);
-        }
-    }
-
-    private string? GetViewContent(string? fileName)
-    {
-        if (fileName.IsNullOrWhiteSpace())
-        {
-            throw new ArgumentNullException(nameof(fileName));
-        }
-
-        if (!fileName!.EndsWith(".cshtml"))
-        {
-            fileName = $"{fileName}.cshtml";
-        }
-
-        Stream fs = _templateRepository.GetFileContentStream(fileName);
-
-        using (var view = new StreamReader(fs))
-        {
-            return view.ReadToEnd().Trim();
-        }
-    }
+        => _templateService.GetFileContentStreamAsync(filepath).GetAwaiter().GetResult();
 
     /// <inheritdoc />
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public void SetTemplateFileContent(string filepath, Stream content)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _templateRepository.SetFileContent(filepath, content);
-            scope.Complete();
-        }
-    }
+        => _templateService.SetFileContentAsync(filepath, content).GetAwaiter().GetResult();
 
     /// <inheritdoc />
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public long GetTemplateFileSize(string filepath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _templateRepository.GetFileSize(filepath);
-        }
-    }
+        => _templateService.GetFileSizeAsync(filepath).GetAwaiter().GetResult();
 
     #endregion
 
     #region Partial Views
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames)
     {
         var snippetProvider =
@@ -680,6 +609,7 @@ public class FileService : RepositoryService, IFileService
         return empty.Union(files.Except(empty)).WhereNotNull();
     }
 
+    [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
     public void DeletePartialViewFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -698,6 +628,7 @@ public class FileService : RepositoryService, IFileService
         }
     }
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public IEnumerable<IPartialView> GetPartialViews(params string[] names)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -706,6 +637,7 @@ public class FileService : RepositoryService, IFileService
         }
     }
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public IPartialView? GetPartialView(string path)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -722,12 +654,14 @@ public class FileService : RepositoryService, IFileService
         }
     }
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId) =>
         CreatePartialViewMacro(partialView, PartialViewType.PartialView, snippetName, userId);
 
     public Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId) =>
         CreatePartialViewMacro(partialView, PartialViewType.PartialViewMacro, snippetName, userId);
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public bool DeletePartialView(string path, int? userId = null) =>
         DeletePartialViewMacro(path, PartialViewType.PartialView, userId);
 
@@ -809,6 +743,7 @@ public class FileService : RepositoryService, IFileService
     public bool DeletePartialViewMacro(string path, int? userId = null) =>
         DeletePartialViewMacro(path, PartialViewType.PartialViewMacro, userId);
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null) =>
         SavePartialView(partialView, PartialViewType.PartialView, userId);
 
@@ -847,6 +782,7 @@ public class FileService : RepositoryService, IFileService
     public Attempt<IPartialView?> SavePartialViewMacro(IPartialView partialView, int? userId = null) =>
         SavePartialView(partialView, PartialViewType.PartialViewMacro, userId);
 
+    [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
     public void CreatePartialViewFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -862,6 +798,7 @@ public class FileService : RepositoryService, IFileService
         return headerMatch.Replace(contents, string.Empty);
     }
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     private Attempt<IPartialView?> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int? userId = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -913,6 +850,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public Stream GetPartialViewFileContentStream(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -935,6 +873,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public void SetPartialViewFileContent(string filepath, Stream content)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -945,6 +884,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public long GetPartialViewFileSize(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))

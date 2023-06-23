@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -6,6 +8,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -13,16 +16,47 @@ namespace Umbraco.Cms.Core.Services;
 public class RelationService : RepositoryService, IRelationService
 {
     private readonly IAuditRepository _auditRepository;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IEntityService _entityService;
     private readonly IRelationRepository _relationRepository;
     private readonly IRelationTypeRepository _relationTypeRepository;
 
-    public RelationService(ICoreScopeProvider uowProvider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IEntityService entityService, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository, IAuditRepository auditRepository)
+    [Obsolete("Please use ctor that takes all parameters, scheduled for removal in V15")]
+    public RelationService(
+        ICoreScopeProvider uowProvider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IEntityService entityService,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        IAuditRepository auditRepository)
+        : this(
+            uowProvider,
+            loggerFactory,
+            eventMessagesFactory,
+            entityService,
+            relationRepository,
+            relationTypeRepository,
+            auditRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+    {
+    }
+
+    public RelationService(
+        ICoreScopeProvider uowProvider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IEntityService entityService,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        IAuditRepository auditRepository,
+        IUserIdKeyResolver userIdKeyResolver)
         : base(uowProvider, loggerFactory, eventMessagesFactory)
     {
         _relationRepository = relationRepository;
         _relationTypeRepository = relationTypeRepository;
         _auditRepository = auditRepository;
+        _userIdKeyResolver = userIdKeyResolver;
         _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
     }
 
@@ -236,6 +270,24 @@ public class RelationService : RepositoryService, IRelationService
         {
             IQuery<IRelation>? query = Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
             return _relationRepository.GetPagedRelationsByQuery(query, pageIndex, pageSize, out totalRecords, ordering);
+        }
+    }
+
+    public async Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKey(Guid key, int skip, int take, Ordering? ordering = null)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IRelationType? relationType = _relationTypeRepository.Get(key);
+            if (relationType is null)
+            {
+                return await Task.FromResult(Attempt.FailWithStatus<PagedModel<IRelation>, RelationOperationStatus>(RelationOperationStatus.RelationTypeNotFound, null!));
+            }
+
+            PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+            IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
+            IEnumerable<IRelation> relations = _relationRepository.GetPagedRelationsByQuery(query, pageNumber, pageSize, out var totalRecords, ordering);
+            return await Task.FromResult(Attempt.SucceedWithStatus(RelationOperationStatus.Success, new PagedModel<IRelation>(totalRecords, relations)));
         }
     }
 
@@ -512,6 +564,73 @@ public class RelationService : RepositoryService, IRelationService
         }
     }
 
+    public async Task<Attempt<IRelationType, RelationTypeOperationStatus>> CreateAsync(IRelationType relationType, Guid userKey)
+    {
+        if (relationType.Id != 0)
+        {
+            return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidId, relationType);
+        }
+
+        return await SaveAsync(
+            relationType,
+            () => _relationTypeRepository.Get(relationType.Key) is not null ? RelationTypeOperationStatus.KeyAlreadyExists : RelationTypeOperationStatus.Success,
+            AuditType.New,
+            $"Created relation type: {relationType.Name}",
+            userKey);
+    }
+
+    public async Task<Attempt<IRelationType, RelationTypeOperationStatus>> UpdateAsync(IRelationType relationType, Guid userKey) =>
+        await SaveAsync(
+            relationType,
+            () => _relationTypeRepository.Get(relationType.Key) is null ? RelationTypeOperationStatus.NotFound : RelationTypeOperationStatus.Success,
+            AuditType.Save,
+            $"Created relation type: {relationType.Name}",
+            userKey);
+
+    private async Task<Attempt<IRelationType, RelationTypeOperationStatus>> SaveAsync(IRelationType relationType, Func<RelationTypeOperationStatus> operationValidation, AuditType auditType, string auditMessage, Guid userKey)
+    {
+        // Validate that parent & child object types are allowed
+        UmbracoObjectTypes[] allowedObjectTypes = GetAllowedObjectTypes().ToArray();
+        var childObjectTypeAllowed = allowedObjectTypes.Any(x => x.GetGuid() == relationType.ChildObjectType);
+        if (childObjectTypeAllowed is false)
+        {
+            return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidChildObjectType, relationType);
+        }
+
+        var parentObjectTypeAllowed = allowedObjectTypes.Any(x => x.GetGuid() == relationType.ParentObjectType);
+
+        if (parentObjectTypeAllowed is false)
+        {
+            return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidParentObjectType, relationType);
+        }
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            RelationTypeOperationStatus status = operationValidation();
+            if (status != RelationTypeOperationStatus.Success)
+            {
+                return Attempt.FailWithStatus(status, relationType);
+            }
+
+            EventMessages eventMessages = EventMessagesFactory.Get();
+            var savingNotification = new RelationTypeSavingNotification(relationType, eventMessages);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus(RelationTypeOperationStatus.CancelledByNotification, relationType);
+            }
+
+            _relationTypeRepository.Save(relationType);
+            var currentUser = await _userIdKeyResolver.GetAsync(userKey);
+            Audit(auditType, currentUser, relationType.Id, auditMessage);
+            scope.Complete();
+            scope.Notifications.Publish(
+                new RelationTypeSavedNotification(relationType, eventMessages).WithStateFrom(savingNotification));
+        }
+
+        return await Task.FromResult(Attempt.SucceedWithStatus(RelationTypeOperationStatus.Success, relationType));
+    }
+
     /// <inheritdoc />
     public void Delete(IRelation relation)
     {
@@ -552,6 +671,33 @@ public class RelationService : RepositoryService, IRelationService
         }
     }
 
+    public async Task<Attempt<IRelationType?, RelationTypeOperationStatus>> DeleteAsync(Guid key, Guid userKey)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            IRelationType? relationType = _relationTypeRepository.Get(key);
+            if (relationType is null)
+            {
+                return Attempt.FailWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.NotFound, null);
+            }
+
+            EventMessages eventMessages = EventMessagesFactory.Get();
+            var deletingNotification = new RelationTypeDeletingNotification(relationType, eventMessages);
+            if (scope.Notifications.PublishCancelable(deletingNotification))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.CancelledByNotification, null);
+            }
+
+            _relationTypeRepository.Delete(relationType);
+            var currentUser = await _userIdKeyResolver.GetAsync(userKey);
+            Audit(AuditType.Delete, currentUser, relationType.Id, "Deleted relation type");
+            scope.Notifications.Publish(new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
+            scope.Complete();
+            return await Task.FromResult(Attempt.SucceedWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.Success, relationType));
+        }
+    }
+
     /// <inheritdoc />
     public void DeleteRelationsOfType(IRelationType relationType)
     {
@@ -583,6 +729,21 @@ public class RelationService : RepositoryService, IRelationService
             return _relationRepository.Get(query).Any();
         }
     }
+
+    public IEnumerable<UmbracoObjectTypes> GetAllowedObjectTypes() =>
+        new[]
+        {
+            UmbracoObjectTypes.Document,
+            UmbracoObjectTypes.Media,
+            UmbracoObjectTypes.Member,
+            UmbracoObjectTypes.DocumentType,
+            UmbracoObjectTypes.MediaType,
+            UmbracoObjectTypes.MemberType,
+            UmbracoObjectTypes.DataType,
+            UmbracoObjectTypes.MemberGroup,
+            UmbracoObjectTypes.ROOT,
+            UmbracoObjectTypes.RecycleBin,
+        };
 
     #region Private Methods
 

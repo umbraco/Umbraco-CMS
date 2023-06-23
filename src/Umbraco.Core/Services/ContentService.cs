@@ -1146,6 +1146,8 @@ public class ContentService : RepositoryService, IContentService
 
             var allLangs = _languageRepository.GetMany().ToList();
 
+            // Change state to publishing
+            content.PublishedState = PublishedState.Publishing;
             var savingNotification = new ContentSavingNotification(content, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
@@ -2385,7 +2387,7 @@ public class ContentService : RepositoryService, IContentService
 
             var originalPath = content.Path;
             var moveEventInfo =
-                new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent);
+                new MoveToRecycleBinEventInfo<IContent>(content, originalPath);
 
             var movingToRecycleBinNotification =
                 new ContentMovingToRecycleBinNotification(moveEventInfo, eventMessages);
@@ -2404,8 +2406,8 @@ public class ContentService : RepositoryService, IContentService
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
 
-            MoveEventInfo<IContent>[] moveInfo = moves
-                .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
+            MoveToRecycleBinEventInfo<IContent>[] moveInfo = moves
+                .Select(x => new MoveToRecycleBinEventInfo<IContent>(x.Item1, x.Item2))
                 .ToArray();
 
             scope.Notifications.Publish(
@@ -2430,21 +2432,20 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="content">The <see cref="IContent" /> to move</param>
     /// <param name="parentId">Id of the Content's new Parent</param>
     /// <param name="userId">Optional Id of the User moving the Content</param>
-    public void Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
+    public OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
     {
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
         if(content.ParentId == parentId)
         {
-            return;
+            return OperationResult.Succeed(eventMessages);
         }
 
         // if moving to the recycle bin then use the proper method
         if (parentId == Constants.System.RecycleBinContent)
         {
-            MoveToRecycleBin(content, userId);
-            return;
+            return MoveToRecycleBin(content, userId);
         }
-
-        EventMessages eventMessages = EventMessagesFactory.Get();
 
         var moves = new List<(IContent, string)>();
 
@@ -2458,13 +2459,14 @@ public class ContentService : RepositoryService, IContentService
                 throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
             }
 
+            // FIXME: Use MoveEventInfo that also takes a parent key when implementing move with parentKey.
             var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentId);
 
             var movingNotification = new ContentMovingNotification(moveEventInfo, eventMessages);
             if (scope.Notifications.PublishCancelable(movingNotification))
             {
                 scope.Complete();
-                return; // causes rollback
+                return OperationResult.Cancel(eventMessages); // causes rollback
             }
 
             // if content was trashed, and since we're not moving to the recycle bin,
@@ -2488,6 +2490,7 @@ public class ContentService : RepositoryService, IContentService
                 new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
 
             // changes
+            // FIXME: Use MoveEventInfo that also takes a parent key when implementing move with parentKey.
             MoveEventInfo<IContent>[] moveInfo = moves
                 .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
                 .ToArray();
@@ -2498,6 +2501,7 @@ public class ContentService : RepositoryService, IContentService
             Audit(AuditType.Move, userId, content.Id);
 
             scope.Complete();
+            return OperationResult.Succeed(eventMessages);
         }
     }
 
@@ -2643,6 +2647,7 @@ public class ContentService : RepositoryService, IContentService
     /// </summary>
     /// <param name="content">The <see cref="IContent" /> to copy</param>
     /// <param name="parentId">Id of the Content's new Parent</param>
+    /// <param name="parentKey">Key of the Content's new Parent</param>
     /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
     /// <param name="recursive">A value indicating whether to recursively copy children.</param>
     /// <param name="userId">Optional Id of the User copying the Content</param>
@@ -2656,8 +2661,8 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            if (scope.Notifications.PublishCancelable(
-                    new ContentCopyingNotification(content, copy, parentId, eventMessages)))
+            // FIXME: Pass parent key in constructor too when proper Copy method is implemented
+            if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentId, eventMessages)))
             {
                 scope.Complete();
                 return null;
@@ -2719,8 +2724,8 @@ public class ContentService : RepositoryService, IContentService
                         IContent descendantCopy = descendant.DeepCloneWithResetIdentities();
                         descendantCopy.ParentId = parentId;
 
-                        if (scope.Notifications.PublishCancelable(
-                                new ContentCopyingNotification(descendant, descendantCopy, parentId, eventMessages)))
+                        // FIXME: Pass parent key in constructor too when proper Copy method is implemented
+                        if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(descendant, descendantCopy, parentId, eventMessages)))
                         {
                             continue;
                         }
@@ -2751,6 +2756,7 @@ public class ContentService : RepositoryService, IContentService
                 new ContentTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
             foreach (Tuple<IContent, IContent> x in copies)
             {
+                // FIXME: Pass parent key in constructor too when proper Copy method is implemented
                 scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, parentId, relateToOriginal, eventMessages));
             }
 
@@ -2932,6 +2938,7 @@ public class ContentService : RepositoryService, IContentService
             // save
             saved.Add(content);
             _documentRepository.Save(content);
+            Audit(AuditType.Sort, userId, content.Id, "Sorting content performed by user");
         }
 
         // first saved, then sorted
@@ -2948,7 +2955,6 @@ public class ContentService : RepositoryService, IContentService
             scope.Notifications.Publish(new ContentPublishedNotification(published, eventMessages));
         }
 
-        Audit(AuditType.Sort, userId, 0, "Sorting content performed by user");
         return OperationResult.Succeed(eventMessages);
     }
 
@@ -3431,8 +3437,8 @@ public class ContentService : RepositoryService, IContentService
                 changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.Remove));
             }
 
-            MoveEventInfo<IContent>[] moveInfos = moves
-                .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
+            MoveToRecycleBinEventInfo<IContent>[] moveInfos = moves
+                .Select(x => new MoveToRecycleBinEventInfo<IContent>(x.Item1, x.Item2))
                 .ToArray();
             if (moveInfos.Length > 0)
             {

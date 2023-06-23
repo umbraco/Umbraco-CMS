@@ -317,7 +317,7 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Moves a document under a new parent.
     /// </summary>
-    void Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId);
+    OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Copies a document.

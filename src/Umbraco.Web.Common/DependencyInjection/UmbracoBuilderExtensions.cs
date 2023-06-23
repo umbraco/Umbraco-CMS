@@ -31,6 +31,7 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry;
@@ -46,6 +47,7 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Web.Common;
 using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.Configuration;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.FileProviders;
@@ -55,6 +57,7 @@ using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.Mvc;
 using Umbraco.Cms.Web.Common.Profiler;
+using Umbraco.Cms.Web.Common.Repositories;
 using Umbraco.Cms.Web.Common.RuntimeMinification;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
@@ -109,7 +112,7 @@ public static partial class UmbracoBuilderExtensions
         services.ConfigureOptions<ConfigureKestrelServerOptions>();
         services.ConfigureOptions<ConfigureFormOptions>();
 
-        IProfiler profiler = GetWebProfiler(config);
+        IProfiler profiler = GetWebProfiler(config, httpContextAccessor);
 
         services.AddLogger(webHostEnvironment, config);
 
@@ -149,8 +152,9 @@ public static partial class UmbracoBuilderExtensions
 
         // WebRootFileProviderFactory is just a wrapper around the IWebHostEnvironment.WebRootFileProvider,
         // therefore no need to register it as singleton
-        builder.Services.AddSingleton<IManifestFileProviderFactory, ContentAndWebRootFileProviderFactory>();
+        builder.Services.AddSingleton<ILegacyPackageManifestFileProviderFactory, ContentAndWebRootFileProviderFactory>();
         builder.Services.AddSingleton<IGridEditorsConfigFileProviderFactory, WebRootFileProviderFactory>();
+        builder.Services.AddSingleton<IPackageManifestFileProviderFactory, ContentAndWebRootFileProviderFactory>();
 
         // Must be added here because DbProviderFactories is netstandard 2.1 so cannot exist in Infra for now
         builder.Services.AddSingleton<IDbProviderFactoryCreator>(factory => new DbProviderFactoryCreator(
@@ -182,6 +186,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddHostedService<KeepAlive>();
         builder.Services.AddHostedService<LogScrubber>();
         builder.Services.AddHostedService<ContentVersionCleanup>();
+        builder.Services.AddHostedService<TemporaryFileCleanup>();
         builder.Services.AddHostedService<ScheduledPublishing>();
         builder.Services.AddHostedService<TempFileCleanup>();
         builder.Services.AddHostedService<InstructionProcessTask>();
@@ -200,15 +205,10 @@ public static partial class UmbracoBuilderExtensions
     {
         builder.Services.AddSingleton<WebProfilerHtml>();
 
-        builder.Services.AddMiniProfiler(options =>
-        {
-            // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
-            options.ShouldProfile = request => false;
+        builder.Services.AddMiniProfiler();
+        builder.Services.ConfigureOptions<ConfigureMiniProfilerOptions>();
 
-            // this is a default path and by default it performs a 'contains' check which will match our content controller
-            // (and probably other requests) and ignore them.
-            options.IgnoredPaths.Remove("/content/");
-        });
+        builder.Services.AddSingleton<IWebProfilerRepository, WebProfilerRepository>();
 
         builder.AddNotificationHandler<UmbracoApplicationStartingNotification, InitializeWebProfiling>();
         return builder;
@@ -291,6 +291,9 @@ public static partial class UmbracoBuilderExtensions
             options.Cookie.HttpOnly = true;
         });
 
+        builder.Services.ConfigureOptions<ConfigureApiVersioningOptions>();
+        builder.Services.ConfigureOptions<ConfigureApiExplorerOptions>();
+        builder.Services.AddApiVersioning().AddApiExplorer();
         builder.Services.ConfigureOptions<UmbracoMvcConfigureOptions>();
         builder.Services.ConfigureOptions<UmbracoRequestLocalizationOptions>();
         builder.Services.TryAddEnumerable(ServiceDescriptor
@@ -385,7 +388,7 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    private static IProfiler GetWebProfiler(IConfiguration config)
+    private static IProfiler GetWebProfiler(IConfiguration config, IHttpContextAccessor httpContextAccessor)
     {
         var isDebug = config.GetValue<bool>($"{Constants.Configuration.ConfigHosting}:Debug");
 
@@ -397,7 +400,7 @@ public static partial class UmbracoBuilderExtensions
             return new NoopProfiler();
         }
 
-        var webProfiler = new WebProfiler();
+        var webProfiler = new WebProfiler(httpContextAccessor);
         webProfiler.StartBoot();
 
         return webProfiler;

@@ -20,13 +20,14 @@ internal sealed class UserGroupValidateAttribute : TypeFilterAttribute
     private class UserGroupValidateFilter : IActionFilter
     {
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IUserService _userService;
+        private readonly IUserGroupService _userGroupService;
 
         public UserGroupValidateFilter(
-            IUserService userService,
+            IUserGroupService userGroupService,
             IShortStringHelper shortStringHelper)
         {
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            ArgumentNullException.ThrowIfNull(userGroupService);
+            _userGroupService = userGroupService;
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         }
 
@@ -45,7 +46,7 @@ internal sealed class UserGroupValidateAttribute : TypeFilterAttribute
             switch (userGroupSave?.Action)
             {
                 case ContentSaveAction.Save:
-                    persisted = _userService.GetUserGroupById(Convert.ToInt32(userGroupSave.Id));
+                    persisted = _userGroupService.GetAsync(Convert.ToInt32(userGroupSave.Id)).GetAwaiter().GetResult();
                     if (persisted == null)
                     {
                         var message = $"User group with id: {userGroupSave.Id} was not found";
@@ -73,7 +74,7 @@ internal sealed class UserGroupValidateAttribute : TypeFilterAttribute
             //now assign the persisted entity to the model so we can use it in the action
             userGroupSave.PersistedUserGroup = persisted;
 
-            IUserGroup? existing = _userService.GetUserGroupByAlias(userGroupSave.Alias);
+            IUserGroup? existing = _userGroupService.GetAsync(userGroupSave.Alias).GetAwaiter().GetResult();
             if (existing != null && existing.Id != userGroupSave.PersistedUserGroup.Id)
             {
                 context.ModelState.AddModelError("Alias", "A user group with this alias already exists");

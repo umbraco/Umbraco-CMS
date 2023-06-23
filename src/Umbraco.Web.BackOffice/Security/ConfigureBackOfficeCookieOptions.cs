@@ -104,6 +104,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
 
         // For any redirections that may occur for the back office, they all go to the same path
         var backOfficePath = _globalSettings.GetBackOfficePath(_hostingEnvironment);
+        backOfficePath += "/login";
         options.AccessDeniedPath = backOfficePath;
         options.LoginPath = backOfficePath;
         options.LogoutPath = backOfficePath;

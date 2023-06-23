@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 
@@ -22,16 +23,20 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
     /// <param name="logger">Logger for this class</param>
     public PasswordChanger(ILogger<PasswordChanger<TUser>> logger) => _logger = logger;
 
+    public Task<Attempt<PasswordChangedModel?>> ChangePasswordWithIdentityAsync(ChangingPasswordModel passwordModel, IUmbracoUserManager<TUser> userMgr) => ChangePasswordWithIdentityAsync(passwordModel, userMgr, null);
+
     /// <summary>
     ///     Changes the password for a user based on the many different rules and config options
     /// </summary>
-    /// <param name="changingPasswordModel">The changing password model</param>
-    /// <param name="userMgr">The identity manager to use to update the password</param>
+    /// <param name="changingPasswordModel">The changing password model.</param>
+    /// <param name="userMgr">The identity manager to use to update the password.</param>
+    /// <param name="currentUser">The user performing the operation.</param>
     /// Create an adapter to pass through everything - adapting the member into a user for this functionality
     /// <returns>The outcome of the password changed model</returns>
     public async Task<Attempt<PasswordChangedModel?>> ChangePasswordWithIdentityAsync(
         ChangingPasswordModel changingPasswordModel,
-        IUmbracoUserManager<TUser> userMgr)
+        IUmbracoUserManager<TUser> userMgr,
+        IUser? currentUser)
     {
         if (changingPasswordModel == null)
         {
@@ -47,7 +52,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
         {
             return Attempt.Fail(new PasswordChangedModel
             {
-                ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" })
+                Error = new ValidationResult("Cannot set an empty password", new[] { "value" })
             });
         }
 
@@ -58,13 +63,22 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
             // this really shouldn't ever happen... but just in case
             return Attempt.Fail(new PasswordChangedModel
             {
-                ChangeError = new ValidationResult("Password could not be verified", new[] { "oldPassword" })
+                Error = new ValidationResult("Password could not be verified", new[] { "oldPassword" })
             });
         }
 
         // Are we just changing another user/member's password?
         if (changingPasswordModel.OldPassword.IsNullOrWhiteSpace())
         {
+            if (changingPasswordModel.Id == currentUser?.Id)
+            {
+                return Attempt.Fail(new PasswordChangedModel
+                {
+
+                    Error = new ValidationResult("Cannot change the password of current user without the old password", new[] { "value" }),
+                });
+            }
+
             // ok, we should be able to reset it
             var resetToken = await userMgr.GeneratePasswordResetTokenAsync(identityUser);
 
@@ -77,7 +91,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
                 _logger.LogWarning("Could not reset user password {PasswordErrors}", errors);
                 return Attempt.Fail(new PasswordChangedModel
                 {
-                    ChangeError = new ValidationResult(errors, new[] { "value" })
+                    Error = new ValidationResult(errors, new[] { "value" })
                 });
             }
 
@@ -91,7 +105,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
             // no, fail with an error message for "oldPassword"
             return Attempt.Fail(new PasswordChangedModel
             {
-                ChangeError = new ValidationResult("Incorrect password", new[] { "oldPassword" })
+                Error = new ValidationResult("Incorrect password", new[] { "oldPassword" })
             });
         }
 
@@ -104,7 +118,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
             _logger.LogWarning("Could not change user password {PasswordErrors}", errors);
             return Attempt.Fail(new PasswordChangedModel
             {
-                ChangeError = new ValidationResult(errors, new[] { "password" })
+                Error = new ValidationResult(errors, new[] { "password" })
             });
         }
 

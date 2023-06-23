@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Moq;
@@ -62,13 +61,13 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
         {
             new("en-US", "English (United States)") { Id = 1, IsDefault = true },
             new("fr", "French") { Id = 2 },
-            new("es", "Spanish") { Id = 3, FallbackLanguageId = 1 },
-            new("it", "Italian") { Id = 4, FallbackLanguageId = 3 },
+            new("es", "Spanish") { Id = 3, FallbackIsoCode = "en-US" },
+            new("it", "Italian") { Id = 4, FallbackIsoCode = "es" },
             new("de", "German") { Id = 5 },
-            new Language("da", "Danish") { Id = 6, FallbackLanguageId = 8 },
-            new Language("sv", "Swedish") { Id = 7, FallbackLanguageId = 6 },
-            new Language("no", "Norweigan") { Id = 8, FallbackLanguageId = 7 },
-            new Language("nl", "Dutch") { Id = 9, FallbackLanguageId = 1 },
+            new Language("da", "Danish") { Id = 6, FallbackIsoCode = "no" },
+            new Language("sv", "Swedish") { Id = 7, FallbackIsoCode = "da" },
+            new Language("no", "Norweigan") { Id = 8, FallbackIsoCode = "sv" },
+            new Language("nl", "Dutch") { Id = 9, FallbackIsoCode = "en-US" },
         };
 
         localizationService.Setup(x => x.GetAllLanguages()).Returns(languages);
@@ -136,6 +135,8 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
             .WithProperties(new PropertyDataBuilder()
                 .WithPropertyData("welcomeText", "Welcome")
                 .WithPropertyData("welcomeText", "Welcome", "en-US")
+                .WithPropertyData("numericField", 123)
+                .WithPropertyData("numericField", 123, "en-US")
                 .WithPropertyData("noprop", "xxx")
                 .Build())
 
@@ -323,9 +324,25 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
         var content = snapshot.Content.GetAtRoot().First().Children.First();
 
         var value = content.Value(PublishedValueFallback, "welcomeText", "nl", fallback: Fallback.ToLanguage);
+        var numericValue = content.Value(PublishedValueFallback, "numericField", "nl", fallback: Fallback.ToLanguage);
 
         // No Dutch value is directly assigned.  Check has fallen back to English value from language variant.
         Assert.AreEqual("Welcome", value);
+        Assert.AreEqual(123, numericValue);
+    }
+
+    [Test]
+    public void Can_Get_Content_For_Property_With_Fallback_Language_Priority()
+    {
+        var snapshot = GetPublishedSnapshot();
+        var content = snapshot.Content.GetAtRoot().First().Children.First();
+
+        var value = content.GetProperty("welcomeText")!.Value(PublishedValueFallback, "nl", fallback: Fallback.ToLanguage);
+        var numericValue = content.GetProperty("numericField")!.Value(PublishedValueFallback, "nl", fallback: Fallback.ToLanguage);
+
+        // No Dutch value is directly assigned.  Check has fallen back to English value from language variant.
+        Assert.AreEqual("Welcome", value);
+        Assert.AreEqual(123, numericValue);
     }
 
     [Test]

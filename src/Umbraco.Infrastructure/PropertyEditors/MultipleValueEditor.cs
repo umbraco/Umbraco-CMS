@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -20,15 +18,16 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </remarks>
 public class MultipleValueEditor : DataValueEditor
 {
+    private readonly IJsonSerializer _jsonSerializer;
+
     public MultipleValueEditor(
         ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
         DataEditorAttribute attribute)
-        : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
-    {
-    }
+        : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute) =>
+        _jsonSerializer = jsonSerializer;
 
     /// <summary>
     ///     Override so that we can return an array to the editor for multi-select values
@@ -43,7 +42,7 @@ public class MultipleValueEditor : DataValueEditor
         string[]? result = null;
         if (json is not null)
         {
-            result = JsonConvert.DeserializeObject<string[]>(json);
+            result = _jsonSerializer.Deserialize<string[]>(json);
         }
 
         return result ?? Array.Empty<string>();
@@ -58,17 +57,12 @@ public class MultipleValueEditor : DataValueEditor
     /// <returns></returns>
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        if (editorValue.Value is not JArray json || json.HasValues == false)
+        if (editorValue.Value is not IEnumerable<string> stringValues || stringValues.Any() == false)
         {
             return null;
         }
 
-        var values = json.Select(item => item.Value<string>()).ToArray();
-        if (values.Length == 0)
-        {
-            return null;
-        }
-
-        return JsonConvert.SerializeObject(values, Formatting.None);
+        var result = _jsonSerializer.Serialize(stringValues);
+        return result;
     }
 }

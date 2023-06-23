@@ -103,7 +103,17 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
         set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _culture!, nameof(Culture));
     }
 
-    public Guid Key => UserIdToInt(Id).ToGuid();
+    private Guid _key;
+
+    public Guid Key
+    {
+        get => _key;
+        set
+        {
+            _key = value;
+            HasIdentity = true;
+        }
+    }
 
     /// <summary>
     ///     Used to construct a new instance without an identity

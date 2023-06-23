@@ -243,7 +243,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 throw new ArgumentNullException(nameof(user));
             }
 
-            IMember? found = _memberService.GetById(UserIdToInt(user.Id));
+            IMember? found = _memberService.GetByKey(user.Key);
             if (found != null)
             {
                 _memberService.Delete(found);
@@ -321,13 +321,33 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
         IMember? user = Guid.TryParse(userId, out Guid key)
             ? _memberService.GetByKey(key)
-            : _memberService.GetById(UserIdToInt(userId));
+            : _memberService.GetById(ResolveEntityIdFromIdentityId(userId).GetAwaiter().GetResult());
+
         if (user == null)
         {
             return Task.FromResult((MemberIdentityUser)null!)!;
         }
 
         return Task.FromResult(AssignLoginsCallback(_mapper.Map<MemberIdentityUser>(user)))!;
+    }
+
+    protected override Task<int> ResolveEntityIdFromIdentityId(string? identityId)
+    {
+        if (TryConvertIdentityIdToInt(identityId, out var id))
+        {
+            return Task.FromResult(id);
+        }
+
+        if (Guid.TryParse(identityId, out Guid key))
+        {
+            IMember? member = _memberService.GetByKey(key);
+            if (member is not null)
+            {
+                return Task.FromResult(member.Id);
+            }
+        }
+
+        throw new InvalidOperationException($"Unable to resolve user with ID {identityId}");
     }
 
     /// <inheritdoc />

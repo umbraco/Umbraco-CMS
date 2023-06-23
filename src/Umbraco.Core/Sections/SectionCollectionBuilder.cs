@@ -14,8 +14,8 @@ public class
         // get the manifest parser just-in-time - injecting it in the ctor would mean that
         // simply getting the builder in order to configure the collection, would require
         // its dependencies too, and that can create cycles or other oddities
-        IManifestParser manifestParser = factory.GetRequiredService<IManifestParser>();
+        ILegacyManifestParser legacyManifestParser = factory.GetRequiredService<ILegacyManifestParser>();
 
-        return base.CreateItems(factory).Concat(manifestParser.CombinedManifest.Sections);
+        return base.CreateItems(factory).Concat(legacyManifestParser.CombinedManifest.Sections);
     }
 }

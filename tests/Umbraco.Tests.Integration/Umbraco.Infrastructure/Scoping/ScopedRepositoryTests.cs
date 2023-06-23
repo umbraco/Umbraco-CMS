@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -28,7 +29,9 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
 {
     private IUserService UserService => GetRequiredService<IUserService>();
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+
+    private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
 
     protected override void ConfigureTestServices(IServiceCollection services)
     {
@@ -138,19 +141,19 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
 
     [TestCase(true)]
     [TestCase(false)]
-    public void FullDataSetRepositoryCachePolicy(bool complete)
+    public async Task FullDataSetRepositoryCachePolicy(bool complete)
     {
         var scopeProvider = (ScopeProvider)ScopeProvider;
-        var service = LocalizationService;
+        var service = LanguageService;
         var globalCache = AppCaches.IsolatedCaches.GetOrCreate(typeof(ILanguage));
 
         ILanguage lang = new Language("fr-FR", "French (France)");
-        service.Save(lang);
+        await service.CreateAsync(lang, Constants.Security.SuperUserKey);
 
         // global cache has been flushed, reload
         var globalFullCached = (IEnumerable<ILanguage>)globalCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
         Assert.IsNull(globalFullCached);
-        var reload = service.GetLanguageById(lang.Id);
+        var reload = await service.GetAsync(lang.IsoCode);
 
         // global cache contains the entity
         globalFullCached = (IEnumerable<ILanguage>)globalCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
@@ -173,12 +176,12 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
 
             // Use IsMandatory of isocode to ensure publishedContent cache is not also rebuild
             lang.IsMandatory = true;
-            service.Save(lang);
+            await service.UpdateAsync(lang, Constants.Security.SuperUserKey);
 
             // scoped cache has been flushed, reload
             var scopeFullCached = (IEnumerable<ILanguage>)scopedCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
             Assert.IsNull(scopeFullCached);
-            reload = service.GetLanguageById(lang.Id);
+            reload = await service.GetAsync(lang.IsoCode);
 
             // scoped cache contains the "new" entity
             scopeFullCached = (IEnumerable<ILanguage>)scopedCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
@@ -217,7 +220,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
         }
 
         // get again, updated if completed
-        lang = service.GetLanguageById(lang.Id);
+        lang = await service.GetAsync(lang.IsoCode);
         Assert.AreEqual(complete, lang.IsMandatory);
 
         // global cache contains the entity again
@@ -231,27 +234,32 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
 
     [TestCase(true)]
     [TestCase(false)]
-    public void SingleItemsOnlyRepositoryCachePolicy(bool complete)
+    public async Task SingleItemsOnlyRepositoryCachePolicy(bool complete)
     {
         var scopeProvider = (ScopeProvider)ScopeProvider;
-        var service = LocalizationService;
+        var languageService = LanguageService;
+        var dictionaryItemService = DictionaryItemService;
         var globalCache = AppCaches.IsolatedCaches.GetOrCreate(typeof(IDictionaryItem));
 
         var lang = new Language("fr-FR", "French (France)");
-        service.Save(lang);
+        await languageService.CreateAsync(lang, Constants.Security.SuperUserKey);
 
-        var item = (IDictionaryItem)new DictionaryItem("item-key");
-        item.Translations = new IDictionaryTranslation[] { new DictionaryTranslation(lang.Id, "item-value") };
-        service.Save(item);
+        var item = (await dictionaryItemService.CreateAsync(
+            new DictionaryItem("item-key")
+            {
+                Translations = new IDictionaryTranslation[] { new DictionaryTranslation(lang, "item-value") }
+            },
+            Constants.Security.SuperUserKey)).Result;
 
-        // Refresh the cache manually because we can't unbind
-        service.GetDictionaryItemById(item.Id);
-        service.GetLanguageById(lang.Id);
+        // Refresh the keyed cache manually
+        await dictionaryItemService.GetAsync(item.Key);
+        await languageService.GetAsync(lang.IsoCode);
 
         // global cache contains the entity
-        var globalCached = (IDictionaryItem)globalCache.Get(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
+        var globalCached = (IDictionaryItem)globalCache.Get(GetCacheIdKey<IDictionaryItem>(item.Key), () => null);
         Assert.IsNotNull(globalCached);
         Assert.AreEqual(item.Id, globalCached.Id);
+        Assert.AreEqual(item.Key, globalCached.Key);
         Assert.AreEqual("item-key", globalCached.ItemKey);
 
         Assert.IsNull(scopeProvider.AmbientScope);
@@ -266,16 +274,18 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
             Assert.AreNotSame(globalCache, scopedCache);
 
             item.ItemKey = "item-changed";
-            service.Save(item);
+            await dictionaryItemService.UpdateAsync(item, Constants.Security.SuperUserKey);
 
             // scoped cache contains the "new" entity
-            var scopeCached = (IDictionaryItem)scopedCache.Get(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
+            // Refresh the keyed cache manually
+            await dictionaryItemService.GetAsync(item.Key);
+            var scopeCached = (IDictionaryItem)scopedCache.Get(GetCacheIdKey<IDictionaryItem>(item.Key), () => null);
             Assert.IsNotNull(scopeCached);
             Assert.AreEqual(item.Id, scopeCached.Id);
             Assert.AreEqual("item-changed", scopeCached.ItemKey);
 
             // global cache is unchanged
-            globalCached = (IDictionaryItem)globalCache.Get(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
+            globalCached = (IDictionaryItem)globalCache.Get(GetCacheIdKey<IDictionaryItem>(item.Key), () => null);
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(item.Id, globalCached.Id);
             Assert.AreEqual("item-key", globalCached.ItemKey);
@@ -288,7 +298,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
 
         Assert.IsNull(scopeProvider.AmbientScope);
 
-        globalCached = (IDictionaryItem)globalCache.Get(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
+        globalCached = (IDictionaryItem)globalCache.Get(GetCacheIdKey<IDictionaryItem>(item.Key), () => null);
         if (complete)
         {
             // global cache has been cleared
@@ -301,11 +311,11 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
         }
 
         // get again, updated if completed
-        item = service.GetDictionaryItemById(item.Id);
+        item = await dictionaryItemService.GetAsync(item.Key);
         Assert.AreEqual(complete ? "item-changed" : "item-key", item.ItemKey);
 
         // global cache contains the entity again
-        globalCached = (IDictionaryItem)globalCache.Get(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
+        globalCached = (IDictionaryItem)globalCache.Get(GetCacheIdKey<IDictionaryItem>(item.Key), () => null);
         Assert.IsNotNull(globalCached);
         Assert.AreEqual(item.Id, globalCached.Id);
         Assert.AreEqual(complete ? "item-changed" : "item-key", globalCached.ItemKey);

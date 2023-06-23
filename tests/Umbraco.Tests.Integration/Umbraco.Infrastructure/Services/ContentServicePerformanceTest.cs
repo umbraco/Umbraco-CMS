@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -70,18 +69,18 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
         ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
         contentType1.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => contentType2.Id), 0, contentType2.Alias),
-            new ContentTypeSort(new Lazy<int>(() => contentType3.Id), 1, contentType3.Alias)
+            new ContentTypeSort(new Lazy<int>(() => contentType2.Id), contentType2.Key, 0, contentType2.Alias),
+            new ContentTypeSort(new Lazy<int>(() => contentType3.Id), contentType3.Key, 1, contentType3.Alias)
         };
         contentType2.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => contentType1.Id), 0, contentType1.Alias),
-            new ContentTypeSort(new Lazy<int>(() => contentType3.Id), 1, contentType3.Alias)
+            new ContentTypeSort(new Lazy<int>(() => contentType1.Id), contentType1.Key, 0, contentType1.Alias),
+            new ContentTypeSort(new Lazy<int>(() => contentType3.Id), contentType3.Key, 1, contentType3.Alias)
         };
         contentType3.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => contentType1.Id), 0, contentType1.Alias),
-            new ContentTypeSort(new Lazy<int>(() => contentType2.Id), 1, contentType2.Alias)
+            new ContentTypeSort(new Lazy<int>(() => contentType1.Id), contentType1.Key, 0, contentType1.Alias),
+            new ContentTypeSort(new Lazy<int>(() => contentType2.Id), contentType2.Key, 1, contentType2.Alias)
         };
         ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
 

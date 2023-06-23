@@ -1,3 +1,4 @@
+using System.Collections;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -25,7 +26,12 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     private readonly IShortStringHelper _shortStringHelper;
     private readonly UserGroupWithUsersRepository _userGroupWithUsersRepository;
 
-    public UserGroupRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger<UserGroupRepository> logger, ILoggerFactory loggerFactory, IShortStringHelper shortStringHelper)
+    public UserGroupRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches appCaches,
+        ILogger<UserGroupRepository> logger,
+        ILoggerFactory loggerFactory,
+        IShortStringHelper shortStringHelper)
         : base(scopeAccessor, appCaches, logger)
     {
         _shortStringHelper = shortStringHelper;
@@ -299,6 +305,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         }
 
         dto.UserGroup2LanguageDtos = GetUserGroupLanguages(id);
+        dto.UserGroup2PermissionDtos = GetUserGroupPermissions(id);
 
         IUserGroup userGroup = UserGroupFactory.BuildEntity(_shortStringHelper, dto);
         return userGroup;
@@ -322,13 +329,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
         List<UserGroupDto> dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql);
 
-        IDictionary<int, List<UserGroup2LanguageDto>> dic = GetAllUserGroupLanguageGrouped();
-
-        foreach (UserGroupDto dto in dtos)
-        {
-            dic.TryGetValue(dto.Id, out var userGroup2LanguageDtos);
-            dto.UserGroup2LanguageDtos = userGroup2LanguageDtos ?? new();
-        }
+        AssignUserGroupOneToManyTables(ref dtos);
 
         return dtos.Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x));
     }
@@ -342,8 +343,26 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         AppendGroupBy(sql);
         sql.OrderBy<UserGroupDto>(x => x.Id); // required for references
 
-        List<UserGroupDto>? dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql);
+        List<UserGroupDto> dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql);
+
+        AssignUserGroupOneToManyTables(ref dtos);
+
         return dtos.Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x));
+    }
+
+    private void AssignUserGroupOneToManyTables(ref List<UserGroupDto> userGroupDtos)
+    {
+        IDictionary<int, List<UserGroup2LanguageDto>> userGroups2Languages = GetAllUserGroupLanguageGrouped();
+        IDictionary<int, List<UserGroup2PermissionDto>> userGroups2Permissions = GetAllUserGroupPermissionsGrouped();
+
+        foreach (UserGroupDto dto in userGroupDtos)
+        {
+            userGroups2Languages.TryGetValue(dto.Id, out List<UserGroup2LanguageDto>? userGroup2LanguageDtos);
+            dto.UserGroup2LanguageDtos = userGroup2LanguageDtos ?? new List<UserGroup2LanguageDto>();
+
+            userGroups2Permissions.TryGetValue(dto.Id, out List<UserGroup2PermissionDto>? userGroup2PermissionDtos);
+            dto.UserGroup2PermissionDtos = userGroup2PermissionDtos ?? new List<UserGroup2PermissionDto>();
+        }
     }
 
     #endregion
@@ -403,7 +422,8 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 x => x.Alias,
                 x => x.DefaultPermissions,
                 x => x.Name,
-                x => x.HasAccessToAllLanguages)
+                x => x.HasAccessToAllLanguages,
+                x => x.Key)
             .AndBy<UserGroup2AppDto>(x => x.AppAlias, x => x.UserGroupId);
 
     protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.UserGroup}.id = @id";
@@ -416,6 +436,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
             "DELETE FROM umbracoUserGroup2App WHERE userGroupId = @id",
             "DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @id",
             "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @id",
+            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupId = @id",
             "DELETE FROM umbracoUserGroup WHERE id = @id",
         };
         return list;
@@ -432,6 +453,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
         PersistAllowedSections(entity);
         PersistAllowedLanguages(entity);
+        PersistPermissions(entity);
 
         entity.ResetDirtyProperties();
     }
@@ -445,7 +467,8 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         Database.Update(userGroupDto);
 
         PersistAllowedSections(entity);
-            PersistAllowedLanguages(entity);
+        PersistAllowedLanguages(entity);
+        PersistPermissions(entity);
 
         entity.ResetDirtyProperties();
     }
@@ -465,43 +488,74 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         }
     }
 
-        private void PersistAllowedLanguages(IUserGroup entity)
+    private void PersistAllowedLanguages(IUserGroup entity)
+    {
+        var userGroup = entity;
+
+        // First delete all
+        Database.Delete<UserGroup2LanguageDto>("WHERE UserGroupId = @UserGroupId", new { UserGroupId = userGroup.Id });
+
+        // Then re-add any associated with the group
+        foreach (var language in userGroup.AllowedLanguages)
         {
-            var userGroup = entity;
-
-            // First delete all
-            Database.Delete<UserGroup2LanguageDto>("WHERE UserGroupId = @UserGroupId", new { UserGroupId = userGroup.Id });
-
-            // Then re-add any associated with the group
-            foreach (var language in userGroup.AllowedLanguages)
+            var dto = new UserGroup2LanguageDto
             {
-                var dto = new UserGroup2LanguageDto
-                {
-                    UserGroupId = userGroup.Id,
-                    LanguageId = language,
-                };
+                UserGroupId = userGroup.Id,
+                LanguageId = language,
+            };
 
-                Database.Insert(dto);
-            }
+            Database.Insert(dto);
         }
+    }
 
-        private List<UserGroup2LanguageDto> GetUserGroupLanguages(int userGroupId)
+    private void PersistPermissions(IUserGroup userGroup)
+    {
+        Database.Delete<UserGroup2PermissionDto>("WHERE UserGroupId = @UserGroupId", new { UserGroupId = userGroup.Id });
+
+        foreach (var permission in userGroup.PermissionNames)
         {
-            Sql<ISqlContext> query = Sql()
-                .Select<UserGroup2LanguageDto>()
-                .From<UserGroup2LanguageDto>()
-                .Where<UserGroup2LanguageDto>(x => x.UserGroupId == userGroupId);
-            return Database.Fetch<UserGroup2LanguageDto>(query);
+            var permissionDto = new UserGroup2PermissionDto { UserGroupId = userGroup.Id, Permission = permission, };
+            Database.Insert(permissionDto);
         }
+    }
 
-        private IDictionary<int, List<UserGroup2LanguageDto>> GetAllUserGroupLanguageGrouped()
-        {
-            Sql<ISqlContext> query = Sql()
-                .Select<UserGroup2LanguageDto>()
-                .From<UserGroup2LanguageDto>();
-            List<UserGroup2LanguageDto> userGroupLanguages = Database.Fetch<UserGroup2LanguageDto>(query);
-            return userGroupLanguages.GroupBy(x => x.UserGroupId).ToDictionary(x => x.Key, x => x.ToList());
-        }
+    private List<UserGroup2LanguageDto> GetUserGroupLanguages(int userGroupId)
+    {
+        Sql<ISqlContext> query = Sql()
+            .Select<UserGroup2LanguageDto>()
+            .From<UserGroup2LanguageDto>()
+            .Where<UserGroup2LanguageDto>(x => x.UserGroupId == userGroupId);
+        return Database.Fetch<UserGroup2LanguageDto>(query);
+    }
+
+    private IDictionary<int, List<UserGroup2LanguageDto>> GetAllUserGroupLanguageGrouped()
+    {
+        Sql<ISqlContext> query = Sql()
+            .Select<UserGroup2LanguageDto>()
+            .From<UserGroup2LanguageDto>();
+        List<UserGroup2LanguageDto> userGroupLanguages = Database.Fetch<UserGroup2LanguageDto>(query);
+        return userGroupLanguages.GroupBy(x => x.UserGroupId).ToDictionary(x => x.Key, x => x.ToList());
+    }
+
+    private List<UserGroup2PermissionDto> GetUserGroupPermissions(int userGroupId)
+    {
+        Sql<ISqlContext> query = Sql()
+            .Select<UserGroup2PermissionDto>()
+            .From<UserGroup2PermissionDto>()
+            .Where<UserGroup2PermissionDto>(x => x.UserGroupId == userGroupId);
+
+        return Database.Fetch<UserGroup2PermissionDto>(query);
+    }
+
+    private Dictionary<int, List<UserGroup2PermissionDto>> GetAllUserGroupPermissionsGrouped()
+    {
+        Sql<ISqlContext> query = Sql()
+            .Select<UserGroup2PermissionDto>()
+            .From<UserGroup2PermissionDto>();
+
+        List<UserGroup2PermissionDto> userGroupPermissions = Database.Fetch<UserGroup2PermissionDto>(query);
+        return userGroupPermissions.GroupBy(x => x.UserGroupId).ToDictionary(x => x.Key, x => x.ToList());
+    }
 
     #endregion
 }

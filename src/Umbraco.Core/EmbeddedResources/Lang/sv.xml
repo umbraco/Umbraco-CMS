@@ -134,7 +134,7 @@
     <key alias="saveToPublish">Spara och skicka för godkännande</key>
     <key alias="schedulePublish">Schemaläggning</key>
     <key alias="select">Välj</key>
-    <key alias="saveAndPreview">Förhandsgranska</key>
+    <key alias="saveAndPreview">Spara och förhandsgranska</key>
     <key alias="showPageDisabled">Förhandsgranskning är avstängt på grund av att det inte finns någon mall tilldelad</key>
     <key alias="somethingElse">Gör något annat</key>
     <key alias="styleChoose">Välj stil</key>

@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -40,6 +39,11 @@ public class MigrationPlanTests
             .Setup(x => x.Database)
             .Returns(database);
 
+        var databaseFactory = Mock.Of<IUmbracoDatabaseFactory>();
+        Mock.Get(databaseFactory)
+            .Setup(x => x.CreateDatabase())
+            .Returns(database);
+
         var sqlContext = new SqlContext(
             new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
             DatabaseType.SQLCe,
@@ -62,17 +66,17 @@ public class MigrationPlanTests
                 }
             });
 
-        var databaseFactory = Mock.Of<IUmbracoDatabaseFactory>();
-        var publishedSnapshotService = Mock.Of<IPublishedSnapshotService>();
-        var distributedCache = new DistributedCache(Mock.Of<IServerMessenger>(), new CacheRefresherCollection(Enumerable.Empty<ICacheRefresher>));
+        var distributedCache = new DistributedCache(
+            Mock.Of<IServerMessenger>(),
+            new CacheRefresherCollection(() => Enumerable.Empty<ICacheRefresher>()));
+
         var executor = new MigrationPlanExecutor(
             scopeProvider,
             scopeProvider,
             loggerFactory,
             migrationBuilder,
             databaseFactory,
-            publishedSnapshotService,
-            distributedCache);
+            Mock.Of<IPublishedSnapshotService>(), distributedCache);
 
         var plan = new MigrationPlan("default")
             .From(string.Empty)
@@ -90,7 +94,8 @@ public class MigrationPlanTests
             var sourceState = kvs.GetValue("Umbraco.Tests.MigrationPlan") ?? string.Empty;
 
             // execute plan
-            state = executor.Execute(plan, sourceState);
+            var result = executor.ExecutePlan(plan, sourceState);
+            state = result.FinalState;
 
             // save new state
             kvs.SetValue("Umbraco.Tests.MigrationPlan", sourceState, state);

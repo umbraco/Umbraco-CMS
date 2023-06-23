@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.ContentApps;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
@@ -58,6 +60,7 @@ public class ContentController : ContentControllerBase
     private readonly ILocalizedTextService _localizedTextService;
     private readonly INotificationService _notificationService;
     private readonly ICultureImpactFactory _cultureImpactFactory;
+    private readonly IUserGroupService _userGroupService;
     private readonly ILogger<ContentController> _logger;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
@@ -65,6 +68,7 @@ public class ContentController : ContentControllerBase
     private readonly ISqlContext _sqlContext;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IUserService _userService;
+    private readonly ContentSettings _contentSettings;
 
     [ActivatorUtilitiesConstructor]
     public ContentController(
@@ -91,7 +95,9 @@ public class ContentController : ContentControllerBase
         ICoreScopeProvider scopeProvider,
         IAuthorizationService authorizationService,
         IContentVersionService contentVersionService,
-        ICultureImpactFactory cultureImpactFactory)
+        ICultureImpactFactory cultureImpactFactory,
+        IUserGroupService userGroupService,
+        IOptions<ContentSettings> contentSettings)
         : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
     {
         _propertyEditors = propertyEditors;
@@ -112,13 +118,15 @@ public class ContentController : ContentControllerBase
         _authorizationService = authorizationService;
         _contentVersionService = contentVersionService;
         _cultureImpactFactory = cultureImpactFactory;
+        _userGroupService = userGroupService;
         _logger = loggerFactory.CreateLogger<ContentController>();
         _scopeProvider = scopeProvider;
         _allLangs = new Lazy<IDictionary<string, ILanguage>>(() =>
-            _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+        _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+        _contentSettings = contentSettings.Value;
     }
 
-    [Obsolete("Use constructor that accepts ICultureImpactService as a parameter, scheduled for removal in V12")]
+    [Obsolete("User constructor that takes a IUserGroupService, scheduled for removal in V15.")]
     public ContentController(
         ICultureDictionary cultureDictionary,
         ILoggerFactory loggerFactory,
@@ -142,7 +150,8 @@ public class ContentController : ContentControllerBase
         IJsonSerializer serializer,
         ICoreScopeProvider scopeProvider,
         IAuthorizationService authorizationService,
-        IContentVersionService contentVersionService)
+        IContentVersionService contentVersionService,
+        ICultureImpactFactory cultureImpactFactory)
         : this(
             cultureDictionary,
             loggerFactory,
@@ -167,7 +176,10 @@ public class ContentController : ContentControllerBase
             scopeProvider,
             authorizationService,
             contentVersionService,
-            StaticServiceProvider.Instance.GetRequiredService<ICultureImpactFactory>())
+            cultureImpactFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IUserGroupService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>()
+        )
     {
     }
 
@@ -224,7 +236,7 @@ public class ContentController : ContentControllerBase
         var contentPermissions = _contentService.GetPermissions(content)
             .ToDictionary(x => x.UserGroupId, x => x);
 
-        IUserGroup[] allUserGroups = _userService.GetAllUserGroups().ToArray();
+        IUserGroup[] allUserGroups = _userGroupService.GetAllAsync(0, int.MaxValue).GetAwaiter().GetResult().Items.ToArray();
 
         //loop through each user group
         foreach (IUserGroup userGroup in allUserGroups)
@@ -277,7 +289,7 @@ public class ContentController : ContentControllerBase
 
         // TODO: Should non-admins be able to see detailed permissions?
 
-        IEnumerable<IUserGroup> allUserGroups = _userService.GetAllUserGroups();
+        IEnumerable<IUserGroup> allUserGroups = _userGroupService.GetAllAsync(0, int.MaxValue).GetAwaiter().GetResult().Items;
 
         return GetDetailedPermissions(content, allUserGroups);
     }
@@ -820,7 +832,6 @@ public class ContentController : ContentControllerBase
     /// <summary>
     ///     Saves content
     /// </summary>
-    [FileUploadCleanupFilter]
     [ContentSaveValidation]
     public async Task<ActionResult<ContentItemDisplay<ContentVariantDisplay>?>?> PostSaveBlueprint(
         [ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
@@ -856,7 +867,6 @@ public class ContentController : ContentControllerBase
     /// <summary>
     ///     Saves content
     /// </summary>
-    [FileUploadCleanupFilter]
     [ContentSaveValidation]
     [OutgoingEditorModelEvent]
     public async Task<ActionResult<ContentItemDisplay<ContentVariantScheduleDisplay>?>> PostSave(
@@ -876,17 +886,6 @@ public class ContentController : ContentControllerBase
         Func<IContent?, ContentItemDisplay<TVariant>?> mapToDisplay)
         where TVariant : ContentVariantDisplay
     {
-        // Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
-        // To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
-        // uploaded files to being *only* the actual file name (as it should be).
-        if (contentItem.UploadedFiles != null && contentItem.UploadedFiles.Any())
-        {
-            foreach (ContentPropertyFile file in contentItem.UploadedFiles)
-            {
-                file.FileName = Path.GetFileName(file.FileName);
-            }
-        }
-
         // If we've reached here it means:
         // * Our model has been bound
         // * and validated
@@ -1710,6 +1709,11 @@ public class ContentController : ContentControllerBase
     /// <param name="globalNotifications"></param>
     internal void AddDomainWarnings(IContent? persistedContent, string[]? culturesPublished, SimpleNotificationModel globalNotifications)
     {
+        if (_contentSettings.ShowDomainWarnings is false)
+        {
+            return;
+        }
+
         // Don't try to verify if no cultures were published
         if (culturesPublished is null)
         {

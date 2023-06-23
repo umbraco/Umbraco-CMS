@@ -89,6 +89,7 @@ public class IdentityMapDefinition : IMapDefinition
     private void Map(IUser source, BackOfficeIdentityUser target)
     {
         // NOTE: Groups/Roles are set in the BackOfficeIdentityUser ctor
+        target.Key = source.Key;
         target.CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService, _appCaches);
         target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService, _appCaches);
         target.Email = source.Email;

@@ -11,6 +11,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     Represents the configuration editor for the media picker value editor.
 /// </summary>
+[Obsolete("Please use the MediaPicker3 instead, will be removed in V13")]
 public class MediaPickerConfigurationEditor : ConfigurationEditor<MediaPickerConfiguration>
 {
     // Scheduled for removal in v12
@@ -32,15 +33,15 @@ public class MediaPickerConfigurationEditor : ConfigurationEditor<MediaPickerCon
         Field(nameof(MediaPickerConfiguration.StartNodeId))
             .Config = new Dictionary<string, object> { { "idType", "udi" } };
 
-    public override IDictionary<string, object> ToValueEditor(object? configuration)
+    public override IDictionary<string, object> ToValueEditor(IDictionary<string, object> configuration)
     {
         // get the configuration fields
-        IDictionary<string, object> d = base.ToValueEditor(configuration);
+        IDictionary<string, object> config = base.ToValueEditor(configuration);
 
         // add extra fields
         // not part of ContentPickerConfiguration but used to configure the UI editor
-        d["idType"] = "udi";
+        config["idType"] = "udi";
 
-        return d;
+        return config;
     }
 }

@@ -461,6 +461,25 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         this.TouchCulture(culture);
     }
 
+    /// <inheritdoc />
+    public void RemoveValue(string propertyTypeAlias)
+    {
+        if (Properties.TryGetValue(propertyTypeAlias, out IProperty? property) == false)
+        {
+            return;
+        }
+
+        foreach (IPropertyValue propertyValue in property.Values.ToArray())
+        {
+            property.SetValue(null, propertyValue.Culture, propertyValue.Segment);
+        }
+
+        foreach (var culture in property.Values.Select(v => v.Culture).Distinct())
+        {
+            this.TouchCulture(culture);
+        }
+    }
+
     #endregion
 
     #region Dirty

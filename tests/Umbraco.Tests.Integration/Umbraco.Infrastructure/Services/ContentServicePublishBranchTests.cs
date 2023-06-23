@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -22,7 +21,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
 {
     private IContentService ContentService => GetRequiredService<IContentService>();
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -443,11 +442,11 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
     private void CreateTypes(out IContentType iContentType, out IContentType vContentType)
     {
         var langDe = new Language("de", "German") { IsDefault = true };
-        LocalizationService.Save(langDe);
+        LanguageService.CreateAsync(langDe, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
         var langRu = new Language("ru", "Russian");
-        LocalizationService.Save(langRu);
+        LanguageService.CreateAsync(langRu, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
         var langEs = new Language("es", "Spanish");
-        LocalizationService.Save(langEs);
+        LanguageService.CreateAsync(langEs, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
 
         iContentType = new ContentType(ShortStringHelper, -1)
         {

@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -13,19 +12,22 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference, IDataValueTags
+internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : DataValueEditor, IDataValueReference, IDataValueTags
+    where TValue : BlockValue<TLayout>, new()
+    where TLayout : class, IBlockLayoutItem, new()
 {
-    private BlockEditorValues? _blockEditorValues;
+    private BlockEditorValues<TValue, TLayout>? _blockEditorValues;
     private readonly IDataTypeService _dataTypeService;
-    private readonly ILogger<BlockEditorPropertyValueEditor> _logger;
+    private readonly ILogger<BlockEditorPropertyValueEditor<TValue, TLayout>> _logger;
     private readonly PropertyEditorCollection _propertyEditors;
+    private readonly IJsonSerializer _jsonSerializer;
 
     protected BlockEditorPropertyValueEditor(
         DataEditorAttribute attribute,
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,
         ILocalizedTextService textService,
-        ILogger<BlockEditorPropertyValueEditor> logger,
+        ILogger<BlockEditorPropertyValueEditor<TValue, TLayout>> logger,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper)
@@ -34,9 +36,10 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
         _propertyEditors = propertyEditors;
         _dataTypeService = dataTypeService;
         _logger = logger;
+        _jsonSerializer = jsonSerializer;
     }
 
-    protected BlockEditorValues BlockEditorValues
+    protected BlockEditorValues<TValue, TLayout> BlockEditorValues
     {
         get => _blockEditorValues ?? throw new NullReferenceException($"The property {nameof(BlockEditorValues)} must be initialized at value editor construction");
         set => _blockEditorValues = value;
@@ -47,7 +50,7 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
         var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
 
         var result = new List<UmbracoEntityReference>();
-        BlockEditorData? blockEditorData = BlockEditorValues.DeserializeAndClean(rawJson);
+        BlockEditorData<TValue, TLayout>? blockEditorData = BlockEditorValues.DeserializeAndClean(rawJson);
         if (blockEditorData == null)
         {
             return Enumerable.Empty<UmbracoEntityReference>();
@@ -82,7 +85,7 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
     {
         var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
 
-        BlockEditorData? blockEditorData = BlockEditorValues.DeserializeAndClean(rawJson);
+        BlockEditorData<TValue, TLayout>? blockEditorData = BlockEditorValues.DeserializeAndClean(rawJson);
         if (blockEditorData == null)
         {
             return Enumerable.Empty<ITag>();
@@ -102,9 +105,9 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
                     continue;
                 }
 
-                object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.Configuration;
+                object? configurationObject = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.ConfigurationObject;
 
-                result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
+                result.AddRange(tagsProvider.GetTags(prop.Value.Value, configurationObject, languageId));
             }
         }
 
@@ -127,12 +130,12 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
     {
         var val = property.GetValue(culture, segment);
 
-        BlockEditorData? blockEditorData;
+        BlockEditorData<TValue, TLayout>? blockEditorData;
         try
         {
             blockEditorData = BlockEditorValues.DeserializeAndClean(val);
         }
-        catch (JsonSerializationException)
+        catch
         {
             // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
             return string.Empty;
@@ -163,12 +166,12 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
             return null;
         }
 
-        BlockEditorData? blockEditorData;
+        BlockEditorData<TValue, TLayout>? blockEditorData;
         try
         {
             blockEditorData = BlockEditorValues.DeserializeAndClean(editorValue.Value);
         }
-        catch (JsonSerializationException)
+        catch
         {
             // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
             return string.Empty;
@@ -183,7 +186,7 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
         MapBlockItemDataFromEditor(blockEditorData.BlockValue.SettingsData);
 
         // return json
-        return JsonConvert.SerializeObject(blockEditorData.BlockValue, Formatting.None);
+        return _jsonSerializer.Serialize(blockEditorData.BlockValue);
     }
 
     private void MapBlockItemDataToEditor(IProperty property, List<BlockItemData> items)
@@ -225,7 +228,7 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
 
                 if (!valEditors.TryGetValue(dataType.Id, out IDataValueEditor? valEditor))
                 {
-                    var tempConfig = dataType.Configuration;
+                    var tempConfig = dataType.ConfigurationObject;
                     valEditor = propEditor.GetValueEditor(tempConfig);
 
                     valEditors.Add(dataType.Id, valEditor);
@@ -246,7 +249,7 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
             foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
             {
                 // Fetch the property types prevalue
-                var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
+                var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.ConfigurationObject;
 
                 // Lookup the property editor
                 IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];

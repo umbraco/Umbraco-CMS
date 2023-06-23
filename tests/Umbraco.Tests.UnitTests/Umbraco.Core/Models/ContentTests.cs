@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -242,7 +241,7 @@ public class ContentTests
         return new ProfilingLogger(logger, profiler);
     }
 
-    [Ignore("fixme - ignored test")]
+    [Ignore("TODO - ignored test")]
     [Test]
     public void Can_Deep_Clone_Perf_Test()
     {

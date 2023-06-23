@@ -1,12 +1,11 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -16,7 +15,6 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -32,7 +30,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
     private IRedirectUrlService RedirectUrlService => GetRequiredService<IRedirectUrlService>();
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
@@ -250,7 +248,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Culture)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.CultureAndSegment)]
-    public void Preserve_Content_Name_After_Content_Type_Variation_Change(ContentVariation contentTypeVariationFrom,
+    public async Task Preserve_Content_Name_After_Content_Type_Variation_Change(ContentVariation contentTypeVariationFrom,
         ContentVariation contentTypeVariationTo)
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
@@ -265,7 +263,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var nlContentName = "Content nl-NL";
         var nlCulture = "nl-NL";
 
-        LocalizationService.Save(new Language(nlCulture, "Dutch (Netherlands)"));
+        await LanguageService.CreateAsync(new Language(nlCulture, "Dutch (Netherlands)"), Constants.Security.SuperUserKey);
 
         var includeCultureNames = contentType.Variations.HasFlag(ContentVariation.Culture);
 
@@ -534,11 +532,11 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Change_Variations_SimpleContentType_VariantToInvariantAndBack()
+    public async Task Change_Variations_SimpleContentType_VariantToInvariantAndBack()
     {
         // one simple content type, variant, with both variant and invariant properties
         // can change it to invariant and back
-        CreateFrenchAndEnglishLangs();
+        await CreateFrenchAndEnglishLangs();
 
         var contentType = CreateContentType(ContentVariation.Culture);
 
@@ -625,7 +623,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Change_Variations_SimpleContentType_InvariantToVariantAndBack()
+    public async Task Change_Variations_SimpleContentType_InvariantToVariantAndBack()
     {
         // one simple content type, invariant
         // can change it to variant and back
@@ -633,9 +631,9 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var globalSettings = new GlobalSettings();
 
         var languageEn = new Language("en", "English") { IsDefault = true };
-        LocalizationService.Save(languageEn);
+        await LanguageService.CreateAsync(languageEn, Constants.Security.SuperUserKey);
         var languageFr = new Language("fr", "French");
-        LocalizationService.Save(languageFr);
+        await LanguageService.CreateAsync(languageFr, Constants.Security.SuperUserKey);
 
         var contentType = CreateContentType(ContentVariation.Nothing);
 
@@ -719,11 +717,11 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Change_Variations_SimpleContentType_VariantPropertyToInvariantAndBack()
+    public async Task Change_Variations_SimpleContentType_VariantPropertyToInvariantAndBack()
     {
         // one simple content type, variant, with both variant and invariant properties
         // can change an invariant property to variant and back
-        CreateFrenchAndEnglishLangs();
+        await CreateFrenchAndEnglishLangs();
 
         var contentType = CreateContentType(ContentVariation.Culture);
 
@@ -814,12 +812,12 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.Culture, ContentVariation.Segment)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
-    public void Change_Property_Variations_From_Variant_To_Invariant_And_Ensure_Edited_Values_Are_Renormalized(
+    public async Task Change_Property_Variations_From_Variant_To_Invariant_And_Ensure_Edited_Values_Are_Renormalized(
         ContentVariation variant, ContentVariation invariant)
     {
         // one simple content type, variant, with both variant and invariant properties
         // can change an invariant property to variant and back
-        CreateFrenchAndEnglishLangs();
+        await CreateFrenchAndEnglishLangs();
 
         var contentType = CreateContentType(ContentVariation.Culture | ContentVariation.Segment);
 
@@ -938,12 +936,12 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.Nothing, ContentVariation.CultureAndSegment)]
     [TestCase(ContentVariation.Segment, ContentVariation.Culture)]
     [TestCase(ContentVariation.Segment, ContentVariation.CultureAndSegment)]
-    public void Change_Property_Variations_From_Invariant_To_Variant_And_Ensure_Edited_Values_Are_Renormalized(
+    public async Task Change_Property_Variations_From_Invariant_To_Variant_And_Ensure_Edited_Values_Are_Renormalized(
         ContentVariation invariant, ContentVariation variant)
     {
         // one simple content type, variant, with both variant and invariant properties
         // can change an invariant property to variant and back
-        CreateFrenchAndEnglishLangs();
+        await CreateFrenchAndEnglishLangs();
 
         var contentType = CreateContentType(ContentVariation.Culture | ContentVariation.Segment);
 
@@ -1023,13 +1021,13 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Change_Variations_ComposedContentType_1()
+    public async Task Change_Variations_ComposedContentType_1()
     {
         // one composing content type, variant, with both variant and invariant properties
         // one composed content type, variant, with both variant and invariant properties
         // can change the composing content type to invariant and back
         // can change the composed content type to invariant and back
-        CreateFrenchAndEnglishLangs();
+        await CreateFrenchAndEnglishLangs();
 
         var composing = CreateContentType(ContentVariation.Culture, "composing");
 
@@ -1123,14 +1121,14 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Change_Variations_ComposedContentType_2()
+    public async Task Change_Variations_ComposedContentType_2()
     {
         // one composing content type, variant, with both variant and invariant properties
         // one composed content type, variant, with both variant and invariant properties
         // one composed content type, invariant
         // can change the composing content type to invariant and back
         // can change the variant composed content type to invariant and back
-        CreateFrenchAndEnglishLangs();
+        await CreateFrenchAndEnglishLangs();
 
         var composing = CreateContentType(ContentVariation.Culture, "composing");
 
@@ -1276,12 +1274,12 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             "{'pd':{'value11':[{'v':'v11'}],'value12':[{'v':'v12'}],'value31':[{'v':'v31'}],'value32':[{'v':'v32'}]},'cd':");
     }
 
-    private void CreateFrenchAndEnglishLangs()
+    private async Task CreateFrenchAndEnglishLangs()
     {
         var languageEn = new Language("en", "English") { IsDefault = true };
-        LocalizationService.Save(languageEn);
+        await LanguageService.CreateAsync(languageEn, Constants.Security.SuperUserKey);
         var languageFr = new Language("fr", "French");
-        LocalizationService.Save(languageFr);
+        await LanguageService.CreateAsync(languageFr, Constants.Security.SuperUserKey);
     }
 
     private IContentType CreateContentType(ContentVariation variance, string alias = "contentType") =>

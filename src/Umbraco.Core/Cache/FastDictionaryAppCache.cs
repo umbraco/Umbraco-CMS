@@ -31,6 +31,14 @@ public class FastDictionaryAppCache : IAppCache
         Lazy<object?>? result = _items.GetOrAdd(cacheKey, k => SafeLazy.GetSafeLazy(getCacheItem));
 
         var value = result.Value; // will not throw (safe lazy)
+
+        if (value is null)
+        {
+            // do not cache null values
+            _items.TryRemove(cacheKey, out _);
+            return null;
+        }
+
         if (!(value is SafeLazy.ExceptionHolder eh))
         {
             return value;

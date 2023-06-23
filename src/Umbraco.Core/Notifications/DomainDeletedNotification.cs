@@ -12,4 +12,9 @@ public class DomainDeletedNotification : DeletedNotification<IDomain>
         : base(target, messages)
     {
     }
+
+    public DomainDeletedNotification(IEnumerable<IDomain> target, EventMessages messages)
+        : base(target, messages)
+    {
+    }
 }

@@ -193,9 +193,9 @@ public class RichTextPropertyEditor : DataEditor
         }
 
         /// <inheritdoc />
-        public override object? Configuration
+        public override object? ConfigurationObject
         {
-            get => base.Configuration;
+            get => base.ConfigurationObject;
             set
             {
                 if (value == null)
@@ -210,7 +210,7 @@ public class RichTextPropertyEditor : DataEditor
                         nameof(value));
                 }
 
-                base.Configuration = value;
+                base.ConfigurationObject = value;
 
                 HideLabel = configuration.HideLabel;
             }
@@ -281,8 +281,8 @@ public class RichTextPropertyEditor : DataEditor
                 return null;
             }
 
-            var userId = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ??
-                         Constants.Security.SuperUserId;
+            Guid userKey = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ??
+                          Constants.Security.SuperUserKey;
 
             var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
             GuidUdi? mediaParent = config?.MediaParentId;
@@ -293,8 +293,10 @@ public class RichTextPropertyEditor : DataEditor
                 return null;
             }
 
-            var parseAndSavedTempImages =
-                _pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString()!, mediaParentId, userId, _imageUrlGenerator);
+            var parseAndSavedTempImages = _pastedImages
+                .FindAndPersistPastedTempImagesAsync(editorValue.Value.ToString()!, mediaParentId, userKey, _imageUrlGenerator)
+                .GetAwaiter()
+                .GetResult();
             var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
             var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
             var sanitized = _htmlSanitizer.Sanitize(parsed);

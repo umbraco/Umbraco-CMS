@@ -1,11 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -14,7 +13,6 @@ using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -42,7 +40,7 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
 
     private ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IFileService FileService => GetRequiredService<IFileService>();
 
@@ -67,9 +65,9 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Saving_Culture()
+    public async Task Saving_Culture()
     {
-        LocalizationService.Save(new Language("fr-FR", "French (France)"));
+        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
 
         _contentType.Variations = ContentVariation.Culture;
         foreach (var propertyType in _contentType.PropertyTypes)
@@ -178,9 +176,9 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Publishing_Culture()
+    public async Task Publishing_Culture()
     {
-        LocalizationService.Save(new Language("fr-FR", "French (France)"));
+        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
 
         _contentType.Variations = ContentVariation.Culture;
         foreach (var propertyType in _contentType.PropertyTypes)
@@ -338,9 +336,9 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Unpublishing_Culture()
+    public async Task Unpublishing_Culture()
     {
-        LocalizationService.Save(new Language("fr-FR", "French (France)"));
+        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
 
         _contentType.Variations = ContentVariation.Culture;
         foreach (var propertyType in _contentType.PropertyTypes)

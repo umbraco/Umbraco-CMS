@@ -279,8 +279,15 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IKeyValueService, KeyValueService>();
             Services.AddUnique<IPublicAccessService, PublicAccessService>();
             Services.AddUnique<IContentVersionService, ContentVersionService>();
+            Services.AddTransient<IUserGroupAuthorizationService, UserGroupAuthorizationService>();
+            Services.AddUnique<IUserGroupService, UserGroupService>();
             Services.AddUnique<IUserService, UserService>();
+            Services.AddUnique<IWebProfilerService, WebProfilerService>();
             Services.AddUnique<ILocalizationService, LocalizationService>();
+            Services.AddUnique<IDictionaryItemService, DictionaryItemService>();
+            Services.AddUnique<IDataTypeContainerService, DataTypeContainerService>();
+            Services.AddUnique<IIsoCodeValidator, IsoCodeValidator>();
+            Services.AddUnique<ILanguageService, LanguageService>();
             Services.AddUnique<IMacroService, MacroService>();
             Services.AddUnique<IMemberGroupService, MemberGroupService>();
             Services.AddUnique<IRedirectUrlService, RedirectUrlService>();
@@ -289,13 +296,25 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDomainService, DomainService>();
             Services.AddUnique<ITagService, TagService>();
             Services.AddUnique<IContentService, ContentService>();
+            Services.AddUnique<IContentEditingService, ContentEditingService>();
             Services.AddUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
             Services.AddUnique<IMemberService, MemberService>();
             Services.AddUnique<IMediaService, MediaService>();
+            Services.AddUnique<IMediaEditingService, MediaEditingService>();
             Services.AddUnique<IContentTypeService, ContentTypeService>();
             Services.AddUnique<IContentTypeBaseServiceProvider, ContentTypeBaseServiceProvider>();
             Services.AddUnique<IMediaTypeService, MediaTypeService>();
             Services.AddUnique<IFileService, FileService>();
+            Services.AddUnique<ITemplateService, TemplateService>();
+            Services.AddUnique<IScriptService, ScriptService>();
+            Services.AddUnique<IStylesheetService, StylesheetService>();
+            Services.AddUnique<IStylesheetFolderService, StylesheetFolderService>();
+            Services.AddUnique<IRichTextStylesheetService, RichTextStylesheetService>();
+            Services.AddUnique<IPartialViewService, PartialViewService>();
+            Services.AddUnique<IScriptFolderService, ScriptFolderService>();
+            Services.AddUnique<IPartialViewFolderService, PartialViewFolderService>();
+            Services.AddUnique<ITemporaryFileService, TemporaryFileService>();
+            Services.AddUnique<ITemplateContentParserService, TemplateContentParserService>();
             Services.AddUnique<IEntityService, EntityService>();
             Services.AddUnique<IRelationService, RelationService>();
             Services.AddUnique<IMemberTypeService, MemberTypeService>();
@@ -326,6 +345,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ICultureImpactFactory>(provider => new CultureImpactFactory(provider.GetRequiredService<IOptionsMonitor<ContentSettings>>()));
             Services.AddUnique<IDictionaryService, DictionaryService>();
             Services.AddUnique<ITemporaryMediaService, TemporaryMediaService>();
+            Services.AddUnique<IMediaImportService, MediaImportService>();
         }
     }
 }

@@ -276,7 +276,6 @@ public class MemberController : ContentControllerBase
     /// </summary>
     /// <param name="contentItem">The content item to save as a member</param>
     /// <returns>The resulting member display object</returns>
-    [FileUploadCleanupFilter]
     [OutgoingEditorModelEvent]
     [MemberSaveValidation]
     public async Task<ActionResult<MemberDisplay?>> PostSave([ModelBinder(typeof(MemberBinder))] MemberSave contentItem)
@@ -623,14 +622,14 @@ public class MemberController : ContentControllerBase
 
             // Change and persist the password
             Attempt<PasswordChangedModel?> passwordChangeResult =
-                await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _memberManager);
+                await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _memberManager, _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser);
 
             if (!passwordChangeResult.Success)
             {
-                foreach (var memberName in passwordChangeResult.Result?.ChangeError?.MemberNames ??
+                foreach (var memberName in passwordChangeResult.Result?.Error?.MemberNames ??
                                            Enumerable.Empty<string>())
                 {
-                    ModelState.AddModelError(memberName, passwordChangeResult.Result?.ChangeError?.ErrorMessage ?? string.Empty);
+                    ModelState.AddModelError(memberName, passwordChangeResult.Result?.Error?.ErrorMessage ?? string.Empty);
                 }
 
                 return ValidationProblem(ModelState);

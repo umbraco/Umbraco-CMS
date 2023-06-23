@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -46,6 +45,8 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
     private IFileService FileService => GetRequiredService<IFileService>();
 
     private IMacroService MacroService => GetRequiredService<IMacroService>();
+
+    private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
 
     private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
@@ -166,18 +167,13 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GivenNestedDictionaryItems_WhenPackageExported_ThenTheXmlIsNested()
+    public async Task GivenNestedDictionaryItems_WhenPackageExported_ThenTheXmlIsNested()
     {
-        var parent = new DictionaryItem("Parent") { Key = Guid.NewGuid() };
-        LocalizationService.Save(parent);
-        var child1 = new DictionaryItem(parent.Key, "Child1") { Key = Guid.NewGuid() };
-        LocalizationService.Save(child1);
-        var child2 = new DictionaryItem(child1.Key, "Child2") { Key = Guid.NewGuid() };
-        LocalizationService.Save(child2);
-        var child3 = new DictionaryItem(child2.Key, "Child3") { Key = Guid.NewGuid() };
-        LocalizationService.Save(child3);
-        var child4 = new DictionaryItem(child3.Key, "Child4") { Key = Guid.NewGuid() };
-        LocalizationService.Save(child4);
+        var parent = (await DictionaryItemService.CreateAsync(new DictionaryItem("Parent"), Constants.Security.SuperUserKey)).Result;
+        var child1 = (await DictionaryItemService.CreateAsync(new DictionaryItem(parent.Key, "Child1"), Constants.Security.SuperUserKey)).Result;
+        var child2 = (await DictionaryItemService.CreateAsync(new DictionaryItem(child1.Key, "Child2"), Constants.Security.SuperUserKey)).Result;
+        var child3 = (await DictionaryItemService.CreateAsync(new DictionaryItem(child2.Key, "Child3"), Constants.Security.SuperUserKey)).Result;
+        var child4 = (await DictionaryItemService.CreateAsync(new DictionaryItem(child3.Key, "Child4"), Constants.Security.SuperUserKey)).Result;
 
         var def = new PackageDefinition
         {
@@ -255,7 +251,7 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
                 Assert.AreEqual(test, mediaEntry.Name);
                 Assert.IsNotNull(zipArchive.GetEntry("package.xml"));
                 Assert.AreEqual(
-                    $"<MediaItems><MediaSet><testImage id=\"{m1.Id}\" key=\"{m1.Key}\" parentID=\"-1\" level=\"1\" creatorID=\"-1\" sortOrder=\"0\" createDate=\"{m1.CreateDate:s}\" updateDate=\"{m1.UpdateDate:s}\" nodeName=\"Test File\" urlName=\"test-file\" path=\"{m1.Path}\" isDoc=\"\" nodeType=\"{mt.Id}\" nodeTypeAlias=\"testImage\" writerName=\"\" writerID=\"0\" udi=\"{m1.GetUdi()}\" mediaFilePath=\"/media/test-file.txt\"><umbracoFile><![CDATA[/media/test-file.txt]]></umbracoFile><umbracoBytes><![CDATA[100]]></umbracoBytes><umbracoExtension><![CDATA[png]]></umbracoExtension></testImage></MediaSet></MediaItems>",
+                    $"<MediaItems><MediaSet><testImage id=\"{m1.Id}\" key=\"{m1.Key}\" parentID=\"-1\" level=\"1\" creatorID=\"-1\" sortOrder=\"0\" createDate=\"{m1.CreateDate:s}\" updateDate=\"{m1.UpdateDate:s}\" nodeName=\"Test File\" urlName=\"test-file\" path=\"{m1.Path}\" isDoc=\"\" nodeType=\"{mt.Id}\" nodeTypeAlias=\"testImage\" writerName=\"Administrator\" writerID=\"-1\" udi=\"{m1.GetUdi()}\" mediaFilePath=\"/media/test-file.txt\"><umbracoFile><![CDATA[/media/test-file.txt]]></umbracoFile><umbracoBytes><![CDATA[100]]></umbracoBytes><umbracoExtension><![CDATA[png]]></umbracoExtension></testImage></MediaSet></MediaItems>",
                     packageXml.Element("umbPackage").Element("MediaItems").ToString(SaveOptions.DisableFormatting));
                 Assert.AreEqual(2, zipArchive.Entries.Count());
                 Assert.AreEqual(ZipArchiveMode.Read, zipArchive.Mode);

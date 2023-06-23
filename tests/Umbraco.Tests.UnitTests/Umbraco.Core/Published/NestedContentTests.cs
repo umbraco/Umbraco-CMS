@@ -1,13 +1,14 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -36,7 +37,7 @@ public class NestedContentTests
         PropertyEditorCollection editors = null;
         var editor = new NestedContentPropertyEditor(
             Mock.Of<IDataValueEditorFactory>(),
-            Mock.Of<IIOHelper>(), 
+            Mock.Of<IIOHelper>(),
             Mock.Of<IEditorConfigurationParser>(),
             Mock.Of<INestedContentPropertyIndexValueFactory>());
         editors = new PropertyEditorCollection(new DataEditorCollection(() => new DataEditor[] { editor }));
@@ -45,25 +46,43 @@ public class NestedContentTests
 
         var dataType1 = new DataType(editor, serializer)
         {
-            Id = 1,
-            Configuration = new NestedContentConfiguration
-            {
-                MinItems = 1,
-                MaxItems = 1,
-                ContentTypes = new[] { new NestedContentConfiguration.ContentType { Alias = "contentN1" } },
-            },
+            Id = 1
         };
+        dataType1.ConfigurationData = dataType1.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new NestedContentConfiguration
+                {
+                    MinItems = 1,
+                    MaxItems = 1,
+                    ContentTypes = new[] { new NestedContentConfiguration.ContentType { Alias = "contentN1" } },
+                },
+                serializer);
+        var configuration = dataType1.ConfigurationObject as NestedContentConfiguration;
+        Assert.NotNull(configuration);
+        Assert.AreEqual(1, configuration.MinItems);
+        Assert.AreEqual(1, configuration.MaxItems);
+        Assert.AreEqual(1, configuration.ContentTypes!.Length);
+        Assert.AreEqual("contentN1", configuration.ContentTypes.First().Alias);
 
         var dataType2 = new DataType(editor, serializer)
         {
-            Id = 2,
-            Configuration = new NestedContentConfiguration
-            {
-                MinItems = 1,
-                MaxItems = 99,
-                ContentTypes = new[] { new NestedContentConfiguration.ContentType { Alias = "contentN1" } },
-            },
+            Id = 2
         };
+        dataType2.ConfigurationData = dataType2.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new NestedContentConfiguration
+                {
+                    MinItems = 1,
+                    MaxItems = 99,
+                    ContentTypes = new[] { new NestedContentConfiguration.ContentType { Alias = "contentN1" } },
+                },
+                serializer);
+        configuration = dataType2.ConfigurationObject as NestedContentConfiguration;
+        Assert.NotNull(configuration);
+        Assert.AreEqual(1, configuration.MinItems);
+        Assert.AreEqual(99, configuration.MaxItems);
+        Assert.AreEqual(1, configuration.ContentTypes!.Length);
+        Assert.AreEqual("contentN1", configuration.ContentTypes.First().Alias);
 
         var dataType3 =
             new DataType(
@@ -121,8 +140,8 @@ public class NestedContentTests
 
         var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
         {
-            new NestedContentSingleValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
-            new NestedContentManyValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
+            new NestedContentSingleValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog, Mock.Of<IApiElementBuilder>()),
+            new NestedContentManyValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog, Mock.Of<IApiElementBuilder>()),
         });
 
         var factory =
@@ -276,5 +295,8 @@ public class NestedContentTests
 
         public override object GetXPathValue(string culture = null, string? segment = null) =>
             throw new InvalidOperationException("This method won't be implemented.");
+
+        public override object GetDeliveryApiValue(bool expanding, string culture = null, string segment = null) =>
+            PropertyType.ConvertInterToDeliveryApiObject(_owner, ReferenceCacheLevel, InterValue, _preview);
     }
 }

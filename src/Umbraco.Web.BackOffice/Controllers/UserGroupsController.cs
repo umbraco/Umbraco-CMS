@@ -18,6 +18,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]
 [PrefixlessBodyModelValidator]
+[Obsolete("Use the new user group controllers instead.")]
 public class UserGroupsController : BackOfficeNotificationsController
 {
     private readonly AppCaches _appCaches;

@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Snippets
 
             string partialViewHeader = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage";
 
-            var snippet = this.Where(x => x.Name.Equals(snippetName + ".cshtml")).FirstOrDefault();
+            ISnippet? snippet = this.Where(x => x.Name.Equals(snippetName + ".cshtml")).FirstOrDefault();
 
             // Try and get the snippet path
             if (snippet is null)

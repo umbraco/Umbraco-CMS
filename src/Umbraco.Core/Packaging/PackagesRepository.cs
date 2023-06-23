@@ -129,6 +129,9 @@ public class PackagesRepository : ICreatedPackagesRepository
         return packageXml == null ? null : _parser.ToPackageDefinition(packageXml);
     }
 
+    // Default implementation as the class is obsolete
+    public PackageDefinition? GetByKey(Guid key) => null;
+
     public void Delete(int id)
     {
         XDocument packagesXml = EnsureStorage(out var packagesFile);

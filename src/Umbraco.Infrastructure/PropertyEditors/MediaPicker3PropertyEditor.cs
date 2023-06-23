@@ -1,16 +1,16 @@
-using System.Runtime.Serialization;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -74,8 +74,11 @@ public class MediaPicker3PropertyEditor : DataEditor
     {
         private readonly IDataTypeService _dataTypeService;
         private readonly IJsonSerializer _jsonSerializer;
-        private readonly ITemporaryMediaService _temporaryMediaService;
-
+        private readonly IMediaImportService _mediaImportService;
+        private readonly IMediaService _mediaService;
+        private readonly ITemporaryFileService _temporaryFileService;
+        private readonly IScopeProvider _scopeProvider;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
         public MediaPicker3PropertyValueEditor(
             ILocalizedTextService localizedTextService,
@@ -84,12 +87,20 @@ public class MediaPicker3PropertyEditor : DataEditor
             IIOHelper ioHelper,
             DataEditorAttribute attribute,
             IDataTypeService dataTypeService,
-            ITemporaryMediaService temporaryMediaService)
+            IMediaImportService mediaImportService,
+            IMediaService mediaService,
+            ITemporaryFileService temporaryFileService,
+            IScopeProvider scopeProvider,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
             : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
             _dataTypeService = dataTypeService;
-            _temporaryMediaService = temporaryMediaService;
+            _mediaImportService = mediaImportService;
+            _mediaService = mediaService;
+            _temporaryFileService = temporaryFileService;
+            _scopeProvider = scopeProvider;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         }
 
         /// <remarks>
@@ -109,9 +120,10 @@ public class MediaPicker3PropertyEditor : DataEditor
             var value = property.GetValue(culture, segment);
 
             var dtos = Deserialize(_jsonSerializer, value).ToList();
+            dtos = UpdateMediaTypeAliases(dtos);
 
             IDataType? dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
-            if (dataType?.Configuration != null)
+            if (dataType?.ConfigurationObject != null)
             {
                 MediaPicker3Configuration? configuration = dataType.ConfigurationAs<MediaPicker3Configuration>();
 
@@ -126,23 +138,30 @@ public class MediaPicker3PropertyEditor : DataEditor
 
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            if (editorValue.Value is JArray dtos)
+            // FIXME: consider creating an object deserialization method on IJsonSerializer instead of relying on deserializing serialized JSON here (and likely other places as well)
+            if (editorValue.Value is not JsonArray jsonArray)
             {
-                if (editorValue.DataTypeConfiguration is MediaPicker3Configuration configuration)
-                {
-                    dtos = PersistTempMedia(dtos, configuration);
-                }
-
-                // Clean up redundant/default data
-                foreach (JObject? dto in dtos.Values<JObject>())
-                {
-                    MediaWithCropsDto.Prune(dto);
-                }
-
-                return dtos.ToString(Formatting.None);
+                return base.FromEditor(editorValue, currentValue);
             }
 
-            return base.FromEditor(editorValue, currentValue);
+            List<MediaWithCropsDto>? mediaWithCropsDtos = _jsonSerializer.Deserialize<List<MediaWithCropsDto>>(jsonArray.ToJsonString());
+            if (mediaWithCropsDtos is null)
+            {
+                return base.FromEditor(editorValue, currentValue);
+            }
+
+            if (editorValue.DataTypeConfiguration is MediaPicker3Configuration configuration)
+            {
+                // handle temporary media uploads
+                mediaWithCropsDtos = HandleTemporaryMediaUploads(mediaWithCropsDtos, configuration);
+            }
+
+            foreach (MediaWithCropsDto mediaWithCropsDto in mediaWithCropsDtos)
+            {
+                mediaWithCropsDto.Prune();
+            }
+
+            return _jsonSerializer.Serialize(mediaWithCropsDtos);
         }
 
         internal static IEnumerable<MediaWithCropsDto> Deserialize(IJsonSerializer jsonSerializer, object? value)
@@ -185,76 +204,94 @@ public class MediaPicker3PropertyEditor : DataEditor
             }
         }
 
-        private JArray PersistTempMedia(JArray jArray, MediaPicker3Configuration mediaPicker3Configuration)
+        private List<MediaWithCropsDto> UpdateMediaTypeAliases(List<MediaWithCropsDto> mediaWithCropsDtos)
         {
-            var result = new JArray();
-            foreach (JObject? dto in jArray.Values<JObject>())
+            const string unknownMediaType = "UNKNOWN";
+
+            foreach (MediaWithCropsDto mediaWithCropsDto in mediaWithCropsDtos)
             {
-                if (dto is null)
-                {
-                    continue;
-                }
-
-                if (!dto.TryGetValue("tmpLocation", out JToken? temporaryLocation))
-                {
-                    // If it does not have a temporary path, it can be an already saved image or not-yet uploaded temp-image, check for media-key
-                    if (dto.TryGetValue("mediaKey", out _))
-                    {
-                        result.Add(dto);
-                    }
-
-                    continue;
-                }
-
-                var temporaryLocationString = temporaryLocation.Value<string>();
-                if (temporaryLocationString is null)
-                {
-                    continue;
-                }
-
-                GuidUdi? startNodeGuid = mediaPicker3Configuration.StartNodeId as GuidUdi ?? null;
-                JToken? mediaTypeAlias = dto.GetValue("mediaTypeAlias");
-                IMedia mediaFile = _temporaryMediaService.Save(temporaryLocationString, startNodeGuid?.Guid, mediaTypeAlias?.Value<string>());
-                MediaWithCropsDto? mediaDto = _jsonSerializer.Deserialize<MediaWithCropsDto>(dto.ToString());
-                if (mediaDto is null)
-                {
-                    continue;
-                }
-
-                mediaDto.MediaKey = mediaFile.GetUdi().Guid;
-                result.Add(JObject.Parse(_jsonSerializer.Serialize(mediaDto)));
+                IMedia? media = _mediaService.GetById(mediaWithCropsDto.MediaKey);
+                mediaWithCropsDto.MediaTypeAlias = media?.ContentType.Alias ?? unknownMediaType;
             }
 
-            return result;
+            return mediaWithCropsDtos.Where(m => m.MediaTypeAlias != unknownMediaType).ToList();
+        }
+
+        private List<MediaWithCropsDto> HandleTemporaryMediaUploads(List<MediaWithCropsDto> mediaWithCropsDtos, MediaPicker3Configuration configuration)
+        {
+            Guid userKey = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key
+                         ?? throw new InvalidOperationException("Could not obtain the current backoffice user");
+
+            var invalidDtos = new List<MediaWithCropsDto>();
+
+            foreach (MediaWithCropsDto mediaWithCropsDto in mediaWithCropsDtos)
+            {
+                // if the media already exist, don't bother with it
+                if (_mediaService.GetById(mediaWithCropsDto.MediaKey) != null)
+                {
+                    continue;
+                }
+
+                // we'll assume that the media key is the key of a temporary file
+                TemporaryFileModel? temporaryFile = _temporaryFileService.GetAsync(mediaWithCropsDto.MediaKey).GetAwaiter().GetResult();
+                if (temporaryFile == null)
+                {
+                    // the temporary file is missing, don't process this item any further
+                    invalidDtos.Add(mediaWithCropsDto);
+                    continue;
+                }
+
+                GuidUdi? startNodeGuid = configuration.StartNodeId as GuidUdi ?? null;
+
+                // make sure we'll clean up the temporary file if the scope completes
+                using IScope scope = _scopeProvider.CreateScope();
+                _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFile.Key, _scopeProvider);
+
+                // create a new media using the temporary file - the media type is passed from the client, in case
+                // there are multiple allowed media types matching the file extension
+                using Stream fileStream = temporaryFile.OpenReadStream();
+                IMedia mediaFile = _mediaImportService
+                    .ImportAsync(temporaryFile.FileName, fileStream, startNodeGuid?.Guid, mediaWithCropsDto.MediaTypeAlias, userKey)
+                    .GetAwaiter()
+                    .GetResult();
+
+                mediaWithCropsDto.MediaKey = mediaFile.Key;
+                scope.Complete();
+            }
+
+            return mediaWithCropsDtos.Except(invalidDtos).ToList();
         }
 
         /// <summary>
         ///     Model/DTO that represents the JSON that the MediaPicker3 stores.
         /// </summary>
-        [DataContract]
         internal class MediaWithCropsDto
         {
-            [DataMember(Name = "key")]
             public Guid Key { get; set; }
 
-            [DataMember(Name = "mediaKey")]
             public Guid MediaKey { get; set; }
 
-            [DataMember(Name = "crops")]
+            public string MediaTypeAlias { get; set; } = string.Empty;
+
             public IEnumerable<ImageCropperValue.ImageCropperCrop>? Crops { get; set; }
 
-            [DataMember(Name = "focalPoint")]
             public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; set; }
 
             /// <summary>
             ///     Removes redundant crop data/default focal point.
             /// </summary>
-            /// <param name="value">The media with crops DTO.</param>
             /// <remarks>
             ///     Because the DTO uses the same JSON keys as the image cropper value for crops and focal point, we can re-use the
             ///     prune method.
             /// </remarks>
-            public static void Prune(JObject? value) => ImageCropperValue.Prune(value);
+            internal void Prune()
+            {
+                Crops = Crops?.Where(crop => crop.Coordinates != null).ToArray();
+                if (FocalPoint is { Top: 0.5m, Left: 0.5m })
+                {
+                    FocalPoint = null;
+                }
+            }
 
             /// <summary>
             ///     Applies the configuration to ensure only valid crops are kept and have the correct width/height.

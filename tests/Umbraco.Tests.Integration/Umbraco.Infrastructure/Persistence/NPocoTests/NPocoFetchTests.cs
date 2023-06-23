@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NPoco;
@@ -310,7 +309,7 @@ public class NPocoFetchTests : UmbracoIntegrationTest
             //    GROUP BY zbThing1.id, zbThing1.name";
             var sql = ScopeAccessor.AmbientScope.SqlContext.Sql()
                 .Select<Thing1Dto>()
-                .Append(", COUNT(zbThing2Group.groupId) AS groupCount") // FIXME:
+                .Append(", COUNT(zbThing2Group.groupId) AS groupCount")
                 .From<Thing1Dto>()
                 .InnerJoin<Thing2GroupDto>().On<Thing1Dto, Thing2GroupDto>((t, t2g) => t.Id == t2g.ThingId)
                 .GroupBy<Thing1Dto>(x => x.Id, x => x.Name);

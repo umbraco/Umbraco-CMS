@@ -1152,6 +1152,7 @@ internal class DatabaseDataCreator
         new UserDto
         {
             Id = Constants.Security.SuperUserId,
+            Key = Constants.Security.SuperUserKey,
             Disabled = false,
             NoConsole = false,
             UserName = "Administrator",
@@ -1165,10 +1166,14 @@ internal class DatabaseDataCreator
 
     private void CreateUserGroupData()
     {
-        _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.UserGroup,
+            "id",
+            false,
             new UserGroupDto
             {
                 Id = 1,
+                Key = Constants.Security.AdminGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
                 Alias = Constants.Security.AdminGroupAlias,
@@ -1179,10 +1184,14 @@ internal class DatabaseDataCreator
                 Icon = "icon-medal",
                 HasAccessToAllLanguages = true,
             });
-        _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.UserGroup,
+            "id",
+            false,
             new UserGroupDto
             {
                 Id = 2,
+                Key = Constants.Security.WriterGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
                 Alias = Constants.Security.WriterGroupAlias,
@@ -1193,10 +1202,14 @@ internal class DatabaseDataCreator
                 Icon = "icon-edit",
                 HasAccessToAllLanguages = true,
             });
-        _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.UserGroup,
+            "id",
+            false,
             new UserGroupDto
             {
                 Id = 3,
+                Key = Constants.Security.EditorGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
                 Alias = Constants.Security.EditorGroupAlias,
@@ -1207,10 +1220,14 @@ internal class DatabaseDataCreator
                 Icon = "icon-tools",
                 HasAccessToAllLanguages = true,
             });
-        _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.UserGroup,
+            "id",
+            false,
             new UserGroupDto
             {
                 Id = 4,
+                Key = Constants.Security.TranslatorGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
                 Alias = Constants.Security.TranslatorGroupAlias,
@@ -1221,10 +1238,14 @@ internal class DatabaseDataCreator
                 Icon = "icon-globe",
                 HasAccessToAllLanguages = true,
             });
-        _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.UserGroup,
+            "id",
+            false,
             new UserGroupDto
             {
                 Id = 5,
+                Key = Constants.Security.SensitiveDataGroupKey,
                 Alias = Constants.Security.SensitiveDataGroupAlias,
                 Name = "Sensitive data",
                 DefaultPermissions = string.Empty,
@@ -1387,7 +1408,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 6,
-                    UniqueId = 6.ToGuid(),
+                    UniqueId = new Guid("B646CA8F-E469-4FC2-A48A-D4DC1AA64A53"),
                     DataTypeId = Constants.DataTypes.ImageCropper,
                     ContentTypeId = 1032,
                     PropertyTypeGroupId = 3,
@@ -1403,7 +1424,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 7,
-                    UniqueId = 7.ToGuid(),
+                    UniqueId = new Guid("A68D453B-1F62-44F4-9F71-0B6BBD43C355"),
                     DataTypeId = Constants.DataTypes.LabelInt,
                     ContentTypeId = 1032,
                     PropertyTypeGroupId = 3,
@@ -1419,7 +1440,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 8,
-                    UniqueId = 8.ToGuid(),
+                    UniqueId = new Guid("854087F6-648B-40ED-BC98-B8A9789E80B9"),
                     DataTypeId = Constants.DataTypes.LabelInt,
                     ContentTypeId = 1032,
                     PropertyTypeGroupId = 3,
@@ -1435,7 +1456,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 9,
-                    UniqueId = 9.ToGuid(),
+                    UniqueId = new Guid("BD4C5ACE-26E3-4A8B-AF1A-E8206A35FA07"),
                     DataTypeId = Constants.DataTypes.LabelBigint,
                     ContentTypeId = 1032,
                     PropertyTypeGroupId = 3,
@@ -1451,7 +1472,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 10,
-                    UniqueId = 10.ToGuid(),
+                    UniqueId = new Guid("F7786FE8-724A-4ED0-B244-72546DB32A92"),
                     DataTypeId = -92,
                     ContentTypeId = 1032,
                     PropertyTypeGroupId = 3,
@@ -1471,7 +1492,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 24,
-                    UniqueId = 24.ToGuid(),
+                    UniqueId = new Guid("A0FB68F3-F427-47A6-AFCE-536FFA5B64E9"),
                     DataTypeId = Constants.DataTypes.Upload,
                     ContentTypeId = 1033,
                     PropertyTypeGroupId = 4,
@@ -1487,7 +1508,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 25,
-                    UniqueId = 25.ToGuid(),
+                    UniqueId = new Guid("3531C0A3-4E0A-4324-A621-B9D3822B071F"),
                     DataTypeId = -92,
                     ContentTypeId = 1033,
                     PropertyTypeGroupId = 4,
@@ -1503,7 +1524,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 26,
-                    UniqueId = 26.ToGuid(),
+                    UniqueId = new Guid("F9527050-59BC-43E4-8FA8-1658D1319FF5"),
                     DataTypeId = Constants.DataTypes.LabelBigint,
                     ContentTypeId = 1033,
                     PropertyTypeGroupId = 4,
@@ -1523,7 +1544,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 40,
-                    UniqueId = 40.ToGuid(),
+                    UniqueId = new Guid("BED8AB97-D85F-44D2-A8B9-AEF6893F9610"),
                     DataTypeId = Constants.DataTypes.UploadVideo,
                     ContentTypeId = 1034,
                     PropertyTypeGroupId = 52,
@@ -1539,7 +1560,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 41,
-                    UniqueId = 41.ToGuid(),
+                    UniqueId = new Guid("EDD2B3FD-1E57-4E57-935E-096DEFCCDC9B"),
                     DataTypeId = -92,
                     ContentTypeId = 1034,
                     PropertyTypeGroupId = 52,
@@ -1555,7 +1576,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 42,
-                    UniqueId = 42.ToGuid(),
+                    UniqueId = new Guid("180EEECF-1F00-409E-8234-BBA967E08B0A"),
                     DataTypeId = Constants.DataTypes.LabelBigint,
                     ContentTypeId = 1034,
                     PropertyTypeGroupId = 52,
@@ -1575,7 +1596,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 43,
-                    UniqueId = 43.ToGuid(),
+                    UniqueId = new Guid("1F48D730-F174-4684-AFAD-A335E59D84A0"),
                     DataTypeId = Constants.DataTypes.UploadAudio,
                     ContentTypeId = 1035,
                     PropertyTypeGroupId = 53,
@@ -1591,7 +1612,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 44,
-                    UniqueId = 44.ToGuid(),
+                    UniqueId = new Guid("1BEE433F-A21A-4031-8E03-AF01BB8D2DE9"),
                     DataTypeId = -92,
                     ContentTypeId = 1035,
                     PropertyTypeGroupId = 53,
@@ -1607,7 +1628,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 45,
-                    UniqueId = 45.ToGuid(),
+                    UniqueId = new Guid("3CBF538A-29AB-4317-A9EB-BBCDF1A54260"),
                     DataTypeId = Constants.DataTypes.LabelBigint,
                     ContentTypeId = 1035,
                     PropertyTypeGroupId = 53,
@@ -1627,7 +1648,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 46,
-                    UniqueId = 46.ToGuid(),
+                    UniqueId = new Guid("E5C8C2D0-2D82-4F01-B53A-45A1D1CBF19C"),
                     DataTypeId = Constants.DataTypes.UploadArticle,
                     ContentTypeId = 1036,
                     PropertyTypeGroupId = 54,
@@ -1643,7 +1664,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 47,
-                    UniqueId = 47.ToGuid(),
+                    UniqueId = new Guid("EF1B4AF7-36DE-45EB-8C18-A2DE07319227"),
                     DataTypeId = -92,
                     ContentTypeId = 1036,
                     PropertyTypeGroupId = 54,
@@ -1659,7 +1680,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 48,
-                    UniqueId = 48.ToGuid(),
+                    UniqueId = new Guid("AAB7D00C-7209-4337-BE3F-A4421C8D79A0"),
                     DataTypeId = Constants.DataTypes.LabelBigint,
                     ContentTypeId = 1036,
                     PropertyTypeGroupId = 54,
@@ -1679,7 +1700,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 49,
-                    UniqueId = 49.ToGuid(),
+                    UniqueId = new Guid("E2A2BDF2-971B-483E-95A1-4104CC06AF26"),
                     DataTypeId = Constants.DataTypes.UploadVectorGraphics,
                     ContentTypeId = 1037,
                     PropertyTypeGroupId = 55,
@@ -1695,7 +1716,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 50,
-                    UniqueId = 50.ToGuid(),
+                    UniqueId = new Guid("0F25A89E-2EB7-49BC-A7B4-759A7E4C69F2"),
                     DataTypeId = -92,
                     ContentTypeId = 1037,
                     PropertyTypeGroupId = 55,
@@ -1711,7 +1732,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 51,
-                    UniqueId = 51.ToGuid(),
+                    UniqueId = new Guid("09A07AFF-861D-4769-A2B0-C165EBD43D39"),
                     DataTypeId = Constants.DataTypes.LabelBigint,
                     ContentTypeId = 1037,
                     PropertyTypeGroupId = 55,
@@ -1732,7 +1753,7 @@ internal class DatabaseDataCreator
                 new PropertyTypeDto
                 {
                     Id = 28,
-                    UniqueId = 28.ToGuid(),
+                    UniqueId = new Guid("70F24C26-1C0E-4053-BD8E-E9E6E4EC4C01"),
                     DataTypeId = Constants.DataTypes.Textarea,
                     ContentTypeId = 1044,
                     PropertyTypeGroupId = 11,
@@ -1757,6 +1778,7 @@ internal class DatabaseDataCreator
         {
             // Insert the specified languages, ensuring the first is marked as default.
             bool isDefault = true;
+            short id = 1;
             foreach (var isoCode in languageInstallDefaultDataSettings.Values)
             {
                 if (!TryCreateCulture(isoCode, out CultureInfo? culture))
@@ -1766,12 +1788,14 @@ internal class DatabaseDataCreator
 
                 var dto = new LanguageDto
                 {
+                    Id = id,
                     IsoCode = culture.Name,
                     CultureName = culture.EnglishName,
                     IsDefault = isDefault,
                 };
-                _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", true, dto);
+                _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", false, dto);
                 isDefault = false;
+                id++;
             }
         }
         else
