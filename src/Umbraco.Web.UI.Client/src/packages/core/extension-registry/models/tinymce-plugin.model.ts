@@ -19,8 +19,9 @@ export interface MetaTinyMcePlugin {
 		label: string;
 
 		/**
-		 * The icon shown on the Rich Text Editor configuration page. The icon has to be registered in the icon provider.
+		 * The icon shown on the Rich Text Editor configuration page. The icon has to be a part of TinyMCE's icon set.
 		 * @optional
+		 * @see [TinyMCE Icon Set](https://www.tiny.cloud/docs/tinymce/6/editor-icon-identifiers/) for available default icons.
 		 */
 		icon?: string;
 	}>;
