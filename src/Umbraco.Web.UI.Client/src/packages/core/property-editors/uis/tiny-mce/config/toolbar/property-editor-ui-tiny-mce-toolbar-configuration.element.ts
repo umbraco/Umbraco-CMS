@@ -4,11 +4,14 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
+
+const tinyIconSet = tinymce.default.IconManager.get('default');
 
 type ToolbarConfig = {
 	alias: string;
 	label: string;
-	icon: string;
+	icon?: string;
 	selected: boolean;
 };
 
@@ -102,7 +105,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 				this._toolbarConfig,
 				(v) => html`<li>
 					<uui-checkbox value=${v.alias} ?checked=${v.selected} @change=${this.onChange}>
-						<uui-icon name=${v.icon}></uui-icon>
+						<uui-icon .svg=${tinyIconSet.icons[v.icon ?? 'alignjustify']}></uui-icon>
 						${v.label}
 					</uui-checkbox>
 				</li>`
