@@ -23,11 +23,6 @@ const manifest: ManifestPropertyEditorUi = {
 							alias: 'toolbar',
 							value: [
 								{
-									alias: 'removeformat',
-									label: 'Remove format',
-									icon: 'remove-formatting',
-								},
-								{
 									alias: 'undo',
 									label: 'Undo',
 									icon: 'undo',
@@ -58,6 +53,16 @@ const manifest: ManifestPropertyEditorUi = {
 									icon: 'permanent-pen',
 								},
 								{
+									alias: 'fontname',
+									label: 'Font select',
+									icon: 'text-color',
+								},
+								{
+									alias: 'fontsize',
+									label: 'Font size',
+									icon: 'text-color',
+								},
+								{
 									alias: 'forecolor',
 									label: 'Text color',
 									icon: 'text-color',
@@ -65,12 +70,22 @@ const manifest: ManifestPropertyEditorUi = {
 								{
 									alias: 'backcolor',
 									label: 'Background color',
-									icon: 'background-color',
+									icon: 'highlight-bg-color',
 								},
 								{
 									alias: 'blockquote',
 									label: 'Blockquote',
 									icon: 'quote',
+								},
+								{
+									alias: 'formatblock',
+									label: 'Format block',
+									icon: 'format',
+								},
+								{
+									alias: 'removeformat',
+									label: 'Remove format',
+									icon: 'remove-formatting',
 								},
 								{
 									alias: 'bold',
