@@ -33,13 +33,13 @@ public class AllowedChildrenByKeyDocumentController : DocumentControllerBase
             return NotFound();
         }
 
-        IEnumerable<IContentType> allowedChildren = _contentTypeService.GetAll(documentType.AllowedContentTypes.Select(x => x.Key)).ToArray();
+        PagedModel<IContentType> allowedChildren = await _contentTypeService.GetAllAsync(documentType.AllowedContentTypes.Select(x => x.Key), skip, take);
 
-        List<DocumentTypeResponseModel> viewModels = _umbracoMapper.MapEnumerable<IContentType, DocumentTypeResponseModel>(allowedChildren.Skip(skip).Take(take));
+        List<DocumentTypeResponseModel> viewModels = _umbracoMapper.MapEnumerable<IContentType, DocumentTypeResponseModel>(allowedChildren.Items);
 
         var pagedViewModel = new PagedViewModel<DocumentTypeResponseModel>
         {
-            Total = allowedChildren.Count(),
+            Total = allowedChildren.Total,
             Items = viewModels,
         };
 

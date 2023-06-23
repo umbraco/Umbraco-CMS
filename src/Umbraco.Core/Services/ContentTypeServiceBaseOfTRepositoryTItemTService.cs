@@ -329,6 +329,22 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
     }
 
+    public Task<PagedModel<TItem>> GetAllAsync(IEnumerable<Guid> keys, int skip, int take)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds);
+
+        TItem[] contentTypeCompositions = Repository.GetMany(keys.ToArray()).ToArray();
+
+        var pagedModel = new PagedModel<TItem>()
+        {
+            Total = contentTypeCompositions.Length,
+            Items = contentTypeCompositions.Skip(skip).Take(take),
+        };
+
+        return Task.FromResult(pagedModel);
+    }
+
     public IEnumerable<TItem> GetChildren(int id)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);

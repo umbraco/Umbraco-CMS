@@ -47,6 +47,8 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
 
     IEnumerable<TItem> GetAll(IEnumerable<Guid>? ids);
 
+    Task<PagedModel<TItem>> GetAllAsync(IEnumerable<Guid> keys, int skip, int take);
+
     IEnumerable<TItem> GetDescendants(int id, bool andSelf); // parent-child axis
 
     IEnumerable<TItem> GetComposedOf(int id); // composition axis
