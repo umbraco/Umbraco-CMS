@@ -21,7 +21,23 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 	implements UmbPropertyEditorExtensionElement
 {
 	@property()
-	value: string[] = [];
+	set value(value: string[]) {
+		this.#selectedValues = value;
+
+		// Migrations
+		if (value.includes('ace')) {
+			this.#selectedValues = value.filter((v) => v !== 'ace');
+			this.#selectedValues.push('sourcecode');
+		}
+
+		this._toolbarConfig.forEach((v) => {
+			v.selected = value.includes(v.alias);
+		});
+	}
+
+	get value(): string[] {
+		return this.#selectedValues;
+	}
 
 	@property({ type: Array, attribute: false })
 	config?: UmbDataTypePropertyCollection;
@@ -29,7 +45,9 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 	@state()
 	private _toolbarConfig: ToolbarConfig[] = [];
 
-	async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
+	#selectedValues: string[] = [];
+
+	protected async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
 		super.firstUpdated(_changedProperties);
 
 		this.config?.getValueByAlias<ToolbarConfig[]>('toolbar')?.forEach((v) => {
@@ -44,7 +62,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 		this.requestUpdate('_toolbarConfig');
 	}
 
-	async getToolbarPlugins(): Promise<void> {
+	private async getToolbarPlugins(): Promise<void> {
 		// Get all the toolbar plugins
 		const plugin$ = umbExtensionsRegistry.extensionsOfType('tinyMcePlugin');
 
@@ -65,12 +83,25 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 		});
 	}
 
+	private onChange(event: CustomEvent) {
+		const checkbox = event.target as HTMLInputElement;
+		const alias = checkbox.value;
+
+		if (checkbox.checked) {
+			this.value = [...this.value, alias];
+		} else {
+			this.value = this.value.filter((v) => v !== alias);
+		}
+
+		this.dispatchEvent(new CustomEvent('property-value-change'));
+	}
+
 	render() {
 		return html`<ul>
 			${map(
 				this._toolbarConfig,
 				(v) => html`<li>
-					<uui-checkbox value=${v.alias} ?checked=${v.selected}>
+					<uui-checkbox value=${v.alias} ?checked=${v.selected} @change=${this.onChange}>
 						<uui-icon name=${v.icon}></uui-icon>
 						${v.label}
 					</uui-checkbox>
