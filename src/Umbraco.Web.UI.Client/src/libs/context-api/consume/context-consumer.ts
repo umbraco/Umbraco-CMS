@@ -36,7 +36,6 @@ export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = 
 	}
 
 	protected _onResponse = (instance: T) => {
-		// TODO: check that this check is not giving us any problems:
 		if (this._instance === instance) {
 			return;
 		}

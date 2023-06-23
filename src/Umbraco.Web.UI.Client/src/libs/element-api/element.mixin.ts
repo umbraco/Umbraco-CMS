@@ -26,7 +26,6 @@ export declare class UmbElementMixinInterface extends UmbControllerHostElement {
 		alias: string | UmbContextToken<R>,
 		callback: UmbContextCallback<R>
 	): UmbContextConsumerController<R>;
-	consumeAllContexts(contextAliases: string[], callback: (_instances: ResolvedContexts) => void): void;
 }
 
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
@@ -74,33 +73,6 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 			callback: UmbContextCallback<R>
 		): UmbContextConsumerController<R> {
 			return new UmbContextConsumerController(this, alias, callback);
-		}
-
-		/**
-		 * @description Setup a subscription for multiple contexts. The callback is called when all contexts are resolved.
-		 * @param {string} aliases
-		 * @param {method} callback Callback method called when all contexts are resolved.
-		 * @memberof UmbElementMixin
-		 * @deprecated it should not be necessary to consume multiple contexts at once, use consumeContext instead with an UmbContextToken
-		 */
-		consumeAllContexts(_contextAliases: Array<string>, callback: (_instances: ResolvedContexts) => void) {
-			let resolvedAmount = 0;
-			const controllers = _contextAliases.map(
-				(alias) =>
-					new UmbContextConsumerController(this, alias, () => {
-						resolvedAmount++;
-
-						if (resolvedAmount === _contextAliases.length) {
-							const result: ResolvedContexts = {};
-
-							controllers.forEach((contextCtrl: UmbContextConsumerController) => {
-								result[contextCtrl.consumerAlias?.toString()] = contextCtrl.instance;
-							});
-
-							callback(result);
-						}
-					})
-			);
 		}
 	}
 

@@ -1,22 +1,26 @@
-import { UmbControllerHostElement } from './controller-host.mixin.js';
+import { UmbControllerHostBaseMixin } from './controller-host-base.mixin.js';
+import { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbControllerInterface } from './controller.interface.js';
 
-export abstract class UmbController implements UmbControllerInterface {
-	protected host?: UmbControllerHostElement;
+/**
+ * This mixin enables a web-component to host controllers.
+ * This enables controllers to be added to the life cycle of this element.
+ *
+ */
+export abstract class UmbController extends UmbControllerHostBaseMixin(class {}) implements UmbControllerInterface {
+	protected host?: UmbControllerHost;
 
 	private _alias?: string;
 	public get unique() {
 		return this._alias;
 	}
 
-	constructor(host: UmbControllerHostElement, alias?: string) {
+	constructor(host: UmbControllerHost, alias?: string) {
+		super();
 		this.host = host;
 		this._alias = alias;
 		this.host.addController(this);
 	}
-
-	abstract hostConnected(): void;
-	abstract hostDisconnected(): void;
 
 	public destroy() {
 		if (this.host) {

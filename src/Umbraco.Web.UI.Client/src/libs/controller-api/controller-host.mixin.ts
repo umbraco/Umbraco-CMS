@@ -1,8 +1,10 @@
+import { UmbControllerHostBaseMixin } from './controller-host-base.mixin.js';
+import { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbControllerInterface } from './controller.interface.js';
 
 type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
 
-export declare class UmbControllerHostElement extends HTMLElement {
+export declare class UmbControllerHostElement extends HTMLElement implements UmbControllerHost {
 	hasController(controller: UmbControllerInterface): boolean;
 	getControllers(filterMethod: (ctrl: UmbControllerInterface) => boolean): UmbControllerInterface[];
 	addController(controller: UmbControllerInterface): void;
@@ -11,107 +13,26 @@ export declare class UmbControllerHostElement extends HTMLElement {
 }
 
 /**
- * This mixin enables the component to host controllers.
- * This is done by calling the `consumeContext` method.
+ * This mixin enables a web-component to host controllers.
+ * This enables controllers to be added to the life cycle of this element.
  *
  * @param {Object} superClass - superclass to be extended.
  * @mixin
  */
 export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superClass: T) => {
-	class UmbContextConsumerClass extends superClass {
-		#controllers: UmbControllerInterface[] = [];
-
-		#attached = false;
-
-		/**
-		 * Tests if a controller is assigned to this element.
-		 * @param {UmbControllerInterface} ctrl
-		 */
-		hasController(ctrl: UmbControllerInterface): boolean {
-			return this.#controllers.indexOf(ctrl) !== -1;
-		}
-
-		/**
-		 * Retrieve controllers matching a filter of this element.
-		 * @param {method} filterMethod
-		 */
-		getControllers(filterMethod: (ctrl: UmbControllerInterface) => boolean): UmbControllerInterface[] {
-			return this.#controllers.filter(filterMethod);
-		}
-
-		/**
-		 * Append a controller to this element.
-		 * @param {UmbControllerInterface} ctrl
-		 */
-		addController(ctrl: UmbControllerInterface): void {
-			// Check if there is one already with same unique
-			this.removeControllerByUnique(ctrl.unique);
-
-			this.#controllers.push(ctrl);
-			if (this.#attached) {
-				// If a controller is created on a already attached element, then it will be added directly. This might not be optimal. As the controller it self has not finished its constructor method jet. therefor i postpone the call:
-				Promise.resolve().then(() => ctrl.hostConnected());
-				//ctrl.hostConnected();
-			}
-		}
-
-		/**
-		 * Remove a controller from this element, by its unique/alias.
-		 * @param {unknown} unique/alias
-		 */
-		removeControllerByUnique(unique: UmbControllerInterface['unique']): void {
-			if (unique) {
-				this.#controllers.forEach((x) => {
-					if (x.unique === unique) {
-						this.removeController(x);
-					}
-				});
-			}
-		}
-
-		/**
-		 * Remove a controller from this element.
-		 * Notice this will also destroy the controller.
-		 * @param {UmbControllerInterface} ctrl
-		 */
-		removeController(ctrl: UmbControllerInterface): void {
-			const index = this.#controllers.indexOf(ctrl);
-			if (index !== -1) {
-				this.#controllers.splice(index, 1);
-				if (this.#attached) {
-					ctrl.hostDisconnected();
-				}
-				ctrl.destroy();
-			}
-		}
-
-		/**
-		 * Remove a controller from this element by its alias.
-		 * Notice this will also destroy the controller.
-		 * @param {string} unique
-		 */
-		removeControllerByAlias(unique: string): void {
-			this.#controllers.forEach((x) => {
-				if (x.unique === unique) {
-					this.removeController(x);
-				}
-			});
-		}
-
+	class UmbControllerHostClass extends UmbControllerHostBaseMixin(superClass) implements UmbControllerHost {
 		connectedCallback() {
-			super.connectedCallback?.();
-			this.#attached = true;
-			this.#controllers.forEach((ctrl: UmbControllerInterface) => ctrl.hostConnected());
+			super.connectedCallback();
+			this.hostConnected();
 		}
 
 		disconnectedCallback() {
-			super.disconnectedCallback?.();
-			this.#attached = false;
-			this.#controllers.forEach((ctrl: UmbControllerInterface) => ctrl.hostDisconnected());
+			super.disconnectedCallback();
+			this.hostDisconnected();
 		}
 	}
 
-	return UmbContextConsumerClass as unknown as HTMLElementConstructor<UmbControllerHostElement> & T;
+	return UmbControllerHostClass as unknown as HTMLElementConstructor<UmbControllerHostElement> & T;
 };
 
 declare global {
