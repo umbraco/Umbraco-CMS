@@ -1,7 +1,6 @@
 import { UmbMemberTreeStore, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN } from './member.tree.store.js';
 import { UmbMemberTreeServerDataSource } from './sources/member.tree.server.data.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 
@@ -9,35 +8,18 @@ export class UmbMemberRepository implements UmbTreeRepository<any> {
 	#host: UmbControllerHostElement;
 	#dataSource: UmbMemberTreeServerDataSource;
 	#treeStore?: UmbMemberTreeStore;
-	#notificationContext?: UmbNotificationContext;
-	#initResolver?: () => void;
-	#initialized = false;
+	#init;
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 		// TODO: figure out how spin up get the correct data source
 		this.#dataSource = new UmbMemberTreeServerDataSource(this.#host);
 
-		new UmbContextConsumerController(this.#host, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#treeStore = instance;
-			this.#checkIfInitialized();
-		});
-
-		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
-			this.#notificationContext = instance;
-			this.#checkIfInitialized();
-		});
-	}
-
-	#init = new Promise<void>((resolve) => {
-		this.#initialized ? resolve() : (this.#initResolver = resolve);
-	});
-
-	#checkIfInitialized() {
-		if (this.#treeStore && this.#notificationContext) {
-			this.#initialized = true;
-			this.#initResolver?.();
-		}
+		this.#init = Promise.all([
+			new UmbContextConsumerController(this.#host, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#treeStore = instance;
+			}).asPromise(),
+		]);
 	}
 
 	// TREE:

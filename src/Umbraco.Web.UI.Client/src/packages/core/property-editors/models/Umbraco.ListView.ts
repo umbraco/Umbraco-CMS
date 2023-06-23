@@ -1,7 +1,7 @@
-import type { ManifestPropertyEditorModel } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: ManifestPropertyEditorModel = {
-	type: 'propertyEditorModel',
+export const manifest: ManifestPropertyEditorSchema = {
+	type: 'propertyEditorSchema',
 	name: 'List View',
 	alias: 'Umbraco.ListView',
 	meta: {
