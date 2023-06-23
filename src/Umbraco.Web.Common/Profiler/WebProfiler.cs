@@ -45,7 +45,7 @@ public class WebProfiler : IProfiler
 
         MiniProfiler.StartNew(name);
 
-        MiniProfilerContext.Value = MiniProfiler.Current;
+        MiniProfilerContext.Value = MiniProfiler.Current!;
     }
 
     public void Stop(bool discardResults = false) => MiniProfilerContext.Value?.Stop(discardResults);
@@ -99,7 +99,7 @@ public class WebProfiler : IProfiler
 
                 if (cookieValue is not null)
                 {
-                    AddSubProfiler(MiniProfiler.FromJson(cookieValue));
+                    AddSubProfiler(MiniProfiler.FromJson(cookieValue)!);
                 }
 
                 // If it is a redirect to a relative path (local redirect)

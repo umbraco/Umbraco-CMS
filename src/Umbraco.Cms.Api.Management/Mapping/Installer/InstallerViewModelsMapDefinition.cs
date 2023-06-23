@@ -43,6 +43,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
         target.Password = source.Password;
         target.ProviderName = source.ProviderName;
         target.Server = source.Server!;
+        target.TrustServerCertificate = source.TrustServerCertificate;
     }
 
     // Umbraco.Code.MapAll
@@ -73,6 +74,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
         target.Password = source.Password;
         target.UseIntegratedAuthentication = source.UseIntegratedAuthentication;
         target.ConnectionString = source.ConnectionString;
+        target.TrustServerCertificate = source.TrustServerCertificate;
     }
 
     // Umbraco.Code.MapAll
@@ -86,6 +88,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
         target.Password = source.Password;
         target.ProviderName = source.ProviderName;
         target.Server = source.Server!;
+        target.TrustServerCertificate = source.TrustServerCertificate;
     }
 
     // Umbraco.Code.MapAll

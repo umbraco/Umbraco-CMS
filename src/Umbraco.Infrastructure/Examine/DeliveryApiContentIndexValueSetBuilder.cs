@@ -15,6 +15,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
     private readonly IContentService _contentService;
     private readonly IPublicAccessService _publicAccessService;
     private readonly ILogger<DeliveryApiContentIndexValueSetBuilder> _logger;
+    private readonly IDeliveryApiContentIndexFieldDefinitionBuilder _deliveryApiContentIndexFieldDefinitionBuilder;
     private DeliveryApiSettings _deliveryApiSettings;
 
     public DeliveryApiContentIndexValueSetBuilder(
@@ -22,11 +23,13 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         IContentService contentService,
         IPublicAccessService publicAccessService,
         ILogger<DeliveryApiContentIndexValueSetBuilder> logger,
+        IDeliveryApiContentIndexFieldDefinitionBuilder deliveryApiContentIndexFieldDefinitionBuilder,
         IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings)
     {
         _contentIndexHandlerCollection = contentIndexHandlerCollection;
         _publicAccessService = publicAccessService;
         _logger = logger;
+        _deliveryApiContentIndexFieldDefinitionBuilder = deliveryApiContentIndexFieldDefinitionBuilder;
         _contentService = contentService;
         _deliveryApiSettings = deliveryApiSettings.CurrentValue;
         deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
@@ -35,6 +38,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
     /// <inheritdoc />
     public IEnumerable<ValueSet> GetValueSets(params IContent[] contents)
     {
+        FieldDefinitionCollection fieldDefinitions = _deliveryApiContentIndexFieldDefinitionBuilder.Build();
         foreach (IContent content in contents.Where(CanIndex))
         {
             var publishedCultures = PublishedCultures(content);
@@ -56,7 +60,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
                     [UmbracoExamineFieldNames.NodeNameFieldName] = new object[] { content.GetPublishName(culture) ?? content.GetCultureName(culture) ?? string.Empty }, // primarily needed for backoffice index browsing
                 };
 
-                AddContentIndexHandlerFields(content, culture, indexValues);
+                AddContentIndexHandlerFields(content, culture, fieldDefinitions, indexValues);
 
                 yield return new ValueSet(DeliveryApiContentIndexUtilites.IndexId(content, indexCulture), IndexTypes.Content, content.ContentType.Alias, indexValues);
             }
@@ -108,7 +112,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         return cultures;
     }
 
-    private void AddContentIndexHandlerFields(IContent content, string? culture, Dictionary<string, IEnumerable<object>> indexValues)
+    private void AddContentIndexHandlerFields(IContent content, string? culture, FieldDefinitionCollection fieldDefinitions, Dictionary<string, IEnumerable<object>> indexValues)
     {
         foreach (IContentIndexHandler handler in _contentIndexHandlerCollection)
         {
@@ -121,7 +125,17 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
                     continue;
                 }
 
-                indexValues[fieldValue.FieldName] = fieldValue.Values.ToArray();
+                // Examine will be case sensitive in the default setup; we need to deal with that for sortable text fields
+                if (fieldDefinitions.TryGetValue(fieldValue.FieldName, out FieldDefinition fieldDefinition)
+                    && fieldDefinition.Type == FieldDefinitionTypes.FullTextSortable
+                    && fieldValue.Values.All(value => value is string))
+                {
+                    indexValues[fieldValue.FieldName] = fieldValue.Values.OfType<string>().Select(value => value.ToLowerInvariant()).ToArray();
+                }
+                else
+                {
+                    indexValues[fieldValue.FieldName] = fieldValue.Values.ToArray();
+                }
             }
         }
     }

@@ -34,7 +34,7 @@ public class WebProfilerHtml : IProfilerHtml
 
         var result = StackExchange.Profiling.Internal.Render.Includes(
             profiler,
-            context is not null ? context.Request.PathBase + path : null,
+            context is not null ? context.Request.PathBase + path : string.Empty,
             true,
             new List<Guid> { profiler.Id },
             RenderPosition.Right,

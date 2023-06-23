@@ -23,4 +23,6 @@ public class DatabaseInstallResponseModel
     public bool UseIntegratedAuthentication { get; set; }
 
     public string? ConnectionString { get; set; }
+
+    public bool TrustServerCertificate { get; set; }
 }
