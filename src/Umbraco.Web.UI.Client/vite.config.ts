@@ -19,8 +19,12 @@ export const plugins: PluginOption[] = [
 			},
 			{
 				src: 'node_modules/tinymce/**/*',
-				dest: 'umbraco/backoffice/tinymce'
-			}
+				dest: 'umbraco/backoffice/tinymce',
+			},
+			{
+				src: 'node_modules/tinymce-i18n/langs6/**/*',
+				dest: 'umbraco/backoffice/tinymce/langs',
+			},
 		],
 	}),
 	viteTSConfigPaths(),
