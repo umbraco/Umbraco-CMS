@@ -7,8 +7,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-tiny-mce-toolbar-configuration')
 export class UmbPropertyEditorUITinyMceToolbarConfigurationElement extends UmbLitElement {
-
-
 	@property()
 	value: string[] = [];
 
@@ -16,7 +14,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement extends UmbLi
 	public config = [];
 
 	render() {
-		return html`TODO => get config options from backend per Umbraco.Cms.Web.BackOffice.PropertyEditors.RichTextPreValueController<ul>
+		return html`<ul>
 			${this.value.map((v) => html`<li><uui-checkbox value=${v} checked>${v}</uui-checkbox></li>`)}
 		</ul>`;
 	}
@@ -27,7 +25,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement extends UmbLi
 			ul {
 				list-style: none;
 				padding: 0;
-				margin:0;
+				margin: 0;
 			}
 		`,
 	];

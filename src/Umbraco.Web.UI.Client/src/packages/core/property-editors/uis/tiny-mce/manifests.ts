@@ -14,22 +14,6 @@ const manifest: ManifestPropertyEditorUi = {
 		settings: {
 			properties: [
 				{
-					alias: 'editor',
-					label: 'Editor',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TinyMCE.Configuration',
-				},
-				{
-					alias: 'overlaySize',
-					label: 'Overlay Size',
-					description: 'Select the width of the overlay (link picker)',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
-				},
-				{
-					alias: 'hideLabel',
-					label: 'Hide Label',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-				},
-				{
 					alias: 'toolbar',
 					label: 'Toolbar',
 					description: 'Pick the toolbar options that should be available when editing',
@@ -52,6 +36,44 @@ const manifest: ManifestPropertyEditorUi = {
 					label: 'Maximum size for inserted images',
 					description: 'Maximum width or height - enter 0 to disable resizing',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.MaxImageSizeConfiguration',
+				},
+				{
+					alias: 'mode',
+					label: 'Mode',
+					description: 'Select the mode for the editor',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+					config: [
+						{
+							alias: 'items',
+							value: ['Classic', 'Inline'],
+						},
+					],
+				},
+				{
+					alias: 'overlaySize',
+					label: 'Overlay Size',
+					description: 'Select the width of the overlay (link picker)',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
+				},
+				{
+					alias: 'hideLabel',
+					label: 'Hide Label',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+				},
+				{
+					alias: 'imageUploadFolder',
+					label: 'Image Upload Folder',
+					description: 'Choose the upload location of pasted images',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaPicker',
+					config: [
+						{
+							alias: 'validationLimit',
+							value: {
+								min: 1,
+								max: 1,
+							},
+						},
+					],
 				},
 			],
 		},
