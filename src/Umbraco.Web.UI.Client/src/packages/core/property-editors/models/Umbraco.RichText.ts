@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/exten
 
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
-	name: 'Tiny MCE',
+	name: 'Rich Text',
 	alias: 'Umbraco.TinyMCE',
 	meta: {
 		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.TinyMCE',
@@ -11,6 +11,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'mediaParentId',
 					label: 'Image Upload Folder',
+					description: 'Choose the upload location of pasted images',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
 				},
 				{

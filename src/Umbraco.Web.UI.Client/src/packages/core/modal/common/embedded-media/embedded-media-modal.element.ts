@@ -5,10 +5,9 @@ import {
 	OEmbedStatus,
 	UmbEmbeddedMediaModalData,
 	UmbEmbeddedMediaModalResult,
-	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 interface UmbEmbeddedMediaModalModel {
 	url?: string;
@@ -22,18 +21,18 @@ interface UmbEmbeddedMediaModalModel {
 }
 
 @customElement('umb-embedded-media-modal')
-export class UmbEmbeddedMediaModalElement extends UmbLitElement {
+export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult> {
 	#loading = false;
 	#embedResult!: OEmbedResult;
 
-	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>;
-
-	@property({ type: Object })
-	data?: UmbEmbeddedMediaModalData;
-
 	#handleConfirm() {
-		this.modalContext?.submit({ selection: this.#embedResult });
+		this.modalContext?.submit({
+			preview: this.#embedResult.markup,
+			originalWidth: this._model.width,
+			originalHeight: this._model.originalHeight,
+			width: this.#embedResult.width,
+			height: this.#embedResult.height,
+		});
 	}
 
 	#handleCancel() {
@@ -180,7 +179,7 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 						() => html` <umb-workspace-property-layout label="Preview" orientation="vertical">
 							<div slot="editor">
 								${when(this.#loading, () => html`<uui-loader-circle></uui-loader-circle>`)}
-								${when(this.#embedResult.markup, () => html`${unsafeHTML(this.#embedResult.markup)}`)}
+								${when(this.#embedResult?.markup, () => html`${unsafeHTML(this.#embedResult.markup)}`)}
 								${when(this._model.info, () => html` <p aria-hidden="true">${this._model.info}</p>`)}
 								${when(this._model.a11yInfo, () => html` <p class="sr-only" role="alert">${this._model.a11yInfo}</p>`)}
 							</div>

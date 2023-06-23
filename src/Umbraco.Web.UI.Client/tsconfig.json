@@ -26,6 +26,7 @@
 			"@umbraco-cms/backoffice/external/lodash": ["src/external/lodash"],
 			"@umbraco-cms/backoffice/external/uui": ["src/external/uui"],
 			"@umbraco-cms/backoffice/external/monaco-editor": ["src/external/monaco-editor"],
+			"@umbraco-cms/backoffice/external/tinymce": ["src/external/tinymce"],
 
 			"@umbraco-cms/backoffice/backend-api": ["src/external/backend-api"],
 			"@umbraco-cms/backoffice/context-api": ["src/libs/context-api"],
@@ -55,6 +56,7 @@
 			"@umbraco-cms/backoffice/entity-bulk-action": ["src/packages/core/entity-bulk-action"],
 			"@umbraco-cms/backoffice/extension-registry": ["src/packages/core/extension-registry"],
 			"@umbraco-cms/backoffice/id": ["src/packages/core/id"],
+			"@umbraco-cms/backoffice/macro": ["src/packages/core/macro"],
 			"@umbraco-cms/backoffice/menu": ["src/packages/core/menu"],
 			"@umbraco-cms/backoffice/modal": ["src/packages/core/modal"],
 			"@umbraco-cms/backoffice/notification": ["src/packages/core/notification"],

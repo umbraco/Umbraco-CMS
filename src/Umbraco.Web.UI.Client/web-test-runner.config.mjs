@@ -40,6 +40,7 @@ export default {
 						'@umbraco-cms/backoffice/external/uuid': './src/external/uuid/index.ts',
 						'@umbraco-cms/backoffice/external/lodash': './src/external/lodash/index.ts',
 						'@umbraco-cms/backoffice/external/monaco-editor': './src/external/monaco-editor/index.ts',
+						'@umbraco-cms/backoffice/external/tinymce': './src/external/tinymce/index.ts',
 
 						'@umbraco-cms/backoffice/backend-api': './src/external/backend-api/index.ts',
 						'@umbraco-cms/backoffice/context-api': './src/libs/context-api/index.ts',
@@ -70,6 +71,7 @@ export default {
 						'@umbraco-cms/backoffice/entity-bulk-action': './src/packages/core/entity-bulk-action/index.ts',
 						'@umbraco-cms/backoffice/extension-registry': './src/packages/core/extension-registry/index.ts',
 						'@umbraco-cms/backoffice/id': './src/packages/core/id/index.ts',
+						'@umbraco-cms/backoffice/macro': './src/packages/core/macro/index.ts',
 						'@umbraco-cms/backoffice/menu': './src/packages/core/menu/index.ts',
 						'@umbraco-cms/backoffice/modal': './src/packages/core/modal/index.ts',
 						'@umbraco-cms/backoffice/notification': './src/packages/core/notification/index.ts',

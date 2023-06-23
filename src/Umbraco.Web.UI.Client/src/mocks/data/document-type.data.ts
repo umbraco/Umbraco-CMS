@@ -21,6 +21,24 @@ export const data: Array<DocumentTypeResponseModel> = [
 		isElement: false,
 		properties: [
 			{
+				id: '1',
+				containerId: 'all-properties-group-key',
+				alias: 'richTextEditor',
+				name: 'Rich Text editor',
+				description: '',
+				dataTypeId: 'dt-richTextEditor',
+				variesByCulture: false,
+				variesBySegment: false,
+				validation: {
+					mandatory: true,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},			{
 				id: '2',
 				containerId: 'all-properties-group-id',
 				alias: 'colorPicker',
