@@ -11,7 +11,7 @@ const pluginManifests: Array<ManifestTinyMcePlugin> = [
 				{
 					alias: 'sourcecode',
 					label: 'Source code editor',
-					icon: 'umb:code',
+					icon: 'sourcecode',
 				},
 			],
 		},
@@ -26,12 +26,12 @@ const pluginManifests: Array<ManifestTinyMcePlugin> = [
 				{
 					alias: 'link',
 					label: 'Insert/Edit link',
-					icon: 'umb:link',
+					icon: 'link',
 				},
 				{
 					alias: 'unlink',
 					label: 'Remove link',
-					icon: 'umb:link',
+					icon: 'unlink',
 				},
 			],
 		},
@@ -46,7 +46,7 @@ const pluginManifests: Array<ManifestTinyMcePlugin> = [
 				{
 					alias: 'umbmediapicker',
 					label: 'Image',
-					icon: 'umb:image',
+					icon: 'image',
 				},
 			],
 		},
@@ -61,7 +61,7 @@ const pluginManifests: Array<ManifestTinyMcePlugin> = [
 				{
 					alias: 'umbembeddialog',
 					label: 'Embed',
-					icon: 'umb:embed',
+					icon: 'embed',
 				},
 			],
 		},
@@ -76,7 +76,7 @@ const pluginManifests: Array<ManifestTinyMcePlugin> = [
 				{
 					alias: 'umbmacro',
 					label: 'Macro',
-					icon: 'umb:preferences',
+					icon: 'preferences',
 				},
 			],
 		},
