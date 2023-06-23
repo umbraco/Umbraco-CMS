@@ -3,6 +3,8 @@
  * we need to load it as a module and then manually register it in the browser
  * as a global variable, so that we can find it and use it in our tests.
  * We are also loading the default icons, so that we can use them outside of a TinyMce instance.
+ *
+ * TODO: Load the plugins that we want to use in the editor.
  */
 import * as tiny from 'tinymce';
 
