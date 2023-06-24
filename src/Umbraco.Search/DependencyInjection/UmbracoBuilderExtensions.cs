@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
 using Umbraco.Extensions;
 using Umbraco.Search.Configuration;
@@ -35,6 +37,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IIndexPopulator, MediaIndexPopulator>();
         builder.Services.AddSingleton<IIndexRebuilder, IndexRebuilder>();
         builder.Services.AddUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
+        builder.AddNotificationHandler<ContentCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
+        builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
+        builder.AddNotificationHandler<PublicAccessCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
 
         builder.Services.AddTransient<IIndexCountService, IndexCountService>();
         builder.Services.AddTransient<IDetailedTelemetryProvider, SearchTelemetryProvider>();
