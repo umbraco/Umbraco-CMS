@@ -10,6 +10,7 @@ using Umbraco.Extensions;
 using Umbraco.Search;
 using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Indexing;
+using Umbraco.Search.Models;
 using SearchResult = Umbraco.Cms.Core.Models.ContentEditing.SearchResult;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
@@ -180,7 +181,7 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
     {
         IIndexDiagnostics indexDiag = _indexDiagnosticsFactory.Create(indexName);
 
-        Attempt<string?> isHealth = indexDiag.IsHealthy();
+        Attempt<HealthStatus?> isHealth = indexDiag.IsHealthy();
 
         var properties = new Dictionary<string, object?>
         {
@@ -195,7 +196,7 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
         var indexerModel = new SearchIndexModel
         {
             Name = indexName,
-            HealthStatus = isHealth.Success ? isHealth.Result ?? "Healthy" : isHealth.Result ?? "Unhealthy",
+            HealthStatus = isHealth.Success ? Enum.GetName(typeof(HealthStatus),isHealth.Result ?? HealthStatus.Healthy) : Enum.GetName(typeof(HealthStatus),isHealth.Result ?? HealthStatus.Unhealthy),
             ProviderProperties = properties,
             CanRebuild = _indexRebuilder.CanRebuild(indexName)
         };

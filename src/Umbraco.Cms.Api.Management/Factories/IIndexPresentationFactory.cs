@@ -1,9 +1,9 @@
-﻿using Examine;
-using Umbraco.Cms.Api.Management.ViewModels.Indexer;
+﻿using Umbraco.Search;
+using Umbraco.Search.Models;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IIndexPresentationFactory
 {
-    IndexResponseModel Create(IIndex index);
+    IndexResponseModel Create(string index);
 }

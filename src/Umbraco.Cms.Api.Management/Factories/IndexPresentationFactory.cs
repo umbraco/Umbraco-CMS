@@ -1,8 +1,9 @@
 ﻿using Umbraco.Cms.Core;
-using Umbraco.Cms.ManagementApi.ViewModels.Search;
 using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Indexing;
+using Umbraco.Search.Models;
 using Umbraco.Search.Services;
+using Umbraco.Search.Services.Umbraco.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -19,14 +20,14 @@ public class IndexPresentationFactory : IIndexPresentationFactory
         _indexingRebuilderService = indexingRebuilderService;
     }
 
-    public IndexViewModel Create(string index)
+    public IndexResponseModel Create(string index)
     {
         if (_indexingRebuilderService.IsRebuilding(index))
         {
             return new IndexResponseModel
             {
                 Name = index,
-                HealthStatus = "Rebuilding",
+                HealthStatus = HealthStatus.Rebuilding,
                 SearcherName = index,
                 DocumentCount = 0,
                 FieldCount = 0,
@@ -35,7 +36,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
 
         IIndexDiagnostics indexDiag = _indexDiagnosticsFactory.Create(index);
 
-        Attempt<string?> isHealthy = indexDiag.IsHealthy();
+        Attempt<HealthStatus?> isHealthy = indexDiag.IsHealthy();
 
         var properties = new Dictionary<string, object?>();
 
@@ -55,7 +56,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
         var indexerModel = new IndexResponseModel
         {
             Name = index,
-            HealthStatus = isHealthy.Success ? isHealthy.Result ?? "Healthy" : isHealthy.Result ?? "Unhealthy",
+            HealthStatus = isHealthy.Success ? isHealthy.Result ?? HealthStatus.Healthy : isHealthy.Result ?? HealthStatus.Unhealthy,
             CanRebuild = _indexRebuilder.CanRebuild(index),
             SearcherName = index,
             DocumentCount = indexDiag.GetDocumentCount(),

@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.Examine.Deferred;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Search;
+using Umbraco.Search.Examine.ValueSetBuilders;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 

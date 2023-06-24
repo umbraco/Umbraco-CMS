@@ -9,8 +9,13 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Extensions;
+using Umbraco.Search.Diagnostics;
+using Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.Indexing;
+using Umbraco.Search.Indexing.Populators;
+using Umbraco.Search.NotificationHandlers;
 
-namespace Umbraco.Cms.Infrastructure.DependencyInjection;
+namespace Umbraco.Search.Examine;
 
 /// <summary>
 ///     Provides extension methods to the <see cref="IUmbracoBuilder" /> class.
@@ -27,10 +32,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IIndexPopulator, MediaIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, DeliveryApiContentIndexPopulator>();
 
-        builder.Services.AddSingleton<IIndexRebuilder, ExamineIndexRebuilder>();
+        builder.Services.AddSingleton<IIndexRebuilder, IndexRebuilder>();
         builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();
         builder.Services.AddSingleton<ExamineIndexingMainDomHandler>();
-        builder.Services.AddUnique<IUmbracoIndexConfig, UmbracoIndexConfig>();
         builder.Services.AddUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
         builder.Services.AddUnique<IPublishedContentValueSetBuilder>(factory =>
             new ContentValueSetBuilder(
@@ -54,7 +58,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDeliveryApiContentIndexFieldDefinitionBuilder, DeliveryApiContentIndexFieldDefinitionBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexHelper, DeliveryApiContentIndexHelper>();
         builder.Services.AddSingleton<IDeliveryApiIndexingHandler, DeliveryApiIndexingHandler>();
-        builder.Services.AddSingleton<ExamineIndexRebuilder>();
 
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, ContentTypeIndexingNotificationHandler>();

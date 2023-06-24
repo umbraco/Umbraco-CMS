@@ -1,4 +1,6 @@
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.HealthChecks;
+using Umbraco.Search.Models;
 
 namespace Umbraco.Search.Diagnostics;
 
@@ -25,7 +27,7 @@ public interface IIndexDiagnostics
     /// <returns>
     ///     A successful attempt if it is healthy, else a failed attempt with a message if unhealthy
     /// </returns>
-    Attempt<string?> IsHealthy();
+    Attempt<HealthStatus?> IsHealthy();
 
     long GetDocumentCount();
     IEnumerable<string> GetFieldNames();

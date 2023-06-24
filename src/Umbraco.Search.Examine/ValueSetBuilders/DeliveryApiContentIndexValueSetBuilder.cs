@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
+using Umbraco.Search.Examine.ValueSetBuilders;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 

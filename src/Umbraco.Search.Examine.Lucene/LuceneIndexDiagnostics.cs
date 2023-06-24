@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Examine.Lucene.Extensions;
+using Umbraco.Search.Models;
 using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Search.Examine.Lucene;
@@ -40,10 +41,10 @@ public class LuceneIndexDiagnostics : IIndexDiagnostics
     public ILogger<LuceneIndexDiagnostics> Logger { get; }
 
 
-    public Attempt<string?> IsHealthy()
+    public Attempt<HealthStatus?> IsHealthy()
     {
         var isHealthy = LuceneIndex.IsHealthy(out Exception? indexError);
-        return isHealthy ? Attempt<string?>.Succeed() : Attempt.Fail(indexError?.Message);
+        return isHealthy ? Attempt<HealthStatus?>.Succeed(HealthStatus.Healthy) : Attempt.Fail((HealthStatus?)HealthStatus.Unhealthy, indexError ?? new Exception("Unknown error"));
     }
 
     public long GetDocumentCount() => LuceneIndex.GetDocumentCount();

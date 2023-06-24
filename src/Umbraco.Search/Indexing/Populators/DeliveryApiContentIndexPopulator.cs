@@ -3,31 +3,32 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Search.Indexing.Populators;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine.ValueSetBuilders;
 
 internal sealed class DeliveryApiContentIndexPopulator : IndexPopulator
 {
-    private readonly IDeliveryApiContentIndexValueSetBuilder _deliveryContentIndexValueSetBuilder;
-    private readonly IDeliveryApiContentIndexHelper _deliveryApiContentIndexHelper;
+   private readonly IDeliveryApiContentIndexHelper _deliveryApiContentIndexHelper;
     private readonly ILogger<DeliveryApiContentIndexPopulator> _logger;
     private DeliveryApiSettings _deliveryApiSettings;
-
+    private readonly ISearchProvider _provider;
     public DeliveryApiContentIndexPopulator(
-        IDeliveryApiContentIndexValueSetBuilder deliveryContentIndexValueSetBuilder,
         IDeliveryApiContentIndexHelper deliveryApiContentIndexHelper,
         ILogger<DeliveryApiContentIndexPopulator> logger,
-        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings)
+        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings, ISearchProvider provider)
     {
-        _deliveryContentIndexValueSetBuilder = deliveryContentIndexValueSetBuilder;
         _deliveryApiContentIndexHelper = deliveryApiContentIndexHelper;
         _logger = logger;
+        _provider = provider;
         _deliveryApiSettings = deliveryApiSettings.CurrentValue;
         deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
         RegisterIndex(Constants.UmbracoIndexes.DeliveryApiContentIndexName);
     }
 
-    protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
+    protected override void PopulateIndexes(IReadOnlyList<string> indexes)
     {
         if (indexes.Any() is false)
         {
@@ -43,15 +44,17 @@ internal sealed class DeliveryApiContentIndexPopulator : IndexPopulator
             Constants.System.Root,
             descendants =>
             {
-                ValueSet[] valueSets = _deliveryContentIndexValueSetBuilder.GetValueSets(descendants).ToArray();
-                foreach (IIndex index in indexes)
+                // ReSharper disable once PossibleMultipleEnumeration
+                foreach (string index in indexes)
                 {
-                    index.IndexItems(valueSets);
+                    _provider.GetIndex<IContent>(index)?.IndexItems(descendants);
                 }
+
+
             });
     }
 
-    public override bool IsRegistered(IIndex index)
+    public override bool IsRegistered(string index)
     {
         if (_deliveryApiSettings.Enabled)
         {
@@ -59,7 +62,7 @@ internal sealed class DeliveryApiContentIndexPopulator : IndexPopulator
         }
 
         // IsRegistered() is invoked for all indexes; only log a message when it's invoked for the Delivery API content index
-        if (index.Name is Constants.UmbracoIndexes.DeliveryApiContentIndexName)
+        if (index is Constants.UmbracoIndexes.DeliveryApiContentIndexName)
         {
             // IsRegistered() is currently invoked only when Umbraco starts and when loading the Examine dashboard,
             // so we won't be flooding the logs with info messages here

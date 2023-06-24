@@ -7,6 +7,7 @@ public interface IUmbracoIndex<T> : IUmbracoIndex
 {
     void IndexItems(T[] members);
 
+    void RemoveFromIndex(IEnumerable<string> select);
 }
 
 public interface IUmbracoIndex

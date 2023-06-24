@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <Folder Include="Constants" />
+    <Folder Include="DefferedActions\" />
     <Folder Include="Properties" />
     <Folder Include="Search" />
   </ItemGroup>
