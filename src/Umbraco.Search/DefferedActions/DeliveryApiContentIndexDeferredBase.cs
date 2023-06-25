@@ -11,13 +11,13 @@ internal abstract class DeliveryApiContentIndexDeferredBase
         _provider = provider;
     }
 
-    protected void RemoveFromIndex(int id, string index)
+    protected void RemoveFromIndex(int id, IUmbracoIndex index)
         => RemoveFromIndex(new[] { id }, index);
 
-    protected void RemoveFromIndex(IReadOnlyCollection<int> ids, string index)
+    protected void RemoveFromIndex(IReadOnlyCollection<int> ids, IUmbracoIndex index)
         => RemoveFromIndex(ids.Select(id => id.ToString()).ToArray(), index);
 
-    protected void RemoveFromIndex(IReadOnlyCollection<string> ids, string index)
+    protected void RemoveFromIndex(IReadOnlyCollection<string> ids, IUmbracoIndex index)
     {
         if (ids.Any() is false)
         {
@@ -25,6 +25,6 @@ internal abstract class DeliveryApiContentIndexDeferredBase
         }
 
         // NOTE: the delivery api index implementation takes care of deleting descendants, so we don't have to do that here
-        _provider.GetIndex<IContent>(index)?.RemoveFromIndex(ids.Select(id => id.ToString()));
+        index?.RemoveFromIndex(ids.Select(id => id.ToString()));
     }
 }

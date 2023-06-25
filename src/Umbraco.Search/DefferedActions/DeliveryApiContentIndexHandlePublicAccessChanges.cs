@@ -1,4 +1,6 @@
-﻿using Umbraco.Cms.Core.Services;
+﻿using Umbraco.Cms.Core.Models.Search;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Extensions;
 
@@ -39,10 +41,12 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
             return Task.CompletedTask;
         }
 
-        IIndex index = _deliveryApiIndexingHandler.GetIndex() ??
+        IUmbracoIndex index = _deliveryApiIndexingHandler.GetIndex() ??
                        throw new InvalidOperationException("Could not obtain the delivery API content index");
+        IUmbracoSearcher searcher = _deliveryApiIndexingHandler.GetSearcher() ??
+                              throw new InvalidOperationException("Could not obtain the delivery API content searcher");
 
-        List<string> indexIds = FindIndexIdsForContentIds(protectedContentIds, index);
+        List<string> indexIds = FindIndexIdsForContentIds(protectedContentIds, searcher);
         if (indexIds.Any() is false)
         {
             return Task.CompletedTask;
@@ -52,7 +56,7 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
         return Task.CompletedTask;
     });
 
-    private List<string> FindIndexIdsForContentIds(int[] contentIds, IIndex index)
+    private List<string> FindIndexIdsForContentIds(int[] contentIds, IUmbracoSearcher searcher)
     {
         const int pageSize = 500;
         const int batchSize = 50;
@@ -67,13 +71,10 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
 
             while (page * pageSize < total)
             {
-                ISearchResults? results = index.Searcher
-                    .CreateQuery()
-                    .GroupedOr(new[] { UmbracoExamineFieldNames.DeliveryApiContentIndex.Id }, batchAsArray.Select(id => id.ToString()).ToArray())
-                    // NOTE: we need to be explicit about fetching ItemIdFieldName here, otherwise Examine will try to be
-                    // clever and use the "id" field of the document (which we can't use for deletion)
-                    .SelectField(UmbracoExamineFieldNames.ItemIdFieldName)
-                    .Execute(QueryOptions.SkipTake(page * pageSize, pageSize));
+                IUmbracoSearchResults? results =
+                    searcher.Search(new[] { UmbracoSearchFieldNames.DeliveryApiContentIndex.Id },
+                        batchAsArray.Select(id => id.ToString()).ToArray());
+
                 total = results.TotalItemCount;
 
                 ids.AddRange(results.Select(result => result.Id));

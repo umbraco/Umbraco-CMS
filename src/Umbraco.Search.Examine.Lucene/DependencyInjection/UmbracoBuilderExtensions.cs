@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Examine.Configuration;
@@ -112,7 +113,20 @@ public static class UmbracoBuilderExtensions
 
         return services;
     }
+    public static IServiceCollection RegisterContentApiIndex(this IServiceCollection services)
+    {
+        services.AddExamineLuceneIndex<DeliveryApiContentIndex, ConfigurationEnabledDirectoryFactory>(Constants
+                .UmbracoIndexes
+                .DeliveryApiContentIndexName)
+            .AddSingleton<IUmbracoIndex>(services => new UmbracoExamineIndex<IMember>(services
+                .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
+                    .DeliveryApiContentIndexName), services.GetRequiredService<IValueSetBuilder<IMember>>()))
+            .AddSingleton<IUmbracoSearcher>(services => new UmbracoExamineSearcher<IMember>(services
+                .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
+                    .DeliveryApiContentIndexName).Searcher));
 
+        return services;
+    }
     /// <summary>
     ///     Adds the Examine indexes for Umbraco
     /// </summary>
@@ -134,6 +148,7 @@ public static class UmbracoBuilderExtensions
             .RegisterIndexExternal()
             .RegisterIndexInternal()
             .RegisterIndexMember()
+            .RegisterContentApiIndex()
             .ConfigureOptions<ConfigureIndexOptions>();
 
         services.AddSingleton<IApplicationRoot, UmbracoApplicationRoot>();

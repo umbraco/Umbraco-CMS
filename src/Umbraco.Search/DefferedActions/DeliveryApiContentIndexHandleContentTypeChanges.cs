@@ -55,15 +55,15 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
             return Task.CompletedTask;
         }
 
-        IUmbracoIndex index = _deliveryApiIndexingHandler.GetIndex() ??
-                       throw new InvalidOperationException("Could not obtain the delivery API content index");
+        IUmbracoIndex<IContent> index = _deliveryApiIndexingHandler.GetIndex() ??
+                                        throw new InvalidOperationException("Could not obtain the delivery API content index");
 
         HandleUpdatedContentTypes(updatedContentTypeIds, index);
 
         return Task.CompletedTask;
     });
 
-    private void HandleUpdatedContentTypes(IEnumerable<int> updatedContentTypesIds, IUmbracoIndex index)
+    private void HandleUpdatedContentTypes(IEnumerable<int> updatedContentTypesIds, IUmbracoIndex<IContent> index)
     {
         foreach (var contentTypeId in updatedContentTypesIds)
         {
@@ -89,7 +89,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
 
             // keep track of the IDs of the documents that must be removed, so we can remove them all in one go
             var indexIdsToRemove = new List<string>();
-
+            List<IContent> contentToBeIndex = new List<IContent>()
             foreach (KeyValuePair<int, string[]> indexIdsByContentId in indexIdsByContentIds)
             {
                 IContent? content = _contentService.GetById(indexIdsByContentId.Key);
@@ -102,14 +102,13 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
                 }
 
                 // reindex the documents for this content
-                ValueSet[] valueSets = _deliveryApiContentIndexValueSetBuilder.GetValueSets(content).ToArray();
-                if (valueSets.Any())
-                {
-                    index.IndexItems(valueSets);
-                }
-
+                contentToBeIndex.Add(content);
                 // if any of the document IDs have changed, make sure we clean up the previous ones
-                indexIdsToRemove.AddRange(indexIdsByContentId.Value.Except(valueSets.Select(set => set.Id)));
+                indexIdsToRemove.AddRange(indexIdsByContentId.Value.Except(contentToBeIndex.Select(set => set.Id.ToString())));
+            }
+            if (contentToBeIndex.Any())
+            {
+                index.IndexItems(contentToBeIndex.ToArray());
             }
 
             RemoveFromIndex(indexIdsToRemove, index);

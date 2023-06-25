@@ -2,6 +2,7 @@ using System.Reflection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Extensions;
+using Umbraco.Search.Models;
 
 namespace Umbraco.Search.Diagnostics;
 
@@ -47,21 +48,21 @@ public class GenericIndexDiagnostics : IIndexDiagnostics
         }
     }
 
-    public Attempt<string?> IsHealthy()
+    public Attempt<HealthStatus?> IsHealthy()
     {
         if (!_index?.Exists() ?? false)
         {
-            return Attempt.Fail("Does not exist");
+            return Attempt.Fail((HealthStatus?)HealthStatus.Unhealthy,new Exception("Index doesnt exist"));
         }
 
         try
         {
            var result= _searcher?.Search("test", 0,1);
-            return Attempt<string?>.Succeed(); // if we can search we'll assume it's healthy
+            return Attempt<HealthStatus?>.Succeed(HealthStatus.Healthy); // if we can search we'll assume it's healthy
         }
         catch (Exception e)
         {
-            return Attempt.Fail($"Error: {e.Message}");
+            return Attempt.Fail((HealthStatus?)HealthStatus.Unhealthy,e);
         }
     }
 

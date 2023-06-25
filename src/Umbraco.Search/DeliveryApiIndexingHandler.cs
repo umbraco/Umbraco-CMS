@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
@@ -111,6 +112,9 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
         return true;
     }
 
-    internal IUmbracoIndex? GetIndex()
-        => _searchProvider.GetIndex(Constants.UmbracoIndexes.DeliveryApiContentIndexName);
+    internal IUmbracoIndex<IContent>? GetIndex()
+        => _searchProvider.GetIndex<IContent>(Constants.UmbracoIndexes.DeliveryApiContentIndexName);
+
+    public IUmbracoSearcher? GetSearcher() =>
+        _searchProvider.GetSearcher(Constants.UmbracoIndexes.DeliveryApiContentIndexName);
 }

@@ -21,4 +21,11 @@ public interface IUmbracoSearcher
         string term);
 
     IEnumerable<PublishedSearchResult> SearchChildren(IPublishedContent content, IUmbracoContextAccessor umbracoContextAccessor, string term);
+    IUmbracoSearchResults Search(string[] fields, string[] values, LogicOperator logicOperator = LogicOperator.OR);
+}
+
+public enum LogicOperator
+{
+    OR,
+    And
 }

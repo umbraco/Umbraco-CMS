@@ -4,12 +4,15 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
+using Umbraco.Search.Examine.Configuration;
+using Umbraco.Search.Examine.Lucene;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public class DeliveryApiContentIndex : UmbracoExamineIndex
+public class DeliveryApiContentIndex : UmbracoExamineLuceneIndex
 {
     private readonly ILogger<DeliveryApiContentIndex> _logger;
 
@@ -17,12 +20,10 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
         ILoggerFactory loggerFactory,
         string name,
         IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions,
+        IUmbracoIndexesConfiguration configuration,
         IHostingEnvironment hostingEnvironment,
-        IRuntimeState runtimeState)
-        : base(loggerFactory, name, indexOptions, hostingEnvironment, runtimeState)
+        IRuntimeState runtimeState) : base(loggerFactory, name, indexOptions, configuration, hostingEnvironment, runtimeState)
     {
-        PublishedValuesOnly = true;
-        EnableDefaultEventHandler = false;
 
         _logger = loggerFactory.CreateLogger<DeliveryApiContentIndex>();
 
@@ -75,7 +76,7 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
             }
 
             // find descendants-or-self based on path and optional culture
-            var rawQuery = $"({UmbracoExamineFieldNames.DeliveryApiContentIndex.Id}:{contentId} OR {UmbracoExamineFieldNames.IndexPathFieldName}:\\-1*,{contentId},*)";
+            var rawQuery = $"({UmbracoSearchFieldNames.DeliveryApiContentIndex.Id}:{contentId} OR {UmbracoSearchFieldNames.IndexPathFieldName}:\\-1*,{contentId},*)";
             if (culture is not null)
             {
                 rawQuery = $"{rawQuery} AND culture:{culture}";
@@ -86,7 +87,7 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
                 .NativeQuery(rawQuery)
                 // NOTE: we need to be explicit about fetching ItemIdFieldName here, otherwise Examine will try to be
                 // clever and use the "id" field of the document (which we can't use for deletion)
-                .SelectField(UmbracoExamineFieldNames.ItemIdFieldName)
+                .SelectField(UmbracoSearchFieldNames.ItemIdFieldName)
                 .Execute();
 
             _logger.LogDebug("DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);

@@ -105,7 +105,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         RemoveFromIndex(idsToDelete, index);
     }
 
-    private string[] UpdateIndex(IContent content, IIndex index)
+    private string[] UpdateIndex(IContent content, IUmbracoIndex index)
     {
         ValueSet[] valueSets = _deliveryApiContentIndexValueSetBuilder.GetValueSets(content).ToArray();
         if (valueSets.Any() is false)
@@ -120,7 +120,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
             .ToArray();
     }
 
-    private void ReindexDescendants(IContent content, IIndex index)
+    private void ReindexDescendants(IContent content, IUmbracoIndex index)
         => _deliveryApiContentIndexHelper.EnumerateApplicableDescendantsForContentIndex(
             content.Id,
             descendants =>

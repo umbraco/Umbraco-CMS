@@ -6,8 +6,6 @@ namespace Umbraco.Search;
 public interface IUmbracoIndex<T> : IUmbracoIndex
 {
     void IndexItems(T[] members);
-
-    void RemoveFromIndex(IEnumerable<string> select);
 }
 
 public interface IUmbracoIndex
@@ -18,4 +16,5 @@ public interface IUmbracoIndex
     bool Exists();
     void Create();
     IEnumerable<string> GetFieldNames();
+    void RemoveFromIndex(IEnumerable<string> ids);
 }

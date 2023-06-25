@@ -34,6 +34,7 @@ public class UmbracoExamineIndex<T> : UmbracoExamineIndex,IUmbracoIndex<T>
 
     public void Create() => ExamineIndex.CreateIndex();
     public IEnumerable<string> GetFieldNames() => ExamineIndex.FieldDefinitions.Select(x=>x.Name);
+    public void RemoveFromIndex(IEnumerable<string> ids) => throw new NotImplementedException();
 
     /// <summary>
     ///
