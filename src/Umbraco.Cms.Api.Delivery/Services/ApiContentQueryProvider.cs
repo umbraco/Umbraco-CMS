@@ -1,10 +1,11 @@
-﻿using Examine;
-using Examine.Search;
+﻿
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Extensions;
+using Umbraco.Search;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
 
@@ -14,13 +15,13 @@ namespace Umbraco.Cms.Api.Delivery.Services;
 internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
 {
     private const string ItemIdFieldName = "itemId";
-    private readonly IExamineManager _examineManager;
+    private readonly ISearchProvider _examineManager;
     private readonly ILogger<ApiContentQueryProvider> _logger;
     private readonly string _fallbackGuidValue;
     private readonly Dictionary<string, FieldType> _fieldTypes;
 
     public ApiContentQueryProvider(
-        IExamineManager examineManager,
+        ISearchProvider examineManager,
         ContentIndexHandlerCollection indexHandlers,
         ILogger<ApiContentQueryProvider> logger)
     {
@@ -40,20 +41,22 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
 
     public PagedModel<Guid> ExecuteQuery(SelectorOption selectorOption, IList<FilterOption> filterOptions, IList<SortOption> sortOptions, string culture, int skip, int take)
     {
-        if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.DeliveryApiContentIndexName, out IIndex? index))
+        var searcher = _examineManager.GetSearcher(Constants.UmbracoIndexes.DeliveryApiContentIndexName);
+        if (searcher == null)
         {
-            _logger.LogError("Could not find the index {IndexName} when attempting to execute a query.", Constants.UmbracoIndexes.DeliveryApiContentIndexName);
+            _logger.LogError("Could not find the searcher for {IndexName} when attempting to execute a query.", Constants.UmbracoIndexes.DeliveryApiContentIndexName);
             return new PagedModel<Guid>();
         }
 
-        IBooleanOperation queryOperation = BuildSelectorOperation(selectorOption, index, culture);
+        /*
+         todo: resotre this code with the new API
+        IBooleanOperation queryOperation = BuildSelectorOperation(selectorOption, searcher, culture);
 
         ApplyFiltering(filterOptions, queryOperation);
         ApplySorting(sortOptions, queryOperation);
-
-        ISearchResults? results = queryOperation
-            .SelectField(ItemIdFieldName)
-            .Execute(QueryOptions.SkipTake(skip, take));
+        */
+//todo: figure out pagination of this query
+        IUmbracoSearchResults? results = searcher.Search( new []{selectorOption.FieldName},selectorOption.Values, 0, 10000);
 
         if (results is null)
         {

@@ -58,16 +58,19 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
         IUmbracoIndex<IContent> index = _deliveryApiIndexingHandler.GetIndex() ??
                                         throw new InvalidOperationException("Could not obtain the delivery API content index");
 
-        HandleUpdatedContentTypes(updatedContentTypeIds, index);
+        IUmbracoSearcher searcher = _deliveryApiIndexingHandler.GetSearcher() ??
+                                        throw new InvalidOperationException("Could not obtain the delivery API content searcher");
+
+        HandleUpdatedContentTypes(updatedContentTypeIds,index, searcher);
 
         return Task.CompletedTask;
     });
 
-    private void HandleUpdatedContentTypes(IEnumerable<int> updatedContentTypesIds, IUmbracoIndex<IContent> index)
+    private void HandleUpdatedContentTypes(IEnumerable<int> updatedContentTypesIds, IUmbracoIndex<IContent> index, IUmbracoSearcher searcher)
     {
         foreach (var contentTypeId in updatedContentTypesIds)
         {
-            List<string> indexIds = FindIdsForContentType(contentTypeId, index);
+            List<string> indexIds = FindIdsForContentType(contentTypeId, searcher);
 
             // the index can contain multiple documents per content (for culture variant content). when reindexing below,
             // all documents are created "in one go", so we don't need to index the same document multiple times.

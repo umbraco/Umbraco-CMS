@@ -65,4 +65,8 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
 
         return query.Execute().ToPublishedSearchResults(umbracoContext.Content);
     }
+
+    public IUmbracoSearchResults Search(string[] fields, string[] values, int page, int pageSize,
+        LogicOperator logicOperator = LogicOperator.OR) =>
+        throw new NotImplementedException();
 }

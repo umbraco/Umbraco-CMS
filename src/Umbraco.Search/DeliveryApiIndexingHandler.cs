@@ -57,8 +57,9 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
         var deferred = new DeliveryApiContentIndexHandleContentChanges(
             changes,
             this,
-            _contentService,
             _deliveryApiContentIndexHelper,
+            _contentService,
+_searchProvider,
             _backgroundTaskQueue);
         Execute(deferred);
     }
@@ -70,6 +71,7 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
             changes,
             this,
             _contentService,
+            _searchProvider,
             _backgroundTaskQueue);
         Execute(deferred);
     }
@@ -80,6 +82,7 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
         var deferred = new DeliveryApiContentIndexHandlePublicAccessChanges(
             _publicAccessService,
             this,
+            _searchProvider,
             _backgroundTaskQueue);
         Execute(deferred);
     }

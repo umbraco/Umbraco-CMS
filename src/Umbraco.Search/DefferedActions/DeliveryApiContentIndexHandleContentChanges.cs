@@ -1,4 +1,6 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using System.Drawing;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.HostedServices;
@@ -13,25 +15,31 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
     private readonly IList<KeyValuePair<int, TreeChangeTypes>> _changes;
     private readonly IContentService _contentService;
     private readonly DeliveryApiIndexingHandler _deliveryApiIndexingHandler;
+    private readonly IDeliveryApiContentIndexHelper _deliveryApiContentIndexHelper;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
 
     public DeliveryApiContentIndexHandleContentChanges(
         IList<KeyValuePair<int, TreeChangeTypes>> changes,
         DeliveryApiIndexingHandler deliveryApiIndexingHandler,
+        IDeliveryApiContentIndexHelper deliveryApiContentIndexHelper,
         IContentService contentService,
         ISearchProvider searchProvider,
         IBackgroundTaskQueue backgroundTaskQueue) : base(searchProvider)
     {
         _changes = changes;
         _deliveryApiIndexingHandler = deliveryApiIndexingHandler;
+        _deliveryApiContentIndexHelper = deliveryApiContentIndexHelper;
         _contentService = contentService;
         _backgroundTaskQueue = backgroundTaskQueue;
     }
 
     public void Execute() => _backgroundTaskQueue.QueueBackgroundWorkItem(_ =>
     {
-        IUmbracoIndex index = _deliveryApiIndexingHandler.GetIndex()
+        IUmbracoIndex<IContent> index = _deliveryApiIndexingHandler.GetIndex()
                        ?? throw new InvalidOperationException("Could not obtain the delivery API content index");
+        IUmbracoSearcher searcher = _deliveryApiIndexingHandler.GetSearcher()
+                              ?? throw new InvalidOperationException("Could not obtain the delivery API content searcher");
+
 
         var pendingRemovals = new List<int>();
         foreach ((int contentId, TreeChangeTypes changeTypes) in _changes)
@@ -55,7 +63,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
                 RemoveFromIndex(pendingRemovals, index);
                 pendingRemovals.Clear();
 
-                Reindex(content, index);
+                Reindex(content, index, searcher);
             }
         }
 
@@ -64,16 +72,11 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         return Task.CompletedTask;
     });
 
-    private void Reindex(IContent content, IUmbracoIndex index)
+    private void Reindex(IContent content, IUmbracoIndex<IContent> index, IUmbracoSearcher searcher)
     {
         // get the currently indexed cultures for the content
-        var existingIndexCultures = index
-            .Searcher
-            .CreateQuery()
-            .Field(UmbracoExamineFieldNames.DeliveryApiContentIndex.Id, content.Id.ToString())
-            .SelectField(UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture)
-            .Execute()
-            .SelectMany(f => f.GetValues(UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture))
+        var existingIndexCultures = searcher.Search(new []{UmbracoSearchFieldNames.DeliveryApiContentIndex.Id}, new []{ content.Id.ToString()},0,1000)
+            .SelectMany(f => f.Values[UmbracoSearchFieldNames.DeliveryApiContentIndex.Culture])
             .ToArray();
 
         // index the content
@@ -101,26 +104,19 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         }
 
         var idsToDelete = unpublishedCultures
-            .Select(culture => DeliveryApiContentIndexUtilites.IndexId(content, culture)).ToArray();
+            .Select(culture => DeliveryApiContentIndexUtilites.IndexId(content, culture.ToString())).ToArray();
         RemoveFromIndex(idsToDelete, index);
     }
 
-    private string[] UpdateIndex(IContent content, IUmbracoIndex index)
+    private string[] UpdateIndex(IContent content, IUmbracoIndex<IContent> index)
     {
-        ValueSet[] valueSets = _deliveryApiContentIndexValueSetBuilder.GetValueSets(content).ToArray();
-        if (valueSets.Any() is false)
-        {
-            return Array.Empty<string>();
-        }
 
-        index.IndexItems(valueSets);
-        return valueSets
-            .SelectMany(v => v.GetValues("culture").Select(c => c.ToString()))
-            .WhereNotNull()
-            .ToArray();
+
+        index.IndexItems(new []{content});
+       throw  new NotImplementedException();
     }
 
-    private void ReindexDescendants(IContent content, IUmbracoIndex index)
+    private void ReindexDescendants(IContent content, IUmbracoIndex<IContent>  index)
         => _deliveryApiContentIndexHelper.EnumerateApplicableDescendantsForContentIndex(
             content.Id,
             descendants =>

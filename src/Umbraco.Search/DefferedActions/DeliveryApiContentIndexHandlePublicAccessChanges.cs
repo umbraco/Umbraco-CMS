@@ -15,7 +15,8 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
     public DeliveryApiContentIndexHandlePublicAccessChanges(
         IPublicAccessService publicAccessService,
         DeliveryApiIndexingHandler deliveryApiIndexingHandler,
-        IBackgroundTaskQueue backgroundTaskQueue)
+        ISearchProvider searchProvider,
+        IBackgroundTaskQueue backgroundTaskQueue) : base(searchProvider)
     {
         _publicAccessService = publicAccessService;
         _deliveryApiIndexingHandler = deliveryApiIndexingHandler;
@@ -73,7 +74,7 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
             {
                 IUmbracoSearchResults? results =
                     searcher.Search(new[] { UmbracoSearchFieldNames.DeliveryApiContentIndex.Id },
-                        batchAsArray.Select(id => id.ToString()).ToArray());
+                        batchAsArray.Select(id => id.ToString()).ToArray(), page,pageSize);
 
                 total = results.TotalItemCount;
 
