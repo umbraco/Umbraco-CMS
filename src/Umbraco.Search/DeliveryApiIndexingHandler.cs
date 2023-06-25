@@ -8,13 +8,14 @@ using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Search.DefferedActions;
 using Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.Services;
 
 namespace Umbraco.Search;
 
 internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
 {
     // these are the dependencies for this handler
-    private readonly ExamineIndexingMainDomHandler _mainDomHandler;
+    private readonly ISearchMainDomHandler _mainDomHandler;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ISearchProvider _searchProvider;
     private readonly ILogger<DeliveryApiIndexingHandler> _logger;
@@ -27,7 +28,7 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
 
     public DeliveryApiIndexingHandler(
-        ExamineIndexingMainDomHandler mainDomHandler,
+        ISearchMainDomHandler mainDomHandler,
         ICoreScopeProvider scopeProvider,
         ISearchProvider searchProvider,
         ILogger<DeliveryApiIndexingHandler> logger,

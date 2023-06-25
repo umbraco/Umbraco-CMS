@@ -118,9 +118,9 @@ public static class UmbracoBuilderExtensions
         services.AddExamineLuceneIndex<DeliveryApiContentIndex, ConfigurationEnabledDirectoryFactory>(Constants
                 .UmbracoIndexes
                 .DeliveryApiContentIndexName)
-            .AddSingleton<IUmbracoIndex>(services => new UmbracoExamineIndex<IMember>(services
+            .AddSingleton<IUmbracoIndex>(services => new UmbracoExamineIndex<IContent>(services
                 .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
-                    .DeliveryApiContentIndexName), services.GetRequiredService<IValueSetBuilder<IMember>>()))
+                    .DeliveryApiContentIndexName), services.GetRequiredService<IDeliveryApiContentIndexValueSetBuilder>()))
             .AddSingleton<IUmbracoSearcher>(services => new UmbracoExamineSearcher<IMember>(services
                 .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
                     .DeliveryApiContentIndexName).Searcher));

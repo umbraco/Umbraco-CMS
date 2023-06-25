@@ -3,10 +3,11 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure;
+using Umbraco.Search.Services;
 
 namespace Umbraco.Search.Examine.ValueSetBuilders;
 
-internal class ExamineIndexingMainDomHandler
+internal class ExamineIndexingMainDomHandler : ISearchMainDomHandler
 {
     private readonly IMainDom _mainDom;
     private readonly IProfilingLogger _profilingLogger;

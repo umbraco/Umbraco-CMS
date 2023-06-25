@@ -1,5 +1,7 @@
 ﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Search;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.HostedServices;
@@ -13,20 +15,18 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
 
     private readonly IList<KeyValuePair<int, ContentTypeChangeTypes>> _changes;
     private readonly DeliveryApiIndexingHandler _deliveryApiIndexingHandler;
-    private readonly IDeliveryApiContentIndexValueSetBuilder _deliveryApiContentIndexValueSetBuilder;
     private readonly IContentService _contentService;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
 
     public DeliveryApiContentIndexHandleContentTypeChanges(
         IList<KeyValuePair<int, ContentTypeChangeTypes>> changes,
         DeliveryApiIndexingHandler deliveryApiIndexingHandler,
-        IDeliveryApiContentIndexValueSetBuilder deliveryApiContentIndexValueSetBuilder,
         IContentService contentService,
-        IBackgroundTaskQueue backgroundTaskQueue)
+        ISearchProvider searchProvider,
+        IBackgroundTaskQueue backgroundTaskQueue) : base(searchProvider)
     {
         _changes = changes;
         _deliveryApiIndexingHandler = deliveryApiIndexingHandler;
-        _deliveryApiContentIndexValueSetBuilder = deliveryApiContentIndexValueSetBuilder;
         _contentService = contentService;
         _backgroundTaskQueue = backgroundTaskQueue;
     }
@@ -89,7 +89,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
 
             // keep track of the IDs of the documents that must be removed, so we can remove them all in one go
             var indexIdsToRemove = new List<string>();
-            List<IContent> contentToBeIndex = new List<IContent>()
+            List<IContent> contentToBeIndex = new List<IContent>();
             foreach (KeyValuePair<int, string[]> indexIdsByContentId in indexIdsByContentIds)
             {
                 IContent? content = _contentService.GetById(indexIdsByContentId.Key);
@@ -115,7 +115,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
         }
     }
 
-    private List<string> FindIdsForContentType(int contentTypeId, IUmbracoIndex index)
+    private List<string> FindIdsForContentType(int contentTypeId, IUmbracoSearcher index)
     {
         var ids = new List<string>();
 
@@ -123,13 +123,10 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
         var total = long.MaxValue;
         while (page * PageSize < total)
         {
-            ISearchResults? results = index.Searcher
-                .CreateQuery()
-                .Field(UmbracoExamineFieldNames.DeliveryApiContentIndex.ContentTypeId, contentTypeId.ToString())
-                // NOTE: we need to be explicit about fetching ItemIdFieldName here, otherwise Examine will try to be
-                // clever and use the "id" field of the document (which we can't use for deletion)
-                .SelectField(UmbracoExamineFieldNames.ItemIdFieldName)
-                .Execute(QueryOptions.SkipTake(page * PageSize, PageSize));
+            IUmbracoSearchResults? results =
+                index.Search(new[] { UmbracoSearchFieldNames.DeliveryApiContentIndex.ContentTypeId },
+                    new[] { contentTypeId.ToString() }, page, PageSize
+                );
             total = results.TotalItemCount;
 
             ids.AddRange(results.Select(result => result.Id));

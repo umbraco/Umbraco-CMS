@@ -33,7 +33,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IIndexRebuilder, IndexRebuilder>();
         builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();
-        builder.Services.AddSingleton<ExamineIndexingMainDomHandler>();
+        builder.Services.AddSingleton<ISearchMainDomHandler,ExamineIndexingMainDomHandler>();
         builder.Services.AddUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
         builder.Services.AddUnique<IPublishedContentValueSetBuilder>(factory =>
             new ContentValueSetBuilder(
