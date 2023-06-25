@@ -1,14 +1,11 @@
-﻿using Examine;
-using Examine.Search;
-using Umbraco.Cms.Core;
+﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Extensions;
-using Umbraco.Search.Examine.ValueSetBuilders;
 
-namespace Umbraco.Cms.Infrastructure.Examine.Deferred;
+namespace Umbraco.Search.DefferedActions;
 
 internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : DeliveryApiContentIndexDeferredBase, IDeferredAction
 {
@@ -58,7 +55,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
             return Task.CompletedTask;
         }
 
-        IIndex index = _deliveryApiIndexingHandler.GetIndex() ??
+        IUmbracoIndex index = _deliveryApiIndexingHandler.GetIndex() ??
                        throw new InvalidOperationException("Could not obtain the delivery API content index");
 
         HandleUpdatedContentTypes(updatedContentTypeIds, index);
@@ -66,7 +63,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
         return Task.CompletedTask;
     });
 
-    private void HandleUpdatedContentTypes(IEnumerable<int> updatedContentTypesIds, IIndex index)
+    private void HandleUpdatedContentTypes(IEnumerable<int> updatedContentTypesIds, IUmbracoIndex index)
     {
         foreach (var contentTypeId in updatedContentTypesIds)
         {
@@ -119,7 +116,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
         }
     }
 
-    private List<string> FindIdsForContentType(int contentTypeId, IIndex index)
+    private List<string> FindIdsForContentType(int contentTypeId, IUmbracoIndex index)
     {
         var ids = new List<string>();
 

@@ -1,10 +1,8 @@
-using Examine;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Search.Indexing.Populators;
 
 namespace Umbraco.Search.Examine.ValueSetBuilders;

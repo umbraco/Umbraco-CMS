@@ -1,6 +1,7 @@
 ﻿using Umbraco.Cms.Core.Scoping;
+using Umbraco.Search.DefferedActions;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine.ValueSetBuilders;
 
 internal class DeferredActions
 {

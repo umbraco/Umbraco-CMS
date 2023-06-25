@@ -17,6 +17,7 @@ using Umbraco.Extensions;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Examine.Configuration;
+using Umbraco.Search.Models;
 
 namespace Umbraco.Search.Examine.Lucene;
 
@@ -45,7 +46,7 @@ public class UmbracoExamineLuceneIndex : LuceneIndex, IUmbracoExamineIndex, IInd
         _logger = loggerFactory.CreateLogger<UmbracoExamineLuceneIndex>();
     }
 
-    public Attempt<string?> IsHealthy() => _diagnostics.IsHealthy();
+    public Attempt<HealthStatus?> IsHealthy() => _diagnostics.IsHealthy();
     public virtual IReadOnlyDictionary<string, object?> Metadata => _diagnostics.Metadata;
 
     /// <summary>

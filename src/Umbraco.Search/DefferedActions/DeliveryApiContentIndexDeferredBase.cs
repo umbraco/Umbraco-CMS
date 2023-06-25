@@ -1,8 +1,6 @@
-﻿using Examine;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Search;
+﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Infrastructure.Examine.Deferred;
+namespace Umbraco.Search.DefferedActions;
 
 internal abstract class DeliveryApiContentIndexDeferredBase
 {
@@ -27,6 +25,6 @@ internal abstract class DeliveryApiContentIndexDeferredBase
         }
 
         // NOTE: the delivery api index implementation takes care of deleting descendants, so we don't have to do that here
-        _provider.GetIndex<IContent>(index).RemoveFromIndex(ids.Select(id => id.ToString()));
+        _provider.GetIndex<IContent>(index)?.RemoveFromIndex(ids.Select(id => id.ToString()));
     }
 }

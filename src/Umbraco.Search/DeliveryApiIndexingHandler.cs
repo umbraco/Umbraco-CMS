@@ -1,50 +1,46 @@
-﻿using Examine;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Cms.Infrastructure.Examine.Deferred;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Search;
+using Umbraco.Search.DefferedActions;
 using Umbraco.Search.Examine.ValueSetBuilders;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search;
 
 internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
 {
     // these are the dependencies for this handler
     private readonly ExamineIndexingMainDomHandler _mainDomHandler;
-    private readonly IExamineManager _examineManager;
     private readonly ICoreScopeProvider _scopeProvider;
+    private readonly ISearchProvider _searchProvider;
     private readonly ILogger<DeliveryApiIndexingHandler> _logger;
     private readonly Lazy<bool> _enabled;
 
     // these dependencies are for the deferred handling (we don't want those handlers registered in the DI)
     private readonly IContentService _contentService;
     private readonly IPublicAccessService _publicAccessService;
-    private readonly IDeliveryApiContentIndexValueSetBuilder _deliveryApiContentIndexValueSetBuilder;
     private readonly IDeliveryApiContentIndexHelper _deliveryApiContentIndexHelper;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
 
     public DeliveryApiIndexingHandler(
         ExamineIndexingMainDomHandler mainDomHandler,
-        IExamineManager examineManager,
         ICoreScopeProvider scopeProvider,
+        ISearchProvider searchProvider,
         ILogger<DeliveryApiIndexingHandler> logger,
         IContentService contentService,
         IPublicAccessService publicAccessService,
-        IDeliveryApiContentIndexValueSetBuilder deliveryApiContentIndexValueSetBuilder,
         IDeliveryApiContentIndexHelper deliveryApiContentIndexHelper,
         IBackgroundTaskQueue backgroundTaskQueue)
     {
         _mainDomHandler = mainDomHandler;
-        _examineManager = examineManager;
         _scopeProvider = scopeProvider;
+        _searchProvider = searchProvider;
         _logger = logger;
         _contentService = contentService;
         _publicAccessService = publicAccessService;
-        _deliveryApiContentIndexValueSetBuilder = deliveryApiContentIndexValueSetBuilder;
         _deliveryApiContentIndexHelper = deliveryApiContentIndexHelper;
         _backgroundTaskQueue = backgroundTaskQueue;
         _enabled = new Lazy<bool>(IsEnabled);
@@ -60,7 +56,6 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
             changes,
             this,
             _contentService,
-            _deliveryApiContentIndexValueSetBuilder,
             _deliveryApiContentIndexHelper,
             _backgroundTaskQueue);
         Execute(deferred);
@@ -72,7 +67,6 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
         var deferred = new DeliveryApiContentIndexHandleContentTypeChanges(
             changes,
             this,
-            _deliveryApiContentIndexValueSetBuilder,
             _contentService,
             _backgroundTaskQueue);
         Execute(deferred);
@@ -117,8 +111,6 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
         return true;
     }
 
-    internal IIndex? GetIndex()
-        => _examineManager.TryGetIndex(Constants.UmbracoIndexes.DeliveryApiContentIndexName, out IIndex index)
-            ? index
-            : null;
+    internal IUmbracoIndex? GetIndex()
+        => _searchProvider.GetIndex(Constants.UmbracoIndexes.DeliveryApiContentIndexName);
 }

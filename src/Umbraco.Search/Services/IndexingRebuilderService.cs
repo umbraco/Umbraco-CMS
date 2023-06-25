@@ -2,11 +2,7 @@
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Search.Indexing;
 
-<<<<<<<< HEAD:src/Umbraco.Search/Services/IndexingRebuilderService.cs
 namespace Umbraco.Search.Services;
-========
-namespace Umbraco.Cms.Infrastructure.Services;
->>>>>>>> origin/v13/dev:src/Umbraco.Infrastructure/Services/IndexingRebuilderService.cs
 
 public class IndexingRebuilderService : IIndexingRebuilderService
 {

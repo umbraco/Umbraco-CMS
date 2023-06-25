@@ -1,10 +1,8 @@
-﻿using Examine;
-using Examine.Search;
-using Umbraco.Cms.Core.Services;
+﻿using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Examine.Deferred;
+namespace Umbraco.Search.DefferedActions;
 
 internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : DeliveryApiContentIndexDeferredBase, IDeferredAction
 {

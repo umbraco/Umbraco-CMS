@@ -25,4 +25,12 @@ public class UmbracoSearchFieldNames
     public const string ItemIdFieldName = "__NodeId";
     public const string CategoryFieldName = "__IndexType";
     public const string ItemTypeFieldName = "__NodeTypeAlias";
+
+    public class DeliveryApiContentIndex
+    {
+        public const string Id ="parentID";
+        public const string ContentTypeId ="parentID";
+        public const string Culture ="parentID";
+
+    }
 }

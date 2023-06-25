@@ -1,9 +1,10 @@
 ﻿using Examine;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine.ValueSetBuilders;
 
 internal sealed class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryApiContentIndexFieldDefinitionBuilder
 {
@@ -20,7 +21,7 @@ internal sealed class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryA
 
     public FieldDefinitionCollection Build()
     {
-        var fieldDefinitions = new List<FieldDefinition>();
+        var fieldDefinitions = new List<global::Examine.FieldDefinition>();
 
         AddRequiredFieldDefinitions(fieldDefinitions);
         AddContentIndexHandlerFieldDefinitions(fieldDefinitions);
@@ -30,16 +31,16 @@ internal sealed class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryA
 
     // required field definitions go here
     // see also the field definitions in the Delivery API content index value set builder
-    private void AddRequiredFieldDefinitions(ICollection<FieldDefinition> fieldDefinitions)
+    private void AddRequiredFieldDefinitions(ICollection<global::Examine.FieldDefinition> fieldDefinitions)
     {
-        fieldDefinitions.Add(new(UmbracoExamineFieldNames.DeliveryApiContentIndex.Id, FieldDefinitionTypes.Raw));
-        fieldDefinitions.Add(new(UmbracoExamineFieldNames.DeliveryApiContentIndex.ContentTypeId, FieldDefinitionTypes.Raw));
-        fieldDefinitions.Add(new(UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture, FieldDefinitionTypes.Raw));
-        fieldDefinitions.Add(new(UmbracoExamineFieldNames.IndexPathFieldName, FieldDefinitionTypes.Raw));
-        fieldDefinitions.Add(new(UmbracoExamineFieldNames.NodeNameFieldName, FieldDefinitionTypes.Raw));
+        fieldDefinitions.Add(new(UmbracoSearchFieldNames.DeliveryApiContentIndex.Id, FieldDefinitionTypes.Raw));
+        fieldDefinitions.Add(new(UmbracoSearchFieldNames.DeliveryApiContentIndex.ContentTypeId, FieldDefinitionTypes.Raw));
+        fieldDefinitions.Add(new(UmbracoSearchFieldNames.DeliveryApiContentIndex.Culture, FieldDefinitionTypes.Raw));
+        fieldDefinitions.Add(new(UmbracoSearchFieldNames.IndexPathFieldName, FieldDefinitionTypes.Raw));
+        fieldDefinitions.Add(new(UmbracoSearchFieldNames.NodeNameFieldName, FieldDefinitionTypes.Raw));
     }
 
-    private void AddContentIndexHandlerFieldDefinitions(ICollection<FieldDefinition> fieldDefinitions)
+    private void AddContentIndexHandlerFieldDefinitions(ICollection<global::Examine.FieldDefinition> fieldDefinitions)
     {
         // add index fields from index handlers (selectors, filters, sorts)
         foreach (IContentIndexHandler handler in _indexHandlers)
@@ -54,13 +55,13 @@ internal sealed class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryA
                     continue;
                 }
 
-                FieldDefinition fieldDefinition = CreateFieldDefinition(field);
+                global::Examine.FieldDefinition fieldDefinition = CreateFieldDefinition(field);
                 fieldDefinitions.Add(fieldDefinition);
             }
         }
     }
 
-    private static FieldDefinition CreateFieldDefinition(IndexField field)
+    private static global::Examine.FieldDefinition CreateFieldDefinition(IndexField field)
     {
         var indexType = field.FieldType switch
         {
@@ -72,6 +73,6 @@ internal sealed class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryA
             _ => throw new ArgumentOutOfRangeException(nameof(field.FieldType))
         };
 
-        return new FieldDefinition(field.FieldName, indexType);
+        return new global::Examine.FieldDefinition(field.FieldName, indexType);
     }
 }

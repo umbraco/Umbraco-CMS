@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Examine;
+﻿namespace Umbraco.Search.DefferedActions;
 
 internal interface IDeferredAction
 {

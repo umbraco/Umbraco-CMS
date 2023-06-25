@@ -1,41 +1,36 @@
-﻿using Examine;
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using Umbraco.Search.Examine.ValueSetBuilders;
 
-namespace Umbraco.Cms.Infrastructure.Examine.Deferred;
+namespace Umbraco.Search.DefferedActions;
 
 internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiContentIndexDeferredBase, IDeferredAction
 {
     private readonly IList<KeyValuePair<int, TreeChangeTypes>> _changes;
     private readonly IContentService _contentService;
     private readonly DeliveryApiIndexingHandler _deliveryApiIndexingHandler;
-    private readonly IDeliveryApiContentIndexValueSetBuilder _deliveryApiContentIndexValueSetBuilder;
-    private readonly IDeliveryApiContentIndexHelper _deliveryApiContentIndexHelper;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
 
     public DeliveryApiContentIndexHandleContentChanges(
         IList<KeyValuePair<int, TreeChangeTypes>> changes,
         DeliveryApiIndexingHandler deliveryApiIndexingHandler,
         IContentService contentService,
-        IDeliveryApiContentIndexValueSetBuilder deliveryApiContentIndexValueSetBuilder,
-        IDeliveryApiContentIndexHelper deliveryApiContentIndexHelper,
-        IBackgroundTaskQueue backgroundTaskQueue)
+        ISearchProvider searchProvider,
+        IBackgroundTaskQueue backgroundTaskQueue) : base(searchProvider)
     {
         _changes = changes;
         _deliveryApiIndexingHandler = deliveryApiIndexingHandler;
         _contentService = contentService;
         _backgroundTaskQueue = backgroundTaskQueue;
-        _deliveryApiContentIndexValueSetBuilder = deliveryApiContentIndexValueSetBuilder;
-        _deliveryApiContentIndexHelper = deliveryApiContentIndexHelper;
     }
 
     public void Execute() => _backgroundTaskQueue.QueueBackgroundWorkItem(_ =>
     {
-        IIndex index = _deliveryApiIndexingHandler.GetIndex()
+        IUmbracoIndex index = _deliveryApiIndexingHandler.GetIndex()
                        ?? throw new InvalidOperationException("Could not obtain the delivery API content index");
 
         var pendingRemovals = new List<int>();
@@ -69,7 +64,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         return Task.CompletedTask;
     });
 
-    private void Reindex(IContent content, IIndex index)
+    private void Reindex(IContent content, IUmbracoIndex index)
     {
         // get the currently indexed cultures for the content
         var existingIndexCultures = index

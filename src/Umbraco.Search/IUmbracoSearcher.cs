@@ -1,9 +1,9 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+﻿using System.Runtime.CompilerServices;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Search;
-
 public interface IUmbracoSearcher<T> : IUmbracoSearcher
 {
 }

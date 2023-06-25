@@ -5,8 +5,9 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
+using Umbraco.Search.Examine.ValueSetBuilders;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Services;
 
 internal sealed class DeliveryApiContentIndexHelper : IDeliveryApiContentIndexHelper
 {
