@@ -2,12 +2,17 @@ import { UmbTemplateRepository } from '../../repository/template.repository.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
-import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_DOCUMENT_PICKER_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UmbModalManagerContext,
+} from '@umbraco-cms/backoffice/modal';
 import {
 	TemplateQueryExecuteModel,
 	TemplateQueryResultResponseModel,
 	TemplateQuerySettingsResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
 
 export interface TemplateQueryBuilderModalData {
 	hidePartialViews?: boolean;
@@ -37,15 +42,24 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	#queryRequest: TemplateQueryExecuteModel = <TemplateQueryExecuteModel>{};
 
+	#updateQueryRequest(update: TemplateQueryExecuteModel) {
+		this.#queryRequest = { ...this.#queryRequest, ...update };
+	}
+
 	@state()
 	private _queryBuiilderSettings?: TemplateQuerySettingsResponseModel;
 
+	@state()
+	private _selectedRootContentName = 'all pages';
+
+	#documentRepository: UmbDocumentRepository;
 	#modalManagerContext?: UmbModalManagerContext;
 	#templateRepository: UmbTemplateRepository;
 
 	constructor() {
 		super();
 		this.#templateRepository = new UmbTemplateRepository(this);
+		this.#documentRepository = new UmbDocumentRepository(this);
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalManagerContext = instance;
@@ -67,7 +81,34 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		const { data, error } = await this.#templateRepository.postTemplateQueryExecute({
 			requestBody: this.#queryRequest,
 		});
-		if (data) this._templateQuery = data;
+		if (data) this._templateQuery = { ...data };
+	}
+
+	#openDocumentPicker = () => {
+		this.#modalManagerContext
+			?.open(UMB_DOCUMENT_PICKER_MODAL)
+			.onSubmit()
+			.then((result) => {
+				debugger;
+				this.#updateQueryRequest({ rootContentId: result.selection[0] });
+
+				if (result.selection.length > 0 && result.selection[0] === null) {
+					this._selectedRootContentName = 'all pages';
+					return;
+				}
+
+				if (result.selection.length > 0) {
+					this.#getDocumentItem(result.selection as string[]);
+					return;
+				}
+			});
+	};
+
+	async #getDocumentItem(ids: string[]) {
+		const { data, error } = await this.#documentRepository.requestItemsLegacy(ids);
+		if (data) {
+			this._selectedRootContentName = data[0].name;
+		}
 	}
 
 	render() {
@@ -77,7 +118,9 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 					<uui-box>
 						<div>
 							I want <uui-button look="outline">all content</uui-button> from
-							<uui-button look="outline">all pages </uui-button>
+							<uui-button look="outline" @click=${this.#openDocumentPicker}
+								>${this._selectedRootContentName}
+							</uui-button>
 						</div>
 						<div>
 							where <uui-button look="outline"></uui-button> from <uui-button look="outline">all pages </uui-button>
