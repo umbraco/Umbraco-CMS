@@ -760,11 +760,25 @@ public class MediaController : ContentControllerBase
                         break;
                     }
 
-                    // If media type is still File then let's check if it's an image.
+                    // If media type is still File then let's check if it's an image or a custom image type.
                     if (mediaTypeAlias == Constants.Conventions.MediaTypes.File &&
                         _imageUrlGenerator.IsSupportedImageFormat(ext))
                     {
-                        mediaTypeAlias = Constants.Conventions.MediaTypes.Image;
+                        if (allowedContentTypes.Any(mt => mt.Alias == Constants.Conventions.MediaTypes.Image))
+                        {
+                            mediaTypeAlias = Constants.Conventions.MediaTypes.Image;
+                        }
+                        else
+                        {
+                            IMediaType? customType = allowedContentTypes.FirstOrDefault(mt =>
+                                mt.CompositionPropertyTypes.Any(pt =>
+                                    pt.PropertyEditorAlias == Constants.PropertyEditors.Aliases.ImageCropper));
+
+                            if (customType is not null)
+                            {
+                                mediaTypeAlias = customType.Alias;
+                            }
+                        }
                     }
                 }
                 else
