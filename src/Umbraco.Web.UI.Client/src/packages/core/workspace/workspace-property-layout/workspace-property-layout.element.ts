@@ -1,4 +1,10 @@
-import { css, html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	LitElement,
+	customElement,
+	property,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 
 /**
@@ -80,9 +86,14 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 				grid-column: span 2;
 			}
 
+			:host > div:last-child {
+				margin-top:var(--uui-size-space-3);
+			}
+
 			@container (width > 600px) {
 				:host(:not([orientation='vertical'])) > div {
 					grid-column: span 1;
+					margin-top:0;
 				}
 			}
 
@@ -90,8 +101,13 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 				border-bottom: none;
 			}
 
+			/* container has 18px padding, reduce here to ensure consistency */
 			:host-context(umb-variantable-property:first-of-type) {
-				padding-top: 0;
+				padding-top: var(--uui-size-space-2);
+			}
+
+			:host-context(umb-variantable-property:last-of-type) {
+				padding-bottom: var(--uui-size-space-2);
 			}
 
 			#description {
@@ -102,7 +118,22 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 				position: sticky;
 				top: var(--uui-size-space-4);
 				height: min-content;
-				z-index: 2;
+				z-index: 1050;
+				background-color:var(--uui-color-surface);
+			}
+
+			:host-context(umb-variantable-property) #header {
+				top: 0;
+			}
+
+			#header::before {
+				content: '';
+				display:block;
+				position:absolute;
+				top:calc(var(--uui-size-layout-1) * -1);
+				width:100%;
+				height:var(--uui-size-layout-1);
+				background-color:var(--uui-color-surface);
 			}
 		`,
 	];
