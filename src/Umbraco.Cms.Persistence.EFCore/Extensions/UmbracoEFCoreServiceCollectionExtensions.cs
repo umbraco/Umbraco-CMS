@@ -20,28 +20,12 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         defaultEFCoreOptionsAction ??= DefaultOptionsAction;
 
         services.AddDbContext<T>(
-            (provider, builder) =>
-            {
-                ConnectionStrings connectionStrings = GetConnectionStringAndProviderName(provider);
-                IEnumerable<IMigrationProviderSetup> migrationProviders = provider.GetServices<IMigrationProviderSetup>();
-                IMigrationProviderSetup? migrationProvider = migrationProviders.FirstOrDefault(x => x.ProviderName == connectionStrings.ProviderName);
-
-                migrationProvider?.Setup(builder, connectionStrings.ConnectionString);
-                defaultEFCoreOptionsAction(builder, connectionStrings.ConnectionString, connectionStrings.ProviderName);
-            },
+            (provider, builder) => SetupDbContext(defaultEFCoreOptionsAction, provider, builder),
             optionsLifetime: ServiceLifetime.Transient);
 
 
 
-        services.AddDbContextFactory<T>((provider, builder) =>
-        {
-            var connectionStrings = GetConnectionStringAndProviderName(provider);
-            var migrationProviders = provider.GetServices<IMigrationProviderSetup>();
-            var migrationProvider = migrationProviders.FirstOrDefault(x => x.ProviderName == connectionStrings.ProviderName);
-            migrationProvider?.Setup(builder, connectionStrings.ConnectionString);
-            defaultEFCoreOptionsAction(builder, connectionStrings.ConnectionString, connectionStrings.ProviderName);
-
-        });
+        services.AddDbContextFactory<T>((provider, builder) => SetupDbContext(defaultEFCoreOptionsAction, provider, builder));
 
         services.AddUnique<IAmbientEFCoreScopeStack<T>, AmbientEFCoreScopeStack<T>>();
         services.AddUnique<IEFCoreScopeAccessor<T>, EFCoreScopeAccessor<T>>();
@@ -50,6 +34,16 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism<T>>();
 
         return services;
+    }
+
+    private static void SetupDbContext(DefaultEFCoreOptionsAction defaultEFCoreOptionsAction, IServiceProvider provider, DbContextOptionsBuilder builder)
+    {
+        ConnectionStrings connectionStrings = GetConnectionStringAndProviderName(provider);
+        IEnumerable<IMigrationProviderSetup> migrationProviders = provider.GetServices<IMigrationProviderSetup>();
+        IMigrationProviderSetup? migrationProvider =
+            migrationProviders.FirstOrDefault(x => x.ProviderName == connectionStrings.ProviderName);
+        migrationProvider?.Setup(builder, connectionStrings.ConnectionString);
+        defaultEFCoreOptionsAction(builder, connectionStrings.ConnectionString, connectionStrings.ProviderName);
     }
 
     private static ConnectionStrings GetConnectionStringAndProviderName(IServiceProvider serviceProvider)
