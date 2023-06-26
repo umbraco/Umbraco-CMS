@@ -97,7 +97,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         var pagedModel = new PagedModel<IContentType>
         {
             Total = contentTypes.Count(),
-            Items = contentTypes.Skip(skip).Take(take),
+            Items = contentTypes.Skip(skip).Take(take)
         };
 
         return Task.FromResult(pagedModel);
