@@ -1,4 +1,4 @@
-import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
+import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import {
 	UMB_MEDIA_TREE_PICKER_MODAL,
@@ -57,7 +57,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 	async #observeCurrentUser() {
 		if (!this.#auth) return;
 
-		this.host.observe(this.#auth.currentUser, (currentUser) => this.#currentUser = currentUser);
+		this.host.observe(this.#auth.currentUser, (currentUser) => (this.#currentUser = currentUser));
 	}
 
 	async #onAction() {
