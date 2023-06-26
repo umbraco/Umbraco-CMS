@@ -24,17 +24,26 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 	implements UmbPropertyEditorExtensionElement
 {
 	@property()
-	set value(value: string[]) {
-		this.#selectedValues = value;
+	set value(value: string | string[] | null) {
+		if (!value) return;
+
+		if (typeof value === 'string') {
+			this.#selectedValues = value.split(',').filter(x => x.length > 0);
+		} else if (Array.isArray(value)) {
+			this.#selectedValues = value;
+		} else {
+			this.#selectedValues = [];
+			return;
+		}
 
 		// Migrations
-		if (value.includes('ace')) {
-			this.#selectedValues = value.filter((v) => v !== 'ace');
+		if (this.#selectedValues.includes('ace')) {
+			this.#selectedValues = this.#selectedValues.filter((v) => v !== 'ace');
 			this.#selectedValues.push('sourcecode');
 		}
 
 		this._toolbarConfig.forEach((v) => {
-			v.selected = value.includes(v.alias);
+			v.selected = this.#selectedValues.includes(v.alias);
 		});
 	}
 
@@ -105,7 +114,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 				this._toolbarConfig,
 				(v) => html`<li>
 					<uui-checkbox value=${v.alias} ?checked=${v.selected} @change=${this.onChange}>
-						<uui-icon .svg=${tinyIconSet.icons[v.icon ?? 'alignjustify']}></uui-icon>
+						<uui-icon .svg=${tinyIconSet?.icons[v.icon ?? 'alignjustify']}></uui-icon>
 						${v.label}
 					</uui-checkbox>
 				</li>`
