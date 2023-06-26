@@ -6,6 +6,7 @@ import { UMB_TEMPLATE_ITEM_STORE_CONTEXT_TOKEN, UmbTemplateItemStore } from './t
 import { UmbTemplateItemServerDataSource } from './sources/template.item.server.data.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
+	DataSourceResponse,
 	UmbDetailRepository,
 	UmbItemDataSource,
 	UmbItemRepository,
@@ -20,10 +21,18 @@ import type {
 	EntityTreeItemResponseModel,
 	ItemResponseModelBaseModel,
 	TemplateItemResponseModel,
+	TemplateQueryExecuteModel,
+	TemplateQueryResultResponseModel,
+	TemplateQuerySettingsResponseModel,
 	TemplateResponseModel,
 	UpdateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { UmbTemplateQueryBuilderServerDataSource } from './sources/template.query-builder.server.data.js';
 
+// interface UmbTemplateQueryBuilderRepository {
+// 	getTemplateQuerySettings(): Promise<DataSourceResponse<TemplateQuerySettingsResponseModel>>;
+// 	postTemplateQueryExecute({ requestBody }: { requestBody?: any }): Promise<DataSourceResponse<TemplateQueryResultResponseModel>>;
+// }
 export class UmbTemplateRepository
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,
@@ -42,6 +51,7 @@ export class UmbTemplateRepository
 	#store?: UmbTemplateStore;
 
 	#notificationContext?: UmbNotificationContext;
+	#queryBuilderSource: UmbTemplateQueryBuilderServerDataSource;
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
@@ -49,6 +59,7 @@ export class UmbTemplateRepository
 		this.#treeDataSource = new UmbTemplateTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbTemplateDetailServerDataSource(this.#host);
 		this.#itemSource = new UmbTemplateItemServerDataSource(this.#host);
+		this.#queryBuilderSource = new UmbTemplateQueryBuilderServerDataSource(this.#host);
 
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_TEMPLATE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
@@ -160,24 +171,6 @@ export class UmbTemplateRepository
 		return { data, error, asObservable: () => this.#treeStore!.items([id]) };
 	}
 
-	// ITEMS:
-	async requestItems(ids: Array<string>) {
-		if (!ids) throw new Error('Ids are missing');
-		await this.#init;
-
-		const { data, error } = await this.#itemSource.getItems(ids);
-
-		if (data) {
-			this.#itemStore?.appendItems(data);
-		}
-
-		return { data, error, asObservable: () => this.#itemStore!.items(ids) };
-	}
-
-	async items(uniques: string[]): Promise<Observable<ItemResponseModelBaseModel[]>> {
-		throw new Error('items method is not implemented in UmbTemplateRepository');
-	}
-
 	async byId(id: string) {
 		if (!id) throw new Error('Key is missing');
 		await this.#init;
@@ -255,4 +248,41 @@ export class UmbTemplateRepository
 
 		return { error };
 	}
+
+	//#endregion
+
+	//#region TEMPLATE_QUERY:
+
+	async getTemplateQuerySettings() {
+		await this.#init;
+		return this.#queryBuilderSource.getTemplateQuerySettings();
+	}
+
+	async postTemplateQueryExecute({ requestBody }: { requestBody?: TemplateQueryExecuteModel }) {
+		await this.#init;
+		return this.#queryBuilderSource.postTemplateQueryExecute({ requestBody });
+	}
+
+	//#endregion
+
+	//#region ITEMS:
+
+	async requestItems(ids: Array<string>) {
+		if (!ids) throw new Error('Ids are missing');
+		await this.#init;
+
+		const { data, error } = await this.#itemSource.getItems(ids);
+
+		if (data) {
+			this.#itemStore?.appendItems(data);
+		}
+
+		return { data, error, asObservable: () => this.#itemStore!.items(ids) };
+	}
+
+	async items(uniques: string[]): Promise<Observable<ItemResponseModelBaseModel[]>> {
+		throw new Error('items method is not implemented in UmbTemplateRepository');
+	}
+
+	//#endregion
 }
