@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,6 +11,8 @@ using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Security;
+using Umbraco.Cms.Persistence.EFCore;
+using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 
@@ -18,24 +21,8 @@ public static class BackOfficeAuthBuilderExtensions
     public static IUmbracoBuilder AddBackOfficeAuthentication(this IUmbracoBuilder builder)
     {
         builder
-            .AddDbContext()
             .AddOpenIddict()
             .AddBackOfficeLogin();
-
-        return builder;
-    }
-
-    private static IUmbracoBuilder AddDbContext(this IUmbracoBuilder builder)
-    {
-        builder.Services.AddDbContext<DbContext>(options =>
-        {
-            // Configure the DB context
-            // TODO: use actual Umbraco DbContext once EF is implemented - and remove dependency on Microsoft.EntityFrameworkCore.InMemory
-            options.UseInMemoryDatabase(nameof(DbContext));
-
-            // Register the entity sets needed by OpenIddict.
-            options.UseOpenIddict();
-        });
 
         return builder;
     }
@@ -46,15 +33,6 @@ public static class BackOfficeAuthBuilderExtensions
         builder.Services.AddAuthorization(CreatePolicies);
 
         builder.Services.AddOpenIddict()
-
-            // Register the OpenIddict core components.
-            .AddCore(options =>
-            {
-                options
-                    .UseEntityFrameworkCore()
-                    .UseDbContext<DbContext>();
-            })
-
             // Register the OpenIddict server components.
             .AddServer(options =>
             {
@@ -118,9 +96,9 @@ public static class BackOfficeAuthBuilderExtensions
 
         builder.Services.AddTransient<IBackOfficeApplicationManager, BackOfficeApplicationManager>();
         builder.Services.AddSingleton<BackOfficeAuthorizationInitializationMiddleware>();
+        builder.Services.Configure<UmbracoPipelineOptions>(options => options.AddFilter(new BackofficePipelineFilter("Backoffice")));
 
         builder.Services.AddHostedService<OpenIddictCleanup>();
-        builder.Services.AddHostedService<DatabaseManager>();
 
         return builder;
     }
@@ -138,28 +116,6 @@ public static class BackOfficeAuthBuilderExtensions
         return builder;
     }
 
-    // TODO: remove this once EF is implemented
-    public class DatabaseManager : IHostedService
-    {
-        private readonly IServiceProvider _serviceProvider;
-
-        public DatabaseManager(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
-
-        public async Task StartAsync(CancellationToken cancellationToken)
-        {
-            using IServiceScope scope = _serviceProvider.CreateScope();
-
-            DbContext context = scope.ServiceProvider.GetRequiredService<DbContext>();
-            await context.Database.EnsureCreatedAsync(cancellationToken);
-
-            // TODO: add BackOfficeAuthorizationInitializationMiddleware before UseAuthorization (to make it run for unauthorized API requests) and remove this
-            IBackOfficeApplicationManager backOfficeApplicationManager = scope.ServiceProvider.GetRequiredService<IBackOfficeApplicationManager>();
-            await backOfficeApplicationManager.EnsureBackOfficeApplicationAsync(new Uri("https://" +
-                "localhost:44339/"), cancellationToken);
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-    }
 
     // TODO: move this to an appropriate location and implement the policy scheme that should be used for the new management APIs
     private static void CreatePolicies(AuthorizationOptions options)
@@ -185,4 +141,11 @@ public static class BackOfficeAuthBuilderExtensions
         AddPolicy(AuthorizationPolicies.SectionAccessMedia, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Media);
         AddPolicy(AuthorizationPolicies.SectionAccessContentOrMedia, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Content, Constants.Applications.Media);
        }
+}
+
+internal class BackofficePipelineFilter : UmbracoPipelineFilter
+{
+    public BackofficePipelineFilter(string name)
+        : base(name)
+        => PrePipeline = builder => builder.UseMiddleware<BackOfficeAuthorizationInitializationMiddleware>();
 }

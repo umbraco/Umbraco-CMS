@@ -11,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="JsonPatch.Net" Version="2.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.2" />
-    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="4.4.0" />
+    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="4.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
