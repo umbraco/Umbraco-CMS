@@ -17,7 +17,7 @@ public abstract class ApiContentBuilderBase<T>
         _outputExpansionStrategyAccessor = outputExpansionStrategyAccessor;
     }
 
-    protected abstract T Create(IPublishedContent content, Guid id, string name, string contentType, IApiContentRoute route, IDictionary<string, object?> properties);
+    protected abstract T Create(IPublishedContent content, string name, IApiContentRoute route, IDictionary<string, object?> properties);
 
     public virtual T? Build(IPublishedContent content)
     {
@@ -34,9 +34,7 @@ public abstract class ApiContentBuilderBase<T>
 
         return Create(
             content,
-            content.Key,
             _apiContentNameProvider.GetName(content),
-            content.ContentType.Alias,
             route,
             properties);
     }

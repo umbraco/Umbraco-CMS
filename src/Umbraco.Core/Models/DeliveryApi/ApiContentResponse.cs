@@ -4,8 +4,8 @@ namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
 public class ApiContentResponse : ApiContent, IApiContentResponse
 {
-    public ApiContentResponse(Guid id, string name, string contentType, IApiContentRoute route, IDictionary<string, object?> properties, IDictionary<string, IApiContentRoute> cultures)
-        : base(id, name, contentType, route, properties)
+    public ApiContentResponse(Guid id, string name, string contentType, DateTime createDate, DateTime updateDate, IApiContentRoute route, IDictionary<string, object?> properties, IDictionary<string, IApiContentRoute> cultures)
+        : base(id, name, contentType, createDate, updateDate, route, properties)
         => Cultures = cultures;
 
     // a little DX; by default this dictionary will be serialized as the first part of the response due to the inner workings of the serializer.
