@@ -5,7 +5,7 @@ import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import { FormControlMixin, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { renderEditor, type tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
-import type {
+import {
 	TinyMcePluginArguments,
 	UmbDataTypePropertyCollection,
 	UmbTinyMcePluginBase,
@@ -167,7 +167,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			this.#editorRef.destroy();
 		}
 
-		// await tinymce.default.init(this._tinyConfig);
 		const editors = await renderEditor(this._tinyConfig);
 		this.#editorRef = editors.pop();
 	}
@@ -204,7 +203,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		// Plugins require a reference to the current editor as a param, so can not
 		// be instantiated until we have an editor
 		for (const plugin of this.#plugins) {
-			new plugin({ host: this, editor, configuration: this.configuration });
+			new plugin({ host: this, editor });			
 		}
 
 		// define keyboard shortcuts
