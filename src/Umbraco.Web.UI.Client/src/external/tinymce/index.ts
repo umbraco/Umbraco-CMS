@@ -15,9 +15,6 @@ declare global {
 	}
 }
 
-// Register it globally so we can load the icons immediately
-window.tinymce = tiny as unknown as typeof tiny.default;
-
 // Load default icons making them available to everyone
 import 'tinymce/icons/default/icons.js';
 
