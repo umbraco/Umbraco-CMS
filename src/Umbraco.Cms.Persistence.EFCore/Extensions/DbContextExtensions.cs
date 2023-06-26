@@ -2,6 +2,7 @@ using System.Data;
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Umbraco.Extensions;
@@ -49,5 +50,22 @@ public static class DbContextExtensions
 
         var result = await dbCommand.ExecuteScalarAsync();
         return (T?)result;
+    }
+
+    public static async Task MigrateDatabaseAsync(this DbContext context, Type targetMigration)
+    {
+        MigrationAttribute? migrationAttribute = targetMigration.GetCustomAttribute<MigrationAttribute>(false);
+
+        if (migrationAttribute is null)
+        {
+            throw new ArgumentException("The type does not have a MigrationAttribute", nameof(targetMigration));
+        }
+
+        await context.MigrateDatabaseAsync(migrationAttribute.Id);
+    }
+
+    public static async Task MigrateDatabaseAsync(this DbContext context, string targetMigrationId)
+    {
+        await context.GetService<IMigrator>().MigrateAsync(targetMigrationId);
     }
 }
