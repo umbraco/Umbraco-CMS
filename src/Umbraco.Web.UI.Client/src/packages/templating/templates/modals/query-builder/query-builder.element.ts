@@ -1,7 +1,13 @@
+import { UmbTemplateRepository } from '../../repository/template.repository.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import {
+	TemplateQueryExecuteModel,
+	TemplateQueryResultResponseModel,
+	TemplateQuerySettingsResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export interface TemplateQueryBuilderModalData {
 	hidePartialViews?: boolean;
@@ -16,17 +22,52 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	TemplateQueryBuilderModalData,
 	TemplateQueryBuilderModalResult
 > {
-	private _close() {
+	#close() {
 		this.modalContext?.reject();
 	}
 
-	private _modalContext?: UmbModalManagerContext;
+	#submit() {
+		this.modalContext?.submit({
+			value: this._templateQuery?.queryExpression ?? '',
+		});
+	}
+
+	@state()
+	private _templateQuery?: TemplateQueryResultResponseModel;
+
+	#queryRequest: TemplateQueryExecuteModel = <TemplateQueryExecuteModel>{};
+
+	@state()
+	private _queryBuiilderSettings?: TemplateQuerySettingsResponseModel;
+
+	#modalManagerContext?: UmbModalManagerContext;
+	#templateRepository: UmbTemplateRepository;
 
 	constructor() {
 		super();
+		this.#templateRepository = new UmbTemplateRepository(this);
+
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
-			this._modalContext = instance;
+			this.#modalManagerContext = instance;
 		});
+		this.#init();
+	}
+
+	#init() {
+		this.#getTemplateQuerySettings();
+		this.#postTemplateQuery();
+	}
+
+	async #getTemplateQuerySettings() {
+		const { data, error } = await this.#templateRepository.getTemplateQuerySettings();
+		if (data) this._queryBuiilderSettings = data;
+	}
+
+	async #postTemplateQuery() {
+		const { data, error } = await this.#templateRepository.postTemplateQueryExecute({
+			requestBody: this.#queryRequest,
+		});
+		if (data) this._templateQuery = data;
 	}
 
 	render() {
@@ -43,8 +84,11 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 						</div>
 					</uui-box>
 				</div>
+
+				<code> ${this._templateQuery?.queryExpression ?? ''} </code>
 				<div slot="actions">
-					<uui-button @click=${this._close} look="secondary">Close</uui-button>
+					<uui-button @click=${this.#close} look="secondary">Close</uui-button>
+					<uui-button @click=${this.#submit} look="primary" color="positive">Submit</uui-button>
 				</div>
 			</umb-body-layout>
 		`;

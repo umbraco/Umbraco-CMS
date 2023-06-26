@@ -4,9 +4,9 @@ import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.
 import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data.js';
 import { UMB_TEMPLATE_ITEM_STORE_CONTEXT_TOKEN, UmbTemplateItemStore } from './template-item.store.js';
 import { UmbTemplateItemServerDataSource } from './sources/template.item.server.data.js';
+import { UmbTemplateQueryBuilderServerDataSource } from './sources/template.query-builder.server.data.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
-	DataSourceResponse,
 	UmbDetailRepository,
 	UmbItemDataSource,
 	UmbItemRepository,
@@ -22,17 +22,10 @@ import type {
 	ItemResponseModelBaseModel,
 	TemplateItemResponseModel,
 	TemplateQueryExecuteModel,
-	TemplateQueryResultResponseModel,
-	TemplateQuerySettingsResponseModel,
 	TemplateResponseModel,
 	UpdateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbTemplateQueryBuilderServerDataSource } from './sources/template.query-builder.server.data.js';
 
-// interface UmbTemplateQueryBuilderRepository {
-// 	getTemplateQuerySettings(): Promise<DataSourceResponse<TemplateQuerySettingsResponseModel>>;
-// 	postTemplateQueryExecute({ requestBody }: { requestBody?: any }): Promise<DataSourceResponse<TemplateQueryResultResponseModel>>;
-// }
 export class UmbTemplateRepository
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,

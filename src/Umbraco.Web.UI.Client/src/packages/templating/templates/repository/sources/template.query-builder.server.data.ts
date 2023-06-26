@@ -27,7 +27,13 @@ export class UmbTemplateQueryBuilderServerDataSource {
 	async getTemplateQuerySettings() {
 		return tryExecuteAndNotify(this.#host, TemplateResource.getTemplateQuerySettings());
 	}
-
+	/**
+	 * Executes a query builder query on the server
+	 *
+	 * @param {{ requestBody?: TemplateQueryExecuteModel }} { requestBody }
+	 * @return {*}
+	 * @memberof UmbTemplateQueryBuilderServerDataSource
+	 */
 	async postTemplateQueryExecute({ requestBody }: { requestBody?: TemplateQueryExecuteModel }) {
 		return tryExecuteAndNotify(this.#host, TemplateResource.postTemplateQueryExecute({ requestBody }));
 	}
