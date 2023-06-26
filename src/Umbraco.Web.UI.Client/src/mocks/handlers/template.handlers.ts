@@ -48,7 +48,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get(umbracoPath('/template/query/execute'), (req, res, ctx) => {
+	rest.post(umbracoPath('/template/query/execute'), (req, res, ctx) => {
 		const response = umbTemplateData.getTemplateQueryResult();
 		return res(ctx.status(200), ctx.json(response));
 	}),
