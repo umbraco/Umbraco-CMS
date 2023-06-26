@@ -139,6 +139,7 @@ ${currentContent}`;
 			} else {
 				this.repository.requestRootTreeItems();
 			}
+			return;
 		}
 
 		if (template?.id) {
