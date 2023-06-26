@@ -176,6 +176,7 @@ public class PackagingService : IPackagingService
     /// <inheritdoc/>
     public async Task<Attempt<PackageDefinition, PackageOperationStatus>> CreateCreatedPackageAsync(PackageDefinition package, Guid userKey)
     {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         if (_createdPackages.SavePackage(package) == false)
         {
             if (string.IsNullOrEmpty(package.Name))
@@ -188,6 +189,7 @@ public class PackagingService : IPackagingService
 
         int currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
         _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' created. Package key: {package.PackageId}");
+        scope.Complete();
         return await Task.FromResult(Attempt.SucceedWithStatus(PackageOperationStatus.Success, package));
 
     }
