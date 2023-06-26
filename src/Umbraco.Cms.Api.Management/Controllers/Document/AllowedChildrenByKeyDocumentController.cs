@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
@@ -26,20 +28,18 @@ public class AllowedChildrenByKeyDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AllowedChildrenByKey(Guid id, int skip = 0, int take = 100)
     {
-        IContentType? documentType = _contentTypeService.Get(id);
+        Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> attempt = await _contentTypeService.GetAllowedChildrenAsync(id, skip, take);
 
-        if (documentType?.AllowedContentTypes is null)
+        if (attempt.Success is false)
         {
-            return NotFound();
+            return ContentTypeOperationStatusResult(attempt.Status);
         }
 
-        IEnumerable<IContentType> allowedChildren = _contentTypeService.GetAll(documentType.AllowedContentTypes.Select(x => x.Key)).ToArray();
-
-        List<DocumentTypeResponseModel> viewModels = _umbracoMapper.MapEnumerable<IContentType, DocumentTypeResponseModel>(allowedChildren.Skip(skip).Take(take));
+        List<DocumentTypeResponseModel> viewModels = _umbracoMapper.MapEnumerable<IContentType, DocumentTypeResponseModel>(attempt.Result!.Items);
 
         var pagedViewModel = new PagedViewModel<DocumentTypeResponseModel>
         {
-            Total = allowedChildren.Count(),
+            Total = attempt.Result.Items.Count(),
             Items = viewModels,
         };
 
