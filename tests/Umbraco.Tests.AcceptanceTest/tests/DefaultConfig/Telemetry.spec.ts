@@ -16,8 +16,6 @@ test.describe('Telemetry tests', () => {
 
     await page.goto(umbracoApi.baseUrl + '/umbraco');
 
-    await page.pause();
-
     // Selects minimal as the telemetry level
     await page.getByRole('tab', { name: 'Settings' }).click();
     await page.getByRole('tab', {name: 'Telemetry Data'}).click();
