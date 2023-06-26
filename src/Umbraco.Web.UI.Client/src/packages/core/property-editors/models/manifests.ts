@@ -25,14 +25,14 @@ import { manifest as slider } from './Umbraco.Slider.js';
 import { manifest as tags } from './Umbraco.Tags.js';
 import { manifest as textArea } from './Umbraco.TextArea.js';
 import { manifest as textBox } from './Umbraco.TextBox.js';
-import { manifest as tinyMCE } from './Umbraco.TinyMCE.js';
+import { manifest as richText } from './Umbraco.RichText.js';
 import { manifest as trueFalse } from './Umbraco.TrueFalse.js';
 import { manifest as uploadField } from './Umbraco.UploadField.js';
 import { manifest as userPicker } from './Umbraco.UserPicker.js';
 
-import type { ManifestPropertyEditorModel } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestPropertyEditorModel> = [
+export const manifests: Array<ManifestPropertyEditorSchema> = [
 	blockGrid,
 	blockList,
 	checkboxList,
@@ -60,7 +60,7 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	tags,
 	textArea,
 	textBox,
-	tinyMCE,
+	richText,
 	trueFalse,
 	uploadField,
 	userPicker,

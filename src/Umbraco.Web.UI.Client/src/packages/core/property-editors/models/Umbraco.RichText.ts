@@ -1,8 +1,8 @@
-import type { ManifestPropertyEditorModel } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: ManifestPropertyEditorModel = {
-	type: 'propertyEditorModel',
-	name: 'Tiny MCE',
+export const manifest: ManifestPropertyEditorSchema = {
+	type: 'propertyEditorSchema',
+	name: 'Rich Text',
 	alias: 'Umbraco.TinyMCE',
 	meta: {
 		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.TinyMCE',
@@ -11,6 +11,7 @@ export const manifest: ManifestPropertyEditorModel = {
 				{
 					alias: 'mediaParentId',
 					label: 'Image Upload Folder',
+					description: 'Choose the upload location of pasted images',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
 				},
 				{

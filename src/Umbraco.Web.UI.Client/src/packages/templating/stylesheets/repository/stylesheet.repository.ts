@@ -2,7 +2,6 @@ import { UmbStylesheetTreeStore, UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN } from 
 import { UmbStylesheetTreeServerDataSource } from './sources/stylesheet.tree.server.data.js';
 import { UmbStylesheetServerDataSource } from './sources/stylesheet.server.data.js';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
@@ -15,9 +14,7 @@ export class UmbStylesheetRepository
 	#dataSource;
 	#treeDataSource;
 	#treeStore?: UmbStylesheetTreeStore;
-	#notificationContext?: UmbNotificationContext;
-	#initResolver?: () => void;
-	#initialized = false;
+	#init;
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
@@ -26,26 +23,9 @@ export class UmbStylesheetRepository
 		this.#dataSource = new UmbStylesheetServerDataSource(this.#host);
 		this.#treeDataSource = new UmbStylesheetTreeServerDataSource(this.#host);
 
-		new UmbContextConsumerController(this.#host, UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+		this.#init = new UmbContextConsumerController(this.#host, UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 			this.#treeStore = instance;
-			this.#checkIfInitialized();
-		});
-
-		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
-			this.#notificationContext = instance;
-			this.#checkIfInitialized();
-		});
-	}
-
-	#init = new Promise<void>((resolve) => {
-		this.#initialized ? resolve() : (this.#initResolver = resolve);
-	});
-
-	#checkIfInitialized() {
-		if (this.#treeStore && this.#notificationContext) {
-			this.#initialized = true;
-			this.#initResolver?.();
-		}
+		}).asPromise();
 	}
 
 	// TREE:

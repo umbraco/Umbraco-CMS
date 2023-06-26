@@ -29,7 +29,7 @@ export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
 					if (dataType) {
 						this.name = dataType.name ?? '';
 						this.propertyEditorUiAlias = dataType.propertyEditorUiAlias ?? '';
-						this.propertyEditorModelAlias = dataType.propertyEditorAlias ?? '';
+						this.propertyEditorSchemaAlias = dataType.propertyEditorAlias ?? '';
 					}
 				},
 				'dataType'
@@ -51,7 +51,7 @@ export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
 	 * Property Editor Model Alias
 	 */
 	@state()
-	propertyEditorModelAlias = '';
+	propertyEditorSchemaAlias = '';
 
 	protected renderDetail() {
 		const details: string[] = [];
@@ -63,8 +63,8 @@ export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
 		}
 		/*
 		// TODO: Revisit if its fine to leave this out:
-		if (this.propertyEditorModelAlias !== '') {
-			details.push(this.propertyEditorModelAlias);
+		if (this.propertyEditorSchemaAlias !== '') {
+			details.push(this.propertyEditorSchemaAlias);
 		} else {
 			details.push('Property Editor Model Missing');
 		}

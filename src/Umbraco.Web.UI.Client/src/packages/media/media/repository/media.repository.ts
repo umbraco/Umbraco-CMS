@@ -22,6 +22,7 @@ export class UmbMediaRepository
 		UmbDetailRepository<CreateMediaRequestModel, any, UpdateMediaRequestModel, MediaDetails>
 {
 	#host: UmbControllerHostElement;
+	#init;
 
 	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbMediaTreeStore;
@@ -31,9 +32,6 @@ export class UmbMediaRepository
 
 	#notificationContext?: UmbNotificationContext;
 
-	#initResolver?: () => void;
-	#initialized = false;
-
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
@@ -41,32 +39,19 @@ export class UmbMediaRepository
 		this.#treeSource = new UmbMediaTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbMediaDetailServerDataSource(this.#host);
 
-		new UmbContextConsumerController(this.#host, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#treeStore = instance;
-			this.#checkIfInitialized();
-		});
+		this.#init = Promise.all([
+			new UmbContextConsumerController(this.#host, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#treeStore = instance;
+			}).asPromise(),
 
-		new UmbContextConsumerController(this.#host, UMB_MEDIA_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#store = instance;
-			this.#checkIfInitialized();
-		});
+			new UmbContextConsumerController(this.#host, UMB_MEDIA_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#store = instance;
+			}).asPromise(),
 
-		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
-			this.#notificationContext = instance;
-			this.#checkIfInitialized();
-		});
-	}
-
-	// TODO: make a generic way to wait for initialization
-	#init = new Promise<void>((resolve) => {
-		this.#initialized ? resolve() : (this.#initResolver = resolve);
-	});
-
-	#checkIfInitialized() {
-		if (this.#treeStore && this.#store && this.#notificationContext) {
-			this.#initialized = true;
-			this.#initResolver?.();
-		}
+			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+				this.#notificationContext = instance;
+			}).asPromise(),
+		]);
 	}
 
 	// TREE:

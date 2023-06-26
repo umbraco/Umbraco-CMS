@@ -117,40 +117,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#resetMasterTemplate() {
-		this.#setMasterTemplateId(null);
-	}
-
-	async #setMasterTemplateId(id: string | null) {
-		//root item selected
-		if (id === '') return;
-
-		if (this._content === null || this._content === undefined) return;
-		const layoutBlockRegex = /(@{[\s\S][^if]*?Layout\s*?=\s*?)("[^"]*?"|null)(;[\s\S]*?})/gi;
-		const masterTemplate = await this.#templateWorkspaceContext?.setMasterTemplate(id);
-
-		//Reset master template or is did not exist and the declaration exists
-		if (masterTemplate === null && layoutBlockRegex.test(this._content)) {
-			const string = this._content?.replace(layoutBlockRegex, `$1null$3`);
-			this.#templateWorkspaceContext?.setContent(string);
-			return;
-		}
-
-		//No declaration and no valid id - do nothing
-		if (masterTemplate === null) return;
-
-		//if has master template in the content
-		if (layoutBlockRegex.test(this._content)) {
-			const string = this._content?.replace(layoutBlockRegex, `$1"${masterTemplate?.name}.cshtml"$3`);
-			this.#templateWorkspaceContext?.setContent(string);
-			return;
-		}
-
-		//if no master template in the content insert it at the beginning
-		const string = `@{
-	Layout = "${masterTemplate?.name}.cshtml";
-}
-${this._content}`;
-		this.#templateWorkspaceContext?.setContent(string);
+		this.#templateWorkspaceContext?.setMasterTemplate(null);
 	}
 
 	#openMasterTemplatePicker() {
@@ -163,7 +130,7 @@ ${this._content}`;
 
 		modalContext?.onSubmit().then((data) => {
 			if (!data.selection) return;
-			this.#setMasterTemplateId(data.selection[0] ?? '');
+			this.#templateWorkspaceContext?.setMasterTemplate(data.selection[0] ?? '');
 		});
 	}
 
@@ -210,7 +177,7 @@ ${this._content}`;
 			<uui-input placeholder="Enter name..." slot="header" .value=${this._name} @input=${this.#onNameInput}
 				><umb-template-alias-input
 					slot="append"
-					.value=${this._alias as string}
+					.value=${this._alias ?? ''}
 					@change=${this.#onAliasInput}></umb-template-alias-input
 			></uui-input>
 			<uui-box>

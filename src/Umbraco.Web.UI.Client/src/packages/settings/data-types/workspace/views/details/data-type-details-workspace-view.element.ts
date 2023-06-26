@@ -32,7 +32,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 	private _propertyEditorUiAlias?: string;
 
 	@state()
-	private _propertyEditorAlias?: string;
+	private _propertyEditorSchemaAlias?: string;
 
 	@state()
 	private _data: Array<any> = [];
@@ -69,13 +69,13 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 				if (this._dataType.propertyEditorAlias) {
 					// Get the property editor UI alias from the property editor alias:
 					this.observe(
-						umbExtensionsRegistry.getByTypeAndAlias('propertyEditorModel', this._dataType.propertyEditorAlias),
-						(propertyEditorModel) => {
-							// TODO: show error. We have stored a PropertyEditorModelAlias and can't find the PropertyEditorModel in the registry.
-							if (!propertyEditorModel) return;
-							this._setPropertyEditorUiAlias(propertyEditorModel.meta.defaultPropertyEditorUiAlias ?? undefined);
+						umbExtensionsRegistry.getByTypeAndAlias('propertyEditorSchema', this._dataType.propertyEditorAlias),
+						(propertyEditorSchema) => {
+							// TODO: show error. We have stored a propertyEditorSchemaAlias and can't find the PropertyEditorSchema in the registry.
+							if (!propertyEditorSchema) return;
+							this._setPropertyEditorUiAlias(propertyEditorSchema.meta.defaultPropertyEditorUiAlias ?? undefined);
 						},
-						'_observePropertyEditorModelForDefaultUI'
+						'_observepropertyEditorSchemaForDefaultUI'
 					);
 				} else {
 					this._setPropertyEditorUiAlias(undefined);
@@ -105,8 +105,8 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 			return;
 		}
 
-		// remove the '_observePropertyEditorModelForDefaultUI' controller, as we do not want to observe for default value anymore:
-		this.removeControllerByUnique('_observePropertyEditorModelForDefaultUI');
+		// remove the '_observepropertyEditorSchemaForDefaultUI' controller, as we do not want to observe for default value anymore:
+		this.removeControllerByUnique('_observepropertyEditorSchemaForDefaultUI');
 
 		this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', propertyEditorUiAlias),
@@ -117,9 +117,9 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 				this._propertyEditorUiName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
 				this._propertyEditorUiAlias = propertyEditorUI?.alias ?? '';
 				this._propertyEditorUiIcon = propertyEditorUI?.meta.icon ?? '';
-				this._propertyEditorAlias = propertyEditorUI?.meta.propertyEditorAlias ?? '';
+				this._propertyEditorSchemaAlias = propertyEditorUI?.meta.propertyEditorSchemaAlias ?? '';
 
-				this._workspaceContext?.setPropertyEditorAlias(this._propertyEditorAlias);
+				this._workspaceContext?.setPropertyEditorSchemaAlias(this._propertyEditorSchemaAlias);
 			},
 			'_observePropertyEditorUI'
 		);
@@ -158,7 +158,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 								slot="editor"
 								name=${this._propertyEditorUiName}
 								alias=${this._propertyEditorUiAlias}
-								property-editor-model-alias=${this._propertyEditorAlias}
+								property-editor-model-alias=${this._propertyEditorSchemaAlias}
 								border>
 								<uui-icon name="${this._propertyEditorUiIcon}" slot="icon"></uui-icon>
 								<uui-action-bar slot="actions">
@@ -180,7 +180,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 
 	private _renderConfig() {
 		return html`
-			${this._propertyEditorAlias && this._propertyEditorUiAlias
+			${this._propertyEditorSchemaAlias && this._propertyEditorUiAlias
 				? html`
 						<uui-box headline="Settings">
 							<umb-property-editor-config

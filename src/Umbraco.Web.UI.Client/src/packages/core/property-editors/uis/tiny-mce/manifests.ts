@@ -1,4 +1,4 @@
-import { manifest as configuration } from './config/configuration/manifests.js';
+import { manifests as configuration } from './config/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: ManifestPropertyEditorUi = {
@@ -8,19 +8,51 @@ const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-tiny-mce.element.js'),
 	meta: {
 		label: 'Rich Text Editor',
-		propertyEditorAlias: 'Umbraco.TinyMCE',
+		propertyEditorSchemaAlias: 'Umbraco.TinyMCE',
 		icon: 'umb:browser-window',
 		group: 'richText',
 		settings: {
 			properties: [
 				{
-					alias: 'editor',
-					label: 'Editor',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TinyMCE.Configuration',
+					alias: 'toolbar',
+					label: 'Toolbar',
+					description: 'Pick the toolbar options that should be available when editing',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.ToolbarConfiguration',
+				},
+				{
+					alias: 'stylesheets',
+					label: 'Stylesheets',
+					description: 'Pick the stylesheets whose editor styles should be available when editing',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.StylesheetsConfiguration',
+				},
+				{
+					alias: 'dimensions',
+					label: 'Dimensions',
+					description: 'Set the editor dimensions',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.DimensionsConfiguration',
+				},
+				{
+					alias: 'maxImageSize',
+					label: 'Maximum size for inserted images',
+					description: 'Maximum width or height - enter 0 to disable resizing',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.MaxImageSizeConfiguration',
+				},
+				{
+					alias: 'mode',
+					label: 'Mode',
+					description: 'Select the mode for the editor',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+					config: [
+						{
+							alias: 'items',
+							value: ['Classic', 'Inline'],
+						},
+					],
 				},
 				{
 					alias: 'overlaySize',
 					label: 'Overlay Size',
+					description: 'Select the width of the overlay (link picker)',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
 				},
 				{
@@ -33,6 +65,4 @@ const manifest: ManifestPropertyEditorUi = {
 	},
 };
 
-const config = [configuration];
-
-export const manifests = [manifest, ...config];
+export const manifests = [manifest, ...configuration];

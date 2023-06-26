@@ -98,13 +98,13 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 					if (!this._propertyEditorUiAlias && dataType?.propertyEditorAlias) {
 						//use 'dataType.propertyEditorAlias' to look up the extension in the registry:
 						this.observe(
-							umbExtensionsRegistry.getByTypeAndAlias('propertyEditorModel', dataType.propertyEditorAlias),
+							umbExtensionsRegistry.getByTypeAndAlias('propertyEditorSchema', dataType.propertyEditorAlias),
 							(extension) => {
 								if (!extension) return;
 								this._propertyEditorUiAlias = extension?.meta.defaultPropertyEditorUiAlias;
-								this.removeControllerByUnique('_observePropertyEditorModel');
+								this.removeControllerByUnique('_observePropertyEditorSchema');
 							},
-							'_observePropertyEditorModel'
+							'_observePropertyEditorSchema'
 						);
 					}
 				},
