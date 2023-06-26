@@ -13,7 +13,7 @@ public class UmbracoEFCoreComposer : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
     {
-        builder.Services.AddSingleton<IEFCoreDatabaseCreator, EfCoreDatabaseCreator>();
+        builder.Services.AddSingleton<IEFCoreMigrationExecutor, EfCoreMigrationExecutor>();
 
         builder.AddNotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification, EFCoreCreateTablesNotificationHandler>();
         builder.AddNotificationAsyncHandler<UnattendedInstallNotification, EFCoreCreateTablesNotificationHandler>();
@@ -32,11 +32,11 @@ public class UmbracoEFCoreComposer : IComposer
 
 public class EFCoreCreateTablesNotificationHandler : INotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification>, INotificationAsyncHandler<UnattendedInstallNotification>
 {
-    private readonly IEFCoreDatabaseCreator _iefCoreDatabaseCreator;
+    private readonly IEFCoreMigrationExecutor _iefCoreMigrationExecutor;
 
-    public EFCoreCreateTablesNotificationHandler(IEFCoreDatabaseCreator iefCoreDatabaseCreator)
+    public EFCoreCreateTablesNotificationHandler(IEFCoreMigrationExecutor iefCoreMigrationExecutor)
     {
-        _iefCoreDatabaseCreator = iefCoreDatabaseCreator;
+        _iefCoreMigrationExecutor = iefCoreMigrationExecutor;
     }
 
     public async Task HandleAsync(UnattendedInstallNotification notification, CancellationToken cancellationToken)
@@ -51,6 +51,6 @@ public class EFCoreCreateTablesNotificationHandler : INotificationAsyncHandler<D
 
     private async Task HandleAsync()
     {
-        await _iefCoreDatabaseCreator.ExecuteAllMigrationsAsync();
+        await _iefCoreMigrationExecutor.ExecuteAllMigrationsAsync();
     }
 }

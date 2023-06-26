@@ -6,8 +6,9 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer;
 public class SqlServerMigrationProviderSetup : IMigrationProviderSetup
 {
     public string ProviderName => "Microsoft.Data.SqlClient";
+
     public void Setup(DbContextOptionsBuilder builder, string? connectionString)
     {
-        builder.UseSqlServer(connectionString, x=>x.MigrationsAssembly(GetType().Assembly.FullName));
+        builder.UseSqlServer(connectionString, x => x.MigrationsAssembly(GetType().Assembly.FullName));
     }
 }

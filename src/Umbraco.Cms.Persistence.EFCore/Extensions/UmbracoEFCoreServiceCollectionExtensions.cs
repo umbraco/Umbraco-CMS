@@ -22,12 +22,12 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         services.AddDbContext<T>(
             (provider, builder) =>
             {
-                var connectionStrings = GetConnectionStringAndProviderName(provider);
-                var migrationProviders = provider.GetServices<IMigrationProviderSetup>();
-                var migrationProvider = migrationProviders.FirstOrDefault(x => x.ProviderName == connectionStrings.ProviderName);
+                ConnectionStrings connectionStrings = GetConnectionStringAndProviderName(provider);
+                IEnumerable<IMigrationProviderSetup> migrationProviders = provider.GetServices<IMigrationProviderSetup>();
+                IMigrationProviderSetup? migrationProvider = migrationProviders.FirstOrDefault(x => x.ProviderName == connectionStrings.ProviderName);
+
                 migrationProvider?.Setup(builder, connectionStrings.ConnectionString);
                 defaultEFCoreOptionsAction(builder, connectionStrings.ConnectionString, connectionStrings.ProviderName);
-
             },
             optionsLifetime: ServiceLifetime.Transient);
 
