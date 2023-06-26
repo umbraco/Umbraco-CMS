@@ -51,7 +51,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         string? connectionString = null;
         string? providerName = null;
 
-        var connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;
+        ConnectionStrings connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;
 
         // Replace data directory
         string? dataDirectory = AppDomain.CurrentDomain.GetData(Constants.System.DataDirectoryName)?.ToString();

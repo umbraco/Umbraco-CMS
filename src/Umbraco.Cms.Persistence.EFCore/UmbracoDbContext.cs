@@ -14,12 +14,11 @@ namespace Umbraco.Cms.Persistence.EFCore;
 /// To find documentation about this way of working with the context see
 /// https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/providers?tabs=dotnet-core-cli#using-one-context-type
 /// </remarks>
-
 public class UmbracoDbContext : DbContext
 {
-    public UmbracoDbContext(DbContextOptions<UmbracoDbContext> options) : base(options)
+    public UmbracoDbContext(DbContextOptions<UmbracoDbContext> options)
+        : base(options)
     {
-
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

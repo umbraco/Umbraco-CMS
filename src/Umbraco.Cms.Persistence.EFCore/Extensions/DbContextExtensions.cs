@@ -54,11 +54,11 @@ public static class DbContextExtensions
 
     public static async Task MigrateDatabaseAsync(this DbContext context, Type targetMigration)
     {
-        var migrationAttribute = targetMigration.GetCustomAttribute<MigrationAttribute>(false);
+        MigrationAttribute? migrationAttribute = targetMigration.GetCustomAttribute<MigrationAttribute>(false);
 
         if (migrationAttribute is null)
         {
-            throw new ArgumentException("Type do nto have a MigrationAttribute", nameof(targetMigration));
+            throw new ArgumentException("The type does not have a MigrationAttribute", nameof(targetMigration));
         }
 
         await context.MigrateDatabaseAsync(migrationAttribute.Id);
