@@ -31,4 +31,4 @@ export function renderEditor(userConfig?: tiny.RawEditorOptions) {
 	return window.tinymce.init(config);
 }
 
-export * as tinymce from 'tinymce';
+export { tiny as tinymce };
