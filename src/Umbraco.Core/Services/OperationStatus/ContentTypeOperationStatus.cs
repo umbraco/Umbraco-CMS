@@ -7,5 +7,6 @@ public enum ContentTypeOperationStatus
     DuplicateAlias,
     InvalidAlias,
     InvalidPropertyTypeAlias,
-    InvalidDataType
+    InvalidDataType,
+    DataTypeNotFound,
 }

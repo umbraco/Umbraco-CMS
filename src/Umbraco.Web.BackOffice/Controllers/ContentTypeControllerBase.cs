@@ -309,7 +309,7 @@ public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotifi
             return NotFound();
         }
 
-        //Validate that there's no other ct with the same alias
+        // Validate that there's no other ct with the same alias
         // it in fact cannot be the same as any content type alias (member, content or media) because
         // this would interfere with how ModelsBuilder works and also how many of the published caches
         // works since that is based on aliases.

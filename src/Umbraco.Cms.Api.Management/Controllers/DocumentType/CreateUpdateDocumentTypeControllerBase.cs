@@ -64,7 +64,7 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
             }
         }
 
-        // validate property data types
+        // validate property data types exists.
         Guid[] dataTypeKeys = requestModel.Properties.Select(property => property.DataTypeId).ToArray();
         var dataTypesByKey = dataTypeKeys
             // FIXME: create GetAllAsync(params Guid[] keys) method on IDataTypeService
