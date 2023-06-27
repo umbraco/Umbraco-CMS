@@ -757,6 +757,7 @@
     <key alias="by">by</key>
     <key alias="cancel">Cancel</key>
     <key alias="cellMargin">Cell margin</key>
+    <key alias="change">Change</key>
     <key alias="choose">Choose</key>
     <key alias="clear">Clear</key>
     <key alias="close">Close</key>

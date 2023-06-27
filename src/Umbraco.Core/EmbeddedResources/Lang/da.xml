@@ -717,6 +717,7 @@
     <key alias="by">af</key>
     <key alias="cancel">Fortryd</key>
     <key alias="cellMargin">Celle margen</key>
+    <key alias="change">Skift</key>
     <key alias="choose">Vælg</key>
     <key alias="clear">Ryd</key>
     <key alias="close">Luk</key>
