@@ -84,6 +84,10 @@ export class UmbExtensionRegistry<
 		manifests.forEach((manifest) => this.register(manifest));
 	}
 
+	unregisterMany(manifests: Array<ManifestTypes | ManifestKind<ManifestTypes>>): void {
+		manifests.forEach((manifest) => this.unregister(manifest.alias));
+	}
+
 	unregister(alias: string): void {
 		const oldExtensionsValues = this._extensions.getValue();
 		const newExtensionsValues = oldExtensionsValues.filter((extension) => extension.alias !== alias);
