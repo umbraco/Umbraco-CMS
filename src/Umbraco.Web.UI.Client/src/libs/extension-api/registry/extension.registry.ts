@@ -84,8 +84,8 @@ export class UmbExtensionRegistry<
 		manifests.forEach((manifest) => this.register(manifest));
 	}
 
-	unregisterMany(manifests: Array<ManifestTypes | ManifestKind<ManifestTypes>>): void {
-		manifests.forEach((manifest) => this.unregister(manifest.alias));
+	unregisterMany(aliases: Array<string>): void {
+		aliases.forEach((alias) => this.unregister(alias));
 	}
 
 	unregister(alias: string): void {
