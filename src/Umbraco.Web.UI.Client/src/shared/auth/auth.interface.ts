@@ -3,6 +3,11 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface IUmbAuth {
 	/**
+	 * Initialise the auth flow.
+	 */
+	setInitialState(): Promise<void>;
+
+	/**
 	 * Get the current user's access token.
 	 *
 	 * @example
