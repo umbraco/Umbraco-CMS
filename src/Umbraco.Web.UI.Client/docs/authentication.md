@@ -16,7 +16,7 @@ There are two ways to use this:
 
 ### Running directly in the Umbraco-CMS repository
 
-1. Checkout the `v13/dev` branch of [Umbraco-CMS](https://github.com/umbraco/Umbraco-cms/tree/v13/dev)
+1. Checkout the `v14/dev` branch of [Umbraco-CMS](https://github.com/umbraco/Umbraco-cms/tree/v14/dev)
 2. Run `git submodule update --init` to initialize and pull down the backoffice repository
    1. If you are using a Git GUI client, you might need to do this manually
 3. Go to src/Umbraco.Web.UI.New or switch default startup project to "Umbraco.Web.UI.New"
@@ -56,11 +56,9 @@ VITE_UMBRACO_API_URL=https://localhost:44339
 
 ## To test a secure endpoint
 
-If you want to mark an endpoint as secure, you can add the `[Authorize]` attribute to the controller or action. This will require you to be logged in to access the endpoint.
+All Management API endpoints are secure and require a token except for the status and installer endpoints. If you want to mark a custom endpoint as secure, you can add the `[Authorize]` attribute to the controller or action. This will require you to be logged in to access the endpoint.
 
 ## What does not work yet
 
-- You cannot log out through the UI
-  - Clear your local storage to log out for now
 - If your session expires or your token is revoked, you will start getting 401 network errors, which for now only will be shown as a notification in the UI - we need to figure out how to send you back to log in
-- We do not _yet_ poll to see if the token is still valid or check how long before you are logged out, so you won't be notified before trying to perfor actions that require a token
+- We do not _yet_ poll to see if the token is still valid or check how long before you are logged out, so you won't be notified before trying to perform actions that require a token
