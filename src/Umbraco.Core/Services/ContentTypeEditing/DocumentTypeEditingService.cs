@@ -24,6 +24,7 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
         // Validation...
 
         // Ensure no duplicate alias across documents, members, and media. Since this would break ModelsBuilder/published cache.
+        // This this method gets aliases across documents, members, and media, so it covers it all.
         if (_contentTypeService.GetAllContentTypeAliases().InvariantContains(model.Alias))
         {
             return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.DuplicateAlias, null);

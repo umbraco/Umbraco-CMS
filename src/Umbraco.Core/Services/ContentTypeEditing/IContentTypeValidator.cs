@@ -9,5 +9,5 @@ public interface IContentTypeValidator<TContentType, TPropertyType, TPropertyTyp
     where TPropertyType : PropertyTypeBase
     where TPropertyTypeContainer : PropertyTypeContainerBase
 {
-    ContentTypeOperationStatus ValidateCommon(TContentType contentType);
+    ContentTypeOperationStatus Validate(TContentType contentType);
 }
