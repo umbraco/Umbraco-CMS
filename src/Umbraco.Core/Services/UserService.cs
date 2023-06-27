@@ -2000,7 +2000,7 @@ internal class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<NodePermissions>> GetPermissionsAsync(Guid userKey, params Guid[] nodeKeys)
+    public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetPermissionsAsync(Guid userKey, params Guid[] nodeKeys)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -2008,13 +2008,13 @@ internal class UserService : RepositoryService, IUserService
 
         if (user is null)
         {
-            throw new InvalidOperationException("No user with that ID");
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, Enumerable.Empty<NodePermissions>());
         }
 
         Guid[] keys = nodeKeys.ToArray();
         if (keys.Length == 0)
         {
-            return Enumerable.Empty<NodePermissions>();
+            return Attempt.SucceedWithStatus(UserOperationStatus.Success, Enumerable.Empty<NodePermissions>());
         }
 
         // We don't know what the entity type may be, so we have to get the entire entity :(
@@ -2029,7 +2029,7 @@ internal class UserService : RepositoryService, IUserService
             results.Add(new NodePermissions { NodeKey = idKeyMap[nodeId], Permissions = permissions });
         }
 
-        return results;
+        return Attempt.SucceedWithStatus<IEnumerable<NodePermissions>, UserOperationStatus>(UserOperationStatus.UserNotFound, results);
     }
 
     /// <summary>
