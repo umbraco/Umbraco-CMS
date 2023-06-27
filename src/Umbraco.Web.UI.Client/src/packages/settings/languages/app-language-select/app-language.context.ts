@@ -50,4 +50,7 @@ export class UmbAppLanguageContext {
 	}
 }
 
+// Default export to enable this as a globalContext extension js:
+export default UmbAppLanguageContext;
+
 export const UMB_APP_LANGUAGE_CONTEXT_TOKEN = new UmbContextToken<UmbAppLanguageContext>('UmbAppLanguageContext');
