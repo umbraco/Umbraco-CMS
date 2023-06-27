@@ -19,6 +19,7 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 	alias = createObservablePart(this.#data, (data) => data?.alias);
 	content = createObservablePart(this.#data, (data) => data?.content);
 	id = createObservablePart(this.#data, (data) => data?.id);
+	masterTemplateID = createObservablePart(this.#data, (data) => data?.masterTemplateId);
 
 	#isCodeEditorReady = new UmbBooleanState(false);
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
@@ -61,46 +62,67 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 		this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', content: value });
 	}
 
+	getLayoutBlockRegexPattern() {
+		return new RegExp('(@{[\\s\\S][^if]*?Layout\\s*?=\\s*?)("[^"]*?"|null)(;[\\s\\S]*?})', 'gi');
+	}
+
+	getHasLayoutBlock() {
+		return this.getData()?.content ? this.getLayoutBlockRegexPattern().test(this.getData()?.content as string) : false;
+	}
+
 	async load(entityId: string) {
 		const { data } = await this.repository.requestById(entityId);
 		if (data) {
 			this.setIsNew(false);
+			this.setMasterTemplate(data.masterTemplateId ?? null);
 			this.#data.next(data);
-			this.#getMasterTemplateFromContent(data.content ?? '');
 		}
-	}
-
-	#getMasterTemplateFromContent(content: string) {
-		if (!content) this.#masterTemplate.next(null);
-		const RegexString = /(@{[\s\S][^if]*?Layout\s*?=\s*?)("[^"]*?"|null)(;[\s\S]*?})/gi;
-		const match = RegexString.exec(content ?? '');
-
-		if (match) {
-			if (match[2] === 'null') {
-				this.#masterTemplate.next(null);
-				return null;
-			}
-
-			this.#masterTemplate.next({ name: match[2].replace(/"/g, '').replace('.cshtml', '') });
-			return match[2].replace(/"/g, '');
-		}
-		this.#masterTemplate.next(null);
-		return null;
 	}
 
 	async setMasterTemplate(id: string | null) {
 		if (id === null) {
 			this.#masterTemplate.next(null);
+			this.#updateMasterTemplateLayoutBlock();
 			return null;
 		}
 
 		const { data } = await this.repository.requestItems([id]);
 		if (data) {
 			this.#masterTemplate.next(data[0]);
+			this.#updateMasterTemplateLayoutBlock();
 			return data[0];
 		}
 		return null;
 	}
+
+	#updateMasterTemplateLayoutBlock = () => {
+		const currentContent = this.#data.getValue()?.content;
+		const newMasterTemplateAlias = this.#masterTemplate?.getValue()?.alias;
+		const hasLayoutBlock = this.getHasLayoutBlock();
+
+		if (this.#masterTemplate.getValue() === null && hasLayoutBlock && currentContent) {
+			const newString = currentContent.replace(this.getLayoutBlockRegexPattern(), `$1null$3`);
+			this.setContent(newString);
+			return;
+		}
+
+		//if has layout block in the content
+		if (hasLayoutBlock && currentContent) {
+			const string = currentContent.replace(
+				this.getLayoutBlockRegexPattern(),
+				`$1"${newMasterTemplateAlias}.cshtml"$3`
+			);
+			this.setContent(string);
+			return;
+		}
+
+		//if no layout block in the content insert it at the beginning
+		const string = `@{
+	Layout = "${newMasterTemplateAlias}.cshtml";
+}
+${currentContent}`;
+		this.setContent(string);
+	};
 
 	public async save() {
 		const template = this.#data.getValue();
@@ -125,6 +147,8 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 				content: template.content,
 				alias: template.alias,
 			});
+			this.repository.requestTreeItemsOf(this.#masterTemplate.value?.id ?? '');
+
 		}
 	}
 
@@ -135,12 +159,6 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 		this.#data.next({ ...data, id: '', name: '', alias: '', $type: 'TemplateResponseModel' });
 		if (!parentId || parentId === 'root') return;
 		await this.setMasterTemplate(parentId);
-		const RegexString = /(@{[\s\S][^if]*?Layout\s*?=\s*?)("[^"]*?"|null)(;[\s\S]*?})/gi;
-		const content = this.#data.value?.content ?? '';
-		const masterTemplateName = this.#masterTemplate.value?.name ?? '';
-		const string = content.replace(RegexString, `$1"${masterTemplateName}.cshtml"$3`) ?? '';
-
-		this.setContent(string);
 	}
 
 	public destroy() {

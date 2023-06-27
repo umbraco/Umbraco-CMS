@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-toggle.element.js'),
 	meta: {
 		label: 'Toggle',
-		propertyEditorAlias: 'Umbraco.TrueFalse',
+		propertyEditorSchemaAlias: 'Umbraco.TrueFalse',
 		icon: 'umb:checkbox',
 		group: 'common',
 		settings: {

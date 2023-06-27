@@ -94,7 +94,6 @@ export interface ManifestClass<ClassType = unknown>
 	 * @TJS-ignore
 	 */
 	class?: ClassConstructor<ClassType>;
-	//loader?: () => Promise<object | HTMLElement>;
 }
 
 export interface ManifestClassWithClassConstructor<T = unknown> extends ManifestClass<T> {
@@ -120,8 +119,6 @@ export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
 	 * Note it is NOT <my-dashboard></my-dashboard> but just the name
 	 */
 	elementName?: string;
-
-	//loader?: () => Promise<object | HTMLElement>;
 
 	/**
 	 * This contains properties specific to the type of extension

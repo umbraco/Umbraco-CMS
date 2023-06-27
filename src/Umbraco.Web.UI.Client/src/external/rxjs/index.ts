@@ -13,4 +13,5 @@ export {
 	tap,
 	of,
 	lastValueFrom,
+	firstValueFrom,
 } from 'rxjs';

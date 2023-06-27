@@ -30,6 +30,7 @@
 		"./entity-bulk-action": "./dist-cms/packages/core/entity-bulk-action/index.js",
 		"./extension-registry": "./dist-cms/packages/core/extension-registry/index.js",
 		"./id": "./dist-cms/packages/core/id/index.js",
+		"./macro": "./dist-cms/packages/core/macro/index.js",
 		"./menu": "./dist-cms/packages/core/menu/index.js",
 		"./modal": "./dist-cms/packages/core/modal/index.js",
 		"./notification": "./dist-cms/packages/core/notification/index.js",
@@ -129,6 +130,8 @@
 		"monaco-editor": "^0.36.1",
 		"router-slot": "file:router-slot-2.3.0.tgz",
 		"rxjs": "^7.8.0",
+		"tinymce": "^6.5.1",
+		"tinymce-i18n": "^23.5.8",
 		"uuid": "^9.0.0"
 	},
 	"devDependencies": {
