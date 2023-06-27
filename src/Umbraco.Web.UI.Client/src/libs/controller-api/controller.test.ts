@@ -21,7 +21,7 @@ describe('UmbContextProvider', () => {
 	});
 
 	describe('Destroyed controllers is gone from host', () => {
-		it('has a host property', () => {
+		it('controller is removed from host when destroyed', () => {
 			const ctrl = new UmbContextProviderController(hostElement, 'my-test-context', contextInstance);
 
 			expect(hostElement.hasController(ctrl)).to.be.true;
@@ -33,7 +33,7 @@ describe('UmbContextProvider', () => {
 	});
 
 	describe('Unique controllers replace each other', () => {
-		it('has a host property', () => {
+		it('controller is replaced by another controller using the same unique', () => {
 			const firstCtrl = new UmbContextProviderController(hostElement, 'my-test-context', contextInstance);
 			const secondCtrl = new UmbContextProviderController(hostElement, 'my-test-context', new UmbTestContext());
 

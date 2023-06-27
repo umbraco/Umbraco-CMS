@@ -23,8 +23,8 @@ describe('UmbContextProvider', () => {
 
 	describe('Public API', () => {
 		describe('properties', () => {
-			it('has a host property', () => {
-				expect(provider).to.have.property('host');
+			it('has a hostElement property', () => {
+				expect(provider).to.have.property('hostElement');
 			});
 		});
 
