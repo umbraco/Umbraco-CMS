@@ -1,22 +1,21 @@
 import type { ManifestTypes } from './models/index.js';
 import { umbExtensionsRegistry } from './registry.js';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import {
 	createExtensionClass,
 	ManifestBase,
 	ManifestClass,
 	SpecificManifestTypeOrManifestBase,
 } from '@umbraco-cms/backoffice/extension-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbExtensionClassInitializer<
 	ExtensionType extends string = string,
 	ExtensionManifest extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ExtensionType>,
 	ExtensionClassInterface = ExtensionManifest extends ManifestClass ? ExtensionManifest['CLASS_TYPE'] : unknown
-> {
-	#observable;
+> extends UmbController {
 	#currentPromise?: Promise<ExtensionClassInterface | undefined>;
 	#currentPromiseResolver?: (value: ExtensionClassInterface | undefined) => void;
+	#currentClass?: ExtensionClassInterface;
 
 	constructor(
 		host: UmbControllerHostElement,
@@ -24,16 +23,20 @@ export class UmbExtensionClassInitializer<
 		extensionAlias: string,
 		callback: (extensionClass: ExtensionClassInterface | undefined) => void
 	) {
+		super(host);
 		const source = umbExtensionsRegistry.getByTypeAndAlias(extensionType, extensionAlias);
 		//TODO: The promise can probably be done in a cleaner way.
-		this.#observable = new UmbObserverController(host, source, async (manifest) => {
+		this.observe(source, async (manifest) => {
 			if (!manifest) return;
 
 			try {
-				const initializedClass = await createExtensionClass<ExtensionClassInterface>(manifest, [host]);
-				callback(initializedClass);
+				// Destroy the previous class if it exists, and if destroy method is an method on the class.
+				(this.#currentClass as any)?.destroy?.();
+
+				this.#currentClass = await createExtensionClass<ExtensionClassInterface>(manifest, [host]);
+				callback(this.#currentClass);
 				if (this.#currentPromiseResolver) {
-					this.#currentPromiseResolver(initializedClass);
+					this.#currentPromiseResolver(this.#currentClass);
 					this.#currentPromise = undefined;
 					this.#currentPromiseResolver = undefined;
 				}
@@ -48,5 +51,11 @@ export class UmbExtensionClassInitializer<
 			this.#currentPromiseResolver = resolve;
 		});
 		return this.#currentPromise;
+	}
+
+	public destroy(): void {
+		super.destroy();
+		// Destroy the current class if it exists, and if destroy method is an method on the class.
+		(this.#currentClass as any)?.destroy?.();
 	}
 }
