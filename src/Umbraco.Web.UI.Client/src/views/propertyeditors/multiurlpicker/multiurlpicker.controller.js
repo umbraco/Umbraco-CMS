@@ -21,12 +21,18 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
 
     $scope.renderModel = [];
 
-    if ($scope.model.config && parseInt($scope.model.config.maxNumber) !== 1 && $scope.umbProperty) {
-        var propertyActions = [
-          removeAllEntriesAction
-        ];
+    if ($scope.model.config) {
 
-        $scope.umbProperty.setPropertyActions(propertyActions);
+        $scope.minNumberOfItems = $scope.model.config.minNumber ? parseInt($scope.model.config.minNumber) : 0;
+        $scope.maxNumberOfItems = $scope.model.config.maxNumber ? parseInt($scope.model.config.maxNumber) : 0;
+
+        if ($scope.umbProperty && $scope.maxNumberOfItems !== 1) {
+            let propertyActions = [
+               removeAllEntriesAction
+            ];
+
+            $scope.umbProperty.setPropertyActions(propertyActions);
+        }
     }
 
     if (!Array.isArray($scope.model.value)) {
@@ -41,7 +47,7 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
         tolerance: "pointer",
         scroll: true,
         zIndex: 6000,
-        disabled: $scope.readonly,
+        disabled: $scope.readonly || $scope.maxNumberOfItems === 1,
         update: function () {
             setDirty();
         }

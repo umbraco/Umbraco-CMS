@@ -2059,7 +2059,7 @@
     <key alias="usergroup">Benutzergruppe</key>
     <key alias="userInvited">wurde eingeladen</key>
     <key alias="userInvitedSuccessHelp">Eine Einladung mit Anweisungen zur Anmeldung im Umbraco-Back-Office wurde dem neuen Benutzer zugeschickt.</key>
-    <key alias="userinviteWelcomeMessage">Hallo und Willkommen bei Umbraco! In nur einer Minute sind Sie bereit loszulegen, Sie müssen nur ein Kennwort festlegen und optinal Ihrem Avatar ein Bild hinzufügen.</key>
+    <key alias="userinviteWelcomeMessage">Hallo und Willkommen bei Umbraco! In nur einer Minute sind Sie bereit loszulegen, Sie müssen nur ein Kennwort festlegen und optional Ihrem Avatar ein Bild hinzufügen.</key>
     <key alias="userinviteExpiredMessage">Willkommen bei Umbraco! Bedauerlicherweise ist Ihre Einladung verfallen. Bitte kontaktieren Sie Ihren Administrator und bitten Sie ihn, diese erneut zu schicken.</key>
     <key alias="userinviteAvatarMessage">Laden Sie ein Foto von sich hoch, um es anderen Benutzern zu erleichtern, sie zu erkennen. Klicken Sie auf den Kreis oben, um Ihr Foto hochzuladen.</key>
     <key alias="writer">Autor</key>
