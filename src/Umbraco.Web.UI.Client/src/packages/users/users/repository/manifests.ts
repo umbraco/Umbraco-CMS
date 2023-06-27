@@ -1,23 +1,27 @@
 import { UmbUserRepository } from '../repository/user.repository.js';
+import { UmbUserItemStore } from './user-item.store.js';
 import { UmbUserStore } from './user.store.js';
-import type { ManifestStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
-
-export const USER_REPOSITORY_ALIAS = 'Umb.Repository.User';
+import type { ManifestStore, ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
 
 const repository: ManifestRepository = {
 	type: 'repository',
-	alias: USER_REPOSITORY_ALIAS,
+	alias: 'Umb.Repository.User',
 	name: 'User Repository',
 	class: UmbUserRepository,
 };
 
-export const USER_STORE_ALIAS = 'Umb.Store.User';
-
 const store: ManifestStore = {
 	type: 'store',
-	alias: USER_STORE_ALIAS,
+	alias: 'Umb.Store.User',
 	name: 'User Store',
 	class: UmbUserStore,
 };
 
-export const manifests = [repository, store];
+const itemStore: ManifestItemStore = {
+	type: 'itemStore',
+	alias: 'Umb.ItemStore.User',
+	name: 'User Store',
+	class: UmbUserItemStore,
+};
+
+export const manifests = [repository, store, itemStore];
