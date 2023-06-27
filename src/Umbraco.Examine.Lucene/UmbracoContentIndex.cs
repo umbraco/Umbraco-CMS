@@ -41,6 +41,7 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
         if (namedOptions.Validator is IContentValueSetValidator contentValueSetValidator)
         {
             PublishedValuesOnly = contentValueSetValidator.PublishedValuesOnly;
+            SupportProtectedContent = contentValueSetValidator.SupportProtectedContent;
         }
     }
 
