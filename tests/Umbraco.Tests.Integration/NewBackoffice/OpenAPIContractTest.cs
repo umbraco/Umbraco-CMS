@@ -7,7 +7,9 @@ using Umbraco.Cms.Api.Management;
 using Umbraco.Cms.Api.Management.Controllers.Install;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Persistence.EFCore.Composition;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
+using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Cms.Tests.Integration.NewBackoffice;
 
@@ -27,6 +29,17 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
         });
 
         new ManagementApiComposer().Compose(builder);
+        new UmbracoEFCoreComposer().Compose(builder);
+
+        // Currently we cannot do this in tests, as EF Core is not initialized
+        builder.Services.PostConfigure<UmbracoPipelineOptions>(options =>
+        {
+            var backofficePipelineFilter = options.PipelineFilters.FirstOrDefault(x => x.Name.Equals("Backoffice"));
+            if (backofficePipelineFilter != null)
+            {
+                options.PipelineFilters.Remove(backofficePipelineFilter);
+            }
+        });
     }
 
     [Test]
