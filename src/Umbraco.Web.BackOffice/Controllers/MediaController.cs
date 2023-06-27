@@ -579,9 +579,9 @@ public class MediaController : ContentControllerBase
         Directory.CreateDirectory(root);
 
         //must have a file
-        if (file.Count == 0)
+        if (file is null || file.Count == 0)
         {
-            return NotFound();
+            return NotFound("No file was uploaded");
         }
 
         //get the string json from the request
