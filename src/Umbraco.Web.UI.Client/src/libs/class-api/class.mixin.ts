@@ -1,8 +1,8 @@
-import type { UmbControllerHost } from '../controller-api/controller-host.interface.js';
 import type { UmbClassMixinInterface } from './class.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import {
+	type UmbControllerHost,
 	UmbControllerHostBaseDeclaration,
 	UmbControllerHostBaseMixin,
 	UmbControllerInterface,
