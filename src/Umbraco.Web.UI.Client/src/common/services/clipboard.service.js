@@ -344,10 +344,14 @@ function clipboardService($window, notificationsService, eventsService, localSto
         // Clean up each entry
         var copiedDatas = datas.map(data => prepareEntryForStorage(type, data, firstLevelClearupMethod));
 
-        // remove previous copies of this entry:
+        // remove previous copies of this entry (Make sure to not remove copies from unsaved content):
         storage.entries = storage.entries.filter(
             (entry) => {
-                return entry.unique !== uniqueKey;
+                if (entry.unique === 0) {
+                    return displayLabel !== entry.label;
+                } else {
+                    return entry.unique !== uniqueKey;
+                }
             }
         );
 
