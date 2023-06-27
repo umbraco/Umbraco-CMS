@@ -1,13 +1,13 @@
-import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbPropertyActionMenuContext {
-	#isOpen = new UmbDeepState(false);
+export class UmbPropertyActionMenuContext extends UmbController {
+	#isOpen = new UmbBooleanState(false);
 	public readonly isOpen = this.#isOpen.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		new UmbContextProviderController(host, 'umbPropertyActionMenu', this);
+		super(host);
+		this.provideContext('umbPropertyActionMenu', this);
 	}
 
 	toggle() {
