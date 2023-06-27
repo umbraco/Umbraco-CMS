@@ -1,9 +1,9 @@
 export const name = 'Umbraco.Core.TranslationManagement';
 export const extensions = [
 	{
-		name: 'Translation Entry Point',
-		alias: 'Umb.EntryPoint.Translation',
-		type: 'entryPoint',
-		loader: () => import('./index.js'),
+		name: 'Translation Management Bundle',
+		alias: 'Umb.Bundle.TranslationManagement',
+		type: 'bundle',
+		loader: () => import('./manifests.js'),
 	},
 ];
