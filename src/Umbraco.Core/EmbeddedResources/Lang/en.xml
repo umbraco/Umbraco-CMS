@@ -488,7 +488,7 @@
     <key alias="insertlink">Insert link</key>
     <key alias="insertMacro">Click to add a Macro</key>
     <key alias="inserttable">Insert table</key>
-    <key alias="languagedeletewarning">This will delete the language</key>
+    <key alias="languagedeletewarning">This will delete the language and all content related to the language</key>
     <key alias="languageChangeWarning">Changing the culture for a language may be an expensive operation and will result
       in the content cache and indexes being rebuilt
     </key>
@@ -2275,7 +2275,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="items">items</key>
     <key alias="urls">URL(s)</key>
     <key alias="urlsSelected">URL(s) selected</key>
-    <key alias="itemsSelected">items selected</key>
+    <key alias="itemsSelected">item(s) selected</key>
     <key alias="invalidDate">Invalid date</key>
     <key alias="invalidNumber">Not a number</key>
     <key alias="invalidNumberStepSize">Not a valid numeric step size</key>

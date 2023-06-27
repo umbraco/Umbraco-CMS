@@ -17,8 +17,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 [TestFixture]
 public class MarkdownEditorValueConverterTests : PropertyValueConverterTests
 {
-    [TestCase("hello world", "<p>hello world</p>")]
-    [TestCase("hello *world*", "<p>hello <em>world</em></p>")]
+    [TestCase("hello world", "hello world")]
+    [TestCase("hello *world*", "hello *world*")]
     [TestCase("", "")]
     [TestCase(null, "")]
     [TestCase(123, "")]
