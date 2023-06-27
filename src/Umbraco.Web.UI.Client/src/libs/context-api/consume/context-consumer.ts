@@ -7,48 +7,50 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  * @class UmbContextConsumer
  */
 export class UmbContextConsumer<T = unknown> {
-	_promise?: Promise<T>;
-	_promiseResolver?: (instance: T) => void;
+	#callback?: UmbContextCallback<T>;
+	#promise?: Promise<T>;
+	#promiseResolver?: (instance: T) => void;
 
-	private _instance?: T;
+	#instance?: T;
 	get instance() {
-		return this._instance;
+		return this.#instance;
 	}
 
-	private _contextAlias: string;
+	#contextAlias: string;
 	get consumerAlias(): string {
-		return this._contextAlias;
+		return this.#contextAlias;
 	}
 
 	/**
 	 * Creates an instance of UmbContextConsumer.
 	 * @param {EventTarget} hostElement
-	 * @param {string} _contextAlias
+	 * @param {string} contextAlias
 	 * @param {UmbContextCallback} _callback
 	 * @memberof UmbContextConsumer
 	 */
 	constructor(
 		protected hostElement: EventTarget,
-		_contextAlias: string | UmbContextToken<T>,
-		private _callback?: UmbContextCallback<T>
+		contextAlias: string | UmbContextToken<T>,
+		callback?: UmbContextCallback<T>
 	) {
-		this._contextAlias = _contextAlias.toString();
+		this.#contextAlias = contextAlias.toString();
+		this.#callback = callback;
 	}
 
 	protected _onResponse = (instance: T) => {
-		if (this._instance === instance) {
+		if (this.#instance === instance) {
 			return;
 		}
-		this._instance = instance;
-		this._callback?.(instance);
-		this._promiseResolver?.(instance);
+		this.#instance = instance;
+		this.#callback?.(instance);
+		this.#promiseResolver?.(instance);
 	};
 
 	public asPromise() {
 		return (
-			this._promise ||
-			(this._promise = new Promise<T>((resolve) => {
-				this._instance ? resolve(this._instance) : (this._promiseResolver = resolve);
+			this.#promise ||
+			(this.#promise = new Promise<T>((resolve) => {
+				this.#instance ? resolve(this.#instance) : (this.#promiseResolver = resolve);
 			}))
 		);
 	}
@@ -57,7 +59,7 @@ export class UmbContextConsumer<T = unknown> {
 	 * @memberof UmbContextConsumer
 	 */
 	public request() {
-		const event = new UmbContextRequestEventImplementation(this._contextAlias, this._onResponse);
+		const event = new UmbContextRequestEventImplementation(this.#contextAlias, this._onResponse);
 		this.hostElement.dispatchEvent(event);
 	}
 
@@ -75,16 +77,17 @@ export class UmbContextConsumer<T = unknown> {
 	private _handleNewProvider = (event: Event) => {
 		if (!isUmbContextProvideEventType(event)) return;
 
-		if (this._contextAlias === event.contextAlias) {
+		if (this.#contextAlias === event.contextAlias) {
 			this.request();
 		}
 	};
 
 	// TODO: Test destroy scenarios:
 	public destroy() {
-		delete this._instance;
-		delete this._callback;
-		delete this._promise;
-		delete this._promiseResolver;
+		this.hostDisconnected();
+		this.#callback = undefined;
+		this.#promise = undefined;
+		this.#promiseResolver = undefined;
+		this.#instance = undefined;
 	}
 }
