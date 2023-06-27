@@ -2000,7 +2000,7 @@ internal class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<NodePermissions>> GetPermissionsAsync(Guid userKey, IEnumerable<Guid> nodeKeys)
+    public async Task<IEnumerable<NodePermissions>> GetPermissionsAsync(Guid userKey, params Guid[] nodeKeys)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 

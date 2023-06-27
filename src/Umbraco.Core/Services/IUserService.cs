@@ -209,7 +209,7 @@ public interface IUserService : IMembershipUserService
     /// <param name="userKey">Key of user to retrieve permissions for. </param>
     /// <param name="nodeKeys">The keys of the nodes to get permissions for.</param>
     /// <returns>An enumerable list of <see cref="NodePermissions"/>.</returns>
-    Task<IEnumerable<NodePermissions>> GetPermissionsAsync(Guid userKey, IEnumerable<Guid> nodeKeys);
+    Task<IEnumerable<NodePermissions>> GetPermissionsAsync(Guid userKey, params Guid[] nodeKeys);
 
     /// <summary>
     /// Get explicitly assigned content permissions for a user and node keys.

@@ -31,7 +31,7 @@ public class GetPermissionsCurrentUserController : CurrentUserControllerBase
     [ProducesResponseType(typeof(IEnumerable<UserPermissionsResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetPermissions([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
-        IEnumerable<NodePermissions> permissions = await _userService.GetPermissionsAsync(CurrentUserKey(_backOfficeSecurityAccessor), ids);
+        IEnumerable<NodePermissions> permissions = await _userService.GetPermissionsAsync(CurrentUserKey(_backOfficeSecurityAccessor), ids.ToArray());
         List<UserPermissionViewModel> viewmodels = _mapper.MapEnumerable<NodePermissions, UserPermissionViewModel>(permissions);
 
         return Ok(new UserPermissionsResponseModel { Permissions = viewmodels });
