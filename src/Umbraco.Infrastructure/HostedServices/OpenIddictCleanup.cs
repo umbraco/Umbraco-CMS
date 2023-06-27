@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices;
 
@@ -14,17 +16,24 @@ public class OpenIddictCleanup : RecurringHostedServiceBase
 
     private readonly ILogger<OpenIddictCleanup> _logger;
     private readonly IServiceProvider _provider;
+    private readonly IRuntimeState _runtimeState;
 
     public OpenIddictCleanup(
-        ILogger<OpenIddictCleanup> logger, IServiceProvider provider)
+        ILogger<OpenIddictCleanup> logger, IServiceProvider provider, IRuntimeState runtimeState)
         : base(logger, TimeSpan.FromHours(1), TimeSpan.FromMinutes(5))
     {
         _logger = logger;
         _provider = provider;
+        _runtimeState = runtimeState;
     }
 
     public override async Task PerformExecuteAsync(object? state)
     {
+        if (_runtimeState.Level < RuntimeLevel.Run)
+        {
+            return;
+        }
+
         // hosted services are registered as singletons, but this particular one consumes scoped services... so
         // we have to fetch the service dependencies manually using a new scope per invocation.
         IServiceScope scope = _provider.CreateScope();
