@@ -1,8 +1,6 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using OpenIddict.Validation.AspNetCore;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -11,7 +9,6 @@ using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Security;
-using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
