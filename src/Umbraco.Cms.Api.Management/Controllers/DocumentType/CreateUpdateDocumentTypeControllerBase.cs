@@ -27,7 +27,7 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
         _templateService = templateService;
     }
 
-    protected ContentTypeOperationStatus HandleRequest<TRequestModel, TPropertyType, TPropertyTypeContainer>(IContentType contentType, TRequestModel requestModel)
+    protected async Task<ContentTypeOperationStatus> HandleRequest<TRequestModel, TPropertyType, TPropertyTypeContainer>(IContentType contentType, TRequestModel requestModel)
         where TRequestModel : ContentTypeModelBase<TPropertyType, TPropertyTypeContainer>, IDocumentTypeRequestModel
         where TPropertyType : PropertyTypeModelBase
         where TPropertyTypeContainer : PropertyTypeContainerModelBase
@@ -66,13 +66,10 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
 
         // validate property data types exists.
         Guid[] dataTypeKeys = requestModel.Properties.Select(property => property.DataTypeId).ToArray();
-        var dataTypesByKey = dataTypeKeys
-            // FIXME: create GetAllAsync(params Guid[] keys) method on IDataTypeService
-            .Select(async key => await _dataTypeService.GetAsync(key))
-            .Select(t => t.Result)
-            .WhereNotNull()
-            .ToDictionary(dataType => dataType.Key);
-        if (dataTypeKeys.Length != dataTypesByKey.Count())
+        Dictionary<Guid, IDataType> dataTypesByKey = (await _dataTypeService.GetAllAsync(dataTypeKeys))
+            .ToDictionary(x => x.Key);
+
+        if (dataTypeKeys.Length != dataTypesByKey.Count)
         {
             return ContentTypeOperationStatus.InvalidDataType;
         }

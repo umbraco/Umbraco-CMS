@@ -36,7 +36,7 @@ public class UpdateDocumentTypeController : CreateUpdateDocumentTypeControllerBa
             return NotFound();
         }
 
-        ContentTypeOperationStatus result = HandleRequest<UpdateDocumentTypeRequestModel, UpdateDocumentTypePropertyTypeRequestModel, UpdateDocumentTypePropertyTypeContainerRequestModel>(contentType, requestModel);
+        ContentTypeOperationStatus result = await HandleRequest<UpdateDocumentTypeRequestModel, UpdateDocumentTypePropertyTypeRequestModel, UpdateDocumentTypePropertyTypeContainerRequestModel>(contentType, requestModel);
 
         return result == ContentTypeOperationStatus.Success
             ? Ok()

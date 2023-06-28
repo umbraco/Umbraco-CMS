@@ -34,7 +34,7 @@ public class CreateDocumentTypeController : CreateUpdateDocumentTypeControllerBa
         }
 
         IContentType contentType = new ContentType(_shortStringHelper, parentId);
-        ContentTypeOperationStatus result = HandleRequest<CreateDocumentTypeRequestModel, CreateDocumentTypePropertyTypeRequestModel, CreateDocumentTypePropertyTypeContainerRequestModel>(contentType, requestModel);
+        ContentTypeOperationStatus result = await HandleRequest<CreateDocumentTypeRequestModel, CreateDocumentTypePropertyTypeRequestModel, CreateDocumentTypePropertyTypeContainerRequestModel>(contentType, requestModel);
 
         return result == ContentTypeOperationStatus.Success
             ? CreatedAtAction<ByKeyDocumentTypeController>(controller => nameof(controller.ByKey), contentType.Key)
