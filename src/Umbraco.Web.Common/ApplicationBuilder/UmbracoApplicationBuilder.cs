@@ -75,7 +75,7 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
 
         AppBuilder.UseUmbracoBackOfficeRewrites();
 
-        AppBuilder.UseStaticFiles();
+        AppBuilder.UseUmbracoStaticFiles();
 
         AppBuilder.UseUmbracoPluginsStaticFiles();
 

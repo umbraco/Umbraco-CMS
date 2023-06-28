@@ -114,6 +114,25 @@ public static class ApplicationBuilderExtensions
     }
 
     /// <summary>
+    ///     Allow static file access from wwwroot with recommended Cache-Control for Umbraco static files
+    /// </summary>
+    public static IApplicationBuilder UseUmbracoStaticFiles(this IApplicationBuilder app)
+    {
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            OnPrepareResponse = ctx =>
+            {
+                if (ctx.Context.Request.IsBackOfficeRequest())
+                {
+                    ctx.Context.Response.Headers.CacheControl = "public, max-age=31536000, immutable";
+                }
+            },
+        });
+
+        return app;
+    }
+
+    /// <summary>
     ///     Allow static file access for App_Plugins folders
     /// </summary>
     public static IApplicationBuilder UseUmbracoPluginsStaticFiles(this IApplicationBuilder app)
