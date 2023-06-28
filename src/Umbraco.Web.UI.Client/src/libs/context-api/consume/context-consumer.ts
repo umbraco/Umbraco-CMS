@@ -17,9 +17,6 @@ export class UmbContextConsumer<T = unknown> {
 	}
 
 	#contextAlias: string;
-	get consumerAlias(): string {
-		return this.#contextAlias;
-	}
 
 	/**
 	 * Creates an instance of UmbContextConsumer.
