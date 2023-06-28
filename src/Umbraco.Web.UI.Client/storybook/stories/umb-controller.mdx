@@ -1,11 +1,11 @@
 import { Meta } from '@storybook/addon-docs';
 
-<Meta title="Guides/Umbraco Element" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
+<Meta title="Guides/Umbraco Controller" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
 
-# Umbraco Element
+# Umbraco Controller
 
-This element can be used as the base of any element.
-This will enable Controllers to be hosted at this element. Additionally it provides few shortcut methods for initializing core Umbraco Controllers.
+This class can be used as the base of any class.
+This will enable Controllers to be hosted in this class. Additionally it provides few shortcut methods for initializing core Umbraco Controllers.
 
 ```ts
 observe<T>(source: Observable<T>, callback: (_value: T) => void, unique?: string): UmbObserverController<T>
