@@ -6,7 +6,7 @@ import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/c
 export class UmbContextConsumerController<T = unknown> extends UmbContextConsumer<T> implements UmbController {
 	#host: UmbControllerHost;
 
-	public get unique() {
+	public get controllerAlias() {
 		return undefined;
 	}
 

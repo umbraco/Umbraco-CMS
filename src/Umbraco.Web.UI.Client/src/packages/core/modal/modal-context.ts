@@ -61,7 +61,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
 
-	public get unique() {
+	public get controllerAlias() {
 		return 'umbModalContext:' + this.key;
 	}
 

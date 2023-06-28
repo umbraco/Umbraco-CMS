@@ -137,7 +137,7 @@ export class UmbSorterController<T> implements UmbController {
 
 	private _lastIndicationContainerVM: UmbSorterController<T> | null = null;
 
-	public get unique() {
+	public get controllerAlias() {
 		return this.#config.identifier;
 	}
 
@@ -427,7 +427,7 @@ export class UmbSorterController<T> implements UmbController {
 					: null;
 				if (parentContainer) {
 					const parentContainerVM = (parentContainer as any)['__umbBlockGridSorterController']();
-					if (parentContainerVM.unique === this.unique) {
+					if (parentContainerVM.unique === this.controllerAlias) {
 						this.#currentContainerElement = parentContainer as Element;
 						this.#currentContainerVM = parentContainerVM;
 						if (this.#config.onContainerChange) {
@@ -516,7 +516,7 @@ export class UmbSorterController<T> implements UmbController {
 					const subOffsetEdge = subContainerHasItems ? -10 : 20;
 					if (isWithinRect(this.#dragX, this.#dragY, subBoundaryRect, subOffsetEdge)) {
 						const subVm = (subLayoutEl as any)['__umbBlockGridSorterController']();
-						if (subVm.unique === this.unique) {
+						if (subVm.unique === this.controllerAlias) {
 							this.#currentContainerElement = subLayoutEl as HTMLElement;
 							this.#currentContainerVM = subVm;
 							if (this.#config.onContainerChange) {

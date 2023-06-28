@@ -6,7 +6,7 @@ export declare class UmbControllerHostBaseDeclaration implements Omit<UmbControl
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;
-	removeControllerByUnique(unique: UmbController['unique']): void;
+	removeControllerByUnique(unique: UmbController['controllerAlias']): void;
 	removeController(controller: UmbController): void;
 
 	hostConnected(): void;
@@ -49,7 +49,7 @@ export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(supe
 		 */
 		addController(ctrl: UmbController): void {
 			// Check if there is one already with same unique
-			this.removeControllerByUnique(ctrl.unique);
+			this.removeControllerByUnique(ctrl.controllerAlias);
 
 			this.#controllers.push(ctrl);
 			if (this.#attached) {
@@ -63,10 +63,10 @@ export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(supe
 		 * Remove a controller from this element, by its unique/alias.
 		 * @param {unknown} unique/alias
 		 */
-		removeControllerByUnique(unique: UmbController['unique']): void {
+		removeControllerByUnique(unique: UmbController['controllerAlias']): void {
 			if (unique) {
 				this.#controllers.forEach((x) => {
-					if (x.unique === unique) {
+					if (x.controllerAlias === unique) {
 						this.removeController(x);
 					}
 				});
@@ -96,7 +96,7 @@ export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(supe
 		 */
 		removeControllerByAlias(unique: string): void {
 			this.#controllers.forEach((x) => {
-				if (x.unique === unique) {
+				if (x.controllerAlias === unique) {
 					this.removeController(x);
 				}
 			});

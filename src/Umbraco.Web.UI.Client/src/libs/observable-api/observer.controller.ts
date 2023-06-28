@@ -4,7 +4,7 @@ import { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/contro
 
 export class UmbObserverController<T = unknown> extends UmbObserver<T> implements UmbController {
 	_alias?: string;
-	public get unique() {
+	public get controllerAlias() {
 		return this._alias;
 	}
 

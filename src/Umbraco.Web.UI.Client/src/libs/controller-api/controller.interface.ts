@@ -1,5 +1,5 @@
 export interface UmbController {
-	get unique(): string | undefined;
+	get controllerAlias(): string | undefined;
 	hostConnected(): void;
 	hostDisconnected(): void;
 	destroy(): void;

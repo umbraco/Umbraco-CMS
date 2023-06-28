@@ -14,7 +14,7 @@ import {
 } from '@umbraco-cms/backoffice/context-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-type UmbClassMixinConstructor = new (host: UmbControllerHost) => UmbClassMixinDeclaration;
+type UmbClassMixinConstructor = new (host: UmbControllerHost, unique: string | undefined) => UmbClassMixinDeclaration;
 
 declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 	_host: UmbControllerHost;
@@ -31,11 +31,11 @@ declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;
-	removeControllerByUnique(unique: UmbController['unique']): void;
+	removeControllerByUnique(unique: UmbController['controllerAlias']): void;
 	removeController(controller: UmbController): void;
 	getElement(): EventTarget;
 
-	get unique(): string | undefined;
+	get controllerAlias(): UmbController['controllerAlias'];
 	hostConnected(): void;
 	hostDisconnected(): void;
 	destroy(): void;
@@ -44,9 +44,9 @@ declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 	class UmbClassMixinClass extends UmbControllerHostBaseMixin(superClass) implements UmbControllerHost {
 		protected _host: UmbControllerHost;
-		protected _unique: string | undefined;
+		protected _unique: UmbController['controllerAlias'];
 
-		constructor(host: UmbControllerHost, unique: string | undefined) {
+		constructor(host: UmbControllerHost, unique: UmbController['controllerAlias']) {
 			super();
 			this._host = host;
 			this._unique = unique ?? undefined; // ?? Symbol();

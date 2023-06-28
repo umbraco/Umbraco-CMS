@@ -8,14 +8,8 @@ import { UmbController } from './controller.interface.js';
  *
  */
 export class UmbBaseController extends UmbClassMixin(class {}) implements UmbController {
-	private _controllerAlias?: string;
-	public get unique() {
-		return this._controllerAlias;
-	}
-
-	constructor(host: UmbControllerHost, alias?: string) {
-		super(host);
-		this._controllerAlias = alias;
+	constructor(host: UmbControllerHost, controllerAlias?: UmbController['controllerAlias']) {
+		super(host, controllerAlias);
 		this._host.addController(this);
 	}
 

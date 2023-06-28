@@ -7,7 +7,7 @@ export declare class UmbControllerHostElement extends HTMLElement implements Umb
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;
-	removeControllerByUnique(unique: UmbController['unique']): void;
+	removeControllerByUnique(unique: UmbController['controllerAlias']): void;
 	removeController(controller: UmbController): void;
 	getElement(): EventTarget;
 }

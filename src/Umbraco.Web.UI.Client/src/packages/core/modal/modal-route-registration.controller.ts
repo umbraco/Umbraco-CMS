@@ -19,7 +19,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	#routeContext?: typeof UMB_ROUTE_CONTEXT_TOKEN.TYPE;
 	#modalRegistration?: UmbModalRouteRegistration;
 
-	public get unique() {
+	public get controllerAlias() {
 		return undefined;
 	}
 

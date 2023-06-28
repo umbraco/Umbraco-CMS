@@ -27,7 +27,7 @@ describe('UmbContextProviderController', () => {
 				expect(provider).to.have.property('unique');
 			});
 			it('has a unique property, is equal to the unique', () => {
-				expect(provider.unique).to.eq('my-test-context');
+				expect(provider.controllerAlias).to.eq('my-test-context');
 			});
 		});
 
