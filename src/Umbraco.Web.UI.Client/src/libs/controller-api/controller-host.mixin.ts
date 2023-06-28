@@ -1,4 +1,5 @@
 import { HTMLElementConstructor } from '../extension-api/types.js';
+import { UmbControllerAlias } from './controller-alias.type.js';
 import { UmbControllerHostBaseMixin } from './controller-host-base.mixin.js';
 import { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbController } from './controller.interface.js';
@@ -7,7 +8,7 @@ export declare class UmbControllerHostElement extends HTMLElement implements Umb
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;
-	removeControllerByAlias(alias: UmbController['controllerAlias']): void;
+	removeControllerByAlias(alias: UmbControllerAlias): void;
 	removeController(controller: UmbController): void;
 	getElement(): EventTarget;
 }
