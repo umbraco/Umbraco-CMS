@@ -1,14 +1,19 @@
 import { UmbObserver } from './observer.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbController, UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbObserverController<T = unknown> extends UmbObserver<T> implements UmbController {
-	_alias?: string;
+	_alias?: UmbControllerAlias;
 	public get controllerAlias() {
 		return this._alias;
 	}
 
-	constructor(host: UmbControllerHost, source: Observable<T>, callback: (_value: T) => void, alias?: string) {
+	constructor(
+		host: UmbControllerHost,
+		source: Observable<T>,
+		callback: (_value: T) => void,
+		alias?: UmbControllerAlias
+	) {
 		super(source, callback);
 		this._alias = alias;
 

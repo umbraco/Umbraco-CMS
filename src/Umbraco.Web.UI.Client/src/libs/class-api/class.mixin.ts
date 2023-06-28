@@ -5,6 +5,7 @@ import {
 	type UmbControllerHost,
 	UmbControllerHostBaseMixin,
 	UmbController,
+	UmbControllerAlias,
 } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbContextToken,
@@ -14,14 +15,17 @@ import {
 } from '@umbraco-cms/backoffice/context-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-type UmbClassMixinConstructor = new (host: UmbControllerHost, unique: string | undefined) => UmbClassMixinDeclaration;
+type UmbClassMixinConstructor = new (
+	host: UmbControllerHost,
+	controllerAlias: UmbControllerAlias
+) => UmbClassMixinDeclaration;
 
 declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 	_host: UmbControllerHost;
 	observe<T>(
 		source: Observable<T> | { asObservable: () => Observable<T> },
 		callback: (_value: T) => void,
-		unique?: string
+		controllerAlias?: UmbControllerAlias
 	): UmbObserverController<T>;
 	provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R>;
 	consumeContext<R = unknown>(
@@ -31,11 +35,11 @@ declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;
-	removeControllerByAlias(unique: UmbController['controllerAlias']): void;
+	removeControllerByAlias(controllerAlias: UmbControllerAlias): void;
 	removeController(controller: UmbController): void;
 	getElement(): EventTarget;
 
-	get controllerAlias(): UmbController['controllerAlias'];
+	get controllerAlias(): UmbControllerAlias;
 	hostConnected(): void;
 	hostDisconnected(): void;
 	destroy(): void;
@@ -44,20 +48,20 @@ declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 	class UmbClassMixinClass extends UmbControllerHostBaseMixin(superClass) implements UmbControllerHost {
 		protected _host: UmbControllerHost;
-		protected _unique: UmbController['controllerAlias'];
+		protected _controllerAlias: UmbControllerAlias;
 
-		constructor(host: UmbControllerHost, unique: UmbController['controllerAlias']) {
+		constructor(host: UmbControllerHost, controllerAlias: UmbControllerAlias) {
 			super();
 			this._host = host;
-			this._unique = unique ?? undefined; // ?? Symbol();
+			this._controllerAlias = controllerAlias ?? undefined; // ?? Symbol();
 		}
 
 		getElement(): EventTarget {
 			return this._host.getElement();
 		}
 
-		get unique(): string | undefined {
-			return this._unique;
+		get controllerAlias(): UmbControllerAlias {
+			return this._controllerAlias;
 		}
 
 		/**
@@ -70,39 +74,42 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 		observe<T>(
 			source: Observable<T> | { asObservable: () => Observable<T> },
 			callback: (_value: T) => void,
-			unique?: string
+			controllerAlias?: UmbControllerAlias
 		) {
 			return new UmbObserverController<T>(
 				this,
 				(source as any).asObservable ? (source as any).asObservable() : source,
 				callback,
-				unique
+				controllerAlias
 			);
 		}
 
 		/**
 		 * @description Provide a context API for this or child elements.
-		 * @param {string} alias
+		 * @param {string} contextAlias
 		 * @param {instance} instance The API instance to be exposed.
 		 * @return {UmbContextProviderController} Reference to a Context Provider Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R> {
-			return new UmbContextProviderController(this, alias, instance);
+		provideContext<R = unknown>(
+			contextAlias: string | UmbContextToken<R>,
+			instance: R
+		): UmbContextProviderController<R> {
+			return new UmbContextProviderController(this, contextAlias, instance);
 		}
 
 		/**
 		 * @description Setup a subscription for a context. The callback is called when the context is resolved.
-		 * @param {string} alias
+		 * @param {string} contextAlias
 		 * @param {method} callback Callback method called when context is resolved.
 		 * @return {UmbContextConsumerController} Reference to a Context Consumer Controller instance
 		 * @memberof UmbElementMixin
 		 */
 		consumeContext<R = unknown>(
-			alias: string | UmbContextToken<R>,
+			contextAlias: string | UmbContextToken<R>,
 			callback: UmbContextCallback<R>
 		): UmbContextConsumerController<R> {
-			return new UmbContextConsumerController(this, alias, callback);
+			return new UmbContextConsumerController(this, contextAlias, callback);
 		}
 	}
 
