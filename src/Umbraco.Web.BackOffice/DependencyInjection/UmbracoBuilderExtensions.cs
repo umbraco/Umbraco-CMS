@@ -20,6 +20,7 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.BackOffice.SignalR;
 using Umbraco.Cms.Web.BackOffice.Trees;
+using Umbraco.Cms.Web.Common.Hosting;
 
 namespace Umbraco.Extensions;
 
