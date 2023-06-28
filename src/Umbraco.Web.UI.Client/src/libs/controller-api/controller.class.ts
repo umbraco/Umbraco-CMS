@@ -7,7 +7,7 @@ import { UmbController } from './controller.interface.js';
  * This enables controllers to be added to the life cycle of this element.
  *
  */
-export class UmbBaseController extends UmbClassMixin(class {}) implements UmbController {
+export abstract class UmbBaseController extends UmbClassMixin(class {}) implements UmbController {
 	constructor(host: UmbControllerHost, controllerAlias?: UmbController['controllerAlias']) {
 		super(host, controllerAlias);
 		this._host.addController(this);
