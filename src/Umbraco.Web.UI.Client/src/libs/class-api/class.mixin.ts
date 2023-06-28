@@ -37,7 +37,7 @@ declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 	addController(controller: UmbController): void;
 	removeControllerByAlias(controllerAlias: UmbControllerAlias): void;
 	removeController(controller: UmbController): void;
-	getElement(): EventTarget;
+	getHostElement(): EventTarget;
 
 	get controllerAlias(): UmbControllerAlias;
 	hostConnected(): void;
@@ -56,8 +56,8 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 			this._controllerAlias = controllerAlias ?? undefined; // ?? Symbol();
 		}
 
-		getElement(): EventTarget {
-			return this._host.getElement();
+		getHostElement(): EventTarget {
+			return this._host.getHostElement();
 		}
 
 		get controllerAlias(): UmbControllerAlias {

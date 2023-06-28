@@ -36,8 +36,8 @@ describe('UmbController', () => {
 
 	describe('Public API', () => {
 		describe('methods', () => {
-			it('has an getElement method', () => {
-				expect(hostElement).to.have.property('getElement').that.is.a('function');
+			it('has an getHostElement method', () => {
+				expect(hostElement).to.have.property('getHostElement').that.is.a('function');
 			});
 
 			/*

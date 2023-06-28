@@ -10,7 +10,7 @@ export class UmbContextProviderController<T = unknown> extends UmbContextProvide
 	}
 
 	constructor(host: UmbControllerHost, contextAlias: string | UmbContextToken<T>, instance: T) {
-		super(host.getElement(), contextAlias, instance);
+		super(host.getHostElement(), contextAlias, instance);
 		this.#host = host;
 
 		// If this API is already provided with this alias? Then we do not want to register this controller:

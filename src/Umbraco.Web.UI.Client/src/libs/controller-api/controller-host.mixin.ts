@@ -10,7 +10,7 @@ export declare class UmbControllerHostElement extends HTMLElement implements Umb
 	addController(controller: UmbController): void;
 	removeControllerByAlias(alias: UmbControllerAlias): void;
 	removeController(controller: UmbController): void;
-	getElement(): EventTarget;
+	getHostElement(): EventTarget;
 }
 
 /**
@@ -22,7 +22,7 @@ export declare class UmbControllerHostElement extends HTMLElement implements Umb
  */
 export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbControllerHostClass extends UmbControllerHostBaseMixin(superClass) implements UmbControllerHost {
-		getElement(): EventTarget {
+		getHostElement(): EventTarget {
 			return this;
 		}
 

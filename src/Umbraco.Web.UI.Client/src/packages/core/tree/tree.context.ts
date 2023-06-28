@@ -104,12 +104,12 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 	public select(unique: string | null) {
 		if (!this.getSelectable()) return;
 		this.#selectionManager.select(unique);
-		this._host.getElement().dispatchEvent(new CustomEvent('selected'));
+		this._host.getHostElement().dispatchEvent(new CustomEvent('selected'));
 	}
 
 	public deselect(unique: string | null) {
 		this.#selectionManager.deselect(unique);
-		this._host.getElement().dispatchEvent(new CustomEvent('selected'));
+		this._host.getHostElement().dispatchEvent(new CustomEvent('selected'));
 	}
 
 	public async requestTreeRoot() {

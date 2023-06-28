@@ -6,5 +6,5 @@ export declare class UmbControllerHost {
 	addController(controller: UmbController): void;
 	removeControllerByAlias(unique: UmbController['controllerAlias']): void;
 	removeController(controller: UmbController): void;
-	getElement(): EventTarget;
+	getHostElement(): EventTarget;
 }

@@ -12,7 +12,7 @@ export class UmbContextConsumerController<T = unknown> extends UmbContextConsume
 	}
 
 	constructor(host: UmbControllerHost, contextAlias: string | UmbContextToken<T>, callback: UmbContextCallback<T>) {
-		super(host.getElement(), contextAlias, callback);
+		super(host.getHostElement(), contextAlias, callback);
 		this.#host = host;
 		host.addController(this);
 	}
