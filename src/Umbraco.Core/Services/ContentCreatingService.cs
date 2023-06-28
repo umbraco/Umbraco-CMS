@@ -28,7 +28,7 @@ public class ContentCreatingService : IContentCreatingService
         // FIXME: When content gets a ContentTypeKey property, we no longer have to get the key from the entityService
         Attempt<Guid> contentTypeKeyAttempt = _entityService.GetKey(content.ContentTypeId, UmbracoObjectTypes.DocumentType);
 
-        if (contentTypeKeyAttempt.Success)
+        if (contentTypeKeyAttempt.Success is false)
         {
             return Attempt.FailWithStatus<PagedModel<IContentType>?, ContentCreatingOperationStatus>(ContentCreatingOperationStatus.ContentTypeNotFound, null);
         }
