@@ -1,14 +1,10 @@
 @using Microsoft.Extensions.Options
-@using Umbraco.Cms.Core.Configuration
 @using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Hosting
-@using Umbraco.Cms.Core.WebAssets
+@using Umbraco.Cms.Web.Common.Hosting
 @using Umbraco.Extensions
-@using UrlHelperExtensions = Umbraco.Extensions.UrlHelperExtensions
-@inject IUmbracoVersion UmbracoVersion
 @inject IHostingEnvironment HostingEnvironment
 @inject IOptions<GlobalSettings> GlobalSettings
-@inject IRuntimeMinifier RuntimeMinifier
 @inject IStaticFilePathGenerator StaticFilePathGenerator
 
 @{
@@ -44,6 +40,7 @@
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/tinymce", backofficeAssetsPath + "/external/tinymce/index.js")),
 
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/backend-api", backofficeAssetsPath + "/external/backend-api/index.js")),
+                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/class-api", backofficeAssetsPath + "/libs/class-api/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/context-api", backofficeAssetsPath + "/libs/context-api/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/controller-api", backofficeAssetsPath + "/libs/controller-api/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/element-api", backofficeAssetsPath + "/libs/element-api/index.js")),
