@@ -2,10 +2,10 @@ import { expect, fixture, html } from '@open-wc/testing';
 import { UmbContextConsumerController } from '../consume/context-consumer.controller.js';
 import { UmbContextProviderElement } from './context-provider.element.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
 @customElement('umb-test-context')
-export class UmbTestContextElement extends UmbControllerHostMixin(HTMLElement) {
+export class UmbTestContextElement extends UmbControllerHostElementMixin(HTMLElement) {
 	public value: string | null = null;
 	constructor() {
 		super();

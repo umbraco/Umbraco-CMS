@@ -20,8 +20,8 @@ export declare class UmbControllerHostElement extends HTMLElement implements Umb
  * @param {Object} superClass - superclass to be extended.
  * @mixin
  */
-export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superClass: T) => {
-	class UmbControllerHostClass extends UmbControllerHostBaseMixin(superClass) implements UmbControllerHost {
+export const UmbControllerHostElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
+	class UmbControllerHostElementClass extends UmbControllerHostBaseMixin(superClass) implements UmbControllerHost {
 		getHostElement(): EventTarget {
 			return this;
 		}
@@ -37,7 +37,7 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 		}
 	}
 
-	return UmbControllerHostClass as unknown as HTMLElementConstructor<UmbControllerHostElement> & T;
+	return UmbControllerHostElementClass as unknown as HTMLElementConstructor<UmbControllerHostElement> & T;
 };
 
 declare global {

@@ -1,10 +1,10 @@
 import { expect } from '@open-wc/testing';
-import { UmbControllerHostElement, UmbControllerHostMixin } from './controller-host.mixin.js';
+import { UmbControllerHostElement, UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
 import { UmbBaseController } from './controller.class.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('test-my-controller-host')
-export class UmbTestControllerHostElement extends UmbControllerHostMixin(HTMLElement) {}
+export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 export class UmbTestControllerImplementationElement extends UmbBaseController {
 	testIsConnected = false;

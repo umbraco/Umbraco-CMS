@@ -1,6 +1,6 @@
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
-import { UmbControllerHostMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbContextToken,
@@ -29,7 +29,7 @@ export declare class UmbElementMixinInterface extends UmbControllerHostElement {
 }
 
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
-	class UmbElementMixinClass extends UmbControllerHostMixin(superClass) implements UmbElementMixinInterface {
+	class UmbElementMixinClass extends UmbControllerHostElementMixin(superClass) implements UmbElementMixinInterface {
 		/**
 		 * @description Observe a RxJS source of choice.
 		 * @param {Observable<T>} source RxJS source
