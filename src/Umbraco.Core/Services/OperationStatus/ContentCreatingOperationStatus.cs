@@ -3,6 +3,6 @@
 public enum ContentCreatingOperationStatus
 {
     Success,
-    DocumentTypeNotFound,
+    ContentTypeNotFound,
     NotFound
 }

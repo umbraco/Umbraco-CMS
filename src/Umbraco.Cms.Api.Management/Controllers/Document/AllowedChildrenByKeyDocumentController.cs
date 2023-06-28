@@ -13,13 +13,13 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
 public class AllowedChildrenByKeyDocumentController : DocumentControllerBase
 {
-    private readonly IContentTypeService _contentTypeService;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IContentCreatingService _contentCreatingService;
 
-    public AllowedChildrenByKeyDocumentController(IContentTypeService contentTypeService, IUmbracoMapper umbracoMapper)
+    public AllowedChildrenByKeyDocumentController(IUmbracoMapper umbracoMapper, IContentCreatingService contentCreatingService)
     {
-        _contentTypeService = contentTypeService;
         _umbracoMapper = umbracoMapper;
+        _contentCreatingService = contentCreatingService;
     }
 
     [HttpGet("{id:guid}/allowed-document-types")]
@@ -28,18 +28,18 @@ public class AllowedChildrenByKeyDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AllowedChildrenByKey(Guid id, int skip = 0, int take = 100)
     {
-        Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> attempt = await _contentTypeService.GetAllowedChildrenAsync(id, skip, take);
+        Attempt<PagedModel<IContentType>?, ContentCreatingOperationStatus> allowedChildrenAttempt = await _contentCreatingService.GetAllowedChildrenAsync(id, skip, take);
 
-        if (attempt.Success is false)
+        if (allowedChildrenAttempt.Success is false)
         {
-            return ContentTypeOperationStatusResult(attempt.Status);
+            return ContentCreatingOperationStatusResult(allowedChildrenAttempt.Status);
         }
 
-        List<DocumentTypeResponseModel> viewModels = _umbracoMapper.MapEnumerable<IContentType, DocumentTypeResponseModel>(attempt.Result!.Items);
+        List<DocumentTypeResponseModel> viewModels = _umbracoMapper.MapEnumerable<IContentType, DocumentTypeResponseModel>(allowedChildrenAttempt.Result!.Items);
 
         var pagedViewModel = new PagedViewModel<DocumentTypeResponseModel>
         {
-            Total = attempt.Result.Items.Count(),
+            Total = allowedChildrenAttempt.Result.Items.Count(),
             Items = viewModels,
         };
 

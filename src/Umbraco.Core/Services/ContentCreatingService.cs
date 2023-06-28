@@ -30,13 +30,13 @@ public class ContentCreatingService : IContentCreatingService
 
         if (contentTypeKeyAttempt.Success)
         {
-            return Attempt.FailWithStatus<PagedModel<IContentType>?, ContentCreatingOperationStatus>(ContentCreatingOperationStatus.DocumentTypeNotFound, null);
+            return Attempt.FailWithStatus<PagedModel<IContentType>?, ContentCreatingOperationStatus>(ContentCreatingOperationStatus.ContentTypeNotFound, null);
         }
 
         Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> contentTypeAttempt = await _contentTypeService.GetAllowedChildrenAsync(contentTypeKeyAttempt.Result, skip, take);
 
         return contentTypeAttempt.Success
             ? Attempt.SucceedWithStatus(ContentCreatingOperationStatus.Success, contentTypeAttempt.Result)
-            : Attempt.FailWithStatus<PagedModel<IContentType>?, ContentCreatingOperationStatus>(ContentCreatingOperationStatus.DocumentTypeNotFound, null);
+            : Attempt.FailWithStatus<PagedModel<IContentType>?, ContentCreatingOperationStatus>(ContentCreatingOperationStatus.ContentTypeNotFound, null);
     }
 }
