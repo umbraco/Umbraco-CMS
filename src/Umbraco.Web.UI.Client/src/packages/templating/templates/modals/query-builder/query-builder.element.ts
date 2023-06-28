@@ -1,6 +1,6 @@
 import { UmbTemplateRepository } from '../../repository/template.repository.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUIComboboxListElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import {
 	UMB_DOCUMENT_PICKER_MODAL,
@@ -13,6 +13,7 @@ import {
 	TemplateQuerySettingsResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
+import { UmbButtonWithDropdownElement } from '@umbraco-cms/backoffice/components';
 
 export interface TemplateQueryBuilderModalData {
 	hidePartialViews?: boolean;
@@ -27,6 +28,9 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	TemplateQueryBuilderModalData,
 	TemplateQueryBuilderModalResult
 > {
+	@query('#content-type-dropdown')
+	private _contentTypeDropdown?: UmbButtonWithDropdownElement;
+
 	#close() {
 		this.modalContext?.reject();
 	}
@@ -40,14 +44,15 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	@state()
 	private _templateQuery?: TemplateQueryResultResponseModel;
 
-	#queryRequest: TemplateQueryExecuteModel = <TemplateQueryExecuteModel>{};
+	@state()
+	private _queryRequest: TemplateQueryExecuteModel = <TemplateQueryExecuteModel>{};
 
 	#updateQueryRequest(update: TemplateQueryExecuteModel) {
-		this.#queryRequest = { ...this.#queryRequest, ...update };
+		this._queryRequest = { ...this._queryRequest, ...update };
 	}
 
 	@state()
-	private _queryBuiilderSettings?: TemplateQuerySettingsResponseModel;
+	private _queryBuilderSettings?: TemplateQuerySettingsResponseModel;
 
 	@state()
 	private _selectedRootContentName = 'all pages';
@@ -74,13 +79,14 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	async #getTemplateQuerySettings() {
 		const { data, error } = await this.#templateRepository.getTemplateQuerySettings();
-		if (data) this._queryBuiilderSettings = data;
+		if (data) this._queryBuilderSettings = data;
 	}
 
 	async #postTemplateQuery() {
 		const { data, error } = await this.#templateRepository.postTemplateQueryExecute({
-			requestBody: this.#queryRequest,
+			requestBody: this._queryRequest,
 		});
+		console.log(this._queryRequest)
 		if (data) this._templateQuery = { ...data };
 	}
 
@@ -89,7 +95,6 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 			?.open(UMB_DOCUMENT_PICKER_MODAL)
 			.onSubmit()
 			.then((result) => {
-				debugger;
 				this.#updateQueryRequest({ rootContentId: result.selection[0] });
 
 				if (result.selection.length > 0 && result.selection[0] === null) {
@@ -111,24 +116,50 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		}
 	}
 
+	#setContentType(event: Event) {
+		const target = event.target as UUIComboboxListElement;
+		this.#updateQueryRequest({ contentTypeAlias: (target.value as string) ?? '' });
+		this.#postTemplateQuery();
+		this._contentTypeDropdown!.closePopover();
+	}
+
 	render() {
 		return html`
 			<umb-body-layout headline="Query builder">
 				<div id="main">
 					<uui-box>
-						<div>
-							I want <uui-button look="outline">all content</uui-button> from
+						<div class="row">
+							I want
+							<umb-button-with-dropdown look="outline" id="content-type-dropdown"
+								>${this._queryRequest?.contentTypeAlias ?? 'all content'}
+								<uui-combobox-list slot="dropdown" @change=${this.#setContentType} id="content-type-list">
+									<uui-combobox-list-option value="">all content</uui-combobox-list-option>
+									${this._queryBuilderSettings?.contentTypeAliases?.map(
+										(alias) =>
+											html`<uui-combobox-list-option .value=${alias}
+												>content of type "${alias}"</uui-combobox-list-option
+											>`
+									)}
+								</uui-combobox-list></umb-button-with-dropdown
+							>
+							from
 							<uui-button look="outline" @click=${this.#openDocumentPicker}
 								>${this._selectedRootContentName}
 							</uui-button>
 						</div>
-						<div>
-							where <uui-button look="outline"></uui-button> from <uui-button look="outline">all pages </uui-button>
+						<div class="row">
+							where <uui-button look="outline">(allowed properties)</uui-button>
+							<uui-button look="outline">(filtered conditions)</uui-button>
 						</div>
+						<div class="row">
+							ordered by <uui-button look="outline">(allowed properties)</uui-button>
+							<uui-button look="outline">ascending/descending</uui-button>
+						</div>
+						<div class="row">N items returned, in 0 ms</div>
+						<code> ${this._templateQuery?.queryExpression ?? ''} </code>
 					</uui-box>
 				</div>
 
-				<code> ${this._templateQuery?.queryExpression ?? ''} </code>
 				<div slot="actions">
 					<uui-button @click=${this.#close} look="secondary">Close</uui-button>
 					<uui-button @click=${this.#submit} look="primary" color="positive">Submit</uui-button>
@@ -151,6 +182,24 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 				height: calc(
 					100dvh - var(--umb-header-layout-height) - var(--umb-footer-layout-height) - 2 * var(--uui-size-layout-1)
 				);
+			}
+
+			#content-type-list {
+				width: 250%;
+				background-color: var(--uui-color-surface);
+				box-shadow: var(--uui-shadow-depth-3);
+			}
+
+			uui-combobox-list-option {
+				padding: 8px 20px;
+			}
+
+			.row {
+				display: flex;
+				gap: 10px;
+				border-bottom: 1px solid #f3f3f5;
+				align-items: center;
+				padding: 20px 0;
 			}
 		`,
 	];

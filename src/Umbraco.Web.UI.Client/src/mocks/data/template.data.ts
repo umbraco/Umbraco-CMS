@@ -133,7 +133,7 @@ export const templateQueryResult: TemplateQueryResultResponseModel = {
 };
 
 export const templateQuerySettings: TemplateQuerySettingsResponseModel = {
-	contentTypeAliases: [],
+	contentTypeAliases: ['docTypeWithTemplate', 'propertyTypeWithTemplate', 'somethingElse'],
 	properties: [
 		{
 			alias: 'Id',

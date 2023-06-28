@@ -36,25 +36,25 @@ export class UmbButtonWithDropdownElement extends LitElement {
 	@query('#popover')
 	popover!: UUIPopoverElement;
 
-	#openPopover() {
+	openPopover() {
 		this.open = true;
 		this.popover.open = true;
 		this.symbolExpand.open = true;
 	}
 
-	#closePopover() {
+	closePopover() {
 		this.open = false;
 		this.popover.open = false;
 		this.symbolExpand.open = false;
 	}
 
 	#togglePopover() {
-		this.open ? this.#closePopover() : this.#openPopover();
+		this.open ? this.closePopover() : this.openPopover();
 	}
 
 	render() {
 		return html`
-			<uui-popover placement=${this.placement} id="popover" @close=${this.#closePopover}>
+			<uui-popover placement=${this.placement} id="popover" @close=${this.closePopover}>
 				<uui-button
 					slot="trigger"
 					.look=${this.look}
