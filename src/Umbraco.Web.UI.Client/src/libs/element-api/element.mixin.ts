@@ -9,6 +9,7 @@ import {
 	UmbContextProviderController,
 } from '@umbraco-cms/backoffice/context-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+
 export declare class UmbElement extends UmbControllerHostElement {
 	observe<T>(
 		source: Observable<T> | { asObservable: () => Observable<T> },
