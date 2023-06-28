@@ -9,8 +9,7 @@ import {
 	UmbContextProviderController,
 } from '@umbraco-cms/backoffice/context-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-
-export declare class UmbElementMixinInterface extends UmbControllerHostElement {
+export declare class UmbElement extends UmbControllerHostElement {
 	observe<T>(
 		source: Observable<T> | { asObservable: () => Observable<T> },
 		callback: (_value: T) => void,
@@ -24,7 +23,7 @@ export declare class UmbElementMixinInterface extends UmbControllerHostElement {
 }
 
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
-	class UmbElementMixinClass extends UmbControllerHostElementMixin(superClass) implements UmbElementMixinInterface {
+	class UmbElementMixinClass extends UmbControllerHostElementMixin(superClass) implements UmbElement {
 		/**
 		 * @description Observe a RxJS source of choice.
 		 * @param {Observable<T>} source RxJS source
@@ -71,5 +70,5 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		}
 	}
 
-	return UmbElementMixinClass as unknown as HTMLElementConstructor<UmbElementMixinInterface> & T;
+	return UmbElementMixinClass as unknown as HTMLElementConstructor<UmbElement> & T;
 };
