@@ -32,15 +32,15 @@ export default {
 					imports: {
 						'src/': './src/',
 
-						'@umbraco-cms/backoffice/external/uui': './src/external/uui/index.ts',
 						'@umbraco-cms/backoffice/external/lit': './src/external/lit/index.ts',
-						'@umbraco-cms/backoffice/external/openid': './src/external/openid/index.ts',
-						'@umbraco-cms/backoffice/external/rxjs': './src/external/rxjs/index.ts',
-						'@umbraco-cms/backoffice/external/router-slot': './src/external/router-slot/index.ts',
-						'@umbraco-cms/backoffice/external/uuid': './src/external/uuid/index.ts',
 						'@umbraco-cms/backoffice/external/lodash': './src/external/lodash/index.ts',
 						'@umbraco-cms/backoffice/external/monaco-editor': './src/external/monaco-editor/index.ts',
+						'@umbraco-cms/backoffice/external/openid': './src/external/openid/index.ts',
+						'@umbraco-cms/backoffice/external/router-slot': './src/external/router-slot/index.ts',
+						'@umbraco-cms/backoffice/external/rxjs': './src/external/rxjs/index.ts',
 						'@umbraco-cms/backoffice/external/tinymce': './src/external/tinymce/index.ts',
+						'@umbraco-cms/backoffice/external/uui': './src/external/uui/index.ts',
+						'@umbraco-cms/backoffice/external/uuid': './src/external/uuid/index.ts',
 
 						'@umbraco-cms/backoffice/backend-api': './src/external/backend-api/index.ts',
 						'@umbraco-cms/backoffice/class-api': './src/libs/class-api/index.ts',
