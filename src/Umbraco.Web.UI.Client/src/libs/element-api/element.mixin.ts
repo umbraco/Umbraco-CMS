@@ -10,11 +10,6 @@ import {
 } from '@umbraco-cms/backoffice/context-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-// TODO: can we use this aliases to generate the key of this type
-interface ResolvedContexts {
-	[key: string]: any;
-}
-
 export declare class UmbElementMixinInterface extends UmbControllerHostElement {
 	observe<T>(
 		source: Observable<T> | { asObservable: () => Observable<T> },
