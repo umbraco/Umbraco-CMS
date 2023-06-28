@@ -40,7 +40,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 			path: 'edit/:id',
 			component: import('./document-type-workspace-editor.element.js'),
 			setup: (_component, info) => {
-				this.removeControllerByUnique('_observeIsNew');
+				this.removeControllerByAlias('_observeIsNew');
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);
 			},

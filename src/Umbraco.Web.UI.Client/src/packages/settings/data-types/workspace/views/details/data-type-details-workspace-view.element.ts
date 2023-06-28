@@ -101,12 +101,12 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 	private _observePropertyEditorUI(propertyEditorUiAlias?: string) {
 		if (!propertyEditorUiAlias) {
 			this._propertyEditorUiName = this._propertyEditorUiIcon = this._propertyEditorUiAlias = undefined;
-			this.removeControllerByUnique('_observePropertyEditorUI');
+			this.removeControllerByAlias('_observePropertyEditorUI');
 			return;
 		}
 
 		// remove the '_observepropertyEditorSchemaForDefaultUI' controller, as we do not want to observe for default value anymore:
-		this.removeControllerByUnique('_observepropertyEditorSchemaForDefaultUI');
+		this.removeControllerByAlias('_observepropertyEditorSchemaForDefaultUI');
 
 		this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', propertyEditorUiAlias),

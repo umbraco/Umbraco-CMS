@@ -4,10 +4,11 @@ import { UmbContextCallback } from './context-request.event.js';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbContextConsumerController<T = unknown> extends UmbContextConsumer<T> implements UmbController {
+	#controllerAlias = Symbol();
 	#host: UmbControllerHost;
 
 	public get controllerAlias() {
-		return undefined;
+		return this.#controllerAlias;
 	}
 
 	constructor(host: UmbControllerHost, contextAlias: string | UmbContextToken<T>, callback: UmbContextCallback<T>) {

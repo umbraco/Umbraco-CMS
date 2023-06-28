@@ -40,7 +40,7 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 						(this.shadowRoot!.querySelector('#nameInput') as HTMLElement).focus();
 					});
 				}
-				this.removeControllerByUnique('_observeIsNew');
+				this.removeControllerByAlias('_observeIsNew');
 			},
 			'_observeIsNew'
 		);

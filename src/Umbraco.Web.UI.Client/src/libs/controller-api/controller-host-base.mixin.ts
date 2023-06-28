@@ -6,7 +6,7 @@ export declare class UmbControllerHostBaseDeclaration implements Omit<UmbControl
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;
-	removeControllerByUnique(unique: UmbController['controllerAlias']): void;
+	removeControllerByAlias(unique: UmbController['controllerAlias']): void;
 	removeController(controller: UmbController): void;
 
 	hostConnected(): void;
@@ -48,28 +48,19 @@ export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(supe
 		 * @param {UmbController} ctrl
 		 */
 		addController(ctrl: UmbController): void {
+			// If this specific class is already added, then skip out.
+			if (this.#controllers.indexOf(ctrl) !== -1) {
+				return;
+			}
+
 			// Check if there is one already with same unique
-			this.removeControllerByUnique(ctrl.controllerAlias);
+			this.removeControllerByAlias(ctrl.controllerAlias);
 
 			this.#controllers.push(ctrl);
 			if (this.#attached) {
 				// If a controller is created on a already attached element, then it will be added directly. This might not be optimal. As the controller it self has not finished its constructor method jet. therefor i postpone the call:
 				Promise.resolve().then(() => ctrl.hostConnected());
 				//ctrl.hostConnected();
-			}
-		}
-
-		/**
-		 * Remove a controller from this element, by its unique/alias.
-		 * @param {unknown} unique/alias
-		 */
-		removeControllerByUnique(unique: UmbController['controllerAlias']): void {
-			if (unique) {
-				this.#controllers.forEach((x) => {
-					if (x.controllerAlias === unique) {
-						this.removeController(x);
-					}
-				});
 			}
 		}
 
@@ -92,14 +83,16 @@ export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(supe
 		/**
 		 * Remove a controller from this element by its alias.
 		 * Notice this will also destroy the controller.
-		 * @param {string} unique
+		 * @param {string | symbol} controllerAlias
 		 */
-		removeControllerByAlias(unique: string): void {
-			this.#controllers.forEach((x) => {
-				if (x.controllerAlias === unique) {
-					this.removeController(x);
-				}
-			});
+		removeControllerByAlias(controllerAlias: UmbController['controllerAlias']): void {
+			if (controllerAlias) {
+				this.#controllers.forEach((x) => {
+					if (x.controllerAlias === controllerAlias) {
+						this.removeController(x);
+					}
+				});
+			}
 		}
 
 		hostConnected() {

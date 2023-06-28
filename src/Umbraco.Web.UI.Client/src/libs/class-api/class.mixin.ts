@@ -31,7 +31,7 @@ declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;
-	removeControllerByUnique(unique: UmbController['controllerAlias']): void;
+	removeControllerByAlias(unique: UmbController['controllerAlias']): void;
 	removeController(controller: UmbController): void;
 	getElement(): EventTarget;
 
