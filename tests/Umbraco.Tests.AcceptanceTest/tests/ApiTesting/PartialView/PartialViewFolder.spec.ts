@@ -57,8 +57,8 @@ test.describe('Partial View Folder tests', () => {
     const childOfParent = await umbracoApi.partialView.getFolderChildren(partialViewFolderPath);
 
     // Creates childOfChild folder in child folder
-    await umbracoApi.partialView.createFolder(childOfChildFolderName, childOfParent.childOfParentPath);
-    const childOfChild = await umbracoApi.partialView.getFolderChildren(childOfParent.childOfParentPath);
+    await umbracoApi.partialView.createFolder(childOfChildFolderName, childOfParentPath);
+    const childOfChild = await umbracoApi.partialView.getFolderChildren(childOfParentPath);
 
     // Assert
     // Checks if the partial views folder are in the correct folders
