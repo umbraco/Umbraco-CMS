@@ -1,4 +1,4 @@
-import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
+import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import {
 	UmbEmbeddedMediaModalData,
 	UmbEmbeddedMediaModalResult,

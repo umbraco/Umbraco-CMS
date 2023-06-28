@@ -92,16 +92,13 @@ export class UmbAppElement extends UmbLitElement {
 			// Get the current runtime level
 			await this.#setInitStatus();
 
-			if (this.bypassAuth === false) {
-				// Get service configuration from authentication server
-				await this.#authFlow.setInitialState();
-
-				// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
-				OpenAPI.TOKEN = () => this.#authFlow!.performWithFreshTokens();
-				OpenAPI.WITH_CREDENTIALS = true;
+			// If the runtime level is "install" we should clear any cached tokens
+			// else we should try and set the auth status
+			if (this.#runtimeLevel === RuntimeLevelModel.INSTALL) {
+				await authContext.signOut();
+			} else {
+				await this.#setAuthStatus(authContext);
 			}
-
-			authContext.isLoggedIn.next(true);
 
 			// Initialise the router
 			this.#redirect();
@@ -156,6 +153,19 @@ export class UmbAppElement extends UmbLitElement {
 			throw error;
 		}
 		this.#runtimeLevel = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
+	}
+
+	async #setAuthStatus(authContext: UmbAuthContext) {
+		if (this.bypassAuth === false) {
+			// Get service configuration from authentication server
+			await authContext.setInitialState();
+
+			// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
+			OpenAPI.TOKEN = () => this.#authFlow!.performWithFreshTokens();
+			OpenAPI.WITH_CREDENTIALS = true;
+		}
+
+		authContext.isLoggedIn.next(true);
 	}
 
 	#redirect() {

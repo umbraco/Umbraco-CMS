@@ -7,7 +7,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-tiny-mce-stylesheets-configuration')
 export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement extends UmbLitElement {
-
 	@property()
 	value: string[] = [];
 
@@ -16,7 +15,7 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement extends U
 
 	render() {
 		return html`<ul>
-			${this.value.map((v) => html`<li><uui-checkbox value=${v}>${v}</uui-checkbox></li>`)}
+			${this.value?.map((v) => html`<li><uui-checkbox value=${v}>${v}</uui-checkbox></li>`)}
 		</ul>`;
 	}
 
@@ -26,7 +25,7 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement extends U
 			ul {
 				list-style: none;
 				padding: 0;
-				margin:0;
+				margin: 0;
 			}
 		`,
 	];

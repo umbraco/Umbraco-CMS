@@ -26,6 +26,10 @@ export class UmbAuthContext implements IUmbAuth {
 		});
 	}
 
+	setInitialState(): Promise<void> {
+		return this.#authFlow.setInitialState();
+	}
+
 	async fetchCurrentUser(): Promise<UmbLoggedInUser | undefined> {
 		const { data } = await tryExecuteAndNotify(this.#host, UserResource.getUserCurrent());
 

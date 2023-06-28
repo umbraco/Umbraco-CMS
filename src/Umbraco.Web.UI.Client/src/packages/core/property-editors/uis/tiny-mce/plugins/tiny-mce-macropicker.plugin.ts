@@ -1,6 +1,10 @@
 import { MacroSyntaxData, UmbMacroService } from '@umbraco-cms/backoffice/macro';
-import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
+import {
+	UMB_CONFIRM_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UmbModalManagerContext,
+} from '@umbraco-cms/backoffice/modal';
 import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 
 interface DialogData {
@@ -12,7 +16,7 @@ interface DialogData {
 // TODO => This is a quick transplant of the existing macro plugin - needs to be finished, and need to
 // determine how to replicate the existing macro service
 export default class UmbTinyMceMacroPickerPlugin extends UmbTinyMcePluginBase {
-    #macroService = new UmbMacroService();
+	#macroService = new UmbMacroService();
 
 	#modalContext?: UmbModalManagerContext;
 
@@ -25,17 +29,14 @@ export default class UmbTinyMceMacroPickerPlugin extends UmbTinyMcePluginBase {
 
 		/** Adds custom rules for the macro plugin and custom serialization */
 		this.editor.on('preInit', () => {
-			//this is requires so that we tell the serializer that a 'div' is actually allowed in the root, 
+			//this is requires so that we tell the serializer that a 'div' is actually allowed in the root,
 			// otherwise the cleanup will strip it out
 			this.editor.serializer.addRules('div');
 
 			/** This checks if the div is a macro container, if so, checks if its wrapped in a p tag and then unwraps it (removes p tag) */
 			this.editor.serializer.addNodeFilter('div', (nodes: Array<tinymce.AstNode>) => {
 				for (let i = 0; i < nodes.length; i++) {
-					if (
-						nodes[i].attr('class') === 'umb-macro-holder' &&
-						nodes[i].parent?.name.toLowerCase() === 'p'
-					) {
+					if (nodes[i].attr('class') === 'umb-macro-holder' && nodes[i].parent?.name.toLowerCase() === 'p') {
 						nodes[i].parent?.unwrap();
 					}
 				}
@@ -94,7 +95,7 @@ export default class UmbTinyMceMacroPickerPlugin extends UmbTinyMcePluginBase {
 			const comment = Array.from(macroDiv.childNodes).find((x) => x.nodeType === 8);
 
 			if (!comment) {
-				throw('Cannot parse the current macro, the syntax in the editor is invalid');
+				throw 'Cannot parse the current macro, the syntax in the editor is invalid';
 			}
 
 			const syntax = comment.textContent?.trim();

@@ -19,7 +19,7 @@ export * from './input-color/index.js';
 export * from './input-eye-dropper/index.js';
 export * from './input-list-base/index.js';
 export * from './input-multi-url/index.js';
-export * from './input-tiny-mce/input-tiny-mce.element.js';
+export * from './input-tiny-mce/index.js';
 export * from './input-number-range/index.js';
 export * from './input-radio-button-list/index.js';
 export * from './input-section/index.js';

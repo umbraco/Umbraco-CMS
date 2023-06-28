@@ -5,14 +5,13 @@ import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import { FormControlMixin, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { renderEditor, type tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
-import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import {
-	ManifestTinyMcePlugin,
 	TinyMcePluginArguments,
+	UmbDataTypePropertyCollection,
 	UmbTinyMcePluginBase,
-	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extension-registry';
+} from '@umbraco-cms/backoffice/components';
+import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
+import { ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	PropertyValueMap,
 	css,
@@ -168,7 +167,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			this.#editorRef.destroy();
 		}
 
-		// await tinymce.default.init(this._tinyConfig);
 		const editors = await renderEditor(this._tinyConfig);
 		this.#editorRef = editors.pop();
 	}
@@ -205,7 +203,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		// Plugins require a reference to the current editor as a param, so can not
 		// be instantiated until we have an editor
 		for (const plugin of this.#plugins) {
-			new plugin({ host: this, editor, configuration: this.configuration });
+			new plugin({ host: this, editor });			
 		}
 
 		// define keyboard shortcuts
@@ -263,7 +261,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	#onChange(value: string) {
 		super.value = value;
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('change'));
 	}
 
 	#isMediaPickerEnabled() {
