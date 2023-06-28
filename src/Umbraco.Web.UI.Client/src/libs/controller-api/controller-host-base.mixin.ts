@@ -1,13 +1,13 @@
 import { ClassConstructor } from '../extension-api/types.js';
 import { UmbControllerHost } from './controller-host.interface.js';
-import type { UmbControllerInterface } from './controller.interface.js';
+import type { UmbController } from './controller.interface.js';
 
 export declare class UmbControllerHostBaseDeclaration implements Omit<UmbControllerHost, 'getElement'> {
-	hasController(controller: UmbControllerInterface): boolean;
-	getControllers(filterMethod: (ctrl: UmbControllerInterface) => boolean): UmbControllerInterface[];
-	addController(controller: UmbControllerInterface): void;
-	removeControllerByUnique(unique: UmbControllerInterface['unique']): void;
-	removeController(controller: UmbControllerInterface): void;
+	hasController(controller: UmbController): boolean;
+	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
+	addController(controller: UmbController): void;
+	removeControllerByUnique(unique: UmbController['unique']): void;
+	removeController(controller: UmbController): void;
 
 	hostConnected(): void;
 	hostDisconnected(): void;
@@ -23,15 +23,15 @@ export declare class UmbControllerHostBaseDeclaration implements Omit<UmbControl
  */
 export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(superClass: T) => {
 	class UmbControllerHostBaseClass extends superClass {
-		#controllers: UmbControllerInterface[] = [];
+		#controllers: UmbController[] = [];
 
 		#attached = false;
 
 		/**
 		 * Tests if a controller is assigned to this element.
-		 * @param {UmbControllerInterface} ctrl
+		 * @param {UmbController} ctrl
 		 */
-		hasController(ctrl: UmbControllerInterface): boolean {
+		hasController(ctrl: UmbController): boolean {
 			return this.#controllers.indexOf(ctrl) !== -1;
 		}
 
@@ -39,15 +39,15 @@ export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(supe
 		 * Retrieve controllers matching a filter of this element.
 		 * @param {method} filterMethod
 		 */
-		getControllers(filterMethod: (ctrl: UmbControllerInterface) => boolean): UmbControllerInterface[] {
+		getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[] {
 			return this.#controllers.filter(filterMethod);
 		}
 
 		/**
 		 * Append a controller to this element.
-		 * @param {UmbControllerInterface} ctrl
+		 * @param {UmbController} ctrl
 		 */
-		addController(ctrl: UmbControllerInterface): void {
+		addController(ctrl: UmbController): void {
 			// Check if there is one already with same unique
 			this.removeControllerByUnique(ctrl.unique);
 
@@ -63,7 +63,7 @@ export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(supe
 		 * Remove a controller from this element, by its unique/alias.
 		 * @param {unknown} unique/alias
 		 */
-		removeControllerByUnique(unique: UmbControllerInterface['unique']): void {
+		removeControllerByUnique(unique: UmbController['unique']): void {
 			if (unique) {
 				this.#controllers.forEach((x) => {
 					if (x.unique === unique) {
@@ -76,9 +76,9 @@ export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(supe
 		/**
 		 * Remove a controller from this element.
 		 * Notice this will also destroy the controller.
-		 * @param {UmbControllerInterface} ctrl
+		 * @param {UmbController} ctrl
 		 */
-		removeController(ctrl: UmbControllerInterface): void {
+		removeController(ctrl: UmbController): void {
 			const index = this.#controllers.indexOf(ctrl);
 			if (index !== -1) {
 				this.#controllers.splice(index, 1);
@@ -104,16 +104,16 @@ export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(supe
 
 		hostConnected() {
 			this.#attached = true;
-			this.#controllers.forEach((ctrl: UmbControllerInterface) => ctrl.hostConnected());
+			this.#controllers.forEach((ctrl: UmbController) => ctrl.hostConnected());
 		}
 
 		hostDisconnected() {
 			this.#attached = false;
-			this.#controllers.forEach((ctrl: UmbControllerInterface) => ctrl.hostDisconnected());
+			this.#controllers.forEach((ctrl: UmbController) => ctrl.hostDisconnected());
 		}
 
 		destroy() {
-			this.#controllers.forEach((ctrl: UmbControllerInterface) => ctrl.destroy());
+			this.#controllers.forEach((ctrl: UmbController) => ctrl.destroy());
 		}
 	}
 

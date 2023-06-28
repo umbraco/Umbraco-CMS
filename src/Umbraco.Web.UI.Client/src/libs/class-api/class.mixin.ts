@@ -3,9 +3,8 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import {
 	type UmbControllerHost,
-	UmbControllerHostBaseDeclaration,
 	UmbControllerHostBaseMixin,
-	UmbControllerInterface,
+	UmbController,
 } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbContextToken,
@@ -17,7 +16,7 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 type UmbClassMixinConstructor = new (host: UmbControllerHost) => UmbClassMixinDeclaration;
 
-declare class UmbClassMixinDeclaration extends UmbControllerHostBaseDeclaration implements UmbClassMixinInterface {
+declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 	_host: UmbControllerHost;
 	observe<T>(
 		source: Observable<T> | { asObservable: () => Observable<T> },
@@ -29,25 +28,36 @@ declare class UmbClassMixinDeclaration extends UmbControllerHostBaseDeclaration 
 		alias: string | UmbContextToken<R>,
 		callback: UmbContextCallback<R>
 	): UmbContextConsumerController<R>;
-	hasController(controller: UmbControllerInterface): boolean;
-	getControllers(filterMethod: (ctrl: UmbControllerInterface) => boolean): UmbControllerInterface[];
-	addController(controller: UmbControllerInterface): void;
-	removeControllerByUnique(unique: UmbControllerInterface['unique']): void;
-	removeController(controller: UmbControllerInterface): void;
+	hasController(controller: UmbController): boolean;
+	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
+	addController(controller: UmbController): void;
+	removeControllerByUnique(unique: UmbController['unique']): void;
+	removeController(controller: UmbController): void;
 	getElement(): EventTarget;
+
+	get unique(): string | undefined;
+	hostConnected(): void;
+	hostDisconnected(): void;
+	destroy(): void;
 }
 
 export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 	class UmbClassMixinClass extends UmbControllerHostBaseMixin(superClass) implements UmbControllerHost {
 		protected _host: UmbControllerHost;
+		protected _unique: string | undefined;
 
-		constructor(host: UmbControllerHost) {
+		constructor(host: UmbControllerHost, unique: string | undefined) {
 			super();
 			this._host = host;
+			this._unique = unique ?? undefined; // ?? Symbol();
 		}
 
 		getElement(): EventTarget {
 			return this._host.getElement();
+		}
+
+		get unique(): string | undefined {
+			return this._unique;
 		}
 
 		/**

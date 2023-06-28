@@ -1,11 +1,11 @@
 import { Subject } from '@umbraco-cms/backoffice/external/rxjs';
 import { PackageResource, OpenAPI } from '@umbraco-cms/backoffice/backend-api';
-import { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { ManifestBase, isManifestJSType } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbExtensionInitializer extends UmbController {
+export class UmbExtensionInitializer extends UmbBaseController {
 	#extensionRegistry: UmbBackofficeExtensionRegistry;
 	#unobserve = new Subject<void>();
 	#localPackages: Array<Promise<any>> = [];

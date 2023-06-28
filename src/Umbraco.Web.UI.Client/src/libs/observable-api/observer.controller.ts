@@ -1,8 +1,8 @@
 import { UmbObserver } from './observer.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbControllerInterface, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbObserverController<T = unknown> extends UmbObserver<T> implements UmbControllerInterface {
+export class UmbObserverController<T = unknown> extends UmbObserver<T> implements UmbController {
 	_alias?: string;
 	public get unique() {
 		return this._alias;

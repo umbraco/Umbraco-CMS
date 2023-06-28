@@ -6,7 +6,7 @@ import {
 	PropertyTypeModelBaseModel,
 	DocumentTypeResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElement, UmbController } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbArrayState,
 	UmbObserverController,
@@ -29,7 +29,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	#contentTypeRepository: R;
 
 	#ownerDocumentTypeId?: string;
-	#documentTypeObservers = new Array<UmbControllerInterface>();
+	#documentTypeObservers = new Array<UmbController>();
 	#documentTypes = new UmbArrayState<T>([], (x) => x.id);
 	readonly documentTypes = this.#documentTypes.asObservable();
 	private readonly _documentTypeContainers = this.#documentTypes.getObservablePart((x) =>

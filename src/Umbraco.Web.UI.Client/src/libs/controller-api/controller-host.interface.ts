@@ -1,10 +1,10 @@
-import type { UmbControllerInterface } from './controller.interface.js';
+import type { UmbController } from './controller.interface.js';
 
 export declare class UmbControllerHost {
-	hasController(controller: UmbControllerInterface): boolean;
-	getControllers(filterMethod: (ctrl: UmbControllerInterface) => boolean): UmbControllerInterface[];
-	addController(controller: UmbControllerInterface): void;
-	removeControllerByUnique(unique: UmbControllerInterface['unique']): void;
-	removeController(controller: UmbControllerInterface): void;
+	hasController(controller: UmbController): boolean;
+	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
+	addController(controller: UmbController): void;
+	removeControllerByUnique(unique: UmbController['unique']): void;
+	removeController(controller: UmbController): void;
 	getElement(): EventTarget;
 }

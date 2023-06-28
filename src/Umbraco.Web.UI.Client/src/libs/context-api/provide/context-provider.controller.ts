@@ -1,8 +1,8 @@
 import { UmbContextToken } from '../token/context-token.js';
 import { UmbContextProvider } from './context-provider.js';
-import type { UmbControllerHost, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbContextProviderController<T = unknown> extends UmbContextProvider implements UmbControllerInterface {
+export class UmbContextProviderController<T = unknown> extends UmbContextProvider implements UmbController {
 	#host: UmbControllerHost;
 
 	public get unique() {

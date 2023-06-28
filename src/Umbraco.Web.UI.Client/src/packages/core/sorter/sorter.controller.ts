@@ -1,4 +1,4 @@
-import { UmbControllerInterface, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 const autoScrollSensitivity = 50;
 const autoScrollSpeed = 16;
@@ -114,7 +114,7 @@ export type UmbSorterConfig<T> = Omit<
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
  */
-export class UmbSorterController<T> implements UmbControllerInterface {
+export class UmbSorterController<T> implements UmbController {
 	#host;
 	#config: INTERNAL_UmbSorterConfig<T>;
 	#observer;

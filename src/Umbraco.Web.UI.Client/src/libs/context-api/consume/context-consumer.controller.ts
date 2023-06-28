@@ -1,9 +1,9 @@
 import { UmbContextToken } from '../token/context-token.js';
 import { UmbContextConsumer } from './context-consumer.js';
 import { UmbContextCallback } from './context-request.event.js';
-import type { UmbControllerHost, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbContextConsumerController<T = unknown> extends UmbContextConsumer<T> implements UmbControllerInterface {
+export class UmbContextConsumerController<T = unknown> extends UmbContextConsumer<T> implements UmbController {
 	#host: UmbControllerHost;
 
 	public get unique() {

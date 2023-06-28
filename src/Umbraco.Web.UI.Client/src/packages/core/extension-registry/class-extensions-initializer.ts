@@ -1,6 +1,6 @@
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Initializes extension classes for a host element.
@@ -10,7 +10,7 @@ import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice
  * @param extensionTypes The extension types(strings) to initialize.
  *
  */
-export class UmbClassExtensionsInitializer extends UmbController {
+export class UmbClassExtensionsInitializer extends UmbBaseController {
 	#extensionMap = new Map();
 
 	constructor(host: UmbControllerHostElement, extensionTypes: Array<string>) {

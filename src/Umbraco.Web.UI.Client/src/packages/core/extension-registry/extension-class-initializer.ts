@@ -6,13 +6,13 @@ import {
 	ManifestClass,
 	SpecificManifestTypeOrManifestBase,
 } from '@umbraco-cms/backoffice/extension-api';
-import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbExtensionClassInitializer<
 	ExtensionType extends string = string,
 	ExtensionManifest extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ExtensionType>,
 	ExtensionClassInterface = ExtensionManifest extends ManifestClass ? ExtensionManifest['CLASS_TYPE'] : unknown
-> extends UmbController {
+> extends UmbBaseController {
 	#currentPromise?: Promise<ExtensionClassInterface | undefined>;
 	#currentPromiseResolver?: (value: ExtensionClassInterface | undefined) => void;
 	#currentClass?: ExtensionClassInterface;

@@ -5,11 +5,11 @@ import {
 	UmbNotificationOptions,
 } from '@umbraco-cms/backoffice/notification';
 import { ApiError, CancelError, CancelablePromise } from '@umbraco-cms/backoffice/backend-api';
-import { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
-export class UmbResourceController extends UmbController {
+export class UmbResourceController extends UmbBaseController {
 	#promise: Promise<any>;
 
 	#notificationContext?: UmbNotificationContext;
