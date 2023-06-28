@@ -36,21 +36,30 @@ describe('UmbController', () => {
 
 	describe('Public API', () => {
 		describe('methods', () => {
-			it('has an getHostElement method', () => {
-				expect(hostElement).to.have.property('getHostElement').that.is.a('function');
+			it('has an hasController method', () => {
+				expect(hostElement).to.have.property('hasController').that.is.a('function');
 			});
-
-			/*
-				hasController(controller: UmbController): boolean;
-	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
-	addController(controller: UmbController): void;
-	removeControllerByAlias(unique: UmbController['controllerAlias']): void;
-	removeController(controller: UmbController): void;
-
-	hostConnected(): void;
-	hostDisconnected(): void;
-	destroy(): void;
-			*/
+			it('has an getControllers method', () => {
+				expect(hostElement).to.have.property('getControllers').that.is.a('function');
+			});
+			it('has an addController method', () => {
+				expect(hostElement).to.have.property('addController').that.is.a('function');
+			});
+			it('has an removeControllerByAlias method', () => {
+				expect(hostElement).to.have.property('removeControllerByAlias').that.is.a('function');
+			});
+			it('has an removeController method', () => {
+				expect(hostElement).to.have.property('removeController').that.is.a('function');
+			});
+			it('has an hostConnected method', () => {
+				expect(hostElement).to.have.property('hostConnected').that.is.a('function');
+			});
+			it('has an hostDisconnected method', () => {
+				expect(hostElement).to.have.property('hostDisconnected').that.is.a('function');
+			});
+			it('has an destroy method', () => {
+				expect(hostElement).to.have.property('destroy').that.is.a('function');
+			});
 		});
 	});
 
