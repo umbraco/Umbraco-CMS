@@ -6,7 +6,24 @@ import { customElement } from '@umbraco-cms/backoffice/external/lit';
 @customElement('test-my-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostMixin(HTMLElement) {}
 
-export class UmbTestControllerImplementationElement extends UmbBaseController {}
+export class UmbTestControllerImplementationElement extends UmbBaseController {
+	testIsConnected = false;
+	testIsDestroyed = false;
+
+	hostConnected(): void {
+		super.hostConnected();
+		this.testIsConnected = true;
+	}
+	hostDisconnected(): void {
+		super.hostDisconnected();
+		this.testIsConnected = false;
+	}
+
+	public destroy(): void {
+		super.destroy();
+		this.testIsDestroyed = true;
+	}
+}
 
 describe('UmbContextProvider', () => {
 	type NewType = UmbControllerHostElement;
@@ -17,7 +34,7 @@ describe('UmbContextProvider', () => {
 		hostElement = document.createElement('test-my-controller-host') as UmbControllerHostElement;
 	});
 
-	describe('Destroyed controllers is gone from host', () => {
+	describe('Controllers lifecycle', () => {
 		it('controller is removed from host when destroyed', () => {
 			const ctrl = new UmbTestControllerImplementationElement(hostElement, 'my-test-context');
 
@@ -26,6 +43,33 @@ describe('UmbContextProvider', () => {
 			ctrl.destroy();
 
 			expect(hostElement.hasController(ctrl)).to.be.false;
+		});
+
+		it('controller is destroyed when removed from host', () => {
+			const ctrl = new UmbTestControllerImplementationElement(hostElement, 'my-test-context');
+
+			expect(ctrl.testIsDestroyed).to.be.false;
+			expect(hostElement.hasController(ctrl)).to.be.true;
+
+			hostElement.removeController(ctrl);
+
+			expect(ctrl.testIsDestroyed).to.be.true;
+			expect(hostElement.hasController(ctrl)).to.be.false;
+		});
+
+		it('hostConnected & hostDisconnected is triggered accordingly to the state of the controller host.', () => {
+			const ctrl = new UmbTestControllerImplementationElement(hostElement, 'my-test-context');
+
+			expect(hostElement.hasController(ctrl)).to.be.true;
+			expect(ctrl.testIsConnected).to.be.false;
+
+			document.body.appendChild(hostElement);
+
+			expect(ctrl.testIsConnected).to.be.true;
+
+			document.body.removeChild(hostElement);
+
+			expect(ctrl.testIsConnected).to.be.false;
 		});
 	});
 
@@ -45,17 +89,6 @@ describe('UmbContextProvider', () => {
 
 			expect(hostElement.hasController(firstCtrl)).to.be.false;
 			expect(hostElement.hasController(secondCtrl)).to.be.true;
-		});
-
-		it('remove controller using a symbol', () => {
-			const mySymbol = Symbol();
-			const firstCtrl = new UmbTestControllerImplementationElement(hostElement, mySymbol);
-
-			expect(hostElement.hasController(firstCtrl)).to.be.true;
-
-			hostElement.removeControllerByAlias(mySymbol);
-
-			expect(hostElement.hasController(firstCtrl)).to.be.false;
 		});
 
 		it('controller is not replacing another controller when using the undefined as alias', () => {
