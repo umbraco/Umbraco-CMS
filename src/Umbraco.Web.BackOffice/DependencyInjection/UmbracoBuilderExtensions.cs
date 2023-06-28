@@ -81,6 +81,7 @@ public static partial class UmbracoBuilderExtensions
 
     public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
     {
+        builder.Services.AddUnique<IStaticFilePathGenerator, UmbracoStaticFilePathGenerator>();
         builder.Services.AddSingleton<KeepAliveMiddleware>();
         builder.Services.ConfigureOptions<ConfigureGlobalOptionsForKeepAliveMiddlware>();
         builder.Services.AddSingleton<ServerVariablesParser>();

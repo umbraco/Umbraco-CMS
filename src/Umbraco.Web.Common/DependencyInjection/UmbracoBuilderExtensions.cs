@@ -410,7 +410,7 @@ public static partial class UmbracoBuilderExtensions
     ///     HACK: returns an AspNetCoreHostingEnvironment that doesn't monitor changes to configuration.<br />
     ///     We require this to create a TypeLoader during ConfigureServices.<br />
     ///     Instances returned from this method shouldn't be registered in the service collection.
-    /// </summary>
+    /// </summary>src/Umbraco.Web.Common/Extensions/ApplicationBuilderExtensions.cs
     private static IHostingEnvironment GetTemporaryHostingEnvironment(
         IWebHostEnvironment webHostEnvironment,
         IConfiguration config)

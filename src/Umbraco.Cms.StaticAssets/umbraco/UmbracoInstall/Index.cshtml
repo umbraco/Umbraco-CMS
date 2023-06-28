@@ -9,11 +9,11 @@
 @inject IHostingEnvironment HostingEnvironment
 @inject IOptions<GlobalSettings> GlobalSettings
 @inject IRuntimeMinifier RuntimeMinifier
+@inject IStaticFilePathGenerator StaticFilePathGenerator
 
 @{
-    var umbracoHash = UrlHelperExtensions.GetCacheBustHash(HostingEnvironment, UmbracoVersion, RuntimeMinifier);
     var backOfficePath = GlobalSettings.Value.GetBackOfficePath(HostingEnvironment);
-    var backofficeAssetsPath = backOfficePath.EnsureEndsWith('/') + "backoffice/" + umbracoHash;
+    var backofficeAssetsPath = StaticFilePathGenerator.BackofficeAssetsPath;
 }
 
 @functions {

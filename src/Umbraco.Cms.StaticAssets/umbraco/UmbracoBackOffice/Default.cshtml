@@ -4,16 +4,15 @@
 @using Umbraco.Cms.Core.Hosting
 @using Umbraco.Cms.Core.WebAssets
 @using Umbraco.Extensions
-@using UrlHelperExtensions = Umbraco.Extensions.UrlHelperExtensions
 @inject IUmbracoVersion UmbracoVersion
 @inject IHostingEnvironment HostingEnvironment
 @inject IOptions<GlobalSettings> GlobalSettings
 @inject IRuntimeMinifier RuntimeMinifier
+@inject IStaticFilePathGenerator StaticFilePathGenerator
 
 @{
-    var umbracoHash = UrlHelperExtensions.GetCacheBustHash(HostingEnvironment, UmbracoVersion, RuntimeMinifier);
     var backOfficePath = GlobalSettings.Value.GetBackOfficePath(HostingEnvironment);
-    var backofficeAssetsPath = backOfficePath.EnsureEndsWith('/') + "backoffice/" + umbracoHash;
+    var backofficeAssetsPath = StaticFilePathGenerator.BackofficeAssetsPath;
 }
 
 @functions {
