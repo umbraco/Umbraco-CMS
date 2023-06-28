@@ -1,13 +1,8 @@
 import type { ManifestTypeMap, ManifestBase, SpecificManifestTypeOrManifestBase, ManifestKind } from '../types.js';
-import {
-	BehaviorSubject,
-	map,
-	Observable,
-	distinctUntilChanged,
-	combineLatest,
-} from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
+import { map, Observable, distinctUntilChanged, combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 
-function extensionArrayMemoization<T extends { alias: string }>(
+function extensionArrayMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	previousValue: Array<T>,
 	currentValue: Array<T>
 ): boolean {
@@ -17,6 +12,51 @@ function extensionArrayMemoization<T extends { alias: string }>(
 	}
 	// previousValue has an alias that is not present in currentValue:
 	if (previousValue.find((p) => !currentValue.find((c) => c.alias === p.alias))) {
+		return false;
+	}
+	return true;
+}
+
+// Note: Keeping the memoization in two separate function, for performance concern.
+function extensionAndMetaArrayMemoization<T extends Pick<ManifestBase, 'alias'> & { meta?: unknown }>(
+	previousValue: Array<T>,
+	currentValue: Array<T>
+): boolean {
+	// If length is different, data is different:
+	if (previousValue.length !== currentValue.length) {
+		return false;
+	}
+	// previousValue has an alias that is not present in currentValue:
+	/* !! This is covered by the test below:
+	if (previousValue.find((p) => !currentValue.find((c) => c.alias === p.alias))) {
+		return false;
+	}*/
+	// if previousValue has different meta values:
+	if (
+		currentValue.find((newValue: T) => {
+			const oldValue = previousValue.find((c) => c.alias === newValue.alias);
+			if (oldValue === undefined) {
+				return true; // Could not find a match, so a change is registered.
+			}
+			if (newValue.meta === undefined && oldValue.meta !== undefined) {
+				return true; // Could meta is gone, so a change is registered.
+			}
+
+			if (newValue.meta && oldValue.meta) {
+				const newMetaEntries = Object.entries(newValue.meta);
+				if (newMetaEntries.length !== Object.entries(oldValue.meta).length) {
+					return true; // A change is registered.
+				}
+				return Object.entries(newValue.meta).find(([key, value]) => {
+					if ((oldValue.meta as any)[key] !== value) {
+						return true; // A change is registered.
+					}
+					return false;
+				});
+			}
+			return false;
+		})
+	) {
 		return false;
 	}
 	return true;
@@ -40,11 +80,10 @@ export class UmbExtensionRegistry<
 > {
 	readonly MANIFEST_TYPES: ManifestTypes = undefined as never;
 
-	// TODO: Use UniqueBehaviorSubject, as we don't want someone to edit data of extensions.
-	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
+	private _extensions = new UmbBasicState<Array<ManifestTypes>>([]);
 	public readonly extensions = this._extensions.asObservable();
 
-	private _kinds = new BehaviorSubject<Array<ManifestKind<ManifestTypes>>>([]);
+	private _kinds = new UmbBasicState<Array<ManifestKind<ManifestTypes>>>([]);
 	public readonly kinds = this._kinds.asObservable();
 
 	defineKind(kind: ManifestKind<ManifestTypes>) {
@@ -89,21 +128,23 @@ export class UmbExtensionRegistry<
 	}
 
 	unregister(alias: string): void {
-		const oldExtensionsValues = this._extensions.getValue();
-		const newExtensionsValues = oldExtensionsValues.filter((extension) => extension.alias !== alias);
+		const newKindsValues = this._kinds.getValue().filter((kind) => kind.alias !== alias);
+		const newExtensionsValues = this._extensions.getValue().filter((extension) => extension.alias !== alias);
 
-		// TODO: Maybe its not needed to fire an console.error. as you might want to call this method without needing to check the existence first.
-		if (oldExtensionsValues.length === newExtensionsValues.length) {
-			console.error(`Unable to unregister extension with alias ${alias}`);
-			return;
-		}
-
+		this._kinds.next(newKindsValues);
 		this._extensions.next(newExtensionsValues);
 	}
 
 	isRegistered(alias: string): boolean {
-		const values = this._extensions.getValue();
-		return values.some((ext) => ext.alias === alias);
+		if (this._extensions.getValue().find((ext) => ext.alias === alias)) {
+			return true;
+		}
+
+		if (this._kinds.getValue().find((ext) => ext.alias === alias)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/*
@@ -193,7 +234,7 @@ export class UmbExtensionRegistry<
 					})
 					.sort(sortExtensions)
 			),
-			distinctUntilChanged(extensionArrayMemoization)
+			distinctUntilChanged(extensionAndMetaArrayMemoization)
 		) as Observable<Array<T>>;
 	}
 
@@ -219,7 +260,7 @@ export class UmbExtensionRegistry<
 					})
 					.sort(sortExtensions)
 			),
-			distinctUntilChanged(extensionArrayMemoization)
+			distinctUntilChanged(extensionAndMetaArrayMemoization)
 		) as Observable<Array<ExtensionTypes>>;
 	}
 }

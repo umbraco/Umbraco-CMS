@@ -55,7 +55,11 @@ describe('UmbExtensionRegistry', () => {
 	it('should register an extension', () => {
 		const registeredExtensions = extensionRegistry['_extensions'].getValue();
 		expect(registeredExtensions).to.have.lengthOf(4);
-		expect(registeredExtensions?.[0]?.name).to.eq('test-section-1');
+		expect(registeredExtensions?.[0]?.alias).to.eq('Umb.Test.Section.1');
+	});
+
+	it('should say that an extension is registered', () => {
+		expect(extensionRegistry.isRegistered('Umb.Test.Section.1')).to.be.true;
 	});
 
 	it('should get an extension by alias', (done) => {
@@ -96,7 +100,7 @@ describe('UmbExtensionRegistry', () => {
 				.unsubscribe();
 		});
 
-		it('Observable only trigged when changes made to the scope of it', (done) => {
+		it('should only trigger observable when changes made to the scope of it', (done) => {
 			let amountOfTimesTriggered = -1;
 			let lastAmount = 0;
 
@@ -218,6 +222,10 @@ describe('UmbExtensionRegistry with kinds', () => {
 		manifests.forEach((manifest) => extensionRegistry.register(manifest));
 	});
 
+	it('should say that an extension kind is registered', () => {
+		expect(extensionRegistry.isRegistered('Umb.Test.Kind')).to.be.true;
+	});
+
 	it('should merge with kinds', (done) => {
 		extensionRegistry
 			.extensionsOfType('section')
@@ -225,11 +233,57 @@ describe('UmbExtensionRegistry with kinds', () => {
 				expect(extensions).to.have.lengthOf(3);
 				expect(extensions?.[0]?.elementName).to.not.eq('my-kind-element');
 				expect(extensions?.[1]?.alias).to.eq('Umb.Test.Section.3');
+				expect(extensions?.[1]?.meta.label).to.eq('Test Section 3');
 				expect(extensions?.[1]?.elementName).to.eq('my-kind-element');
 				expect(extensions?.[2]?.alias).to.eq('Umb.Test.Section.1');
 				expect(extensions?.[2]?.elementName).to.eq('my-kind-element');
 				expect(extensions?.[2]?.meta.label).to.eq('my-kind-meta-label');
 				done();
+			})
+			.unsubscribe();
+	});
+
+	it('should update extensions using kinds, when a kind appears', (done) => {
+		let amountOfTimesTriggered = -1;
+
+		extensionRegistry.unregister('Umb.Test.Kind');
+
+		extensionRegistry
+			.extensionsOfType('section')
+			.subscribe((extensions) => {
+				amountOfTimesTriggered++;
+				expect(extensions).to.have.lengthOf(3);
+
+				if (amountOfTimesTriggered === 0) {
+					expect(extensions?.[2]?.meta.label).to.be.undefined;
+					expect(extensionRegistry.isRegistered('Umb.Test.Kind')).to.be.false;
+					extensionRegistry.register(manifests[0]); // Registration of the kind again.
+					expect(extensionRegistry.isRegistered('Umb.Test.Kind')).to.be.true;
+				} else if (amountOfTimesTriggered === 1) {
+					expect(extensions?.[2]?.meta.label).to.eq('my-kind-meta-label');
+					done();
+				}
+			})
+			.unsubscribe();
+	});
+
+	it('should update extensions using kinds, when a kind is removed', (done) => {
+		let amountOfTimesTriggered = -1;
+
+		extensionRegistry
+			.extensionsOfType('section')
+			.subscribe((extensions) => {
+				amountOfTimesTriggered++;
+				expect(extensions).to.have.lengthOf(3);
+
+				if (amountOfTimesTriggered === 0) {
+					expect(extensions?.[2]?.meta.label).to.not.be.undefined;
+					extensionRegistry.unregister('Umb.Test.Kind');
+					expect(extensionRegistry.isRegistered('Umb.Test.Kind')).to.be.false;
+				} else if (amountOfTimesTriggered === 1) {
+					expect(extensions?.[2]?.meta.label).to.be.undefined;
+					done();
+				}
 			})
 			.unsubscribe();
 	});
