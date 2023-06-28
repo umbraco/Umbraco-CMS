@@ -18,7 +18,7 @@ function extensionArrayMemoization<T extends Pick<ManifestBase, 'alias'>>(
 }
 
 // Note: Keeping the memoization in two separate function, for performance concern.
-function extensionAndMetaArrayMemoization<T extends Pick<ManifestBase, 'alias'> & { meta?: unknown }>(
+function extensionAndKindMatchArrayMemoization<T extends Pick<ManifestBase, 'alias'> & { isMatchedWithKind?: boolean }>(
 	previousValue: Array<T>,
 	currentValue: Array<T>
 ): boolean {
@@ -35,26 +35,9 @@ function extensionAndMetaArrayMemoization<T extends Pick<ManifestBase, 'alias'> 
 	if (
 		currentValue.find((newValue: T) => {
 			const oldValue = previousValue.find((c) => c.alias === newValue.alias);
-			if (oldValue === undefined) {
-				return true; // Could not find a match, so a change is registered.
-			}
-			if (newValue.meta === undefined && oldValue.meta !== undefined) {
-				return true; // Could meta is gone, so a change is registered.
-			}
-
-			if (newValue.meta && oldValue.meta) {
-				const newMetaEntries = Object.entries(newValue.meta);
-				if (newMetaEntries.length !== Object.entries(oldValue.meta).length) {
-					return true; // A change is registered.
-				}
-				return Object.entries(newValue.meta).find(([key, value]) => {
-					if ((oldValue.meta as any)[key] !== value) {
-						return true; // A change is registered.
-					}
-					return false;
-				});
-			}
-			return false;
+			// First check if we found a previous value, matching this alias.
+			// Then checking isMatchedWithKind, as this is much more performant than checking the whole object. (I assume the only change happening to an extension is the match with a kind, we do not want to watch for other changes)
+			return oldValue === undefined || newValue.isMatchedWithKind !== oldValue.isMatchedWithKind;
 		})
 	) {
 		return false;
@@ -200,7 +183,7 @@ export class UmbExtensionRegistry<
 				if (ext) {
 					const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
 					if (baseManifest) {
-						const merged = { ...baseManifest, ...ext } as any;
+						const merged = { isMatchedWithKind: true, ...baseManifest, ...ext } as any;
 						if ((baseManifest as any).meta) {
 							merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
 						}
@@ -224,7 +207,7 @@ export class UmbExtensionRegistry<
 						// Specific Extension Meta merge (does not merge conditions)
 						const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
 						if (baseManifest) {
-							const merged = { ...baseManifest, ...ext } as any;
+							const merged = { isMatchedWithKind: true, ...baseManifest, ...ext } as any;
 							if ((baseManifest as any).meta) {
 								merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
 							}
@@ -234,7 +217,7 @@ export class UmbExtensionRegistry<
 					})
 					.sort(sortExtensions)
 			),
-			distinctUntilChanged(extensionAndMetaArrayMemoization)
+			distinctUntilChanged(extensionAndKindMatchArrayMemoization)
 		) as Observable<Array<T>>;
 	}
 
@@ -249,7 +232,7 @@ export class UmbExtensionRegistry<
 						if (ext) {
 							const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
 							if (baseManifest) {
-								const merged = { ...baseManifest, ...ext } as any;
+								const merged = { isMatchedWithKind: true, ...baseManifest, ...ext } as any;
 								if ((baseManifest as any).meta) {
 									merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
 								}
@@ -260,7 +243,7 @@ export class UmbExtensionRegistry<
 					})
 					.sort(sortExtensions)
 			),
-			distinctUntilChanged(extensionAndMetaArrayMemoization)
+			distinctUntilChanged(extensionAndKindMatchArrayMemoization)
 		) as Observable<Array<ExtensionTypes>>;
 	}
 }
