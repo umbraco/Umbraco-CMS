@@ -25,13 +25,33 @@ export class UmbTestControllerImplementationElement extends UmbBaseController {
 	}
 }
 
-describe('UmbContextProvider', () => {
+describe('UmbController', () => {
 	type NewType = UmbControllerHostElement;
 
 	let hostElement: NewType;
 
 	beforeEach(() => {
 		hostElement = document.createElement('test-my-controller-host') as UmbControllerHostElement;
+	});
+
+	describe('Public API', () => {
+		describe('methods', () => {
+			it('has an getElement method', () => {
+				expect(hostElement).to.have.property('getElement').that.is.a('function');
+			});
+
+			/*
+				hasController(controller: UmbController): boolean;
+	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
+	addController(controller: UmbController): void;
+	removeControllerByAlias(unique: UmbController['controllerAlias']): void;
+	removeController(controller: UmbController): void;
+
+	hostConnected(): void;
+	hostDisconnected(): void;
+	destroy(): void;
+			*/
+		});
 	});
 
 	describe('Controllers lifecycle', () => {
