@@ -183,7 +183,7 @@ public static class ApplicationBuilderExtensions
     {
         IHostingEnvironment hostingEnvironment = builder.ApplicationServices.GetRequiredService<IHostingEnvironment>();
         IOptions<GlobalSettings> globalSettings = builder.ApplicationServices.GetRequiredService<IOptions<GlobalSettings>>();
-        var backofficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment).TrimStart("/") ?? "umbraco";
+        var backofficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment).TrimStart("/");
 
         builder.UseRewriter(new RewriteOptions()
             .AddRewrite(@"^" + backofficePath + @"/backoffice/[a-f0-9]{40}/(.+)", backofficePath + "/backoffice/$1", true));
