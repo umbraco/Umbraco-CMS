@@ -47,6 +47,17 @@ describe('UmbContextProvider', () => {
 			expect(hostElement.hasController(secondCtrl)).to.be.true;
 		});
 
+		it('remove controller using a symbol', () => {
+			const mySymbol = Symbol();
+			const firstCtrl = new UmbTestControllerImplementationElement(hostElement, mySymbol);
+
+			expect(hostElement.hasController(firstCtrl)).to.be.true;
+
+			hostElement.removeControllerByAlias(mySymbol);
+
+			expect(hostElement.hasController(firstCtrl)).to.be.false;
+		});
+
 		it('controller is not replacing another controller when using the undefined as alias', () => {
 			const firstCtrl = new UmbTestControllerImplementationElement(hostElement, undefined);
 			const secondCtrl = new UmbTestControllerImplementationElement(hostElement, undefined);
