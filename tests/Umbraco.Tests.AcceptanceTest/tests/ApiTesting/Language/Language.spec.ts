@@ -6,46 +6,46 @@ test.describe('Language tests', () => {
   const isoCodeDanish = 'da-DK';
 
   test.beforeEach(async ({page, umbracoApi}) => {
-    await umbracoApi.language.ensureIsoCodeNotExists(isoCodeDanish);
+    await umbracoApi.language.delete(isoCodeDanish);
   });
 
   test.afterEach(async ({page, umbracoApi}) => {
-    await umbracoApi.language.ensureIsoCodeNotExists(isoCodeDanish);
+    await umbracoApi.language.delete(isoCodeDanish);
   });
 
-  test('can create new language', async ({page, umbracoApi, umbracoUi}) => {
-    await umbracoApi.language.createLanguage(languageNameDanish, false, false, isoCodeDanish);
+  test('can create a language', async ({page, umbracoApi, umbracoUi}) => {
+    await umbracoApi.language.create(languageNameDanish, false, false, isoCodeDanish);
 
     // Assert
-    await expect(await umbracoApi.language.doesLanguageWithIsoCodeExist(isoCodeDanish)).toBeTruthy();
+    await expect(await umbracoApi.language.exists(isoCodeDanish)).toBeTruthy();
   });
 
-  test('can update language', async ({page, umbracoApi, umbracoUi}) => {
+  test('can update a language', async ({page, umbracoApi, umbracoUi}) => {
     const wrongLanguageName = 'densk';
 
-    await umbracoApi.language.createLanguage(wrongLanguageName, false, false, isoCodeDanish);
+    await umbracoApi.language.create(wrongLanguageName, false, false, isoCodeDanish);
 
-    const language = await umbracoApi.language.getLanguageByName(wrongLanguageName);
+    const language = await umbracoApi.language.get(isoCodeDanish);
 
     // Updates language
     language.name = languageNameDanish;
-    await umbracoApi.language.updateLanguageWithIsoCode(isoCodeDanish, language);
+    await umbracoApi.language.update(isoCodeDanish, language);
 
     // Assert
-    await expect(await umbracoApi.language.doesLanguageWithIsoCodeExist(isoCodeDanish)).toBeTruthy();
+    await expect(await umbracoApi.language.exists(isoCodeDanish)).toBeTruthy();
     // Checks if the language name was updated
-    const updatedLanguage = await umbracoApi.language.getLanguageByIsoCode(isoCodeDanish);
-    await expect(updatedLanguage.name == languageNameDanish).toBeTruthy();
+    const updatedLanguage = await umbracoApi.language.get(isoCodeDanish);
+    await expect(updatedLanguage.name).toEqual(languageNameDanish);
   });
 
-  test('can delete language', async ({page, umbracoApi, umbracoUi}) => {
-    await umbracoApi.language.createLanguage(languageNameDanish, false, false, isoCodeDanish);
+  test('can delete a language', async ({page, umbracoApi, umbracoUi}) => {
+    await umbracoApi.language.create(languageNameDanish, false, false, isoCodeDanish);
 
-    await expect(await umbracoApi.language.doesLanguageWithIsoCodeExist(isoCodeDanish)).toBeTruthy();
+    await expect(await umbracoApi.language.exists(isoCodeDanish)).toBeTruthy();
 
-    await umbracoApi.language.deleteLanguageWithIsoCode(isoCodeDanish);
+    await umbracoApi.language.delete(isoCodeDanish);
 
     // Assert
-    await expect(await umbracoApi.language.doesLanguageWithIsoCodeExist(isoCodeDanish)).toBeFalsy();
+    await expect(await umbracoApi.language.exists(isoCodeDanish)).toBeFalsy();
   });
 });
