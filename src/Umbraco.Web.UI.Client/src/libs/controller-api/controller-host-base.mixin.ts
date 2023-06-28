@@ -2,7 +2,7 @@ import { ClassConstructor } from '../extension-api/types.js';
 import { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbController } from './controller.interface.js';
 
-export declare class UmbControllerHostBaseDeclaration implements Omit<UmbControllerHost, 'getHostElement'> {
+declare class UmbControllerHostBaseDeclaration implements Omit<UmbControllerHost, 'getHostElement'> {
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;
