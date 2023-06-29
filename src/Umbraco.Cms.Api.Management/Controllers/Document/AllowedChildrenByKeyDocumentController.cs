@@ -43,6 +43,6 @@ public class AllowedChildrenByKeyDocumentController : DocumentControllerBase
             Items = viewModels,
         };
 
-        return await Task.FromResult(Ok(pagedViewModel));
+        return Ok(pagedViewModel);
     }
 }
