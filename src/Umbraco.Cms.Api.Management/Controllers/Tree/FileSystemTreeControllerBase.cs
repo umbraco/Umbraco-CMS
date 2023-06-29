@@ -12,8 +12,6 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 {
     protected abstract IFileSystem FileSystem { get; }
 
-    protected abstract string FileIcon(string path);
-
     protected abstract string ItemType(string path);
 
     protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> GetRoot(int skip, int take)
@@ -102,7 +100,6 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
         {
             Path = path,
             Name = name,
-            Icon = isFolder ? Constants.Icons.Folder : FileIcon(path),
             HasChildren = isFolder && DirectoryHasChildren(path),
             Type = ItemType(path),
             IsFolder = isFolder

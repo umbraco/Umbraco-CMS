@@ -18,7 +18,5 @@ public class PartialViewTreeControllerBase : FileSystemTreeControllerBase
 
     protected override IFileSystem FileSystem { get; }
 
-    protected override string FileIcon(string path) => Constants.Icons.PartialView;
-
     protected override string ItemType(string path) => Constants.UdiEntityType.PartialView;
 }

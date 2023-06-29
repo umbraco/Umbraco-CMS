@@ -25,7 +25,6 @@ public class MemberGroupTreeControllerBase : EntityTreeControllerBase<EntityTree
     protected override EntityTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
         EntityTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
-        responseModel.Icon = Constants.Icons.MemberGroup;
         return responseModel;
     }
 }
