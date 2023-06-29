@@ -35,6 +35,7 @@
 		"./modal": "./dist-cms/packages/core/modal/index.js",
 		"./notification": "./dist-cms/packages/core/notification/index.js",
 		"./picker-input": "./dist-cms/packages/core/picker-input/index.js",
+		"./property-action": "./dist-cms/packages/core/property-action/index.js",
 		"./property-editor": "./dist-cms/packages/core/property-editor/index.js",
 		"./section": "./dist-cms/packages/core/section/index.js",
 		"./sorter": "./dist-cms/packages/core/sorter/index.js",

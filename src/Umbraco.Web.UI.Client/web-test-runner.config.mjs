@@ -77,6 +77,7 @@ export default {
 						'@umbraco-cms/backoffice/modal': './src/packages/core/modal/index.ts',
 						'@umbraco-cms/backoffice/notification': './src/packages/core/notification/index.ts',
 						'@umbraco-cms/backoffice/picker-input': './src/packages/core/picker-input/index.ts',
+						'@umbraco-cms/backoffice/property-action': './src/packages/core/property-action/index.ts',
 						'@umbraco-cms/backoffice/property-editor': './src/packages/core/property-editor/index.ts',
 						'@umbraco-cms/backoffice/section': './src/packages/core/section/index.ts',
 						'@umbraco-cms/backoffice/sorter': './src/packages/core/sorter/index.ts',
