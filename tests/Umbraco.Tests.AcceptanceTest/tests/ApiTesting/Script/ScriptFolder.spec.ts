@@ -2,47 +2,45 @@ import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 test.describe('Script Folder tests', () => {
+  let scriptFolderPath = "";
   const scriptFolderName = 'scriptFolder';
 
   test.beforeEach(async ({page, umbracoApi}) => {
-    await umbracoApi.script.ensureScriptNotNameNotExistsAtRoot(scriptFolderName);
+    await umbracoApi.script.ensureNameNotExistsAtRoot(scriptFolderName);
   });
 
   test.afterEach(async ({page, umbracoApi}) => {
-    await umbracoApi.script.ensureScriptNotNameNotExistsAtRoot(scriptFolderName);
+    await umbracoApi.script.deleteFolder(scriptFolderPath);
   });
 
-  test('can create script folder', async ({page, umbracoApi, umbracoUi}) => {
-    await umbracoApi.script.createScriptFolder(scriptFolderName);
+  test('can create a script folder', async ({page, umbracoApi, umbracoUi}) => {
+    scriptFolderPath = await umbracoApi.script.createFolder(scriptFolderName);
 
     // Assert
-    await expect(umbracoApi.script.doesScriptWithNameExistAtRoot(scriptFolderName)).toBeTruthy();
+    await expect(umbracoApi.script.folderExists(scriptFolderPath)).toBeTruthy();
   });
 
-  test('can delete script folder', async ({page, umbracoApi, umbracoUi}) => {
-    await umbracoApi.script.createScriptFolder(scriptFolderName);
+  test('can delete a script folder', async ({page, umbracoApi, umbracoUi}) => {
+    scriptFolderPath = await umbracoApi.script.createFolder(scriptFolderName);
 
-    await expect(await umbracoApi.script.doesScriptWithNameExistAtRoot(scriptFolderName)).toBeTruthy();
-    const scriptFolder = await umbracoApi.script.getScriptByNameAtRoot(scriptFolderName);
+    await expect(await umbracoApi.script.folderExists(scriptFolderName)).toBeTruthy();
 
-    await umbracoApi.script.deleteScriptFolder(scriptFolder.path);
+    await umbracoApi.script.deleteFolder(scriptFolderPath);
 
     // Assert
-    await expect(await umbracoApi.script.doesScriptWithNameExistAtRoot(scriptFolderName)).toBeFalsy();
+    await expect(await umbracoApi.script.folderExists(scriptFolderPath)).toBeFalsy();
   });
 
   test('can add a script folder in another folder', async ({page, umbracoApi, umbracoUi}) => {
     const childFolderName = 'childFolder';
-    await umbracoApi.script.createScriptFolder(scriptFolderName);
+    scriptFolderPath = await umbracoApi.script.createFolder(scriptFolderName);
 
-    const parentFolder = await umbracoApi.script.getScriptByNameAtRoot(scriptFolderName);
+    await umbracoApi.script.createFolder(childFolderName, scriptFolderPath);
 
-    await umbracoApi.script.createScriptFolder(childFolderName, parentFolder.path);
-
-    const children = await umbracoApi.script.getChildrenInScriptFolderByPath(parentFolder.path);
+    const childFolder = await umbracoApi.script.getFolderChildren(scriptFolderPath);
 
     // Assert
-    await expect(children.items[0].name === childFolderName).toBeTruthy();
+    await expect(childFolder.items[0].name).toEqual(childFolderName);
   });
 
   test('can add a script folder in a folder in another folder', async ({page, umbracoApi, umbracoUi}) => {
@@ -50,20 +48,19 @@ test.describe('Script Folder tests', () => {
     const childOfChildFolderName = 'childOfChildFolder';
 
     // Creates parent folder
-    await umbracoApi.script.createScriptFolder(scriptFolderName);
-    const parentFolder = await umbracoApi.script.getScriptByNameAtRoot(scriptFolderName);
+    scriptFolderPath = await umbracoApi.script.createFolder(scriptFolderName);
 
     // Creates child folder in parent folder
-    await umbracoApi.script.createScriptFolder(childFolderName, parentFolder.path);
-    const childOfParent = await umbracoApi.script.getChildrenInScriptFolderByPath(parentFolder.path);
+    const childOfParentPath = await umbracoApi.script.createFolder(childFolderName, scriptFolderPath);
+    const childOfParent = await umbracoApi.script.getFolderChildren(scriptFolderPath);
 
     // Creates childOfChild folder in child folder
-    await umbracoApi.script.createScriptFolder(childOfChildFolderName, childOfParent.items[0].path);
-    const childOfChild = await umbracoApi.script.getChildrenInScriptFolderByPath(childOfParent.items[0].path);
+    await umbracoApi.script.createFolder(childOfChildFolderName, childOfParentPath);
+    const childOfChild = await umbracoApi.script.getFolderChildren(childOfParentPath);
 
     // Assert
     // Checks if the script folder are in the correct folders
-    await expect(childOfParent.items[0].name === childFolderName).toBeTruthy();
-    await expect(childOfChild.items[0].name === childOfChildFolderName).toBeTruthy();
+    await expect(childOfParent.items[0].name).toEqual(childFolderName);
+    await expect(childOfChild.items[0].name).toEqual(childOfChildFolderName);
   });
 });

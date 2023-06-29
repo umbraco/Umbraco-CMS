@@ -3,6 +3,7 @@ import {expect} from "@playwright/test";
 
 test.describe('User Avatar Tests', () => {
   // User
+  let userId = "";
   const userEmail = "userAvatar@email.com";
   const userName = "UserAvatarTests";
   // Avatar
@@ -13,56 +14,52 @@ test.describe('User Avatar Tests', () => {
   const avatarFilePath = './fixtures/mediaLibrary/Umbraco.png';
 
   test.beforeEach(async ({page, umbracoApi}) => {
-    await umbracoApi.user.ensureUserNameNotExists(userName);
-    await umbracoApi.temporaryFile.ensureTemporaryFileWithIdNotExists(avatarFileId);
+    await umbracoApi.user.ensureNameNotExists(userName);
+    await umbracoApi.temporaryFile.delete(avatarFileId);
   });
 
   test.afterEach(async ({page, umbracoApi}) => {
-    await umbracoApi.user.ensureUserNameNotExists(userName);
-    await umbracoApi.temporaryFile.ensureTemporaryFileWithIdNotExists(avatarFileId);
+    await umbracoApi.user.ensureNameNotExists(userName);
+    await umbracoApi.temporaryFile.delete(avatarFileId);
   });
 
   test('can add an avatar to a user', async ({page, umbracoApi, umbracoUi}) => {
-    const userGroup = await umbracoApi.userGroup.getUserGroupByName("Writers");
+    const userGroup = await umbracoApi.userGroup.getByName("Writers");
 
     const userGroupData = [userGroup.id];
 
-    await umbracoApi.user.createUser(userEmail, userName, userGroupData);
+    userId = await umbracoApi.user.create(userEmail, userName, userGroupData);
 
-    const userData = await umbracoApi.user.getUserByName(userName);
+    await umbracoApi.temporaryFile.create(avatarFileId, avatarName, mimeType, avatarFilePath);
 
-    await umbracoApi.temporaryFile.createTemporaryFile(avatarFileId, avatarName, mimeType, avatarFilePath);
-
-    await umbracoApi.user.addAvatarToUserWithId(userData.id, avatarFileId);
+    await umbracoApi.user.addAvatar(userId, avatarFileId);
 
     // Assert
     // Checks if the avatar was added to the user
-    const userDataWithAvatar = await umbracoApi.user.getUserByName(userName);
+    const userDataWithAvatar = await umbracoApi.user.get(userId);
     await expect(userDataWithAvatar.avatarUrls.length !== 0).toBeTruthy();
   });
 
   test('can remove an avatar from a user', async ({page, umbracoApi, umbracoUi}) => {
-    const userGroup = await umbracoApi.userGroup.getUserGroupByName("Writers");
+    const userGroup = await umbracoApi.userGroup.getByName("Writers");
 
     const userGroupData = [userGroup.id];
 
-    await umbracoApi.user.createUser(userEmail, userName, userGroupData);
+    userId = await umbracoApi.user.create(userEmail, userName, userGroupData);
 
-    const userData = await umbracoApi.user.getUserByName(userName);
+    await umbracoApi.temporaryFile.create(avatarFileId, avatarName, mimeType, avatarFilePath);
 
-    await umbracoApi.temporaryFile.createTemporaryFile(avatarFileId, avatarName, mimeType, avatarFilePath);
-
-    await umbracoApi.user.addAvatarToUserWithId(userData.id, avatarFileId);
+    await umbracoApi.user.addAvatar(userId, avatarFileId);
 
     // Checks if the avatar was added to the user
-    const userDataWithAvatar = await umbracoApi.user.getUserByName(userName);
+    const userDataWithAvatar = await umbracoApi.user.get(userId);
     await expect(userDataWithAvatar.avatarUrls.length !== 0).toBeTruthy();
 
-    await umbracoApi.user.removeAvatarFromUserWithId(userData.id);
+    await umbracoApi.user.removeAvatar(userId);
 
     // Assert
     // Checks if the avatar was removed from the user
-    const userDataWithoutAvatar = await umbracoApi.user.getUserByName(userName);
-    await expect(userDataWithoutAvatar.avatarUrls.length == 0).toBeTruthy();
+    const userDataWithoutAvatar = await umbracoApi.user.get(userId);
+    await expect(userDataWithoutAvatar.avatarUrls.length).toEqual(0);
   });
 });

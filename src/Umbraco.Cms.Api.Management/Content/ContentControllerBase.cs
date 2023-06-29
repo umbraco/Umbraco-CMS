@@ -43,4 +43,11 @@ public class ContentControllerBase : ManagementApiControllerBase
             ContentEditingOperationStatus.Unknown => StatusCode(StatusCodes.Status500InternalServerError, "Unknown error. Please see the log for more details."),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status.")
         };
+
+    protected IActionResult ContentCreatingOperationStatusResult(ContentCreatingOperationStatus status) =>
+        status switch
+        {
+            ContentCreatingOperationStatus.NotFound => NotFound("The content type could not be found"),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status."),
+        };
 }
