@@ -43,7 +43,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	#editorRef?: tinymce.Editor | null = null;
 
 	protected getFormElement() {
-		return undefined;
+		return this._editorElement?.querySelector('iframe') ?? undefined;
 	}
 
 	@query('#editor', true)
