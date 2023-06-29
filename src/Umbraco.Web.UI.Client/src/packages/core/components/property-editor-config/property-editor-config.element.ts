@@ -7,7 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '../../property-editor';
+import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  *  @element umb-property-editor-config
