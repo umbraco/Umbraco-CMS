@@ -28,7 +28,7 @@ public class AllowedChildrenByKeyDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AllowedChildrenByKey(Guid id, int skip = 0, int take = 100)
     {
-        Attempt<PagedModel<IContentType>?, ContentCreatingOperationStatus> allowedChildrenAttempt = await _contentCreatingService.GetAllowedChildrenAsync(id, skip, take);
+        Attempt<PagedModel<IContentType>?, ContentCreatingOperationStatus> allowedChildrenAttempt = await _contentCreatingService.GetAllowedChildrenContentTypesAsync(id, skip, take);
 
         if (allowedChildrenAttempt.Success is false)
         {

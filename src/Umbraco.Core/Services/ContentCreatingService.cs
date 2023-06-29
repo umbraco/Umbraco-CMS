@@ -19,7 +19,7 @@ public class ContentCreatingService : IContentCreatingService
         _coreScopeProvider = coreScopeProvider;
     }
 
-    public async Task<Attempt<PagedModel<IContentType>?, ContentCreatingOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take)
+    public async Task<Attempt<PagedModel<IContentType>?, ContentCreatingOperationStatus>> GetAllowedChildrenContentTypesAsync(Guid key, int skip, int take)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         IContent? content = _contentService.GetById(key);
