@@ -36,6 +36,7 @@ public class PublishedContentQueryTests : ExamineBaseTest
 
         public bool EnableDefaultEventHandler => throw new NotImplementedException();
         public bool PublishedValuesOnly => throw new NotImplementedException();
+        public bool SupportProtectedContent => throw new NotImplementedException();
         public IEnumerable<string> GetFields() => _fieldNames;
     }
 

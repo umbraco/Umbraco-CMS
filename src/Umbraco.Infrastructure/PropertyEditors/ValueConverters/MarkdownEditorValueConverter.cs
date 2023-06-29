@@ -72,7 +72,6 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase, IDeliver
             return string.Empty;
         }
 
-        var mark = new Markdown();
-        return mark.Transform(markdownString);
+        return markdownString;
     }
 }
