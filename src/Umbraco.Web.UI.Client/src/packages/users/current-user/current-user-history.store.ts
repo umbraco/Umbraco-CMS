@@ -1,5 +1,7 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 
 export type UmbModelType = 'dialog' | 'sidebar';
 
@@ -9,13 +11,16 @@ export type UmbCurrentUserHistoryItem = {
 	icon?: string;
 };
 
-export class UmbCurrentUserHistoryStore {
-	#history = new UmbDeepState(<Array<UmbCurrentUserHistoryItem>>[]);
+export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHistoryItem> {
+	public readonly history = this._data.asObservable();
+	public readonly latestHistory = this._data.getObservablePart((historyItems) => historyItems.slice(-10));
 
-	public readonly history = this.#history.asObservable();
-	public readonly latestHistory = this.#history.getObservablePart((historyItems) => historyItems.slice(-10));
-
-	constructor() {
+	constructor(host: UmbControllerHost) {
+		super(
+			host,
+			UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN.toString(),
+			new UmbArrayState<UmbCurrentUserHistoryItem>([])
+		);
 		if (!('navigation' in window)) return;
 		(window as any).navigation.addEventListener('navigate', (event: any) => {
 			const url = new URL(event.destination.url);
@@ -31,12 +36,12 @@ export class UmbCurrentUserHistoryStore {
 	 * @memberof UmbHistoryService
 	 */
 	public push(historyItem: UmbCurrentUserHistoryItem): void {
-		const history = this.#history.getValue();
+		const history = this._data.getValue();
 		const lastItem = history[history.length - 1];
 
 		// This prevents duplicate entries in the history array.
 		if (!lastItem || lastItem.path !== historyItem.path) {
-			this.#history.next([...this.#history.getValue(), historyItem]);
+			this._data.next([...this._data.getValue(), historyItem]);
 		}
 	}
 
@@ -46,10 +51,13 @@ export class UmbCurrentUserHistoryStore {
 	 * @memberof UmbHistoryService
 	 */
 	public clear() {
-		this.#history.next([]);
+		this._data.next([]);
 	}
 }
 
 export const UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbCurrentUserHistoryStore>(
 	'UmbCurrentUserHistoryStore'
 );
+
+// Default export for the globalContext manifest:
+export default UmbCurrentUserHistoryStore;

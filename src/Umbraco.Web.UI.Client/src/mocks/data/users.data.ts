@@ -1,5 +1,5 @@
-import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { UmbData } from './data.js';
+import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { PagedUserResponseModel, UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 // Temp mocked database

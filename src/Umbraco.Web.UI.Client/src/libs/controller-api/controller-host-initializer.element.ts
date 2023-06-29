@@ -1,7 +1,7 @@
-import { UmbControllerHostElement, UmbControllerHostMixin } from './controller-host.mixin.js';
+import { UmbControllerHostElement, UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
 
 export class UmbControllerHostInitializerElement
-	extends UmbControllerHostMixin(HTMLElement)
+	extends UmbControllerHostElementMixin(HTMLElement)
 	implements UmbControllerHostElement
 {
 	/**

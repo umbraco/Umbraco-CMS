@@ -1,12 +1,11 @@
-import type { UmbExtensionRegistry } from './registry/extension.registry.js';
+import { UmbEntryPointModule } from './entry-point.interface.js';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ClassConstructor<T> = new (...args: any[]) => T;
+export type ClassConstructor<T = object> = new (...args: any[]) => T;
 
 export type ManifestTypeMap<ManifestTypes extends ManifestBase> = {
 	[Manifest in ManifestTypes as Manifest['type']]: Manifest;
@@ -156,10 +155,7 @@ export interface ManifestWithMeta extends ManifestBase {
  * This type of extension gives full control and will simply load the specified JS file
  * You could have custom logic to decide which extensions to load/register by using extensionRegistry
  */
-export interface ManifestEntryPoint
-	extends ManifestWithLoader<{
-		onInit: (host: UmbControllerHostElement, extensionApi: UmbBackofficeExtensionRegistry) => void;
-	}> {
+export interface ManifestEntryPoint extends ManifestWithLoader<UmbEntryPointModule> {
 	type: 'entryPoint';
 
 	/**
