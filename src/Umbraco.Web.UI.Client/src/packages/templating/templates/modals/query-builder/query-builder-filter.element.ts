@@ -83,7 +83,7 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
     }
 
 	private _renderOperatorsDropdown() {
-		return html`<umb-button-with-dropdown look="outline" id="operator-dropdown">
+		return html`<umb-button-with-dropdown look="outline" id="operator-dropdown" label="choose operator">
 			${this.filter?.operator ?? ''}
 			<uui-combobox-list slot="dropdown" @change=${this.#setOperator} class="options-list">
 				${this.settings?.operators
@@ -103,13 +103,13 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	private _renderConstraintValueInput() {
 		switch (this.currentPropertyType) {
 			case TemplateQueryPropertyTypeModel.INTEGER:
-				return html`<uui-input type="number" @change=${this.#setConstrainValue}></uui-input>`;
+				return html`<uui-input type="number" @change=${this.#setConstrainValue} label="constrain value"></uui-input>`;
 			case TemplateQueryPropertyTypeModel.STRING:
-				return html`<uui-input type="text" @change=${this.#setConstrainValue}></uui-input>`;
+				return html`<uui-input type="text" @change=${this.#setConstrainValue} label="constrain value"></uui-input>`;
 			case TemplateQueryPropertyTypeModel.DATE_TIME:
-				return html`<uui-input type="datetime-local" @change=${this.#setConstrainValue}></uui-input>`;
+				return html`<uui-input type="datetime-local" @change=${this.#setConstrainValue} label="constrain value"></uui-input>`;
 			default:
-				return html`<input type="text" @change=${this.#setConstrainValue} />`;
+				return html`<uui-input type="text" @change=${this.#setConstrainValue} label="constrain value"></uui-input>`;
 		}
 	}
 
@@ -117,6 +117,7 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 		return html`
 			<span>${this.unremovable ? 'where' : 'and'}</span>
 			<umb-button-with-dropdown look="outline" id="property-alias-dropdown"
+            label="Property alias"
 				>${this.filter?.propertyAlias ?? ''}
 				<uui-combobox-list slot="dropdown" @change=${this.#setPropertyAlias} class="options-list">
 					${this.settings?.properties?.map(

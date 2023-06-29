@@ -10,6 +10,7 @@ import {
 import {
 	TemplateQueryExecuteFilterPresentationModel,
 	TemplateQueryExecuteModel,
+	TemplateQueryExecuteSortModel,
 	TemplateQueryResultResponseModel,
 	TemplateQuerySettingsResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -26,6 +27,11 @@ export interface TemplateQueryBuilderModalResult {
 	value: string;
 }
 
+enum SortOrder {
+	Ascending = 'ascending',
+	Descending = 'descending',
+}
+
 @customElement('umb-templating-query-builder-modal')
 export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement<
 	TemplateQueryBuilderModalData,
@@ -33,6 +39,9 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 > {
 	@query('#content-type-dropdown')
 	private _contentTypeDropdown?: UmbButtonWithDropdownElement;
+
+	@query('#sort-dropdown')
+	private _sortDropdown?: UmbButtonWithDropdownElement;
 
 	@query('#filter-container')
 	private _filterContainer?: HTMLElement;
@@ -66,6 +75,9 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	@state()
 	private _selectedRootContentName = 'all pages';
+
+	@state()
+	private _defaultSortDirection: SortOrder = SortOrder.Ascending;
 
 	#documentRepository: UmbDocumentRepository;
 	#modalManagerContext?: UmbModalManagerContext;
@@ -142,12 +154,36 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		this._contentTypeDropdown!.closePopover();
 	}
 
+	#setSortProperty(event: Event) {
+		const target = event.target as UUIComboboxListElement;
+		this.#updateQueryRequest({
+			sort: { ...this._queryRequest.sort, propertyAlias: (target.value as string) ?? '' },
+		});
+		this._sortDropdown!.closePopover();
+	}
+
+	#setSortDirection() {
+		if (!this._queryRequest.sort?.direction) {
+			this.#updateQueryRequest({
+				sort: { ...this._queryRequest.sort, direction: this._defaultSortDirection },
+			});
+			return;
+		}
+
+		this.#updateQueryRequest({
+			sort: {
+				...this._queryRequest.sort,
+				direction:
+					this._queryRequest.sort?.direction === SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending,
+			},
+		});
+	}
+
 	#addFilterElement = () => {
 		this._filterContainer?.appendChild(this.#createFilterElement());
 	};
 
 	#updateFilters = () => {
-		
 		this.#updateQueryRequest({ filters: Array.from(this._filterElements)?.map((filter) => filter.filter) ?? [] });
 	};
 
@@ -164,9 +200,9 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 					<uui-box>
 						<div class="row">
 							I want
-							<umb-button-with-dropdown look="outline" id="content-type-dropdown"
+							<umb-button-with-dropdown look="outline" id="content-type-dropdown" label="Choose content type"
 								>${this._queryRequest?.contentTypeAlias ?? 'all content'}
-								<uui-combobox-list slot="dropdown" @change=${this.#setContentType} id="content-type-list">
+								<uui-combobox-list slot="dropdown" @change=${this.#setContentType} class="options-list">
 									<uui-combobox-list-option value="">all content</uui-combobox-list-option>
 									${this._queryBuilderSettings?.contentTypeAliases?.map(
 										(alias) =>
@@ -177,7 +213,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 								</uui-combobox-list></umb-button-with-dropdown
 							>
 							from
-							<uui-button look="outline" @click=${this.#openDocumentPicker}
+							<uui-button look="outline" @click=${this.#openDocumentPicker} label="Choose root content"
 								>${this._selectedRootContentName}
 							</uui-button>
 						</div>
@@ -191,8 +227,24 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 								@remove-filter=${this.#removeFilter}></umb-query-builder-filter>
 						</div>
 						<div class="row">
-							ordered by <uui-button look="outline">(allowed properties)</uui-button>
-							<uui-button look="outline">ascending/descending</uui-button>
+							ordered by
+							<umb-button-with-dropdown look="outline" id="sort-dropdown" label="Property alias"
+								>${this._queryRequest.sort?.propertyAlias ?? ''}
+								<uui-combobox-list slot="dropdown" @change=${this.#setSortProperty} class="options-list">
+									${this._queryBuilderSettings?.properties?.map(
+										(property) =>
+											html`<uui-combobox-list-option .value=${property.alias ?? ''}
+												>${property.alias}</uui-combobox-list-option
+											>`
+									)}
+								</uui-combobox-list></umb-button-with-dropdown
+							>
+
+							${this._queryRequest.sort?.propertyAlias
+								? html`<uui-button look="outline" @click=${this.#setSortDirection}
+										>${this._queryRequest.sort.direction ?? this._defaultSortDirection}</uui-button
+								  >`
+								: ''}
 						</div>
 						<div class="row">N items returned, in 0 ms</div>
 						<code> ${this._templateQuery?.queryExpression ?? ''} </code>
@@ -200,8 +252,8 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 				</div>
 
 				<div slot="actions">
-					<uui-button @click=${this.#close} look="secondary">Close</uui-button>
-					<uui-button @click=${this.#submit} look="primary" color="positive">Submit</uui-button>
+					<uui-button @click=${this.#close} look="secondary" label="Close">Close</uui-button>
+					<uui-button @click=${this.#submit} look="primary" color="positive" label="Submit">Submit</uui-button>
 				</div>
 			</umb-body-layout>
 		`;
@@ -223,8 +275,8 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 				);
 			}
 
-			#content-type-list {
-				width: 250%;
+			.options-list {
+				min-width: 25ch;
 				background-color: var(--uui-color-surface);
 				box-shadow: var(--uui-shadow-depth-3);
 			}
