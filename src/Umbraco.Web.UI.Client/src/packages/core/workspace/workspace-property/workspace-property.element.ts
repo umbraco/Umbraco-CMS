@@ -1,4 +1,4 @@
-import { type UmbDataTypeConfig } from '../../property-editors/index.js';
+import { type UmbDataTypeConfig } from '../../property-editor/index.js';
 import { UmbWorkspacePropertyContext } from './workspace-property.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';

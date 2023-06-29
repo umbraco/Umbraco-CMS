@@ -1,4 +1,4 @@
-import { type UmbDataTypeConfigProperty, type UmbDataTypeConfig } from '../../property-editors/index.js';
+import { type UmbDataTypeConfigProperty, type UmbDataTypeConfig } from '../../property-editor/index.js';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
