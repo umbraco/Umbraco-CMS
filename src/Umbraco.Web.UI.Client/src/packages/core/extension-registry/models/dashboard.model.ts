@@ -10,7 +10,12 @@ export interface ManifestDashboard
 
 export interface MetaDashboard {
 	/**
-	 * This is the URL path for the dashboard which is used for navigating or deep linking directly to the dashboard
+	 * The displayed name (label) in the navigation.
+	 */
+	label?: string;
+
+	/**
+	 * This is the URL path part for this view. This is used for navigating or deep linking directly to the dashboard
 	 * https://yoursite.com/section/settings/dashboard/my-dashboard-path
 	 *
 	 * @example my-dashboard-path
@@ -18,12 +23,7 @@ export interface MetaDashboard {
 	 *  "my-dashboard-path"
 	 * ]
 	 */
-	pathname: string;
-
-	/**
-	 * The displayed name (label) for the tab of the dashboard
-	 */
-	label?: string;
+	pathname?: string;
 }
 
 export interface ConditionsDashboard {
