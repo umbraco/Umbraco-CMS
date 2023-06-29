@@ -35,7 +35,7 @@ describe('UmbDeepState', () => {
 	it('use gObservablePart, updates on its specific change.', (done) => {
 		let amountOfCallbacks = 0;
 
-		const subObserver = subject.getObservablePart((data) => data.another);
+		const subObserver = subject.asObservablePart((data) => data.another);
 		subObserver.subscribe((value) => {
 			amountOfCallbacks++;
 			if (amountOfCallbacks === 1) {

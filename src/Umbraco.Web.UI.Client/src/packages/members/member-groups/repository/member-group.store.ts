@@ -31,7 +31,7 @@ export class UmbMemberGroupStore extends UmbStoreBase {
 	 * @memberof UmbMemberGroupStore
 	 */
 	byId(id: MemberGroupDetails['id']) {
-		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
+		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
 	}
 
 	remove(uniques: string[]) {

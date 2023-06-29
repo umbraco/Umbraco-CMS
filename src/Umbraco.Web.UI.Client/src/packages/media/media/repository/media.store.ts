@@ -35,7 +35,7 @@ export class UmbMediaStore extends UmbStoreBase {
 	 * @memberof UmbMediaStore
 	 */
 	byId(id: MediaDetails['id']) {
-		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
+		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
 	}
 
 	/**

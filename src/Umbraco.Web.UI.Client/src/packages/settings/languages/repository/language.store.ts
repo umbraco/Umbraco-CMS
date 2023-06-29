@@ -33,6 +33,6 @@ export class UmbLanguageStore extends UmbStoreBase {
 
 	// TODO: how do we best handle this? They might have a smaller data set than the details
 	items(isoCodes: Array<string>) {
-		return this._data.getObservablePart((items) => items.filter((item) => isoCodes.includes(item.isoCode ?? '')));
+		return this._data.asObservablePart((items) => items.filter((item) => isoCodes.includes(item.isoCode ?? '')));
 	}
 }

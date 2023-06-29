@@ -39,7 +39,7 @@ export class UmbDocumentTypeStore extends UmbStoreBase {
 	 * @memberof UmbDocumentTypeStore
 	 */
 	byId(id: DocumentTypeResponseModel['id']) {
-		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
+		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
 	}
 
 	/**

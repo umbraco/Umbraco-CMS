@@ -35,7 +35,7 @@ export class UmbDocumentStore extends UmbStoreBase {
 	 * @memberof UmbDocumentStore
 	 */
 	byId(id: DocumentResponseModel['id']) {
-		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
+		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
 	}
 
 	/**

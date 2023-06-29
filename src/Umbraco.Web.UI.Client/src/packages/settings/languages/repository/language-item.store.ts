@@ -26,6 +26,6 @@ export class UmbLanguageItemStore
 	}
 
 	items(isoCodes: Array<string>) {
-		return this._data.getObservablePart((items) => items.filter((item) => isoCodes.includes(item.isoCode ?? '')));
+		return this._data.asObservablePart((items) => items.filter((item) => isoCodes.includes(item.isoCode ?? '')));
 	}
 }

@@ -29,7 +29,7 @@ export class UmbUserItemStore
 	}
 
 	items(ids: Array<string>) {
-		return this._data.getObservablePart((items) => items.filter((item) => ids.includes(item.id ?? '')));
+		return this._data.asObservablePart((items) => items.filter((item) => ids.includes(item.id ?? '')));
 	}
 }
 

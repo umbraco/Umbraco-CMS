@@ -29,7 +29,7 @@ export class UmbDictionaryStore extends UmbStoreBase {
 	 * @memberof UmbDictionaryStore
 	 */
 	byId(id: DictionaryItemResponseModel['id']) {
-		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
+		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
 	}
 
 	remove(uniques: string[]) {

@@ -11,8 +11,8 @@ export class UmbDictionaryWorkspaceContext
 	#data = new UmbObjectState<DictionaryItemResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
-	name = this.#data.getObservablePart((data) => data?.name);
-	dictionary = this.#data.getObservablePart((data) => data);
+	name = this.#data.asObservablePart((data) => data?.name);
+	dictionary = this.#data.asObservablePart((data) => data);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbDictionaryRepository(host));

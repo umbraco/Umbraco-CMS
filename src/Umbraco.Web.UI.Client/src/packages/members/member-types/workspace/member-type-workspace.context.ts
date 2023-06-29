@@ -11,7 +11,7 @@ export class UmbMemberTypeWorkspaceContext
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
-	name = this.#data.getObservablePart((data) => data?.name);
+	name = this.#data.asObservablePart((data) => data?.name);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbMemberTypeRepository(host));
