@@ -28,6 +28,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiAccessService, ApiAccessService>();
         builder.Services.AddSingleton<IApiContentQueryService, ApiContentQueryService>();
         builder.Services.AddSingleton<IApiContentQueryProvider, ApiContentQueryProvider>();
+        builder.Services.AddSingleton<IApiMediaQueryService, ApiMediaQueryService>();
 
         builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
         builder.AddUmbracoApiOpenApiUI();
