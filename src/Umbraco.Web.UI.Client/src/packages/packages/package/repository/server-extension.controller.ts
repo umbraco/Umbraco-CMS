@@ -1,9 +1,9 @@
 import { UmbPackageRepository } from './package.repository.js';
 import { Subject, takeUntil } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbExtensionInitializer extends UmbController {
+export class UmbExtensionInitializer extends UmbBaseController {
 	#host: UmbControllerHostElement;
 	#extensionRegistry: UmbBackofficeExtensionRegistry;
 	#unobserve = new Subject<void>();

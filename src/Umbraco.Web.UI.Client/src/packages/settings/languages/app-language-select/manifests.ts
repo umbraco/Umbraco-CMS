@@ -1,6 +1,12 @@
-import { ManifestSectionSidebarApp } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestSectionSidebarApp> = [
+const entityActions: Array<ManifestTypes> = [
+	{
+		type: 'globalContext',
+		alias: 'Umb.GlobalContext.AppLanguage',
+		name: 'App Language Context',
+		loader: () => import('./app-language.context.js'),
+	},
 	{
 		type: 'sectionSidebarApp',
 		alias: 'Umb.SectionSidebarItem.LanguageSelect',

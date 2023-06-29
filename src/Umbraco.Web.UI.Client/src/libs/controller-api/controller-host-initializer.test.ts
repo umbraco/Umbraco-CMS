@@ -1,11 +1,11 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbControllerHostInitializerElement } from './controller-host-initializer.element.js';
-import { UmbControllerHostElement, UmbControllerHostMixin } from './controller-host.mixin.js';
+import { UmbControllerHostElement, UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-test-controller-host-initializer-consumer')
-export class UmbTestControllerHostInitializerConsumerElement extends UmbControllerHostMixin(HTMLElement) {
+export class UmbTestControllerHostInitializerConsumerElement extends UmbControllerHostElementMixin(HTMLElement) {
 	public value: string | null = null;
 	constructor() {
 		super();

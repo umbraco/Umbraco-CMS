@@ -23,11 +23,11 @@ describe('UmbContextProviderController', () => {
 
 	describe('Public API', () => {
 		describe('properties', () => {
-			it('has a unique property', () => {
-				expect(provider).to.have.property('unique');
+			it('has a controllerAlias property', () => {
+				expect(provider).to.have.property('controllerAlias');
 			});
-			it('has a unique property, is equal to the unique', () => {
-				expect(provider.unique).to.eq('my-test-context');
+			it('has a controllerAlias property, is equal to the controllerAlias', () => {
+				expect(provider.controllerAlias).to.eq('my-test-context');
 			});
 		});
 

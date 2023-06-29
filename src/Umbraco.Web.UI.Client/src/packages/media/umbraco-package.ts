@@ -1,9 +1,9 @@
 export const name = 'Umbraco.Core.MediaManagement';
 export const extensions = [
 	{
-		name: 'Media Management Entry Point',
-		alias: 'Umb.EntryPoint.MediaManagement',
-		type: 'entryPoint',
-		loader: () => import('./package-entry-point.js'),
+		name: 'Media Management Bundle',
+		alias: 'Umb.Bundle.MediaManagement',
+		type: 'bundle',
+		loader: () => import('./manifests.js'),
 	},
 ];

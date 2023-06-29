@@ -6,7 +6,7 @@
     "outDir": "../dist-cms",
     "rootDir": "./",
     "composite": true,
-		"sourceMap": true,
+		"sourceMap": false,
 		"declaration": true,
     "resolveJsonModule": true,
   },

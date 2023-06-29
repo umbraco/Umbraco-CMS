@@ -1,26 +1,23 @@
-import { manifests } from './manifests.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { ManifestTheme, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 const LOCAL_STORAGE_KEY = 'umb-theme-alias';
 
-export class UmbThemeContext {
-	private _host: UmbControllerHostElement;
-
+export class UmbThemeContext extends UmbBaseController {
 	#theme = new UmbStringState('umb-light-theme');
-	public readonly theme = this.#theme.asObservable();
+	#themeObserver?: UmbObserverController<ManifestTheme[]>;
 
-	private themeSubscription?: UmbObserverController<ManifestTheme[]>;
+	public readonly theme = this.#theme.asObservable();
 
 	#styleElement: HTMLLinkElement | HTMLStyleElement | null = null;
 
 	constructor(host: UmbControllerHostElement) {
-		this._host = host;
+		super(host);
 
-		new UmbContextProviderController(host, UMB_THEME_CONTEXT_TOKEN, this);
+		this.provideContext(UMB_THEME_CONTEXT_TOKEN, this);
 
 		const storedTheme = localStorage.getItem(LOCAL_STORAGE_KEY);
 		if (storedTheme) {
@@ -31,11 +28,10 @@ export class UmbThemeContext {
 	public setThemeByAlias(themeAlias: string) {
 		this.#theme.next(themeAlias);
 
-		this.themeSubscription?.destroy();
+		this.#themeObserver?.destroy();
 		if (themeAlias) {
 			localStorage.setItem(LOCAL_STORAGE_KEY, themeAlias);
-			this.themeSubscription = new UmbObserverController(
-				this._host,
+			this.#themeObserver = this.observe(
 				umbExtensionsRegistry
 					.extensionsOfType('theme')
 					.pipe(map((extensions) => extensions.filter((extension) => extension.alias === themeAlias))),
@@ -73,11 +69,5 @@ export class UmbThemeContext {
 
 export const UMB_THEME_CONTEXT_TOKEN = new UmbContextToken<UmbThemeContext>('umbThemeContext');
 
-// TODO: Can we do this in a smarter way:
-const registerExtensions = (manifests: Array<ManifestTheme>) => {
-	manifests.forEach((manifest) => {
-		umbExtensionsRegistry.register(manifest);
-	});
-};
-
-registerExtensions([...manifests]);
+// Default export to enable this as a globalContext extension js:
+export default UmbThemeContext;

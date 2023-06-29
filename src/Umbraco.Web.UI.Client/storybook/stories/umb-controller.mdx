@@ -1,0 +1,36 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta title="Guides/Umbraco Controller" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
+
+# Umbraco Controller
+
+This class can be used as the base of any class.
+This will enable Controllers to be hosted in this class. Additionally it provides few shortcut methods for initializing core Umbraco Controllers.
+
+```ts
+observe<T>(source: Observable<T>, callback: (_value: T) => void, unique?: string): UmbObserverController<T>
+
+provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R>
+
+consumeContext<R = unknown>(alias: string | UmbContextToken<R>, callback: UmbContextCallback<R>): UmbContextConsumerController<R>
+```
+
+Use these for an smooth consumption, like this request for a Context API using a simple string context, where the callback value is of an unknown type:
+
+```ts
+this.consumeContext('requestThisContextAlias', (context) => {
+	// Notice this is a subscription, as context might change or a new one appears.
+	console.log("I've got the context", context);
+});
+```
+
+Or use the a Context Token to get a typed context:
+
+```ts
+import { UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+
+this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (context) => {
+	// Notice this is a subscription, as context might change or a new one appears, but the value is strongly typed
+	console.log("I've got the context", context);
+});
+```
