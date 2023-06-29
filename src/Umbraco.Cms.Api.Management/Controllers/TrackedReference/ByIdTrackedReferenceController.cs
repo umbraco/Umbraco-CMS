@@ -33,8 +33,8 @@ public class ByIdTrackedReferenceController : TrackedReferenceControllerBase
     [ProducesResponseType(typeof(PagedViewModel<RelationItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<RelationItemResponseModel>>> Get(
         Guid id,
-        long skip = 0,
-        long take = 20,
+        int skip = 0,
+        int take = 20,
         bool filterMustBeIsDependency = false)
     {
         PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, filterMustBeIsDependency);
