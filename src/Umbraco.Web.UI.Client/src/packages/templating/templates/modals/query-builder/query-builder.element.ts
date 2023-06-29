@@ -14,6 +14,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
 import { UmbButtonWithDropdownElement } from '@umbraco-cms/backoffice/components';
+import './query-builder-filter.element.js';
 
 export interface TemplateQueryBuilderModalData {
 	hidePartialViews?: boolean;
@@ -86,7 +87,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		const { data, error } = await this.#templateRepository.postTemplateQueryExecute({
 			requestBody: this._queryRequest,
 		});
-		console.log(this._queryRequest)
+		console.log(this._queryRequest);
 		if (data) this._templateQuery = { ...data };
 	}
 
@@ -147,10 +148,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 								>${this._selectedRootContentName}
 							</uui-button>
 						</div>
-						<div class="row">
-							where <uui-button look="outline">(allowed properties)</uui-button>
-							<uui-button look="outline">(filtered conditions)</uui-button>
-						</div>
+						<umb-query-builder-filter class="row" .settings=${this._queryBuilderSettings}></umb-query-builder-filter>
 						<div class="row">
 							ordered by <uui-button look="outline">(allowed properties)</uui-button>
 							<uui-button look="outline">ascending/descending</uui-button>
