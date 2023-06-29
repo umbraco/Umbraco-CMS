@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -8,16 +9,19 @@ public class ContentCreatingService : IContentCreatingService
     private readonly IContentTypeService _contentTypeService;
     private readonly IContentService _contentService;
     private readonly IEntityService _entityService;
+    private readonly ICoreScopeProvider _coreScopeProvider;
 
-    public ContentCreatingService(IContentTypeService contentTypeService, IContentService contentService, IEntityService entityService)
+    public ContentCreatingService(IContentTypeService contentTypeService, IContentService contentService, IEntityService entityService, ICoreScopeProvider coreScopeProvider)
     {
         _contentTypeService = contentTypeService;
         _contentService = contentService;
         _entityService = entityService;
+        _coreScopeProvider = coreScopeProvider;
     }
 
     public async Task<Attempt<PagedModel<IContentType>?, ContentCreatingOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take)
     {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         IContent? content = _contentService.GetById(key);
 
         if (content is null)
@@ -40,6 +44,8 @@ public class ContentCreatingService : IContentCreatingService
         {
             throw new InvalidOperationException("The document type could not be found.");
         }
+
+        scope.Complete();
 
         return Attempt.SucceedWithStatus(ContentCreatingOperationStatus.Success, contentTypeAttempt.Result);
     }
