@@ -41,6 +41,13 @@ public interface IContentTypeComposition : IContentTypeBase
     bool RemoveContentType(string alias);
 
     /// <summary>
+    /// Removes a content type with a specified key from the composition.
+    /// </summary>
+    /// <param name="key">The key of the content type to remove.</param>
+    /// <returns>True if the content type was removed, otherwise false.</returns>
+    bool RemoveContentType(Guid key);
+
+    /// <summary>
     ///     Checks if a ContentType with the supplied alias exists in the list of composite ContentTypes
     /// </summary>
     /// <param name="alias">Alias of a <see cref="IContentType" /></param>

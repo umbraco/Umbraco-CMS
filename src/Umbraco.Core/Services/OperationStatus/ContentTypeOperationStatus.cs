@@ -9,4 +9,5 @@ public enum ContentTypeOperationStatus
     InvalidPropertyTypeAlias,
     InvalidDataType,
     DataTypeNotFound,
+    InvalidInheritance
 }

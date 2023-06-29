@@ -18,6 +18,7 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
     private readonly IDataTypeService _dataTypeService;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ITemplateService _templateService;
+    private const int MaxInheritance = 1;
 
     protected CreateUpdateDocumentTypeControllerBase(IContentTypeService contentTypeService, IDataTypeService dataTypeService, IShortStringHelper shortStringHelper, ITemplateService templateService)
     {
@@ -72,6 +73,12 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
         if (dataTypeKeys.Length != dataTypesByKey.Count)
         {
             return ContentTypeOperationStatus.InvalidDataType;
+        }
+
+        // Only one composition can be parent
+        if (requestModel.Compositions.Count(x => x.CompositionType is ContentTypeCompositionType.Inheritance) > MaxInheritance)
+        {
+            return ContentTypeOperationStatus.InvalidInheritance;
         }
 
         // filter out properties and containers with no name/alias
@@ -191,7 +198,40 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
         }
 
         // FIXME: handle properties outside containers ("generic properties") if they still exist
-        // FIXME: handle compositions (yeah, that)
+        // Updates compositions
+        // We don't actually have to worry about alias collision here because that's also checked in the service
+        // We'll probably want to refactor this to be able to return a proper ContentTypeOperationStatus.
+        // In the mapping step here we only really care about the most immediate ancestors.
+        // We only really have to care about removing when updating
+        Guid[] currentKeys = contentType.ContentTypeComposition.Select(x => x.Key).ToArray();
+        Guid[] targetCompositionKeys = requestModel.Compositions.Select(x => x.Id).ToArray();
+
+        // We want to remove all of those that are in current, but not in targetCompositionKeys
+        Guid[] remove = currentKeys.Except(targetCompositionKeys).ToArray();
+        IEnumerable<Guid> add = targetCompositionKeys.Except(currentKeys);
+
+        foreach (Guid key in remove)
+        {
+            contentType.RemoveContentType(key);
+        }
+
+        // We have to look up the content types we want to add to composition, since we keep a full reference.
+        // TODO: Make Async
+        IContentType[] contentTypesToAdd = _contentTypeService.GetAll(add).ToArray();
+        foreach (IContentType contentTypeToAdd in contentTypesToAdd)
+        {
+            contentType.AddContentType(contentTypeToAdd);
+        }
+
+        // We need to handle the parent as well
+        // We've already validated that there is only one
+        ContentTypeComposition? parent = requestModel.Compositions
+            .FirstOrDefault(x => x.CompositionType is ContentTypeCompositionType.Inheritance);
+        if(parent is not null)
+        {
+            IContentType? parentType = await _contentTypeService.GetAsync(parent.Id);
+            contentType.SetParent(parentType);
+        }
 
         // update content type history clean-up
         contentType.HistoryCleanup ??= new HistoryCleanup();

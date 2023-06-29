@@ -28,11 +28,6 @@ public class CreateDocumentTypeController : CreateUpdateDocumentTypeControllerBa
         // FIXME: support document type folders (and creation within folders)
         const int parentId = Constants.System.Root;
 
-        if (requestModel.Compositions.Any())
-        {
-            return await Task.FromResult(BadRequest("Compositions and inheritance is not yet supported by this endpoint"));
-        }
-
         IContentType contentType = new ContentType(_shortStringHelper, parentId);
         ContentTypeOperationStatus result = await HandleRequest<CreateDocumentTypeRequestModel, CreateDocumentTypePropertyTypeRequestModel, CreateDocumentTypePropertyTypeContainerRequestModel>(contentType, requestModel);
 

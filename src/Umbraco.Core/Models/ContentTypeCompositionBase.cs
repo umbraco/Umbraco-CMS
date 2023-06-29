@@ -153,6 +153,19 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
         return false;
     }
 
+    /// <inheritdoc />
+    public bool RemoveContentType(Guid key)
+    {
+        // Kinda hacky, but no reason to dupe all the code
+        var aliasToRemove = ContentTypeComposition.FirstOrDefault(x => x.Key == key)?.Alias;
+        if (aliasToRemove is null)
+        {
+            return false;
+        }
+
+        return RemoveContentType(aliasToRemove);
+    }
+
     /// <summary>
     ///     Removes a content type with a specified alias from the composition.
     /// </summary>
