@@ -1,1 +1,1 @@
-export * from './data-type-config.type';
+export * from './data-type-config.type.js';
