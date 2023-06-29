@@ -39,7 +39,7 @@ public class AllowedChildrenByKeyDocumentController : DocumentControllerBase
 
         var pagedViewModel = new PagedViewModel<DocumentTypeResponseModel>
         {
-            Total = allowedChildrenAttempt.Result.Items.Count(),
+            Total = allowedChildrenAttempt.Result.Total,
             Items = viewModels,
         };
 
