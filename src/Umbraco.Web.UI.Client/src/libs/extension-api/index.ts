@@ -9,4 +9,4 @@ export * from './load-extension.function.js';
 export * from './registry/extension.registry.js';
 export * from './type-guards/index.js';
 export * from './types.js';
-export * from './umb-lifecycle.interface.js';
+export * from './entry-point.interface.js';

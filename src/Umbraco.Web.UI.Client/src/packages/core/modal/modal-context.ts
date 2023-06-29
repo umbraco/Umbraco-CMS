@@ -11,7 +11,7 @@ import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { ManifestModal, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement, UmbController } from '@umbraco-cms/backoffice/controller-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextProvider, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -41,9 +41,7 @@ type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
 	  };
 
 // TODO: consider splitting this into two separate handlers
-export class UmbModalContextClass<ModalData extends object = object, ModalResult = unknown>
-	implements UmbControllerInterface
-{
+export class UmbModalContextClass<ModalData extends object = object, ModalResult = unknown> implements UmbController {
 	#host: UmbControllerHostElement;
 
 	#submitPromise: Promise<ModalResult>;
@@ -63,7 +61,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
 
-	public get unique() {
+	public get controllerAlias() {
 		return 'umbModalContext:' + this.key;
 	}
 

@@ -3,7 +3,7 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 import '../../../components/input-number-range/input-number-range.element.js';
 
@@ -28,8 +28,8 @@ export class UmbPropertyEditorUINumberRangeElement extends UmbLitElement impleme
 		this._maxValue = value?.max;
 	}
 
-	@property({ type: Array, attribute: false })
-	public config = new UmbDataTypePropertyCollection();
+	@property({ attribute: false })
+	public config?: UmbDataTypeConfigCollection;
 
 	private _onChange(event: CustomEvent) {
 		this.value = {

@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import type { UmbPropertyEditorUITinyMceElement } from './property-editor-ui-tiny-mce.element.js';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 import './property-editor-ui-tiny-mce.element.js';
 
-const config = new UmbDataTypePropertyCollection([
+const config = new UmbDataTypeConfigCollection([
 	{
 		alias: 'hideLabel',
 		value: true,

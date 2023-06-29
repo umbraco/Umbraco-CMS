@@ -1,11 +1,8 @@
 import type { UmbExtensionRegistry } from './registry/extension.registry.js';
 import { ManifestBase } from './types.js';
-import type { UmbElementMixinInterface } from '@umbraco-cms/backoffice/element-api';
+import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
 
-export type UmbEntryPointOnInit = (
-	host: UmbElementMixinInterface,
-	extensionRegistry: UmbExtensionRegistry<ManifestBase>
-) => void;
+export type UmbEntryPointOnInit = (host: UmbElement, extensionRegistry: UmbExtensionRegistry<ManifestBase>) => void;
 
 /**
  * Interface containing supported life-cycle functions for ESModule entry points

@@ -1,7 +1,7 @@
 import { UmbLanguageRepository } from '../repository/language.repository.js';
 import { UmbObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbAppLanguageContext {
@@ -15,6 +15,9 @@ export class UmbAppLanguageContext {
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
+
+		new UmbContextProviderController(host, UMB_APP_LANGUAGE_CONTEXT_TOKEN, this);
+
 		this.#languageRepository = new UmbLanguageRepository(this.#host);
 		this.#observeLanguages();
 	}
@@ -46,5 +49,8 @@ export class UmbAppLanguageContext {
 		this.setLanguage(defaultLanguage.isoCode);
 	}
 }
+
+// Default export to enable this as a globalContext extension js:
+export default UmbAppLanguageContext;
 
 export const UMB_APP_LANGUAGE_CONTEXT_TOKEN = new UmbContextToken<UmbAppLanguageContext>('UmbAppLanguageContext');

@@ -3,10 +3,6 @@ import { manifests as templateManifests } from './templates/manifests.js';
 import { manifests as stylesheetManifests } from './stylesheets/manifests.js';
 import { manifests as partialManifests } from './partial-views/manifests.js';
 import { manifests as modalManifests } from './modals/manifests.js';
-import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
-
-import './components/index.js';
-import './templates/index.js';
 
 export const manifests = [
 	...menuManifests,
@@ -15,7 +11,3 @@ export const manifests = [
 	...partialManifests,
 	...modalManifests,
 ];
-
-export const onInit: UmbEntryPointOnInit = (_host, extensionRegistry) => {
-	extensionRegistry.registerMany(manifests);
-};

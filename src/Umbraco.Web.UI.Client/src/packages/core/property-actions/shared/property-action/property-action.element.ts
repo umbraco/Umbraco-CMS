@@ -5,6 +5,7 @@ import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
 import type { ManifestPropertyAction } from '@umbraco-cms/backoffice/extension-registry';
 
+// TODO: Here is a problem. The UmbPropertyActionElement is used for the type of the Extension Element. But is also a component that renders the Extension Element...
 @customElement('umb-property-action')
 export class UmbPropertyActionElement extends LitElement implements UmbPropertyAction {
 	private _propertyAction?: ManifestPropertyAction;
@@ -18,8 +19,8 @@ export class UmbPropertyActionElement extends LitElement implements UmbPropertyA
 	}
 
 	// TODO: we need to investigate context api vs values props and events
-	@property()
-	public value?: string;
+	@property({ attribute: false })
+	public value?: unknown;
 
 	@state()
 	private _element?: UmbPropertyActionElement;
@@ -28,6 +29,7 @@ export class UmbPropertyActionElement extends LitElement implements UmbPropertyA
 		if (!this.propertyAction) return;
 
 		try {
+			// TODO: Here is a problem. The UmbPropertyActionElement is used for the type of the Extension Element. But is also a component that renders the Extension Element...
 			this._element = (await createExtensionElement(this.propertyAction)) as UmbPropertyActionElement | undefined;
 			if (!this._element) return;
 

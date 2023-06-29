@@ -7,7 +7,7 @@ import {
 	UMB_ICON_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-icon-picker
@@ -17,8 +17,8 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 	@property()
 	value = '';
 
-	@property({ type: Array, attribute: false })
-	public config?: UmbDataTypePropertyCollection;
+	@property({ attribute: false })
+	public config?: UmbDataTypeConfigCollection;
 
 	private _modalContext?: UmbModalManagerContext;
 

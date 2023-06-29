@@ -1,4 +1,4 @@
-import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
+import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import {
 	UmbLinkPickerModalResult,
 	UMB_LINK_PICKER_MODAL,
@@ -14,7 +14,7 @@ type AnchorElementAttributes = {
 	'data-anchor'?: string | null;
 	rel?: string | null;
 	text?: string;
-}
+};
 
 export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 	#modalContext?: UmbModalManagerContext;
@@ -118,7 +118,7 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 	// TODO => where has rel gone?
 	#createElemAttributes() {
 		const a: AnchorElementAttributes = Object.assign({}, this.#linkPickerData?.link, { 'data-anchor': null });
-				
+
 		// always need to map back to href for tinymce to render correctly
 		// do this first as checking querystring below may modify the href property
 		if (this.#linkPickerData?.link.url) {

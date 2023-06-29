@@ -14,8 +14,6 @@ import {
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
-type ItemDetailType = MediaDetails;
-
 export class UmbMediaRepository
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,

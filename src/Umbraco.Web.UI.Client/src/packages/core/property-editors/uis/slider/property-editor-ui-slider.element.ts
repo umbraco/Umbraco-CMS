@@ -3,14 +3,14 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-slider
  */
 @customElement('umb-property-editor-ui-slider')
 export class UmbPropertyEditorUISliderElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
-	@property()
+	@property({ type: Object })
 	value:
 		| {
 				to?: number;
@@ -36,14 +36,14 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 	@state()
 	_max?: number;
 
-	@property({ type: Array, attribute: false })
-	public set config(config: UmbDataTypePropertyCollection) {
-		this._enableRange = config.getValueByAlias('enableRange');
-		this._initVal1 = config.getValueByAlias('initVal1');
-		this._initVal2 = config.getValueByAlias('initVal2');
-		this._step = config.getValueByAlias('step');
-		this._min = config.getValueByAlias('minVal');
-		this._max = config.getValueByAlias('maxVal');
+	@property({ attribute: false })
+	public set config(config: UmbDataTypeConfigCollection | undefined) {
+		this._enableRange = config?.getValueByAlias('enableRange');
+		this._initVal1 = config?.getValueByAlias('initVal1');
+		this._initVal2 = config?.getValueByAlias('initVal2');
+		this._step = config?.getValueByAlias('step');
+		this._min = config?.getValueByAlias('minVal');
+		this._max = config?.getValueByAlias('maxVal');
 	}
 
 	#getValueObject(val: string) {

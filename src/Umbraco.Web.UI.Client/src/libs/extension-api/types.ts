@@ -1,12 +1,11 @@
-import type { UmbExtensionRegistry } from './registry/extension.registry.js';
+import { UmbEntryPointModule } from './entry-point.interface.js';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ClassConstructor<T> = new (...args: any[]) => T;
+export type ClassConstructor<T = object> = new (...args: any[]) => T;
 
 export type ManifestTypeMap<ManifestTypes extends ManifestBase> = {
 	[Manifest in ManifestTypes as Manifest['type']]: Manifest;
@@ -95,7 +94,6 @@ export interface ManifestClass<ClassType = unknown>
 	 * @TJS-ignore
 	 */
 	class?: ClassConstructor<ClassType>;
-	//loader?: () => Promise<object | HTMLElement>;
 }
 
 export interface ManifestClassWithClassConstructor<T = unknown> extends ManifestClass<T> {
@@ -121,8 +119,6 @@ export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
 	 * Note it is NOT <my-dashboard></my-dashboard> but just the name
 	 */
 	elementName?: string;
-
-	//loader?: () => Promise<object | HTMLElement>;
 
 	/**
 	 * This contains properties specific to the type of extension
@@ -159,10 +155,7 @@ export interface ManifestWithMeta extends ManifestBase {
  * This type of extension gives full control and will simply load the specified JS file
  * You could have custom logic to decide which extensions to load/register by using extensionRegistry
  */
-export interface ManifestEntryPoint
-	extends ManifestWithLoader<{
-		onInit: (host: UmbControllerHostElement, extensionApi: UmbBackofficeExtensionRegistry) => void;
-	}> {
+export interface ManifestEntryPoint extends ManifestWithLoader<UmbEntryPointModule> {
 	type: 'entryPoint';
 
 	/**

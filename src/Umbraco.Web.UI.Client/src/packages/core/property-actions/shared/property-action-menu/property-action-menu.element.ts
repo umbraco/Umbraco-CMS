@@ -10,9 +10,8 @@ import '../property-action/property-action.element.js';
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
-	// TODO: we need to investigate context api vs values props and events
-	@property()
-	public value?: string;
+	@property({ attribute: false })
+	public value?: unknown;
 
 	@property()
 	set propertyEditorUiAlias(alias: string) {

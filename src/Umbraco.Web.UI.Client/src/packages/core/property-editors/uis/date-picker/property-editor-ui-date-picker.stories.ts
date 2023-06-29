@@ -3,14 +3,14 @@ import type { UmbPropertyEditorUIDatePickerElement } from './property-editor-ui-
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-date-picker.element.js';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 export default {
 	title: 'Property Editor UIs/Date Picker',
 	component: 'umb-property-editor-ui-date-picker',
 	id: 'umb-property-editor-ui-date-picker',
 	args: {
-		config: new UmbDataTypePropertyCollection([
+		config: new UmbDataTypeConfigCollection([
 			{
 				alias: 'format',
 				value: 'YYYY-MM-DD HH:mm:ss',
@@ -31,7 +31,7 @@ WithDateValue.args = {
 
 export const WithFormat = Template.bind({});
 WithFormat.args = {
-	config: new UmbDataTypePropertyCollection([
+	config: new UmbDataTypeConfigCollection([
 		{
 			alias: 'format',
 			value: 'dd/MM/yyyy HH:mm:ss',
@@ -41,7 +41,7 @@ WithFormat.args = {
 
 export const Timeframe = Template.bind({});
 Timeframe.args = {
-	config: new UmbDataTypePropertyCollection([
+	config: new UmbDataTypeConfigCollection([
 		{
 			alias: 'format',
 			value: 'dd/MM/yyyy HH:mm:ss',
@@ -59,7 +59,7 @@ Timeframe.args = {
 
 export const TimeOnly = Template.bind({});
 TimeOnly.args = {
-	config: new UmbDataTypePropertyCollection([
+	config: new UmbDataTypeConfigCollection([
 		{
 			alias: 'format',
 			value: 'HH:mm:ss',
@@ -69,7 +69,7 @@ TimeOnly.args = {
 
 export const DateOnly = Template.bind({});
 DateOnly.args = {
-	config: new UmbDataTypePropertyCollection([
+	config: new UmbDataTypeConfigCollection([
 		{
 			alias: 'format',
 			value: 'dd/MM/yyyy',

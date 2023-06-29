@@ -1,13 +1,10 @@
+import { UmbDataTypeConfig, type UmbDataTypeConfigProperty } from '../../property-editors/index.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDataTypeRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type {
-	DataTypeResponseModel,
-	DataTypePropertyPresentationModel,
-	PropertyTypeModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { DataTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -32,7 +29,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	private _propertyEditorUiAlias?: string;
 
 	@state()
-	private _dataTypeData: DataTypePropertyPresentationModel[] = [];
+	private _dataTypeData?: UmbDataTypeConfig;
 
 	private _dataTypeRepository: UmbDataTypeRepository = new UmbDataTypeRepository(this);
 	private _dataTypeObserver?: UmbObserverController<DataTypeResponseModel | undefined>;
@@ -92,7 +89,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			this._dataTypeObserver = this.observe(
 				await this._dataTypeRepository.byId(dataTypeId),
 				(dataType) => {
-					this._dataTypeData = dataType?.values || [];
+					this._dataTypeData = dataType?.values;
 					this._propertyEditorUiAlias = dataType?.propertyEditorUiAlias || undefined;
 					// If there is no UI, we will look up the Property editor model to find the default UI alias:
 					if (!this._propertyEditorUiAlias && dataType?.propertyEditorAlias) {
@@ -102,7 +99,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 							(extension) => {
 								if (!extension) return;
 								this._propertyEditorUiAlias = extension?.meta.defaultPropertyEditorUiAlias;
-								this.removeControllerByUnique('_observePropertyEditorSchema');
+								this.removeControllerByAlias('_observePropertyEditorSchema');
 							},
 							'_observePropertyEditorSchema'
 						);

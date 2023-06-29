@@ -5,14 +5,13 @@ import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import { FormControlMixin, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { renderEditor, type tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
-import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import {
-	ManifestTinyMcePlugin,
 	TinyMcePluginArguments,
+	UmbDataTypeConfigCollection,
 	UmbTinyMcePluginBase,
-	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extension-registry';
+} from '@umbraco-cms/backoffice/components';
+import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
+import { ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	PropertyValueMap,
 	css,
@@ -30,8 +29,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 // TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
 @customElement('umb-input-tiny-mce')
 export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
-	@property({ type: Object })
-	configuration?: UmbDataTypePropertyCollection;
+	@property({ attribute: false })
+	configuration?: UmbDataTypeConfigCollection;
 
 	@state()
 	private _tinyConfig: tinymce.RawEditorOptions = {};
@@ -44,7 +43,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	#editorRef?: tinymce.Editor | null = null;
 
 	protected getFormElement() {
-		return undefined;
+		return this._editorElement?.querySelector('iframe') ?? undefined;
 	}
 
 	@query('#editor', true)
@@ -81,6 +80,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		super.disconnectedCallback();
 
 		if (this.#editorRef) {
+			// TODO: Test if there is any problems with destroying the RTE here, but not initializing on connectedCallback. (firstUpdated is only called first time the element is rendered, not when it is reconnected)
 			this.#editorRef.destroy();
 		}
 	}
@@ -105,6 +105,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	async #setTinyConfig() {
 		// create an object by merging the configuration onto the fallback config
+		// TODO: Seems like a too tight coupling between DataTypeConfigCollection and TinyMceConfig, I would love it begin more explicit what we take from DataTypeConfigCollection and parse on, but I understand that this gives some flexibility. Is this flexibility on purpose?
 		const configurationOptions: Record<string, any> = {
 			...defaultFallbackConfig,
 			...(this.configuration ? this.configuration?.toObject() : {}),
@@ -168,7 +169,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			this.#editorRef.destroy();
 		}
 
-		// await tinymce.default.init(this._tinyConfig);
 		const editors = await renderEditor(this._tinyConfig);
 		this.#editorRef = editors.pop();
 	}
@@ -205,7 +205,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		// Plugins require a reference to the current editor as a param, so can not
 		// be instantiated until we have an editor
 		for (const plugin of this.#plugins) {
-			new plugin({ host: this, editor, configuration: this.configuration });
+			new plugin({ host: this, editor });
 		}
 
 		// define keyboard shortcuts
@@ -263,7 +263,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	#onChange(value: string) {
 		super.value = value;
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('change'));
 	}
 
 	#isMediaPickerEnabled() {

@@ -1,3 +1,4 @@
+import { type UmbDataTypeConfig } from '../../property-editors/index.js';
 import { UmbWorkspacePropertyContext } from './workspace-property.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
@@ -6,8 +7,7 @@ import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  *  @element umb-workspace-property
@@ -85,8 +85,8 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	 * @attr
 	 * @default ''
 	 */
-	@property({ type: Object, attribute: false })
-	public set config(value: DataTypePropertyPresentationModel[] | undefined) {
+	@property({ type: Array, attribute: false })
+	public set config(value: UmbDataTypeConfig | undefined) {
 		this._propertyContext.setConfig(value);
 	}
 
@@ -123,10 +123,8 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 
 	private _propertyContext = new UmbWorkspacePropertyContext(this);
 
-	private propertyEditorUIObserver?: UmbObserverController<ManifestPropertyEditorUi | undefined>;
-
 	private _valueObserver?: UmbObserverController<unknown>;
-	private _configObserver?: UmbObserverController<DataTypePropertyPresentationModel[] | undefined>;
+	private _configObserver?: UmbObserverController<UmbDataTypeConfigCollection | undefined>;
 
 	constructor() {
 		super();
@@ -154,8 +152,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	};
 
 	private _observePropertyEditorUI() {
-		this.propertyEditorUIObserver?.destroy();
-		this.propertyEditorUIObserver = this.observe(
+		this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', this._propertyEditorUiAlias),
 			(manifest) => {
 				this._gotEditorUI(manifest);
@@ -202,7 +199,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 						this._propertyContext.config,
 						(config) => {
 							if (this._element && config) {
-								this._element.config = new UmbDataTypePropertyCollection(config);
+								this._element.config = config;
 							}
 						},
 						'_observePropertyConfig'

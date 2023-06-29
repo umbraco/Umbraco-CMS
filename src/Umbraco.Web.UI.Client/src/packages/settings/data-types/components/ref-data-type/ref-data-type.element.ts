@@ -35,7 +35,7 @@ export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
 				'dataType'
 			);
 		} else {
-			this.removeControllerByUnique('dataType');
+			this.removeControllerByAlias('dataType');
 		}
 	}
 

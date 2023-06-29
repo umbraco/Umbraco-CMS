@@ -18,6 +18,178 @@ const manifest: ManifestPropertyEditorUi = {
 					label: 'Toolbar',
 					description: 'Pick the toolbar options that should be available when editing',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.ToolbarConfiguration',
+					config: [
+						{
+							alias: 'toolbar',
+							value: [
+								{
+									alias: 'undo',
+									label: 'Undo',
+									icon: 'undo',
+								},
+								{
+									alias: 'redo',
+									label: 'Redo',
+									icon: 'redo',
+								},
+								{
+									alias: 'cut',
+									label: 'Cut',
+									icon: 'cut',
+								},
+								{
+									alias: 'copy',
+									label: 'Copy',
+									icon: 'copy',
+								},
+								{
+									alias: 'paste',
+									label: 'Paste',
+									icon: 'paste',
+								},
+								{
+									alias: 'styles',
+									label: 'Style select',
+									icon: 'permanent-pen',
+								},
+								{
+									alias: 'fontname',
+									label: 'Font select',
+									icon: 'text-color',
+								},
+								{
+									alias: 'fontsize',
+									label: 'Font size',
+									icon: 'text-color',
+								},
+								{
+									alias: 'forecolor',
+									label: 'Text color',
+									icon: 'text-color',
+								},
+								{
+									alias: 'backcolor',
+									label: 'Background color',
+									icon: 'highlight-bg-color',
+								},
+								{
+									alias: 'blockquote',
+									label: 'Blockquote',
+									icon: 'quote',
+								},
+								{
+									alias: 'formatblock',
+									label: 'Format block',
+									icon: 'format',
+								},
+								{
+									alias: 'removeformat',
+									label: 'Remove format',
+									icon: 'remove-formatting',
+								},
+								{
+									alias: 'bold',
+									label: 'Bold',
+									icon: 'bold',
+								},
+								{
+									alias: 'italic',
+									label: 'Italic',
+									icon: 'italic',
+								},
+								{
+									alias: 'underline',
+									label: 'Underline',
+									icon: 'underline',
+								},
+								{
+									alias: 'strikethrough',
+									label: 'Strikethrough',
+									icon: 'strike-through',
+								},
+								{
+									alias: 'alignleft',
+									label: 'Align left',
+									icon: 'align-left',
+								},
+								{
+									alias: 'aligncenter',
+									label: 'Align center',
+									icon: 'align-center',
+								},
+								{
+									alias: 'alignright',
+									label: 'Align right',
+									icon: 'align-right',
+								},
+								{
+									alias: 'alignjustify',
+									label: 'Justify justify',
+									icon: 'align-justify',
+								},
+								{
+									alias: 'bullist',
+									label: 'Bullet list',
+									icon: 'unordered-list',
+								},
+								{
+									alias: 'numlist',
+									label: 'Numbered list',
+									icon: 'ordered-list',
+								},
+								{
+									alias: 'outdent',
+									label: 'Outdent',
+									icon: 'outdent',
+								},
+								{
+									alias: 'indent',
+									label: 'Indent',
+									icon: 'indent',
+								},
+								{
+									alias: 'anchor',
+									label: 'Anchor',
+									icon: 'bookmark',
+								},
+								{
+									alias: 'table',
+									label: 'Table',
+									icon: 'table',
+								},
+								{
+									alias: 'hr',
+									label: 'Horizontal rule',
+									icon: 'horizontal-rule',
+								},
+								{
+									alias: 'subscript',
+									label: 'Subscript',
+									icon: 'subscript',
+								},
+								{
+									alias: 'superscript',
+									label: 'Superscript',
+									icon: 'superscript',
+								},
+								{
+									alias: 'charmap',
+									label: 'Character map',
+									icon: 'insert-character',
+								},
+								{
+									alias: 'rtl',
+									label: 'Right to left',
+									icon: 'rtl',
+								},
+								{
+									alias: 'ltr',
+									label: 'Left to right',
+									icon: 'ltr',
+								},
+							],
+						},
+					],
 				},
 				{
 					alias: 'stylesheets',

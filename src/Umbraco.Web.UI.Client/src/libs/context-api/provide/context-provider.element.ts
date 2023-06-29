@@ -1,4 +1,4 @@
-import { UmbControllerHostElement, UmbControllerHostMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElement, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
@@ -9,7 +9,7 @@ import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/back
  * @throws {Error} If the key property is not set.
  * @throws {Error} If the value property is not set.
  */
-export class UmbContextProviderElement extends UmbControllerHostMixin(HTMLElement) {
+export class UmbContextProviderElement extends UmbControllerHostElementMixin(HTMLElement) {
 	/**
 	 * The value to provide to the context.
 	 * @optional

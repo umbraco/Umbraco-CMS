@@ -2,16 +2,20 @@ import { UmbBackofficeNotificationContainerElement, UmbBackofficeModalContainerE
 import { manifests as debugManifests } from './debug/manifests.js';
 import { manifests as propertyActionManifests } from './property-actions/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editors/manifests.js';
-import { manifests as tinyMcePluginManifests } from './property-editors/uis/tiny-mce/plugins/manifests.js'; 
+import { manifests as tinyMcePluginManifests } from './property-editors/uis/tiny-mce/plugins/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as modalManifests } from './modal/common/manifests.js';
-import { UmbStoreExtensionInitializer } from './store/index.js';
+import { manifests as themeManifests } from './themes/manifests.js';
 
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	ManifestTypes,
+	UmbBackofficeManifestKind,
+	UmbClassExtensionsInitializer,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 export * from './action/index.js';
 export * from './collection/index.js';
@@ -43,10 +47,11 @@ const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...tinyMcePluginManifests,
 	...workspaceManifests,
 	...modalManifests,
+	...themeManifests,
 ];
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
-	new UmbStoreExtensionInitializer(host);
+	new UmbClassExtensionsInitializer(host, ['globalContext', 'store', 'treeStore', 'itemStore']);
 
 	extensionRegistry.registerMany(manifests);
 
