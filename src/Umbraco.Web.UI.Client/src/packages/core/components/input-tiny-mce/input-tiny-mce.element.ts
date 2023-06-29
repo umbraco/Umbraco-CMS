@@ -104,6 +104,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	async #setTinyConfig() {
 		// create an object by merging the configuration onto the fallback config
+		// TODO: Seems like a too tight coupling between DataTypeConfigCollection and TinyMceConfig
 		const configurationOptions: Record<string, any> = {
 			...defaultFallbackConfig,
 			...(this.configuration ? this.configuration?.toObject() : {}),
