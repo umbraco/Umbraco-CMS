@@ -1,10 +1,4 @@
-import {
-	css,
-	html,
-	LitElement,
-	customElement,
-	property,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 
 /**
@@ -56,13 +50,13 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 	render() {
 		// TODO: Only show alias on label if user has access to DocumentType within settings:
 		return html`
-			<div id="header">
+			<div id="headerColumn">
 				<uui-label title=${this.alias}>${this.label}</uui-label>
 				<slot name="property-action-menu"></slot>
 				<div id="description">${this.description}</div>
 				<slot name="description"></slot>
 			</div>
-			<div>
+			<div id="editorColumn">
 				<uui-form-validation-message>
 					<slot name="editor"></slot>
 				</uui-form-validation-message>
@@ -82,58 +76,42 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 				container-type: inline-size;
 			}
 
-			:host > div {
-				grid-column: span 2;
-			}
-
-			:host > div:last-child {
-				margin-top:var(--uui-size-space-3);
-			}
-
-			@container (width > 600px) {
-				:host(:not([orientation='vertical'])) > div {
-					grid-column: span 1;
-					margin-top:0;
-				}
-			}
-
 			:host(:last-of-type) {
 				border-bottom: none;
 			}
 
-			/* container has 18px padding, reduce here to ensure consistency */
-			:host-context(umb-variantable-property:first-of-type) {
-				padding-top: var(--uui-size-space-2);
+			:host > div {
+				grid-column: span 2;
+			}
+			@container (width > 600px) {
+				:host(:not([orientation='vertical'])) > div {
+					grid-column: span 1;
+				}
 			}
 
-			:host-context(umb-variantable-property:last-of-type) {
-				padding-bottom: var(--uui-size-space-2);
+			#headerColumn {
+				position: relative;
+				height: min-content;
+				z-index: 2;
+			}
+			@container (width > 600px) {
+				#headerColumn {
+					position: sticky;
+					top: calc(var(--uui-size-space-2) * -1);
+				}
 			}
 
 			#description {
 				color: var(--uui-color-text-alt);
 			}
 
-			#header {
-				position: sticky;
-				top: var(--uui-size-space-4);
-				height: min-content;
-				z-index: 1050;
-				background-color:var(--uui-color-surface);
+			#editorColumn {
+				margin-top: var(--uui-size-space-3);
 			}
-
-			:host-context(umb-variantable-property) #header {
-				top: 0;
-			}
-
-			#header::before {
-				content: '';
-				display:block;
-				position:absolute;
-				top:calc(var(--uui-size-layout-1) * -1);
-				width:100%;
-				height:var(--uui-size-layout-1);
-				background-color:var(--uui-color-surface);
+			@container (width > 600px) {
+				#editorColumn {
+					margin-top: 0;
+				}
 			}
 		`,
 	];

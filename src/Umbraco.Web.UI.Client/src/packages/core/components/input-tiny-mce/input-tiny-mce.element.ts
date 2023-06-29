@@ -296,7 +296,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 			.tox-tinymce {
 				border-radius: 0;
-				border: var(--uui-input-border-width, 1px) solid var(--uui-input-border-color, var(--uui-color-border,#d8d7d9));
+				border: var(--uui-input-border-width, 1px) solid var(--uui-input-border-color, var(--uui-color-border, #d8d7d9));
 			}
 
 			.tox-tinymce-aux {
