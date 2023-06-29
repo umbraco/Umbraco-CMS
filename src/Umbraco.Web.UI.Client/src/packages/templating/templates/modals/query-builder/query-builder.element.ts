@@ -1,6 +1,6 @@
 import { UmbTemplateRepository } from '../../repository/template.repository.js';
 import { UUIComboboxListElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state, query } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, query, queryAll } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import {
 	UMB_DOCUMENT_PICKER_MODAL,
@@ -8,6 +8,7 @@ import {
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 import {
+	TemplateQueryExecuteFilterPresentationModel,
 	TemplateQueryExecuteModel,
 	TemplateQueryResultResponseModel,
 	TemplateQuerySettingsResponseModel,
@@ -15,6 +16,7 @@ import {
 import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
 import { UmbButtonWithDropdownElement } from '@umbraco-cms/backoffice/components';
 import './query-builder-filter.element.js';
+import UmbQueryBuilderFilterElement from './query-builder-filter.element.js';
 
 export interface TemplateQueryBuilderModalData {
 	hidePartialViews?: boolean;
@@ -31,6 +33,12 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 > {
 	@query('#content-type-dropdown')
 	private _contentTypeDropdown?: UmbButtonWithDropdownElement;
+
+	@query('#filter-container')
+	private _filterContainer?: HTMLElement;
+
+	@queryAll('umb-query-builder-filter')
+	private _filterElements!: UmbQueryBuilderFilterElement[];
 
 	#close() {
 		this.modalContext?.reject();
@@ -50,6 +58,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	#updateQueryRequest(update: TemplateQueryExecuteModel) {
 		this._queryRequest = { ...this._queryRequest, ...update };
+		this.#postTemplateQuery();
 	}
 
 	@state()
@@ -83,13 +92,13 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		if (data) this._queryBuilderSettings = data;
 	}
 
-	async #postTemplateQuery() {
+	#postTemplateQuery = async () => {
 		const { data, error } = await this.#templateRepository.postTemplateQueryExecute({
 			requestBody: this._queryRequest,
 		});
 		console.log(this._queryRequest);
 		if (data) this._templateQuery = { ...data };
-	}
+	};
 
 	#openDocumentPicker = () => {
 		this.#modalManagerContext
@@ -117,12 +126,36 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		}
 	}
 
+	#createFilterElement() {
+		const filterElement = document.createElement('umb-query-builder-filter');
+		filterElement.settings = this._queryBuilderSettings;
+		filterElement.classList.add('row');
+		filterElement.addEventListener('add-filter', this.#addFilterElement);
+		filterElement.addEventListener('remove-filter', this.#removeFilter);
+		filterElement.addEventListener('update-query', this.#updateFilters);
+		return filterElement;
+	}
+
 	#setContentType(event: Event) {
 		const target = event.target as UUIComboboxListElement;
 		this.#updateQueryRequest({ contentTypeAlias: (target.value as string) ?? '' });
-		this.#postTemplateQuery();
 		this._contentTypeDropdown!.closePopover();
 	}
+
+	#addFilterElement = () => {
+		this._filterContainer?.appendChild(this.#createFilterElement());
+	};
+
+	#updateFilters = () => {
+		
+		this.#updateQueryRequest({ filters: Array.from(this._filterElements)?.map((filter) => filter.filter) ?? [] });
+	};
+
+	#removeFilter = (event: Event) => {
+		const target = event.target as UmbQueryBuilderFilterElement;
+		this._filterContainer?.removeChild(target);
+		this.#updateFilters();
+	};
 
 	render() {
 		return html`
@@ -148,7 +181,15 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 								>${this._selectedRootContentName}
 							</uui-button>
 						</div>
-						<umb-query-builder-filter class="row" .settings=${this._queryBuilderSettings}></umb-query-builder-filter>
+						<div id="filter-container">
+							<umb-query-builder-filter
+								unremovable
+								class="row"
+								.settings=${this._queryBuilderSettings}
+								@add-filter=${this.#addFilterElement}
+								@update-query=${this.#updateFilters}
+								@remove-filter=${this.#removeFilter}></umb-query-builder-filter>
+						</div>
 						<div class="row">
 							ordered by <uui-button look="outline">(allowed properties)</uui-button>
 							<uui-button look="outline">ascending/descending</uui-button>
@@ -198,6 +239,11 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 				border-bottom: 1px solid #f3f3f5;
 				align-items: center;
 				padding: 20px 0;
+			}
+
+			#filter-container {
+				flex-direction: column;
+				justify-content: flex-start;
 			}
 		`,
 	];

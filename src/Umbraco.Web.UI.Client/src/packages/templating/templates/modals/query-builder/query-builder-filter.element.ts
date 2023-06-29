@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
+import { PropertyValueMap, css, html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
@@ -22,8 +22,11 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	filter: TemplateQueryExecuteFilterPresentationModel = <TemplateQueryExecuteFilterPresentationModel>{};
 
+	@property({ type: Boolean })
+	unremovable = false;
+
 	@property({ type: Object, attribute: false })
-	settings: TemplateQuerySettingsResponseModel | null = null;
+	settings?: TemplateQuerySettingsResponseModel;
 
 	@state()
 	currentPropertyType: TemplateQueryPropertyTypeModel | null = null;
@@ -52,6 +55,32 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	#resetOperator() {
 		this.filter = { ...this.filter, operator: undefined };
 	}
+
+	#resetFilter() {
+		this.filter = <TemplateQueryExecuteFilterPresentationModel>{};
+	}
+
+	#removeOrReset() {
+		if (this.unremovable) this.#resetFilter();
+		else this.dispatchEvent(new Event('remove-filter'));
+	}
+
+	#addFilter() {
+		this.dispatchEvent(new Event('add-filter'));
+	}
+
+    get isFilterValid(): boolean {
+        return Object.keys(this.filter).length === 3 && Object.values(this.filter).every((v) => !!v);
+    }
+
+    protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        if (_changedProperties.has('filter')) {
+
+            if (this.isFilterValid) {
+                this.dispatchEvent(new Event('update-query'));
+            }
+        }
+    }
 
 	private _renderOperatorsDropdown() {
 		return html`<umb-button-with-dropdown look="outline" id="operator-dropdown">
@@ -85,7 +114,8 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`where
+		return html`
+			<span>${this.unremovable ? 'where' : 'and'}</span>
 			<umb-button-with-dropdown look="outline" id="property-alias-dropdown"
 				>${this.filter?.propertyAlias ?? ''}
 				<uui-combobox-list slot="dropdown" @change=${this.#setPropertyAlias} class="options-list">
@@ -98,7 +128,16 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 				</uui-combobox-list></umb-button-with-dropdown
 			>
 			${this.filter?.propertyAlias ? this._renderOperatorsDropdown() : ''}
-			${this.filter?.operator ? this._renderConstraintValueInput() : ''} `;
+			${this.filter?.operator ? this._renderConstraintValueInput() : ''}
+			<uui-button-group>
+				<uui-button title="Add filter" label="Add filter" compact @click=${this.#addFilter}
+					><uui-icon name="add"></uui-icon
+				></uui-button>
+				<uui-button title="Remove filter" label="Remove filter" compact @click=${this.#removeOrReset}
+					><uui-icon name="delete"></uui-icon
+				></uui-button>
+			</uui-button-group>
+		`;
 	}
 
 	static styles = [
@@ -106,7 +145,10 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 		css`
 			:host {
 				display: flex;
+				gap: 10px;
+				border-bottom: 1px solid #f3f3f5;
 				align-items: center;
+				padding: 20px 0;
 			}
 
 			.options-list {
