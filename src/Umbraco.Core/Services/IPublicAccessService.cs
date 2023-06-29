@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -66,4 +67,6 @@ public interface IPublicAccessService : IService
     /// </summary>
     /// <param name="entry"></param>
     Attempt<OperationResult?> Delete(PublicAccessEntry entry);
+
+    Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKey(Guid key);
 }

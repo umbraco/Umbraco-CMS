@@ -2,9 +2,11 @@ using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -12,14 +14,19 @@ namespace Umbraco.Cms.Core.Services;
 internal class PublicAccessService : RepositoryService, IPublicAccessService
 {
     private readonly IPublicAccessRepository _publicAccessRepository;
+    private readonly IEntityService _entityService;
 
     public PublicAccessService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
-        IPublicAccessRepository publicAccessRepository)
-        : base(provider, loggerFactory, eventMessagesFactory) =>
+        IPublicAccessRepository publicAccessRepository,
+        IEntityService entityService)
+        : base(provider, loggerFactory, eventMessagesFactory)
+    {
         _publicAccessRepository = publicAccessRepository;
+        _entityService = entityService;
+    }
 
     /// <summary>
     ///     Gets all defined entries and associated rules
@@ -245,5 +252,23 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         }
 
         return OperationResult.Attempt.Succeed(evtMsgs);
+    }
+
+    public Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKey(Guid key)
+    {
+        IEntitySlim? entity = _entityService.Get(key, UmbracoObjectTypes.Document);
+        if (entity is null)
+        {
+            return Task.FromResult(Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.ContentNotFound, null));
+        }
+
+        PublicAccessEntry? entry = GetEntryForContent(entity.Path.EnsureEndsWith("," + entity.Id));
+
+        if (entry is null)
+        {
+            return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, null));
+        }
+
+        return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, entry));
     }
 }
