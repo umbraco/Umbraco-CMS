@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-value-type
@@ -38,8 +38,8 @@ export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implement
 		{ name: 'Long String', value: 'TEXT' },
 	];
 
-	@property({ type: Array, attribute: false })
-	public config?: UmbDataTypePropertyCollection;
+	@property({ attribute: false })
+	public config?: UmbDataTypeConfigCollection;
 
 	#onChange(e: UUISelectEvent) {
 		this.value = e.target.value as string;

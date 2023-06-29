@@ -1,45 +1,40 @@
 import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface.js';
 import { UmbPropertyEditorExtensionElement } from '../../extension-registry/interfaces/property-editor-ui-extension-element.interface.js';
-import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
+import { type WorkspacePropertyData } from '../types/workspace-property-data.type.js';
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbClassState,
 	UmbObjectState,
 	UmbStringState,
 	UmbObserverController,
+	UmbBasicState,
 } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbContextConsumerController,
 	UmbContextProviderController,
 	UmbContextToken,
 } from '@umbraco-cms/backoffice/context-api';
-
-// If we get this from the server then we can consider using TypeScripts Partial<> around the model from the Management-API.
-export type WorkspacePropertyData<ValueType> = {
-	alias?: string;
-	label?: string;
-	description?: string;
-	value?: ValueType | null;
-	config?: DataTypeResponseModel['values']; // This could potentially then come from hardcoded JS object and not the DataType store.
-};
+import { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 export class UmbWorkspacePropertyContext<ValueType = any> {
 	#host: UmbControllerHostElement;
 
 	private _providerController: UmbContextProviderController;
 
-	private _data = new UmbObjectState<WorkspacePropertyData<ValueType>>({});
+	#data = new UmbObjectState<WorkspacePropertyData<ValueType>>({});
 
-	public readonly alias = this._data.getObservablePart((data) => data.alias);
-	public readonly label = this._data.getObservablePart((data) => data.label);
-	public readonly description = this._data.getObservablePart((data) => data.description);
-	public readonly value = this._data.getObservablePart((data) => data.value);
-	public readonly config = this._data.getObservablePart((data) => data.config);
+	public readonly alias = this.#data.getObservablePart((data) => data.alias);
+	public readonly label = this.#data.getObservablePart((data) => data.label);
+	public readonly description = this.#data.getObservablePart((data) => data.description);
+	public readonly value = this.#data.getObservablePart((data) => data.value);
+	public readonly configValues = this.#data.getObservablePart((data) => data.config);
 
-	private _editor = new BehaviorSubject<UmbPropertyEditorExtensionElement | undefined>(undefined);
+	#configCollection = new UmbClassState<UmbDataTypeConfigCollection | undefined>(undefined);
+	public readonly config = this.#configCollection.asObservable();
+
+	private _editor = new UmbBasicState<UmbPropertyEditorExtensionElement | undefined>(undefined);
 	public readonly editor = this._editor.asObservable();
 	setEditor(editor: UmbPropertyEditorExtensionElement | undefined) {
 		this._editor.next(editor ?? undefined);
@@ -66,6 +61,10 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 		});
 
 		this._providerController = new UmbContextProviderController(host, UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, this);
+
+		this.configValues.subscribe((configValues) => {
+			this.#configCollection.next(configValues ? new UmbDataTypeConfigCollection(configValues) : undefined);
+		});
 
 		this.variantId.subscribe((propertyVariantId) => {
 			if (propertyVariantId) {
@@ -94,28 +93,28 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 	}
 
 	public setAlias(alias: WorkspacePropertyData<ValueType>['alias']) {
-		this._data.update({ alias });
+		this.#data.update({ alias });
 	}
 	public setLabel(label: WorkspacePropertyData<ValueType>['label']) {
-		this._data.update({ label });
+		this.#data.update({ label });
 	}
 	public setDescription(description: WorkspacePropertyData<ValueType>['description']) {
-		this._data.update({ description });
+		this.#data.update({ description });
 	}
 	public setValue(value: WorkspacePropertyData<ValueType>['value']) {
 		// Note: Do not try to compare new / old value, as it can of any type. We trust the UmbObjectState in doing such.
-		this._data.update({ value });
+		this.#data.update({ value });
 	}
 	public changeValue(value: WorkspacePropertyData<ValueType>['value']) {
 		this.setValue(value);
 
-		const alias = this._data.getValue().alias;
+		const alias = this.#data.getValue().alias;
 		if (alias) {
 			this._workspaceContext?.setPropertyValue(alias, value, this.#variantId.getValue());
 		}
 	}
 	public setConfig(config: WorkspacePropertyData<ValueType>['config'] | undefined) {
-		this._data.update({ config });
+		this.#data.update({ config });
 	}
 	public setVariantId(variantId: UmbVariantId | undefined) {
 		this.#variantId.next(variantId);
@@ -129,7 +128,7 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 	}
 
 	public destroy(): void {
-		this._data.unsubscribe();
+		this.#data.unsubscribe();
 		this._providerController.destroy(); // This would also be handled by the controller host, but if someone wanted to replace/remove this context without the host being destroyed. Then we have clean up out selfs here.
 	}
 }

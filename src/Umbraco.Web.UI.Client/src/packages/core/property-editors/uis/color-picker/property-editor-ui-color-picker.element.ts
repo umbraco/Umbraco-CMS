@@ -3,7 +3,7 @@ import { UUITextStyles, UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/ex
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-color-picker
@@ -21,10 +21,10 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 	@state()
 	private _swatches: UmbSwatchDetails[] = [];
 
-	@property({ type: Array, attribute: false })
-	public set config(config: UmbDataTypePropertyCollection) {
-		this._showLabels = config.getValueByAlias('useLabel') ?? this.#defaultShowLabels;
-		this._swatches = config.getValueByAlias('items') ?? [];
+	@property({ attribute: false })
+	public set config(config: UmbDataTypeConfigCollection | undefined) {
+		this._showLabels = config?.getValueByAlias('useLabel') ?? this.#defaultShowLabels;
+		this._swatches = config?.getValueByAlias('items') ?? [];
 	}
 
 	private _onChange(event: UUIColorSwatchesEvent) {

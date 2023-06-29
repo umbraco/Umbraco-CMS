@@ -2,7 +2,7 @@ import { UmbTagsInputElement } from '../../components/tags-input/tags-input.elem
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -11,8 +11,15 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-tags')
 export class UmbPropertyEditorUITagsElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
-	@property()
-	value: string[] = [];
+	private _value: Array<string> = [];
+
+	@property({ type: Array })
+	public get value(): Array<string> {
+		return this._value;
+	}
+	public set value(value: Array<string>) {
+		this._value = value || [];
+	}
 
 	@state()
 	private _group?: string;
@@ -21,10 +28,10 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 	private _culture?: string | null;
 	//TODO: Use type from VariantID
 
-	@property({ type: Array, attribute: false })
-	public set config(config: UmbDataTypePropertyCollection) {
-		this._group = config.getValueByAlias('group');
-		this.value = config.getValueByAlias('items') ?? [];
+	@property({ attribute: false })
+	public set config(config: UmbDataTypeConfigCollection | undefined) {
+		this._group = config?.getValueByAlias('group');
+		this.value = config?.getValueByAlias('items') ?? [];
 	}
 
 	constructor() {

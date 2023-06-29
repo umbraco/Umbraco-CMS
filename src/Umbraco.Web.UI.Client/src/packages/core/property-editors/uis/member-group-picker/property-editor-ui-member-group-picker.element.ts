@@ -2,7 +2,7 @@ import { html, customElement, property } from '@umbraco-cms/backoffice/external/
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-member-group-picker
@@ -15,8 +15,8 @@ export class UmbPropertyEditorUIMemberGroupPickerElement
 	@property()
 	value = '';
 
-	@property({ type: Array, attribute: false })
-	public config = new UmbDataTypePropertyCollection();
+	@property({ attribute: false })
+	public config?: UmbDataTypeConfigCollection;
 
 	render() {
 		return html`<div>umb-property-editor-ui-member-group-picker</div>`;

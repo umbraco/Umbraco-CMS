@@ -7,7 +7,7 @@ import { renderEditor, type tinymce } from '@umbraco-cms/backoffice/external/tin
 import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import {
 	TinyMcePluginArguments,
-	UmbDataTypePropertyCollection,
+	UmbDataTypeConfigCollection,
 	UmbTinyMcePluginBase,
 } from '@umbraco-cms/backoffice/components';
 import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
@@ -29,8 +29,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 // TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
 @customElement('umb-input-tiny-mce')
 export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
-	@property({ type: Object })
-	configuration?: UmbDataTypePropertyCollection;
+	@property({ attribute: false })
+	configuration?: UmbDataTypeConfigCollection;
 
 	@state()
 	private _tinyConfig: tinymce.RawEditorOptions = {};
@@ -203,7 +203,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		// Plugins require a reference to the current editor as a param, so can not
 		// be instantiated until we have an editor
 		for (const plugin of this.#plugins) {
-			new plugin({ host: this, editor });			
+			new plugin({ host: this, editor });
 		}
 
 		// define keyboard shortcuts

@@ -2,7 +2,7 @@ import { html, customElement, property } from '@umbraco-cms/backoffice/external/
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-dropdown
@@ -13,7 +13,7 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	value = '';
 
 	@property({ attribute: false })
-	public config?: UmbDataTypePropertyCollection;
+	public config?: UmbDataTypeConfigCollection;
 
 	render() {
 		return html`<div>umb-property-editor-ui-dropdown</div>`;
