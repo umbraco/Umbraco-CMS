@@ -80,6 +80,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		super.disconnectedCallback();
 
 		if (this.#editorRef) {
+			// TODO: Test if there is any problems with us destroying the RTE here, but not initializing on connectedCallback. (firstUpdated is only called first time the element is rendered, not when it is reconnected)
 			this.#editorRef.destroy();
 		}
 	}
