@@ -1,16 +1,16 @@
 import { UmbStore } from './store.interface.js';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 // TODO: Make a Store interface?
 export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType> {
-	protected _host: UmbControllerHostElement;
+	protected _host: UmbControllerHost;
 	protected _data: UmbArrayState<StoreItemType>;
 
 	public readonly storeAlias: string;
 
-	constructor(_host: UmbControllerHostElement, storeAlias: string, data: UmbArrayState<StoreItemType>) {
+	constructor(_host: UmbControllerHost, storeAlias: string, data: UmbArrayState<StoreItemType>) {
 		this._host = _host;
 		this.storeAlias = storeAlias;
 		this._data = data;

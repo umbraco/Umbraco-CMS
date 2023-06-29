@@ -4,6 +4,12 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const headerApps: Array<ManifestTypes> = [
 	{
+		type: 'store',
+		alias: 'Umb.Store.CurrentUser',
+		name: 'Current User Store',
+		loader: () => import('./current-user-history.store.js'),
+	},
+	{
 		type: 'headerApp',
 		alias: 'Umb.HeaderApp.CurrentUser',
 		name: 'Current User',

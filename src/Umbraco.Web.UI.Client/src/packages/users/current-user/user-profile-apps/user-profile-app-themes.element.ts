@@ -1,4 +1,4 @@
-import { UmbThemeContext, UMB_THEME_CONTEXT_TOKEN } from '../../../settings/themes/theme.context.js';
+import { UmbThemeContext, UMB_THEME_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/themes';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

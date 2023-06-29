@@ -4,6 +4,7 @@ import type { ManifestDashboardCollection } from './dashboard-collection.model.j
 import type { ManifestEntityAction } from './entity-action.model.js';
 import type { ManifestEntityBulkAction } from './entity-bulk-action.model.js';
 import type { ManifestExternalLoginProvider } from './external-login-provider.model.js';
+import type { ManifestGlobalContext } from './global-context.model.js';
 import type { ManifestHeaderApp, ManifestHeaderAppButtonKind } from './header-app.model.js';
 import type { ManifestHealthCheck } from './health-check.model.js';
 import type { ManifestMenu } from './menu.model.js';
@@ -34,6 +35,7 @@ export * from './dashboard.model.js';
 export * from './entity-action.model.js';
 export * from './entity-bulk-action.model.js';
 export * from './external-login-provider.model.js';
+export * from './global-context.model.js';
 export * from './header-app.model.js';
 export * from './health-check.model.js';
 export * from './menu-item.model.js';
@@ -66,6 +68,7 @@ export type ManifestTypes =
 	| ManifestEntityBulkAction
 	| ManifestEntryPoint
 	| ManifestExternalLoginProvider
+	| ManifestGlobalContext
 	| ManifestHeaderApp
 	| ManifestHeaderAppButtonKind
 	| ManifestHealthCheck

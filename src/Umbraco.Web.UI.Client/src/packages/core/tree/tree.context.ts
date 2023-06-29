@@ -1,15 +1,15 @@
 import { Observable, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbPagedData, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { ManifestTree, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { ProblemDetailsModel, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 
 // TODO: update interface
-export interface UmbTreeContext<TreeItemType extends TreeItemPresentationModel> {
+export interface UmbTreeContext<TreeItemType extends TreeItemPresentationModel> extends UmbBaseController {
 	readonly selectable: Observable<boolean>;
 	readonly selection: Observable<Array<string | null>>;
 	setSelectable(value: boolean): void;
@@ -28,10 +28,9 @@ export interface UmbTreeContext<TreeItemType extends TreeItemPresentationModel> 
 }
 
 export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
+	extends UmbBaseController
 	implements UmbTreeContext<TreeItemType>
 {
-	public host: UmbControllerHostElement;
-
 	#selectionManager = new UmbSelectionManagerBase();
 
 	#selectable = new UmbBooleanState(false);
@@ -53,8 +52,8 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 	});
 
 	constructor(host: UmbControllerHostElement) {
-		this.host = host;
-		new UmbContextProviderController(host, 'umbTreeContext', this);
+		super(host);
+		this.provideContext('umbTreeContext', this);
 	}
 
 	// TODO: find a generic way to do this
@@ -105,12 +104,12 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 	public select(unique: string | null) {
 		if (!this.getSelectable()) return;
 		this.#selectionManager.select(unique);
-		this.host.dispatchEvent(new CustomEvent('selected'));
+		this._host.getHostElement().dispatchEvent(new CustomEvent('selected'));
 	}
 
 	public deselect(unique: string | null) {
 		this.#selectionManager.deselect(unique);
-		this.host.dispatchEvent(new CustomEvent('selected'));
+		this._host.getHostElement().dispatchEvent(new CustomEvent('selected'));
 	}
 
 	public async requestTreeRoot() {
@@ -140,8 +139,7 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 	}
 
 	#observeTreeManifest() {
-		new UmbObserverController<any>(
-			this.host,
+		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('tree')
 				.pipe(map((treeManifests) => treeManifests.find((treeManifest) => treeManifest.alias === this.#treeAlias))),
@@ -157,14 +155,13 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 		const repositoryAlias = treeManifest.meta.repositoryAlias;
 		if (!repositoryAlias) throw new Error('Tree must have a repository alias.');
 
-		new UmbObserverController(
-			this.host,
+		this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('repository', treeManifest.meta.repositoryAlias),
 			async (repositoryManifest) => {
 				if (!repositoryManifest) return;
 
 				try {
-					const result = await createExtensionClass<UmbTreeRepository<TreeItemType>>(repositoryManifest, [this.host]);
+					const result = await createExtensionClass<UmbTreeRepository<TreeItemType>>(repositoryManifest, [this._host]);
 					this.repository = result;
 					this.#checkIfInitialized();
 				} catch (error) {
