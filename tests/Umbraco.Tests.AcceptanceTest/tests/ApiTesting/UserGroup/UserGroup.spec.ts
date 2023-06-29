@@ -2,14 +2,15 @@
 import {expect} from "@playwright/test";
 
 test.describe('User Group Tests', () => {
+  let userGroupId = "";
   const userGroupName = "UserGroupTest";
 
   test.beforeEach(async ({page, umbracoApi}) => {
-    await umbracoApi.userGroup.ensureUserGroupNameNotExists(userGroupName);
+    await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
   });
 
   test.afterEach(async ({page, umbracoApi}) => {
-    await umbracoApi.userGroup.ensureUserGroupNameNotExists(userGroupName);
+    await umbracoApi.userGroup.delete(userGroupId);
   });
 
   test('can create a user group', async ({page, umbracoApi, umbracoUi}) => {
@@ -17,35 +18,32 @@ test.describe('User Group Tests', () => {
       "Umb.Section.Forms",
       "Umb.Section.Media"];
 
-    await umbracoApi.userGroup.createUserGroup(userGroupName, true, sections);
+    userGroupId = await umbracoApi.userGroup.create(userGroupName, true, sections);
 
     // Assert
-    await expect(umbracoApi.userGroup.doesUserGroupWithNameExists(userGroupName)).toBeTruthy();
+    await expect(umbracoApi.userGroup.exist(userGroupId)).toBeTruthy();
   });
 
   test('can update a user group', async ({page, umbracoApi, umbracoUi}) => {
-    await umbracoApi.userGroup.createUserGroup('UserGroupNameTest', true);
+    userGroupId = await umbracoApi.userGroup.create('UserGroupNameTest', true);
 
-    const userGroupData = await umbracoApi.userGroup.getUserGroupByName('UserGroupNameTest');
+    const userGroupData = await umbracoApi.userGroup.get(userGroupId);
 
     // Updates name of the user group
     userGroupData.name = userGroupName;
-    await umbracoApi.userGroup.updateUserGroupById(userGroupData.id, userGroupData);
-
+    await umbracoApi.userGroup.update(userGroupId, userGroupData);
 
     // Assert
-    const updatedUserGroupData = await umbracoApi.userGroup.getUserGroupById(userGroupData.id);
-    await expect(updatedUserGroupData.name == userGroupName).toBeTruthy();
+    const updatedUserGroupData = await umbracoApi.userGroup.get(userGroupId);
+    await expect(updatedUserGroupData.name).toEqual(userGroupName);
   });
 
   test('can delete a user group', async ({page, umbracoApi, umbracoUi}) => {
-    await umbracoApi.userGroup.createUserGroup(userGroupName, true);
+    userGroupId = await umbracoApi.userGroup.create(userGroupName, true);
 
-    const userGroupData = await umbracoApi.userGroup.getUserGroupByName(userGroupName);
-
-    await umbracoApi.userGroup.deleteUserGroupById(userGroupData.id);
+    await umbracoApi.userGroup.delete(userGroupId);
 
     // Assert
-    await expect(await umbracoApi.userGroup.doesUserGroupWithNameExists(userGroupName)).toBeFalsy();
+    await expect(await umbracoApi.userGroup.exist(userGroupId)).toBeFalsy();
   });
 });

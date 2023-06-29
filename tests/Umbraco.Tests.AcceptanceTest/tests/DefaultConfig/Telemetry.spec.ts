@@ -4,11 +4,11 @@ import {expect} from "@playwright/test";
 test.describe('Telemetry tests', () => {
 
   test.beforeEach(async ({page, umbracoApi}, testInfo) => {
-    await umbracoApi.telemetry.setTelemetryLevel("Basic");
+    await umbracoApi.telemetry.setLevel("Basic");
   });
 
   test.afterEach(async ({page, umbracoApi}, testInfo) => {
-    await umbracoApi.telemetry.setTelemetryLevel("Basic");
+    await umbracoApi.telemetry.setLevel("Basic");
   });
 
   test('can change telemetry level', async ({page, umbracoApi, umbracoUi}) => {
@@ -27,6 +27,6 @@ test.describe('Telemetry tests', () => {
     await page.reload();
     await expect(await page.locator('[name="telemetryLevel"] >> input[id=input]')).toHaveValue('1');
     // API
-    await expect(await umbracoApi.telemetry.checkTelemetryLevel(expectedLevel)).toBeTruthy();
+    await expect(await umbracoApi.telemetry.checkLevel(expectedLevel)).toBeTruthy();
   });
 });
