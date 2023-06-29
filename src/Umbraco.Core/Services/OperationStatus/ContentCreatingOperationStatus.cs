@@ -3,6 +3,5 @@
 public enum ContentCreatingOperationStatus
 {
     Success,
-    ContentTypeNotFound,
     NotFound
 }

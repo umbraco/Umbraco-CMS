@@ -30,13 +30,17 @@ public class ContentCreatingService : IContentCreatingService
 
         if (contentTypeKeyAttempt.Success is false)
         {
-            return Attempt.FailWithStatus<PagedModel<IContentType>?, ContentCreatingOperationStatus>(ContentCreatingOperationStatus.ContentTypeNotFound, null);
+            // This should never happen, content shouldn't be able to exists without a document type
+            throw new InvalidOperationException("The document type could not be found.");
         }
 
         Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> contentTypeAttempt = await _contentTypeService.GetAllowedChildrenAsync(contentTypeKeyAttempt.Result, skip, take);
 
-        return contentTypeAttempt.Success
-            ? Attempt.SucceedWithStatus(ContentCreatingOperationStatus.Success, contentTypeAttempt.Result)
-            : Attempt.FailWithStatus<PagedModel<IContentType>?, ContentCreatingOperationStatus>(ContentCreatingOperationStatus.ContentTypeNotFound, null);
+        if (contentTypeAttempt.Success is false)
+        {
+            throw new InvalidOperationException("The document type could not be found.");
+        }
+
+        return Attempt.SucceedWithStatus(ContentCreatingOperationStatus.Success, contentTypeAttempt.Result);
     }
 }

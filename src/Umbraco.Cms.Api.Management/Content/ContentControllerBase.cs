@@ -47,7 +47,6 @@ public class ContentControllerBase : ManagementApiControllerBase
     protected IActionResult ContentCreatingOperationStatusResult(ContentCreatingOperationStatus status) =>
         status switch
         {
-            ContentCreatingOperationStatus.ContentTypeNotFound => NotFound("The content type could not be found"),
             ContentCreatingOperationStatus.NotFound => NotFound("The content type could not be found"),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status."),
         };
