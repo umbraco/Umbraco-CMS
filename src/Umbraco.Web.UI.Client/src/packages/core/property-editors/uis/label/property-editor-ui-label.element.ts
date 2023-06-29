@@ -2,7 +2,7 @@ import { html, customElement, property } from '@umbraco-cms/backoffice/external/
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-label
@@ -15,8 +15,8 @@ export class UmbPropertyEditorUILabelElement extends UmbLitElement implements Um
 	@property()
 	description = '';
 
-	@property({ type: Array, attribute: false })
-	public config?: UmbDataTypePropertyCollection;
+	@property({ attribute: false })
+	public config?: UmbDataTypeConfigCollection;
 
 	render() {
 		return html`${this.value ?? ''}`;

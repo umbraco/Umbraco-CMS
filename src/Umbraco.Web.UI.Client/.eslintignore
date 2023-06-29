@@ -1,5 +1,5 @@
 .eslintrc.js
-types
+/types
 dist
 dist-cms
 schemas
