@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -29,4 +30,16 @@ public interface IContentTypeService : IContentTypeBaseService<IContentType>
     /// <param name="aliases"></param>
     /// <returns></returns>
     IEnumerable<int> GetAllContentTypeIds(string[] aliases);
+
+    /// <summary>
+    /// Returns all the content type allowed as root.
+    /// </summary>
+    /// <returns></returns>
+    Task<PagedModel<IContentType>> GetAllAllowedAsRootAsync(int skip, int take);
+
+    /// <summary>
+    /// Returns all content types allowed as children for a given content type key.
+    /// </summary>
+    /// <returns></returns>
+    Task<Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take);
 }
