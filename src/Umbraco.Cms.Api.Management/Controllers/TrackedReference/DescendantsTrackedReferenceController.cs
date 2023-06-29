@@ -32,7 +32,7 @@ public class DescendantsTrackedReferenceController : TrackedReferenceControllerB
     [HttpGet("descendants/{parentId:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<RelationItemResponseModel>>> Descendants(Guid parentId, long skip, long take, bool filterMustBeIsDependency = true)
+    public async Task<ActionResult<PagedViewModel<RelationItemResponseModel>>> Descendants(Guid parentId, int skip = 0, int take = 20, bool filterMustBeIsDependency = true)
     {
         PagedModel<RelationItemModel> relationItems = await _trackedReferencesSkipTakeService.GetPagedDescendantsInReferencesAsync(parentId, skip, take, filterMustBeIsDependency);
         var pagedViewModel = new PagedViewModel<RelationItemResponseModel>

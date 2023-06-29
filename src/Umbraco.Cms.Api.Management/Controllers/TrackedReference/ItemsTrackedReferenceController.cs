@@ -31,7 +31,7 @@ public class ItemsTrackedReferenceController : TrackedReferenceControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<RelationItemResponseModel>>> GetPagedReferencedItems([FromQuery(Name="id")]HashSet<Guid> ids, long skip = 0, long take = 20, bool filterMustBeIsDependency = true)
+    public async Task<ActionResult<PagedViewModel<RelationItemResponseModel>>> GetPagedReferencedItems([FromQuery(Name="id")]HashSet<Guid> ids, int skip = 0, int take = 20, bool filterMustBeIsDependency = true)
     {
         PagedModel<RelationItemModel> relationItems = await _trackedReferencesSkipTakeService.GetPagedItemsWithRelationsAsync(ids, skip, take, filterMustBeIsDependency);
         var pagedViewModel = new PagedViewModel<RelationItemResponseModel>

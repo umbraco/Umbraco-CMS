@@ -8,7 +8,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.AuditLog;
@@ -18,18 +17,15 @@ public class CurrentUserAuditLogController : AuditLogControllerBase
 {
     private readonly IAuditService _auditService;
     private readonly IAuditLogPresentationFactory _auditLogPresentationFactory;
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IUserService _userService;
 
     public CurrentUserAuditLogController(
         IAuditService auditService,
         IAuditLogPresentationFactory auditLogPresentationFactory,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserService userService)
     {
         _auditService = auditService;
         _auditLogPresentationFactory = auditLogPresentationFactory;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _userService = userService;
     }
 
@@ -57,7 +53,7 @@ public class CurrentUserAuditLogController : AuditLogControllerBase
             null,
             sinceDate);
 
-        IEnumerable<AuditLogWithUsernameResponseModel> mapped = _auditLogPresentationFactory.CreateAuditLogWithUsernameViewModels(result.Items.Skip(skip).Take(take));
+        IEnumerable<AuditLogWithUsernameResponseModel> mapped = _auditLogPresentationFactory.CreateAuditLogWithUsernameViewModels(result.Items);
         var viewModel = new PagedViewModel<AuditLogWithUsernameResponseModel>
         {
             Total = result.Total,
