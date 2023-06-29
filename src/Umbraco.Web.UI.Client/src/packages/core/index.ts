@@ -1,6 +1,6 @@
 import { UmbBackofficeNotificationContainerElement, UmbBackofficeModalContainerElement } from './components/index.js';
 import { manifests as debugManifests } from './debug/manifests.js';
-import { manifests as propertyActionManifests } from './property-actions/manifests.js';
+import { manifests as propertyActionManifests } from './property-action/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
 import { manifests as tinyMcePluginManifests } from './property-editor/uis/tiny-mce/plugins/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
@@ -31,7 +31,7 @@ export * from './menu/index.js';
 export * from './modal/index.js';
 export * from './notification/index.js';
 export * from './picker-input/index.js';
-export * from './property-actions/index.js';
+export * from './property-action/index.js';
 export * from './property-editor/index.js';
 export * from './section/index.js';
 export * from './sorter/index.js';
