@@ -298,7 +298,7 @@ describe('tree service tests', function () {
 
         it('can find a plugin based tree', function () {
             //we know this exists in the mock umbraco server vars
-            var found = treeService.getTreePackageFolder("MyPackageSectionAlias", "myTree");
+            var found = treeService.getTreePackageFolder("myTree", "MyPackageSectionAlias");
             expect(found).toBe("MyPackage");
         });
 
