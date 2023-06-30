@@ -60,7 +60,7 @@ public class UmbracoPageResult : IActionResult
     /// </summary>
     private async Task ExecuteControllerAction(IActionInvoker? actionInvoker)
     {
-        using (_profilingLogger.TraceDuration<UmbracoPageResult>(
+        using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Verbose) ? null : _profilingLogger.TraceDuration<UmbracoPageResult>(
                    "Executing Umbraco RouteDefinition controller",
                    "Finished"))
         {

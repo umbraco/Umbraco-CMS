@@ -3,13 +3,10 @@
 
 #pragma warning disable SA1124 // Do not use regions (justification: regions are currently adding some useful organisation to this file)
 
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -20,7 +17,6 @@ using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
@@ -175,7 +171,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 .AddNotificationHandler<ContentDeletingVersionsNotification, TestNotificationHandler>()
                 .AddNotificationHandler<ContentRefreshNotification, TestNotificationHandler>()
                 ;
-            builder.AddNotificationHandler<ContentTreeChangeNotification, DistributedCacheBinder>();
+            builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
         }
 
         [SetUp]

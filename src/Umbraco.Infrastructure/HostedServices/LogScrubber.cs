@@ -63,23 +63,32 @@ public class LogScrubber : RecurringHostedServiceBase
         switch (_serverRegistrar.CurrentServerRole)
         {
             case ServerRole.Subscriber:
-                _logger.LogDebug("Does not run on subscriber servers.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Does not run on subscriber servers.");
+                }
                 return Task.CompletedTask;
             case ServerRole.Unknown:
-                _logger.LogDebug("Does not run on servers with unknown role.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Does not run on servers with unknown role.");
+                }
                 return Task.CompletedTask;
         }
 
         // Ensure we do not run if not main domain, but do NOT lock it
         if (_mainDom.IsMainDom == false)
         {
-            _logger.LogDebug("Does not run if not MainDom.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Does not run if not MainDom.");
+            }
             return Task.CompletedTask;
         }
 
         // Ensure we use an explicit scope since we are running on a background thread.
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
-        using (_profilingLogger.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
+        using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
         {
             _auditService.CleanLogs((int)_settings.MaxLogAge.TotalMinutes);
             _ = scope.Complete();

@@ -79,10 +79,13 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         IDictionary<string, string?>? items = auth.Properties?.Items;
         if (auth.Principal == null || items == null)
         {
-            Logger.LogDebug(
+            if (Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                Logger.LogDebug(
                 auth.Failure ??
                 new NullReferenceException("Context.AuthenticateAsync(ExternalAuthenticationType) is null"),
                 "The external login authentication failed. No user Principal or authentication items was resolved.");
+            }
             return null;
         }
 

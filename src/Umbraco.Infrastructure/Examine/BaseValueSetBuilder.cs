@@ -22,7 +22,11 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
     /// <inheritdoc />
     public abstract IEnumerable<ValueSet> GetValueSets(params TContent[] content);
 
+    [Obsolete("Use the overload that specifies availableCultures, scheduled for removal in v14")]
     protected void AddPropertyValue(IProperty property, string? culture, string? segment, IDictionary<string, IEnumerable<object?>>? values)
+        => AddPropertyValue(property, culture, segment, values, Enumerable.Empty<string>());
+
+    protected void AddPropertyValue(IProperty property, string? culture, string? segment, IDictionary<string, IEnumerable<object?>>? values, IEnumerable<string> availableCultures)
     {
         IDataEditor? editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
         if (editor == null)
@@ -31,7 +35,7 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
         }
 
         IEnumerable<KeyValuePair<string, IEnumerable<object?>>> indexVals =
-            editor.PropertyIndexValueFactory.GetIndexValues(property, culture, segment, PublishedValuesOnly);
+            editor.PropertyIndexValueFactory.GetIndexValues(property, culture, segment, PublishedValuesOnly, availableCultures);
         foreach (KeyValuePair<string, IEnumerable<object?>> keyVal in indexVals)
         {
             if (keyVal.Key.IsNullOrWhiteSpace())

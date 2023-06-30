@@ -195,21 +195,23 @@ function ExamineManagementController($http, $q, $timeout, umbRequestHelper, loca
 
         searcher.isProcessing = true;
 
+        const pageIndex = pageNumber ? (pageNumber - 1) : 0;
+
         umbRequestHelper.resourcePromise(
                 $http.get(umbRequestHelper.getApiUrl("examineMgmtBaseUrl",
                     "GetSearchResults",
                     {
                         searcherName: searcher.name,
                         query: encodeURIComponent(vm.searchText),
-                        pageIndex: pageNumber ? (pageNumber - 1) : 0
+                        pageIndex: pageIndex
                     })),
                 'Failed to search')
             .then(searchResults => {
                 searcher.isProcessing = false;
-                vm.searchResults = searchResults
+                vm.searchResults = searchResults;
+                vm.searchResults.pageIndex = pageIndex;
                 vm.searchResults.pageNumber = pageNumber ? pageNumber : 1;
-                //20 is page size
-                vm.searchResults.totalPages = Math.ceil(vm.searchResults.totalRecords / 20);
+                vm.searchResults.totalPages = Math.ceil(vm.searchResults.totalRecords / vm.searchResults.pageSize);
                 // add URLs to edit well known entities
                 _.each(vm.searchResults.results, function (result) {
                     var section = result.values["__IndexType"][0];

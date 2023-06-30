@@ -19,10 +19,29 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
 
     // used for tests
     public ContentValueSetValidator(bool publishedValuesOnly, int? parentId = null, IEnumerable<string>? includeItemTypes = null, IEnumerable<string>? excludeItemTypes = null)
-        : this(publishedValuesOnly, true, null, null, parentId, includeItemTypes, excludeItemTypes)
+        : this(publishedValuesOnly, true, null, null, parentId, includeItemTypes, excludeItemTypes, null, null)
     {
     }
 
+    [Obsolete("Use the overload accepting includeFields and excludeFields instead. This overload will be removed in Umbraco 14.")]
+    public ContentValueSetValidator(
+        bool publishedValuesOnly,
+        bool supportProtectedContent,
+        IPublicAccessService? publicAccessService,
+        IScopeProvider? scopeProvider,
+        int? parentId,
+        IEnumerable<string>? includeItemTypes,
+        IEnumerable<string>? excludeItemTypes)
+        : base(includeItemTypes, excludeItemTypes, null, null)
+    {
+        PublishedValuesOnly = publishedValuesOnly;
+        SupportProtectedContent = supportProtectedContent;
+        ParentId = parentId;
+        _publicAccessService = publicAccessService;
+        _scopeProvider = scopeProvider;
+    }
+
+    [Obsolete("This constructor is obsolete, the IScopeProvider will change to Infrastructure.Scoping.ScopeProvider instead, this will be removed in Umbraco 14.")]
     public ContentValueSetValidator(
         bool publishedValuesOnly,
         bool supportProtectedContent,
@@ -30,8 +49,10 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         IScopeProvider? scopeProvider,
         int? parentId = null,
         IEnumerable<string>? includeItemTypes = null,
-        IEnumerable<string>? excludeItemTypes = null)
-        : base(includeItemTypes, excludeItemTypes, null, null)
+        IEnumerable<string>? excludeItemTypes = null,
+        IEnumerable<string>? includeFields = null,
+        IEnumerable<string>? excludeFields = null)
+        : base(includeItemTypes, excludeItemTypes, includeFields, excludeFields)
     {
         PublishedValuesOnly = publishedValuesOnly;
         SupportProtectedContent = supportProtectedContent;

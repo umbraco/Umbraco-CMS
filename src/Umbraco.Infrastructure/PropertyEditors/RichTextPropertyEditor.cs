@@ -305,7 +305,7 @@ public class RichTextPropertyEditor : DataEditor
 
     internal class RichTextPropertyIndexValueFactory : IPropertyIndexValueFactory
     {
-        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
+        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published, IEnumerable<string> availableCultures)
         {
             var val = property.GetValue(culture, segment, published);
 
@@ -323,5 +323,9 @@ public class RichTextPropertyEditor : DataEditor
             yield return new KeyValuePair<string, IEnumerable<object?>>(
                 $"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new object[] { strVal });
         }
+
+        [Obsolete("Use the overload with the 'availableCultures' parameter instead, scheduled for removal in v14")]
+        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
+            => GetIndexValues(property, culture, segment, published);
     }
 }

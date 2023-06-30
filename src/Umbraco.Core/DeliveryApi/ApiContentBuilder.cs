@@ -10,6 +10,6 @@ public sealed class ApiContentBuilder : ApiContentBuilderBase<IApiContent>, IApi
     {
     }
 
-    protected override IApiContent Create(IPublishedContent content, Guid id, string name, string contentType, IApiContentRoute route, IDictionary<string, object?> properties)
-        => new ApiContent(id, name, contentType, route, properties);
+    protected override IApiContent Create(IPublishedContent content, string name, IApiContentRoute route, IDictionary<string, object?> properties)
+        => new ApiContent(content.Key, name, content.ContentType.Alias, content.CreateDate, content.UpdateDate, route, properties);
 }

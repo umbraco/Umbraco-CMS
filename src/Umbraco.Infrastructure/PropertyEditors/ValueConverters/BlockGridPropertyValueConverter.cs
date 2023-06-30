@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
             => typeof(ApiBlockGridModel);
 
-        public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
         {
             const int defaultColumns = 12;
 
@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         private BlockGridModel? ConvertIntermediateToBlockGridModel(IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
-            using (_proflog.DebugDuration<BlockGridPropertyValueConverter>($"ConvertPropertyToBlockGrid ({propertyType.DataType.Id})"))
+            using (!_proflog.IsEnabled(LogLevel.Debug) ? null : _proflog.DebugDuration<BlockGridPropertyValueConverter>($"ConvertPropertyToBlockGrid ({propertyType.DataType.Id})"))
             {
                 // Get configuration
                 var configuration = propertyType.DataType.ConfigurationAs<BlockGridConfiguration>();

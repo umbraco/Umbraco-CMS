@@ -1910,8 +1910,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="stateInactive">Inactif</key>
     <key alias="sortNameAscending">Nom (A-Z)</key>
     <key alias="sortNameDescending">Nom (Z-A)</key>
-    <key alias="sortCreateDateAscending">Plus récent</key>
-    <key alias="sortCreateDateDescending">Plus ancien</key>
+    <key alias="sortCreateDateAscending">Plus ancien</key>
+    <key alias="sortCreateDateDescending">Plus récent</key>
     <key alias="sortLastLoginDateDescending">Dernière connexion</key>
   </area>
   <area alias="validation">

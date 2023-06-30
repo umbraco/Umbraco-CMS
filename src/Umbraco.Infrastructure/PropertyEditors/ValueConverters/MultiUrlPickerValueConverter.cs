@@ -84,7 +84,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
 
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        using (_proflog.DebugDuration<MultiUrlPickerValueConverter>(
+        using (!_proflog.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _proflog.DebugDuration<MultiUrlPickerValueConverter>(
                    $"ConvertPropertyToLinks ({propertyType.DataType.Id})"))
         {
             var maxNumber = propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>()!.MaxNumber;
@@ -154,7 +154,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
 
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<ApiLink>);
 
-    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
         IEnumerable<ApiLink> DefaultValue() => Array.Empty<ApiLink>();
 

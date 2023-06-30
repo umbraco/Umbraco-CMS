@@ -77,5 +77,9 @@ public class UmbracoPlan : MigrationPlan
         // To 12.0.0
         To<V_12_0_0.UseNvarcharInsteadOfNText>("{888A0D5D-51E4-4C7E-AA0A-01306523C7FB}");
         To<V_12_0_0.ResetCache>("{539F2F83-FBA7-4C48-81A3-75081A56BB9D}");
+
+        // To 12.1.0
+        To<V_12_1_0.TablesIndexesImprovement>("{1187192D-EDB5-4619-955D-91D48D738871}");
+        To<V_12_1_0.AddOpenIddict>("{47DE85CE-1E16-42A0-8AF6-3EC3BCEF5471}");
     }
 }

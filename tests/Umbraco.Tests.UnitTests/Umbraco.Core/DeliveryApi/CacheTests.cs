@@ -27,6 +27,7 @@ public class CacheTests : DeliveryApiTests
             It.IsAny<IPublishedPropertyType>(),
             It.IsAny<PropertyCacheLevel>(),
             It.IsAny<object?>(),
+            It.IsAny<bool>(),
             It.IsAny<bool>())
         ).Returns(() => $"Delivery API value: {++invocationCount}");
         propertyValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
@@ -54,6 +55,7 @@ public class CacheTests : DeliveryApiTests
                 It.IsAny<IPublishedPropertyType>(),
                 It.IsAny<PropertyCacheLevel>(),
                 It.IsAny<object?>(),
+                It.IsAny<bool>(),
                 It.IsAny<bool>()),
             Times.Exactly(expectedConverterHits));
     }

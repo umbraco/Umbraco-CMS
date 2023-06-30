@@ -115,18 +115,18 @@ public class RichTextEditorSettings
         new Dictionary<string, string> { ["entity_encoding"] = "raw" };
 
     /// <summary>
-    ///     HTML RichText Editor TinyMCE Commands
+    ///     HTML RichText Editor TinyMCE Commands.
     /// </summary>
     /// WB-TODO Custom Array of objects
     public RichTextEditorCommand[] Commands { get; set; } = Default_commands;
 
     /// <summary>
-    ///     HTML RichText Editor TinyMCE Plugins
+    ///     HTML RichText Editor TinyMCE Plugins.
     /// </summary>
     public string[] Plugins { get; set; } = Default_plugins;
 
     /// <summary>
-    ///     HTML RichText Editor TinyMCE Custom Config
+    ///     HTML RichText Editor TinyMCE Custom Config.
     /// </summary>
     /// WB-TODO Custom Dictionary
     public IDictionary<string, string> CustomConfig { get; set; } = Default_custom_config;
@@ -137,7 +137,7 @@ public class RichTextEditorSettings
     public string ValidElements { get; set; } = StaticValidElements;
 
     /// <summary>
-    ///     Invalid HTML elements for RichText Editor
+    ///     Invalid HTML elements for RichText Editor.
     /// </summary>
     [DefaultValue(StaticInvalidElements)]
     public string InvalidElements { get; set; } = StaticInvalidElements;
