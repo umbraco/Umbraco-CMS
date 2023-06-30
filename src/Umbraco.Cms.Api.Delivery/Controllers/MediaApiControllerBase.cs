@@ -14,22 +14,22 @@ namespace Umbraco.Cms.Api.Delivery.Controllers;
 [ApiExplorerSettings(GroupName = "Media")]
 public abstract class MediaApiControllerBase : DeliveryApiControllerBase
 {
-    private readonly IApiMediaWithCropsBuilder _apiMediaWithCropsBuilder;
+    private readonly IApiMediaWithCropsResponseBuilder _apiMediaWithCropsResponseBuilder;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private IPublishedMediaCache? _publishedMediaCache;
 
-    protected MediaApiControllerBase(IPublishedSnapshotAccessor publishedSnapshotAccessor, IApiMediaWithCropsBuilder apiMediaWithCropsBuilder)
+    protected MediaApiControllerBase(IPublishedSnapshotAccessor publishedSnapshotAccessor, IApiMediaWithCropsResponseBuilder apiMediaWithCropsResponseBuilder)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
-        _apiMediaWithCropsBuilder = apiMediaWithCropsBuilder;
+        _apiMediaWithCropsResponseBuilder = apiMediaWithCropsResponseBuilder;
     }
 
     protected IPublishedMediaCache PublishedMediaCache => _publishedMediaCache
         ??= _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Media
             ?? throw new InvalidOperationException("Could not obtain the published media cache");
 
-    protected ApiMediaWithCrops BuildApiMediaWithCrops(IPublishedContent media)
-        => _apiMediaWithCropsBuilder.Build(media);
+    protected ApiMediaWithCropsResponse BuildApiMediaWithCrops(IPublishedContent media)
+        => _apiMediaWithCropsResponseBuilder.Build(media);
 
     protected IActionResult ApiMediaQueryOperationStatusResult(ApiMediaQueryOperationStatus status) =>
         status switch

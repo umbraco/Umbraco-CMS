@@ -26,6 +26,7 @@ public class ApiMediaQueryService : IApiMediaQueryService
         _logger = logger;
     }
 
+    /// <inheritdoc/>
     public Attempt<PagedModel<Guid>, ApiMediaQueryOperationStatus> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts, int skip, int take)
     {
         var emptyResult = new PagedModel<Guid>();
@@ -54,8 +55,7 @@ public class ApiMediaQueryService : IApiMediaQueryService
             return Attempt.FailWithStatus(ApiMediaQueryOperationStatus.SortOptionNotFound, emptyResult);
         }
 
-        IPublishedMediaCache mediaCache = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Media
-                                          ?? throw new InvalidOperationException("Could not obtain the published media cache");
+        IPublishedMediaCache mediaCache = GetRequiredPublishedMediaCache();
 
         if (childrenOf.Trim(Constants.CharArrays.ForwardSlash).Length == 0)
         {
@@ -74,6 +74,14 @@ public class ApiMediaQueryService : IApiMediaQueryService
 
         return PagedResult(startItem?.Children ?? Array.Empty<IPublishedContent>(), skip, take);
     }
+
+    /// <inheritdoc/>
+    public IPublishedContent? GetByPath(string path)
+        => TryGetByPath(path, GetRequiredPublishedMediaCache());
+
+    private IPublishedMediaCache GetRequiredPublishedMediaCache()
+        => _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Media
+           ?? throw new InvalidOperationException("Could not obtain the published media cache");
 
     private IPublishedContent? TryGetByPath(string path, IPublishedMediaCache mediaCache)
     {

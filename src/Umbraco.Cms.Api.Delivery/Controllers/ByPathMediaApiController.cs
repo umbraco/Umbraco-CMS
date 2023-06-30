@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -9,25 +10,31 @@ using Umbraco.Cms.Infrastructure.DeliveryApi;
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
 [ApiVersion("1.0")]
-public class ByIdMediaApiController : MediaApiControllerBase
+public class ByPathMediaApiController : MediaApiControllerBase
 {
-    public ByIdMediaApiController(IPublishedSnapshotAccessor publishedSnapshotAccessor, IApiMediaWithCropsResponseBuilder apiMediaWithCropsResponseBuilder)
+    private readonly IApiMediaQueryService _apiMediaQueryService;
+
+    public ByPathMediaApiController(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IApiMediaWithCropsResponseBuilder apiMediaWithCropsResponseBuilder,
+        IApiMediaQueryService apiMediaQueryService)
         : base(publishedSnapshotAccessor, apiMediaWithCropsResponseBuilder)
-    {
-    }
+        => _apiMediaQueryService = apiMediaQueryService;
 
     /// <summary>
-    ///     Gets a media item by id.
+    ///     Gets a media item by its path.
     /// </summary>
-    /// <param name="id">The unique identifier of the media item.</param>
+    /// <param name="path">The path of the media item.</param>
     /// <returns>The media item or not found result.</returns>
-    [HttpGet("item/{id:guid}")]
+    [HttpGet("item/{*path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ApiMediaWithCropsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ById(Guid id)
+    public async Task<IActionResult> ByPath(string path)
     {
-        IPublishedContent? media = PublishedMediaCache.GetById(id);
+        path = DecodePath(path);
+
+        IPublishedContent? media = _apiMediaQueryService.GetByPath(path);
         if (media is null)
         {
             return await Task.FromResult(NotFound());

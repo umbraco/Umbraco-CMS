@@ -21,9 +21,9 @@ public class QueryMediaApiController : MediaApiControllerBase
 
     public QueryMediaApiController(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IApiMediaWithCropsBuilder apiMediaWithCropsBuilder,
+        IApiMediaWithCropsResponseBuilder apiMediaWithCropsResponseBuilder,
         IApiMediaQueryService apiMediaQueryService)
-        : base(publishedSnapshotAccessor, apiMediaWithCropsBuilder)
+        : base(publishedSnapshotAccessor, apiMediaWithCropsResponseBuilder)
         => _apiMediaQueryService = apiMediaQueryService;
 
     /// <summary>
@@ -37,7 +37,7 @@ public class QueryMediaApiController : MediaApiControllerBase
     /// <returns>The paged result of the media item(s).</returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<ApiMediaWithCrops>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<ApiMediaWithCropsResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Query(
@@ -57,7 +57,7 @@ public class QueryMediaApiController : MediaApiControllerBase
         PagedModel<Guid> pagedResult = queryAttempt.Result;
         IPublishedContent[] mediaItems = pagedResult.Items.Select(PublishedMediaCache.GetById).WhereNotNull().ToArray();
 
-        var model = new PagedViewModel<ApiMediaWithCrops>
+        var model = new PagedViewModel<ApiMediaWithCropsResponse>
         {
             Total = pagedResult.Total,
             Items = mediaItems.Select(BuildApiMediaWithCrops)

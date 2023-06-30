@@ -424,6 +424,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiContentResponseBuilder, ApiContentResponseBuilder>();
         builder.Services.AddSingleton<IApiMediaBuilder, ApiMediaBuilder>();
         builder.Services.AddSingleton<IApiMediaWithCropsBuilder, ApiMediaWithCropsBuilder>();
+        builder.Services.AddSingleton<IApiMediaWithCropsResponseBuilder, ApiMediaWithCropsResponseBuilder>();
         builder.Services.AddSingleton<IApiContentNameProvider, ApiContentNameProvider>();
         builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, NoopOutputExpansionStrategyAccessor>();
         builder.Services.AddSingleton<IRequestStartItemProviderAccessor, NoopRequestStartItemProviderAccessor>();
