@@ -246,8 +246,13 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 								  >`
 								: ''}
 						</div>
-						<div class="row">N items returned, in 0 ms</div>
-						<code> ${this._templateQuery?.queryExpression ?? ''} </code>
+						<div class="row">
+							<span id="results-count"
+								>${this._templateQuery?.resultCount ?? 0} items returned, in ${this._templateQuery?.executionTime ?? 0}
+								ms</span
+							>
+						</div>
+						<umb-code-block language="C#" copy> ${this._templateQuery?.queryExpression ?? ''} </umb-code-block>
 					</uui-box>
 				</div>
 
@@ -296,6 +301,10 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 			#filter-container {
 				flex-direction: column;
 				justify-content: flex-start;
+			}
+
+			#results-count {
+				font-weight: bold;
 			}
 		`,
 	];

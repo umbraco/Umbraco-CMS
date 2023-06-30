@@ -109,18 +109,19 @@ export const createTemplateScaffold = (masterTemplateAlias: string) => {
 }`;
 };
 
+//prettier-ignore
 const templateQueryExpressions = [
-	`Umbraco.ContentAtRoot().FirstOrDefault()
-    .ChildrenOfType("docTypeWithTemplate")
-    .Where(x => x.IsVisible())`,
-	`Umbraco.Content(Guid.Parse("0b3498dc-255a-4d62-aa4f-ef7bff333544"))
-    .ChildrenOfType("docTypeWithTemplate")
-    .Where(x => x.IsVisible())`,
-	`Umbraco.Content(Guid.Parse("0b3498dc-255a-4d62-aa4f-ef7bff333544"))
-    .ChildrenOfType("docTypeWithTemplate")
-    .Where(x => (x.Id > 5))
-    .Where(x => x.IsVisible())
-    .OrderByDescending(x => x.UpdateDate)`,
+`Umbraco.ContentAtRoot().FirstOrDefault()
+.ChildrenOfType("docTypeWithTemplate")
+.Where(x => x.IsVisible())`,
+`Umbraco.Content(Guid.Parse("0b3498dc-255a-4d62-aa4f-ef7bff333544"))
+.ChildrenOfType("docTypeWithTemplate")
+.Where(x => x.IsVisible())`,
+`Umbraco.ContentAtRoot().FirstOrDefault()
+.ChildrenOfType("docTypeWithTemplate")
+.Where(x => (x.Id != -6))
+.Where(x => x.IsVisible())
+.OrderBy(x => x.UpdateDate)`,
 ];
 
 const randomIndex = () => Math.floor(Math.random() * 3);
