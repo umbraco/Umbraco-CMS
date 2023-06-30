@@ -90,11 +90,9 @@ export class UmbCodeBlockElement extends LitElement {
 				padding: 9.5px;
 			}
 
-			pre code {
+			pre,
+			code {
 				word-wrap: normal;
-				background-color: transparent;
-				border: 0;
-				padding: 0;
 				white-space: pre-line;
 			}
 
