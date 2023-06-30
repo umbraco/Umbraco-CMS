@@ -360,7 +360,7 @@ public class ApplicationTreeController : UmbracoAuthorizedApiController
         ControllerActionDescriptor? actionDescriptor = _actionDescriptorCollectionProvider.ActionDescriptors.Items
             .Cast<ControllerActionDescriptor>()
             .First(x =>
-                x.ControllerName.Equals(controllerName) &&
+                (x.ControllerTypeInfo.FullName ?? string.Empty).Equals(controllerType.FullName) &&
                 x.ActionName == action);
 
         var actionContext = new ActionContext(HttpContext, routeData, actionDescriptor);
