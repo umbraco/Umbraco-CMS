@@ -106,7 +106,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		this.dispatchEvent(new CustomEvent('insert', { bubbles: false, cancelable: true, composed: false }));
 	}
 
-	@property()
+	@property({ type: Boolean })
 	hidePartialView = false;
 
 	render() {

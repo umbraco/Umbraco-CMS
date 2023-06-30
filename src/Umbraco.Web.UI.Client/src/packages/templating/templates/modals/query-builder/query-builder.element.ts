@@ -8,9 +8,7 @@ import {
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 import {
-	TemplateQueryExecuteFilterPresentationModel,
 	TemplateQueryExecuteModel,
-	TemplateQueryExecuteSortModel,
 	TemplateQueryResultResponseModel,
 	TemplateQuerySettingsResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -49,26 +47,11 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	@queryAll('umb-query-builder-filter')
 	private _filterElements!: UmbQueryBuilderFilterElement[];
 
-	#close() {
-		this.modalContext?.reject();
-	}
-
-	#submit() {
-		this.modalContext?.submit({
-			value: this._templateQuery?.queryExpression ?? '',
-		});
-	}
-
 	@state()
 	private _templateQuery?: TemplateQueryResultResponseModel;
 
 	@state()
 	private _queryRequest: TemplateQueryExecuteModel = <TemplateQueryExecuteModel>{};
-
-	#updateQueryRequest(update: TemplateQueryExecuteModel) {
-		this._queryRequest = { ...this._queryRequest, ...update };
-		this.#postTemplateQuery();
-	}
 
 	@state()
 	private _queryBuilderSettings?: TemplateQuerySettingsResponseModel;
@@ -77,7 +60,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	private _selectedRootContentName = 'all pages';
 
 	@state()
-	private _defaultSortDirection: SortOrder = SortOrder.Ascending;
+	private _defaultSortDirection: SortOrder = SortOrder.Descending;
 
 	#documentRepository: UmbDocumentRepository;
 	#modalManagerContext?: UmbModalManagerContext;
@@ -96,6 +79,21 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	#init() {
 		this.#getTemplateQuerySettings();
+		this.#postTemplateQuery();
+	}
+
+	#close() {
+		this.modalContext?.reject();
+	}
+
+	#submit() {
+		this.modalContext?.submit({
+			value: this._templateQuery?.queryExpression ?? '',
+		});
+	}
+
+	#updateQueryRequest(update: TemplateQueryExecuteModel) {
+		this._queryRequest = { ...this._queryRequest, ...update };
 		this.#postTemplateQuery();
 	}
 
@@ -155,6 +153,9 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	#setSortProperty(event: Event) {
 		const target = event.target as UUIComboboxListElement;
+
+		if (!this._queryRequest.sort) this.#setSortDirection();
+
 		this.#updateQueryRequest({
 			sort: { ...this._queryRequest.sort, propertyAlias: (target.value as string) ?? '' },
 		});
