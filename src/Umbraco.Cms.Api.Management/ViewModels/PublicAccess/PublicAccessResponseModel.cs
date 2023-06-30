@@ -8,7 +8,7 @@ public class PublicAccessResponseModel
 {
     public MemberItemResponseModel[] Members { get; set; } = Array.Empty<MemberItemResponseModel>();
 
-    public MemberGroupItemReponseModel[] Groups { get; set; } = Array.Empty<MemberGroupItemReponseModel>();
+    public MemberGroupItemResponseModel[] Groups { get; set; } = Array.Empty<MemberGroupItemResponseModel>();
 
     public ContentTreeItemResponseModel? LoginPage { get; set; }
 

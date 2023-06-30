@@ -59,13 +59,13 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
             .ToArray();
 
         var allGroups = _memberRoleManager.Roles.Where(x => x.Name != null).ToDictionary(x => x.Name!);
-        MemberGroupItemReponseModel[] groups = entry.Rules
+        MemberGroupItemResponseModel[] groups = entry.Rules
             .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
             .Select(rule =>
                 rule.RuleValue is not null && allGroups.TryGetValue(rule.RuleValue, out UmbracoIdentityRole? memberRole)
                     ? memberRole
                     : null)
-            .Select(_mapper.Map<MemberGroupItemReponseModel>)
+            .Select(_mapper.Map<MemberGroupItemResponseModel>)
             .WhereNotNull()
             .ToArray();
 
