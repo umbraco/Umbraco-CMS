@@ -2,7 +2,7 @@ import { css, html, customElement, property, state, ifDefined } from '@umbraco-c
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-property-editor-ui-number')
 export class UmbPropertyEditorUINumberElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
@@ -18,11 +18,11 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 	@state()
 	private _step?: number;
 
-	@property({ type: Array, attribute: false })
-	public set config(config: UmbDataTypePropertyCollection) {
-		this._min = config.getValueByAlias('min');
-		this._max = config.getValueByAlias('max');
-		this._step = config.getValueByAlias('step');
+	@property({ attribute: false })
+	public set config(config: UmbDataTypeConfigCollection | undefined) {
+		this._min = config?.getValueByAlias('min');
+		this._max = config?.getValueByAlias('max');
+		this._step = config?.getValueByAlias('step');
 	}
 
 	private onInput(e: InputEvent) {

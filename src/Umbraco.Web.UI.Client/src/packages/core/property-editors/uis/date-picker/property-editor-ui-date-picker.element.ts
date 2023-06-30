@@ -3,7 +3,7 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import { UUITextStyles, InputType } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-date-picker
@@ -53,8 +53,9 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 
 	private _offsetTime?: boolean;
 
-	@property({ type: Array, attribute: false })
-	public set config(config: UmbDataTypePropertyCollection) {
+	@property({ attribute: false })
+	public set config(config: UmbDataTypeConfigCollection | undefined) {
+		if (!config) return;
 		const oldVal = this._inputType;
 
 		// Format string prevalue/config

@@ -9,7 +9,7 @@ Here is the LIT documentation and playground: [https://lit.dev](https://lit.dev)
 ### How best to find what needs converting from the old backoffice?
 
 1. Navigate to [https://github.com/umbraco/Umbraco-CMS](https://github.com/umbraco/Umbraco-CMS)
-2. Make sure you are on the `v13/dev` branch
+2. Make sure you are on the `v14/dev` branch
 
 ### What is the process of contribution?
 
@@ -35,12 +35,11 @@ The frontend has an API formatter that takes the OpenAPI schema file and convert
 ### Caveats
 
 1. There is currently no way to add translations. All texts in the UI are expected to be written in Umbraco’s default language of English.
-2. The backoffice can be run and tested against a real Umbraco instance by cloning down the `v13/dev` branch, but there are no guarantees about how well it works yet.
-3. Authentication has not been built, so the login page is never shown - HQ is working actively on this.
+2. The backoffice can be run and tested against a real Umbraco instance by cloning down the `v14/dev` branch, but there are no guarantees about how well it works yet.
 
 **Current schema for API:**
 
-[https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v13/dev/src/Umbraco.Cms.Api.Management/OpenApi.json](https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v13/dev/src/Umbraco.Cms.Api.Management/OpenApi.json)
+[https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v13/dev/src/Umbraco.Cms.Api.Management/OpenApi.json](https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v14/dev/src/Umbraco.Cms.Api.Management/OpenApi.json)
 
 **How to convert it:**
 
@@ -73,8 +72,8 @@ The old AngularJS controllers will have to be converted into modern TypeScript a
 To make the first button work, which simply just requests a new status from the server, we must make a call to `PublishedCacheResource.getPublishedCacheStatus()`. An additional thing here is to wrap that in a friendly function called `tryExecuteAndNotify`, which is something we make available to developers to automatically handle the responses coming from the server and additionally use the Notifications to notify of any errors:
 
 ```typescript
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { PublishedCacheResource } from '@umbraco-cms/backend-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { PublishedCacheResource } from '@umbraco-cms/backoffice/backend-api';
 
 private _getStatus() {
   const { data: status } = await tryExecuteAndNotify(this, PublishedCacheResource.getPublishedCacheStatus());
@@ -113,17 +112,20 @@ To declare the Published Cache Status Dashboard as a new manifest, we need to ad
 
 ```typescript
 {
- type: 'dashboard',
- alias: 'Umb.Dashboard.PublishedStatus',
- name: 'Published Status',
- elementName: 'umb-dashboard-published-status',
- loader: () => import('./backoffice/dashboards/published-status/dashboard-published-status.element'),
- meta: {
-  sections: ['Umb.Section.Settings'],
-  pathname: 'published-status',
-  weight: 9,
- },
-}
+	type: 'dashboard',
+	alias: 'Umb.Dashboard.PublishedStatus',
+	name: 'Published Status Dashboard',
+	elementName: 'umb-dashboard-published-status',
+	loader: () => import('./published-status/dashboard-published-status.element.js'),
+	weight: 200,
+	meta: {
+		label: 'Published Status',
+		pathname: 'published-status',
+	},
+	conditions: {
+		sections: ['Umb.Section.Settings'],
+	},
+},
 ```
 
 Let’s go through each of these properties…
@@ -150,7 +152,11 @@ Let’s go through each of these properties…
 
 - Loader: references a function call to import the file that the element is declared within
 
-- Meta: allows us to reference additional data - in our case we can specify the section that our dashboard will sit within, the pathname that will be displayed in the url and the weight of the section
+- Weight: allows us to specify the order in which the dashboard will be displayed within the tabs bar
+
+- Meta: allows us to reference additional data - in our case we can specify the label that is shown in the tabs bar and the pathname that will be displayed in the url
+
+- Conditions: allows us to specify the conditions that must be met in order for the dashboard to be displayed. In our case we are specifying that the dashboard will only be displayed within the Settings section
 
 ## API mock handlers
 
@@ -164,7 +170,7 @@ So to define this, we must first add a handler for the Published Status called `
 
 ```typescript
 const { rest } = window.MockServiceWorker;
-import { umbracoPath } from '@umbraco-cms/utils';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
 	rest.get(umbracoPath('/published-cache/status'), (_req, res, ctx) => {
@@ -225,10 +231,6 @@ There are two testing tools on the backoffice: unit testing and end-to-end testi
 We are using a tool called Web Test Runner which spins up a bunch of browsers using Playwright with the well-known jasmine/chai syntax. It is expected that any new component/element has a test file named “&lt;component>.test.ts”. It will automatically be picked up and there are a set of standard tests we apply to all components, which checks that they are registered correctly and they pass accessibility testing through Axe.
 
 Working with playwright: [https://playwright.dev/docs/intro](https://playwright.dev/docs/intro)
-
-### End-to-end testing
-
-This test is being performed by Playwright as well but is running in a mode where Playwright clicks through the browser in different scenarios and reports on those. There are no requirements to add these tests to new components yet, but it is encouraged. The tests are located in a separate app called “backoffice-e2e”.
 
 ## Putting it all together
 

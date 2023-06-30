@@ -6,7 +6,7 @@ import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/wo
 import { UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
@@ -19,13 +19,13 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 	@property({ type: Array })
 	value: UmbLinkPickerLink[] = [];
 
-	@property({ type: Array, attribute: false })
-	public set config(config: UmbDataTypePropertyCollection) {
-		this._overlaySize = config.getValueByAlias('overlaySize');
-		this._hideAnchor = config.getValueByAlias('hideAnchor');
-		this._ignoreUserStartNodes = config.getValueByAlias('ignoreUserStartNodes');
-		this._minNumber = config.getValueByAlias('minNumber');
-		this._maxNumber = config.getValueByAlias('maxNumber');
+	@property({ attribute: false })
+	public set config(config: UmbDataTypeConfigCollection | undefined) {
+		this._overlaySize = config?.getValueByAlias('overlaySize');
+		this._hideAnchor = config?.getValueByAlias('hideAnchor');
+		this._ignoreUserStartNodes = config?.getValueByAlias('ignoreUserStartNodes');
+		this._minNumber = config?.getValueByAlias('minNumber');
+		this._maxNumber = config?.getValueByAlias('maxNumber');
 	}
 
 	@state()

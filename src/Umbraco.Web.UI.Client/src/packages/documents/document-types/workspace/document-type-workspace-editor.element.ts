@@ -57,7 +57,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 					// TODO: Would be good with a more general way to bring focus to the name input.
 					(this.shadowRoot?.querySelector('#name') as HTMLElement)?.focus();
 				}
-				this.removeControllerByUnique('_observeIsNew');
+				this.removeControllerByAlias('_observeIsNew');
 			},
 			'_observeIsNew'
 		);

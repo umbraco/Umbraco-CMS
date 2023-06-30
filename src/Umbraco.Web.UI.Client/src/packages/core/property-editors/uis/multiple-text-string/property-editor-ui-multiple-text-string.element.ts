@@ -4,7 +4,7 @@ import {
 	MultipleTextStringValue,
 } from './input-multiple-text-string/input-multiple-text-string.element.js';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -20,10 +20,10 @@ export class UmbPropertyEditorUIMultipleTextStringElement
 	@property({ type: Array })
 	public value: MultipleTextStringValue = [];
 
-	@property({ type: Array, attribute: false })
-	public set config(config: UmbDataTypePropertyCollection) {
-		this._limitMin = config.getValueByAlias('minNumber');
-		this._limitMax = config.getValueByAlias('maxNumber');
+	@property({ attribute: false })
+	public set config(config: UmbDataTypeConfigCollection | undefined) {
+		this._limitMin = config?.getValueByAlias('minNumber');
+		this._limitMax = config?.getValueByAlias('maxNumber');
 	}
 
 	/**

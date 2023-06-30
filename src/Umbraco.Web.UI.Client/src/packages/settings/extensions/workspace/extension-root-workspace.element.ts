@@ -65,9 +65,9 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 					<uui-table>
 						<uui-table-head>
 							<uui-table-head-cell>Type</uui-table-head-cell>
-							<uui-table-head-cell>Weight</uui-table-head-cell>
 							<uui-table-head-cell>Name</uui-table-head-cell>
 							<uui-table-head-cell>Alias</uui-table-head-cell>
+							<uui-table-head-cell>Weight</uui-table-head-cell>
 							<uui-table-head-cell>Actions</uui-table-head-cell>
 						</uui-table-head>
 
@@ -75,11 +75,11 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 							(extension) => html`
 								<uui-table-row>
 									<uui-table-cell>${extension.type}</uui-table-cell>
-									<uui-table-cell>${extension.weight ? extension.weight : 'Not Set'} </uui-table-cell>
 									<uui-table-cell>
 										${isManifestElementNameType(extension) ? extension.name : `[Custom extension] ${extension.name}`}
 									</uui-table-cell>
 									<uui-table-cell>${extension.alias}</uui-table-cell>
+									<uui-table-cell>${extension.weight ? extension.weight : ''} </uui-table-cell>
 									<uui-table-cell>
 										<uui-button
 											label="Unload"

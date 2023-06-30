@@ -6,7 +6,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-block-grid
@@ -18,8 +18,8 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 	@property()
 	value = '';
 
-	@property({ type: Array, attribute: false })
-	public config?: UmbDataTypePropertyCollection;
+	@property({ attribute: false })
+	public config?: UmbDataTypeConfigCollection;
 
 	@state()
 	private _routes: UmbRoute[] = [];

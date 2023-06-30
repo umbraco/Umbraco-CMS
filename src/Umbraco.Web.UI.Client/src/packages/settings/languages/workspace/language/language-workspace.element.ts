@@ -32,7 +32,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 			path: 'edit/:isoCode',
 			component: this.#getComponentElement,
 			setup: (_component, info) => {
-				this.removeControllerByUnique('_observeIsNew');
+				this.removeControllerByAlias('_observeIsNew');
 				this.#languageWorkspaceContext.load(info.match.params.isoCode);
 			},
 		},

@@ -1,20 +1,18 @@
 import { Subject } from '@umbraco-cms/backoffice/external/rxjs';
 import { PackageResource, OpenAPI } from '@umbraco-cms/backoffice/backend-api';
-import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { ManifestBase, isManifestJSType } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbExtensionInitializer extends UmbController {
-	host: UmbControllerHostElement;
+export class UmbExtensionInitializer extends UmbBaseController {
 	#extensionRegistry: UmbBackofficeExtensionRegistry;
 	#unobserve = new Subject<void>();
 	#localPackages: Array<Promise<any>> = [];
 	#apiBaseUrl = OpenAPI.BASE;
 
-	constructor(host: UmbControllerHostElement, extensionRegistry: UmbBackofficeExtensionRegistry) {
+	constructor(host: UmbControllerHost, extensionRegistry: UmbBackofficeExtensionRegistry) {
 		super(host, UmbExtensionInitializer.name);
-		this.host = host;
 		this.#extensionRegistry = extensionRegistry;
 	}
 
@@ -41,13 +39,13 @@ export class UmbExtensionInitializer extends UmbController {
 
 	async #loadServerPackages() {
 		/* TODO: we need a new endpoint here, to remove the dependency on the package repository, to get the modules available for the backoffice scope
-		/ we will need a similar endpoint for the login, installer etc at some point. 
+		/ we will need a similar endpoint for the login, installer etc at some point.
 			We should expose more information about the packages when not authorized so the end point should only return a list of modules from the manifest with
 			with the correct scope.
 
 			This code is copy pasted from the package repository. We probably don't need this is the package repository anymore.
 		*/
-		const { data: packages } = await tryExecuteAndNotify(this.host, PackageResource.getPackageManifest());
+		const { data: packages } = await tryExecuteAndNotify(this._host, PackageResource.getPackageManifest());
 
 		if (packages) {
 			// Append packages to the store but only if they have a name

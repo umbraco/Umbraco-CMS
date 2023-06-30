@@ -2,7 +2,7 @@ import { css, html, customElement, property, state, ifDefined } from '@umbraco-c
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-property-editor-ui-text-box')
 export class UmbPropertyEditorUITextBoxElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
@@ -17,10 +17,10 @@ export class UmbPropertyEditorUITextBoxElement extends UmbLitElement implements 
 	@state()
 	private _maxChars?: number;
 
-	@property({ type: Array, attribute: false })
-	public set config(config: UmbDataTypePropertyCollection) {
-		this._type = config.getValueByAlias('inputType') ?? this.#defaultType;
-		this._maxChars = config.getValueByAlias('maxChars');
+	@property({ attribute: false })
+	public set config(config: UmbDataTypeConfigCollection | undefined) {
+		this._type = config?.getValueByAlias('inputType') ?? this.#defaultType;
+		this._maxChars = config?.getValueByAlias('maxChars');
 	}
 
 	private onInput(e: InputEvent) {

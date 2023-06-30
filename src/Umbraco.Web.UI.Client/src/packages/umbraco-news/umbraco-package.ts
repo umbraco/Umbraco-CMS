@@ -1,9 +1,9 @@
 export const name = 'Umbraco.Core.UmbracoNews';
 export const extensions = [
 	{
-		name: 'Umbraco News Entry Point',
-		alias: 'Umb.EntryPoint.UmbracoNews',
-		type: 'entryPoint',
-		loader: () => import('./index.js'),
+		name: 'Umbraco News Bundle',
+		alias: 'Umb.Bundle.UmbracoNews',
+		type: 'bundle',
+		loader: () => import('./manifests.js'),
 	},
 ];

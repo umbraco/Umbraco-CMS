@@ -1,6 +1,6 @@
 import { UmbInputMediaElement } from '../../../../media/media/components/input-media/input-media.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -19,9 +19,9 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		this._value = value || [];
 	}
 
-	@property({ type: Array, attribute: false })
-	public set config(config: UmbDataTypePropertyCollection) {
-		const validationLimit = config.getByAlias('validationLimit');
+	@property({ attribute: false })
+	public set config(config: UmbDataTypeConfigCollection | undefined) {
+		const validationLimit = config?.getByAlias('validationLimit');
 		if (!validationLimit) return;
 
 		const minMax: Record<string, number> = validationLimit.value;

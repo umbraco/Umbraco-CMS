@@ -1,9 +1,9 @@
 export const name = 'Umbraco.Core.Templating';
 export const extensions = [
 	{
-		name: 'Templating Entry Point',
-		alias: 'Umb.EntryPoint.Templating',
-		type: 'entryPoint',
-		loader: () => import('./package-entry-point.js'),
+		name: 'Template Management Bundle',
+		alias: 'Umb.Bundle.TemplateManagement',
+		type: 'bundle',
+		loader: () => import('./manifests.js'),
 	},
 ];

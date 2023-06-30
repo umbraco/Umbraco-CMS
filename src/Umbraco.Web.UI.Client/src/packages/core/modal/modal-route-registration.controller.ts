@@ -3,12 +3,12 @@ import { UmbModalRouteRegistration } from './modal-route-registration.js';
 import { UmbModalToken } from './token/index.js';
 import { UmbModalConfig } from './modal-manager.context.js';
 import { UMB_ROUTE_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/router';
-import type { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement, UmbController } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbModalRouteRegistrationController<D extends object = object, R = any>
 	extends UmbModalRouteRegistration<D, R>
-	implements UmbControllerInterface
+	implements UmbController
 {
 	//#host: UmbControllerHostInterface;
 	#init;
@@ -19,7 +19,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	#routeContext?: typeof UMB_ROUTE_CONTEXT_TOKEN.TYPE;
 	#modalRegistration?: UmbModalRouteRegistration;
 
-	public get unique() {
+	public get controllerAlias() {
 		return undefined;
 	}
 
