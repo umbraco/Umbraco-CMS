@@ -116,13 +116,12 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	render() {
 		return html`
 			<span>${this.unremovable ? 'where' : 'and'}</span>
-			<umb-button-with-dropdown look="outline" id="property-alias-dropdown"
-            label="Property alias"
+			<umb-button-with-dropdown look="outline" id="property-alias-dropdown" label="Property alias"
 				>${this.filter?.propertyAlias ?? ''}
-				<uui-combobox-list slot="dropdown" @change=${this.#setPropertyAlias} class="options-list">
+				<uui-combobox-list  slot="dropdown" @change=${this.#setPropertyAlias} class="options-list">
 					${this.settings?.properties?.map(
 						(property) =>
-							html`<uui-combobox-list-option .value=${property.alias ?? ''}
+							html`<uui-combobox-list-option tabindex="0" .value=${property.alias ?? ''}
 								>${property.alias}</uui-combobox-list-option
 							>`
 					)}

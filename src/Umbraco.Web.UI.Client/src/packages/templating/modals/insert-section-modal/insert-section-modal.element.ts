@@ -109,8 +109,8 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 					</uui-box>
 				</div>
 				<div slot="actions">
-					<uui-button @click=${this.#close} look="secondary">Close</uui-button>
-					<uui-button @click=${this.#submit} look="primary" color="positive">Submit</uui-button>
+					<uui-button @click=${this.#close} look="secondary" label="Close">Close</uui-button>
+					<uui-button @click=${this.#submit} look="primary" color="positive" label="Submit">Submit</uui-button>
 				</div>
 			</umb-body-layout>
 		`;

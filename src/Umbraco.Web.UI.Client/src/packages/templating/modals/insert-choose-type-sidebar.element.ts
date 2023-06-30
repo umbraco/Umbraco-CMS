@@ -93,7 +93,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 					</uui-box>
 				</div>
 				<div slot="actions">
-					<uui-button @click=${this._close} look="secondary">Close</uui-button>
+					<uui-button @click=${this._close} look="secondary" label="Close">Close</uui-button>
 				</div>
 			</umb-body-layout>
 		`;

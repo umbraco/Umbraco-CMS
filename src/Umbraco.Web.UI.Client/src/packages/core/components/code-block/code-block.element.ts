@@ -54,13 +54,13 @@ export class UmbCodeBlockElement extends LitElement {
 							: ''}
 				  </div>`
 				: ''}
-			<uui-scroll-container>
-				<pre style="${this.language ? 'border-top: 1px solid var(--uui-color-divider-emphasis);' : ''}">
+			<pre style="${this.language ? 'border-top: 1px solid var(--uui-color-divider-emphasis);' : ''}">
+				<uui-scroll-container>
 					<code>
 						<slot></slot>
 					</code>
+					</uui-scroll-container>
 				</pre>
-			</uui-scroll-container>
 		`;
 	}
 
@@ -70,16 +70,15 @@ export class UmbCodeBlockElement extends LitElement {
 			:host {
 				display: block;
 				border: 1px solid var(--uui-color-divider-emphasis);
-				color: var(--uui-color-text-alt);
 				border-radius: var(--uui-border-radius);
-				line-height: var(--uui-size-10);
 			}
 
-			:host uui-scroll-container {
+			uui-scroll-container {
 				max-height: 500px;
 				overflow-y: auto;
 				overflow-wrap: anywhere;
 			}
+
 			pre {
 				font-family: monospace;
 				background-color: var(--uui-color-surface-alt);
@@ -89,7 +88,6 @@ export class UmbCodeBlockElement extends LitElement {
 				margin: 0;
 				overflow-x: auto;
 				padding: 9.5px;
-				white-space: pre-wrap;
 			}
 
 			pre code {
@@ -97,7 +95,7 @@ export class UmbCodeBlockElement extends LitElement {
 				background-color: transparent;
 				border: 0;
 				padding: 0;
-				white-space: pre;
+				white-space: pre-line;
 			}
 
 			#header {

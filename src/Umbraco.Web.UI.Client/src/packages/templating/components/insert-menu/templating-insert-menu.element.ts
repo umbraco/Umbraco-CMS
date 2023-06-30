@@ -112,7 +112,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-button-group>
-				<uui-button look="secondary" @click=${this.#openChooseTypeModal}>
+				<uui-button look="secondary" @click=${this.#openChooseTypeModal} label="Choose value to insert">
 					<uui-icon name="umb:add"></uui-icon>Insert</uui-button
 				>
 				<umb-button-with-dropdown

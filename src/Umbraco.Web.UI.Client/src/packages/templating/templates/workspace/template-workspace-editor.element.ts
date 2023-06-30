@@ -175,7 +175,12 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	render() {
 		// TODO: add correct UI elements
 		return html`<umb-workspace-editor alias="Umb.Workspace.Template">
-			<uui-input placeholder="Enter name..." slot="header" .value=${this._name} @input=${this.#onNameInput}
+			<uui-input
+				placeholder="Enter name..."
+				slot="header"
+				.value=${this._name}
+				@input=${this.#onNameInput}
+				label="template name"
 				><umb-template-alias-input
 					slot="append"
 					.value=${this._alias ?? ''}
