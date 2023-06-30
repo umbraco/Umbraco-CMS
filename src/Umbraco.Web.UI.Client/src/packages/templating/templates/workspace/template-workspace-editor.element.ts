@@ -14,6 +14,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_MODAL_TEMPLATING_QUERY_BUILDER_SIDEBAR_ALIAS } from '../modals/manifests.js';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/modal-tokens.js';
+import { getQuerySnippet } from '../../utils.js';
 
 @customElement('umb-template-workspace-editor')
 export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
@@ -135,10 +136,10 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#openQueryBuilder() {
-		const modalContext = this._modalContext?.open(UMB_TEMPLATE_QUERY_BUILDER_MODAL);
+		const queryBuilderModal = this._modalContext?.open(UMB_TEMPLATE_QUERY_BUILDER_MODAL);
 
-		modalContext?.onSubmit().then((data) => {
-			console.log(data);
+		queryBuilderModal?.onSubmit().then((queryBuilderModalResult) => {
+			if (queryBuilderModalResult.value) this._codeEditor?.insert(getQuerySnippet(queryBuilderModalResult.value));
 		});
 	}
 

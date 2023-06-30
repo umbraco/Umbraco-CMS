@@ -281,7 +281,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 			}
 
 			.options-list {
-				min-width: 25ch;
+				min-width: 30ch;
 				background-color: var(--uui-color-surface);
 				box-shadow: var(--uui-shadow-depth-3);
 			}
