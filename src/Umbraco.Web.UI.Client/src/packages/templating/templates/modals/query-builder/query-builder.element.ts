@@ -108,7 +108,6 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		const { data, error } = await this.#templateRepository.postTemplateQueryExecute({
 			requestBody: this._queryRequest,
 		});
-		console.log(this._queryRequest);
 		if (data) this._templateQuery = { ...data };
 	};
 

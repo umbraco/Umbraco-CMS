@@ -107,7 +107,7 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 			case TemplateQueryPropertyTypeModel.STRING:
 				return html`<uui-input type="text" @change=${this.#setConstrainValue} label="constrain value"></uui-input>`;
 			case TemplateQueryPropertyTypeModel.DATE_TIME:
-				return html`<uui-input type="datetime-local" @change=${this.#setConstrainValue} label="constrain value"></uui-input>`;
+				return html`<uui-input type="date" @change=${this.#setConstrainValue} label="constrain value"></uui-input>`;
 			default:
 				return html`<uui-input type="text" @change=${this.#setConstrainValue} label="constrain value"></uui-input>`;
 		}
