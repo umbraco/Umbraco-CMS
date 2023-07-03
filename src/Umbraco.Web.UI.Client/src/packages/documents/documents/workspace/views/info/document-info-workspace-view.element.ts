@@ -102,6 +102,7 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 		super();
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('document-type')
 			.onSetup(() => {
 				return { entityType: 'document-type', preset: {} };
 			})
