@@ -1,5 +1,7 @@
 import type { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element.js';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element.js';
+import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/modal-tokens.js';
+import { getQuerySnippet } from '../../utils.js';
 import type { UmbTemplateWorkspaceContext } from './template-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { camelCase } from '@umbraco-cms/backoffice/external/lodash';
@@ -132,6 +134,14 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		});
 	}
 
+	#openQueryBuilder() {
+		const queryBuilderModal = this._modalContext?.open(UMB_TEMPLATE_QUERY_BUILDER_MODAL);
+
+		queryBuilderModal?.onSubmit().then((queryBuilderModalResult) => {
+			if (queryBuilderModalResult.value) this._codeEditor?.insert(getQuerySnippet(queryBuilderModalResult.value));
+		});
+	}
+
 	#renderMasterTemplatePicker() {
 		return html`
 			<uui-button-group>
@@ -164,7 +174,12 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	render() {
 		// TODO: add correct UI elements
 		return html`<umb-workspace-editor alias="Umb.Workspace.Template">
-			<uui-input placeholder="Enter name..." slot="header" .value=${this._name} @input=${this.#onNameInput}
+			<uui-input
+				placeholder="Enter name..."
+				slot="header"
+				.value=${this._name}
+				@input=${this.#onNameInput}
+				label="template name"
 				><umb-template-alias-input
 					slot="append"
 					.value=${this._alias ?? ''}
@@ -175,9 +190,13 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					${this.#renderMasterTemplatePicker()}
 					<div>
 						<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
-						<!-- <uui-button look="secondary" id="query-builder-button" label="Query builder">
+						<uui-button
+							look="secondary"
+							id="query-builder-button"
+							label="Query builder"
+							@click=${this.#openQueryBuilder}>
 							<uui-icon name="umb:wand"></uui-icon>Query builder
-						</uui-button> -->
+						</uui-button>
 						<uui-button
 							look="secondary"
 							id="sections-button"

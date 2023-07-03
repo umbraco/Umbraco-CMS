@@ -4,7 +4,7 @@ export * from './backoffice-modal-container/backoffice-modal-container.element.j
 export * from './backoffice-notification-container/backoffice-notification-container.element.js';
 export * from './body-layout/body-layout.element.js';
 export * from './button-with-dropdown/button-with-dropdown.element.js'; // TODO: delete this and change usage to umb-dropdown
-// export * from './code-block.js';
+export * from './code-block/index.js';
 export * from './data-type/index.js';
 export * from './input-date/index.js';
 export * from './dropdown/index.js';

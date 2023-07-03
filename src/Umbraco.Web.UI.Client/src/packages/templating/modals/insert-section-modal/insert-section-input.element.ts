@@ -66,6 +66,7 @@ export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 								<uui-input
 									required
 									placeholder="Enter section name"
+									label="Section name"
 									id="section-name-input"></uui-input> </uui-form-layout-item
 							>${this.showMandatory
 								? html`<p slot="if-checked">

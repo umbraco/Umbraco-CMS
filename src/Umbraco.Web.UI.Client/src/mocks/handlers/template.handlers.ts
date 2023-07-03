@@ -48,6 +48,11 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
+	rest.post(umbracoPath('/template/query/execute'), (req, res, ctx) => {
+		const response = umbTemplateData.getTemplateQueryResult();
+		return res(ctx.status(200), ctx.json(response));
+	}),
+
 	rest.get(umbracoPath('/template/:id'), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return;
