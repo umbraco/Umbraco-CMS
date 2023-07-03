@@ -10,10 +10,7 @@
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="OpenIddict.Abstractions" Version="4.3.0" />
-  </ItemGroup>
-
+ 
   <ItemGroup>
     <Folder Include="Services" />
   </ItemGroup>

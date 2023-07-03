@@ -19,11 +19,9 @@ public interface IUmbracoSearcher
 
     IEnumerable<PublishedSearchResult> SearchDescendants(
         IPublishedContent content,
-        IUmbracoContextAccessor umbracoContextAccessor,
         string term);
 
-    IEnumerable<PublishedSearchResult> SearchChildren(IPublishedContent content,
-        IUmbracoContextAccessor umbracoContextAccessor, string term);
+    IEnumerable<PublishedSearchResult> SearchChildren(IPublishedContent content, string term);
 
     IUmbracoSearchResults Search(ISearchRequest searchRequest);
     public ISearchRequest CreateSearchRequest();

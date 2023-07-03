@@ -54,17 +54,16 @@ public static class UmbracoSearchExtensions
         {
             indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
             var searcher = SearchProvider.GetSearcher(indexName);
-        return searcher?.SearchDescendants(content, umbracoContextAccessor, term) ?? new List<PublishedSearchResult>();
+        return searcher?.SearchDescendants(content,term) ?? new List<PublishedSearchResult>();
     }
     public static IEnumerable<PublishedSearchResult> SearchChildren(
         this IPublishedContent content,
-        IUmbracoContextAccessor umbracoContextAccessor,
         string term,
         string? indexName = null)
     {
         indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
         var searcher = SearchProvider.GetSearcher(indexName);
-        return searcher?.SearchChildren(content, umbracoContextAccessor, term) ?? new List<PublishedSearchResult>();
+        return searcher?.SearchChildren(content, term) ?? new List<PublishedSearchResult>();
 
     }
 }

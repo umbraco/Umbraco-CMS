@@ -13,12 +13,12 @@ namespace Umbraco.Search.Examine;
 public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
 {
     private readonly ISearcher _examineIndex;
-    private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+    private readonly IUmbracoContextFactory _umbracoContextFactory;
 
-    public UmbracoExamineSearcher(ISearcher examineIndex, IUmbracoContextAccessor umbracoContextAccessor)
+    public UmbracoExamineSearcher(ISearcher examineIndex, IUmbracoContextFactory umbracoContextFactory)
     {
         _examineIndex = examineIndex;
-        _umbracoContextAccessor = umbracoContextAccessor;
+        _umbracoContextFactory = umbracoContextFactory;
         _examineIndex = examineIndex;
     }
 
@@ -43,7 +43,6 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
 
     public IEnumerable<PublishedSearchResult> SearchDescendants(
         IPublishedContent content,
-        IUmbracoContextAccessor umbracoContextAccessor,
         string term)
     {
         // var t = term.Escape().Value;
@@ -52,22 +51,25 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
             .Field(UmbracoSearchFieldNames.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
             .And()
             .ManagedQuery(term);
-        IUmbracoContext umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
-        return query.Execute().ToPublishedSearchResults(umbracoContext.Content);
+        using (var contextReference = _umbracoContextFactory.EnsureUmbracoContext())
+        {
+            IUmbracoContext umbracoContext = contextReference.UmbracoContext;
+            return query.Execute().ToPublishedSearchResults(umbracoContext.Content);
+        }
     }
 
     public IEnumerable<PublishedSearchResult> SearchChildren(
         IPublishedContent content,
-        IUmbracoContextAccessor umbracoContextAccessor,
         string term)
     {
         IBooleanOperation? query = _examineIndex.CreateQuery()
             .Field("parentID", content.Id)
             .And()
             .ManagedQuery(term);
-        IUmbracoContext umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
-
-        return query.Execute().ToPublishedSearchResults(umbracoContext.Content);
+        using (var contextReference = _umbracoContextFactory.EnsureUmbracoContext())
+        {
+            return query.Execute().ToPublishedSearchResults(contextReference.UmbracoContext.Content);
+        }
     }
 
     public IUmbracoSearchResults Search(ISearchRequest searchRequest)
@@ -114,11 +116,13 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
 
             (searchRequest.FiltersLogicOperator)
         }*/
-
-        IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-        var searchResult = booleanOperation.Execute();
-        return new UmbracoSearchResults(searchResult.TotalItemCount,
-            searchResult.Select(x => new UmbracoSearchResult(x.Id, x.Score, x.Values)));
+        using (var contextReference = _umbracoContextFactory.EnsureUmbracoContext())
+        {
+            IUmbracoContext umbracoContext = contextReference.UmbracoContext;
+            var searchResult = booleanOperation.Execute();
+            return new UmbracoSearchResults(searchResult.TotalItemCount,
+                searchResult.Select(x => new UmbracoSearchResult(x.Id, x.Score, x.Values)));
+        }
     }
 
     public ISearchRequest CreateSearchRequest()

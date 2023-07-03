@@ -3,7 +3,6 @@ using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Indexing;
 using Umbraco.Search.Models;
 using Umbraco.Search.Services;
-using Umbraco.Search.Services.Umbraco.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 

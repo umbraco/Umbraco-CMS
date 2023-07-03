@@ -1,10 +1,10 @@
 ﻿
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.ViewModels.Searcher;
 using Umbraco.Cms.Core.Models.Search;
-using Umbraco.Cms.ManagementApi.Services;
-using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
-using Umbraco.Cms.ManagementApi.ViewModels.Search;
 using Umbraco.Extensions;
 using Umbraco.Search;
 
@@ -68,12 +68,12 @@ public class QuerySearcherController : SearcherControllerBase
         return await Task.FromResult(new PagedViewModel<SearchResultResponseModel>
         {
             Total = results?.TotalRecords ?? 0,
-            Items = results?.Results?.Select(x => new SearchResultViewModel
+            Items = results?.Results?.Select(x => new SearchResultResponseModel
             {
                 Id = x.Id,
                 Score = x.Score,
-                Fields = x.Values.OrderBy(y => y.Key).Select(y => new FieldViewModel { Name = y.Key, Values =  y.Value.Select(x=>x?.ToString() ?? String.Empty) }),
-            }) ?? new List<SearchResultViewModel>()
+                Fields = x.Values.OrderBy(y => y.Key).Select(y => new FieldPresentationModel { Name = y.Key, Values =  y.Value.Select(x=>x?.ToString() ?? String.Empty) }),
+            }) ?? new List<SearchResultResponseModel>()
         });
     }
 }

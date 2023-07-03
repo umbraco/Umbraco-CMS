@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 using Umbraco.Search.Diagnostics;
@@ -26,12 +27,19 @@ public static class UmbracoBuilderExtensions
         services.AddExamineLuceneIndex<UmbracoExamineLuceneIndex, ConfigurationEnabledDirectoryFactory>(Constants
                 .UmbracoIndexes
                 .ExternalIndexName)
-            .AddSingleton<IUmbracoIndex>(services => new UmbracoExamineIndex<IContent>(services
-                .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
-                    .ExternalIndexName), services.GetRequiredService<IPublishedContentValueSetBuilder>()))
-            .AddSingleton<IUmbracoSearcher>(services => new UmbracoExamineSearcher<IContent>(services
-                .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
-                    .ExternalIndexName).Searcher));
+            .AddSingleton<IUmbracoIndex>(services =>
+                new UmbracoExamineIndex<IContent>(
+                    services
+                        .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
+                            .ExternalIndexName),
+                    services.GetRequiredService<IPublishedContentValueSetBuilder>()))
+            .AddSingleton<IUmbracoSearcher>(
+                services => new UmbracoExamineSearcher<IContent>(
+                    services
+                        .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
+                            .ExternalIndexName).Searcher,
+                    services
+                        .GetRequiredService<IUmbracoContextFactory>()));
 
         return services;
     }
@@ -41,12 +49,17 @@ public static class UmbracoBuilderExtensions
         services.AddExamineLuceneIndex<UmbracoExamineLuceneIndex, ConfigurationEnabledDirectoryFactory>(Constants
                 .UmbracoIndexes
                 .InternalIndexName)
-            .AddSingleton<IUmbracoIndex>(services => new UmbracoExamineIndex<IContent>(services
-                .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
-                    .InternalIndexName), services.GetRequiredService<IContentValueSetBuilder>()))
-            .AddSingleton<IUmbracoSearcher>(services => new UmbracoExamineSearcher<IContent>(services
-                .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
-                    .InternalIndexName).Searcher));
+            .AddSingleton<IUmbracoIndex>(services => new UmbracoExamineIndex<IContent>(
+                services
+                    .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
+                        .InternalIndexName),
+                services.GetRequiredService<IContentValueSetBuilder>()))
+            .AddSingleton<IUmbracoSearcher>(services => new UmbracoExamineSearcher<IContent>(
+                services
+                    .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
+                        .InternalIndexName).Searcher,
+                services
+                    .GetRequiredService<IUmbracoContextFactory>()));
 
         return services;
     }
@@ -93,7 +106,7 @@ public static class UmbracoBuilderExtensions
                 = services.GetRequiredService<IUmbracoIndexesConfiguration>();
             TIndex index = ActivatorUtilities.CreateInstance<TIndex>(
                 services,
-                new object[] { loggerFactory, name,options,configuration,  hostingEnvironment, runtimeState});
+                new object[] { loggerFactory, name, options, configuration, hostingEnvironment, runtimeState });
 
             return index;
         });
@@ -104,29 +117,41 @@ public static class UmbracoBuilderExtensions
         services.AddExamineLuceneIndex<UmbracoExamineLuceneIndex, ConfigurationEnabledDirectoryFactory>(Constants
                 .UmbracoIndexes
                 .MembersIndexName)
-            .AddSingleton<IUmbracoIndex>(services => new UmbracoExamineIndex<IMember>(services
-                .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
-                    .MembersIndexName), services.GetRequiredService<IValueSetBuilder<IMember>>()))
-            .AddSingleton<IUmbracoSearcher>(services => new UmbracoExamineSearcher<IMember>(services
-                .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
-                    .MembersIndexName).Searcher));
+            .AddSingleton<IUmbracoIndex>(services => new UmbracoExamineIndex<IMember>(
+                services
+                    .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
+                        .MembersIndexName),
+                services.GetRequiredService<IValueSetBuilder<IMember>>()))
+            .AddSingleton<IUmbracoSearcher>(
+                services => new UmbracoExamineSearcher<IMember>(
+                    services.GetRequiredService<IExamineManager>()
+                        .GetIndex(Constants.UmbracoIndexes
+                            .MembersIndexName).Searcher,
+                    services.GetRequiredService<IUmbracoContextFactory>()));
 
         return services;
     }
+
     public static IServiceCollection RegisterContentApiIndex(this IServiceCollection services)
     {
         services.AddExamineLuceneIndex<DeliveryApiContentIndex, ConfigurationEnabledDirectoryFactory>(Constants
                 .UmbracoIndexes
                 .DeliveryApiContentIndexName)
-            .AddSingleton<IUmbracoIndex>(services => new UmbracoExamineIndex<IContent>(services
-                .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
-                    .DeliveryApiContentIndexName), services.GetRequiredService<IDeliveryApiContentIndexValueSetBuilder>()))
-            .AddSingleton<IUmbracoSearcher>(services => new UmbracoExamineSearcher<IMember>(services
-                .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
-                    .DeliveryApiContentIndexName).Searcher));
+            .AddSingleton<IUmbracoIndex>(services => new UmbracoExamineIndex<IContent>(
+                services
+                    .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
+                        .DeliveryApiContentIndexName),
+                services.GetRequiredService<IDeliveryApiContentIndexValueSetBuilder>()))
+            .AddSingleton<IUmbracoSearcher>(services => new UmbracoExamineSearcher<IMember>(
+                services
+                    .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
+                        .DeliveryApiContentIndexName).Searcher,
+                services
+                    .GetRequiredService<IUmbracoContextFactory>()));
 
         return services;
     }
+
     /// <summary>
     ///     Adds the Examine indexes for Umbraco
     /// </summary>
@@ -139,7 +164,7 @@ public static class UmbracoBuilderExtensions
 
         services.AddSingleton<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
         //todo: restore when indexes are working
-       services.AddUnique<IIndexDiagnosticsFactory, ExamineLuceneIndexDiagnosticsFactory>();
+        services.AddUnique<IIndexDiagnosticsFactory, ExamineLuceneIndexDiagnosticsFactory>();
 
         services.AddExamine();
 

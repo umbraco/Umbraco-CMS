@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.ManagementApi.Factories;
-using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.Extensions;
 using Umbraco.Search;
 using Umbraco.Search.Diagnostics;
@@ -18,7 +17,7 @@ public static class SearchManagementBuilderExtensions
         builder.Services.AddTransient<IIndexingRebuilderService, IndexingRebuilderService>();
 
         // Add factories
-        builder.Services.AddTransient<IIndexViewModelFactory, IndexViewModelFactory>();
+        builder.Services.AddTransient<IIndexPresentationFactory, IndexPresentationFactory>();
         return builder;
     }
 }

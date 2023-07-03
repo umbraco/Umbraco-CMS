@@ -1,25 +1,25 @@
 ﻿using Asp.Versioning;
-using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.ViewModels.Indexer;
 using Umbraco.Extensions;
+using Umbraco.Search;
+using Umbraco.Search.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Indexer;
 
 [ApiVersion("1.0")]
 public class AllIndexerController : IndexerControllerBase
 {
-    private readonly IExamineManager _examineManager;
+    private readonly ISearchProvider _searchProvider;
     private readonly IIndexPresentationFactory _indexPresentationFactory;
 
     public AllIndexerController(
-        IExamineManager examineManager,
+        ISearchProvider searchProvider,
         IIndexPresentationFactory indexPresentationFactory)
     {
-        _examineManager = examineManager;
+        _searchProvider = searchProvider;
         _indexPresentationFactory = indexPresentationFactory;
     }
 
@@ -32,9 +32,8 @@ public class AllIndexerController : IndexerControllerBase
     [ProducesResponseType(typeof(PagedViewModel<IndexResponseModel>), StatusCodes.Status200OK)]
     public Task<PagedViewModel<IndexResponseModel>> All(int skip, int take)
     {
-        IndexResponseModel[] indexes = _examineManager.Indexes
-            .Select(_indexPresentationFactory.Create)
-            .OrderBy(indexModel => indexModel.Name.TrimEnd("Indexer")).ToArray();
+        IndexResponseModel[] indexes = _searchProvider.GetAllIndexes()
+            .Select(x=>_indexPresentationFactory.Create(x)) .OrderBy(indexModel => indexModel.Name.TrimEnd("Indexer")).ToArray();
 
         var viewModel = new PagedViewModel<IndexResponseModel> { Items = indexes.Skip(skip).Take(take), Total = indexes.Length };
         return Task.FromResult(viewModel);
