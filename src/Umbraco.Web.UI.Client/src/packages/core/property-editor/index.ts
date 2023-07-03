@@ -1,4 +1,4 @@
-export * from './types';
-export * from './events';
+export * from './types/index.js';
+export * from './events/index.js';
 
 export const UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT = 'Umbraco.JSON';
