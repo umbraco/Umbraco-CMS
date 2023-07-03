@@ -8,6 +8,10 @@ import {
 	TemplateScaffoldResponseModel,
 	CreateTemplateRequestModel,
 	TemplateItemResponseModel,
+	TemplateQuerySettingsResponseModel,
+	TemplateQueryPropertyTypeModel,
+	OperatorModel,
+	TemplateQueryResultResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 type TemplateDBItem = TemplateResponseModel & EntityTreeItemResponseModel;
@@ -105,58 +109,82 @@ export const createTemplateScaffold = (masterTemplateAlias: string) => {
 }`;
 };
 
-export const templateQuerySettings = {
-	contentTypeAliases: [],
+//prettier-ignore
+const templateQueryExpressions = [
+`Umbraco.ContentAtRoot().FirstOrDefault()
+.ChildrenOfType("docTypeWithTemplate")
+.Where(x => x.IsVisible())`,
+`Umbraco.Content(Guid.Parse("0b3498dc-255a-4d62-aa4f-ef7bff333544"))
+.ChildrenOfType("docTypeWithTemplate")
+.Where(x => x.IsVisible())`,
+`Umbraco.ContentAtRoot().FirstOrDefault()
+.ChildrenOfType("docTypeWithTemplate")
+.Where(x => (x.Id != -6))
+.Where(x => x.IsVisible())
+.OrderBy(x => x.UpdateDate)`,
+];
+
+const randomIndex = () => Math.floor(Math.random() * 3);
+
+export const templateQueryResult: TemplateQueryResultResponseModel = {
+	queryExpression: templateQueryExpressions[randomIndex()],
+	sampleResults: [],
+	resultCount: 0,
+	executionTime: 0,
+};
+
+export const templateQuerySettings: TemplateQuerySettingsResponseModel = {
+	contentTypeAliases: ['docTypeWithTemplate', 'propertyTypeWithTemplate', 'somethingElse'],
 	properties: [
 		{
 			alias: 'Id',
-			type: 'Integer',
+			type: TemplateQueryPropertyTypeModel.INTEGER,
 		},
 		{
 			alias: 'Name',
-			type: 'String',
+			type: TemplateQueryPropertyTypeModel.STRING,
 		},
 		{
 			alias: 'CreateDate',
-			type: 'DateTime',
+			type: TemplateQueryPropertyTypeModel.DATE_TIME,
 		},
 		{
 			alias: 'UpdateDate',
-			type: 'DateTime',
+			type: TemplateQueryPropertyTypeModel.DATE_TIME,
 		},
 	],
 	operators: [
 		{
-			operator: 'Equals',
-			applicableTypes: ['Integer', 'String'],
+			operator: OperatorModel.EQUALS,
+			applicableTypes: [TemplateQueryPropertyTypeModel.INTEGER, TemplateQueryPropertyTypeModel.STRING],
 		},
 		{
-			operator: 'NotEquals',
-			applicableTypes: ['Integer', 'String'],
+			operator: OperatorModel.NOT_EQUALS,
+			applicableTypes: [TemplateQueryPropertyTypeModel.INTEGER, TemplateQueryPropertyTypeModel.STRING],
 		},
 		{
-			operator: 'LessThan',
-			applicableTypes: ['Integer', 'DateTime'],
+			operator: OperatorModel.LESS_THAN,
+			applicableTypes: [TemplateQueryPropertyTypeModel.INTEGER, TemplateQueryPropertyTypeModel.DATE_TIME],
 		},
 		{
-			operator: 'LessThanEqualTo',
-			applicableTypes: ['Integer', 'DateTime'],
+			operator: OperatorModel.GREATER_THAN_EQUAL_TO,
+			applicableTypes: [TemplateQueryPropertyTypeModel.INTEGER, TemplateQueryPropertyTypeModel.DATE_TIME],
 		},
 		{
-			operator: 'GreaterThan',
-			applicableTypes: ['Integer', 'DateTime'],
+			operator: OperatorModel.GREATER_THAN,
+			applicableTypes: [TemplateQueryPropertyTypeModel.INTEGER, TemplateQueryPropertyTypeModel.DATE_TIME],
 		},
 		{
-			operator: 'GreaterThanEqualTo',
-			applicableTypes: ['Integer', 'DateTime'],
+			operator: OperatorModel.GREATER_THAN_EQUAL_TO,
+			applicableTypes: [TemplateQueryPropertyTypeModel.INTEGER, TemplateQueryPropertyTypeModel.DATE_TIME],
 		},
 		{
-			operator: 'Contains',
-			applicableTypes: ['String'],
+			operator: OperatorModel.CONTAINS,
+			applicableTypes: [TemplateQueryPropertyTypeModel.STRING],
 		},
 		{
-			operator: 'NotContains',
-			applicableTypes: ['String'],
+			operator: OperatorModel.NOT_CONTAINS,
+			applicableTypes: [TemplateQueryPropertyTypeModel.STRING],
 		},
 	],
 };
@@ -191,6 +219,8 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 	}
 
 	getTemplateQuerySettings = () => templateQuerySettings;
+
+	getTemplateQueryResult = () => templateQueryResult;
 
 	create(templateData: CreateTemplateRequestModel) {
 		const template = {

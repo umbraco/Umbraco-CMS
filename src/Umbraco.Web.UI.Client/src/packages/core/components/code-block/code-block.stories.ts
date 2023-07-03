@@ -1,11 +1,14 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import { html } from '@umbraco-cms/backoffice/external/lit';
 import './code-block.element.js';
 import type { UmbCodeBlockElement } from './code-block.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const meta: Meta<UmbCodeBlockElement> = {
 	title: 'Components/Code Block',
 	component: 'umb-code-block',
+	parameters: {
+		layout: 'centered',
+	},
 };
 
 export default meta;

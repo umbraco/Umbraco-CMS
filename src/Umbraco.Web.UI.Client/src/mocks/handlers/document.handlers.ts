@@ -28,7 +28,6 @@ export const handlers = [
 	rest.get('/umbraco/management/api/v1/tree/document/item', (req, res, ctx) => {
 		const ids = req.url.searchParams.getAll('id');
 		if (!ids) return;
-
 		const items = umbDocumentData.getTreeItem(ids);
 
 		return res(ctx.status(200), ctx.json(items));

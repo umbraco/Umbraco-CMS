@@ -7,7 +7,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 export class UmbTemplateAliasInputElement extends UmbLitElement {
 	render() {
 		return html`
-        <uui-button compact @click=${this.#handleClick}>
+        <uui-button compact @click=${this.#handleClick} label="unlock alias input">
             <uui-symbol-lock .open=${this.isOpen} ></uui-symbol-lock>
         </uui-button>
         <input placeholder="Enter alias..." .value=${this.value} ?disabled=${!this.isOpen} @input=${

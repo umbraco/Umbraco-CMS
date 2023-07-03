@@ -139,6 +139,7 @@ ${currentContent}`;
 			} else {
 				this.repository.requestRootTreeItems();
 			}
+			return;
 		}
 
 		if (template?.id) {
@@ -147,7 +148,7 @@ ${currentContent}`;
 				content: template.content,
 				alias: template.alias,
 			});
-			this.repository.requestTreeItemsOf(this.#masterTemplate.value?.id ?? '');
+			this.repository.requestTreeItemsOf(this.#masterTemplate.value?.id ?? null);
 
 		}
 	}

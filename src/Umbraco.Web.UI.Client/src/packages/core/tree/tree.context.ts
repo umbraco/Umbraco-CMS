@@ -68,9 +68,7 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 		if (this.#treeAlias === treeAlias) return;
 		this.#treeAlias = treeAlias;
 
-		if (treeAlias) {
-			this.#observeTreeManifest();
-		}
+		this.#observeTreeManifest();
 	}
 
 	public getTreeAlias() {
@@ -139,16 +137,16 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 	}
 
 	#observeTreeManifest() {
-		this.observe(
-			umbExtensionsRegistry
-				.extensionsOfType('tree')
-				.pipe(map((treeManifests) => treeManifests.find((treeManifest) => treeManifest.alias === this.#treeAlias))),
-			async (treeManifest) => {
-				if (!treeManifest) return;
-				this.#observeRepository(treeManifest);
-			},
-			'_observeTreeManifest'
-		);
+		if (this.#treeAlias) {
+			this.observe(
+				umbExtensionsRegistry.getByTypeAndAlias('tree', this.#treeAlias),
+				async (treeManifest) => {
+					if (!treeManifest) return;
+					this.#observeRepository(treeManifest);
+				},
+				'_observeTreeManifest'
+			);
+		}
 	}
 
 	#observeRepository(treeManifest: ManifestTree) {

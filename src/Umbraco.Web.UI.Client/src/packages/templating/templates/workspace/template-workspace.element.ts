@@ -3,6 +3,7 @@ import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit
 import type { IRoutingInfo, PageComponent, UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
+import '../../components/insert-menu/templating-insert-menu.element.js';
 import './template-workspace-editor.element.js';
 
 @customElement('umb-template-workspace')
@@ -24,7 +25,8 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 			component: () => this.#element,
 			setup: (component: PageComponent, info: IRoutingInfo) => {
 				const parentKey = info.match.params.parentKey;
-				this.#templateWorkspaceContext.create(parentKey);
+
+				this.#templateWorkspaceContext.create(parentKey === 'root' ? null : parentKey);
 			},
 		},
 		{
