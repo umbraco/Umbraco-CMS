@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <Folder Include="Constants" />
-    <Folder Include="Search" />
+    <Folder Include="Filtering\Filters\" />
   </ItemGroup>
 
 </Project>

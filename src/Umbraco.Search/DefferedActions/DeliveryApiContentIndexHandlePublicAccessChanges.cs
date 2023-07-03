@@ -72,9 +72,13 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
 
             while (page * pageSize < total)
             {
+                var searchRequest = searcher.CreateSearchRequest();
+                searchRequest.CreateFilter(UmbracoSearchFieldNames.DeliveryApiContentIndex.Id,batchAsArray.Select(id => id.ToString()).ToList(), LogicOperator.OR);
+                ;
+                searchRequest.Page = page;
+                searchRequest.PageSize = pageSize;
                 IUmbracoSearchResults? results =
-                    searcher.Search(new[] { UmbracoSearchFieldNames.DeliveryApiContentIndex.Id },
-                        batchAsArray.Select(id => id.ToString()).ToArray(), page,pageSize);
+                    searcher.Search(  searchRequest);
 
                 total = results.TotalItemCount;
 

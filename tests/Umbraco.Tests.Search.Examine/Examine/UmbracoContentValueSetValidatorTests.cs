@@ -440,7 +440,7 @@ public class UmbracoContentValueSetValidatorTests
         publicAccessService.Setup(x => x.IsProtected("-1,555"))
             .Returns(Attempt.Succeed(new PublicAccessEntry(Guid.NewGuid(), 555, 444, 333, Enumerable.Empty<PublicAccessRule>())));
         publicAccessService.Setup(x => x.IsProtected("-1,777"))
-            .Returns(Attempt.Fail<PublicAccessEntry>());
+            .Returns(Attempt.Fail<PublicAccessEntry?>());
         var validator = new ContentValueSetValidator(
             false,
             false,

@@ -74,8 +74,12 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
 
     private void Reindex(IContent content, IUmbracoIndex<IContent> index, IUmbracoSearcher searcher)
     {
+        var searchRequest = searcher.CreateSearchRequest();
+        searchRequest.CreateFilter(UmbracoSearchFieldNames.DeliveryApiContentIndex.Id,new[] { content.Id.ToString() }.ToList(), LogicOperator.OR);
+        searchRequest.Page = 0;
+        searchRequest.PageSize = 10000;
         // get the currently indexed cultures for the content
-        var existingIndexCultures = searcher.Search(new []{UmbracoSearchFieldNames.DeliveryApiContentIndex.Id}, new []{ content.Id.ToString()},0,1000)
+        var existingIndexCultures = searcher.Search(searchRequest)
             .SelectMany(f => f.Values[UmbracoSearchFieldNames.DeliveryApiContentIndex.Culture])
             .ToArray();
 

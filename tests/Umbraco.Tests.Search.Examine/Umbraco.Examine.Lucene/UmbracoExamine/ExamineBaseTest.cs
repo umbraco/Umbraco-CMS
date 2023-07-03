@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Search;
+using Umbraco.Search.Examine.ValueSetBuilders;
 using Umbraco.Search.Indexing.Populators;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Examine.Lucene.UmbracoExamine;
@@ -75,10 +76,10 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
                 {
                     if (path.EndsWith("," + ExamineDemoDataContentService.ProtectedNode))
                     {
-                        return Attempt<PublicAccessEntry>.Succeed();
+                        return Attempt<PublicAccessEntry?>.Succeed();
                     }
 
-                    return Attempt<PublicAccessEntry>.Fail();
+                    return Attempt<PublicAccessEntry?>.Fail();
                 });
 
             var scopeProviderMock = new Mock<IScopeProvider>();

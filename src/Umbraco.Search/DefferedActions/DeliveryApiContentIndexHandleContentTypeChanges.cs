@@ -126,9 +126,12 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
         var total = long.MaxValue;
         while (page * PageSize < total)
         {
+            var searchRequest = index.CreateSearchRequest();
+            searchRequest.CreateFilter(UmbracoSearchFieldNames.DeliveryApiContentIndex.ContentTypeId,new[] { contentTypeId.ToString() }.ToList(), LogicOperator.OR);
+            searchRequest.Page = page;
+            searchRequest.PageSize = PageSize;
             IUmbracoSearchResults? results =
-                index.Search(new[] { UmbracoSearchFieldNames.DeliveryApiContentIndex.ContentTypeId },
-                    new[] { contentTypeId.ToString() }, page, PageSize
+                index.Search(searchRequest
                 );
             total = results.TotalItemCount;
 

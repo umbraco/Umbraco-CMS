@@ -1,11 +1,12 @@
-﻿
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Search;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Extensions;
 using Umbraco.Search;
+using Umbraco.Search.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
 
@@ -36,27 +37,30 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
         _fieldTypes = indexHandlers
             .SelectMany(handler => handler.GetFields())
             .DistinctBy(field => field.FieldName)
-            .ToDictionary(field => field.FieldName, field => field.FieldType, StringComparer.InvariantCultureIgnoreCase);
+            .ToDictionary(field => field.FieldName, field => field.FieldType,
+                StringComparer.InvariantCultureIgnoreCase);
     }
 
-    public PagedModel<Guid> ExecuteQuery(SelectorOption selectorOption, IList<FilterOption> filterOptions, IList<SortOption> sortOptions, string culture, int skip, int take)
+    public PagedModel<Guid> ExecuteQuery(SelectorOption selectorOption, IList<FilterOption> filterOptions,
+        IList<SortOption> sortOptions, string culture, int skip, int take)
     {
         var searcher = _examineManager.GetSearcher(Constants.UmbracoIndexes.DeliveryApiContentIndexName);
         if (searcher == null)
         {
-            _logger.LogError("Could not find the searcher for {IndexName} when attempting to execute a query.", Constants.UmbracoIndexes.DeliveryApiContentIndexName);
+            _logger.LogError("Could not find the searcher for {IndexName} when attempting to execute a query.",
+                Constants.UmbracoIndexes.DeliveryApiContentIndexName);
             return new PagedModel<Guid>();
         }
 
-        /*
-         todo: resotre this code with the new API
-        IBooleanOperation queryOperation = BuildSelectorOperation(selectorOption, searcher, culture);
+
+        ISearchRequest queryOperation = BuildSelectorOperation(selectorOption, searcher, culture);
 
         ApplyFiltering(filterOptions, queryOperation);
         ApplySorting(sortOptions, queryOperation);
-        */
+
 //todo: figure out pagination of this query
-        IUmbracoSearchResults? results = searcher.Search( new []{selectorOption.FieldName},selectorOption.Values, 0, 10000);
+        IUmbracoSearchResults? results =
+            searcher.Search(queryOperation);
 
         if (results is null)
         {
@@ -66,7 +70,8 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
 
         Guid[] items = results
             .Where(r => r.Values.ContainsKey(ItemIdFieldName))
-            .Select(r => Guid.Parse(r.Values[ItemIdFieldName]))
+            .Select(r => r.Values[ItemIdFieldName][0]?.ToString() ?? string.Empty)
+            .Where(r => !string.IsNullOrWhiteSpace(r)).Select(Guid.Parse)
             .ToArray();
 
         return new PagedModel<Guid>(results.TotalItemCount, items);
@@ -74,37 +79,31 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
 
     public SelectorOption AllContentSelectorOption() => new()
     {
-        FieldName = UmbracoExamineFieldNames.CategoryFieldName, Values = new[] { "content" }
+        FieldName = UmbracoSearchFieldNames.CategoryFieldName, Values = new[] { "content" }
     };
 
-    private IBooleanOperation BuildSelectorOperation(SelectorOption selectorOption, IIndex index, string culture)
+    private ISearchRequest BuildSelectorOperation(SelectorOption selectorOption, IUmbracoSearcher searcher,
+        string culture)
     {
-        IQuery query = index.Searcher.CreateQuery();
+        ISearchRequest searchRequest = searcher.CreateSearchRequest();
+        searchRequest.FiltersLogicOperator = LogicOperator.And;
+        searchRequest.CreateFilter(selectorOption.FieldName, selectorOption.Values.ToList(), LogicOperator.OR);
+        searchRequest.CreateFilter(UmbracoSearchFieldNames.DeliveryApiContentIndex.Culture,
+            new List<string>() { culture.ToLowerInvariant().IfNullOrWhiteSpace(_fallbackGuidValue), "none" },
+            LogicOperator.OR);
 
-        IBooleanOperation selectorOperation = selectorOption.Values.Length == 1
-            ? query.Field(selectorOption.FieldName, selectorOption.Values.First())
-            : query.GroupedOr(new[] { selectorOption.FieldName }, selectorOption.Values);
 
-        // Item culture must be either the requested culture or "none"
-        selectorOperation.And().GroupedOr(new[] { UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture }, culture.ToLowerInvariant().IfNullOrWhiteSpace(_fallbackGuidValue), "none");
 
-        return selectorOperation;
+        return searchRequest;
     }
 
-    private void ApplyFiltering(IList<FilterOption> filterOptions, IBooleanOperation queryOperation)
+    private void ApplyFiltering(IList<FilterOption> filterOptions, ISearchRequest queryOperation)
     {
-        void HandleExact(IQuery query, string fieldName, string[] values)
+        void HandleExact(ISearchFilter query, string fieldName, string[] values, LogicOperator logicOperator)
         {
-            if (values.Length == 1)
-            {
-                query.Field(fieldName, values[0]);
-            }
-            else
-            {
-                query.GroupedOr(new[] { fieldName }, values);
-            }
+            query.CreateSubFilter(fieldName, values.ToList(), logicOperator);
         }
-
+var defaultFilter = new DefaultSearchFilter("filters", new List<string>(), LogicOperator.And, new List<ISearchFilter>());
         foreach (FilterOption filterOption in filterOptions)
         {
             var values = filterOption.Values.Any()
@@ -115,11 +114,11 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             {
                 case FilterOperation.Is:
                     // TODO: test this for explicit word matching
-                    HandleExact(queryOperation.And(), filterOption.FieldName, values);
+                    HandleExact(defaultFilter, filterOption.FieldName, values, LogicOperator.And);
                     break;
                 case FilterOperation.IsNot:
                     // TODO: test this for explicit word matching
-                    HandleExact(queryOperation.Not(), filterOption.FieldName, values);
+                    HandleExact(defaultFilter, filterOption.FieldName, values, LogicOperator.Not);
                     break;
                 // TODO: Fix
                 case FilterOperation.Contains:
@@ -133,7 +132,7 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
         }
     }
 
-    private void ApplySorting(IList<SortOption> sortOptions, IOrdering ordering)
+    private void ApplySorting(IList<SortOption> sortOptions, ISearchRequest ordering)
     {
         foreach (SortOption sort in sortOptions)
         {
@@ -154,13 +153,7 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
                 FieldType.StringSortable => SortType.String,
                 _ => throw new ArgumentOutOfRangeException(nameof(fieldType))
             };
-
-            ordering = sort.Direction switch
-            {
-                Direction.Ascending => ordering.OrderBy(new SortableField(sort.FieldName, sortType)),
-                Direction.Descending => ordering.OrderByDescending(new SortableField(sort.FieldName, sortType)),
-                _ => ordering
-            };
+            ordering.SortBy(sort.FieldName, sortType);
         }
     }
 }
