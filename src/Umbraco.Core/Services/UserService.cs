@@ -1025,7 +1025,7 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new PasswordChangedModel());
         }
 
-        if (performingUser.Username == user.Username && string.IsNullOrEmpty(model.OldPassword))
+        if (performingUser.UserState != UserState.Invited && performingUser.Username == user.Username && string.IsNullOrEmpty(model.OldPassword))
         {
             return Attempt.FailWithStatus(UserOperationStatus.OldPasswordRequired, new PasswordChangedModel());
         }
@@ -1897,6 +1897,45 @@ internal class UserService : RepositoryService, IUserService
 
             scope.Complete();
         }
+    }
+
+    public async Task<Attempt<UserOperationStatus>> VerifyInviteAsync(Guid userKey, string token)
+    {
+        var decoded = token.FromUrlBase64();
+
+        if (decoded is null)
+        {
+            return Attempt.Fail(UserOperationStatus.InvalidVerificationToken);
+        }
+
+        IUser? user = await GetAsync(userKey);
+
+        if (user is null)
+        {
+            return Attempt.Fail(UserOperationStatus.UserNotFound);
+        }
+
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        ICoreBackOfficeUserManager backOfficeUserManager = scope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
+
+        var isValid = await backOfficeUserManager.IsEmailConfirmationTokenValidAsync(user, decoded);
+
+        return isValid
+            ? Attempt.Succeed(UserOperationStatus.Success)
+            : Attempt.Fail(UserOperationStatus.InvalidVerificationToken);
+    }
+
+    public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> CreateInitialPasswordAsync(Guid userKey, string token, string password)
+    {
+        Attempt<UserOperationStatus> verifyInviteAttempt = await VerifyInviteAsync(userKey, token);
+        if (verifyInviteAttempt.Result != UserOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(verifyInviteAttempt.Result, new PasswordChangedModel());
+        }
+
+        Attempt<PasswordChangedModel, UserOperationStatus> changePasswordAttempt = await ChangePasswordAsync(userKey, new ChangeUserPasswordModel() { NewPassword = password, UserKey = userKey });
+
+        return changePasswordAttempt;
     }
 
     /// <summary>

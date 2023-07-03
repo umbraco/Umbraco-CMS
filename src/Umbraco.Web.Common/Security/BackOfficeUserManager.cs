@@ -342,4 +342,15 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, identityUser.Logins);
     }
 
+    public async Task<bool> IsEmailConfirmationTokenValidAsync(IUser user, string token)
+    {
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString());
+
+        if (identityUser != null && await VerifyUserTokenAsync(identityUser, Options.Tokens.EmailConfirmationTokenProvider, ConfirmEmailTokenPurpose, token).ConfigureAwait(false))
+        {
+            return true;
+        }
+
+        return false;
+    }
 }

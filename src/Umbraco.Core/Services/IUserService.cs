@@ -59,6 +59,10 @@ public interface IUserService : IMembershipUserService
 
     Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(Guid performingUserKey, UserInviteModel model);
 
+    Task<Attempt<UserOperationStatus>> VerifyInviteAsync(Guid userKey, string token);
+
+    Task<Attempt<PasswordChangedModel, UserOperationStatus>> CreateInitialPasswordAsync(Guid userKey, string token, string password);
+    
     Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model);
 
     Task<UserOperationStatus> SetAvatarAsync(Guid userKey, Guid temporaryFileKey);
@@ -375,4 +379,5 @@ public interface IUserService : IMembershipUserService
     void DeleteUserGroup(IUserGroup userGroup);
 
     #endregion
+
 }
