@@ -50,13 +50,20 @@ export class UmbSectionViewsElement extends UmbLitElement {
 		});
 	}
 
+	#constructDashboardPath(manifest: ManifestDashboard) {
+		const dashboardName = manifest.meta.label ?? manifest.name;
+		return 'dashboard/' + (manifest.meta.pathname ? manifest.meta.pathname : pathFolderName(dashboardName));
+	}
+
+	#constructViewPath(manifest: ManifestSectionView) {
+		const viewName = manifest.meta.label ?? manifest.name;
+		return 'view/' + (manifest.meta.pathname ? manifest.meta.pathname : pathFolderName(viewName));
+	}
+
 	async #createRoutes() {
 		const dashboardRoutes = this._dashboards?.map((manifest) => {
-			const dashboardName = manifest.meta.label ?? manifest.name;
-			const dashboardPath =
-				'dashboard/' + (manifest.meta.pathname ? manifest.meta.pathname : pathFolderName(dashboardName));
 			return {
-				path: dashboardPath,
+				path: this.#constructDashboardPath(manifest),
 				component: () => createExtensionElement(manifest),
 				setup: (component: UmbDashboardExtensionElement) => {
 					component.manifest = manifest;
@@ -65,10 +72,8 @@ export class UmbSectionViewsElement extends UmbLitElement {
 		});
 
 		const viewRoutes = this._views?.map((manifest) => {
-			const viewName = manifest.meta.label ?? manifest.name;
-			const viewPath = 'view/' + (manifest.meta.pathname ? manifest.meta.pathname : pathFolderName(viewName));
 			return {
-				path: viewPath,
+				path: this.#constructViewPath(manifest),
 				component: () => createExtensionElement(manifest),
 				setup: (component: UmbSectionViewExtensionElement) => {
 					component.manifest = manifest;
@@ -149,8 +154,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 					<uui-tab-group slot="header" id="dashboards">
 						${this._dashboards.map((dashboard) => {
 							const dashboardName = dashboard.meta.label ?? dashboard.name;
-							const dashboardPath =
-								'dashboard/' + (dashboard.meta.pathname ? dashboard.meta.pathname : pathFolderName(dashboardName));
+							const dashboardPath = this.#constructDashboardPath(dashboard);
 							return html`
 								<uui-tab
 									.label="${dashboardName}"
@@ -169,7 +173,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 					<uui-tab-group slot="navigation" id="views">
 						${this._views.map((view) => {
 							const viewName = view.meta.label ?? view.name;
-							const viewPath = 'view/' + (view.meta.pathname ? view.meta.pathname : pathFolderName(viewName));
+							const viewPath = this.#constructViewPath(view);
 							return html`
 								<uui-tab
 									.label="${viewName}"
