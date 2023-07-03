@@ -4,7 +4,7 @@ public class PublicAccessRequestModel : PublicAccessBaseModel
 {
     public Guid ContentId { get; set; }
 
-    public Guid[] MemberIds { get; set; } = Array.Empty<Guid>();
+    public string[] MemberUserNames { get; set; } = Array.Empty<string>();
 
-    public Guid[] MemberGroupIds { get; set; } = Array.Empty<Guid>();
+    public string[] MemberGroupNames { get; set; } = Array.Empty<string>();
 }
