@@ -15,8 +15,13 @@ public class CreateDocumentTypeController : CreateUpdateDocumentTypeControllerBa
 {
     private readonly IShortStringHelper _shortStringHelper;
 
-    public CreateDocumentTypeController(IContentTypeService contentTypeService, IDataTypeService dataTypeService, IShortStringHelper shortStringHelper, ITemplateService templateService)
-        : base(contentTypeService, dataTypeService, shortStringHelper, templateService)
+    public CreateDocumentTypeController(
+        IContentTypeService contentTypeService,
+        IDataTypeService dataTypeService,
+        IShortStringHelper shortStringHelper,
+        ITemplateService templateService,
+        IEntityService entityService)
+        : base(contentTypeService, dataTypeService, shortStringHelper, templateService, entityService)
         => _shortStringHelper = shortStringHelper;
 
     [HttpPost]

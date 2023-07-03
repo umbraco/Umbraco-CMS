@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.ContentType;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -18,14 +19,21 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
     private readonly IDataTypeService _dataTypeService;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ITemplateService _templateService;
+    private readonly IEntityService _entityService;
     private const int MaxInheritance = 1;
 
-    protected CreateUpdateDocumentTypeControllerBase(IContentTypeService contentTypeService, IDataTypeService dataTypeService, IShortStringHelper shortStringHelper, ITemplateService templateService)
+    protected CreateUpdateDocumentTypeControllerBase(
+        IContentTypeService contentTypeService,
+        IDataTypeService dataTypeService,
+        IShortStringHelper shortStringHelper,
+        ITemplateService templateService,
+        IEntityService entityService)
     {
         _contentTypeService = contentTypeService;
         _dataTypeService = dataTypeService;
         _shortStringHelper = shortStringHelper;
         _templateService = templateService;
+        _entityService = entityService;
     }
 
     protected async Task<ContentTypeOperationStatus> HandleRequest<TRequestModel, TPropertyType, TPropertyTypeContainer>(IContentType contentType, TRequestModel requestModel)
@@ -75,8 +83,12 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
             return ContentTypeOperationStatus.InvalidDataType;
         }
 
-        // Only one composition can be parent
-        if (requestModel.Compositions.Count(x => x.CompositionType is ContentTypeCompositionType.Inheritance) > MaxInheritance)
+        // Only one composition can be inherited, and the key of that composition must be the parent ID.
+        ContentTypeComposition[] inheritedCompositions = requestModel
+            .Compositions
+            .Where(x => x.CompositionType is ContentTypeCompositionType.Inheritance)
+            .ToArray();
+        if (inheritedCompositions.Length > MaxInheritance || (inheritedCompositions.Any() && inheritedCompositions.First().Id != requestModel.ParentId))
         {
             return ContentTypeOperationStatus.InvalidInheritance;
         }
@@ -85,7 +97,35 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
         requestModel.Properties = requestModel.Properties.Where(propertyType => propertyType.Alias.IsNullOrWhiteSpace() is false).ToArray();
         requestModel.Containers = requestModel.Containers.Where(container => container.Name.IsNullOrWhiteSpace() is false).ToArray();
 
+        int? parentId = null;
+        if (requestModel.ParentId is not null)
+        {
+            Attempt<int> parentContentTypeIdAttempt = _entityService.GetId(requestModel.ParentId.Value, UmbracoObjectTypes.DocumentType);
+            if (parentContentTypeIdAttempt.Success is false)
+            {
+                // Of course document document type container is a separate thing, so we have to try again if we can't find it >:(
+                // We can probably do this smarter....
+
+                // TODO: Make this not suck
+                // Try container...
+                Attempt<int> containerIdAttempt = _entityService.GetId(requestModel.ParentId.Value, UmbracoObjectTypes.DocumentTypeContainer);
+
+                if (containerIdAttempt.Success is false)
+                {
+                    // TODO: ParentNotFound.
+                    return ContentTypeOperationStatus.NotFound;
+                }
+
+                parentId = containerIdAttempt.Result;
+            }
+            else
+            {
+                parentId = parentContentTypeIdAttempt.Result;
+            }
+        }
+
         // update basic content type settings
+        contentType.ParentId = parentId ?? default;
         contentType.Alias = requestModel.Alias;
         contentType.Description = requestModel.Description;
         contentType.Icon = requestModel.Icon;
@@ -208,7 +248,7 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
 
         // We want to remove all of those that are in current, but not in targetCompositionKeys
         Guid[] remove = currentKeys.Except(targetCompositionKeys).ToArray();
-        IEnumerable<Guid> add = targetCompositionKeys.Except(currentKeys);
+        IEnumerable<Guid> add = targetCompositionKeys.Except(currentKeys).ToArray();
 
         foreach (Guid key in remove)
         {
@@ -217,10 +257,14 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
 
         // We have to look up the content types we want to add to composition, since we keep a full reference.
         // TODO: Make Async
-        IContentType[] contentTypesToAdd = _contentTypeService.GetAll(add).ToArray();
-        foreach (IContentType contentTypeToAdd in contentTypesToAdd)
+        if (add.Any())
         {
-            contentType.AddContentType(contentTypeToAdd);
+            IContentType[] contentTypesToAdd = _contentTypeService.GetAll(add).ToArray();
+            foreach (IContentType contentTypeToAdd in contentTypesToAdd)
+            {
+                contentType.AddContentType(contentTypeToAdd);
+            }
+
         }
 
         // We need to handle the parent as well

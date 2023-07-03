@@ -27,4 +27,6 @@ public abstract class ContentTypeModelBase<TPropertyType, TPropertyTypeContainer
     public IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; } = Array.Empty<ContentTypeSort>();
 
     public IEnumerable<ContentTypeComposition> Compositions { get; set; } = Array.Empty<ContentTypeComposition>();
+
+    public Guid? ParentId { get; set; }
 }

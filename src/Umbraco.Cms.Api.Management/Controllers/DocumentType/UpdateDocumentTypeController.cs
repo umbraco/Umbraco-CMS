@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
@@ -14,8 +15,13 @@ public class UpdateDocumentTypeController : CreateUpdateDocumentTypeControllerBa
 {
     private readonly IContentTypeService _contentTypeService;
 
-    public UpdateDocumentTypeController(IContentTypeService contentTypeService, IDataTypeService dataTypeService, IShortStringHelper shortStringHelper, ITemplateService templateService)
-        : base(contentTypeService, dataTypeService, shortStringHelper, templateService)
+    public UpdateDocumentTypeController(
+        IContentTypeService contentTypeService,
+        IDataTypeService dataTypeService,
+        IShortStringHelper shortStringHelper,
+        ITemplateService templateService,
+        IEntityService entityService)
+        : base(contentTypeService, dataTypeService, shortStringHelper, templateService, entityService)
         => _contentTypeService = contentTypeService;
 
     [HttpPut("{id:guid}")]
