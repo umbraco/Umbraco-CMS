@@ -1,21 +1,20 @@
-﻿using Microsoft.Extensions.Hosting;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Extensions;
+﻿using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_0_0;
 
 public class ResetCache : MigrationBase
 {
-    private readonly IHostEnvironment _hostEnvironment;
+    private readonly IHostingEnvironment _hostingEnvironment;
 
-    public ResetCache(IMigrationContext context, IHostEnvironment hostEnvironment)
-        : base(context) => _hostEnvironment = hostEnvironment;
+    public ResetCache(IMigrationContext context, IHostingEnvironment hostingEnvironment)
+        : base(context) =>
+        _hostingEnvironment = hostingEnvironment;
 
     protected override void Migrate()
     {
         RebuildCache = true;
-        var distCacheFolderAbsolutePath = _hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData + "/DistCache");
-        var nuCacheFolderAbsolutePath = _hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData + "/NuCache");
+        var distCacheFolderAbsolutePath = Path.Combine(_hostingEnvironment.LocalTempPath, "DistCache");
+        var nuCacheFolderAbsolutePath = Path.Combine(_hostingEnvironment.LocalTempPath, "NuCache");
         DeleteAllFilesInFolder(distCacheFolderAbsolutePath);
         DeleteAllFilesInFolder(nuCacheFolderAbsolutePath);
     }

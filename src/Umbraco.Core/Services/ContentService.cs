@@ -36,20 +36,20 @@ public class ContentService : RepositoryService, IContentService
 
     #region Constructors
 
-        public ContentService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IDocumentRepository documentRepository,
-        IEntityRepository entityRepository,
-        IAuditRepository auditRepository,
-        IContentTypeRepository contentTypeRepository,
-        IDocumentBlueprintRepository documentBlueprintRepository,
-        ILanguageRepository languageRepository,
-        Lazy<IPropertyValidationService> propertyValidationService,
-        IShortStringHelper shortStringHelper,
-        ICultureImpactFactory cultureImpactFactory)
-        : base(provider, loggerFactory, eventMessagesFactory)
+    public ContentService(
+    ICoreScopeProvider provider,
+    ILoggerFactory loggerFactory,
+    IEventMessagesFactory eventMessagesFactory,
+    IDocumentRepository documentRepository,
+    IEntityRepository entityRepository,
+    IAuditRepository auditRepository,
+    IContentTypeRepository contentTypeRepository,
+    IDocumentBlueprintRepository documentBlueprintRepository,
+    ILanguageRepository languageRepository,
+    Lazy<IPropertyValidationService> propertyValidationService,
+    IShortStringHelper shortStringHelper,
+    ICultureImpactFactory cultureImpactFactory)
+    : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
         _entityRepository = entityRepository;
@@ -59,7 +59,7 @@ public class ContentService : RepositoryService, IContentService
         _languageRepository = languageRepository;
         _propertyValidationService = propertyValidationService;
         _shortStringHelper = shortStringHelper;
-            _cultureImpactFactory = cultureImpactFactory;
+        _cultureImpactFactory = cultureImpactFactory;
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
@@ -1158,7 +1158,7 @@ public class ContentService : RepositoryService, IContentService
             // if culture is '*', then publish them all (including variants)
 
             // this will create the correct culture impact even if culture is * or null
-                var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+            var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
 
             // publish the culture(s)
             // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -1845,7 +1845,7 @@ public class ContentService : RepositoryService, IContentService
 
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
-                            var impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
+                        var impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
                         var tryPublish = d.PublishCulture(impact) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                         if (invalidProperties != null && invalidProperties.Length > 0)
@@ -1929,14 +1929,14 @@ public class ContentService : RepositoryService, IContentService
         {
             return culturesToPublish.All(culture =>
             {
-                    var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+                var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
                 return content.PublishCulture(impact) &&
                        _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
             });
         }
 
-            return content.PublishCulture(_cultureImpactFactory.ImpactInvariant())
-                   && _propertyValidationService.Value.IsPropertyDataValid(content, out _, _cultureImpactFactory.ImpactInvariant());
+        return content.PublishCulture(_cultureImpactFactory.ImpactInvariant())
+               && _propertyValidationService.Value.IsPropertyDataValid(content, out _, _cultureImpactFactory.ImpactInvariant());
     }
 
     // utility 'ShouldPublish' func used by SaveAndPublishBranch
@@ -2164,7 +2164,7 @@ public class ContentService : RepositoryService, IContentService
             // (SaveAndPublishBranchOne does *not* do it)
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(document, TreeChangeTypes.RefreshBranch, eventMessages));
-            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages));
+            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages, true));
 
             scope.Complete();
         }
@@ -2434,7 +2434,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId">Optional Id of the User moving the Content</param>
     public void Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
     {
-        if(content.ParentId == parentId)
+        if (content.ParentId == parentId)
         {
             return;
         }
@@ -2585,7 +2585,8 @@ public class ContentService : RepositoryService, IContentService
             IContent[] contents = _documentRepository.Get(query).ToArray();
 
             var emptyingRecycleBinNotification = new ContentEmptyingRecycleBinNotification(contents, eventMessages);
-            if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification))
+            var deletingContentNotification = new ContentDeletingNotification(contents, eventMessages);
+            if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification) || scope.Notifications.PublishCancelable(deletingContentNotification))
             {
                 scope.Complete();
                 return OperationResult.Cancel(eventMessages);
@@ -2950,7 +2951,7 @@ public class ContentService : RepositoryService, IContentService
         {
             scope.Notifications.Publish(new ContentPublishedNotification(published, eventMessages));
         }
-        
+
         return OperationResult.Succeed(eventMessages);
     }
 

@@ -1,4 +1,6 @@
 using System.Globalization;
+using System.Text.RegularExpressions;
+using HeyRed.MarkdownSharp;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
@@ -125,6 +127,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.Tabs = source.Tabs;
         target.UpdateDate = source.UpdateDate;
         target.AllowedActions = source.AllowedActions;
+        target.AdditionalPreviewUrls = source.AdditionalPreviewUrls;
     }
 
     // Umbraco.Code.MapAll
@@ -189,6 +192,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.Tabs = source.Tabs;
         target.UpdateDate = source.UpdateDate;
         target.AllowedActions = source.AllowedActions;
+        target.AdditionalPreviewUrls = source.AdditionalPreviewUrls;
 
         // We'll only try and map the ReleaseDate/ExpireDate if the "old" ContentVariantScheduleDisplay is in the context, otherwise we'll just skip it quietly.
         _ = context.Items.TryGetValue(nameof(ContentItemDisplayWithSchedule.Variants), out var variants);
@@ -309,9 +313,54 @@ internal class ContentMapDefinition : IMapDefinition
         {
             Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties).WhereNotNull()
         };
+        var markdown = new Markdown();
+        var linkCheck = new Regex("<a[^>]+>", RegexOptions.IgnoreCase);
+        var evaluator = new MatchEvaluator(AddRelNoReferrer);
+        foreach (TVariant variant in target.Variants)
+        {
+            foreach (Tab<ContentPropertyDisplay> tab in variant.Tabs)
+            {
+                if (tab.Properties == null)
+                {
+                    continue;
+                }
+
+                foreach (ContentPropertyDisplay property in tab.Properties)
+                {
+                    if (string.IsNullOrEmpty(property.Description))
+                    {
+                        continue;
+                    }
+
+                    var description = markdown.Transform(property.Description);
+                    property.Description = linkCheck.Replace(description, evaluator);
+                }
+            }
+        }
     }
 
-    // Umbraco.Code.MapAll -Segment -Language -DisplayName
+    private string AddRelNoReferrer(Match m)
+    {
+        string result = m.Value;
+        if (!result.Contains("rel=", StringComparison.Ordinal))
+        {
+            result = result.Replace(">", " rel=\"noreferrer\">");
+        }
+
+        if (!result.Contains("class=", StringComparison.Ordinal))
+        {
+            result = result.Replace(">", " class=\"underline\">");
+        }
+
+        if (!result.Contains("target=", StringComparison.Ordinal))
+        {
+            result = result.Replace(">", " target=\"_blank\">");
+        }
+
+        return result;
+    }
+
+    // Umbraco.Code.MapAll -Segment -Language -DisplayName -AdditionalPreviewUrls
     private void Map(IContent source, ContentVariantDisplay target, MapperContext context)
     {
         target.CreateDate = source.CreateDate;
@@ -365,7 +414,7 @@ internal class ContentMapDefinition : IMapDefinition
         {
             currentUser = currentIUserBackofficeUser;
         }
-        else if(_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is not null)
+        else if (_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is not null)
         {
             currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
         }

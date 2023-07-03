@@ -1,4 +1,4 @@
-﻿namespace Umbraco.New.Cms.Core.Models;
+﻿namespace Umbraco.Cms.Core.Models;
 
 public class PagedModel<T>
 {

@@ -28,13 +28,15 @@ public class ContentBuilderTests : DeliveryApiTests
         var urlSegment = "url-segment";
         var name = "The page";
         ConfigurePublishedContentMock(content, key, name, urlSegment, contentType.Object, new[] { prop1, prop2 });
+        content.SetupGet(c => c.CreateDate).Returns(new DateTime(2023, 06, 01));
+        content.SetupGet(c => c.UpdateDate).Returns(new DateTime(2023, 07, 12));
 
         var publishedUrlProvider = new Mock<IPublishedUrlProvider>();
         publishedUrlProvider
             .Setup(p => p.GetUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns((IPublishedContent content, UrlMode mode, string? culture, Uri? current) => $"url:{content.UrlSegment}");
 
-        var routeBuilder = new ApiContentRouteBuilder(publishedUrlProvider.Object, CreateGlobalSettings(), Mock.Of<IVariationContextAccessor>(), Mock.Of<IPublishedSnapshotAccessor>());
+        var routeBuilder = CreateContentRouteBuilder(publishedUrlProvider.Object, CreateGlobalSettings());
 
         var builder = new ApiContentBuilder(new ApiContentNameProvider(), routeBuilder, CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(content.Object);
@@ -47,6 +49,8 @@ public class ContentBuilderTests : DeliveryApiTests
         Assert.AreEqual(2, result.Properties.Count);
         Assert.AreEqual("Delivery API value", result.Properties["deliveryApi"]);
         Assert.AreEqual("Default value", result.Properties["default"]);
+        Assert.AreEqual(new DateTime(2023, 06, 01), result.CreateDate);
+        Assert.AreEqual(new DateTime(2023, 07, 12), result.UpdateDate);
     }
 
     [Test]

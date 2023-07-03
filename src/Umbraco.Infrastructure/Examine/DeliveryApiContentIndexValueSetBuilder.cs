@@ -15,6 +15,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
     private readonly IContentService _contentService;
     private readonly IPublicAccessService _publicAccessService;
     private readonly ILogger<DeliveryApiContentIndexValueSetBuilder> _logger;
+    private readonly IDeliveryApiContentIndexFieldDefinitionBuilder _deliveryApiContentIndexFieldDefinitionBuilder;
     private DeliveryApiSettings _deliveryApiSettings;
 
     public DeliveryApiContentIndexValueSetBuilder(
@@ -22,11 +23,13 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         IContentService contentService,
         IPublicAccessService publicAccessService,
         ILogger<DeliveryApiContentIndexValueSetBuilder> logger,
+        IDeliveryApiContentIndexFieldDefinitionBuilder deliveryApiContentIndexFieldDefinitionBuilder,
         IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings)
     {
         _contentIndexHandlerCollection = contentIndexHandlerCollection;
         _publicAccessService = publicAccessService;
         _logger = logger;
+        _deliveryApiContentIndexFieldDefinitionBuilder = deliveryApiContentIndexFieldDefinitionBuilder;
         _contentService = contentService;
         _deliveryApiSettings = deliveryApiSettings.CurrentValue;
         deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
@@ -35,13 +38,16 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
     /// <inheritdoc />
     public IEnumerable<ValueSet> GetValueSets(params IContent[] contents)
     {
+        FieldDefinitionCollection fieldDefinitions = _deliveryApiContentIndexFieldDefinitionBuilder.Build();
         foreach (IContent content in contents.Where(CanIndex))
         {
-            var cultures = IndexableCultures(content);
+            var publishedCultures = PublishedCultures(content);
+            var availableCultures = AvailableCultures(content);
 
-            foreach (var culture in cultures)
+            foreach (var culture in availableCultures)
             {
                 var indexCulture = culture ?? "none";
+                var isPublished = publishedCultures.Contains(culture);
 
                 // required index values go here
                 var indexValues = new Dictionary<string, IEnumerable<object>>(StringComparer.InvariantCultureIgnoreCase)
@@ -49,19 +55,30 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
                     [UmbracoExamineFieldNames.DeliveryApiContentIndex.Id] = new object[] { content.Id.ToString() }, // required for correct publishing handling and also needed for backoffice index browsing
                     [UmbracoExamineFieldNames.DeliveryApiContentIndex.ContentTypeId] = new object[] { content.ContentTypeId.ToString() }, // required for correct content type change handling
                     [UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture] = new object[] { indexCulture }, // required for culture variant querying
+                    [UmbracoExamineFieldNames.DeliveryApiContentIndex.Published] = new object[] { isPublished ? "y" : "n" }, // required for querying draft content
                     [UmbracoExamineFieldNames.IndexPathFieldName] = new object[] { content.Path }, // required for unpublishing/deletion handling
-                    [UmbracoExamineFieldNames.NodeNameFieldName] = new object[] { content.GetPublishName(culture) ?? string.Empty }, // primarily needed for backoffice index browsing
+                    [UmbracoExamineFieldNames.NodeNameFieldName] = new object[] { content.GetPublishName(culture) ?? content.GetCultureName(culture) ?? string.Empty }, // primarily needed for backoffice index browsing
                 };
 
-                AddContentIndexHandlerFields(content, culture, indexValues);
+                AddContentIndexHandlerFields(content, culture, fieldDefinitions, indexValues);
 
                 yield return new ValueSet(DeliveryApiContentIndexUtilites.IndexId(content, indexCulture), IndexTypes.Content, content.ContentType.Alias, indexValues);
             }
         }
     }
 
-    private string?[] IndexableCultures(IContent content)
+    private string?[] AvailableCultures(IContent content)
+        => content.ContentType.VariesByCulture()
+            ? content.AvailableCultures.ToArray()
+            : new string?[] { null };
+
+    private string?[] PublishedCultures(IContent content)
     {
+        if (content.Published == false)
+        {
+            return Array.Empty<string>();
+        }
+
         var variesByCulture = content.ContentType.VariesByCulture();
 
         // if the content varies by culture, the indexable cultures are the published
@@ -95,7 +112,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         return cultures;
     }
 
-    private void AddContentIndexHandlerFields(IContent content, string? culture, Dictionary<string, IEnumerable<object>> indexValues)
+    private void AddContentIndexHandlerFields(IContent content, string? culture, FieldDefinitionCollection fieldDefinitions, Dictionary<string, IEnumerable<object>> indexValues)
     {
         foreach (IContentIndexHandler handler in _contentIndexHandlerCollection)
         {
@@ -108,7 +125,17 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
                     continue;
                 }
 
-                indexValues[fieldValue.FieldName] = fieldValue.Values.ToArray();
+                // Examine will be case sensitive in the default setup; we need to deal with that for sortable text fields
+                if (fieldDefinitions.TryGetValue(fieldValue.FieldName, out FieldDefinition fieldDefinition)
+                    && fieldDefinition.Type == FieldDefinitionTypes.FullTextSortable
+                    && fieldValue.Values.All(value => value is string))
+                {
+                    indexValues[fieldValue.FieldName] = fieldValue.Values.OfType<string>().Select(value => value.ToLowerInvariant()).ToArray();
+                }
+                else
+                {
+                    indexValues[fieldValue.FieldName] = fieldValue.Values.ToArray();
+                }
             }
         }
     }
@@ -116,7 +143,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
     private bool CanIndex(IContent content)
     {
         // is the content in a state that is allowed in the index?
-        if (content.Published is false || content.Trashed)
+        if (content.Trashed)
         {
             return false;
         }

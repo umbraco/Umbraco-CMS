@@ -17,8 +17,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 [TestFixture]
 public class MarkdownEditorValueConverterTests : PropertyValueConverterTests
 {
-    [TestCase("hello world", "<p>hello world</p>")]
-    [TestCase("hello *world*", "<p>hello <em>world</em></p>")]
+    [TestCase("hello world", "hello world")]
+    [TestCase("hello *world*", "hello *world*")]
     [TestCase("", "")]
     [TestCase(null, "")]
     [TestCase(123, "")]
@@ -29,7 +29,7 @@ public class MarkdownEditorValueConverterTests : PropertyValueConverterTests
         var valueConverter = new MarkdownEditorValueConverter(linkParser, urlParser);
 
         Assert.AreEqual(typeof(string), valueConverter.GetDeliveryApiPropertyValueType(Mock.Of<IPublishedPropertyType>()));
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), Mock.Of<IPublishedPropertyType>(), PropertyCacheLevel.Element, inter, false);
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), Mock.Of<IPublishedPropertyType>(), PropertyCacheLevel.Element, inter, false, false);
         Assert.AreEqual(expected, result);
     }
 }

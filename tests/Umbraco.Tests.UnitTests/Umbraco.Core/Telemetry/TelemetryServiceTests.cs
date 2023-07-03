@@ -1,10 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry;
@@ -21,7 +19,7 @@ public class TelemetryServiceTests
         var siteIdentifierServiceMock = new Mock<ISiteIdentifierService>();
         var usageInformationServiceMock = new Mock<IUsageInformationService>();
         var sut = new TelemetryService(
-            Mock.Of<IManifestParser>(),
+            Mock.Of<IPackagingService>(),
             version,
             siteIdentifierServiceMock.Object,
             usageInformationServiceMock.Object,
@@ -37,7 +35,7 @@ public class TelemetryServiceTests
     {
         var version = CreateUmbracoVersion(9, 3, 1);
         var sut = new TelemetryService(
-            Mock.Of<IManifestParser>(),
+            Mock.Of<IPackagingService>(),
             version,
             CreateSiteIdentifierService(false),
             Mock.Of<IUsageInformationService>(),
@@ -57,7 +55,7 @@ public class TelemetryServiceTests
         var metricsConsentService = new Mock<IMetricsConsentService>();
         metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Detailed);
         var sut = new TelemetryService(
-            Mock.Of<IManifestParser>(),
+            Mock.Of<IPackagingService>(),
             version,
             CreateSiteIdentifierService(),
             Mock.Of<IUsageInformationService>(),
@@ -73,19 +71,20 @@ public class TelemetryServiceTests
     public void CanGatherPackageTelemetry()
     {
         var version = CreateUmbracoVersion(9, 1, 1);
-        var versionPackageName = "VersionPackage";
+        var versionPackageId = "VersionPackageId";
+        var versionPackageName = "VersionPackageName";
         var packageVersion = "1.0.0";
-        var noVersionPackageName = "NoVersionPackage";
-        PackageManifest[] manifests =
+        var noVersionPackageName = "NoVersionPackageName";
+        InstalledPackage[] installedPackages =
         {
-            new() { PackageName = versionPackageName, Version = packageVersion },
+            new() { PackageId = versionPackageId, PackageName = versionPackageName, Version = packageVersion },
             new() { PackageName = noVersionPackageName },
         };
-        var manifestParser = CreateManifestParser(manifests);
+        var packagingService = CreatePackagingService(installedPackages);
         var metricsConsentService = new Mock<IMetricsConsentService>();
         metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Detailed);
         var sut = new TelemetryService(
-            manifestParser,
+            packagingService,
             version,
             CreateSiteIdentifierService(),
             Mock.Of<IUsageInformationService>(),
@@ -98,12 +97,14 @@ public class TelemetryServiceTests
         {
             Assert.AreEqual(2, telemetry.Packages.Count());
             var versionPackage = telemetry.Packages.FirstOrDefault(x => x.Name == versionPackageName);
+            Assert.AreEqual(versionPackageId, versionPackage.Id);
             Assert.AreEqual(versionPackageName, versionPackage.Name);
             Assert.AreEqual(packageVersion, versionPackage.Version);
 
             var noVersionPackage = telemetry.Packages.FirstOrDefault(x => x.Name == noVersionPackageName);
+            Assert.AreEqual(null, noVersionPackage.Id);
             Assert.AreEqual(noVersionPackageName, noVersionPackage.Name);
-            Assert.AreEqual(string.Empty, noVersionPackage.Version);
+            Assert.AreEqual(null, noVersionPackage.Version);
         });
     }
 
@@ -111,16 +112,16 @@ public class TelemetryServiceTests
     public void RespectsAllowPackageTelemetry()
     {
         var version = CreateUmbracoVersion(9, 1, 1);
-        PackageManifest[] manifests =
+        InstalledPackage[] installedPackages =
         {
             new() { PackageName = "DoNotTrack", AllowPackageTelemetry = false },
             new() { PackageName = "TrackingAllowed", AllowPackageTelemetry = true },
         };
-        var manifestParser = CreateManifestParser(manifests);
+        var packagingService = CreatePackagingService(installedPackages);
         var metricsConsentService = new Mock<IMetricsConsentService>();
         metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Detailed);
         var sut = new TelemetryService(
-            manifestParser,
+            packagingService,
             version,
             CreateSiteIdentifierService(),
             Mock.Of<IUsageInformationService>(),
@@ -136,11 +137,11 @@ public class TelemetryServiceTests
         });
     }
 
-    private IManifestParser CreateManifestParser(IEnumerable<PackageManifest> manifests)
+    private IPackagingService CreatePackagingService(IEnumerable<InstalledPackage> installedPackages)
     {
-        var manifestParserMock = new Mock<IManifestParser>();
-        manifestParserMock.Setup(x => x.GetManifests()).Returns(manifests);
-        return manifestParserMock.Object;
+        var packagingServiceMock = new Mock<IPackagingService>();
+        packagingServiceMock.Setup(x => x.GetAllInstalledPackages()).Returns(installedPackages);
+        return packagingServiceMock.Object;
     }
 
     private IUmbracoVersion CreateUmbracoVersion(int major, int minor, int patch, string prerelease = "", string build = "")

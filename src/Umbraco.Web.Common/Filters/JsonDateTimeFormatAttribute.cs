@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
@@ -42,7 +43,7 @@ public sealed class JsonDateTimeFormatAttribute : TypeFilterAttribute
             {
                 var serializerSettings = new JsonSerializerSettings();
                 serializerSettings.Converters.Add(
-                    new IsoDateTimeConverter { DateTimeFormat = _format });
+                    new IsoDateTimeConverter { DateTimeFormat = _format, Culture = CultureInfo.InvariantCulture });
                 objectResult.Formatters.Clear();
                 objectResult.Formatters.Add(
                     new AngularJsonMediaTypeFormatter(serializerSettings, _arrayPool, _options));

@@ -410,6 +410,40 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         Assert.Throws<ArgumentException>(() => outputExpansionStrategy.MapMediaProperties(PublishedContent));
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public void OutputExpansionStrategy_ForwardsExpansionStateToPropertyValueConverter(bool expanding)
+    {
+        var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { expanding ? "theAlias" : "noSuchAlias" });
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+
+        var content = new Mock<IPublishedContent>();
+
+        var valueConverterMock = new Mock<IDeliveryApiPropertyValueConverter>();
+        valueConverterMock.Setup(v => v.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
+        valueConverterMock.Setup(p => p.IsValue(It.IsAny<object?>(), It.IsAny<PropertyValueLevel>())).Returns(true);
+        valueConverterMock.Setup(v => v.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+        valueConverterMock.Setup(v => v.GetDeliveryApiPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+        valueConverterMock.Setup(v => v.ConvertIntermediateToDeliveryApiObject(
+                It.IsAny<IPublishedElement>(),
+                It.IsAny<IPublishedPropertyType>(),
+                It.IsAny<PropertyCacheLevel>(),
+                It.IsAny<object?>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>()))
+            .Returns(expanding ? "Expanding" : "Not expanding");
+
+        var propertyType = SetupPublishedPropertyType(valueConverterMock.Object, "theAlias", Constants.PropertyEditors.Aliases.Label);
+        var property = new PublishedElementPropertyBase(propertyType, content.Object, false, PropertyCacheLevel.None, "The Value");
+
+        SetupContentMock(content, property);
+
+        var result = apiContentBuilder.Build(content.Object);
+
+        Assert.AreEqual(1, result.Properties.Count);
+        Assert.AreEqual(expanding ? "Expanding" : "Not expanding", result.Properties["theAlias"] as string);
+    }
+
     private IOutputExpansionStrategyAccessor CreateOutputExpansionStrategyAccessor(bool expandAll = false, string[]? expandPropertyAliases = null)
     {
         var httpContextMock = new Mock<HttpContext>();
@@ -424,7 +458,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         httpContextMock.SetupGet(c => c.Request).Returns(httpRequestMock.Object);
         httpContextAccessorMock.SetupGet(a => a.HttpContext).Returns(httpContextMock.Object);
 
-        IOutputExpansionStrategy outputExpansionStrategy = new RequestContextOutputExpansionStrategy(httpContextAccessorMock.Object);
+        IOutputExpansionStrategy outputExpansionStrategy = new RequestContextOutputExpansionStrategy(httpContextAccessorMock.Object, new ApiPropertyRenderer(new NoopPublishedValueFallback()));
         var outputExpansionStrategyAccessorMock = new Mock<IOutputExpansionStrategyAccessor>();
         outputExpansionStrategyAccessorMock.Setup(s => s.TryGetValue(out outputExpansionStrategy)).Returns(true);
 
@@ -547,9 +581,11 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
                 It.IsAny<IPublishedPropertyType>(),
                 It.IsAny<PropertyCacheLevel>(),
                 It.IsAny<object?>(),
+                It.IsAny<bool>(),
                 It.IsAny<bool>()))
             .Returns(() => apiElementBuilder.Build(element.Object));
         elementValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
+        elementValueConverter.Setup(p => p.IsValue(It.IsAny<object?>(), It.IsAny<PropertyValueLevel>())).Returns(true);
         elementValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
         elementValueConverter.Setup(p => p.GetDeliveryApiPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
 
@@ -557,5 +593,5 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         return new PublishedElementPropertyBase(elementPropertyType, parent, false, PropertyCacheLevel.None);
     }
 
-    private IApiContentRouteBuilder ApiContentRouteBuilder() => new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings(), Mock.Of<IVariationContextAccessor>(), Mock.Of<IPublishedSnapshotAccessor>());
+    private IApiContentRouteBuilder ApiContentRouteBuilder() => CreateContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings());
 }

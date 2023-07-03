@@ -75,7 +75,10 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
 #endif
-            logger.LogTrace("Create {InstanceId} on thread {ThreadId}", InstanceId.ToString("N").Substring(0, 8), Thread.CurrentThread.ManagedThreadId);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace))
+            {
+                logger.LogTrace("Create {InstanceId} on thread {ThreadId}", InstanceId.ToString("N").Substring(0, 8), Thread.CurrentThread.ManagedThreadId);
+            }
 
             if (detachable)
             {

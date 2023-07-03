@@ -1869,8 +1869,8 @@
     <key alias="stateInactive">Neaktivní</key>
     <key alias="sortNameAscending">Jméno (A-Z)</key>
     <key alias="sortNameDescending">Jméno (Z-A)</key>
-    <key alias="sortCreateDateAscending">Nejnovější</key>
-    <key alias="sortCreateDateDescending">Nejstarší</key>
+    <key alias="sortCreateDateAscending">Nejstarší</key>
+    <key alias="sortCreateDateDescending">Nejnovější</key>
     <key alias="sortLastLoginDateDescending">Poslední přihlášení</key>
     <key alias="noUserGroupsAdded">Nebyly přidány žádné skupiny uživatelů</key>
   </area>
