@@ -70,6 +70,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 				? html`
 						<uui-box>
 							<umb-document-workspace-view-edit-properties
+								class="properties"
 								container-type="Tab"
 								container-name=${this.tabName || ''}></umb-document-workspace-view-edit-properties>
 						</uui-box>
@@ -80,6 +81,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 				(group) => group.name,
 				(group) => html`<uui-box .headline=${group.name || ''}>
 					<umb-document-workspace-view-edit-properties
+						class="properties"
 						container-type="Group"
 						container-name=${group.name || ''}></umb-document-workspace-view-edit-properties>
 				</uui-box>`
@@ -90,6 +92,9 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			uui-box {
+				--uui-box-default-padding: 0 var(--uui-size-space-5);
+			}
 			uui-box:not(:first-child) {
 				margin-top: var(--uui-size-layout-1);
 			}

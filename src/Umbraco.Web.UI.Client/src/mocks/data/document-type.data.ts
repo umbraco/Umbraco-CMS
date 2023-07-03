@@ -25,7 +25,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				containerId: 'all-properties-group-key',
 				alias: 'richTextEditor',
 				name: 'Rich Text editor',
-				description: '',
+				description: 'Some description to test with a long description.',
 				dataTypeId: 'dt-richTextEditor',
 				variesByCulture: false,
 				variesBySegment: false,
@@ -38,7 +38,8 @@ export const data: Array<DocumentTypeResponseModel> = [
 				appearance: {
 					labelOnTop: false,
 				},
-			},			{
+			},
+			{
 				id: '2',
 				containerId: 'all-properties-group-id',
 				alias: 'colorPicker',

@@ -50,13 +50,13 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 	render() {
 		// TODO: Only show alias on label if user has access to DocumentType within settings:
 		return html`
-			<div id="header">
+			<div id="headerColumn">
 				<uui-label title=${this.alias}>${this.label}</uui-label>
 				<slot name="property-action-menu"></slot>
 				<div id="description">${this.description}</div>
 				<slot name="description"></slot>
 			</div>
-			<div>
+			<div id="editorColumn">
 				<uui-form-validation-message>
 					<slot name="editor"></slot>
 				</uui-form-validation-message>
@@ -76,33 +76,42 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 				container-type: inline-size;
 			}
 
+			:host(:last-of-type) {
+				border-bottom: none;
+			}
+
 			:host > div {
 				grid-column: span 2;
 			}
-
 			@container (width > 600px) {
 				:host(:not([orientation='vertical'])) > div {
 					grid-column: span 1;
 				}
 			}
 
-			:host(:last-of-type) {
-				border-bottom: none;
+			#headerColumn {
+				position: relative;
+				height: min-content;
+				z-index: 2;
 			}
-
-			:host-context(umb-variantable-property:first-of-type) {
-				padding-top: 0;
+			@container (width > 600px) {
+				#headerColumn {
+					position: sticky;
+					top: calc(var(--uui-size-space-2) * -1);
+				}
 			}
 
 			#description {
 				color: var(--uui-color-text-alt);
 			}
 
-			#header {
-				position: sticky;
-				top: var(--uui-size-space-4);
-				height: min-content;
-				z-index: 2;
+			#editorColumn {
+				margin-top: var(--uui-size-space-3);
+			}
+			@container (width > 600px) {
+				#editorColumn {
+					margin-top: 0;
+				}
 			}
 		`,
 	];
