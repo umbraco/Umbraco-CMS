@@ -15,17 +15,20 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
 {
     private readonly IPublicAccessRepository _publicAccessRepository;
     private readonly IEntityService _entityService;
+    private readonly IContentService _contentService;
 
     public PublicAccessService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IPublicAccessRepository publicAccessRepository,
-        IEntityService entityService)
+        IEntityService entityService,
+        IContentService contentService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _publicAccessRepository = publicAccessRepository;
         _entityService = entityService;
+        _contentService = contentService;
     }
 
     /// <summary>
@@ -227,10 +230,43 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         return OperationResult.Attempt.Succeed(evtMsgs);
     }
 
-    public Task<Attempt<PublicAccessOperationStatus>> SaveAsync(PublicAccessEntry entry)
+    public async Task<Attempt<PublicAccessOperationStatus>> SaveAsync(PublicAccessEntrySlim entry)
     {
-        Attempt<OperationResult?> attempt = Save(entry);
-        return Task.FromResult(attempt.Success ?
+        if (entry.MemberUserNames.Any() is false && entry.MemberGroupNames.Any() is false)
+        {
+            return Attempt.Fail(PublicAccessOperationStatus.NoAllowedEntities);
+        }
+
+        IContent? protectedNode = _contentService.GetById(entry.ContentId);
+
+        if (protectedNode is null)
+        {
+            return Attempt.Fail(PublicAccessOperationStatus.ContentNotFound);
+        }
+
+        IContent? loginNode = _contentService.GetById(entry.LoginPageId);
+
+        if (loginNode is null)
+        {
+            return Attempt.Fail(PublicAccessOperationStatus.LoginNodeNotFound);
+        }
+
+        IContent? errorNode = _contentService.GetById(entry.ErrorPageId);
+
+        if (errorNode is null)
+        {
+            return Attempt.Fail(PublicAccessOperationStatus.ErrorNodeNotFound);
+        }
+
+        IEnumerable<PublicAccessRule> publicAccessRules =
+            entry.MemberUserNames.Any() ? // We only need to check either member usernames or member group names, not both, as we have a check at the top of this method
+                CreateAccessRuleList(entry.MemberUserNames, Constants.Conventions.PublicAccess.MemberUsernameRuleType) :
+                CreateAccessRuleList(entry.MemberGroupNames, Constants.Conventions.PublicAccess.MemberRoleRuleType);
+
+        var publicAccessEntry = new PublicAccessEntry(protectedNode, loginNode, errorNode, publicAccessRules);
+
+        Attempt<OperationResult?> attempt = Save(publicAccessEntry);
+        return await Task.FromResult(attempt.Success ?
             Attempt.Succeed(PublicAccessOperationStatus.Success)
             : Attempt.Fail(PublicAccessOperationStatus.CancelledByNotification));
     }
@@ -279,4 +315,11 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
 
         return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, entry));
     }
+
+    private IEnumerable<PublicAccessRule> CreateAccessRuleList(string[] ruleValues, string ruleType) =>
+        ruleValues.Select(ruleValue => new PublicAccessRule
+        {
+            RuleValue = ruleValue,
+            RuleType = ruleType,
+        });
 }
