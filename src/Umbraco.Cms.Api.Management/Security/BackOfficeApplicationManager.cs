@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Configuration;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
 
 namespace Umbraco.Cms.Api.Management.Security;
@@ -12,22 +13,30 @@ public class BackOfficeApplicationManager : IBackOfficeApplicationManager
 {
     private readonly IOpenIddictApplicationManager _applicationManager;
     private readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly IRuntimeState _runtimeState;
     private readonly Uri? _backOfficeHost;
     private readonly string? _authorizeCallbackPathName;
 
     public BackOfficeApplicationManager(
         IOpenIddictApplicationManager applicationManager,
         IWebHostEnvironment webHostEnvironment,
-        IOptions<NewBackOfficeSettings> securitySettings)
+        IOptions<NewBackOfficeSettings> securitySettings,
+        IRuntimeState runtimeState)
     {
         _applicationManager = applicationManager;
         _webHostEnvironment = webHostEnvironment;
+        _runtimeState = runtimeState;
         _backOfficeHost = securitySettings.Value.BackOfficeHost;
         _authorizeCallbackPathName = securitySettings.Value.AuthorizeCallbackPathName;
     }
 
     public async Task EnsureBackOfficeApplicationAsync(Uri backOfficeUrl, CancellationToken cancellationToken = default)
     {
+        if (_runtimeState.Level < RuntimeLevel.Run)
+        {
+            return;
+        }
+
         if (backOfficeUrl.IsAbsoluteUri is false)
         {
             throw new ArgumentException($"Expected an absolute URL, got: {backOfficeUrl}", nameof(backOfficeUrl));

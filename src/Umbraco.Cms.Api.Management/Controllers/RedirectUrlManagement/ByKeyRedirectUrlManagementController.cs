@@ -26,7 +26,7 @@ public class ByKeyRedirectUrlManagementController : RedirectUrlManagementControl
     [MapToApiVersion("1.0")]
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(PagedViewModel<RedirectUrlResponseModel>), StatusCodes.Status200OK)]
-    public Task<ActionResult<PagedViewModel<RedirectUrlResponseModel>>> ByKey(Guid id, int skip, int take)
+    public Task<ActionResult<PagedViewModel<RedirectUrlResponseModel>>> ByKey(Guid id, int skip = 0, int take = 100)
     {
         IRedirectUrl[] redirects = _redirectUrlService.GetContentRedirectUrls(id).ToArray();
 

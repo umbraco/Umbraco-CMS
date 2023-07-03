@@ -20,6 +20,7 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.BackOffice.SignalR;
 using Umbraco.Cms.Web.BackOffice.Trees;
+using Umbraco.Cms.Web.Common.Hosting;
 
 namespace Umbraco.Extensions;
 
@@ -81,6 +82,7 @@ public static partial class UmbracoBuilderExtensions
 
     public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
     {
+        builder.Services.AddUnique<IStaticFilePathGenerator, UmbracoStaticFilePathGenerator>();
         builder.Services.AddSingleton<KeepAliveMiddleware>();
         builder.Services.ConfigureOptions<ConfigureGlobalOptionsForKeepAliveMiddlware>();
         builder.Services.AddSingleton<ServerVariablesParser>();

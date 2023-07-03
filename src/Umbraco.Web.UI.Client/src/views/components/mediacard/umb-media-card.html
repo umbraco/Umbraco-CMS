@@ -12,13 +12,14 @@
             <umb-icon icon="icon-block"></umb-icon>
             <localize key="mediaPicker_notAllowed">Not allowed</localize>
         </p>
-
+        
         <!-- IMAGE and SVG-->
         <img ng-if="vm.loading === false && vm.thumbnail"
             ng-class="{'trashed': vm.media.trashed}"
             ng-src="{{vm.thumbnail}}"
             title="{{vm.media.name}}"
-            alt="{{vm.media.name}}" />
+            alt="{{vm.media.name}}"
+            draggable="false" />
 
         <umb-file-icon ng-if="vm.loading === false && vm.icon"
             icon="{{vm.icon}}"
