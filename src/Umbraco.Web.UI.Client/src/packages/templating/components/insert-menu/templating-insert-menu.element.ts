@@ -1,11 +1,7 @@
 import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS } from '../../modals/manifests.js';
 import { UmbDictionaryRepository } from '../../../translation/dictionary/repository/dictionary.repository.js';
 import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils.js';
-import {
-	ChooseInsertTypeModalResult,
-	CodeSnippetType,
-	UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL,
-} from '../../modals/insert-choose-type-sidebar.element.js';
+import { ChooseInsertTypeModalResult, CodeSnippetType } from '../../modals/insert-choose-type-sidebar.element.js';
 import { customElement, property, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
@@ -50,10 +46,6 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		const { type, value } = modalResult;
 
 		switch (type) {
-			case CodeSnippetType.umbracoField: {
-				this.#getUmbracoFieldValueSnippet(value as string);
-				break;
-			}
 			case CodeSnippetType.partialView: {
 				this.#getPartialViewSnippet(value as UmbPartialViewPickerModalResult);
 				break;
@@ -77,11 +69,6 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		this.value = getInsertDictionarySnippet(data?.name ?? '');
 	};
 
-	#getUmbracoFieldValueSnippet = async (value: string) => {
-		this.value = value;
-		this.#dispatchInsertEvent();
-	};
-
 	#getPartialViewSnippet = async (modalResult: UmbPartialViewPickerModalResult) => {
 		this.value = getInsertPartialSnippet(modalResult.selection?.[0] ?? '');
 	};
@@ -94,14 +81,6 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 			this.determineInsertValue(closedModal);
 		});
 	};
-
-	#openInsertValueSidebar() {
-		this.#openModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL);
-		this.#openModal?.onSubmit().then((value) => {
-			this.value = value;
-			this.#dispatchInsertEvent();
-		});
-	}
 
 	#openInsertPartialViewSidebar() {
 		this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
@@ -127,13 +106,13 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		this.dispatchEvent(new CustomEvent('insert', { bubbles: false, cancelable: true, composed: false }));
 	}
 
-	@property()
+	@property({ type: Boolean })
 	hidePartialView = false;
 
 	render() {
 		return html`
 			<uui-button-group>
-				<uui-button look="secondary" @click=${this.#openChooseTypeModal}>
+				<uui-button look="secondary" @click=${this.#openChooseTypeModal} label="Choose value to insert">
 					<uui-icon name="umb:add"></uui-icon>Insert</uui-button
 				>
 				<umb-button-with-dropdown
@@ -143,18 +122,6 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 					id="insert-button"
 					label="open insert menu">
 					<ul id="insert-menu" slot="dropdown">
-						<!--
-						TODO: uncomment when insert value has endpoint and is properly implemented
-						<li>
-							<uui-menu-item
-								class="insert-menu-item"
-								target="_blank"
-								label="Value"
-								title="Value"
-								>
-							</uui-menu-item>
-						</li> -->
-
 						<li>
 							<uui-menu-item
 								class="insert-menu-item"
