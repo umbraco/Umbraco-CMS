@@ -55,7 +55,7 @@ public class ContentControllerBase : ManagementApiControllerBase
         status switch
         {
             PublicAccessOperationStatus.ContentNotFound => NotFound("The content could not be found"),
-            PublicAccessOperationStatus.ErrorPageNotFound => NotFound("The error page could not be found"),
+            PublicAccessOperationStatus.ErrorNodeNotFound => NotFound("The error page could not be found"),
             PublicAccessOperationStatus.LoginNodeNotFound => NotFound("The login page could not be found"),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status."),
         };

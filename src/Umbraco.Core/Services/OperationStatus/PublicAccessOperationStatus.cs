@@ -5,5 +5,6 @@ public enum PublicAccessOperationStatus
     Success,
     ContentNotFound,
     LoginNodeNotFound,
-    ErrorPageNotFound,
+    ErrorNodeNotFound,
+    NoAllowedEntities
 }
