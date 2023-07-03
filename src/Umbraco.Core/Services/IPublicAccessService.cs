@@ -85,5 +85,5 @@ public interface IPublicAccessService : IService
     /// </summary>
     /// <param name="key"></param>
     /// <returns>Returns null if no entry is found</returns>
-    Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKey(Guid key);
+    Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKeyAsync(Guid key);
 }

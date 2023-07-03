@@ -332,7 +332,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         return OperationResult.Attempt.Succeed(evtMsgs);
     }
 
-    public Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKey(Guid key)
+    public Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKeyAsync(Guid key)
     {
         IEntitySlim? entity = _entityService.Get(key, UmbracoObjectTypes.Document);
         if (entity is null)

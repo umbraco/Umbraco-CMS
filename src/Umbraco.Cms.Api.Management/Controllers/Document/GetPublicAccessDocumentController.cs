@@ -24,7 +24,7 @@ public class GetPublicAccessDocumentController : DocumentControllerBase
     [HttpGet("{id:guid}/public-access")]
     public async Task<IActionResult> GetPublicAccess(Guid id)
     {
-        Attempt<PublicAccessEntry?, PublicAccessOperationStatus> accessAttempt = await _publicAccessService.GetEntryByContentKey(id);
+        Attempt<PublicAccessEntry?, PublicAccessOperationStatus> accessAttempt = await _publicAccessService.GetEntryByContentKeyAsync(id);
 
         if (accessAttempt.Success is false)
         {
