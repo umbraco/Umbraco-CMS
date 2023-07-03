@@ -31,16 +31,15 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
 
     public PublicAccessResponseModel CreatePublicAccessResponseModel(PublicAccessEntry entry)
     {
-        var nodes = _entityService
-            .GetAll(UmbracoObjectTypes.Document, entry.LoginNodeId, entry.NoAccessNodeId)
-            .ToDictionary(x => x.Id);
+        Attempt<Guid> loginNodeKeyAttempt = _entityService.GetKey(entry.LoginNodeId, UmbracoObjectTypes.Document);
+        Attempt<Guid> noAccessNodeKeyAttempt = _entityService.GetKey(entry.NoAccessNodeId, UmbracoObjectTypes.Document);
 
-        if (!nodes.TryGetValue(entry.LoginNodeId, out IEntitySlim? loginPageEntity))
+        if (loginNodeKeyAttempt.Success is false)
         {
             throw new InvalidOperationException($"Login node with id ${entry.LoginNodeId} was not found");
         }
 
-        if (!nodes.TryGetValue(entry.NoAccessNodeId, out IEntitySlim? errorPageEntity))
+        if (noAccessNodeKeyAttempt.Success is false)
         {
             throw new InvalidOperationException($"Error node with id ${entry.NoAccessNodeId} was not found");
         }
@@ -59,22 +58,23 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
             .ToArray();
 
         var allGroups = _memberRoleManager.Roles.Where(x => x.Name != null).ToDictionary(x => x.Name!);
-        MemberGroupItemResponseModel[] groups = entry.Rules
+        IEnumerable<UmbracoIdentityRole> identityRoles = entry.Rules
             .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
             .Select(rule =>
                 rule.RuleValue is not null && allGroups.TryGetValue(rule.RuleValue, out UmbracoIdentityRole? memberRole)
                     ? memberRole
                     : null)
-            .Select(_mapper.Map<MemberGroupItemResponseModel>)
-            .WhereNotNull()
-            .ToArray();
+            .WhereNotNull();
+
+        IEnumerable<IEntitySlim> groupsEntities = _entityService.GetAll(UmbracoObjectTypes.MemberGroup, identityRoles.Select(x => Convert.ToInt32(x.Id)).ToArray());
+        MemberGroupItemResponseModel[] memberGroups = groupsEntities.Select(x => _mapper.Map<MemberGroupItemResponseModel>(x)!).ToArray();
 
         return new PublicAccessResponseModel
         {
             Members = members,
-            Groups = groups,
-            LoginPage = loginPageEntity is not null ? _mapper.Map<ContentTreeItemResponseModel>(loginPageEntity) : null,
-            ErrorPage = errorPageEntity != null ? _mapper.Map<ContentTreeItemResponseModel>(errorPageEntity) : null
+            Groups = memberGroups,
+            LoginPageId = loginNodeKeyAttempt.Result,
+            ErrorPageId = noAccessNodeKeyAttempt.Result,
         };
     }
 }
