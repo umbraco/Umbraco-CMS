@@ -8,6 +8,5 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public interface IPublicAccessPresentationFactory
 {
     Task<Attempt<PublicAccessResponseModel?, PublicAccessOperationStatus>> CreatePublicAccessResponseModel(PublicAccessEntry entry);
-    Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> CreatePublicAccessEntry(PublicAccessRequestModel requestModel);
 
 }
