@@ -298,13 +298,13 @@ describe('tree service tests', function () {
 
         it('can find a plugin based tree', function () {
             //we know this exists in the mock umbraco server vars
-            var found = treeService.getTreePackageFolder("myTree");
+            var found = treeService.getTreePackageFolder("myTree", "MyPackageSectionAlias");
             expect(found).toBe("MyPackage");
         });
 
         it('returns undefined for a not found tree', function () {
             //we know this does not exist in the mock umbraco server vars
-            var found = treeService.getTreePackageFolder("asdfasdf");
+            var found = treeService.getTreePackageFolder("asdfasdf", "fdsafdsa");
             expect(found).not.toBeDefined();
         });
 
