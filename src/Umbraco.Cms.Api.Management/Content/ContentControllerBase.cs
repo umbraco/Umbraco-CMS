@@ -57,6 +57,15 @@ public class ContentControllerBase : ManagementApiControllerBase
             PublicAccessOperationStatus.ContentNotFound => NotFound("The content could not be found"),
             PublicAccessOperationStatus.ErrorNodeNotFound => NotFound("The error page could not be found"),
             PublicAccessOperationStatus.LoginNodeNotFound => NotFound("The login page could not be found"),
+            PublicAccessOperationStatus.NoAllowedEntities => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("No allowed entities given")
+                .WithDetail("Both MemberGroups and Members were empty, thus no entities can be allowed.")
+                .Build()),
+            PublicAccessOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Request cancelled by notification")
+                .WithDetail("The request to save a public access entry was cancelled by a notification handler.")
+                .Build()),
+
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status."),
         };
 }

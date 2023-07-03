@@ -6,5 +6,6 @@ public enum PublicAccessOperationStatus
     ContentNotFound,
     LoginNodeNotFound,
     ErrorNodeNotFound,
-    NoAllowedEntities
+    NoAllowedEntities,
+    CancelledByNotification,
 }
