@@ -271,6 +271,40 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             : Attempt.Fail(PublicAccessOperationStatus.CancelledByNotification));
     }
 
+    public async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> UpdateAsync(PublicAccessEntry entry)
+    {
+        if (entry.Rules.Any() is false)
+        {
+            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.NoAllowedEntities, null);
+        }
+
+        IContent? protectedNode = _contentService.GetById(entry.ProtectedNodeId);
+
+        if (protectedNode is null)
+        {
+            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.ContentNotFound, null);
+        }
+
+        IContent? loginNode = _contentService.GetById(entry.LoginNodeId);
+
+        if (loginNode is null)
+        {
+            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.LoginNodeNotFound, null);
+        }
+
+        IContent? errorNode = _contentService.GetById(entry.NoAccessNodeId);
+
+        if (errorNode is null)
+        {
+            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.ErrorNodeNotFound, null);
+        }
+
+        Attempt<OperationResult?> attempt = Save(entry);
+        return attempt.Success
+            ? await Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, entry))
+            : await Task.FromResult(Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.CancelledByNotification, null));
+    }
+
     /// <summary>
     ///     Deletes the entry and all associated rules
     /// </summary>

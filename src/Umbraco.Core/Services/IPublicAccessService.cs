@@ -69,6 +69,12 @@ public interface IPublicAccessService : IService
     Task<Attempt<PublicAccessOperationStatus>> CreateAsync(PublicAccessEntrySlim entry);
 
     /// <summary>
+    ///     Updates the entry asynchronously and returns a status result whether the operation succeeded or not
+    /// </summary>
+    /// <param name="entry"></param>
+    Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> UpdateAsync(PublicAccessEntry entry);
+
+    /// <summary>
     ///     Deletes the entry and all associated rules
     /// </summary>
     /// <param name="entry"></param>
