@@ -123,8 +123,8 @@
 	},
 	"dependencies": {
 		"@openid/appauth": "^1.3.1",
-		"@umbraco-ui/uui": "1.3.0-rc.1",
-		"@umbraco-ui/uui-css": "1.3.0-rc.1",
+		"@umbraco-ui/uui": "1.3.0",
+		"@umbraco-ui/uui-css": "1.3.0",
 		"element-internals-polyfill": "^1.1.19",
 		"lit": "^2.7.4",
 		"lodash-es": "4.17.21",
@@ -132,7 +132,7 @@
 		"router-slot": "file:router-slot-2.3.0.tgz",
 		"rxjs": "^7.8.0",
 		"tinymce": "^6.5.1",
-		"tinymce-i18n": "^23.5.8",
+		"tinymce-i18n": "^23.6.19",
 		"uuid": "^9.0.0"
 	},
 	"devDependencies": {
