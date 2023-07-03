@@ -13,7 +13,7 @@ import {
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { pathFolderName } from 'src/shared/utils/path-folder-name.function.js';
+import { pathFolderName } from '@umbraco-cms/backoffice/utils';
 
 // TODO: this might need a new name, since it's both view and dashboard now
 @customElement('umb-section-views')
