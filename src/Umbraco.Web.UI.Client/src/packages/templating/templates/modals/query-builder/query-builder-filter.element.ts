@@ -1,6 +1,5 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { PropertyValueMap, css, html } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { UUITextStyles, type UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
+import { PropertyValueMap, css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	OperatorModel,
@@ -8,7 +7,6 @@ import {
 	TemplateQueryPropertyTypeModel,
 	TemplateQuerySettingsResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UUIComboboxListElement } from '@umbraco-ui/uui';
 import { UmbButtonWithDropdownElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-query-builder-filter')
