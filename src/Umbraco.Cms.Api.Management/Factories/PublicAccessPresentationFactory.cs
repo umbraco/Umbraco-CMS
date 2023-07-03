@@ -1,14 +1,13 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberGroup.Item;
 using Umbraco.Cms.Api.Management.ViewModels.PublicAccess;
-using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
@@ -29,19 +28,19 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
         _memberRoleManager = memberRoleManager;
     }
 
-    public PublicAccessResponseModel CreatePublicAccessResponseModel(PublicAccessEntry entry)
+    public Task<Attempt<PublicAccessResponseModel?, PublicAccessOperationStatus>> CreatePublicAccessResponseModel(PublicAccessEntry entry)
     {
         Attempt<Guid> loginNodeKeyAttempt = _entityService.GetKey(entry.LoginNodeId, UmbracoObjectTypes.Document);
         Attempt<Guid> noAccessNodeKeyAttempt = _entityService.GetKey(entry.NoAccessNodeId, UmbracoObjectTypes.Document);
 
         if (loginNodeKeyAttempt.Success is false)
         {
-            throw new InvalidOperationException($"Login node with id ${entry.LoginNodeId} was not found");
+            return Task.FromResult(Attempt.FailWithStatus<PublicAccessResponseModel?, PublicAccessOperationStatus>(PublicAccessOperationStatus.LoginNodeNotFound, null));
         }
 
         if (noAccessNodeKeyAttempt.Success is false)
         {
-            throw new InvalidOperationException($"Error node with id ${entry.NoAccessNodeId} was not found");
+            return Task.FromResult(Attempt.FailWithStatus<PublicAccessResponseModel?, PublicAccessOperationStatus>(PublicAccessOperationStatus.ErrorPageNotFound, null));
         }
 
         // unwrap the current public access setup for the client
@@ -69,12 +68,14 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
         IEnumerable<IEntitySlim> groupsEntities = _entityService.GetAll(UmbracoObjectTypes.MemberGroup, identityRoles.Select(x => Convert.ToInt32(x.Id)).ToArray());
         MemberGroupItemResponseModel[] memberGroups = groupsEntities.Select(x => _mapper.Map<MemberGroupItemResponseModel>(x)!).ToArray();
 
-        return new PublicAccessResponseModel
+        var responseModel = new PublicAccessResponseModel
         {
             Members = members,
             Groups = memberGroups,
             LoginPageId = loginNodeKeyAttempt.Result,
             ErrorPageId = noAccessNodeKeyAttempt.Result,
         };
+
+        return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessResponseModel?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, responseModel));
     }
 }
