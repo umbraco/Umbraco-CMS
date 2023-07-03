@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Models;
 ///     <para>Content items are documents, medias and members.</para>
 ///     <para>Content items have a content type, and properties.</para>
 /// </remarks>
-public interface IContentBase : IUmbracoEntity, IRememberBeingDirty
+public interface IContentBase : IUmbracoEntity, IRememberBeingDirty, IHaveAlternateVersions
 {
     /// <summary>
     ///     Integer Id of the default ContentType
@@ -30,11 +30,6 @@ public interface IContentBase : IUmbracoEntity, IRememberBeingDirty
     ///     Gets the version identifier.
     /// </summary>
     int VersionId { get; set; }
-
-    /// <summary>
-    ///     Gets the bool value indicating this is not the current draft version.
-    /// </summary>
-    bool IsAlternateVersion { get; set; }
 
     /// <summary>
     ///     Gets culture infos of the content item.
