@@ -20,11 +20,11 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: 'create/:parentKey',
+			path: 'create/:parentId',
 			component: () => this.#element,
 			setup: (component: PageComponent, info: IRoutingInfo) => {
-				const parentKey = info.match.params.parentKey;
-				this.#templateWorkspaceContext.create(parentKey);
+				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
+				this.#templateWorkspaceContext.create(parentId);
 			},
 		},
 		{

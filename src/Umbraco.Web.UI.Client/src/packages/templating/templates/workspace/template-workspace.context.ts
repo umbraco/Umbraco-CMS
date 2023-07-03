@@ -148,7 +148,6 @@ ${currentContent}`;
 				alias: template.alias,
 			});
 			this.repository.requestTreeItemsOf(this.#masterTemplate.value?.id ?? '');
-
 		}
 	}
 
@@ -157,7 +156,7 @@ ${currentContent}`;
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.next({ ...data, id: '', name: '', alias: '', $type: 'TemplateResponseModel' });
-		if (!parentId || parentId === 'root') return;
+		if (!parentId) return;
 		await this.setMasterTemplate(parentId);
 	}
 
