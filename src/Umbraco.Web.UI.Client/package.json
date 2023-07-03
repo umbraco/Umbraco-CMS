@@ -135,7 +135,7 @@
 		"uuid": "^9.0.0"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.20.12",
+		"@babel/core": "^7.22.5",
 		"@mdx-js/react": "^2.2.1",
 		"@open-wc/testing": "^3.1.7",
 		"@playwright/test": "^1.30.0",
