@@ -50,4 +50,13 @@ public class ContentControllerBase : ManagementApiControllerBase
             ContentCreatingOperationStatus.NotFound => NotFound("The content type could not be found"),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status."),
         };
+
+    protected IActionResult PublicAccessOperationStatusResult(PublicAccessOperationStatus status) =>
+        status switch
+        {
+            PublicAccessOperationStatus.ContentNotFound => NotFound("The content could not be found"),
+            PublicAccessOperationStatus.ErrorPageNotFound => NotFound("The error page could not be found"),
+            PublicAccessOperationStatus.LoginNodeNotFound => NotFound("The login page could not be found"),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status."),
+        };
 }
