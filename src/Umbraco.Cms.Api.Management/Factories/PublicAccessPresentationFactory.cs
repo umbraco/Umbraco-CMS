@@ -19,13 +19,15 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
     private readonly IMemberService _memberService;
     private readonly IUmbracoMapper _mapper;
     private readonly IMemberRoleManager _memberRoleManager;
+    private readonly IContentService _contentService;
 
-    public PublicAccessPresentationFactory(IEntityService entityService, IMemberService memberService, IUmbracoMapper mapper, IMemberRoleManager memberRoleManager)
+    public PublicAccessPresentationFactory(IEntityService entityService, IMemberService memberService, IUmbracoMapper mapper, IMemberRoleManager memberRoleManager, IContentService contentService)
     {
         _entityService = entityService;
         _memberService = memberService;
         _mapper = mapper;
         _memberRoleManager = memberRoleManager;
+        _contentService = contentService;
     }
 
     public Task<Attempt<PublicAccessResponseModel?, PublicAccessOperationStatus>> CreatePublicAccessResponseModel(PublicAccessEntry entry)
@@ -40,7 +42,7 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
 
         if (noAccessNodeKeyAttempt.Success is false)
         {
-            return Task.FromResult(Attempt.FailWithStatus<PublicAccessResponseModel?, PublicAccessOperationStatus>(PublicAccessOperationStatus.ErrorPageNotFound, null));
+            return Task.FromResult(Attempt.FailWithStatus<PublicAccessResponseModel?, PublicAccessOperationStatus>(PublicAccessOperationStatus.ErrorNodeNotFound, null));
         }
 
         // unwrap the current public access setup for the client
@@ -78,4 +80,50 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
 
         return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessResponseModel?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, responseModel));
     }
+
+    public async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> CreatePublicAccessEntry(PublicAccessRequestModel requestModel)
+    {
+        if (requestModel.MemberUserNames.Any() is false && requestModel.MemberGroupNames.Any() is false)
+        {
+            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.NoAllowedEntities, null);
+        }
+
+        IContent? protectedNode = _contentService.GetById(requestModel.ContentId);
+
+        if (protectedNode is null)
+        {
+            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.ContentNotFound, null);
+        }
+
+        IContent? loginNode = _contentService.GetById(requestModel.LoginPageId);
+
+        if (loginNode is null)
+        {
+            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.LoginNodeNotFound, null);
+        }
+
+        IContent? errorNode = _contentService.GetById(requestModel.ErrorPageId);
+
+        if (errorNode is null)
+        {
+            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.ErrorNodeNotFound, null);
+        }
+
+        IEnumerable<PublicAccessRule> publicAccessRules =
+            requestModel.MemberUserNames.Any() ? // We only need to check either member usernames or member group names, not both, as we have a check at the top of this method
+                CreateAccessRuleList(requestModel.MemberUserNames, Constants.Conventions.PublicAccess.MemberUsernameRuleType) :
+                CreateAccessRuleList(requestModel.MemberGroupNames, Constants.Conventions.PublicAccess.MemberRoleRuleType);
+
+        var publicAccessEntry = new PublicAccessEntry(protectedNode, loginNode, errorNode, publicAccessRules);
+
+        return await Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, publicAccessEntry));
+    }
+
+
+    private IEnumerable<PublicAccessRule> CreateAccessRuleList(string[] ruleValues, string ruleType) =>
+        ruleValues.Select(ruleValue => new PublicAccessRule
+        {
+            RuleValue = ruleValue,
+            RuleType = ruleType,
+        });
 }
