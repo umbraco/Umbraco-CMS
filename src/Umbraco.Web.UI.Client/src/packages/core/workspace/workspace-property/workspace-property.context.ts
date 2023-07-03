@@ -25,11 +25,11 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 
 	#data = new UmbObjectState<WorkspacePropertyData<ValueType>>({});
 
-	public readonly alias = this.#data.getObservablePart((data) => data.alias);
-	public readonly label = this.#data.getObservablePart((data) => data.label);
-	public readonly description = this.#data.getObservablePart((data) => data.description);
-	public readonly value = this.#data.getObservablePart((data) => data.value);
-	public readonly configValues = this.#data.getObservablePart((data) => data.config);
+	public readonly alias = this.#data.asObservablePart((data) => data.alias);
+	public readonly label = this.#data.asObservablePart((data) => data.label);
+	public readonly description = this.#data.asObservablePart((data) => data.description);
+	public readonly value = this.#data.asObservablePart((data) => data.value);
+	public readonly configValues = this.#data.asObservablePart((data) => data.config);
 
 	#configCollection = new UmbClassState<UmbDataTypeConfigCollection | undefined>(undefined);
 	public readonly config = this.#configCollection.asObservable();

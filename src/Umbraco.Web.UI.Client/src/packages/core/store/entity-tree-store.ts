@@ -22,7 +22,7 @@ export class UmbEntityTreeStore
 	 * An observable to observe the root items
 	 * @memberof UmbEntityTreeStore
 	 */
-	rootItems = this._data.getObservablePart((items) => items.filter((item) => item.parentId === null));
+	rootItems = this._data.asObservablePart((items) => items.filter((item) => item.parentId === null));
 
 	/**
 	 * Returns an observable to observe the children of a given parent
@@ -31,7 +31,7 @@ export class UmbEntityTreeStore
 	 * @memberof UmbEntityTreeStore
 	 */
 	childrenOf(parentId: string | null) {
-		return this._data.getObservablePart((items) => items.filter((item) => item.parentId === parentId));
+		return this._data.asObservablePart((items) => items.filter((item) => item.parentId === parentId));
 	}
 
 	/**
@@ -41,6 +41,6 @@ export class UmbEntityTreeStore
 	 * @memberof UmbEntityTreeStore
 	 */
 	items(ids: Array<string | null>) {
-		return this._data.getObservablePart((items) => items.filter((item) => ids.includes(item.id ?? '')));
+		return this._data.asObservablePart((items) => items.filter((item) => ids.includes(item.id ?? '')));
 	}
 }

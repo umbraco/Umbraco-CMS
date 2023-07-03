@@ -41,7 +41,7 @@ export class UmbDataTypeStore extends UmbStoreBase<DataTypeResponseModel> {
 	 * @memberof UmbDataTypeStore
 	 */
 	byId(id: DataTypeResponseModel['id']) {
-		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
+		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
 	}
 
 	/**
@@ -55,7 +55,7 @@ export class UmbDataTypeStore extends UmbStoreBase<DataTypeResponseModel> {
 
 	withPropertyEditorUiAlias(propertyEditorUiAlias: string) {
 		// TODO: Use a model for the data-type tree items: ^^Most likely it should be parsed to the UmbEntityTreeStore as a generic type.
-		return this._data.getObservablePart((items) =>
+		return this._data.asObservablePart((items) =>
 			items.filter((item) => (item as any).propertyEditorUiAlias === propertyEditorUiAlias)
 		);
 	}

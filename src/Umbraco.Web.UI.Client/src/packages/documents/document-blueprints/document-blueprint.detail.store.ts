@@ -35,7 +35,7 @@ export class UmbDocumentBlueprintStore extends UmbStoreBase {
 				this._data.append(data);
 			});
 
-		return this._data.getObservablePart((documents) => documents.find((document) => document.id === id));
+		return this._data.asObservablePart((documents) => documents.find((document) => document.id === id));
 	}
 
 	getScaffold(entityType: string, parentId: string | null) {

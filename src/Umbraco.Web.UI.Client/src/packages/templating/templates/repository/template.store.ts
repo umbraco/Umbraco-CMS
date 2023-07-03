@@ -35,11 +35,11 @@ export class UmbTemplateStore extends UmbStoreBase {
 	 * @memberof UmbTemplateStore
 	 */
 	byId(id: TemplateResponseModel['id']) {
-		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
+		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
 	}
 
 	items(uniques: string[]) {
-		return this._data.getObservablePart((x) => x.filter((y) => uniques.includes(y.id)));
+		return this._data.asObservablePart((x) => x.filter((y) => uniques.includes(y.id)));
 	}
 
 	/**

@@ -25,7 +25,7 @@ export class UmbMemberTypeStore extends UmbStoreBase {
 	 * @memberof UmbMemberTypeStore
 	 */
 	byId(id: MemberTypeDetails['id']) {
-		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
+		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
 	}
 
 	remove(uniques: string[]) {

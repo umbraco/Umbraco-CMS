@@ -7,6 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  *  @element umb-property-editor-config
@@ -59,7 +60,9 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', this.propertyEditorUiAlias),
 			(manifest) => {
-				this._observePropertyEditorSchemaConfig(manifest?.meta.propertyEditorSchemaAlias);
+				this._observePropertyEditorSchemaConfig(
+					manifest?.meta.propertyEditorSchemaAlias || UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT
+				);
 				this._propertyEditorUISettingsProperties = manifest?.meta.settings?.properties || [];
 				this._propertyEditorUISettingsDefaultData = manifest?.meta.settings?.defaultData || [];
 				this._mergeConfigProperties();
@@ -68,9 +71,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 		);
 	}
 
-	private _observePropertyEditorSchemaConfig(propertyEditorSchemaAlias?: string) {
-		if (!propertyEditorSchemaAlias) return;
-
+	private _observePropertyEditorSchemaConfig(propertyEditorSchemaAlias: string) {
 		this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorSchema', propertyEditorSchemaAlias),
 			(manifest) => {

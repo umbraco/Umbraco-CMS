@@ -83,7 +83,7 @@ describe('ArrayState', () => {
 	});
 
 	it('getObservablePart for a specific entry of array', (done) => {
-		const subObserver = subject.getObservablePart((data) => data.find((x) => x.key === '2'));
+		const subObserver = subject.asObservablePart((data) => data.find((x) => x.key === '2'));
 		subObserver.subscribe((entry) => {
 			if (entry) {
 				expect(entry.another).to.be.equal(initialData[1].another);
@@ -96,7 +96,7 @@ describe('ArrayState', () => {
 		let amountOfCallbacks = 0;
 		const newItem = { key: '4', another: 'myValue4' };
 
-		const subObserver = subject.getObservablePart((data) => data.find((x) => x.key === newItem.key));
+		const subObserver = subject.asObservablePart((data) => data.find((x) => x.key === newItem.key));
 		subObserver.subscribe((entry) => {
 			amountOfCallbacks++;
 			if (amountOfCallbacks === 1) {
@@ -132,7 +132,7 @@ describe('ArrayState', () => {
 		const newItem = { key: '2', another: 'myValue4' };
 		subject.appendOne(newItem);
 
-		const subObserver = subject.getObservablePart((data) => data.find((x) => x.key === newItem.key));
+		const subObserver = subject.asObservablePart((data) => data.find((x) => x.key === newItem.key));
 		subObserver.subscribe((entry) => {
 			expect(entry).to.be.equal(newItem); // Second callback should give us the right data:
 			if (entry) {
@@ -145,7 +145,7 @@ describe('ArrayState', () => {
 	it('getObservablePart replays existing data to any amount of subscribers.', (done) => {
 		let amountOfCallbacks = 0;
 
-		const subObserver = subject.getObservablePart((data) => data.find((x) => x.key === '2'));
+		const subObserver = subject.asObservablePart((data) => data.find((x) => x.key === '2'));
 		subObserver.subscribe((entry) => {
 			if (entry) {
 				amountOfCallbacks++;
@@ -166,7 +166,7 @@ describe('ArrayState', () => {
 	it('getObservablePart replays existing data to any amount of subscribers.', (done) => {
 		let amountOfCallbacks = 0;
 
-		const subObserver = subject.getObservablePart((data) => data.find((x) => x.key === '2'));
+		const subObserver = subject.asObservablePart((data) => data.find((x) => x.key === '2'));
 		subObserver.subscribe((entry) => {
 			if (entry) {
 				amountOfCallbacks++;

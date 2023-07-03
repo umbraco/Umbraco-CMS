@@ -1,4 +1,6 @@
-import { UmbTemplateCardElement } from '../template-card/template-card.element.js';
+import type { UmbTemplateCardElement } from '../template-card/template-card.element.js';
+import '../template-card/template-card.element.js';
+
 import { UmbTemplateRepository } from '../../repository/template.repository.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
@@ -50,12 +52,12 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	_selectedIds: Array<string> = [];
-	@property({ type: Array<string> })
+	@property({ type: Array })
 	public get selectedIds() {
 		return this._selectedIds;
 	}
-	public set selectedIds(newKeys: Array<string>) {
-		this._selectedIds = newKeys;
+	public set selectedIds(newKeys: Array<string> | undefined) {
+		this._selectedIds = newKeys ?? [];
 		this.#observePickedTemplates();
 	}
 
@@ -111,7 +113,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 		// TODO: Change experience, so its not multi selectable. But instead already picked templates should be unpickable. (awaiting general picker features for such)
 		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			multiple: true,
-			selection: [...this.selectedIds],
+			selection: [...this._selectedIds],
 			pickableFilter: (template: TemplateResponseModel) => template.id !== null,
 		});
 
@@ -132,7 +134,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 		In current backoffice we just prevent deleting a default when there are other templates. But if its the only one its okay. This is a weird experience, so we should make something that makes more sense.
 		BTW. its weird cause the damage of removing the default template is equally bad when there is one or more templates.
 		*/
-		this.selectedIds = this.selectedIds.filter((x) => x !== id);
+		this.selectedIds = this._selectedIds.filter((x) => x !== id);
 	}
 
 	#openTemplate(e: CustomEvent) {

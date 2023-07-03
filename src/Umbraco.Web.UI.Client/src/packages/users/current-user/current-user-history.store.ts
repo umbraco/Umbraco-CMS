@@ -13,7 +13,7 @@ export type UmbCurrentUserHistoryItem = {
 
 export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHistoryItem> {
 	public readonly history = this._data.asObservable();
-	public readonly latestHistory = this._data.getObservablePart((historyItems) => historyItems.slice(-10));
+	public readonly latestHistory = this._data.asObservablePart((historyItems) => historyItems.slice(-10));
 
 	constructor(host: UmbControllerHost) {
 		super(

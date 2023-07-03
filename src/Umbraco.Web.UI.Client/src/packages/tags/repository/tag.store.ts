@@ -38,11 +38,11 @@ export class UmbTagStore extends UmbStoreBase {
 	 * @memberof UmbTagStore
 	 */
 	byId(id: TagResponseModel['id']) {
-		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
+		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
 	}
 
 	items(group: TagResponseModel['group'], culture: string) {
-		return this._data.getObservablePart((items) =>
+		return this._data.asObservablePart((items) =>
 			items.filter((item) => item.group === group && item.culture === culture)
 		);
 	}
@@ -54,7 +54,7 @@ export class UmbTagStore extends UmbStoreBase {
 	// If we already has picked lets say 4 of them, the list will only show 1 more, even though there is more remaining in the database.
 
 	byQuery(group: TagResponseModel['group'], culture: string, query: string) {
-		return this._data.getObservablePart((items) =>
+		return this._data.asObservablePart((items) =>
 			items.filter(
 				(item) =>
 					item.group === group &&

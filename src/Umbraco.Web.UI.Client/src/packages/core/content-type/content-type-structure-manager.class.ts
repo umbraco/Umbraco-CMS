@@ -32,7 +32,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	#documentTypeObservers = new Array<UmbController>();
 	#documentTypes = new UmbArrayState<T>([], (x) => x.id);
 	readonly documentTypes = this.#documentTypes.asObservable();
-	private readonly _documentTypeContainers = this.#documentTypes.getObservablePart((x) =>
+	private readonly _documentTypeContainers = this.#documentTypes.asObservablePart((x) =>
 		x.flatMap((x) => x.containers ?? [])
 	);
 
@@ -158,7 +158,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	/** Public methods for consuming structure: */
 
 	ownerDocumentType() {
-		return this.#documentTypes.getObservablePart((x) => x.find((y) => y.id === this.#ownerDocumentTypeId));
+		return this.#documentTypes.asObservablePart((x) => x.find((y) => y.id === this.#ownerDocumentTypeId));
 	}
 	getOwnerDocumentType() {
 		return this.#documentTypes.getValue().find((y) => y.id === this.#ownerDocumentTypeId);
@@ -309,7 +309,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 	/*
 	rootDocumentTypeName() {
-		return this.#documentTypes.getObservablePart((docTypes) => {
+		return this.#documentTypes.asObservablePart((docTypes) => {
 			const docType = docTypes.find((x) => x.id === this.#rootDocumentTypeKey);
 			return docType?.name ?? '';
 		});
@@ -317,14 +317,14 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	*/
 
 	ownerDocumentTypeObservablePart<PartResult>(mappingFunction: MappingFunction<T, PartResult>) {
-		return this.#documentTypes.getObservablePart((docTypes) => {
+		return this.#documentTypes.asObservablePart((docTypes) => {
 			const docType = docTypes.find((x) => x.id === this.#ownerDocumentTypeId);
 			return docType ? mappingFunction(docType) : undefined;
 		});
 	}
 	/*
 	nameOfDocumentType(id: string) {
-		return this.#documentTypes.getObservablePart((docTypes) => {
+		return this.#documentTypes.asObservablePart((docTypes) => {
 			const docType = docTypes.find((x) => x.id === id);
 			return docType?.name ?? '';
 		});
@@ -332,7 +332,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	*/
 
 	hasPropertyStructuresOf(containerId: string | null) {
-		return this.#documentTypes.getObservablePart((docTypes) => {
+		return this.#documentTypes.asObservablePart((docTypes) => {
 			return (
 				docTypes.find((docType) => {
 					return docType.properties?.find((property) => property.containerId === containerId);
@@ -344,7 +344,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		return this.propertyStructuresOf(null);
 	}
 	propertyStructuresOf(containerId: string | null) {
-		return this.#documentTypes.getObservablePart((docTypes) => {
+		return this.#documentTypes.asObservablePart((docTypes) => {
 			const props: DocumentTypePropertyTypeResponseModel[] = [];
 			docTypes.forEach((docType) => {
 				docType.properties?.forEach((property) => {
@@ -358,7 +358,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	}
 
 	rootContainers(containerType: PropertyContainerTypes) {
-		return this.#containers.getObservablePart((data) => {
+		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.parentId === null && x.type === containerType);
 		});
 	}
@@ -368,7 +368,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	}
 
 	hasRootContainers(containerType: PropertyContainerTypes) {
-		return this.#containers.getObservablePart((data) => {
+		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.parentId === null && x.type === containerType).length > 0;
 		});
 	}
@@ -389,14 +389,14 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		parentId: PropertyTypeContainerModelBaseModel['parentId'],
 		containerType: PropertyContainerTypes
 	) {
-		return this.#containers.getObservablePart((data) => {
+		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.parentId === parentId && x.type === containerType);
 		});
 	}
 
 	// In future this might need to take parentName(parentId lookup) into account as well? otherwise containers that share same name and type will always be merged, but their position might be different and they should not be merged.
 	containersByNameAndType(name: string, containerType: PropertyContainerTypes) {
-		return this.#containers.getObservablePart((data) => {
+		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.name === name && x.type === containerType);
 		});
 	}

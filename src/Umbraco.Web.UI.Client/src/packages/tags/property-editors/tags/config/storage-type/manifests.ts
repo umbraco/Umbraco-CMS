@@ -1,5 +1,6 @@
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
+// TODO: Missing propertyEditorSchemaAlias ?
 export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.Tags.StorageType',

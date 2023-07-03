@@ -1,3 +1,4 @@
+import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
@@ -39,7 +40,7 @@ export class UmbRefPropertyEditorUIElement extends UUIRefNodeElement {
 		if (this.propertyEditorSchemaAlias !== '') {
 			details.push(this.propertyEditorSchemaAlias);
 		} else {
-			details.push('Property Editor Missing');
+			details.push(UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT);
 		}
 
 		if (this.detail !== '') {

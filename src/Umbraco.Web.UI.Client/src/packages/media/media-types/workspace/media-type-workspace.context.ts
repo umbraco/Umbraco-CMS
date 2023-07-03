@@ -11,7 +11,7 @@ export class UmbWorkspaceMediaTypeContext
 {
 	#data = new UmbObjectState<MediaTypeDetails | undefined>(undefined);
 	data = this.#data.asObservable();
-	name = this.#data.getObservablePart((data) => data?.name);
+	name = this.#data.asObservablePart((data) => data?.name);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbMediaTypeRepository(host));

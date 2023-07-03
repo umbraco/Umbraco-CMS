@@ -17,7 +17,7 @@ export class UmbDeepState<T> extends BehaviorSubject<T> {
 		super(deepFreeze(initialData));
 	}
 
-	getObservablePart<ReturnType>(
+	asObservablePart<ReturnType>(
 		mappingFunction: MappingFunction<T, ReturnType>,
 		memoizationFunction?: MemoizationFunction<ReturnType>
 	) {

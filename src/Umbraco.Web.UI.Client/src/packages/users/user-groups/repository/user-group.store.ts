@@ -58,7 +58,7 @@ export class UmbUserGroupStore extends UmbStoreBase implements UmbEntityDetailSt
 				this.#groups.append([data]);
 			});
 
-		return this.#groups.getObservablePart((userGroups) => userGroups.find((userGroup) => userGroup.id === id));
+		return this.#groups.asObservablePart((userGroups) => userGroups.find((userGroup) => userGroup.id === id));
 	}
 
 	async save(userGroups: Array<UserGroupDetails>) {

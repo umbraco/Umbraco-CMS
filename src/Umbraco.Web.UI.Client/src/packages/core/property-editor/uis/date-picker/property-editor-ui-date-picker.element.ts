@@ -1,9 +1,9 @@
 import { UmbPropertyValueChangeEvent } from '../../index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, InputType } from '@umbraco-cms/backoffice/external/uui';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbDataTypeConfigCollection, UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-date-picker
@@ -40,7 +40,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 	private _format?: string;
 
 	@state()
-	private _inputType: InputType = 'datetime-local';
+	private _inputType: UmbInputDateElement['type'] = 'datetime-local';
 
 	@state()
 	private _min?: string;
@@ -90,7 +90,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 			.min=${this._min}
 			.max=${this._max}
 			.step=${this._step}
-			.offsetTime=${this._offsetTime}
+			.offsetTime=${this._offsetTime || false}
 			label="Pick a date or time"></umb-input-date>`;
 	}
 

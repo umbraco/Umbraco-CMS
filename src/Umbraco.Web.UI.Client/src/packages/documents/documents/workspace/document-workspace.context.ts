@@ -35,12 +35,12 @@ export class UmbDocumentWorkspaceContext
 	 * The document is the current state/draft version of the document.
 	 */
 	#draft = new UmbObjectState<EntityType | undefined>(undefined);
-	readonly unique = this.#draft.getObservablePart((data) => data?.id);
-	readonly documentTypeKey = this.#draft.getObservablePart((data) => data?.contentTypeId);
+	readonly unique = this.#draft.asObservablePart((data) => data?.id);
+	readonly documentTypeKey = this.#draft.asObservablePart((data) => data?.contentTypeId);
 
-	readonly variants = this.#draft.getObservablePart((data) => data?.variants || []);
-	readonly urls = this.#draft.getObservablePart((data) => data?.urls || []);
-	readonly templateId = this.#draft.getObservablePart((data) => data?.templateId || null);
+	readonly variants = this.#draft.asObservablePart((data) => data?.variants || []);
+	readonly urls = this.#draft.asObservablePart((data) => data?.urls || []);
+	readonly templateId = this.#draft.asObservablePart((data) => data?.templateId || null);
 
 	readonly structure;
 	readonly splitView;
@@ -125,18 +125,18 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	propertyValuesOf(variantId?: UmbVariantId) {
-		return this.#draft.getObservablePart((data) =>
+		return this.#draft.asObservablePart((data) =>
 			variantId ? data?.values?.filter((x) => variantId.compare(x)) : data?.values
 		);
 	}
 
 	propertyDataByAlias(propertyAlias: string, variantId?: UmbVariantId) {
-		return this.#draft.getObservablePart((data) =>
+		return this.#draft.asObservablePart((data) =>
 			data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))
 		);
 	}
 	propertyValueByAlias(propertyAlias: string, variantId?: UmbVariantId) {
-		return this.#draft.getObservablePart(
+		return this.#draft.asObservablePart(
 			(data) =>
 				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))?.value
 		);

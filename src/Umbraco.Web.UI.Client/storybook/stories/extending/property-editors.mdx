@@ -11,16 +11,17 @@ import { Meta } from '@storybook/addon-docs';
 (rough notes. We have a lot on docs.umbraco.com we can use)
 
 - This section describes how to work with and create Property Editors. A property editor is the editor used to insert content into Umbraco.
-- Property editor are defined in two parts.
+- A whole Property Editor is defined by two parts.
 - The Property Editor and the Property Editor UI.
 - The Property Editor UI is the UI that is used to edit the data in the backoffice.
 - Each Property Editor can have multiple Property Editor UIs.
 
-- Both a Property Editor and Property Editor UI can have a configuration.
-- The Property Editor configuration is used for configuration that the server needs to know about.
-- The Property Editor UI configuration is used for configuration that is related to rendering the UI in the backoffice.
+- Both a Property Editor Schema and Property Editor UI can define the Settings used for their configuration.
+- The Property Editor Schema settings is used for configuration that the server needs to know about.
+- The Property Editor UI settings is used for configuration that is related to rendering the UI in the backoffice.
+- Both will be available for the Property Editor UI to use.
 
-## Property Editor
+## Property Editor Schema
 
 **Manifest**
 
@@ -50,15 +51,14 @@ import { Meta } from '@storybook/addon-docs';
 }
 ```
 
-If no Property Editor is specified in the manifest, the Propety Editor will use a generic JSON Property Editor Model
+If no Property Editor Schema is specified in the manifest, the Propety Editor UI will use a generic JSON Property Editor Model
 
 ## Configuration
 
 // TODO: add description
 
-- Configuration for a Property Editor or Property Editor UI is defined in the manifest.
-- The both use the same configuration format.
-- It is possible to use another Property Editor UI as the editor for a configuration property.
+- Data Type Settings for a Property Editor or Property Editor UI is defined in the manifests.
+- They both use the same format for their settings.
 
 **Manifest**
 
@@ -69,7 +69,7 @@ If no Property Editor is specified in the manifest, the Propety Editor will use 
 	//... more
 	"meta": {
 		//... more
-		"config": {
+		"settings": {
 			"properties": [
 				{
 					"alias": "rows",

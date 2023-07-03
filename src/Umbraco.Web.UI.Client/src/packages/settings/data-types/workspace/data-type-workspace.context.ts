@@ -12,8 +12,8 @@ export class UmbDataTypeWorkspaceContext
 	#data = new UmbObjectState<DataTypeResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
-	name = this.#data.getObservablePart((data) => data?.name);
-	id = this.#data.getObservablePart((data) => data?.id);
+	name = this.#data.asObservablePart((data) => data?.name);
+	id = this.#data.asObservablePart((data) => data?.id);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbDataTypeRepository(host));

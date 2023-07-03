@@ -23,7 +23,7 @@ export const WithDetail: Story = {
 	args: {
 		name: 'Custom Data Type',
 		propertyEditorUiAlias: 'Umb.DataType.CustomUI',
-		propertyEditorSchemaAlias: 'UmbracoInput.JSON',
+		propertyEditorSchemaAlias: 'Umbraco.JSON',
 		detail: 'With some custom details',
 	},
 };

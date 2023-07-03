@@ -32,9 +32,9 @@ export class UmbWorkspaceVariantContext {
 	#currentVariant = new UmbObjectState<DocumentVariantResponseModel | undefined>(undefined);
 	currentVariant = this.#currentVariant.asObservable();
 
-	name = this.#currentVariant.getObservablePart((x) => x?.name);
-	culture = this.#currentVariant.getObservablePart((x) => x?.culture);
-	segment = this.#currentVariant.getObservablePart((x) => x?.segment);
+	name = this.#currentVariant.asObservablePart((x) => x?.name);
+	culture = this.#currentVariant.asObservablePart((x) => x?.culture);
+	segment = this.#currentVariant.asObservablePart((x) => x?.segment);
 
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	variantId = this.#variantId.asObservable();

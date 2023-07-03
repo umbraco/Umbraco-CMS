@@ -1,5 +1,6 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbInputTemplateElement } from '../../../../../templating/templates/components/input-template/input-template.element.js';
+import '../../../../../templating/templates/components/input-template/input-template.element.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -52,7 +53,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement
 	#templateInputChange(e: CustomEvent) {
 		// save new allowed ids
 		const input = e.target as UmbInputTemplateElement;
-		const idsWithoutRoot = input.selectedIds.filter((id) => id !== null) as Array<string>;
+		const idsWithoutRoot = input.selectedIds?.filter((id) => id !== null) ?? [];
 		this.#workspaceContext?.setAllowedTemplateIds(idsWithoutRoot);
 		this.#workspaceContext?.setDefaultTemplateId(input.defaultId);
 	}

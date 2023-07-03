@@ -46,7 +46,7 @@ export class UmbWorkspaceSplitViewManager {
 	}
 
 	public activeVariantByIndex(index: number) {
-		return this.#activeVariantsInfo.getObservablePart((data) => data[index] || undefined);
+		return this.#activeVariantsInfo.asObservablePart((data) => data[index] || undefined);
 	}
 
 	public switchVariant(index: number, variantId: UmbVariantId) {

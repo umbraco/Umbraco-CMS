@@ -13,6 +13,7 @@ import {
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { pathFolderName } from '@umbraco-cms/backoffice/utils';
 
 // TODO: this might need a new name, since it's both view and dashboard now
 @customElement('umb-section-views')
@@ -49,10 +50,20 @@ export class UmbSectionViewsElement extends UmbLitElement {
 		});
 	}
 
+	#constructDashboardPath(manifest: ManifestDashboard) {
+		const dashboardName = manifest.meta.label ?? manifest.name;
+		return 'dashboard/' + (manifest.meta.pathname ? manifest.meta.pathname : pathFolderName(dashboardName));
+	}
+
+	#constructViewPath(manifest: ManifestSectionView) {
+		const viewName = manifest.meta.label ?? manifest.name;
+		return 'view/' + (manifest.meta.pathname ? manifest.meta.pathname : pathFolderName(viewName));
+	}
+
 	async #createRoutes() {
 		const dashboardRoutes = this._dashboards?.map((manifest) => {
 			return {
-				path: 'dashboard/' + manifest.meta.pathname,
+				path: this.#constructDashboardPath(manifest),
 				component: () => createExtensionElement(manifest),
 				setup: (component: UmbDashboardExtensionElement) => {
 					component.manifest = manifest;
@@ -62,7 +73,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 
 		const viewRoutes = this._views?.map((manifest) => {
 			return {
-				path: 'view/' + manifest.meta.pathname,
+				path: this.#constructViewPath(manifest),
 				component: () => createExtensionElement(manifest),
 				setup: (component: UmbSectionViewExtensionElement) => {
 					component.manifest = manifest;
@@ -141,16 +152,16 @@ export class UmbSectionViewsElement extends UmbLitElement {
 		return this._dashboards.length > 0
 			? html`
 					<uui-tab-group slot="header" id="dashboards">
-						${this._dashboards.map(
-							(dashboard) => html`
+						${this._dashboards.map((dashboard) => {
+							const dashboardName = dashboard.meta.label ?? dashboard.name;
+							const dashboardPath = this.#constructDashboardPath(dashboard);
+							return html`
 								<uui-tab
-									.label="${dashboard.meta.label || dashboard.name}"
-									href="${this._routerPath}/dashboard/${dashboard.meta.pathname}"
-									?active="${this._activePath === 'dashboard/' + dashboard.meta.pathname}">
-									${dashboard.meta.label || dashboard.name}
-								</uui-tab>
-							`
-						)}
+									.label="${dashboardName}"
+									href="${this._routerPath}/${dashboardPath}"
+									?active="${this._activePath === dashboardPath}"></uui-tab>
+							`;
+						})}
 					</uui-tab-group>
 			  `
 			: '';
@@ -160,17 +171,19 @@ export class UmbSectionViewsElement extends UmbLitElement {
 		return this._views.length > 0
 			? html`
 					<uui-tab-group slot="navigation" id="views">
-						${this._views.map(
-							(view) => html`
+						${this._views.map((view) => {
+							const viewName = view.meta.label ?? view.name;
+							const viewPath = this.#constructViewPath(view);
+							return html`
 								<uui-tab
-									.label="${view.meta.label || view.name}"
-									href="${this._routerPath}/view/${view.meta.pathname}"
-									?active="${this._activePath === 'view/' + view.meta.pathname}">
+									.label="${viewName}"
+									href="${this._routerPath}/${viewPath}"
+									?active="${this._activePath === viewPath}">
 									<uui-icon slot="icon" name=${view.meta.icon}></uui-icon>
-									${view.meta.label || view.name}
+									${viewName}
 								</uui-tab>
-							`
-						)}
+							`;
+						})}
 					</uui-tab-group>
 			  `
 			: '';

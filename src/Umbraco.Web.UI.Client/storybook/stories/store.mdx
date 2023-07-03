@@ -4,8 +4,8 @@ import { Meta } from '@storybook/addon-docs';
 
 # Store
 
-A store is the link between a Resource and a data implementation. A store is mainly taken form as a Context, In other words we will have to Consume the Context(Store) to get the Store.
-Generally a Store will be holding one or more RxJS Subjects, each Subject is made available for Subscription via a RxJS Observable.
+A store is the link between a Resource and a Repository. A store is mainly taken form as a Context, In other words we will have to Consume the Context(Store) to get the Store.
+Generally a Store will be holding one or more State Objects, each Subject is made available for Observation via a Observables.
 
 ### A Simple Store:
 
@@ -75,7 +75,7 @@ class MyProductStore {
 		});
 
 		// Return a Observable part, to listen for this specific product and the future changes of it.
-		return this.#data.getObservablePart((documents) =>
+		return this.#data.asObservablePart((documents) =>
 			documents.find((document) => document.id === id)
 		);
 	}
@@ -121,8 +121,8 @@ class MyProductStore {
   #products = new UmbArrayState(<Array<MyProductType>>[]);
 
   public readonly products = this.#products.asObservable();
-  public readonly amountOfProducts = this.#products.getObservablePart((products) => products.length);
-  public readonly topTenRatedProducts = this.#products.getObservablePart((products) => products.sort((a, b) => b.rating - a.rating).slice(0, 10));
+  public readonly amountOfProducts = this.#products.asObservablePart((products) => products.length);
+  public readonly topTenRatedProducts = this.#products.asObservablePart((products) => products.sort((a, b) => b.rating - a.rating).slice(0, 10));
 
   ...
 }
