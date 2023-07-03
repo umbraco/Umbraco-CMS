@@ -227,6 +227,14 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         return OperationResult.Attempt.Succeed(evtMsgs);
     }
 
+    public Task<Attempt<PublicAccessOperationStatus>> SaveAsync(PublicAccessEntry entry)
+    {
+        Attempt<OperationResult?> attempt = Save(entry);
+        return Task.FromResult(attempt.Success ?
+            Attempt.Succeed(PublicAccessOperationStatus.Success)
+            : Attempt.Fail(PublicAccessOperationStatus.CancelledByNotification));
+    }
+
     /// <summary>
     ///     Deletes the entry and all associated rules
     /// </summary>

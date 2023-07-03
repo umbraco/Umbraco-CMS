@@ -63,10 +63,21 @@ public interface IPublicAccessService : IService
     Attempt<OperationResult?> Save(PublicAccessEntry entry);
 
     /// <summary>
+    ///     Saves the entry asynchronously and returns a status result whether the operation succeeded or not
+    /// </summary>
+    /// <param name="entry"></param>
+    Task<Attempt<PublicAccessOperationStatus>> SaveAsync(PublicAccessEntry entry);
+
+    /// <summary>
     ///     Deletes the entry and all associated rules
     /// </summary>
     /// <param name="entry"></param>
     Attempt<OperationResult?> Delete(PublicAccessEntry entry);
 
+    /// <summary>
+    ///     Gets the entry defined for the content item based on a content key
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns>Returns null if no entry is found</returns>
     Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKey(Guid key);
 }
