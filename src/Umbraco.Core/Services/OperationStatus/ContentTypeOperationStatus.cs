@@ -9,5 +9,6 @@ public enum ContentTypeOperationStatus
     InvalidDataType,
     DataTypeNotFound,
     InvalidInheritance,
+    InvalidComposition,
     NotFound,
 }

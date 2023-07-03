@@ -250,6 +250,28 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
         //       contentType.SetDefaultTemplate() will be called with a null value, which will reset the default template.
         contentType.SetDefaultTemplate(allowedTemplates.FirstOrDefault(t => t.Key == requestModel.DefaultTemplateId));
 
+        // Validate that the all the compositions are allowed
+        // Would be nice to maybe have this in a little nicer way, but for now it should be okay.
+        IContentTypeComposition[] allContentTypes = _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+
+        // TODO: Handle Update (should come pretty natty when we refactor this)
+        if (contentType.Id == 0)
+        {
+            IEnumerable<Guid> allowedCompositionKeys =
+                // NOTE: Here if we're checking for create we should pass null, otherwise the updated content type.
+                _contentTypeService.GetAvailableCompositeContentTypes(null, allContentTypes, isElement: true)
+                    .Results
+                    .Where(x => x.Allowed)
+                    .Select(x => x.Composition.Key);
+
+            if (contentType.CompositionKeys().Except(allowedCompositionKeys).Any())
+            {
+                // We have a composition key that's not in the allowed composition keys
+                return ContentTypeOperationStatus.InvalidComposition;
+            }
+        }
+
+
         // save content type
         // FIXME: create and use an async get method here.
         _contentTypeService.Save(contentType);

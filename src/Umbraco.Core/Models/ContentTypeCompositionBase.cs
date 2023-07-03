@@ -104,6 +104,7 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
         }
     }
 
+
     /// <inheritdoc />
     public IEnumerable<IPropertyType> GetOriginalComposedPropertyTypes() => GetRawComposedPropertyTypes();
 
@@ -286,6 +287,13 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
         => ContentTypeComposition
             .Select(x => x.Id)
             .Union(ContentTypeComposition.SelectMany(x => x.CompositionIds()));
+
+    /// <inheritdoc />
+    public IEnumerable<Guid> CompositionKeys()
+        => ContentTypeComposition
+            .Select(x => x.Key)
+            .Union(ContentTypeComposition.SelectMany(x => x.CompositionKeys()));
+
 
     protected override void PerformDeepClone(object clone)
     {
