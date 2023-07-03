@@ -13,7 +13,7 @@ import {
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import { pathFolderName } from 'src/shared/utils/path-folder-name.function.js';
 
 // TODO: this might need a new name, since it's both view and dashboard now
 @customElement('umb-section-views')
@@ -52,8 +52,11 @@ export class UmbSectionViewsElement extends UmbLitElement {
 
 	async #createRoutes() {
 		const dashboardRoutes = this._dashboards?.map((manifest) => {
+			const dashboardName = manifest.meta.label ?? manifest.name;
+			const dashboardPath =
+				'dashboard/' + (manifest.meta.pathname ? manifest.meta.pathname : pathFolderName(dashboardName));
 			return {
-				path: 'dashboard/' + manifest.meta.pathname,
+				path: dashboardPath,
 				component: () => createExtensionElement(manifest),
 				setup: (component: UmbDashboardExtensionElement) => {
 					component.manifest = manifest;
@@ -62,8 +65,10 @@ export class UmbSectionViewsElement extends UmbLitElement {
 		});
 
 		const viewRoutes = this._views?.map((manifest) => {
+			const viewName = manifest.meta.label ?? manifest.name;
+			const viewPath = 'view/' + (manifest.meta.pathname ? manifest.meta.pathname : pathFolderName(viewName));
 			return {
-				path: 'view/' + manifest.meta.pathname,
+				path: viewPath,
 				component: () => createExtensionElement(manifest),
 				setup: (component: UmbSectionViewExtensionElement) => {
 					component.manifest = manifest;
@@ -145,7 +150,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 						${this._dashboards.map((dashboard) => {
 							const dashboardName = dashboard.meta.label ?? dashboard.name;
 							const dashboardPath =
-								'dashboard/' + dashboard.meta.pathname ? dashboard.meta.pathname : umbracoPath(dashboardName);
+								'dashboard/' + (dashboard.meta.pathname ? dashboard.meta.pathname : pathFolderName(dashboardName));
 							return html`
 								<uui-tab
 									.label="${dashboardName}"
@@ -164,7 +169,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 					<uui-tab-group slot="navigation" id="views">
 						${this._views.map((view) => {
 							const viewName = view.meta.label ?? view.name;
-							const viewPath = 'view/' + view.meta.pathname ? view.meta.pathname : umbracoPath(viewName);
+							const viewPath = 'view/' + (view.meta.pathname ? view.meta.pathname : pathFolderName(viewName));
 							return html`
 								<uui-tab
 									.label="${viewName}"

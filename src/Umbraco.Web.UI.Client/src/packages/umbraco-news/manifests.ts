@@ -8,7 +8,6 @@ export const dashboard: ManifestDashboard = {
 	weight: 20,
 	meta: {
 		label: 'Welcome',
-		pathname: 'welcome',
 	},
 	conditions: {
 		sections: ['Umb.Section.Content'],
