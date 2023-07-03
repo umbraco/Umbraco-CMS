@@ -230,7 +230,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         return OperationResult.Attempt.Succeed(evtMsgs);
     }
 
-    public async Task<Attempt<PublicAccessOperationStatus>> SaveAsync(PublicAccessEntrySlim entry)
+    public async Task<Attempt<PublicAccessOperationStatus>> CreateAsync(PublicAccessEntrySlim entry)
     {
         if (entry.MemberUserNames.Any() is false && entry.MemberGroupNames.Any() is false)
         {
