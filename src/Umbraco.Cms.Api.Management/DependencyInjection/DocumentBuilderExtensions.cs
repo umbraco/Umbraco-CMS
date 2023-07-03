@@ -18,7 +18,8 @@ internal static class DocumentBuilderExtensions
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<DocumentMapDefinition>()
-            .Add<DomainMapDefinition>();
+            .Add<DomainMapDefinition>()
+            .Add<PublicAccessMapDefinition>();
 
         return builder;
     }
