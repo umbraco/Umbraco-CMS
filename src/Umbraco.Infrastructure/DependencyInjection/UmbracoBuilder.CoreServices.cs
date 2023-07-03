@@ -437,6 +437,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiPublishedContentCache, ApiPublishedContentCache>();
         builder.Services.AddSingleton<IApiRichTextElementParser, ApiRichTextElementParser>();
         builder.Services.AddSingleton<IApiRichTextMarkupParser, ApiRichTextMarkupParser>();
+        builder.Services.AddSingleton<IApiPropertyRenderer, ApiPropertyRenderer>();
 
         return builder;
     }

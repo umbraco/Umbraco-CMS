@@ -9,7 +9,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 
-public sealed class ContentIndexingNotificationHandler : INotificationHandler<ContentCacheRefresherNotification>
+public sealed class ContentIndexingNotificationHandler :
+    INotificationHandler<ContentCacheRefresherNotification>,
+    INotificationHandler<PublicAccessCacheRefresherNotification>
 {
     private readonly IContentService _contentService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
@@ -158,4 +160,7 @@ public sealed class ContentIndexingNotificationHandler : INotificationHandler<Co
             _umbracoIndexingHandler.DeleteIndexForEntities(deleteBatch, false);
         }
     }
+
+    public void Handle(PublicAccessCacheRefresherNotification notification)
+        => _umbracoIndexingHandler.RemoveProtectedContent();
 }

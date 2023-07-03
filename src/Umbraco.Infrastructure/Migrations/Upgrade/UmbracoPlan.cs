@@ -80,5 +80,6 @@ public class UmbracoPlan : MigrationPlan
 
         // To 12.1.0
         To<V_12_1_0.TablesIndexesImprovement>("{1187192D-EDB5-4619-955D-91D48D738871}");
+        To<V_12_1_0.AddOpenIddict>("{47DE85CE-1E16-42A0-8AF6-3EC3BCEF5471}");
     }
 }
