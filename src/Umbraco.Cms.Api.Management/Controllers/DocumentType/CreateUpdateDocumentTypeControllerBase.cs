@@ -232,6 +232,40 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
             .WhereNotNull()
             .ToArray();
 
+        // Handle orphaned properties
+        IEnumerable<TPropertyType> orphanedPropertyTypeModels = requestModel.Properties.Where(x => x.ContainerId is null);
+
+        if(orphanedPropertyTypeModels.Any())
+        {
+            var orphanedProperties = new List<IPropertyType>();
+            foreach (TPropertyType propertyTypeModel in orphanedPropertyTypeModels)
+            {
+                // TODO: Don't duplicate the code above
+                IDataType dataType = dataTypesByKey[propertyTypeModel.DataTypeId];
+
+                IPropertyType existing = contentType.PropertyTypes.FirstOrDefault(pt => pt.Key == propertyTypeModel.Id)
+                                         ?? new Core.Models.PropertyType(_shortStringHelper, dataType);
+                existing.Name = propertyTypeModel.Name;
+                existing.DataTypeId = dataType.Id;
+                existing.DataTypeKey = dataType.Key;
+                existing.Mandatory = propertyTypeModel.Validation.Mandatory;
+                existing.MandatoryMessage = propertyTypeModel.Validation.MandatoryMessage;
+                existing.ValidationRegExp = propertyTypeModel.Validation.RegEx;
+                existing.ValidationRegExpMessage = propertyTypeModel.Validation.RegExMessage;
+                existing.SetVariesBy(ContentVariation.Culture, propertyTypeModel.VariesByCulture);
+                existing.SetVariesBy(ContentVariation.Segment, propertyTypeModel.VariesBySegment);
+                // existing.PropertyGroupId = new Lazy<int>(() => propertyGroup.Id, false);
+                existing.Alias = propertyTypeModel.Alias;
+                existing.Description = propertyTypeModel.Description;
+                existing.SortOrder = propertyTypeModel.SortOrder;
+                existing.LabelOnTop = propertyTypeModel.Appearance.LabelOnTop;
+
+                orphanedProperties.Add(existing);
+            }
+
+            contentType.NoGroupPropertyTypes = new PropertyTypeCollection(supportsPublishing, orphanedProperties);
+        }
+
         if (contentType.PropertyGroups.SequenceEqual(propertyGroups) is false)
         {
             contentType.PropertyGroups = new PropertyGroupCollection(propertyGroups);
