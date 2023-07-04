@@ -121,6 +121,12 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
 
         var contentType = new ContentType(_shortStringHelper, parentId.Value);
         // update basic content type settings
+        // We want to allow the FE to specify a key
+        if (model.Key is not null)
+        {
+            contentType.Key = model.Key.Value;
+        }
+
         contentType.Alias = model.Alias;
         contentType.Description = model.Description;
         contentType.Icon = model.Icon;

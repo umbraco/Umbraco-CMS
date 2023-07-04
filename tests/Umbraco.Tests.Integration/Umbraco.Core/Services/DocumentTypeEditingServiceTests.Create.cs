@@ -32,4 +32,22 @@ public partial class DocumentTypeEditingServiceTests
             Assert.AreEqual(response.Result.Key, documentType.Key);
         });
     }
+
+    [Test]
+    public async Task Can_Specify_Key()
+    {
+        var key = new Guid("33C326F6-CB5E-43D6-9730-E946AA5F9C7B");
+        var createModel = new DocumentTypeCreateModel { Alias = "test", Name = "Test", Key = key };
+
+        var response = await DocumentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        var documentType = await ContentTypeService.GetAsync(response.Result!.Key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(response.Success);
+            Assert.IsNotNull(documentType);
+            Assert.AreEqual(key, documentType.Key);
+        });
+    }
 }
