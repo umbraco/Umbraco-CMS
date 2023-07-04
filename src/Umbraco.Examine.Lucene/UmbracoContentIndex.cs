@@ -14,6 +14,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     An indexer for Umbraco content and media
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
 {
     private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };

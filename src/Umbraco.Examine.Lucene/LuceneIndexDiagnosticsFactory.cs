@@ -13,6 +13,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 ///     for lucene based indexes that don't have an implementation else fallsback to the default
 ///     <see cref="IndexDiagnosticsFactory" /> implementation.
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public class LuceneIndexDiagnosticsFactory : IndexDiagnosticsFactory
 {
     private readonly IHostingEnvironment _hostingEnvironment;

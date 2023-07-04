@@ -12,6 +12,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     Custom indexer for members
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public class UmbracoMemberIndex : UmbracoExamineIndex, IUmbracoMemberIndex
 {
     public UmbracoMemberIndex(

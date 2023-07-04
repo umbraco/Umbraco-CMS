@@ -7,6 +7,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     Sets the Examine <see cref="IApplicationRoot" /> to be ExamineIndexes sub directory of the Umbraco TEMP folder
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public class UmbracoApplicationRoot : IApplicationRoot
 {
     private readonly IHostingEnvironment _hostingEnvironment;

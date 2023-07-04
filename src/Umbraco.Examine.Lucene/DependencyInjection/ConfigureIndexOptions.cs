@@ -14,6 +14,8 @@ namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 /// <summary>
 ///     Configures the index options to construct the Examine indexes
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirectoryIndexOptions>
 {
     private readonly IndexCreatorSettings _settings;

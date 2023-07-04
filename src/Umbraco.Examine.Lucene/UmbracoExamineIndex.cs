@@ -17,6 +17,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     An abstract provider containing the basic functionality to be able to query against Umbraco data.
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDiagnostics
 {
     private readonly UmbracoExamineIndexDiagnostics _diagnostics;

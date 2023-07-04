@@ -14,6 +14,8 @@ namespace Umbraco.Extensions;
 /// <summary>
 ///     Extension methods for the LuceneIndex
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public static class ExamineExtensions
 {
     internal static bool TryParseLuceneQuery(string query)

@@ -12,6 +12,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 ///     This is a work around for the Lucene APIs. By default Lucene will use a null prefix however when we set a custom
 ///     lock factory the null prefix is overwritten.
 /// </remarks>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public class NoPrefixSimpleFsLockFactory : SimpleFSLockFactory
 {
     public NoPrefixSimpleFsLockFactory(DirectoryInfo lockDir) : base(lockDir)

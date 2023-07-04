@@ -5,6 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
 
 public static class UmbracoBuilderExtensions
 {

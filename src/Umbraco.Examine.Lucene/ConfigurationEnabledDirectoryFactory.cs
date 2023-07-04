@@ -14,6 +14,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     An Examine directory factory implementation based on configured values
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public class ConfigurationEnabledDirectoryFactory : DirectoryFactoryBase
 {
     private readonly IApplicationRoot _applicationRoot;
