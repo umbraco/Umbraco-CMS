@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
-using Umbraco.Search.Examine.TBD;
 using Umbraco.Search.Models;
 
 namespace Umbraco.Search.Examine;
@@ -85,6 +84,11 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
             booleanOperation = query.Field("", "");
         }
 
+        // when not fetching for preview, make sure the "published" field is "y"
+        if (searchRequest.Preview is false)
+        {
+            booleanOperation = booleanOperation.And().Field(UmbracoSearchFieldNames.DeliveryApiContentIndex.Published, "y");
+        }
         /*foreach (var filter in searchRequest.Filters)
         {
             switch (searchRequest.FiltersLogicOperator)

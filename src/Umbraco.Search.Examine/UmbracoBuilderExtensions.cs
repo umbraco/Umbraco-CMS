@@ -14,6 +14,12 @@ using Umbraco.Search.Indexing;
 using Umbraco.Search.Indexing.Populators;
 using Umbraco.Search.NotificationHandlers;
 using Umbraco.Search.Services;
+using ContentIndexingNotificationHandler = Umbraco.Search.NotificationHandlers.ContentIndexingNotificationHandler;
+using ContentTypeIndexingNotificationHandler = Umbraco.Search.NotificationHandlers.ContentTypeIndexingNotificationHandler;
+using IUmbracoIndexingHandler = Umbraco.Search.NotificationHandlers.IUmbracoIndexingHandler;
+using LanguageIndexingNotificationHandler = Umbraco.Search.NotificationHandlers.LanguageIndexingNotificationHandler;
+using MediaIndexingNotificationHandler = Umbraco.Search.NotificationHandlers.MediaIndexingNotificationHandler;
+using MemberIndexingNotificationHandler = Umbraco.Search.NotificationHandlers.MemberIndexingNotificationHandler;
 
 namespace Umbraco.Search.Examine;
 

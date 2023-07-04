@@ -7,10 +7,9 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
-using Umbraco.Search.Examine.Configuration;
-using Umbraco.Search.Examine.Lucene;
+using Umbraco.Search.Configuration;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine.Lucene;
 
 public class DeliveryApiContentIndex : UmbracoExamineLuceneIndex
 {

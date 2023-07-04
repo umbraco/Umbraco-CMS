@@ -7,8 +7,6 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
-using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
-using Umbraco.Cms.Infrastructure.Templates.PartialViews;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Filters;
@@ -52,8 +50,6 @@ public static partial class UmbracoBuilderExtensions
             .AddUnattendedInstallInstallCreateUser()
             .AddCoreNotifications()
             .AddLogViewer()
-            .AddExamine()
-            .AddExamineIndexes()
             .AddControllersWithAmbiguousConstructors()
             .AddSupplemenataryLocalizedTextFileSources();
 

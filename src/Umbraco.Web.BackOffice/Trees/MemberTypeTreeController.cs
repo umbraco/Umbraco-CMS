@@ -7,9 +7,9 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
-using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Search.SpecialisedSearchers.Tree;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees;
 

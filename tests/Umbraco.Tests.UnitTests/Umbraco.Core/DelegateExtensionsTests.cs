@@ -1,10 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Lucene.Net.Index;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Extensions;
+using Umbraco.Search.Indexing;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core;
 
@@ -20,7 +20,7 @@ public class DelegateExtensionsTests
             currentTry =>
             {
                 totalTries = currentTry;
-                return Attempt<IndexWriter>.Fail();
+                return Attempt<IIndexRebuilder>.Fail();
             },
             5,
             TimeSpan.FromMilliseconds(10));

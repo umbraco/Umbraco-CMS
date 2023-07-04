@@ -26,11 +26,11 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Xml;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Web.BackOffice.ModelBinders;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Extensions;
+using Umbraco.Search.SpecialisedSearchers.Tree;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 

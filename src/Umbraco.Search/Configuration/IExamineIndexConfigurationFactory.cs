@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Search.Examine.Configuration;
+﻿namespace Umbraco.Search.Configuration;
 
 public interface IExamineIndexConfigurationFactory
 {

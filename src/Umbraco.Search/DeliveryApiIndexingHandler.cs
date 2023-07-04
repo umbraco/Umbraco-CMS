@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Search.DefferedActions;
-using Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.NotificationHandlers;
 using Umbraco.Search.Services;
 
 namespace Umbraco.Search;

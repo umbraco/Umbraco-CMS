@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Extensions;
+using Umbraco.Search.Configuration;
 using Umbraco.Search.DefferedActions;
 using Umbraco.Search.Examine.Configuration;
 using Umbraco.Search.Examine.ValueSetBuilders;

@@ -7,8 +7,9 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure;
 
-namespace Umbraco.Cms.Infrastructure.Search;
+namespace Umbraco.Search.NotificationHandlers;
 
 internal sealed class DeliveryApiContentIndexingNotificationHandler :
     INotificationHandler<ContentCacheRefresherNotification>,

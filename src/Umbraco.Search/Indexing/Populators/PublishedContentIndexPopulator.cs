@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Search.Examine.Configuration;
+using Umbraco.Search.Configuration;
 
 namespace Umbraco.Search.Indexing.Populators;
 

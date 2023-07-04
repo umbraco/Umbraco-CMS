@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
-using Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.Services;
 
 namespace Umbraco.Search.DefferedActions;
 

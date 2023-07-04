@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
-using Umbraco.Search.Examine.ValueSetBuilders;
 
 namespace Umbraco.Search.Services;
 

@@ -4,8 +4,9 @@ using Lucene.Net.Index;
 using Lucene.Net.Util;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Search.Configuration;
 using Umbraco.Search.Examine.Configuration;
-using Umbraco.Search.Examine.TBD;
+using Umbraco.Search.Examine.Extensions;
 
 namespace Umbraco.Search.Examine.Lucene.DependencyInjection;
 

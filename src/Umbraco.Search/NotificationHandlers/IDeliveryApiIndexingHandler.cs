@@ -1,6 +1,6 @@
 ﻿using Umbraco.Cms.Core.Services.Changes;
 
-namespace Umbraco.Cms.Infrastructure.Search;
+namespace Umbraco.Search.NotificationHandlers;
 
 internal interface IDeliveryApiIndexingHandler
 {

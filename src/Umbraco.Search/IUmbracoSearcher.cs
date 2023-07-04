@@ -36,6 +36,7 @@ public interface ISearchRequest
     LogicOperator FiltersLogicOperator { get; set; }
     int Page { get; set; }
     int PageSize { get; set; }
+    bool Preview { get; set; }
     ISearchRequest CreateFilter(string name, IList<string> values, LogicOperator logicOperator);
     void SortBy(string sortFieldName, SortType sortType);
 }

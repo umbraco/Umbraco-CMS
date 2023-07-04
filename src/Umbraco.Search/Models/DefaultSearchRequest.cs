@@ -14,6 +14,7 @@ public class DefaultSearchRequest : ISearchRequest
     public LogicOperator FiltersLogicOperator { get; set; }
     public int Page { get; set; }
     public int PageSize { get; set; }
+    public bool Preview { get; set; }
     public ISearchRequest CreateFilter(string name, IList<string> values, LogicOperator logicOperator) => throw new NotImplementedException();
 
     public void SortBy(string sortFieldName, SortType sortType) => throw new NotImplementedException();

@@ -25,7 +25,6 @@ using Umbraco.Search.Configuration;
 using Umbraco.Search.Examine;
 using Umbraco.Search.Examine.Configuration;
 using Umbraco.Search.Examine.Lucene;
-using Umbraco.Search.Examine.TBD;
 using Umbraco.Search.Examine.ValueSetBuilders;
 using Umbraco.Search.Indexing.Populators;
 using Directory = Lucene.Net.Store.Directory;

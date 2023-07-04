@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Search;
 using Umbraco.Extensions;
 using Umbraco.Search.Extensions;
 
-namespace Umbraco.Search.Examine.TBD;
+namespace Umbraco.Search.Examine.Extensions;
 
 public static class UmbracoExamineSearchExtensions
 {

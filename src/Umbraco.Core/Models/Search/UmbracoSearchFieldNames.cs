@@ -26,11 +26,29 @@ public class UmbracoSearchFieldNames
     public const string CategoryFieldName = "__IndexType";
     public const string ItemTypeFieldName = "__NodeTypeAlias";
 
-    public class DeliveryApiContentIndex
+    /// <summary>
+    ///     Field names specifically used in the Delivery API content index
+    /// </summary>
+    public static class DeliveryApiContentIndex
     {
-        public const string Id ="parentID";
-        public const string ContentTypeId ="parentID";
-        public const string Culture ="parentID";
+        /// <summary>
+        ///     The content ID
+        /// </summary>
+        public const string Id = "id";
 
+        /// <summary>
+        ///     The content type ID
+        /// </summary>
+        public const string ContentTypeId = "contentTypeId";
+
+        /// <summary>
+        ///     The content culture
+        /// </summary>
+        public const string Culture = "culture";
+
+        /// <summary>
+        ///     Whether or not the content exists in a published state
+        /// </summary>
+        public const string Published = "published";
     }
 }

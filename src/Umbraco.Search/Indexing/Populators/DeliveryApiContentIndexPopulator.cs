@@ -3,9 +3,9 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Search.Indexing.Populators;
+using Umbraco.Search.Services;
 
-namespace Umbraco.Search.Examine.ValueSetBuilders;
+namespace Umbraco.Search.Indexing.Populators;
 
 internal sealed class DeliveryApiContentIndexPopulator : IndexPopulator
 {

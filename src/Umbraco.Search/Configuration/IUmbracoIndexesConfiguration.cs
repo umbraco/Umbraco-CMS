@@ -1,6 +1,4 @@
-﻿using Umbraco.Search.Configuration;
-
-namespace Umbraco.Search.Examine.Configuration;
+﻿namespace Umbraco.Search.Configuration;
 
 public interface IUmbracoIndexesConfiguration
 {

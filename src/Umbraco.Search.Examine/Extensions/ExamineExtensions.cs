@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Search.Enums;
 
-namespace Umbraco.Search.Examine.TBD;
+namespace Umbraco.Search.Examine.Extensions;
 
 /// <summary>
 ///     Extension methods for Examine.

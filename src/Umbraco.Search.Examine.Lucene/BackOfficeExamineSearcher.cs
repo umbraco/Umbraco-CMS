@@ -21,7 +21,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Search.Configuration;
-using Umbraco.Search.Examine.TBD;
+using Umbraco.Search.Examine.Extensions;
 using Umbraco.Search.SpecialisedSearchers;
 
 namespace Umbraco.Search.Examine.Lucene;
