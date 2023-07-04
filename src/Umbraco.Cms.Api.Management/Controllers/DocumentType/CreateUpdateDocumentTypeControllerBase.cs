@@ -112,8 +112,7 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
 
                 if (containerIdAttempt.Success is false)
                 {
-                    // TODO: ParentNotFound.
-                    return ContentTypeOperationStatus.NotFound;
+                    return ContentTypeOperationStatus.ParentNotFound;
                 }
 
                 parentId = containerIdAttempt.Result;

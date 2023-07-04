@@ -36,6 +36,21 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid property type alias")
                 .WithDetail("The property type alias is invalid")
                 .Build()),
+            ContentTypeOperationStatus.DataTypeNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("Data Type not found")
+                .WithDetail("The requested data type was not found")
+                .Build()),
+            ContentTypeOperationStatus.InvalidInheritance => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid inheritance")
+                .WithDetail("The specified inheritance is invalid")
+                .Build()),
+            ContentTypeOperationStatus.InvalidComposition => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid composition")
+                .WithDetail("The specified composition is invalid")),
+            ContentTypeOperationStatus.ParentNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("Parent not found")
+                .WithDetail("The specified parent was not found")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content type operation status"),
         };
 }
