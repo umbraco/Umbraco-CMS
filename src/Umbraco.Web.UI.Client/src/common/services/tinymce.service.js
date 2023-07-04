@@ -694,7 +694,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     userService.getCurrentUser().then(function (userData) {
                         if (callback) {
                             angularHelper.safeApply($rootScope, function() {
-                                callback(currentTarget, userData, imgDomElement);
+                                callback(currentTarget, userData);
                             });
                         }
                     });
