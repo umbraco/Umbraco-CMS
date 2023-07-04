@@ -2885,6 +2885,179 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document/{id}/public-access": {
+      "post": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PostDocumentByIdPublicAccess",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "DeleteDocumentByIdPublicAccess",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentByIdPublicAccess",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PutDocumentByIdPublicAccess",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/document/item": {
       "get": {
         "tags": [
@@ -5817,7 +5990,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MemberGroupItemReponseModel"
+                    "$ref": "#/components/schemas/MemberGroupItemResponseModel"
                   }
                 }
               },
@@ -5825,7 +5998,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MemberGroupItemReponseModel"
+                    "$ref": "#/components/schemas/MemberGroupItemResponseModel"
                   }
                 }
               },
@@ -5833,7 +6006,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MemberGroupItemReponseModel"
+                    "$ref": "#/components/schemas/MemberGroupItemResponseModel"
                   }
                 }
               }
@@ -15049,7 +15222,7 @@
         },
         "additionalProperties": false
       },
-      "MemberGroupItemReponseModel": {
+      "MemberGroupItemResponseModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -16165,6 +16338,32 @@
           "regExMessage": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PublicAccessRequestModel": {
+        "type": "object",
+        "properties": {
+          "loginPageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "errorPageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "memberUserNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "memberGroupNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false
