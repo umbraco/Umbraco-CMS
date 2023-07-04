@@ -72,7 +72,7 @@ public interface IPublicAccessService : IService
     ///     Updates the entry asynchronously and returns a status result whether the operation succeeded or not
     /// </summary>
     /// <param name="entry"></param>
-    Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> UpdateAsync(PublicAccessEntry entry);
+    Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> UpdateAsync(PublicAccessEntrySlim entry);
 
     /// <summary>
     ///     Deletes the entry and all associated rules

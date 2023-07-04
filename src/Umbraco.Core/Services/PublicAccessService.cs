@@ -1,6 +1,7 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
@@ -16,6 +17,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
     private readonly IPublicAccessRepository _publicAccessRepository;
     private readonly IEntityService _entityService;
     private readonly IContentService _contentService;
+    private readonly IUmbracoMapper _umbracoMapper;
 
     public PublicAccessService(
         ICoreScopeProvider provider,
@@ -23,12 +25,14 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         IEventMessagesFactory eventMessagesFactory,
         IPublicAccessRepository publicAccessRepository,
         IEntityService entityService,
-        IContentService contentService)
+        IContentService contentService,
+        IUmbracoMapper umbracoMapper)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _publicAccessRepository = publicAccessRepository;
         _entityService = entityService;
         _contentService = contentService;
+        _umbracoMapper = umbracoMapper;
     }
 
     /// <summary>
@@ -232,30 +236,10 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
 
     public async Task<Attempt<PublicAccessOperationStatus>> CreateAsync(PublicAccessEntrySlim entry)
     {
-        if (entry.MemberUserNames.Any() is false && entry.MemberGroupNames.Any() is false)
+        Attempt<PublicAccessOperationStatus> validationAttempt = ValidatePublicAccessEntrySlim(entry, out IContent? protectedNode, out IContent? loginNode, out IContent? errorNode);
+        if (validationAttempt.Success is false)
         {
-            return Attempt.Fail(PublicAccessOperationStatus.NoAllowedEntities);
-        }
-
-        IContent? protectedNode = _contentService.GetById(entry.ContentId);
-
-        if (protectedNode is null)
-        {
-            return Attempt.Fail(PublicAccessOperationStatus.ContentNotFound);
-        }
-
-        IContent? loginNode = _contentService.GetById(entry.LoginPageId);
-
-        if (loginNode is null)
-        {
-            return Attempt.Fail(PublicAccessOperationStatus.LoginNodeNotFound);
-        }
-
-        IContent? errorNode = _contentService.GetById(entry.ErrorPageId);
-
-        if (errorNode is null)
-        {
-            return Attempt.Fail(PublicAccessOperationStatus.ErrorNodeNotFound);
+            return validationAttempt;
         }
 
         IEnumerable<PublicAccessRule> publicAccessRules =
@@ -263,7 +247,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
                 CreateAccessRuleList(entry.MemberUserNames, Constants.Conventions.PublicAccess.MemberUsernameRuleType) :
                 CreateAccessRuleList(entry.MemberGroupNames, Constants.Conventions.PublicAccess.MemberRoleRuleType);
 
-        var publicAccessEntry = new PublicAccessEntry(protectedNode, loginNode, errorNode, publicAccessRules);
+        var publicAccessEntry = new PublicAccessEntry(protectedNode!, loginNode!, errorNode!, publicAccessRules);
 
         Attempt<OperationResult?> attempt = Save(publicAccessEntry);
         return await Task.FromResult(attempt.Success ?
@@ -271,37 +255,71 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             : Attempt.Fail(PublicAccessOperationStatus.CancelledByNotification));
     }
 
-    public async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> UpdateAsync(PublicAccessEntry entry)
+    private Attempt<PublicAccessOperationStatus> ValidatePublicAccessEntrySlim(PublicAccessEntrySlim entry, out IContent? protectedNode, out IContent? loginNode, out IContent? errorNode)
     {
-        if (entry.Rules.Any() is false)
+        protectedNode = null;
+        loginNode = null;
+        errorNode = null;
+
+        if (entry.MemberUserNames.Any() is false && entry.MemberGroupNames.Any() is false)
         {
-            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.NoAllowedEntities, null);
+            {
+                return Attempt.Fail(PublicAccessOperationStatus.NoAllowedEntities);
+            }
         }
 
-        IContent? protectedNode = _contentService.GetById(entry.ProtectedNodeId);
+        protectedNode = _contentService.GetById(entry.ContentId);
 
         if (protectedNode is null)
         {
-            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.ContentNotFound, null);
+            {
+                return Attempt.Fail(PublicAccessOperationStatus.ContentNotFound);
+            }
         }
 
-        IContent? loginNode = _contentService.GetById(entry.LoginNodeId);
+        loginNode = _contentService.GetById(entry.LoginPageId);
 
         if (loginNode is null)
         {
-            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.LoginNodeNotFound, null);
+            {
+                return Attempt.Fail(PublicAccessOperationStatus.LoginNodeNotFound);
+            }
         }
 
-        IContent? errorNode = _contentService.GetById(entry.NoAccessNodeId);
+        errorNode = _contentService.GetById(entry.ErrorPageId);
 
         if (errorNode is null)
         {
-            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.ErrorNodeNotFound, null);
+            {
+                return Attempt.Fail(PublicAccessOperationStatus.ErrorNodeNotFound);
+            }
         }
 
-        Attempt<OperationResult?> attempt = Save(entry);
+        return Attempt.Succeed(PublicAccessOperationStatus.Success);
+    }
+
+    public async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> UpdateAsync(PublicAccessEntrySlim entry)
+    {
+        Attempt<PublicAccessOperationStatus> validationAttempt = ValidatePublicAccessEntrySlim(entry, out _, out _, out _);
+
+        if (validationAttempt.Success is false)
+        {
+            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(validationAttempt.Result, null);
+        }
+
+        Attempt<PublicAccessEntry?, PublicAccessOperationStatus> currentPublicAccessEntryAttempt = await GetEntryByContentKeyAsync(entry.ContentId);
+
+        if (currentPublicAccessEntryAttempt.Success is false)
+        {
+            return currentPublicAccessEntryAttempt;
+        }
+
+        PublicAccessEntry mappedEntry = _umbracoMapper.Map(entry, currentPublicAccessEntryAttempt.Result)!;
+
+        Attempt<OperationResult?> attempt = Save(mappedEntry);
+
         return attempt.Success
-            ? await Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, entry))
+            ? await Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, mappedEntry))
             : await Task.FromResult(Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.CancelledByNotification, null));
     }
 
