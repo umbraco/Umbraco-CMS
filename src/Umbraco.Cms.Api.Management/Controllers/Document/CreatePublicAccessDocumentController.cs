@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.PublicAccess;
@@ -22,7 +23,10 @@ public class CreatePublicAccessDocumentController : DocumentControllerBase
 
     [MapToApiVersion("1.0")]
     [HttpPost("{id:guid}/public-access")]
-    public async Task<IActionResult> CreatePublicAccess(Guid id, PublicAccessRequestModel publicAccessRequestModel)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Create(Guid id, PublicAccessRequestModel publicAccessRequestModel)
     {
         PublicAccessEntrySlim publicAccessEntrySlim = _publicAccessPresentationFactory.CreatePublicAccessEntrySlim(publicAccessRequestModel, id);
 

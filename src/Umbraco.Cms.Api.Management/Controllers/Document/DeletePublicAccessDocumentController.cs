@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
 
@@ -12,7 +13,9 @@ public class DeletePublicAccessDocumentController : DocumentControllerBase
 
     [MapToApiVersion("1.0")]
     [HttpDelete("{id:guid}/public-access")]
-    public async Task<IActionResult> CreatePublicAccess(Guid id)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(Guid id)
     {
         await _publicAccessService.DeleteAsync(id);
 
