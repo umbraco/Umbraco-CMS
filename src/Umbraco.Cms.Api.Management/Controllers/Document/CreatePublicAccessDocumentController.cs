@@ -27,8 +27,8 @@ public class CreatePublicAccessDocumentController : DocumentControllerBase
     {
         PublicAccessEntrySlim publicAccessEntrySlim = _mapper.Map<PublicAccessEntrySlim>(publicAccessRequestModel)!;
 
-        Attempt<PublicAccessOperationStatus> saveAttempt = await _publicAccessService.CreateAsync(publicAccessEntrySlim);
+        Attempt<PublicAccessEntry?, PublicAccessOperationStatus> saveAttempt = await _publicAccessService.CreateAsync(publicAccessEntrySlim);
 
-        return saveAttempt.Success ? Ok() : PublicAccessOperationStatusResult(saveAttempt.Result);
+        return saveAttempt.Success ? CreatedAtAction<GetPublicAccessDocumentController>(controller => nameof(controller.GetPublicAccess), saveAttempt.Result!.Key) : PublicAccessOperationStatusResult(saveAttempt.Status);
     }
 }

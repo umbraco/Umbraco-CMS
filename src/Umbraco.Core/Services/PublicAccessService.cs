@@ -234,12 +234,12 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         return OperationResult.Attempt.Succeed(evtMsgs);
     }
 
-    public async Task<Attempt<PublicAccessOperationStatus>> CreateAsync(PublicAccessEntrySlim entry)
+    public async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> CreateAsync(PublicAccessEntrySlim entry)
     {
         Attempt<PublicAccessOperationStatus> validationAttempt = ValidatePublicAccessEntrySlim(entry, out IContent? protectedNode, out IContent? loginNode, out IContent? errorNode);
         if (validationAttempt.Success is false)
         {
-            return validationAttempt;
+            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(validationAttempt.Result, null);
         }
 
         IEnumerable<PublicAccessRule> publicAccessRules =
@@ -249,10 +249,32 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
 
         var publicAccessEntry = new PublicAccessEntry(protectedNode!, loginNode!, errorNode!, publicAccessRules);
 
-        Attempt<OperationResult?> attempt = Save(publicAccessEntry);
-        return await Task.FromResult(attempt.Success ?
-            Attempt.Succeed(PublicAccessOperationStatus.Success)
-            : Attempt.Fail(PublicAccessOperationStatus.CancelledByNotification));
+        Attempt<PublicAccessEntry?, PublicAccessOperationStatus> attempt = await SaveAsync(publicAccessEntry);
+        return attempt.Success ? Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, attempt.Result!)
+                : Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(attempt.Status, null);
+    }
+
+    private async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> SaveAsync(PublicAccessEntry entry)
+    {
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            var savingNotification = new PublicAccessEntrySavingNotification(entry, eventMessages);
+            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.CancelledByNotification, null);
+            }
+
+            _publicAccessRepository.Save(entry);
+            scope.Complete();
+
+            scope.Notifications.Publish(
+                new PublicAccessEntrySavedNotification(entry, eventMessages).WithStateFrom(savingNotification));
+        }
+
+        return Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, entry);
     }
 
     private Attempt<PublicAccessOperationStatus> ValidatePublicAccessEntrySlim(PublicAccessEntrySlim entry, out IContent? protectedNode, out IContent? loginNode, out IContent? errorNode)

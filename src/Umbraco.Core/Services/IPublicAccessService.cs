@@ -66,7 +66,7 @@ public interface IPublicAccessService : IService
     ///     Saves the entry asynchronously and returns a status result whether the operation succeeded or not
     /// </summary>
     /// <param name="entry"></param>
-    Task<Attempt<PublicAccessOperationStatus>> CreateAsync(PublicAccessEntrySlim entry);
+    Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> CreateAsync(PublicAccessEntrySlim entry);
 
     /// <summary>
     ///     Updates the entry asynchronously and returns a status result whether the operation succeeded or not
