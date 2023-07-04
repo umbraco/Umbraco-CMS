@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Search;
 
 namespace Umbraco.Extensions;
 
@@ -32,9 +33,6 @@ public static class FriendlyPublishedContentExtensions
 
     private static ISiteDomainMapper SiteDomainHelper { get; } =
         StaticServiceProvider.Instance.GetRequiredService<ISiteDomainMapper>();
-
-    private static IExamineManager ExamineManager { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IExamineManager>();
 
     private static IFileService FileService { get; } =
         StaticServiceProvider.Instance.GetRequiredService<IFileService>();
@@ -595,11 +593,11 @@ public static class FriendlyPublishedContentExtensions
         this IPublishedContent content,
         string term,
         string? indexName = null)
-        => content.SearchDescendants(ExamineManager, UmbracoContextAccessor, term, indexName);
+        => content.SearchDescendants( term, indexName);
 
     public static IEnumerable<PublishedSearchResult> SearchChildren(
         this IPublishedContent content,
         string term,
         string? indexName = null)
-        => content.SearchChildren(ExamineManager, UmbracoContextAccessor, term, indexName);
+        => content.SearchChildren( term, indexName);
 }

@@ -28,10 +28,10 @@ public static partial class UmbracoBuilderExtensions
         // populators are not a collection: one cannot remove ours, and can only add more
         // the container can inject IEnumerable<IIndexPopulator> and get them all
 
-        builder.Services.AddSingleton<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
+        builder.Services.AddSingleton<IUmbracoTreeSearcherFields, Configuration.UmbracoTreeSearcherFields>();
 
         builder.Services.AddSingleton<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
-        builder.Services.AddScoped<UmbracoTreeSearcher>();
+        builder.Services.AddScoped<SpecialisedSearchers.Tree.UmbracoTreeSearcher>();
         builder.Services.AddSingleton<IIndexPopulator, MemberIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, ContentIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, PublishedContentIndexPopulator>();

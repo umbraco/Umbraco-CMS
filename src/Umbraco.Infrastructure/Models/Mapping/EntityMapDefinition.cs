@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Mapping;
@@ -205,12 +205,12 @@ public class EntityMapDefinition : IMapDefinition
         // TODO: Properly map this (not aftermap)
 
         // get the icon if there is one
-        target.Icon = source.Values.ContainsKey(UmbracoExamineFieldNames.IconFieldName)
-            ? source.Values[UmbracoExamineFieldNames.IconFieldName]
+        target.Icon = source.Values.ContainsKey(UmbracoSearchFieldNames.IconFieldName)
+            ? source.Values[UmbracoSearchFieldNames.IconFieldName]
             : Constants.Icons.DefaultIcon;
 
-        target.Name = source.Values.ContainsKey(UmbracoExamineFieldNames.NodeNameFieldName)
-            ? source.Values[UmbracoExamineFieldNames.NodeNameFieldName]
+        target.Name = source.Values.ContainsKey(UmbracoSearchFieldNames.NodeNameFieldName)
+            ? source.Values[UmbracoSearchFieldNames.NodeNameFieldName]
             : "[no name]";
 
         var culture = context.GetCulture()?.ToLowerInvariant();
@@ -221,7 +221,7 @@ public class EntityMapDefinition : IMapDefinition
                 : target.Name;
         }
 
-        if (source.Values.TryGetValue(UmbracoExamineFieldNames.UmbracoFileFieldName, out var umbracoFile) &&
+        if (source.Values.TryGetValue(UmbracoSearchFieldNames.UmbracoFileFieldName, out var umbracoFile) &&
             umbracoFile.IsNullOrWhiteSpace() == false)
         {
             if (umbracoFile != null)
@@ -230,9 +230,9 @@ public class EntityMapDefinition : IMapDefinition
             }
         }
 
-        if (source.Values.ContainsKey(UmbracoExamineFieldNames.NodeKeyFieldName))
+        if (source.Values.ContainsKey(UmbracoSearchFieldNames.NodeKeyFieldName))
         {
-            if (Guid.TryParse(source.Values[UmbracoExamineFieldNames.NodeKeyFieldName], out Guid key))
+            if (Guid.TryParse(source.Values[UmbracoSearchFieldNames.NodeKeyFieldName], out Guid key))
             {
                 target.Key = key;
 
@@ -268,8 +268,8 @@ public class EntityMapDefinition : IMapDefinition
             }
         }
 
-        target.Path = source.Values.ContainsKey(UmbracoExamineFieldNames.IndexPathFieldName)
-            ? source.Values[UmbracoExamineFieldNames.IndexPathFieldName]
+        target.Path = source.Values.ContainsKey(UmbracoSearchFieldNames.IndexPathFieldName)
+            ? source.Values[UmbracoSearchFieldNames.IndexPathFieldName]
             : string.Empty;
 
         if (source.Values.ContainsKey(ExamineFieldNames.ItemTypeFieldName))

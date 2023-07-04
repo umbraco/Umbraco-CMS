@@ -1,6 +1,3 @@
-using Examine;
-using Examine.Search;
-using Lucene.Net.QueryParsers.Classic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;

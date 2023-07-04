@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Sync;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Search;
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
 
 public sealed class ContentIndexingNotificationHandler :
     INotificationHandler<ContentCacheRefresherNotification>,

@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
+    <ProjectReference Include="..\Umbraco.Search\Umbraco.Search.csproj" />
   </ItemGroup>
 
   <ItemGroup>

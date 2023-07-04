@@ -195,7 +195,7 @@ public static partial class UmbracoBuilderExtensions
             IUmbracoContext umbracoContext = umbCtx.GetRequiredUmbracoContext();
             return new PublishedContentQuery(
                 umbracoContext.PublishedSnapshot,
-                factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
+                factory.GetRequiredService<IVariationContextAccessor>());
         });
 
         // register accessors for cultures

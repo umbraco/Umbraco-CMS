@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Infrastructure.Search;
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
 
 internal sealed class DeliveryApiContentIndexingNotificationHandler :
     INotificationHandler<ContentCacheRefresherNotification>,
