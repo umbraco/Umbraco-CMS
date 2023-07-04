@@ -3,6 +3,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     The index types stored in the Lucene Index
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public static class IndexTypes
 {
     /// <summary>

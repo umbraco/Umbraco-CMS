@@ -3,6 +3,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     Used to propagate hardcoded internal Field lists
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public interface IUmbracoTreeSearcherFields
 {
     /// <summary>

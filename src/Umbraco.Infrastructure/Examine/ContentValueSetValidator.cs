@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     Used to validate a ValueSet for content/media - based on permissions, parent id, etc....
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
 public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValidator
 {
     private const string PathKey = "path";

@@ -7,6 +7,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 ///     An <see cref="IIndexPopulator" /> that is automatically associated to any index of type <see cref="TIndex" />
 /// </summary>
 /// <typeparam name="TIndex"></typeparam>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public abstract class IndexPopulator<TIndex> : IndexPopulator
     where TIndex : IIndex
 {

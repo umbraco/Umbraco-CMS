@@ -15,6 +15,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     Builds <see cref="ValueSet" />s for <see cref="IContent" /> items
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentValueSetBuilder,
     IPublishedContentValueSetBuilder
 {

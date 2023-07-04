@@ -4,6 +4,7 @@ using Examine.Search;
 using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Extensions;
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
 
 public static class UmbracoExamineExtensions
 {

@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
 
 public class MemberIndexPopulator : IndexPopulator<IUmbracoMemberIndex>
 {

@@ -8,6 +8,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     Performs the data lookups required to rebuild a media index
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
 {
     private readonly ILogger<MediaIndexPopulator> _logger;

@@ -5,6 +5,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     A Marker interface for defining an Umbraco indexer
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public interface IUmbracoIndex : IIndex, IIndexStats
 {
     /// <summary>

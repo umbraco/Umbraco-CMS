@@ -7,6 +7,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     Custom <see cref="FieldDefinitionCollection" /> allowing dynamic creation of <see cref="FieldDefinition" />
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public class UmbracoFieldDefinitionCollection : FieldDefinitionCollection
 {
     /// <summary>

@@ -6,6 +6,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 ///     Default implementation of <see cref="IIndexDiagnosticsFactory" /> which returns
 ///     <see cref="GenericIndexDiagnostics" /> for indexes that don't have an implementation
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public class IndexDiagnosticsFactory : IIndexDiagnosticsFactory
 {
     public virtual IIndexDiagnostics Create(IIndex index)

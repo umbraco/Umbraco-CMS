@@ -6,6 +6,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     Exposes diagnostic information about an index
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public interface IIndexDiagnostics : IIndexStats
 {
     /// <summary>

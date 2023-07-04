@@ -13,6 +13,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 ///     but this will be used when the single index is rebuilt and will go a little bit faster since the data query is more specific.
 ///     since the data query is more specific.
 /// </remarks>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public class PublishedContentIndexPopulator : ContentIndexPopulator
 {
     public PublishedContentIndexPopulator(

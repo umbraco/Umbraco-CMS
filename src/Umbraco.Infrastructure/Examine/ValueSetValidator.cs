@@ -6,6 +6,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     Performing basic validation of a value set
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public class ValueSetValidator : IValueSetValidator
 {
     public ValueSetValidator(

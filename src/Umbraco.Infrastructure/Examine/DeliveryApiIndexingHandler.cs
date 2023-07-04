@@ -9,6 +9,7 @@ using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Search;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
 
 internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
 {

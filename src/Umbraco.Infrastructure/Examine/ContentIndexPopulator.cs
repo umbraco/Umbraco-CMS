@@ -10,6 +10,9 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     Performs the data lookups required to rebuild a content index
 /// </summary>
+///
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
 {
     private readonly IContentService _contentService;

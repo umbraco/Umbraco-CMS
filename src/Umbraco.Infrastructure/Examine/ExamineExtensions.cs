@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Extensions;
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
 
 /// <summary>
 ///     Extension methods for Examine.
