@@ -338,11 +338,11 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
 
         PublicAccessEntry mappedEntry = _umbracoMapper.Map(entry, currentPublicAccessEntryAttempt.Result)!;
 
-        Attempt<OperationResult?> attempt = Save(mappedEntry);
+        Attempt<PublicAccessEntry?, PublicAccessOperationStatus> attempt = await SaveAsync(mappedEntry);
 
         return attempt.Success
-            ? await Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, mappedEntry))
-            : await Task.FromResult(Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.CancelledByNotification, null));
+            ? Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, mappedEntry)
+            : Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.CancelledByNotification, null);
     }
 
     /// <summary>
