@@ -19,13 +19,14 @@ public class VerifyInviteUserController : UserControllerBase
     [AllowAnonymous]
     [HttpPost("invite/verify")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Invite(VerifyInviteUserRequestModel model)
     {
         Attempt<UserOperationStatus> result = await _userService.VerifyInviteAsync(model.UserId, model.Token);
 
         return result.Success
-            ? NoContent()
+            ? Ok()
             : UserOperationStatusResult(result.Result);
     }
 }

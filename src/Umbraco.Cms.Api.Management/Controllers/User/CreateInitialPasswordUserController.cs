@@ -20,13 +20,14 @@ public class CreateInitialPasswordUserController : UserControllerBase
     [AllowAnonymous]
     [HttpPost("invite/create-password")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateInitialPassword(CreateInitialPasswordUserRequestModel model)
     {
         Attempt<PasswordChangedModel, UserOperationStatus> response = await _userService.CreateInitialPasswordAsync(model.UserId, model.Token, model.Password);
 
         return response.Success
-            ? NoContent()
+            ? Ok()
             : UserOperationStatusResult(response.Status, response.Result);
     }
 }
