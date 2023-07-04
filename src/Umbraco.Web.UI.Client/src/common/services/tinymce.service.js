@@ -445,7 +445,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
 
                 if (args.htmlId) {
-                    config.selector = "#" + args.htmlId;
+                    config.selector = `[id="${args.htmlId}"]`;
                 } else if (args.target) {
                     config.target = args.target;
                 }
