@@ -2,5 +2,5 @@
 
 public class PropertyTypeAppearance
 {
-    public bool LabelOnType { get; set; }
+    public bool LabelOnTop { get; set; }
 }

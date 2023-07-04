@@ -31,9 +31,13 @@ public class ContentTypeBase<TPropertyType, TPropertyTypeContainer>
 
     public bool VariesBySegment { get; set; }
 
+    public Guid? ParentKey { get; set; }
+
     public IEnumerable<TPropertyType> Properties { get; set; } = Array.Empty<TPropertyType>();
 
     public IEnumerable<TPropertyTypeContainer> Containers { get; set; } = Array.Empty<TPropertyTypeContainer>();
+
+    public IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; } = Array.Empty<ContentTypeSort>();
 
     public IEnumerable<ContentTypeComposition> Compositions { get; set; } = Array.Empty<ContentTypeComposition>();
 }

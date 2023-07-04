@@ -2,9 +2,9 @@
 
 public class PropertyTypeContainerBase
 {
-    public Guid Id { get; set; }
+    public Guid Key { get; set; }
 
-    public Guid? ParentId { get; set; }
+    public Guid? ParentKey { get; set; }
 
     public string? Name { get; set; }
 
