@@ -6,6 +6,7 @@ using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine.Deferred;
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
 
 internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiContentIndexDeferredBase, IDeferredAction
 {

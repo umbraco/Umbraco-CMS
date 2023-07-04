@@ -15,6 +15,9 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 /// <summary>
 ///     Provides extension methods to the <see cref="IUmbracoBuilder" /> class.
 /// </summary>
+///
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public static partial class UmbracoBuilderExtensions
 {
     public static IUmbracoBuilder AddExamine(this IUmbracoBuilder builder)

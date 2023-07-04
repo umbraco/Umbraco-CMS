@@ -29,6 +29,7 @@ public abstract class IndexPopulator<TIndex> : IndexPopulator
 
     public virtual bool IsRegistered(TIndex index) => true;
 }
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
 
 public abstract class IndexPopulator : IIndexPopulator
 {
