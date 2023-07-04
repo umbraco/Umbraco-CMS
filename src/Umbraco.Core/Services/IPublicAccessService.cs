@@ -86,4 +86,10 @@ public interface IPublicAccessService : IService
     /// <param name="key"></param>
     /// <returns>Returns null if no entry is found</returns>
     Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKeyAsync(Guid key);
+
+    /// <summary>
+    ///     Deletes the entry and all associated rules for a given key.
+    /// </summary>
+    /// <param name="key"></param>
+    Task<Attempt<PublicAccessOperationStatus>> DeleteAsync(Guid key);
 }

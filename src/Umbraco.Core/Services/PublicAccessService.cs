@@ -390,6 +390,38 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, entry));
     }
 
+    public async Task<Attempt<PublicAccessOperationStatus>> DeleteAsync(Guid key)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            Attempt<PublicAccessEntry?, PublicAccessOperationStatus> attempt = await GetEntryByContentKeyAsync(key);
+
+            if (attempt.Success is false)
+            {
+                return Attempt.Fail(attempt.Status);
+            }
+
+            EventMessages evtMsgs = EventMessagesFactory.Get();
+
+
+            var deletingNotification = new PublicAccessEntryDeletingNotification(attempt.Result!, evtMsgs);
+            if (scope.Notifications.PublishCancelable(deletingNotification))
+            {
+                scope.Complete();
+                return Attempt.Fail(PublicAccessOperationStatus.CancelledByNotification);
+            }
+
+            _publicAccessRepository.Delete(attempt.Result!);
+
+            scope.Complete();
+
+            scope.Notifications.Publish(
+                new PublicAccessEntryDeletedNotification(attempt.Result!, evtMsgs).WithStateFrom(deletingNotification));
+        }
+
+        return Attempt.Succeed(PublicAccessOperationStatus.Success);
+    }
+
     private IEnumerable<PublicAccessRule> CreateAccessRuleList(string[] ruleValues, string ruleType) =>
         ruleValues.Select(ruleValue => new PublicAccessRule
         {
