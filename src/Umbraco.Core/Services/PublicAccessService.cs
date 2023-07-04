@@ -1,7 +1,6 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
@@ -17,7 +16,6 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
     private readonly IPublicAccessRepository _publicAccessRepository;
     private readonly IEntityService _entityService;
     private readonly IContentService _contentService;
-    private readonly IUmbracoMapper _umbracoMapper;
 
     public PublicAccessService(
         ICoreScopeProvider provider,
@@ -25,14 +23,12 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         IEventMessagesFactory eventMessagesFactory,
         IPublicAccessRepository publicAccessRepository,
         IEntityService entityService,
-        IContentService contentService,
-        IUmbracoMapper umbracoMapper)
+        IContentService contentService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _publicAccessRepository = publicAccessRepository;
         _entityService = entityService;
         _contentService = contentService;
-        _umbracoMapper = umbracoMapper;
     }
 
     /// <summary>
@@ -336,7 +332,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             return currentPublicAccessEntryAttempt;
         }
 
-        PublicAccessEntry mappedEntry = _umbracoMapper.Map(entry, currentPublicAccessEntryAttempt.Result)!;
+        PublicAccessEntry mappedEntry = MapToUpdatedEntry(entry, currentPublicAccessEntryAttempt.Result!);
 
         Attempt<PublicAccessEntry?, PublicAccessOperationStatus> attempt = await SaveAsync(mappedEntry);
 
@@ -428,4 +424,43 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             RuleValue = ruleValue,
             RuleType = ruleType,
         });
+
+    private PublicAccessEntry MapToUpdatedEntry(PublicAccessEntrySlim updatesModel, PublicAccessEntry entryToUpdate)
+    {
+        entryToUpdate.LoginNodeId = _entityService.GetId(updatesModel.LoginPageId, UmbracoObjectTypes.Document).Result;
+        entryToUpdate.NoAccessNodeId = _entityService.GetId(updatesModel.ErrorPageId, UmbracoObjectTypes.Document).Result;
+
+        var isGroupBased = updatesModel.MemberGroupNames.Any();
+        var candidateRuleValues = isGroupBased
+            ? updatesModel.MemberGroupNames
+            : updatesModel.MemberUserNames;
+        var newRuleType = isGroupBased
+            ? Constants.Conventions.PublicAccess.MemberRoleRuleType
+            : Constants.Conventions.PublicAccess.MemberUsernameRuleType;
+
+        PublicAccessRule[] currentRules = entryToUpdate.Rules.ToArray();
+        IEnumerable<PublicAccessRule> obsoleteRules = currentRules.Where(rule =>
+            rule.RuleType != newRuleType
+            || candidateRuleValues?.Contains(rule.RuleValue) == false);
+
+        IEnumerable<string>? newRuleValues = candidateRuleValues?.Where(group =>
+            currentRules.Any(rule =>
+                rule.RuleType == newRuleType
+                && rule.RuleValue == group) == false);
+
+        foreach (PublicAccessRule rule in obsoleteRules)
+        {
+            entryToUpdate.RemoveRule(rule);
+        }
+
+        if (newRuleValues is not null)
+        {
+            foreach (var ruleValue in newRuleValues)
+            {
+                entryToUpdate.AddRule(ruleValue, newRuleType);
+            }
+        }
+
+        return entryToUpdate;
+    }
 }
