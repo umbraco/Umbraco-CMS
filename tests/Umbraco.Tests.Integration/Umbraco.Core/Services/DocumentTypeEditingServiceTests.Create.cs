@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using Umbraco.Cms.Api.Management.Controllers.Template;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentTypeEditing.Document;
 
@@ -26,6 +25,7 @@ public partial class DocumentTypeEditingServiceTests
         {
             Assert.IsTrue(response.Success);
             Assert.IsNotNull(documentType);
+            Assert.IsTrue(documentType.IsElement);
             Assert.AreEqual(alias, documentType.Alias);
             Assert.AreEqual(name, documentType.Name);
             Assert.AreEqual(response.Result.Id, documentType.Id);
