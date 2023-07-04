@@ -15,7 +15,8 @@ public class ExamineIndexConfigurationFactory : IExamineIndexConfigurationFactor
         {
             { Constants.UmbracoIndexes.InternalIndexName, new UmbracoIndexConfig(publicAccessService, provider)  },
             { Constants.UmbracoIndexes.ExternalIndexName, new UmbracoIndexConfig(publicAccessService, provider) { PublishedValuesOnly = true}},
-            { Constants.UmbracoIndexes.MembersIndexName, new UmbracoIndexConfig(publicAccessService, provider) }
+            { Constants.UmbracoIndexes.MembersIndexName, new UmbracoIndexConfig(publicAccessService, provider) },
+            { Constants.UmbracoIndexes.DeliveryApiContentIndexName, new UmbracoIndexConfig(publicAccessService, provider) }
         };
     }
 

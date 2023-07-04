@@ -14,6 +14,7 @@ using Umbraco.Search.DefferedActions;
 using Umbraco.Search.Examine.Configuration;
 using Umbraco.Search.Examine.ValueSetBuilders;
 using Umbraco.Search.NotificationHandlers;
+using Umbraco.Search.Services;
 
 namespace Umbraco.Search.Examine;
 
@@ -38,7 +39,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     private readonly IProfilingLogger _profilingLogger;
     private readonly IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
     private readonly ICoreScopeProvider _scopeProvider;
-    private readonly ExamineIndexingMainDomHandler _mainDomHandler;
+    private readonly ISearchMainDomHandler _mainDomHandler;
 
     public ExamineUmbracoIndexingHandler(
         IMainDom mainDom,
@@ -52,7 +53,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         IValueSetBuilder<IMedia> mediaValueSetBuilder,
         IValueSetBuilder<IMember> memberValueSetBuilder,
         IUmbracoIndexesConfiguration configuration,
-        ExamineIndexingMainDomHandler mainDomHandler)
+        ISearchMainDomHandler mainDomHandler)
     {
         _mainDom = mainDom;
         _logger = logger;

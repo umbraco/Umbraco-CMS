@@ -29,7 +29,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, MediaIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, DeliveryApiContentIndexPopulator>();
-
         builder.Services.AddSingleton<IIndexRebuilder, ExamineIndexRebuilder>();
         builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();
         builder.Services.AddSingleton<ExamineIndexingMainDomHandler>();

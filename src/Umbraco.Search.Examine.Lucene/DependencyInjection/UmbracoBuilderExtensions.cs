@@ -161,7 +161,12 @@ public static class UmbracoBuilderExtensions
     {
         umbracoBuilder.AddExamine();
         IServiceCollection services = umbracoBuilder.Services;
-
+        services.AddSingleton<IUmbracoIndexesConfiguration>(services =>
+        {
+            IExamineIndexConfigurationFactory configuration
+                = services.GetRequiredService<IExamineIndexConfigurationFactory>();
+            return configuration.GetConfiguration();
+        });
         services.AddSingleton<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
         //todo: restore when indexes are working
         services.AddUnique<IIndexDiagnosticsFactory, ExamineLuceneIndexDiagnosticsFactory>();

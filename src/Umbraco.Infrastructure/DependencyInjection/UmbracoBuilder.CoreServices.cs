@@ -172,8 +172,6 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
-        builder.Services.AddScoped<UmbracoTreeSearcher>();
-
         // replace
         builder.Services.AddSingleton<IEmailSender, EmailSender>(
             services => new EmailSender(

@@ -8,6 +8,7 @@
   <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />
+    <ProjectReference Include="..\Umbraco.Search.Examine.Lucene\Umbraco.Search.Examine.Lucene.csproj" />
   </ItemGroup>
 
   <ItemGroup>

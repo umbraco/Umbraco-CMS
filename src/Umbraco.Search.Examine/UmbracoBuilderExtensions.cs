@@ -8,7 +8,9 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Extensions;
+using Umbraco.Search.Configuration;
 using Umbraco.Search.Diagnostics;
+using Umbraco.Search.Examine.Configuration;
 using Umbraco.Search.Examine.ValueSetBuilders;
 using Umbraco.Search.Indexing;
 using Umbraco.Search.Indexing.Populators;
@@ -36,7 +38,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IIndexPopulator, ContentIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, MediaIndexPopulator>();
-
+        builder.Services.AddSingleton<IExamineIndexConfigurationFactory, ExamineIndexConfigurationFactory>();
         builder.Services.AddSingleton<IIndexRebuilder, IndexRebuilder>();
         builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();
         builder.Services.AddSingleton<ISearchMainDomHandler,ExamineIndexingMainDomHandler>();
@@ -71,7 +73,7 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationHandler<LanguageCacheRefresherNotification, LanguageIndexingNotificationHandler>();
 
         builder.AddNotificationHandler<UmbracoRequestBeginNotification, RebuildOnStartupHandler>();
-
+        builder.Services.AddSingleton<ISearchProvider, ExamineSearchProvider>();
         return builder;
     }
 }

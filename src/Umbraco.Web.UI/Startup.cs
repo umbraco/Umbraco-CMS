@@ -1,3 +1,7 @@
+using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Search.DependencyInjection;
+using Umbraco.Search.Examine.Lucene.DependencyInjection;
+
 namespace Umbraco.Cms.Web.UI
 {
     public class Startup
@@ -30,6 +34,8 @@ namespace Umbraco.Cms.Web.UI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddUmbraco(_env, _config)
+                .AddSearchServices()
+                .AddExamineLuceneIndexes()
                 .AddBackOffice()
                 .AddWebsite()
                 .AddDeliveryApi()
