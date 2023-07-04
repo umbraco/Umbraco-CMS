@@ -750,7 +750,7 @@
             return deferred.promise;
         };
 
-        $scope.save = function (submitButtonLabelKey) {
+        $scope.save = function (submitButtonLabelKey = 'buttons_save') {
             var deferred = $q.defer();
             clearNotifications($scope.content);
             // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
