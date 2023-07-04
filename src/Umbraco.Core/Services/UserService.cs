@@ -1927,6 +1927,8 @@ internal class UserService : RepositoryService, IUserService
 
     public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> CreateInitialPasswordAsync(Guid userKey, string token, string password)
     {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
         Attempt<UserOperationStatus> verifyInviteAttempt = await VerifyInviteAsync(userKey, token);
         if (verifyInviteAttempt.Result != UserOperationStatus.Success)
         {
@@ -1935,6 +1937,14 @@ internal class UserService : RepositoryService, IUserService
 
         Attempt<PasswordChangedModel, UserOperationStatus> changePasswordAttempt = await ChangePasswordAsync(userKey, new ChangeUserPasswordModel() { NewPassword = password, UserKey = userKey });
 
+        Task<UserOperationStatus> enableAttempt = EnableAsync(userKey, new HashSet<Guid>() { userKey });
+
+        if (enableAttempt.Result != UserOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(enableAttempt.Result, new PasswordChangedModel());
+        }
+
+        scope.Complete();
         return changePasswordAttempt;
     }
 
