@@ -6,12 +6,13 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Examine.Lucene.UmbracoExamine;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
@@ -34,9 +35,9 @@ public class SearchTests : ExamineBaseTest
                     m.SortOrder == (int)x.Attribute("sortOrder") &&
                     m.CreateDate == (DateTime)x.Attribute("createDate") &&
                     m.UpdateDate == (DateTime)x.Attribute("updateDate") &&
-                    m.Name == (string)x.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
+                    m.Name == (string)x.Attribute(UmbracoSearchFieldNames.NodeNameFieldName) &&
                     m.GetCultureName(It.IsAny<string>()) ==
-                    (string)x.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
+                    (string)x.Attribute(UmbracoSearchFieldNames.NodeNameFieldName) &&
                     m.Path == (string)x.Attribute("path") &&
                     m.Properties == new PropertyCollection() &&
                     m.Published == true &&
@@ -53,10 +54,10 @@ public class SearchTests : ExamineBaseTest
 
         using (GetSynchronousContentIndex(false, out var index, out var contentRebuilder, out _, null, contentService))
         {
-            index.CreateIndex();
+            index.Create();
             contentRebuilder.Populate(index);
 
-            var searcher = index.Searcher;
+            var searcher = index;
 
             Assert.Greater(searcher.CreateQuery().All().Execute().TotalItemCount, 0);
 

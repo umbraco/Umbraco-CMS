@@ -1,7 +1,7 @@
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Examine.Lucene.UmbracoExamine;
 
 // TODO: This is ultra hack and still left over from legacy but still works for testing atm
 internal class ExamineDemoDataMediaService

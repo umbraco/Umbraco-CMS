@@ -4,7 +4,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Examine;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Examine.Lucene.UmbracoExamine;
 
 /// <summary>
 ///     LEGACY!! Static methods to help query umbraco xml

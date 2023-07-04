@@ -1,9 +1,9 @@
 using Examine;
 using Examine.Lucene;
 using Examine.Lucene.Directories;
+using Examine.Lucene.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -15,15 +15,22 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Search;
+using Umbraco.Search.Configuration;
+using Umbraco.Search.Examine;
+using Umbraco.Search.Examine.Configuration;
+using Umbraco.Search.Examine.Lucene;
+using Umbraco.Search.Examine.TBD;
+using Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.Indexing.Populators;
 using Directory = Lucene.Net.Store.Directory;
-using StaticServiceProvider = Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Examine.Lucene.UmbracoExamine;
 
 /// <summary>
 ///     Used internally by test classes to initialize a new index from the template
@@ -31,11 +38,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 public class IndexInitializer
 {
     private readonly IOptions<ContentSettings> _contentSettings;
-    private readonly ILocalizationService _localizationService;
     private readonly ILoggerFactory _loggerFactory;
     private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IScopeProvider _scopeProvider;
+    private readonly ISearchProvider _provider;
     private readonly IShortStringHelper _shortStringHelper;
 
     public IndexInitializer(
@@ -43,35 +50,17 @@ public class IndexInitializer
         PropertyEditorCollection propertyEditors,
         MediaUrlGeneratorCollection mediaUrlGenerators,
         IScopeProvider scopeProvider,
+        ISearchProvider provider,
         ILoggerFactory loggerFactory,
-        IOptions<ContentSettings> contentSettings,
-        ILocalizationService localizationService)
+        IOptions<ContentSettings> contentSettings)
     {
         _shortStringHelper = shortStringHelper;
         _propertyEditors = propertyEditors;
         _mediaUrlGenerators = mediaUrlGenerators;
         _scopeProvider = scopeProvider;
+        _provider = provider;
         _loggerFactory = loggerFactory;
         _contentSettings = contentSettings;
-        _localizationService = localizationService;
-    }
-
-    public IndexInitializer(
-        IShortStringHelper shortStringHelper,
-        PropertyEditorCollection propertyEditors,
-        MediaUrlGeneratorCollection mediaUrlGenerators,
-        IScopeProvider scopeProvider,
-        ILoggerFactory loggerFactory,
-        IOptions<ContentSettings> contentSettings)
-        : this(
-        shortStringHelper,
-        propertyEditors,
-        mediaUrlGenerators,
-        scopeProvider,
-        loggerFactory,
-        contentSettings,
-        StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
-    {
     }
 
     public ContentValueSetBuilder GetContentValueSetBuilder(bool publishedValuesOnly)
@@ -82,8 +71,7 @@ public class IndexInitializer
             GetMockUserService(),
             _shortStringHelper,
             _scopeProvider,
-            publishedValuesOnly,
-            _localizationService);
+            publishedValuesOnly);
 
         return contentValueSetBuilder;
     }
@@ -134,9 +122,9 @@ public class IndexInitializer
                     m.SortOrder == (int)xmlElement.Attribute("sortOrder") &&
                     m.CreateDate == (DateTime)xmlElement.Attribute("createDate") &&
                     m.UpdateDate == (DateTime)xmlElement.Attribute("updateDate") &&
-                    m.Name == (string)xmlElement.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
+                    m.Name == (string)xmlElement.Attribute(UmbracoSearchFieldNames.NodeNameFieldName) &&
                     m.GetCultureName(It.IsAny<string>()) ==
-                    (string)xmlElement.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
+                    (string)xmlElement.Attribute(UmbracoSearchFieldNames.NodeNameFieldName) &&
                     m.Path == (string)xmlElement.Attribute("path") &&
                     m.Properties == new PropertyCollection() &&
                     m.ContentType == Mock.Of<ISimpleContentType>(mt =>
@@ -172,9 +160,9 @@ public class IndexInitializer
                     m.SortOrder == (int)x.Attribute("sortOrder") &&
                     m.CreateDate == (DateTime)x.Attribute("createDate") &&
                     m.UpdateDate == (DateTime)x.Attribute("updateDate") &&
-                    m.Name == (string)x.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
+                    m.Name == (string)x.Attribute(UmbracoSearchFieldNames.NodeNameFieldName) &&
                     m.GetCultureName(It.IsAny<string>()) ==
-                    (string)x.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
+                    (string)x.Attribute(UmbracoSearchFieldNames.NodeNameFieldName) &&
                     m.Path == (string)x.Attribute("path") &&
                     m.Properties == new PropertyCollection() &&
                     m.ContentType == Mock.Of<ISimpleContentType>(mt =>
@@ -201,7 +189,7 @@ public class IndexInitializer
         return mediaServiceMock.Object;
     }
 
-    public ILocalizationService GetMockLocalizationService() =>
+    public ILocalizationService? GetMockLocalizationService() =>
         Mock.Of<ILocalizationService>(x => x.GetAllLanguages() == Array.Empty<ILanguage>());
 
     public static IMediaTypeService GetMockMediaTypeService(IShortStringHelper shortStringHelper)
@@ -225,13 +213,13 @@ public class IndexInitializer
     public IProfilingLogger GetMockProfilingLogger() =>
         new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>());
 
-    public UmbracoContentIndex GetUmbracoIndexer(
+    public IUmbracoIndex<IContent> GetUmbracoIndexer(
         IHostingEnvironment hostingEnvironment,
         IRuntimeState runtimeState,
         Directory luceneDir,
-        Analyzer analyzer = null,
-        ILocalizationService languageService = null,
-        IContentValueSetValidator validator = null)
+        Analyzer? analyzer = null,
+        ILocalizationService? languageService = null,
+        IContentValueSetValidator? validator = null)
     {
         if (languageService == null)
         {
@@ -255,21 +243,15 @@ public class IndexInitializer
                 Analyzer = analyzer,
                 Validator = validator,
                 DirectoryFactory = new GenericDirectoryFactory(s => luceneDir),
-                FieldDefinitions = new UmbracoFieldDefinitionCollection()
+                FieldDefinitions = new UmbracoFieldDefinitionCollection().toExamineFieldDefinitionCollection()
             });
 
-        var i = new UmbracoContentIndex(
-            _loggerFactory,
+        var i = new UmbracoExamineLuceneIndex( _loggerFactory,
             "testIndexer",
-            options,
-            hostingEnvironment,
-            runtimeState,
-            languageService);
+            options, new UmbracoIndexesConfiguration(new Dictionary<string, IUmbracoIndexConfiguration>()), hostingEnvironment, runtimeState);
 
-        i.IndexingError += IndexingError;
-        i.IndexOperationComplete += I_IndexOperationComplete;
 
-        return i;
+        return new UmbracoExamineIndex<IContent>(i, new ContentValueSetBuilder());
     }
 
     private void I_IndexOperationComplete(object sender, IndexOperationEventArgs e)

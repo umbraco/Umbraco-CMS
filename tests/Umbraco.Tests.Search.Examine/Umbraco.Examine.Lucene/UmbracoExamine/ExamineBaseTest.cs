@@ -10,11 +10,13 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Search;
+using Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.Indexing.Populators;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Examine.Lucene.UmbracoExamine;
 
 [TestFixture]
 public abstract class ExamineBaseTest : UmbracoIntegrationTest
@@ -40,7 +42,8 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
     /// <returns></returns>
     protected IDisposable GetSynchronousContentIndex(
         bool publishedValuesOnly,
-        out UmbracoContentIndex index,
+        out IUmbracoIndex<IContent> index,
+        out IUmbracoSearcher searcher,
         out ContentIndexPopulator contentRebuilder,
         out ContentValueSetBuilder contentValueSetBuilder,
         int? parentId = null,
@@ -60,7 +63,7 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
 
         var luceneDir = new RandomIdRAMDirectory();
 
-        ContentValueSetValidator validator;
+        ContentValueSetValidator? validator;
 
         // if only published values then we'll change the validator for tests to
         // ensure we don't support protected nodes and that we
@@ -73,10 +76,10 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
                 {
                     if (path.EndsWith("," + ExamineDemoDataContentService.ProtectedNode))
                     {
-                        return Attempt<PublicAccessEntry>.Succeed();
+                        return Attempt<PublicAccessEntry?>.Succeed();
                     }
 
-                    return Attempt<PublicAccessEntry>.Fail();
+                    return Attempt<PublicAccessEntry?>.Fail();
                 });
 
             var scopeProviderMock = new Mock<IScopeProvider>();

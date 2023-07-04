@@ -6,19 +6,20 @@ using Lucene.Net.Util;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Examine.Lucene.UmbracoExamine;
 
 /// <summary>
 ///     Tests the standard indexing capabilities
 /// </summary>
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+[UmbracoTest(Database = UmbracoTestOptions.Database.None)]
 public class IndexTest : ExamineBaseTest
 {
     [Test]
@@ -81,7 +82,7 @@ public class IndexTest : ExamineBaseTest
             var results = index.Searcher.CreateQuery().Id(555).Execute();
             var result = results.First();
 
-            var key = $"{UmbracoExamineFieldNames.RawFieldPrefix}rte";
+            var key = $"{UmbracoSearchFieldNames.RawFieldPrefix}rte";
             Assert.IsTrue(result.Values.ContainsKey(key));
             Assert.Greater(result.Values[key].Length, luceneStringFieldMaxLength);
         }
@@ -167,8 +168,8 @@ public class IndexTest : ExamineBaseTest
             Assert.AreEqual("value2", result.AllValues["grid.row1"][1]);
             Assert.IsTrue(result.Values.ContainsKey("grid"));
             Assert.AreEqual("value1 value2 ", result["grid"]);
-            Assert.IsTrue(result.Values.ContainsKey($"{UmbracoExamineFieldNames.RawFieldPrefix}grid"));
-            Assert.AreEqual(json, result[$"{UmbracoExamineFieldNames.RawFieldPrefix}grid"]);
+            Assert.IsTrue(result.Values.ContainsKey($"{UmbracoSearchFieldNames.RawFieldPrefix}grid"));
+            Assert.AreEqual(json, result[$"{UmbracoSearchFieldNames.RawFieldPrefix}grid"]);
         }
     }
 
