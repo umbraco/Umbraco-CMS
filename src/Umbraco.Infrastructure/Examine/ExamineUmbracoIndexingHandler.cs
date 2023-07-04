@@ -4,6 +4,7 @@ using Examine.Search;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Extensions;
@@ -25,6 +26,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     private readonly IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ExamineIndexingMainDomHandler _mainDomHandler;
+    private readonly IPublicAccessService _publicAccessService;
 
     public ExamineUmbracoIndexingHandler(
         ILogger<ExamineUmbracoIndexingHandler> logger,
@@ -35,7 +37,8 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         IPublishedContentValueSetBuilder publishedContentValueSetBuilder,
         IValueSetBuilder<IMedia> mediaValueSetBuilder,
         IValueSetBuilder<IMember> memberValueSetBuilder,
-        ExamineIndexingMainDomHandler mainDomHandler)
+        ExamineIndexingMainDomHandler mainDomHandler,
+        IPublicAccessService publicAccessService)
     {
         _logger = logger;
         _scopeProvider = scopeProvider;
@@ -46,6 +49,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         _mediaValueSetBuilder = mediaValueSetBuilder;
         _memberValueSetBuilder = memberValueSetBuilder;
         _mainDomHandler = mainDomHandler;
+        _publicAccessService = publicAccessService;
         _enabled = new Lazy<bool>(IsEnabled);
     }
 
@@ -119,6 +123,20 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         else
         {
             DeferredReIndexForMember.Execute(_backgroundTaskQueue, this, member);
+        }
+    }
+
+    /// <inheritdoc />
+    public void RemoveProtectedContent()
+    {
+        var actions = DeferredActions.Get(_scopeProvider);
+        if (actions != null)
+        {
+            actions.Add(new DeferredRemoveProtectedContent(_backgroundTaskQueue, this, _publicAccessService));
+        }
+        else
+        {
+            DeferredRemoveProtectedContent.Execute(_backgroundTaskQueue, this, _publicAccessService);
         }
     }
 
@@ -389,6 +407,51 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                 index.DeleteFromIndex(ids.Select(x => x.ToString(CultureInfo.InvariantCulture)));
             }
         }
+    }
+
+    /// <summary>
+    ///     Removes all protected content from applicable indexes on a background thread
+    /// </summary>
+    private class DeferredRemoveProtectedContent : IDeferredAction
+    {
+        private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+        private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
+        private readonly IPublicAccessService _publicAccessService;
+
+        public DeferredRemoveProtectedContent(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IPublicAccessService publicAccessService)
+        {
+            _backgroundTaskQueue = backgroundTaskQueue;
+            _examineUmbracoIndexingHandler = examineUmbracoIndexingHandler;
+            _publicAccessService = publicAccessService;
+        }
+
+        public void Execute() => Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _publicAccessService);
+
+        public static void Execute(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IPublicAccessService publicAccessService)
+            => backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
+            {
+                using ICoreScope scope = examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true);
+
+                var protectedContentIds = publicAccessService.GetAll().Select(entry => entry.ProtectedNodeId).ToArray();
+                if (protectedContentIds.Any() is false)
+                {
+                    return Task.CompletedTask;
+                }
+
+                foreach (IUmbracoContentIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
+                             .OfType<IUmbracoContentIndex>()
+                             .Where(x => x is { EnableDefaultEventHandler: true, SupportProtectedContent: false }))
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return Task.CompletedTask;
+                    }
+
+                    index.DeleteFromIndex(protectedContentIds.Select(id => id.ToString()));
+                }
+
+                return Task.CompletedTask;
+            });
     }
 
     #endregion
