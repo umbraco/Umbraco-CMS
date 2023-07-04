@@ -57,6 +57,8 @@ public static class Suspendable
 
     // This is really needed at all since the only place this is used is in ExamineComponent and that already maintains a flag of whether it suspsended or not
     // AHH... but Deploy probably uses this?
+    [Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
     public static class ExamineEvents
     {
         private static bool _tried;

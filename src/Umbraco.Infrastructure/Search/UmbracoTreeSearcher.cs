@@ -17,6 +17,8 @@ namespace Umbraco.Cms.Infrastructure.Search;
 /// <summary>
 ///     Used for internal Umbraco implementations of <see cref="ISearchableTree" />
 /// </summary>
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+
 public class UmbracoTreeSearcher
 {
     private readonly IBackOfficeExamineSearcher _backOfficeExamineSearcher;

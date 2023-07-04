@@ -1,13 +1,11 @@
 using System.Web;
-using Examine;
-using Examine.Search;
 using Microsoft.AspNetCore.Html;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Extensions;
 
@@ -59,57 +57,6 @@ public static class PublishedContentExtensions
     /// <param name="userService"></param>
     public static string? WriterName(this IPublishedContent content, IUserService userService) =>
         userService.GetProfileById(content.WriterId)?.Name;
-
-    #endregion
-
-    #region Search
-
-    public static IEnumerable<PublishedSearchResult> SearchDescendants(
-        this IPublishedContent content,
-        IExamineManager examineManager,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        string term,
-        string? indexName = null)
-    {
-        indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
-        if (!examineManager.TryGetIndex(indexName, out IIndex? index))
-        {
-            throw new InvalidOperationException("No index found with name " + indexName);
-        }
-
-        // var t = term.Escape().Value;
-        // var luceneQuery = "+__Path:(" + content.Path.Replace("-", "\\-") + "*) +" + t;
-        IBooleanOperation? query = index.Searcher.CreateQuery()
-            .Field(UmbracoExamineFieldNames.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
-            .And()
-            .ManagedQuery(term);
-        IUmbracoContext umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
-        return query.Execute().ToPublishedSearchResults(umbracoContext.Content);
-    }
-
-    public static IEnumerable<PublishedSearchResult> SearchChildren(
-        this IPublishedContent content,
-        IExamineManager examineManager,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        string term,
-        string? indexName = null)
-    {
-        indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
-        if (!examineManager.TryGetIndex(indexName, out IIndex? index))
-        {
-            throw new InvalidOperationException("No index found with name " + indexName);
-        }
-
-        // var t = term.Escape().Value;
-        // var luceneQuery = "+parentID:" + content.Id + " +" + t;
-        IBooleanOperation? query = index.Searcher.CreateQuery()
-            .Field("parentID", content.Id)
-            .And()
-            .ManagedQuery(term);
-        IUmbracoContext umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
-
-        return query.Execute().ToPublishedSearchResults(umbracoContext.Content);
-    }
 
     #endregion
 

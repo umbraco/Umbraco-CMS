@@ -2,6 +2,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Cms.Infrastructure.Search;
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
 
 public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
 {
