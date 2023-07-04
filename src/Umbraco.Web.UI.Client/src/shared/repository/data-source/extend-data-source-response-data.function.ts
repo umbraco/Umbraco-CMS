@@ -1,10 +1,5 @@
 import { DataSourceResponse } from '../index.js';
-
-type FilterKeys<T, U> = {
-	[K in keyof T]: K extends keyof U ? never : K;
-};
-
-type Diff<U, T> = Pick<T, FilterKeys<T, U>[keyof T]>;
+import { Diff } from '@umbraco-cms/backoffice/utils';
 
 export function extendDataSourceResponseData<
 	ExtendedDataType extends IncomingDataType,

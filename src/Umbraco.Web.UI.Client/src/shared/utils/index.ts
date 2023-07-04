@@ -1,3 +1,4 @@
+export * from './diff.type.js';
 export * from './generate-umbraco-alias.function.js';
 export * from './increment-string.function.js';
 export * from './media-helper.service.js';
