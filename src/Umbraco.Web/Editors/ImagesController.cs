@@ -6,10 +6,8 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Web.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -73,7 +71,7 @@ namespace Umbraco.Web.Editors
             try
             {
                 imageLastModified = _mediaFileSystem.GetLastModified(imagePath);
-                
+
             }
             catch (Exception)
             {
@@ -89,6 +87,59 @@ namespace Umbraco.Web.Editors
             response.Headers.Location = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
             return response;
         }
-        
+
+        /// <summary>
+        ///     Gets a processed image for the image at the given path
+        /// </summary>
+        /// <param name="imagePath"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="focalPointLeft"></param>
+        /// <param name="focalPointTop"></param>
+        /// <param name="mode"></param>
+        /// <param name="cacheBusterValue"></param>
+        /// <param name="cropX1"></param>
+        /// <param name="cropX2"></param>
+        /// <param name="cropY1"></param>
+        /// <param name="cropY2"></param>
+        /// <returns></returns>
+        /// <remarks>
+        ///     If there is no media, image property or image file is found then this will return not found.
+        /// </remarks>
+        public string GetProcessedImageUrl(
+            string imagePath,
+            int? width = null,
+            int? height = null,
+            decimal? focalPointLeft = null,
+            decimal? focalPointTop = null,
+            string mode = "max",
+            string cacheBusterValue = "",
+            decimal? cropX1 = null,
+            decimal? cropX2 = null,
+            decimal? cropY1 = null,
+            decimal? cropY2 = null)
+        {
+            var options = new ImageUrlGenerationOptions(imagePath)
+            {
+                Width = width,
+                Height = height,
+                ImageCropMode = mode,
+                CacheBusterValue = cacheBusterValue
+            };
+
+            if (focalPointLeft.HasValue && focalPointTop.HasValue)
+            {
+                options.FocalPoint =
+                    new ImageUrlGenerationOptions.FocalPointPosition(focalPointLeft.Value, focalPointTop.Value);
+            }
+            else if (cropX1.HasValue && cropX2.HasValue && cropY1.HasValue && cropY2.HasValue)
+            {
+                options.Crop =
+                    new ImageUrlGenerationOptions.CropCoordinates(cropX1.Value, cropY1.Value, cropX2.Value, cropY2.Value);
+            }
+
+            return _imageUrlGenerator.GetImageUrl(options);
+        }
+
     }
 }
