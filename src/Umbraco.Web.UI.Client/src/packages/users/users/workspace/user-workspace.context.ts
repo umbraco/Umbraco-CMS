@@ -1,18 +1,19 @@
 import { UmbUserRepository } from '../repository/user.repository.js';
+import { type UmbUserDetail } from '../index.js';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UpdateUserRequestModel, UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbUserWorkspaceContext
-	extends UmbWorkspaceContext<UmbUserRepository, UserResponseModel>
-	implements UmbEntityWorkspaceContextInterface<UserResponseModel | undefined>
+	extends UmbWorkspaceContext<UmbUserRepository, UmbUserDetail>
+	implements UmbEntityWorkspaceContextInterface<UmbUserDetail | undefined>
 {
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbUserRepository(host));
 	}
 
-	#data = new UmbObjectState<UserResponseModel | undefined>(undefined);
+	#data = new UmbObjectState<UmbUserDetail | undefined>(undefined);
 	data = this.#data.asObservable();
 
 	async load(id: string) {
@@ -35,9 +36,9 @@ export class UmbUserWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	updateProperty<PropertyName extends keyof UserResponseModel>(
+	updateProperty<PropertyName extends keyof UmbUserDetail>(
 		propertyName: PropertyName,
-		value: UserResponseModel[PropertyName]
+		value: UmbUserDetail[PropertyName]
 	) {
 		this.#data.update({ [propertyName]: value });
 	}

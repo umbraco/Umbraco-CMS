@@ -1,6 +1,7 @@
 import { getLookAndColorFromUserStatus } from '../../utils.js';
 import { UmbUserRepository } from '../repository/user.repository.js';
 import { UmbUserGroupInputElement } from '../../user-groups/components/input-user-group/user-group-input.element.js';
+import { type UmbUserDetail } from '../index.js';
 import { UmbUserWorkspaceContext } from './user-workspace.context.js';
 import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
@@ -19,7 +20,7 @@ import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -31,7 +32,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	private _currentUser?: UmbLoggedInUser;
 
 	@state()
-	private _user?: UserResponseModel;
+	private _user?: UmbUserDetail;
 
 	#auth?: typeof UMB_AUTH.TYPE;
 	#modalContext?: UmbModalManagerContext;

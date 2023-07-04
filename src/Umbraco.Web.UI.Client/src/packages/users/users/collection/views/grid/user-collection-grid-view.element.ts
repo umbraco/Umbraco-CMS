@@ -1,15 +1,16 @@
 import { getLookAndColorFromUserStatus } from '../../../../utils.js';
 import { UmbUserCollectionContext } from '../../user-collection.context.js';
+import { type UmbUserDetail } from '../../../types.js';
 import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-collection-grid-view')
 export class UmbUserCollectionGridViewElement extends UmbLitElement {
 	@state()
-	private _users: Array<UserResponseModel> = [];
+	private _users: Array<UmbUserDetail> = [];
 
 	@state()
 	private _selection: Array<string> = [];
@@ -34,18 +35,18 @@ export class UmbUserCollectionGridViewElement extends UmbLitElement {
 		history.pushState(null, '', 'section/users/view/users/user/' + id); //TODO Change to a tag with href and make dynamic
 	}
 
-	#onSelect(user: UserResponseModel) {
+	#onSelect(user: UmbUserDetail) {
 		this.#collectionContext?.select(user.id ?? '');
 	}
 
-	#onDeselect(user: UserResponseModel) {
+	#onDeselect(user: UmbUserDetail) {
 		this.#collectionContext?.deselect(user.id ?? '');
 	}
 
-	#renderUserCard(user: UserResponseModel) {
+	#renderUserCard(user: UmbUserDetail) {
 		return html`
 			<uui-card-user
-				.name=${user.name}
+				.name=${user.name ?? 'Unnamed user'}
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#collectionContext?.isSelected(user.id ?? '')}
@@ -57,7 +58,7 @@ export class UmbUserCollectionGridViewElement extends UmbLitElement {
 		`;
 	}
 
-	#renderUserTag(user: UserResponseModel) {
+	#renderUserTag(user: UmbUserDetail) {
 		if (user.state && user.state === UserStateModel.ACTIVE) {
 			return nothing;
 		}
@@ -72,7 +73,7 @@ export class UmbUserCollectionGridViewElement extends UmbLitElement {
 		</uui-tag>`;
 	}
 
-	#renderUserLoginDate(user: UserResponseModel) {
+	#renderUserLoginDate(user: UmbUserDetail) {
 		if (!user.lastLoginDate) {
 			return html`<div class="user-login-time">${`${user.name} has not logged in yet`}</div>`;
 		}

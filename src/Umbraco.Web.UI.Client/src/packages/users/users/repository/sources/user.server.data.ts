@@ -1,13 +1,11 @@
-import { UmbUserDetailDataSource } from '../../types.js';
-import { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import { UmbUserDetail, UmbUserDetailDataSource } from '../../types.js';
+import { DataSourceResponse, extendDataSourceResponseData } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateUserRequestModel,
 	UpdateUserRequestModel,
 	UserPresentationBaseModel,
 	UserResource,
 	InviteUserRequestModel,
-	EnableUserRequestModel,
-	DisableUserRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -35,9 +33,12 @@ export class UmbUserServerDataSource implements UmbUserDetailDataSource {
 		throw new Error('Method not implemented.');
 	}
 
-	get(id: string) {
+	async get(id: string) {
 		if (!id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, UserResource.getUserById({ id }));
+		const response = await tryExecuteAndNotify(this.#host, UserResource.getUserById({ id }));
+		return extendDataSourceResponseData<UmbUserDetail>(response, {
+			entityType: 'user',
+		});
 	}
 
 	insert(data: CreateUserRequestModel) {

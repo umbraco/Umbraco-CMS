@@ -1,10 +1,10 @@
 import { USER_REPOSITORY_ALIAS } from '../repository/manifests.js';
-import { UmbUserCollectionFilterModel } from '../types.js';
+import { UmbUserCollectionFilterModel, UmbUserDetail } from '../types.js';
 import { UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { UserOrderModel, UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbUserCollectionContext extends UmbCollectionContext<UserResponseModel, UmbUserCollectionFilterModel> {
+export class UmbUserCollectionContext extends UmbCollectionContext<UmbUserDetail, UmbUserCollectionFilterModel> {
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'user', USER_REPOSITORY_ALIAS);
 	}

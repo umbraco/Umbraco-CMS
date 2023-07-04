@@ -1,8 +1,8 @@
+import { type UmbUserDetail } from '../index.js';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export const UMB_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>('UmbUserStore');
 
@@ -13,18 +13,18 @@ export const UMB_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>('U
  * @description - Data Store for Users
  */
 export class UmbUserStore extends UmbStoreBase {
-	//#data = new UmbArrayState<UserResponseModel>([], (x) => x.id);
+	//#data = new UmbArrayState<UmbUserDetail>([], (x) => x.id);
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_USER_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<UserResponseModel>([], (x) => x.id));
+		super(host, UMB_USER_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<UmbUserDetail>([], (x) => x.id));
 	}
 
 	/**
 	 * Append a user to the store
-	 * @param {UserResponseModel} user
+	 * @param {UmbUserDetail} user
 	 * @memberof UmbUserStore
 	 */
-	append(user: UserResponseModel) {
+	append(user: UmbUserDetail) {
 		this._data.append([user]);
 	}
 
@@ -33,7 +33,7 @@ export class UmbUserStore extends UmbStoreBase {
 	 * @param {id} string id.
 	 * @memberof UmbUserStore
 	 */
-	byId(id: UserResponseModel['id']) {
+	byId(id: UmbUserDetail['id']) {
 		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
 	}
 
@@ -42,7 +42,7 @@ export class UmbUserStore extends UmbStoreBase {
 	 * @param {string[]} uniques
 	 * @memberof UmbUserStore
 	 */
-	remove(uniques: Array<UserResponseModel['id']>) {
+	remove(uniques: Array<UmbUserDetail['id']>) {
 		this._data.remove(uniques);
 	}
 }

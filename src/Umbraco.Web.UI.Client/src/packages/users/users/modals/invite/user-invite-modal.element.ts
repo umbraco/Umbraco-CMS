@@ -3,7 +3,6 @@ import { UmbUserRepository } from '../../repository/user.repository.js';
 import { css, html, nothing, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
-import type { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-user-invite-modal')
@@ -12,7 +11,7 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 	private _form!: HTMLFormElement;
 
 	@state()
-	private _invitedUser?: UserResponseModel;
+	private _invitedUser?: any;
 
 	// TODO: get from extension registry
 	#userRepository = new UmbUserRepository(this);

@@ -9,7 +9,16 @@ import type {
 	UserStateModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-import { UmbDataSource, UmbDataSourceErrorResponse, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import {
+	DataSourceResponse,
+	UmbDataSource,
+	UmbDataSourceErrorResponse,
+	UmbDetailRepository,
+} from '@umbraco-cms/backoffice/repository';
+
+export type UmbUserDetail = UserResponseModel & {
+	entityType: 'user';
+};
 
 export interface UmbCreateUserResponseModel {
 	user: UserResponseModel;
@@ -27,8 +36,8 @@ export interface UmbUserCollectionFilterModel {
 }
 
 export interface UmbUserDetailDataSource
-	extends UmbDataSource<CreateUserRequestModel, CreateUserResponseModel, UpdateUserRequestModel, UserResponseModel> {
-	invite(data: InviteUserRequestModel): Promise<any>;
+	extends UmbDataSource<CreateUserRequestModel, CreateUserResponseModel, UpdateUserRequestModel, UmbUserDetail> {
+	invite(data: InviteUserRequestModel): Promise<DataSourceResponse<any>>;
 }
 
 export interface UmbUserSetGroupDataSource {

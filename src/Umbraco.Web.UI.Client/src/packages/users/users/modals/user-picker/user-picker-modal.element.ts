@@ -5,14 +5,14 @@ import { UmbUserPickerModalData, UmbUserPickerModalResult } from '@umbraco-cms/b
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
+import { type UmbUserDetail } from '@umbraco-cms/backoffice/users';
 
 @customElement('umb-user-picker-modal')
 export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPickerModalData, UmbUserPickerModalResult> {
 	@state()
-	private _users: Array<UserResponseModel> = [];
+	private _users: Array<UmbUserDetail> = [];
 
 	#selectionManager = new UmbSelectionManagerBase();
 	#userRepository?: UmbUserRepository;
