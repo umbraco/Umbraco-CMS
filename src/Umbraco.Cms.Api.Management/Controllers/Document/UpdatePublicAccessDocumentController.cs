@@ -26,7 +26,7 @@ public class UpdatePublicAccessDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(Guid id, PublicAccessRequestModel requestModel)
+    public async Task<IActionResult> Update(Guid id, PublicAccessRequestModel requestModel)
     {
         PublicAccessEntrySlim publicAccessEntrySlim = _publicAccessPresentationFactory.CreatePublicAccessEntrySlim(requestModel, id);
 
