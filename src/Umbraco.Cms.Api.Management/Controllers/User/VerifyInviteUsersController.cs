@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core;
@@ -18,6 +19,7 @@ public class VerifyInviteUserController : UserControllerBase
     [AllowAnonymous]
     [HttpPost("invite/verify")]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Invite(VerifyInviteUserRequestModel model)
     {
         Attempt<UserOperationStatus> result = await _userService.VerifyInviteAsync(model.UserId, model.Token);

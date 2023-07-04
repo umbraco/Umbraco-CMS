@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core;
@@ -19,6 +20,7 @@ public class CreateInitialPasswordUserController : UserControllerBase
     [AllowAnonymous]
     [HttpPost("invite/create-password")]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> CreateInitialPassword(CreateInitialPasswordUserRequestModel model)
     {
         Attempt<PasswordChangedModel, UserOperationStatus> response = await _userService.CreateInitialPasswordAsync(model.UserId, model.Token, model.Password);
