@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Security;
@@ -49,15 +48,18 @@ public sealed class ConfigureMemberCookieOptions : IConfigureNamedOptions<Cookie
 
                 return Task.CompletedTask;
             },
+            OnValidatePrincipal = async ctx =>
+            {
+                // We need to resolve the BackOfficeSecurityStampValidator per request as a requirement (even in aspnetcore they do this)
+                MemberSecurityStampValidator securityStampValidator =
+                    ctx.HttpContext.RequestServices.GetRequiredService<MemberSecurityStampValidator>();
+
+                await securityStampValidator.ValidateAsync(ctx);
+            },
             OnRedirectToAccessDenied = ctx =>
             {
-                //When the controller is an UmbracoAPIController, we want to return a statuscode instead of a redirect.
-                //All other cases should use the default Redirect of the CookieAuthenticationEvent.
-                var controllerDescriptor = ctx.HttpContext.GetEndpoint()?.Metadata?.OfType<ControllerActionDescriptor>().FirstOrDefault();
-                if (!controllerDescriptor?.ControllerTypeInfo.IsSubclassOf(typeof(UmbracoApiController)) ?? false)
-                {
-                    new CookieAuthenticationEvents().OnRedirectToAccessDenied(ctx);
-                }
+                ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
+
                 return Task.CompletedTask;
             },
         };

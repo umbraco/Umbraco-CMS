@@ -41,6 +41,7 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         _scopeProvider = scopeProvider;
     }
 
+    [Obsolete("This constructor is obsolete, the IScopeProvider will change to Infrastructure.Scoping.ScopeProvider instead, this will be removed in Umbraco 14.")]
     public ContentValueSetValidator(
         bool publishedValuesOnly,
         bool supportProtectedContent,

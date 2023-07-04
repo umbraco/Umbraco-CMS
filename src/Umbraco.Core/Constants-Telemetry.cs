@@ -30,5 +30,7 @@ public static partial class Constants
         public static string CurrentServerRole = "CurrentServerRole";
         public static string RuntimeMode = "RuntimeMode";
         public static string BackofficeExternalLoginProviderCount = "BackofficeExternalLoginProviderCount";
+        public static string DeliverApiEnabled = "DeliverApiEnabled";
+        public static string DeliveryApiPublicAccess = "DeliveryApiPublicAccess";
     }
 }

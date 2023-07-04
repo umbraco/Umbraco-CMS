@@ -503,7 +503,7 @@
     <key alias="insertlink">Insert link</key>
     <key alias="insertMacro">Click to add a Macro</key>
     <key alias="inserttable">Insert table</key>
-    <key alias="languagedeletewarning">This will delete the language</key>
+    <key alias="languagedeletewarning">This will delete the language and all content related to the language</key>
     <key alias="languageChangeWarning">Changing the culture for a language may be an expensive operation and will result
       in the content cache and indexes being rebuilt
     </key>
@@ -759,6 +759,7 @@
     <key alias="by">by</key>
     <key alias="cancel">Cancel</key>
     <key alias="cellMargin">Cell margin</key>
+    <key alias="change">Change</key>
     <key alias="choose">Choose</key>
     <key alias="clear">Clear</key>
     <key alias="close">Close</key>
@@ -3014,7 +3015,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
             <li>Anonymized site ID, Umbraco version, and packages installed.</li>
             <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, and Property Editors in use.</li>
             <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
-            <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li>
+            <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, whether the delivery API is enabled, and allows public access, and if you are in debug mode.</li>
           </ul>
           <em>We might change what we send on the Detailed level in the future. If so, it will be listed above.
           <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</em>
