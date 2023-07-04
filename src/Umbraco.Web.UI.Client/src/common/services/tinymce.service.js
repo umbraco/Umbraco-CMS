@@ -1250,7 +1250,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             // the href might be an external url, so check the value for an anchor/qs
             // href has the anchor re-appended later, hence the reset here to avoid duplicating the anchor
-            if (!target.anchor) {
+            if (!target.anchor && href) {
                 var urlParts = href.split(/(#|\?)/);
                 if (urlParts.length === 3) {
                     href = urlParts[0];
