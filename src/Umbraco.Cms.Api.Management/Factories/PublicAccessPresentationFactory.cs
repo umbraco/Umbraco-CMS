@@ -19,15 +19,13 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
     private readonly IMemberService _memberService;
     private readonly IUmbracoMapper _mapper;
     private readonly IMemberRoleManager _memberRoleManager;
-    private readonly IPublicAccessService _publicAccessService;
 
-    public PublicAccessPresentationFactory(IEntityService entityService, IMemberService memberService, IUmbracoMapper mapper, IMemberRoleManager memberRoleManager, IPublicAccessService publicAccessService)
+    public PublicAccessPresentationFactory(IEntityService entityService, IMemberService memberService, IUmbracoMapper mapper, IMemberRoleManager memberRoleManager)
     {
         _entityService = entityService;
         _memberService = memberService;
         _mapper = mapper;
         _memberRoleManager = memberRoleManager;
-        _publicAccessService = publicAccessService;
     }
 
     public Task<Attempt<PublicAccessResponseModel?, PublicAccessOperationStatus>> CreatePublicAccessResponseModel(PublicAccessEntry entry)
@@ -81,17 +79,13 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
         return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessResponseModel?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, responseModel));
     }
 
-    public async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> CreatePublicAccessEntry(PublicAccessRequestModel requestModel, Guid contentKey)
-    {
-        Attempt<PublicAccessEntry?, PublicAccessOperationStatus> currentPublicAccessEntry = await _publicAccessService.GetEntryByContentKeyAsync(contentKey);
-
-        if (currentPublicAccessEntry.Success is false)
+    public PublicAccessEntrySlim CreatePublicAccessEntrySlim(PublicAccessRequestModel requestModel, Guid contentKey) =>
+        new()
         {
-            return currentPublicAccessEntry;
-        }
-
-        PublicAccessEntry mappedEntry = _mapper.Map(requestModel, currentPublicAccessEntry.Result)!;
-
-        return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, mappedEntry);
-    }
+            ContentId = contentKey,
+            MemberGroupNames = requestModel.MemberGroupNames,
+            MemberUserNames = requestModel.MemberUserNames,
+            ErrorPageId = requestModel.ErrorPageId,
+            LoginPageId = requestModel.LoginPageId,
+        };
 }
