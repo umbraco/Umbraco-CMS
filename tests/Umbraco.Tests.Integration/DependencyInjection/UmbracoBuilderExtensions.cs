@@ -28,6 +28,9 @@ using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
 using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
+using Umbraco.Search;
+using IIndexPopulator = Umbraco.Search.IIndexPopulator;
+using IIndexRebuilder = Umbraco.Search.Indexing.IIndexRebuilder;
 
 namespace Umbraco.Cms.Tests.Integration.DependencyInjection;
 
@@ -46,7 +49,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddUnique(Mock.Of<IUmbracoBootPermissionChecker>());
         builder.Services.AddUnique(testHelper.MainDom);
 
-        builder.Services.AddUnique<ExamineIndexRebuilder, TestBackgroundIndexRebuilder>();
+        builder.Services.AddUnique<IIndexRebuilder, TestBackgroundIndexRebuilder>();
         builder.Services.AddUnique(factory => Mock.Of<IRuntimeMinifier>());
 
         // we don't want persisted nucache files in tests
@@ -139,20 +142,20 @@ public static class UmbracoBuilderExtensions
     }
 
     // replace the default so there is no background index rebuilder
-    private class TestBackgroundIndexRebuilder : ExamineIndexRebuilder
+    private class TestBackgroundIndexRebuilder : IndexRebuilder
     {
         public TestBackgroundIndexRebuilder(
             IMainDom mainDom,
             IRuntimeState runtimeState,
-            ILogger<ExamineIndexRebuilder> logger,
-            IExamineManager examineManager,
+            ISearchProvider searchProvider,
+            ILogger<IndexRebuilder> logger,
             IEnumerable<IIndexPopulator> populators,
             IBackgroundTaskQueue backgroundTaskQueue)
             : base(
             mainDom,
             runtimeState,
+            searchProvider,
             logger,
-            examineManager,
             populators,
             backgroundTaskQueue)
         {
