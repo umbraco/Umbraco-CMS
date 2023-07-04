@@ -222,9 +222,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     }
 
     function uploadImageHandler(blobInfo, success, failure, progress){
-        let xhr, formData;
-
-        xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
         xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
 
         xhr.onloadstart = function(e) {
@@ -255,10 +253,24 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 return;
             }
 
-            json = JSON.parse(xhr.responseText);
+            const data = xhr.responseText;
+
+            if (!data.length > 1) {
+                failure('Unrecognized text string: ' + data);
+                return;
+            }
+
+            let json = {};
+
+            try {
+                json = JSON.parse(data);
+            } catch (e) {
+                failure('Invalid JSON: ' + data + ' - ' + e.message);
+                return;
+            }
 
             if (!json || typeof json.tmpLocation !== 'string') {
-                failure('Invalid JSON: ' + xhr.responseText);
+                failure('Invalid JSON: ' + data);
                 return;
             }
 
@@ -271,7 +283,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             success(blobInfo.blobUri());
         };
 
-        formData = new FormData();
+        const formData = new FormData();
         formData.append('file', blobInfo.blob(), blobInfo.blob().name);
 
         xhr.send(formData);
