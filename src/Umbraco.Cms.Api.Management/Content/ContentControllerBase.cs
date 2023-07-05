@@ -50,4 +50,25 @@ public class ContentControllerBase : ManagementApiControllerBase
             ContentCreatingOperationStatus.NotFound => NotFound("The content type could not be found"),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status."),
         };
+
+    protected IActionResult PublicAccessOperationStatusResult(PublicAccessOperationStatus status) =>
+        status switch
+        {
+            PublicAccessOperationStatus.ContentNotFound => NotFound("The content could not be found"),
+            PublicAccessOperationStatus.ErrorNodeNotFound => NotFound("The error page could not be found"),
+            PublicAccessOperationStatus.LoginNodeNotFound => NotFound("The login page could not be found"),
+            PublicAccessOperationStatus.NoAllowedEntities => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("No allowed entities given")
+                .WithDetail("Both MemberGroups and Members were empty, thus no entities can be allowed.")
+                .Build()),
+            PublicAccessOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Request cancelled by notification")
+                .WithDetail("The request to save a public access entry was cancelled by a notification handler.")
+                .Build()),
+            PublicAccessOperationStatus.AmbiguousRule => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Ambiguous Rule")
+                .WithDetail("The specified rule is ambiguous, because both member groups and member names were given.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status."),
+        };
 }
