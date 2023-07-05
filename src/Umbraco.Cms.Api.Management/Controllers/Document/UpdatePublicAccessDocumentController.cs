@@ -15,7 +15,9 @@ public class UpdatePublicAccessDocumentController : DocumentControllerBase
     private readonly IPublicAccessPresentationFactory _publicAccessPresentationFactory;
     private readonly IPublicAccessService _publicAccessService;
 
-    public UpdatePublicAccessDocumentController(IPublicAccessPresentationFactory publicAccessPresentationFactory, IPublicAccessService publicAccessService)
+    public UpdatePublicAccessDocumentController(
+        IPublicAccessPresentationFactory publicAccessPresentationFactory,
+        IPublicAccessService publicAccessService)
     {
         _publicAccessPresentationFactory = publicAccessPresentationFactory;
         _publicAccessService = publicAccessService;
@@ -32,6 +34,8 @@ public class UpdatePublicAccessDocumentController : DocumentControllerBase
 
         Attempt<PublicAccessEntry?, PublicAccessOperationStatus> updateAttempt = await _publicAccessService.UpdateAsync(publicAccessEntrySlim);
 
-        return updateAttempt.Success ? Ok() : PublicAccessOperationStatusResult(updateAttempt.Status);
+        return updateAttempt.Success
+            ? Ok()
+            : PublicAccessOperationStatusResult(updateAttempt.Status);
     }
 }

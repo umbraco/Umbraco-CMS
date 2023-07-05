@@ -15,7 +15,9 @@ public class CreatePublicAccessDocumentController : DocumentControllerBase
     private readonly IPublicAccessService _publicAccessService;
     private readonly IPublicAccessPresentationFactory _publicAccessPresentationFactory;
 
-    public CreatePublicAccessDocumentController(IPublicAccessService publicAccessService, IPublicAccessPresentationFactory publicAccessPresentationFactory)
+    public CreatePublicAccessDocumentController(
+        IPublicAccessService publicAccessService,
+        IPublicAccessPresentationFactory publicAccessPresentationFactory)
     {
         _publicAccessService = publicAccessService;
         _publicAccessPresentationFactory = publicAccessPresentationFactory;
@@ -32,6 +34,8 @@ public class CreatePublicAccessDocumentController : DocumentControllerBase
 
         Attempt<PublicAccessEntry?, PublicAccessOperationStatus> saveAttempt = await _publicAccessService.CreateAsync(publicAccessEntrySlim);
 
-        return saveAttempt.Success ? CreatedAtAction<GetPublicAccessDocumentController>(controller => nameof(controller.GetPublicAccess), saveAttempt.Result!.Key) : PublicAccessOperationStatusResult(saveAttempt.Status);
+        return saveAttempt.Success
+            ? CreatedAtAction<GetPublicAccessDocumentController>(controller => nameof(controller.GetPublicAccess), saveAttempt.Result!.Key)
+            : PublicAccessOperationStatusResult(saveAttempt.Status);
     }
 }
