@@ -187,7 +187,7 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
 
                 IPropertyType[] properties = model
                     .Properties
-                    .Where(property => property.ContainerId == container.Key)
+                    .Where(property => property.ContainerKey == container.Key)
                     .Select(property =>
                     {
                         // get the selected data type
@@ -234,7 +234,7 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
             .ToArray();
 
         // Handle orphaned properties
-        IEnumerable<DocumentPropertyType> orphanedPropertyTypeModels = model.Properties.Where(x => x.ContainerId is null).ToArray();
+        IEnumerable<DocumentPropertyType> orphanedPropertyTypeModels = model.Properties.Where(x => x.ContainerKey is null).ToArray();
 
         if(orphanedPropertyTypeModels.Any())
         {

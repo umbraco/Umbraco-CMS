@@ -4,7 +4,7 @@ public class PropertyTypeBase
 {
     public Guid Key { get; set; }
 
-    public Guid? ContainerId { get; set; }
+    public Guid? ContainerKey { get; set; }
 
     public int SortOrder { get; set; }
 
