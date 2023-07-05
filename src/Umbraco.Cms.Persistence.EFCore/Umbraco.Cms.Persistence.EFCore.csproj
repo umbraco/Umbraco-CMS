@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Title>Umbraco CMS - Persistence - EFCore</Title>
-    <!-- TODO: Enable when final version is shipped (because there's currently no previous version) -->
-    <EnablePackageValidation>false</EnablePackageValidation>
+    <Title>Umbraco CMS - Persistence - Entity Framework Core</Title>
+    <Description>Adds support for Entity Framework Core to Umbraco CMS.</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,5 +20,4 @@
       <_Parameter1>Umbraco.Tests.Integration</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
-
 </Project>
