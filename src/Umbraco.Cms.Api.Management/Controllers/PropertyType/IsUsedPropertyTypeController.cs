@@ -21,7 +21,7 @@ public class IsUsedPropertyTypeController : PropertyTypeControllerBase
     [HttpGet("is-used")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(PagedViewModel<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(Guid contentTypeId, string propertyAlias)
     {
         Attempt<bool, PropertyTypeOperationStatus> result = await _propertyTypeUsageService.HasSavedPropertyValuesAsync(contentTypeId, propertyAlias);
