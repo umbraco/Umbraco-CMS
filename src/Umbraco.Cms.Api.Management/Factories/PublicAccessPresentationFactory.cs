@@ -20,7 +20,11 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
     private readonly IUmbracoMapper _mapper;
     private readonly IMemberRoleManager _memberRoleManager;
 
-    public PublicAccessPresentationFactory(IEntityService entityService, IMemberService memberService, IUmbracoMapper mapper, IMemberRoleManager memberRoleManager)
+    public PublicAccessPresentationFactory(
+        IEntityService entityService,
+        IMemberService memberService,
+        IUmbracoMapper mapper,
+        IMemberRoleManager memberRoleManager)
     {
         _entityService = entityService;
         _memberService = memberService;
@@ -28,19 +32,19 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
         _memberRoleManager = memberRoleManager;
     }
 
-    public Task<Attempt<PublicAccessResponseModel?, PublicAccessOperationStatus>> CreatePublicAccessResponseModel(PublicAccessEntry entry)
+    public Attempt<PublicAccessResponseModel?, PublicAccessOperationStatus> CreatePublicAccessResponseModel(PublicAccessEntry entry)
     {
         Attempt<Guid> loginNodeKeyAttempt = _entityService.GetKey(entry.LoginNodeId, UmbracoObjectTypes.Document);
         Attempt<Guid> noAccessNodeKeyAttempt = _entityService.GetKey(entry.NoAccessNodeId, UmbracoObjectTypes.Document);
 
         if (loginNodeKeyAttempt.Success is false)
         {
-            return Task.FromResult(Attempt.FailWithStatus<PublicAccessResponseModel?, PublicAccessOperationStatus>(PublicAccessOperationStatus.LoginNodeNotFound, null));
+            return Attempt.FailWithStatus<PublicAccessResponseModel?, PublicAccessOperationStatus>(PublicAccessOperationStatus.LoginNodeNotFound, null);
         }
 
         if (noAccessNodeKeyAttempt.Success is false)
         {
-            return Task.FromResult(Attempt.FailWithStatus<PublicAccessResponseModel?, PublicAccessOperationStatus>(PublicAccessOperationStatus.ErrorNodeNotFound, null));
+            return Attempt.FailWithStatus<PublicAccessResponseModel?, PublicAccessOperationStatus>(PublicAccessOperationStatus.ErrorNodeNotFound, null);
         }
 
         // unwrap the current public access setup for the client
@@ -76,7 +80,7 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
             ErrorPageId = noAccessNodeKeyAttempt.Result,
         };
 
-        return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessResponseModel?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, responseModel));
+        return Attempt.SucceedWithStatus<PublicAccessResponseModel?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, responseModel);
     }
 
     public PublicAccessEntrySlim CreatePublicAccessEntrySlim(PublicAccessRequestModel requestModel, Guid contentKey) =>
