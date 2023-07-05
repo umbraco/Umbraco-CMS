@@ -1,5 +1,4 @@
-﻿using Asp.Versioning;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -25,7 +24,6 @@ public class MemberTypeTreeControllerBase : EntityTreeControllerBase<EntityTreeI
     protected override EntityTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
         EntityTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
-        responseModel.Icon = Constants.Icons.User;
         return responseModel;
     }
 }

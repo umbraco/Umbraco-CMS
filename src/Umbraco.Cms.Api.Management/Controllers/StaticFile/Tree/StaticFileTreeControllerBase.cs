@@ -1,9 +1,8 @@
-﻿using Asp.Versioning;
-using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.IO;
+﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Tree;
 
@@ -18,8 +17,6 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
         => FileSystem = physicalFileSystem;
 
     protected override IFileSystem FileSystem { get; }
-
-    protected override string FileIcon(string path) => Constants.Icons.DefaultIcon;
 
     protected override string ItemType(string path) => "static-file";
 

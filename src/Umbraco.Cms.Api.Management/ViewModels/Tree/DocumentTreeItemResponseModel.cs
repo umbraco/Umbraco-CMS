@@ -11,4 +11,6 @@ public class DocumentTreeItemResponseModel : ContentTreeItemResponseModel
     public Guid ContentTypeId { get; set; }
 
     public IEnumerable<VariantTreeItemViewModel> Variants { get; set; } = Enumerable.Empty<VariantTreeItemViewModel>();
+
+    public string Icon { get; set; } = string.Empty;
 }
