@@ -172,7 +172,7 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
         PropertyGroup[] propertyGroups = model.Containers.Select(container =>
             {
                 PropertyGroup propertyGroup = contentType.PropertyGroups.FirstOrDefault(group => group.Key == container.Key) ??
-                                              new PropertyGroup(supportsPublishing);
+                                              new PropertyGroup(supportsPublishing) { Key = container.Key };
                 // NOTE: eventually group.Type should be a string to make the client more flexible; for now we'll have to parse the string value back to its expected enum
                 propertyGroup.Type = Enum.Parse<PropertyGroupType>(container.Type);
                 propertyGroup.Name = container.Name;
