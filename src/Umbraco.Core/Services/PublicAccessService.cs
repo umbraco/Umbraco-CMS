@@ -282,6 +282,11 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             return Attempt.FailWithStatus(PublicAccessOperationStatus.NoAllowedEntities, result);
         }
 
+        if(entry.MemberUserNames.Any() && entry.MemberGroupNames.Any())
+        {
+            return Attempt.FailWithStatus(PublicAccessOperationStatus.AmbiguousRule, result);
+        }
+
         result.ProtectedNode = _contentService.GetById(entry.ContentId);
 
         if (result.ProtectedNode is null)

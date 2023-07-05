@@ -65,7 +65,10 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Request cancelled by notification")
                 .WithDetail("The request to save a public access entry was cancelled by a notification handler.")
                 .Build()),
-
+            PublicAccessOperationStatus.AmbiguousRule => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Ambiguous Rule")
+                .WithDetail("The specified rule is ambiguous, because both member groups and member names were given.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status."),
         };
 }

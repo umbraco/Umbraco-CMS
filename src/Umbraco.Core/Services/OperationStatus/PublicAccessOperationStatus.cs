@@ -7,5 +7,6 @@ public enum PublicAccessOperationStatus
     LoginNodeNotFound,
     ErrorNodeNotFound,
     NoAllowedEntities,
+    AmbiguousRule,
     CancelledByNotification,
 }
