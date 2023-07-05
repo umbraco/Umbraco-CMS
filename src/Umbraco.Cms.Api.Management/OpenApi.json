@@ -1064,17 +1064,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDataTypeTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDataTypeTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDataTypeTreeItemResponseModel"
                 }
               }
             }
@@ -1127,17 +1127,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDataTypeTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDataTypeTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDataTypeTreeItemResponseModel"
                 }
               }
             }
@@ -13540,6 +13540,40 @@
         },
         "additionalProperties": false
       },
+      "DataTypeTreeItemResponseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "hasChildren": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isContainer": {
+            "type": "boolean"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "isFolder": {
+            "type": "boolean"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "DatabaseInstallResponseModel": {
         "required": [
           "id",
@@ -14287,36 +14321,6 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "FolderTreeItemResponseModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "hasChildren": {
-            "type": "boolean"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isContainer": {
-            "type": "boolean"
-          },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "isFolder": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -15433,6 +15437,26 @@
         },
         "additionalProperties": false
       },
+      "PagedDataTypeTreeItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedDictionaryOverviewResponseModel": {
         "required": [
           "items",
@@ -15568,26 +15592,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "PagedFolderTreeItemResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FolderTreeItemResponseModel"
             }
           }
         },
