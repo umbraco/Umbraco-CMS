@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -27,6 +28,18 @@ namespace Umbraco.Web.Editors
     {
         private IMediaService _mediaService;
         private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+
+        private readonly Dictionary<string, string> _fileContentTypeMappings = new()
+        {
+            { "image/png", "png" },
+            { "image/jpeg", "jpg" },
+            { "image/gif", "gif" },
+            { "image/bmp", "bmp" },
+            { "image/x-icon", "ico" },
+            { "image/svg+xml", "svg" },
+            { "image/tiff", "tiff" },
+            { "image/webp", "webp" },
+        };
 
 
         public TinyMceController(IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
@@ -76,7 +89,20 @@ namespace Umbraco.Web.Editors
             var file = result.FileData[0];
             var fileName = file.Headers.ContentDisposition.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
             var safeFileName = fileName.ToSafeFileName();
-            var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
+            string ext;
+            var fileExtensionIndex = safeFileName.LastIndexOf('.');
+            if (fileExtensionIndex is not -1)
+            {
+                ext = safeFileName.Substring(fileExtensionIndex + 1).ToLowerInvariant();
+            }
+            else
+            {
+                _fileContentTypeMappings.TryGetValue(file.Headers.ContentType.MediaType, out var fileExtension);
+                ext = fileExtension ?? string.Empty;
+
+                // safeFileName will not have a file extension, so we need to add it back
+                safeFileName += $".{ext}";
+            }
 
             if (Current.Configs.Settings().Content.IsFileAllowedForUpload(ext) == false || Current.Configs.Settings().Content.ImageFileTypes.Contains(ext) == false)
             {
