@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Api.Management.Services.Paging;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
