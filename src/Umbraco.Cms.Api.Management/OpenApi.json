@@ -5073,17 +5073,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTypeTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTypeTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTypeTreeItemResponseModel"
                 }
               }
             }
@@ -5136,17 +5136,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTypeTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTypeTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTypeTreeItemResponseModel"
                 }
               }
             }
@@ -5638,17 +5638,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTreeItemResponseModel"
                 }
               }
             }
@@ -5696,7 +5696,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ContentTreeItemResponseModel"
+                    "$ref": "#/components/schemas/MediaTreeItemResponseModel"
                   }
                 }
               },
@@ -5704,7 +5704,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ContentTreeItemResponseModel"
+                    "$ref": "#/components/schemas/MediaTreeItemResponseModel"
                   }
                 }
               },
@@ -5712,7 +5712,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ContentTreeItemResponseModel"
+                    "$ref": "#/components/schemas/MediaTreeItemResponseModel"
                   }
                 }
               }
@@ -5766,17 +5766,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTreeItemResponseModel"
                 }
               }
             }
@@ -12719,42 +12719,6 @@
         "type": "integer",
         "format": "int32"
       },
-      "ContentTreeItemResponseModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "icon": {
-            "type": "string"
-          },
-          "hasChildren": {
-            "type": "boolean"
-          },
-          "isContainer": {
-            "type": "boolean"
-          },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "noAccess": {
-            "type": "boolean"
-          },
-          "isTrashed": {
-            "type": "boolean"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "additionalProperties": false
-      },
       "ContentTypeCleanupModel": {
         "type": "object",
         "properties": {
@@ -13774,9 +13738,6 @@
           "type": {
             "type": "string"
           },
-          "icon": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           },
@@ -13885,9 +13846,6 @@
           "type": {
             "type": "string"
           },
-          "icon": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           },
@@ -13927,6 +13885,9 @@
             "items": {
               "$ref": "#/components/schemas/VariantTreeItemModel"
             }
+          },
+          "icon": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -14105,9 +14066,6 @@
           "type": {
             "type": "string"
           },
-          "icon": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           },
@@ -14128,6 +14086,9 @@
           },
           "isElement": {
             "type": "boolean"
+          },
+          "icon": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -14237,9 +14198,6 @@
           "type": {
             "type": "string"
           },
-          "icon": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           },
@@ -14303,9 +14261,6 @@
           "type": {
             "type": "string"
           },
-          "icon": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           },
@@ -14343,9 +14298,6 @@
             "type": "string"
           },
           "type": {
-            "type": "string"
-          },
-          "icon": {
             "type": "string"
           },
           "hasChildren": {
@@ -14865,6 +14817,42 @@
         },
         "additionalProperties": false
       },
+      "MediaTreeItemResponseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "hasChildren": {
+            "type": "boolean"
+          },
+          "isContainer": {
+            "type": "boolean"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "noAccess": {
+            "type": "boolean"
+          },
+          "isTrashed": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "icon": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "MediaTypeItemResponseModel": {
         "type": "object",
         "properties": {
@@ -15008,6 +14996,39 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MediaTypeTreeItemResponseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "hasChildren": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isContainer": {
+            "type": "boolean"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "isFolder": {
+            "type": "boolean"
+          },
+          "icon": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -15392,26 +15413,6 @@
         },
         "additionalProperties": false
       },
-      "PagedContentTreeItemResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ContentTreeItemResponseModel"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "PagedCultureReponseModel": {
         "required": [
           "items",
@@ -15727,6 +15728,46 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LoggerResponseModel"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedMediaTreeItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaTreeItemResponseModel"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedMediaTypeTreeItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
             }
           }
         },
