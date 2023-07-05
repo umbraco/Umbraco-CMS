@@ -8,7 +8,7 @@ public class IpAddressUtilities : IIpAddressUtilities
     public bool IsAllowListed(IPAddress clientIpAddress, string allowedIpString)
     {
         var subnetmaskIndex = allowedIpString.LastIndexOf('/');
-        if (subnetmaskIndex >= 0) // Its a network
+        if (subnetmaskIndex >= 0) // It's a network
         {
             if (IPNetwork.TryParse(allowedIpString, out IPNetwork allowedIp) && allowedIp.Contains(clientIpAddress))
             {
