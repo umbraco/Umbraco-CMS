@@ -47,15 +47,14 @@ public static class UrlHelperExtensions
         string nodeId,
         FormCollection? queryStrings)
     {
-        var actionName = "GetNodes";
-        var actionUrl = urlHelper.GetUmbracoApiService(umbracoApiControllerTypeCollection, actionName, treeType);
-        actionUrl = StartOrContinueQueryString(actionUrl, actionName);
+        var actionUrl = urlHelper.GetUmbracoApiService(umbracoApiControllerTypeCollection, "GetNodes", treeType)?
+            .EnsureEndsWith('?');
 
-        // Now we need to append the query strings
-        // Always ignore the custom start node id when generating URLs for tree nodes since this is a custom once-only parameter
-        // that should only ever be used when requesting a tree to render (root), not a tree node
-        actionUrl += "id=" + nodeId.EnsureEndsWith('&') + queryStrings?.ToQueryString("id", TreeQueryStringParameters.StartNodeId);
-
+        //now we need to append the query strings
+        actionUrl += "id=" + nodeId.EnsureEndsWith('&') + queryStrings?.ToQueryString("id",
+            //Always ignore the custom start node id when generating URLs for tree nodes since this is a custom once-only parameter
+            // that should only ever be used when requesting a tree to render (root), not a tree node
+            TreeQueryStringParameters.StartNodeId);
         return actionUrl;
     }
 
@@ -66,29 +65,11 @@ public static class UrlHelperExtensions
         string nodeId,
         FormCollection? queryStrings)
     {
-        var actionName = "GetMenu";
-        var actionUrl = urlHelper.GetUmbracoApiService(umbracoApiControllerTypeCollection, actionName, treeType);
-        actionUrl = StartOrContinueQueryString(actionUrl, actionName);
+        var actionUrl = urlHelper.GetUmbracoApiService(umbracoApiControllerTypeCollection, "GetMenu", treeType)?
+            .EnsureEndsWith('?');
 
-        // now we need to append the query strings
+        //now we need to append the query strings
         actionUrl += "id=" + nodeId.EnsureEndsWith('&') + queryStrings?.ToQueryString("id");
         return actionUrl;
-    }
-
-    /// <summary>
-    /// Check the provided string already includes a querystring fragment
-    /// If so, result has "&amp;" appended, else has "?" appended.
-    /// </summary>
-    /// <param name="actionUrl"></param>
-    /// <param name="delimiter"></param>
-    /// <returns></returns>
-    private static string? StartOrContinueQueryString(string? actionUrl, string? delimiter)
-    {
-        if (actionUrl is null)
-        {
-            return actionUrl;
-        }
-
-        return actionUrl.EnsureEndsWith(actionUrl.Contains($"{delimiter}?") ? "&" : "?");
     }
 }
