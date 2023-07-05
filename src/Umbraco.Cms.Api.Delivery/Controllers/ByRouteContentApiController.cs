@@ -58,7 +58,8 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
             path = WebUtility.UrlDecode(path);
         }
 
-        path = path.EnsureStartsWith("/");
+        path = path.TrimStart("/");
+        path = path.Length == 0 ? "/" : path;
 
         IPublishedContent? contentItem = GetContent(path);
         if (contentItem is not null)

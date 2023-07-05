@@ -827,12 +827,9 @@ public class MediaController : ContentControllerBase
         }
         catch (Exception ex)
         {
+            _postAddFileSemaphore.Release();
             _logger.LogError(ex, "Something went wrong adding files");
             throw;
-        }
-        finally
-        {
-            _postAddFileSemaphore.Release();
         }
     }
 

@@ -241,6 +241,14 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     /// <inheritdoc />
     public override async Task SignOutAsync()
     {
+        // Update the security stamp to sign out everywhere.
+        TUser? user = await UserManager.GetUserAsync(Context.User);
+
+        if (user is not null)
+        {
+            await UserManager.UpdateSecurityStampAsync(user);
+        }
+
         // override to replace IdentityConstants.ApplicationScheme with custom auth types
         // code taken from aspnetcore: https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         await Context.SignOutAsync(AuthenticationType);

@@ -3,9 +3,12 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
-internal static class SchemaIdGenerator
+public class SchemaIdSelector : ISchemaIdSelector
 {
-    public static string Generate(Type type)
+    public virtual string SchemaId(Type type)
+        => type.Namespace?.StartsWith("Umbraco.Cms") is true ? UmbracoSchemaId(type) : type.Name;
+
+    protected string UmbracoSchemaId(Type type)
     {
         string SanitizedTypeName(Type t) => t.Name
             // first grab the "non generic" part of any generic type name (i.e. "PagedViewModel`1" becomes "PagedViewModel")
