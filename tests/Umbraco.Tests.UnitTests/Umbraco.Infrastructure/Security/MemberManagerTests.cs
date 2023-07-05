@@ -142,7 +142,7 @@ public class MemberManagerTests
     }
 
     [Test]
-    public async Task GivenAUserExists_AndTheCorrectCredentialsAreProvided_ThenACheckOfCredentialsShouldSucceed()
+    public async Task GivenAApprovedUserExists_AndTheCorrectCredentialsAreProvided_ThenACheckOfCredentialsShouldSucceed()
     {
         // arrange
         var password = "password";
@@ -166,6 +166,34 @@ public class MemberManagerTests
 
         // assert
         Assert.IsTrue(result);
+    }
+
+    [Test]
+    public async Task GivenAnUnapprovedUserExists_AndTheCorrectCredentialsAreProvided_ThenACheckOfCredentialsShouldFail()
+    {
+        // arrange
+        var password = "password";
+        var sut = CreateSut();
+
+        var fakeUser = CreateValidUser();
+        fakeUser.IsApproved = false;
+
+        var fakeMember = CreateMember(fakeUser);
+
+        MockMemberServiceForCreateMember(fakeMember);
+
+        _mockMemberService.Setup(x => x.GetByUsername(It.Is<string>(y => y == fakeUser.UserName))).Returns(fakeMember);
+
+        _mockPasswordHasher
+            .Setup(x => x.VerifyHashedPassword(It.IsAny<MemberIdentityUser>(), It.IsAny<string>(), It.IsAny<string>()))
+            .Returns(PasswordVerificationResult.Success);
+
+        // act
+        await sut.CreateAsync(fakeUser);
+        var result = await sut.ValidateCredentialsAsync(fakeUser.UserName, password);
+
+        // assert
+        Assert.IsFalse(result);
     }
 
     [Test]
@@ -220,6 +248,7 @@ public class MemberManagerTests
             MemberTypeAlias = "Anything",
             PasswordConfig = "testConfig",
             PasswordHash = "hashedPassword",
+            IsApproved = true
         };
 
     private static IMember CreateMember(MemberIdentityUser fakeUser)
