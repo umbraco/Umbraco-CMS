@@ -3,6 +3,7 @@ import {
 	UmbUserGroupStore,
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
 } from '../../../../user-groups/repository/user-group.store.js';
+import type { UmbUserDetail } from '../../../types.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
@@ -17,7 +18,6 @@ import {
 import type { UserGroupEntity } from '@umbraco-cms/backoffice/user-group';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 import './column-layouts/name/user-table-name-column-layout.element.js';
 import './column-layouts/status/user-table-status-column-layout.element.js';
@@ -60,7 +60,7 @@ export class UmbUserCollectionTableViewElement extends UmbLitElement {
 	private _userGroupStore?: UmbUserGroupStore;
 
 	@state()
-	private _users: Array<UserResponseModel> = [];
+	private _users: Array<UmbUserDetail> = [];
 
 	@state()
 	private _selection: Array<string> = [];
@@ -98,7 +98,7 @@ export class UmbUserCollectionTableViewElement extends UmbLitElement {
 			.join(', ');
 	}
 
-	private _createTableItems(users: Array<UserResponseModel>) {
+	private _createTableItems(users: Array<UmbUserDetail>) {
 		this._tableItems = users.map((user) => {
 			return {
 				id: user.id ?? '',

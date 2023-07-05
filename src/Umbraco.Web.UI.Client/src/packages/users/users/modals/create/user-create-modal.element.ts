@@ -1,5 +1,6 @@
 import { UmbUserGroupInputElement } from '../../../user-groups/components/input-user-group/user-group-input.element.js';
 import { UmbUserRepository } from '../../repository/user.repository.js';
+import { UmbUserDetail } from '../../types.js';
 import { css, html, nothing, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles, UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
 // TODO: we need to import this from the user group module when it is ready
@@ -9,7 +10,6 @@ import {
 	UmbNotificationContext,
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/notification';
-import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-user-create-modal')
@@ -18,7 +18,7 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 	private _form!: HTMLFormElement;
 
 	@state()
-	private _createdUser?: UserResponseModel;
+	private _createdUser?: UmbUserDetail;
 
 	@state()
 	private _createdUserInitialPassword?: string | null;
