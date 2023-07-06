@@ -3,7 +3,7 @@ import { stripSlash } from '@umbraco-cms/backoffice/external/router-slot'; // Th
 
 const PARAM_IDENTIFIER = /:([^\\/]+)/g;
 
-export function generateRoutePathBuilder(path: string) {
+export function createRoutePathBuilder(path: string) {
 	return (params: { [key: string]: string | number } | null) => {
 		return (
 			'/' +

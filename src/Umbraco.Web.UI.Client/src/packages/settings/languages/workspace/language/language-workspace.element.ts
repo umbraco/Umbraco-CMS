@@ -2,7 +2,7 @@ import { UmbLanguageWorkspaceContext } from './language-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
-import { generateRoutePathBuilder } from '@umbraco-cms/backoffice/router';
+import { createRoutePathBuilder } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './language-workspace-editor.element.js';
@@ -51,7 +51,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 							if (this.#routerPath && isoCode) {
 								const routeBasePath = this.#routerPath.endsWith('/') ? this.#routerPath : this.#routerPath + '/';
 								// TODO: Revisit if this is the right way to change URL:
-								const newPath = generateRoutePathBuilder(routeBasePath + 'edit/:isoCode')({ isoCode });
+								const newPath = createRoutePathBuilder(routeBasePath + 'edit/:isoCode')({ isoCode });
 								window.history.pushState({}, '', newPath);
 							}
 						}
