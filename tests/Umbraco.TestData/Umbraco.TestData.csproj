@@ -1,10 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <RootNamespace>Umbraco.TestData</RootNamespace>
-    <IsPackable>false</IsPackable>
-    <EnablePackageValidation>false</EnablePackageValidation>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Bogus" Version="34.0.2" />
   </ItemGroup>

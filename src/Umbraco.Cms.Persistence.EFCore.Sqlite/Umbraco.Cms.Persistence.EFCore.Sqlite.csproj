@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Title>Umbraco CMS - EF Core - Sqlite migrations</Title>
+    <Title>Umbraco CMS - Persistence - Entity Framework Core - SQLite migrations</Title>
+    <Description>Adds support for Entity Framework Core SQLite migrations to Umbraco CMS.</Description>
     <!-- TODO: Enable when final version is shipped (because there's currently no previous version) -->
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>

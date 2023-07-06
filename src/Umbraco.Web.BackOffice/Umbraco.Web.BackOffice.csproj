@@ -3,7 +3,6 @@
     <PackageId>Umbraco.Cms.Web.BackOffice</PackageId>
     <Title>Umbraco CMS - Web - Backoffice</Title>
     <Description>Contains the backoffice assembly needed to run the backend of Umbraco CMS.</Description>
-    <OutputType>Library</OutputType>
     <RootNamespace>Umbraco.Cms.Web.BackOffice</RootNamespace>
   </PropertyGroup>
 
