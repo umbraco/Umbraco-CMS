@@ -1,13 +1,13 @@
 import { UmbDocumentTypeWorkspaceContext } from './document-type-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbRoute, UmbRouterSlotInitEvent, createRoutePathBuilder } from '@umbraco-cms/backoffice/router';
+import { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbDocumentTypeWorkspaceContext(this);
-	#routerPath? = '';
 
 	@state()
 	_routes: UmbRoute[] = [
@@ -18,21 +18,10 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
 				this.#workspaceContext.create(parentId);
 
-				// Navigate to edit route when language is created:
-				this.observe(
-					this.#workspaceContext.isNew,
-					(isNew) => {
-						if (isNew === false) {
-							const id = this.#workspaceContext.getEntityId();
-							if (this.#routerPath && id) {
-								const routeBasePath = this.#routerPath.endsWith('/') ? this.#routerPath : this.#routerPath + '/';
-								// TODO: Revisit if this is the right way to change URL:
-								const newPath = createRoutePathBuilder(routeBasePath + 'edit/:id')({ id });
-								window.history.pushState({}, '', newPath);
-							}
-						}
-					},
-					'_observeIsNew'
+				new UmbWorkspaceIsNewRedirectController(
+					this,
+					this.#workspaceContext,
+					this.shadowRoot!.querySelector('umb-router-slot')!
 				);
 			},
 		},
@@ -48,13 +37,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	];
 
 	render() {
-		return html`
-			<umb-router-slot
-				.routes=${this._routes}
-				@init=${(event: UmbRouterSlotInitEvent) => {
-					this.#routerPath = event.target.absoluteRouterPath;
-				}}></umb-router-slot>
-		`;
+		return html` <umb-router-slot .routes=${this._routes}></umb-router-slot> `;
 	}
 
 	static styles = [UUITextStyles];

@@ -11,11 +11,11 @@ import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffic
 TODO: We need to figure out if we like to keep using same alias for all workspace contexts.
 If so we need to align on a interface that all of these implements. otherwise consumers cant trust the workspace-context.
 */
-export abstract class UmbWorkspaceContext<T, EntityType extends UmbEntityBase>
+export abstract class UmbWorkspaceContext<RepositoryType, EntityType extends UmbEntityBase>
 	implements UmbEntityWorkspaceContextInterface<EntityType>
 {
 	public readonly host: UmbControllerHostElement;
-	public readonly repository: T;
+	public readonly repository: RepositoryType;
 
 	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique.
 	public readonly modalContext?: UmbModalContext<{ preset: object }>;
@@ -23,7 +23,7 @@ export abstract class UmbWorkspaceContext<T, EntityType extends UmbEntityBase>
 	#isNew = new UmbBooleanState(undefined);
 	isNew = this.#isNew.asObservable();
 
-	constructor(host: UmbControllerHostElement, repository: T) {
+	constructor(host: UmbControllerHostElement, repository: RepositoryType) {
 		this.host = host;
 		this.repository = repository;
 		new UmbContextProviderController(host, UMB_ENTITY_WORKSPACE_CONTEXT, this);
