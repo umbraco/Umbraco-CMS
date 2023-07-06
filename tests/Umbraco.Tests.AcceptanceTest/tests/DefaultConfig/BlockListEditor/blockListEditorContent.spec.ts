@@ -1,29 +1,31 @@
 import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
-import {ContentBuilder, DocumentTypeBuilder, PartialViewBuilder} from "@umbraco/json-models-builders";
+import {ContentBuilder, DocumentTypeBuilder, PartialViewBuilder, SliderDataTypeBuilder} from "@umbraco/json-models-builders";
 import {BlockListDataTypeBuilder} from "@umbraco/json-models-builders/dist/lib/builders/dataTypes";
 
 test.describe('BlockListEditorContent', () => {
   const documentName = 'DocumentTestName';
   const blockListName = 'BlockListTest';
-  const elementName = 'TestElement';
+  const contentElementName = 'ContentElement';
+  const settingElementName = 'SettingsElement';
 
   const documentAlias = AliasHelper.toAlias(documentName);
   const blockListAlias = AliasHelper.toAlias(blockListName);
-  // Won't work if I use the to alias for the elementAlias
-  const elementAlias = 'testElement';
-  
+  // Won't work if we use the to alias for the elementAliases
+  const contentElementAlias = 'contentElement';
+  const settingsElementAlias = 'settingsElement';
+
   test.beforeEach(async ({page, umbracoApi, umbracoUi}, testInfo) => {
     await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
     await umbracoApi.documentTypes.ensureNameNotExists(documentName);
-    await umbracoApi.documentTypes.ensureNameNotExists(elementName);
+    await umbracoApi.documentTypes.ensureNameNotExists(contentElementName);
     await umbracoApi.dataTypes.ensureNameNotExists(blockListName);
   });
-  
+
   test.afterEach(async ({page, umbracoApi, umbracoUi}) => {
     await umbracoApi.documentTypes.ensureNameNotExists(documentName);
-    await umbracoApi.documentTypes.ensureNameNotExists(elementName);
+    await umbracoApi.documentTypes.ensureNameNotExists(contentElementName);
     await umbracoApi.dataTypes.ensureNameNotExists(blockListName);
   });
 
@@ -31,23 +33,22 @@ test.describe('BlockListEditorContent', () => {
     const dataTypeBlockList = new BlockListDataTypeBuilder()
       .withName(blockListName)
       .addBlock()
-      .withContentElementTypeKey(element['key'])
-      .withSettingsElementTypeKey(element['key'])
+        .withContentElementTypeKey(element['key'])
+        .withSettingsElementTypeKey(element['key'])
       .done()
       .build();
     return await umbracoApi.dataTypes.save(dataTypeBlockList);
   }
-  
-  async function createDocumentWithOneBlockListEditor(umbracoApi, element, dataType){
-    
+
+  async function createDocumentWithOneBlockListEditor(umbracoApi, element, dataType, elementName?, elementAlias?){
     if(element == null) {
       element = await umbracoApi.documentTypes.createDefaultElementType(elementName, elementAlias);
     }
-    
+
     if(dataType == null) {
       dataType = await createDefaultBlockList(umbracoApi, blockListName, element);
     }
-    
+
     const docType = new DocumentTypeBuilder()
       .withName(documentName)
       .withAlias(documentAlias)
@@ -61,16 +62,15 @@ test.describe('BlockListEditorContent', () => {
       .done()
       .build();
     await umbracoApi.documentTypes.save(docType);
-    
+
     return element;
   }
-  
-  async function createContentWithOneBlockListEditor(umbracoApi, element) {
-    
+
+  async function createContentWithOneBlockListEditor(umbracoApi, element, datatype?, elementName?, elementAlias?) {
     if(element == null) {
-      element = await createDocumentWithOneBlockListEditor(umbracoApi, null, null);
+      element = await createDocumentWithOneBlockListEditor(umbracoApi, null, datatype, elementName, elementAlias);
     }
-    
+
     const rootContentNode = new ContentBuilder()
       .withContentTypeAlias(documentAlias)
       .withAction(ConstantHelper.actions.save)
@@ -89,13 +89,43 @@ test.describe('BlockListEditorContent', () => {
       .done()
       .build();
     await umbracoApi.content.save(rootContentNode);
-    
+
     return element;
   }
 
+  async function createSliderWithDefaultValue(umbracoApi, sliderName: string, defaultValue: number) {
+    const slider = new SliderDataTypeBuilder()
+      .withName(sliderName)
+      .withInitialLowerValue(defaultValue)
+      .build();
+    return await umbracoApi.dataTypes.save(slider);
+  }
+
+  async function createElementWithSlider(umbracoApi, name, alias, sliderId, sliderName?, sliderDefaultValue?) {
+    if (sliderId == null) {
+      const sliderData = await createSliderWithDefaultValue(umbracoApi, sliderName, sliderDefaultValue);
+      sliderId = sliderData.id;
+    }
+
+    const contentElement = new DocumentTypeBuilder()
+      .withName(name)
+      .withAlias(alias)
+      .AsElementType()
+      .addGroup()
+        .withName('Content')
+        .withAlias('content')
+        .addCustomProperty(sliderId)
+          .withLabel('Slider')
+          .withAlias('slider')
+        .done()
+      .done()
+      .build();
+    return await umbracoApi.documentTypes.save(contentElement);
+  }
+
   test('can create content with a block list editor', async ({page, umbracoApi, umbracoUi}) => {
-    await createDocumentWithOneBlockListEditor(umbracoApi, null, null);
-    
+    await createDocumentWithOneBlockListEditor(umbracoApi, null, null, contentElementName, contentElementAlias);
+
     const rootContentNode = new ContentBuilder()
       .withContentTypeAlias(documentAlias)
       .withAction(ConstantHelper.actions.save)
@@ -113,7 +143,7 @@ test.describe('BlockListEditorContent', () => {
     await umbracoUi.clickDataElementByElementName('tree-item-' + blockListName);
 
     // Adds TestElement
-    await page.locator('[key="blockEditor_addThis"]', {hasText: elementName}).click();
+    await page.locator('[key="blockEditor_addThis"]', {hasText: contentElementName}).click();
     await page.locator('[id="sub-view-0"]').locator('[id="title"]').fill('Testing...');
     await page.locator('[label="Create"]').click();
 
@@ -121,17 +151,17 @@ test.describe('BlockListEditorContent', () => {
 
     // Assert
     await umbracoUi.isSuccessNotificationVisible();
-    
+
     // Checks if the content was created
     await expect(page.locator('.umb-block-list__block--view')).toHaveCount(1);
-    await expect(page.locator('.umb-block-list__block--view').nth(0)).toHaveText(elementName);
+    await expect(page.locator('.umb-block-list__block--view').nth(0)).toHaveText(contentElementName);
     // Checks if the content contains the correct value
     await page.locator('.umb-block-list__block--view').nth(0).click();
     await expect(page.locator('[id="sub-view-0"]').locator('[id="title"]')).toHaveValue('Testing...');
   });
 
   test('can update content with a block list editor', async ({page, umbracoApi, umbracoUi}) => {
-    await createContentWithOneBlockListEditor(umbracoApi, null);
+    await createContentWithOneBlockListEditor(umbracoApi, null, null, contentElementName, contentElementAlias);
 
     await umbracoUi.goToSection(ConstantHelper.sections.content);
     await umbracoUi.refreshContentTree();
@@ -154,7 +184,7 @@ test.describe('BlockListEditorContent', () => {
   });
 
   test('can delete a block list editor in content', async ({page, umbracoApi, umbracoUi}) => {
-    await createContentWithOneBlockListEditor(umbracoApi, null);
+    await createContentWithOneBlockListEditor(umbracoApi, null, null, contentElementName, contentElementAlias);
 
     await umbracoUi.goToSection(ConstantHelper.sections.content);
     await umbracoUi.refreshContentTree();
@@ -172,13 +202,13 @@ test.describe('BlockListEditorContent', () => {
 
     // Assert
     await umbracoUi.isSuccessNotificationVisible();
-    
+
     // Checks if the content is actually deleted
     await expect(page.locator('[ui-sortable="vm.sortableOptions"]').nth(0)).not.toBeVisible();
   });
 
   test('can copy block list content and paste it', async ({page, umbracoApi, umbracoUi}) => {
-    await createContentWithOneBlockListEditor(umbracoApi, null);
+    await createContentWithOneBlockListEditor(umbracoApi, null, null, contentElementName, contentElementAlias);
 
     await umbracoUi.goToSection(ConstantHelper.sections.content);
     await umbracoUi.refreshContentTree();
@@ -194,7 +224,7 @@ test.describe('BlockListEditorContent', () => {
     await expect(page.locator('.alert-success', {hasText: 'Copied to clipboard'})).toBeVisible();
     // Pastes block list content
     await page.locator('[title="Clipboard"]').click();
-    await page.locator('umb-block-card', {hasText: elementName}).click();
+    await page.locator('umb-block-card', {hasText: contentElementName}).click();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
 
     // Assert
@@ -204,9 +234,9 @@ test.describe('BlockListEditorContent', () => {
   });
 
   test('can copy block list content and paste it into another group with the same block list editor', async ({page, umbracoApi, umbracoUi}) => {
-    const element = await umbracoApi.documentTypes.createDefaultElementType(elementName, elementAlias);
+    const contentElement = await umbracoApi.documentTypes.createDefaultElementType(contentElementName, contentElementAlias);
 
-    const dataType = await createDefaultBlockList(umbracoApi, blockListName, element);
+    const dataType = await createDefaultBlockList(umbracoApi, blockListName, contentElement);
 
     const docType = new DocumentTypeBuilder()
       .withName(documentName)
@@ -227,7 +257,7 @@ test.describe('BlockListEditorContent', () => {
       .build();
     await umbracoApi.documentTypes.save(docType);
 
-    await createContentWithOneBlockListEditor(umbracoApi, element);
+    await createContentWithOneBlockListEditor(umbracoApi, contentElement);
 
     await umbracoUi.goToSection(ConstantHelper.sections.content);
     await umbracoUi.refreshContentTree();
@@ -245,7 +275,7 @@ test.describe('BlockListEditorContent', () => {
     await expect(page.locator('.alert-success', {hasText: 'Copied to clipboard'})).toBeVisible();
     // Pastes into the second group
     await page.locator('[title="Clipboard"]').nth(1).click();
-    await page.locator('umb-block-card', {hasText: elementName}).click();
+    await page.locator('umb-block-card', {hasText: contentElementName}).click();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await expect(page.locator('.alert-success', {hasText: 'Content Published'})).toBeVisible();
 
@@ -257,20 +287,20 @@ test.describe('BlockListEditorContent', () => {
   });
 
   test('can set a minimum of required blocks in content with a block list editor', async ({page, umbracoApi, umbracoUi}) => {
-    const element = await umbracoApi.documentTypes.createDefaultElementType(elementName, elementAlias);
+    const contentElement = await umbracoApi.documentTypes.createDefaultElementType(contentElementName, contentElementAlias);
 
     const dataTypeBlockList = new BlockListDataTypeBuilder()
       .withName(blockListName)
       .withMin(2)
       .addBlock()
-        .withContentElementTypeKey(element['key'])
+        .withContentElementTypeKey(contentElement['key'])
       .done()
       .build();
     const dataType = await umbracoApi.dataTypes.save(dataTypeBlockList);
 
-    await createDocumentWithOneBlockListEditor(umbracoApi, element, dataType);
-    
-    await createContentWithOneBlockListEditor(umbracoApi, element);
+    await createDocumentWithOneBlockListEditor(umbracoApi, contentElement, dataType);
+
+    await createContentWithOneBlockListEditor(umbracoApi, contentElement);
 
     await umbracoUi.goToSection(ConstantHelper.sections.content);
     await umbracoUi.refreshContentTree();
@@ -294,18 +324,18 @@ test.describe('BlockListEditorContent', () => {
   });
 
   test('can set a maximum of required blocks in content with a block list editor', async ({page, umbracoApi, umbracoUi}) => {
-    const element = await umbracoApi.documentTypes.createDefaultElementType(elementName, elementAlias);
+    const contentElement = await umbracoApi.documentTypes.createDefaultElementType(contentElementName, contentElementAlias);
 
     const dataTypeBlockList = new BlockListDataTypeBuilder()
       .withName(blockListName)
       .withMax(2)
       .addBlock()
-        .withContentElementTypeKey(element['key'])
+        .withContentElementTypeKey(contentElement['key'])
       .done()
       .build();
     const dataType = await umbracoApi.dataTypes.save(dataTypeBlockList);
 
-    await createDocumentWithOneBlockListEditor(umbracoApi, element, dataType);
+    await createDocumentWithOneBlockListEditor(umbracoApi, contentElement, dataType);
 
     const rootContentNode = new ContentBuilder()
       .withContentTypeAlias(documentAlias)
@@ -317,16 +347,16 @@ test.describe('BlockListEditorContent', () => {
           .withAlias(blockListAlias)
           .addBlockListValue()
             .addBlockListEntry()
-              .withContentTypeKey(element['key'])
-              .appendContentProperties(element.groups[0].properties[0].alias, "aliasTest")
+              .withContentTypeKey(contentElement['key'])
+              .appendContentProperties(contentElement.groups[0].properties[0].alias, "aliasTest")
             .done()
             .addBlockListEntry()
-              .withContentTypeKey(element['key'])
-              .appendContentProperties(element.groups[0].properties[0].alias, "aliasTests")
+              .withContentTypeKey(contentElement['key'])
+              .appendContentProperties(contentElement.groups[0].properties[0].alias, "aliasTests")
             .done()
             .addBlockListEntry()
-              .withContentTypeKey(element['key'])
-              .appendContentProperties(element.groups[0].properties[0].alias, "aliasTester")
+              .withContentTypeKey(contentElement['key'])
+              .appendContentProperties(contentElement.groups[0].properties[0].alias, "aliasTester")
             .done()
           .done()
         .done()
@@ -357,20 +387,20 @@ test.describe('BlockListEditorContent', () => {
   });
 
   test('can use inline editing mode in content with a block list editor', async ({page, umbracoApi, umbracoUi}) => {
-    const element = await umbracoApi.documentTypes.createDefaultElementType(elementName, elementAlias);
+    const contentElement = await umbracoApi.documentTypes.createDefaultElementType(contentElementName, contentElementAlias);
 
     const dataTypeBlockList = new BlockListDataTypeBuilder()
       .withName(blockListName)
       .withUseInlineEditingAsDefault(true)
       .addBlock()
-        .withContentElementTypeKey(element['key'])
+        .withContentElementTypeKey(contentElement['key'])
       .done()
       .build();
     const dataType = await umbracoApi.dataTypes.save(dataTypeBlockList);
 
-    await createDocumentWithOneBlockListEditor(umbracoApi, element, dataType);
-    
-    await createContentWithOneBlockListEditor(umbracoApi, element);
+    await createDocumentWithOneBlockListEditor(umbracoApi, contentElement, dataType);
+
+    await createContentWithOneBlockListEditor(umbracoApi, contentElement);
 
     await umbracoUi.goToSection(ConstantHelper.sections.content);
     await umbracoUi.refreshContentTree();
@@ -387,11 +417,11 @@ test.describe('BlockListEditorContent', () => {
 
   test('can see rendered content with a block list editor', async ({page, umbracoApi, umbracoUi}) => {
     await umbracoApi.templates.ensureNameNotExists(documentName);
-    await umbracoApi.partialViews.ensureNameNotExists('blocklist/Components',elementAlias + '.cshtml');
+    await umbracoApi.partialViews.ensureNameNotExists('blocklist/Components',contentElementAlias + '.cshtml');
 
-    const element = new DocumentTypeBuilder()
-      .withName(elementName)
-      .withAlias(elementAlias)
+    const contentElement = new DocumentTypeBuilder()
+      .withName(contentElementName)
+      .withAlias(contentElementAlias)
       .AsElementType()
       .addGroup()
         .withName("TestString")
@@ -406,9 +436,9 @@ test.describe('BlockListEditorContent', () => {
         .done()
       .done()
       .build();
-    await umbracoApi.documentTypes.save(element);
+    await umbracoApi.documentTypes.save(contentElement);
 
-    const dataType = await createDefaultBlockList(umbracoApi, blockListName, element);
+    const dataType = await createDefaultBlockList(umbracoApi, blockListName, contentElement);
 
     const docType = new DocumentTypeBuilder()
       .withName(documentName)
@@ -418,7 +448,7 @@ test.describe('BlockListEditorContent', () => {
       .addGroup()
         .withName('BlockListGroup')
         .addCustomProperty(dataType['id'])
-          .withAlias(elementAlias)
+          .withAlias(contentElementAlias)
         .done()
       .done()
       .build();
@@ -431,15 +461,15 @@ test.describe('BlockListEditorContent', () => {
       '\n    Layout = null;' +
       '\n}' +
       '\n' +
-      '@Html.GetBlockListHtml(Model.' + elementName + ')');
+      '@Html.GetBlockListHtml(Model.' + contentElementName + ')');
 
     const partialView = new PartialViewBuilder()
-      .withName(elementAlias)
+      .withName(contentElementAlias)
       .withContent("@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>;\n" +
         "@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\n" +
         "@{\n" +
-        "var content = (ContentModels." + elementName + ")Model.Content;\n" +
-        "var settings = (ContentModels." + elementName + ")Model.Settings;\n" +
+        "var content = (ContentModels." + contentElementName + ")Model.Content;\n" +
+        "var settings = (ContentModels." + contentElementName + ")Model.Settings;\n" +
         "}\n" +
         "\n" +
         "<h1>@content.Title</h1>" +
@@ -459,15 +489,15 @@ test.describe('BlockListEditorContent', () => {
         .withSave(true)
         .withPublish(true)
         .addProperty()
-          .withAlias(elementAlias)
+          .withAlias(contentElementAlias)
           .addBlockListValue()
             .addBlockListEntry()
-              .withContentTypeKey(element['key'])
-              .appendContentProperties(element.groups[0].properties[0].alias, "ContentTest")
-              .appendContentProperties(element.groups[0].properties[1].alias, "RTEContent")
-              .withSettingsTypeKey(element['key'])
-              .appendSettingsProperties(element.groups[0].properties[0].alias, "SettingTest")
-              .appendSettingsProperties(element.groups[0].properties[1].alias, "RTESetting")
+              .withContentTypeKey(contentElement['key'])
+              .appendContentProperties(contentElement.groups[0].properties[0].alias, "ContentTest")
+              .appendContentProperties(contentElement.groups[0].properties[1].alias, "RTEContent")
+              .withSettingsTypeKey(contentElement['key'])
+              .appendSettingsProperties(contentElement.groups[0].properties[0].alias, "SettingTest")
+              .appendSettingsProperties(contentElement.groups[0].properties[1].alias, "RTESetting")
             .done()
           .done()
         .done()
@@ -479,9 +509,85 @@ test.describe('BlockListEditorContent', () => {
     // Ensure that the view gets rendered correctly
     const expected = `<divclass="umb-block-list"><h1>ContentTest</h1><p>RTEContent</p><h1>SettingTest</h1><p>RTESetting</p></div>`;
     await expect(await umbracoApi.content.verifyRenderedContent('/', expected, true)).toBeTruthy();
-    
+
     // Clean
     await umbracoApi.templates.ensureNameNotExists(documentName);
-    await umbracoApi.partialViews.ensureNameNotExists('blocklist/Components',elementAlias + '.cshtml');
+    await umbracoApi.partialViews.ensureNameNotExists('blocklist/Components',contentElementAlias + '.cshtml');
+  });
+
+  test('Checks if the settings content model contains a default value when created', async ({page, umbracoApi, umbracoUi}) => {
+    await test.slow();
+
+    const contentSliderName = 'ContentSlider';
+    const contentSliderDefaultValue = 5;
+    const settingsSliderName = 'SettingsSlider';
+    const settingsSliderDefaultValue = 9;
+
+    await umbracoApi.documentTypes.ensureNameNotExists(settingElementName);
+    await umbracoApi.dataTypes.ensureNameNotExists(contentSliderName);
+    await umbracoApi.dataTypes.ensureNameNotExists(settingsSliderName);
+
+    const contentElement = await createElementWithSlider(umbracoApi, contentElementName, contentElementAlias, null, contentSliderName, contentSliderDefaultValue);
+
+    const settingsElement = await createElementWithSlider(umbracoApi, settingElementName, settingsElementAlias, null, settingsSliderName, settingsSliderDefaultValue);
+
+    const blockList = new BlockListDataTypeBuilder()
+      .withName(blockListName)
+      .addBlock()
+        .withContentElementTypeKey(contentElement['key'])
+        .withSettingsElementTypeKey(settingsElement['key'])
+      .done()
+      .build();
+    const blockListDataType = await umbracoApi.dataTypes.save(blockList);
+
+    const document = new DocumentTypeBuilder()
+      .withName(documentName)
+      .withAlias(documentAlias)
+      .withAllowAsRoot(true)
+      .addGroup()
+        .withName('Content')
+        .withAlias('content')
+        .addCustomProperty(blockListDataType['id'])
+          .withLabel('BlockListTest')
+          .withAlias('blockListTest')
+        .done()
+      .done()
+      .build();
+    await umbracoApi.documentTypes.save(document);
+
+    const content = new ContentBuilder()
+      .withContentTypeAlias(documentAlias)
+      .withAction(ConstantHelper.actions.publish)
+      .addVariant()
+        .withName(blockListName)
+        .withSave(true)
+        .withPublish(true)
+      .done()
+      .build();
+    const contentNode = await umbracoApi.content.save(content);
+
+    await umbracoUi.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.refreshContentTree();
+    await umbracoUi.clickDataElementByElementName('tree-item-' + blockListName);
+    await page.locator('[key="blockEditor_addThis"]', {hasText: contentElementName}).click();
+    await page.locator('[label="Create"]').click();
+    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
+
+    // Assert
+    // Checks if the content contains the BlockListEditor block
+    await umbracoUi.clickDataElementByElementName("tree-root");
+    await umbracoUi.refreshContentTree();
+    await umbracoUi.clickDataElementByElementName('tree-item-' + blockListName);
+    await expect(page.locator('.umb-block-list__block--view')).toHaveCount(1);
+
+    // Checks if both the content and settings have been assigned their DefaultValues
+    const contentData = await umbracoApi.content.getContent(contentNode.id);
+    await expect(contentData.variants[0].tabs[0].properties[0].value.contentData[0].slider).toEqual(contentSliderDefaultValue.toString());
+    await expect(contentData.variants[0].tabs[0].properties[0].value.settingsData[0].slider).toEqual(settingsSliderDefaultValue.toString());
+
+    // Clean
+    await umbracoApi.documentTypes.ensureNameNotExists(settingElementName);
+    await umbracoApi.dataTypes.ensureNameNotExists(contentSliderName);
+    await umbracoApi.dataTypes.ensureNameNotExists(settingsSliderName);
   });
 });
