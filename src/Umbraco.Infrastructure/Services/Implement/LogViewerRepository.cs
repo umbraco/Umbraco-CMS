@@ -4,7 +4,6 @@ using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Logging.Viewer;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
@@ -24,7 +23,7 @@ public class LogViewerRepository : ILogViewerRepository
         _jsonSerializer = jsonSerializer;
     }
 
-    public PagedModel<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, string? filterExpression)
+    public IEnumerable<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, string? filterExpression)
     {
         var logs = new List<LogEvent>();
         var expressionFilter = new ExpressionFilter(filterExpression);
@@ -67,7 +66,7 @@ public class LogViewerRepository : ILogViewerRepository
         }
 
         // Order By, Skip, Take & Select
-        IEnumerable<LogEntry> logMessages = logs
+        return logs
             .Select(x => new LogEntry
             {
                 Timestamp = x.Timestamp,
@@ -77,8 +76,6 @@ public class LogViewerRepository : ILogViewerRepository
                 Properties = MapLogMessageProperties(x.Properties),
                 RenderedMessage = x.RenderMessage(),
             }).ToArray();
-
-        return new PagedModel<ILogEntry>(logMessages.Count(), logMessages);
     }
 
     private IReadOnlyDictionary<string, string?> MapLogMessageProperties(IReadOnlyDictionary<string, LogEventPropertyValue>? properties)
