@@ -1,60 +1,31 @@
 using System.Collections.ObjectModel;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Infrastructure.Logging.Serilog;
 using Umbraco.Extensions;
 using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
-namespace Umbraco.Cms.Core.Services.Implement;
+namespace Umbraco.Cms.Core.Services;
 
 public class LogViewerService : ILogViewerService
 {
     private const int FileSizeCap = 100;
     private readonly ILogViewerQueryRepository _logViewerQueryRepository;
     private readonly ICoreScopeProvider _provider;
-    private readonly IJsonSerializer _jsonSerializer;
-    private readonly ILogger<LogViewerService> _logger;
     private readonly ILoggingConfiguration _loggingConfiguration;
     private readonly ILogViewerRepository _logViewerRepository;
 
-    [Obsolete("Use the constructor without ILogLevelLoader instead, Scheduled for removal in Umbraco 15.")]
-    public LogViewerService(
-        ILogViewerQueryRepository logViewerQueryRepository,
-        ILogViewer logViewer,
-        ILogLevelLoader logLevelLoader,
-        ICoreScopeProvider provider,
-        IJsonSerializer jsonSerializer,
-        UmbracoFileConfiguration umbracoFileConfig)
-        : this(
-            logViewerQueryRepository,
-            provider,
-            jsonSerializer,
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<LogViewerService>>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILoggingConfiguration>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILogViewerRepository>())
-    {
-    }
-
     public LogViewerService(
         ILogViewerQueryRepository logViewerQueryRepository,
         ICoreScopeProvider provider,
-        IJsonSerializer jsonSerializer,
-        ILogger<LogViewerService> logger,
         ILoggingConfiguration loggingConfiguration,
         ILogViewerRepository logViewerRepository)
     {
         _logViewerQueryRepository = logViewerQueryRepository;
         _provider = provider;
-        _jsonSerializer = jsonSerializer;
-        _logger = logger;
         _loggingConfiguration = loggingConfiguration;
         _logViewerRepository = logViewerRepository;
     }
