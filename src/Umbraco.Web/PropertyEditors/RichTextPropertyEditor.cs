@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Web.Models;
 using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors
@@ -11,13 +14,24 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.TinyMCEAlias, "Rich Text Editor", "rte", ValueType = PropertyEditorValueTypes.Text,  HideLabel = false, Group="Rich Content", Icon="icon-browser-window")]
     public class RichTextPropertyEditor : PropertyEditor
     {
+        private readonly ILogger _logger;
+        private readonly IMediaService _mediaService;
+
+        public RichTextPropertyEditor(
+            ILogger logger,
+            IMediaService mediaService)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
+        }
+
         /// <summary>
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
         protected override PropertyValueEditor CreateValueEditor()
         {
-            return new RichTextPropertyValueEditor(base.CreateValueEditor());
+            return new RichTextPropertyValueEditor(base.CreateValueEditor(), _logger, _mediaService);
         }
 
         protected override PreValueEditor CreatePreValueEditor()
@@ -31,9 +45,17 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class RichTextPropertyValueEditor : PropertyValueEditorWrapper
         {
-            public RichTextPropertyValueEditor(PropertyValueEditor wrapped)
+            private readonly ILogger _logger;
+            private readonly IMediaService _mediaService;
+
+            public RichTextPropertyValueEditor(
+                PropertyValueEditor wrapped,
+                ILogger logger,
+                IMediaService mediaService)
                 : base(wrapped)
             {
+                _logger = logger;
+                _mediaService = mediaService;
             }
 
             /// <summary>
@@ -82,7 +104,16 @@ namespace Umbraco.Web.PropertyEditors
                 if (editorValue.Value == null)
                     return null;
 
-                var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValue.Value.ToString());
+                var userId = UmbracoContext.Current.Security?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
+
+                // You can configure the media parent folder in V8+, but this is supposed to handle images for V7 once and for all
+                // so we will just save the images in the Media root folder
+                var mediaParentId = Guid.Empty;
+
+                var pastedImages = new RichTextEditorPastedImages(_logger, _mediaService);
+                var imageUrlGenerator = new ImageProcessorImageUrlGenerator();
+                var parseAndSaveTempImages = pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId, imageUrlGenerator);
+                var parsed = MacroTagParser.FormatRichTextContentForPersistence(parseAndSaveTempImages);
                 return parsed;
             }
         }
