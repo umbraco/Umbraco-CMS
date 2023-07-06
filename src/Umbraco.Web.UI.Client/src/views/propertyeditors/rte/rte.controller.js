@@ -15,6 +15,7 @@ angular.module("umbraco")
             editor.save();
             angularHelper.safeApply($scope, function () {
                 $scope.model.value = editor.getContent();
+                console.log('content was synced', $scope.model.value);
             });
 
             //make the form dirty manually so that the track changes works, setting our model doesn't trigger
@@ -29,7 +30,7 @@ angular.module("umbraco")
 
             //These are absolutely required in order for the macros to render inline
             //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
-            var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],span[id|class|style]";
+            var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],span[id|class|style],img[longdesc|usemap|src|border|alt=|title|hspace|vspace|width|height|align|data-tmpimg]";
 
             var invalidElements = tinyMceConfig.inValidElements;
             var plugins = _.map(tinyMceConfig.plugins, function (plugin) {
@@ -256,6 +257,37 @@ angular.module("umbraco")
 
                     // Update model on change, i.e. copy/pasted text, plugins altering content
                     editor.on('SetContent', function (e) {
+
+                        // Check to see if the content contains <img> tags with embedded base64 sources so that we can upload them to the server
+                        // and replace the base64 with the response received from the server
+                        var matches = e.content.match(/<img[^>]+src="data:image\/[^>]+>/g);
+                        if (matches != null) {
+                            // TODO: Queue
+                            for (var i = 0; i < matches.length; i++) {
+                                var img = matches[i];
+                                var matches2 = img.match(/src="(data:image\/.+?;base64,.+?)"/);
+                                if (matches2 != null) {
+                                    var dataUri = matches2[1];
+
+                                    var onSuccess = function (response) {
+                                        // Replace the base64 with the blob data uri returned from the server to keep the reference to the just uploaded image
+                                        var content = e.content.replace(img, '<img src="' + URL.createObjectURL(response.blobInfo) + '" data-tmpimg="' + response.tmpLocation + '" />');
+                                        e.target.setContent(content + "<p>whatever</p>", { format: 'raw' });
+                                        syncContent(e.target);
+                                    };
+
+                                    var onError = function (response) {
+                                        // TODO: Should we remove the image or warn the user?
+                                        alert("Error uploading image");
+                                        console.error(response);
+                                    };
+
+                                    // Call the endpoint to upload the image
+                                    tinyMceService.uploadBase64ImageHandler(dataUri, onSuccess, onError);
+                                }
+                            }
+                        }
+
                         if (!e.initial) {
                               // sync content if editor is dirty
                               if (!editor.isNotDirty) {
@@ -263,7 +295,6 @@ angular.module("umbraco")
                             }
                         }
                     });
-
 
                     editor.on('ObjectResized', function (e) {
                         var qs = "?width=" + e.width + "&height=" + e.height + "&mode=max";
