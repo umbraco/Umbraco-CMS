@@ -30,7 +30,7 @@ export class UmbWorkspaceIsNewRedirectController extends UmbBaseController {
 					if (router && id) {
 						const routerPath = router.absoluteRouterPath;
 						if (routerPath) {
-							const newPath = createRoutePathBuilder(ensurePathEndsWithSlash(basePath) + 'edit/:id')({ id });
+							const newPath = createRoutePathBuilder(ensurePathEndsWithSlash(routerPath) + 'edit/:id')({ id });
 							window.history.pushState({}, '', newPath);
 
 							this.destroy();
