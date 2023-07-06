@@ -6,7 +6,7 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper, userService) {
+function tinyMceService(imageHelper, $http, $timeout, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper, userService) {
 	return {
 
 		/**
@@ -24,8 +24,8 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					umbRequestHelper.getApiUrl(
 						"rteApiBaseUrl",
 						"GetConfiguration"), {
-						cache: true
-					}),
+					cache: true
+				}),
 				'Failed to retrieve tinymce configuration');
 		},
 
@@ -161,8 +161,8 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 							var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
 							editor.dom.setAttrib(imgElm, 'data-mce-src', src);
 						}
-                    }
-				    editor.dom.setAttrib(imgElm, 'id', null);
+					}
+					editor.dom.setAttrib(imgElm, 'id', null);
 				}, 500);
 			}
 		},
@@ -454,8 +454,8 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 			//create an id class for this element so we can re-select it after inserting
 			var uniqueId = "umb-macro-" + editor.dom.uniqueId();
 			var macroDiv = editor.dom.create('div', {
-					'class': 'umb-macro-holder ' + macroObject.macroAlias + ' mceNonEditable ' + uniqueId
-				},
+				'class': 'umb-macro-holder ' + macroObject.macroAlias + ' mceNonEditable ' + uniqueId
+			},
 				macroSyntaxComment + '<ins>Macro alias: <strong>' + macroObject.macroAlias + '</strong></ins>');
 
 			editor.selection.setNode(macroDiv);
@@ -546,7 +546,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					var linkListItems = [{
 						text: 'None',
 						value: ''
-                    }];
+					}];
 
 					tinymce.each(linkList, function (link) {
 						linkListItems.push({
@@ -563,7 +563,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					var relListItems = [{
 						text: 'None',
 						value: ''
-                    }];
+					}];
 
 					tinymce.each(editor.settings.rel_list, function (rel) {
 						relListItems.push({
@@ -580,7 +580,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					var targetListItems = [{
 						text: 'None',
 						value: ''
-                    }];
+					}];
 
 					if (!editor.settings.target_list) {
 						targetListItems.push({
@@ -807,7 +807,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 				}
 			}
 
-            if (!href && !target.anchor) {
+			if (!href && !target.anchor) {
 				editor.execCommand('unlink');
 				return;
 			}
@@ -821,14 +821,14 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 				return;
 			}
 
-		    if (!href) {
-		        href = "";
-            }
+			if (!href) {
+				href = "";
+			}
 
-		    // Is email and not //user@domain.com and protocol (e.g. mailto:, sip:) is not specified
-		    if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf(':') === -1) {
-		        // assume it's a mailto link
-		        href = 'mailto:' + href;
+			// Is email and not //user@domain.com and protocol (e.g. mailto:, sip:) is not specified
+			if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf(':') === -1) {
+				// assume it's a mailto link
+				href = 'mailto:' + href;
 				insertLink();
 				return;
 			}
@@ -842,6 +842,91 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 
 			insertLink();
 
+		},
+
+		uploadBase64ImageHandler: function (dataURI, success, failure, progress, fileName) {
+			var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+			fetch(dataURI).then(function (res) {
+				return res.blob();
+			}).then(function (blob) {
+				var imageBlob = new Blob([blob], { type: mimeString });
+				return this.uploadImageHandler(imageBlob, success, failure, progress, fileName || mimeString.replace('/', '.'));
+			}.bind(this));
+		},
+
+		uploadImageHandler: function (blobInfo, success, failure, progress, fileName) {
+			if (!success) {
+				console.warn('No success callback provided for uploadImageHandler');
+				return;
+			}
+
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
+
+			/* 			
+			xhr.onloadstart = function (e) {
+				angularHelper.safeApply($rootScope, function () {
+					eventsService.emit("rte.file.uploading");
+				});
+			};
+
+			xhr.onloadend = function (e) {
+				angularHelper.safeApply($rootScope, function () {
+					eventsService.emit("rte.file.uploaded");
+				});
+			};
+			*/
+
+			if (progress) {
+				xhr.upload.onprogress = function (e) {
+					progress(e.loaded / e.total * 100);
+				};
+			}
+
+			if (failure) {
+				xhr.onerror = function () {
+					failure('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+				};
+			}
+
+			xhr.onload = function () {
+				if (xhr.status < 200 || xhr.status >= 300) {
+					failure('HTTP Error: ' + xhr.status);
+					return;
+				}
+
+				var data = xhr.responseText;
+
+				if (!data.length > 1) {
+					failure('Unrecognized text string: ' + data);
+					return;
+				}
+
+				var json = {};
+
+				try {
+					json = JSON.parse(data);
+				} catch (e) {
+					failure('Invalid JSON: ' + data + ' - ' + e.message);
+					return;
+				}
+
+				if (!json || typeof json.tmpLocation !== 'string') {
+					failure('Invalid JSON: ' + data);
+					return;
+				}
+
+				// We set the img src url to be the same as we started
+				// The Blob URI is stored in TinyMce's cache
+				// so the img still shows in the editor
+				success({ blobInfo: blobInfo, tmpLocation: json.tmpLocation });
+			};
+
+			var formData = new FormData();
+			formData.append('file', blobInfo, fileName || 'image.jpg');
+
+			xhr.send(formData);
 		}
 
 	};
