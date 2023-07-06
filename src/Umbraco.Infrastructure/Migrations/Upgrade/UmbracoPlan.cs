@@ -6,6 +6,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_2_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_5_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_7_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0;
@@ -303,5 +304,8 @@ public class UmbracoPlan : MigrationPlan
 
         // to 10.5.0
         To<AddPrimaryKeyConstrainToContentVersionCleanupDtos>("{83AF7945-DADE-4A02-9041-F3F6EBFAC319}");
+
+        // to 10.7.0
+        To<MigrateTagsFromNVarcharToNText>("{EF93F398-1385-4F07-808A-D3C518984442}");
     }
 }
