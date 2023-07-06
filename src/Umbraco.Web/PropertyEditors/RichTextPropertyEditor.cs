@@ -5,7 +5,6 @@ using Umbraco.Core.Macros;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Web.Models;
 using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors
@@ -94,8 +93,8 @@ namespace Umbraco.Web.PropertyEditors
                 var mediaService = UmbracoContext.Current.Application.Services.MediaService;
 
                 var pastedImages = new RichTextEditorPastedImages(logger, mediaService);
-                var imageUrlGenerator = new ImageProcessorImageUrlGenerator();
-                var parseAndSaveTempImages = pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId, imageUrlGenerator);
+                var parseAndSaveDataUriImages = pastedImages.FindAndPersistBase64Images(editorValue.Value.ToString(), mediaParentId, userId);
+                var parseAndSaveTempImages = pastedImages.FindAndPersistPastedTempImages(parseAndSaveDataUriImages, mediaParentId, userId);
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(parseAndSaveTempImages);
                 return parsed;
             }
