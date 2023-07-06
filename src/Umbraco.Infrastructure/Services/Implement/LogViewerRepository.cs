@@ -24,11 +24,10 @@ public class LogViewerRepository : ILogViewerRepository
         _jsonSerializer = jsonSerializer;
     }
 
-    public PagedModel<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, int skip, int take)
+    public PagedModel<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, string? filterExpression)
     {
-        List<LogEvent> logs = new List<LogEvent>();
-
-        var count = 0;
+        var logs = new List<LogEvent>();
+        var expressionFilter = new ExpressionFilter(filterExpression);
 
         // foreach full day in the range - see if we can find one or more filenames that end with
         // yyyyMMdd.json - Ends with due to MachineName in filenames - could be 1 or more due to load balancing
@@ -57,20 +56,10 @@ public class LogViewerRepository : ILogViewerRepository
                                 continue;
                             }
 
-                            if (count > skip + take)
+                            if (expressionFilter.TakeLogEvent(evt))
                             {
-                                break;
+                                logs.Add(evt);
                             }
-
-                            if (count < skip)
-                            {
-                                count++;
-                                continue;
-                            }
-
-                            logs.Add(evt);
-
-                            count++;
                         }
                     }
                 }
