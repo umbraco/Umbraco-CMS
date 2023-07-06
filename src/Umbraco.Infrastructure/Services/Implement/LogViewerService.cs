@@ -28,6 +28,7 @@ public class LogViewerService : ILogViewerService
     private readonly UmbracoFileConfiguration _umbracoFileConfig;
     private readonly ILogger<LogViewerService> _logger;
     private readonly ILoggingConfiguration _loggingConfiguration;
+    private readonly ILogViewerRepository _logViewerRepository;
 
     [Obsolete("Use the constructor without ILogLevelLoader instead, Scheduled for removal in Umbraco 15.")]
     public LogViewerService(
@@ -43,7 +44,8 @@ public class LogViewerService : ILogViewerService
             jsonSerializer,
             umbracoFileConfig,
             StaticServiceProvider.Instance.GetRequiredService<ILogger<LogViewerService>>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILoggingConfiguration>())
+            StaticServiceProvider.Instance.GetRequiredService<ILoggingConfiguration>(),
+            StaticServiceProvider.Instance.GetRequiredService<ILogViewerRepository>())
     {
     }
 
@@ -53,7 +55,8 @@ public class LogViewerService : ILogViewerService
         IJsonSerializer jsonSerializer,
         UmbracoFileConfiguration umbracoFileConfig,
         ILogger<LogViewerService> logger,
-        ILoggingConfiguration loggingConfiguration)
+        ILoggingConfiguration loggingConfiguration,
+        ILogViewerRepository logViewerRepository)
     {
         _logViewerQueryRepository = logViewerQueryRepository;
         _provider = provider;
@@ -61,6 +64,7 @@ public class LogViewerService : ILogViewerService
         _umbracoFileConfig = umbracoFileConfig;
         _logger = logger;
         _loggingConfiguration = loggingConfiguration;
+        _logViewerRepository = logViewerRepository;
     }
 
     /// <inheritdoc/>
@@ -84,26 +88,11 @@ public class LogViewerService : ILogViewerService
         }
 
 
-        IReadOnlyList<LogEvent> filteredLogs = GetFilteredLogs(logTimePeriod, filterExpression, logLevels);
-
-        // Order By, Skip, Take & Select
-        IEnumerable<LogEntry> logMessages = filteredLogs
-            .OrderBy(l => l.Timestamp, orderDirection)
-            .Select(x => new LogEntry
-            {
-                Timestamp = x.Timestamp,
-                Level = Enum.Parse<LogLevel>(x.Level.ToString()),
-                MessageTemplateText = x.MessageTemplate.Text,
-                Exception = x.Exception?.ToString(),
-                Properties = MapLogMessageProperties(x.Properties),
-                RenderedMessage = x.RenderMessage(),
-            }).ToArray();
-
-        var logEntries = new PagedModel<ILogEntry>(logMessages.Count(), logMessages);
+        PagedModel<ILogEntry> filteredLogs = GetFilteredLogs(logTimePeriod, filterExpression, logLevels, orderDirection, skip, take);
 
         return Attempt.SucceedWithStatus<PagedModel<ILogEntry>?, LogViewerOperationStatus>(
             LogViewerOperationStatus.Success,
-            logEntries);
+            filteredLogs);
     }
 
     /// <inheritdoc/>
@@ -329,19 +318,21 @@ public class LogViewerService : ILogViewerService
         return result.AsReadOnly();
     }
 
-    private IReadOnlyList<LogEvent> GetFilteredLogs(
+    private PagedModel<ILogEntry> GetFilteredLogs(
         LogTimePeriod logTimePeriod,
         string? filterExpression,
-        string[]? logLevels)
+        string[]? logLevels,
+        Direction orderDirection,
+        int skip,
+        int take)
     {
-        var expression = new ExpressionFilter(filterExpression);
-        IReadOnlyList<LogEvent> filteredLogs = GetLogs(logTimePeriod, expression, 0, int.MaxValue);
+        IEnumerable<ILogEntry> logs = _logViewerRepository.GetLogs(logTimePeriod, filterExpression).ToArray();
 
         // This is user used the checkbox UI to toggle which log levels they wish to see
         // If an empty array or null - its implied all levels to be viewed
         if (logLevels?.Length > 0)
         {
-            var logsAfterLevelFilters = new List<LogEvent>();
+            var logsAfterLevelFilters = new List<ILogEntry>();
             var validLogType = true;
             foreach (var level in logLevels)
             {
@@ -349,7 +340,7 @@ public class LogViewerService : ILogViewerService
                 if (Enum.IsDefined(typeof(LogEventLevel), level))
                 {
                     validLogType = true;
-                    logsAfterLevelFilters.AddRange(filteredLogs.Where(x =>
+                    logsAfterLevelFilters.AddRange(logs.Where(x =>
                         string.Equals(x.Level.ToString(), level, StringComparison.InvariantCultureIgnoreCase)));
                 }
                 else
@@ -360,88 +351,19 @@ public class LogViewerService : ILogViewerService
 
             if (validLogType)
             {
-                filteredLogs = logsAfterLevelFilters;
+                logs = logsAfterLevelFilters;
             }
         }
 
-        return filteredLogs;
-    }
-
-    private IReadOnlyList<LogEvent> GetLogs(LogTimePeriod logTimePeriod, ILogFilter filter, int skip, int take)
-    {
-        var logs = new List<LogEvent>();
-
-        var count = 0;
-
-        // foreach full day in the range - see if we can find one or more filenames that end with
-        // yyyyMMdd.json - Ends with due to MachineName in filenames - could be 1 or more due to load balancing
-        for (DateTime day = logTimePeriod.StartTime.Date; day.Date <= logTimePeriod.EndTime.Date; day = day.AddDays(1))
+        return new PagedModel<ILogEntry>
         {
-            // Filename ending to search for (As could be multiple)
-            var filesToFind = GetSearchPattern(day);
-
-            var filesForCurrentDay = Directory.GetFiles(_loggingConfiguration.LogDirectory, filesToFind);
-
-            // Foreach file we find - open it
-            foreach (var filePath in filesForCurrentDay)
-            {
-                // Open log file & add contents to the log collection
-                // Which we then use LINQ to page over
-                using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                {
-                    using (var stream = new StreamReader(fs))
-                    {
-                        var reader = new LogEventReader(stream);
-                        while (TryRead(reader, out LogEvent? evt))
-                        {
-                            // We may get a null if log line is malformed
-                            if (evt == null)
-                            {
-                                continue;
-                            }
-
-                            if (count > skip + take)
-                            {
-                                break;
-                            }
-
-                            if (count < skip)
-                            {
-                                count++;
-                                continue;
-                            }
-
-                            if (filter.TakeLogEvent(evt))
-                            {
-                                logs.Add(evt);
-                            }
-
-                            count++;
-                        }
-                    }
-                }
-            }
-        }
-
-        return logs;
+            Total = logs.Count(),
+            Items = logs
+                .OrderBy(l => l.Timestamp, orderDirection)
+                .Skip(skip)
+                .Take(take),
+        };
     }
 
     private string GetSearchPattern(DateTime day) => $"*{day:yyyyMMdd}*.json";
-
-    private bool TryRead(LogEventReader reader, out LogEvent? evt)
-    {
-        try
-        {
-            return reader.TryRead(out evt);
-        }
-        catch (JsonReaderException ex)
-        {
-            // As we are reading/streaming one line at a time in the JSON file
-            // Thus we can not report the line number, as it will always be 1
-            _logger.LogError(ex, "Unable to parse a line in the JSON log file");
-
-            evt = null;
-            return true;
-        }
-    }
 }
