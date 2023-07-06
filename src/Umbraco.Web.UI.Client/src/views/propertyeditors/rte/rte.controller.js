@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $scope, $q, $locale, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, editorState, entityResource) {
+        function ($scope, $q, $locale, dialogService, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, entityResource) {
 
         $scope.isLoading = true;
 
@@ -15,7 +15,6 @@ angular.module("umbraco")
             editor.save();
             angularHelper.safeApply($scope, function () {
                 $scope.model.value = editor.getContent();
-                console.log('content was synced', $scope.model.value);
             });
 
             //make the form dirty manually so that the track changes works, setting our model doesn't trigger
@@ -260,7 +259,7 @@ angular.module("umbraco")
 
                         // Check to see if the content contains <img> tags with embedded base64 sources so that we can upload them to the server
                         // and replace the base64 with the response received from the server
-                        var matches = e.content.match(/<img[^>]+src="data:image\/[^>]+>/g);
+                        /*var matches = e.content.match(/<img[^>]+src="data:image\/[^>]+>/g);
                         if (matches != null) {
                             // TODO: Queue
                             for (var i = 0; i < matches.length; i++) {
@@ -286,7 +285,7 @@ angular.module("umbraco")
                                     tinyMceService.uploadBase64ImageHandler(dataUri, onSuccess, onError);
                                 }
                             }
-                        }
+                        }*/
 
                         if (!e.initial) {
                               // sync content if editor is dirty
