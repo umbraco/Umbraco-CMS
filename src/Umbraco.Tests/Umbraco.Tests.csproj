@@ -193,6 +193,7 @@
   <ItemGroup>
     <Compile Include="DateTimeExtensionsTests.cs" />
     <Compile Include="Cache\CacheRefresherEventHandlerTests.cs" />
+    <Compile Include="Models\ImageProcessorImageUrlGeneratorTest.cs" />
     <Compile Include="Models\Mapping\UserModelMapperTests.cs" />
     <Compile Include="Packaging\PackageExtractionTests.cs" />
     <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
