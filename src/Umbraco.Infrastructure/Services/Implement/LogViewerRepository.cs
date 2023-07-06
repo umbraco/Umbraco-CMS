@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Logging.Serilog;
 using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement;
@@ -15,18 +17,66 @@ public class LogViewerRepository : ILogViewerRepository
     private readonly ILoggingConfiguration _loggingConfiguration;
     private readonly ILogger<LogViewerRepository> _logger;
     private readonly IJsonSerializer _jsonSerializer;
+    private readonly UmbracoFileConfiguration _umbracoFileConfig;
 
-    public LogViewerRepository(ILoggingConfiguration loggingConfiguration, ILogger<LogViewerRepository> logger, IJsonSerializer jsonSerializer)
+    public LogViewerRepository(ILoggingConfiguration loggingConfiguration, ILogger<LogViewerRepository> logger, IJsonSerializer jsonSerializer, UmbracoFileConfiguration umbracoFileConfig)
     {
         _loggingConfiguration = loggingConfiguration;
         _logger = logger;
         _jsonSerializer = jsonSerializer;
+        _umbracoFileConfig = umbracoFileConfig;
     }
 
-    public IEnumerable<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, string? filterExpression)
+    public IEnumerable<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, string? filterExpression = null)
+    {
+        var expressionFilter = new ExpressionFilter(filterExpression);
+
+        return GetLogs(logTimePeriod, expressionFilter);
+    }
+
+    public LogLevelCounts GetLogCount(LogTimePeriod logTimePeriod)
+    {
+        var counter = new CountingFilter();
+
+        GetLogs(logTimePeriod, counter);
+
+        return counter.Counts;
+    }
+
+    public LogTemplate[] GetMessageTemplates(LogTimePeriod logTimePeriod)
+    {
+        var messageTemplates = new MessageTemplateFilter();
+
+        GetLogs(logTimePeriod, messageTemplates);
+
+        return messageTemplates.Counts
+            .Select(x => new LogTemplate { MessageTemplate = x.Key, Count = x.Value })
+            .OrderByDescending(x => x.Count).ToArray();
+    }
+
+    public LogLevel GetGlobalMinLogLevel()
+    {
+        LogEventLevel logLevel = GetGlobalLogLevelEventMinLevel();
+
+        return Enum.Parse<LogLevel>(logLevel.ToString());
+    }
+
+    public LogLevel RestrictedToMinimumLevel()
+    {
+        LogEventLevel minLevel = _umbracoFileConfig.RestrictedToMinimumLevel;
+        return Enum.Parse<LogLevel>(minLevel.ToString());
+    }
+
+    private LogEventLevel GetGlobalLogLevelEventMinLevel() =>
+        Enum.GetValues(typeof(LogEventLevel))
+            .Cast<LogEventLevel>()
+            .Where(Log.IsEnabled)
+            .DefaultIfEmpty(LogEventLevel.Information)
+            .Min();
+
+    private IEnumerable<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, ILogFilter logFilter)
     {
         var logs = new List<LogEvent>();
-        var expressionFilter = new ExpressionFilter(filterExpression);
 
         // foreach full day in the range - see if we can find one or more filenames that end with
         // yyyyMMdd.json - Ends with due to MachineName in filenames - could be 1 or more due to load balancing
@@ -55,7 +105,7 @@ public class LogViewerRepository : ILogViewerRepository
                                 continue;
                             }
 
-                            if (expressionFilter.TakeLogEvent(evt))
+                            if (logFilter.TakeLogEvent(evt))
                             {
                                 logs.Add(evt);
                             }
@@ -129,4 +179,5 @@ public class LogViewerRepository : ILogViewerRepository
             return true;
         }
     }
+
 }
