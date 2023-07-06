@@ -775,10 +775,18 @@ public class ContentController : ContentControllerBase
             IQuery<IContent>? queryFilter = null;
             if (filter.IsNullOrWhiteSpace() == false)
             {
+                //adding multiple conditions ,considering id,key & name as filter param
+                //for id as int
+                int.TryParse(filter, out int filterAsIntId);
+                //for key as Guid
+                Guid.TryParse(filter, out Guid filterAsGuid);
+
                 //add the default text filter
                 queryFilter = _sqlContext.Query<IContent>()
                     .Where(x => x.Name != null)
-                    .Where(x => x.Name!.Contains(filter));
+                    .Where(x => x.Name!.Contains(filter)
+                    || x.Id == filterAsIntId
+                      || x.Key == filterAsGuid);
             }
 
             children = _contentService
