@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Core.Services;
 
 public interface ILogViewerRepository
 {
-    PagedModel<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, string? filterExpression);
+    IEnumerable<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, string? filterExpression);
 }
