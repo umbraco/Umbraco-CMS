@@ -275,6 +275,10 @@ namespace Umbraco.Web.Editors
                         {
                             "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
                                 controller => controller.GetSupportedMomentLocales())
+                        },
+                        {
+                            "tinyMceApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TinyMceController>(
+                                controller => controller.UploadImage())
                         }
 
                     }
