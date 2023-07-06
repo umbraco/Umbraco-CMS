@@ -53,6 +53,30 @@ namespace Umbraco.Core.IO
             }
         }
 
+        public static string TempData
+        {
+            get
+            {
+                return Data + "/TEMP";
+            }
+        }
+
+        public static string TempFileUploads
+        {
+            get
+            {
+                return TempData + "/FileUploads";
+            }
+        }
+
+        public static string TempImageUploads
+        {
+            get
+            {
+                return TempFileUploads + "/rte";
+            }
+        }
+
         public static string Install
         {
             get
@@ -207,7 +231,7 @@ namespace Umbraco.Core.IO
             }
         }
 
-	    private static string _root;
+        private static string _root;
         /// <summary>
         /// Gets the root path of the application
         /// </summary>

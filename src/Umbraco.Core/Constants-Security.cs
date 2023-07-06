@@ -7,6 +7,10 @@ namespace Umbraco.Core
     {
         public static class Security
         {
+            /// <summary>
+            /// Gets the identifier of the 'super' user.
+            /// </summary>
+            public const int SuperUserId = -1;
 
             public const string AdminGroupAlias = "admin";
             public const string SensitiveDataGroupAlias = "sensitiveData";
