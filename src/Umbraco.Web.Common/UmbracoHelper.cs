@@ -150,7 +150,7 @@ public class UmbracoHelper
     /// <returns></returns>
     public string? GetDictionaryValue(string key, CultureInfo specificCulture)
     {
-        this._cultureDictionary = _cultureDictionaryFactory.CreateDictionary(specificCulture);
+        _cultureDictionary = _cultureDictionaryFactory.CreateDictionary(specificCulture);
         return GetDictionaryValue(key);
     }
 
@@ -177,7 +177,7 @@ public class UmbracoHelper
     /// <param name="key">key of dictionary item</param>
     /// <param name="altText">fall back text if dictionary item is empty - Name altText to match Umbraco.Field</param>
     /// <returns></returns>
-    [Obsolete]
+    [Obsolete("Use GetDictionaryValueOrDefault instead, scheduled for removal in v14.")]
     public string GetDictionaryValue(string key, string altText)
     {
         var dictionaryValue = GetDictionaryValue(key);
@@ -185,6 +185,7 @@ public class UmbracoHelper
         {
             dictionaryValue = altText;
         }
+
         return dictionaryValue;
     }
 
