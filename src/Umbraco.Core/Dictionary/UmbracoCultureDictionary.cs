@@ -50,7 +50,7 @@ internal class DefaultCultureDictionary : ICultureDictionary
     /// <summary>
     ///     Returns the defualt umbraco's back office culture
     /// </summary>
-    public CultureInfo Culture => _specificCulture ?? new CultureInfo( _localizationService.GetDefaultLanguageIsoCode());
+    public CultureInfo Culture => _specificCulture ?? Thread.CurrentThread.CurrentUICulture;
 
     private ILanguage? Language =>
 
