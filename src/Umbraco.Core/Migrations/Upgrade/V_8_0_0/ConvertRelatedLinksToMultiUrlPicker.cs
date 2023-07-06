@@ -60,6 +60,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 var links = new List<LinkDto>();
                 foreach (var relatedLink in relatedLinks)
                 {
+                    if (relatedLink == null)
+                        continue;
+
                     GuidUdi udi = null;
                     if (relatedLink.IsInternal)
                     {
