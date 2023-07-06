@@ -4,6 +4,7 @@ import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-user-group-workspace')
 export class UmbUserGroupWorkspaceElement extends UmbLitElement {
@@ -17,6 +18,12 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 			component: () => this.#element,
 			setup: (component, info) => {
 				this.#workspaceContext.create();
+
+				new UmbWorkspaceIsNewRedirectController(
+					this,
+					this.#workspaceContext,
+					this.shadowRoot!.querySelector('umb-router-slot')!
+				);
 			},
 		},
 		{

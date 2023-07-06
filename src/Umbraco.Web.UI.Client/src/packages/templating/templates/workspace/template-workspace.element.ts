@@ -5,6 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import '../../components/insert-menu/templating-insert-menu.element.js';
 import './template-workspace-editor.element.js';
+import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-template-workspace')
 export class UmbTemplateWorkspaceElement extends UmbLitElement {
@@ -13,8 +14,6 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 	}
 
 	#templateWorkspaceContext = new UmbTemplateWorkspaceContext(this);
-
-	#routerPath? = '';
 
 	#element = document.createElement('umb-template-workspace-editor');
 
@@ -26,6 +25,12 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 			setup: (component: PageComponent, info: IRoutingInfo) => {
 				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
 				this.#templateWorkspaceContext.create(parentId);
+
+				new UmbWorkspaceIsNewRedirectController(
+					this,
+					this.#templateWorkspaceContext,
+					this.shadowRoot!.querySelector('umb-router-slot')!
+				);
 			},
 		},
 		{
@@ -39,11 +44,7 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 	];
 
 	render() {
-		return html`<umb-router-slot
-			.routes=${this._routes}
-			@init=${(event: UmbRouterSlotInitEvent) => {
-				this.#routerPath = event.target.absoluteRouterPath;
-			}}></umb-router-slot>`;
+		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
 }
 

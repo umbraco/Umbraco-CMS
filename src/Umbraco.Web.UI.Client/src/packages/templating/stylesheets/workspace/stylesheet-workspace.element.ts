@@ -5,6 +5,7 @@ import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-stylesheet-workspace')
 export class UmbStylesheetWorkspaceElement extends UmbLitElement {
@@ -20,6 +21,12 @@ export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 				const path = info.match.params.path;
 				const serverPath = serverFilePathFromUrlFriendlyPath(path);
 				this.#workspaceContext.load(serverPath);
+
+				new UmbWorkspaceIsNewRedirectController(
+					this,
+					this.#workspaceContext,
+					this.shadowRoot!.querySelector('umb-router-slot')!
+				);
 			},
 		},
 	];
