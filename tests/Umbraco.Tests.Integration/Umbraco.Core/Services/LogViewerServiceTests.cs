@@ -84,11 +84,14 @@ public class LogViewerServiceTests : UmbracoIntegrationTest
     {
         var attempt = await LogViewerService.GetPagedLogsAsync(_startDate, _endDate, 0, int.MaxValue, filterExpression: "@Level='Error'");
 
-        Assert.IsTrue(attempt.Success);
-        Assert.AreEqual(LogViewerOperationStatus.Success, attempt.Status);
-        Assert.IsNotNull(attempt.Result);
-        Assert.IsNotEmpty(attempt.Result.Items);
-        Assert.AreEqual(6, attempt.Result.Total);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(attempt.Success);
+            Assert.AreEqual(LogViewerOperationStatus.Success, attempt.Status);
+            Assert.IsNotNull(attempt.Result);
+            Assert.IsNotEmpty(attempt.Result.Items);
+            Assert.AreEqual(6, attempt.Result.Total);
+        });
     }
 
     [Test]
@@ -96,11 +99,14 @@ public class LogViewerServiceTests : UmbracoIntegrationTest
     {
         var attempt = await LogViewerService.GetPagedLogsAsync(_startDate, _endDate, 0, int.MaxValue, logLevels: new[] { "Error" });
 
-        Assert.IsTrue(attempt.Success);
-        Assert.AreEqual(LogViewerOperationStatus.Success, attempt.Status);
-        Assert.IsNotNull(attempt.Result);
-        Assert.IsNotEmpty(attempt.Result.Items);
-        Assert.AreEqual(6, attempt.Result.Total);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(attempt.Success);
+            Assert.AreEqual(LogViewerOperationStatus.Success, attempt.Status);
+            Assert.IsNotNull(attempt.Result);
+            Assert.IsNotEmpty(attempt.Result.Items);
+            Assert.AreEqual(6, attempt.Result.Total);
+        });
     }
 
     [Test]
@@ -139,6 +145,66 @@ public class LogViewerServiceTests : UmbracoIntegrationTest
             Assert.AreEqual("Create Index:\n {Sql}", mostPopularTemplate.MessageTemplate);
             Assert.AreEqual(74, mostPopularTemplate.Count);
             Assert.AreEqual(attempt.Result.Items, attempt.Result.Items.OrderByDescending(x => x.Count));
+        });
+    }
+
+    [Test]
+    public async Task Can_Add_Saved_Query()
+    {
+        const string queryName = "testQuery";
+        const string query = "@Message like '%test critical%'";
+        var attempt = await LogViewerService.AddSavedLogQueryAsync(queryName, query);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(attempt.Success);
+            Assert.AreEqual(attempt.Status, LogViewerOperationStatus.Success);
+            Assert.IsNotNull(attempt.Result);
+            Assert.AreEqual(queryName, attempt.Result.Name);
+            Assert.AreEqual(query, attempt.Result.Query);
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Saved_Query()
+    {
+        const string queryName = "testQuery";
+        const string query = "@Message like '%test critical%'";
+        var savedAttempt = await LogViewerService.AddSavedLogQueryAsync(queryName, query);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(savedAttempt.Success);
+            Assert.AreEqual(savedAttempt.Status, LogViewerOperationStatus.Success);
+            Assert.IsNotNull(savedAttempt.Result);
+        });
+
+        var getAttempt = await LogViewerService.GetSavedLogQueryByNameAsync(queryName);
+
+        Assert.AreEqual(getAttempt, savedAttempt.Result);
+    }
+
+    [Test]
+    public async Task Can_Delete_Saved_Query()
+    {
+        const string queryName = "testQuery";
+        const string query = "@Message like '%test critical%'";
+        var savedAttempt = await LogViewerService.AddSavedLogQueryAsync(queryName, query);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(savedAttempt.Success);
+            Assert.AreEqual(savedAttempt.Status, LogViewerOperationStatus.Success);
+            Assert.IsNotNull(savedAttempt.Result);
+        });
+
+        var deleteAttempt = await LogViewerService.DeleteSavedLogQueryAsync(queryName);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(deleteAttempt.Success);
+            Assert.AreEqual(deleteAttempt.Status, LogViewerOperationStatus.Success);
+            Assert.AreEqual(savedAttempt.Result, deleteAttempt.Result);
         });
     }
 }
