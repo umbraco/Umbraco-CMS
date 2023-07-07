@@ -178,6 +178,7 @@ export class UmbDocumentServerDataSource
 	async getAllowedDocumentTypesOf(id: string) {
 		if (!id) throw new Error('Id is missing');
 
+		// TODO: Notice, here we need to implement pagination.
 		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdAllowedDocumentTypes({ id }));
 	}
 
@@ -189,7 +190,7 @@ export class UmbDocumentServerDataSource
 	 */
 	async getAllowedDocumentTypesAtRoot() {
 		console.log('source requestAllowedDocumentTypesAtRoot');
-		// Notice, here we need to implement pagination.
-		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentRootAllowedDocumentTypes({ take: 4 }));
+		// TODO: Notice, here we need to implement pagination.
+		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentRootAllowedDocumentTypes({}));
 	}
 }
