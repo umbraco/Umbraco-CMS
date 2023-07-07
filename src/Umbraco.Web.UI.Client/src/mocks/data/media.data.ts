@@ -6,7 +6,6 @@ import { ContentTreeItemResponseModel, PagedContentTreeItemResponseModel } from 
 
 export const data: Array<MediaDetails> = [
 	{
-		$type: '',
 		name: 'Flipped Car',
 		type: 'media',
 		icon: 'picture',
@@ -33,7 +32,6 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		$type: '',
 		name: 'Umbracoffee',
 		type: 'media',
 		icon: 'picture',
@@ -60,7 +58,6 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		$type: '',
 		name: 'People',
 		type: 'media',
 		icon: 'folder',
@@ -75,7 +72,6 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		$type: '',
 		name: 'Products',
 		type: 'media',
 		icon: 'folder',
@@ -90,7 +86,6 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		$type: '',
 		name: 'John Smith',
 		type: 'media',
 		icon: 'picture',
@@ -117,7 +112,6 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		$type: '',
 		name: 'Jane Doe',
 		type: 'media',
 		icon: 'picture',
@@ -144,7 +138,6 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		$type: '',
 		name: 'A very nice hat',
 		type: 'media',
 		icon: 'picture',
@@ -171,7 +164,6 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		$type: '',
 		name: 'Fancy old chair',
 		type: 'media',
 		icon: 'picture',

@@ -11,7 +11,6 @@ import type {
 
 export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => {
 	return {
-		$type: '',
 		name: item.name,
 		type: item.type,
 		icon: item.icon,

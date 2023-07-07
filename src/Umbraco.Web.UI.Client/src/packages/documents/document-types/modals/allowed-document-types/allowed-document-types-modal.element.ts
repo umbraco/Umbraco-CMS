@@ -57,7 +57,7 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 				if (item.id) {
 					return this.#documentTypeRepository.requestById(item.id).then((result) => {
 						if (result.data) {
-							allFullModels.push({ $type: '', ...result.data });
+							allFullModels.push({ ...result.data });
 						}
 					});
 				}

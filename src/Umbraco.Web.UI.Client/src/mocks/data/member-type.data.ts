@@ -5,7 +5,6 @@ import { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel } from '@
 
 export const data: Array<MemberTypeDetails> = [
 	{
-		$type: '',
 		name: 'Member Type 1',
 		type: 'member-type',
 		icon: 'icon-user',

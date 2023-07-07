@@ -8,7 +8,6 @@ import type {
 
 export const data: Array<MemberDetails> = [
 	{
-		$type: '',
 		name: 'Member AAA',
 		type: 'member',
 		icon: 'umb:user',
