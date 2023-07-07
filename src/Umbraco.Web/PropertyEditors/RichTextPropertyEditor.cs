@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -89,8 +90,8 @@ namespace Umbraco.Web.PropertyEditors
                 // You can configure the media parent folder in V8+, but this is supposed to handle images for V7 once and for all
                 // so we will just save the images in the Media root folder
                 var mediaParentId = Guid.Empty;
-                var logger = UmbracoContext.Current.Application.ProfilingLogger.Logger;
-                var mediaService = UmbracoContext.Current.Application.Services.MediaService;
+                ILogger logger = UmbracoContext.Current.Application.ProfilingLogger.Logger;
+                IMediaService mediaService = UmbracoContext.Current.Application.Services.MediaService;
 
                 var pastedImages = new RichTextEditorPastedImages(logger, mediaService);
                 var parseAndSaveDataUriImages = pastedImages.FindAndPersistBase64Images(editorValue.Value.ToString(), mediaParentId, userId);
