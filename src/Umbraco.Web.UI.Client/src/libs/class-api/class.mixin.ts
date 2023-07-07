@@ -53,7 +53,7 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 		constructor(host: UmbControllerHost, controllerAlias: UmbControllerAlias) {
 			super();
 			this._host = host;
-			this._controllerAlias = controllerAlias ?? undefined; // ?? Symbol();
+			this._controllerAlias = controllerAlias ?? Symbol(); // This will fallback to a Symbol, ensuring that this class is only appended to the controller host once.
 		}
 
 		getHostElement(): EventTarget {

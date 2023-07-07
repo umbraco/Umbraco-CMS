@@ -1,11 +1,11 @@
 import { UmbLanguageWorkspaceContext } from './language-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
-import { generateRoutePathBuilder } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './language-workspace-editor.element.js';
+import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-language-workspace')
 export class UmbLanguageWorkspaceElement extends UmbLitElement {
@@ -15,8 +15,6 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 	 * Workspace editor element, lazy loaded but shared across several user flows.
 	 */
 	#editorElement?: HTMLElement;
-
-	#routerPath? = '';
 
 	#getComponentElement = async () => {
 		if (this.#editorElement) {
@@ -42,32 +40,17 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 			setup: async () => {
 				this.#languageWorkspaceContext.create();
 
-				// Navigate to edit route when language is created:
-				this.observe(
-					this.#languageWorkspaceContext.isNew,
-					(isNew) => {
-						if (isNew === false) {
-							const isoCode = this.#languageWorkspaceContext.getEntityId();
-							if (this.#routerPath && isoCode) {
-								const routeBasePath = this.#routerPath.endsWith('/') ? this.#routerPath : this.#routerPath + '/';
-								// TODO: Revisit if this is the right way to change URL:
-								const newPath = generateRoutePathBuilder(routeBasePath + 'edit/:isoCode')({ isoCode });
-								window.history.pushState({}, '', newPath);
-							}
-						}
-					},
-					'_observeIsNew'
+				new UmbWorkspaceIsNewRedirectController(
+					this,
+					this.#languageWorkspaceContext,
+					this.shadowRoot!.querySelector('umb-router-slot')!
 				);
 			},
 		},
 	];
 
 	render() {
-		return html`<umb-router-slot
-			.routes=${this._routes}
-			@init=${(event: UmbRouterSlotInitEvent) => {
-				this.#routerPath = event.target.absoluteRouterPath;
-			}}></umb-router-slot>`;
+		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
 
 	static styles = [UUITextStyles, css``];

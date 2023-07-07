@@ -5,15 +5,13 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbRoute, IRoutingInfo, PageComponent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 
 import './partial-views-workspace-edit.element.js';
+import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-partial-views-workspace')
 export class UmbPartialViewsWorkspaceElement extends UmbLitElement {
 	#partialViewsWorkspaceContext = new UmbPartialViewsWorkspaceContext(this);
 
-	#routerPath? = '';
-
 	#element = document.createElement('umb-partial-views-workspace-edit');
-	#key = '';
 
 	@state()
 	_routes: UmbRoute[] = [
@@ -23,6 +21,12 @@ export class UmbPartialViewsWorkspaceElement extends UmbLitElement {
 			setup: async (component: PageComponent, info: IRoutingInfo) => {
 				const parentKey = info.match.params.parentKey;
 				this.#partialViewsWorkspaceContext.create(parentKey);
+
+				new UmbWorkspaceIsNewRedirectController(
+					this,
+					this.#partialViewsWorkspaceContext,
+					this.shadowRoot!.querySelector('umb-router-slot')!
+				);
 			},
 		},
 		{
@@ -36,11 +40,7 @@ export class UmbPartialViewsWorkspaceElement extends UmbLitElement {
 	];
 
 	render() {
-		return html`<umb-router-slot
-			.routes=${this._routes}
-			@init=${(event: UmbRouterSlotInitEvent) => {
-				this.#routerPath = event.target.absoluteRouterPath;
-			}}></umb-router-slot>`;
+		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
 
 	static styles = [UUITextStyles, css``];
