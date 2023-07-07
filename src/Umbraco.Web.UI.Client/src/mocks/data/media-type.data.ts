@@ -5,7 +5,6 @@ import { FolderTreeItemResponseModel, PagedFolderTreeItemResponseModel } from '@
 
 export const data: Array<MediaTypeDetails> = [
 	{
-		$type: 'media-type',
 		name: 'Media Type 1',
 		type: 'media-type',
 		hasChildren: false,
@@ -13,12 +12,10 @@ export const data: Array<MediaTypeDetails> = [
 		isContainer: false,
 		parentId: null,
 		isFolder: false,
-		icon: '',
 		alias: 'mediaType1',
 		properties: [],
 	},
 	{
-		$type: 'media-type',
 		name: 'Media Type 2',
 		type: 'media-type',
 		hasChildren: false,
@@ -26,7 +23,6 @@ export const data: Array<MediaTypeDetails> = [
 		isContainer: false,
 		parentId: null,
 		isFolder: false,
-		icon: '',
 		alias: 'mediaType2',
 		properties: [],
 	},

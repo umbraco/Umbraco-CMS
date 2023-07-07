@@ -65,7 +65,6 @@ export class UmbDocumentServerDataSource
 			values: [],
 			variants: [
 				{
-					$type: 'DocumentVariantRequestModel',
 					state: ContentStateModel.DRAFT,
 					publishDate: null,
 					culture: null,
@@ -92,12 +91,11 @@ export class UmbDocumentServerDataSource
 
 		// TODO: Hack to remove some props that ruins the document-type post end-point.
 		const unFroozenDocument = { ...document };
-		(unFroozenDocument as any).$type = undefined;
 		(unFroozenDocument as any).id = undefined;
 
 		(unFroozenDocument.variants as any) =
 			unFroozenDocument.variants?.map((variant) => {
-				return { ...variant, $type: undefined };
+				return { ...variant };
 			}) ?? [];
 
 		return tryExecuteAndNotify(this.#host, DocumentResource.postDocument({ requestBody: unFroozenDocument }));
@@ -114,12 +112,11 @@ export class UmbDocumentServerDataSource
 
 		// TODO: Hack to remove some props that ruins the document-type post end-point.
 		const unFroozenDocument = { ...document };
-		(unFroozenDocument as any).$type = undefined;
 		(unFroozenDocument as any).id = undefined;
 
 		(unFroozenDocument.variants as any) =
 			unFroozenDocument.variants?.map((variant) => {
-				return { ...variant, $type: undefined };
+				return { ...variant };
 			}) ?? [];
 
 		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentById({ id, requestBody: unFroozenDocument }));

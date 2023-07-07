@@ -476,7 +476,6 @@ export const data: Array<DocumentResponseModel> = [
 
 export const treeData: Array<DocumentTreeItemResponseModel> = [
 	{
-		$type: 'DocumentTreeItemViewModel',
 		isProtected: false,
 		isPublished: true,
 		isEdited: false,
@@ -491,7 +490,6 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		hasChildren: false,
 	},
 	{
-		$type: 'DocumentTreeItemViewModel',
 		isProtected: false,
 		isPublished: true,
 		isEdited: false,
@@ -506,7 +504,6 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		hasChildren: true,
 	},
 	{
-		$type: 'DocumentTreeItemViewModel',
 		isProtected: false,
 		isPublished: false,
 		isEdited: false,
@@ -521,7 +518,6 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		hasChildren: false,
 	},
 	{
-		$type: 'DocumentTreeItemViewModel',
 		name: 'Document 5',
 		type: 'document',
 		icon: 'document',
@@ -536,7 +532,6 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		isTrashed: false,
 	},
 	{
-		$type: 'DocumentTreeItemViewModel',
 		name: 'Simple',
 		type: 'document',
 		icon: 'document',

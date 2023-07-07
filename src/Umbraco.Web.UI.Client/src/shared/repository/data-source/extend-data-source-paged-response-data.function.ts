@@ -21,7 +21,7 @@ import { Diff } from '@umbraco-cms/backoffice/utils';
 export function extendDataSourcePagedResponseData<
 	ExtendedDataType extends IncomingDataType,
 	IncomingDataType extends object = object,
-	MissingPropsType extends object = Omit<Diff<IncomingDataType, ExtendedDataType>, '$type'>,
+	MissingPropsType extends object = Diff<IncomingDataType, ExtendedDataType>,
 	// Maybe this Omit<..., "$ype"> can be removed, but for now it kept showing up as a difference, though its not a difference on the two types.
 	ToType = IncomingDataType & ExtendedDataType
 >(

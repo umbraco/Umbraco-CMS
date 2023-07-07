@@ -1,6 +1,6 @@
 const { rest } = window.MockServiceWorker;
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { ProblemDetailsModel, RuntimeLevelModel, ServerStatusResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { ProblemDetails, RuntimeLevelModel, ServerStatusResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { expect, test } from './test.js';
 
 test.describe('upgrader tests', () => {
@@ -43,7 +43,7 @@ test.describe('upgrader tests', () => {
 				return res(
 					// Respond with a 200 status code
 					ctx.status(400),
-					ctx.json<ProblemDetailsModel>({
+					ctx.json<ProblemDetails>({
 						status: 400,
 						type: 'error',
 						detail: 'Something went wrong',

@@ -41,7 +41,6 @@ const dictionaryTree: Array<EntityTreeItemResponseModel> = [
 		hasChildren: true,
 		type: 'dictionary-item',
 		isContainer: false,
-		icon: 'umb:book-alt',
 	},
 	{
 		parentId: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
@@ -50,7 +49,6 @@ const dictionaryTree: Array<EntityTreeItemResponseModel> = [
 		hasChildren: false,
 		type: 'dictionary-item',
 		isContainer: false,
-		icon: 'umb:book-alt',
 	},
 ];
 

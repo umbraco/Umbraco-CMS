@@ -188,7 +188,7 @@ export class UmbTemplateRepository
 
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
-		//this.#store?.append({ ...template, $type: 'EntityTreeItemResponseModel' });
+		//this.#store?.append({ ...template });
 		// TODO: Update tree store with the new item? or ask tree to request the new item?
 
 		return { error };

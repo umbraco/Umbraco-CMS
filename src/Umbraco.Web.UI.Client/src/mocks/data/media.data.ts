@@ -8,7 +8,6 @@ export const data: Array<MediaDetails> = [
 	{
 		name: 'Flipped Car',
 		type: 'media',
-		icon: 'picture',
 		hasChildren: false,
 		id: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
 		isContainer: false,
@@ -34,7 +33,6 @@ export const data: Array<MediaDetails> = [
 	{
 		name: 'Umbracoffee',
 		type: 'media',
-		icon: 'picture',
 		hasChildren: false,
 		id: '69431027-8867-45bf-a93b-72bbdabfb177',
 		isContainer: false,
@@ -60,7 +58,6 @@ export const data: Array<MediaDetails> = [
 	{
 		name: 'People',
 		type: 'media',
-		icon: 'folder',
 		hasChildren: true,
 		id: '69461027-8867-45bf-a93b-72bbdabfb177',
 		isContainer: true,
@@ -74,7 +71,6 @@ export const data: Array<MediaDetails> = [
 	{
 		name: 'Products',
 		type: 'media',
-		icon: 'folder',
 		hasChildren: true,
 		id: '69461027-8867-45bf-a93b-5224dabfb177',
 		isContainer: true,
@@ -88,7 +84,6 @@ export const data: Array<MediaDetails> = [
 	{
 		name: 'John Smith',
 		type: 'media',
-		icon: 'picture',
 		hasChildren: false,
 		id: '69431027-8867-45s7-a93b-7uibdabfb177',
 		isContainer: false,
@@ -114,7 +109,6 @@ export const data: Array<MediaDetails> = [
 	{
 		name: 'Jane Doe',
 		type: 'media',
-		icon: 'picture',
 		hasChildren: false,
 		id: '69431027-8867-45s7-a93b-7uibdabf2147',
 		isContainer: false,
@@ -140,7 +134,6 @@ export const data: Array<MediaDetails> = [
 	{
 		name: 'A very nice hat',
 		type: 'media',
-		icon: 'picture',
 		hasChildren: false,
 		id: '694hdj27-8867-45s7-a93b-7uibdabf2147',
 		isContainer: false,
@@ -166,7 +159,6 @@ export const data: Array<MediaDetails> = [
 	{
 		name: 'Fancy old chair',
 		type: 'media',
-		icon: 'picture',
 		hasChildren: false,
 		id: '694hdj27-1237-45s7-a93b-7uibdabfas47',
 		isContainer: false,

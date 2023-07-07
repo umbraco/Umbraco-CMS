@@ -20,7 +20,6 @@ const importResponse: DictionaryItemResponseModel & EntityTreeItemResponseModel 
 	hasChildren: false,
 	type: 'dictionary-item',
 	isContainer: false,
-	icon: 'umb:book-alt',
 	translations: [
 		{
 			isoCode: 'en',

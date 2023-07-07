@@ -1,12 +1,12 @@
 import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context.js';
 import { css, CSSResultGroup, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-installer-error')
 export class UmbInstallerErrorElement extends UmbLitElement {
 	@state()
-	_error?: ProblemDetailsModel;
+	_error?: ProblemDetails;
 
 	private _installerContext?: UmbInstallerContext;
 
@@ -34,7 +34,7 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 		this._installerContext?.reset();
 	}
 
-	private _renderError(error: ProblemDetailsModel) {
+	private _renderError(error: ProblemDetails) {
 		return html`
 			<p>Description: ${error.title}</p>
 			${error.errors ? this._renderErrors(error.errors) : nothing}

@@ -4,7 +4,7 @@ import { ManifestTree, umbExtensionsRegistry } from '@umbraco-cms/backoffice/ext
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
-import { ProblemDetailsModel, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { ProblemDetails, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 
@@ -22,7 +22,7 @@ export interface UmbTreeContext<TreeItemType extends TreeItemPresentationModel> 
 	deselect(unique: string | null): void;
 	requestChildrenOf: (parentUnique: string | null) => Promise<{
 		data?: UmbPagedData<TreeItemType>;
-		error?: ProblemDetailsModel;
+		error?: ProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;
 	}>;
 }

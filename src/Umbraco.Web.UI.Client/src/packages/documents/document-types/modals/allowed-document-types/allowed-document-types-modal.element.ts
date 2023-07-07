@@ -51,7 +51,7 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 		const { data } = await this.#documentTypeRepository.requestRootTreeItems();
 		if (!data) return;
 
-		const allFullModels: Array<DocumentTypeResponseModel & { $type: '' }> = [];
+		const allFullModels: Array<DocumentTypeResponseModel> = [];
 		await Promise.all(
 			data.items.map((item) => {
 				if (item.id) {
@@ -83,7 +83,7 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 
 	render() {
 		return html`
-			<umb-body-layout headline=${this._headline}>
+			<umb-body-layout headline=${this._headline ?? ''}>
 				<uui-box>
 					${this._allowedDocumentTypes.length === 0 ? html`<p>No allowed types</p>` : nothing}
 					${this._allowedDocumentTypes.map(

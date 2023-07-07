@@ -1,6 +1,6 @@
 const { rest } = window.MockServiceWorker;
 import { umbLanguagesData } from '../data/languages.data.js';
-import { LanguageResponseModel, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import { LanguageResponseModel, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 // TODO: add schema
@@ -48,7 +48,7 @@ export const handlers = [
 		} catch (error) {
 			return res(
 				ctx.status(400),
-				ctx.json<ProblemDetailsModel>({
+				ctx.json<ProblemDetails>({
 					status: 400,
 					type: 'validation',
 					detail: 'Something went wrong',

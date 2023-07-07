@@ -691,7 +691,6 @@ class UmbDataTypeData extends UmbEntityData<DataTypeResponseModel | FolderTreeIt
 			name: folder.name,
 			id: folder.id,
 			parentId: folder.parentId,
-			$type: 'FolderTreeItemResponseModel',
 			isFolder: true,
 			isContainer: false,
 		};

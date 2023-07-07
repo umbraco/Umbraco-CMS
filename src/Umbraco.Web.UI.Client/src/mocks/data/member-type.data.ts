@@ -7,7 +7,6 @@ export const data: Array<MemberTypeDetails> = [
 	{
 		name: 'Member Type 1',
 		type: 'member-type',
-		icon: 'icon-user',
 		hasChildren: false,
 		id: 'd59be02f-1df9-4228-aa1e-01917d806cda',
 		isContainer: false,

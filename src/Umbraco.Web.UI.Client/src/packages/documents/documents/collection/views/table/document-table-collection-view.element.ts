@@ -79,7 +79,6 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			if (!item.id) throw new Error('Item id is missing.');
 			return {
 				id: item.id,
-				icon: item.icon,
 				data: [
 					{
 						columnAlias: 'entityName',
