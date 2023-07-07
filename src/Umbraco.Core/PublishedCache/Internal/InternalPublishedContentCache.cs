@@ -38,20 +38,26 @@ public sealed class InternalPublishedContentCache : PublishedCacheBase, IPublish
     public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null) =>
         _content.Values.Where(x => x.Parent == null);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override IPublishedContent GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars) =>
         throw new NotImplementedException();
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override IPublishedContent GetSingleByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars) =>
         throw new NotImplementedException();
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, XPathVariable[] vars) =>
         throw new NotImplementedException();
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override IEnumerable<IPublishedContent>
         GetByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars) => throw new NotImplementedException();
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override XPathNavigator CreateNavigator(bool preview) => throw new NotImplementedException();
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override XPathNavigator CreateNodeNavigator(int id, bool preview) => throw new NotImplementedException();
 
     public override bool HasContent(bool preview) => _content.Count > 0;

@@ -86,6 +86,7 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
         return content ?? inter;
     }
 
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         if (inter == null)
