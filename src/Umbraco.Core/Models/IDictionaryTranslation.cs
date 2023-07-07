@@ -20,4 +20,10 @@ public interface IDictionaryTranslation : IEntity, IRememberBeingDirty
     /// </summary>
     [DataMember]
     string Value { get; set; }
+
+    /// <summary>
+    ///     Gets the ISO code of the language.
+    /// </summary>
+    [DataMember]
+    string LanguageIsoCode { get; }
 }

@@ -13,6 +13,7 @@ public class Language : EntityBase, ILanguage
 {
     private string _cultureName;
     private int? _fallbackLanguageId;
+    private string? _fallbackLanguageIsoCode;
     private bool _isDefaultVariantLanguage;
     private string _isoCode;
     private bool _mandatory;
@@ -78,5 +79,12 @@ public class Language : EntityBase, ILanguage
     {
         get => _fallbackLanguageId;
         set => SetPropertyValueAndDetectChanges(value, ref _fallbackLanguageId, nameof(FallbackLanguageId));
+    }
+
+    /// <inheritdoc />
+    public string? FallbackIsoCode
+    {
+        get => _fallbackLanguageIsoCode;
+        set => SetPropertyValueAndDetectChanges(value, ref _fallbackLanguageIsoCode, nameof(FallbackIsoCode));
     }
 }
