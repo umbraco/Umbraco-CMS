@@ -5,6 +5,7 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './document-workspace-editor.element.js';
+import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-document-workspace')
 export class UmbDocumentWorkspaceElement extends UmbLitElement {
@@ -21,6 +22,12 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
 				const documentTypeKey = info.match.params.documentTypeKey;
 				this.#workspaceContext.create(documentTypeKey, parentId);
+
+				new UmbWorkspaceIsNewRedirectController(
+					this,
+					this.#workspaceContext,
+					this.shadowRoot!.querySelector('umb-router-slot')!
+				);
 			},
 		},
 		{

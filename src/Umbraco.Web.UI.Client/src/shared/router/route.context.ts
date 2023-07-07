@@ -1,5 +1,5 @@
 import type { UmbRoute } from './route.interface.js';
-import { generateRoutePathBuilder } from './generate-route-path-builder.function.js';
+import { createRoutePathBuilder } from './generate-route-path-builder.function.js';
 import type { IRoutingInfo, IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -32,7 +32,7 @@ export class UmbRouteContext extends UmbBaseController {
 
 	public registerModal(registration: UmbModalRouteRegistration) {
 		this.#modalRegistrations.push(registration);
-		this.#generateNewUrlBuilder(registration);
+		this.#createNewUrlBuilder(registration);
 		this.#generateModalRoutes();
 		return registration;
 	}
@@ -104,13 +104,13 @@ export class UmbRouteContext extends UmbBaseController {
 	public _internal_routerGotBasePath(routerBasePath: string) {
 		if (this.#routerBasePath === routerBasePath) return;
 		this.#routerBasePath = routerBasePath;
-		this.#generateNewUrlBuilders();
+		this.#createNewUrlBuilders();
 	}
 
 	public _internal_routerGotActiveLocalPath(routerActiveLocalPath: string | undefined) {
 		if (this.#routerActiveLocalPath === routerActiveLocalPath) return;
 		this.#routerActiveLocalPath = routerActiveLocalPath;
-		this.#generateNewUrlBuilders();
+		this.#createNewUrlBuilders();
 	}
 
 	// Also notice each registration should now hold its handler when its active.
@@ -128,11 +128,11 @@ export class UmbRouteContext extends UmbBaseController {
 		this.#activeModalPath = activeModalPath;
 	}
 
-	#generateNewUrlBuilders() {
-		this.#modalRegistrations.forEach(this.#generateNewUrlBuilder);
+	#createNewUrlBuilders() {
+		this.#modalRegistrations.forEach(this.#createNewUrlBuilder);
 	}
 
-	#generateNewUrlBuilder = (modalRegistration: UmbModalRouteRegistration) => {
+	#createNewUrlBuilder = (modalRegistration: UmbModalRouteRegistration) => {
 		if (!this.#routerBasePath) return;
 
 		const routeBasePath = this.#routerBasePath.endsWith('/') ? this.#routerBasePath : this.#routerBasePath + '/';
@@ -143,7 +143,7 @@ export class UmbRouteContext extends UmbBaseController {
 			: '';
 		const localPath = routeBasePath + routeActiveLocalPath + modalRegistration.generateModalPath();
 
-		const urlBuilder = generateRoutePathBuilder(localPath);
+		const urlBuilder = createRoutePathBuilder(localPath);
 
 		modalRegistration._internal_setRouteBuilder(urlBuilder);
 	};
