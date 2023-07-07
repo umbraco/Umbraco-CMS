@@ -166,6 +166,34 @@ export class UmbExtensionRegistry<
 		) as unknown as Observable<Array<ExtensionType>>;
 	}
 
+	getByAlias<T extends ManifestBase = ManifestBase>(alias: string) {
+		return combineLatest([
+			this.extensions.pipe(
+				map((exts) => exts.find((ext) => ext.alias === alias)),
+				distinctUntilChanged(extensionSingleMemoization)
+			),
+		]).pipe(
+			map(([ext]) => {
+				// Specific Extension Meta merge (does not merge conditions)
+				if (ext) {
+					// Since we dont have the type up front in this request, we will just get all kinds here and find the matching one:
+					const baseManifest = this._kinds
+						.getValue()
+						.find((kind) => kind.matchType === ext.type && kind.matchKind === ext.kind)?.manifest;
+					if (baseManifest) {
+						const merged = { isMatchedWithKind: true, ...baseManifest, ...ext } as any;
+						if ((baseManifest as any).meta) {
+							merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
+						}
+						return merged;
+					}
+				}
+				return ext;
+			}),
+			distinctUntilChanged(extensionSingleMemoization)
+		) as Observable<T | undefined>;
+	}
+
 	getByTypeAndAlias<
 		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
 		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>

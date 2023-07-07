@@ -1,5 +1,5 @@
 import { UmbEntryPointModule } from './entry-point.interface.js';
-import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbBackofficeExtensionRegistry, type UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-registry';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
@@ -60,6 +60,15 @@ export interface ManifestWithConditions<ConditionsType> {
 	 * Set the conditions for when the extension should be loaded
 	 */
 	conditions: ConditionsType;
+}
+export interface ManifestWithDynamicConditions extends ManifestBase {
+	/**
+	 * Set the conditions for when the extension should be loaded
+	 */
+	conditions: Array<{
+		alias: string;
+		value: unknown;
+	}>;
 }
 
 export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
@@ -170,6 +179,18 @@ export interface ManifestEntryPoint extends ManifestWithLoader<UmbEntryPointModu
 export interface ManifestBundle
 	extends ManifestWithLoader<{ [key: string]: Array<UmbBackofficeExtensionRegistry['MANIFEST_TYPES']> }> {
 	type: 'bundle';
+
+	/**
+	 * The file location of the javascript file to load in the backoffice
+	 */
+	js: string;
+}
+
+/**
+ * This type of extension takes a JS module and registers all exported manifests from the pointed JS file.
+ */
+export interface ManifestCondition extends ManifestClass<UmbExtensionCondition> {
+	type: 'condition';
 
 	/**
 	 * The file location of the javascript file to load in the backoffice

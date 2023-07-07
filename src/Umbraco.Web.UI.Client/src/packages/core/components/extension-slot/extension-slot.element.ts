@@ -62,9 +62,17 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 					this.requestUpdate('_extensions', oldValue);
 				}
 
+				// ---------------------------------------------------------------
+				// May change this into a Extensions Manager Controller???
+				// ---------------------------------------------------------------
+
 				extensions.forEach(async (extension) => {
-					const hasExt = this._extensions.find((x) => x.alias === extension.alias);
-					if (!hasExt) {
+					const existing = this._extensions.find((x) => x.alias === extension.alias);
+					if (!existing) {
+						// ---------------------------------------------------------------
+						// Change this object into a ExtensionController???
+						// ---------------------------------------------------------------
+
 						const extensionObject: InitializedExtension = {
 							alias: extension.alias,
 							weight: (extension as any).weight || 0,
