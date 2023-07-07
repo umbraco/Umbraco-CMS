@@ -53,13 +53,10 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
-	rest.get(umbracoPath('/document/:id'), (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return;
+	rest.get(umbracoPath('/document/root/allowed-document-types'), (req, res, ctx) => {
+		const response = umbDocumentData.getAllowedDocumentTypesAtRoot();
 
-		const document = umbDocumentData.getById(id);
-
-		return res(ctx.status(200), ctx.json(document));
+		return res(ctx.status(200), ctx.json(response));
 	}),
 
 	rest.get(umbracoPath('/document/:id/allowed-document-types'), (req, res, ctx) => {
@@ -71,9 +68,12 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get(umbracoPath('/document/root/allowed-document-types'), (req, res, ctx) => {
-		const response = umbDocumentData.getAllowedDocumentTypesAtRoot();
+	rest.get(umbracoPath('/document/:id'), (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
-		return res(ctx.status(200), ctx.json(response));
+		const document = umbDocumentData.getById(id);
+
+		return res(ctx.status(200), ctx.json(document));
 	}),
 ];
