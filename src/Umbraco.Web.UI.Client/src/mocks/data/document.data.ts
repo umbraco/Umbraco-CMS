@@ -1,3 +1,4 @@
+import { umbDocumentTypeData } from './document-type.data.js';
 import { UmbEntityData } from './entity.data.js';
 import { createDocumentTreeItem } from './utils.js';
 import {
@@ -5,6 +6,7 @@ import {
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
 	PagedDocumentTreeItemResponseModel,
+	PagedDocumentTypeResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<DocumentResponseModel> = [
@@ -594,6 +596,26 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 	getTreeItem(ids: Array<string>): Array<DocumentTreeItemResponseModel> {
 		const items = this.treeData.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => item);
+	}
+
+	getDocumentByIdAllowedDocumentTypes(id: string): PagedDocumentTypeResponseModel {
+		const item = this.getById(id);
+		if (item?.contentTypeId) {
+			const docType = umbDocumentTypeData.getById(item.contentTypeId);
+			if (docType) {
+				const items = docType.allowedContentTypes ?? [];
+				const total = items?.length;
+				return { items, total };
+			}
+		}
+		return { items: [], total: 0 };
+	}
+
+	getAllowedDocumentTypesAtRoot(): PagedDocumentTypeResponseModel {
+		const items = umbDocumentTypeData.getAll(); //.filter((docType) => docType.allowedAsRoot);
+
+		const total = items?.length;
+		return { items, total };
 	}
 }
 

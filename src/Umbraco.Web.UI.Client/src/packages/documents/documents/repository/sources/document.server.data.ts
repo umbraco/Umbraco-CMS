@@ -168,4 +168,28 @@ export class UmbDocumentServerDataSource
 			}).then((res) => res.json())
 		);
 	}
+
+	/**
+	 * Get the allowed document types for a given parent id
+	 * @param {string} id
+	 * @return {*}
+	 * @memberof UmbDocumentTypeServerDataSource
+	 */
+	async getAllowedDocumentTypesOf(id: string) {
+		if (!id) throw new Error('Id is missing');
+
+		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdAllowedDocumentTypes({ id }));
+	}
+
+	/**
+	 * Get the allowed document types for root
+	 * @param {string} id
+	 * @return {*}
+	 * @memberof UmbDocumentTypeServerDataSource
+	 */
+	async getAllowedDocumentTypesAtRoot() {
+		console.log('source requestAllowedDocumentTypesAtRoot');
+		// Notice, here we need to implement pagination.
+		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentRootAllowedDocumentTypes({ take: 4 }));
+	}
 }
