@@ -60,14 +60,14 @@ public class UmbracoMemberAuthorizeFilter : IAsyncAuthorizationFilter
             {
                 context.HttpContext.SetReasonPhrase(
                     "Resource restricted: the member is not of a permitted type or group.");
+                context.HttpContext.Response.StatusCode = 403;
                 context.Result = new ForbidResult();
             }
         }
         else
         {
-            context.HttpContext.SetReasonPhrase(
-                "Resource restricted: the member is not logged in.");
-            context.Result = new UnauthorizedResult();
+            context.HttpContext.Response.StatusCode = 401;
+            context.Result = new ForbidResult();
         }
     }
 
