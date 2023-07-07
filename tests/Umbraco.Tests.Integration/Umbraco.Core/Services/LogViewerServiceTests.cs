@@ -57,7 +57,11 @@ public class LogViewerServiceTests : UmbracoIntegrationTest
     {
         var attempt = await LogViewerService.CanViewLogsAsync(_startDate, _endDate);
 
-        Assert.AreEqual(attempt.Status, LogViewerOperationStatus.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(attempt.Success);
+            Assert.AreEqual(attempt.Status, LogViewerOperationStatus.Success);
+        });
     }
 
     [Test]
@@ -65,9 +69,76 @@ public class LogViewerServiceTests : UmbracoIntegrationTest
     {
         var attempt = await LogViewerService.GetPagedLogsAsync(_startDate, _endDate, 0, int.MaxValue);
 
-        Assert.AreEqual(attempt.Status, LogViewerOperationStatus.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(attempt.Success);
+            Assert.AreEqual(attempt.Status, LogViewerOperationStatus.Success);
+            Assert.IsNotNull(attempt.Result);
+            Assert.IsNotEmpty(attempt.Result.Items);
+            Assert.AreEqual(362, attempt.Result.Total);
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Logs_By_Filter_Expression()
+    {
+        var attempt = await LogViewerService.GetPagedLogsAsync(_startDate, _endDate, 0, int.MaxValue, filterExpression: "@Level='Error'");
+
+        Assert.IsTrue(attempt.Success);
+        Assert.AreEqual(LogViewerOperationStatus.Success, attempt.Status);
         Assert.IsNotNull(attempt.Result);
         Assert.IsNotEmpty(attempt.Result.Items);
-        Assert.AreEqual(362, attempt.Result.Total);
+        Assert.AreEqual(6, attempt.Result.Total);
+    }
+
+    [Test]
+    public async Task Can_Get_Logs_By_Log_Levels()
+    {
+        var attempt = await LogViewerService.GetPagedLogsAsync(_startDate, _endDate, 0, int.MaxValue, logLevels: new[] { "Error" });
+
+        Assert.IsTrue(attempt.Success);
+        Assert.AreEqual(LogViewerOperationStatus.Success, attempt.Status);
+        Assert.IsNotNull(attempt.Result);
+        Assert.IsNotEmpty(attempt.Result.Items);
+        Assert.AreEqual(6, attempt.Result.Total);
+    }
+
+    [Test]
+    public async Task Can_Get_Log_Count()
+    {
+        var attempt = await LogViewerService.GetLogLevelCountsAsync(_startDate, _endDate);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(attempt.Success);
+            Assert.AreEqual(attempt.Status, LogViewerOperationStatus.Success);
+            Assert.IsNotNull(attempt.Result);
+            Assert.AreEqual(341, attempt.Result.Information);
+            Assert.AreEqual(0, attempt.Result.Debug);
+            Assert.AreEqual(9, attempt.Result.Warning);
+            Assert.AreEqual(6, attempt.Result.Error);
+            Assert.AreEqual(6, attempt.Result.Fatal);
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Message_Templates()
+    {
+        var attempt = await LogViewerService.GetMessageTemplatesAsync(_startDate, _endDate, 0, int.MaxValue);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(attempt.Success);
+            Assert.AreEqual(attempt.Status, LogViewerOperationStatus.Success);
+            Assert.IsNotNull(attempt.Result);
+            Assert.IsNotEmpty(attempt.Result.Items);
+            Assert.AreEqual(31, attempt.Result.Total);
+
+            // Assert its sorted correctly
+            var mostPopularTemplate = attempt.Result.Items.First();
+            Assert.AreEqual("Create Index:\n {Sql}", mostPopularTemplate.MessageTemplate);
+            Assert.AreEqual(74, mostPopularTemplate.Count);
+            Assert.AreEqual(attempt.Result.Items, attempt.Result.Items.OrderByDescending(x => x.Count));
+        });
     }
 }
