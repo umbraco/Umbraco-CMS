@@ -166,27 +166,23 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          *
          * @description
          * Determines if the current tree is a plugin tree and if so returns the package folder it has declared
-         * so we know where to find its views, otherwise it will just return undefined.
+         * so we know where to find it's views, otherwise it will just return undefined.
          *
          * @param {String} treeAlias The tree alias to check
-         * @param {String} sectionAlias The current section
          */
-        getTreePackageFolder: function (treeAlias, sectionAlias) {
+        getTreePackageFolder: function (treeAlias) {
             //we determine this based on the server variables
-            if (!Umbraco.Sys.ServerVariables.umbracoPlugins || !Utilities.isArray(Umbraco.Sys.ServerVariables.umbracoPlugins.trees)) {
-                return undefined;
-            }
+            if (Umbraco.Sys.ServerVariables.umbracoPlugins &&
+                Umbraco.Sys.ServerVariables.umbracoPlugins.trees &&
+                Utilities.isArray(Umbraco.Sys.ServerVariables.umbracoPlugins.trees)) {
 
-            let found;
-            if (sectionAlias !== undefined) {
-                found = Umbraco.Sys.ServerVariables.umbracoPlugins.trees.find(item =>
-                  invariantEquals(item.alias, treeAlias) && invariantEquals(item.sectionAlias, sectionAlias));
-            } else {
-                found = Umbraco.Sys.ServerVariables.umbracoPlugins.trees.find(item =>
-                  invariantEquals(item.alias, treeAlias));
-            }
+                var found = _.find(Umbraco.Sys.ServerVariables.umbracoPlugins.trees, function (item) {
+                    return invariantEquals(item.alias, treeAlias);
+                });
 
-            return found ? found.packageFolder : undefined;
+                return found ? found.packageFolder : undefined;
+            }
+            return undefined;
         },
 
         /**
@@ -872,7 +868,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             //start
             var wrappedPromise = doSync();
 
-            //then wrap it
+            //then wrap it 
             wrappedPromise.then(function (args) {
                 deferred.resolve(args);
             }, function (args) {

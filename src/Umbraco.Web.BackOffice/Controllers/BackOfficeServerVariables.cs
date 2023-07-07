@@ -704,9 +704,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             [DataMember(Name = "packageFolder")]
             public string? PackageFolder { get; set; }
-
-            [DataMember(Name = "sectionAlias")]
-            public string? SectionAlias { get; set; }
         }
 
         private IEnumerable<PluginTree> GetPluginTrees()
@@ -738,7 +735,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     continue;
                 }
 
-                yield return new PluginTree { Alias = tree.TreeAlias, PackageFolder = pluginController.AreaName, SectionAlias = tree.SectionAlias };
+                yield return new PluginTree { Alias = tree.TreeAlias, PackageFolder = pluginController.AreaName };
             }
         }
 
