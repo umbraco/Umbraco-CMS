@@ -4,8 +4,7 @@
 
 import type { FolderTreeItemResponseModel } from './FolderTreeItemResponseModel';
 
-export type DocumentTypeTreeItemResponseModel = (FolderTreeItemResponseModel & {
-    isElement?: boolean;
+export type MediaTypeTreeItemResponseModel = (FolderTreeItemResponseModel & {
     icon?: string;
 });
 

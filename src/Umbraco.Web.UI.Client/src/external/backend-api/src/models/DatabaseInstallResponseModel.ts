@@ -11,5 +11,6 @@ export type DatabaseInstallResponseModel = {
     password?: string | null;
     useIntegratedAuthentication?: boolean;
     connectionString?: string | null;
+    trustServerCertificate?: boolean;
 };
 

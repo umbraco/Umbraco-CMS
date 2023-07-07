@@ -17,7 +17,7 @@ export class TelemetryResource {
      */
     public static getTelemetry({
         skip,
-        take,
+        take = 100,
     }: {
         skip?: number,
         take?: number,

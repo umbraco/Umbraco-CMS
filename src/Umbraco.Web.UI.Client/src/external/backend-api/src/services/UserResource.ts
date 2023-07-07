@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { ChangePasswordUserRequestModel } from '../models/ChangePasswordUserRequestModel';
+import type { CreateInitialPasswordUserRequestModel } from '../models/CreateInitialPasswordUserRequestModel';
 import type { CreateUserRequestModel } from '../models/CreateUserRequestModel';
 import type { CreateUserResponseModel } from '../models/CreateUserResponseModel';
 import type { CurrentUserResponseModel } from '../models/CurrentUserResponseModel';
@@ -21,6 +22,7 @@ import type { UserOrderModel } from '../models/UserOrderModel';
 import type { UserPermissionsResponseModel } from '../models/UserPermissionsResponseModel';
 import type { UserResponseModel } from '../models/UserResponseModel';
 import type { UserStateModel } from '../models/UserStateModel';
+import type { VerifyInviteUserRequestModel } from '../models/VerifyInviteUserRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -407,6 +409,46 @@ export class UserResource {
             body: requestBody,
             mediaType: 'application/json',
             responseHeader: 'Location',
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postUserInviteCreatePassword({
+        requestBody,
+    }: {
+        requestBody?: CreateInitialPasswordUserRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/user/invite/create-password',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postUserInviteVerify({
+        requestBody,
+    }: {
+        requestBody?: (VerifyInviteUserRequestModel | CreateInitialPasswordUserRequestModel),
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/user/invite/verify',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+            },
         });
     }
 

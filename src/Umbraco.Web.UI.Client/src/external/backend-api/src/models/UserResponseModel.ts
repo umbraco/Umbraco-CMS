@@ -6,7 +6,6 @@ import type { UserPresentationBaseModel } from './UserPresentationBaseModel';
 import type { UserStateModel } from './UserStateModel';
 
 export type UserResponseModel = (UserPresentationBaseModel & {
-    $type: string;
     id?: string;
     languageIsoCode?: string | null;
     contentStartNodeIds?: Array<string>;

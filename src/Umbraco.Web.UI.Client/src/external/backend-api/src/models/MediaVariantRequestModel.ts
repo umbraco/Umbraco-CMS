@@ -4,7 +4,5 @@
 
 import type { VariantModelBaseModel } from './VariantModelBaseModel';
 
-export type MediaVariantRequestModel = (VariantModelBaseModel & {
-    $type: string;
-});
+export type MediaVariantRequestModel = VariantModelBaseModel;
 

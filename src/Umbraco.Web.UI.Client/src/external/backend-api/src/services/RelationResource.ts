@@ -38,7 +38,7 @@ export class RelationResource {
     public static getRelationChildRelationByChildId({
         childId,
         skip,
-        take,
+        take = 100,
         relationTypeAlias = '',
     }: {
         childId: number,

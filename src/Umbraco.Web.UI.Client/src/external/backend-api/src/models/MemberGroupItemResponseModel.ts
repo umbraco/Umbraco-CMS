@@ -4,5 +4,5 @@
 
 import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
 
-export type MemberGroupItemReponseModel = ItemResponseModelBaseModel;
+export type MemberGroupItemResponseModel = ItemResponseModelBaseModel;
 
