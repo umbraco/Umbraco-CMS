@@ -54,8 +54,8 @@
     <key alias="setPermissions">Sæt rettigheder</key>
     <key alias="unlock">Lås op</key>
     <key alias="createblueprint">Opret indholdsskabelon</key>
-    <key alias="resendInvite">Gensend Invitation</key>
-    <key alias="defaultValue">Standard værdi</key>
+    <key alias="resendInvite">Gensend invitation</key>
+    <key alias="defaultValue">Standardværdi</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Indhold</key>
@@ -717,6 +717,7 @@
     <key alias="by">af</key>
     <key alias="cancel">Fortryd</key>
     <key alias="cellMargin">Celle margen</key>
+    <key alias="change">Skift</key>
     <key alias="choose">Vælg</key>
     <key alias="clear">Ryd</key>
     <key alias="close">Luk</key>
@@ -1927,8 +1928,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="stateInactive">Inaktiv</key>
     <key alias="sortNameAscending">Navn (A-Å)</key>
     <key alias="sortNameDescending">Navn (Å-A)</key>
-    <key alias="sortCreateDateAscending">Nyeste</key>
-    <key alias="sortCreateDateDescending">Ældste</key>
+    <key alias="sortCreateDateAscending">Ældste</key>
+    <key alias="sortCreateDateDescending">Nyeste</key>
     <key alias="sortLastLoginDateDescending">Sidst logget ind</key>
     <key alias="noUserGroupsAdded">Ingen brugere er blevet tilføjet</key>
     <key alias="2faDisableText">Hvis du ønsker at slå denne totrinsbekræftelse fra, så skal du nu indtaste koden fra din enhed:</key>

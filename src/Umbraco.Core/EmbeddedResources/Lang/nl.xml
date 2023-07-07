@@ -2059,8 +2059,8 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="stateInactive">Inactief</key>
     <key alias="sortNameAscending">Naam (A-Z)</key>
     <key alias="sortNameDescending">Naam (Z-A)</key>
-    <key alias="sortCreateDateAscending">Nieuwste</key>
-    <key alias="sortCreateDateDescending">Oudste</key>
+    <key alias="sortCreateDateAscending">Oudste</key>
+    <key alias="sortCreateDateDescending">Nieuwste</key>
     <key alias="sortLastLoginDateDescending">Laatste login</key>
     <key alias="noUserGroupsAdded">Er zijn geen gebruikersgroepen toegevoegd</key>
   </area>

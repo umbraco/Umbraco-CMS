@@ -1001,8 +1001,8 @@
     <key alias="writer">Skribent</key>
     <key alias="yourHistory">Din nuvarande historik</key>
     <key alias="yourProfile">Din profil</key>
-    <key alias="sortCreateDateAscending">Nyast</key>
-    <key alias="sortCreateDateDescending">Äldst</key>
+    <key alias="sortCreateDateAscending">Äldst</key>
+    <key alias="sortCreateDateDescending">Nyast</key>
     <key alias="sortLastLoginDateDescending">Senaste login</key>
   </area>
   <area alias="logViewer">
