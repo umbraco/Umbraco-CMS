@@ -4,7 +4,7 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 // TODO: add schema
 export const handlers = [
-	rest.post<string[]>('/umbraco/management/api/v1/document/trash', async (req, res, ctx) => {
+	rest.post<string[]>(umbracoPath('/document/trash'), async (req, res, ctx) => {
 		console.warn('Please move to schema');
 		const ids = await req.json();
 
@@ -13,19 +13,19 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(trashed));
 	}),
 
-	rest.get('/umbraco/management/api/v1/tree/document/root', (req, res, ctx) => {
+	rest.get(umbracoPath('/tree/document/root'), (req, res, ctx) => {
 		const response = umbDocumentData.getTreeRoot();
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get('/umbraco/management/api/v1/tree/document/children', (req, res, ctx) => {
+	rest.get(umbracoPath('/tree/document/children'), (req, res, ctx) => {
 		const parentId = req.url.searchParams.get('parentId');
 		if (!parentId) return;
 		const response = umbDocumentData.getTreeItemChildren(parentId);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get('/umbraco/management/api/v1/tree/document/item', (req, res, ctx) => {
+	rest.get(umbracoPath('/tree/document/item'), (req, res, ctx) => {
 		const ids = req.url.searchParams.getAll('id');
 		if (!ids) return;
 		const items = umbDocumentData.getTreeItem(ids);
