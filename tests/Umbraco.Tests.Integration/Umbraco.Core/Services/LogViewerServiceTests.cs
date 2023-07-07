@@ -31,14 +31,15 @@ public class LogViewerServiceTests : UmbracoIntegrationTest
         var loggingConfiguration = TestHelper.GetLoggingConfiguration(hostingEnv);
 
         var exampleLogfilePath = Path.Combine(testRoot, "TestData", "TestLogs", LogfileName);
-        _newLogfileDirPath = loggingConfiguration.LogDirectory;
-        _newLogfilePath = Path.Combine(_newLogfileDirPath, LogfileName);
+
+        string newLogfileDirPath = loggingConfiguration.LogDirectory;
+        string newLogfilePath = Path.Combine(newLogfileDirPath, LogfileName);
 
         // Create/ensure Directory exists
-        ioHelper.EnsurePathExists(_newLogfileDirPath);
+        ioHelper.EnsurePathExists(newLogfileDirPath);
 
         // Copy the sample files
-        File.Copy(exampleLogfilePath, _newLogfilePath, true);
+        File.Copy(exampleLogfilePath, newLogfilePath, true);
     }
 
     [OneTimeTearDown]
@@ -82,7 +83,8 @@ public class LogViewerServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Get_Logs_By_Filter_Expression()
     {
-        var attempt = await LogViewerService.GetPagedLogsAsync(_startDate, _endDate, 0, int.MaxValue, filterExpression: "@Level='Error'");
+        var attempt = await LogViewerService.GetPagedLogsAsync(_startDate, _endDate, 0, int.MaxValue,
+            filterExpression: "@Level='Error'");
 
         Assert.Multiple(() =>
         {
@@ -97,7 +99,8 @@ public class LogViewerServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Get_Logs_By_Log_Levels()
     {
-        var attempt = await LogViewerService.GetPagedLogsAsync(_startDate, _endDate, 0, int.MaxValue, logLevels: new[] { "Error" });
+        var attempt =
+            await LogViewerService.GetPagedLogsAsync(_startDate, _endDate, 0, int.MaxValue, logLevels: new[] {"Error"});
 
         Assert.Multiple(() =>
         {
