@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Runtime.Serialization;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
@@ -74,7 +73,7 @@ public class Language : EntityBase, ILanguage
     }
 
     /// <inheritdoc />
-    [Obsolete("This will be replaced by fallback language ISO code in V13.")]
+    [Obsolete("This will be replaced by fallback language ISO code in V14.")]
     public int? FallbackLanguageId
     {
         get => _fallbackLanguageId;
