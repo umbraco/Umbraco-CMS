@@ -86,7 +86,7 @@ public class DictionaryTranslation : EntityBase, IDictionaryTranslation
         }
     }
 
-    [Obsolete("This will be replaced by language ISO code in V13.")]
+    [Obsolete("This will be replaced by language ISO code in V14.")]
     public int LanguageId { get; private set; }
 
     /// <summary>

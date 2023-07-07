@@ -55,7 +55,7 @@ public interface ILanguage : IEntity, IRememberBeingDirty
     ///         define fallback strategies when a value does not exist for a requested language.
     ///     </para>
     /// </remarks>
-    [Obsolete("This will be replaced by fallback language ISO code in V13.")]
+    [Obsolete("This will be replaced by fallback language ISO code in V14.")]
     [DataMember]
     int? FallbackLanguageId { get; set; }
 }
