@@ -3,7 +3,6 @@
 /* eslint-disable */
 
 export type CurrentUserResponseModel = {
-    $type: string;
     id?: string;
     email?: string;
     userName?: string;

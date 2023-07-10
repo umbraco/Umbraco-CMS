@@ -1,3 +1,4 @@
+import { umbDocumentTypeData } from './document-type.data.js';
 import { UmbEntityData } from './entity.data.js';
 import { createDocumentTreeItem } from './utils.js';
 import {
@@ -5,6 +6,7 @@ import {
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
 	PagedDocumentTreeItemResponseModel,
+	PagedDocumentTypeResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<DocumentResponseModel> = [
@@ -20,42 +22,37 @@ export const data: Array<DocumentResponseModel> = [
 		contentTypeId: 'all-property-editors-document-type-id',
 		values: [
 			{
-				$type: '', 
 				alias: 'richTextEditor',
 				culture: null,
 				segment: null,
-				value: 'Some value for the RTE with an <a href="http://foo.com">external link</a> and an <a href="/{localLink:umb://document/c05da24d7740447b9cdcbd8ce2172e38}">internal link</a> foo foo <div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>',
+				value:
+					'Some value for the RTE with an <a href="http://foo.com">external link</a> and an <a href="/{localLink:umb://document/c05da24d7740447b9cdcbd8ce2172e38}">internal link</a> foo foo <div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>',
 			},
 			{
-				$type: '',
 				alias: 'email',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'colorPicker',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'contentPicker',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'eyeDropper',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'multiUrlPicker',
 				culture: 'en-us',
 				segment: null,
@@ -72,210 +69,180 @@ export const data: Array<DocumentResponseModel> = [
 				],
 			},
 			{
-				$type: '',
 				alias: 'multiUrlPicker',
 				culture: 'da-dk',
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'multiNodeTreePicker',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'datePicker',
 				culture: null,
 				segment: null,
 				value: '2023-12-24',
 			},
 			{
-				$type: '',
 				alias: 'datePickerTime',
 				culture: null,
 				segment: null,
 				value: '2023-12-24 14:52',
 			},
 			{
-				$type: '',
 				alias: 'time',
 				culture: null,
 				segment: null,
 				value: '14:52:00',
 			},
 			{
-				$type: '',
 				alias: 'email',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'textBox',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'dropdown',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'textArea',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'slider',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'toggle',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'tags',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'markdownEditor',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'radioButtonList',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'checkboxList',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'blockList',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'mediaPicker',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'imageCropper',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'uploadField',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'blockGrid',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'blockGrid',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'numberRange',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'orderDirection',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'overlaySize',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'label',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'integer',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'decimal',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'memberPicker',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'memberGroupPicker',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
-				$type: '',
 				alias: 'userPicker',
 				culture: null,
 				segment: null,
@@ -284,7 +251,6 @@ export const data: Array<DocumentResponseModel> = [
 		],
 		variants: [
 			{
-				$type: '',
 				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
@@ -294,7 +260,6 @@ export const data: Array<DocumentResponseModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
-				$type: '',
 				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'da-dk',
@@ -317,70 +282,60 @@ export const data: Array<DocumentResponseModel> = [
 		contentTypeId: '29643452-cff9-47f2-98cd-7de4b6807681',
 		values: [
 			{
-				$type: '',
 				culture: null,
 				segment: null,
 				alias: 'masterText',
 				value: 'i have a master text',
 			},
 			{
-				$type: '',
 				culture: null,
 				segment: null,
 				alias: 'pageTitle',
 				value: 'with a page title',
 			},
 			{
-				$type: '',
 				culture: null,
 				segment: null,
 				alias: 'blogPostText',
 				value: 'My first blog post',
 			},
 			{
-				$type: '',
 				culture: 'en-us',
 				segment: null,
 				alias: 'blogTextStringUnderMasterTab',
 				value: 'in the master tab',
 			},
 			{
-				$type: '',
 				culture: 'en-us',
 				segment: null,
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				value: 'which is under another group in the tab',
 			},
 			{
-				$type: '',
 				culture: 'da-dk',
 				segment: null,
 				alias: 'blogTextStringUnderMasterTab',
 				value: 'på master dokument tab B',
 			},
 			{
-				$type: '',
 				culture: 'da-dk',
 				segment: null,
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				value: 'denne er under en anden gruppe i tab B',
 			},
 			{
-				$type: '',
 				culture: 'no-no',
 				segment: null,
 				alias: 'blogTextStringUnderMasterTab',
 				value: 'Norsk på master dokument tab B',
 			},
 			{
-				$type: '',
 				culture: 'no-no',
 				segment: null,
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				value: 'Norsk denne er under en anden gruppe i tab B',
 			},
 			{
-				$type: '',
 				culture: null,
 				segment: null,
 				alias: 'localBlogTabString',
@@ -389,7 +344,6 @@ export const data: Array<DocumentResponseModel> = [
 		],
 		variants: [
 			{
-				$type: '',
 				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
@@ -399,7 +353,6 @@ export const data: Array<DocumentResponseModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
-				$type: '',
 				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'da-dk',
@@ -409,7 +362,6 @@ export const data: Array<DocumentResponseModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
-				$type: '',
 				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'no-no',
@@ -419,7 +371,6 @@ export const data: Array<DocumentResponseModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
-				$type: '',
 				state: ContentStateModel.PUBLISHED_PENDING_CHANGES,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'es-es',
@@ -429,7 +380,6 @@ export const data: Array<DocumentResponseModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
-				$type: '',
 				state: ContentStateModel.NOT_CREATED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'pl-pl',
@@ -447,56 +397,48 @@ export const data: Array<DocumentResponseModel> = [
 		contentTypeId: '29643452-cff9-47f2-98cd-7de4b6807681',
 		values: [
 			{
-				$type: '',
 				culture: null,
 				segment: null,
 				alias: 'masterText',
 				value: 'i have a master text B',
 			},
 			{
-				$type: '',
 				culture: null,
 				segment: null,
 				alias: 'pageTitle',
 				value: 'with a page title B',
 			},
 			{
-				$type: '',
 				culture: null,
 				segment: null,
 				alias: 'blogPostText',
 				value: 'My first blog post B',
 			},
 			{
-				$type: '',
 				culture: 'en-us',
 				segment: null,
 				alias: 'blogTextStringUnderMasterTab',
 				value: 'in the master tab B',
 			},
 			{
-				$type: '',
 				culture: 'en-us',
 				segment: null,
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				value: 'which is under another group in the tab B',
 			},
 			{
-				$type: '',
 				culture: 'da-dk',
 				segment: null,
 				alias: 'blogTextStringUnderMasterTab',
 				value: 'på master dokument tab B',
 			},
 			{
-				$type: '',
 				culture: 'da-dk',
 				segment: null,
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				value: 'denne er under en anden gruppe i tab B',
 			},
 			{
-				$type: '',
 				culture: null,
 				segment: null,
 				alias: 'localBlogTabString',
@@ -505,7 +447,6 @@ export const data: Array<DocumentResponseModel> = [
 		],
 		variants: [
 			{
-				$type: '',
 				state: ContentStateModel.DRAFT,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-us',
@@ -523,7 +464,6 @@ export const data: Array<DocumentResponseModel> = [
 		contentTypeId: 'simple-document-type-id',
 		variants: [
 			{
-				$type: '',
 				state: ContentStateModel.DRAFT,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-us',
@@ -538,7 +478,6 @@ export const data: Array<DocumentResponseModel> = [
 
 export const treeData: Array<DocumentTreeItemResponseModel> = [
 	{
-		$type: 'DocumentTreeItemViewModel',
 		isProtected: false,
 		isPublished: true,
 		isEdited: false,
@@ -553,7 +492,6 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		hasChildren: false,
 	},
 	{
-		$type: 'DocumentTreeItemViewModel',
 		isProtected: false,
 		isPublished: true,
 		isEdited: false,
@@ -568,7 +506,6 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		hasChildren: true,
 	},
 	{
-		$type: 'DocumentTreeItemViewModel',
 		isProtected: false,
 		isPublished: false,
 		isEdited: false,
@@ -583,7 +520,6 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		hasChildren: false,
 	},
 	{
-		$type: 'DocumentTreeItemViewModel',
 		name: 'Document 5',
 		type: 'document',
 		icon: 'document',
@@ -598,7 +534,6 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		isTrashed: false,
 	},
 	{
-		$type: 'DocumentTreeItemViewModel',
 		name: 'Simple',
 		type: 'document',
 		icon: 'document',
@@ -661,6 +596,26 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 	getTreeItem(ids: Array<string>): Array<DocumentTreeItemResponseModel> {
 		const items = this.treeData.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => item);
+	}
+
+	getDocumentByIdAllowedDocumentTypes(id: string): PagedDocumentTypeResponseModel {
+		const item = this.getById(id);
+		if (item?.contentTypeId) {
+			const docType = umbDocumentTypeData.getById(item.contentTypeId);
+			if (docType) {
+				const items = docType.allowedContentTypes ?? [];
+				const total = items?.length;
+				return { items, total };
+			}
+		}
+		return { items: [], total: 0 };
+	}
+
+	getAllowedDocumentTypesAtRoot(): PagedDocumentTypeResponseModel {
+		const items = umbDocumentTypeData.getAll(); //.filter((docType) => docType.allowedAsRoot);
+
+		const total = items?.length;
+		return { items, total };
 	}
 }
 

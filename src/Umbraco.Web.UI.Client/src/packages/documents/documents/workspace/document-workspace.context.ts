@@ -152,7 +152,7 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 	setPropertyValue(alias: string, value: unknown, variantId?: UmbVariantId) {
-		const entry = { $type: 'DocumentValueModel', ...variantId?.toObject(), alias, value };
+		const entry = { ...variantId?.toObject(), alias, value };
 		const currentData = this.#draft.value;
 		if (currentData) {
 			const values = appendToFrozenArray(

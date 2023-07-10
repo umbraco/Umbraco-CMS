@@ -1,8 +1,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { PagedBooleanModel } from '../models/PagedBooleanModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -10,7 +8,7 @@ import { request as __request } from '../core/request';
 export class PropertyTypeResource {
 
     /**
-     * @returns PagedBooleanModel Success
+     * @returns boolean Success
      * @throws ApiError
      */
     public static getPropertyTypeIsUsed({
@@ -19,7 +17,7 @@ export class PropertyTypeResource {
     }: {
         contentTypeId?: string,
         propertyAlias?: string,
-    }): CancelablePromise<PagedBooleanModel> {
+    }): CancelablePromise<boolean> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/property-type/is-used',

@@ -23,7 +23,6 @@ class UmbUsersData extends UmbData<UserResponseModel> {
 		const firstUser = this.data[0];
 
 		return {
-			$type: 'CurrentUserResponseModel',
 			id: firstUser.id,
 			name: firstUser.name,
 			email: firstUser.email,
@@ -113,7 +112,6 @@ export const data: Array<UserResponseModel & { type: string }> = [
 	{
 		id: 'bca6c733-a63d-4353-a271-9a8b6bcca8bd',
 		type: 'user',
-		$type: 'UserResponseModel',
 		contentStartNodeIds: [],
 		mediaStartNodeIds: [],
 		name: 'Umbraco User',
@@ -131,7 +129,6 @@ export const data: Array<UserResponseModel & { type: string }> = [
 	{
 		id: '82e11d3d-b91d-43c9-9071-34d28e62e81d',
 		type: 'user',
-		$type: 'UserResponseModel',
 		contentStartNodeIds: [],
 		mediaStartNodeIds: [],
 		name: 'Amelie Walker',
@@ -149,7 +146,6 @@ export const data: Array<UserResponseModel & { type: string }> = [
 	{
 		id: 'aa1d83a9-bc7f-47d2-b288-58d8a31f5017',
 		type: 'user',
-		$type: 'UserResponseModel',
 		contentStartNodeIds: [],
 		mediaStartNodeIds: [],
 		name: 'Oliver Kim',
@@ -167,7 +163,6 @@ export const data: Array<UserResponseModel & { type: string }> = [
 	{
 		id: 'ff2f4a50-d3d4-4bc4-869d-c7948c160e54',
 		type: 'user',
-		$type: 'UserResponseModel',
 		contentStartNodeIds: [],
 		mediaStartNodeIds: [],
 		name: 'Eliana Nieves',
@@ -185,7 +180,6 @@ export const data: Array<UserResponseModel & { type: string }> = [
 	{
 		id: 'c290c6d9-9f12-4838-8567-621b52a178de',
 		type: 'user',
-		$type: 'UserResponseModel',
 		contentStartNodeIds: [],
 		mediaStartNodeIds: [],
 		name: 'Jasmine Patel',

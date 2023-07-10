@@ -1,6 +1,6 @@
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type { ProblemDetailsModel, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import type { ProblemDetails, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbPagedData } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbTreeItemContext<TreeItemType extends TreeItemPresentationModel> {
@@ -20,7 +20,7 @@ export interface UmbTreeItemContext<TreeItemType extends TreeItemPresentationMod
 	setTreeItem(treeItem: TreeItemType | undefined): void;
 	requestChildren(): Promise<{
 		data?: UmbPagedData<TreeItemType> | undefined;
-		error?: ProblemDetailsModel | undefined;
+		error?: ProblemDetails | undefined;
 		asObservable?: () => Observable<TreeItemType[]>;
 	}>;
 	toggleContextMenu(): void;

@@ -1,5 +1,5 @@
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import type { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -23,7 +23,7 @@ export class UmbAppErrorElement extends UmbLitElement {
 	@property()
 	error?: unknown;
 
-	private renderProblemDetails = (problemDetails: ProblemDetailsModel) => html`
+	private renderProblemDetails = (problemDetails: ProblemDetails) => html`
 		<h2>${problemDetails.title}</h2>
 		<p>${problemDetails.detail}</p>
 		<pre>${problemDetails.stack}</pre>
@@ -35,7 +35,7 @@ export class UmbAppErrorElement extends UmbLitElement {
 		<pre>${error.stack}</pre>
 	`;
 
-	private isProblemDetails(error: unknown): error is ProblemDetailsModel {
+	private isProblemDetails(error: unknown): error is ProblemDetails {
 		return typeof error === 'object' && error !== null && 'detail' in error && 'title' in error;
 	}
 

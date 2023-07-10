@@ -2,4 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type ProblemDetailsModel = Record<string, any>;
+export type ProblemDetails = Record<string, any>;

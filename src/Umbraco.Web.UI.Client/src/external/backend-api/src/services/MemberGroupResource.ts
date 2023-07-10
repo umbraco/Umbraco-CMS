@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { MemberGroupItemReponseModel } from '../models/MemberGroupItemReponseModel';
+import type { MemberGroupItemResponseModel } from '../models/MemberGroupItemResponseModel';
 import type { PagedEntityTreeItemResponseModel } from '../models/PagedEntityTreeItemResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -18,7 +18,7 @@ export class MemberGroupResource {
         id,
     }: {
         id?: Array<string>,
-    }): CancelablePromise<Array<MemberGroupItemReponseModel>> {
+    }): CancelablePromise<Array<MemberGroupItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/member-group/item',

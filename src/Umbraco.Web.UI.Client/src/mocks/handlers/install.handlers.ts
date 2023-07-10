@@ -3,7 +3,7 @@ import {
 	DatabaseInstallResponseModel,
 	InstallVResponseModel,
 	InstallSettingsResponseModel,
-	ProblemDetailsModel,
+	ProblemDetails,
 	TelemetryLevelModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -84,7 +84,7 @@ export const handlers = [
 		if (body.name === 'validate') {
 			return res(
 				ctx.status(400),
-				ctx.json<ProblemDetailsModel>({
+				ctx.json<ProblemDetails>({
 					type: 'connection',
 					status: 400,
 					detail: 'Database connection failed',
@@ -106,7 +106,7 @@ export const handlers = [
 				// Respond with a 200 status code
 				ctx.status(400),
 				ctx.delay(1000),
-				ctx.json<ProblemDetailsModel>({
+				ctx.json<ProblemDetails>({
 					type: 'validation',
 					status: 400,
 					detail: 'Something went wrong',

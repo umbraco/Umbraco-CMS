@@ -2,14 +2,12 @@ import type { MediaDetails } from '../../packages/media/media/index.js';
 import { UmbEntityTreeData } from './entity-tree.data.js';
 import { UmbEntityData } from './entity.data.js';
 import { createContentTreeItem } from './utils.js';
-import { ContentTreeItemResponseModel, PagedContentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { ContentTreeItemResponseModel, PagedMediaTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<MediaDetails> = [
 	{
-		$type: '',
 		name: 'Flipped Car',
 		type: 'media',
-		icon: 'picture',
 		hasChildren: false,
 		id: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
 		isContainer: false,
@@ -33,10 +31,8 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		$type: '',
 		name: 'Umbracoffee',
 		type: 'media',
-		icon: 'picture',
 		hasChildren: false,
 		id: '69431027-8867-45bf-a93b-72bbdabfb177',
 		isContainer: false,
@@ -60,10 +56,8 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		$type: '',
 		name: 'People',
 		type: 'media',
-		icon: 'folder',
 		hasChildren: true,
 		id: '69461027-8867-45bf-a93b-72bbdabfb177',
 		isContainer: true,
@@ -75,10 +69,8 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		$type: '',
 		name: 'Products',
 		type: 'media',
-		icon: 'folder',
 		hasChildren: true,
 		id: '69461027-8867-45bf-a93b-5224dabfb177',
 		isContainer: true,
@@ -90,10 +82,8 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		$type: '',
 		name: 'John Smith',
 		type: 'media',
-		icon: 'picture',
 		hasChildren: false,
 		id: '69431027-8867-45s7-a93b-7uibdabfb177',
 		isContainer: false,
@@ -117,10 +107,8 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		$type: '',
 		name: 'Jane Doe',
 		type: 'media',
-		icon: 'picture',
 		hasChildren: false,
 		id: '69431027-8867-45s7-a93b-7uibdabf2147',
 		isContainer: false,
@@ -144,10 +132,8 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		$type: '',
 		name: 'A very nice hat',
 		type: 'media',
-		icon: 'picture',
 		hasChildren: false,
 		id: '694hdj27-8867-45s7-a93b-7uibdabf2147',
 		isContainer: false,
@@ -171,10 +157,8 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		$type: '',
 		name: 'Fancy old chair',
 		type: 'media',
-		icon: 'picture',
 		hasChildren: false,
 		id: '694hdj27-1237-45s7-a93b-7uibdabfas47',
 		isContainer: false,
@@ -210,14 +194,14 @@ class UmbMediaData extends UmbEntityData<MediaDetails> {
 		super(data);
 	}
 
-	getTreeRoot(): PagedContentTreeItemResponseModel {
+	getTreeRoot(): PagedMediaTreeItemResponseModel {
 		const items = this.data.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => createContentTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(id: string): PagedContentTreeItemResponseModel {
+	getTreeItemChildren(id: string): PagedMediaTreeItemResponseModel {
 		const items = this.data.filter((item) => item.parentId === id);
 		const treeItems = items.map((item) => createContentTreeItem(item));
 		const total = items.length;

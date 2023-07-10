@@ -35,7 +35,6 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	 */
 	async createScaffold(parentId: string | null) {
 		const scaffold: FolderReponseModel = {
-			$type: 'FolderReponseModel',
 			name: '',
 			id: UmbId.new(),
 			parentId,

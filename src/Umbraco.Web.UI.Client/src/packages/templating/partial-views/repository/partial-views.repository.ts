@@ -4,7 +4,7 @@ import { UmbPartialViewsTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } f
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbTreeRootEntityModel } from '@umbraco-cms/backoffice/tree';
 
@@ -30,7 +30,7 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 		]);
 	}
 
-	requestTreeRoot(): Promise<{ data?: UmbTreeRootEntityModel | undefined; error?: ProblemDetailsModel | undefined }> {
+	requestTreeRoot(): Promise<{ data?: UmbTreeRootEntityModel | undefined; error?: ProblemDetails | undefined }> {
 		//throw new Error('Method not implemented.');
 		return { data: undefined, error: undefined } as any;
 	}
@@ -38,7 +38,7 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 	requestItemsLegacy?:
 		| ((uniques: string[]) => Promise<{
 				data?: any[] | undefined;
-				error?: ProblemDetailsModel | undefined;
+				error?: ProblemDetails | undefined;
 				asObservable?: (() => Observable<any[]>) | undefined;
 		  }>)
 		| undefined;
@@ -52,7 +52,7 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 	// TODO: This method to be done, or able to go away?
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
-	requestById(id: string): Promise<{ data?: any; error?: ProblemDetailsModel | undefined }> {
+	requestById(id: string): Promise<{ data?: any; error?: ProblemDetails | undefined }> {
 		throw new Error('Method not implemented.');
 	}
 
@@ -88,7 +88,7 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 		await this.#init;
 
 		if (!keys) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
+			const error: ProblemDetails = { title: 'Keys are missing' };
 			return { data: undefined, error };
 		}
 

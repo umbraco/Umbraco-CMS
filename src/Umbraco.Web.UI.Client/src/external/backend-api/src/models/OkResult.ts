@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type OkResultModel = {
+export type OkResult = {
     statusCode?: number;
 };
 

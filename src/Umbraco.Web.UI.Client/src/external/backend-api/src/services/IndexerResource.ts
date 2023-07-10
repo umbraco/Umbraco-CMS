@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { IndexResponseModel } from '../models/IndexResponseModel';
-import type { OkResultModel } from '../models/OkResultModel';
+import type { OkResult } from '../models/OkResult';
 import type { PagedIndexResponseModel } from '../models/PagedIndexResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -17,7 +17,7 @@ export class IndexerResource {
      */
     public static getIndexer({
         skip,
-        take,
+        take = 100,
     }: {
         skip?: number,
         take?: number,
@@ -54,14 +54,14 @@ export class IndexerResource {
     }
 
     /**
-     * @returns OkResultModel Success
+     * @returns OkResult Success
      * @throws ApiError
      */
     public static postIndexerByIndexNameRebuild({
         indexName,
     }: {
         indexName: string,
-    }): CancelablePromise<OkResultModel> {
+    }): CancelablePromise<OkResult> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/indexer/{indexName}/rebuild',

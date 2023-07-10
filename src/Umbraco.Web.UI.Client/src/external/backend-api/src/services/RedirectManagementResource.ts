@@ -18,7 +18,7 @@ export class RedirectManagementResource {
     public static getRedirectManagement({
         filter,
         skip,
-        take,
+        take = 100,
     }: {
         filter?: string,
         skip?: number,
@@ -45,7 +45,7 @@ export class RedirectManagementResource {
     public static getRedirectManagementById({
         id,
         skip,
-        take,
+        take = 100,
     }: {
         id: string,
         skip?: number,

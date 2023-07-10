@@ -18,7 +18,6 @@ type TemplateDBItem = TemplateResponseModel & EntityTreeItemResponseModel;
 
 const createTemplate = (dbItem: TemplateDBItem): TemplateResponseModel => {
 	return {
-		$type: '',
 		id: dbItem.id,
 		name: dbItem.name,
 		alias: dbItem.alias,
@@ -35,13 +34,11 @@ const createTemplateItem = (dbItem: TemplateDBItem): TemplateItemResponseModel =
 
 export const data: Array<TemplateDBItem> = [
 	{
-		$type: '',
 		id: '2bf464b6-3aca-4388-b043-4eb439cc2643',
 		isContainer: false,
 		parentId: null,
 		name: 'Doc 1',
 		type: 'template',
-		icon: 'umb:layout',
 		hasChildren: false,
 		alias: 'Doc1',
 		content: `@using Umbraco.Extensions
@@ -59,41 +56,35 @@ export const data: Array<TemplateDBItem> = [
 		</div>`,
 	},
 	{
-		$type: '',
 		id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		isContainer: false,
 		parentId: null,
 		name: 'Test',
 		type: 'template',
-		icon: 'umb:layout',
 		hasChildren: true,
 		alias: 'Test',
 		content:
 			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Test>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = null;\r\n}',
 	},
 	{
-		$type: '',
 		id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f72',
 		isContainer: false,
 		parentId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		masterTemplateId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		name: 'Child',
 		type: 'template',
-		icon: 'umb:layout',
 		hasChildren: false,
 		alias: 'Test',
 		content:
 			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Test>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = "Test.cshtml";\r\n}',
 	},
 	{
-		$type: '',
 		id: '9a84c0b3-03b4-4dd4-84ac-706740acwerer0f72',
 		isContainer: false,
 		parentId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		name: 'Has Master Template',
 		masterTemplateId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		type: 'template',
-		icon: 'umb:layout',
 		hasChildren: false,
 		alias: 'hasMasterTemplate',
 		content:
@@ -224,7 +215,6 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 
 	create(templateData: CreateTemplateRequestModel) {
 		const template = {
-			$type: '',
 			id: UmbId.new(),
 			...templateData,
 		};

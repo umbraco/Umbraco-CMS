@@ -8,6 +8,9 @@ import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 @customElement('umb-tree-item-base')
 export class UmbTreeItemBaseElement extends UmbLitElement {
 	@state()
+	private _iconAlias?: string;
+
+	@state()
 	private _item?: TreeItemPresentationModel;
 
 	@state()
@@ -119,8 +122,8 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				@slotchange=${(e: Event) => {
 					this._iconSlotHasChildren = this.#hasNodes(e);
 				}}></slot>
-			${this._item?.icon && !this._iconSlotHasChildren
-				? html` <uui-icon slot="icon" name="${this._item.icon}"></uui-icon> `
+			${this._iconAlias && !this._iconSlotHasChildren
+				? html` <uui-icon slot="icon" name="${this._iconAlias}"></uui-icon> `
 				: nothing}
 		`;
 	}
@@ -133,7 +136,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 		return this.#treeItemContext && this._item
 			? html`<umb-entity-actions-bundle
 					slot="actions"
-					entity-type=${this.#treeItemContext.type}
+					.entityType=${this.#treeItemContext.type}
 					.unique=${this.#treeItemContext.unique}
 					.label=${this._item.name}>
 			  </umb-entity-actions-bundle>`
