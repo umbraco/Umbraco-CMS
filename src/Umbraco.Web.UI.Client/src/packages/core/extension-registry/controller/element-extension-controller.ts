@@ -1,7 +1,6 @@
 import { UmbExtensionController } from './extension-controller.js';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { createExtensionElement, isManifestElementableType } from '@umbraco-cms/backoffice/extension-api';
-import { property } from '@umbraco-cms/backoffice/external/lit';
 
 export class UmbElementExtensionController extends UmbExtensionController {
 	#defaultElement?: string;
@@ -31,7 +30,6 @@ export class UmbElementExtensionController extends UmbExtensionController {
 	 * ```
 	 */
 	#props?: Record<string, any> = {};
-	@property({ type: Object, attribute: false })
 	get props() {
 		return this.#props;
 	}
