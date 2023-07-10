@@ -23,7 +23,9 @@ export abstract class UmbExtensionController extends UmbBaseController {
 		return this.#isPermitted;
 	}
 
-	public component?: HTMLElement | null;
+	get manifest() {
+		return this.#manifest;
+	}
 
 	constructor(host: UmbControllerHost, alias: string, onPermissionChanged: () => void) {
 		super(host, alias);
@@ -99,11 +101,6 @@ export abstract class UmbExtensionController extends UmbBaseController {
 			},
 			'_observeConditions'
 		);
-
-		// Initialize the conditions controllers:
-		// We can get the element of the host?
-
-		//When good then someone, somehow needs to get notified?
 	}
 
 	#conditionsAreInitialized() {
@@ -115,26 +112,30 @@ export abstract class UmbExtensionController extends UmbBaseController {
 	}
 
 	async #onConditionsChanged() {
+		const oldValue = this.#isPermitted;
 		// Find a condition that is not permitted (Notice how no conditions, means that this extension is permitted)
 		this.#isPermitted =
 			this.#conditionsAreInitialized() &&
 			this.#conditionControllers.find((condition) => condition.permitted === false) === undefined;
 
 		if (this.#isPermitted) {
-			await this._conditionsAreGood();
+			this.#isPermitted = await this._conditionsAreGood();
 		} else {
 			await this._conditionsAreBad();
 		}
-
-		this.#onPermissionChanged();
+		if (oldValue !== this.#isPermitted) {
+			this.#onPermissionChanged();
+		}
 	}
 
-	protected abstract _conditionsAreGood(): Promise<void>;
+	protected abstract _conditionsAreGood(): Promise<boolean>;
 
 	protected abstract _conditionsAreBad(): Promise<void>;
 
+	/*
 	public destroy(): void {
 		super.destroy();
 		// Destroy the conditions controllers, are begin destroyed cause they are controllers.
 	}
+	*/
 }
