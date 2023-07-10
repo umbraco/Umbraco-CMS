@@ -9,7 +9,7 @@ using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
 using PropertyEditorAliases = Umbraco.Cms.Core.Constants.PropertyEditors.Aliases;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 
 public class MigrateDataTypeConfigurations : MigrationBase
 {

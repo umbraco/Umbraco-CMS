@@ -1,12 +1,11 @@
 ﻿using NPoco;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Scoping;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 
 public class AddGuidsToUserGroups : UnscopedMigrationBase
 {

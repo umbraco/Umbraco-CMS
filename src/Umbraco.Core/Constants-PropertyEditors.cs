@@ -173,7 +173,7 @@ public static partial class Constants
             /// <summary>
             ///     TinyMCE
             /// </summary>
-            public const string TinyMce = "Umbraco.TinyMCE";
+            public const string TinyMce = "Umbraco.RichText";
 
             /// <summary>
             ///     Boolean.
