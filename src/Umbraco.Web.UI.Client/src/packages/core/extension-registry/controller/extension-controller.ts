@@ -8,7 +8,7 @@ import {
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export abstract class UmbExtensionController extends UmbBaseController {
-	#alias: string;
+	//#alias: string;
 	#manifest?: ManifestWithDynamicConditions;
 	#conditionManifests: Array<ManifestCondition> = [];
 	#conditionControllers: Array<UmbExtensionCondition> = [];
@@ -29,7 +29,7 @@ export abstract class UmbExtensionController extends UmbBaseController {
 
 	constructor(host: UmbControllerHost, alias: string, onPermissionChanged: () => void) {
 		super(host, alias);
-		this.#alias = alias;
+		//this.#alias = alias;
 		this.#onPermissionChanged = onPermissionChanged;
 
 		this.observe(umbExtensionsRegistry?.getByAlias(alias), async (extensionManifest) => {
