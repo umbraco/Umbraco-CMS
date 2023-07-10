@@ -1,13 +1,14 @@
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
 import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
-	ManifestCondition,
-	ManifestWithDynamicConditions,
+	type ManifestCondition,
+	type ManifestWithDynamicConditions,
+	type UmbExtensionRegistry,
 	createExtensionClass,
 } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export abstract class UmbExtensionController extends UmbBaseController {
+	#extensionRegistry: UmbExtensionRegistry<ManifestCondition>;
 	//#alias: string;
 	#manifest?: ManifestWithDynamicConditions;
 	#conditionManifests: Array<ManifestCondition> = [];
@@ -27,12 +28,18 @@ export abstract class UmbExtensionController extends UmbBaseController {
 		return this.#manifest;
 	}
 
-	constructor(host: UmbControllerHost, alias: string, onPermissionChanged: () => void) {
+	constructor(
+		host: UmbControllerHost,
+		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
+		alias: string,
+		onPermissionChanged: () => void
+	) {
 		super(host, alias);
+		this.#extensionRegistry = extensionRegistry;
 		//this.#alias = alias;
 		this.#onPermissionChanged = onPermissionChanged;
 
-		this.observe(umbExtensionsRegistry?.getByAlias(alias), async (extensionManifest) => {
+		this.observe(extensionRegistry.getByAlias(alias), async (extensionManifest) => {
 			this.#manifest = extensionManifest as ManifestWithDynamicConditions;
 			if (extensionManifest) {
 				this.#gotManifest(extensionManifest as ManifestWithDynamicConditions);
@@ -50,7 +57,7 @@ export abstract class UmbExtensionController extends UmbBaseController {
 
 		// Observes the conditions and initialize as they come in.
 		this.observe(
-			umbExtensionsRegistry?.getByTypeAndAliases('condition', conditionAliases),
+			this.#extensionRegistry.getByTypeAndAliases('condition', conditionAliases),
 			async (manifests) => {
 				//const oldValue = this.#conditionManifests;
 				//const oldLength = this.#conditionManifests.length;

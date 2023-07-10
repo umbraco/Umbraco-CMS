@@ -1,6 +1,11 @@
 import { UmbExtensionController } from './extension-controller.js';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { createExtensionElement, isManifestElementableType } from '@umbraco-cms/backoffice/extension-api';
+import {
+	ManifestCondition,
+	UmbExtensionRegistry,
+	createExtensionElement,
+	isManifestElementableType,
+} from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbElementExtensionController extends UmbExtensionController {
 	#defaultElement?: string;
@@ -39,8 +44,14 @@ export class UmbElementExtensionController extends UmbExtensionController {
 		this.#assignProps();
 	}
 
-	constructor(host: UmbControllerHost, alias: string, onPermissionChanged: () => void, defaultElement?: string) {
-		super(host, alias, onPermissionChanged);
+	constructor(
+		host: UmbControllerHost,
+		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
+		alias: string,
+		onPermissionChanged: () => void,
+		defaultElement?: string
+	) {
+		super(host, extensionRegistry, alias, onPermissionChanged);
 		this.#defaultElement = defaultElement;
 	}
 
