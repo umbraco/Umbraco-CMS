@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $scope, $q, $locale, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, editorState, entityResource) {
+        function ($scope, $q, $locale, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, entityResource) {
 
         $scope.isLoading = true;
 
@@ -263,7 +263,6 @@ angular.module("umbraco")
                             }
                         }
                     });
-
 
                     editor.on('ObjectResized', function (e) {
                         var qs = "?width=" + e.width + "&height=" + e.height + "&mode=max";

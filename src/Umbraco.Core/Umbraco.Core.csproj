@@ -326,6 +326,7 @@
     <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="Attempt.cs" />
+    <Compile Include="Constants-CharArrays.cs" />
     <Compile Include="Constants-DataTypes.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
@@ -385,6 +386,8 @@
     <Compile Include="Models\IAuditEntry.cs" />
     <Compile Include="Models\IAuditItem.cs" />
     <Compile Include="Models\IConsent.cs" />
+    <Compile Include="Models\IImageUrlGenerator.cs" />
+    <Compile Include="Models\ImageUrlGenerationOptions.cs" />
     <Compile Include="Models\IUserControl.cs" />
     <Compile Include="Models\Membership\ContentPermissionSet.cs" />
     <Compile Include="Models\Membership\EntityPermissionCollection.cs" />

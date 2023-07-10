@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -8,9 +10,10 @@ using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.TinyMCEAlias, "Rich Text Editor", "rte", ValueType = PropertyEditorValueTypes.Text,  HideLabel = false, Group="Rich Content", Icon="icon-browser-window")]
+    [PropertyEditor(Constants.PropertyEditors.TinyMCEAlias, "Rich Text Editor", "rte", ValueType = PropertyEditorValueTypes.Text, HideLabel = false, Group = "Rich Content", Icon = "icon-browser-window")]
     public class RichTextPropertyEditor : PropertyEditor
     {
+
         /// <summary>
         /// Create a custom value editor
         /// </summary>
@@ -31,10 +34,10 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class RichTextPropertyValueEditor : PropertyValueEditorWrapper
         {
-            public RichTextPropertyValueEditor(PropertyValueEditor wrapped)
+            public RichTextPropertyValueEditor(
+                PropertyValueEditor wrapped)
                 : base(wrapped)
-            {
-            }
+            {}
 
             /// <summary>
             /// override so that we can hide the label based on the pre-value
@@ -82,11 +85,22 @@ namespace Umbraco.Web.PropertyEditors
                 if (editorValue.Value == null)
                     return null;
 
-                var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValue.Value.ToString());
+                var userId = UmbracoContext.Current.Security?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
+
+                // You can configure the media parent folder in V8+, but this is supposed to handle images for V7 once and for all
+                // so we will just save the images in the Media root folder
+                var mediaParentId = Guid.Empty;
+                ILogger logger = UmbracoContext.Current.Application.ProfilingLogger.Logger;
+                IMediaService mediaService = UmbracoContext.Current.Application.Services.MediaService;
+
+                var pastedImages = new RichTextEditorPastedImages(logger, mediaService);
+                var parseAndSaveDataUriImages = pastedImages.FindAndPersistBase64Images(editorValue.Value.ToString(), mediaParentId, userId);
+                var parseAndSaveTempImages = pastedImages.FindAndPersistPastedTempImages(parseAndSaveDataUriImages, mediaParentId, userId);
+                var parsed = MacroTagParser.FormatRichTextContentForPersistence(parseAndSaveTempImages);
                 return parsed;
             }
         }
     }
 
-    
+
 }

@@ -6,7 +6,7 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper, userService) {
+function tinyMceService(imageHelper, $http, $timeout, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper, userService) {
 	return {
 
 		/**
@@ -24,8 +24,8 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					umbRequestHelper.getApiUrl(
 						"rteApiBaseUrl",
 						"GetConfiguration"), {
-						cache: true
-					}),
+					cache: true
+				}),
 				'Failed to retrieve tinymce configuration');
 		},
 
@@ -161,8 +161,8 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 							var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
 							editor.dom.setAttrib(imgElm, 'data-mce-src', src);
 						}
-                    }
-				    editor.dom.setAttrib(imgElm, 'id', null);
+					}
+					editor.dom.setAttrib(imgElm, 'id', null);
 				}, 500);
 			}
 		},
@@ -454,8 +454,8 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 			//create an id class for this element so we can re-select it after inserting
 			var uniqueId = "umb-macro-" + editor.dom.uniqueId();
 			var macroDiv = editor.dom.create('div', {
-					'class': 'umb-macro-holder ' + macroObject.macroAlias + ' mceNonEditable ' + uniqueId
-				},
+				'class': 'umb-macro-holder ' + macroObject.macroAlias + ' mceNonEditable ' + uniqueId
+			},
 				macroSyntaxComment + '<ins>Macro alias: <strong>' + macroObject.macroAlias + '</strong></ins>');
 
 			editor.selection.setNode(macroDiv);
@@ -546,7 +546,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					var linkListItems = [{
 						text: 'None',
 						value: ''
-                    }];
+					}];
 
 					tinymce.each(linkList, function (link) {
 						linkListItems.push({
@@ -563,7 +563,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					var relListItems = [{
 						text: 'None',
 						value: ''
-                    }];
+					}];
 
 					tinymce.each(editor.settings.rel_list, function (rel) {
 						relListItems.push({
@@ -580,7 +580,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					var targetListItems = [{
 						text: 'None',
 						value: ''
-                    }];
+					}];
 
 					if (!editor.settings.target_list) {
 						targetListItems.push({
@@ -807,7 +807,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 				}
 			}
 
-            if (!href && !target.anchor) {
+			if (!href && !target.anchor) {
 				editor.execCommand('unlink');
 				return;
 			}
@@ -821,14 +821,14 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 				return;
 			}
 
-		    if (!href) {
-		        href = "";
-            }
+			if (!href) {
+				href = "";
+			}
 
-		    // Is email and not //user@domain.com and protocol (e.g. mailto:, sip:) is not specified
-		    if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf(':') === -1) {
-		        // assume it's a mailto link
-		        href = 'mailto:' + href;
+			// Is email and not //user@domain.com and protocol (e.g. mailto:, sip:) is not specified
+			if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf(':') === -1) {
+				// assume it's a mailto link
+				href = 'mailto:' + href;
 				insertLink();
 				return;
 			}
