@@ -27,6 +27,7 @@ public class LogViewerRepository : ILogViewerRepository
         _umbracoFileConfig = umbracoFileConfig;
     }
 
+    /// <inheritdoc />
     public IEnumerable<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, string? filterExpression = null)
     {
         var expressionFilter = new ExpressionFilter(filterExpression);
@@ -34,6 +35,7 @@ public class LogViewerRepository : ILogViewerRepository
         return GetLogs(logTimePeriod, expressionFilter);
     }
 
+    /// <inheritdoc />
     public LogLevelCounts GetLogCount(LogTimePeriod logTimePeriod)
     {
         var counter = new CountingFilter();
@@ -43,6 +45,7 @@ public class LogViewerRepository : ILogViewerRepository
         return counter.Counts;
     }
 
+    /// <inheritdoc />
     public LogTemplate[] GetMessageTemplates(LogTimePeriod logTimePeriod)
     {
         var messageTemplates = new MessageTemplateFilter();
@@ -54,6 +57,7 @@ public class LogViewerRepository : ILogViewerRepository
             .OrderByDescending(x => x.Count).ToArray();
     }
 
+    /// <inheritdoc />
     public LogLevel GetGlobalMinLogLevel()
     {
         LogEventLevel logLevel = GetGlobalLogLevelEventMinLevel();
@@ -138,7 +142,6 @@ public class LogViewerRepository : ILogViewerRepository
             {
                 string? value;
 
-
                 if (property.Value is ScalarValue scalarValue)
                 {
                     value = scalarValue.Value?.ToString();
@@ -179,5 +182,4 @@ public class LogViewerRepository : ILogViewerRepository
             return true;
         }
     }
-
 }
