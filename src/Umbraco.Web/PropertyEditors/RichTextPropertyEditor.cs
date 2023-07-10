@@ -174,7 +174,8 @@ namespace Umbraco.Web.PropertyEditors
                 var mediaParent = config?.MediaParentId;
                 var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
 
-                var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId, _imageUrlGenerator);
+                var parseAndSaveDataUriImages = _pastedImages.FindAndPersistBase64Images(editorValue.Value.ToString(), mediaParentId, userId, _imageUrlGenerator);
+                var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(parseAndSaveDataUriImages, mediaParentId, userId, _imageUrlGenerator);
                 var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
                 var sanitized = _htmlSanitizer.Sanitize(parsed);
