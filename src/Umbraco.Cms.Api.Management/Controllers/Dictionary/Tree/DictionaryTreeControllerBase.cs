@@ -32,7 +32,6 @@ public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeI
             var hasChildren = (await DictionaryItemService.GetChildrenAsync(dictionaryItem.Key)).Any();
             return new EntityTreeItemResponseModel
             {
-                Icon = Constants.Icons.Dictionary,
                 Name = dictionaryItem.ItemKey,
                 Id = dictionaryItem.Key,
                 Type = Constants.UdiEntityType.DictionaryItem,

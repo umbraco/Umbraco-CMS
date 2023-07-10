@@ -1,5 +1,4 @@
-﻿using Asp.Versioning;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -26,7 +25,6 @@ public class RelationTypeTreeControllerBase : EntityTreeControllerBase<EntityTre
     protected EntityTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IRelationType[] relationTypes)
         => relationTypes.Select(relationType => new EntityTreeItemResponseModel
         {
-            Icon = Constants.Icons.RelationType,
             Name = relationType.Name!,
             Id = relationType.Key,
             Type = Constants.UdiEntityType.RelationType,

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Api.Management.Services.Paging;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -11,8 +10,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 {
     protected abstract IFileSystem FileSystem { get; }
-
-    protected abstract string FileIcon(string path);
 
     protected abstract string ItemType(string path);
 
@@ -102,7 +99,6 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
         {
             Path = path,
             Name = name,
-            Icon = isFolder ? Constants.Icons.Folder : FileIcon(path),
             HasChildren = isFolder && DirectoryHasChildren(path),
             Type = ItemType(path),
             IsFolder = isFolder

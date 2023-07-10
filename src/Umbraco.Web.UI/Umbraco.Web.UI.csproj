@@ -24,7 +24,7 @@
     <AdditionalFiles Include="umbraco\UmbracoWebsite\Maintenance.cshtml" />
     <AdditionalFiles Include="umbraco\UmbracoWebsite\NoNodes.cshtml" />
     <AdditionalFiles Include="umbraco\UmbracoWebsite\NotFound.cshtml" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.7">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.5.*">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>

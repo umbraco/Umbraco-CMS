@@ -25,7 +25,6 @@ public class TemplateTreeControllerBase : EntityTreeControllerBase<EntityTreeIte
     protected override EntityTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
         EntityTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
-        responseModel.Icon = Constants.Icons.Template;
         return responseModel;
     }
 }

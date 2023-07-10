@@ -38,7 +38,6 @@ public class DocumentBlueprintTreeControllerBase : EntityTreeControllerBase<Docu
         return entities.Select(entity =>
         {
             DocumentBlueprintTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentId, entity);
-            responseModel.Icon = Constants.Icons.Blueprint;
             responseModel.HasChildren = false;
 
             if (entity is IDocumentEntitySlim documentEntitySlim

@@ -1,5 +1,4 @@
-﻿using Asp.Versioning;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
@@ -17,8 +16,6 @@ public class PartialViewTreeControllerBase : FileSystemTreeControllerBase
                         throw new ArgumentException("Missing partial views file system", nameof(fileSystems));
 
     protected override IFileSystem FileSystem { get; }
-
-    protected override string FileIcon(string path) => Constants.Icons.PartialView;
 
     protected override string ItemType(string path) => Constants.UdiEntityType.PartialView;
 }

@@ -23,6 +23,7 @@ public enum UserOperationStatus
     OldPasswordRequired,
     InvalidAvatar,
     InvalidIsoCode,
+    InvalidVerificationToken,
     ContentStartNodeNotFound,
     MediaStartNodeNotFound,
     ContentNodeNotFound,

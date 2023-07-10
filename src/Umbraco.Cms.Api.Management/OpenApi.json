@@ -1064,17 +1064,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDataTypeTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDataTypeTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDataTypeTreeItemResponseModel"
                 }
               }
             }
@@ -1127,17 +1127,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDataTypeTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDataTypeTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDataTypeTreeItemResponseModel"
                 }
               }
             }
@@ -2873,6 +2873,179 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document/{id}/public-access": {
+      "post": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PostDocumentByIdPublicAccess",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "DeleteDocumentByIdPublicAccess",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentByIdPublicAccess",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PutDocumentByIdPublicAccess",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "404": {
             "description": "Not Found"
@@ -5073,17 +5246,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTypeTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTypeTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTypeTreeItemResponseModel"
                 }
               }
             }
@@ -5136,17 +5309,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTypeTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTypeTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTypeTreeItemResponseModel"
                 }
               }
             }
@@ -5638,17 +5811,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTreeItemResponseModel"
                 }
               }
             }
@@ -5696,7 +5869,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ContentTreeItemResponseModel"
+                    "$ref": "#/components/schemas/MediaTreeItemResponseModel"
                   }
                 }
               },
@@ -5704,7 +5877,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ContentTreeItemResponseModel"
+                    "$ref": "#/components/schemas/MediaTreeItemResponseModel"
                   }
                 }
               },
@@ -5712,7 +5885,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ContentTreeItemResponseModel"
+                    "$ref": "#/components/schemas/MediaTreeItemResponseModel"
                   }
                 }
               }
@@ -5766,17 +5939,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaTreeItemResponseModel"
                 }
               }
             }
@@ -5817,7 +5990,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MemberGroupItemReponseModel"
+                    "$ref": "#/components/schemas/MemberGroupItemResponseModel"
                   }
                 }
               },
@@ -5825,7 +5998,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MemberGroupItemReponseModel"
+                    "$ref": "#/components/schemas/MemberGroupItemResponseModel"
                   }
                 }
               },
@@ -5833,7 +6006,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MemberGroupItemReponseModel"
+                    "$ref": "#/components/schemas/MemberGroupItemResponseModel"
                   }
                 }
               }
@@ -12719,42 +12892,6 @@
         "type": "integer",
         "format": "int32"
       },
-      "ContentTreeItemResponseModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "icon": {
-            "type": "string"
-          },
-          "hasChildren": {
-            "type": "boolean"
-          },
-          "isContainer": {
-            "type": "boolean"
-          },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "noAccess": {
-            "type": "boolean"
-          },
-          "isTrashed": {
-            "type": "boolean"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "additionalProperties": false
-      },
       "ContentTypeCleanupModel": {
         "type": "object",
         "properties": {
@@ -13576,6 +13713,40 @@
         },
         "additionalProperties": false
       },
+      "DataTypeTreeItemResponseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "hasChildren": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isContainer": {
+            "type": "boolean"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "isFolder": {
+            "type": "boolean"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "DatabaseInstallResponseModel": {
         "required": [
           "id",
@@ -13774,9 +13945,6 @@
           "type": {
             "type": "string"
           },
-          "icon": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           },
@@ -13885,9 +14053,6 @@
           "type": {
             "type": "string"
           },
-          "icon": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           },
@@ -13927,6 +14092,9 @@
             "items": {
               "$ref": "#/components/schemas/VariantTreeItemModel"
             }
+          },
+          "icon": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -14105,9 +14273,6 @@
           "type": {
             "type": "string"
           },
-          "icon": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           },
@@ -14128,6 +14293,9 @@
           },
           "isElement": {
             "type": "boolean"
+          },
+          "icon": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -14237,9 +14405,6 @@
           "type": {
             "type": "string"
           },
-          "icon": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           },
@@ -14303,9 +14468,6 @@
           "type": {
             "type": "string"
           },
-          "icon": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           },
@@ -14332,39 +14494,6 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "FolderTreeItemResponseModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "icon": {
-            "type": "string"
-          },
-          "hasChildren": {
-            "type": "boolean"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isContainer": {
-            "type": "boolean"
-          },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "isFolder": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -14865,6 +14994,42 @@
         },
         "additionalProperties": false
       },
+      "MediaTreeItemResponseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "hasChildren": {
+            "type": "boolean"
+          },
+          "isContainer": {
+            "type": "boolean"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "noAccess": {
+            "type": "boolean"
+          },
+          "isTrashed": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "icon": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "MediaTypeItemResponseModel": {
         "type": "object",
         "properties": {
@@ -15012,6 +15177,39 @@
         },
         "additionalProperties": false
       },
+      "MediaTypeTreeItemResponseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "hasChildren": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isContainer": {
+            "type": "boolean"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "isFolder": {
+            "type": "boolean"
+          },
+          "icon": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "MediaValueModel": {
         "type": "object",
         "properties": {
@@ -15049,7 +15247,7 @@
         },
         "additionalProperties": false
       },
-      "MemberGroupItemReponseModel": {
+      "MemberGroupItemResponseModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -15392,26 +15590,6 @@
         },
         "additionalProperties": false
       },
-      "PagedContentTreeItemResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ContentTreeItemResponseModel"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "PagedCultureReponseModel": {
         "required": [
           "items",
@@ -15427,6 +15605,26 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CultureReponseModel"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedDataTypeTreeItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
             }
           }
         },
@@ -15572,26 +15770,6 @@
         },
         "additionalProperties": false
       },
-      "PagedFolderTreeItemResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FolderTreeItemResponseModel"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "PagedHealthCheckGroupResponseModel": {
         "required": [
           "items",
@@ -15727,6 +15905,46 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LoggerResponseModel"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedMediaTreeItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaTreeItemResponseModel"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedMediaTypeTreeItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
             }
           }
         },
@@ -16165,6 +16383,32 @@
           "regExMessage": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PublicAccessRequestModel": {
+        "type": "object",
+        "properties": {
+          "loginPageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "errorPageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "memberUserNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "memberGroupNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false

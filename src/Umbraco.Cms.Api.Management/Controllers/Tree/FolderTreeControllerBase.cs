@@ -57,7 +57,6 @@ public abstract class FolderTreeControllerBase<TItem> : EntityTreeControllerBase
         if (entity.NodeObjectType == _folderObjectTypeId)
         {
             viewModel.IsFolder = true;
-            viewModel.Icon = Constants.Icons.Folder;
         }
 
         return viewModel;
