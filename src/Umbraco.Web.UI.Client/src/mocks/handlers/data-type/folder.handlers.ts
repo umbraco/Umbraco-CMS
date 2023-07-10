@@ -2,7 +2,7 @@ const { rest } = window.MockServiceWorker;
 import { umbDataTypeData } from '../../data/data-type.data.js';
 import { slug } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 
 export const folderHandlers = [
 	rest.post(umbracoPath(`${slug}/folder`), async (req, res, ctx) => {
@@ -44,7 +44,7 @@ export const folderHandlers = [
 		} catch (error) {
 			return res(
 				ctx.status(404),
-				ctx.json<ProblemDetailsModel>({
+				ctx.json<ProblemDetails>({
 					status: 404,
 					type: 'error',
 					detail: 'Not Found',

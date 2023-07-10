@@ -87,7 +87,6 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 			// TODO: Generate URL for editing the dictionary item
 			const tableItem: UmbTableItem = {
 				id: dictionary.name ?? '',
-				icon: 'umb:book-alt',
 				data: [
 					{
 						columnAlias: 'name',

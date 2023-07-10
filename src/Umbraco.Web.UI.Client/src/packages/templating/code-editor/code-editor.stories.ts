@@ -132,11 +132,11 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 		}
 
 		setName(value: string) {
-			this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', name: value });
+			this.#data.next({ ...this.#data.value, name: value });
 		}
 
 		setContent(value: string) {
-			this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', content: value });
+			this.#data.next({ ...this.#data.value, content: value });
 		}
 
 		async load(entityId: string) {

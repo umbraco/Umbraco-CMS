@@ -5,10 +5,8 @@ import { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel } from '@
 
 export const data: Array<MemberGroupDetails> = [
 	{
-		$type: '',
 		name: 'Member Group AAA',
 		type: 'member-group',
-		icon: 'umb:document',
 		hasChildren: false,
 		id: '76708ccd-4179-464c-b694-6969149dd9f9',
 		isContainer: false,

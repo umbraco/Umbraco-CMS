@@ -17,7 +17,6 @@ class UmbUserGroupsData extends UmbEntityData<UserGroupResponseModel> {
 
 export const data: Array<UserGroupResponseModel> = [
 	{
-		$type: 'UserGroupResponseModel',
 		id: 'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		name: 'Administrators',
 		icon: 'umb:medal',

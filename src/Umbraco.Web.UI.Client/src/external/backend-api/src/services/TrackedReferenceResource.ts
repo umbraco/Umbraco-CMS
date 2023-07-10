@@ -45,7 +45,7 @@ export class TrackedReferenceResource {
     public static getTrackedReferenceDescendantsByParentId({
         parentId,
         skip,
-        take,
+        take = 20,
         filterMustBeIsDependency = true,
     }: {
         parentId: string,

@@ -1,11 +1,10 @@
 import type { MediaTypeDetails } from '../../packages/media/media-types/types.js';
 import { UmbEntityData } from './entity.data.js';
 import { createFolderTreeItem } from './utils.js';
-import { FolderTreeItemResponseModel, PagedFolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { FolderTreeItemResponseModel, PagedMediaTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<MediaTypeDetails> = [
 	{
-		$type: 'media-type',
 		name: 'Media Type 1',
 		type: 'media-type',
 		hasChildren: false,
@@ -13,12 +12,10 @@ export const data: Array<MediaTypeDetails> = [
 		isContainer: false,
 		parentId: null,
 		isFolder: false,
-		icon: '',
 		alias: 'mediaType1',
 		properties: [],
 	},
 	{
-		$type: 'media-type',
 		name: 'Media Type 2',
 		type: 'media-type',
 		hasChildren: false,
@@ -26,7 +23,6 @@ export const data: Array<MediaTypeDetails> = [
 		isContainer: false,
 		parentId: null,
 		isFolder: false,
-		icon: '',
 		alias: 'mediaType2',
 		properties: [],
 	},
@@ -41,14 +37,14 @@ class UmbMediaTypeData extends UmbEntityData<MediaTypeDetails> {
 		super(data);
 	}
 
-	getTreeRoot(): PagedFolderTreeItemResponseModel {
+	getTreeRoot(): PagedMediaTreeItemResponseModel {
 		const items = this.data.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => createFolderTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(id: string): PagedFolderTreeItemResponseModel {
+	getTreeItemChildren(id: string): PagedMediaTreeItemResponseModel {
 		const items = this.data.filter((item) => item.parentId === id);
 		const treeItems = items.map((item) => createFolderTreeItem(item));
 		const total = items.length;

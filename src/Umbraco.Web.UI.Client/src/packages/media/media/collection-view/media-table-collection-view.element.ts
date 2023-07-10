@@ -67,7 +67,6 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		this._tableItems = mediaItems.map((item) => {
 			return {
 				id: item.id,
-				icon: item.icon,
 				data: [
 					{
 						columnAlias: 'mediaName',

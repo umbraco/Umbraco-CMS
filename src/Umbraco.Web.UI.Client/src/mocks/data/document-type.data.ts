@@ -1057,7 +1057,6 @@ export const data: Array<DocumentTypeResponseModel> = [
 
 export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 	{
-		$type: 'DocumentTypeTreeItemViewModel',
 		name: 'All property editors document type',
 		type: 'document-type',
 		hasChildren: false,
@@ -1067,7 +1066,6 @@ export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 		icon: '',
 	},
 	{
-		$type: 'DocumentTypeTreeItemViewModel',
 		name: 'Page Document Type',
 		type: 'document-type',
 		hasChildren: false,
@@ -1077,7 +1075,6 @@ export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 		icon: 'umb:document',
 	},
 	{
-		$type: 'DocumentTypeTreeItemViewModel',
 		name: 'Page Document Type Compositional',
 		type: 'document-type',
 		hasChildren: false,
@@ -1087,7 +1084,6 @@ export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 		icon: 'umb:document',
 	},
 	{
-		$type: 'DocumentTypeTreeItemViewModel',
 		name: 'Page Document Type Inherited',
 		type: 'document-type',
 		hasChildren: false,
@@ -1097,7 +1093,6 @@ export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 		icon: 'umb:document',
 	},
 	{
-		$type: 'DocumentTypeTreeItemViewModel',
 		name: 'Simple Document Type',
 		type: 'document-type',
 		hasChildren: false,
@@ -1107,7 +1102,6 @@ export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 		icon: 'umb:document',
 	},
 	{
-		$type: 'DocumentTypeTreeItemViewModel',
 		name: 'Simple Document Type 2',
 		type: 'document-type',
 		hasChildren: false,
@@ -1169,6 +1163,11 @@ class UmbDocumentTypeData extends UmbEntityData<DocumentTypeResponseModel> {
 		const allowedTypeKeys = documentType?.allowedContentTypes?.map((documentType) => documentType.id) ?? [];
 		const items = this.treeData.filter((item) => allowedTypeKeys.includes(item.id ?? ''));
 		return items.map((item) => item);
+	}
+
+	/** For internal use */
+	getAll() {
+		return this.data;
 	}
 }
 

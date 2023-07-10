@@ -5,7 +5,6 @@
 export type TreeItemPresentationModel = {
     name?: string;
     type?: string;
-    icon?: string;
     hasChildren?: boolean;
 };
 
