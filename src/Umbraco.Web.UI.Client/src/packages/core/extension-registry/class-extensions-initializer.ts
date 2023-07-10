@@ -19,7 +19,16 @@ export class UmbClassExtensionsInitializer extends UmbBaseController {
 		this.observe(umbExtensionsRegistry.extensionsOfTypes(extensionTypes), (extensions) => {
 			if (!extensions) return;
 
+			// Clean up removed extensions:
+			this.#extensionMap.forEach((value, key) => {
+				if (!extensions.find((incoming) => incoming.alias === key)) {
+					this.#extensionMap.delete(key);
+					value.destroy();
+				}
+			});
+
 			extensions.forEach((extension) => {
+				// TODO: Needs to do some clean up, if extension gets removed.
 				if (this.#extensionMap.has(extension.alias)) return;
 
 				// Instantiate and provide extension JS class. For Context API the classes provide them selfs when the class instantiates.
