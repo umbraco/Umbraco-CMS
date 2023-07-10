@@ -186,6 +186,6 @@ public abstract class TestHelperBase
     {
         hostingEnv ??= GetHostingEnvironment();
         return new LoggingConfiguration(
-            Path.Combine(hostingEnv.ApplicationPhysicalPath, "umbraco", "logs"));
+            Path.Combine(hostingEnv.ApplicationPhysicalPath, "umbraco", "Logs"));
     }
 }

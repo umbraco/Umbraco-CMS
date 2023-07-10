@@ -256,7 +256,6 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<ILoggingConfiguration>(),
             factory.GetRequiredService<ILogLevelLoader>(),
             Log.Logger));
-        builder.Services.AddSingleton<ILogViewerService, LogViewerService>();
 
         return builder;
     }
