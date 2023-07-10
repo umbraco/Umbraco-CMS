@@ -8,13 +8,15 @@ import {
 } from '@umbraco-cms/backoffice/extension-api';
 
 export abstract class UmbExtensionController extends UmbBaseController {
+	#promise?: Promise<T>;
+	#promiseResolver?: () => void;
 	#extensionRegistry: UmbExtensionRegistry<ManifestCondition>;
 	//#alias: string;
 	#manifest?: ManifestWithDynamicConditions;
 	#conditionManifests: Array<ManifestCondition> = [];
 	#conditionControllers: Array<UmbExtensionCondition> = [];
 	#onPermissionChanged: () => void;
-	#isPermitted = false;
+	#isPermitted?: boolean;
 
 	get weight() {
 		return this.#manifest?.weight ?? 0;
@@ -48,6 +50,15 @@ export abstract class UmbExtensionController extends UmbBaseController {
 				// TODO: more proper clean up.
 			}
 		});
+	}
+
+	asPromise() {
+		return (
+			this.#promise ||
+			(this.#promise = new Promise<T>((resolve) => {
+				this.#conditionsAreInitialized() ? resolve() : (this.#promiseResolver = resolve);
+			}))
+		);
 	}
 
 	#gotManifest(extensionManifest: ManifestWithDynamicConditions) {
@@ -96,11 +107,13 @@ export abstract class UmbExtensionController extends UmbBaseController {
 							const conditionController = await createExtensionClass<UmbExtensionCondition>(conditionManifest, [
 								this,
 								condition.value,
+								this.#onConditionsChangedCallback,
 							]);
 							if (conditionController) {
 								// Some how listen to it? callback/event/onChange something.
 								// then call this one: this.#onConditionsChanged();
 								this.#conditionControllers.push(conditionController);
+								this.#onConditionsChanged();
 							}
 						});
 					}
@@ -118,19 +131,25 @@ export abstract class UmbExtensionController extends UmbBaseController {
 		);
 	}
 
+	#onConditionsChangedCallback = this.#onConditionsChanged.bind(this);
+
 	async #onConditionsChanged() {
 		const oldValue = this.#isPermitted;
 		// Find a condition that is not permitted (Notice how no conditions, means that this extension is permitted)
-		this.#isPermitted =
+		const conditionsArePositive =
 			this.#conditionsAreInitialized() &&
 			this.#conditionControllers.find((condition) => condition.permitted === false) === undefined;
 
-		if (this.#isPermitted) {
+		if (conditionsArePositive) {
 			this.#isPermitted = await this._conditionsAreGood();
 		} else {
+			this.#isPermitted = false;
 			await this._conditionsAreBad();
 		}
 		if (oldValue !== this.#isPermitted) {
+			if (this.#isPermitted) {
+				this.#promiseResolver?.();
+			}
 			this.#onPermissionChanged();
 		}
 	}

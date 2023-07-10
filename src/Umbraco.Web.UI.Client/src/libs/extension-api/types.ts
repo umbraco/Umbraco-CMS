@@ -55,6 +55,7 @@ export interface ManifestKind<ManifestTypes> {
 	manifest: Partial<ManifestTypes>;
 }
 
+// TODO: Get rid of this type and implements ManifestWithDynamicConditions instead.
 export interface ManifestWithConditions<ConditionsType> {
 	/**
 	 * Set the conditions for when the extension should be loaded
