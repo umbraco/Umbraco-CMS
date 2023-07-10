@@ -15,6 +15,7 @@ import {
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { componentHasManifestProperty } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @element umb-workspace-editor
@@ -90,7 +91,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	// TODO: Move into a helper function:
-	private componentHasManifest(component: PageComponent): component is HTMLElement & { manifest: unknown } {
+	private componentHasManifest(component: HTMLElement): component is HTMLElement & { manifest: unknown } {
 		return component ? 'manifest' in component : false;
 	}
 
@@ -110,8 +111,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 						return createExtensionElement(manifest);
 					},
 					setup: (component) => {
-						// TODO: We could just always parse it on and instead we should make a element interface for the workspace views.
-						if (this.componentHasManifest(component)) {
+						if (component && componentHasManifestProperty(component)) {
 							component.manifest = manifest;
 						}
 					},
