@@ -36,7 +36,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
-		new UmbExtensionInitializer(this, umbExtensionsRegistry);
 		this.#extensionInitializer.setLocalPackages(CORE_PACKAGES);
 	}
 
