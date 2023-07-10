@@ -1,6 +1,6 @@
 import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
-import {ContentBuilder, DocumentTypeBuilder, PartialViewBuilder, SliderDataTypeBuilder} from "@umbraco/json-models-builders";
+import {ContentBuilder, DocumentTypeBuilder, PartialViewBuilder} from "@umbraco/json-models-builders";
 import {BlockListDataTypeBuilder} from "@umbraco/json-models-builders/dist/lib/builders/dataTypes";
 
 test.describe('BlockListEditorContent', () => {
@@ -93,17 +93,9 @@ test.describe('BlockListEditorContent', () => {
     return element;
   }
 
-  async function createSliderWithDefaultValue(umbracoApi, sliderName: string, defaultValue: number) {
-    const slider = new SliderDataTypeBuilder()
-      .withName(sliderName)
-      .withInitialLowerValue(defaultValue)
-      .build();
-    return await umbracoApi.dataTypes.save(slider);
-  }
-
   async function createElementWithSlider(umbracoApi, name, alias, sliderId, sliderName?, sliderDefaultValue?) {
     if (sliderId == null) {
-      const sliderData = await createSliderWithDefaultValue(umbracoApi, sliderName, sliderDefaultValue);
+      const sliderData = await umbracoApi.dataTypes.createSliderWithDefaultValue(sliderName, sliderDefaultValue);
       sliderId = sliderData.id;
     }
 
@@ -154,9 +146,9 @@ test.describe('BlockListEditorContent', () => {
 
     // Checks if the content was created
     await expect(page.locator('.umb-block-list__block--view')).toHaveCount(1);
-    await expect(page.locator('.umb-block-list__block--view').nth(0)).toHaveText(contentElementName);
+    await expect(page.locator('.umb-block-list__block--view')).toHaveText(contentElementName);
     // Checks if the content contains the correct value
-    await page.locator('.umb-block-list__block--view').nth(0).click();
+    await page.locator('.umb-block-list__block--view', {hasText: contentElementName}).click();
     await expect(page.locator('[id="sub-view-0"]').locator('[id="title"]')).toHaveValue('Testing...');
   });
 
@@ -516,8 +508,6 @@ test.describe('BlockListEditorContent', () => {
   });
 
   test('Checks if the settings content model contains a default value when created', async ({page, umbracoApi, umbracoUi}) => {
-    await test.slow();
-
     const contentSliderName = 'ContentSlider';
     const contentSliderDefaultValue = 5;
     const settingsSliderName = 'SettingsSlider';
