@@ -54,6 +54,31 @@ public partial class DocumentTypeEditingServiceTests
     }
 
     [Test]
+    public async Task Can_Specify_PropertyType_Key()
+    {
+        var propertyTypeKey = new Guid("82DDEBD8-D2CA-423E-B88D-6890F26152B4");
+
+        var propertyTypeContainer =
+            new DocumentTypePropertyContainer { Name = "Container", Type = "Tab", Key = Guid.NewGuid() };
+        var propertyTypeCreateModel = CreatePropertyType(key: propertyTypeKey, containerKey: propertyTypeContainer.Key);
+
+        var createModel = new DocumentTypeCreateModel { Alias = "test", Name = "Test", Properties = new[] { propertyTypeCreateModel }, Containers = new[] { propertyTypeContainer } };
+
+        var response = await DocumentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        var documentType = await ContentTypeService.GetAsync(response.Result!.Key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(response.Success);
+            Assert.IsNotNull(documentType);
+            var propertyType = documentType.PropertyGroups.FirstOrDefault()?.PropertyTypes?.FirstOrDefault();
+            Assert.IsNotNull(propertyType);
+            Assert.AreEqual(propertyTypeKey, propertyType.Key);
+        });
+    }
+
+    [Test]
     public async Task Can_Create_Composite_DocumentType()
     {
         var compositionBase = new DocumentTypeCreateModel
