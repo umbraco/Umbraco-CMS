@@ -7,7 +7,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 public partial class DocumentTypeEditingServiceTests
 {
-
     [Test]
     public async Task Can_Create_Basic_DocumentType()
     {
@@ -55,8 +54,7 @@ public partial class DocumentTypeEditingServiceTests
     {
         var propertyTypeKey = new Guid("82DDEBD8-D2CA-423E-B88D-6890F26152B4");
 
-        var propertyTypeContainer =
-            new DocumentTypePropertyContainer { Name = "Container", Type = TabContainerType, Key = Guid.NewGuid() };
+        var propertyTypeContainer = CreateContainer();
         var propertyTypeCreateModel = CreatePropertyType(key: propertyTypeKey, containerKey: propertyTypeContainer.Key);
 
         var createModel = CreateCreateModel(
@@ -86,7 +84,7 @@ public partial class DocumentTypeEditingServiceTests
             isElement: true);
 
         // Let's add a property to ensure that it passes through
-        var container = new DocumentTypePropertyContainer { Key = Guid.NewGuid(), Name = "Container", Type = TabContainerType };
+        var container = CreateContainer();
         compositionBase.Containers = new[] { container };
 
         var compositionProperty = CreatePropertyType(name: "Composition Property", alias: "compositionProperty", containerKey: container.Key);

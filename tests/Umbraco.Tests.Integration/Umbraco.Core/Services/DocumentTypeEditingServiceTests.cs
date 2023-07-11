@@ -62,4 +62,15 @@ public partial class DocumentTypeEditingServiceTests : UmbracoIntegrationTest
             Validation = new PropertyTypeValidation(),
             Appearance = new PropertyTypeAppearance(),
         };
+
+    private DocumentTypePropertyContainer CreateContainer(
+        string name = "Container",
+        string type = TabContainerType,
+        Guid? key = null) =>
+        new()
+        {
+            Name = name,
+            Type = type,
+            Key = key ?? Guid.NewGuid(),
+        };
 }
