@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.ContentTypeEditing.Document;
 using Umbraco.Cms.Core.Models.ContentTypeEditing.PropertyTypes;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using PropertyTypeValidation = Umbraco.Cms.Core.Models.ContentTypeEditing.PropertyTypes.PropertyTypeValidation;
@@ -23,13 +24,15 @@ public partial class DocumentTypeEditingServiceTests : UmbracoIntegrationTest
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
+    private IShortStringHelper ShortStringHelper => GetRequiredService<IShortStringHelper>();
+
     private const string TabContainerType = "Tab";
 
     private const string GroupContainerType = "Group";
 
     private DocumentTypeCreateModel CreateCreateModel(
         string name = "Test",
-        string alias = "test",
+        string? alias = null,
         Guid? key = null,
         bool isElement = false,
         IEnumerable<DocumentPropertyType>? propertyTypes = null,
@@ -38,7 +41,7 @@ public partial class DocumentTypeEditingServiceTests : UmbracoIntegrationTest
         new()
         {
             Name = name,
-            Alias = alias,
+            Alias = alias ?? ShortStringHelper.CleanStringForSafeAlias(name),
             Key = key ?? Guid.NewGuid(),
             Properties = propertyTypes ?? Enumerable.Empty<DocumentPropertyType>(),
             Containers = containers ?? Enumerable.Empty<DocumentTypePropertyContainer>(),
@@ -47,15 +50,15 @@ public partial class DocumentTypeEditingServiceTests : UmbracoIntegrationTest
         };
 
     private DocumentPropertyType CreatePropertyType(
-        string alias = "title",
         string name = "Title",
+        string? alias = null,
         Guid? key = null,
         Guid? containerKey = null,
         Guid? dataTypeKey = null) =>
         new()
         {
-            Alias = alias,
             Name = name,
+            Alias = alias ?? ShortStringHelper.CleanStringForSafeAlias(name),
             Key = key ?? Guid.NewGuid(),
             ContainerKey = containerKey,
             DataTypeKey = dataTypeKey ?? Constants.DataTypes.Guids.TextstringGuid,
