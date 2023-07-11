@@ -77,12 +77,16 @@ public partial class DocumentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Can_Create_Composite_DocumentType()
+    [TestCase(true, true)]
+    [TestCase(true, false)]
+    [TestCase(false, false)]
+    // Wondering where the last case is? Look at the test below.
+    public async Task Can_Create_Composite_DocumentType(bool compositionIsElement, bool documentTypeIsElement)
     {
         var compositionBase = CreateCreateModel(
             alias: "compositionBase",
             name: "Composition Base",
-            isElement: true);
+            isElement: compositionIsElement);
 
         // Let's add a property to ensure that it passes through
         var container = CreateContainer();
@@ -97,6 +101,7 @@ public partial class DocumentTypeEditingServiceTests
 
         // Create doc type using the composition
         var documentType = CreateCreateModel(
+            isElement: documentTypeIsElement,
             compositions: new[]
             {
                 new ContentTypeComposition
@@ -119,6 +124,44 @@ public partial class DocumentTypeEditingServiceTests
             Assert.AreEqual(container.Key, compositionType.CompositionPropertyGroups.First().Key);
             Assert.AreEqual(1, compositionType.CompositionPropertyTypes.Count());
             Assert.AreEqual(compositionProperty.Key, compositionType.CompositionPropertyTypes.First().Key);
+        });
+    }
+
+    [Test]
+    public async Task Element_Types_Must_Not_Be_Composed_By_non_element_type()
+    {
+        // This is a pretty interesting one, since it actually seems to be broken in the old backoffice,
+        // since the client will always send the isElement flag as false to the GetAvailableCompositeContentTypes endpoint
+        // Even if it's an element type, however if we look at the comment in GetAvailableCompositeContentTypes
+        // We see that element types are not suppose to be allowed to be composed by non-element types.
+        // Since this breaks models builder evidently.
+        var compositionBase = CreateCreateModel(
+            name: "Composition Base",
+            isElement: false);
+
+        var compositionResult = await DocumentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
+        Assert.IsTrue(compositionResult.Success);
+        var compositionType = compositionResult.Result;
+
+        var documentType = CreateCreateModel(
+            name: "Document Type Using Composition",
+            compositions: new[]
+            {
+                new ContentTypeComposition
+                {
+                    CompositionType = ContentTypeCompositionType.Composition,
+                    Key = compositionType.Key,
+                },
+            },
+            isElement: true);
+
+        var documentTypeResult = await DocumentTypeEditingService.CreateAsync(documentType, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(documentTypeResult.Success);
+            Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, documentTypeResult.Status);
+            Assert.IsNull(documentTypeResult.Result);
         });
     }
 
