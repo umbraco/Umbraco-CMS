@@ -14,9 +14,7 @@ public partial class DocumentTypeEditingServiceTests
         var name = "Test";
         var alias = "test";
 
-        var createModel = new DocumentTypeCreateModel { Alias = alias, Name = name };
-        createModel.IsElement = true;
-
+        var createModel = CreateCreateModel(alias: alias, name: name, isElement: true);
         var response = await DocumentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         // Ensure it's actually persisted
@@ -38,7 +36,7 @@ public partial class DocumentTypeEditingServiceTests
     public async Task Can_Specify_Key()
     {
         var key = new Guid("33C326F6-CB5E-43D6-9730-E946AA5F9C7B");
-        var createModel = new DocumentTypeCreateModel { Alias = "test", Name = "Test", Key = key };
+        var createModel = CreateCreateModel(key: key);
 
         var response = await DocumentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
@@ -58,10 +56,12 @@ public partial class DocumentTypeEditingServiceTests
         var propertyTypeKey = new Guid("82DDEBD8-D2CA-423E-B88D-6890F26152B4");
 
         var propertyTypeContainer =
-            new DocumentTypePropertyContainer { Name = "Container", Type = "Tab", Key = Guid.NewGuid() };
+            new DocumentTypePropertyContainer { Name = "Container", Type = TabContainerType, Key = Guid.NewGuid() };
         var propertyTypeCreateModel = CreatePropertyType(key: propertyTypeKey, containerKey: propertyTypeContainer.Key);
 
-        var createModel = new DocumentTypeCreateModel { Alias = "test", Name = "Test", Properties = new[] { propertyTypeCreateModel }, Containers = new[] { propertyTypeContainer } };
+        var createModel = CreateCreateModel(
+            propertyTypes: new[] { propertyTypeCreateModel },
+            containers: new[] { propertyTypeContainer });
 
         var response = await DocumentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
@@ -80,15 +80,13 @@ public partial class DocumentTypeEditingServiceTests
     [Test]
     public async Task Can_Create_Composite_DocumentType()
     {
-        var compositionBase = new DocumentTypeCreateModel
-        {
-            Alias = "compositionBase",
-            Name = "Composition Base",
-            IsElement = true,
-        };
+        var compositionBase = CreateCreateModel(
+            alias: "compositionBase",
+            name: "Composition Base",
+            isElement: true);
 
         // Let's add a property to ensure that it passes through
-        var container = new DocumentTypePropertyContainer { Key = Guid.NewGuid(), Name = "Container", Type = "Tab" };
+        var container = new DocumentTypePropertyContainer { Key = Guid.NewGuid(), Name = "Container", Type = TabContainerType };
         compositionBase.Containers = new[] { container };
 
         var compositionProperty = CreatePropertyType(name: "Composition Property", alias: "compositionProperty", containerKey: container.Key);
@@ -99,19 +97,16 @@ public partial class DocumentTypeEditingServiceTests
         var compositionType = compositionResult.Result;
 
         // Create doc type using the composition
-        var documentType = new DocumentTypeCreateModel
-        {
-            Alias = "test",
-            Name = "Test",
-            Compositions = new[]
+        var documentType = CreateCreateModel(
+            compositions: new[]
             {
                 new ContentTypeComposition
                 {
                 CompositionType = ContentTypeCompositionType.Composition,
                 Key = compositionType.Key,
                 },
-            },
-        };
+            }
+        );
 
         var result = await DocumentTypeEditingService.CreateAsync(documentType, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);

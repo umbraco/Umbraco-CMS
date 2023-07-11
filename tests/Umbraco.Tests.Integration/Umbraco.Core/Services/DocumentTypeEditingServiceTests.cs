@@ -1,5 +1,7 @@
-﻿using NUnit.Framework;
+﻿using System.Collections.Concurrent;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing.Document;
 using Umbraco.Cms.Core.Models.ContentTypeEditing.PropertyTypes;
 using Umbraco.Cms.Core.Services;
@@ -20,6 +22,29 @@ public partial class DocumentTypeEditingServiceTests : UmbracoIntegrationTest
     private IDocumentTypeEditingService DocumentTypeEditingService => GetRequiredService<IDocumentTypeEditingService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
+    private const string TabContainerType = "Tab";
+
+    private const string GroupContainerType = "Group";
+
+    private DocumentTypeCreateModel CreateCreateModel(
+        string name = "Test",
+        string alias = "test",
+        Guid? key = null,
+        bool isElement = false,
+        IEnumerable<DocumentPropertyType>? propertyTypes = null,
+        IEnumerable<DocumentTypePropertyContainer>? containers = null,
+        IEnumerable<ContentTypeComposition>? compositions = null) =>
+        new()
+        {
+            Name = name,
+            Alias = alias,
+            Key = key ?? Guid.NewGuid(),
+            Properties = propertyTypes ?? Enumerable.Empty<DocumentPropertyType>(),
+            Containers = containers ?? Enumerable.Empty<DocumentTypePropertyContainer>(),
+            Compositions = compositions ?? Enumerable.Empty<ContentTypeComposition>(),
+            IsElement = isElement,
+        };
 
     private DocumentPropertyType CreatePropertyType(
         string alias = "title",
