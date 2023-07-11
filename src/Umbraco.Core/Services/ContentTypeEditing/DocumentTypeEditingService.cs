@@ -198,6 +198,8 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
                         IPropertyType propertyType = contentType.PropertyTypes.FirstOrDefault(pt => pt.Key == property.Key)
                                                      ?? new PropertyType(_shortStringHelper, dataType);
 
+                        // We are demanding a property type key in the model, so we should probably ensure that it's the on that's actually used.
+                        propertyType.Key = property.Key;
                         propertyType.Name = property.Name;
                         propertyType.DataTypeId = dataType.Id;
                         propertyType.DataTypeKey = dataType.Key;
