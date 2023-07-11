@@ -2,7 +2,6 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing.Document;
-using Umbraco.Cms.Core.Models.ContentTypeEditing.PropertyTypes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -116,7 +115,7 @@ public partial class DocumentTypeEditingServiceTests
 
         var result = await DocumentTypeEditingService.CreateAsync(documentType, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
-        var createdDocumentType = result.Result;
+        var createdDocumentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
         Assert.Multiple(() =>
         {
