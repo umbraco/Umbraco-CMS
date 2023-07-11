@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing.Document;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -118,6 +119,49 @@ public partial class DocumentTypeEditingServiceTests
             Assert.AreEqual(container.Key, compositionType.CompositionPropertyGroups.First().Key);
             Assert.AreEqual(1, compositionType.CompositionPropertyTypes.Count());
             Assert.AreEqual(compositionProperty.Key, compositionType.CompositionPropertyTypes.First().Key);
+        });
+    }
+
+    [Test]
+    public async Task DocumentType_Containing_Composition_Cannot_Be_Used_As_Composition()
+    {
+        var compositionBase = CreateCreateModel(name: "CompositionBase");
+
+        var baseResult = await DocumentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
+        Assert.IsTrue(baseResult.Success);
+
+        var composition = CreateCreateModel(
+            name: "Composition",
+            compositions: new[]
+            {
+                new ContentTypeComposition
+                {
+                    CompositionType = ContentTypeCompositionType.Composition, Key = baseResult.Result!.Key
+                }
+            });
+
+        var compositionResult = await DocumentTypeEditingService.CreateAsync(composition, Constants.Security.SuperUserKey);
+        Assert.IsTrue(compositionResult.Success);
+
+        // This is not allowed because the composition also has a composition (compositionBase).
+        var invalidComposition = CreateCreateModel(
+            name: "Invalid",
+            compositions: new[]
+            {
+                new ContentTypeComposition
+                {
+                    CompositionType = ContentTypeCompositionType.Composition,
+                    Key = compositionResult.Result!.Key
+                },
+            });
+
+        var invalidAttempt = await DocumentTypeEditingService.CreateAsync(invalidComposition, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(invalidAttempt.Success);
+            Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, invalidAttempt.Status);
+            Assert.IsNull(invalidAttempt.Result);
         });
     }
 }
