@@ -337,7 +337,7 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
 
         IEnumerable<Guid> allowedCompositionKeys =
             // NOTE: Here if we're checking for create we should pass null, otherwise the updated content type.
-            _contentTypeService.GetAvailableCompositeContentTypes(null, allContentTypes, isElement: true)
+            _contentTypeService.GetAvailableCompositeContentTypes(null, allContentTypes, isElement: contentType.IsElement)
                 .Results
                 .Where(x => x.Allowed)
                 .Select(x => x.Composition.Key);
