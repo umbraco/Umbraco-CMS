@@ -17,8 +17,7 @@ export default defineConfig({
 				},
 			},
 		},
-		outDir: '../../../Umbraco.Cms.StaticAssets/wwwroot/umbraco/login',
+		outDir: '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/login',
 		emptyOutDir: true,
 	},
-  base: '/umbraco/login/',
 });

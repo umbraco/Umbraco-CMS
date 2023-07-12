@@ -1,13 +1,9 @@
-import { UmbAuthRepository } from './auth.repository.js';
-import { LoginRequestModel, IUmbAuthContext } from './types.js';
+import {IUmbAuthContext, LoginRequestModel, LoginResponse} from "./types.ts";
 
 export class UmbAuthContext implements IUmbAuthContext {
-	readonly #AUTH_URL = '/umbraco/management/api/v1/security/back-office';
-	readonly supportsPersistLogin = false;
+  supportsPersistLogin = false;
 
-	#authRepository = new UmbAuthRepository(this.#AUTH_URL);
-
-	public async login(data: LoginRequestModel) {
-		return this.#authRepository.login(data);
-	}
+  login(_data: LoginRequestModel): Promise<LoginResponse> {
+    throw new Error("Method not implemented.");
+  }
 }

@@ -1,4 +1,4 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import {css, CSSResultGroup, html, LitElement} from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-auth-layout')
@@ -27,7 +27,7 @@ export class UmbAuthLayoutElement extends LitElement {
 				background-position: 50%;
 				background-repeat: no-repeat;
 				background-size: cover;
-				background-image: url('login.jpeg');
+				background-image: url('login.svg');
 				width: 100vw;
 				height: 100vh;
 			}

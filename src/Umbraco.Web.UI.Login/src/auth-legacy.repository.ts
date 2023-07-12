@@ -1,18 +1,15 @@
-import { LoginRequestModel } from './types.js';
+import type {LoginRequestModel, LoginResponse} from './types.js';
 
-export class UmbAuthRepository {
-	#authURL = '';
+export class UmbAuthLegacyRepository {
+  readonly #authURL = '/umbraco/backoffice/umbracoapi/authentication/postlogin';
 
-	constructor(authUrl: string) {
-		this.#authURL = authUrl;
-	}
-
-	public async login(data: LoginRequestModel) {
-		const request = new Request(this.#authURL + '/login', {
+	public async login(data: LoginRequestModel): Promise<LoginResponse> {
+		const request = new Request(this.#authURL, {
 			method: 'POST',
 			body: JSON.stringify({
 				username: data.username,
 				password: data.password,
+        persist: data.persist,
 			}),
 			headers: {
 				'Content-Type': 'application/json',
@@ -20,17 +17,17 @@ export class UmbAuthRepository {
 		});
 		const response = await fetch(request);
 
-		//TODO: What kind of data does the old backoffice expect?
-		//NOTE: this conditionally adds error and data to the response object
 		return {
 			status: response.status,
-			...(!response.ok && { error: this.#getErrorText(response) }),
-			...(response.ok && { data: 'WHAT DATA SHOULD BE RETURNED?' }),
+			error: response.ok ? undefined : this.#getErrorText(response),
 		};
 	}
 
 	#getErrorText(response: Response) {
 		switch (response.status) {
+      case 400:
+        return 'Oops! It seems like your login credentials are invalid or expired. Please double-check your username and password and try again.';
+
 			case 401:
 				return 'Oops! It seems like your login credentials are invalid or expired. Please double-check your username and password and try again.';
 

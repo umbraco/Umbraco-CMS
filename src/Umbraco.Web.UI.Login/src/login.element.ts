@@ -12,9 +12,17 @@ import './auth-layout.element.js';
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {
 	#authContext: IUmbAuthContext = new UmbAuthContext();
+  #returnUrl = '';
 
 	@property({ type: String, attribute: 'return-url' })
-	returnUrl = '';
+	set returnUrl(value: string) {
+    this.#returnUrl = value;
+  }
+
+  get returnUrl() {
+    // Check if there is a ?redir querystring or else return the returnUrl attribute
+    return new URLSearchParams(window.location.search).get('redir') || this.#returnUrl;
+  }
 
 	@property({ type: Boolean, attribute: 'is-legacy' })
 	set isLegacy(value: boolean) {
@@ -54,7 +62,11 @@ export default class UmbLoginElement extends LitElement {
 
 		if (response.error) return;
 
-		location.href = this.returnUrl;
+    if (this.returnUrl) {
+      location.href = this.returnUrl;
+    }
+
+    this.dispatchEvent(new CustomEvent('login-success', { bubbles: true, composed: true }));
 	};
 
 	get #greeting() {
