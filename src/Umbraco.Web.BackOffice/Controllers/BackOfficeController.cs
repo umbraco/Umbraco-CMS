@@ -145,6 +145,22 @@ public class BackOfficeController : UmbracoController
 
     [HttpGet]
     [AllowAnonymous]
+    public async Task<IActionResult> Login()
+    {
+        // force authentication to occur since this is not an authorized endpoint
+        AuthenticateResult result = await this.AuthenticateBackOfficeAsync();
+
+        var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeLoginArea, "Index.cshtml")
+            .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
+
+        return await RenderDefaultOrProcessExternalLoginAsync(
+            result,
+            () => View(viewPath),
+            () => View(viewPath));
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> VerifyInvite(string invite)
     {
         AuthenticateResult authenticate = await this.AuthenticateBackOfficeAsync();
@@ -194,7 +210,7 @@ public class BackOfficeController : UmbracoController
         if (result.Succeeded == false)
         {
             _logger.LogWarning("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
-            return new RedirectResult(Url.Action(nameof(Default)) + "#/login/false?invite=3");
+            return new RedirectResult(Url.Action(nameof(Default)) + "/login?status=false&invite=3");
         }
 
         //sign the user in
@@ -204,7 +220,7 @@ public class BackOfficeController : UmbracoController
         identityUser.LastLoginDateUtc = previousLastLoginDate;
         await _userManager.UpdateAsync(identityUser);
 
-        return new RedirectResult(Url.Action(nameof(Default)) + "#/login/false?invite=1");
+        return new RedirectResult(Url.Action(nameof(Default)) + "/login?status=false&invite=1");
     }
 
     /// <summary>
@@ -227,14 +243,8 @@ public class BackOfficeController : UmbracoController
             return new LocalRedirectResult(installerUrl);
         }
 
-        var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
-
-        return await RenderDefaultOrProcessExternalLoginAsync(
-            result,
-            //The default view to render when there is no external login info or errors
-            () => View(viewPath),
-            //The IActionResult to perform if external login is successful
-            () => Redirect("/"));
+        // Redirect to login if we're not authorized
+        return new LocalRedirectResult(Url.Action(nameof(Login), this.GetControllerName()) + "?redir=" + Url.Action(nameof(AuthorizeUpgrade), this.GetControllerName()));
     }
 
     /// <summary>

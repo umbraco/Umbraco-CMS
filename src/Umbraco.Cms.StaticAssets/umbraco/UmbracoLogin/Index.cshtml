@@ -1,0 +1,45 @@
+@using Microsoft.Extensions.Options;
+@using Umbraco.Cms.Core.Configuration
+@using Umbraco.Cms.Core.Configuration.Models
+@using Umbraco.Cms.Core.Hosting
+@using Umbraco.Cms.Core.Logging
+@using Umbraco.Cms.Core.Services
+@using Umbraco.Cms.Core.WebAssets
+@using Umbraco.Cms.Web.BackOffice.Controllers
+@using Umbraco.Cms.Web.BackOffice.Security
+@using Umbraco.Extensions
+@inject BackOfficeServerVariables backOfficeServerVariables
+@inject IUmbracoVersion umbracoVersion
+@inject IHostingEnvironment hostingEnvironment
+@inject IOptions<GlobalSettings> globalSettings
+@inject IRuntimeMinifier runtimeMinifier
+@inject IProfilerHtml profilerHtml
+@inject IIconService IconService
+@inject IBackOfficeExternalLoginProviders externalLogins
+@{
+    var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+}
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <base href="@backOfficePath/login/"/>
+        <link rel="icon" type="image/svg+xml" href="~/umbraco/login/favicon.svg"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Umbraco</title>
+        <script type="module" src="~/umbraco/login/main.js" asp-append-version="true"></script>
+        <link rel="stylesheet" href="~/umbraco/login/style.css" asp-append-version="true"/>
+        <style>
+          body {
+            margin: 0;
+            padding: 0;
+          }
+        </style>
+    </head>
+
+    <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
+        <umb-login is-legacy return-url="@backOfficePath"></umb-login>
+    </body>
+</html>
