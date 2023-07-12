@@ -109,7 +109,7 @@ public sealed class RichTextEditorPastedImages
     /// <param name="userId"></param>
     /// <returns>Formatted HTML.</returns>
     /// <exception cref="NotSupportedException">Thrown if image extension is not allowed</exception>
-    internal string FindAndPersistBase64Images(string html, Guid mediaParentFolder, int userId)
+    internal string FindAndPersistEmbeddedImages(string html, Guid mediaParentFolder, int userId)
     {
         // Find all img's that has data-tmpimg attribute
         // Use HTML Agility Pack - https://html-agility-pack.net
