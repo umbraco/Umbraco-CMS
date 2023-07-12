@@ -83,7 +83,7 @@ describe('UmbExtensionController', () => {
 	describe('Manifest with empty conditions', () => {
 		let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
-		let manifest: Array<ManifestWithDynamicConditions>;
+		let manifest: ManifestWithDynamicConditions;
 
 		beforeEach(async () => {
 			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
@@ -93,10 +93,6 @@ describe('UmbExtensionController', () => {
 				name: 'test-section-1',
 				alias: 'Umb.Test.Section.1',
 				weight: 1,
-				meta: {
-					label: 'Test Section 1',
-					pathname: 'test-section-1',
-				},
 				conditions: [],
 			};
 
@@ -121,7 +117,7 @@ describe('UmbExtensionController', () => {
 	describe('Manifest with valid conditions', () => {
 		let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
-		let manifest: Array<ManifestWithDynamicConditions>;
+		let manifest: ManifestWithDynamicConditions;
 
 		beforeEach(async () => {
 			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
@@ -131,10 +127,6 @@ describe('UmbExtensionController', () => {
 				name: 'test-section-1',
 				alias: 'Umb.Test.Section.1',
 				weight: 1,
-				meta: {
-					label: 'Test Section 1',
-					pathname: 'test-section-1',
-				},
 				conditions: [
 					{
 						alias: 'Umb.Test.Condition.Valid',
@@ -174,7 +166,7 @@ describe('UmbExtensionController', () => {
 	describe('Manifest with invalid conditions', () => {
 		let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
-		let manifest: Array<ManifestWithDynamicConditions>;
+		let manifest: ManifestWithDynamicConditions;
 
 		beforeEach(async () => {
 			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
@@ -184,10 +176,6 @@ describe('UmbExtensionController', () => {
 				name: 'test-section-1',
 				alias: 'Umb.Test.Section.1',
 				weight: 1,
-				meta: {
-					label: 'Test Section 1',
-					pathname: 'test-section-1',
-				},
 				conditions: [
 					{
 						alias: 'Umb.Test.Condition.Invalid',
