@@ -19,8 +19,8 @@
     "wait-on": "^6.0.1"
   },
   "dependencies": {
-    "@umbraco/json-models-builders": "^1.0.5",
-    "@umbraco/playwright-testhelpers": "^1.0.22",
+    "@umbraco/json-models-builders": "^1.0.6",
+    "@umbraco/playwright-testhelpers": "^1.0.24",
     "camelize": "^1.0.0",
     "faker": "^4.1.0",
     "form-data": "^4.0.0",
