@@ -24,13 +24,13 @@ public class RichTextPreValueController : UmbracoAuthorizedJsonController
 
         var config = new RichTextEditorConfiguration
         {
-            Plugins = settings.Plugins.Select(x => new RichTextEditorPlugin { Name = x }),
+            Plugins = (settings.Plugins ?? RichTextEditorSettings.DefaultPluginsConfig).Select(x => new RichTextEditorPlugin { Name = x }),
             Commands =
-                settings.Commands.Select(x =>
+                (settings.Commands ?? RichTextEditorSettings.DefaultCommandsConfig).Select(x =>
                     new RichTextEditorCommand { Alias = x.Alias, Mode = x.Mode, Name = x.Name }),
-            ValidElements = settings.ValidElements,
-            InvalidElements = settings.InvalidElements,
-            CustomConfig = settings.CustomConfig
+            ValidElements = settings.ValidElements ?? RichTextEditorSettings.StaticValidElements,
+            InvalidElements = settings.InvalidElements ?? RichTextEditorSettings.StaticInvalidElements,
+            CustomConfig = settings.CustomConfig ?? RichTextEditorSettings.DefaultCustomConfig
         };
 
         return config;

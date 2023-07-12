@@ -7,17 +7,17 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigRichTextEditor)]
 public class RichTextEditorSettings
 {
-    internal const string StaticValidElements =
+    public const string StaticValidElements =
         "+a[id|style|rel|data-id|data-udi|rev|charset|hreflang|dir|lang|tabindex|accesskey|type|name|href|target|title|class|onfocus|onblur|onclick|ondblclick|onmousedown|onmouseup|onmouseover|onmousemove|onmouseout|onkeypress|onkeydown|onkeyup],-strong/-b[class|style],-em/-i[class|style],-strike[class|style],-s[class|style],-u[class|style],#p[id|style|dir|class|align],-ol[class|reversed|start|style|type],-ul[class|style],-li[class|style],br[class],img[id|dir|lang|longdesc|usemap|style|class|src|onmouseover|onmouseout|border|alt=|title|hspace|vspace|width|height|align|umbracoorgwidth|umbracoorgheight|onresize|onresizestart|onresizeend|rel|data-id],-sub[style|class],-sup[style|class],-blockquote[dir|style|class],-table[border=0|cellspacing|cellpadding|width|height|class|align|summary|style|dir|id|lang|bgcolor|background|bordercolor],-tr[id|lang|dir|class|rowspan|width|height|align|valign|style|bgcolor|background|bordercolor],tbody[id|class],thead[id|class],tfoot[id|class],#td[id|lang|dir|class|colspan|rowspan|width|height|align|valign|style|bgcolor|background|bordercolor|scope],-th[id|lang|dir|class|colspan|rowspan|width|height|align|valign|style|scope],caption[id|lang|dir|class|style],-div[id|dir|class|align|style],-span[class|align|style],-pre[class|align|style],address[class|align|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align|style],hr[class|style],small[class|style],dd[id|class|title|style|dir|lang],dl[id|class|title|style|dir|lang],dt[id|class|title|style|dir|lang],object[class|id|width|height|codebase|*],param[name|value|_value|class],embed[type|width|height|src|class|*],map[name|class],area[shape|coords|href|alt|target|class],bdo[class],button[class],iframe[*],figure,figcaption,cite,video[*],audio[*],picture[*],source[*],canvas[*]";
 
-    internal const string StaticInvalidElements = "font";
+    public const string StaticInvalidElements = "font";
 
-    private static readonly string[] Default_plugins =
+    public static readonly string[] DefaultPluginsConfig =
     {
         "anchor", "charmap", "table", "lists", "advlist", "autolink", "directionality", "searchreplace",
     };
 
-    private static readonly RichTextEditorCommand[] Default_commands =
+    public static readonly RichTextEditorCommand[] DefaultCommandsConfig =
     {
         new RichTextEditorCommand
         {
@@ -111,36 +111,36 @@ public class RichTextEditorSettings
         },
     };
 
-    private static readonly IDictionary<string, string> Default_custom_config =
+    public static readonly IDictionary<string, string> DefaultCustomConfig =
         new Dictionary<string, string> { ["entity_encoding"] = "raw" };
 
     /// <summary>
     ///     HTML RichText Editor TinyMCE Commands.
     /// </summary>
     /// WB-TODO Custom Array of objects
-    public RichTextEditorCommand[] Commands { get; set; } = Default_commands;
+    public RichTextEditorCommand[]? Commands { get; set; }
 
     /// <summary>
     ///     HTML RichText Editor TinyMCE Plugins.
     /// </summary>
-    public string[] Plugins { get; set; } = Default_plugins;
+    public string[]? Plugins { get; set; }
 
     /// <summary>
     ///     HTML RichText Editor TinyMCE Custom Config.
     /// </summary>
     /// WB-TODO Custom Dictionary
-    public IDictionary<string, string> CustomConfig { get; set; } = Default_custom_config;
+    public IDictionary<string, string>? CustomConfig { get; set; }
 
     /// <summary>
     /// </summary>
     [DefaultValue(StaticValidElements)]
-    public string ValidElements { get; set; } = StaticValidElements;
+    public string? ValidElements { get; set; }
 
     /// <summary>
     ///     Invalid HTML elements for RichText Editor.
     /// </summary>
     [DefaultValue(StaticInvalidElements)]
-    public string InvalidElements { get; set; } = StaticInvalidElements;
+    public string? InvalidElements { get; set; }
 
     public class RichTextEditorCommand
     {
