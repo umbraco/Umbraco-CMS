@@ -86,11 +86,11 @@
 	},
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc --project ./src/tsconfig.json && rollup -c ./src/rollup.config.js",
+		"build": "tsc --project ./src/tsconfig.build.json && rollup -c ./src/rollup.config.js",
 		"build:vite": "tsc && vite build --mode staging",
 		"build:for:static": "vite build",
 		"build:for:cms": "npm run build && node ./devops/build/copy-to-cms.js",
-		"build:for:npm": "npm run build && tsc-alias -f -p src/tsconfig.json && npm run generate:jsonschema:dist && npm run wc-analyze && npm run wc-analyze:vscode",
+		"build:for:npm": "npm run build && tsc-alias -f -p src/tsconfig.build.json && npm run generate:jsonschema:dist && npm run wc-analyze && npm run wc-analyze:vscode",
 		"preview": "vite preview --open",
 		"test": "web-test-runner --coverage",
 		"test:watch": "web-test-runner --watch",
