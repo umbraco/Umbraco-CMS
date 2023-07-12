@@ -1,6 +1,6 @@
 import { expect, fixture } from '@open-wc/testing';
 import type { ManifestWithDynamicConditions } from '../types.js';
-import { UmbExtensionRegistry } from '../index.js';
+import { UmbExtensionCondition, UmbExtensionRegistry } from '../index.js';
 import { UmbExtensionController } from './extension-controller.js';
 import { UmbControllerHostElement, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
@@ -33,6 +33,18 @@ class UmbTestConditionAlwaysValid implements UmbExtensionCondition {
 class UmbTestConditionAlwaysInvalid implements UmbExtensionCondition {
 	permitted = false;
 }
+class UmbTestConditionDelay implements UmbExtensionCondition {
+	permitted = false;
+	constructor(host, value: string, private callback: () => void) {
+		setTimeout(() => {
+			this.approve();
+		}, parseInt(value));
+	}
+	approve() {
+		this.permitted = true;
+		this.callback();
+	}
+}
 
 describe('UmbExtensionController', () => {
 	describe('Manifest without conditions', () => {
@@ -48,10 +60,6 @@ describe('UmbExtensionController', () => {
 				name: 'test-section-1',
 				alias: 'Umb.Test.Section.1',
 				weight: 1,
-				meta: {
-					label: 'Test Section 1',
-					pathname: 'test-section-1',
-				},
 			};
 
 			extensionRegistry.register(manifest);
@@ -138,7 +146,6 @@ describe('UmbExtensionController', () => {
 				type: 'condition',
 				name: 'test-condition-valid',
 				alias: 'Umb.Test.Condition.Valid',
-				weight: 1,
 				class: UmbTestConditionAlwaysValid,
 			};
 
@@ -192,7 +199,6 @@ describe('UmbExtensionController', () => {
 				type: 'condition',
 				name: 'test-condition-invalid',
 				alias: 'Umb.Test.Condition.Invalid',
-				weight: 2,
 				class: UmbTestConditionAlwaysInvalid,
 			};
 
