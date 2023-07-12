@@ -34,6 +34,29 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "ht
 		StartServerOnDebug = "false"
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Login", "http://localhost:3961", "{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}"
+	ProjectSection(WebsiteProperties) = preProject
+		UseIISExpress = "true"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_3961"
+		Debug.AspNetCompiler.PhysicalPath = "src\Umbraco.Web.UI.Login\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_3961\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_3961"
+		Release.AspNetCompiler.PhysicalPath = "src\Umbraco.Web.UI.Login\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_3961\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		SlnRelativePath = "src\Umbraco.Web.UI.Login\"
+		DefaultWebSiteLanguage = "Visual C#"
+		StartServerOnDebug = "false"
+	EndProjectSection
+EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTest", "http://localhost:58896", "{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}"
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "true"
