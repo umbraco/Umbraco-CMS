@@ -66,7 +66,7 @@ export interface ManifestWithDynamicConditions extends ManifestBase {
 	/**
 	 * Set the conditions for when the extension should be loaded
 	 */
-	conditions: Array<{
+	conditions?: Array<{
 		alias: string;
 		value: unknown;
 	}>;
