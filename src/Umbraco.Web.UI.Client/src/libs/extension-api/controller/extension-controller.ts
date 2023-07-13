@@ -14,7 +14,7 @@ export abstract class UmbExtensionController extends UmbBaseController {
 	//#alias: string;
 	#manifest?: ManifestWithDynamicConditions;
 	#conditionControllers: Array<UmbExtensionCondition> = [];
-	#onPermissionChanged: () => void;
+	#onPermissionChanged: (isPermitted: boolean) => void;
 	#isPermitted?: boolean;
 
 	get weight() {
@@ -38,7 +38,7 @@ export abstract class UmbExtensionController extends UmbBaseController {
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
-		onPermissionChanged: () => void
+		onPermissionChanged: (isPermitted: boolean) => void
 	) {
 		super(host, alias);
 		this.#extensionRegistry = extensionRegistry;
@@ -161,7 +161,7 @@ export abstract class UmbExtensionController extends UmbBaseController {
 				this.#promiseResolvers.forEach((x) => x());
 				this.#promiseResolvers = [];
 			}
-			this.#onPermissionChanged();
+			this.#onPermissionChanged(this.#isPermitted);
 		}
 	}
 

@@ -18,7 +18,7 @@ class UmbTestExtensionController extends UmbExtensionController {
 		host: UmbControllerHostElement,
 		extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>,
 		alias: string,
-		onPermissionChanged: () => void
+		onPermissionChanged: (isPermitted: boolean) => void
 	) {
 		super(host, extensionRegistry, alias, onPermissionChanged);
 	}
@@ -49,6 +49,7 @@ class UmbTestConditionAlwaysInvalid extends UmbBaseController implements UmbExte
 	permitted = false;
 }
 class UmbTestConditionDelay extends UmbBaseController implements UmbExtensionCondition {
+	#timer?: any;
 	config: UmbConditionConfig<string>;
 	permitted = false;
 	#onChange: () => void;
@@ -57,10 +58,28 @@ class UmbTestConditionDelay extends UmbBaseController implements UmbExtensionCon
 		super(args.host);
 		this.config = args.config;
 		this.#onChange = args.onChange;
-		setTimeout(() => {
+		this.startApprove();
+	}
+
+	startApprove() {
+		this.#timer = setTimeout(() => {
 			this.permitted = true;
 			this.#onChange();
+			this.startDisapprove();
 		}, parseInt(this.config.value));
+	}
+
+	startDisapprove() {
+		this.#timer = setTimeout(() => {
+			this.permitted = false;
+			this.#onChange();
+			this.startApprove();
+		}, parseInt(this.config.value));
+	}
+
+	destroy() {
+		super.destroy();
+		clearTimeout(this.#timer);
 	}
 }
 
@@ -88,6 +107,7 @@ describe('UmbExtensionController', () => {
 				extensionRegistry,
 				'Umb.Test.Section.1',
 				() => {
+					expect(extensionController.permitted).to.be.true;
 					if (extensionController.permitted) {
 						expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
 
@@ -125,6 +145,7 @@ describe('UmbExtensionController', () => {
 				extensionRegistry,
 				'Umb.Test.Section.1',
 				() => {
+					expect(extensionController.permitted).to.be.true;
 					if (extensionController.permitted) {
 						expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
 
@@ -171,9 +192,9 @@ describe('UmbExtensionController', () => {
 				hostElement,
 				extensionRegistry,
 				'Umb.Test.Section.1',
-				() => {
+				(isPermitted) => {
 					// No relevant for this test.
-					expect(extensionController?.permitted).to.be.true;
+					expect(isPermitted).to.be.true;
 				}
 			);
 
@@ -330,7 +351,7 @@ describe('UmbExtensionController', () => {
 		});
 	});
 
-	describe('Manifest with condition that changes', () => {
+	describe('Manifest with one condition that changes over time', () => {
 		let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
 		let manifest: ManifestWithDynamicConditions;
@@ -338,6 +359,7 @@ describe('UmbExtensionController', () => {
 		beforeEach(async () => {
 			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
+
 			manifest = {
 				type: 'section',
 				name: 'test-section-1',
@@ -345,10 +367,15 @@ describe('UmbExtensionController', () => {
 				conditions: [
 					{
 						alias: 'Umb.Test.Condition.Delay',
-						value: 'Changes later',
+						value: '100',
 					},
 				],
 			};
+
+			// A ASCII timeline for the condition, when allowed and then not allowed:
+			// Condition		 				0ms  100ms  200ms  300ms
+			// condition:							-		 +			-			+
+
 			const conditionManifest = {
 				type: 'condition',
 				name: 'test-condition-delay',
@@ -360,7 +387,7 @@ describe('UmbExtensionController', () => {
 			extensionRegistry.register(conditionManifest);
 		});
 
-		it('does change permit as conditions change', (done) => {
+		it('does change permission as condition change', (done) => {
 			let count = 0;
 			const extensionController = new UmbTestExtensionController(
 				hostElement,
@@ -375,6 +402,78 @@ describe('UmbExtensionController', () => {
 						expect(extensionController?.permitted).to.be.false;
 					} else if (count === 2) {
 						expect(extensionController?.permitted).to.be.true;
+					} else if (count === 3) {
+						expect(extensionController?.permitted).to.be.false;
+						extensionController.destroy(); // need to destroy the conditions.
+						done();
+					}
+				}
+			);
+		});
+	});
+
+	describe('Manifest with multiple conditions that changes over time', () => {
+		let hostElement: UmbControllerHostElement;
+		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
+		let manifest: ManifestWithDynamicConditions;
+
+		beforeEach(async () => {
+			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			extensionRegistry = new UmbExtensionRegistry();
+
+			manifest = {
+				type: 'section',
+				name: 'test-section-1',
+				alias: 'Umb.Test.Section.1',
+				conditions: [
+					{
+						alias: 'Umb.Test.Condition.Delay',
+						value: '100',
+					},
+					{
+						alias: 'Umb.Test.Condition.Delay',
+						value: '200',
+					},
+				],
+			};
+
+			// A ASCII timeline for the conditions, when allowed and then not allowed:
+			// Condition		 				0ms  100ms  200ms  300ms
+			// First condition:				-		+			-			+
+			// Second condition:			-		-			+			+
+			// Sum:										-		-			-			+
+
+			const conditionManifest = {
+				type: 'condition',
+				name: 'test-condition-delay',
+				alias: 'Umb.Test.Condition.Delay',
+				class: UmbTestConditionDelay,
+			};
+
+			extensionRegistry.register(manifest);
+			extensionRegistry.register(conditionManifest);
+		});
+
+		it('does change permission as conditions change', (done) => {
+			let count = 0;
+			const extensionController = new UmbTestExtensionController(
+				hostElement,
+				extensionRegistry,
+				'Umb.Test.Section.1',
+				async () => {
+					count++;
+					// We want the controller callback to first fire when conditions are initialized.
+					expect(extensionController.manifest?.conditions?.length).to.be.equal(2);
+					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
+					if (count === 1) {
+						expect(extensionController?.permitted).to.be.false;
+					} else if (count === 2) {
+						expect(extensionController?.permitted).to.be.true;
+						// Hack to double check that its two conditions that make up the state:
+						expect(extensionController.getControllers((controller) => (controller as any).permitted).length).to.equal(
+							2
+						);
+						extensionController.destroy(); // need to destroy the conditions.
 						done();
 					}
 				}
