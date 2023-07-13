@@ -1,6 +1,6 @@
 import { UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context.js';
 import type { UmbBackofficeContext } from '../backoffice.context.js';
-import { css, CSSResultGroup, html, when, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, CSSResultGroup, html, when, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbManifestExtensionController } from '@umbraco-cms/backoffice/extension-api';
@@ -69,7 +69,9 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		console.log('header sections', this._sections, this._sections.length);
 		return html`
 			<uui-tab-group id="tabs">
-				${this._sections.map(
+				${repeat(
+					this._sections,
+					(section) => section.alias,
 					(section) => html`
 						<uui-tab
 							@click="${() => this._handleSectionTabClick(section.alias)}"
