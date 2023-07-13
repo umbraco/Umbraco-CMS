@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -11,12 +11,14 @@ using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Extensions;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Document}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
+[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessForContentTree)]
 public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBase<DocumentTreeItemResponseModel>
 {
     private readonly IPublicAccessService _publicAccessService;
