@@ -48,21 +48,21 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         AddPolicy(AuthorizationPolicies.SectionAccessSettings, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
         AddPolicy(AuthorizationPolicies.SectionAccessUsers, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Users);
 
-        AddPolicy(AuthorizationPolicies.TreeAccessDataTypes, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings); //new TreeRequirement(Constants.Trees.DataTypes)
-        AddPolicy(AuthorizationPolicies.TreeAccessDictionary, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Translation); //new TreeRequirement(Constants.Trees.Dictionary)
-        AddPolicy(AuthorizationPolicies.TreeAccessDictionaryOrTemplates, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Translation, Constants.Applications.Settings); //new TreeRequirement(Constants.Trees.Dictionary, Constants.Trees.Templates)
-        AddPolicy(AuthorizationPolicies.TreeAccessDocuments, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Content); //new TreeRequirement(Constants.Trees.Content)
-        AddPolicy(AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Content, Constants.Applications.Settings); //new TreeRequirement(Constants.Trees.DocumentTypes, Constants.Trees.Content)
-        AddPolicy(AuthorizationPolicies.TreeAccessDocumentTypes, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings); //new TreeRequirement(Constants.Trees.DocumentTypes)
-        AddPolicy(AuthorizationPolicies.TreeAccessLanguages, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings); //new TreeRequirement(Constants.Trees.Languages)
-        AddPolicy(AuthorizationPolicies.TreeAccessMediaTypes, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings); //new TreeRequirement(Constants.Trees.MediaTypes)
-        AddPolicy(AuthorizationPolicies.TreeAccessMemberGroups, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Members); //new TreeRequirement(Constants.Trees.MemberGroups)
-        AddPolicy(AuthorizationPolicies.TreeAccessMemberTypes, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings); //new TreeRequirement(Constants.Trees.MemberTypes)
-        AddPolicy(AuthorizationPolicies.TreeAccessPartialViews, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings); //new TreeRequirement(Constants.Trees.PartialViews)
-        AddPolicy(AuthorizationPolicies.TreeAccessRelationTypes, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings); //new TreeRequirement(Constants.Trees.RelationTypes)
+        AddPolicy(AuthorizationPolicies.TreeAccessDataTypes, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
+        AddPolicy(AuthorizationPolicies.TreeAccessDictionary, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Translation);
+        AddPolicy(AuthorizationPolicies.TreeAccessDictionaryOrTemplates, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Translation, Constants.Applications.Settings);
+        AddPolicy(AuthorizationPolicies.TreeAccessDocuments, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Content);
+        AddPolicy(AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Content, Constants.Applications.Settings);
+        AddPolicy(AuthorizationPolicies.TreeAccessDocumentTypes, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
+        AddPolicy(AuthorizationPolicies.TreeAccessLanguages, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
+        AddPolicy(AuthorizationPolicies.TreeAccessMediaTypes, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
+        AddPolicy(AuthorizationPolicies.TreeAccessMemberGroups, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Members);
+        AddPolicy(AuthorizationPolicies.TreeAccessMemberTypes, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
+        AddPolicy(AuthorizationPolicies.TreeAccessPartialViews, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
+        AddPolicy(AuthorizationPolicies.TreeAccessRelationTypes, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
         AddPolicy(AuthorizationPolicies.TreeAccessScripts, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
         AddPolicy(AuthorizationPolicies.TreeAccessStylesheets, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
-        AddPolicy(AuthorizationPolicies.TreeAccessTemplates, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings); //new TreeRequirement(Constants.Trees.Templates)
+        AddPolicy(AuthorizationPolicies.TreeAccessTemplates, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
 
         AddPolicy(AuthorizationPolicies.AdminUserEditsRequireAdmin, ClaimsIdentity.DefaultRoleClaimType, "admin");
     }
