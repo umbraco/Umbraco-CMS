@@ -438,10 +438,10 @@ describe('UmbExtensionController', () => {
 			};
 
 			// A ASCII timeline for the conditions, when allowed and then not allowed:
-			// Condition		 				0ms  100ms  200ms  300ms
-			// First condition:				-		+			-			+
-			// Second condition:			-		-			+			+
-			// Sum:										-		-			-			+
+			// Condition		 				0ms  100ms  200ms  300ms  400ms  500ms
+			// First condition:				-		 +			-		   +      -      +
+			// Second condition:			-		 -			+		   +      -      -
+			// Sum:										-		 -			-		   +      -      -
 
 			const conditionManifest = {
 				type: 'condition',
@@ -472,6 +472,12 @@ describe('UmbExtensionController', () => {
 						// Hack to double check that its two conditions that make up the state:
 						expect(extensionController.getControllers((controller) => (controller as any).permitted).length).to.equal(
 							2
+						);
+					} else if (count === 3) {
+						expect(extensionController?.permitted).to.be.false;
+						// Hack to double check that its two conditions that make up the state, in this case its one, cause we already got the callback when one of the conditions changed. meaning in this split second one is still good:
+						expect(extensionController.getControllers((controller) => (controller as any).permitted).length).to.equal(
+							1
 						);
 						extensionController.destroy(); // need to destroy the conditions.
 						done();
