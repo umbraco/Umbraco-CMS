@@ -7,14 +7,17 @@ import {
 	createExtensionClass,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export abstract class UmbExtensionController extends UmbBaseController {
+export abstract class UmbExtensionController<
+	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
+	SubClassType = never
+> extends UmbBaseController {
 	#promiseResolvers: Array<() => void> = [];
 	#manifestObserver;
 	#extensionRegistry: UmbExtensionRegistry<ManifestCondition>;
-	//#alias: string;
-	#manifest?: ManifestWithDynamicConditions;
+	#alias: string;
+	#manifest?: ManifestType;
 	#conditionControllers: Array<UmbExtensionCondition> = [];
-	#onPermissionChanged: (isPermitted: boolean) => void;
+	#onPermissionChanged: (isPermitted: boolean, controller: SubClassType) => void;
 	#isPermitted?: boolean;
 
 	get weight() {
@@ -29,6 +32,10 @@ export abstract class UmbExtensionController extends UmbBaseController {
 		return this.#manifest;
 	}
 
+	get alias() {
+		return this.#alias;
+	}
+
 	hasConditions = async () => {
 		await this.#manifestObserver.asPromise();
 		return (this.#manifest?.conditions ?? []).length > 0;
@@ -38,24 +45,27 @@ export abstract class UmbExtensionController extends UmbBaseController {
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
-		onPermissionChanged: (isPermitted: boolean) => void
+		onPermissionChanged: (isPermitted: boolean, controller: SubClassType) => void
 	) {
 		super(host, alias);
 		this.#extensionRegistry = extensionRegistry;
-		//this.#alias = alias;
+		this.#alias = alias;
 		this.#onPermissionChanged = onPermissionChanged;
 
-		this.#manifestObserver = this.observe(extensionRegistry.getByAlias(alias), async (extensionManifest) => {
-			this.#isPermitted = undefined;
-			this.#manifest = extensionManifest as ManifestWithDynamicConditions;
-			if (extensionManifest) {
-				this.#gotManifest(extensionManifest as ManifestWithDynamicConditions);
-			} else {
-				this.#cleanConditions();
-				this.removeControllerByAlias('_observeConditions');
-				// TODO: more proper clean up.
+		this.#manifestObserver = this.observe(
+			extensionRegistry.getByAlias<ManifestType>(alias),
+			async (extensionManifest) => {
+				this.#isPermitted = undefined;
+				this.#manifest = extensionManifest;
+				if (extensionManifest) {
+					this.#gotManifest(extensionManifest);
+				} else {
+					this.#cleanConditions();
+					this.removeControllerByAlias('_observeConditions');
+					// TODO: more proper clean up.
+				}
 			}
-		});
+		);
 	}
 
 	asPromise(): Promise<void> {
@@ -69,7 +79,7 @@ export abstract class UmbExtensionController extends UmbBaseController {
 		this.#conditionControllers = [];
 	}
 
-	#gotManifest(extensionManifest: ManifestWithDynamicConditions) {
+	#gotManifest(extensionManifest: ManifestType) {
 		const conditionConfigs = extensionManifest.conditions ?? [];
 
 		if (conditionConfigs.length === 0) {
@@ -161,7 +171,7 @@ export abstract class UmbExtensionController extends UmbBaseController {
 				this.#promiseResolvers.forEach((x) => x());
 				this.#promiseResolvers = [];
 			}
-			this.#onPermissionChanged(this.#isPermitted);
+			this.#onPermissionChanged(this.#isPermitted, this as any);
 		}
 	}
 
@@ -169,10 +179,12 @@ export abstract class UmbExtensionController extends UmbBaseController {
 
 	protected abstract _conditionsAreBad(): Promise<void>;
 
-	/*
 	public destroy(): void {
+		this.#isPermitted = undefined;
+		this.#promiseResolvers = [];
+		this._conditionsAreBad();
+		this.#onPermissionChanged(false, this as any);
 		super.destroy();
 		// Destroy the conditions controllers, are begin destroyed cause they are controllers.
 	}
-	*/
 }

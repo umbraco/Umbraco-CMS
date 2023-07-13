@@ -2,14 +2,18 @@ import { UmbExtensionController } from './extension-controller.js';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	ManifestCondition,
+	ManifestWithDynamicConditions,
 	UmbExtensionRegistry,
 	createExtensionElement,
 	isManifestElementableType,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbElementExtensionController extends UmbExtensionController {
-	#defaultElement?: string;
-	#component?: HTMLElement;
+export class UmbElementExtensionController extends UmbExtensionController<
+	ManifestWithDynamicConditions,
+	UmbElementExtensionController
+> {
+	_defaultElement?: string;
+	_component?: HTMLElement;
 
 	/**
 	 * The component that is created for this extension.
@@ -17,7 +21,7 @@ export class UmbElementExtensionController extends UmbExtensionController {
 	 * @type {(HTMLElement | undefined)}
 	 */
 	public get component() {
-		return this.#component;
+		return this._component;
 	}
 
 	/**
@@ -34,32 +38,33 @@ export class UmbElementExtensionController extends UmbExtensionController {
 	 * controller.component.foo = 'bar';
 	 * ```
 	 */
-	#props?: Record<string, any> = {};
-	get props() {
-		return this.#props;
+	#properties?: Record<string, any> = {};
+	get properties() {
+		return this.#properties;
 	}
-	set props(newVal) {
-		this.#props = newVal;
+	set properties(newVal) {
+		this.#properties = newVal;
 		// TODO: we could optimize this so we only re-set the changed props.
-		this.#assignProps();
+		this.#assignProperties();
 	}
 
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
-		onPermissionChanged: (isPermitted: boolean) => void,
+		onPermissionChanged: (isPermitted: boolean, controller: UmbElementExtensionController) => void,
 		defaultElement?: string
 	) {
 		super(host, extensionRegistry, alias, onPermissionChanged);
-		this.#defaultElement = defaultElement;
+		this._defaultElement = defaultElement;
 	}
 
-	#assignProps = () => {
-		if (!this.#component || !this.#props) return;
+	#assignProperties = () => {
+		if (!this._component || !this.#properties) return;
 
-		Object.keys(this.#props).forEach((key) => {
-			(this.#component as any)[key] = this.#props?.[key];
+		// TODO: we could optimize this so we only re-set the updated props.
+		Object.keys(this.#properties).forEach((key) => {
+			(this._component as any)[key] = this.#properties?.[key];
 		});
 	};
 
@@ -69,16 +74,16 @@ export class UmbElementExtensionController extends UmbExtensionController {
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
 		if (isManifestElementableType(manifest)) {
-			this.#component = await createExtensionElement(manifest);
-		} else if (this.#defaultElement) {
-			this.#component = document.createElement(this.#defaultElement);
+			this._component = await createExtensionElement(manifest);
+		} else if (this._defaultElement) {
+			this._component = document.createElement(this._defaultElement);
 		} else {
-			this.#component = undefined;
+			this._component = undefined;
 			// TODO: Lets make an console.error in this case? we could not initialize any component based on this manifest.
 		}
-		if (this.#component) {
-			this.#assignProps();
-			(this.#component as any).manifest = manifest;
+		if (this._component) {
+			this.#assignProperties();
+			(this._component as any).manifest = manifest;
 			return true; // we will confirm we have a component and are still good to go.
 		}
 
@@ -87,11 +92,11 @@ export class UmbElementExtensionController extends UmbExtensionController {
 
 	protected async _conditionsAreBad() {
 		// Destroy the element:
-		if (this.#component) {
-			if ('destroy' in this.#component) {
-				(this.#component as unknown as { destroy: () => void }).destroy();
+		if (this._component) {
+			if ('destroy' in this._component) {
+				(this._component as unknown as { destroy: () => void }).destroy();
 			}
-			this.#component = undefined;
+			this._component = undefined;
 		}
 	}
 }

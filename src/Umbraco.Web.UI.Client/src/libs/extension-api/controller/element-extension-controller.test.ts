@@ -1,52 +1,11 @@
 import { expect, fixture } from '@open-wc/testing';
-import type { UmbConditionConfig } from '../types.js';
-import { UmbElementExtensionController, UmbExtensionCondition, UmbExtensionRegistry } from '../index.js';
-import {
-	UmbBaseController,
-	UmbControllerHost,
-	UmbControllerHostElement,
-	UmbControllerHostElementMixin,
-} from '@umbraco-cms/backoffice/controller-api';
+import { UmbElementExtensionController, UmbExtensionRegistry } from '../index.js';
+import { UmbControllerHostElement, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
-import { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestSection, UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
-
-class UmbTestConditionDelay extends UmbBaseController implements UmbExtensionCondition {
-	#timer?: any;
-	config: UmbConditionConfig<string>;
-	permitted = false;
-	#onChange: () => void;
-
-	constructor(args: { host: UmbControllerHost; config: UmbConditionConfig<string>; onChange: () => void }) {
-		super(args.host);
-		this.config = args.config;
-		this.#onChange = args.onChange;
-		this.startApprove();
-	}
-
-	startApprove() {
-		this.#timer = setTimeout(() => {
-			this.permitted = true;
-			this.#onChange();
-			this.startDisapprove();
-		}, parseInt(this.config.value));
-	}
-
-	startDisapprove() {
-		this.#timer = setTimeout(() => {
-			this.permitted = false;
-			this.#onChange();
-			this.startApprove();
-		}, parseInt(this.config.value));
-	}
-
-	destroy() {
-		super.destroy();
-		clearTimeout(this.#timer);
-	}
-}
 
 describe('UmbElementExtensionController', () => {
 	describe('Manifest without conditions', () => {
@@ -112,7 +71,7 @@ describe('UmbElementExtensionController', () => {
 						value: '200',
 					},
 				],
-			};
+			} as any;
 
 			// A ASCII timeline for the conditions, when allowed and then not allowed:
 			// Condition		 				0ms  100ms  200ms  300ms  400ms  500ms
@@ -124,7 +83,7 @@ describe('UmbElementExtensionController', () => {
 				type: 'condition',
 				name: 'test-condition-delay',
 				alias: 'Umb.Test.Condition.Delay',
-				class: UmbTestConditionDelay,
+				class: UmbSwitchCondition,
 			};
 
 			extensionRegistry.register(manifest);

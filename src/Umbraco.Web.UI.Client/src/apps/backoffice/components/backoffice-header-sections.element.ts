@@ -3,6 +3,7 @@ import type { UmbBackofficeContext } from '../backoffice.context.js';
 import { css, CSSResultGroup, html, when, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbManifestExtensionController } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
@@ -10,10 +11,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	private _open = false;
 
 	@state()
-	private _sections: Array<ManifestSection> = [];
-
-	@state()
-	private _visibleSections: Array<ManifestSection> = [];
+	private _sections: Array<UmbManifestExtensionController<ManifestSection>> = [];
 
 	@state()
 	private _extraSections: Array<ManifestSection> = [];
@@ -53,8 +51,9 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		if (!this._backofficeContext) return;
 
 		this.observe(this._backofficeContext.allowedSections, (allowedSections) => {
+			const oldValue = this._sections;
 			this._sections = allowedSections;
-			this._visibleSections = this._sections;
+			this.requestUpdate('_sections', oldValue);
 		});
 	}
 
@@ -67,15 +66,16 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	}
 
 	private _renderSections() {
+		console.log('header sections', this._sections, this._sections.length);
 		return html`
 			<uui-tab-group id="tabs">
-				${this._visibleSections.map(
-					(section: ManifestSection) => html`
+				${this._sections.map(
+					(section) => html`
 						<uui-tab
 							@click="${() => this._handleSectionTabClick(section.alias)}"
 							?active="${this._currentSectionAlias === section.alias}"
-							href="${`section/${section.meta.pathname}`}"
-							label="${section.meta.label || section.name}"></uui-tab>
+							href="${`section/${section.manifest?.meta.pathname}`}"
+							label="${section.manifest?.meta.label ?? section.manifest?.name ?? ''}"></uui-tab>
 					`
 				)}
 				${this._renderExtraSections()}

@@ -3,7 +3,10 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import type { UmbRoute, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { ManifestSection, UmbSectionExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
-import { createExtensionElementOrFallback } from '@umbraco-cms/backoffice/extension-api';
+import {
+	UmbManifestExtensionController,
+	createExtensionElementOrFallback,
+} from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-backoffice-main')
@@ -12,7 +15,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	private _routes: Array<UmbRoute & { alias: string }> = [];
 
 	@state()
-	private _sections: Array<ManifestSection> = [];
+	private _sections: Array<UmbManifestExtensionController<ManifestSection>> = [];
 
 	private _routePrefix = 'section/';
 	private _backofficeContext?: UmbBackofficeContext;
@@ -42,6 +45,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 
 	private _createRoutes() {
 		if (!this._sections) return;
+		const oldValue = this._routes;
 
 		// TODO: Refactor this for re-use across the app where the routes are re-generated at any time.
 		// TODO: remove section-routes that does not exist anymore.
@@ -52,10 +56,10 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 			} else {
 				return {
 					alias: section.alias,
-					path: this._routePrefix + section.meta.pathname,
-					component: () => createExtensionElementOrFallback(section, 'umb-section-default'),
+					path: this._routePrefix + (section.manifest as any).meta.pathname,
+					component: () => createExtensionElementOrFallback(section.manifest, 'umb-section-default'),
 					setup: (component) => {
-						(component as UmbSectionExtensionElement).manifest = section;
+						(component as UmbSectionExtensionElement).manifest = section.manifest as any;
 					},
 				};
 			}
@@ -68,14 +72,16 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 				redirectTo: 'section/content',
 			});
 		}
+
+		this.requestUpdate('_routes', oldValue);
 	}
 
 	private _onRouteChange = (event: UmbRouterSlotChangeEvent) => {
 		const currentPath = event.target.localActiveViewPath || '';
-		const section = this._sections.find((s) => this._routePrefix + s.meta.pathname === currentPath);
+		const section = this._sections.find((s) => this._routePrefix + (s.manifest as any).meta.pathname === currentPath);
 		if (!section) return;
 		this._backofficeContext?.setActiveSectionAlias(section.alias);
-		this._provideSectionContext(section);
+		this._provideSectionContext(section.manifest as any);
 	};
 
 	private _provideSectionContext(section: ManifestSection) {

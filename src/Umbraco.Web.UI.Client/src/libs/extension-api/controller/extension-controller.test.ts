@@ -9,6 +9,7 @@ import {
 	UmbControllerHostElementMixin,
 } from '@umbraco-cms/backoffice/controller-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -47,40 +48,6 @@ class UmbTestConditionAlwaysInvalid extends UmbBaseController implements UmbExte
 		this.config = args.config;
 	}
 	permitted = false;
-}
-class UmbTestConditionDelay extends UmbBaseController implements UmbExtensionCondition {
-	#timer?: any;
-	config: UmbConditionConfig<string>;
-	permitted = false;
-	#onChange: () => void;
-
-	constructor(args: { host: UmbControllerHost; config: UmbConditionConfig<string>; onChange: () => void }) {
-		super(args.host);
-		this.config = args.config;
-		this.#onChange = args.onChange;
-		this.startApprove();
-	}
-
-	startApprove() {
-		this.#timer = setTimeout(() => {
-			this.permitted = true;
-			this.#onChange();
-			this.startDisapprove();
-		}, parseInt(this.config.value));
-	}
-
-	startDisapprove() {
-		this.#timer = setTimeout(() => {
-			this.permitted = false;
-			this.#onChange();
-			this.startApprove();
-		}, parseInt(this.config.value));
-	}
-
-	destroy() {
-		super.destroy();
-		clearTimeout(this.#timer);
-	}
 }
 
 describe('UmbExtensionController', () => {
@@ -380,7 +347,7 @@ describe('UmbExtensionController', () => {
 				type: 'condition',
 				name: 'test-condition-delay',
 				alias: 'Umb.Test.Condition.Delay',
-				class: UmbTestConditionDelay,
+				class: UmbSwitchCondition,
 			};
 
 			extensionRegistry.register(manifest);
@@ -447,7 +414,7 @@ describe('UmbExtensionController', () => {
 				type: 'condition',
 				name: 'test-condition-delay',
 				alias: 'Umb.Test.Condition.Delay',
-				class: UmbTestConditionDelay,
+				class: UmbSwitchCondition,
 			};
 
 			extensionRegistry.register(manifest);

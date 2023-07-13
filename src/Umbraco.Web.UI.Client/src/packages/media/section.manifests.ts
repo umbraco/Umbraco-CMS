@@ -16,6 +16,12 @@ const section: ManifestSection = {
 		label: 'Media',
 		pathname: 'media',
 	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.Switch',
+			value: '600',
+		},
+	],
 };
 
 const dashboards: Array<ManifestDashboardCollection> = [
