@@ -70,11 +70,9 @@ export abstract class UmbExtensionController extends UmbBaseController {
 	}
 
 	#gotManifest(extensionManifest: ManifestWithDynamicConditions) {
-		console.log('got manifest', extensionManifest.weight ?? '');
 		const conditionConfigs = extensionManifest.conditions ?? [];
 
 		if (conditionConfigs.length === 0) {
-			console.log('- no configs');
 			this.#cleanConditions();
 			this.#onConditionsChanged();
 			return;
@@ -95,12 +93,10 @@ export abstract class UmbExtensionController extends UmbBaseController {
 		});
 
 		if (conditionConfigs.length > 0) {
-			console.log('- has configs');
 			// Observes the conditions and initialize as they come in.
 			this.observe(
 				this.#extensionRegistry.getByTypeAndAliases('condition', conditionAliases),
 				async (manifests) => {
-					console.log('- got config manifests');
 					// New comers:
 					manifests.forEach((conditionManifest) => {
 						const configsOfThisType = conditionConfigs.filter(
@@ -112,7 +108,6 @@ export abstract class UmbExtensionController extends UmbBaseController {
 							// Check if we already have a controller for this config:
 							const existing = this.#conditionControllers.find((controller) => controller.config === conditionConfig);
 							if (!existing) {
-								console.log('- spin up new class');
 								const conditionController = await createExtensionClass<UmbExtensionCondition>(conditionManifest, [
 									{
 										host: this,
@@ -122,7 +117,6 @@ export abstract class UmbExtensionController extends UmbBaseController {
 									},
 								]);
 								if (conditionController) {
-									console.log('- got new class');
 									// Some how listen to it? callback/event/onChange something.
 									// then call this one: this.#onConditionsChanged();
 									this.#conditionControllers.push(conditionController);
@@ -150,7 +144,6 @@ export abstract class UmbExtensionController extends UmbBaseController {
 	#onConditionsChangedCallback = this.#onConditionsChanged.bind(this);
 
 	async #onConditionsChanged() {
-		console.log('- onConditionsChanged was ', this.#isPermitted);
 		const oldValue = this.#isPermitted;
 		// Find a condition that is not permitted (Notice how no conditions, means that this extension is permitted)
 		const conditionsArePositive =
