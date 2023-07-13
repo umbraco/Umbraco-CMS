@@ -6,6 +6,7 @@ import { manifests as tinyMcePluginManifests } from './property-editor/uis/tiny-
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as modalManifests } from './modal/common/manifests.js';
 import { manifests as themeManifests } from './themes/manifests.js';
+import { manifests as conditionManifests } from './extension-registry/conditions/manifests.js';
 
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
@@ -41,6 +42,7 @@ export * from './variant/index.js';
 export * from './workspace/index.js';
 
 const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
+	...conditionManifests,
 	...debugManifests,
 	...propertyActionManifests,
 	...propertyEditorManifests,
