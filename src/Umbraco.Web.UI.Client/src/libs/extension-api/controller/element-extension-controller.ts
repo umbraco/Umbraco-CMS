@@ -48,7 +48,7 @@ export class UmbElementExtensionController extends UmbExtensionController {
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
-		onPermissionChanged: () => void,
+		onPermissionChanged: (isPermitted: boolean) => void,
 		defaultElement?: string
 	) {
 		super(host, extensionRegistry, alias, onPermissionChanged);
@@ -64,7 +64,7 @@ export class UmbElementExtensionController extends UmbExtensionController {
 	};
 
 	protected async _conditionsAreGood() {
-		// Create the element/class.
+		// Create the element:
 
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
@@ -86,6 +86,12 @@ export class UmbElementExtensionController extends UmbExtensionController {
 	}
 
 	protected async _conditionsAreBad() {
-		// Destroy the element/class.
+		// Destroy the element:
+		if (this.#component) {
+			if ('destroy' in this.#component) {
+				(this.#component as unknown as { destroy: () => void }).destroy();
+			}
+			this.#component = undefined;
+		}
 	}
 }
