@@ -1,14 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Umbraco.Cms.Api.Management.Routing;
+﻿using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Query;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.TemplateQuery;
-using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Query;
 
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Template}/query")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessTemplates)]
 public abstract class TemplateQueryControllerBase : TemplateControllerBase
 {
     protected IEnumerable<TemplateQueryOperatorViewModel> GetOperators() => new TemplateQueryOperatorViewModel[]
