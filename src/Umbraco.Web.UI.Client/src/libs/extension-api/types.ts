@@ -1,5 +1,5 @@
-import { UmbEntryPointModule } from './entry-point.interface.js';
-import { UmbBackofficeExtensionRegistry, type UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbEntryPointModule } from './entry-point.interface.js';
+import type { UmbExtensionCondition } from './index.js';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
@@ -180,8 +180,8 @@ export interface ManifestEntryPoint extends ManifestWithLoader<UmbEntryPointModu
 /**
  * This type of extension takes a JS module and registers all exported manifests from the pointed JS file.
  */
-export interface ManifestBundle
-	extends ManifestWithLoader<{ [key: string]: Array<UmbBackofficeExtensionRegistry['MANIFEST_TYPES']> }> {
+export interface ManifestBundle<UmbManifestTypes extends ManifestBase = ManifestBase>
+	extends ManifestWithLoader<{ [key: string]: Array<UmbManifestTypes> }> {
 	type: 'bundle';
 
 	/**

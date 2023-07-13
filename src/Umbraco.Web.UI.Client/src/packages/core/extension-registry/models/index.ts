@@ -65,7 +65,7 @@ export * from './workspace-editor-view.model.js';
 export * from './workspace.model.js';
 
 export type ManifestTypes =
-	| ManifestBundle
+	| ManifestBundle<ManifestTypes>
 	| ManifestCondition
 	| ManifestCollectionView
 	| ManifestDashboard
