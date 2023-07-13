@@ -1,8 +1,13 @@
 import { expect, fixture } from '@open-wc/testing';
-import type { ManifestWithDynamicConditions } from '../types.js';
+import type { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfig } from '../types.js';
 import { UmbExtensionCondition, UmbExtensionRegistry } from '../index.js';
 import { UmbExtensionController } from './extension-controller.js';
-import { UmbControllerHostElement, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import {
+	UmbBaseController,
+	UmbControllerHost,
+	UmbControllerHostElement,
+	UmbControllerHostElementMixin,
+} from '@umbraco-cms/backoffice/controller-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-test-controller-host')
@@ -27,22 +32,35 @@ class UmbTestExtensionController extends UmbExtensionController {
 	}
 }
 
-class UmbTestConditionAlwaysValid implements UmbExtensionCondition {
+class UmbTestConditionAlwaysValid extends UmbBaseController implements UmbExtensionCondition {
+	config: UmbConditionConfig;
+	constructor(args: { host: UmbControllerHost; config: UmbConditionConfig }) {
+		super(args.host);
+		this.config = args.config;
+	}
 	permitted = true;
 }
-class UmbTestConditionAlwaysInvalid implements UmbExtensionCondition {
+class UmbTestConditionAlwaysInvalid extends UmbBaseController implements UmbExtensionCondition {
+	config: UmbConditionConfig;
+	constructor(args: { host: UmbControllerHost; config: UmbConditionConfig }) {
+		super(args.host);
+		this.config = args.config;
+	}
 	permitted = false;
 }
-class UmbTestConditionDelay implements UmbExtensionCondition {
+class UmbTestConditionDelay extends UmbBaseController implements UmbExtensionCondition {
+	config: UmbConditionConfig<string>;
 	permitted = false;
-	constructor(host, value: string, private callback: () => void) {
+	#onChange: () => void;
+
+	constructor(args: { host: UmbControllerHost; config: UmbConditionConfig<string>; onChange: () => void }) {
+		super(args.host);
+		this.config = args.config;
+		this.#onChange = args.onChange;
 		setTimeout(() => {
-			this.approve();
-		}, parseInt(value));
-	}
-	approve() {
-		this.permitted = true;
-		this.callback();
+			this.permitted = true;
+			this.#onChange();
+		}, parseInt(this.config.value));
 	}
 }
 
@@ -59,7 +77,6 @@ describe('UmbExtensionController', () => {
 				type: 'section',
 				name: 'test-section-1',
 				alias: 'Umb.Test.Section.1',
-				weight: 1,
 			};
 
 			extensionRegistry.register(manifest);
@@ -73,7 +90,11 @@ describe('UmbExtensionController', () => {
 				() => {
 					if (extensionController.permitted) {
 						expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
-						done();
+
+						// Also verifying that the promise gets resolved.
+						extensionController.asPromise().then(() => {
+							done();
+						});
 					}
 				}
 			);
@@ -92,7 +113,6 @@ describe('UmbExtensionController', () => {
 				type: 'section',
 				name: 'test-section-1',
 				alias: 'Umb.Test.Section.1',
-				weight: 1,
 				conditions: [],
 			};
 
@@ -107,7 +127,11 @@ describe('UmbExtensionController', () => {
 				() => {
 					if (extensionController.permitted) {
 						expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
-						done();
+
+						// Also verifying that the promise gets resolved.
+						extensionController.asPromise().then(() => {
+							done();
+						});
 					}
 				}
 			);
@@ -118,6 +142,7 @@ describe('UmbExtensionController', () => {
 		let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
 		let manifest: ManifestWithDynamicConditions;
+		let conditionManifest: ManifestCondition;
 
 		beforeEach(async () => {
 			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
@@ -126,7 +151,6 @@ describe('UmbExtensionController', () => {
 				type: 'section',
 				name: 'test-section-1',
 				alias: 'Umb.Test.Section.1',
-				weight: 1,
 				conditions: [
 					{
 						alias: 'Umb.Test.Condition.Valid',
@@ -134,15 +158,12 @@ describe('UmbExtensionController', () => {
 					},
 				],
 			};
-			const conditionManifest = {
+			conditionManifest = {
 				type: 'condition',
 				name: 'test-condition-valid',
 				alias: 'Umb.Test.Condition.Valid',
 				class: UmbTestConditionAlwaysValid,
 			};
-
-			extensionRegistry.register(manifest);
-			extensionRegistry.register(conditionManifest);
 		});
 
 		it('does permit when having a valid condition', async () => {
@@ -156,14 +177,160 @@ describe('UmbExtensionController', () => {
 				}
 			);
 
+			extensionRegistry.register(manifest);
+			Promise.resolve().then(() => {
+				extensionRegistry.register(conditionManifest);
+			});
+
 			await extensionController.asPromise();
 
 			expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
 			expect(extensionController?.permitted).to.be.true;
 		});
+
+		it('does not resolve promise when conditions does not exist.', () => {
+			const extensionController = new UmbTestExtensionController(
+				hostElement,
+				extensionRegistry,
+				'Umb.Test.Section.1',
+				() => {
+					expect.fail('Callback should not be called when never permitted');
+				}
+			);
+			extensionController.asPromise().then(() => {
+				expect.fail('Promise should not resolve');
+			});
+
+			extensionRegistry.register(manifest);
+		});
+
+		it('works with extension manifest begin changed during usage.', (done) => {
+			let count = 0;
+			let initialPromiseResolved = false;
+			const noConditionsManifest = {
+				type: 'section',
+				name: 'test-section-1',
+				alias: 'Umb.Test.Section.1',
+				weight: 2,
+				conditions: [],
+			};
+			const extensionController = new UmbTestExtensionController(
+				hostElement,
+				extensionRegistry,
+				'Umb.Test.Section.1',
+				() => {
+					count++;
+					if (count === 1) {
+						// First time render, there is no conditions.
+						expect(extensionController.manifest?.conditions?.length).to.be.equal(0);
+					} else if (count === 2) {
+						// Second time render, there is conditions and weight is 22.
+						expect(extensionController.manifest?.weight).to.be.equal(22);
+						expect(extensionController.manifest?.conditions?.length).to.be.equal(1);
+						// Check that the promise has been resolved for the first render to ensure timing is right.
+						expect(initialPromiseResolved).to.be.true;
+						done();
+					}
+				}
+			);
+			extensionController.asPromise().then(() => {
+				initialPromiseResolved = true;
+				extensionRegistry.unregister(noConditionsManifest.alias);
+				Promise.resolve().then(() => {
+					extensionRegistry.register({ ...manifest, weight: 22 });
+				});
+			});
+
+			extensionRegistry.register(noConditionsManifest);
+			extensionRegistry.register(conditionManifest);
+		});
 	});
 
 	describe('Manifest with invalid conditions', () => {
+		let hostElement: UmbControllerHostElement;
+		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
+		let manifest: ManifestWithDynamicConditions;
+		let conditionManifest: ManifestCondition;
+
+		beforeEach(async () => {
+			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			extensionRegistry = new UmbExtensionRegistry();
+			manifest = {
+				type: 'section',
+				name: 'test-section-1',
+				alias: 'Umb.Test.Section.1',
+				conditions: [
+					{
+						alias: 'Umb.Test.Condition.Invalid',
+						value: 'Always valid condition',
+					},
+				],
+			};
+			conditionManifest = {
+				type: 'condition',
+				name: 'test-condition-invalid',
+				alias: 'Umb.Test.Condition.Invalid',
+				class: UmbTestConditionAlwaysInvalid,
+			};
+		});
+
+		it('does permit when having a valid condition', (done) => {
+			extensionRegistry.register(manifest);
+			extensionRegistry.register(conditionManifest);
+			const extensionController = new UmbTestExtensionController(
+				hostElement,
+				extensionRegistry,
+				'Umb.Test.Section.1',
+				() => {
+					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
+					expect(extensionController?.permitted).to.be.false;
+					done();
+				}
+			);
+		});
+
+		it('does permit when having a late coming extension', (done) => {
+			const extensionController = new UmbTestExtensionController(
+				hostElement,
+				extensionRegistry,
+				'Umb.Test.Section.1',
+				() => {
+					// We want the controller callback to first fire when conditions are initialized.
+					expect(extensionController.manifest?.conditions?.length).to.be.equal(1);
+					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
+					expect(extensionController?.permitted).to.be.false;
+					done();
+				}
+			);
+
+			extensionRegistry.register(manifest);
+			Promise.resolve().then(() => {
+				extensionRegistry.register(conditionManifest);
+			});
+		});
+
+		it('provides a Promise that resolved ones it has its manifest', (done) => {
+			const extensionController = new UmbTestExtensionController(
+				hostElement,
+				extensionRegistry,
+				'Umb.Test.Section.1',
+				() => {
+					// Empty callback.
+				}
+			);
+			extensionController.hasConditions().then((hasConditions) => {
+				expect(hasConditions).to.be.true;
+				done();
+			});
+
+			extensionRegistry.register(manifest);
+			Promise.resolve().then(() => {
+				extensionRegistry.register(conditionManifest);
+			});
+		});
+	});
+
+	describe('Manifest with condition that changes', () => {
 		let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
 		let manifest: ManifestWithDynamicConditions;
@@ -175,34 +342,41 @@ describe('UmbExtensionController', () => {
 				type: 'section',
 				name: 'test-section-1',
 				alias: 'Umb.Test.Section.1',
-				weight: 1,
 				conditions: [
 					{
-						alias: 'Umb.Test.Condition.Invalid',
-						value: 'Always valid condition',
+						alias: 'Umb.Test.Condition.Delay',
+						value: 'Changes later',
 					},
 				],
 			};
 			const conditionManifest = {
 				type: 'condition',
-				name: 'test-condition-invalid',
-				alias: 'Umb.Test.Condition.Invalid',
-				class: UmbTestConditionAlwaysInvalid,
+				name: 'test-condition-delay',
+				alias: 'Umb.Test.Condition.Delay',
+				class: UmbTestConditionDelay,
 			};
 
 			extensionRegistry.register(manifest);
 			extensionRegistry.register(conditionManifest);
 		});
 
-		it('does permit when having a valid condition', (done) => {
+		it('does change permit as conditions change', (done) => {
+			let count = 0;
 			const extensionController = new UmbTestExtensionController(
 				hostElement,
 				extensionRegistry,
 				'Umb.Test.Section.1',
-				() => {
+				async () => {
+					count++;
+					// We want the controller callback to first fire when conditions are initialized.
+					expect(extensionController.manifest?.conditions?.length).to.be.equal(1);
 					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
-					expect(extensionController?.permitted).to.be.false;
-					done();
+					if (count === 1) {
+						expect(extensionController?.permitted).to.be.false;
+					} else if (count === 2) {
+						expect(extensionController?.permitted).to.be.true;
+						done();
+					}
 				}
 			);
 		});

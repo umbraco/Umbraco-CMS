@@ -66,10 +66,13 @@ export interface ManifestWithDynamicConditions extends ManifestBase {
 	/**
 	 * Set the conditions for when the extension should be loaded
 	 */
-	conditions?: Array<{
-		alias: string;
-		value: unknown;
-	}>;
+	// TODO: Can this be a type union? can we compose types for the ones we know.
+	conditions?: Array<UmbConditionConfig>;
+}
+
+export interface UmbConditionConfig<ValueType = unknown> {
+	alias: string;
+	value: ValueType;
 }
 
 export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
