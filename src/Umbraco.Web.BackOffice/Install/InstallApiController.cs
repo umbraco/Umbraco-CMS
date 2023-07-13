@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core;
@@ -25,8 +26,6 @@ namespace Umbraco.Cms.Web.BackOffice.Install;
 [Area(Constants.Web.Mvc.InstallArea)]
 public class InstallApiController : ControllerBase
 {
-    private readonly IBackOfficeSignInManager _backOfficeSignInManager;
-    private readonly IBackOfficeUserManager _backOfficeUserManager;
     private readonly DatabaseBuilder _databaseBuilder;
     private readonly InstallStatusTracker _installStatusTracker;
     private readonly InstallStepCollection _installSteps;
@@ -34,6 +33,7 @@ public class InstallApiController : ControllerBase
     private readonly IProfilingLogger _proflog;
     private readonly IRuntime _runtime;
 
+    [Obsolete("Use the constructor without IBackOfficeUserManager & IBackOfficeSignInManager instead, scheduled for removal in v14")]
     public InstallApiController(
         DatabaseBuilder databaseBuilder,
         IProfilingLogger proflog,
@@ -44,14 +44,25 @@ public class InstallApiController : ControllerBase
         IRuntime runtime,
         IBackOfficeUserManager backOfficeUserManager,
         IBackOfficeSignInManager backOfficeSignInManager)
+        : this(databaseBuilder, proflog, logger, installHelper, installSteps, installStatusTracker, runtime)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public InstallApiController(
+        DatabaseBuilder databaseBuilder,
+        IProfilingLogger proflog,
+        ILogger<InstallApiController> logger,
+        InstallHelper installHelper,
+        InstallStepCollection installSteps,
+        InstallStatusTracker installStatusTracker,
+        IRuntime runtime)
     {
         _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
         _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
         _installSteps = installSteps;
         _installStatusTracker = installStatusTracker;
         _runtime = runtime;
-        _backOfficeUserManager = backOfficeUserManager;
-        _backOfficeSignInManager = backOfficeSignInManager;
         InstallHelper = installHelper;
         _logger = logger;
     }
@@ -88,19 +99,7 @@ public class InstallApiController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CompleteInstall()
     {
-        RuntimeLevel levelBeforeRestart = _runtime.State.Level;
-
         await _runtime.RestartAsync();
-
-        if (levelBeforeRestart == RuntimeLevel.Install)
-        {
-            BackOfficeIdentityUser? identityUser =
-                await _backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserIdAsString);
-            if (identityUser is not null)
-            {
-                _backOfficeSignInManager.SignInAsync(identityUser, false);
-            }
-        }
 
         return NoContent();
     }
