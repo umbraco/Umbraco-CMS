@@ -171,7 +171,7 @@ export interface ManifestEntryPoint extends ManifestWithLoader<UmbEntryPointModu
 	/**
 	 * The file location of the javascript file to load in the backoffice
 	 */
-	js: string;
+	js?: string;
 }
 
 /**
@@ -184,7 +184,7 @@ export interface ManifestBundle
 	/**
 	 * The file location of the javascript file to load in the backoffice
 	 */
-	js: string;
+	js?: string;
 }
 
 /**
@@ -196,5 +196,5 @@ export interface ManifestCondition extends ManifestClass<UmbExtensionCondition> 
 	/**
 	 * The file location of the javascript file to load in the backoffice
 	 */
-	js: string;
+	js?: string;
 }
