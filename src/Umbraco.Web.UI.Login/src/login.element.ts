@@ -12,7 +12,7 @@ import { UmbAuthMainContext } from './context/auth-main.context.js';
 
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {
-	#authContext: IUmbAuthContext = new UmbAuthContext();
+	#authContext: IUmbAuthContext;
 	#returnUrl = '';
 
 	@state()
@@ -31,9 +31,9 @@ export default class UmbLoginElement extends LitElement {
 	@property({ type: Boolean, attribute: 'is-legacy' })
 	set isLegacy(value: boolean) {
 		if (value) {
-			this.#authContext = new UmbAuthLegacyContext();
+			// this.#authContext = new UmbAuthLegacyContext();
 		} else {
-			this.#authContext = new UmbAuthContext();
+			// this.#authContext = new UmbAuthContext();
 		}
 	}
 
@@ -42,6 +42,12 @@ export default class UmbLoginElement extends LitElement {
 
 	@state()
 	private _loginError = '';
+
+	constructor() {
+		super();
+		new UmbAuthMainContext(true);
+		this.#authContext = UmbAuthMainContext.Instance;
+	}
 
 	#handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
