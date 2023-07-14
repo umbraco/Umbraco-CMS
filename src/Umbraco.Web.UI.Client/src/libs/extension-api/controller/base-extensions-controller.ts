@@ -1,9 +1,9 @@
-import { UmbExtensionManifestController } from './extension-manifest-controller.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	ManifestBase,
 	ManifestTypeMap,
 	SpecificManifestTypeOrManifestBase,
+	UmbBaseExtensionController,
 } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -13,7 +13,7 @@ import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/co
 export abstract class UmbBaseExtensionsController<
 	ManifestAlias extends keyof ManifestTypeMap<ManifestTypes> | string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestAlias>,
-	ControllerType extends UmbExtensionManifestController<ManifestType> = UmbExtensionManifestController<ManifestType>
+	ControllerType extends UmbBaseExtensionController<ManifestType> = UmbBaseExtensionController<ManifestType>
 > extends UmbBaseController {
 	#onChange: (permittedManifests: Array<ControllerType>, controller: ControllerType) => void;
 	private _extensions: Array<ControllerType> = [];

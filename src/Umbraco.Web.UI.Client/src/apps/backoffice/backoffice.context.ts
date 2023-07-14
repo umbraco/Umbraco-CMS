@@ -14,7 +14,6 @@ export class UmbBackofficeContext {
 
 	constructor(host: UmbControllerHost) {
 		new UmbExtensionsManifestController(host, 'section', null, (sections) => {
-			console.log('allowed sections', sections);
 			this.#allowedSections.next([...sections]);
 		});
 	}

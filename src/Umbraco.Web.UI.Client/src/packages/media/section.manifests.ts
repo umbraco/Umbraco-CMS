@@ -52,9 +52,12 @@ const menuSectionSidebarApp: ManifestTypes = {
 		label: 'Media',
 		menu: 'Umb.Menu.Media',
 	},
-	conditions: {
-		sections: [sectionAlias],
-	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionAlias',
+			value: sectionAlias,
+		},
+	],
 };
 
 export const manifests = [section, menuSectionSidebarApp, ...dashboards];

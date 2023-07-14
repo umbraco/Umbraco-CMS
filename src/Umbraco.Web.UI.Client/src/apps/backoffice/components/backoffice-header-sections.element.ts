@@ -67,7 +67,6 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	}
 
 	private _renderSections() {
-		console.log('header sections', this._sections, this._sections.length);
 		return html`
 			<uui-tab-group id="tabs">
 				${repeat(

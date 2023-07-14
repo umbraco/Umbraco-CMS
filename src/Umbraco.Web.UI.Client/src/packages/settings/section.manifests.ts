@@ -24,9 +24,12 @@ const menuSectionSidebarApp: ManifestSectionSidebarAppMenuKind = {
 		label: 'Settings',
 		menu: 'Umb.Menu.Settings',
 	},
-	conditions: {
-		sections: [sectionAlias],
-	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionAlias',
+			value: sectionAlias,
+		},
+	],
 };
 
 export const manifests = [section, menuSectionSidebarApp];

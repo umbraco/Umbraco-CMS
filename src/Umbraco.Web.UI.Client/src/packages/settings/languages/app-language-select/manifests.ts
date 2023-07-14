@@ -13,9 +13,12 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'App Language Select Section Sidebar Item',
 		loader: () => import('./app-language-select.element.js'),
 		weight: 900,
-		conditions: {
-			sections: ['Umb.Section.Content'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				value: 'Umb.Section.Content',
+			},
+		],
 	},
 ];
 
