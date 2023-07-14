@@ -210,7 +210,7 @@ public sealed class BlockGridSampleHelper
         IDataType[] dataTypes = _dataTypeService.GetAll().OrderBy(d => d.Id).ToArray();
 
         textBox = dataTypes.FirstOrDefault(d => d.EditorAlias == Constants.PropertyEditors.Aliases.TextBox);
-        tinyMce = dataTypes.FirstOrDefault(d => d.EditorAlias == Constants.PropertyEditors.Aliases.TinyMce);
+        tinyMce = dataTypes.FirstOrDefault(d => d.EditorAlias == Constants.PropertyEditors.Aliases.RichText);
         mediaPicker = dataTypes.Where(d =>
                 d.EditorAlias == Constants.PropertyEditors.Aliases.MediaPicker3
                 && d.ConfigurationAs<MediaPicker3Configuration>()?.Multiple == false)

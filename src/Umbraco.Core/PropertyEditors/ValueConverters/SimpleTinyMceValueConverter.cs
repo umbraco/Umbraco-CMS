@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 public class SimpleTinyMceValueConverter : PropertyValueConverterBase
 {
     public override bool IsConverter(IPublishedPropertyType propertyType)
-        => propertyType.EditorAlias == Constants.PropertyEditors.Aliases.TinyMce;
+        => propertyType.EditorAlias == Constants.PropertyEditors.Aliases.RichText;
 
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(IHtmlEncodedString);

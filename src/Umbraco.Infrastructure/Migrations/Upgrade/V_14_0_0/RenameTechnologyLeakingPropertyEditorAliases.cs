@@ -11,7 +11,7 @@ public class RenameTechnologyLeakingPropertyEditorAliases : MigrationBase
 
     protected override void Migrate()
     {
-        MigratePropertyEditorAlias("Umbraco.TinyMCE", Constants.PropertyEditors.Aliases.TinyMce);
+        MigratePropertyEditorAlias("Umbraco.TinyMCE", Constants.PropertyEditors.Aliases.RichText);
     }
 
     private void MigratePropertyEditorAlias(string propertyEditorAlias, string newAlias)

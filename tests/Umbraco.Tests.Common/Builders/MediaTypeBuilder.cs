@@ -150,7 +150,7 @@ public class MediaTypeBuilder
             .WithSortOrder(1)
             .Done()
             .AddPropertyType()
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TinyMce)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.RichText)
             .WithValueStorageType(ValueStorageType.Ntext)
             .WithAlias(RandomAlias("bodyText", randomizeAliases))
             .WithName("Body text")
