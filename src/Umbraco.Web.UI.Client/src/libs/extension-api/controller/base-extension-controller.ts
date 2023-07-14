@@ -151,9 +151,6 @@ export abstract class UmbBaseExtensionController<
 	}
 
 	#onConditionsChangedCallback = async () => {
-		if (this.alias === 'Umb.SectionSidebarMenu.Media') {
-			console.log('!!!!onConditionsChangedCallback', this.#isPermitted, this.#conditionControllers);
-		}
 		const oldValue = this.#isPermitted;
 		// Find a condition that is not permitted (Notice how no conditions, means that this extension is permitted)
 		const conditionsArePositive =
