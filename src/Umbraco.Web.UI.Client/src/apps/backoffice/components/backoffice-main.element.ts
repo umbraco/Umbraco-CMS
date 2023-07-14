@@ -84,12 +84,13 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 		this._provideSectionContext(section.manifest as any);
 	};
 
-	private _provideSectionContext(section: ManifestSection) {
+	private _provideSectionContext(sectionManifest: ManifestSection) {
 		if (!this._sectionContext) {
-			this._sectionContext = new UmbSectionContext(section);
+			console.log('Spin up new SECTION CONTEXT######');
+			this._sectionContext = new UmbSectionContext(sectionManifest);
 			this.provideContext(UMB_SECTION_CONTEXT_TOKEN, this._sectionContext);
 		} else {
-			this._sectionContext.setManifest(section);
+			this._sectionContext.setManifest(sectionManifest);
 		}
 	}
 

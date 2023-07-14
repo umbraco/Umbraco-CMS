@@ -13,18 +13,33 @@ export class UmbSectionCondition extends UmbBaseController implements UmbExtensi
 		this.#onChange = args.onChange;
 		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (context) => {
 			if (context) {
+				console.log('got new context', context, this.config.value);
 				this.observe(
 					context.alias,
 					(sectionAlias) => {
 						// TODO: Would be nice to change to match:
+						console.log(sectionAlias, ' === ', this.config.value, sectionAlias === this.config.value);
 						this.permitted = sectionAlias === this.config.value;
 						this.#onChange();
 					},
 					'_observeSectionAlias'
 				);
+			} else {
+				this.permitted = false;
+				this.#onChange();
+				this.removeControllerByAlias('_observeSectionAlias');
 			}
 		});
 	}
+
+	/*
+	hostDisconnected() {
+		super.hostDisconnected();
+		console.log('Condition disconnected');
+		this.permitted = false;
+		this.#onChange();
+	}
+	*/
 }
 
 export const manifest: ManifestCondition = {

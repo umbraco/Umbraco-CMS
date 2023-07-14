@@ -43,9 +43,12 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	constructor() {
 		super();
 		this.#createRoutes();
+
+		console.log('setup section default --------');
 		new UmbExtensionsElementController(this, 'sectionSidebarApp', null, (sidebarApps) => {
-			console.log('sidebar apps', sidebarApps);
 			this._sidebarApps = sidebarApps;
+			this.requestUpdate('_sidebarApps', this.parentNode);
+			console.log(this.manifest?.alias, 'sidebar apps', sidebarApps);
 		});
 	}
 
@@ -69,6 +72,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	}
 
 	render() {
+		console.log('render ---- ', this._sidebarApps?.length);
 		return html`
 			${this._sidebarApps && this._sidebarApps.length > 0
 				? html`

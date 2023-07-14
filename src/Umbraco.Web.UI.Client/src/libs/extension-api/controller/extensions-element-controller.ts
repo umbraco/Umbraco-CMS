@@ -16,6 +16,7 @@ export class UmbExtensionsElementController<
 	ControllerType extends UmbExtensionElementController<ManifestType> = UmbExtensionElementController<ManifestType>
 > extends UmbBaseExtensionsController<ManifestAlias, ManifestType, ControllerType> {
 	private _defaultElement?: string;
+	private _type: ManifestAlias;
 
 	constructor(
 		host: UmbControllerHost,
@@ -26,6 +27,7 @@ export class UmbExtensionsElementController<
 	) {
 		super(host, type, filter, onChange);
 		this._defaultElement = defaultElement;
+		this._type = type;
 	}
 
 	protected _createController(manifest: ManifestType) {
