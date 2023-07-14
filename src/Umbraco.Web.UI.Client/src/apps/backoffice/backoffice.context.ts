@@ -1,6 +1,6 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbExtensionManifestController, UmbManifestsExtensionController } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionManifestController, UmbExtensionsManifestController } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -13,7 +13,7 @@ export class UmbBackofficeContext {
 	public readonly allowedSections = this.#allowedSections.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		new UmbManifestsExtensionController<ManifestSection>(host, 'section', null, (sections) => {
+		new UmbExtensionsManifestController(host, 'section', null, (sections) => {
 			console.log('allowed sections', sections);
 			this.#allowedSections.next([...sections]);
 		});
