@@ -7,7 +7,7 @@ import {
 	createExtensionClass,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export abstract class UmbExtensionController<
+export abstract class UmbBaseExtensionController<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
 	SubClassType = never
 > extends UmbBaseController {

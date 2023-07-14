@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { css, repeat, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { ManifestBase, UmbElementExtensionController } from '@umbraco-cms/backoffice/extension-api';
+import { ManifestBase, UmbExtensionElementController } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -21,10 +21,10 @@ export type InitializedExtension = { alias: string; weight: number; component: H
 @customElement('umb-extension-slot')
 export class UmbExtensionSlotElement extends UmbLitElement {
 	@state()
-	private _extensions: Array<UmbElementExtensionController> = [];
+	private _extensions: Array<UmbExtensionElementController> = [];
 
 	@state()
-	private _permittedExts: Array<UmbElementExtensionController> = [];
+	private _permittedExts: Array<UmbExtensionElementController> = [];
 
 	@property({ type: String })
 	public type = '';
@@ -80,7 +80,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		manifests.forEach((manifest) => {
 			const existing = this._extensions.find((x) => x.alias === manifest.alias);
 			if (!existing) {
-				const controller = new UmbElementExtensionController(
+				const controller = new UmbExtensionElementController(
 					this,
 					umbExtensionsRegistry,
 					manifest.alias,
@@ -93,7 +93,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		});
 	};
 
-	#extensionChanged = (isPermitted: boolean, controller: UmbElementExtensionController) => {
+	#extensionChanged = (isPermitted: boolean, controller: UmbExtensionElementController) => {
 		const oldValue = this._permittedExts;
 		const oldLength = oldValue.length;
 		const existingIndex = this._permittedExts.indexOf(controller);

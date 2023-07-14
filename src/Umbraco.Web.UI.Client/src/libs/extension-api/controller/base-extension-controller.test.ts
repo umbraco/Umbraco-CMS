@@ -1,7 +1,7 @@
 import { expect, fixture } from '@open-wc/testing';
 import type { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfig } from '../types.js';
 import { UmbExtensionCondition, UmbExtensionRegistry } from '../index.js';
-import { UmbExtensionController } from './extension-controller.js';
+import { UmbBaseExtensionController } from './base-extension-controller.js';
 import {
 	UmbBaseController,
 	UmbControllerHost,
@@ -14,7 +14,7 @@ import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-class UmbTestExtensionController extends UmbExtensionController {
+class UmbTestExtensionController extends UmbBaseExtensionController {
 	constructor(
 		host: UmbControllerHostElement,
 		extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>,
@@ -50,7 +50,7 @@ class UmbTestConditionAlwaysInvalid extends UmbBaseController implements UmbExte
 	permitted = false;
 }
 
-describe('UmbExtensionController', () => {
+describe('UmbBaseExtensionController', () => {
 	describe('Manifest without conditions', () => {
 		let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;

@@ -1,6 +1,6 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbManifestExtensionController, UmbManifestsExtensionController } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionManifestController, UmbManifestsExtensionController } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -9,7 +9,7 @@ export class UmbBackofficeContext {
 	public readonly activeSectionAlias = this.#activeSectionAlias.asObservable();
 
 	// TODO: We need a class array state:
-	#allowedSections = new UmbBasicState<Array<UmbManifestExtensionController<ManifestSection>>>([]);
+	#allowedSections = new UmbBasicState<Array<UmbExtensionManifestController<ManifestSection>>>([]);
 	public readonly allowedSections = this.#allowedSections.asObservable();
 
 	constructor(host: UmbControllerHost) {

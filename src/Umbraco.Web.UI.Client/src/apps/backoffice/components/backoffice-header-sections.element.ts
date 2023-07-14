@@ -3,7 +3,7 @@ import type { UmbBackofficeContext } from '../backoffice.context.js';
 import { css, CSSResultGroup, html, when, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbManifestExtensionController } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionManifestController } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
@@ -11,7 +11,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	private _open = false;
 
 	@state()
-	private _sections: Array<UmbManifestExtensionController<ManifestSection>> = [];
+	private _sections: Array<UmbExtensionManifestController<ManifestSection>> = [];
 
 	@state()
 	private _extraSections: Array<ManifestSection> = [];

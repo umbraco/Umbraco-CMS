@@ -1,5 +1,5 @@
 import { expect, fixture } from '@open-wc/testing';
-import { UmbElementExtensionController, UmbExtensionRegistry } from '../index.js';
+import { UmbExtensionElementController, UmbExtensionRegistry } from '../index.js';
 import { UmbControllerHostElement, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { ManifestSection, UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
@@ -7,7 +7,7 @@ import { ManifestSection, UmbSwitchCondition } from '@umbraco-cms/backoffice/ext
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-describe('UmbElementExtensionController', () => {
+describe('UmbExtensionElementController', () => {
 	describe('Manifest without conditions', () => {
 		let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestSection>;
@@ -31,7 +31,7 @@ describe('UmbElementExtensionController', () => {
 		});
 
 		it('permits when there is no conditions', (done) => {
-			const extensionController = new UmbElementExtensionController(
+			const extensionController = new UmbExtensionElementController(
 				hostElement,
 				extensionRegistry,
 				'Umb.Test.Section.1',
@@ -92,7 +92,7 @@ describe('UmbElementExtensionController', () => {
 
 		it('does change permission as conditions change', (done) => {
 			let count = 0;
-			const extensionController = new UmbElementExtensionController(
+			const extensionController = new UmbExtensionElementController(
 				hostElement,
 				extensionRegistry,
 				'Umb.Test.Section.1',

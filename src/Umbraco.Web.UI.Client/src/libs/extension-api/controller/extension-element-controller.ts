@@ -1,4 +1,4 @@
-import { UmbExtensionController } from './extension-controller.js';
+import { UmbBaseExtensionController } from './base-extension-controller.js';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	ManifestCondition,
@@ -8,9 +8,9 @@ import {
 	isManifestElementableType,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbElementExtensionController extends UmbExtensionController<
+export class UmbExtensionElementController extends UmbBaseExtensionController<
 	ManifestWithDynamicConditions,
-	UmbElementExtensionController
+	UmbExtensionElementController
 > {
 	_defaultElement?: string;
 	_component?: HTMLElement;
@@ -52,7 +52,7 @@ export class UmbElementExtensionController extends UmbExtensionController<
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
-		onPermissionChanged: (isPermitted: boolean, controller: UmbElementExtensionController) => void,
+		onPermissionChanged: (isPermitted: boolean, controller: UmbExtensionElementController) => void,
 		defaultElement?: string
 	) {
 		super(host, extensionRegistry, alias, onPermissionChanged);

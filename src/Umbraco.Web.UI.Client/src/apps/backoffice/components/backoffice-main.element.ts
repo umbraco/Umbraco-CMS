@@ -4,7 +4,7 @@ import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backo
 import type { UmbRoute, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { ManifestSection, UmbSectionExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import {
-	UmbManifestExtensionController,
+	UmbExtensionManifestController,
 	createExtensionElementOrFallback,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -15,7 +15,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	private _routes: Array<UmbRoute & { alias: string }> = [];
 
 	@state()
-	private _sections: Array<UmbManifestExtensionController<ManifestSection>> = [];
+	private _sections: Array<UmbExtensionManifestController<ManifestSection>> = [];
 
 	private _routePrefix = 'section/';
 	private _backofficeContext?: UmbBackofficeContext;

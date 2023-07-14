@@ -1,9 +1,9 @@
 import type { ManifestWithDynamicConditions } from '../types.js';
-import { UmbExtensionController } from './extension-controller.js';
+import { UmbBaseExtensionController } from './base-extension-controller.js';
 
-export class UmbManifestExtensionController<
+export class UmbExtensionManifestController<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions
-> extends UmbExtensionController<ManifestType> {
+> extends UmbBaseExtensionController<ManifestType> {
 	protected async _conditionsAreGood() {
 		return true;
 	}
@@ -12,7 +12,7 @@ export class UmbManifestExtensionController<
 		// Destroy the element/class.
 	}
 
-	public equal(otherClass: UmbManifestExtensionController | undefined): boolean {
+	public equal(otherClass: UmbExtensionManifestController | undefined): boolean {
 		return otherClass?.manifest === this.manifest;
 	}
 }
