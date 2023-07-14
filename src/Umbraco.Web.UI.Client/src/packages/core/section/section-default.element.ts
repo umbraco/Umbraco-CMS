@@ -20,6 +20,7 @@ import { UmbExtensionElementController, UmbExtensionsElementController } from '@
 @customElement('umb-section-default')
 export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectionExtensionElement {
 	private _manifest?: ManifestSection | undefined;
+	private _extensionController?: UmbExtensionsElementController<'sectionSidebarApp'>;
 
 	@property({ type: Object, attribute: false })
 	public get manifest(): ManifestSection | undefined {
@@ -29,6 +30,15 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 		const oldValue = this._manifest;
 		if (oldValue === value) return;
 		this._manifest = value;
+
+		// It was important to ensure that the UmbExtensionsElementController first got created a little later.
+		// TODO: this needs further investigation, to figure out why it happens.
+		if (!this._extensionController) {
+			this._extensionController = new UmbExtensionsElementController(this, 'sectionSidebarApp', null, (sidebarApps) => {
+				this._sidebarApps = sidebarApps;
+				this.requestUpdate('_sidebarApps');
+			});
+		}
 		this.requestUpdate('manifest', oldValue);
 	}
 
@@ -43,13 +53,6 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	constructor() {
 		super();
 		this.#createRoutes();
-
-		console.log('setup section default --------');
-		new UmbExtensionsElementController(this, 'sectionSidebarApp', null, (sidebarApps) => {
-			this._sidebarApps = sidebarApps;
-			this.requestUpdate('_sidebarApps', this.parentNode);
-			console.log(this.manifest?.alias, 'sidebar apps', sidebarApps);
-		});
 	}
 
 	#createRoutes() {
@@ -72,7 +75,6 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	}
 
 	render() {
-		console.log('render ---- ', this._sidebarApps?.length);
 		return html`
 			${this._sidebarApps && this._sidebarApps.length > 0
 				? html`
