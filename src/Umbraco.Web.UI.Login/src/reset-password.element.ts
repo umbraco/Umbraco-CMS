@@ -1,6 +1,7 @@
 import { UUIButtonState, UUITextStyles } from '@umbraco-ui/uui';
 import { CSSResultGroup, LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { UmbAuthMainContext } from './context/auth-main.context';
 
 @customElement('umb-reset-password')
 export default class UmbResetPasswordElement extends LitElement {
@@ -17,7 +18,7 @@ export default class UmbResetPasswordElement extends LitElement {
 		const formData = new FormData(form);
 		const username = formData.get('email') as string;
 
-		//TODO call api
+		UmbAuthMainContext.Instance.resetPassword(username);
 
 		this.dispatchEvent(new CustomEvent('login-success', { bubbles: true, composed: true }));
 	};
