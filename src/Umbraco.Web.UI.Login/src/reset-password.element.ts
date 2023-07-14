@@ -19,7 +19,14 @@ export default class UmbResetPasswordElement extends LitElement {
 		const formData = new FormData(form);
 		const username = formData.get('email') as string;
 
-		UmbAuthMainContext.Instance.resetPassword(username);
+		this.resetCallState = 'waiting';
+		const response = await UmbAuthMainContext.Instance.resetPassword(username);
+
+		if (response.status === 200) {
+			this.resetCallState = 'success';
+		} else {
+			this.resetCallState = 'failed';
+		}
 	};
 
 	#renderResetPage() {

@@ -12,4 +12,8 @@ export const handlers = [
 
 		return res(ctx.status(status), ctx.json(data));
 	}),
+
+	rest.post('http://localhost:5173/umbraco/backoffice/umbracoapi/authentication/reset', async (req, res, ctx) => {
+		return res(ctx.status(200));
+	}),
 ];

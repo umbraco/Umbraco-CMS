@@ -24,7 +24,7 @@ export class UmbAuthLegacyRepository {
 	}
 
 	public async resetPassword(username: string): Promise<ResetPasswordResponse> {
-		const request = new Request('/umbraco/backoffice/umbracoapi/authentication/ResetPassword', {
+		const request = new Request('/umbraco/backoffice/umbracoapi/authentication/reset', {
 			method: 'POST',
 			body: JSON.stringify({
 				username,
