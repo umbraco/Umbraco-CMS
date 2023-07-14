@@ -3,7 +3,7 @@ import { rest } from "msw";
 
 export const handlers = [
   rest.post(
-    "http://localhost:5173/umbraco/management/api/v1/security/back-office/login",
+    "http://localhost:5173/umbraco/backoffice/umbracoapi/authentication/postlogin",
     async (req, res, ctx) => {
       const json = await req.json();
 
