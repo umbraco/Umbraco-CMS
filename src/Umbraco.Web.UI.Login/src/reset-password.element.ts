@@ -2,8 +2,8 @@ import { UUIButtonState, UUITextStyles } from '@umbraco-ui/uui';
 import { CSSResultGroup, LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-@customElement('umb-reset')
-export default class UmbResetElement extends LitElement {
+@customElement('umb-reset-password')
+export default class UmbResetPasswordElement extends LitElement {
 	@state()
 	resetCallState: UUIButtonState = undefined;
 
@@ -64,6 +64,6 @@ export default class UmbResetElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-reset': UmbResetElement;
+		'umb-reset-password': UmbResetPasswordElement;
 	}
 }
