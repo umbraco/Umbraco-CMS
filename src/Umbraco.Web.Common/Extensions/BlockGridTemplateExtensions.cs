@@ -3,6 +3,7 @@
 
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -19,7 +20,7 @@ public static class BlockGridTemplateExtensions
     #region Async
 
     /// <summary>
-    /// Renders a block grid model into a grid layout
+    /// Renders a block grid model into a grid layout.
     /// </summary>
     /// <remarks>
     /// By default this method uses a set of built-in partial views for rendering the blocks and areas in the grid model.
@@ -58,11 +59,28 @@ public static class BlockGridTemplateExtensions
     public static async Task<IHtmlContent> GetBlockGridItemsHtmlAsync(this IHtmlHelper html, IEnumerable<BlockGridItem> items, string template = DefaultItemsTemplate)
         => await html.PartialAsync(DefaultFolderTemplate(template), items);
 
-    public static async Task<IHtmlContent> GetBlockGridItemAreasHtmlAsync(this IHtmlHelper html, BlockGridItem item, string template = DefaultItemAreasTemplate)
-        => await html.PartialAsync(DefaultFolderTemplate(template), item);
+    public static async Task<IHtmlContent> GetBlockGridItemsHtmlAsync(this IHtmlHelper html, IEnumerable<BlockGridItem> items, string template = DefaultItemsTemplate, ViewDataDictionary? viewData = null)
+        => await html.PartialAsync(DefaultFolderTemplate(template), items, viewData);
 
     public static async Task<IHtmlContent> GetBlockGridItemAreaHtmlAsync(this IHtmlHelper html, BlockGridArea area, string template = DefaultItemAreaTemplate)
         => await html.PartialAsync(DefaultFolderTemplate(template), area);
+
+    public static async Task<IHtmlContent> GetBlockGridItemAreaHtmlAsync(this IHtmlHelper html, BlockGridArea area, string template = DefaultItemAreaTemplate, ViewDataDictionary? viewData = null)
+        => await html.PartialAsync(DefaultFolderTemplate(template), area, viewData);
+
+    public static async Task<IHtmlContent> GetBlockGridItemAreasHtmlAsync(this IHtmlHelper html, BlockGridItem item, string template = DefaultItemAreasTemplate)
+        => await html.PartialAsync(DefaultFolderTemplate(template), item);
+
+    public static async Task<IHtmlContent> GetBlockGridItemAreaHtmlAsync(this IHtmlHelper html, BlockGridItem item, string areaAlias, string template = DefaultItemAreaTemplate, ViewDataDictionary? viewData = null)
+    {
+        BlockGridArea? area = item.Areas.FirstOrDefault(a => a.Alias == areaAlias);
+        if (area == null)
+        {
+            return new HtmlString(string.Empty);
+        }
+
+        return await GetBlockGridItemAreaHtmlAsync(html, area, template, viewData);
+    }
 
     public static async Task<IHtmlContent> GetBlockGridItemAreaHtmlAsync(this IHtmlHelper html, BlockGridItem item, string areaAlias, string template = DefaultItemAreaTemplate)
     {
