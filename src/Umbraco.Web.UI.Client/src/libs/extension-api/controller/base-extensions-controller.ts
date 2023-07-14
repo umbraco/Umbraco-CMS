@@ -11,8 +11,8 @@ import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/co
 /**
  */
 export abstract class UmbBaseExtensionsController<
-	ManifestAlias extends keyof ManifestTypeMap<ManifestTypes> | string,
-	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestAlias>,
+	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string,
+	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbBaseExtensionController<ManifestType> = UmbBaseExtensionController<ManifestType>
 > extends UmbBaseController {
 	#onChange: (permittedManifests: Array<ControllerType>, controller: ControllerType) => void;
@@ -25,7 +25,7 @@ export abstract class UmbBaseExtensionsController<
 
 	constructor(
 		host: UmbControllerHost,
-		type: ManifestAlias,
+		type: ManifestTypeName,
 		filter: null | ((manifest: ManifestType) => boolean),
 		onChange: (permittedManifests: Array<ControllerType>, controller: ControllerType) => void
 	) {
@@ -33,7 +33,7 @@ export abstract class UmbBaseExtensionsController<
 		this.#onChange = onChange;
 
 		// TODO: This could be optimized by just getting the aliases, well depends on the filter. (revisit one day to see how much filter is used)
-		let source = umbExtensionsRegistry?.extensionsOfType<ManifestAlias, ManifestType>(type);
+		let source = umbExtensionsRegistry?.extensionsOfType<ManifestTypeName, ManifestType>(type);
 		if (filter) {
 			source = source.pipe(map((extensions) => extensions.filter(filter)));
 		}
@@ -83,6 +83,8 @@ export abstract class UmbBaseExtensionsController<
 			}
 		}
 		if (hasChanged) {
+			this._permittedExts = this._permittedExts.filter((a) => a.permitted);
+			console.log('this._permittedExts', this._permittedExts);
 			this._permittedExts.sort((a, b) => b.weight - a.weight);
 			this.#onChange(this._permittedExts, this as unknown as ControllerType);
 			// Idea: could be abstracted into a requestChange method, so we can override it in a subclass.
