@@ -65,10 +65,18 @@ public class UmbracoPlan : MigrationPlan
         // To 10.5.0 / 11.2.0
         To<V_10_5_0.AddPrimaryKeyConstrainToContentVersionCleanupDtos>("{83AF7945-DADE-4A02-9041-F3F6EBFAC319}");
 
+        // to 10.7.0
+        To<MigrateTagsFromNVarcharToNText>("{EF93F398-1385-4F07-808A-D3C518984442}");
+
         // To 11.3.0
         To<V_11_3_0.AddDomainSortOrder>("{BB3889ED-E2DE-49F2-8F71-5FD8616A2661}");
 
         // To 11.4.0
         To<V_11_4_0.AlterKeyValueDataType>("{FFB6B9B0-F1A8-45E9-9CD7-25700577D1CA}");
+
+        // to 11.4.3
+        // This is here twice since it was added in 10, so if you had already upgraded you wouldn't get it
+        // But we still need the first once, since if you upgraded to 10.7.0 then the "From" state would be unknown otherwise.
+        To<MigrateTagsFromNVarcharToNText>("{EF93F398-1385-4F07-808A-D3C518984442}");
     }
 }
