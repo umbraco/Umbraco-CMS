@@ -36,6 +36,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		this._open = !this._open;
 	}
 
+	// TODO: This should not be done here, this should be performed by the router when the URL changes.
 	private _handleSectionTabClick(alias: string) {
 		this._backofficeContext?.setActiveSectionAlias(alias);
 	}
