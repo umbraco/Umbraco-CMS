@@ -41,6 +41,16 @@ export abstract class UmbBaseExtensionsController<
 	}
 
 	#gotManifests = (manifests: Array<ManifestType>) => {
+		if (!manifests) {
+			// Clean up:
+			this._extensions.forEach((controller) => {
+				controller.destroy();
+			});
+			this._extensions = [];
+			// _permittedExts should have been cleared via the destroy callbacks.
+			return;
+		}
+
 		// Clean up extensions that are no longer.
 		this._extensions = this._extensions.filter((controller) => {
 			if (!manifests.find((manifest) => manifest.alias === controller.alias)) {
@@ -83,8 +93,7 @@ export abstract class UmbBaseExtensionsController<
 			}
 		}
 		if (hasChanged) {
-			this._permittedExts = this._permittedExts.filter((a) => a.permitted);
-			console.log('this._permittedExts', this._permittedExts);
+			//this._permittedExts = this._permittedExts.filter((a) => a.permitted);
 			this._permittedExts.sort((a, b) => b.weight - a.weight);
 			this.#onChange(this._permittedExts, this as unknown as ControllerType);
 			// Idea: could be abstracted into a requestChange method, so we can override it in a subclass.
