@@ -1,14 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { when } from 'lit/directives/when.js';
 
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import type { IUmbAuthContext } from './types.js';
-import { UmbAuthLegacyContext } from './context/auth-legacy.context.js';
-import { UmbAuthContext } from './context/auth.context.js';
+import { UmbAuthMainContext } from './context/auth-main.context.js';
 
 import './auth-layout.element.js';
-import { UmbAuthMainContext } from './context/auth-main.context.js';
+import './reset-password.element.js';
 
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {
@@ -36,6 +36,9 @@ export default class UmbLoginElement extends LitElement {
 			// this.#authContext = new UmbAuthContext();
 		}
 	}
+
+	@property({ type: Boolean, attribute: 'allow-password-reset' })
+	allowPasswordReset = true;
 
 	@state()
 	private _loginState: UUIButtonState = undefined;
@@ -97,50 +100,70 @@ export default class UmbLoginElement extends LitElement {
 
 	render() {
 		return html`
-			<umb-auth-layout>
-				<div class="uui-text">
-					<h1 class="uui-h3">${this.#greeting}</h1>
-					<uui-form>
-						<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
-							<uui-form-layout-item>
-								<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>
-								<uui-input
-									type="email"
-									id="email"
-									name="email"
-									label="Email"
-									required
-									required-message="Email is required"></uui-input>
-							</uui-form-layout-item>
+			<umb-auth-layout> ${this.page === 'login' ? this.#renderLoginPage() : this.#renderResetPage()} </umb-auth-layout>
+		`;
+	}
+	#renderResetPage() {
+		return html`<umb-reset-password></umb-reset-password>`;
+	}
+	#renderLoginPage() {
+		return html`
+			<div class="uui-text">
+				<h1 class="uui-h3">${this.#greeting}</h1>
+				<uui-form>
+					<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
+						<uui-form-layout-item>
+							<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>
+							<uui-input
+								type="email"
+								id="email"
+								name="email"
+								label="Email"
+								required
+								required-message="Email is required"></uui-input>
+						</uui-form-layout-item>
 
-							<uui-form-layout-item>
-								<uui-label id="passwordLabel" for="password" slot="label" required>Password</uui-label>
-								<uui-input-password
-									id="password"
-									name="password"
-									label="Password"
-									required
-									required-message="Password is required"></uui-input-password>
-							</uui-form-layout-item>
+						<uui-form-layout-item>
+							<uui-label id="passwordLabel" for="password" slot="label" required>Password</uui-label>
+							<uui-input-password
+								id="password"
+								name="password"
+								label="Password"
+								required
+								required-message="Password is required"></uui-input-password>
+						</uui-form-layout-item>
 
-							${this.#authContext.supportsPersistLogin
-								? html`<uui-form-layout-item>
-										<uui-checkbox name="persist" label="Remember me">Remember me</uui-checkbox>
-								  </uui-form-layout-item>`
-								: nothing}
+						<div id="secondary-actions">
+							${when(
+								this.#authContext.supportsPersistLogin,
+								() => html`<uui-form-layout-item>
+									<uui-checkbox name="persist" label="Remember me">Remember me</uui-checkbox>
+								</uui-form-layout-item>`
+							)}
+							<!-- TODO: Should this be a link instead? -->
+							${when(
+								this.allowPasswordReset,
+								() =>
+									html`
+										<uui-button style="height: min-content" @click=${() => (this.page = 'reset')}>
+											Forgot password?
+										</uui-button>
+									`
+							)}
+						</div>
 
-							<uui-form-layout-item>${this.#renderErrorMessage()}</uui-form-layout-item>
+						<uui-form-layout-item>${this.#renderErrorMessage()}</uui-form-layout-item>
 
-							<uui-button
-								type="submit"
-								label="Login"
-								look="primary"
-								color="positive"
-								.state=${this._loginState}></uui-button>
-						</form>
-					</uui-form>
-				</div>
-			</umb-auth-layout>
+						<uui-button
+							type="submit"
+							id="login-button"
+							label="Login"
+							look="primary"
+							color="positive"
+							.state=${this._loginState}></uui-button>
+					</form>
+				</uui-form>
+			</div>
 		`;
 	}
 
@@ -153,12 +176,22 @@ export default class UmbLoginElement extends LitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
-			#email,
-			#password {
+			uui-input,
+			uui-input-password {
 				width: 100%;
+			}
+			#login-button {
+				margin-left: auto;
+				display: flex;
+				width: fit-content;
 			}
 			.text-danger {
 				color: var(--uui-color-danger-standalone);
+			}
+			#secondary-actions {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
 			}
 		`,
 	];

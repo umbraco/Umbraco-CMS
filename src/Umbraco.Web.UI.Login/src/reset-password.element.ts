@@ -1,4 +1,5 @@
-import { UUIButtonState, UUITextStyles } from '@umbraco-ui/uui';
+import type { UUIButtonState } from '@umbraco-ui/uui';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { CSSResultGroup, LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbAuthMainContext } from './context/auth-main.context';
@@ -19,14 +20,13 @@ export default class UmbResetPasswordElement extends LitElement {
 		const username = formData.get('email') as string;
 
 		UmbAuthMainContext.Instance.resetPassword(username);
-
-		this.dispatchEvent(new CustomEvent('login-success', { bubbles: true, composed: true }));
 	};
 
 	#renderResetPage() {
 		return html`
 			<uui-form>
 				<form id="LoginForm" name="login" @submit="${this.#handleResetSubmit}">
+					Enter the email address associated with your account and we'll send you a link to reset your password.
 					<uui-form-layout-item>
 						<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>
 						<uui-input
@@ -40,7 +40,7 @@ export default class UmbResetPasswordElement extends LitElement {
 
 					<uui-button
 						type="submit"
-						label="Login"
+						label="Continue"
 						look="primary"
 						color="positive"
 						.state=${this.resetCallState}></uui-button>
@@ -57,10 +57,22 @@ export default class UmbResetPasswordElement extends LitElement {
 	}
 
 	render() {
-		return this.resetCallState === 'success' ? this.#renderResetPage() : this.#renderConfirmationPage();
+		return this.resetCallState === 'success' ? this.#renderConfirmationPage() : this.#renderResetPage();
 	}
 
-	static styles: CSSResultGroup = [UUITextStyles, css``];
+	static styles: CSSResultGroup = [
+		UUITextStyles,
+		css`
+			uui-input {
+				width: 100%;
+			}
+			uui-button {
+				margin-left: auto;
+				display: flex;
+				width: fit-content;
+			}
+		`,
+	];
 }
 
 declare global {
