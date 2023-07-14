@@ -88,7 +88,7 @@ namespace JsonSchema
 
                 public HelpPageSettings? HelpPage { get; set; }
 
-                public InstallDefaultDataSettings? DefaultDataCreation { get; set; }
+                public InstallDefaultDataSettings? InstallDefaultData { get; set; }
 
                 public DataTypesSettings? DataTypes { get; set; }
 
