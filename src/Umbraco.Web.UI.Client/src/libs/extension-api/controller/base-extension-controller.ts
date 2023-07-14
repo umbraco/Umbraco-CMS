@@ -179,6 +179,10 @@ export abstract class UmbBaseExtensionController<
 
 	protected abstract _conditionsAreBad(): Promise<void>;
 
+	public equal(otherClass: UmbBaseExtensionController | undefined): boolean {
+		return otherClass?.manifest === this.manifest;
+	}
+
 	public destroy(): void {
 		this.#isPermitted = undefined;
 		this.#promiseResolvers = [];

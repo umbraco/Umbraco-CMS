@@ -11,8 +11,4 @@ export class UmbExtensionManifestController<
 	protected async _conditionsAreBad() {
 		// Destroy the element/class.
 	}
-
-	public equal(otherClass: UmbExtensionManifestController | undefined): boolean {
-		return otherClass?.manifest === this.manifest;
-	}
 }
