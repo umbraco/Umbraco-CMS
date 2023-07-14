@@ -171,9 +171,15 @@ public static partial class Constants
             public const string TextArea = "Umbraco.TextArea";
 
             /// <summary>
-            ///     TinyMCE
+            ///     Rich Text Editor.
             /// </summary>
             public const string RichText = "Umbraco.RichText";
+
+            /// <summary>
+            ///     TinyMCE
+            /// </summary>
+            [Obsolete("Please use RichText constant instead, scheduled for removal in v16")]
+            public const string TinyMce = "Umbraco.RichText";
 
             /// <summary>
             ///     Boolean.
