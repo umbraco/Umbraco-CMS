@@ -64,6 +64,6 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         AddPolicy(AuthorizationPolicies.TreeAccessStylesheets, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
         AddPolicy(AuthorizationPolicies.TreeAccessTemplates, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
 
-        AddPolicy(AuthorizationPolicies.AdminUserEditsRequireAdmin, ClaimsIdentity.DefaultRoleClaimType, Constants.Security.AdminGroupAlias); // Change to AdminGroupKey when the "role" claim has a GUID value
+        AddPolicy(AuthorizationPolicies.AdminUserEditsRequireAdmin, ClaimsIdentity.DefaultRoleClaimType, "admin");
     }
 }
