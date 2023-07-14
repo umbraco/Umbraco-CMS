@@ -69,8 +69,6 @@ export class UmbExtensionElementController<
 	};
 
 	protected async _conditionsAreGood() {
-		// Create the element:
-
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
 		if (isManifestElementableType(manifest)) {
