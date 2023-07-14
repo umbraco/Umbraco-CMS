@@ -4,10 +4,11 @@ import { customElement, property, state } from 'lit/decorators.js';
 
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import type { IUmbAuthContext } from './types.js';
-import { UmbAuthLegacyContext } from './auth-legacy.context.js';
-import { UmbAuthContext } from './auth.context.js';
+import { UmbAuthLegacyContext } from './context/auth-legacy.context.js';
+import { UmbAuthContext } from './context/auth.context.js';
 
 import './auth-layout.element.js';
+import { UmbAuthMainContext } from './context/auth-main.context.js';
 
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {

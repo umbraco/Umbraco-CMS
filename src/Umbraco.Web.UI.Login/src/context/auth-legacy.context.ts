@@ -1,4 +1,4 @@
-import { LoginRequestModel, IUmbAuthContext, LoginResponse } from './types.js';
+import { LoginRequestModel, IUmbAuthContext, LoginResponse, ResetPasswordResponse } from '../types.js';
 import { UmbAuthLegacyRepository } from './auth-legacy.repository.ts';
 
 export class UmbAuthLegacyContext implements IUmbAuthContext {
@@ -8,5 +8,9 @@ export class UmbAuthLegacyContext implements IUmbAuthContext {
 
 	async login(data: LoginRequestModel): Promise<LoginResponse> {
 		return this.#authRepository.login(data);
+	}
+
+	async resetPassword(username: string): Promise<ResetPasswordResponse> {
+		return this.#authRepository.resetPassword(username);
 	}
 }

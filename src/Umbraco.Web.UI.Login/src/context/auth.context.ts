@@ -1,4 +1,4 @@
-import { IUmbAuthContext, LoginRequestModel, LoginResponse } from './types.ts';
+import { IUmbAuthContext, LoginRequestModel, LoginResponse } from '../types.ts';
 
 export class UmbAuthContext implements IUmbAuthContext {
 	supportsPersistLogin = false;
