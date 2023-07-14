@@ -2,7 +2,7 @@ import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/co
 import { ManifestCondition, UmbConditionConfig, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 
-export class UmbSectionCondition extends UmbBaseController implements UmbExtensionCondition {
+export class UmbSectionAliasCondition extends UmbBaseController implements UmbExtensionCondition {
 	config: UmbConditionConfig<string>;
 	permitted = false;
 	#onChange: () => void;
@@ -43,5 +43,5 @@ export const manifest: ManifestCondition = {
 	type: 'condition',
 	name: 'Section Alias Condition',
 	alias: 'Umb.Condition.SectionAlias',
-	class: UmbSectionCondition,
+	class: UmbSectionAliasCondition,
 };
