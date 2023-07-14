@@ -14,6 +14,9 @@ export default class UmbLoginElement extends LitElement {
 	#authContext: IUmbAuthContext = new UmbAuthContext();
 	#returnUrl = '';
 
+	@state()
+	private page: 'login' | 'reset' = 'login';
+
 	@property({ type: String, attribute: 'return-url' })
 	set returnUrl(value: string) {
 		this.#returnUrl = value;
@@ -126,7 +129,7 @@ export default class UmbLoginElement extends LitElement {
 								label="Login"
 								look="primary"
 								color="positive"
-								state=${this._loginState}></uui-button>
+								.state=${this._loginState}></uui-button>
 						</form>
 					</uui-form>
 				</div>
