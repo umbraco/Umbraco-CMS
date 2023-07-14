@@ -107,6 +107,7 @@ export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(supe
 
 		destroy() {
 			this.#controllers.forEach((ctrl: UmbController) => ctrl.destroy());
+			this.#controllers = [];
 		}
 	}
 
