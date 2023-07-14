@@ -69,19 +69,20 @@ export abstract class UmbBaseExtensionsController<
 	protected abstract _createController(manifest: ManifestType): ControllerType;
 
 	protected _extensionChanged = (isPermitted: boolean, controller: ControllerType) => {
-		const oldValue = this._permittedExts;
-		const oldLength = oldValue.length;
+		let hasChanged = false;
 		const existingIndex = this._permittedExts.indexOf(controller);
 		if (isPermitted) {
 			if (existingIndex === -1) {
 				this._permittedExts.push(controller);
+				hasChanged = true;
 			}
 		} else {
 			if (existingIndex !== -1) {
 				this._permittedExts.splice(existingIndex, 1);
+				hasChanged = true;
 			}
 		}
-		if (oldLength !== this._permittedExts.length) {
+		if (hasChanged) {
 			this._permittedExts.sort((a, b) => b.weight - a.weight);
 			this.#onChange(this._permittedExts, this as unknown as ControllerType);
 			// Idea: could be abstracted into a requestChange method, so we can override it in a subclass.
