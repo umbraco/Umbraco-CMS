@@ -61,8 +61,6 @@ export abstract class UmbBaseExtensionController<
 					this.#gotManifest(extensionManifest);
 				} else {
 					this.#cleanConditions();
-					this.removeControllerByAlias('_observeConditions');
-					// TODO: more proper clean up.
 				}
 			}
 		);
@@ -77,6 +75,7 @@ export abstract class UmbBaseExtensionController<
 	#cleanConditions() {
 		this.#conditionControllers.forEach((controller) => controller.destroy());
 		this.#conditionControllers = [];
+		this.removeControllerByAlias('_observeConditions');
 	}
 
 	#gotManifest(extensionManifest: ManifestType) {
@@ -84,7 +83,7 @@ export abstract class UmbBaseExtensionController<
 
 		if (conditionConfigs.length === 0) {
 			this.#cleanConditions();
-			this.#onConditionsChanged();
+			this.#onConditionsChangedCallback();
 			return;
 		}
 
@@ -130,7 +129,7 @@ export abstract class UmbBaseExtensionController<
 									// Some how listen to it? callback/event/onChange something.
 									// then call this one: this.#onConditionsChanged();
 									this.#conditionControllers.push(conditionController);
-									this.#onConditionsChanged();
+									this.#onConditionsChangedCallback();
 								}
 							}
 						});
@@ -151,9 +150,10 @@ export abstract class UmbBaseExtensionController<
 		);
 	}
 
-	#onConditionsChangedCallback = this.#onConditionsChanged.bind(this);
-
-	async #onConditionsChanged() {
+	#onConditionsChangedCallback = async () => {
+		if (this.alias === 'Umb.SectionSidebarMenu.Media') {
+			console.log('!!!!onConditionsChangedCallback', this.#isPermitted, this.#conditionControllers);
+		}
 		const oldValue = this.#isPermitted;
 		// Find a condition that is not permitted (Notice how no conditions, means that this extension is permitted)
 		const conditionsArePositive =
@@ -161,10 +161,12 @@ export abstract class UmbBaseExtensionController<
 			this.#conditionControllers.find((condition) => condition.permitted === false) === undefined;
 
 		if (conditionsArePositive) {
-			this.#isPermitted = await this._conditionsAreGood();
-		} else {
-			this.#isPermitted = false;
+			if (this.#isPermitted !== true) {
+				this.#isPermitted = await this._conditionsAreGood();
+			}
+		} else if (this.#isPermitted !== false) {
 			await this._conditionsAreBad();
+			this.#isPermitted = false;
 		}
 		if (oldValue !== this.#isPermitted) {
 			if (this.#isPermitted) {
@@ -173,7 +175,7 @@ export abstract class UmbBaseExtensionController<
 			}
 			this.#onPermissionChanged(this.#isPermitted, this as any);
 		}
-	}
+	};
 
 	protected abstract _conditionsAreGood(): Promise<boolean>;
 
