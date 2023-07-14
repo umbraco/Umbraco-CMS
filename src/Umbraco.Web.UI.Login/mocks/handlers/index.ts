@@ -1,4 +1,4 @@
-import { handlers as loginHandlers } from './login.handlers.js';
+import { handlers as loginHandlers } from "./login.handlers.js";
 
 const handlers = [...loginHandlers];
 
