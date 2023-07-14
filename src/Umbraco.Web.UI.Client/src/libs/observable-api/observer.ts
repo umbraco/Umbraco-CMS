@@ -49,6 +49,11 @@ export class UmbObserver<T> {
 	}
 
 	destroy(): void {
-		this.#subscription.unsubscribe();
+		if (this.#subscription) {
+			this.#subscription.unsubscribe();
+			(this.#source as any) = undefined;
+			(this.#callback as any) = undefined;
+			(this.#subscription as any) = undefined;
+		}
 	}
 }
