@@ -13,7 +13,6 @@ export class UmbSectionCondition extends UmbBaseController implements UmbExtensi
 		this.#onChange = args.onChange;
 		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (context) => {
 			if (context) {
-				console.log('got new context', context, this.config.value);
 				this.observe(
 					context.alias,
 					(sectionAlias) => {
@@ -34,7 +33,6 @@ export class UmbSectionCondition extends UmbBaseController implements UmbExtensi
 	/*
 	hostDisconnected() {
 		super.hostDisconnected();
-		console.log('Condition disconnected');
 		this.permitted = false;
 		this.#onChange();
 	}
