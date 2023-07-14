@@ -18,7 +18,6 @@ export class UmbSectionCondition extends UmbBaseController implements UmbExtensi
 					context.alias,
 					(sectionAlias) => {
 						// TODO: Would be nice to change to match:
-						console.log(sectionAlias, ' === ', this.config.value, sectionAlias === this.config.value);
 						this.permitted = sectionAlias === this.config.value;
 						this.#onChange();
 					},
