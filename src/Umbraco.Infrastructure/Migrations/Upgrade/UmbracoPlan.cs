@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_7_0;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -77,6 +78,7 @@ public class UmbracoPlan : MigrationPlan
         // to 11.4.3
         // This is here twice since it was added in 10, so if you had already upgraded you wouldn't get it
         // But we still need the first once, since if you upgraded to 10.7.0 then the "From" state would be unknown otherwise.
-        To<MigrateTagsFromNVarcharToNText>("{EF93F398-1385-4F07-808A-D3C518984442}");
+        // This has it's own key, we essentially consider it a separate migration.
+        To<MigrateTagsFromNVarcharToNText>("{2CA0C5BB-170B-45E5-8179-E73DA4B41A46}");
     }
 }
