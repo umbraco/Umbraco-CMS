@@ -36,11 +36,6 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		this._open = !this._open;
 	}
 
-	// TODO: This should not be done here, this should be performed by the router when the URL changes.
-	private _handleSectionTabClick(alias: string) {
-		this._backofficeContext?.setActiveSectionAlias(alias);
-	}
-
 	private _handleLabelClick() {
 		const moreTab = this.shadowRoot?.getElementById('moreTab');
 		moreTab?.setAttribute('active', 'true');
@@ -74,7 +69,6 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 					(section) => section.alias,
 					(section) => html`
 						<uui-tab
-							@click="${() => this._handleSectionTabClick(section.alias)}"
 							?active="${this._currentSectionAlias === section.alias}"
 							href="${`section/${section.manifest?.meta.pathname}`}"
 							label="${section.manifest?.meta.label ?? section.manifest?.name ?? ''}"></uui-tab>
