@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 ///     Represents a rich text property editor.
 /// </summary>
 [DataEditor(
-    Constants.PropertyEditors.Aliases.TinyMce,
+    Constants.PropertyEditors.Aliases.RichText,
     "Rich Text Editor",
     "rte",
     ValueType = ValueTypes.Text,

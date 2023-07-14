@@ -282,7 +282,7 @@ public class UmbracoTestDataController : SurfaceController
     }
 
     private IDataType GetOrCreateRichText() =>
-        GetOrCreateDataType(RichTextDataTypeName, Constants.PropertyEditors.Aliases.TinyMce);
+        GetOrCreateDataType(RichTextDataTypeName, Constants.PropertyEditors.Aliases.RichText);
 
     private IDataType GetOrCreateMediaPicker() =>
         GetOrCreateDataType(MediaPickerDataTypeName, Constants.PropertyEditors.Aliases.MediaPicker);

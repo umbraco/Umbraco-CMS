@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_7_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -96,11 +97,12 @@ public class UmbracoPlan : MigrationPlan
         To<MigrateTagsFromNVarcharToNText>("{2D4C9FBD-08B3-472D-A76C-6ED467A0CD20}");
 
         // To 14.0.0
-        To<V_13_0_0.AddPropertyEditorUiAliasColumn>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
-        To<V_13_0_0.MigrateDataTypeConfigurations>("{5F15A1CC-353D-4889-8C7E-F303B4766196}");
-        To<V_13_0_0.AddGuidsToUserGroups>("{69E12556-D9B3-493A-8E8A-65EC89FB658D}");
-        To<V_13_0_0.AddUserGroup2PermisionTable>("{F2B16CD4-F181-4BEE-81C9-11CF384E6025}");
-        To<V_13_0_0.AddGuidsToUsers>("{A8E01644-9F2E-4988-8341-587EF5B7EA69}");
-        To<V_13_0_0.UpdateDefaultGuidsOfCreatedPackages>("{E073DBC0-9E8E-4C92-8210-9CB18364F46E}");
+        To<V_14_0_0.AddPropertyEditorUiAliasColumn>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
+        To<V_14_0_0.MigrateDataTypeConfigurations>("{5F15A1CC-353D-4889-8C7E-F303B4766196}");
+        To<V_14_0_0.AddGuidsToUserGroups>("{69E12556-D9B3-493A-8E8A-65EC89FB658D}");
+        To<V_14_0_0.AddUserGroup2PermisionTable>("{F2B16CD4-F181-4BEE-81C9-11CF384E6025}");
+        To<V_14_0_0.AddGuidsToUsers>("{A8E01644-9F2E-4988-8341-587EF5B7EA69}");
+        To<V_14_0_0.UpdateDefaultGuidsOfCreatedPackages>("{E073DBC0-9E8E-4C92-8210-9CB18364F46E}");
+        To<V_14_0_0.RenameTechnologyLeakingPropertyEditorAliases>("{80D282A4-5497-47FF-991F-BC0BCE603121}");
     }
 }

@@ -1,12 +1,13 @@
 ﻿using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 
 /// <summary>
 /// This is an unscoped migration to support migrating sqlite, since it doesn't support adding columns.
