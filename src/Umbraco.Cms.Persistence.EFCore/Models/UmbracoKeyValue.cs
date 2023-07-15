@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace Umbraco.Cms.Persistence.EFCore.Models;
 
 public class UmbracoKeyValue
