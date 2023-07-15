@@ -6,21 +6,21 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer;
 
 public class SqlServerMigrationProvider : IMigrationProvider
 {
-    private readonly IDbContextFactory<UmbracoInternalDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<UmbracoDbContext> _dbContextFactory;
 
-    public SqlServerMigrationProvider(IDbContextFactory<UmbracoInternalDbContext> dbContextFactory) => _dbContextFactory = dbContextFactory;
+    public SqlServerMigrationProvider(IDbContextFactory<UmbracoDbContext> dbContextFactory) => _dbContextFactory = dbContextFactory;
 
     public string ProviderName => "Microsoft.Data.SqlClient";
 
     public async Task MigrateAsync(EFCoreMigration migration)
     {
-        UmbracoInternalDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        UmbracoDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await context.MigrateDatabaseAsync(GetMigrationType(migration));
     }
 
     public async Task MigrateAllAsync()
     {
-        UmbracoInternalDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        UmbracoDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await context.Database.MigrateAsync();
     }
 

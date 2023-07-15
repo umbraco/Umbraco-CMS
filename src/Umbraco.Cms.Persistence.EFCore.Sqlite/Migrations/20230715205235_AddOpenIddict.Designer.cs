@@ -10,7 +10,7 @@ using Umbraco.Cms.Persistence.EFCore;
 
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 {
-    [DbContext(typeof(UmbracoInternalDbContext))]
+    [DbContext(typeof(UmbracoDbContext))]
     [Migration("20230715205235_AddOpenIddict")]
     partial class AddOpenIddict
     {

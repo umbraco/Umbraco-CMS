@@ -11,7 +11,7 @@ using Umbraco.Cms.Persistence.EFCore;
 
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 {
-    [DbContext(typeof(UmbracoInternalDbContext))]
+    [DbContext(typeof(UmbracoDbContext))]
     [Migration("20230715193050_InitalCreate")]
     partial class InitalCreate
     {

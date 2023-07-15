@@ -7,9 +7,9 @@ namespace Umbraco.Cms.Web.UI
 {
     public class TestController : UmbracoApiController
     {
-        private readonly IDbContextFactory<UmbracoInternalDbContext> _dbContextFactory;
+        private readonly IDbContextFactory<UmbracoDbContext> _dbContextFactory;
 
-        public TestController(IDbContextFactory<UmbracoInternalDbContext> dbContextFactory)
+        public TestController(IDbContextFactory<UmbracoDbContext> dbContextFactory)
         {
             _dbContextFactory = dbContextFactory;
         }

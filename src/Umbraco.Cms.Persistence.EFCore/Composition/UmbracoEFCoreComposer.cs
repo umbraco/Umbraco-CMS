@@ -8,6 +8,7 @@ using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Notifications;
 using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.Composition;
 
@@ -20,10 +21,8 @@ public class UmbracoEFCoreComposer : IComposer
         builder.AddNotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification, EFCoreCreateTablesNotificationHandler>();
         builder.AddNotificationAsyncHandler<UnattendedInstallNotification, EFCoreCreateTablesNotificationHandler>();
 
-        builder.Services.AddPooledDbContextFactory<UmbracoInternalDbContext>((serviceProvider, options) =>
+        builder.Services.AddUmbracoEFCoreContext<UmbracoDbContext>((options, connectionString, providerName) =>
         {
-            // The database provider is set in the UmbracoInternalDbContext
-
             // Register the entity sets needed by OpenIddict.
             options.UseOpenIddict<UmbracoOpenIddictApplication, UmbracoOpenIddictAuthorization, UmbracoOpenIddictScope, UmbracoOpenIddictToken, string>();
         });
@@ -35,7 +34,7 @@ public class UmbracoEFCoreComposer : IComposer
             {
                 options
                     .UseEntityFrameworkCore()
-                    .UseDbContext<UmbracoInternalDbContext>();
+                    .UseDbContext<UmbracoDbContext>();
             });
     }
 }

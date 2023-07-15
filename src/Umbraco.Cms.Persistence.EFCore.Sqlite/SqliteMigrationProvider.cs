@@ -6,22 +6,22 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
 
 public class SqliteMigrationProvider : IMigrationProvider
 {
-    private readonly IDbContextFactory<UmbracoInternalDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<UmbracoDbContext> _dbContextFactory;
 
-    public SqliteMigrationProvider(IDbContextFactory<UmbracoInternalDbContext> dbContextFactory)
+    public SqliteMigrationProvider(IDbContextFactory<UmbracoDbContext> dbContextFactory)
         => _dbContextFactory = dbContextFactory;
 
     public string ProviderName => "Microsoft.Data.Sqlite";
 
     public async Task MigrateAsync(EFCoreMigration migration)
     {
-        UmbracoInternalDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        UmbracoDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await context.MigrateDatabaseAsync(GetMigrationType(migration));
     }
 
     public async Task MigrateAllAsync()
     {
-        UmbracoInternalDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        UmbracoDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
         if (context.Database.CurrentTransaction is not null)
         {
