@@ -149,6 +149,14 @@ public class UmbracoInternalDbContext : DbContext
 
     public virtual DbSet<UmbracoNode> UmbracoNodes { get; set; }
 
+    public virtual DbSet<UmbracoOpenIddictApplication> UmbracoOpenIddictApplications { get; set; }
+
+    public virtual DbSet<UmbracoOpenIddictAuthorization> UmbracoOpenIddictAuthorizations { get; set; }
+
+    public virtual DbSet<UmbracoOpenIddictScope> UmbracoOpenIddictScopes { get; set; }
+
+    public virtual DbSet<UmbracoOpenIddictToken> UmbracoOpenIddictTokens { get; set; }
+
     public virtual DbSet<UmbracoPropertyDatum> UmbracoPropertyData { get; set; }
 
     public virtual DbSet<UmbracoRedirectUrl> UmbracoRedirectUrls { get; set; }
@@ -186,6 +194,8 @@ public class UmbracoInternalDbContext : DbContext
             entity.HasKey(e => new { e.NodeId, e.Published });
 
             entity.ToTable("cmsContentNu");
+
+            entity.HasIndex(e => new { e.Published, e.NodeId, e.Rv }, "IX_cmsContentNu_published");
 
             entity.Property(e => e.NodeId).HasColumnName("nodeId");
             entity.Property(e => e.Published).HasColumnName("published");
@@ -611,6 +621,8 @@ public class UmbracoInternalDbContext : DbContext
 
             entity.HasIndex(e => e.LanguageId, "IX_cmsTags_LanguageId");
 
+            entity.HasIndex(e => new { e.LanguageId, e.Group }, "IX_cmsTags_languageId_group");
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Group)
                 .HasMaxLength(100)
@@ -630,6 +642,8 @@ public class UmbracoInternalDbContext : DbContext
             entity.HasKey(e => new { e.NodeId, e.PropertyTypeId, e.TagId });
 
             entity.ToTable("cmsTagRelationship");
+
+            entity.HasIndex(e => new { e.TagId, e.NodeId }, "IX_cmsTagRelationship_tagId_nodeId");
 
             entity.Property(e => e.NodeId).HasColumnName("nodeId");
             entity.Property(e => e.PropertyTypeId).HasColumnName("propertyTypeId");
@@ -1040,6 +1054,10 @@ public class UmbracoInternalDbContext : DbContext
         {
             entity.ToTable("umbracoDocumentVersion");
 
+            entity.HasIndex(e => new { e.Id, e.Published }, "IX_umbracoDocumentVersion_id_published");
+
+            entity.HasIndex(e => e.Published, "IX_umbracoDocumentVersion_published");
+
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
                 .HasColumnName("id");
@@ -1186,6 +1204,10 @@ public class UmbracoInternalDbContext : DbContext
 
             entity.HasIndex(e => e.NodeId, "IX_umbracoLog");
 
+            entity.HasIndex(e => new { e.Datestamp, e.UserId, e.NodeId }, "IX_umbracoLog_datestamp");
+
+            entity.HasIndex(e => new { e.Datestamp, e.LogHeader }, "IX_umbracoLog_datestamp_logheader");
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Datestamp)
                 .HasDefaultValueSql("(getdate())")
@@ -1250,13 +1272,15 @@ public class UmbracoInternalDbContext : DbContext
 
             entity.HasIndex(e => new { e.NodeObjectType, e.Trashed }, "IX_umbracoNode_ObjectType");
 
-            entity.HasIndex(e => e.ParentId, "IX_umbracoNode_ParentId");
+            entity.HasIndex(e => new { e.NodeObjectType, e.Trashed, e.SortOrder, e.Id }, "IX_umbracoNode_ObjectType_trashed_sorted");
 
             entity.HasIndex(e => e.Path, "IX_umbracoNode_Path");
 
             entity.HasIndex(e => e.Trashed, "IX_umbracoNode_Trashed");
 
             entity.HasIndex(e => e.UniqueId, "IX_umbracoNode_UniqueId").IsUnique();
+
+            entity.HasIndex(e => new { e.ParentId, e.NodeObjectType }, "IX_umbracoNode_parentId_nodeObjectType");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreateDate)
@@ -1330,6 +1354,69 @@ public class UmbracoInternalDbContext : DbContext
                     });
         });
 
+        modelBuilder.Entity<UmbracoOpenIddictApplication>(entity =>
+        {
+            entity.ToTable("umbracoOpenIddictApplications");
+
+            entity.HasIndex(e => e.ClientId, "IX_umbracoOpenIddictApplications_ClientId")
+                .IsUnique()
+                .HasFilter("([ClientId] IS NOT NULL)");
+
+            entity.Property(e => e.ClientId).HasMaxLength(100);
+            entity.Property(e => e.ConcurrencyToken).HasMaxLength(50);
+            entity.Property(e => e.ConsentType).HasMaxLength(50);
+            entity.Property(e => e.Type).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<UmbracoOpenIddictAuthorization>(entity =>
+        {
+            entity.ToTable("umbracoOpenIddictAuthorizations");
+
+            entity.HasIndex(e => new { e.ApplicationId, e.Status, e.Subject, e.Type }, "IX_umbracoOpenIddictAuthorizations_ApplicationId_Status_Subject_Type");
+
+            entity.Property(e => e.ConcurrencyToken).HasMaxLength(50);
+            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.Subject).HasMaxLength(400);
+            entity.Property(e => e.Type).HasMaxLength(50);
+
+            entity.HasOne(d => d.Application).WithMany(p => p.UmbracoOpenIddictAuthorizations).HasForeignKey(d => d.ApplicationId);
+        });
+
+        modelBuilder.Entity<UmbracoOpenIddictScope>(entity =>
+        {
+            entity.ToTable("umbracoOpenIddictScopes");
+
+            entity.HasIndex(e => e.Name, "IX_umbracoOpenIddictScopes_Name")
+                .IsUnique()
+                .HasFilter("([Name] IS NOT NULL)");
+
+            entity.Property(e => e.ConcurrencyToken).HasMaxLength(50);
+            entity.Property(e => e.Name).HasMaxLength(200);
+        });
+
+        modelBuilder.Entity<UmbracoOpenIddictToken>(entity =>
+        {
+            entity.ToTable("umbracoOpenIddictTokens");
+
+            entity.HasIndex(e => new { e.ApplicationId, e.Status, e.Subject, e.Type }, "IX_umbracoOpenIddictTokens_ApplicationId_Status_Subject_Type");
+
+            entity.HasIndex(e => e.AuthorizationId, "IX_umbracoOpenIddictTokens_AuthorizationId");
+
+            entity.HasIndex(e => e.ReferenceId, "IX_umbracoOpenIddictTokens_ReferenceId")
+                .IsUnique()
+                .HasFilter("([ReferenceId] IS NOT NULL)");
+
+            entity.Property(e => e.ConcurrencyToken).HasMaxLength(50);
+            entity.Property(e => e.ReferenceId).HasMaxLength(100);
+            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.Subject).HasMaxLength(400);
+            entity.Property(e => e.Type).HasMaxLength(50);
+
+            entity.HasOne(d => d.Application).WithMany(p => p.UmbracoOpenIddictTokens).HasForeignKey(d => d.ApplicationId);
+
+            entity.HasOne(d => d.Authorization).WithMany(p => p.UmbracoOpenIddictTokens).HasForeignKey(d => d.AuthorizationId);
+        });
+
         modelBuilder.Entity<UmbracoPropertyDatum>(entity =>
         {
             entity.ToTable("umbracoPropertyData");
@@ -1381,6 +1468,8 @@ public class UmbracoInternalDbContext : DbContext
             entity.ToTable("umbracoRedirectUrl");
 
             entity.HasIndex(e => new { e.UrlHash, e.ContentKey, e.Culture, e.CreateDateUtc }, "IX_umbracoRedirectUrl").IsUnique();
+
+            entity.HasIndex(e => e.CreateDateUtc, "IX_umbracoRedirectUrl_culture_hash");
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
