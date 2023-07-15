@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations.UmbracoInternalDb
+namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations.UmbracoInternalDb
 {
     /// <inheritdoc />
     public partial class InitalCreate : Migration
@@ -11,13 +11,13 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations.UmbracoInternalDb
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Intentinally left empty - This is handled by the NPoco migrations
+            // This is intentionally left empty - This is handled by the NPoco migrations
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            // Intentinally left empty - This is handled by the NPoco migrations
+            // This is intentionally left empty - This is handled by the NPoco migrations
         }
     }
 }

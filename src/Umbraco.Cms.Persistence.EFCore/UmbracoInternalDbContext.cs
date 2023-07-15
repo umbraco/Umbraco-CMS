@@ -149,13 +149,13 @@ public class UmbracoInternalDbContext : DbContext
 
     public virtual DbSet<UmbracoNode> UmbracoNodes { get; set; }
 
-    public virtual DbSet<UmbracoOpenIddictApplication> UmbracoOpenIddictApplications { get; set; }
+    //public virtual DbSet<UmbracoOpenIddictApplication> UmbracoOpenIddictApplications { get; set; }
 
-    public virtual DbSet<UmbracoOpenIddictAuthorization> UmbracoOpenIddictAuthorizations { get; set; }
+    //public virtual DbSet<UmbracoOpenIddictAuthorization> UmbracoOpenIddictAuthorizations { get; set; }
 
-    public virtual DbSet<UmbracoOpenIddictScope> UmbracoOpenIddictScopes { get; set; }
+    //public virtual DbSet<UmbracoOpenIddictScope> UmbracoOpenIddictScopes { get; set; }
 
-    public virtual DbSet<UmbracoOpenIddictToken> UmbracoOpenIddictTokens { get; set; }
+    //public virtual DbSet<UmbracoOpenIddictToken> UmbracoOpenIddictTokens { get; set; }
 
     public virtual DbSet<UmbracoPropertyDatum> UmbracoPropertyData { get; set; }
 
@@ -1354,68 +1354,68 @@ public class UmbracoInternalDbContext : DbContext
                     });
         });
 
-        modelBuilder.Entity<UmbracoOpenIddictApplication>(entity =>
-        {
-            entity.ToTable("umbracoOpenIddictApplications");
+        //modelBuilder.Entity<UmbracoOpenIddictApplication>(entity =>
+        //{
+        //    entity.ToTable("umbracoOpenIddictApplications");
 
-            entity.HasIndex(e => e.ClientId, "IX_umbracoOpenIddictApplications_ClientId")
-                .IsUnique()
-                .HasFilter("([ClientId] IS NOT NULL)");
+        //    entity.HasIndex(e => e.ClientId, "IX_umbracoOpenIddictApplications_ClientId")
+        //        .IsUnique()
+        //        .HasFilter("([ClientId] IS NOT NULL)");
 
-            entity.Property(e => e.ClientId).HasMaxLength(100);
-            entity.Property(e => e.ConcurrencyToken).HasMaxLength(50);
-            entity.Property(e => e.ConsentType).HasMaxLength(50);
-            entity.Property(e => e.Type).HasMaxLength(50);
-        });
+        //    entity.Property(e => e.ClientId).HasMaxLength(100);
+        //    entity.Property(e => e.ConcurrencyToken).HasMaxLength(50);
+        //    entity.Property(e => e.ConsentType).HasMaxLength(50);
+        //    entity.Property(e => e.Type).HasMaxLength(50);
+        //});
 
-        modelBuilder.Entity<UmbracoOpenIddictAuthorization>(entity =>
-        {
-            entity.ToTable("umbracoOpenIddictAuthorizations");
+        //modelBuilder.Entity<UmbracoOpenIddictAuthorization>(entity =>
+        //{
+        //    entity.ToTable("umbracoOpenIddictAuthorizations");
 
-            entity.HasIndex(e => new { e.ApplicationId, e.Status, e.Subject, e.Type }, "IX_umbracoOpenIddictAuthorizations_ApplicationId_Status_Subject_Type");
+        //    entity.HasIndex(e => new { e.ApplicationId, e.Status, e.Subject, e.Type }, "IX_umbracoOpenIddictAuthorizations_ApplicationId_Status_Subject_Type");
 
-            entity.Property(e => e.ConcurrencyToken).HasMaxLength(50);
-            entity.Property(e => e.Status).HasMaxLength(50);
-            entity.Property(e => e.Subject).HasMaxLength(400);
-            entity.Property(e => e.Type).HasMaxLength(50);
+        //    entity.Property(e => e.ConcurrencyToken).HasMaxLength(50);
+        //    entity.Property(e => e.Status).HasMaxLength(50);
+        //    entity.Property(e => e.Subject).HasMaxLength(400);
+        //    entity.Property(e => e.Type).HasMaxLength(50);
 
-            entity.HasOne(d => d.Application).WithMany(p => p.UmbracoOpenIddictAuthorizations).HasForeignKey(d => d.ApplicationId);
-        });
+        //    entity.HasOne(d => d.Application).WithMany(p => p.UmbracoOpenIddictAuthorizations).HasForeignKey(d => d.ApplicationId);
+        //});
 
-        modelBuilder.Entity<UmbracoOpenIddictScope>(entity =>
-        {
-            entity.ToTable("umbracoOpenIddictScopes");
+        //modelBuilder.Entity<UmbracoOpenIddictScope>(entity =>
+        //{
+        //    entity.ToTable("umbracoOpenIddictScopes");
 
-            entity.HasIndex(e => e.Name, "IX_umbracoOpenIddictScopes_Name")
-                .IsUnique()
-                .HasFilter("([Name] IS NOT NULL)");
+        //    entity.HasIndex(e => e.Name, "IX_umbracoOpenIddictScopes_Name")
+        //        .IsUnique()
+        //        .HasFilter("([Name] IS NOT NULL)");
 
-            entity.Property(e => e.ConcurrencyToken).HasMaxLength(50);
-            entity.Property(e => e.Name).HasMaxLength(200);
-        });
+        //    entity.Property(e => e.ConcurrencyToken).HasMaxLength(50);
+        //    entity.Property(e => e.Name).HasMaxLength(200);
+        //});
 
-        modelBuilder.Entity<UmbracoOpenIddictToken>(entity =>
-        {
-            entity.ToTable("umbracoOpenIddictTokens");
+        //modelBuilder.Entity<UmbracoOpenIddictToken>(entity =>
+        //{
+        //    entity.ToTable("umbracoOpenIddictTokens");
 
-            entity.HasIndex(e => new { e.ApplicationId, e.Status, e.Subject, e.Type }, "IX_umbracoOpenIddictTokens_ApplicationId_Status_Subject_Type");
+        //    entity.HasIndex(e => new { e.ApplicationId, e.Status, e.Subject, e.Type }, "IX_umbracoOpenIddictTokens_ApplicationId_Status_Subject_Type");
 
-            entity.HasIndex(e => e.AuthorizationId, "IX_umbracoOpenIddictTokens_AuthorizationId");
+        //    entity.HasIndex(e => e.AuthorizationId, "IX_umbracoOpenIddictTokens_AuthorizationId");
 
-            entity.HasIndex(e => e.ReferenceId, "IX_umbracoOpenIddictTokens_ReferenceId")
-                .IsUnique()
-                .HasFilter("([ReferenceId] IS NOT NULL)");
+        //    entity.HasIndex(e => e.ReferenceId, "IX_umbracoOpenIddictTokens_ReferenceId")
+        //        .IsUnique()
+        //        .HasFilter("([ReferenceId] IS NOT NULL)");
 
-            entity.Property(e => e.ConcurrencyToken).HasMaxLength(50);
-            entity.Property(e => e.ReferenceId).HasMaxLength(100);
-            entity.Property(e => e.Status).HasMaxLength(50);
-            entity.Property(e => e.Subject).HasMaxLength(400);
-            entity.Property(e => e.Type).HasMaxLength(50);
+        //    entity.Property(e => e.ConcurrencyToken).HasMaxLength(50);
+        //    entity.Property(e => e.ReferenceId).HasMaxLength(100);
+        //    entity.Property(e => e.Status).HasMaxLength(50);
+        //    entity.Property(e => e.Subject).HasMaxLength(400);
+        //    entity.Property(e => e.Type).HasMaxLength(50);
 
-            entity.HasOne(d => d.Application).WithMany(p => p.UmbracoOpenIddictTokens).HasForeignKey(d => d.ApplicationId);
+        //    entity.HasOne(d => d.Application).WithMany(p => p.UmbracoOpenIddictTokens).HasForeignKey(d => d.ApplicationId);
 
-            entity.HasOne(d => d.Authorization).WithMany(p => p.UmbracoOpenIddictTokens).HasForeignKey(d => d.AuthorizationId);
-        });
+        //    entity.HasOne(d => d.Authorization).WithMany(p => p.UmbracoOpenIddictTokens).HasForeignKey(d => d.AuthorizationId);
+        //});
 
         modelBuilder.Entity<UmbracoPropertyDatum>(entity =>
         {
