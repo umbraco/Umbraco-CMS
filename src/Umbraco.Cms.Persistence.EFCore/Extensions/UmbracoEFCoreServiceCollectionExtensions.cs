@@ -19,13 +19,36 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     {
         defaultEFCoreOptionsAction ??= DefaultOptionsAction;
 
-        services.AddDbContext<T>(
-            (provider, builder) => SetupDbContext(defaultEFCoreOptionsAction, provider, builder),
-            optionsLifetime: ServiceLifetime.Transient);
+        services.AddPooledDbContextFactory<T>((serviceProvider, options) =>
+        {
+            SetupDbContext(defaultEFCoreOptionsAction, serviceProvider, options);
+        });
 
+        services.AddUnique<IAmbientEFCoreScopeStack<T>, AmbientEFCoreScopeStack<T>>();
+        services.AddUnique<IEFCoreScopeAccessor<T>, EFCoreScopeAccessor<T>>();
+        services.AddUnique<IEFCoreScopeProvider<T>, EFCoreScopeProvider<T>>();
+        services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism<T>>();
+        services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism<T>>();
 
+        return services;
+    }
 
-        services.AddDbContextFactory<T>((provider, builder) => SetupDbContext(defaultEFCoreOptionsAction, provider, builder));
+    public static IServiceCollection AddUmbracoEFCoreContext<T>(this IServiceCollection services, string connectionString, string providerName, DefaultEFCoreOptionsAction? defaultEFCoreOptionsAction = null)
+        where T : DbContext
+    {
+        defaultEFCoreOptionsAction ??= DefaultOptionsAction;
+
+        // Replace data directory
+        string? dataDirectory = AppDomain.CurrentDomain.GetData(Constants.System.DataDirectoryName)?.ToString();
+        if (string.IsNullOrEmpty(dataDirectory) is false)
+        {
+            connectionString = connectionString.Replace(Constants.System.DataDirectoryPlaceholder, dataDirectory);
+        }
+
+        services.AddPooledDbContextFactory<T>(options =>
+        {
+            defaultEFCoreOptionsAction(options, providerName, connectionString);
+        });
 
         services.AddUnique<IAmbientEFCoreScopeStack<T>, AmbientEFCoreScopeStack<T>>();
         services.AddUnique<IEFCoreScopeAccessor<T>, EFCoreScopeAccessor<T>>();
@@ -48,9 +71,6 @@ public static class UmbracoEFCoreServiceCollectionExtensions
 
     private static ConnectionStrings GetConnectionStringAndProviderName(IServiceProvider serviceProvider)
     {
-        string? connectionString = null;
-        string? providerName = null;
-
         ConnectionStrings connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;
 
         // Replace data directory
@@ -63,39 +83,6 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         return connectionStrings;
     }
 
-    public static IServiceCollection AddUmbracoEFCoreContext<T>(this IServiceCollection services, string connectionString, string providerName, DefaultEFCoreOptionsAction? defaultEFCoreOptionsAction = null)
-        where T : DbContext
-    {
-        defaultEFCoreOptionsAction ??= DefaultOptionsAction;
-
-        // Replace data directory
-        string? dataDirectory = AppDomain.CurrentDomain.GetData(Constants.System.DataDirectoryName)?.ToString();
-        if (string.IsNullOrEmpty(dataDirectory) is false)
-        {
-            connectionString = connectionString.Replace(Constants.System.DataDirectoryPlaceholder, dataDirectory);
-        }
-
-        services.AddDbContext<T>(
-            options =>
-            {
-                defaultEFCoreOptionsAction(options, providerName, connectionString);
-            },
-            optionsLifetime: ServiceLifetime.Singleton);
-
-        services.AddDbContextFactory<T>(options =>
-        {
-            defaultEFCoreOptionsAction(options, providerName, connectionString);
-        });
-
-        services.AddUnique<IAmbientEFCoreScopeStack<T>, AmbientEFCoreScopeStack<T>>();
-        services.AddUnique<IEFCoreScopeAccessor<T>, EFCoreScopeAccessor<T>>();
-        services.AddUnique<IEFCoreScopeProvider<T>, EFCoreScopeProvider<T>>();
-        services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism<T>>();
-        services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism<T>>();
-
-        return services;
-    }
-
     private static void DefaultOptionsAction(DbContextOptionsBuilder options, string? providerName, string? connectionString)
     {
         if (connectionString.IsNullOrWhiteSpace())
@@ -106,11 +93,26 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         switch (providerName)
         {
             case "Microsoft.Data.Sqlite":
-                options.UseSqlite(connectionString);
+                options.UseSqlite(connectionString, optionsBuilder =>
+                {
+                    optionsBuilder.MigrationsAssembly("Umbraco.Cms.Persistence.EFCore.Sqlite");
+                });
                 break;
             case "Microsoft.Data.SqlClient":
-                options.UseSqlServer(connectionString);
+                options.UseSqlServer(connectionString, optionsBuilder =>
+                {
+                    optionsBuilder.MigrationsAssembly("Umbraco.Cms.Persistence.EFCore.SqlServer");
+                });
                 break;
+
+            case "":
+                if (!connectionString.IsNullOrWhiteSpace())
+                {
+                    throw new InvalidOperationException("No provider was found with your connection string please specify one");
+                }
+                break;
+            default:
+                throw new NotSupportedException($"The provider {providerName} is not supported");
         }
     }
 }

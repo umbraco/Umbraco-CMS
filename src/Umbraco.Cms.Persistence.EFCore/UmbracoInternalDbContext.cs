@@ -32,41 +32,8 @@ namespace Umbraco.Cms.Persistence.EFCore;
 public class UmbracoInternalDbContext : DbContext
 {
     public UmbracoInternalDbContext(DbContextOptions<UmbracoInternalDbContext> options)
-        : base(ConfigureOptions(options))
+        : base(options)
     {
-    }
-
-    public static DbContextOptions<UmbracoInternalDbContext> ConfigureOptions(DbContextOptions<UmbracoInternalDbContext> options)
-    {
-        var configuration = StaticServiceProvider.Instance.GetRequiredService<IConfiguration>();
-        var connectionString = configuration.GetUmbracoConnectionString(out var providerName);
-        var optionsBuilder = new DbContextOptionsBuilder<UmbracoInternalDbContext>(options);
-
-        switch (providerName)
-        {
-            case "Microsoft.Data.Sqlite":
-                optionsBuilder.UseSqlite(connectionString, optionsBuilder =>
-                {
-                    optionsBuilder.MigrationsAssembly("Umbraco.Cms.Persistence.EFCore.Sqlite");
-                });
-                break;
-            case "Microsoft.Data.SqlClient":
-                optionsBuilder.UseSqlServer(connectionString, optionsBuilder =>
-                {
-                    optionsBuilder.MigrationsAssembly("Umbraco.Cms.Persistence.EFCore.SqlServer");
-                });
-                break;
-            case "":
-                if (!connectionString.IsNullOrWhiteSpace())
-                {
-                    throw new InvalidOperationException("No provider was found with your connection string please specify one");
-                }
-                break;
-            default:
-                throw new NotSupportedException($"The provider {providerName} is not supported");
-
-        }
-        return optionsBuilder.Options;
     }
 
     public virtual DbSet<CmsContentNu> CmsContentNus { get; set; }
