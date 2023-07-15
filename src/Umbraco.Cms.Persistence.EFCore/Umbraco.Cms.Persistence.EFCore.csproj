@@ -20,8 +20,4 @@
       <_Parameter1>Umbraco.Tests.Integration</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
 </Project>
