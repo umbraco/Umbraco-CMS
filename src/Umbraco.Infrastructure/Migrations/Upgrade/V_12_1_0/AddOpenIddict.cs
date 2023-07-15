@@ -14,7 +14,7 @@ public class AddOpenIddict : UnscopedMigrationBase
 
     protected override void Migrate()
     {
-        _iefCoreMigrationExecutor.ExecuteSingleMigrationAsync(EFCoreMigration.InitialCreate).GetAwaiter().GetResult();
+        _iefCoreMigrationExecutor.ExecuteSingleMigrationAsync(EFCoreMigration.AddOpenIddict).GetAwaiter().GetResult();
     }
 }
 

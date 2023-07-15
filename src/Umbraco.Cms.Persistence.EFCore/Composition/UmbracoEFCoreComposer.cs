@@ -24,6 +24,7 @@ public class UmbracoEFCoreComposer : IComposer
         {
             // The database provider is set in the UmbracoInternalDbContext
 
+            // Register the entity sets needed by OpenIddict.
             options.UseOpenIddict<UmbracoOpenIddictApplication, UmbracoOpenIddictAuthorization, UmbracoOpenIddictScope, UmbracoOpenIddictToken, string>();
         });
 
