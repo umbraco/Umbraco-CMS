@@ -1699,6 +1699,211 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations.UmbracoInternalDb
                     b.ToTable("umbracoNode", (string)null);
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Persistence.EFCore.Models.UmbracoOpenIddictApplication", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ClientId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ClientSecret")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConcurrencyToken")
+                        .IsConcurrencyToken()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ConsentType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisplayNames")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Permissions")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PostLogoutRedirectUris")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Properties")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RedirectUris")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Requirements")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId")
+                        .IsUnique()
+                        .HasFilter("[ClientId] IS NOT NULL");
+
+                    b.ToTable("umbracoOpenIddictApplications", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Persistence.EFCore.Models.UmbracoOpenIddictAuthorization", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ApplicationId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyToken")
+                        .IsConcurrencyToken()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Properties")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Scopes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Subject")
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
+
+                    b.Property<string>("Type")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationId", "Status", "Subject", "Type");
+
+                    b.HasIndex(new[] { "ApplicationId", "Status", "Subject", "Type" }, "IX_umbracoOpenIddictAuthorizations_ApplicationId_Status_Subject_Type");
+
+                    b.ToTable("umbracoOpenIddictAuthorizations", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Persistence.EFCore.Models.UmbracoOpenIddictScope", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyToken")
+                        .IsConcurrencyToken()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Descriptions")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisplayNames")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Properties")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Resources")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasFilter("[Name] IS NOT NULL");
+
+                    b.ToTable("umbracoOpenIddictScopes", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Persistence.EFCore.Models.UmbracoOpenIddictToken", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ApplicationId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AuthorizationId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyToken")
+                        .IsConcurrencyToken()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Payload")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Properties")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RedemptionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReferenceId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Subject")
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
+
+                    b.Property<string>("Type")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReferenceId")
+                        .IsUnique()
+                        .HasFilter("[ReferenceId] IS NOT NULL");
+
+                    b.HasIndex("ApplicationId", "Status", "Subject", "Type");
+
+                    b.HasIndex(new[] { "ApplicationId", "Status", "Subject", "Type" }, "IX_umbracoOpenIddictTokens_ApplicationId_Status_Subject_Type");
+
+                    b.HasIndex(new[] { "AuthorizationId" }, "IX_umbracoOpenIddictTokens_AuthorizationId");
+
+                    b.ToTable("umbracoOpenIddictTokens", (string)null);
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Persistence.EFCore.Models.UmbracoPropertyDatum", b =>
                 {
                     b.Property<int>("Id")
@@ -2880,6 +3085,30 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations.UmbracoInternalDb
                     b.Navigation("Parent");
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Persistence.EFCore.Models.UmbracoOpenIddictAuthorization", b =>
+                {
+                    b.HasOne("Umbraco.Cms.Persistence.EFCore.Models.UmbracoOpenIddictApplication", "Application")
+                        .WithMany("Authorizations")
+                        .HasForeignKey("ApplicationId");
+
+                    b.Navigation("Application");
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Persistence.EFCore.Models.UmbracoOpenIddictToken", b =>
+                {
+                    b.HasOne("Umbraco.Cms.Persistence.EFCore.Models.UmbracoOpenIddictApplication", "Application")
+                        .WithMany("Tokens")
+                        .HasForeignKey("ApplicationId");
+
+                    b.HasOne("Umbraco.Cms.Persistence.EFCore.Models.UmbracoOpenIddictAuthorization", "Authorization")
+                        .WithMany("Tokens")
+                        .HasForeignKey("AuthorizationId");
+
+                    b.Navigation("Application");
+
+                    b.Navigation("Authorization");
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Persistence.EFCore.Models.UmbracoPropertyDatum", b =>
                 {
                     b.HasOne("Umbraco.Cms.Persistence.EFCore.Models.UmbracoLanguage", "Language")
@@ -3242,6 +3471,18 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations.UmbracoInternalDb
                     b.Navigation("UmbracoUserGroupStartMedia");
 
                     b.Navigation("UmbracoUserStartNodes");
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Persistence.EFCore.Models.UmbracoOpenIddictApplication", b =>
+                {
+                    b.Navigation("Authorizations");
+
+                    b.Navigation("Tokens");
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Persistence.EFCore.Models.UmbracoOpenIddictAuthorization", b =>
+                {
+                    b.Navigation("Tokens");
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Persistence.EFCore.Models.UmbracoRelationType", b =>
