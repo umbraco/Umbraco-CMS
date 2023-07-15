@@ -8,9 +8,17 @@ namespace Umbraco.Cms.Persistence.EFCore;
 /// To autogenerate migrations use the following commands
 /// and insure the 'src/Umbraco.Web.UI/appsettings.json' have a connection string set with the right provider.
 ///
-/// dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.SqlServer  -- --provider SqlServer
-/// dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.Sqlite  -- --provider Sqlite
+/// Add a migration for each provider
 ///
+/// <code>dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.SqlServer -c UmbracoDbContext  -- --provider SqlServer</code>
+/// <code>dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.Sqlite -c UmbracoDbContext  -- --provider Sqlite</code>
+///
+/// Remove the last migration for each provider
+///
+/// <code>dotnet ef migrations remove -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.SqlServer -c UmbracoDbContext -- --provider SqlServer</code>
+///
+/// <code>dotnet ef migrations remove -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.Sqlite -c UmbracoDbContext -- --provider Sqlite</code>
+/// 
 /// To find documentation about this way of working with the context see
 /// https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/providers?tabs=dotnet-core-cli#using-one-context-type
 /// </remarks>

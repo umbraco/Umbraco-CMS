@@ -26,6 +26,11 @@ public class UmbracoEFCoreComposer : IComposer
                     .UseEntityFrameworkCore()
                     .UseDbContext<UmbracoDbContext>();
             });
+
+        builder.Services.AddPooledDbContextFactory<UmbracoInternalDbContext>((serviceProvider, options) =>
+        {
+            // The database provider is set in the UmbracoInternalDbContext
+        });
     }
 }
 
