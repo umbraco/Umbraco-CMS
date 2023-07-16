@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Umbraco.Cms.Persistence.EFCore.Models;
+using Umbraco.Cms.Infrastructure.Persistence.Models;
 
 namespace Umbraco.Cms.Persistence.EFCore.Configurations
 {

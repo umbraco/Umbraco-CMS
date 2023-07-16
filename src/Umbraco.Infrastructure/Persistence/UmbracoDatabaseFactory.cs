@@ -29,6 +29,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence;
 /// </remarks>
 // TODO: these comments are not true anymore
 // TODO: this class needs not be disposable!
+[Obsolete("This will be removed when NPOCO is written out of the repositories")]
 public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFactory
 {
     private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
@@ -195,6 +196,9 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
         return (IUmbracoDatabase)_npocoDatabaseFactory!.GetDatabase();
     }
 
+    /// <inheritdoc />
+    public Task<IUmbracoDatabase> CreateDatabaseAsync(CancellationToken? cancellationToken = null) => throw new NotImplementedException();
+
     private void EnsureInitialized() =>
         LazyInitializer.EnsureInitialized(ref _sqlContext, ref _initialized, ref _lock, Initialize);
 
@@ -307,4 +311,6 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
         // _umbracoDatabaseAccessor.UmbracoDatabase = null;
         // db?.Dispose();
         Volatile.Write(ref _initialized, false);
+
+    public Task<IUmbracoDatabase> CreateDatabaseAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
 }

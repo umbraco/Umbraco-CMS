@@ -3,7 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Umbraco.Cms.Persistence.EFCore;
+using Umbraco.Cms.Persistence.EFCore.DbContexts;
 
 #nullable disable
 

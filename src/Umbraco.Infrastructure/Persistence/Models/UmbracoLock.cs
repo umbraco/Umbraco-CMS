@@ -1,0 +1,10 @@
+namespace Umbraco.Cms.Infrastructure.Persistence.Models;
+
+public class UmbracoLock
+{
+    public int Id { get; set; }
+
+    public int Value { get; set; }
+
+    public string Name { get; set; } = null!;
+}

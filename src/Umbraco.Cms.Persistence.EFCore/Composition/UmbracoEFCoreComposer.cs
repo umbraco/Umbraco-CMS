@@ -6,6 +6,9 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Notifications;
+using Umbraco.Cms.Infrastructure.Persistence.Models;
+using Umbraco.Cms.Persistence.EFCore.DbContexts;
+using Umbraco.Cms.Persistence.EFCore.Factories;
 using Umbraco.Cms.Persistence.EFCore.Models;
 using Umbraco.Extensions;
 
@@ -16,6 +19,7 @@ public class UmbracoEFCoreComposer : IComposer
     public void Compose(IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IEFCoreMigrationExecutor, EfCoreMigrationExecutor>();
+        builder.Services.AddSingleton<Infrastructure.Persistence.IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
 
         builder.AddNotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification, EFCoreCreateTablesNotificationHandler>();
         builder.AddNotificationAsyncHandler<UnattendedInstallNotification, EFCoreCreateTablesNotificationHandler>();

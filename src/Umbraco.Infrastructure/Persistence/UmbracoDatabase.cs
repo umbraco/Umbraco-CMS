@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence.Models;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence;
@@ -413,4 +414,60 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
         var result = base.ExecuteScalar<object>(sql, commandType, args);
         return (T)mapper.Map(result);
     }
+
+    #region New EF Core properties (Will not be implemented)
+    public IQueryable<CmsContentNu> CmsContentNus => throw new NotImplementedException();
+    public IQueryable<CmsContentTypeAllowedContentType> CmsContentTypeAllowedContentTypes => throw new NotImplementedException();
+    public IQueryable<CmsContentType> CmsContentTypes => throw new NotImplementedException();
+    public IQueryable<CmsDictionary> CmsDictionaries => throw new NotImplementedException();
+    public IQueryable<CmsDocumentType> CmsDocumentTypes => throw new NotImplementedException();
+    public IQueryable<CmsLanguageText> CmsLanguageTexts => throw new NotImplementedException();
+    public IQueryable<CmsMacroProperty> CmsMacroProperties => throw new NotImplementedException();
+    public IQueryable<CmsMacro> CmsMacros => throw new NotImplementedException();
+    public IQueryable<CmsMember> CmsMembers => throw new NotImplementedException();
+    public IQueryable<CmsMemberType> CmsMemberTypes => throw new NotImplementedException();
+    public IQueryable<CmsPropertyTypeGroup> CmsPropertyTypeGroups => throw new NotImplementedException();
+    public IQueryable<CmsPropertyType> CmsPropertyTypes => throw new NotImplementedException();
+    public IQueryable<CmsTagRelationship> CmsTagRelationships => throw new NotImplementedException();
+    public IQueryable<CmsTag> CmsTags => throw new NotImplementedException();
+    public IQueryable<CmsTemplate> CmsTemplates => throw new NotImplementedException();
+    public IQueryable<UmbracoAccess> UmbracoAccesses => throw new NotImplementedException();
+    public IQueryable<UmbracoAccessRule> UmbracoAccessRules => throw new NotImplementedException();
+    public IQueryable<UmbracoAudit> UmbracoAudits => throw new NotImplementedException();
+    public IQueryable<UmbracoCacheInstruction> UmbracoCacheInstructions => throw new NotImplementedException();
+    public IQueryable<UmbracoConsent> UmbracoConsents => throw new NotImplementedException();
+    public IQueryable<UmbracoContent> UmbracoContents => throw new NotImplementedException();
+    public IQueryable<UmbracoContentSchedule> UmbracoContentSchedules => throw new NotImplementedException();
+    public IQueryable<UmbracoContentVersionCleanupPolicy> UmbracoContentVersionCleanupPolicies => throw new NotImplementedException();
+    public IQueryable<UmbracoContentVersionCultureVariation> UmbracoContentVersionCultureVariations => throw new NotImplementedException();
+    public IQueryable<UmbracoContentVersion> UmbracoContentVersions => throw new NotImplementedException();
+    public IQueryable<UmbracoCreatedPackageSchema> UmbracoCreatedPackageSchemas => throw new NotImplementedException();
+    public IQueryable<UmbracoDataType> UmbracoDataTypes => throw new NotImplementedException();
+    public IQueryable<UmbracoDocumentCultureVariation> UmbracoDocumentCultureVariations => throw new NotImplementedException();
+    public IQueryable<UmbracoDocument> UmbracoDocuments => throw new NotImplementedException();
+    public IQueryable<UmbracoDocumentVersion> UmbracoDocumentVersions => throw new NotImplementedException();
+    public IQueryable<UmbracoDomain> UmbracoDomains => throw new NotImplementedException();
+    public IQueryable<UmbracoExternalLogin> UmbracoExternalLogins => throw new NotImplementedException();
+    public IQueryable<UmbracoExternalLoginToken> UmbracoExternalLoginTokens => throw new NotImplementedException();
+    public IQueryable<UmbracoKeyValue> UmbracoKeyValues => throw new NotImplementedException();
+    public IQueryable<UmbracoLanguage> UmbracoLanguages => throw new NotImplementedException();
+    public IQueryable<UmbracoLock> UmbracoLocks => throw new NotImplementedException();
+    public IQueryable<UmbracoLog> UmbracoLogs => throw new NotImplementedException();
+    public IQueryable<UmbracoLogViewerQuery> UmbracoLogViewerQueries => throw new NotImplementedException();
+    public IQueryable<UmbracoMediaVersion> UmbracoMediaVersions => throw new NotImplementedException();
+    public IQueryable<UmbracoNode> UmbracoNodes => throw new NotImplementedException();
+    public IQueryable<UmbracoPropertyDatum> UmbracoPropertyData => throw new NotImplementedException();
+    public IQueryable<UmbracoRedirectUrl> UmbracoRedirectUrls => throw new NotImplementedException();
+    public IQueryable<UmbracoRelation> UmbracoRelations => throw new NotImplementedException();
+    public IQueryable<UmbracoRelationType> UmbracoRelationTypes => throw new NotImplementedException();
+    public IQueryable<UmbracoServer> UmbracoServers => throw new NotImplementedException();
+    public IQueryable<UmbracoTwoFactorLogin> UmbracoTwoFactorLogins => throw new NotImplementedException();
+    public IQueryable<UmbracoUser2NodeNotify> UmbracoUser2NodeNotifies => throw new NotImplementedException();
+    public IQueryable<UmbracoUserGroup2App> UmbracoUserGroup2Apps => throw new NotImplementedException();
+    public IQueryable<UmbracoUserGroup2NodePermission> UmbracoUserGroup2NodePermissions => throw new NotImplementedException();
+    public IQueryable<UmbracoUserGroup> UmbracoUserGroups => throw new NotImplementedException();
+    public IQueryable<UmbracoUserLogin> UmbracoUserLogins => throw new NotImplementedException();
+    public IQueryable<UmbracoUser> UmbracoUsers => throw new NotImplementedException();
+    public IQueryable<UmbracoUserStartNode> UmbracoUserStartNodes => throw new NotImplementedException();
+    #endregion
 }

@@ -180,7 +180,7 @@ public class DatabaseSchemaCreator
     /// <summary>
     ///     Validates the schema of the current database.
     /// </summary>
-    internal DatabaseSchemaResult ValidateSchema() => ValidateSchema(_orderedTables);
+    public DatabaseSchemaResult ValidateSchema() => ValidateSchema(_orderedTables);
 
     internal DatabaseSchemaResult ValidateSchema(IEnumerable<Type> orderedTables)
     {

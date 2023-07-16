@@ -1,0 +1,18 @@
+namespace Umbraco.Cms.Infrastructure.Persistence.Models;
+
+public class UmbracoContentSchedule
+{
+    public Guid Id { get; set; }
+
+    public int NodeId { get; set; }
+
+    public int? LanguageId { get; set; }
+
+    public DateTime Date { get; set; }
+
+    public string Action { get; set; } = null!;
+
+    public virtual UmbracoLanguage? Language { get; set; }
+
+    public virtual UmbracoContent Node { get; set; } = null!;
+}

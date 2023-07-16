@@ -18,6 +18,7 @@ public interface IUmbracoDatabaseFactory : IDisposable
     ///     Gets a value indicating whether the database factory is initialized, i.e. whether
     ///     its internal state is ready and it has been possible to connect to the database.
     /// </summary>
+    [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
     bool Initialized { get; }
 
     /// <summary>
@@ -45,6 +46,7 @@ public interface IUmbracoDatabaseFactory : IDisposable
     /// <remarks>
     ///     <para>Getting the <see cref="ISqlContext" /> causes the factory to initialize if it is not already initialized.</para>
     /// </remarks>
+    [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
     ISqlContext SqlContext { get; }
 
     /// <summary>
@@ -56,6 +58,7 @@ public interface IUmbracoDatabaseFactory : IDisposable
     ///         initialized.
     ///     </para>
     /// </remarks>
+    [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
     IBulkSqlInsertProvider? BulkSqlInsertProvider { get; }
 
     /// <summary>
@@ -68,8 +71,18 @@ public interface IUmbracoDatabaseFactory : IDisposable
     IUmbracoDatabase CreateDatabase();
 
     /// <summary>
+    ///     Creates a new database.
+    /// </summary>
+    /// <remarks>
+    ///     <para>The new database must be disposed after being used.</para>
+    ///     <para>Creating a database causes the factory to initialize if it is not already initialized.</para>
+    /// </remarks>
+    Task<IUmbracoDatabase> CreateDatabaseAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     ///     Configures the database factory.
     /// </summary>
+    [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
     void Configure(ConnectionStrings umbracoConnectionString);
 
     [Obsolete("Please use alternative Configure method.")]
@@ -79,5 +92,6 @@ public interface IUmbracoDatabaseFactory : IDisposable
     /// <summary>
     ///     Configures the database factory for upgrades.
     /// </summary>
+    [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
     void ConfigureForUpgrade();
 }
