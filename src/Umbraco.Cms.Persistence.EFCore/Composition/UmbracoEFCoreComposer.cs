@@ -20,6 +20,7 @@ public class UmbracoEFCoreComposer : IComposer
     {
         builder.Services.AddSingleton<IEFCoreMigrationExecutor, EfCoreMigrationExecutor>();
         builder.Services.AddSingleton<Infrastructure.Persistence.IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
+        builder.Services.AddSingleton<Infrastructure.Persistence.IUmbracoDatabaseFactory, Infrastructure.Persistence.UmbracoDatabaseFactory>(); // Add this after the new one to make sure this is the default
 
         builder.AddNotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification, EFCoreCreateTablesNotificationHandler>();
         builder.AddNotificationAsyncHandler<UnattendedInstallNotification, EFCoreCreateTablesNotificationHandler>();

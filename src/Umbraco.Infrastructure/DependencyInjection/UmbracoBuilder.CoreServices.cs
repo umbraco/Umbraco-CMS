@@ -74,7 +74,6 @@ public static partial class UmbracoBuilderExtensions
             .AddLogging();
 
         builder.Services.AddSingleton<IDistributedLockingMechanismFactory, DefaultDistributedLockingMechanismFactory>();
-        builder.Services.AddSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
         builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
         builder.NPocoMappers()?.Add<NullableDateMapper>();
         builder.PackageMigrationPlans()?.Add(() => builder.TypeLoader.GetPackageMigrationPlans());
