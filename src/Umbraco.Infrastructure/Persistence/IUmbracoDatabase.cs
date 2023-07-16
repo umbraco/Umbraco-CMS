@@ -3,6 +3,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Install;
 
 namespace Umbraco.Cms.Infrastructure.Persistence;
 
+// TODO: Remove IDatabase when NPOCO is removed from the repositories.
 public interface IUmbracoDatabase : IDatabase, IUmbracoDatabaseContract
 {
     /// <summary>
