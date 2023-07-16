@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Cms.Persistence.EFCore.Factories;
 using Umbraco.Cms.Persistence.EFCore.Locking;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
@@ -62,9 +64,22 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     private static void SetupDbContext(DefaultEFCoreOptionsAction defaultEFCoreOptionsAction, IServiceProvider provider, DbContextOptionsBuilder builder)
     {
         ConnectionStrings connectionStrings = GetConnectionStringAndProviderName(provider);
+
+        if (string.IsNullOrWhiteSpace(connectionStrings.ConnectionString))
+        {
+            ILogger<UmbracoDatabaseFactory> logger = provider.GetRequiredService<ILogger<UmbracoDatabaseFactory>>();
+            logger.LogCritical("No connection string was found, cannot setup Umbraco EF Core context");
+        }
+
         IEnumerable<IMigrationProviderSetup> migrationProviders = provider.GetServices<IMigrationProviderSetup>();
         IMigrationProviderSetup? migrationProvider =
             migrationProviders.FirstOrDefault(x => x.ProviderName == connectionStrings.ProviderName);
+
+        if (migrationProvider == null && connectionStrings.ProviderName != null)
+        {
+            throw new InvalidOperationException($"No migration provider found for provider name {connectionStrings.ProviderName}");
+        }
+
         migrationProvider?.Setup(builder, connectionStrings.ConnectionString);
         defaultEFCoreOptionsAction(builder, connectionStrings.ConnectionString, connectionStrings.ProviderName);
     }
