@@ -8,16 +8,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence;
 
 internal static class UmbracoDatabaseExtensions
 {
-    public static UmbracoDatabase AsUmbracoDatabase(this IUmbracoDatabase database)
-    {
-        if (database is not UmbracoDatabase asDatabase)
-        {
-            throw new Exception("oops: database.");
-        }
-
-        return asDatabase;
-    }
-
     /// <summary>
     ///     Gets a dictionary of key/values directly from the database, no scope, nothing.
     /// </summary>

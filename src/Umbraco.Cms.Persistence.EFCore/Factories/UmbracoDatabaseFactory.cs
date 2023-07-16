@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Persistence.EFCore.Databases;
 using Umbraco.Cms.Persistence.EFCore.DbContexts;
@@ -18,6 +19,7 @@ public class UmbracoDatabaseFactory : Infrastructure.Persistence.IUmbracoDatabas
     private readonly object _lock = new();
     private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
     private readonly IDbContextFactory<UmbracoDbContext> _dbContextFactory;
+    private readonly Infrastructure.Persistence.UmbracoDatabaseFactory _legacyDatabaseFactory;
 
     private ConnectionStrings? _umbracoConnectionString;
     private bool _initialized;
@@ -39,6 +41,10 @@ public class UmbracoDatabaseFactory : Infrastructure.Persistence.IUmbracoDatabas
         _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory ??
                                         throw new ArgumentNullException(nameof(databaseSchemaCreatorFactory));
         _dbContextFactory = dbContextFactory;
+
+        // TODO: Remove leagcy factory - We are using the StaticServiceProvider to avoid having breaking changes later
+        _legacyDatabaseFactory = (Infrastructure.Persistence.UmbracoDatabaseFactory)StaticServiceProvider.Instance.GetService(typeof(Infrastructure.Persistence.UmbracoDatabaseFactory))!;
+
         ILogger<UmbracoDatabaseFactory> logger = loggerFactory.CreateLogger<UmbracoDatabaseFactory>();
 
         ConnectionStrings umbracoConnectionString = connectionStrings.CurrentValue;
@@ -126,18 +132,18 @@ public class UmbracoDatabaseFactory : Infrastructure.Persistence.IUmbracoDatabas
     #region Obsolete
     /// <inheritdoc />
     [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
-    public bool Initialized => throw new NotImplementedException();
+    public bool Initialized => _legacyDatabaseFactory.Initialized;
 
     /// <inheritdoc />
     [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
-    public Infrastructure.Persistence.ISqlContext SqlContext => throw new NotImplementedException();
+    public Infrastructure.Persistence.ISqlContext SqlContext => _legacyDatabaseFactory.SqlContext;
 
     /// <inheritdoc />
     [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
-    public Infrastructure.Persistence.IBulkSqlInsertProvider? BulkSqlInsertProvider => throw new NotImplementedException();
+    public Infrastructure.Persistence.IBulkSqlInsertProvider? BulkSqlInsertProvider => _legacyDatabaseFactory.BulkSqlInsertProvider;
 
     /// <inheritdoc />
     [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
-    public void ConfigureForUpgrade() => throw new NotImplementedException();
+    public void ConfigureForUpgrade() => _legacyDatabaseFactory.ConfigureForUpgrade();
     #endregion
 }
