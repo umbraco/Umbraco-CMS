@@ -146,6 +146,6 @@ public class UmbracoDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(typeof(UmbracoDbContext))!);
     }
 }
