@@ -311,6 +311,4 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
         // _umbracoDatabaseAccessor.UmbracoDatabase = null;
         // db?.Dispose();
         Volatile.Write(ref _initialized, false);
-
-    public Task<IUmbracoDatabase> CreateDatabaseAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
 }

@@ -77,7 +77,7 @@ public interface IUmbracoDatabaseFactory : IDisposable
     ///     <para>The new database must be disposed after being used.</para>
     ///     <para>Creating a database causes the factory to initialize if it is not already initialized.</para>
     /// </remarks>
-    Task<IUmbracoDatabase> CreateDatabaseAsync(CancellationToken cancellationToken = default);
+    Task<IUmbracoDatabase> CreateDatabaseAsync(CancellationToken cancellationToken = default) => Task.FromResult(CreateDatabase());
 
     /// <summary>
     ///     Configures the database factory.
