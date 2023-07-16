@@ -12,6 +12,7 @@ public interface IUmbracoDatabaseFactory : IDisposable
     ///     its connection string and provider name have been set. The factory may however not
     ///     be initialized (see <see cref="Initialized" />).
     /// </summary>
+    [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
     bool Configured { get; }
 
     /// <summary>
@@ -25,12 +26,14 @@ public interface IUmbracoDatabaseFactory : IDisposable
     ///     Gets the connection string.
     /// </summary>
     /// <remarks>May return <c>null</c> if the database factory is not configured.</remarks>
+    [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
     string? ConnectionString { get; }
 
     /// <summary>
     ///     Gets the provider name.
     /// </summary>
     /// <remarks>May return <c>null</c> if the database factory is not configured.</remarks>
+    [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
     string? ProviderName { get; }
 
     /// <summary>

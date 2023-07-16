@@ -1,12 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Persistence.EFCore.Databases;
 using Umbraco.Cms.Persistence.EFCore.DbContexts;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.Factories;
 
@@ -21,22 +19,17 @@ public class UmbracoDatabaseFactory : Infrastructure.Persistence.IUmbracoDatabas
     private readonly IDbContextFactory<UmbracoDbContext> _dbContextFactory;
     private readonly Infrastructure.Persistence.UmbracoDatabaseFactory _legacyDatabaseFactory;
 
-    private ConnectionStrings? _umbracoConnectionString;
-    private bool _initialized;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/> class.
     /// </summary>
     /// <param name="loggerFactory"></param>
     /// <param name="databaseSchemaCreatorFactory"></param>
     /// <param name="dbContextFactory"></param>
-    /// <param name="connectionStrings"></param>
     /// <remarks>Used by the other ctor and in tests.</remarks>
     public UmbracoDatabaseFactory(
         ILoggerFactory loggerFactory,
         DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-        IDbContextFactory<UmbracoDbContext> dbContextFactory,
-        IOptionsMonitor<ConnectionStrings> connectionStrings)
+        IDbContextFactory<UmbracoDbContext> dbContextFactory)
     {
         _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory ??
                                         throw new ArgumentNullException(nameof(databaseSchemaCreatorFactory));
@@ -46,39 +39,20 @@ public class UmbracoDatabaseFactory : Infrastructure.Persistence.IUmbracoDatabas
         _legacyDatabaseFactory = (Infrastructure.Persistence.UmbracoDatabaseFactory)StaticServiceProvider.Instance.GetService(typeof(Infrastructure.Persistence.UmbracoDatabaseFactory))!;
 
         ILogger<UmbracoDatabaseFactory> logger = loggerFactory.CreateLogger<UmbracoDatabaseFactory>();
-
-        ConnectionStrings umbracoConnectionString = connectionStrings.CurrentValue;
-        if (!umbracoConnectionString.IsConnectionStringConfigured())
-        {
-            if (logger.IsEnabled(LogLevel.Debug))
-            {
-                logger.LogDebug("Missing connection string, defer configuration.");
-            }
-
-            return; // not configured
-        }
-
-        Configure(umbracoConnectionString);
     }
 
 
     /// <inheritdoc />
-    public bool Configured
-    {
-        get
-        {
-            lock (_lock)
-            {
-                return !ConnectionString.IsNullOrWhiteSpace() && !ProviderName.IsNullOrWhiteSpace();
-            }
-        }
-    }
+    [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
+    public bool Configured => _legacyDatabaseFactory.Configured;
 
     /// <inheritdoc />
-    public string? ConnectionString => _umbracoConnectionString?.ConnectionString;
+    [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
+    public string? ConnectionString => _legacyDatabaseFactory.ConnectionString;
 
     /// <inheritdoc />
-    public string? ProviderName => _umbracoConnectionString?.ProviderName;
+    [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
+    public string? ProviderName => _legacyDatabaseFactory.ProviderName;
 
     /// <inheritdoc />
     public bool CanConnect
@@ -86,28 +60,20 @@ public class UmbracoDatabaseFactory : Infrastructure.Persistence.IUmbracoDatabas
         get
         {
             UmbracoDbContext dbContext = _dbContextFactory.CreateDbContext();
-            return dbContext.Database.CanConnect();
+            if (dbContext.Database.CanConnect())
+            {
+                return true;
+            }
+            else
+            {
+                return _legacyDatabaseFactory.CanConnect; // TODO: Remove this when it's time to remove the old UmbracoDatabase implementation and tests have been rewritten to not use Configure to set the connection string
+            }
         }
     }
 
     /// <inheritdoc />
-    public void Configure(ConnectionStrings umbracoConnectionString)
-    {
-        if (umbracoConnectionString is null)
-        {
-            throw new ArgumentNullException(nameof(umbracoConnectionString));
-        }
-
-        lock (_lock)
-        {
-            if (Volatile.Read(ref _initialized))
-            {
-                throw new InvalidOperationException("Already initialized.");
-            }
-
-            _umbracoConnectionString = umbracoConnectionString;
-        }
-    }
+    [Obsolete("This will be removed when NPOCO is removed from the repositories.")]
+    public void Configure(ConnectionStrings umbracoConnectionString) => _legacyDatabaseFactory.Configure(umbracoConnectionString);
 
     /// <inheritdoc />
     public Infrastructure.Persistence.IUmbracoDatabase CreateDatabase()
@@ -127,6 +93,8 @@ public class UmbracoDatabaseFactory : Infrastructure.Persistence.IUmbracoDatabas
     public void Dispose()
     {
         // TODO: Remove IDisposable from this class when NPOCO is removed from the repositories. - It's not needed anymore.
+
+        _legacyDatabaseFactory.Dispose(); // TODO: Remove this when it's time to remove the old UmbracoDatabase implementation
     }
 
     #region Obsolete
