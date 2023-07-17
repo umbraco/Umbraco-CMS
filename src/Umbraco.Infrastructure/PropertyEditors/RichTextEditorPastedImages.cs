@@ -41,7 +41,7 @@ public sealed class RichTextEditorPastedImages
     private readonly ContentSettings _contentSettings;
     private readonly Dictionary<string, GuidUdi> _uploadedImages = new();
 
-    [Obsolete("Use the ctor which takes an IImageUrlGenerator and IOptions<ContentSettings> instead")]
+    [Obsolete("Use the ctor which takes an IImageUrlGenerator and IOptions<ContentSettings> instead, scheduled for removal in v14")]
     public RichTextEditorPastedImages(
         IUmbracoContextAccessor umbracoContextAccessor,
         ILogger<RichTextEditorPastedImages> logger,
@@ -52,23 +52,19 @@ public sealed class RichTextEditorPastedImages
         MediaUrlGeneratorCollection mediaUrlGenerators,
         IShortStringHelper shortStringHelper,
         IPublishedUrlProvider publishedUrlProvider)
+        : this(
+            umbracoContextAccessor,
+            logger,
+            hostingEnvironment,
+            mediaService,
+            contentTypeBaseServiceProvider,
+            mediaFileManager,
+            mediaUrlGenerators,
+            shortStringHelper,
+            publishedUrlProvider,
+            StaticServiceProvider.Instance.GetRequiredService<IImageUrlGenerator>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>())
     {
-        _umbracoContextAccessor =
-            umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _hostingEnvironment = hostingEnvironment;
-        _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
-        _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider ??
-                                          throw new ArgumentNullException(nameof(contentTypeBaseServiceProvider));
-        _mediaFileManager = mediaFileManager;
-        _mediaUrlGenerators = mediaUrlGenerators;
-        _shortStringHelper = shortStringHelper;
-        _publishedUrlProvider = publishedUrlProvider;
-
-        _tempFolderAbsolutePath = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempImageUploads);
-
-        _imageUrlGenerator = StaticServiceProvider.Instance.GetRequiredService<IImageUrlGenerator>();
-        _contentSettings = StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>().Value;
     }
 
     public RichTextEditorPastedImages(
