@@ -113,7 +113,7 @@ public sealed class RichTextEditorPastedImages
         htmlDoc.LoadHtml(html);
 
         HtmlNodeCollection? imagesWithDataUris = htmlDoc.DocumentNode.SelectNodes("//img");
-        if (imagesWithDataUris == null || imagesWithDataUris.Count == 0)
+        if (imagesWithDataUris is null || imagesWithDataUris.Count is 0)
         {
             return html;
         }
@@ -140,7 +140,7 @@ public sealed class RichTextEditorPastedImages
             Match dataUriInfo = Regex.Match(srcValue, @"^data:\w+\/(?<ext>\w+)[\w\+]*?;(?<encoding>\w+),(?<data>.+)$");
 
             // If it turns up false, it was probably a false-positive and we can't do anything with it
-            if (dataUriInfo.Success == false)
+            if (dataUriInfo.Success is false)
             {
                 continue;
             }
@@ -149,7 +149,7 @@ public sealed class RichTextEditorPastedImages
             var encoding = dataUriInfo.Groups["encoding"].Value.ToLowerInvariant();
             var imageData = dataUriInfo.Groups["data"].Value;
 
-            if (_contentSettings.IsFileAllowedForUpload(ext) == false)
+            if (_contentSettings.IsFileAllowedForUpload(ext) is false)
             {
                 // If the image format is not supported we should probably leave it be
                 // since the user decided to include it.
@@ -168,7 +168,7 @@ public sealed class RichTextEditorPastedImages
                 _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempImageUploads + Path.DirectorySeparatorChar + Guid.NewGuid());
 
             // Ensure image temp path exists
-            if (Directory.Exists(imageTempPath) == false)
+            if (Directory.Exists(imageTempPath) is false)
             {
                 Directory.CreateDirectory(imageTempPath);
             }
@@ -251,7 +251,7 @@ public sealed class RichTextEditorPastedImages
     {
         var absoluteTempImagePath = Path.GetFullPath(qualifiedTmpImgPath);
 
-        if (IsValidPath(absoluteTempImagePath) == false)
+        if (IsValidPath(absoluteTempImagePath) is false)
         {
             return;
         }
@@ -262,7 +262,7 @@ public sealed class RichTextEditorPastedImages
         var mediaItemName = safeFileName.ToFriendlyName();
         GuidUdi udi;
 
-        if (_uploadedImages.ContainsKey(qualifiedTmpImgPath) == false)
+        if (_uploadedImages.ContainsKey(qualifiedTmpImgPath) is false)
         {
             var isSvg = qualifiedTmpImgPath.EndsWith(".svg");
             var mediaType = isSvg
@@ -282,7 +282,7 @@ public sealed class RichTextEditorPastedImages
             var fileInfo = new FileInfo(absoluteTempImagePath);
 
             FileStream? fileStream = fileInfo.OpenReadWithRetry();
-            if (fileStream == null)
+            if (fileStream is null)
             {
                 throw new InvalidOperationException("Could not acquire file stream");
             }
@@ -309,7 +309,7 @@ public sealed class RichTextEditorPastedImages
         // Get the new persisted image URL
         _umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext);
         IPublishedContent? mediaTyped = umbracoContext?.Media?.GetById(udi.Guid);
-        if (mediaTyped == null)
+        if (mediaTyped is null)
         {
             throw new PanicException(
                 $"Could not find media by id {udi.Guid} or there was no UmbracoContext available.");
@@ -337,7 +337,7 @@ public sealed class RichTextEditorPastedImages
         img.Attributes.Remove(TemporaryImageDataAttribute);
 
         // Add to the dictionary to avoid dupes
-        if (_uploadedImages.ContainsKey(qualifiedTmpImgPath) == false)
+        if (_uploadedImages.ContainsKey(qualifiedTmpImgPath) is false)
         {
             _uploadedImages.Add(qualifiedTmpImgPath, udi);
 
