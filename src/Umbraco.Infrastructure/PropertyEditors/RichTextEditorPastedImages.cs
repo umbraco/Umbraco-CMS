@@ -224,7 +224,7 @@ public sealed class RichTextEditorPastedImages
         htmlDoc.LoadHtml(html);
 
         HtmlNodeCollection? tmpImages = htmlDoc.DocumentNode.SelectNodes($"//img[@{TemporaryImageDataAttribute}]");
-        if (tmpImages == null || tmpImages.Count == 0)
+        if (tmpImages is null || tmpImages.Count is 0)
         {
             return html;
         }
@@ -269,15 +269,9 @@ public sealed class RichTextEditorPastedImages
                 ? Constants.Conventions.MediaTypes.VectorGraphicsAlias
                 : Constants.Conventions.MediaTypes.Image;
 
-            IMedia mediaFile;
-            if (mediaParentFolder == Guid.Empty)
-            {
-                mediaFile = _mediaService.CreateMedia(mediaItemName, Constants.System.Root, mediaType, userId);
-            }
-            else
-            {
-                mediaFile = _mediaService.CreateMedia(mediaItemName, mediaParentFolder, mediaType, userId);
-            }
+            IMedia mediaFile = mediaParentFolder == Guid.Empty
+                ? _mediaService.CreateMedia(mediaItemName, Constants.System.Root, mediaType, userId)
+                : _mediaService.CreateMedia(mediaItemName, mediaParentFolder, mediaType, userId);
 
             var fileInfo = new FileInfo(absoluteTempImagePath);
 
