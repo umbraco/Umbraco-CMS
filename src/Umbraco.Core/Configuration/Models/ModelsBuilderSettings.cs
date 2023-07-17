@@ -22,7 +22,7 @@ public class ModelsBuilderSettings
     ///     Gets or sets a value for the models mode.
     /// </summary>
     [DefaultValue(StaticModelsMode)]
-    public ModelsMode ModelsMode { get; set; } = Enum<ModelsMode>.Parse(StaticModelsMode);
+    public ModelsMode ModelsMode { get; set; } = Enum.Parse<ModelsMode>(StaticModelsMode);
 
     /// <summary>
     ///     Gets or sets a value for models namespace.
@@ -52,9 +52,8 @@ public class ModelsBuilderSettings
             return _flagOutOfDateModels;
         }
 
-            set => _flagOutOfDateModels = value;
+        set => _flagOutOfDateModels = value;
     }
-
 
     /// <summary>
     ///     Gets or sets a value for the models directory.
