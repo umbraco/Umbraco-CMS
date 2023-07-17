@@ -57,10 +57,12 @@ export class UmbPartialViewsRepository
 	// TREE:
 
 	async requestTreeRoot() {
+
 		await this.#init;
 
 		const data = {
 			id: null,
+			path: null,
 			type: PARTIAL_VIEW_ROOT_ENTITY_TYPE,
 			name: 'Partial Views',
 			icon: 'umb:folder',
@@ -82,8 +84,10 @@ export class UmbPartialViewsRepository
 	}
 
 	async requestTreeItemsOf(path: string | null) {
-		if (!path) throw new Error('Cannot request tree item with missing path');
-
+		if (path === null) {
+			return this.requestRootTreeItems();
+		}
+		
 		await this.#init;
 
 		const { data, error } = await this.#treeDataSource.getChildrenOf({ path });

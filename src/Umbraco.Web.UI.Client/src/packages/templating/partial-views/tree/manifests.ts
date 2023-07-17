@@ -10,6 +10,7 @@ const tree: ManifestTree = {
 	type: 'tree',
 	alias: PARTIAL_VIEW_TREE_ALIAS,
 	name: 'Partial Views Tree',
+	weight: 30,
 	meta: {
 		repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
 	},
@@ -17,11 +18,11 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'entity',
+	kind: 'fileSystem',
 	alias: 'Umb.TreeItem.PartialViews',
 	name: 'Partial Views Tree Item',
 	conditions: {
-		entityTypes: [PARTIAL_VIEW_ENTITY_TYPE, PARTIAL_VIEW_ROOT_ENTITY_TYPE],
+		entityTypes: [PARTIAL_VIEW_ROOT_ENTITY_TYPE, PARTIAL_VIEW_ENTITY_TYPE],
 	},
 };
 
