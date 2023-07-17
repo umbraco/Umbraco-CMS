@@ -238,6 +238,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .AddWebsite()
                 .AddUmbracoSqlServerSupport()
                 .AddUmbracoSqliteSupport()
+                .AddComposers()
                 .AddTestServices(TestHelper); // This is the important one!
 
             CustomTestSetup(builder);
