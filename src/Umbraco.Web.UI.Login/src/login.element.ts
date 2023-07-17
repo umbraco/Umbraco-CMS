@@ -49,7 +49,7 @@ export default class UmbLoginElement extends LitElement {
 		new UmbAuthMainContext(this.isLegacy);
 		this.#authContext = UmbAuthMainContext.Instance;
 
-		window.addEventListener('pushstate', (e: any) => this.#handleUrlChange(e.detail.url));
+		window.addEventListener('popstate', this.#handleUrlChange);
 
 		// Save a reference to the original `pushState` method
 		const originalPushState = history.pushState;
@@ -60,15 +60,19 @@ export default class UmbLoginElement extends LitElement {
 			//@ts-ignore
 			originalPushState.apply(history, arguments);
 			// Dispatch a custom event
-			window.dispatchEvent(new CustomEvent('pushstate', { detail: { state, title, url } }));
+			window.dispatchEvent(new CustomEvent('popstate', { detail: { state, title, url } }));
 		};
 
-		this.#handleUrlChange(window.location.pathname);
+		this.#setPage(window.location.pathname);
 	}
 
-	#handleUrlChange = (url: any) => {
-		const extractPage = url.replace(/^\/(.*)/, '$1');
-		this.page = this.pages.includes(extractPage) ? extractPage : this.pages[0];
+	#setPage(url: any) {
+		this.page = this.pages.includes(url) ? url : this.pages[0];
+	}
+
+	#handleUrlChange = () => {
+		const extractPage = document.location.pathname.replace(/^\/(.*)/, '$1');
+		this.#setPage(extractPage);
 	};
 
 	#handleSubmit = async (e: SubmitEvent) => {
