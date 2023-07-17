@@ -2,5 +2,6 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations;
 
 public enum EFCoreMigration
 {
-    AddOpenIddict = 0
+    InitialCreate = 0,
+    AddOpenIddict = 1
 }
