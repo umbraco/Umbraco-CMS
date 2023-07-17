@@ -67,7 +67,7 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
             originalGeneratedContract.Remove(key);
             mergedContract.Remove(key);
         }
-
+        Assert.AreEqual(originalGeneratedContract.ToString(Formatting.Indented), mergedContract.ToString(Formatting.Indented), $"Generated API do not respect the contract:{Environment.NewLine}Expected:{Environment.NewLine}{originalGeneratedContract.ToString(Formatting.Indented)}{Environment.NewLine}{Environment.NewLine}Actual:{Environment.NewLine}{mergedContract.ToString(Formatting.Indented)}");
         Assert.AreEqual(originalGeneratedContract.ToString(Formatting.Indented), mergedContract.ToString(Formatting.Indented), $"Generated API do not respect the contract.");
     }
 }

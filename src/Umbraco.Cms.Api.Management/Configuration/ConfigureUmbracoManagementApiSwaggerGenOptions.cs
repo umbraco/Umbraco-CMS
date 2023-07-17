@@ -21,6 +21,7 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
 
     public void Configure(SwaggerGenOptions swaggerGenOptions)
     {
+
         swaggerGenOptions.SwaggerDoc(
             ManagementApiConfiguration.ApiName,
             new OpenApiInfo
@@ -30,14 +31,10 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
                 Description = "This shows all APIs available in this version of Umbraco - including all the legacy apis that are available for backward compatibility",
             });
 
-        swaggerGenOptions.OperationFilter<ResponseHeaderOperationFilter>();
-        swaggerGenOptions.SelectSubTypesUsing(_umbracoJsonTypeInfoResolver.FindSubTypes);
         swaggerGenOptions.UseOneOfForPolymorphism();
         swaggerGenOptions.UseAllOfForInheritance();
-        swaggerGenOptions.TagActionsBy(api => new[] { api.GroupName });
-        swaggerGenOptions.OrderActionsBy(ActionOrderBy);
-
-
+        swaggerGenOptions.OperationFilter<ResponseHeaderOperationFilter>();
+        swaggerGenOptions.SelectSubTypesUsing(_umbracoJsonTypeInfoResolver.FindSubTypes);
 
         swaggerGenOptions.AddSecurityDefinition(
             ManagementApiConfiguration.ApiSecurityName,
@@ -62,6 +59,4 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
         swaggerGenOptions.OperationFilter<BackOfficeSecurityRequirementsOperationFilter>();
     }
 
-    private static string ActionOrderBy(ApiDescription apiDesc)
-        => $"{apiDesc.GroupName}_{apiDesc.ActionDescriptor.AttributeRouteInfo?.Template ?? apiDesc.ActionDescriptor.RouteValues["controller"]}_{apiDesc.ActionDescriptor.RouteValues["action"]}_{apiDesc.HttpMethod}";
 }
