@@ -66,9 +66,9 @@ export default class UmbLoginElement extends LitElement {
 		this.#setPage(window.location.pathname);
 	}
 
-	#setPage(url: any) {
+	#setPage = (url: any) => {
 		this.page = this.pages.includes(url) ? url : this.pages[0];
-	}
+	};
 
 	#handleUrlChange = () => {
 		const extractPage = document.location.pathname.replace(/^\/(.*)/, '$1');

@@ -22,7 +22,7 @@ export default class UmbNewPasswordElement extends LitElement {
 		this.#validateCode();
 	}
 
-	async #validateCode() {
+	#validateCode = async () => {
 		// get url params
 		const urlParams = new URLSearchParams(window.location.search);
 		this.code = urlParams.get('code') || '';
@@ -31,7 +31,7 @@ export default class UmbNewPasswordElement extends LitElement {
 		await new Promise((resolve) => setTimeout(resolve, 2000));
 
 		this.page = 'new';
-	}
+	};
 
 	#handleResetSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
