@@ -58,6 +58,7 @@ public class RawValueProperty : PublishedPropertyBase
     public override object? GetValue(string? culture = null, string? segment = null)
         => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _objectValue.Value : null;
 
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override object? GetXPathValue(string? culture = null, string? segment = null)
         => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _xpathValue.Value : null;
 

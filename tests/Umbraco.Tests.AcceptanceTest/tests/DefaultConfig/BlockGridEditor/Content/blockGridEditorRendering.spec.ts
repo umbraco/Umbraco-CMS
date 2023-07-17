@@ -9,14 +9,14 @@ test.describe('BlockGridEditorRending', () => {
   const blockGridName = 'BlockGridTest';
   const elementTitleName = 'ElementTitle';
   const contentText = "ContentTest";
-  
+
   const documentAlias = 'documentTest';
   const blockGridAlias = 'blockGridTest';
   const elementTitleAlias = "elementTitle";
 
   const elementTitleLabel = 'Title';
   const elementTitleLabelAlias = AliasHelper.toAlias(elementTitleLabel);
-  
+
   test.beforeEach(async ({page, umbracoApi, umbracoUi}, testInfo) => {
     await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
@@ -51,7 +51,7 @@ test.describe('BlockGridEditorRending', () => {
       .build();
     return await umbracoApi.documentTypes.save(element);
   }
-  
+
   async function createDocumentWithTemplateAndDataType(umbracoApi, dataType){
     const docType = new DocumentTypeBuilder()
       .withName(documentName)
@@ -69,14 +69,14 @@ test.describe('BlockGridEditorRending', () => {
       .build();
     return await umbracoApi.documentTypes.save(docType);
   }
-  
+
   async function editDefaultTemplate(umbracoApi){
     await umbracoApi.templates.edit(documentName, '@using Umbraco.Cms.Web.Common.PublishedModels;\n' +
       '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.' + documentName + '>\n' +
       '@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;' + '\n' +
       '@await Html.GetBlockGridHtmlAsync(Model.' + blockGridName + ')');
   }
-  
+
   async function createPartialViewWithArea(umbracoApi, elementAlias, elementLabelAlias){
     const partialViewElementTitle = new PartialViewBuilder()
       .withName(elementAlias)
@@ -91,7 +91,7 @@ test.describe('BlockGridEditorRending', () => {
     partialViewElementTitle.virtualPath = "/Views/Partials/blockgrid/Components/";
     return await umbracoApi.partialViews.save(partialViewElementTitle);
   }
-  
+
   async function createPartialViewWithBlock(umbracoApi,elementAlias, elementLabelAlias){
     const partialViewElementBody = new PartialViewBuilder()
       .withName(elementAlias)
@@ -105,11 +105,11 @@ test.describe('BlockGridEditorRending', () => {
     partialViewElementBody.virtualPath = "/Views/Partials/blockgrid/Components/";
     await umbracoApi.partialViews.save(partialViewElementBody);
   }
-  
+
   test('can render content with a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
     const element = await createElementWithRTE(umbracoApi, elementTitleName, elementTitleAlias, elementTitleLabel, elementTitleLabelAlias);
 
-    const dataType = await umbracoApi.dataTypes.createDefaultBlockGrid(umbracoApi, blockGridName, element);
+    const dataType = await umbracoApi.dataTypes.createDefaultBlockGrid(blockGridName, element);
 
     await createDocumentWithTemplateAndDataType(umbracoApi, dataType);
 
@@ -140,7 +140,7 @@ test.describe('BlockGridEditorRending', () => {
       .withTemplateAlias(documentName)
       .build();
     await umbracoApi.content.save(rootContentNode);
-    
+
     // Assert
     await page.goto(umbracoConfig.environment.baseUrl);
     await expect(page).toHaveScreenshot('Block-grid-editor.png');
@@ -158,7 +158,7 @@ test.describe('BlockGridEditorRending', () => {
 
     const element = await createElementWithRTE(umbracoApi, elementTitleName, elementTitleAlias, elementTitleLabel, elementTitleLabelAlias);
     const elementBody = await createElementWithRTE(umbracoApi, elementBodyName, elementBodyAlias, elementBodyLabel, elementBodyLabelAlias);
-    
+
     const dataTypeBlockGrid = new BlockGridDataTypeBuilder()
       .withName(blockGridName)
       .addBlock()
@@ -179,7 +179,7 @@ test.describe('BlockGridEditorRending', () => {
 
     // Creates partial view for the ElementBody
     await createPartialViewWithBlock(umbracoApi, elementBodyAlias, elementBodyLabelAlias);
-    
+
     const rootContentNode = new ContentBuilder()
       .withContentTypeAlias(documentAlias)
       .withAction(ConstantHelper.actions.publish)
@@ -210,12 +210,12 @@ test.describe('BlockGridEditorRending', () => {
       .withTemplateAlias(documentName)
       .build();
     await umbracoApi.content.save(rootContentNode);
-    
+
     // Assert
     await page.goto(umbracoConfig.environment.baseUrl);
     await expect(page).toHaveScreenshot('Block-grid-editor-with-two-elements.png');
 
-    // Clean 
+    // Clean
     await umbracoApi.documentTypes.ensureNameNotExists(elementBodyName);
     await umbracoApi.partialViews.ensureNameNotExists('blockgrid/Components', elementBodyAlias + '.cshtml');
   });
@@ -257,7 +257,7 @@ test.describe('BlockGridEditorRending', () => {
 
       // Creates partial view for the ElementBody
       await createPartialViewWithBlock(umbracoApi, elementBodyAlias, elementBodyLabelAlias);
-      
+
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
         .withAction(ConstantHelper.actions.publish)
@@ -291,12 +291,12 @@ test.describe('BlockGridEditorRending', () => {
         .withTemplateAlias(documentName)
         .build();
       await umbracoApi.content.save(rootContentNode);
-      
+
       // Assert
       await page.goto(umbracoConfig.environment.baseUrl);
       await expect(page).toHaveScreenshot('Block-grid-editor-with-area.png');
-      
-      // Clean 
+
+      // Clean
       await umbracoApi.documentTypes.ensureNameNotExists(elementBodyName);
       await umbracoApi.partialViews.ensureNameNotExists('blockgrid/Components', elementBodyAlias + '.cshtml');
     })
@@ -392,7 +392,7 @@ test.describe('BlockGridEditorRending', () => {
         .withTemplateAlias(documentName)
         .build();
       await umbracoApi.content.save(rootContentNode);
-      
+
       // Assert
       await page.goto(umbracoConfig.environment.baseUrl);
       await expect(page).toHaveScreenshot('Block-grid-editor-with-multiple-areas.png');
@@ -433,7 +433,7 @@ test.describe('BlockGridEditorRending', () => {
           .done()
         .done()
         .addBlock()
-          .withContentElementTypeKey(elementBody['key'])  
+          .withContentElementTypeKey(elementBody['key'])
           .addArea()
             .withAlias('bodyArea')
           .done()
@@ -551,7 +551,7 @@ test.describe('BlockGridEditorRending', () => {
         .build();
       partialViewElement.virtualPath = "/Views/Partials/blockgrid/Components/";
       await umbracoApi.partialViews.save(partialViewElement);
-      
+
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
         .withAction(ConstantHelper.actions.publish)
@@ -595,7 +595,7 @@ test.describe('BlockGridEditorRending', () => {
       // ElementBody
       const elementBodyName = "ElementBody";
       const elementBodyAlias = AliasHelper.toAlias(elementBodyName);
-      
+
       await umbracoApi.documentTypes.ensureNameNotExists(elementBodyName);
       await umbracoApi.media.ensureNameNotExists(stylesheetTitleName);
       await umbracoApi.media.ensureNameNotExists(stylesheetBodyName);
@@ -695,7 +695,7 @@ test.describe('BlockGridEditorRending', () => {
       // Assert
       await page.goto(umbracoConfig.environment.baseUrl);
       await expect(page).toHaveScreenshot('Block-grid-editor-with-two-custom-stylesheets.png');
-      
+
       // Clean
       await umbracoApi.documentTypes.ensureNameNotExists(elementBodyName);
       await umbracoApi.media.ensureNameNotExists(stylesheetTitleName);
@@ -703,7 +703,7 @@ test.describe('BlockGridEditorRending', () => {
       await umbracoApi.partialViews.ensureNameNotExists('blockgrid/Components', elementBodyAlias + '.cshtml');
     });
   });
-  
+
   test.describe('Image', () => {
     test('can render a block grid with an image', async ({page, umbracoApi, umbracoUi}) => {
       // Image
@@ -714,9 +714,9 @@ test.describe('BlockGridEditorRending', () => {
       const imageMimeType = "image/png";
 
       await umbracoApi.media.ensureNameNotExists(imageName);
-      
+
       const imageData = await umbracoApi.media.createImageWithFile(imageName, umbracoFileValue, imageFileName, imagePath, imageMimeType);
-      
+
       const element = new DocumentTypeBuilder()
         .withName(elementTitleName)
         .withAlias(elementTitleAlias)
@@ -756,7 +756,7 @@ test.describe('BlockGridEditorRending', () => {
         .build();
       partialViewImage.virtualPath = "/Views/Partials/blockgrid/Components/";
       await umbracoApi.partialViews.save(partialViewImage);
-      
+
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
         .withAction(ConstantHelper.actions.publish)
@@ -771,7 +771,7 @@ test.describe('BlockGridEditorRending', () => {
                 .addImage()
                   .withMediaKey(imageData.key)
                 .done()
-              .done() 
+              .done()
               .addLayout()
                 .withContentUdi(element['key'])
               .done()
@@ -780,12 +780,12 @@ test.describe('BlockGridEditorRending', () => {
         .done()
         .build();
       await umbracoApi.content.save(rootContentNode);
-      
+
       // Assert
       await page.goto(umbracoConfig.environment.baseUrl);
       await expect(page).toHaveScreenshot('Block-grid-editor-with-image.png');
-      
-      // Clean 
+
+      // Clean
       await umbracoApi.media.ensureNameNotExists(imageName);
     });
   });
