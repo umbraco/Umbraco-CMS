@@ -33,6 +33,7 @@ export default class UmbResetPasswordElement extends LitElement {
 		return html`
 			<uui-form>
 				<form id="LoginForm" name="login" @submit="${this.#handleResetSubmit}">
+					<h2>Reset password</h2>
 					Enter the email address associated with your account and we'll send you a link to reset your password.
 					<uui-form-layout-item>
 						<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>

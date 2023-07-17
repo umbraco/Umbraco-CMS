@@ -9,10 +9,11 @@ import { UmbAuthMainContext } from './context/auth-main.context.js';
 
 import './auth-layout.element.js';
 import './reset-password.element.js';
+import './new-password.element.js';
 
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {
-	#authContext: IUmbAuthContext;
+	#authContext!: IUmbAuthContext;
 	#returnUrl = '';
 
 	pages = ['login', 'reset', 'new'] as const;
@@ -131,11 +132,11 @@ export default class UmbLoginElement extends LitElement {
 				return this.#renderLoginPage();
 
 			case 'reset':
-				return this.#renderResetPage();
+				return html`<umb-reset-password></umb-reset-password>`;
+
+			case 'new':
+				return html`<umb-new-password></umb-new-password>`;
 		}
-	}
-	#renderResetPage() {
-		return html`<umb-reset-password></umb-reset-password>`;
 	}
 	#renderLoginPage() {
 		return html`
