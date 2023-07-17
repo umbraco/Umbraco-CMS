@@ -17408,6 +17408,9 @@
                   "$ref": "#/components/schemas/ContentTreeItemResponseModel"
                 },
                 {
+                  "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
+                },
+                {
                   "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
                 },
                 {
@@ -17424,9 +17427,6 @@
                 },
                 {
                   "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
-                },
-                {
-                  "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
                 }
               ]
             }
