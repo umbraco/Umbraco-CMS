@@ -12,6 +12,27 @@ export default class UmbNewPasswordElement extends LitElement {
 	@state()
 	newCallState: UUIButtonState = undefined;
 
+	@state()
+	private page: (typeof this.pages)[number] = 'validate';
+	pages = ['validate', 'new', 'done', 'error'] as const;
+
+	connectedCallback(): void {
+		super.connectedCallback();
+
+		this.#validateCode();
+	}
+
+	async #validateCode() {
+		// get url params
+		const urlParams = new URLSearchParams(window.location.search);
+		this.code = urlParams.get('code') || '';
+
+		//DEBUG wait 2 seconds
+		await new Promise((resolve) => setTimeout(resolve, 2000));
+
+		this.page = 'new';
+	}
+
 	#handleResetSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
 		const form = e.target as HTMLFormElement;
@@ -32,7 +53,7 @@ export default class UmbNewPasswordElement extends LitElement {
 		// }
 	};
 
-	#renderResetPage() {
+	#renderNewPasswordPage() {
 		return html`
 			<uui-form>
 				<form id="LoginForm" name="login" @submit="${this.#handleResetSubmit}">
@@ -73,15 +94,36 @@ export default class UmbNewPasswordElement extends LitElement {
 		`;
 	}
 
-	#renderConfirmationPage() {
+	#renderValidatePage() {
 		return html`
-			Information about the reset has been sent to your email address. Please follow the instructions in the email to
-			reset your password.
+			Checking reset code...
+			<uui-loader-circle></uui-loader-circle>
 		`;
 	}
 
+	#renderConfirmationPage() {
+		return html` PASSWORD SUCCESSFULLY CHANGED PAGE `;
+	}
+
+	#renderErrorPage() {
+		return html` ERROR PAGE `;
+	}
+
+	#renderRoute() {
+		switch (this.page) {
+			case 'validate':
+				return this.#renderValidatePage();
+			case 'new':
+				return this.#renderNewPasswordPage();
+			case 'done':
+				return this.#renderConfirmationPage();
+			case 'error':
+				return this.#renderErrorPage();
+		}
+	}
+
 	render() {
-		return this.newCallState === 'success' ? this.#renderConfirmationPage() : this.#renderResetPage();
+		return this.#renderRoute();
 	}
 
 	static styles: CSSResultGroup = [
