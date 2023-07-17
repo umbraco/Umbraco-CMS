@@ -36,14 +36,14 @@ public class DictionaryTranslation : EntityBase, IDictionaryTranslation
         Key = uniqueId;
     }
 
-    [Obsolete("Please use constructor that accepts ILanguage. This will be removed in V13.")]
+    [Obsolete("Please use constructor that accepts ILanguage. This will be removed in V14.")]
     public DictionaryTranslation(int languageId, string value)
     {
         LanguageId = languageId;
         _value = value;
     }
 
-    [Obsolete("Please use constructor that accepts ILanguage. This will be removed in V13.")]
+    [Obsolete("Please use constructor that accepts ILanguage. This will be removed in V14.")]
     public DictionaryTranslation(int languageId, string value, Guid uniqueId)
     {
         LanguageId = languageId;
@@ -64,7 +64,7 @@ public class DictionaryTranslation : EntityBase, IDictionaryTranslation
     ///     returned
     ///     on a callback.
     /// </remarks>
-    [Obsolete("This will be removed in V13. From V13 onwards you should get languages by ISO code from ILanguageService.")]
+    [Obsolete("This will be removed in V14. From V14 onwards you should get languages by ISO code from ILanguageService.")]
     [DataMember]
     [DoNotClone]
     public ILanguage? Language
@@ -110,7 +110,7 @@ public class DictionaryTranslation : EntityBase, IDictionaryTranslation
     {
         get
         {
-            // TODO: this won't be necessary after obsoleted ctors are removed in v13.
+            // TODO: this won't be necessary after obsoleted ctors are removed in v14.
             if (_languageIsoCode is null)
             {
                 var _languageService = StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>();
