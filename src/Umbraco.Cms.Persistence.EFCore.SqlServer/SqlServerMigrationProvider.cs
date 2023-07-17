@@ -30,6 +30,7 @@ public class SqlServerMigrationProvider : IMigrationProvider
         {
             EFCoreMigration.InitialCreate => typeof(Migrations.InitialCreate),
             EFCoreMigration.AddOpenIddict => typeof(Migrations.AddOpenIddict),
+            EFCoreMigration.MoveModelsToInfrastructure => typeof(Migrations.MoveModelsToInfrastructure),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }

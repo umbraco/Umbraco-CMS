@@ -82,5 +82,6 @@ public class UmbracoPlan : MigrationPlan
         To<V_12_1_0.TablesIndexesImprovement>("{1187192D-EDB5-4619-955D-91D48D738871}");
         To<V_12_1_0.InitialCreate>("{92DFCC68-A1FD-4732-B6C0-52F58BF5DB3A}");
         To<V_12_1_0.AddOpenIddict>("{47DE85CE-1E16-42A0-8AF6-3EC3BCEF5471}");
+        To<V_12_1_0.MoveModelsToInfrastructure>("{5A238BFE-2602-4004-9D1E-AB149359678C}");
     }
 }
