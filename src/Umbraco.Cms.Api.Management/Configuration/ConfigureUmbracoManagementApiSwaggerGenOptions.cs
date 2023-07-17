@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -31,8 +32,12 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
 
         swaggerGenOptions.OperationFilter<ResponseHeaderOperationFilter>();
         swaggerGenOptions.SelectSubTypesUsing(_umbracoJsonTypeInfoResolver.FindSubTypes);
-        // swaggerGenOptions.UseOneOfForPolymorphism();
-        // swaggerGenOptions.UseAllOfForInheritance();
+        swaggerGenOptions.UseOneOfForPolymorphism();
+        swaggerGenOptions.UseAllOfForInheritance();
+        swaggerGenOptions.TagActionsBy(api => new[] { api.GroupName });
+        swaggerGenOptions.OrderActionsBy(ActionOrderBy);
+
+
 
         swaggerGenOptions.AddSecurityDefinition(
             ManagementApiConfiguration.ApiSecurityName,
@@ -56,4 +61,7 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
         // Sets Security requirement on backoffice apis
         swaggerGenOptions.OperationFilter<BackOfficeSecurityRequirementsOperationFilter>();
     }
+
+    private static string ActionOrderBy(ApiDescription apiDesc)
+        => $"{apiDesc.GroupName}_{apiDesc.ActionDescriptor.AttributeRouteInfo?.Template ?? apiDesc.ActionDescriptor.RouteValues["controller"]}_{apiDesc.ActionDescriptor.RouteValues["action"]}_{apiDesc.HttpMethod}";
 }
