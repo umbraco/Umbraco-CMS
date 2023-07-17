@@ -15,7 +15,7 @@ export default class UmbLoginElement extends LitElement {
 	#authContext: IUmbAuthContext;
 	#returnUrl = '';
 
-	pages = ['login', 'reset'] as const;
+	pages = ['login', 'reset', 'new'] as const;
 
 	@state()
 	private page: (typeof this.pages)[number] = 'login';
@@ -31,13 +31,7 @@ export default class UmbLoginElement extends LitElement {
 	}
 
 	@property({ type: Boolean, attribute: 'is-legacy' })
-	set isLegacy(value: boolean) {
-		if (value) {
-			// this.#authContext = new UmbAuthLegacyContext();
-		} else {
-			// this.#authContext = new UmbAuthContext();
-		}
-	}
+	isLegacy = false;
 
 	@property({ type: Boolean, attribute: 'allow-password-reset' })
 	allowPasswordReset = true;
@@ -48,9 +42,10 @@ export default class UmbLoginElement extends LitElement {
 	@state()
 	private _loginError = '';
 
-	constructor() {
-		super();
-		new UmbAuthMainContext(true);
+	connectedCallback(): void {
+		super.connectedCallback();
+
+		new UmbAuthMainContext(this.isLegacy);
 		this.#authContext = UmbAuthMainContext.Instance;
 
 		window.addEventListener('pushstate', this.#handleUrlChange);
@@ -63,7 +58,6 @@ export default class UmbLoginElement extends LitElement {
 			// Call the original `pushState` method
 			//@ts-ignore
 			originalPushState.apply(history, arguments);
-
 			// Dispatch a custom event
 			window.dispatchEvent(new CustomEvent('pushstate', { detail: { state, title, url } }));
 		};
@@ -72,8 +66,6 @@ export default class UmbLoginElement extends LitElement {
 	#handleUrlChange = (event: any) => {
 		const extractPage = event.detail.url.replace(/^\/(.*)/, '$1');
 		this.page = this.pages.includes(extractPage) ? extractPage : this.pages[0];
-
-		console.log('url changed', event.detail.url, this.page);
 	};
 
 	#handleSubmit = async (e: SubmitEvent) => {
