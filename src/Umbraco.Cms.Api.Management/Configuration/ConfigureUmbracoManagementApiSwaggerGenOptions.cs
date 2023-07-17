@@ -31,14 +31,14 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
                 Description = "This shows all APIs available in this version of Umbraco - including all the legacy apis that are available for backward compatibility",
             });
 
-        swaggerGenOptions.UseOneOfForPolymorphism();
-        swaggerGenOptions.UseAllOfForInheritance();
         swaggerGenOptions.OperationFilter<ResponseHeaderOperationFilter>();
         swaggerGenOptions.SelectSubTypesUsing(_umbracoJsonTypeInfoResolver.FindSubTypes);
+        swaggerGenOptions.UseOneOfForPolymorphism();
+        swaggerGenOptions.UseAllOfForInheritance();
 
         swaggerGenOptions.AddSecurityDefinition(
             ManagementApiConfiguration.ApiSecurityName,
-             new OpenApiSecurityScheme
+            new OpenApiSecurityScheme
              {
                  In = ParameterLocation.Header,
                  Name = "Umbraco",
