@@ -117,11 +117,17 @@ export default class UmbLoginElement extends LitElement {
 
 	render() {
 		return html`
-			<select
-				style="font-size: 20px; position: absolute; left: 50%; top: 100px; z-index: 1"
-				@change=${(e: any) => history.pushState({}, '', e.target.value)}>
-				${this.pages.map((page) => html`<option value="${page}" ?selected="${this.page === page}">${page}</option>`)}
-			</select>
+			<div
+				style="background: white; padding: 16px; position: absolute; left: 50%; top: 100px; z-index: 1; transform: translateX(-50%);">
+				<label for="page">DEBUG set page</label>
+				<select
+					style="padding: 6px; font-size: 20px;"
+					id="page"
+					name="page"
+					@change=${(e: any) => history.pushState({}, '', e.target.value)}>
+					${this.pages.map((page) => html`<option value="${page}" ?selected="${this.page === page}">${page}</option>`)}
+				</select>
+			</div>
 			<umb-auth-layout>${this.#renderRoute()}</umb-auth-layout>
 		`;
 	}
