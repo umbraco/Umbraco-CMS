@@ -4,11 +4,14 @@ import { UmbPartialViewsTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } f
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
+import { EntityTreeItemResponseModel, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbTreeRootEntityModel } from '@umbraco-cms/backoffice/tree';
+import { PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../config.js';
 
-export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailRepository<any> {
+export class UmbPartialViewsRepository
+	implements UmbTreeRepository<EntityTreeItemResponseModel>, UmbDetailRepository<any>
+{
 	#init;
 	#host: UmbControllerHostElement;
 
@@ -28,11 +31,6 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 				this.#treeStore = instance;
 			}),
 		]);
-	}
-
-	requestTreeRoot(): Promise<{ data?: UmbTreeRootEntityModel | undefined; error?: ProblemDetails | undefined }> {
-		//throw new Error('Method not implemented.');
-		return { data: undefined, error: undefined } as any;
 	}
 
 	requestItemsLegacy?:
@@ -57,6 +55,19 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 	}
 
 	// TREE:
+
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+			name: 'Partial Views',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+		return { data };
+	}
 
 	async requestRootTreeItems() {
 		await this.#init;

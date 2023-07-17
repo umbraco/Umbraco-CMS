@@ -1,4 +1,9 @@
-import { PARTIAL_VIEW_ENTITY_TYPE, PARTIAL_VIEW_REPOSITORY_ALIAS, PARTIAL_VIEW_TREE_ALIAS } from '../config.js';
+import {
+	PARTIAL_VIEW_ENTITY_TYPE,
+	PARTIAL_VIEW_REPOSITORY_ALIAS,
+	PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+	PARTIAL_VIEW_TREE_ALIAS,
+} from '../config.js';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 
 const tree: ManifestTree = {
@@ -12,11 +17,11 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'fileSystem',
+	kind: 'entity',
 	alias: 'Umb.TreeItem.PartialViews',
 	name: 'Partial Views Tree Item',
 	conditions: {
-		entityTypes: [PARTIAL_VIEW_ENTITY_TYPE],
+		entityTypes: [PARTIAL_VIEW_ENTITY_TYPE, PARTIAL_VIEW_ROOT_ENTITY_TYPE],
 	},
 };
 
