@@ -571,7 +571,7 @@ public class LocksTests : UmbracoIntegrationTest
     {
         using (var scope = ScopeProvider.CreateScope())
         {
-            var realDb = (Database)ScopeAccessor.AmbientScope.Database;
+            var realDb = (Database)((Cms.Persistence.EFCore.Databases.UmbracoDatabase)ScopeAccessor.AmbientScope.Database).LegacyUmbracoDatabase; // Warning this is testing implementation details for the old NPOCO database
             realDb.CommandTimeout = 1000;
 
             Console.WriteLine("Write lock A");
