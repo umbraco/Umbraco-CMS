@@ -15,8 +15,10 @@ export default class UmbLoginElement extends LitElement {
 	#authContext: IUmbAuthContext;
 	#returnUrl = '';
 
+	pages = ['login', 'reset'] as const;
+
 	@state()
-	private page: 'login' | 'reset' = 'login';
+	private page: (typeof this.pages)[number] = 'login';
 
 	@property({ type: String, attribute: 'return-url' })
 	set returnUrl(value: string) {
@@ -50,7 +52,29 @@ export default class UmbLoginElement extends LitElement {
 		super();
 		new UmbAuthMainContext(true);
 		this.#authContext = UmbAuthMainContext.Instance;
+
+		window.addEventListener('pushstate', this.#handleUrlChange);
+
+		// Save a reference to the original `pushState` method
+		const originalPushState = history.pushState;
+
+		// Override `pushState` with a custom implementation
+		history.pushState = function (state, title, url) {
+			// Call the original `pushState` method
+			//@ts-ignore
+			originalPushState.apply(history, arguments);
+
+			// Dispatch a custom event
+			window.dispatchEvent(new CustomEvent('pushstate', { detail: { state, title, url } }));
+		};
 	}
+
+	#handleUrlChange = (event: any) => {
+		const extractPage = event.detail.url.replace(/^\/(.*)/, '$1');
+		this.page = this.pages.includes(extractPage) ? extractPage : this.pages[0];
+
+		console.log('url changed', event.detail.url, this.page);
+	};
 
 	#handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
@@ -100,8 +124,23 @@ export default class UmbLoginElement extends LitElement {
 
 	render() {
 		return html`
-			<umb-auth-layout> ${this.page === 'login' ? this.#renderLoginPage() : this.#renderResetPage()} </umb-auth-layout>
+			<select
+				style="font-size: 20px; position: absolute; left: 50%; top: 100px; z-index: 1"
+				@change=${(e: any) => history.pushState({}, '', e.target.value)}>
+				${this.pages.map((page) => html`<option value="${page}" ?selected="${this.page === page}">${page}</option>`)}
+			</select>
+			<umb-auth-layout>${this.#renderRoute()}</umb-auth-layout>
 		`;
+	}
+
+	#renderRoute() {
+		switch (this.page) {
+			case 'login':
+				return this.#renderLoginPage();
+
+			case 'reset':
+				return this.#renderResetPage();
+		}
 	}
 	#renderResetPage() {
 		return html`<umb-reset-password></umb-reset-password>`;
