@@ -51,6 +51,14 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 .WithTitle("Parent not found")
                 .WithDetail("The specified parent was not found")
                 .Build()),
+            ContentTypeOperationStatus.CompositionTypeNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("Composition type not found")
+                .WithDetail("One or more types specified for composition was not found.")
+                .Build()),
+            ContentTypeOperationStatus.DuplicatePropertyTypeAlias => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Duplicate property type alias")
+                .WithDetail("The property type alias is already in use, all property type aliases must be unique.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content type operation status"),
         };
 }

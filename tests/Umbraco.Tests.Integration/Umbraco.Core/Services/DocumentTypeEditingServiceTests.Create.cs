@@ -353,6 +353,57 @@ public partial class DocumentTypeEditingServiceTests
             Assert.IsFalse(result.Success);
             Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
         });
+    }
 
+    [Test]
+    public async Task Cannot_Specify_Duplicate_PropertyType_Alias_From_Compositions()
+    {
+        var propertyTypeAlias = "testproperty";
+        var compositionPropertyType = CreatePropertyType("Test Property", propertyTypeAlias);
+        var compositionBase = CreateCreateModel(
+            name: "CompositionBase",
+            propertyTypes: new[] { compositionPropertyType });
+
+        var compositionBaseResult = await DocumentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
+        Assert.IsTrue(compositionBaseResult.Success);
+
+        var createModel = CreateCreateModel(
+            compositions: new[]
+            {
+                new ContentTypeComposition
+                {
+                    CompositionType = ContentTypeCompositionType.Composition, Key = compositionBaseResult.Result!.Key
+                },
+            },
+            propertyTypes: new[]
+            {
+                CreatePropertyType("Test Property", propertyTypeAlias)
+            });
+        var result = await DocumentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentTypeOperationStatus.DuplicatePropertyTypeAlias, result.Status);
+        });
+    }
+
+    [Test]
+    public async Task Cannot_Specify_Non_Existent_DocType_As_Composition()
+    {
+        var createModel = CreateCreateModel(
+            compositions: new[]
+            {
+                new ContentTypeComposition
+                {
+                    CompositionType = ContentTypeCompositionType.Composition, Key = Guid.NewGuid()
+                },
+            });
+
+        var result = await DocumentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentTypeOperationStatus.CompositionTypeNotFound, result.Status);
+        });
     }
 }

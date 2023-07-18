@@ -103,6 +103,25 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
                 .Where(x => x.Allowed)
                 .Select(x => x.Composition.Key);
 
+        // Both inheritance and compositions.
+        Guid[] allCompositionKeys = inheritedCompositions.Select(x => x.Key).Union(compositionKeys).ToArray();
+        IContentTypeComposition[] allCompositionTypes = allContentTypes.Where(x => allCompositionKeys.Contains(x.Key)).ToArray();
+
+        if (allCompositionKeys.Length != allCompositionTypes.Length)
+        {
+            // We must be missing one.
+            return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.CompositionTypeNotFound, null);
+        }
+
+        var allPropertyTypeAliases = allCompositionTypes.SelectMany(x => x.CompositionPropertyTypes).Select(x => x.Alias).ToList();
+        // Add all the aliases we're going to try to add as well.
+        allPropertyTypeAliases.AddRange(model.Properties.Select(x => x.Alias));
+        IEnumerable<string> allPropertyTypeAliasesDistinct = allPropertyTypeAliases.Distinct();
+        if (allPropertyTypeAliases.Count != allPropertyTypeAliasesDistinct.Count())
+        {
+            // If our list shrank when doing distinct there was duplicates.
+            return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.DuplicatePropertyTypeAlias, null);
+        }
 
         // We only care about the keys used for composition.
         if (compositionKeys
