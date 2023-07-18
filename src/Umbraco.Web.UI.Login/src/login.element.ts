@@ -4,7 +4,6 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 
 import type { UUIButtonState } from '@umbraco-ui/uui';
-import type { IUmbAuthContext } from './types.js';
 import { UmbAuthMainContext } from './context/auth-main.context.js';
 
 import './auth-layout.element.js';
@@ -13,29 +12,7 @@ import './new-password.element.js';
 
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {
-	#authContext!: IUmbAuthContext;
-	#returnUrl = '';
-
-	pages = ['login', 'reset', 'new'] as const;
-
-	@state()
-	private page: (typeof this.pages)[number] = 'login';
-
-	@property({ type: String, attribute: 'return-url' })
-	set returnUrl(value: string) {
-		this.#returnUrl = value;
-	}
-
-	get returnUrl() {
-		// Check if there is a ?redir querystring or else return the returnUrl attribute
-		return new URLSearchParams(window.location.search).get('redir') || this.#returnUrl;
-	}
-
-	@property({ type: Boolean, attribute: 'is-legacy' })
-	isLegacy = false;
-
-	@property({ type: Boolean, attribute: 'allow-password-reset' })
-	allowPasswordReset = true;
+	#authContext = UmbAuthMainContext.Instance;
 
 	@state()
 	private _loginState: UUIButtonState = undefined;
@@ -43,37 +20,11 @@ export default class UmbLoginElement extends LitElement {
 	@state()
 	private _loginError = '';
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	@state()
+	private _returnURL = ''; // GET FROM CONTEXT
 
-		new UmbAuthMainContext(this.isLegacy);
-		this.#authContext = UmbAuthMainContext.Instance;
-
-		window.addEventListener('popstate', this.#handleUrlChange);
-
-		// Save a reference to the original `pushState` method
-		const originalPushState = history.pushState;
-
-		// Override `pushState` with a custom implementation
-		history.pushState = function (state, title, url) {
-			// Call the original `pushState` method
-			//@ts-ignore
-			originalPushState.apply(history, arguments);
-			// Dispatch a custom event
-			window.dispatchEvent(new CustomEvent('popstate', { detail: { state, title, url } }));
-		};
-
-		this.#setPage(window.location.pathname);
-	}
-
-	#setPage = (url: any) => {
-		this.page = this.pages.includes(url) ? url : this.pages[0];
-	};
-
-	#handleUrlChange = () => {
-		const extractPage = document.location.pathname.replace(/^\/(.*)/, '$1');
-		this.#setPage(extractPage);
-	};
+	@state()
+	private _allowPasswordReset = true; // GET FROM CONTEXT
 
 	#handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
@@ -102,8 +53,8 @@ export default class UmbLoginElement extends LitElement {
 
 		if (response.error) return;
 
-		if (this.returnUrl) {
-			location.href = this.returnUrl;
+		if (this._returnURL) {
+			location.href = this._returnURL;
 		}
 
 		this.dispatchEvent(new CustomEvent('login-success', { bubbles: true, composed: true }));
@@ -122,35 +73,6 @@ export default class UmbLoginElement extends LitElement {
 	}
 
 	render() {
-		return html`
-			<div
-				style="background: white; padding: 16px; position: absolute; left: 50%; top: 100px; z-index: 1; transform: translateX(-50%);">
-				<label for="page">DEBUG set page</label>
-				<select
-					style="padding: 6px; font-size: 20px;"
-					id="page"
-					name="page"
-					@change=${(e: any) => history.pushState({}, '', e.target.value)}>
-					${this.pages.map((page) => html`<option value="${page}" ?selected="${this.page === page}">${page}</option>`)}
-				</select>
-			</div>
-			<umb-auth-layout>${this.#renderRoute()}</umb-auth-layout>
-		`;
-	}
-
-	#renderRoute() {
-		switch (this.page) {
-			case 'login':
-				return this.#renderLoginPage();
-
-			case 'reset':
-				return html`<umb-reset-password></umb-reset-password>`;
-
-			case 'new':
-				return html`<umb-new-password></umb-new-password>`;
-		}
-	}
-	#renderLoginPage() {
 		return html`
 			<div class="uui-text">
 				<h1 class="uui-h3">${this.#greeting}</h1>
@@ -184,16 +106,7 @@ export default class UmbLoginElement extends LitElement {
 									<uui-checkbox name="persist" label="Remember me">Remember me</uui-checkbox>
 								</uui-form-layout-item>`
 							)}
-							<!-- TODO: Should this be a link instead? -->
-							${when(
-								this.allowPasswordReset,
-								() =>
-									html`
-										<uui-button style="height: min-content" @click=${() => (this.page = 'reset')}>
-											Forgot password?
-										</uui-button>
-									`
-							)}
+							${when(this._allowPasswordReset, () => html`<a href="/reset"> Forgot password? </a>`)}
 						</div>
 
 						<uui-form-layout-item>${this.#renderErrorMessage()}</uui-form-layout-item>
