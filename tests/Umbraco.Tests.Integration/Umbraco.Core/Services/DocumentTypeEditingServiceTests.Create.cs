@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -204,6 +205,122 @@ public partial class DocumentTypeEditingServiceTests
             Assert.IsFalse(invalidAttempt.Success);
             Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, invalidAttempt.Status);
             Assert.IsNull(invalidAttempt.Result);
+        });
+    }
+
+    [Test]
+    public async Task Can_Create_Child_Document_Type()
+    {
+
+        var parentProperty = CreatePropertyType("Parent Property", "parentProperty");
+        var parentModel = CreateCreateModel(
+            name: "Parent",
+            propertyTypes: new[] { parentProperty });
+
+        var parentResult = await DocumentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(parentResult.Success);
+
+        var childProperty = CreatePropertyType("Child Property", "childProperty");
+        var parentKey = parentResult.Result!.Key;
+        ContentTypeComposition[] composition =
+        {
+            new()
+            {
+                CompositionType = ContentTypeCompositionType.Inheritance, Key = parentKey,
+            },
+        };
+
+        var childModel = CreateCreateModel(
+            name: "Child",
+            propertyTypes: new[] { childProperty },
+            compositions: composition,
+            parentKey: parentKey);
+
+        var result = await DocumentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+
+        Assert.Multiple(() =>
+        {
+            var documentType = result.Result!;
+            Assert.AreEqual(parentResult.Result.Id, documentType.ParentId);
+            Assert.AreEqual(1, documentType.ContentTypeComposition.Count());
+            Assert.AreEqual(parentResult.Result.Key, documentType.ContentTypeComposition.FirstOrDefault()?.Key);
+            Assert.AreEqual(2, documentType.CompositionPropertyTypes.Count());
+            Assert.IsTrue(documentType.CompositionPropertyTypes.Any(x => x.Alias == parentProperty.Alias));
+            Assert.IsTrue(documentType.CompositionPropertyTypes.Any(x => x.Alias == childProperty.Alias));
+        });
+    }
+
+    // Unlike compositions, it is allowed to inherit on multiple levels
+    [Test]
+    public async Task Can_Create_Grandchild_DocumentType()
+    {
+        var rootProperty = CreatePropertyType("Root property");
+        var rootModel = CreateCreateModel(
+            name: "Root",
+            propertyTypes: new[] { rootProperty });
+
+        var rootResult = await DocumentTypeEditingService.CreateAsync(rootModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(rootResult.Success);
+
+        var childProperty = CreatePropertyType("Child Property", "childProperty");
+        var rootKey = rootResult.Result!.Key;
+        ContentTypeComposition[] composition =
+        {
+            new()
+            {
+                CompositionType = ContentTypeCompositionType.Inheritance, Key = rootKey,
+            },
+        };
+
+        var childModel = CreateCreateModel(
+            name: "Child",
+            propertyTypes: new[] { childProperty },
+            compositions: composition,
+            parentKey: rootKey);
+
+        var childResult = await DocumentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(childResult.Success);
+
+        var grandchildProperty = CreatePropertyType("Grandchild Property", "grandchildProperty");
+        var childKey = childResult.Result!.Key;
+        ContentTypeComposition[] grandchildComposition =
+        {
+            new()
+            {
+                CompositionType = ContentTypeCompositionType.Inheritance, Key = childKey,
+            },
+        };
+
+        var grandchildModel = CreateCreateModel(
+            name: "Grandchild",
+            propertyTypes: new[] { grandchildProperty },
+            compositions: grandchildComposition,
+            parentKey: childKey);
+
+        var grandchildResult = await DocumentTypeEditingService.CreateAsync(grandchildModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(grandchildResult.Success);
+
+        var root = rootResult.Result!;
+        var child = childResult.Result!;
+        IContentType grandchild = grandchildResult.Result!;
+        Assert.Multiple(() =>
+        {
+            // Write asserts for this test
+            Assert.AreEqual(-1, root.ParentId);
+            Assert.AreEqual(root.Id, child.ParentId);
+            Assert.AreEqual(child.Id, grandchild.ParentId);
+
+            // We only have the immediate parent as a composition
+            Assert.AreEqual(1, grandchild.ContentTypeComposition.Count());
+            Assert.AreEqual(child.Key, grandchild.ContentTypeComposition.FirstOrDefault()?.Key);
+
+            // But all the property types are there since we crawl up the chain in CompositionPropertyTypes
+            Assert.AreEqual(3, grandchild.CompositionPropertyTypes.Count());
+            Assert.IsTrue(grandchild.CompositionPropertyTypes.Any(x => x.Alias == rootProperty.Alias));
+            Assert.IsTrue(grandchild.CompositionPropertyTypes.Any(x => x.Alias == childProperty.Alias));
+            Assert.IsTrue(grandchild.CompositionPropertyTypes.Any(x => x.Alias == grandchildProperty.Alias));
         });
     }
 }

@@ -83,6 +83,30 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
             return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidInheritance, null);
         }
 
+        // Validate that the all the compositions are allowed
+        // Would be nice to maybe have this in a little nicer way, but for now it should be okay.
+        IContentTypeComposition[] allContentTypes = _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+
+        IEnumerable<Guid> allowedCompositionKeys =
+            // NOTE: Here if we're checking for create we should pass null, otherwise the updated content type.
+            _contentTypeService.GetAvailableCompositeContentTypes(null, allContentTypes, isElement: model.IsElement)
+                .Results
+                .Where(x => x.Allowed)
+                .Select(x => x.Composition.Key);
+
+
+        // We only care about the keys used for composition.
+        if (model
+            .Compositions
+            .Where(x => x.CompositionType is ContentTypeCompositionType.Composition)
+            .Select(x => x.Key)
+            .Except(allowedCompositionKeys)
+            .Any())
+        {
+            // We have a composition key that's not in the allowed composition keys
+            return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidComposition, null);
+        }
+
         // filter out properties and containers with no name/alias
         // TODO: Let's be predictable and fail instead of trying to guess intentions.
         model.Properties = model.Properties.Where(propertyType => propertyType.Alias.IsNullOrWhiteSpace() is false).ToArray();
@@ -330,23 +354,6 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
         // NOTE: incidentally this also covers removing the default template; when requestModel.DefaultTemplateId is null,
         //       contentType.SetDefaultTemplate() will be called with a null value, which will reset the default template.
         contentType.SetDefaultTemplate(allowedTemplates.FirstOrDefault(t => t.Key == model.DefaultTemplateKey));
-
-        // Validate that the all the compositions are allowed
-        // Would be nice to maybe have this in a little nicer way, but for now it should be okay.
-        IContentTypeComposition[] allContentTypes = _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
-
-        IEnumerable<Guid> allowedCompositionKeys =
-            // NOTE: Here if we're checking for create we should pass null, otherwise the updated content type.
-            _contentTypeService.GetAvailableCompositeContentTypes(null, allContentTypes, isElement: contentType.IsElement)
-                .Results
-                .Where(x => x.Allowed)
-                .Select(x => x.Composition.Key);
-
-        if (contentType.CompositionKeys().Except(allowedCompositionKeys).Any())
-        {
-            // We have a composition key that's not in the allowed composition keys
-            return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidComposition, null);
-        }
 
 
         // save content type

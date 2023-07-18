@@ -35,6 +35,7 @@ public partial class DocumentTypeEditingServiceTests : UmbracoIntegrationTest
         string? alias = null,
         Guid? key = null,
         bool isElement = false,
+        Guid? parentKey = null,
         IEnumerable<DocumentPropertyType>? propertyTypes = null,
         IEnumerable<DocumentTypePropertyContainer>? containers = null,
         IEnumerable<ContentTypeComposition>? compositions = null) =>
@@ -47,6 +48,7 @@ public partial class DocumentTypeEditingServiceTests : UmbracoIntegrationTest
             Containers = containers ?? Enumerable.Empty<DocumentTypePropertyContainer>(),
             Compositions = compositions ?? Enumerable.Empty<ContentTypeComposition>(),
             IsElement = isElement,
+            ParentKey = parentKey,
         };
 
     private DocumentPropertyType CreatePropertyType(
