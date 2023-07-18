@@ -7,7 +7,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-tiny-mce-maximagesize-configuration')
 export class UmbPropertyEditorUITinyMceMaxImageSizeConfigurationElement extends UmbLitElement {
-
 	@property()
 	value?: number;
 

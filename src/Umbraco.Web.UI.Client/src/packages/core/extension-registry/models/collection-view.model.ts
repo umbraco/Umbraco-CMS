@@ -33,7 +33,7 @@ export interface MetaCollectionView {
 export interface ConditionsCollectionView {
 	/**
 	 * Type of entity this collection view should be available for
-	 * 
+	 *
 	 * @examples ["media"]
 	 */
 	entityType: string;

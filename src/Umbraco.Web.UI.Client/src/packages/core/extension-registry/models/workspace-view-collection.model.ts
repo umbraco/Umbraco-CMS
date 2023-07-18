@@ -11,11 +11,10 @@ export interface ManifestWorkspaceViewCollection
 	meta: MetaEditorViewCollection;
 }
 
-
 export interface MetaEditorViewCollection extends MetaManifestWithView {
 	/**
 	 * The entity type that this view collection should be available in
-	 * 
+	 *
 	 * @examples [
 	 * "media"
 	 * ]
@@ -31,11 +30,10 @@ export interface MetaEditorViewCollection extends MetaManifestWithView {
 	repositoryAlias: string;
 }
 
-
 export interface ConditionsEditorViewCollection {
 	/**
 	 * The workspaces that this view collection should be available in
-	 * 
+	 *
 	 * @examples [
 	 * "Umb.Workspace.DataType",
 	 * "Umb.Workspace.Dictionary",
