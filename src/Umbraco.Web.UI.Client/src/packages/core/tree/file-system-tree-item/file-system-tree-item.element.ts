@@ -2,7 +2,7 @@ import { UmbFileSystemTreeItemContext } from './file-system-tree-item.context.js
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	UmbBackofficeManifestKind,
 	UmbTreeItemExtensionElement,
@@ -24,12 +24,12 @@ umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-file-system-tree-item')
 export class UmbFileSystemTreeItemElement extends UmbLitElement implements UmbTreeItemExtensionElement {
-	private _item?: EntityTreeItemResponseModel;
+	private _item?: FileSystemTreeItemPresentationModel;
 	@property({ type: Object, attribute: false })
 	public get item() {
 		return this._item;
 	}
-	public set item(value: EntityTreeItemResponseModel | undefined) {
+	public set item(value: FileSystemTreeItemPresentationModel | undefined) {
 		this._item = value;
 		this.#context.setTreeItem(value);
 	}
