@@ -3,9 +3,10 @@ import { createFileSystemTreeItem } from './utils.js';
 import {
 	FileSystemTreeItemPresentationModel,
 	PagedFileSystemTreeItemPresentationModel,
+	SnippetItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export const data: Array<FileSystemTreeItemPresentationModel> = [
+export const treeData: Array<FileSystemTreeItemPresentationModel> = [
 	{
 		path: 'blockgrid',
 		isFolder: true,
@@ -66,7 +67,7 @@ export const data: Array<FileSystemTreeItemPresentationModel> = [
 
 class UmbPartialViewsTreeData extends UmbEntityData<FileSystemTreeItemPresentationModel> {
 	constructor() {
-		super(data);
+		super(treeData);
 	}
 
 	getTreeRoot(): PagedFileSystemTreeItemPresentationModel {
@@ -90,3 +91,51 @@ class UmbPartialViewsTreeData extends UmbEntityData<FileSystemTreeItemPresentati
 }
 
 export const umbPartialViewsTreeData = new UmbPartialViewsTreeData();
+
+export const snippets: Array<SnippetItemResponseModel> = [
+	{
+		name: 'Empty',
+	},
+	{
+		name: 'Breadcrumb',
+	},
+	{
+		name: 'EditProfile',
+	},
+	{
+		name: 'ListAncestorsFromCurrentPage',
+	},
+	{
+		name: 'ListChildPagesFromCurrentPage',
+	},
+	{
+		name: 'ListChildPagesOrderedByDate',
+	},
+	{
+		name: 'ListChildPagesOrderedByName',
+	},
+	{
+		name: 'ListChildPagesWithDoctype',
+	},
+	{
+		name: 'ListDescendantsFromCurrentPage',
+	},
+	{
+		name: 'Login',
+	},
+	{
+		name: 'LoginStatus',
+	},
+	{
+		name: 'MultinodeTree-picker',
+	},
+	{
+		name: 'Navigation',
+	},
+	{
+		name: 'RegisterMember',
+	},
+	{
+		name: 'SiteMap',
+	},
+];

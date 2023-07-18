@@ -2,7 +2,7 @@ const { rest } = window.MockServiceWorker;
 import { umbPartialViewsTreeData } from '../data/partial-views.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
-export const handlers = [
+ const treeHandlers = [
 	rest.get(umbracoPath('/tree/partial-view/root'), (req, res, ctx) => {
 		const response = umbPartialViewsTreeData.getTreeRoot();
 		return res(ctx.status(200), ctx.json(response));
@@ -24,3 +24,8 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(items));
 	}),
 ];
+
+ const detailHandlers = [];
+ const folderHandlers = [];
+
+export const handlers = [...treeHandlers, ...detailHandlers, ...folderHandlers]
