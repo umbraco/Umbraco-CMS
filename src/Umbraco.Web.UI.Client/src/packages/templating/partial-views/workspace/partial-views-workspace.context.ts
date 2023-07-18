@@ -1,12 +1,13 @@
 import { UmbPartialViewsRepository } from '../repository/partial-views.repository.js';
-import { createObservablePart, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
-import { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { PartialViewDetails } from '../config.js';
+import { createObservablePart, UmbBooleanState, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 
 export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<
 	UmbPartialViewsRepository,
-	TemplateResponseModel
+	PartialViewDetails
 > {
 	getEntityId(): string | undefined {
 		throw new Error('Method not implemented.');
@@ -20,13 +21,27 @@ export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<
 	destroy(): void {
 		throw new Error('Method not implemented.');
 	}
-	#data = new UmbDeepState<TemplateResponseModel | undefined>(undefined);
+	#data = new UmbDeepState<PartialViewDetails | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = createObservablePart(this.#data, (data) => data?.name);
 	content = createObservablePart(this.#data, (data) => data?.content);
+	path = createObservablePart(this.#data, (data) => data?.path);
+
+	#isCodeEditorReady = new UmbBooleanState(false);
+	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbPartialViewsRepository(host));
+		this.#loadCodeEditor();
+	}
+
+	async #loadCodeEditor() {
+		try {
+			await loadCodeEditor();
+			this.#isCodeEditorReady.next(true);
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	getData() {
