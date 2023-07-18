@@ -8,13 +8,19 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
 	CreateFolderRequestModel,
+	CreatePartialViewRequestModel,
 	FileSystemTreeItemPresentationModel,
 	FolderModelBaseModel,
 	FolderReponseModel,
+	PagedSnippetItemResponseModel,
+	PartialViewResponseModel,
 	ProblemDetails,
+	TextFileResponseModelBaseModel,
+	UpdatePartialViewRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import {
 	DataSourceResponse,
+	UmbDataSourceErrorResponse,
 	UmbDetailRepository,
 	UmbFolderRepository,
 	UmbTreeRepository,
@@ -23,7 +29,13 @@ import {
 export class UmbPartialViewsRepository
 	implements
 		UmbTreeRepository<FileSystemTreeItemPresentationModel>,
-		UmbDetailRepository<PartialViewDetails>,
+		UmbDetailRepository<
+			CreatePartialViewRequestModel,
+			string,
+			UpdatePartialViewRequestModel,
+			PartialViewResponseModel,
+			string
+		>,
 		UmbFolderRepository
 {
 	#init;
@@ -55,15 +67,17 @@ export class UmbPartialViewsRepository
 	): Promise<{ data?: FolderReponseModel | undefined; error?: ProblemDetails | undefined }> {
 		throw new Error('Method not implemented.');
 	}
-	createFolder(
-		folderRequest: CreateFolderRequestModel
+	async createFolder(
+		requestBody: CreateFolderRequestModel
 	): Promise<{ data?: string | undefined; error?: ProblemDetails | undefined }> {
-		throw new Error('Method not implemented.');
+		await this.#init;
+		return this.#folderDataSource.insert(requestBody);
 	}
-	requestFolder(
+	async requestFolder(
 		unique: string
 	): Promise<{ data?: FolderReponseModel | undefined; error?: ProblemDetails | undefined }> {
-		throw new Error('Method not implemented.');
+		await this.#init;
+		return this.#folderDataSource.get(unique);
 	}
 	updateFolder(
 		unique: string,
@@ -71,8 +85,9 @@ export class UmbPartialViewsRepository
 	): Promise<{ data?: FolderModelBaseModel | undefined; error?: ProblemDetails | undefined }> {
 		throw new Error('Method not implemented.');
 	}
-	deleteFolder(id: string): Promise<{ error?: ProblemDetails | undefined }> {
-		throw new Error('Method not implemented.');
+	async deleteFolder(path: string): Promise<{ error?: ProblemDetails | undefined }> {
+		await this.#init;
+		return this.#folderDataSource.get(path);
 	}
 	//#endregion
 
@@ -166,20 +181,22 @@ export class UmbPartialViewsRepository
 		throw new Error('Method not implemented.');
 	}
 
-	async createScaffold(parentKey: string | null) {
-		return Promise.reject(new Error('Not implemented'));
+	createScaffold(parentId: string | null, preset: string): Promise<DataSourceResponse<TextFileResponseModelBaseModel>> {
+		return this.#detailDataSource.createScaffold(parentId, preset);
+	}
+	create(data: CreatePartialViewRequestModel): Promise<DataSourceResponse<any>> {
+		return this.#detailDataSource.insert(data);
+	}
+	save(id: string, requestBody: UpdatePartialViewRequestModel): Promise<UmbDataSourceErrorResponse> {
+		return this.#detailDataSource.update(id, requestBody);
+	}
+	delete(id: string): Promise<UmbDataSourceErrorResponse> {
+		return this.#detailDataSource.delete(id);
 	}
 
-	async create(patrial: any) {
-		return Promise.reject(new Error('Not implemented'));
+	getSnippets({ skip = 0, take = 100 }): Promise<DataSourceResponse<PagedSnippetItemResponseModel>> {
+		return this.#detailDataSource.getSnippets({ skip, take });
 	}
 
-	async save(patrial: any) {
-		return Promise.reject(new Error('Not implemented'));
-	}
-
-	async delete(key: string) {
-		return Promise.reject(new Error('Not implemented'));
-	}
 	//#endregion
 }

@@ -66,7 +66,7 @@ export class UmbPartialViewDetailServerDataSource
 	 * @memberof UmbPartialViewDetailServerDataSource
 	 */
 	insert(requestBody: CreatePartialViewRequestModel): Promise<DataSourceResponse<string>> {
-		return tryExecuteAndNotify(this.#host, PartialViewResource.postPartialViewFolder({ requestBody }));
+		return tryExecuteAndNotify(this.#host, PartialViewResource.postPartialView({ requestBody }));
 	}
 
 	//TODO the parameters here are bit ugly, since unique is already in the request body parameter, but it has to be done to marry the UmbDataSource interface an backend API together... maybe come up with some nicer solution
