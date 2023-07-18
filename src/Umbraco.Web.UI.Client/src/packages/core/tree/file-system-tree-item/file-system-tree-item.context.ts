@@ -6,4 +6,8 @@ export class UmbFileSystemTreeItemContext extends UmbTreeItemContextBase<FileSys
 	constructor(host: UmbControllerHostElement) {
 		super(host, (x: FileSystemTreeItemPresentationModel) => x.path);
 	}
+
+	constructPath(pathname: string, entityType: string, path: string) {
+		return `section/${pathname}/workspace/${entityType}/edit/${encodeURIComponent(path).replace('.', '-')}`;
+	}
 }
