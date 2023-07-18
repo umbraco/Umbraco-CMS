@@ -9,7 +9,7 @@ const url = fromRollup(rollupUrl);
 /** @type {import('@web/dev-server').DevServerConfig} */
 export default {
 	nodeResolve: true,
-	files: ['src/**/*.test.ts', 'libs/**/*.test.ts'],
+	files: ['src/**/*.test.ts'],
 	mimeTypes: {
 		'./public/**/*': 'js',
 	},
