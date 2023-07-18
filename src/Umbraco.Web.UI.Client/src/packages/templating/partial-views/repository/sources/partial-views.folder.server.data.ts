@@ -8,7 +8,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
 import { DataSourceResponse, UmbFolderDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
-export class UmbPartialViewsTreeServerDataSource implements UmbFolderDataSource {
+export class UmbPartialViewsFolderServerDataSource implements UmbFolderDataSource {
 	#host: UmbControllerHostElement;
 
 	constructor(host: UmbControllerHostElement) {

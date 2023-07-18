@@ -2,20 +2,36 @@ import { PARTIAL_VIEW_ROOT_ENTITY_TYPE, PartialViewDetails } from '../config.js'
 import { UmbPartialViewDetailServerDataSource } from './sources/partial-views.detail.server.data.js';
 import { UmbPartialViewsTreeServerDataSource } from './sources/partial-views.tree.server.data.js';
 import { UmbPartialViewsTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } from './partial-views.tree.store.js';
+import { UmbPartialViewsFolderServerDataSource } from './sources/partial-views.folder.server.data.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { FileSystemTreeItemPresentationModel, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import {
+	CreateFolderRequestModel,
+	FileSystemTreeItemPresentationModel,
+	FolderModelBaseModel,
+	FolderReponseModel,
+	ProblemDetails,
+} from '@umbraco-cms/backoffice/backend-api';
+import {
+	DataSourceResponse,
+	UmbDetailRepository,
+	UmbFolderRepository,
+	UmbTreeRepository,
+} from '@umbraco-cms/backoffice/repository';
 
 export class UmbPartialViewsRepository
-	implements UmbTreeRepository<FileSystemTreeItemPresentationModel>, UmbDetailRepository<PartialViewDetails>
+	implements
+		UmbTreeRepository<FileSystemTreeItemPresentationModel>,
+		UmbDetailRepository<PartialViewDetails>,
+		UmbFolderRepository
 {
 	#init;
 	#host: UmbControllerHostElement;
 
 	#treeDataSource: UmbPartialViewsTreeServerDataSource;
 	#detailDataSource: UmbPartialViewDetailServerDataSource;
+	#folderDataSource: UmbPartialViewsFolderServerDataSource;
 
 	#treeStore?: UmbPartialViewsTreeStore;
 
@@ -24,6 +40,7 @@ export class UmbPartialViewsRepository
 
 		this.#treeDataSource = new UmbPartialViewsTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbPartialViewDetailServerDataSource(this.#host);
+		this.#folderDataSource = new UmbPartialViewsFolderServerDataSource(this.#host);
 
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN, (instance) => {
@@ -32,28 +49,34 @@ export class UmbPartialViewsRepository
 		]);
 	}
 
-	requestItemsLegacy?:
-		| ((uniques: string[]) => Promise<{
-				data?: any[] | undefined;
-				error?: ProblemDetails | undefined;
-				asObservable?: (() => Observable<any[]>) | undefined;
-		  }>)
-		| undefined;
-
-	itemsLegacy?: ((uniques: string[]) => Promise<Observable<any[]>>) | undefined;
-
-	byId(id: string): Promise<Observable<any>> {
+	//#region FOLDER
+	createFolderScaffold(
+		parentId: string | null
+	): Promise<{ data?: FolderReponseModel | undefined; error?: ProblemDetails | undefined }> {
 		throw new Error('Method not implemented.');
 	}
-
-	// TODO: This method to be done, or able to go away?
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	requestById(id: string): Promise<{ data?: any; error?: ProblemDetails | undefined }> {
+	createFolder(
+		folderRequest: CreateFolderRequestModel
+	): Promise<{ data?: string | undefined; error?: ProblemDetails | undefined }> {
 		throw new Error('Method not implemented.');
 	}
+	requestFolder(
+		unique: string
+	): Promise<{ data?: FolderReponseModel | undefined; error?: ProblemDetails | undefined }> {
+		throw new Error('Method not implemented.');
+	}
+	updateFolder(
+		unique: string,
+		folder: FolderModelBaseModel
+	): Promise<{ data?: FolderModelBaseModel | undefined; error?: ProblemDetails | undefined }> {
+		throw new Error('Method not implemented.');
+	}
+	deleteFolder(id: string): Promise<{ error?: ProblemDetails | undefined }> {
+		throw new Error('Method not implemented.');
+	}
+	//#endregion
 
-	// TREE:
+	//#region TREE
 
 	async requestTreeRoot() {
 		await this.#init;
@@ -126,8 +149,9 @@ export class UmbPartialViewsRepository
 		await this.#init;
 		return this.#treeStore!.items(paths);
 	}
+	//#endregion
 
-	// DETAILS
+	//#region DETAILS
 	async requestByKey(path: string) {
 		if (!path) throw new Error('Path is missing');
 		await this.#init;
@@ -135,7 +159,12 @@ export class UmbPartialViewsRepository
 		return { data, error };
 	}
 
-	// DETAILS:
+	requestById(id: string): Promise<DataSourceResponse<any>> {
+		throw new Error('Method not implemented.');
+	}
+	byId(id: string): Promise<Observable<any>> {
+		throw new Error('Method not implemented.');
+	}
 
 	async createScaffold(parentKey: string | null) {
 		return Promise.reject(new Error('Not implemented'));
@@ -152,4 +181,5 @@ export class UmbPartialViewsRepository
 	async delete(key: string) {
 		return Promise.reject(new Error('Not implemented'));
 	}
+	//#endregion
 }
