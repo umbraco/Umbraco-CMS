@@ -1,16 +1,15 @@
+import { PARTIAL_VIEW_ROOT_ENTITY_TYPE, PartialViewDetails } from '../config.js';
 import { UmbPartialViewDetailServerDataSource } from './sources/partial-views.detail.server.data.js';
 import { UmbPartialViewsTreeServerDataSource } from './sources/partial-views.tree.server.data.js';
 import { UmbPartialViewsTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } from './partial-views.tree.store.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { EntityTreeItemResponseModel, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
+import { FileSystemTreeItemPresentationModel, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbTreeRootEntityModel } from '@umbraco-cms/backoffice/tree';
-import { PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../config.js';
 
 export class UmbPartialViewsRepository
-	implements UmbTreeRepository<EntityTreeItemResponseModel>, UmbDetailRepository<any>
+	implements UmbTreeRepository<FileSystemTreeItemPresentationModel>, UmbDetailRepository<PartialViewDetails>
 {
 	#init;
 	#host: UmbControllerHostElement;
@@ -57,7 +56,6 @@ export class UmbPartialViewsRepository
 	// TREE:
 
 	async requestTreeRoot() {
-
 		await this.#init;
 
 		const data = {
@@ -87,7 +85,7 @@ export class UmbPartialViewsRepository
 		if (path === null) {
 			return this.requestRootTreeItems();
 		}
-		
+
 		await this.#init;
 
 		const { data, error } = await this.#treeDataSource.getChildrenOf({ path });
