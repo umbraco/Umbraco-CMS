@@ -21,7 +21,14 @@ const manifest: UmbBackofficeManifestKind = {
 	},
 };
 umbExtensionsRegistry.register(manifest);
-
+/**
+ * Tree item element for file system tree items. Uses the path as the unique identifier.
+ *
+ * @export
+ * @class UmbFileSystemTreeItemElement
+ * @extends {UmbLitElement}
+ * @implements {UmbTreeItemExtensionElement}
+ */
 @customElement('umb-file-system-tree-item')
 export class UmbFileSystemTreeItemElement extends UmbLitElement implements UmbTreeItemExtensionElement {
 	private _item?: FileSystemTreeItemPresentationModel;
