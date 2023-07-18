@@ -1,15 +1,15 @@
 {
-  "extends": "../tsconfig.json",
-  "compilerOptions": {
-    "allowJs": true,
-    "noEmit": false,
-    "outDir": "../dist-cms",
-    "rootDir": "./",
-    "composite": true,
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"allowJs": true,
+		"noEmit": false,
+		"outDir": "../dist-cms",
+		"rootDir": "./",
+		"composite": true,
 		"sourceMap": false,
 		"declaration": true,
-    "resolveJsonModule": true,
-  },
-  "include": ["./**/*.ts", "./**/*.json", "./**/*.js"],
-  "exclude": ["./**/*.test.ts", "./**/*.stories.ts", "tsconfig.json", "rollup.config.js"],
+		"resolveJsonModule": true
+	},
+	"include": ["./**/*.ts", "./**/*.json", "./**/*.js"],
+	"exclude": ["./**/*.test.ts", "./**/*.stories.ts", "tsconfig.json", "rollup.config.js"]
 }

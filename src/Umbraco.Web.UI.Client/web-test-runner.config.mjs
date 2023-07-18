@@ -9,7 +9,7 @@ const url = fromRollup(rollupUrl);
 /** @type {import('@web/dev-server').DevServerConfig} */
 export default {
 	nodeResolve: true,
-	files: ['src/**/*.test.ts', 'libs/**/*.test.ts'],
+	files: ['src/**/*.test.ts'],
 	mimeTypes: {
 		'./public/**/*': 'js',
 	},
@@ -25,7 +25,7 @@ export default {
 		},
 		// Serve images from the public folder as JS modules
 		url({ include: ['public/**/*'] }),
-		esbuildPlugin({ ts: true, target: 'auto', json: true }),
+		esbuildPlugin({ ts: true, tsconfig: './tsconfig.json', target: 'auto', json: true }),
 		importMapsPlugin({
 			inject: {
 				importMap: {

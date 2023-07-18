@@ -21,7 +21,10 @@ interface UmbEmbeddedMediaModalModel {
 }
 
 @customElement('umb-embedded-media-modal')
-export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult> {
+export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
+	UmbEmbeddedMediaModalData,
+	UmbEmbeddedMediaModalResult
+> {
 	#loading = false;
 	#embedResult!: OEmbedResult;
 

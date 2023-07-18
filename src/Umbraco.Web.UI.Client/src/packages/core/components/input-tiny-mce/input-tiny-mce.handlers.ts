@@ -47,7 +47,7 @@ export const uploadImageHandler: tinymce.RawEditorOptions['images_upload_handler
 		};
 
 		const formData = new FormData();
-		formData.append('file', blobInfo.blob(), blobInfo.blob().name);
+		formData.append('file', blobInfo.blob(), blobInfo.filename());
 
 		xhr.send(formData);
 	});

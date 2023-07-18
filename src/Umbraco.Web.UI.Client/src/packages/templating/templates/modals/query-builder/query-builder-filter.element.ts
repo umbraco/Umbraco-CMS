@@ -1,5 +1,13 @@
 import { UUITextStyles, type UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
-import { PropertyValueMap, css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	PropertyValueMap,
+	css,
+	html,
+	customElement,
+	property,
+	query,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	OperatorModel,
@@ -67,18 +75,17 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 		this.dispatchEvent(new Event('add-filter'));
 	}
 
-    get isFilterValid(): boolean {
-        return Object.keys(this.filter).length === 3 && Object.values(this.filter).every((v) => !!v);
-    }
+	get isFilterValid(): boolean {
+		return Object.keys(this.filter).length === 3 && Object.values(this.filter).every((v) => !!v);
+	}
 
-    protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-        if (_changedProperties.has('filter')) {
-
-            if (this.isFilterValid) {
-                this.dispatchEvent(new Event('update-query'));
-            }
-        }
-    }
+	protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		if (_changedProperties.has('filter')) {
+			if (this.isFilterValid) {
+				this.dispatchEvent(new Event('update-query'));
+			}
+		}
+	}
 
 	private _renderOperatorsDropdown() {
 		return html`<umb-button-with-dropdown look="outline" id="operator-dropdown" label="choose operator">
@@ -116,7 +123,7 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 			<span>${this.unremovable ? 'where' : 'and'}</span>
 			<umb-button-with-dropdown look="outline" id="property-alias-dropdown" label="Property alias"
 				>${this.filter?.propertyAlias ?? ''}
-				<uui-combobox-list  slot="dropdown" @change=${this.#setPropertyAlias} class="options-list">
+				<uui-combobox-list slot="dropdown" @change=${this.#setPropertyAlias} class="options-list">
 					${this.settings?.properties?.map(
 						(property) =>
 							html`<uui-combobox-list-option tabindex="0" .value=${property.alias ?? ''}
