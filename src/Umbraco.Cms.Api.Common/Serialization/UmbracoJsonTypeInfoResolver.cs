@@ -22,7 +22,7 @@ public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, I
             return cachedResult;
         }
 
-        var result = _typeFinder.FindClassesOfType(type).ToHashSet();
+        var result = _typeFinder.FindClassesOfType(type).OrderBy(x => x.Name).ToHashSet();
         _subTypesCache.TryAdd(type, result);
         return result;
     }
