@@ -70,5 +70,9 @@ public interface ILanguage : IEntity, IRememberBeingDirty
     ///     </para>
     /// </remarks>
     [DataMember]
-    string? FallbackIsoCode { get; set; }
+    string? FallbackIsoCode
+    {
+        get => null;
+        set { }
+    }
 }

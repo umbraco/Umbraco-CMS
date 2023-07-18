@@ -25,5 +25,5 @@ public interface IDictionaryTranslation : IEntity, IRememberBeingDirty
     ///     Gets the ISO code of the language.
     /// </summary>
     [DataMember]
-    string LanguageIsoCode { get; }
+    string LanguageIsoCode => Language?.IsoCode ?? string.Empty;
 }
