@@ -45,7 +45,9 @@
 				"local-rules/umb-class-prefix": "error",
 				"local-rules/prefer-static-styles-last": "warn",
 				"local-rules/ensure-relative-import-use-js-extension": "error",
-				"@typescript-eslint/no-non-null-assertion": "off"
+				"@typescript-eslint/no-non-null-assertion": "off",
+				"@typescript-eslint/no-explicit-any": "warn",
+				"@typescript-eslint/no-unused-vars": "warn"
 			},
 			"settings": {
 				"import/parsers": {
