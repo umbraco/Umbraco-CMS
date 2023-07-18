@@ -1,10 +1,13 @@
-import { UmbTemplateRepository } from '../repository/partial-views.repository.js';
+import { UmbPartialViewsRepository } from '../repository/partial-views.repository.js';
 import { createObservablePart, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
-export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository, TemplateResponseModel> {
+export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<
+	UmbPartialViewsRepository,
+	TemplateResponseModel
+> {
 	getEntityId(): string | undefined {
 		throw new Error('Method not implemented.');
 	}
@@ -23,7 +26,7 @@ export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<UmbTemp
 	content = createObservablePart(this.#data, (data) => data?.content);
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, new UmbTemplateRepository(host));
+		super(host, new UmbPartialViewsRepository(host));
 	}
 
 	getData() {

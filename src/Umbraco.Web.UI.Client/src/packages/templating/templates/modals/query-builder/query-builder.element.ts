@@ -1,5 +1,5 @@
 import { UmbTemplateRepository } from '../../repository/template.repository.js';
-import UmbQueryBuilderFilterElement from './query-builder-filter.element.js';
+import type { UmbQueryBuilderFilterElement } from './query-builder-filter.element.js';
 import { UUIComboboxListElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, query, queryAll } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
@@ -15,6 +15,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
 import { UmbButtonWithDropdownElement } from '@umbraco-cms/backoffice/components';
+import './query-builder-filter.element.js';
 
 export interface TemplateQueryBuilderModalData {
 	hidePartialViews?: boolean;

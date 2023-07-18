@@ -1,10 +1,13 @@
 import { UmbFileSystemTreeItemContext } from './file-system-tree-item.context.js';
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { UmbTreeItemElement } from '@umbraco-cms/backoffice/tree';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbBackofficeManifestKind, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	UmbBackofficeManifestKind,
+	UmbTreeItemExtensionElement,
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 // TODO: Move to separate file:
 const manifest: UmbBackofficeManifestKind = {
@@ -18,9 +21,16 @@ const manifest: UmbBackofficeManifestKind = {
 	},
 };
 umbExtensionsRegistry.register(manifest);
-
+/**
+ * Tree item element for file system tree items. Uses the path as the unique identifier.
+ *
+ * @export
+ * @class UmbFileSystemTreeItemElement
+ * @extends {UmbLitElement}
+ * @implements {UmbTreeItemExtensionElement}
+ */
 @customElement('umb-file-system-tree-item')
-export class UmbFileSystemTreeItemElement extends UmbLitElement implements UmbTreeItemElement {
+export class UmbFileSystemTreeItemElement extends UmbLitElement implements UmbTreeItemExtensionElement {
 	private _item?: FileSystemTreeItemPresentationModel;
 	@property({ type: Object, attribute: false })
 	public get item() {
