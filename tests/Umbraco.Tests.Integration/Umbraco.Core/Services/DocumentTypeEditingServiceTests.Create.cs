@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Core.Models.ContentTypeEditing.Document;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
@@ -257,7 +258,7 @@ public partial class DocumentTypeEditingServiceTests
     public async Task Can_Create_Grandchild_DocumentType()
     {
         var rootProperty = CreatePropertyType("Root property");
-        var rootModel = CreateCreateModel(
+        DocumentTypeCreateModel rootModel = CreateCreateModel(
             name: "Root",
             propertyTypes: new[] { rootProperty });
 
@@ -322,5 +323,36 @@ public partial class DocumentTypeEditingServiceTests
             Assert.IsTrue(grandchild.CompositionPropertyTypes.Any(x => x.Alias == childProperty.Alias));
             Assert.IsTrue(grandchild.CompositionPropertyTypes.Any(x => x.Alias == grandchildProperty.Alias));
         });
+    }
+
+    [Test]
+    public async Task DocumentType_Cannot_Be_Both_Parent_And_Composition()
+    {
+        var compositionBase = CreateCreateModel(name: "CompositionBase");
+
+        var baseResult = await DocumentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
+        Assert.IsTrue(baseResult.Success);
+
+        var createModel = CreateCreateModel(
+            compositions: new[]
+            {
+                new ContentTypeComposition
+                {
+                    CompositionType = ContentTypeCompositionType.Composition, Key = baseResult.Result!.Key
+                },
+                new ContentTypeComposition
+                {
+                    CompositionType = ContentTypeCompositionType.Inheritance, Key = baseResult.Result!.Key
+                },
+            },
+            parentKey: baseResult.Result.Key);
+
+        var result = await DocumentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+        });
+
     }
 }

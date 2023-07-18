@@ -78,7 +78,16 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
             .Compositions
             .Where(x => x.CompositionType is ContentTypeCompositionType.Inheritance)
             .ToArray();
-        if (inheritedCompositions.Length > MaxInheritance || (inheritedCompositions.Any() && inheritedCompositions.First().Key != model.ParentKey))
+        Guid[] compositionKeys = model
+            .Compositions
+            .Where(x => x.CompositionType is ContentTypeCompositionType.Composition)
+            .Select(x => x.Key)
+            .ToArray();
+
+        if (inheritedCompositions.Any() &&
+             (inheritedCompositions.Length > MaxInheritance
+            || inheritedCompositions.First().Key != model.ParentKey
+            || compositionKeys.Contains(inheritedCompositions.First().Key)))
         {
             return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidInheritance, null);
         }
@@ -96,10 +105,7 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
 
 
         // We only care about the keys used for composition.
-        if (model
-            .Compositions
-            .Where(x => x.CompositionType is ContentTypeCompositionType.Composition)
-            .Select(x => x.Key)
+        if (compositionKeys
             .Except(allowedCompositionKeys)
             .Any())
         {
