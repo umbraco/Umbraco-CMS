@@ -1,10 +1,23 @@
 import { PartialViewDetails } from '../../config.js';
+import {
+	CreatePartialViewRequestModel,
+	PartialViewResource,
+	PartialViewResponseModel,
+	UpdatePartialViewRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
-//TODO Pass proper models
 export class UmbPartialViewDetailServerDataSource
-	implements UmbDataSource<PartialViewDetails, PartialViewDetails, PartialViewDetails, PartialViewDetails>
+	implements
+		UmbDataSource<
+			CreatePartialViewRequestModel,
+			string,
+			UpdatePartialViewRequestModel,
+			PartialViewResponseModel,
+			string
+		>
 {
 	#host: UmbControllerHostElement;
 
@@ -17,29 +30,52 @@ export class UmbPartialViewDetailServerDataSource
 		this.#host = host;
 	}
 
-	createScaffold(parentKey: string | null): Promise<DataSourceResponse<PartialViewDetails>> {
-		throw new Error('Method not implemented.');
+	//TODO check if this is correct
+	createScaffold(parentid: string | null = null, preset: string): Promise<DataSourceResponse<PartialViewDetails>> {
+		return tryExecuteAndNotify(this.#host, PartialViewResource.getPartialViewSnippetByName({ name: preset }));
 	}
 
 	/**
-	 * Fetches a Stylesheet with the given path from the server
+	 * Fetches a partial view with the given path from the server
 	 * @param {string} path
 	 * @return {*}
 	 * @memberof UmbStylesheetServerDataSource
 	 */
-	async get(path: string) {
+	get(path: string) {
 		if (!path) throw new Error('Path is missing');
-		console.log('GET PATRIAL WITH PATH', path);
-		return { data: undefined, error: undefined };
+		return tryExecuteAndNotify(this.#host, PartialViewResource.getPartialView({ path }));
+	}
+	/**
+	 * Creates a new partial view
+	 *
+	 * @param {CreatePartialViewRequestModel} requestBody
+	 * @return {*}  {Promise<DataSourceResponse<string>>}
+	 * @memberof UmbPartialViewDetailServerDataSource
+	 */
+	insert(requestBody: CreatePartialViewRequestModel): Promise<DataSourceResponse<string>> {
+		return tryExecuteAndNotify(this.#host, PartialViewResource.postPartialViewFolder({ requestBody }));
 	}
 
-	insert(data: any): Promise<DataSourceResponse<PartialViewDetails>> {
-		throw new Error('Method not implemented.');
+	//TODO the parameters here are bit ugly, since unique is already in the request body parameter, but it has to be done to marry the UmbDataSource interface an backend API together... maybe come up with some nicer solution
+	/**
+	 * Updates a partial view
+	 *
+	 * @param {string} [unique='']
+	 * @param {UpdatePartialViewRequestModel} requestBody
+	 * @return {*}  {Promise<DataSourceResponse<any>>}
+	 * @memberof UmbPartialViewDetailServerDataSource
+	 */
+	update(unique = '', requestBody: UpdatePartialViewRequestModel): Promise<DataSourceResponse<any>> {
+		return tryExecuteAndNotify(this.#host, PartialViewResource.putPartialView({ requestBody }));
 	}
-	update(unique: string, data: PartialViewDetails): Promise<DataSourceResponse<PartialViewDetails>> {
-		throw new Error('Method not implemented.');
-	}
-	delete(unique: string): Promise<DataSourceResponse> {
-		throw new Error('Method not implemented.');
+	/**
+	 * Deletes a partial view
+	 *
+	 * @param {string} path
+	 * @return {*}  {Promise<DataSourceResponse>}
+	 * @memberof UmbPartialViewDetailServerDataSource
+	 */
+	delete(path: string): Promise<DataSourceResponse> {
+		return tryExecuteAndNotify(this.#host, PartialViewResource.deletePartialView({ path }));
 	}
 }
