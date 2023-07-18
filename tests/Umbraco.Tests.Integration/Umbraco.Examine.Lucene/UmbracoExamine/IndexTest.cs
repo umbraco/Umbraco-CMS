@@ -62,7 +62,7 @@ public class IndexTest : ExamineBaseTest
             {
                 Alias = "rte",
                 Name = "RichText",
-                PropertyEditorAlias = Constants.PropertyEditors.Aliases.TinyMce
+                PropertyEditorAlias = Constants.PropertyEditors.Aliases.RichText
             });
 
             var content = ContentBuilder.CreateBasicContent(contentType);

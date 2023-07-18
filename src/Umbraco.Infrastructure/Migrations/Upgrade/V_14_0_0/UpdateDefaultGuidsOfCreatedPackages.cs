@@ -2,7 +2,7 @@ using System.Xml.Linq;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 
 public class UpdateDefaultGuidsOfCreatedPackages : MigrationBase
 {

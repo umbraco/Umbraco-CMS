@@ -14,7 +14,7 @@ public class RenameLabelAndRichTextPropertyEditorAliases : MigrationBase
 
     protected override void Migrate()
     {
-        MigratePropertyEditorAlias("Umbraco.TinyMCEv3", Constants.PropertyEditors.Aliases.TinyMce);
+        MigratePropertyEditorAlias("Umbraco.TinyMCEv3", Constants.PropertyEditors.Aliases.RichText);
         MigratePropertyEditorAlias("Umbraco.NoEdit", Constants.PropertyEditors.Aliases.Label);
     }
 

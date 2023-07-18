@@ -46,7 +46,6 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
     public async Task Validate_OpenApi_Contract_is_implemented()
     {
         string[] keysToIgnore = { "servers", "x-generator" };
-
         var officePath = GlobalSettings.GetBackOfficePath(HostingEnvironment);
 
         var urlToContract = $"{officePath}/management/api/openapi.json";

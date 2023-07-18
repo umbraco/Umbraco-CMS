@@ -380,7 +380,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
                 "title")
             { Name = "Title", Description = string.Empty, Mandatory = false, DataTypeId = -88 });
         contentType.AddPropertyType(
-            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TinyMce, ValueStorageType.Ntext,
+            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.RichText, ValueStorageType.Ntext,
                 "bodyText")
             { Name = "Body Text", Description = string.Empty, Mandatory = false, DataTypeId = -87 });
         contentType.AddPropertyType(

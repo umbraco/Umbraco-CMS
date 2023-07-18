@@ -1,6 +1,6 @@
 ﻿using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 
 public class AddPropertyEditorUiAliasColumn : MigrationBase
 {
