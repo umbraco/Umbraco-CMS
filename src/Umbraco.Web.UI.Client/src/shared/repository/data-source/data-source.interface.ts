@@ -1,9 +1,15 @@
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
-export interface UmbDataSource<CreateRequestType, CreateResponseType, UpdateRequestType, ResponseType> {
+export interface UmbDataSource<
+	CreateRequestType,
+	CreateResponseType,
+	UpdateRequestType,
+	ResponseType,
+	CreateScaffoldPresetType = Partial<CreateRequestType>
+> {
 	createScaffold(
 		parentId: string | null,
-		preset?: Partial<CreateRequestType>
+		preset?: Partial<CreateRequestType> | CreateScaffoldPresetType
 	): Promise<DataSourceResponse<CreateRequestType>>;
 	get(unique: string): Promise<DataSourceResponse<ResponseType>>;
 	insert(data: CreateRequestType): Promise<DataSourceResponse<CreateResponseType>>;
