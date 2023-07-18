@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@umbraco-ui/uui": "^1.3.0",
+    "@vaadin/router": "^1.7.5",
     "lit": "^2.7.5",
     "msw": "^1.2.2"
   },
