@@ -1,3 +1,4 @@
+/* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -14,6 +15,6 @@ import type { MediaTypeTreeItemResponseModel } from './MediaTypeTreeItemResponse
 
 export type PagedEntityTreeItemResponseModel = {
     total: number;
-    items: Array<(EntityTreeItemResponseModel | ContentTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel | MediaTypeTreeItemResponseModel | MediaTreeItemResponseModel | DataTypeTreeItemResponseModel)>;
+    items: Array<(EntityTreeItemResponseModel | ContentTreeItemResponseModel | DataTypeTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel | MediaTreeItemResponseModel | MediaTypeTreeItemResponseModel)>;
 };
 
