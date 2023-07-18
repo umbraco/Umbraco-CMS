@@ -1,10 +1,10 @@
 const { rest } = window.MockServiceWorker;
-import { umbPartialViewsData } from '../data/partial-views.data.js';
+import { umbPartialViewsTreeData } from '../data/partial-views.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
 	rest.get(umbracoPath('/tree/partial-view/root'), (req, res, ctx) => {
-		const response = umbPartialViewsData.getTreeRoot();
+		const response = umbPartialViewsTreeData.getTreeRoot();
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
@@ -12,7 +12,7 @@ export const handlers = [
 		const path = req.url.searchParams.get('path');
 		if (!path) return;
 
-		const response = umbPartialViewsData.getTreeItemChildren(path);
+		const response = umbPartialViewsTreeData.getTreeItemChildren(path);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
@@ -20,7 +20,7 @@ export const handlers = [
 		const paths = req.url.searchParams.getAll('paths');
 		if (!paths) return;
 
-		const items = umbPartialViewsData.getTreeItem(paths);
+		const items = umbPartialViewsTreeData.getTreeItem(paths);
 		return res(ctx.status(200), ctx.json(items));
 	}),
 ];

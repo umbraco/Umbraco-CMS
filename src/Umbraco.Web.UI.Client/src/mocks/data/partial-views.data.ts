@@ -64,11 +64,7 @@ export const data: Array<FileSystemTreeItemPresentationModel> = [
 	},
 ];
 
-// Temp mocked database
-// TODO: all properties are optional in the server schema. I don't think this is correct.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-class UmbPartialViewsData extends UmbEntityData<FileSystemTreeItemPresentationModel> {
+class UmbPartialViewsTreeData extends UmbEntityData<FileSystemTreeItemPresentationModel> {
 	constructor() {
 		super(data);
 	}
@@ -93,4 +89,4 @@ class UmbPartialViewsData extends UmbEntityData<FileSystemTreeItemPresentationMo
 	}
 }
 
-export const umbPartialViewsData = new UmbPartialViewsData();
+export const umbPartialViewsTreeData = new UmbPartialViewsTreeData();
