@@ -18,7 +18,7 @@ public abstract class ContentTypeModelBase<TPropertyType, TPropertyTypeContainer
 
     public bool VariesBySegment { get; set; }
 
-    public bool IsElement { get; set; } // <-- Content only
+    public bool IsElement { get; set; }
 
     public IEnumerable<TPropertyType> Properties { get; set; } = Array.Empty<TPropertyType>();
 
