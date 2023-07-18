@@ -21,11 +21,6 @@ export class UmbPartialViewDetailServerDataSource
 {
 	#host: UmbControllerHostElement;
 
-	/**
-	 * Creates an instance of UmbPartialViewDetailServerDataSource.
-	 * @param {UmbControllerHostInterface} host
-	 * @memberof UmbPartialViewDetailServerDataSource
-	 */
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
