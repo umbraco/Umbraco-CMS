@@ -2179,7 +2179,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="passwordIsDifferent">There was a difference between the new password and the confirmed password. Please
       try again!
     </key>
-    <key alias="passwordMismatch">The confirmed password doesn't match the new password!</key>
+    <key alias="passwordMismatch">There was a password mismatch!</key>
     <key alias="passwordRequiresDigit">The password must have at least one digit ('0'-'9')</key>
     <key alias="passwordRequiresLower">The password must have at least one lowercase ('a'-'z')</key>
     <key alias="passwordRequiresNonAlphanumeric">The password must have at least one non alphanumeric character</key>

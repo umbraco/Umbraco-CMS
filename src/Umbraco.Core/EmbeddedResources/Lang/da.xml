@@ -1863,7 +1863,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="passwordCurrent">Nuværende kodeord</key>
     <key alias="passwordInvalid">ugyldig nuværende kodeord</key>
     <key alias="passwordIsDifferent">Dit nye kodeord og dit bekræftede kodeord var ikke ens, forsøg venligst igen!</key>
-    <key alias="passwordMismatch">Det bekræftede kodeord matcher ikke det nye kodeord</key>
+    <key alias="passwordMismatch">Der var et mismatch af kodeord!</key>
     <key alias="permissionReplaceChildren">Erstat underelement-rettigheder</key>
     <key alias="permissionSelectedPages">Du ændrer i øjeblikket rettigheder for siderne:</key>
     <key alias="permissionSelectPages">Vælg sider for at ændre deres rettigheder</key>
