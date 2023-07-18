@@ -1,6 +1,7 @@
 import { PartialViewDetails } from '../../config.js';
 import {
 	CreatePartialViewRequestModel,
+	PagedSnippetItemResponseModel,
 	PartialViewResource,
 	PartialViewResponseModel,
 	UpdatePartialViewRequestModel,
@@ -25,9 +26,26 @@ export class UmbPartialViewDetailServerDataSource
 		this.#host = host;
 	}
 
-	//TODO check if this is correct
-	createScaffold(parentid: string | null = null, preset: string): Promise<DataSourceResponse<PartialViewDetails>> {
+	/**
+	 * Creates a new partial view scaffold
+	 *
+	 * @param {(string | null)} [parentId=null] You can leave this empty
+	 * @param {string} preset Name of the snippet to use as a preset
+	 * @return {*}  {Promise<DataSourceResponse<PartialViewDetails>>}
+	 * @memberof UmbPartialViewDetailServerDataSource
+	 */
+	createScaffold(parentId: string | null = null, preset: string): Promise<DataSourceResponse<PartialViewDetails>> {
 		return tryExecuteAndNotify(this.#host, PartialViewResource.getPartialViewSnippetByName({ name: preset }));
+	}
+	/**
+	 * Get possible snippets for partial views
+	 *
+	 * @param {*} { skip = 0, take = 100 }
+	 * @return {*}  {Promise<DataSourceResponse<PagedSnippetItemResponseModel>>}
+	 * @memberof UmbPartialViewDetailServerDataSource
+	 */
+	getSnippets({ skip = 0, take = 100 }): Promise<DataSourceResponse<PagedSnippetItemResponseModel>> {
+		return tryExecuteAndNotify(this.#host, PartialViewResource.getPartialViewSnippet({ skip, take }));
 	}
 
 	/**
