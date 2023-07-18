@@ -14,8 +14,9 @@ export default {
 } as Meta;
 
 export const AAAOverview = ({ value }: any) =>
-	html`<umb-property-editor-ui-tiny-mce-stylesheets-configuration .value=${value}></umb-property-editor-ui-tiny-mce-stylesheets-configuration>`;
+	html`<umb-property-editor-ui-tiny-mce-stylesheets-configuration
+		.value=${value}></umb-property-editor-ui-tiny-mce-stylesheets-configuration>`;
 AAAOverview.storyName = 'Overview';
 AAAOverview.args = {
-	value: dataTypeData?.values?.find(x => x.alias === 'stylesheets')?.value ?? []
-}
+	value: dataTypeData?.values?.find((x) => x.alias === 'stylesheets')?.value ?? [],
+};

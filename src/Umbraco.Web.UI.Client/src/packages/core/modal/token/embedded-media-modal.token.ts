@@ -26,12 +26,12 @@ export interface UmbEmbeddedMediaModalResult extends UmbEmbeddedMediaModalData {
 	preview?: string;
 	originalWidth: number;
 	originalHeight: number;
-};
+}
 
 export const UMB_EMBEDDED_MEDIA_MODAL = new UmbModalToken<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>(
 	'Umb.Modal.EmbeddedMedia',
 	{
 		type: 'sidebar',
-		size: 'medium', 
+		size: 'medium',
 	}
 );

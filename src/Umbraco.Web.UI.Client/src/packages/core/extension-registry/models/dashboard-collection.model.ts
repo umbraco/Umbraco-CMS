@@ -6,7 +6,6 @@ export interface ManifestDashboardCollection extends ManifestBase {
 	conditions: ConditionsDashboardCollection;
 }
 
-
 export interface MetaDashboardCollection {
 	/**
 	 * The URL path for the dashboard which is used for navigating or deep linking directly to the dashboard
@@ -37,7 +36,7 @@ export interface MetaDashboardCollection {
 export interface ConditionsDashboardCollection {
 	/**
 	 * An array of section aliases that the dashboard collection should be available in
-	 * 
+	 *
 	 * @uniqueItems true
 	 * @examples [
 	 *  "Umb.Section.Content",

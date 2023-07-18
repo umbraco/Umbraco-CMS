@@ -13,7 +13,8 @@ export default {
 } as Meta;
 
 export const AAAOverview = ({ value }: any) =>
-	html`<umb-property-editor-ui-tiny-mce-dimensions-configuration .value=${value}></umb-property-editor-ui-tiny-mce-dimensions-configuration>`;
+	html`<umb-property-editor-ui-tiny-mce-dimensions-configuration
+		.value=${value}></umb-property-editor-ui-tiny-mce-dimensions-configuration>`;
 AAAOverview.storyName = 'Overview';
 AAAOverview.args = {
 	value: dataTypeData?.values?.find((x) => x.alias === 'dimensions')?.value,

@@ -1,0 +1,2 @@
+# Ignore auto-generated backend-api files
+src/external/backend-api/src
