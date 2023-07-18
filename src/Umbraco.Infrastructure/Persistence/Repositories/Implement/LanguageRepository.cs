@@ -120,7 +120,19 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
 
     protected ILanguage ConvertFromDto(LanguageDto dto)
-        => LanguageFactory.BuildEntity(dto);
+    {
+        // yes, we want to lock _codeIdMap
+        lock (_codeIdMap)
+        {
+            string? fallbackIsoCode = null;
+            if (dto.FallbackLanguageId.HasValue && _idCodeMap.TryGetValue(dto.FallbackLanguageId.Value, out fallbackIsoCode) == false)
+            {
+                throw new ArgumentException($"The ISO code map did not contain ISO code for fallback language ID: {dto.FallbackLanguageId}. Please reload the caches.");
+            }
+
+            return LanguageFactory.BuildEntity(dto, fallbackIsoCode);
+        }
+    }
 
     // do NOT leak that language, it's not deep-cloned!
     private ILanguage GetDefault()
@@ -172,20 +184,25 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         sql.OrderBy<LanguageDto>(x => x.Id);
 
         // get languages
-        var languages = Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto).OrderBy(x => x.Id).ToList();
+        List<LanguageDto>? languageDtos = Database.Fetch<LanguageDto>(sql) ?? new List<LanguageDto>();
 
-        // initialize the code-id map
-        lock (_codeIdMap)
+        // initialize the code-id map if we've reloaded the entire set of languages
+        if (ids?.Any() == false)
         {
-            _codeIdMap.Clear();
-            _idCodeMap.Clear();
-            foreach (ILanguage language in languages)
+            lock (_codeIdMap)
             {
-                _codeIdMap[language.IsoCode] = language.Id;
-                _idCodeMap[language.Id] = language.IsoCode.ToLowerInvariant();
+                _codeIdMap.Clear();
+                _idCodeMap.Clear();
+                foreach (LanguageDto languageDto in languageDtos)
+                {
+                    ArgumentException.ThrowIfNullOrEmpty(languageDto.IsoCode, nameof(LanguageDto.IsoCode));
+                    _codeIdMap[languageDto.IsoCode] = languageDto.Id;
+                    _idCodeMap[languageDto.Id] = languageDto.IsoCode;
+                }
             }
         }
 
+        var languages = languageDtos.Select(ConvertFromDto).OrderBy(x => x.Id).ToList();
         return languages;
     }
 

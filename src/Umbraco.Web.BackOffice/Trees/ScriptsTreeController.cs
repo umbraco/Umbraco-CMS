@@ -3,12 +3,10 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
-using Umbraco.Cms.Web.Common.Attributes;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees;
 
 [CoreTree]
-[PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
 [Tree(Constants.Applications.Settings, Constants.Trees.Scripts, TreeTitle = "Scripts", SortOrder = 10, TreeGroup = Constants.Trees.Groups.Templating)]
 public class ScriptsTreeController : FileSystemTreeController
 {

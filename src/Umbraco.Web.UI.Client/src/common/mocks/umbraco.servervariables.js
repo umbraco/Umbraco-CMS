@@ -32,7 +32,7 @@ Umbraco.Sys.ServerVariables = {
     },
     umbracoPlugins: {
         trees: [
-            { alias: "myTree", packageFolder: "MyPackage", sectionAlias: "myPackageSectionAlias" }
+            { alias: "myTree", packageFolder: "MyPackage" }
         ]
     },
     isDebuggingEnabled: true,
