@@ -17,6 +17,7 @@
             </select>
             <input 
                 type="number"
+                pattern="[0-9]*"
                 name="label"
                 min="0"
                 ng-max="model.value.max"
@@ -28,6 +29,7 @@
             <span>–</span>
             <input 
                 type="number"
+                pattern="[0-9]*"
                 name="label"
                 ng-model="allowance.maxAllowed"
                 placeholder="∞"
