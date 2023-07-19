@@ -155,7 +155,7 @@ angular.module("umbraco.directives")
             if (file.$error) {
                 file.done = true;
                 scope.processed.push(file);
-                file.messages.push({type: "Error"});
+                file.messages.push({type: "Error", header: "Error"});
                 return;
             }
 
