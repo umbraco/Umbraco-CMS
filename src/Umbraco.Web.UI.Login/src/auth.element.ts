@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
+import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import './auth-layout.element.js';
@@ -39,7 +39,6 @@ export default class UmbAuthElement extends LitElement {
 			router.setRoutes([
 				{ path: '/', component: 'umb-login' },
 				{ path: '/reset', component: 'umb-reset-password' },
-				{ path: '/reset-verify', component: 'umb-new-password' },
 				{ path: '/new', component: 'umb-new-password' },
 			]);
 		});
