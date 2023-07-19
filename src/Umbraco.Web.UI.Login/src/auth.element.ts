@@ -7,7 +7,6 @@ import './reset-password.element.js';
 import './new-password.element.js';
 import './login.element.js';
 import { Router } from '@vaadin/router';
-import { UmbAuthMainContext } from './context/auth-main.context.js';
 
 @customElement('umb-auth')
 export default class UmbAuthElement extends LitElement {
@@ -32,14 +31,13 @@ export default class UmbAuthElement extends LitElement {
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		new UmbAuthMainContext(this.isLegacy);
-
 		requestAnimationFrame(() => {
 			const router = new Router(this.shadowRoot?.getElementById('outlet'));
 			router.setRoutes([
-				{ path: '/', component: 'umb-login' },
+				{ path: '', component: 'umb-login' },
 				{ path: '/reset', component: 'umb-reset-password' },
 				{ path: '/new', component: 'umb-new-password' },
+				{ path: '(.*)', redirect: '' },
 			]);
 		});
 	}
