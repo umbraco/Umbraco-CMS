@@ -128,11 +128,18 @@ public class BackOfficeController : UmbracoController
                     ["redir"] = _globalSettings.GetBackOfficePath(_hostingEnvironment),
                 });
             }
-            return Redirect("/");
+
+            return RedirectToLocal(null);
         }
 
         // force authentication to occur since this is not an authorized endpoint
         AuthenticateResult result = await this.AuthenticateBackOfficeAsync();
+
+        // if we are not authenticated then we need to redirect to the login page
+        if (!result.Succeeded)
+        {
+            return RedirectToLogin(null);
+        }
 
         var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
             .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
@@ -210,17 +217,18 @@ public class BackOfficeController : UmbracoController
         if (result.Succeeded == false)
         {
             _logger.LogWarning("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
-            return new RedirectResult(Url.Action(nameof(Default)) + "/login/?status=false&invite=3");
+            return RedirectToLogin("status=false&invite=3");
         }
 
-        //sign the user in
+        // sign the user in
         DateTime? previousLastLoginDate = identityUser.LastLoginDateUtc;
         await _signInManager.SignInAsync(identityUser, false);
-        //reset the lastlogindate back to previous as the user hasn't actually logged in, to add a flag or similar to BackOfficeSignInManager would be a breaking change
+
+        // reset the lastlogindate back to previous as the user hasn't actually logged in, to add a flag or similar to BackOfficeSignInManager would be a breaking change
         identityUser.LastLoginDateUtc = previousLastLoginDate;
         await _userManager.UpdateAsync(identityUser);
 
-        return new RedirectResult(Url.Action(nameof(Default)) + "/login/?status=false&invite=1");
+        return RedirectToLogin("status=false&invite=1");
     }
 
     /// <summary>
@@ -244,7 +252,8 @@ public class BackOfficeController : UmbracoController
         }
 
         // Redirect to login if we're not authorized
-        return new LocalRedirectResult(Url.Action(nameof(Login), this.GetControllerName()) + "?returnPath=" + Url.Action(nameof(AuthorizeUpgrade), this.GetControllerName()));
+        return RedirectToLogin("returnPath=" + Url.Action(nameof(AuthorizeUpgrade), this.GetControllerName()));
+
     }
 
     /// <summary>
@@ -472,7 +481,7 @@ public class BackOfficeController : UmbracoController
             return defaultResponse();
         }
 
-        //First check if there's external login info, if there's not proceed as normal
+        // First check if there's external login info, if there's not proceed as normal
         ExternalLoginInfo? loginInfo = await _signInManager.GetExternalLoginInfoAsync();
 
         if (loginInfo == null || loginInfo.Principal == null)
@@ -490,7 +499,7 @@ public class BackOfficeController : UmbracoController
             return defaultResponse();
         }
 
-        //we're just logging in with an external source, not linking accounts
+        // we're just logging in with an external source, not linking accounts
         return await ExternalSignInAsync(loginInfo, externalSignInResponse);
     }
 
@@ -520,7 +529,7 @@ public class BackOfficeController : UmbracoController
             if (_runtimeState.Level == RuntimeLevel.Upgrade)
             {
                 // redirect to the the installer
-                return Redirect("/");
+                return RedirectToLocal(null);
             }
         }
         else if (result == SignInResult.TwoFactorRequired)
@@ -603,7 +612,7 @@ public class BackOfficeController : UmbracoController
         return response();
     }
 
-    private IActionResult RedirectToLocal(string? returnUrl)
+    private RedirectResult RedirectToLocal(string? returnUrl)
     {
         if (Url.IsLocalUrl(returnUrl))
         {
@@ -611,5 +620,17 @@ public class BackOfficeController : UmbracoController
         }
 
         return Redirect("/");
+    }
+
+    private LocalRedirectResult RedirectToLogin(string? parameters)
+    {
+        var loginUrl = Url.Action(nameof(Login), this.GetControllerName())?.ToLowerInvariant().EnsureEndsWith("/");
+
+        if (string.IsNullOrWhiteSpace(parameters) is false)
+        {
+            loginUrl += "?" + parameters;
+        }
+
+        return new LocalRedirectResult(loginUrl!);
     }
 }
