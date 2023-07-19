@@ -115,6 +115,10 @@ angular.module("umbraco.directives")
 
                     function _upload(file) {
 
+                        if (!file) {
+                            return;
+                        }
+
                         scope.propertyAlias = scope.propertyAlias ? scope.propertyAlias : "umbracoFile";
                         scope.contentTypeAlias = scope.contentTypeAlias ? scope.contentTypeAlias : "Image";
 
