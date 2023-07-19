@@ -209,7 +209,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       // if the file size is greater than the max file size, reject it
       if (maxFileSize > 0 && blob.size > maxFileSize) {
-        reject(`The file size (${blob.size / 1000} KB) exceeded the maximum allowed size of ${maxFileSize/1000} KB.`);
+        reject({
+          message: `The file size (${blob.size / 1000} KB) exceeded the maximum allowed size of ${maxFileSize / 1000} KB.`,
+          remove: true
+        });
         return;
       }
 
@@ -233,12 +236,18 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       };
 
       xhr.onerror = function () {
-        reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+        reject({
+          message: 'Image upload failed due to a XHR Transport error. Code: ' + xhr.status,
+          remove: true
+        });
       };
 
       xhr.onload = function () {
         if (xhr.status < 200 || xhr.status >= 300) {
-          reject('HTTP Error: ' + xhr.status);
+          reject({
+            message: 'HTTP Error: ' + xhr.status,
+            remove: true
+          });
           return;
         }
 
@@ -248,7 +257,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         data = data.split("\n");
 
         if (!data.length > 1) {
-          reject('Unrecognized text string: ' + data);
+          reject({
+            message: 'Unrecognized text string: ' + data,
+            remove: true
+          });
           return;
         }
 
@@ -257,12 +269,18 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         try {
           json = JSON.parse(data[1]);
         } catch (e) {
-          reject('Invalid JSON: ' + data + ' - ' + e.message);
+          reject({
+            message: 'Invalid JSON: ' + data + ' - ' + e.message,
+            remove: true
+          });
           return;
         }
 
         if (!json || typeof json.tmpLocation !== 'string') {
-          reject('Invalid JSON: ' + data);
+          reject({
+            message: 'Invalid JSON: ' + data,
+            remove: true
+          });
           return;
         }
 
