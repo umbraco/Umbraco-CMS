@@ -153,10 +153,9 @@ angular.module("umbraco.directives")
             }
 
             if (file.$error) {
+                file.done = true;
                 scope.processed.push(file);
-                scope.currentFile = undefined;
                 file.messages.push({type: "Error"});
-                _processQueueItems();
                 return;
             }
 
