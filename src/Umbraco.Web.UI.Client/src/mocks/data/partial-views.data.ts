@@ -356,7 +356,6 @@ class UmbPartialViewsData extends UmbEntityData<PartialViewResponseModel> {
 	}
 
 	getPartialView(path: string): PartialViewResponseModel | undefined {
-		debugger;
 		return createTextFileItem(this.data.find((item) => item.path === path));
 	}
 

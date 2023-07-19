@@ -29,7 +29,6 @@ const treeHandlers = [
 
 const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 	rest.get(umbracoPath('/partial-view'), (req, res, ctx) => {
-		debugger;
 		const path = decodeURIComponent(req.url.searchParams.get('path') ?? '').replace('-cshtml', '.cshtml');
 		if (!path) return res(ctx.status(400));
 		const response = umbPartialViewsData.getPartialView(path);
