@@ -93,6 +93,15 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         }
     }
 
+
+    /// <inheritdoc />
+    public bool HasContentTypesOrEntityContainers()
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds);
+        return Repository.GetMany(Array.Empty<int>()).Any() || GetContainers(Array.Empty<int>()).Any();
+    }
+
     #region Notifications
 
     protected override SavingNotification<IContentType> GetSavingNotification(
