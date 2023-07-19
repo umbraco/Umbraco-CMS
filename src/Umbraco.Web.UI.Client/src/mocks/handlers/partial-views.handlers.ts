@@ -1,8 +1,9 @@
 const { rest } = window.MockServiceWorker;
+import { RestHandler, MockedRequest, DefaultBodyType } from 'msw';
 import { umbPartialViewsTreeData } from '../data/partial-views.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
- const treeHandlers = [
+const treeHandlers = [
 	rest.get(umbracoPath('/tree/partial-view/root'), (req, res, ctx) => {
 		const response = umbPartialViewsTreeData.getTreeRoot();
 		return res(ctx.status(200), ctx.json(response));
@@ -25,7 +26,7 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 	}),
 ];
 
- const detailHandlers = [];
- const folderHandlers = [];
+const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [];
+const folderHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [];
 
 export const handlers = [...treeHandlers, ...detailHandlers, ...folderHandlers]
