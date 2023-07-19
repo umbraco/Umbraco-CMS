@@ -158,11 +158,22 @@ angular.module("umbraco.directives")
                                 } else if (evt && typeof evt === "string") {
                                     file.messages.push({message: evt, type: "Error"});
                                 }
-                                // If file not found, server will return a 404 and display this message
-                                if (status === 404) {
-                                    file.messages.push({message: "File not found", type: "Error"});
+
+                                // If there were no errors with the request, but the status code was 404, we'll add a custom message
+                                // or a generic message for all other status codes.
+                                if (!file.messages.length) {
+                                    if (status === 404) {
+                                        file.messages.push({message: "File not found", type: "Error"});
+                                    } else {
+                                        file.messages.push({message: "Error uploading file", type: "Error"});
+                                    }
                                 }
+
+                                // The file has been processed, even though it resulted in an error, so we add it to the processed queue
+                                scope.processed.push(file);
                                 scope.currentFile = undefined;
+
+                                // Return to queue processing
                                 _processQueueItems();
                             });
                     }
