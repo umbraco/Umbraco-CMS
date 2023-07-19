@@ -516,6 +516,13 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void HasContentTypesOrEntityContainers_Returns_false_When_Has_ContentTypes()
+    {
+        var hasContainers = ContentTypeService.HasContentTypesOrEntityContainers();
+        Assert.IsFalse(hasContainers);
+    }
+
+    [Test]
     public void Deleting_ContentType_Sends_Correct_Number_Of_DeletedEntities_In_Events()
     {
         var deletedEntities = 0;
