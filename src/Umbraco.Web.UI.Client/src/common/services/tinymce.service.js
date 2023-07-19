@@ -222,6 +222,17 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     }
 
     function uploadImageHandler(blobInfo, success, failure, progress){
+        const blob = blobInfo.blob();
+
+        // get the max file size from the server
+        const maxFileSize = Number(Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize ?? 0) * 1000;
+
+        // if the file size is greater than the max file size, reject it
+        if (maxFileSize > 0 && blob.size > maxFileSize) {
+            failure(`The file size (${blob.size / 1000} KB) exceeded the maximum allowed size of ${maxFileSize/1000} KB.`);
+            return;
+        }
+
         const xhr = new XMLHttpRequest();
         xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
 
@@ -727,11 +738,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 };
                 var newImage = editor.dom.createHTML('img', data);
                 var parentElement = editor.selection.getNode().parentElement;
-                    
+
                 if (img.caption) {
                     var figCaption = editor.dom.createHTML('figcaption', {}, img.caption);
                     var combined = newImage + figCaption;
-                        
+
                     if (parentElement.nodeName !== 'FIGURE') {
                         var fragment = editor.dom.createHTML('figure', {}, combined);
                         editor.selection.setContent(fragment);
@@ -749,7 +760,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         editor.selection.setContent(newImage);
                     }
                 }
-                  
+
                 // Using settimeout to wait for a DoM-render, so we can find the new element by ID.
                 $timeout(function () {
 
@@ -770,7 +781,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     }
 
                 });
-                
+
             }
         },
 
@@ -1454,7 +1465,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             // Then we need to add an event listener to the editor
             // That will update native browser drag & drop events
             // To update the icon to show you can NOT drop something into the editor
-            
+
             var toolbarItems = args.editor.settings.toolbar === false ? [] : args.editor.settings.toolbar.split(" ");
             if(isMediaPickerEnabled(toolbarItems) === false){
                 // Wire up the event listener
