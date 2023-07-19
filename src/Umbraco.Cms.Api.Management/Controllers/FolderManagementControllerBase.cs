@@ -26,7 +26,7 @@ public abstract class FolderManagementControllerBase<TStatus> : ManagementApiCon
         EntityContainer? parentContainer = await GetParentContainerAsync(container);
 
         // we could implement a mapper for this but it seems rather overkill at this point
-        return Ok(new FolderReponseModel
+        return Ok(new FolderResponseModel
         {
             Name = container.Name!,
             Id = container.Key,
