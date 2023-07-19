@@ -296,7 +296,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         };
 
         const formData = new FormData();
-        formData.append('file', blobInfo.blob(), blobInfo.blob().name);
+        formData.append('file', blob, blob.name);
 
         xhr.send(formData);
     }
