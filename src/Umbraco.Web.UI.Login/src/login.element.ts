@@ -53,8 +53,10 @@ export default class UmbLoginElement extends LitElement {
 
 		if (response.error) return;
 
-		if (this._returnURL) {
-			location.href = this._returnURL;
+		const returnPath = this.#authContext.returnPath;
+
+		if (returnPath) {
+			location.href = returnPath;
 		}
 
 		this.dispatchEvent(new CustomEvent('login-success', { bubbles: true, composed: true }));
@@ -105,7 +107,7 @@ export default class UmbLoginElement extends LitElement {
 								<uui-checkbox name="persist" label="Remember me">Remember me</uui-checkbox>
 							</uui-form-layout-item>`
 						)}
-						${when(this._allowPasswordReset, () => html`<a href="/reset"> Forgot password? </a>`)}
+						${when(this._allowPasswordReset, () => html`<a href="reset"> Forgot password? </a>`)}
 					</div>
 
 					<uui-form-layout-item>${this.#renderErrorMessage()}</uui-form-layout-item>

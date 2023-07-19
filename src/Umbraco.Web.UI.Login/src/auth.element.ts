@@ -7,10 +7,11 @@ import './reset-password.element.js';
 import './new-password.element.js';
 import './login.element.js';
 import { Router } from '@vaadin/router';
+import { UmbAuthMainContext } from './context/auth-main.context.js';
 
 @customElement('umb-auth')
 export default class UmbAuthElement extends LitElement {
-	#returnUrl = '';
+	#returnPath = '';
 
 	@property({ type: Boolean, attribute: 'is-legacy' })
 	isLegacy = false;
@@ -19,13 +20,13 @@ export default class UmbAuthElement extends LitElement {
 	allowPasswordReset = true;
 
 	@property({ type: String, attribute: 'return-url' })
-	set returnUrl(value: string) {
-		this.#returnUrl = value;
+	set returnPath(value: string) {
+		this.#returnPath = value;
+		UmbAuthMainContext.Instance.returnPath = this.returnPath;
 	}
-
-	get returnUrl() {
+	get returnPath() {
 		// Check if there is a ?redir querystring or else return the returnUrl attribute
-		return new URLSearchParams(window.location.search).get('returnPath') || this.#returnUrl;
+		return new URLSearchParams(window.location.search).get('returnPath') || this.#returnPath;
 	}
 
 	connectedCallback(): void {
@@ -33,10 +34,11 @@ export default class UmbAuthElement extends LitElement {
 
 		requestAnimationFrame(() => {
 			const router = new Router(this.shadowRoot?.getElementById('outlet'));
+
 			router.setRoutes([
 				{ path: '', component: 'umb-login' },
-				{ path: '/reset', component: 'umb-reset-password' },
-				{ path: '/new', component: 'umb-new-password' },
+				{ path: 'reset', component: 'umb-reset-password' },
+				{ path: 'new', component: 'umb-new-password' },
 				{ path: '(.*)', redirect: '' },
 			]);
 		});

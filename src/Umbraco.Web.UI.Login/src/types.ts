@@ -10,6 +10,7 @@ export interface IUmbAuthContext {
 	validatePasswordResetCode(code: string): Promise<ValidatePasswordResetCodeResponse>;
 	newPassword(password: string, code: string): Promise<NewPasswordResponse>;
 	supportsPersistLogin: boolean;
+	returnPath: string;
 }
 
 export type LoginResponse = {
