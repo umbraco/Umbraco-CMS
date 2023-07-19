@@ -53,8 +53,10 @@ export default class UmbLoginElement extends LitElement {
 
 		if (response.error) return;
 
-		if (this._returnURL) {
-			location.href = this._returnURL;
+		const returnPath = this.#authContext.returnPath;
+
+		if (returnPath) {
+			location.href = returnPath;
 		}
 
 		this.dispatchEvent(new CustomEvent('login-success', { bubbles: true, composed: true }));
