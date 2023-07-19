@@ -32,7 +32,6 @@ public static partial class Constants
         /// </summary>
         public const string UnknownUserName = "SYSTEM";
 
-        [Obsolete("Use AdminGroupKey instead. Scheduled for removal in V15.")]
         public const string AdminGroupAlias = "admin";
 
         [Obsolete("Use EditorGroupKey instead. Scheduled for removal in V15.")]

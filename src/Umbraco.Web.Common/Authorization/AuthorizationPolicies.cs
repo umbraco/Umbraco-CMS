@@ -12,6 +12,7 @@ public static class AuthorizationPolicies
     public const string UserBelongsToUserGroupInRequest = nameof(UserBelongsToUserGroupInRequest);
     public const string AdminUserEditsRequireAdmin = nameof(AdminUserEditsRequireAdmin);
     public const string DenyLocalLoginIfConfigured = nameof(DenyLocalLoginIfConfigured);
+    public const string RequireAdminAccess = nameof(RequireAdminAccess);
 
     // Content permission access
     public const string ContentPermissionByResource = nameof(ContentPermissionByResource);
