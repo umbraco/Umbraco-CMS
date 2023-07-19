@@ -1,6 +1,7 @@
 import { UmbEntityData } from './entity.data.js';
-import { createFileSystemTreeItem } from './utils.js';
+import { createFileSystemTreeItem, createTextFileItem } from './utils.js';
 import {
+	CreateTextFileViewModelBaseModel,
 	FileSystemTreeItemPresentationModel,
 	PagedFileSystemTreeItemPresentationModel,
 	PartialViewResponseModel,
@@ -8,10 +9,11 @@ import {
 	SnippetItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-type PartialViewsDataItem = PartialViewResponseModel & FileSystemTreeItemPresentationModel;
+type PartialViewsDataItem = PartialViewResponseModel & FileSystemTreeItemPresentationModel & { id: string };
 
 export const treeData: Array<PartialViewsDataItem> = [
 	{
+		id: 'blockgrid',
 		path: 'blockgrid',
 		isFolder: true,
 		name: 'blockgrid',
@@ -19,6 +21,7 @@ export const treeData: Array<PartialViewsDataItem> = [
 		hasChildren: true,
 	},
 	{
+		id: 'blocklist',
 		path: 'blocklist',
 		isFolder: true,
 		name: 'blocklist',
@@ -26,6 +29,7 @@ export const treeData: Array<PartialViewsDataItem> = [
 		hasChildren: true,
 	},
 	{
+		id: 'grid',
 		path: 'grid',
 		isFolder: true,
 		name: 'grid',
@@ -33,6 +37,7 @@ export const treeData: Array<PartialViewsDataItem> = [
 		hasChildren: true,
 	},
 	{
+		id: 'blockgrid/area.cshtml',
 		path: 'blockgrid/area.cshtml',
 		isFolder: false,
 		name: 'area.cshtml',
@@ -51,6 +56,7 @@ export const treeData: Array<PartialViewsDataItem> = [
 		`,
 	},
 	{
+		id: 'blockgrid/items.cshtml',
 		path: 'blockgrid/items.cshtml',
 		isFolder: false,
 		name: 'items.cshtml',
@@ -59,6 +65,7 @@ export const treeData: Array<PartialViewsDataItem> = [
 		content: '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage',
 	},
 	{
+		id: 'blocklist/default.cshtml',
 		path: 'blocklist/default.cshtml',
 		isFolder: false,
 		name: 'default.cshtml',
@@ -78,7 +85,8 @@ export const treeData: Array<PartialViewsDataItem> = [
 		`,
 	},
 	{
-		path: 'grid/editors',
+		id: 'grid/embed.cshtm',
+		path: 'grid/embed.cshtm',
 		isFolder: false,
 		name: 'embed.cshtml',
 		type: 'partial-view',
@@ -97,6 +105,7 @@ export const treeData: Array<PartialViewsDataItem> = [
 		`,
 	},
 	{
+		id: 'grid/default.cshtml',
 		path: 'grid/default.cshtml',
 		isFolder: false,
 		name: 'items.cshtml',
@@ -341,4 +350,30 @@ class UmbPartialViewSnippetsData extends UmbEntityData<SnippetItemResponseModel>
 	}
 }
 
+class UmbPartialViewsData extends UmbEntityData<PartialViewResponseModel> {
+	constructor() {
+		super(treeData);
+	}
+
+	getPartialView(path: string): PartialViewResponseModel | undefined {
+		debugger;
+		return createTextFileItem(this.data.find((item) => item.path === path));
+	}
+
+	insertPartialView(item: CreateTextFileViewModelBaseModel) {
+		const newItem: PartialViewsDataItem = {
+			...item,
+			path: `${item.parentPath}/${item.name}.cshtml}`,
+			id: `${item.parentPath}/${item.name}.cshtml}`,
+			isFolder: false,
+			hasChildren: false,
+			type: 'partial-view',
+		};
+
+		this.insert(newItem);
+		return newItem;
+	}
+}
+
 export const umbPartialViewSnippetsData = new UmbPartialViewSnippetsData();
+export const umbPartialViewsData = new UmbPartialViewsData();
