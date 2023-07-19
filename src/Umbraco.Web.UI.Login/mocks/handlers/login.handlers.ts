@@ -29,4 +29,8 @@ export const handlers = [
 			return res(ctx.status(status));
 		}
 	),
+
+	rest.post('http://localhost:5173/umbraco/backoffice/umbracoapi/authentication/newpassword', async (req, res, ctx) => {
+		return res(ctx.status(200));
+	}),
 ];

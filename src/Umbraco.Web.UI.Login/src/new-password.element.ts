@@ -40,16 +40,24 @@ export default class UmbNewPasswordElement extends LitElement {
 		if (!form.checkValidity()) return;
 
 		const formData = new FormData(form);
-		const username = formData.get('email') as string;
+		const password = formData.get('password') as string;
+		const passwordConfirm = formData.get('confirmPassword') as string;
 
-		// this.newCallState = 'waiting';
-		// const response = await UmbAuthMainContext.Instance.newPassword(username);
+		if (password !== passwordConfirm) {
+			//TODO: tell user that the passwords are not the same
+			return;
+		}
 
-		// if (response.status === 200) {
-		// 	this.newCallState = 'success';
-		// } else {
-		// 	this.newCallState = 'failed';
-		// }
+		this.newCallState = 'waiting';
+		const response = await UmbAuthMainContext.Instance.newPassword(this.code, password);
+
+		if (response.status === 200) {
+			this.newCallState = 'success';
+			this.page = 'done';
+		} else {
+			this.newCallState = 'failed';
+			this.page = 'error';
+		}
 	};
 
 	#renderNewPasswordPage() {
@@ -60,26 +68,26 @@ export default class UmbNewPasswordElement extends LitElement {
 					Enter a new password for your account.
 					<uui-form-layout-item>
 						<uui-label id="passwordLabel" for="password" slot="label" required>Password</uui-label>
-						<uui-input
+						<uui-input-password
 							type="password"
 							id="password"
 							name="password"
 							label="Password"
 							required
-							required-message="Password is required"></uui-input>
+							required-message="Password is required"></uui-input-password>
 					</uui-form-layout-item>
 
 					<uui-form-layout-item>
 						<uui-label id="confirmPasswordLabel" for="confirmPassword" slot="label" required>
 							Confirm password
 						</uui-label>
-						<uui-input
+						<uui-input-password
 							type="password"
 							id="confirmPassword"
 							name="confirmPassword"
 							label="ConfirmPassword"
 							required
-							required-message="ConfirmPassword is required"></uui-input>
+							required-message="ConfirmPassword is required"></uui-input-password>
 					</uui-form-layout-item>
 
 					<uui-button
@@ -105,7 +113,7 @@ export default class UmbNewPasswordElement extends LitElement {
 	}
 
 	#renderErrorPage() {
-		return html` ERROR PAGE `;
+		return html` ERROR PAGE use param ?code=valid to test`;
 	}
 
 	#renderRoute() {
@@ -128,7 +136,7 @@ export default class UmbNewPasswordElement extends LitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
-			uui-input {
+			uui-input-password {
 				width: 100%;
 			}
 			uui-button {

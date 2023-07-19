@@ -64,6 +64,25 @@ export class UmbAuthLegacyRepository {
 		};
 	}
 
+	public async newPassword(password: string, code: string): Promise<LoginResponse> {
+		const request = new Request('/umbraco/backoffice/umbracoapi/authentication/newpassword', {
+			method: 'POST',
+			body: JSON.stringify({
+				password,
+				code,
+			}),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		const response = await fetch(request);
+
+		return {
+			status: response.status,
+			error: response.ok ? undefined : this.#getErrorText(response),
+		};
+	}
+
 	#getErrorText(response: Response) {
 		switch (response.status) {
 			case 400:

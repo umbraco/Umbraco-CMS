@@ -4,6 +4,7 @@ import {
 	LoginResponse,
 	ResetPasswordResponse,
 	ValidatePasswordResetCodeResponse,
+	NewPasswordResponse,
 } from '../types.js';
 import { UmbAuthLegacyRepository } from './auth-legacy.repository.ts';
 
@@ -22,5 +23,9 @@ export class UmbAuthLegacyContext implements IUmbAuthContext {
 
 	async validatePasswordResetCode(code: string): Promise<ValidatePasswordResetCodeResponse> {
 		return this.#authRepository.validatePasswordResetCode(code);
+	}
+
+	async newPassword(password: string, code: string): Promise<NewPasswordResponse> {
+		return this.#authRepository.newPassword(password, code);
 	}
 }
