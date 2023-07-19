@@ -1,16 +1,18 @@
-﻿using Asp.Versioning;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 
 [ApiController]
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DataType)]
 [ApiExplorerSettings(GroupName = "Data Type")]
+[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
 public abstract class DataTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult DataTypeOperationStatusResult(DataTypeOperationStatus status) =>

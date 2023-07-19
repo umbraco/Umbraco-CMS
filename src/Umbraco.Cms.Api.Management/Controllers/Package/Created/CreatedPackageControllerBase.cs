@@ -1,4 +1,3 @@
-using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
 

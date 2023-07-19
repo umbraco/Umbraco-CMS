@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
@@ -9,6 +9,7 @@ using Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 
@@ -17,6 +18,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 [RequireMediaTreeRootAccess]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
+[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessMedia)]
 public class MediaRecycleBinControllerBase : RecycleBinControllerBase<RecycleBinItemResponseModel>
 {
     public MediaRecycleBinControllerBase(IEntityService entityService)

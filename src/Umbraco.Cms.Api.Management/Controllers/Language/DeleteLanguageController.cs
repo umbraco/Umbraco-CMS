@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
@@ -6,10 +7,12 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
 [ApiVersion("1.0")]
+[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessLanguages)]
 public class DeleteLanguageController : LanguageControllerBase
 {
     private readonly ILanguageService _languageService;

@@ -1,16 +1,18 @@
-﻿using Asp.Versioning;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Script;
 
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Script}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Script))]
+[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessScripts)]
 public class ScriptControllerBase : ManagementApiControllerBase
 {
     protected IActionResult ScriptOperationStatusResult(ScriptOperationStatus status) =>

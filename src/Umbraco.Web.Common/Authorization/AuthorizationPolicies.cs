@@ -12,6 +12,7 @@ public static class AuthorizationPolicies
     public const string UserBelongsToUserGroupInRequest = nameof(UserBelongsToUserGroupInRequest);
     public const string AdminUserEditsRequireAdmin = nameof(AdminUserEditsRequireAdmin);
     public const string DenyLocalLoginIfConfigured = nameof(DenyLocalLoginIfConfigured);
+    public const string RequireAdminAccess = nameof(RequireAdminAccess);
 
     // Content permission access
     public const string ContentPermissionByResource = nameof(ContentPermissionByResource);
@@ -59,6 +60,8 @@ public static class AuthorizationPolicies
     public const string TreeAccessMemberGroups = nameof(TreeAccessMemberGroups);
     public const string TreeAccessDocumentTypes = nameof(TreeAccessDocumentTypes);
     public const string TreeAccessMemberTypes = nameof(TreeAccessMemberTypes);
+    public const string TreeAccessScripts = nameof(TreeAccessScripts);
+    public const string TreeAccessStylesheets = nameof(TreeAccessStylesheets);
 
     // Custom access based on multiple trees
     public const string TreeAccessDocumentsOrDocumentTypes = nameof(TreeAccessDocumentsOrDocumentTypes);

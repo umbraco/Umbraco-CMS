@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -7,10 +8,12 @@ using Umbraco.Cms.Api.Management.ViewModels.AuditLogs;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.AuditLog;
 
 [ApiVersion("1.0")]
+[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessContentOrMedia)]
 public class ByKeyAuditLogController : AuditLogControllerBase
 {
     private readonly IAuditService _auditService;
