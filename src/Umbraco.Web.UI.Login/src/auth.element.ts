@@ -26,7 +26,7 @@ export default class UmbAuthElement extends LitElement {
 
 	get returnUrl() {
 		// Check if there is a ?redir querystring or else return the returnUrl attribute
-		return new URLSearchParams(window.location.search).get('redir') || this.#returnUrl;
+		return new URLSearchParams(window.location.search).get('returnPath') || this.#returnUrl;
 	}
 
 	connectedCallback(): void {

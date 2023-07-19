@@ -244,7 +244,7 @@ public class BackOfficeController : UmbracoController
         }
 
         // Redirect to login if we're not authorized
-        return new LocalRedirectResult(Url.Action(nameof(Login), this.GetControllerName()) + "?redir=" + Url.Action(nameof(AuthorizeUpgrade), this.GetControllerName()));
+        return new LocalRedirectResult(Url.Action(nameof(Login), this.GetControllerName()) + "?returnPath=" + Url.Action(nameof(AuthorizeUpgrade), this.GetControllerName()));
     }
 
     /// <summary>
