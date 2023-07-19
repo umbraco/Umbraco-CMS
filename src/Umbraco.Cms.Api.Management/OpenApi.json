@@ -894,7 +894,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/FolderReponseModel"
+                      "$ref": "#/components/schemas/FolderResponseModel"
                     }
                   ]
                 }
@@ -903,7 +903,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/FolderReponseModel"
+                      "$ref": "#/components/schemas/FolderResponseModel"
                     }
                   ]
                 }
@@ -912,7 +912,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/FolderReponseModel"
+                      "$ref": "#/components/schemas/FolderResponseModel"
                     }
                   ]
                 }
@@ -16160,7 +16160,7 @@
         },
         "additionalProperties": false
       },
-      "FolderReponseModel": {
+      "FolderResponseModel": {
         "type": "object",
         "allOf": [
           {
