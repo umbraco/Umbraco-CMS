@@ -31,7 +31,7 @@ angular.module("umbraco.directives")
                     propertyAlias: '@',
                     accept: '@',
                     maxFileSize: '@',
- 
+
                     compact: '@',
                     hideDropzone: '@',
                     acceptedMediatypes: '=',
@@ -87,7 +87,7 @@ angular.module("umbraco.directives")
                         // Add the processed length, as we might be uploading in stages
                         scope.totalQueued = scope.queue.length + scope.processed.length;
 
-                        _processQueueItems();                        
+                        _processQueueItems();
                     }
 
                     function _processQueueItems() {
