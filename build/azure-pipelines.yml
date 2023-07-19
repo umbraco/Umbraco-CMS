@@ -68,6 +68,20 @@ stages:
               gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
               targets: coreBuild
               workingDirectory: src/Umbraco.Web.UI.Client
+          - task: npm@1
+            displayName: Run npm ci
+            inputs:
+              command: custom
+              workingDir: src/Umbraco.Web.UI.Login
+              verbose: false
+              customCommand: ci
+          - task: npm@1
+            displayName: Run npm build
+            inputs:
+              command: custom
+              workingDir: src/Umbraco.Web.UI.Login
+              verbose: false
+              customCommand: run build
           - task: UseDotNet@2
             displayName: Use .NET $(dotnetVersion)
             inputs:
