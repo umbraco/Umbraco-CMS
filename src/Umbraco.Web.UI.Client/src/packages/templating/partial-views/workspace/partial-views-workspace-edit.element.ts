@@ -18,6 +18,9 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 	private _content?: string | null = '';
 
 	@state()
+	private _path?: string | null = '';
+
+	@state()
 	private _ready?: boolean = false;
 
 	@query('umb-code-editor')
@@ -46,6 +49,10 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 
 			this.observe(this.#partialViewsWorkspaceContext.content, (content) => {
 				this._content = content;
+			});
+
+			this.observe(this.#partialViewsWorkspaceContext.path, (path) => {
+				this._path = path;
 			});
 
 			this.observe(this.#partialViewsWorkspaceContext.isNew, (isNew) => {
@@ -98,24 +105,20 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 
 	render() {
 		return html`<umb-workspace-editor alias="Umb.Workspace.Template">
-			<uui-input
-				placeholder="Enter name..."
-				slot="header"
-				.value=${this._name}
-				@input=${this.#onNameInput}
-				label="template name"></uui-input>
+			<div id="workspace-header" slot="header">
+				<uui-input
+					placeholder="Enter name..."
+					.value=${this._name}
+					@input=${this.#onNameInput}
+					label="template name"></uui-input>
+				<small>${this._path}</small>
+			</div>
 			<uui-box>
 				<div slot="header" id="code-editor-menu-container">
-					<div>
-						<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
-						<uui-button
-							look="secondary"
-							id="query-builder-button"
-							label="Query builder"
-							@click=${this.#openQueryBuilder}>
-							<uui-icon name="umb:wand"></uui-icon>Query builder
-						</uui-button>
-					</div>
+					<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
+					<uui-button look="secondary" id="query-builder-button" label="Query builder" @click=${this.#openQueryBuilder}>
+						<uui-icon name="umb:wand"></uui-icon>Query builder
+					</uui-button>
 				</div>
 				${this._ready
 					? this.#renderCodeEditor()
@@ -153,9 +156,12 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 				--uui-color-divider-standalone: transparent;
 			}
 
+			#workspace-header {
+				width: 100%;
+			}
+
 			uui-input {
 				width: 100%;
-				margin: 1em;
 			}
 
 			#code-editor-menu-container uui-icon:not([name='umb:delete']) {
@@ -184,7 +190,7 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 
 			#code-editor-menu-container {
 				display: flex;
-				justify-content: space-between;
+				justify-content: flex-end;
 				gap: var(--uui-size-space-3);
 			}
 		`,
