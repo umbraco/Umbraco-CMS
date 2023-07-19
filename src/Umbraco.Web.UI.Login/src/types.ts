@@ -7,6 +7,7 @@ export type LoginRequestModel = {
 export interface IUmbAuthContext {
 	login(data: LoginRequestModel): Promise<LoginResponse>;
 	resetPassword(username: string): Promise<ResetPasswordResponse>;
+	validatePasswordResetCode(code: string): Promise<ValidatePasswordResetCodeResponse>;
 	supportsPersistLogin: boolean;
 }
 
@@ -17,6 +18,11 @@ export type LoginResponse = {
 };
 
 export type ResetPasswordResponse = {
+	error?: string;
+	status: number;
+};
+
+export type ValidatePasswordResetCodeResponse = {
 	error?: string;
 	status: number;
 };

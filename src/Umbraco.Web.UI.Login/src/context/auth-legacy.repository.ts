@@ -1,4 +1,9 @@
-import type { LoginRequestModel, LoginResponse, ResetPasswordResponse } from '../types.js';
+import type {
+	LoginRequestModel,
+	LoginResponse,
+	ResetPasswordResponse,
+	ValidatePasswordResetCodeResponse,
+} from '../types.js';
 
 export class UmbAuthLegacyRepository {
 	readonly #authURL = '/umbraco/backoffice/umbracoapi/authentication/postlogin';
@@ -28,6 +33,24 @@ export class UmbAuthLegacyRepository {
 			method: 'POST',
 			body: JSON.stringify({
 				username,
+			}),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		const response = await fetch(request);
+
+		return {
+			status: response.status,
+			error: response.ok ? undefined : this.#getErrorText(response),
+		};
+	}
+
+	public async validatePasswordResetCode(code: string): Promise<ValidatePasswordResetCodeResponse> {
+		const request = new Request('/umbraco/backoffice/umbracoapi/authentication/validatepasswordresetcode', {
+			method: 'POST',
+			body: JSON.stringify({
+				code,
 			}),
 			headers: {
 				'Content-Type': 'application/json',

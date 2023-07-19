@@ -39,6 +39,7 @@ export default class UmbAuthElement extends LitElement {
 			router.setRoutes([
 				{ path: '/', component: 'umb-login' },
 				{ path: '/reset', component: 'umb-reset-password' },
+				{ path: '/reset-verify', component: 'umb-new-password' },
 				{ path: '/new', component: 'umb-new-password' },
 			]);
 		});

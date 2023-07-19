@@ -27,10 +27,9 @@ export default class UmbNewPasswordElement extends LitElement {
 		const urlParams = new URLSearchParams(window.location.search);
 		this.code = urlParams.get('code') || '';
 
-		//DEBUG wait 2 seconds
-		await new Promise((resolve) => setTimeout(resolve, 2000));
+		const response = await UmbAuthMainContext.Instance.validatePasswordResetCode(this.code);
 
-		this.page = 'new';
+		this.page = response.status === 200 ? 'new' : 'error';
 	};
 
 	#handleResetSubmit = async (e: SubmitEvent) => {
