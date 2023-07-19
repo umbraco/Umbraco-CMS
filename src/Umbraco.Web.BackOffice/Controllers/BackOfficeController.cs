@@ -210,7 +210,7 @@ public class BackOfficeController : UmbracoController
         if (result.Succeeded == false)
         {
             _logger.LogWarning("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
-            return new RedirectResult(Url.Action(nameof(Default)) + "/login?status=false&invite=3");
+            return new RedirectResult(Url.Action(nameof(Default)) + "/login/?status=false&invite=3");
         }
 
         //sign the user in
@@ -220,7 +220,7 @@ public class BackOfficeController : UmbracoController
         identityUser.LastLoginDateUtc = previousLastLoginDate;
         await _userManager.UpdateAsync(identityUser);
 
-        return new RedirectResult(Url.Action(nameof(Default)) + "/login?status=false&invite=1");
+        return new RedirectResult(Url.Action(nameof(Default)) + "/login/?status=false&invite=1");
     }
 
     /// <summary>
