@@ -21,9 +21,6 @@ export default class UmbLoginElement extends LitElement {
 	private _loginError = '';
 
 	@state()
-	private _returnURL = ''; // GET FROM CONTEXT
-
-	@state()
 	private _allowPasswordReset = true; // GET FROM CONTEXT
 
 	#handleSubmit = async (e: SubmitEvent) => {
