@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 
 import type { UUIButtonState } from '@umbraco-ui/uui';
@@ -74,53 +74,51 @@ export default class UmbLoginElement extends LitElement {
 
 	render() {
 		return html`
-			<div class="uui-text">
-				<h1 class="uui-h3">${this.#greeting}</h1>
-				<uui-form>
-					<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
-						<uui-form-layout-item>
-							<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>
-							<uui-input
-								type="email"
-								id="email"
-								name="email"
-								label="Email"
-								required
-								required-message="Email is required"></uui-input>
-						</uui-form-layout-item>
+			<h1 class="uui-h3">${this.#greeting}</h1>
+			<uui-form>
+				<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
+					<uui-form-layout-item>
+						<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>
+						<uui-input
+							type="email"
+							id="email"
+							name="email"
+							label="Email"
+							required
+							required-message="Email is required"></uui-input>
+					</uui-form-layout-item>
 
-						<uui-form-layout-item>
-							<uui-label id="passwordLabel" for="password" slot="label" required>Password</uui-label>
-							<uui-input-password
-								id="password"
-								name="password"
-								label="Password"
-								required
-								required-message="Password is required"></uui-input-password>
-						</uui-form-layout-item>
+					<uui-form-layout-item>
+						<uui-label id="passwordLabel" for="password" slot="label" required>Password</uui-label>
+						<uui-input-password
+							id="password"
+							name="password"
+							label="Password"
+							required
+							required-message="Password is required"></uui-input-password>
+					</uui-form-layout-item>
 
-						<div id="secondary-actions">
-							${when(
-								this.#authContext.supportsPersistLogin,
-								() => html`<uui-form-layout-item>
-									<uui-checkbox name="persist" label="Remember me">Remember me</uui-checkbox>
-								</uui-form-layout-item>`
-							)}
-							${when(this._allowPasswordReset, () => html`<a href="/reset"> Forgot password? </a>`)}
-						</div>
+					<div id="secondary-actions">
+						${when(
+							this.#authContext.supportsPersistLogin,
+							() => html`<uui-form-layout-item>
+								<uui-checkbox name="persist" label="Remember me">Remember me</uui-checkbox>
+							</uui-form-layout-item>`
+						)}
+						${when(this._allowPasswordReset, () => html`<a href="/reset"> Forgot password? </a>`)}
+					</div>
 
-						<uui-form-layout-item>${this.#renderErrorMessage()}</uui-form-layout-item>
+					<uui-form-layout-item>${this.#renderErrorMessage()}</uui-form-layout-item>
 
-						<uui-button
-							type="submit"
-							id="login-button"
-							label="Login"
-							look="primary"
-							color="positive"
-							.state=${this._loginState}></uui-button>
-					</form>
-				</uui-form>
-			</div>
+					<uui-button
+						type="submit"
+						id="login-button"
+						label="Login"
+						look="primary"
+						color="positive"
+						.state=${this._loginState}></uui-button>
+				</form>
+			</uui-form>
 		`;
 	}
 

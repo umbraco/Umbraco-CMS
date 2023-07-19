@@ -14,7 +14,7 @@ export class UmbAuthLegacyRepository {
 			body: JSON.stringify({
 				username: data.username,
 				password: data.password,
-				persist: data.persist,
+				rememberMe: data.persist,
 			}),
 			headers: {
 				'Content-Type': 'application/json',

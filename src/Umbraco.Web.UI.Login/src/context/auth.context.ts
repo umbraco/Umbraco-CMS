@@ -8,13 +8,13 @@ import {
 } from '../types.ts';
 
 export class UmbAuthContext implements IUmbAuthContext {
-	resetPassword(username: string): Promise<ResetPasswordResponse> {
+	resetPassword(_username: string): Promise<ResetPasswordResponse> {
 		throw new Error('Method not implemented.');
 	}
-	validatePasswordResetCode(code: string): Promise<ValidatePasswordResetCodeResponse> {
+	validatePasswordResetCode(_code: string): Promise<ValidatePasswordResetCodeResponse> {
 		throw new Error('Method not implemented.');
 	}
-	newPassword(password: string, code: string): Promise<NewPasswordResponse> {
+	newPassword(_password: string, _code: string): Promise<NewPasswordResponse> {
 		throw new Error('Method not implemented.');
 	}
 	supportsPersistLogin = false;
