@@ -111,7 +111,7 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 					.value=${this._name}
 					@input=${this.#onNameInput}
 					label="template name"></uui-input>
-				<small>${this._path}</small>
+				<small>Views/Partials/${this._path}</small>
 			</div>
 			<uui-box>
 				<div slot="header" id="code-editor-menu-container">

@@ -4,8 +4,12 @@ import { createObservablePart, UmbBooleanState, UmbDeepState } from '@umbraco-cm
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
+import { UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<UmbPartialViewsRepository, PartialViewDetails> {
+export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<
+	UmbPartialViewsRepository,
+	PartialViewDetails
+> {
 	getEntityId(): string | undefined {
 		throw new Error('Method not implemented.');
 	}
@@ -13,7 +17,23 @@ export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<UmbPart
 		throw new Error('Method not implemented.');
 	}
 	save(): Promise<void> {
-		throw new Error('Method not implemented.');
+		const partialView = this.getData();
+
+		if (!partialView)
+			return Promise.reject('Something went wrong, there is no data for partial view you want to save...');
+		if (this.getIsNew()) {
+			//this.repository.create()
+			console.log('create');
+			return Promise.resolve();
+		}
+		if (!partialView.path) return Promise.reject('There is no path');
+		const updateRequestBody: UpdatePartialViewRequestModel = {
+			name: partialView.name,
+			existingPath: partialView.path,
+			content: partialView.content,
+		};
+		this.repository.save(partialView.path, updateRequestBody);
+		return Promise.resolve();
 	}
 	destroy(): void {
 		throw new Error('Method not implemented.');
