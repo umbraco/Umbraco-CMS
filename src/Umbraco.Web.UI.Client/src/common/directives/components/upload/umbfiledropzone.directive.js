@@ -152,6 +152,14 @@ angular.module("umbraco.directives")
               return;
             }
 
+            if (file.$error) {
+                scope.processed.push(file);
+                scope.currentFile = undefined;
+                file.messages.push({type: "Error"});
+                _processQueueItems();
+                return;
+            }
+
             scope.propertyAlias = scope.propertyAlias ? scope.propertyAlias : "umbracoFile";
             scope.contentTypeAlias = scope.contentTypeAlias ? scope.contentTypeAlias : "umbracoAutoSelect";
 
