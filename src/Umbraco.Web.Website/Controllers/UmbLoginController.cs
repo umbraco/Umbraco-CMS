@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Models.Email;
@@ -93,7 +95,13 @@ public class UmbLoginController : SurfaceController
             return CurrentUmbracoPage();
         }
 
-        MemberIdentityUser memberIdentity = await _memberManager.FindByNameAsync(model.Username);
+        MemberIdentityUser? memberIdentity = await _memberManager.FindByNameAsync(model.Username);
+        if (memberIdentity == null!)
+        {
+            return new ValidationErrorResult(
+                $"No local member found for username {model.Username}");
+        }
+
         string token = await _memberManager.GeneratePasswordResetTokenAsync(memberIdentity);
 
         var inviteToken = $"{memberIdentity.Id}{WebUtility.UrlEncode("|")}{token.ToUrlBase64()}";
@@ -134,7 +142,13 @@ public class UmbLoginController : SurfaceController
             return CurrentUmbracoPage();
         }
 
-        MemberIdentityUser memberIdentity = await _memberManager.FindByIdAsync(model.UserId);
+        MemberIdentityUser? memberIdentity = await _memberManager.FindByIdAsync(model.UserId);
+        if (memberIdentity == null!)
+        {
+            return new ValidationErrorResult(
+                $"No local member found for username {model.Username}");
+        }
+
         IdentityResult result = await _memberManager.ChangePasswordWithResetAsync(memberIdentity.Id, token, model.Password);
 
         if (result.Succeeded)
