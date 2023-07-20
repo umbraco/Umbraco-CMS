@@ -7,7 +7,7 @@
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
 function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
-                        $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService, mediaHelper) {
+                        $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService, mediaHelper, fileManager) {
 
     //These are absolutely required in order for the macros to render inline
     //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
@@ -224,12 +224,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     function uploadImageHandler(blobInfo, success, failure, progress){
         const blob = blobInfo.blob();
 
-        // get the max file size from the server
-        const maxFileSize = Number(Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize ?? 0) * 1000;
-
         // if the file size is greater than the max file size, reject it
-        if (maxFileSize > 0 && blob.size > maxFileSize) {
-            failure(`The file size (${blob.size / 1000} KB) exceeded the maximum allowed size of ${maxFileSize/1000} KB.`);
+        if (fileManager.maxFileSize > 0 && blob.size > fileManager.maxFileSize) {
+            failure(`The file size (${blob.size / 1000} KB) exceeded the maximum allowed size of ${fileManager.maxFileSize / 1000} KB.`);
             return;
         }
 
