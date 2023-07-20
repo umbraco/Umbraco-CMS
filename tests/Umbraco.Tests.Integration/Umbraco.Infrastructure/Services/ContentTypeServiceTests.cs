@@ -511,15 +511,15 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page");
         ContentTypeService.Save(contentType);
 
-        var hasContainers = ContentTypeService.HasContentTypesOrEntityContainers();
-        Assert.IsTrue(hasContainers);
+        var hasContentTypes = ContentTypeService.HasContentTypesOrEntityContainers();
+        Assert.IsTrue(hasContentTypes);
     }
 
     [Test]
     public void HasContentTypesOrEntityContainers_Returns_false_When_Has_ContentTypes()
     {
-        var hasContainers = ContentTypeService.HasContentTypesOrEntityContainers();
-        Assert.IsFalse(hasContainers);
+        var hasAny = ContentTypeService.HasContentTypesOrEntityContainers();
+        Assert.IsFalse(hasAny);
     }
 
     [Test]
