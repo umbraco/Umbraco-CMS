@@ -1,14 +1,19 @@
 using System.Net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using MimeKit;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Email;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
@@ -30,6 +35,9 @@ public class UmbLoginController : SurfaceController
     private readonly IMemberSignInManager _signInManager;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
     private readonly IEmailSender _emailSender;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly LinkGenerator _linkGenerator;
+    private readonly WebRoutingSettings _webRoutingSettings;
     private readonly GlobalSettings _globalSettings;
 
     [ActivatorUtilitiesConstructor]
@@ -44,6 +52,9 @@ public class UmbLoginController : SurfaceController
         IMemberManager memberManager,
         ITwoFactorLoginService twoFactorLoginService,
         IEmailSender emailSender,
+        IHttpContextAccessor httpContextAccessor,
+        LinkGenerator linkGenerator,
+        IOptions<WebRoutingSettings> webRoutingSettings,
         IOptions<GlobalSettings> globalSettings)
         : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
     {
@@ -51,6 +62,9 @@ public class UmbLoginController : SurfaceController
         _memberManager = memberManager;
         _twoFactorLoginService = twoFactorLoginService;
         _emailSender = emailSender;
+        _httpContextAccessor = httpContextAccessor;
+        _linkGenerator = linkGenerator;
+        _webRoutingSettings = webRoutingSettings.Value;
         _globalSettings = globalSettings.Value;
     }
 
@@ -74,6 +88,9 @@ public class UmbLoginController : SurfaceController
             StaticServiceProvider.Instance.GetRequiredService<IMemberManager>(),
             StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>(),
             StaticServiceProvider.Instance.GetRequiredService<IEmailSender>(),
+            StaticServiceProvider.Instance.GetRequiredService<IHttpContextAccessor>(),
+            StaticServiceProvider.Instance.GetRequiredService<LinkGenerator>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<WebRoutingSettings>>(),
             StaticServiceProvider.Instance.GetRequiredService<IOptions<GlobalSettings>>())
     {
     }
@@ -102,21 +119,8 @@ public class UmbLoginController : SurfaceController
                 $"No local member found for username {model.Username}");
         }
 
-        string token = await _memberManager.GeneratePasswordResetTokenAsync(memberIdentity);
-
-        var inviteToken = $"{memberIdentity.Id}{WebUtility.UrlEncode("|")}{token.ToUrlBase64()}";
-
-        var senderEmail = _globalSettings.Smtp?.From;
-
-        var passwordLink = $"<a href=\"{model.RedirectUrl}?invite={inviteToken}\">Reset password</a>";
-
-        var subject = "Reset Password";
-        var body = $"<h3>Reset password</h3>"
-            + $"<p>{passwordLink}</p>";
-
-        var mailMessage = new EmailMessage(senderEmail, memberIdentity.Email, subject, body, true);
-
-        await _emailSender.SendAsync(mailMessage, Core.Constants.Web.EmailTypes.PasswordReset);
+        // send the email
+        await SendMemberResetEmailAsync(memberIdentity);
 
         TempData["ForgottenPasswordSuccess"] = true;
 
@@ -252,5 +256,73 @@ public class UmbLoginController : SurfaceController
         {
             model.RedirectUrl = redirectUrl.ToString();
         }
+    }
+
+    private async Task SendMemberResetEmailAsync(MemberIdentityUser? member, string? from, string? fromEmail, string? message)
+    {
+        if (member is null)
+        {
+            throw new InvalidOperationException("Could not find member");
+        }
+
+        var token = await _memberManager.GeneratePasswordResetTokenAsync(member);
+
+        // Use info from SMTP Settings if configured, otherwise set fromEmail as fallback
+        var senderEmail = !string.IsNullOrEmpty(_globalSettings.Smtp?.From) ? _globalSettings.Smtp.From : fromEmail;
+
+        var resetToken = $"{member.Id}{WebUtility.UrlEncode("|")}{token.ToUrlBase64()}";
+
+        // Get an mvc helper to get the URL
+        var action = _linkGenerator.GetPathByAction(
+            nameof(BackOfficeController.VerifyInvite),
+            ControllerExtensions.GetControllerName<UmbLoginController>(),
+            new { area = Constants.Web.Mvc.BackOfficeArea, reset = resetToken });
+
+        // Construct full URL using configured application URL (which will fall back to request)
+        Uri applicationUri = _httpContextAccessor.GetRequiredHttpContext().Request
+            .GetApplicationUri(_webRoutingSettings);
+
+        var resetUri = new Uri(applicationUri, action);
+
+        //var emailSubject = _localizedTextService.Localize("user", "inviteEmailCopySubject",
+        //    // Ensure the culture of the found user is used for the email!
+        //    UmbracoUserExtensions.GetUserCulture(to?.Language, _localizedTextService, _globalSettings));
+
+        //var emailBody = _localizedTextService.Localize("user", "inviteEmailCopyFormat",
+        //    // Ensure the culture of the found user is used for the email!
+        //    UmbracoUserExtensions.GetUserCulture(to?.Language, _localizedTextService, _globalSettings),
+        //    new[] { userDisplay?.Name, from, message, resetUri.ToString(), senderEmail });
+
+        var passwordLink = $"<a href=\"{resetUri}?reset={resetToken}\">Reset password</a>";
+
+        var emailSubject = "Reset Password";
+
+        var emailBody = $"<h3>Reset password</h3>"
+            + $"<p>{passwordLink}</p>";
+
+        // This needs to be in the correct mailto format including the name, else
+        // the name cannot be captured in the email sending notification.
+        // i.e. "Some Person" <hello@example.com>
+        var toMailBoxAddress = new MailboxAddress(member?.Name, member?.Email);
+
+        var mailMessage = new EmailMessage(senderEmail, toMailBoxAddress.ToString(), emailSubject, emailBody, true);
+
+        await _emailSender.SendAsync(mailMessage, Core.Constants.Web.EmailTypes.PasswordReset, true);
+
+        //string token = await _memberManager.GeneratePasswordResetTokenAsync(memberIdentity);
+
+        //var inviteToken = $"{memberIdentity.Id}{WebUtility.UrlEncode("|")}{token.ToUrlBase64()}";
+
+        //var senderEmail = _globalSettings.Smtp?.From;
+
+        //var passwordLink = $"<a href=\"{model.RedirectUrl}?invite={inviteToken}\">Reset password</a>";
+
+        //var subject = "Reset Password";
+        //var body = $"<h3>Reset password</h3>"
+        //    + $"<p>{passwordLink}</p>";
+
+        //var mailMessage = new EmailMessage(senderEmail, memberIdentity.Email, subject, body, true);
+
+        //await _emailSender.SendAsync(mailMessage, Core.Constants.Web.EmailTypes.PasswordReset);
     }
 }
