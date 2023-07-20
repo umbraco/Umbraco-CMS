@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Builder;
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 /// <summary>
-/// Used to modify the <see cref="IApplicationBuilder" /> pipeline before and after Umbraco registers it's middlewares.
-/// middlewares.
+/// Used to modify the <see cref="IApplicationBuilder" /> pipeline before and after Umbraco registers its middlewares.
 /// </summary>
 /// <remarks>
 /// Mainly used for package developers.
