@@ -1,0 +1,15 @@
+{
+  "general": {
+    "login": "Login"
+  },
+  "user": {
+    "username": "Username",
+    "email": "Email",
+    "password": "Password"
+  },
+  "placeholders": {
+    "username": "Enter your username",
+    "email": "Enter your email",
+    "password": "Enter your password"
+  }
+}
