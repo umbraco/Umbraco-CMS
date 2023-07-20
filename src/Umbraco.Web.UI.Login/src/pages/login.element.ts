@@ -122,7 +122,7 @@ export default class UmbLoginElement extends LitElement {
             label="Login"
 						color="positive"
 						.state=${this._loginState}>
-            <umb-localize key="user_login">Login</umb-localize>
+            <umb-localize key="general_login">Login</umb-localize>
           </uui-button>
 				</form>
 			</uui-form>
