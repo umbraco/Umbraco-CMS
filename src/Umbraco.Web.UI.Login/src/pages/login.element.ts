@@ -73,7 +73,7 @@ export default class UmbLoginElement extends LitElement {
 
 	render() {
 		return html`
-			<h1 class="uui-h3">${this.#greeting}</h1>
+			<h1 id="greeting" class="uui-h3">${this.#greeting}</h1>
 			<uui-form>
 				<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
 					<uui-form-layout-item>
@@ -130,6 +130,13 @@ export default class UmbLoginElement extends LitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+			}
+			#greeting {
+				text-align: center;
+			}
 			uui-input,
 			uui-input-password {
 				width: 100%;
