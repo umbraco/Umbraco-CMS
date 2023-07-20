@@ -6,10 +6,7 @@ import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<
-	UmbPartialViewsRepository,
-	PartialViewDetails
-> {
+export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<UmbPartialViewsRepository, PartialViewDetails> {
 	getEntityId(): string | undefined {
 		throw new Error('Method not implemented.');
 	}
@@ -81,10 +78,16 @@ export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<
 		}
 	}
 
-	async create(parentKey: string | null, name = 'empty') {
+	async create(parentKey: string | null, name = 'Empty') {
 		const { data } = await this.repository.createScaffold(parentKey, name);
+		debugger;
+		const newPartial = {
+			...data,
+			name: '',
+			path: parentKey ?? '',
+		};
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next(data);
+		this.#data.next(newPartial);
 	}
 }

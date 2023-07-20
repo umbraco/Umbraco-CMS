@@ -22,9 +22,10 @@ export class UmbPartialViewsWorkspaceElement extends UmbLitElement {
 			component: () => this.#element,
 			setup: async (component: PageComponent, info: IRoutingInfo) => {
 				const parentKey = info.match.params.parentKey;
-				const decodePath = decodeURIComponent(parentKey).replace('-cshtml', '.cshtml');
+				const decodePath = decodeURIComponent(parentKey);
+				const snippetName = 'Empty';
 
-				this.#partialViewsWorkspaceContext.create(parentKey);
+				this.#partialViewsWorkspaceContext.create(parentKey === 'null' ? null : parentKey, snippetName);
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,
