@@ -35,16 +35,11 @@ class UmbLocalizationContext {
    * Localize a key.
    * If the key is not found, the fallback is returned.
    * If the fallback is not provided, the key is returned.
-   * @param key The key to localize. The key is case sensitive and should be provided as "section_key". If no section is provided, "general" is used.
+   * @param key The key to localize. The key is case sensitive.
    * @param fallback The fallback text to use if the key is not found (default: undefined).
    */
   async localize(key: string, fallback?: string): Promise<string> {
     this.#initLocalizedResources();
-
-    // If no section is provided, use "general".
-    if (!key.includes("_")) {
-      key = `general_${key}`;
-    }
 
     return (await firstValueFrom(this.#innerDictionary)).get(key) ?? fallback ?? '';
   }
