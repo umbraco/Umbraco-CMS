@@ -496,33 +496,6 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void HasContentTypesOrEntityContainers_Returns_true_When_Has_Container()
-    {
-        var container = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container" };
-        ContentTypeService.SaveContainer(container);
-
-        var hasContainers = ContentTypeService.HasContentTypesOrEntityContainers();
-        Assert.IsTrue(hasContainers);
-    }
-
-    [Test]
-    public void HasContentTypesOrEntityContainers_Returns_true_When_Has_ContentTypes()
-    {
-        var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page");
-        ContentTypeService.Save(contentType);
-
-        var hasContentTypes = ContentTypeService.HasContentTypesOrEntityContainers();
-        Assert.IsTrue(hasContentTypes);
-    }
-
-    [Test]
-    public void HasContentTypesOrEntityContainers_Returns_false_When_Has_ContentTypes()
-    {
-        var hasAny = ContentTypeService.HasContentTypesOrEntityContainers();
-        Assert.IsFalse(hasAny);
-    }
-
-    [Test]
     public void Deleting_ContentType_Sends_Correct_Number_Of_DeletedEntities_In_Events()
     {
         var deletedEntities = 0;

@@ -30,9 +30,4 @@ public interface IContentTypeService : IContentTypeBaseService<IContentType>
     /// <returns></returns>
     IEnumerable<int> GetAllContentTypeIds(string[] aliases);
 
-    /// <summary>
-    /// Check if there are any content types or entity containers. This is used to determine if the tree controller should return a true result for the "hasChildren" property.
-    /// </summary>
-    /// <returns>True if there are any contentypes or entity containers (folders).</returns>
-    bool HasContentTypesOrEntityContainers();
 }

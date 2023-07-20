@@ -64,7 +64,7 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
         if (root is not null)
         {
             // check if there are any types or containers
-            root.HasChildren = _contentTypeService.HasContentTypesOrEntityContainers();
+            root.HasChildren = _contentTypeService.GetAll().Any() || _contentTypeService.GetContainers(Array.Empty<int>()).Any();
         }
 
         return root;
