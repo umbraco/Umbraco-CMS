@@ -29,5 +29,4 @@ public interface IContentTypeService : IContentTypeBaseService<IContentType>
     /// <param name="aliases"></param>
     /// <returns></returns>
     IEnumerable<int> GetAllContentTypeIds(string[] aliases);
-
 }
