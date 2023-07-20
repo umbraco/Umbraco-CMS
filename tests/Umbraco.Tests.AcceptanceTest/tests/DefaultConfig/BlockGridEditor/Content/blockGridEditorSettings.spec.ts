@@ -29,7 +29,7 @@ test.describe('BlockGridEditorSettings', () => {
   test.describe('General', () => {
     test('can see label in content for a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
       const newLabel = "New Label";
-      
+
       const element = await umbracoApi.documentTypes.createDefaultElementType(elementName, elementAlias);
 
       const dataTypeBlockGrid = new BlockGridDataTypeBuilder()
@@ -41,14 +41,14 @@ test.describe('BlockGridEditorSettings', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, element, dataType, null);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, null);
 
       await umbracoUi.navigateToContent(blockGridName);
-      
+
       // Assert
       // Checks if the element contains the correct label
       await expect(page.locator('[data-content-element-type-alias="' + elementAlias + '"]')).toContainText(newLabel);
-      // Checks if the element is clickable 
+      // Checks if the element is clickable
       await page.locator('[data-content-element-type-alias="' + elementAlias + '"]').click();
     });
   });
@@ -65,9 +65,9 @@ test.describe('BlockGridEditorSettings', () => {
         .done()
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
-      
-      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, element, dataType);
-      
+
+      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(element, dataType);
+
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
         .withAction(ConstantHelper.actions.save)
@@ -77,21 +77,21 @@ test.describe('BlockGridEditorSettings', () => {
         .done()
         .build();
       await umbracoApi.content.save(rootContentNode);
-      
+
       await umbracoUi.navigateToContent(blockGridName);
-      
+
       // Checks if adding a block is disabled
       await expect(page.locator('[data-element="property-'+blockGridAlias+'"]').locator('umb-block-grid-root').locator('[disabled="disabled"]')).toBeDisabled();
       // Checks if the button is not clickable
       await expect(page.locator('[data-element="property-' + blockGridAlias + '"]').locator('[key="blockEditor_addBlock"]')).not.toBeEnabled();
     });
-    
+
     test('can set allow in areas to false for an element in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
       const elementBodyName = 'BodyElement';
       const elementBodyAlias = AliasHelper.toAlias(elementBodyName);
-      
+
       await umbracoApi.documentTypes.ensureNameNotExists(elementBodyName);
-      
+
       const element = await umbracoApi.documentTypes.createDefaultElementType(elementName, elementAlias);
       const elementBody = await umbracoApi.documentTypes.createDefaultElementType(elementBodyName, elementBodyAlias);
 
@@ -110,14 +110,14 @@ test.describe('BlockGridEditorSettings', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi,element,dataType,false);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
-      
+
       // Assert
       // Checks if the elementTitle is the only element selectable to be in a area
       await expect(page.locator('[data-area-alias="titleArea"]').locator('[key="blockEditor_addThis"]')).toContainText('Add ' + elementName);
-      
+
       // Clean
       await umbracoApi.documentTypes.ensureNameNotExists(elementBodyName);
     });
@@ -136,17 +136,17 @@ test.describe('BlockGridEditorSettings', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, element, dataType, null);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, null);
 
       await umbracoUi.navigateToContent(blockGridName);
-      
+
       // Drags the blocks from a columnSpan of 12 to 6
       const dragFrom = await page.locator('[data-content-element-type-key="' + element['key'] + '"]', {hasText: elementName}).locator('[title="Drag to scale"]');
       const dragTo = await page.locator('[data-content-element-type-key="' + element['key'] + '"]', {hasText: elementName});
       await umbracoUi.dragAndDrop(dragFrom,dragTo, 0, 0 ,10);
       await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
 
-      // Assert 
+      // Assert
       await umbracoUi.isSuccessNotificationVisible();
       // Checks if the block is resized to a column span of 6
       await expect(page.locator('[data-content-element-type-key="' + element['key'] + '"], [data-col-span="6"]', {hasText: elementName})).toBeVisible();
