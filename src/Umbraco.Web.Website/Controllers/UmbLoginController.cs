@@ -146,7 +146,7 @@ public class UmbLoginController : SurfaceController
         if (memberIdentity == null!)
         {
             return new ValidationErrorResult(
-                $"No local member found for username {model.Username}");
+                $"No local member found for user id {model.UserId}");
         }
 
         IdentityResult result = await _memberManager.ChangePasswordWithResetAsync(memberIdentity.Id, token, model.Password);
