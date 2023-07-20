@@ -1,15 +1,19 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 
 @customElement('umb-auth-layout')
 export class UmbAuthLayoutElement extends LitElement {
+	@property({ type: String, attribute: 'background-image' })
+	backgroundImage = 'login.svg';
+
+	@property({ type: String, attribute: 'logo-image' })
+	logoImage = 'umbraco_logomark_white.svg';
+
 	render() {
 		return html`
 			<div id="background"></div>
 
-			<div id="logo">
-				<img src="umbraco_logomark_white.svg" alt="Umbraco" />
-			</div>
+			<div id="logo"><img src=${this.logoImage} alt="Umbraco" /></div>
 
 			<div id="container">
 				<uui-box id="box">

@@ -2,6 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
+import { ifDefined } from 'lit/directives/if-defined.js';
+
 import './auth-layout.element.js';
 import './pages/reset-password.element.js';
 import './pages/new-password.element.js';
@@ -15,6 +17,12 @@ export default class UmbAuthElement extends LitElement {
 
 	@property({ type: Boolean, attribute: 'is-legacy' })
 	isLegacy = false;
+
+	@property({ type: String, attribute: 'background-image' })
+	backgroundImage = '';
+
+	@property({ type: String, attribute: 'logo-image' })
+	logoImage = '';
 
 	@property({ type: Boolean, attribute: 'allow-password-reset' })
 	allowPasswordReset = true;
@@ -46,7 +54,7 @@ export default class UmbAuthElement extends LitElement {
 
 	render() {
 		return html`
-			<umb-auth-layout>
+			<umb-auth-layout backgroundImage=${ifDefined(this.backgroundImage)} logoImage=${ifDefined(this.logoImage)}>
 				<div id="outlet"></div>
 			</umb-auth-layout>
 		`;
