@@ -3,9 +3,9 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import './auth-layout.element.js';
-import './reset-password.element.js';
-import './new-password.element.js';
-import './login.element.js';
+import './pages/reset-password.element.js';
+import './pages/new-password.element.js';
+import './pages/login.element.js';
 import { Router } from '@vaadin/router';
 import { UmbAuthMainContext } from './context/auth-main.context.js';
 
