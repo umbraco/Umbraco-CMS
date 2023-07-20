@@ -19,7 +19,14 @@ export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<UmbPart
 		if (!partialView)
 			return Promise.reject('Something went wrong, there is no data for partial view you want to save...');
 		if (this.getIsNew()) {
-			//this.repository.create()
+
+			const createRequestBody = {
+				name: partialView.name,
+				content: partialView.content,
+				parentPath: partialView.path + '/',
+			}
+
+			this.repository.create(createRequestBody)
 			console.log('create');
 			return Promise.resolve();
 		}
@@ -80,7 +87,6 @@ export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<UmbPart
 
 	async create(parentKey: string | null, name = 'Empty') {
 		const { data } = await this.repository.createScaffold(parentKey, name);
-		debugger;
 		const newPartial = {
 			...data,
 			name: '',

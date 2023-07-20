@@ -11,8 +11,16 @@ import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-partial-views-workspace-edit')
 export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
+	#name: string | undefined = '';
 	@state()
-	private _name?: string | null = '';
+	private get _name() {
+		return this.#name;
+	}
+
+	private set _name(value) {
+		this.#name = value?.replace('.cshtml', '');
+		this.requestUpdate();
+	}
 
 	@state()
 	private _content?: string | null = '';
@@ -64,7 +72,7 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 			});
 
 			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue: string) => {
-				this.#partialViewsWorkspaceContext?.setName(nameInputValue);
+				this.#partialViewsWorkspaceContext?.setName(`${nameInputValue}.cshtml`);
 			});
 		});
 	}
