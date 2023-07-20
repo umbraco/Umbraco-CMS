@@ -13,6 +13,7 @@ import {
 	FolderModelBaseModel,
 	FolderReponseModel,
 	PagedSnippetItemResponseModel,
+	PartialViewItemResponseModel,
 	PartialViewResponseModel,
 	ProblemDetails,
 	TextFileResponseModelBaseModel,
@@ -196,6 +197,10 @@ export class UmbPartialViewsRepository
 
 	getSnippets({ skip = 0, take = 100 }): Promise<DataSourceResponse<PagedSnippetItemResponseModel>> {
 		return this.#detailDataSource.getSnippets({ skip, take });
+	}
+
+	requestItems(keys: Array<string>): Promise<DataSourceResponse<PartialViewItemResponseModel[]>> {
+		return this.#detailDataSource.getItems(keys);
 	}
 
 	//#endregion

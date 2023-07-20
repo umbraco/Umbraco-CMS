@@ -8,7 +8,7 @@ import { UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/backend-a
 
 export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<UmbPartialViewsRepository, PartialViewDetails> {
 	getEntityId(): string | undefined {
-		throw new Error('Method not implemented.');
+		return this.getData()?.path;
 	}
 	getEntityType(): string {
 		throw new Error('Method not implemented.');

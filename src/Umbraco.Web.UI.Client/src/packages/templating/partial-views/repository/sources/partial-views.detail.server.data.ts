@@ -2,6 +2,7 @@ import { PartialViewDetails } from '../../config.js';
 import {
 	CreatePartialViewRequestModel,
 	PagedSnippetItemResponseModel,
+	PartialViewItemResponseModel,
 	PartialViewResource,
 	PartialViewResponseModel,
 	UpdatePartialViewRequestModel,
@@ -90,5 +91,9 @@ export class UmbPartialViewDetailServerDataSource
 	 */
 	delete(path: string): Promise<DataSourceResponse> {
 		return tryExecuteAndNotify(this.#host, PartialViewResource.deletePartialView({ path }));
+	}
+
+	getItems(keys: Array<string>): Promise<DataSourceResponse<PartialViewItemResponseModel[]>> {
+		return tryExecuteAndNotify(this.#host, PartialViewResource.getPartialViewItem({ id: keys }));
 	}
 }
