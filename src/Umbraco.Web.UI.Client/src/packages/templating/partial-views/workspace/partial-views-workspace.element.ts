@@ -23,7 +23,6 @@ export class UmbPartialViewsWorkspaceElement extends UmbLitElement {
 			setup: async (component: PageComponent, info: IRoutingInfo) => {
 				const parentKey = info.match.params.parentKey;
 				const decodePath = decodeURIComponent(parentKey);
-				debugger;
 				const snippetName = info.match.params.snippetName;
 
 				this.#partialViewsWorkspaceContext.create(decodePath === 'null' ? null : parentKey, snippetName);
