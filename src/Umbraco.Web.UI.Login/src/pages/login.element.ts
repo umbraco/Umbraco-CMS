@@ -77,7 +77,9 @@ export default class UmbLoginElement extends LitElement {
 			<uui-form>
 				<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
 					<uui-form-layout-item>
-						<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>
+						<uui-label id="emailLabel" for="email" slot="label" required>
+              <umb-localize key="user_email">Email</umb-localize>
+            </uui-label>
 						<uui-input
 							type="email"
 							id="email"
@@ -88,7 +90,9 @@ export default class UmbLoginElement extends LitElement {
 					</uui-form-layout-item>
 
 					<uui-form-layout-item>
-						<uui-label id="passwordLabel" for="password" slot="label" required>Password</uui-label>
+						<uui-label id="passwordLabel" for="password" slot="label" required>
+              <umb-localize key="user_password">Password</umb-localize>
+            </uui-label>
 						<uui-input-password
 							id="password"
 							name="password"
@@ -101,10 +105,12 @@ export default class UmbLoginElement extends LitElement {
 						${when(
 							this.#authContext.supportsPersistLogin,
 							() => html`<uui-form-layout-item>
-								<uui-checkbox name="persist" label="Remember me">Remember me</uui-checkbox>
+								<uui-checkbox name="persist" label="Remember me">
+                  <umb-localize="user_rememberMe">Remember me</umb-localize>
+                </uui-checkbox>
 							</uui-form-layout-item>`
 						)}
-						${when(this._allowPasswordReset, () => html`<a href="reset"> Forgot password? </a>`)}
+						${when(this._allowPasswordReset, () => html`<a href="reset"><umb-localize key="user_forgotPassword">Forgot password?</umb-localize></a>`)}
 					</div>
 
 					<uui-form-layout-item>${this.#renderErrorMessage()}</uui-form-layout-item>
@@ -112,10 +118,12 @@ export default class UmbLoginElement extends LitElement {
 					<uui-button
 						type="submit"
 						id="login-button"
-						label="Login"
 						look="primary"
+            label="Login"
 						color="positive"
-						.state=${this._loginState}></uui-button>
+						.state=${this._loginState}>
+            <umb-localize key="user_login">Login</umb-localize>
+          </uui-button>
 				</form>
 			</uui-form>
 		`;
