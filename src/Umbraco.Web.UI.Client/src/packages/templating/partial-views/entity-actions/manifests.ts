@@ -1,4 +1,9 @@
-import { PARTIAL_VIEW_ENTITY_TYPE, PARTIAL_VIEW_FOLDER_ENTITY_TYPE, PARTIAL_VIEW_REPOSITORY_ALIAS } from '../config.js';
+import {
+	PARTIAL_VIEW_ENTITY_TYPE,
+	PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
+	PARTIAL_VIEW_REPOSITORY_ALIAS,
+	PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+} from '../config.js';
 import { UmbCreateFromSnippetPartialViewAction } from './create/create-from-snippet.action.js';
 import { UmbCreateEmptyPartialViewAction } from './create/create-empty.action.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
@@ -38,7 +43,7 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
 		},
 		conditions: {
-			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
+			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE, PARTIAL_VIEW_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -52,7 +57,7 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
 		},
 		conditions: {
-			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
+			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE, PARTIAL_VIEW_ROOT_ENTITY_TYPE],
 		},
 	},
 ];

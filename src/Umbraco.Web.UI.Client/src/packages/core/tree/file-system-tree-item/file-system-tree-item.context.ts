@@ -13,6 +13,12 @@ export class UmbFileSystemTreeItemContext extends UmbTreeItemContextBase<FileSys
 		super(host, (x: FileSystemTreeItemPresentationModel) => x.path);
 	}
 
+	checkIfIsFolder() {
+		if (this.getTreeItem()?.isFolder) {
+			this.type = `${this.getTreeItem()?.type}-folder`;
+		}
+	}
+
 	constructPath(pathname: string, entityType: string, path: string) {
 		return `section/${pathname}/workspace/${entityType}/edit/${encodeURIComponent(path).replace('.', '-')}`;
 	}
