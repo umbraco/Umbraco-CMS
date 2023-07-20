@@ -81,13 +81,15 @@ public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerS
         var setting = _globalSettings.Value.DatabaseFactoryServerVersion;
         var fromSettings = false;
 
-        if (setting.IsNullOrWhiteSpace() || !setting.StartsWith("SqlServer.")
-                                         || !Enum<VersionName>.TryParse(setting.Substring("SqlServer.".Length), out VersionName versionName, true))
+        if (setting.IsNullOrWhiteSpace() || !setting.StartsWith("SqlServer.") || !Enum.TryParse(setting.AsSpan("SqlServer.".Length), true, out VersionName versionName))
         {
             versionName = GetSetVersion(connectionString, ProviderName, _logger).ProductVersionName;
         }
 
-        _logger.LogDebug("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).", versionName, DatabaseType.SqlServer2012, fromSettings ? "settings" : "detected");
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).", versionName, DatabaseType.SqlServer2012, fromSettings ? "settings" : "detected");
+        }
 
         return DatabaseType.SqlServer2012;
     }
@@ -272,6 +274,13 @@ where tbl.[name]=@0 and col.[name]=@1;",
         return !constraintName.IsNullOrWhiteSpace();
     }
 
+    public override bool DoesPrimaryKeyExist(IDatabase db, string tableName, string primaryKeyName)
+    {
+        IEnumerable<SqlPrimaryKey>? keys = db.Fetch<SqlPrimaryKey>($"select * from sysobjects where xtype='pk' and  parent_obj in (select id from sysobjects where name='{tableName}')")
+            .Where(x => x.Name == primaryKeyName);
+        return keys.FirstOrDefault() is not null;
+    }
+
     public override bool DoesTableExist(IDatabase db, string tableName)
     {
         var result =
@@ -453,4 +462,9 @@ _sqlInspector ??= new SqlInspectionUtilities();
     }
 
     #endregion
+
+    private class SqlPrimaryKey
+    {
+        public string Name { get; set; } = null!;
+    }
 }

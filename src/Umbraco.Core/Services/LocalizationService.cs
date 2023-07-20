@@ -171,6 +171,29 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     }
 
     /// <summary>
+    ///     Gets a collection <see cref="IDictionaryItem" /> by their <see cref="Guid" /> ids
+    /// </summary>
+    /// <param name="ids">Ids of the <see cref="IDictionaryItem" /></param>
+    /// <returns>
+    ///     A collection of <see cref="IDictionaryItem" />
+    /// </returns>
+    public IEnumerable<IDictionaryItem> GetDictionaryItemsByIds(params Guid[] ids)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IEnumerable<IDictionaryItem> items = _dictionaryRepository.GetMany(ids).ToArray();
+
+            // ensure the lazy Language callback is assigned
+            foreach (IDictionaryItem item in items)
+            {
+                EnsureDictionaryItemLanguageCallback(item);
+            }
+
+            return items;
+        }
+    }
+
+    /// <summary>
     ///     Gets a <see cref="IDictionaryItem" /> by its key
     /// </summary>
     /// <param name="key">Key of the <see cref="IDictionaryItem" /></param>
@@ -186,6 +209,28 @@ internal class LocalizationService : RepositoryService, ILocalizationService
             // ensure the lazy Language callback is assigned
             EnsureDictionaryItemLanguageCallback(item);
             return item;
+        }
+    }
+
+    /// <summary>
+    ///     Gets a collection of <see cref="IDictionaryItem" /> by their keys
+    /// </summary>
+    /// <param name="keys">Keys of the <see cref="IDictionaryItem" /></param>
+    /// <returns>
+    ///     A collection of <see cref="IDictionaryItem" />
+    /// </returns>
+    public IEnumerable<IDictionaryItem> GetDictionaryItemsByKeys(params string[] keys)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IEnumerable<IDictionaryItem> items = _dictionaryRepository.GetManyByKeys(keys).ToArray();
+
+            // ensure the lazy Language callback is assigned
+            foreach (IDictionaryItem item in items)
+            {
+                EnsureDictionaryItemLanguageCallback(item);
+            }
+            return items;
         }
     }
 

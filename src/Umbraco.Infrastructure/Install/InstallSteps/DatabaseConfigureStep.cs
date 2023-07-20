@@ -9,6 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps;
 
+[Obsolete("Will be replace with a new step with the new backoffice")]
 [InstallSetupStep(InstallationType.NewInstall, "DatabaseConfigure", "database", 10, "Setting up a database, so Umbraco has a place to store your website", PerformsAppRestart = true)]
 public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
 {
@@ -35,7 +36,12 @@ public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
 
     public override Task<InstallSetupResult?> ExecuteAsync(DatabaseModel databaseSettings)
     {
-        if (!_databaseBuilder.ConfigureDatabaseConnection(databaseSettings, false))
+        if (databaseSettings is null && string.IsNullOrWhiteSpace(_connectionStrings.CurrentValue.ConnectionString) is false)
+        {
+            return Task.FromResult<InstallSetupResult?>(null);
+        }
+
+        if (!_databaseBuilder.ConfigureDatabaseConnection(databaseSettings!, false))
         {
             throw new InstallException("Could not connect to the database");
         }

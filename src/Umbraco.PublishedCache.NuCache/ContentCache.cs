@@ -243,7 +243,7 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
             IPublishedContent? rootNode = GetByRoute(preview, "/", true);
             if (rootNode == null)
             {
-                throw new Exception("Failed to get node at /.");
+                throw new Exception("Failed to get node at /. This might be because you're trying to publish a variant, with no domains setup");
             }
 
             // remove only if we're the default node
@@ -360,6 +360,7 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
             ? _snapshot.IsEmpty == false
             : _snapshot.GetAtRoot().Any(x => x.PublishedModel != null);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override IPublishedContent? GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars)
     {
         XPathNavigator navigator = CreateNavigator(preview);
@@ -367,6 +368,7 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         return GetSingleByXPath(iterator);
     }
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override IPublishedContent? GetSingleByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars)
     {
         XPathNavigator navigator = CreateNavigator(preview);
@@ -386,6 +388,7 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         return xcontent?.InnerContent;
     }
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, XPathVariable[] vars)
     {
         XPathNavigator navigator = CreateNavigator(preview);
@@ -393,6 +396,7 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         return GetByXPath(iterator);
     }
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override IEnumerable<IPublishedContent> GetByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars)
     {
         XPathNavigator navigator = CreateNavigator(preview);
@@ -416,6 +420,7 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         }
     }
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override XPathNavigator CreateNavigator(bool preview)
     {
         var source = new Source(this, preview);
@@ -423,6 +428,7 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         return navigator;
     }
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override XPathNavigator? CreateNodeNavigator(int id, bool preview)
     {
         var source = new Source(this, preview);

@@ -129,8 +129,10 @@ internal class ContentVersionService : IContentVersionService
             {
                 return Array.Empty<ContentVersionMeta>();
             }
-
-            _logger.LogDebug("Discovered {count} candidate(s) for ContentVersion cleanup", allHistoricVersions.Count);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Discovered {count} candidate(s) for ContentVersion cleanup", allHistoricVersions.Count);
+            }
             versionsToDelete = new List<ContentVersionMeta>(allHistoricVersions.Count);
 
             IEnumerable<ContentVersionMeta> filteredContentVersions =
@@ -143,7 +145,10 @@ internal class ContentVersionService : IContentVersionService
                 if (scope.Notifications.PublishCancelable(
                         new ContentDeletingVersionsNotification(version.ContentId, messages, version.VersionId)))
                 {
-                    _logger.LogDebug("Delete cancelled for ContentVersion [{versionId}]", version.VersionId);
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    {
+                        _logger.LogDebug("Delete cancelled for ContentVersion [{versionId}]", version.VersionId);
+                    }
                     continue;
                 }
 
@@ -153,7 +158,10 @@ internal class ContentVersionService : IContentVersionService
 
         if (!versionsToDelete.Any())
         {
-            _logger.LogDebug("No remaining ContentVersions for cleanup");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("No remaining ContentVersions for cleanup");
+            }
             return Array.Empty<ContentVersionMeta>();
         }
 

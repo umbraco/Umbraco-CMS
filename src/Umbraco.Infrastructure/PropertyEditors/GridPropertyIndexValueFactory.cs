@@ -14,9 +14,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// <summary>
     /// Parses the grid value into indexable values
     /// </summary>
+    [Obsolete("The grid is obsolete, will be removed in V13")]
     public class GridPropertyIndexValueFactory : IPropertyIndexValueFactory
     {
-        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
+        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published, IEnumerable<string> availableCultures)
         {
             var result = new List<KeyValuePair<string, IEnumerable<object?>>>();
 
@@ -88,5 +89,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             return result;
         }
+
+        [Obsolete("Use the overload that specifies availableCultures, scheduled for removal in v14")]
+        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
+            => GetIndexValues(property, culture, segment, published);
     }
 }

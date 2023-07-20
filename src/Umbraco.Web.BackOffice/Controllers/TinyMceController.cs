@@ -26,6 +26,19 @@ public class TinyMceController : UmbracoAuthorizedApiController
     private readonly IIOHelper _ioHelper;
     private readonly IShortStringHelper _shortStringHelper;
 
+    private readonly Dictionary<string, string> _fileContentTypeMappings =
+        new()
+        {
+            { "image/png", "png" },
+            { "image/jpeg", "jpg" },
+            { "image/gif", "gif" },
+            { "image/bmp", "bmp" },
+            { "image/x-icon", "ico" },
+            { "image/svg+xml", "svg" },
+            { "image/tiff", "tiff" },
+            { "image/webp", "webp" },
+        };
+
     public TinyMceController(
         IHostingEnvironment hostingEnvironment,
         IShortStringHelper shortStringHelper,
@@ -43,16 +56,6 @@ public class TinyMceController : UmbracoAuthorizedApiController
     [HttpPost]
     public async Task<IActionResult> UploadImage(List<IFormFile> file)
     {
-        // Create an unique folder path to help with concurrent users to avoid filename clash
-        var imageTempPath =
-            _hostingEnvironment.MapPathWebRoot(Constants.SystemDirectories.TempImageUploads + "/" + Guid.NewGuid());
-
-        // Ensure image temp path exists
-        if (Directory.Exists(imageTempPath) == false)
-        {
-            Directory.CreateDirectory(imageTempPath);
-        }
-
         // Must have a file
         if (file.Count == 0)
         {
@@ -65,13 +68,36 @@ public class TinyMceController : UmbracoAuthorizedApiController
             return new UmbracoProblemResult("Only one file can be uploaded at a time", HttpStatusCode.BadRequest);
         }
 
+        // Create an unique folder path to help with concurrent users to avoid filename clash
+        var imageTempPath =
+            _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempImageUploads + "/" + Guid.NewGuid());
+
+        // Ensure image temp path exists
+        if (Directory.Exists(imageTempPath) == false)
+        {
+            Directory.CreateDirectory(imageTempPath);
+        }
+
         IFormFile formFile = file.First();
 
         // Really we should only have one file per request to this endpoint
         //  var file = result.FileData[0];
-        var fileName = formFile.FileName.Trim(new[] { '\"' }).TrimEnd();
+        var fileName = formFile.FileName.Trim(new[] {'\"'}).TrimEnd();
         var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
-        var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLowerInvariant();
+        string ext;
+        var fileExtensionIndex = safeFileName.LastIndexOf('.');
+        if (fileExtensionIndex is not -1)
+        {
+            ext = safeFileName.Substring(fileExtensionIndex + 1).ToLowerInvariant();
+        }
+        else
+        {
+            _fileContentTypeMappings.TryGetValue(formFile.ContentType, out var fileExtension);
+            ext = fileExtension ?? string.Empty;
+
+            // safeFileName will not have a file extension, so we need to add it back
+            safeFileName += $".{ext}";
+        }
 
         if (_contentSettings.IsFileAllowedForUpload(ext) == false ||
             _imageUrlGenerator.IsSupportedImageFormat(ext) == false)
@@ -81,7 +107,7 @@ public class TinyMceController : UmbracoAuthorizedApiController
         }
 
         var newFilePath = imageTempPath + Path.DirectorySeparatorChar + safeFileName;
-        var relativeNewFilePath = _ioHelper.GetRelativePath(newFilePath);
+        var relativeNewFilePath = GetRelativePath(newFilePath);
 
         await using (FileStream stream = System.IO.File.Create(newFilePath))
         {
@@ -89,5 +115,18 @@ public class TinyMceController : UmbracoAuthorizedApiController
         }
 
         return Ok(new { tmpLocation = relativeNewFilePath });
+    }
+
+    // Use private method istead of _ioHelper.GetRelativePath as that is relative for the webroot and not the content root.
+    private string GetRelativePath(string path)
+    {
+        if (path.IsFullPath())
+        {
+            var rootDirectory = _hostingEnvironment.MapPathContentRoot("~");
+            var relativePath = _ioHelper.PathStartsWith(path, rootDirectory) ? path[rootDirectory.Length..] : path;
+            path = relativePath;
+        }
+
+        return PathUtility.EnsurePathIsApplicationRootPrefixed(path);
     }
 }

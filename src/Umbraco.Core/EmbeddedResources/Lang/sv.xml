@@ -2,7 +2,7 @@
 <language alias="sv" intName="Swedish" localName="Svenska" lcid="29" culture="sv-SE">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="apps">
     <key alias="umbContent">Innehåll</key>
@@ -97,6 +97,13 @@
     <key alias="smallSort">Sortera</key>
     <key alias="historyIncludingVariants">Historik (alla varianter)</key>
   </area>
+  <area alias="blockEditor">
+    <key alias="addBlock">Lägg till innehåll</key>
+    <key alias="addThis">Lägg till %0%</key>
+    <key alias="blockHasChanges">Du har gjort ändringar i detta innehåll. Är du säker på att du vill ta bort dem?</key>
+    <key alias="confirmCancelBlockCreationHeadline">Ignorera skapandet</key>
+    <key alias="confirmCancelBlockCreationMessage"><![CDATA[Är du säker på att du vill avbryta skapandet?]]></key>
+  </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Skapa en ny innehållsmall för <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Tom</key>
@@ -108,6 +115,7 @@
   </area>
   <area alias="buttons">
     <key alias="clearSelection">Rensa urval</key>
+    <key alias="confirmActionConfirm">Bekräfta</key>
     <key alias="bold">Fetstil</key>
     <key alias="deindent">Minska indrag</key>
     <key alias="formFieldInsert">Infoga formulärfält</key>
@@ -126,6 +134,7 @@
     <key alias="noDocumentTypesCreateNew">Skapa en ny dokumenttyp</key>
     <key alias="pictureInsert">Infoga bild</key>
     <key alias="publishAndClose">Publicera och stäng</key>
+    <key alias="publishDescendants">Publicera med undersidor</key>
     <key alias="relations">Ändra relation</key>
     <key alias="returnToList">Återvänd till lista</key>
     <key alias="save">Spara</key>
@@ -133,12 +142,13 @@
     <key alias="saveToPublish">Spara och skicka för godkännande</key>
     <key alias="schedulePublish">Schemaläggning</key>
     <key alias="select">Välj</key>
-    <key alias="saveAndPreview">Förhandsgranska</key>
+    <key alias="saveAndPreview">Spara och förhandsgranska</key>
     <key alias="showPageDisabled">Förhandsgranskning är avstängt på grund av att det inte finns någon mall tilldelad</key>
     <key alias="somethingElse">Gör något annat</key>
     <key alias="styleChoose">Välj stil</key>
     <key alias="styleShow">Visa stil</key>
     <key alias="tableInsert">Infoga tabell</key>
+    <key alias="submitChanges">Skicka</key>
   </area>
   <area alias="colorpicker">
     <key alias="noColors">Du har inte konfigurerat några giltiga färger</key>
@@ -149,6 +159,7 @@
     <key alias="alternativeTextHelp">(hur skulle du beskriva denna bild för någon över telefon)</key>
     <key alias="alternativeUrls">Alternativa länkar</key>
     <key alias="altTextOptional">Alternativ text (optionell)</key>
+    <key alias="captionTextOptional">Bildtext (optionell)</key>
     <key alias="childItems">Underliggande noder</key>
     <key alias="clickToEdit">Klicka för att redigera detta objekt</key>
     <key alias="createBy">Skapad av</key>
@@ -196,6 +207,14 @@
     <key alias="updatedBy">Uppdaterad av</key>
     <key alias="uploadClear">Ta bort fil</key>
     <key alias="urls">Länk till dokument</key>
+    <key alias="unpublished">Avpublicerad</key>
+    <key alias="publishedPendingChanges">Publicerad (osparade ändringar)</key>
+    <key alias="listViewNoContent">Inga undernoder har lagts till</key>
+    <key alias="noChanges">Inga ändringar har gjorts</key>
+    <key alias="notCreated">Ej skapad</key>    
+  </area>
+  <area alias="contentTypeEditor">
+    <key alias="yesDelete">Ja, ta bort</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Var vill du skapa den nya %0%</key>
@@ -222,10 +241,10 @@
     <key alias="formsInstall">Installera Umbraco Forms</key>
   </area>
   <area alias="prompt">
-    <key alias="stay">Stay</key>
-    <key alias="discardChanges">Discard changes</key>
-    <key alias="unsavedChanges">You have unsaved changes</key>
-    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+    <key alias="stay">Stanna</key>
+    <key alias="discardChanges">Ignorera ändringar</key>
+    <key alias="unsavedChanges">Du har osparade ändringar</key>
+    <key alias="unsavedChangesWarning">Är du säker på att du vill lämna sidan? - Du har osparade ändringar.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Klar</key>
@@ -257,6 +276,7 @@
     <key alias="assignDomain">Hantera domännamn</key>
     <key alias="closeThisWindow">Stäng fönstret</key>
     <key alias="confirmdelete">Är du säker på att du vill ta bort</key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Är du säker på att du vill ta bort <strong>%0%</strong> av <strong>%1%</strong> objekt]]></key>
     <key alias="confirmdisable">Är du säker på att du vill avaktivera</key>
     <key alias="confirmlogout">Är du säker?</key>
     <key alias="confirmSure">Är du säker?</key>
@@ -382,6 +402,7 @@
     <key alias="deleting">Tar bort...</key>
     <key alias="design">Design</key>
     <key alias="dimensions">Dimensioner</key>
+    <key alias="discard">Ignorera</key>
     <key alias="down">Ner</key>
     <key alias="download">Ladda ned</key>
     <key alias="edit">Redigera</key>
@@ -662,6 +683,9 @@
     <key alias="publishAll">Publicera %0% och alla dess underordnade sidor</key>
     <key alias="publishHelp"><![CDATA[Klicka på <em>ok</em> för att publicera <strong>%0%</strong>. Därmed blir innehållet publikt.<br/><br /> Du kan publicera denna sida och alla dess undersidor genom att kryssa i <em>publicera alla undersidor</em>. ]]></key>
   </area>
+  <area alias="references">
+    <key alias="labelUsedItems">Följande objekt refereras till</key>
+  </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">ange en extern länk</key>
     <key alias="chooseInternal">ange en intern sida</key>
@@ -675,7 +699,6 @@
     <key alias="reset">Återställ</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">Nuvarande version</key>
     <key alias="diffHelp"><![CDATA[Här visas skillnaderna mellan nuvarande version och vald version<br /><del>Röd</del> text kommer inte att synas i den valda versionen. , <ins>Grön betyder att den har tillkommit</ins>]]></key>
     <key alias="documentRolledBack">Dokumentet har återgått till en tidigare version</key>
     <key alias="htmlHelp">Här visas den valda sidversionen i HTML. Om du vill se skillnaden mellan två versioner samtidigt, välj istället "Diff".</key>
@@ -724,6 +747,7 @@
     <key alias="sortDone">Sortering klar</key>
     <key alias="sortHelp">Välj i vilken ordning du vill ha sidorna genom att dra dem upp eller ner i listan. Du kan också klicka på kolumnrubrikerna för att sortera grupper av sidor</key>
     <key alias="sortPleaseWait"><![CDATA[Vänta medan sidorna sorteras. Det kan ta en stund.]]></key>
+    <key alias="sortEmptyState">Den här noden har inga undernoder att sortera</key>
   </area>
   <area alias="speechBubbles">
     <key alias="contentPublishedFailedByEvent">Publiceringen avbröts av ett tredjepartstillägg</key>
@@ -994,8 +1018,8 @@
     <key alias="writer">Skribent</key>
     <key alias="yourHistory">Din nuvarande historik</key>
     <key alias="yourProfile">Din profil</key>
-    <key alias="sortCreateDateAscending">Nyast</key>
-    <key alias="sortCreateDateDescending">Äldst</key>
+    <key alias="sortCreateDateAscending">Äldst</key>
+    <key alias="sortCreateDateDescending">Nyast</key>
     <key alias="sortLastLoginDateDescending">Senaste login</key>
   </area>
   <area alias="logViewer">

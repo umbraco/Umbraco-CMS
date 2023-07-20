@@ -4,7 +4,7 @@ umb-property-info-button {
     vertical-align: text-bottom;
 
     .control-label + & {
-        margin-left: -8px;
+        margin-left: 3px;
     }
 
     > .__button {
@@ -12,11 +12,11 @@ umb-property-info-button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        text-align: center;
 
         width: 15px;
         height: 15px;
-        padding-top: 1px;
-        padding-left: 1px;
+        padding: 2px 1px 1px 1px;
         margin-top: -1px;
         font-size: 12px;
         font-weight: 700;
@@ -75,6 +75,7 @@ umb-property-info-button {
 // hide umb-info-button if inside umb-property
 .umb-property umb-property-info-button {
     opacity: 0;
+    transition: opacity 120ms;
 }
 
 .umb-property:focus-within umb-property-info-button,
@@ -90,6 +91,7 @@ umb-property-info-button {
 // hide umb-info-button if inside 
 .umb-control-group umb-property-info-button {
     opacity: 0;
+    transition: opacity 120ms;
 }
 
 .umb-control-group:focus-within umb-property-info-button,
@@ -100,4 +102,19 @@ umb-property-info-button {
 // Revert-style-hack that ensures that we only show property-actions on properties that are directly begin hovered.
 .umb-control-group:hover .umb-control-group:not(:hover) umb-property-info-button {
     opacity: 0;
+}
+
+
+
+.umb-group-panel > .umb-group-panel__header umb-property-info-button {
+    opacity: 0;
+}
+.umb-group-panel > .umb-group-panel__header umb-property-info-button:focus {
+    opacity: 1;
+}
+.umb-group-panel:focus-within, 
+.umb-group-panel:hover {
+    > .umb-group-panel__header umb-property-info-button {
+        opacity: 1;
+    }
 }

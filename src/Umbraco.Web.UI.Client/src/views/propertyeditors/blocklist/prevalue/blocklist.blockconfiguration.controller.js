@@ -51,13 +51,13 @@
 
         vm.requestRemoveBlockByIndex = function (index, event) {
 
-          const labelKeys = [
-            "general_delete",
-            "blockEditor_confirmDeleteBlockTypeMessage",
-            "blockEditor_confirmDeleteBlockTypeNotice"
-          ];
+            const labelKeys = [
+              "general_delete",
+              "blockEditor_confirmDeleteBlockTypeMessage",
+              "blockEditor_confirmDeleteBlockTypeNotice"
+            ];
 
-          localizationService.localizeMany(labelKeys).then(data => {
+            localizationService.localizeMany(labelKeys).then(data => {
                 var contentElementType = vm.getElementTypeByKey($scope.model.value[index].contentElementTypeKey);
                 overlayService.confirmDelete({
                     title: data[0],
@@ -72,7 +72,7 @@
             });
 
             event.stopPropagation();
-        }
+        };
 
         vm.removeBlockByIndex = function (index) {
             $scope.model.value.splice(index, 1);
@@ -152,7 +152,6 @@
                 infiniteMode: true,
                 noTemplate: true,
                 isElement: true,
-                noTemplate: true,
                 submit: function (model) {
                     loadElementTypes().then(() => {
                         callback(model.documentTypeKey);

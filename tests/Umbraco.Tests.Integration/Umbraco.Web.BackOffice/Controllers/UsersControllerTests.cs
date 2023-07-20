@@ -1,14 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -21,7 +16,7 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Formatters;
-using Umbraco.Extensions;
+using Umbraco.Cms.Web.Common.Models;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers;
 
@@ -229,6 +224,71 @@ public class UsersControllerTests : UmbracoTestServerTestBase
         {
             Assert.NotNull(actual);
             Assert.AreEqual($"Unlocked {users.Count()} users", actual.Message);
+        });
+    }
+
+    [Test]
+    public async Task Cannot_Disable_Invited_User()
+    {
+        var userService = GetRequiredService<IUserService>();
+
+        var user = new UserBuilder()
+            .AddUserGroup()
+            .WithAlias("writer") // Needs to be an existing alias
+            .Done()
+            .Build();
+
+        user.LastLoginDate = default;
+        user.InvitedDate = DateTime.Now;
+        userService.Save(user);
+        var createdUser = userService.GetByEmail("test@test.com");
+
+        // Act
+        var url = PrepareApiControllerUrl<UsersController>(x => x.PostDisableUsers(new []{createdUser.Id}));
+        var response = await Client.PostAsync(url, null);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            var body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+            body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+        });
+    }
+
+    [Test]
+    public async Task Can_Disable_Active_User()
+    {
+        var userService = GetRequiredService<IUserService>();
+
+        var user = new UserBuilder()
+            .AddUserGroup()
+            .WithAlias("writer") // Needs to be an existing alias
+            .Done()
+            .Build();
+
+        user.IsApproved = true;
+        userService.Save(user);
+
+        var createdUser = userService.GetByEmail("test@test.com");
+
+        // Act
+        var url = PrepareApiControllerUrl<UsersController>(x => x.PostDisableUsers(new[] { createdUser.Id }));
+        var response = await Client.PostAsync(url, null);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            var body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+            body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+            var affectedUsers = JsonConvert.DeserializeObject<DisabledUsersModel>(body, new JsonSerializerSettings { ContractResolver = new IgnoreRequiredAttributesResolver() });
+            Assert.AreEqual(affectedUsers!.DisabledUserIds.First(), createdUser!.Id);
+
+            var disabledUser = userService.GetByEmail("test@test.com");
+            Assert.AreEqual(disabledUser!.UserState, UserState.Disabled);
         });
     }
 }

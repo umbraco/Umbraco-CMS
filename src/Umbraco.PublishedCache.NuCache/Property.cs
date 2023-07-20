@@ -288,6 +288,7 @@ internal class Property : PublishedPropertyBase
         return value;
     }
 
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override object? GetXPathValue(string? culture = null, string? segment = null)
     {
         _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
@@ -310,6 +311,49 @@ internal class Property : PublishedPropertyBase
         }
     }
 
+    public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
+    {
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
+
+        object? value;
+        lock (_locko)
+        {
+            CacheValue cacheValues = GetCacheValues(PropertyType.DeliveryApiCacheLevel).For(culture, segment);
+
+            // initial reference cache level always is .Content
+            const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
+
+            object? GetDeliveryApiObject() => PropertyType.ConvertInterToDeliveryApiObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing, expanding);
+            value = expanding
+                ? GetDeliveryApiExpandedObject(cacheValues, GetDeliveryApiObject)
+                : GetDeliveryApiDefaultObject(cacheValues, GetDeliveryApiObject);
+        }
+
+        return value;
+    }
+
+    private object? GetDeliveryApiDefaultObject(CacheValue cacheValues, Func<object?> getValue)
+    {
+        if (cacheValues.DeliveryApiDefaultObjectInitialized == false)
+        {
+            cacheValues.DeliveryApiDefaultObjectValue = getValue();
+            cacheValues.DeliveryApiDefaultObjectInitialized = true;
+        }
+
+        return cacheValues.DeliveryApiDefaultObjectValue;
+    }
+
+    private object? GetDeliveryApiExpandedObject(CacheValue cacheValues, Func<object?> getValue)
+    {
+        if (cacheValues.DeliveryApiExpandedObjectInitialized == false)
+        {
+            cacheValues.DeliveryApiExpandedObjectValue = getValue();
+            cacheValues.DeliveryApiExpandedObjectInitialized = true;
+        }
+
+        return cacheValues.DeliveryApiExpandedObjectValue;
+    }
+
     #region Classes
 
     private class CacheValue
@@ -321,6 +365,14 @@ internal class Property : PublishedPropertyBase
         public bool XPathInitialized { get; set; }
 
         public object? XPathValue { get; set; }
+
+        public bool DeliveryApiDefaultObjectInitialized { get; set; }
+
+        public object? DeliveryApiDefaultObjectValue { get; set; }
+
+        public bool DeliveryApiExpandedObjectInitialized { get; set; }
+
+        public object? DeliveryApiExpandedObjectValue { get; set; }
     }
 
     private class CacheValues : CacheValue

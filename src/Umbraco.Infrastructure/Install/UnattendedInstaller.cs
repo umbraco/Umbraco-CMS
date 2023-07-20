@@ -73,8 +73,10 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
                 {
                     break;
                 }
-
-                _logger.LogDebug("Could not immediately connect to database, trying again.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Could not immediately connect to database, trying again.");
+                }
 
                 Thread.Sleep(1000);
             }

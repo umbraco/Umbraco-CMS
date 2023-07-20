@@ -69,7 +69,9 @@ public class SqliteDatabaseCreator : IDatabaseCreator
          * always initializing in this way and it probably helps for non azure scenarios also (anytime persisting on a cifs mount for example).
          */
 
-        var tempFile = Path.GetTempFileName();
+        // Create a random file name using cryptographically strong random number generator (RNGCryptoServiceProvider)
+        var tempFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+
         var tempConnectionString = new SqliteConnectionStringBuilder { DataSource = tempFile, Pooling = false };
 
         using (var connection = new SqliteConnection(tempConnectionString.ConnectionString))

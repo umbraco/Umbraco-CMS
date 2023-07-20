@@ -23,20 +23,26 @@ namespace Umbraco.Extensions;
 public static class UrlHelperExtensions
 {
     /// <summary>
+    /// Gets the Umbraco backoffice URL (if Umbraco is installed).
+    /// </summary>
+    /// <param name="urlHelper">The URL helper.</param>
+    /// <returns>
+    /// The Umbraco backoffice URL.
+    /// </returns>
+    public static string? GetUmbracoBackOfficeUrl(this IUrlHelper urlHelper)
+        => urlHelper.Action("Default", "BackOffice", new { area = Constants.Web.Mvc.BackOfficeArea });
+
+    /// <summary>
     ///     Return the back office url if the back office is installed
     /// </summary>
     /// <param name="url"></param>
     /// <returns></returns>
+    /// <remarks>
+    /// This method contained a bug that would result in always returning "/".
+    /// </remarks>
+    [Obsolete("Use the GetUmbracoBackOfficeUrl extension method instead. This method will be removed in Umbraco 13.")]
     public static string? GetBackOfficeUrl(this IUrlHelper url)
-    {
-        var backOfficeControllerType = Type.GetType("Umbraco.Web.BackOffice.Controllers");
-        if (backOfficeControllerType == null)
-        {
-            return "/"; // this would indicate that the installer is installed without the back office
-        }
-
-        return url.Action("Default", ControllerExtensions.GetControllerName(backOfficeControllerType), new { area = Constants.Web.Mvc.BackOfficeApiArea });
-    }
+        => "/";
 
     /// <summary>
     ///     Return the Url for a Web Api service

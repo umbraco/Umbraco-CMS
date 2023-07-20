@@ -33,11 +33,25 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         return uniqueIdRepo.Get(uniqueId);
     }
 
+    public IEnumerable<IDictionaryItem> GetMany(params Guid[] uniqueIds)
+    {
+        var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, ScopeAccessor, AppCaches,
+            _loggerFactory.CreateLogger<DictionaryByUniqueIdRepository>());
+        return uniqueIdRepo.GetMany(uniqueIds);
+    }
+
     public IDictionaryItem? Get(string key)
     {
         var keyRepo = new DictionaryByKeyRepository(this, ScopeAccessor, AppCaches,
             _loggerFactory.CreateLogger<DictionaryByKeyRepository>());
         return keyRepo.Get(key);
+    }
+
+    public IEnumerable<IDictionaryItem> GetManyByKeys(string[] keys)
+    {
+        var keyRepo = new DictionaryByKeyRepository(this, ScopeAccessor, AppCaches,
+            _loggerFactory.CreateLogger<DictionaryByKeyRepository>());
+        return keyRepo.GetMany(keys);
     }
 
     public Dictionary<string, Guid> GetDictionaryItemKeyMap()

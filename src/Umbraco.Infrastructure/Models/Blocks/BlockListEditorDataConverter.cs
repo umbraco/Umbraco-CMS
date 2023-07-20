@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Cms.Core.Models.Blocks;

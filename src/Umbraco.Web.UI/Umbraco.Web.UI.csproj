@@ -1,25 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
+    <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
-  <Import Project="..\Umbraco.Cms\buildTransitive\Umbraco.Cms.props" />
+  <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
+  <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.5" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
-    <PackageReference Include="Umbraco.Code" Version="2.0.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.7">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <PropertyGroup>
@@ -33,30 +34,13 @@
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <JsonSchemaPath>$(ProjectDir)appsettings-schema.json</JsonSchemaPath>
-    <JsonSchemaProjectPath>$(ProjectDir)../JsonSchema/JsonSchema.csproj</JsonSchemaProjectPath>
-  </PropertyGroup>
-
-  <Target Name="CheckPreconditions" BeforeTargets="Build">
-    <Message Text="-CheckPreconditions-" Importance="high" />
-    <Message Text="JsonSchemaPath:  $(JsonSchemaPath)" Importance="high" />
-    <CallTarget Targets="JsonSchemaBuild" Condition="!Exists('$(JsonSchemaPath)') and '$(UmbracoBuild)' == ''" />
-    <CallTarget Targets="AppsettingsBuild" Condition="!Exists('appsettings.json')" />
-    <CallTarget Targets="AppsettingsDevBuild" Condition="!Exists('appsettings.Development.json')" />
+  <Target Name="CopyAppsettingsTemplate" BeforeTargets="Build" Condition="!Exists('appsettings.json')">
+    <Message Text="Copying appsettings.template.json to appsettings.json because it doesn't exist" Importance="high" />
+    <Copy SourceFiles="appsettings.template.json" DestinationFiles="appsettings.json" />
   </Target>
 
-  <Target Name="JsonSchemaBuild">
-    <Exec Command="dotnet run -c Release --project $(JsonSchemaProjectPath) -o &quot;$(ProjectDir)appsettings-schema.json&quot;" />
-  </Target>
-
-  <Target Name="AppsettingsBuild">
-    <Message Text="Generating appsettings.json because it doesnt exist" Importance="High" />
-    <Copy SourceFiles="$(Projectdir)/appsettings.template.json" DestinationFiles="$(ProjectDir)/appsettings.json" />
-  </Target>
-
-  <Target Name="AppsettingsDevBuild">
-    <Message Text="Generating appsettings.Development.json because it doesnt exist" Importance="High" />
-    <Copy SourceFiles="$(ProjectDir)appsettings.Development.template.json" DestinationFiles="$(ProjectDir)appsettings.Development.json" />
+  <Target Name="CopyAppsettingsDevelopmentTemplate" BeforeTargets="Build" Condition="!Exists('appsettings.Development.json')">
+    <Message Text="Copying appsettings.Development.template.json to appsettings.Development.json because it doesn't exist" Importance="high" />
+    <Copy SourceFiles="appsettings.Development.template.json" DestinationFiles="appsettings.Development.json" />
   </Target>
 </Project>

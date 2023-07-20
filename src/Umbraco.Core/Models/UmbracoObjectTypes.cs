@@ -54,7 +54,7 @@ public enum UmbracoObjectTypes
     /// <summary>
     ///     Member Group
     /// </summary>
-    [UmbracoObjectType(Constants.ObjectTypes.Strings.MemberGroup)]
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.MemberGroup, typeof(IMemberGroup))]
     [FriendlyName("Member Group")]
     [UmbracoUdiType(Constants.UdiEntityType.MemberGroup)]
     MemberGroup,

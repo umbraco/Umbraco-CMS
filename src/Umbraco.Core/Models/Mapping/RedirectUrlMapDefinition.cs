@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Core.Models.Mapping;
 
+[Obsolete("Will no longer be used with new backoffice, use IRedirectUrlViewModelFactory instead")]
 public class RedirectUrlMapDefinition : IMapDefinition
 {
     private readonly IPublishedUrlProvider _publishedUrlProvider;

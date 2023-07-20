@@ -2,15 +2,16 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
 ///     Represents the configuration editor for the media picker value editor.
 /// </summary>
+[Obsolete("Please use the MediaPicker3 instead, will be removed in V13")]
 public class MediaPickerConfigurationEditor : ConfigurationEditor<MediaPickerConfiguration>
 {
     // Scheduled for removal in v12

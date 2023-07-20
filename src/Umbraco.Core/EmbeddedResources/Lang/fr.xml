@@ -2,7 +2,7 @@
 <language alias="fr" intName="French" localName="français" lcid="12" culture="fr-FR">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Culture et noms d'hôte</key>
@@ -252,7 +252,7 @@
     <key alias="childItems" version="7.0">Eléments enfants</key>
     <key alias="target" version="7.0">Cible</key>
     <key alias="scheduledPublishServerTime">Ceci se traduit par l'heure suivante sur le serveur :</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Qu'est-ce que cela signifie?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">Qu'est-ce que cela signifie?</a>]]></key>
     <key alias="nestedContentDeleteItem">Etes-vous certain(e) de vouloir supprimer cet élément?</key>
     <key alias="nestedContentDeleteAllItems">Etes-vous certain(e) de vouloir supprimer tous les éléments?</key>
     <key alias="nestedContentEditorNotSupported">La propriété %0% utilise l'éditeur %1% qui n'est pas supporté par Nested Content.</key>
@@ -1251,7 +1251,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   </area>
   <area alias="rollback">
     <key alias="headline">Sélectionnez une version à comparer avec la version actuelle</key>
-    <key alias="currentVersion">Version actuelle</key>
     <key alias="diffHelp"><![CDATA[Ceci affiche les différences entre la version actuelle et la version choisie<br />Le texte en <del>Rouge</del> signifie qu'il a été supprimé de la version choisie, <ins>vert signifie ajouté</ins>]]></key>
     <key alias="documentRolledBack">Le document a été restauré à une version antérieure</key>
     <key alias="htmlHelp">Ceci affiche la version choisie en tant que HTML, si vous souhaitez voir les différences entre les deux versions en même temps, utilisez la vue différentielle</key>
@@ -1911,8 +1910,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="stateInactive">Inactif</key>
     <key alias="sortNameAscending">Nom (A-Z)</key>
     <key alias="sortNameDescending">Nom (Z-A)</key>
-    <key alias="sortCreateDateAscending">Plus récent</key>
-    <key alias="sortCreateDateDescending">Plus ancien</key>
+    <key alias="sortCreateDateAscending">Plus ancien</key>
+    <key alias="sortCreateDateDescending">Plus récent</key>
     <key alias="sortLastLoginDateDescending">Dernière connexion</key>
   </area>
   <area alias="validation">
@@ -2204,7 +2203,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="more">En savoir plus</key>
     <key alias="bulletPointOne">
         <![CDATA[
-            Lisez-en plus sur la façon de travailler avec les éléments dans la section Settings <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">dans la section Documentation</a> de Our Umbraco
+            Lisez-en plus sur la façon de travailler avec les éléments dans la section Settings <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">dans la section Documentation</a> de Our Umbraco
         ]]>
     </key>
     <key alias="bulletPointTwo">

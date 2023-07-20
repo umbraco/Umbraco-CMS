@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees;
 
@@ -20,8 +20,7 @@ public class MemberGroupTreeController : MemberTypeAndGroupTreeControllerBase
 {
     private readonly IMemberGroupService _memberGroupService;
 
-    [
-        ActivatorUtilitiesConstructor]
+    [ActivatorUtilitiesConstructor]
     public MemberGroupTreeController(
         ILocalizedTextService localizedTextService,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,

@@ -2,7 +2,7 @@
 <language alias="ko" intName="Korean" localName="한국어" lcid="18" culture="ko-KR">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">호스트명 관리</key>
@@ -575,7 +575,6 @@
     <key alias="removeLink">링크 삭제</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">현재 버전</key>
     <key alias="diffHelp"><![CDATA[현재 버전과 선택한 버전의 차이점을 보여줍니다<br /><del>빨간</del> 텍스트는 선택한 버전에선 보이지 않습니다. <ins>녹색은 추가되었음을 의미합니다</ins>]]></key>
     <key alias="documentRolledBack">문서가 롤백되었습니다.</key>
     <key alias="htmlHelp">선택한 버전을 html로 보여줍니다. 두 버전의 차이점을 동시에 보시려면, 차이점 보기를 사용하세요</key>

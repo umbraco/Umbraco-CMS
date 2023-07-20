@@ -103,20 +103,6 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         }
     };
 
-    // sortable options
-    $scope.sortableOptions = {
-        axis: "y",
-        containment: "parent",
-        distance: 10,
-        opacity: 0.7,
-        tolerance: "pointer",
-        scroll: true,
-        zIndex: 6000,
-        update: function (e, ui) {
-            setDirty();
-        }
-    };
-
     let removeAllEntriesAction = {
         labelKey: "clipboard_labelForRemoveAllEntries",
         labelTokens: [],
@@ -152,6 +138,21 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         $scope.minNumberOfItems = $scope.model.config.minNumber ? parseInt($scope.model.config.minNumber) : 0;
         $scope.maxNumberOfItems = $scope.model.config.maxNumber ? parseInt($scope.model.config.maxNumber) : 0;
     }
+
+    // sortable options
+    $scope.sortableOptions = {
+        axis: "y",
+        containment: "parent",
+        distance: 10,
+        opacity: 0.7,
+        tolerance: "pointer",
+        scroll: true,
+        zIndex: 6000,
+        disabled: $scope.readonly || $scope.maxNumberOfItems === 1,
+        update: function (e, ui) {
+          setDirty();
+        }
+    };
 
     //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
     $scope.model.config.multiPicker = Object.toBoolean($scope.model.config.multiPicker);
@@ -245,9 +246,12 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         dialogOptions.startNodeId = -1;
     }
     else if ($scope.model.config.startNode.query) {
-        //if we have a query for the startnode, we will use that.
-        var rootId = $routeParams.id;
-        entityResource.getByQuery($scope.model.config.startNode.query, rootId, "Document").then(function (ent) {
+        entityResource.getByXPath(
+            $scope.model.config.startNode.query,
+            editorState.current.id,
+            editorState.current.parentId,
+            "Document"
+        ).then(function (ent) {
             dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
         });
     }

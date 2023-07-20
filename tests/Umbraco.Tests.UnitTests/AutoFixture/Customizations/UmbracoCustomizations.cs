@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using AutoFixture;
 using AutoFixture.Kernel;
@@ -39,7 +38,8 @@ internal class UmbracoCustomizations : ICustomization
             .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(DatabaseSchemaCreatorFactory), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(BackOfficeServerVariables), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(InstallHelper), new GreedyConstructorQuery()));
+            .Customize(new ConstructorCustomization(typeof(InstallHelper), new GreedyConstructorQuery()))
+            .Customize(new ConstructorCustomization(typeof(DatabaseBuilder), new GreedyConstructorQuery()));
 
         // When requesting an IUserStore ensure we actually uses a IUserLockoutStore
         fixture.Customize<IUserStore<BackOfficeIdentityUser>>(cc =>

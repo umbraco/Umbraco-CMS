@@ -80,7 +80,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
     }
 
     /// <inheritdoc />
-    public void Configure(string name, CookieAuthenticationOptions options)
+    public void Configure(string? name, CookieAuthenticationOptions options)
     {
         if (name != Constants.Security.BackOfficeAuthenticationType)
         {

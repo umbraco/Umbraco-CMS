@@ -2,7 +2,7 @@
 <language alias="da" intName="Danish" localName="dansk" lcid="6" culture="da-DK">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Tilføj domæne</key>
@@ -54,8 +54,8 @@
     <key alias="setPermissions">Sæt rettigheder</key>
     <key alias="unlock">Lås op</key>
     <key alias="createblueprint">Opret indholdsskabelon</key>
-    <key alias="resendInvite">Gensend Invitation</key>
-    <key alias="defaultValue">Standard værdi</key>
+    <key alias="resendInvite">Gensend invitation</key>
+    <key alias="defaultValue">Standardværdi</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Indhold</key>
@@ -275,7 +275,7 @@
     <key alias="target" version="7.0">Åben i vindue</key>
     <key alias="scheduledPublishServerTime">Dette oversætter til den følgende tid på serveren:</key>
     <key alias="scheduledPublishDocumentation">
-      <![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Hvad betyder det?</a>]]></key>
+      <![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">Hvad betyder det?</a>]]></key>
     <key alias="nestedContentDeleteItem">Er du sikker på, at du vil slette dette element?</key>
     <key alias="nestedContentDeleteAllItems">Er du sikker på, at du vil slette alle elementer?</key>
     <key alias="nestedContentEditorNotSupported">Egenskaben %0% anvender editoren %1% som ikke er understøttet af Nested
@@ -342,6 +342,7 @@
     <key alias="createNewMember">Opret et nyt medlem</key>
     <key alias="allMembers">Alle medlemmer</key>
     <key alias="memberGroupNoProperties">Medlemgrupper har ingen yderligere egenskaber til redigering.</key>
+    <key alias="2fa">Totrinsbekræftelse</key>
   </area>
   <area alias="contentType">
     <key alias="copyFailed">Kopiering af indholdstypen fejlede</key>
@@ -388,7 +389,7 @@
     </key>
     <key alias="elementType">Element-type</key>
     <key alias="elementTypeDescription">Definerer skabelonen for et sæt at egenskaber, der kan anvendes som skema i
-      avancerede felter som f.eks. 'Block List' eller 'Nested Content'.
+      avancerede felter som f.eks. 'Block List' eller 'Block Grid'.
     </key>
     <key alias="composition">Komposition</key>
     <key alias="compositionDescription">Definerer et sæt genbrugbare egenskaber, der kan inkluderes i definitionen af
@@ -606,6 +607,8 @@
     </key>
     <key alias="indexCannotRebuild">Dette index kan ikke genbygges for det ikke har nogen</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
+    <key alias="noResults">Der blev ikke fundet nogen resultater</key>
+    <key alias="searchResultsFound">Viser %0% - %1% af %2% resultat(er) - Side %3% af %4%</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>
@@ -716,6 +719,7 @@
     <key alias="by">af</key>
     <key alias="cancel">Fortryd</key>
     <key alias="cellMargin">Celle margen</key>
+    <key alias="change">Skift</key>
     <key alias="choose">Vælg</key>
     <key alias="clear">Ryd</key>
     <key alias="close">Luk</key>
@@ -1238,11 +1242,10 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="rollback">
     <key alias="changes">Ændringer</key>
-    <key alias="created">Oprettet</key>
     <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
-    <key alias="currentVersion">Nuværende version</key>
     <key alias="diffHelp">
       <![CDATA[Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>]]></key>
+    <key alias="noDiff">Der er ingen forskelle mellem den nuværende version og den valgte version</key>
     <key alias="documentRolledBack">Dokument tilbagerullet</key>
     <key alias="htmlHelp">Her vises den valgte version som html. Hvis du ønsker at se forskellen mellem de 2 versioner
       på samme tid, brug 'diff'-oversigten
@@ -1263,6 +1266,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="media">Mediearkiv</key>
     <key alias="member">Medlemmer</key>
     <key alias="packages">Pakker</key>
+    <key alias="marketplace">Marketplace</key>
     <key alias="newsletters">Nyhedsbreve</key>
     <key alias="settings">Indstillinger</key>
     <key alias="statistics">Statistik</key>
@@ -1646,7 +1650,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="allowVaryBySegment">Tillad segmentering</key>
     <key alias="elementType">Element-type</key>
     <key alias="elementHeading">Er en Element-type</key>
-    <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet.
+    <key alias="elementDescription">En Element-type er tiltænkt brug i andre Dokumenttyper, ikke i indholdstræet.
     </key>
     <key alias="elementCannotToggle">En Dokumenttype kan ikke ændres til en Element-type efter den er blevet brugt til
       at oprette en eller flere indholds elementer.
@@ -1902,6 +1906,7 @@ Mange hilsner fra Umbraco robotten
       genkende dig. Klik på cirklen ovenfor for at uploade et billede.
     </key>
     <key alias="writer">Forfatter</key>
+    <key alias="configureTwoFactor">Konfigurer totrinsbekræftelse</key>
     <key alias="change">Skift</key>
     <key alias="yourProfile">Din profil</key>
     <key alias="yourHistory">Din historik</key>
@@ -1925,15 +1930,15 @@ Mange hilsner fra Umbraco robotten
     <key alias="stateInactive">Inaktiv</key>
     <key alias="sortNameAscending">Navn (A-Å)</key>
     <key alias="sortNameDescending">Navn (Å-A)</key>
-    <key alias="sortCreateDateAscending">Nyeste</key>
-    <key alias="sortCreateDateDescending">Ældste</key>
+    <key alias="sortCreateDateAscending">Ældste</key>
+    <key alias="sortCreateDateDescending">Nyeste</key>
     <key alias="sortLastLoginDateDescending">Sidst logget ind</key>
     <key alias="noUserGroupsAdded">Ingen brugere er blevet tilføjet</key>
-    <key alias="2faDisableText">Hvis du ønsker at slå denne autentificeringsmetode fra, så skal du nu indtaste koden fra dit device:</key>
-    <key alias="2faProviderIsEnabled">Denne autentificeringsmetode er slået til</key>
-    <key alias="2faProviderIsDisabledMsg">Den valgte autentificeringsmetode er nu slået fra</key>
-    <key alias="2faProviderIsNotDisabledMsg">Der skete en ukendt fejl da denne autentificeringsmetode skulles slåes fra</key>
-    <key alias="2faDisableForUser">Er du sikker på, at du vil fjerne denne autentificeringsmetode for denne bruger?</key>
+    <key alias="2faDisableText">Hvis du ønsker at slå denne totrinsbekræftelse fra, så skal du nu indtaste koden fra din enhed:</key>
+    <key alias="2faProviderIsEnabled">Denne totrinsbekræftelse er slået til</key>
+    <key alias="2faProviderIsDisabledMsg">Den valgte totrinsbekræftelse er nu slået fra</key>
+    <key alias="2faProviderIsNotDisabledMsg">Der skete en ukendt fejl da denne totrinsbekræftelse skulles slåes fra</key>
+    <key alias="2faDisableForUser">Er du sikker på, at du vil fjerne denne totrinsbekræftelse for denne bruger?</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validering</key>
@@ -1962,6 +1967,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="customValidation">Selvvalgt validering</key>
     <key alias="entriesShort"><![CDATA[Minimum %0% element(er), tilføj <strong>%1%</strong> mere.]]></key>
     <key alias="entriesExceed"><![CDATA[Maksimum %0% element(er), <strong>%1%</strong> for mange.]]></key>
+    <key alias="entriesAreasMismatch">Ét eller flere områder lever ikke op til kravene for antal indholdselementer.</key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Slå URL tracker fra</key>
@@ -2184,6 +2190,12 @@ Mange hilsner fra Umbraco robotten
     <key alias="confirmDeleteBlockTypeNotice">Indholdet vil stadigt eksistere, men redigering af dette indhold vil ikke
       være muligt. Indholdet vil blive vist som ikke understøttet indhold.
     </key>
+
+    <key alias="confirmDeleteBlockGroupMessage">
+      <![CDATA[Er du sikker på at du vil slette gruppen <strong>%0%</strong> og blok konfigurationer?]]></key>
+    <key alias="confirmDeleteBlockGroupNotice">Indholdet af gruppens blokke vil stadigt eksistere, men redigering af dette indhold vil ikke
+      være muligt. Indholdet vil blive vist som ikke understøttet indhold.
+    </key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Konfiguration af '%0%']]></key>
     <key alias="elementTypeDoesNotExist">Kan ikke redigeres fordi elementtypen ikke eksisterer.</key>
     <key alias="thumbnail">Billede</key>
@@ -2193,6 +2205,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="tabBlockSettings">Indstillinger</key>
     <key alias="headlineAdvanced">Avanceret</key>
     <key alias="forceHideContentEditor">Skjul indholdseditoren</key>
+    <key alias="forceHideContentEditorHelp">Skjul indholds redigerings knappen samt indholdseditoren i Blok Redigerings vinduet</key>
+    <key alias="girdInlineEditing">Direkte redigering</key>
+    <key alias="girdInlineEditingHelp">Tilføjer direkte redigering a det første felt. Yderligere felter optræder kun i redigerings vinduet.</key>
     <key alias="blockHasChanges">Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?</key>
     <key alias="confirmCancelBlockCreationHeadline">Annuller oprettelse?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
@@ -2201,6 +2216,63 @@ Mange hilsner fra Umbraco robotten
     <key alias="addBlock">Tilføj indhold</key>
     <key alias="addThis">Tilføj %0%</key>
     <key alias="propertyEditorNotSupported">Feltet %0% bruger editor %1% som ikke er supporteret for blokke.</key>
+    <key alias="focusParentBlock">Fokusér på den ydre blok</key>
+    <key alias="areaIdentification">Identifikation</key>
+    <key alias="areaValidation">Validering</key>
+    <key alias="areaValidationEntriesShort"><![CDATA[<strong>%0%</strong> skal tilføjes minimum <strong>%2%</strong> gang(e).]]></key>
+    <key alias="areaValidationEntriesExceed"><![CDATA[<strong>%0%</strong> må maksimalt tilføjes <strong>%3%</strong> gang(e).]]></key>
+    <key alias="areaNumberOfBlocks">Antal blokke</key>
+    <key alias="areaDisallowAllBlocks">Tillad kun specifikke blok-typer</key>
+    <key alias="areaAllowedBlocks">Tilladte blok-typer</key>
+    <key alias="areaAllowedBlocksHelp">Vælg de blok-typer, der er tilladt i dette område, og evt. også hvor mange af hver type, redaktørerne skal tilføje til området.</key>
+    <key alias="areaAllowedBlocksEmpty">Når denne er tom er alle block-typer tilladt for områder tilladt.</key>
+    <key alias="confirmDeleteBlockAreaMessage">Er du sikker på, at du vil slette dette område?</key>
+    <key alias="confirmDeleteBlockAreaNotice">Alle blokke, der er oprettet i dette område, vil blive slettet.</key>
+    <key alias="layoutOptions">Layout-opsætning</key>
+    <key alias="structuralOptions">Struktur</key>
+    <key alias="sizeOptions">Størrelses opsætning</key>
+    <key alias="allowedBlockColumns">Tilgængelige kolonne-størrelser</key>
+    <key alias="allowedBlockColumnsHelp">Vælg de forskellige antal kolonner denne blok må optage i layoutet. Dette forhindre ikke blokken i at optræde i et mindre område.</key>
+    <key alias="allowedBlockRows">TIlgængelige række-størrelser</key>
+    <key alias="allowedBlockRowsHelp">Vælg hvor mange rækker denne blok på optage i layoutet.</key>
+    <key alias="allowBlockInRoot">Tillad på rodniveau</key>
+    <key alias="allowBlockInRootHelp">Gør denne blok tilgængelig i layoutets rodniveau. Hvis dette ikke er valgt, kan denne blok kun bruges inden for andre blokkes definerede områder.</key>
+    <key alias="areas">Blok-områder</key>
+    <key alias="areasLayoutColumns">Layout-kolonner</key>
+    <key alias="areasLayoutColumnsHelp">Vælg hvor mange layout-kolonnner der skal være tilgængelig for blokkens områder. Hvis der ikke er valgt noget her, benyttes det antal layout-kolonner der er valgt for hele layoutet.</key>
+    <key alias="areasConfigurations">Opsætning af områder</key>
+    <key alias="areasConfigurationsHelp">Hvis det skal være muligt at indsætte nye blokke indeni denne blok, skal der oprettes ét eller flere områder til at indsætte de nye blokke i.</key>
+    <key alias="invalidDropPosition">Ikke tilladt placering.</key>
+    <key alias="defaultLayoutStylesheet">Standardlayout stylesheet</key>
+    <key alias="confirmPasteDisallowedNestedBlockHeadline">Ikke tilladt indhold blev afvist</key>
+    <key alias="confirmPasteDisallowedNestedBlockMessage">
+      <![CDATA[Det indsatte indhold bestod af ikke tilladt del-indhold, disse dele er blevet afvist. Vil du beholde det resterene alligevel?]]></key>
+    <key alias="areaAliasHelp">
+      <![CDATA[Dette alias skrives ud via GetBlockGridHTML(), brug aliaset til at fange det element der repræsentere dette område. F.eks.. .umb-block-grid__area[data-area-alias="MitOmraadeAlias"] { ... }]]></key>
+    <key alias="scaleHandlerButtonTitle">Træk for at skalere</key>
+    <key alias="areaCreateLabelTitle">Tilføj indhold label</key>
+    <key alias="areaCreateLabelHelp">Overskriv labellen for tilføj indholds knappen i dette område.</key>
+    <key alias="showSizeOptions">Tilføj skalerings muligheder</key>
+    <key alias="addBlockType">Tilføj Blok</key>
+    <key alias="addBlockGroup">Tilføj gruppe</key>
+    <key alias="pickSpecificAllowance">Tilføj gruppe eller Blok</key>
+    <key alias="allowanceMinimum">Sæt minimum krav</key>
+    <key alias="allowanceMaximum">Sæt maksimum krav</key>
+    <key alias="block">Blok</key>
+    <key alias="tabBlock">Blok</key>
+    <key alias="tabBlockTypeSettings">Indstillinger</key>
+    <key alias="tabAreas">Områder</key>
+    <key alias="tabAdvanced">Avanceret</key>
+    <key alias="headlineAllowance">Tilladelser</key>
+    <key alias="getSampleHeadline">Installer demo konfiguration</key>
+    <key alias="getSampleDescription"><![CDATA[Dette tilføjer basale og hjælper dig til at komme igang med Block Grid Editor.<br/>Dette indeholder Blokke for Overskrift, Beriget-Tekst, Billede og To-Koloners-Layout.]]></key>
+    <key alias="getSampleButton">Installer</key>
+    <key alias="actionEnterSortMode">Sortings tilstand</key>
+    <key alias="actionExitSortMode">Afslut sortings tilstand</key>
+    <key alias="areaAliasIsNotUnique">Dette område alias skal være unikt sammenlignet med andre områder af denne Blok.</key>
+    <key alias="configureArea">Konfigurer område</key>
+    <key alias="deleteArea">Slet område</key>
+    <key alias="addColumnSpanOption">Tilføj mulighed for %0% koloner</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>

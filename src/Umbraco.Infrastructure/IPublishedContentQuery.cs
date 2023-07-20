@@ -18,6 +18,7 @@ public interface IPublishedContentQuery
 
     IPublishedContent? Content(object id);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     IPublishedContent? ContentSingleAtXPath(string xpath, params XPathVariable[] vars);
 
     IEnumerable<IPublishedContent> Content(IEnumerable<int> ids);
@@ -26,8 +27,10 @@ public interface IPublishedContentQuery
 
     IEnumerable<IPublishedContent> Content(IEnumerable<object> ids);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars);
 
     IEnumerable<IPublishedContent> ContentAtRoot();

@@ -53,8 +53,7 @@ public abstract class IOHelper : IIOHelper
             throw new ArgumentNullException(nameof(path));
         }
 
-        // Check if the path is already mapped - TODO: This should be switched to Path.IsPathFullyQualified once we are on Net Standard 2.1
-        if (IsPathFullyQualified(path))
+        if (path.IsFullPath())
         {
             return path;
         }
@@ -231,13 +230,7 @@ public abstract class IOHelper : IIOHelper
             : CleanFolderResult.Success();
     }
 
-    /// <summary>
-    ///     Returns true if the path has a root, and is considered fully qualified for the OS it is on
-    ///     See
-    ///     https://github.com/dotnet/runtime/blob/30769e8f31b20be10ca26e27ec279cd4e79412b9/src/libraries/System.Private.CoreLib/src/System/IO/Path.cs#L281
-    ///     for the .NET Standard 2.1 version of this
-    /// </summary>
-    /// <param name="path">The path to check</param>
-    /// <returns>True if the path is fully qualified, false otherwise</returns>
-    public abstract bool IsPathFullyQualified(string path);
+    [Obsolete("Use Path.IsPathFullyQualified instead. This will be removed in Umbraco 13.")]
+
+    public virtual bool IsPathFullyQualified(string path) => Path.IsPathFullyQualified(path);
 }

@@ -90,10 +90,7 @@ preserve.belle
 /src/Umbraco.Web.UI/appsettings.Local.json
 
 # Tests
-cypress.env.json
-/tests/Umbraco.Tests.AcceptanceTest/cypress/screenshots/
-/tests/Umbraco.Tests.AcceptanceTest/cypress/support/chainable.ts
-/tests/Umbraco.Tests.AcceptanceTest/cypress/videos/
+/tests/Umbraco.Tests.AcceptanceTest/.env
 /tests/Umbraco.Tests.Integration.SqlCe/DatabaseContextTests.sdf
 /tests/Umbraco.Tests.Integration.SqlCe/[Uu]mbraco/[Dd]ata/TEMP/
 /tests/Umbraco.Tests.Integration/appsettings.Tests.Local.json
@@ -104,5 +101,12 @@ cypress.env.json
 /tests/Umbraco.Tests.UnitTests/[Uu]mbraco/[Dd]ata/TEMP/
 
 # Ignore auto-generated schema
+/src/Umbraco.Cms.Targets/tasks/
+/src/Umbraco.Cms.Targets/appsettings-schema.*.json
 /src/Umbraco.Web.UI/appsettings-schema.json
+/src/Umbraco.Web.UI/appsettings-schema.*.json
+/tests/Umbraco.Tests.Integration/appsettings-schema.json
+/tests/Umbraco.Tests.Integration/appsettings-schema.*.json
 /src/Umbraco.Cms/appsettings-schema.json
+playwright-report
+trace.zip

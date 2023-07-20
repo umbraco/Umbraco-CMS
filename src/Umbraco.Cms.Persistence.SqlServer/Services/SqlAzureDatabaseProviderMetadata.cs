@@ -1,4 +1,5 @@
 using System.Runtime.Serialization;
+using Microsoft.Data.SqlClient;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
@@ -51,8 +52,32 @@ public class SqlAzureDatabaseProviderMetadata : IDatabaseProviderMetadata
     public bool ForceCreateDatabase => false;
 
     /// <inheritdoc />
+    public bool CanRecognizeConnectionString(string? connectionString)
+    {
+        if (connectionString is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            var builder = new SqlConnectionStringBuilder(connectionString);
+
+            return string.IsNullOrEmpty(builder.AttachDBFilename) && builder.DataSource.Contains("database.windows.net");
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
+    }
+    /// <inheritdoc />
     public string GenerateConnectionString(DatabaseModel databaseModel)
     {
+        if (databaseModel.Server is null)
+        {
+            throw new ArgumentNullException(nameof(databaseModel.Server));
+        }
+
         var server = databaseModel.Server;
         var databaseName = databaseModel.DatabaseName;
         var user = databaseModel.Login;
@@ -89,7 +114,7 @@ public class SqlAzureDatabaseProviderMetadata : IDatabaseProviderMetadata
             server = $"{server},1433";
         }
 
-        if (user.Contains("@") == false)
+        if (user?.Contains("@") == false)
         {
             var userDomain = server;
 

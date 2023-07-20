@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Moq;
@@ -240,6 +239,15 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
         var content = snapshot.Content.GetAtRoot().First();
         var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText", "no", fallback: Fallback.ToLanguage);
         Assert.IsNull(value);
+    }
+
+    [Test]
+    public void Can_Get_Content_For_Unpopulated_Requested_DefaultLanguage_With_Fallback()
+    {
+        var snapshot = GetPublishedSnapshot();
+        var content = snapshot.Content.GetAtRoot().First();
+        var value = content.Value(PublishedValueFallback, "welcomeText", "fr", fallback: Fallback.ToDefaultLanguage);
+        Assert.AreEqual("Welcome", value);
     }
 
     [Test]

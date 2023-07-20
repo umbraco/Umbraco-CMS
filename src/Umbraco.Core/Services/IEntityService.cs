@@ -187,6 +187,22 @@ public interface IEntityService
         Ordering? ordering = null);
 
     /// <summary>
+    ///     Gets children of an entity.
+    /// </summary>
+    IEnumerable<IEntitySlim> GetPagedTrashedChildren(
+        int id,
+        UmbracoObjectTypes objectType,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        totalRecords = 0;
+        return Array.Empty<IEntitySlim>();
+    }
+
+    /// <summary>
     ///     Gets descendants of an entity.
     /// </summary>
     IEnumerable<IEntitySlim> GetPagedDescendants(

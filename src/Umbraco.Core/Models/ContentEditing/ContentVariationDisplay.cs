@@ -14,6 +14,7 @@ public class ContentVariantDisplay : ITabbedContent<ContentPropertyDisplay>, ICo
         Tabs = new List<Tab<ContentPropertyDisplay>>();
         Notifications = new List<BackOfficeNotification>();
         AllowedActions = Enumerable.Empty<string>();
+        AdditionalPreviewUrls = Enumerable.Empty<NamedUrl>();
     }
 
     [DataMember(Name = "allowedActions", IsRequired = true)]
@@ -72,6 +73,9 @@ public class ContentVariantDisplay : ITabbedContent<ContentPropertyDisplay>, ICo
     /// </summary>
     [DataMember(Name = "tabs")]
     public IEnumerable<Tab<ContentPropertyDisplay>> Tabs { get; set; }
+
+    [DataMember(Name = "additionalPreviewUrls")]
+    public IEnumerable<NamedUrl> AdditionalPreviewUrls { get; set; }
 }
 
 public class ContentVariantScheduleDisplay : ContentVariantDisplay

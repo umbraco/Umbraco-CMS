@@ -1,9 +1,12 @@
+using System.ComponentModel;
 using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 using Umbraco.Cms.Web.BackOffice.Controllers;
@@ -33,11 +36,40 @@ public class ModelsBuilderDashboardController : UmbracoAuthorizedJsonController
     private readonly ModelsBuilderSettings _config;
     private readonly DashboardReport _dashboardReport;
     private readonly ModelsGenerationError _mbErrors;
-    private readonly ModelsGenerator _modelGenerator;
+    private readonly IModelsGenerator _modelGenerator;
     private readonly OutOfDateModelsStatus _outOfDateModels;
 
-    public ModelsBuilderDashboardController(IOptions<ModelsBuilderSettings> config, ModelsGenerator modelsGenerator,
-        OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors)
+    // TODO: Remove in v13
+    private readonly ModelsGenerator? _concreteModelGenerator;
+
+    [Obsolete("This constructor is obsolete and will be removed in v13. Use the constructor with IModelsGenerator instead.")]
+    [Browsable(false)]
+    public ModelsBuilderDashboardController(
+        IOptions<ModelsBuilderSettings> config,
+        ModelsGenerator modelsGenerator,
+        OutOfDateModelsStatus outOfDateModels,
+        ModelsGenerationError mbErrors)
+        : this(config, StaticServiceProvider.Instance.GetRequiredService<IModelsGenerator>(), outOfDateModels, mbErrors)
+    {
+    }
+
+    [Obsolete("This constructor is obsolete and will be removed in v13. Use the constructor with only IModelsGenerator instead.")]
+    [Browsable(false)]
+    public ModelsBuilderDashboardController(
+        IOptions<ModelsBuilderSettings> config,
+        ModelsGenerator concreteModelGenerator,
+        IModelsGenerator modelsGenerator,
+        OutOfDateModelsStatus outOfDateModels,
+        ModelsGenerationError mbErrors)
+        : this(config, modelsGenerator, outOfDateModels, mbErrors)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public ModelsBuilderDashboardController(IOptions<ModelsBuilderSettings> config,
+        IModelsGenerator modelsGenerator,
+        OutOfDateModelsStatus outOfDateModels,
+        ModelsGenerationError mbErrors)
     {
         _config = config.Value;
         _modelGenerator = modelsGenerator;

@@ -2,13 +2,13 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -26,7 +26,9 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueType = ValueTypes.Text,
     Group = Constants.PropertyEditors.Groups.Media,
     Icon = Constants.Icons.MediaImage,
-    IsDeprecated = false)]
+    IsDeprecated = false,
+    ValueEditorIsReusable = true)]
+[Obsolete("Please use the MediaPicker3 instead, will be removed in V13")]
 public class MediaPickerPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

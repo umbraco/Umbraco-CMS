@@ -1,7 +1,6 @@
 using System.Data;
 using System.Data.Common;
 using System.Text.RegularExpressions;
-using Microsoft.Data.SqlClient;
 using NPoco;
 using StackExchange.Profiling.Data;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -186,7 +185,7 @@ public static partial class NPocoDatabaseExtensions
                 db.Insert(poco);
                 return RecordPersistenceType.Insert;
             }
-            catch (SqlException)
+            catch (DbException)
             {
                 // assuming all db engines will throw SQLException exception
                 // failed: exists (due to race cond RC1)

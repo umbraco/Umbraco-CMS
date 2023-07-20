@@ -54,9 +54,6 @@ public class ListViewConfiguration
     [ConfigurationField("pageSize", "Page Size", "number", Description = "Number of items per page")]
     public int PageSize { get; set; }
 
-    [ConfigurationField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html", Description = "The default sort order for the list")]
-    public string OrderBy { get; set; }
-
     [ConfigurationField("orderDirection", "Order Direction", "views/propertyeditors/listview/orderDirection.prevalues.html")]
     public string OrderDirection { get; set; }
 
@@ -66,6 +63,9 @@ public class ListViewConfiguration
         "views/propertyeditors/listview/includeproperties.prevalues.html",
         Description = "The properties that will be displayed for each column")]
     public Property[] IncludeProperties { get; set; }
+
+    [ConfigurationField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html", Description = "The default sort order for the list")]
+    public string OrderBy { get; set; }
 
     [ConfigurationField("layouts", "Layouts", "views/propertyeditors/listview/layouts.prevalues.html")]
     public Layout[] Layouts { get; set; }

@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Install.Models;
@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Core.Install.InstallSteps;
 /// <summary>
 ///     Represents a step in the installation that ensure all the required permissions on files and folders are correct.
 /// </summary>
+[Obsolete("Will be replace with a new step with the new backoffice")]
 [InstallSetupStep(
     InstallationType.NewInstall | InstallationType.Upgrade,
     "Permissions",

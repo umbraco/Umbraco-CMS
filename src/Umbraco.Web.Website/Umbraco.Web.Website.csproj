@@ -1,50 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Umbraco.Cms.Web.Website</PackageId>
+    <Title>Umbraco CMS - Web - Website</Title>
+    <Description>Contains the website assembly needed to run the frontend of Umbraco CMS.</Description>
+    <RootNamespace>Umbraco.Cms.Web.Website</RootNamespace>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <OutputType>Library</OutputType>
-        <RootNamespace>Umbraco.Cms.Web.Website</RootNamespace>
-        <PackageId>Umbraco.Cms.Web.Website</PackageId>
-        <Title>Umbraco CMS Website</Title>
-        <Description>Contains the Website assembly needed to run Umbraco Cms (Front office). This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</Description>
-    </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <DocumentationFile>bin\Release\Umbraco.Web.Website.xml</DocumentationFile>
-    </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
+  </ItemGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <DocumentationFile>bin\Release\Umbraco.Web.Website.xml</DocumentationFile>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
-        <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
-        <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Umbraco.Code" Version="2.0.0">
-        <PrivateAssets>all</PrivateAssets>
-      </PackageReference>
-      <PackageReference Update="Nerdbank.GitVersioning">
-        <Version>3.5.107</Version>
-      </PackageReference>
-    </ItemGroup>
-    <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
-        </AssemblyAttribute>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>Umbraco.Tests.Integration</_Parameter1>
-        </AssemblyAttribute>
-    </ItemGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Umbraco.Tests.Integration</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>

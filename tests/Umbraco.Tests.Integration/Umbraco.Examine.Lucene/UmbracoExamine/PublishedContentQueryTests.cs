@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Examine;
 using Examine.Lucene;
 using Examine.Lucene.Directories;
 using Examine.Lucene.Providers;
-using Lucene.Net.Store;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -14,6 +10,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Testing;
+using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
@@ -39,6 +36,7 @@ public class PublishedContentQueryTests : ExamineBaseTest
 
         public bool EnableDefaultEventHandler => throw new NotImplementedException();
         public bool PublishedValuesOnly => throw new NotImplementedException();
+        public bool SupportProtectedContent => throw new NotImplementedException();
         public IEnumerable<string> GetFields() => _fieldNames;
     }
 

@@ -22,7 +22,3 @@ RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/
 # https://docs.npmjs.com/cli/v6/using-npm/config#unsafe-perm
 # Default: false if running as root, true otherwise (we are ROOT)
 #RUN npm -g config set user vscode && npm -g config set unsafe-perm
-
-# Generate and trust a local developer certificate for Kestrel
-# This is needed for Kestrel to bind on https
-RUN dotnet dev-certs https --trust

@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Mapping;
@@ -23,7 +24,6 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
@@ -81,47 +81,15 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
         _userDataService = userDataService;
     }
 
-    [Obsolete("This constructor is obsolete and will be removed in v11, use constructor with all values")]
-    public CurrentUserController(
-        MediaFileManager mediaFileManager,
-        IOptions<ContentSettings> contentSettings,
-        IHostingEnvironment hostingEnvironment,
-        IImageUrlGenerator imageUrlGenerator,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IUserService userService,
-        IUmbracoMapper umbracoMapper,
-        IBackOfficeUserManager backOfficeUserManager,
-        ILoggerFactory loggerFactory,
-        ILocalizedTextService localizedTextService,
-        AppCaches appCaches,
-        IShortStringHelper shortStringHelper,
-        IPasswordChanger<BackOfficeIdentityUser> passwordChanger) : this(
-        mediaFileManager,
-        StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<ContentSettings>>(),
-        hostingEnvironment,
-        imageUrlGenerator,
-        backofficeSecurityAccessor,
-        userService,
-        umbracoMapper,
-        backOfficeUserManager,
-        localizedTextService,
-        appCaches,
-        shortStringHelper,
-        passwordChanger,
-        StaticServiceProvider.Instance.GetRequiredService<IUserDataService>())
-    {
-    }
-
-
-    /// <summary>
-    ///     Returns permissions for all nodes passed in for the current user
-    /// </summary>
-    /// <param name="nodeIds"></param>
-    /// <returns></returns>
-    [HttpPost]
-    public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
-    {
-        EntityPermissionCollection permissions = _userService
+        /// <summary>
+        /// Returns permissions for all nodes passed in for the current user
+        /// </summary>
+        /// <param name="nodeIds"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
+        {
+            EntityPermissionCollection permissions = _userService
             .GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, nodeIds);
 
         var permissionsDictionary = new Dictionary<int, string[]>();
@@ -230,12 +198,13 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
     [AllowAnonymous]
     public async Task<ActionResult<UserDetail?>> PostSetInvitedUserPassword([FromBody] string newPassword)
     {
-        BackOfficeIdentityUser? user = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor
-            .BackOfficeSecurity?.GetUserId().ResultOr(0).ToString());
-        if (user == null)
+        var userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().ResultOr(0).ToString();
+        if (userId is null)
         {
-            throw new InvalidOperationException("Could not find user");
+            throw new InvalidOperationException("Could not find user Id");
         }
+        var user = await _backOfficeUserManager.FindByIdAsync(userId);
+        if (user == null) throw new InvalidOperationException("Could not find user");
 
         IdentityResult result = await _backOfficeUserManager.AddPasswordAsync(user, newPassword);
 
@@ -309,7 +278,7 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
         // all current users have access to reset/manually change their password
 
         Attempt<PasswordChangedModel?> passwordChangeResult =
-            await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _backOfficeUserManager);
+            await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _backOfficeUserManager, currentUser);
 
         if (passwordChangeResult.Success)
         {
@@ -335,8 +304,18 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
     [ValidateAngularAntiForgeryToken]
     public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
     {
-        BackOfficeIdentityUser identityUser = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor
-            .BackOfficeSecurity?.GetUserId().ResultOr(0).ToString(CultureInfo.InvariantCulture));
+        var userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().ResultOr(0).ToString(CultureInfo.InvariantCulture);
+        if (userId is null)
+        {
+            throw new InvalidOperationException("Could not find user Id");
+        }
+
+        BackOfficeIdentityUser? identityUser = await _backOfficeUserManager.FindByIdAsync(userId);
+
+        if (identityUser is null)
+        {
+            throw new InvalidOperationException("Could not find user");
+        }
 
         // deduplicate in case there are duplicates (there shouldn't be now since we have a unique constraint on the external logins
         // but there didn't used to be)

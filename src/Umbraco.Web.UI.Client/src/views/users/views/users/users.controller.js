@@ -187,7 +187,23 @@
         }
 
         function initUserStateSelections() {
-            initUsersOptionsFilterSelections(vm.userStatesFilter, vm.usersOptions.userStates, "key");
+            if (!vm.usersOptions.userStates && vm.userStatesFilter) {
+                  // create a new empty userStates array
+                  vm.usersOptions.userStates = [];
+
+                  // add selected userStatesFilters to usersOptions.userStates array
+                  for (var i = 0; i < vm.userStatesFilter.length; i++) {
+                      if (vm.userStatesFilter[i].selected) {
+                        vm.usersOptions.userStates.push(vm.userStatesFilter[i].key);
+                      }
+                  }
+
+                  // If there are any selected userStates, update location and change pagenumber
+                  if (vm.usersOptions.userStates.length > 0) {
+                      updateLocation("userStates", vm.usersOptions.userStates.join(","));
+                      changePageNumber(1);
+                  }
+              }
         }
 
         function initUserGroupSelections() {
@@ -318,7 +334,7 @@
             vm.disableUserButtonState = "busy";
             usersResource.disableUsers(vm.selection).then(function (data) {
                 // update userState
-                vm.selection.forEach(function (userId) {
+                data.disabledUserIds.forEach(function (userId) {
                     var user = getUserFromArrayById(userId, vm.users);
                     if (user) {
                         user.userState = "Disabled";
@@ -792,6 +808,7 @@
 
                 if (user.userDisplayState && user.userDisplayState.key === "Invited") {
                     vm.allowEnableUser = false;
+                    vm.allowDisableUser = false;
                 }
 
                 if (user.userDisplayState && user.userDisplayState.key === "LockedOut") {
