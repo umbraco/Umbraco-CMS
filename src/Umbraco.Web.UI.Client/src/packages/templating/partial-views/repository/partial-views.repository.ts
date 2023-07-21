@@ -145,7 +145,7 @@ export class UmbPartialViewsRepository
 
 		await this.#init;
 
-		const { data, error } = await this.#treeDataSource.getChildrenOf({ path });
+		const { data, error } = await this.#treeDataSource.getChildrenOf({ path, skip: 0, take: 100 });
 		if (data) {
 			this.#treeStore!.appendItems(data.items);
 		}
