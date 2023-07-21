@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
+    <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 

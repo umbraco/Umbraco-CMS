@@ -226,7 +226,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                     if (html is not null)
                     {
-                        var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(html, mediaParentId, userId, _imageUrlGenerator);
+                        var parseAndSaveBase64Images = _pastedImages.FindAndPersistPastedTempImages(
+                            html, mediaParentId, userId, _imageUrlGenerator);
+                        var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(parseAndSaveBase64Images, mediaParentId, userId, _imageUrlGenerator);
                         var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
                         rte.Value = editorValueWithMediaUrlsRemoved;
                     }
