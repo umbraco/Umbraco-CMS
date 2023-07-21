@@ -13,9 +13,16 @@ export class UmbFileSystemTreeItemContext extends UmbTreeItemContextBase<FileSys
 		super(host, (x: FileSystemTreeItemPresentationModel) => x.path);
 	}
 
+	//TODO: this is not a nice solution! There should be a better way to distinguish in the tree between folders and files. Additionally we need to be able to register an action only on empty folder.
+
 	checkIfIsFolder() {
-		if (this.getTreeItem()?.isFolder) {
-			this.type = `${this.getTreeItem()?.type}-folder`;
+		const treeItem = this.getTreeItem();
+		if (treeItem?.isFolder) {
+			if (treeItem.hasChildren) {
+				this.type = `${this.getTreeItem()?.type}-folder`;
+			} else {
+				this.type = `${this.getTreeItem()?.type}-folder-empty`;
+			}
 		}
 	}
 

@@ -1,4 +1,4 @@
-import { PARTIAL_VIEW_ROOT_ENTITY_TYPE, PartialViewDetails } from '../config.js';
+import { PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../config.js';
 import { UmbPartialViewDetailServerDataSource } from './sources/partial-views.detail.server.data.js';
 import { UmbPartialViewsTreeServerDataSource } from './sources/partial-views.tree.server.data.js';
 import { UmbPartialViewsTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } from './partial-views.tree.store.js';
@@ -66,13 +66,21 @@ export class UmbPartialViewsRepository
 	createFolderScaffold(
 		parentId: string | null
 	): Promise<{ data?: FolderReponseModel | undefined; error?: ProblemDetails | undefined }> {
-		throw new Error('Method not implemented.');
+		const data: FolderReponseModel = {
+			name: '',
+			parentId,
+		};
+		return Promise.resolve({ data, error: undefined });
 	}
 	async createFolder(
 		requestBody: CreateFolderRequestModel
 	): Promise<{ data?: string | undefined; error?: ProblemDetails | undefined }> {
 		await this.#init;
-		return this.#folderDataSource.insert(requestBody);
+		const req = {
+			parentPath: requestBody.parentId,
+			name: requestBody.name,
+		};
+		return this.#folderDataSource.insert(req);
 	}
 	async requestFolder(
 		unique: string
@@ -88,7 +96,7 @@ export class UmbPartialViewsRepository
 	}
 	async deleteFolder(path: string): Promise<{ error?: ProblemDetails | undefined }> {
 		await this.#init;
-		return this.#folderDataSource.get(path);
+		return this.#folderDataSource.delete(path);
 	}
 	//#endregion
 
