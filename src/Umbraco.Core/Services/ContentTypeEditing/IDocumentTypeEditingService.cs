@@ -6,5 +6,5 @@ namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 
 public interface IDocumentTypeEditingService
 {
-    Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(DocumentTypeCreateModel model, Guid performingUserId);
+    Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(DocumentTypeCreateModel model, Guid performingUserKey);
 }

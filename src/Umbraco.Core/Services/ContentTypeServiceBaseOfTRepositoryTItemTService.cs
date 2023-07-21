@@ -494,6 +494,12 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #region Save
 
+    public async Task SaveAsync(TItem item, Guid performingUserKey)
+    {
+        var userId = await _userIdKeyResolver.GetAsync(performingUserKey);
+        Save(item, userId);
+    }
+
     public void Save(TItem? item, int userId = Constants.Security.SuperUserId)
     {
         if (item is null)

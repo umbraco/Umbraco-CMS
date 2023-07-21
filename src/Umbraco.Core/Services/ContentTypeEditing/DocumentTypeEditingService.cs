@@ -32,7 +32,7 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
         _templateService = templateService;
     }
 
-    public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(DocumentTypeCreateModel model, Guid performingUserId)
+    public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(DocumentTypeCreateModel model, Guid performingUserKey)
     {
         // Get all content types, we need to validate the compositions. and the alias.
         IContentTypeComposition[] allContentTypes = _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
@@ -385,8 +385,7 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
 
 
         // save content type
-        // FIXME: create and use an async get method here.
-        _contentTypeService.Save(contentType);
+        await _contentTypeService.SaveAsync(contentType, performingUserKey);
 
         return Attempt.SucceedWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
     }
