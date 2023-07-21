@@ -17,6 +17,7 @@
 		"skipLibCheck": true,
 		"resolveJsonModule": true,
 		"baseUrl": ".",
+		"incremental": true,
 		"paths": {
 			"@umbraco-cms/backoffice/external/lit": ["src/external/lit"],
 			"@umbraco-cms/backoffice/external/lodash": ["src/external/lodash"],
