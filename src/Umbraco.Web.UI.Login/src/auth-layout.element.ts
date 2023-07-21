@@ -16,9 +16,9 @@ export class UmbAuthLayoutElement extends LitElement {
 			<div id="logo"><img src=${this.logoImage} alt="Umbraco" /></div>
 
 			<div id="container">
-				<uui-box id="box">
+				<div id="box">
 					<slot></slot>
-				</uui-box>
+				</div>
 			</div>
 		`;
 	}
@@ -58,7 +58,11 @@ export class UmbAuthLayoutElement extends LitElement {
 
 			#box {
 				width: 500px;
-				padding: var(--uui-size-space-6) var(--uui-size-space-5) var(--uui-size-space-5) var(--uui-size-space-5);
+				padding: var(--uui-size-layout-3);
+				background-color: var(--uui-color-surface);
+				box-sizing: border-box;
+				box-shadow: var(--uui-shadow-depth-5);
+				border-radius: calc(var(--uui-border-radius) * 2);
 			}
 
 			#email,
