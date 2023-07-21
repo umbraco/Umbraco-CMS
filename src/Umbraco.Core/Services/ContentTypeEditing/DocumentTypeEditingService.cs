@@ -34,10 +34,12 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(DocumentTypeCreateModel model, Guid performingUserId)
     {
+        // Get all content types, we need to validate the compositions. and the alias.
+        IContentTypeComposition[] allContentTypes = _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+
         // Ensure no duplicate alias across documents, members, and media. Since this would break ModelsBuilder/published cache.
         // This this method gets aliases across documents, members, and media, so it covers it all
-        // TODO: This can probably be optimized, we need all the content types later anyway to validate the compositions.
-        if (_contentTypeService.GetAllContentTypeAliases().Contains(model.Alias))
+        if (allContentTypes.Select(x => x.Alias).Contains(model.Alias))
         {
             return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.DuplicateAlias, null);
         }
@@ -84,6 +86,11 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
             .Select(x => x.Key)
             .ToArray();
 
+        // Validate that the inheritance is valid.
+        // This means validating the following:
+        // * There can only be 1 parent
+        // * The ParentKey must be equal to the key of the parent (otherwise it's not inheritance)
+        // * The parent must not be one of the compositions, you can't be both a composition and a parent.
         if (inheritedCompositions.Any() &&
              (inheritedCompositions.Length > MaxInheritance
             || inheritedCompositions.First().Key != model.ParentKey
@@ -91,10 +98,6 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
         {
             return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidInheritance, null);
         }
-
-        // Validate that the all the compositions are allowed
-        // Would be nice to maybe have this in a little nicer way, but for now it should be okay.
-        IContentTypeComposition[] allContentTypes = _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
 
         // Both inheritance and compositions.
         Guid[] allCompositionKeys = inheritedCompositions.Select(x => x.Key).Union(compositionKeys).ToArray();
@@ -116,6 +119,8 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
             return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.DuplicatePropertyTypeAlias, null);
         }
 
+        // Validate that the all the compositions are allowed
+        // Would be nice to maybe have this in a little nicer way, but for now it should be okay.
         IEnumerable<Guid> allowedCompositionKeys =
             // NOTE: Here if we're checking for create we should pass null, otherwise the updated content type.
             _contentTypeService.GetAvailableCompositeContentTypes(null, allContentTypes, isElement: model.IsElement)
@@ -323,7 +328,6 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
             contentType.PropertyGroups = new PropertyGroupCollection(propertyGroups);
         }
 
-        // FIXME: handle properties outside containers ("generic properties") if they still exist
         // Updates compositions
         // We don't actually have to worry about alias collision here because that's also checked in the service
         // We'll probably want to refactor this to be able to return a proper ContentTypeOperationStatus.
@@ -341,12 +345,11 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
             contentType.RemoveContentType(key);
         }
 
-        // We have to look up the content types we want to add to composition, since we keep a full reference.
-        // TODO: Make Async
+        // We need the full object to add is as a composition, but since we fetched everything in the beginning we can just select from that.
         if (add.Any())
         {
-            IContentType[] contentTypesToAdd = _contentTypeService.GetAll(add).ToArray();
-            foreach (IContentType contentTypeToAdd in contentTypesToAdd)
+            IContentTypeComposition[] contentTypesToAdd = allContentTypes.Where(x => add.Contains(x.Key)).ToArray();
+            foreach (IContentTypeComposition contentTypeToAdd in contentTypesToAdd)
             {
                 contentType.AddContentType(contentTypeToAdd);
             }
