@@ -139,7 +139,6 @@ export class UmbPartialViewsRepository
 	}
 
 	async requestTreeItemsOf(path: string | null) {
-		debugger;
 		if (path === null) {
 			return this.requestRootTreeItems();
 		}
