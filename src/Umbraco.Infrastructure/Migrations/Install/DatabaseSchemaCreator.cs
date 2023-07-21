@@ -87,7 +87,7 @@ public class DatabaseSchemaCreator
     };
 
     private readonly IUmbracoDatabase _database;
-    private readonly IOptionsMonitor<InstallDefaultDataSettings> _defaultDataCreationSettings;
+    private readonly IOptionsMonitor<InstallDefaultDataSettings> _installDefaultDataSettings;
     private readonly IEventAggregator _eventAggregator;
     private readonly ILogger<DatabaseSchemaCreator> _logger;
     private readonly ILoggerFactory _loggerFactory;
@@ -118,7 +118,7 @@ public class DatabaseSchemaCreator
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
         _eventAggregator = eventAggregator;
-        _defaultDataCreationSettings = defaultDataCreationSettings;
+        _installDefaultDataSettings = defaultDataCreationSettings;  // TODO (V13): Rename this parameter to installDefaultDataSettings.
 
         if (_database?.SqlContext?.SqlSyntax == null)
         {
@@ -178,7 +178,7 @@ public class DatabaseSchemaCreator
             var dataCreation = new DatabaseDataCreator(
                 _database, _loggerFactory.CreateLogger<DatabaseDataCreator>(),
                 _umbracoVersion,
-                _defaultDataCreationSettings);
+                _installDefaultDataSettings);
             foreach (Type table in _orderedTables)
             {
                 CreateTable(false, table, dataCreation);
@@ -455,7 +455,7 @@ public class DatabaseSchemaCreator
                 _database,
                 _loggerFactory.CreateLogger<DatabaseDataCreator>(),
                 _umbracoVersion,
-                _defaultDataCreationSettings));
+                _installDefaultDataSettings));
     }
 
     /// <summary>

@@ -88,11 +88,25 @@ namespace JsonSchema
 
                 public HelpPageSettings? HelpPage { get; set; }
 
-                public InstallDefaultDataSettings? InstallDefaultData { get; set; }
+                public InstallDefaultData? InstallDefaultData { get; set; }
 
                 public DataTypesSettings? DataTypes { get; set; }
 
                 public MarketplaceSettings? Marketplace { get; set; }
+            }
+
+            /// <summary>
+            ///     Configurations for the Umbraco CMS InstallDefaultData configuration.
+            /// </summary>
+            public class InstallDefaultData
+            {
+                public InstallDefaultDataSettings? Languages { get; set; }
+
+                public InstallDefaultDataSettings? DataTypes { get; set; }
+
+                public InstallDefaultDataSettings? MediaTypes { get; set; }
+
+                public InstallDefaultDataSettings? MemberTypes { get; set; }
             }
 
             /// <summary>
