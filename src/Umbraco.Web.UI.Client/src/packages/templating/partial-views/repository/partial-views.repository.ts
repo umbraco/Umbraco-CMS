@@ -2,7 +2,10 @@ import { PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../config.js';
 import { UmbPartialViewDetailServerDataSource } from './sources/partial-views.detail.server.data.js';
 import { UmbPartialViewsTreeServerDataSource } from './sources/partial-views.tree.server.data.js';
 import { UmbPartialViewsTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } from './partial-views.tree.store.js';
-import { UmbPartialViewsFolderServerDataSource } from './sources/partial-views.folder.server.data.js';
+import {
+	PartialViewGetFolderResponse,
+	UmbPartialViewsFolderServerDataSource,
+} from './sources/partial-views.folder.server.data.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
@@ -80,11 +83,14 @@ export class UmbPartialViewsRepository
 			parentPath: requestBody.parentId,
 			name: requestBody.name,
 		};
-		return this.#folderDataSource.insert(req);
+		const promise = this.#folderDataSource.insert(req);
+		await promise;
+		this.requestTreeItemsOf(requestBody.parentId ? requestBody.parentId : null);
+		return promise;
 	}
 	async requestFolder(
 		unique: string
-	): Promise<{ data?: FolderReponseModel | undefined; error?: ProblemDetails | undefined }> {
+	): Promise<{ data?: PartialViewGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
 		await this.#init;
 		return this.#folderDataSource.get(unique);
 	}
@@ -96,7 +102,11 @@ export class UmbPartialViewsRepository
 	}
 	async deleteFolder(path: string): Promise<{ error?: ProblemDetails | undefined }> {
 		await this.#init;
-		return this.#folderDataSource.delete(path);
+		const { data } = await this.requestFolder(path);
+		const promise = this.#folderDataSource.delete(path);
+		await promise;
+		this.requestTreeItemsOf(data?.parentPath ? data?.parentPath : null);
+		return promise;
 	}
 	//#endregion
 
@@ -129,6 +139,7 @@ export class UmbPartialViewsRepository
 	}
 
 	async requestTreeItemsOf(path: string | null) {
+		debugger;
 		if (path === null) {
 			return this.requestRootTreeItems();
 		}
@@ -136,7 +147,6 @@ export class UmbPartialViewsRepository
 		await this.#init;
 
 		const { data, error } = await this.#treeDataSource.getChildrenOf({ path });
-
 		if (data) {
 			this.#treeStore!.appendItems(data.items);
 		}
