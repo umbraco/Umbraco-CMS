@@ -706,86 +706,89 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         });
     }
 
-    [TestCase(
-        @"<p><img alt src=""data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7""></p>",
-        false)]
-    [TestCase(
-        @"<p><img src=""data:image/svg+xml;utf8,<svg viewBox=""0 0 70 74"" fill=""none"" xmlns=""http://www.w3.org/2000/svg""><rect width=""100%"" height=""100%"" fill=""black""/></svg>""></p>",
-        false)]
-    [TestCase(
-        @"<p><img alt src=""/some/random/image.jpg""></p><p><img alt src=""data:image/jpg;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7""></p>",
-        false)]
-    [TestCase(
-        @"<p><img alt src=""data:image/notallowedextension;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7""></p>",
-        true)]
-    public async Task PostSave_Simple_RichText_With_Base64(string html, bool shouldHaveDataUri)
-    {
-        var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
-
-        var dataTypeService = GetRequiredService<IDataTypeService>();
-        var contentService = GetRequiredService<IContentService>();
-        var contentTypeService = GetRequiredService<IContentTypeService>();
-
-        var dataType = new DataTypeBuilder()
-            .WithId(0)
-            .WithoutIdentity()
-            .WithDatabaseType(ValueStorageType.Ntext)
-            .AddEditor()
-            .WithAlias(Constants.PropertyEditors.Aliases.TinyMce)
-            .Done()
-            .Build();
-
-        dataTypeService.Save(dataType);
-
-        var contentType = new ContentTypeBuilder()
-            .WithId(0)
-            .AddPropertyType()
-            .WithDataTypeId(dataType.Id)
-            .WithAlias("richText")
-            .WithName("Rich Text")
-            .Done()
-            .WithContentVariation(ContentVariation.Nothing)
-            .Build();
-
-        contentTypeService.Save(contentType);
-
-        var content = new ContentBuilder()
-            .WithId(0)
-            .WithName("Invariant")
-            .WithContentType(contentType)
-            .AddPropertyData()
-            .WithKeyValue("richText", html)
-            .Done()
-            .Build();
-        contentService.SaveAndPublish(content);
-        var model = new ContentItemSaveBuilder()
-            .WithContent(content)
-            .Build();
-
-        // Act
-        var response =
-            await Client.PostAsync(url, new MultipartFormDataContent {{new StringContent(JsonConvert.SerializeObject(model)), "contentItem"}});
-
-        // Assert
-        var body = await response.Content.ReadAsStringAsync();
-
-        body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
-
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, body);
-            var display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
-            var bodyText = display.Variants.FirstOrDefault()?.Tabs.FirstOrDefault()?.Properties
-                ?.FirstOrDefault(x => x.Alias.Equals("richText"))?.Value?.ToString();
-            Assert.NotNull(bodyText);
-
-            var containsDataUri = bodyText.Contains("data:image");
-            if (shouldHaveDataUri)
-            {
-                Assert.True(containsDataUri, $"Data URIs were expected to be found in the body: {bodyText}");
-            } else {
-                Assert.False(containsDataUri, $"Data URIs were not expected to be found in the body: {bodyText}");
-            }
-        });
-    }
+    // FIXME: I've commented out this tests, since it should be relevant for new backoffice
+    // This is because in new backoffice we use the temporary file service to handle drag'n'dropped images
+    // see RichTextEditorPastedImages.FindAndPersistPastedTempImagesAsync for more information.
+    // [TestCase(
+    //     @"<p><img alt src=""data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7""></p>",
+    //     false)]
+    // [TestCase(
+    //     @"<p><img src=""data:image/svg+xml;utf8,<svg viewBox=""0 0 70 74"" fill=""none"" xmlns=""http://www.w3.org/2000/svg""><rect width=""100%"" height=""100%"" fill=""black""/></svg>""></p>",
+    //     false)]
+    // [TestCase(
+    //     @"<p><img alt src=""/some/random/image.jpg""></p><p><img alt src=""data:image/jpg;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7""></p>",
+    //     false)]
+    // [TestCase(
+    //     @"<p><img alt src=""data:image/notallowedextension;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7""></p>",
+    //     true)]
+    // public async Task PostSave_Simple_RichText_With_Base64(string html, bool shouldHaveDataUri)
+    // {
+    //     var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+    //
+    //     var dataTypeService = GetRequiredService<IDataTypeService>();
+    //     var contentService = GetRequiredService<IContentService>();
+    //     var contentTypeService = GetRequiredService<IContentTypeService>();
+    //
+    //     var dataType = new DataTypeBuilder()
+    //         .WithId(0)
+    //         .WithoutIdentity()
+    //         .WithDatabaseType(ValueStorageType.Ntext)
+    //         .AddEditor()
+    //         .WithAlias(Constants.PropertyEditors.Aliases.TinyMce)
+    //         .Done()
+    //         .Build();
+    //
+    //     dataTypeService.Save(dataType);
+    //
+    //     var contentType = new ContentTypeBuilder()
+    //         .WithId(0)
+    //         .AddPropertyType()
+    //         .WithDataTypeId(dataType.Id)
+    //         .WithAlias("richText")
+    //         .WithName("Rich Text")
+    //         .Done()
+    //         .WithContentVariation(ContentVariation.Nothing)
+    //         .Build();
+    //
+    //     contentTypeService.Save(contentType);
+    //
+    //     var content = new ContentBuilder()
+    //         .WithId(0)
+    //         .WithName("Invariant")
+    //         .WithContentType(contentType)
+    //         .AddPropertyData()
+    //         .WithKeyValue("richText", html)
+    //         .Done()
+    //         .Build();
+    //     contentService.SaveAndPublish(content);
+    //     var model = new ContentItemSaveBuilder()
+    //         .WithContent(content)
+    //         .Build();
+    //
+    //     // Act
+    //     var response =
+    //         await Client.PostAsync(url, new MultipartFormDataContent {{new StringContent(JsonConvert.SerializeObject(model)), "contentItem"}});
+    //
+    //     // Assert
+    //     var body = await response.Content.ReadAsStringAsync();
+    //
+    //     body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+    //
+    //     Assert.Multiple(() =>
+    //     {
+    //         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, body);
+    //         var display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
+    //         var bodyText = display.Variants.FirstOrDefault()?.Tabs.FirstOrDefault()?.Properties
+    //             ?.FirstOrDefault(x => x.Alias.Equals("richText"))?.Value?.ToString();
+    //         Assert.NotNull(bodyText);
+    //
+    //         var containsDataUri = bodyText.Contains("data:image");
+    //         if (shouldHaveDataUri)
+    //         {
+    //             Assert.True(containsDataUri, $"Data URIs were expected to be found in the body: {bodyText}");
+    //         } else {
+    //             Assert.False(containsDataUri, $"Data URIs were not expected to be found in the body: {bodyText}");
+    //         }
+    //     });
+    // }
 }
