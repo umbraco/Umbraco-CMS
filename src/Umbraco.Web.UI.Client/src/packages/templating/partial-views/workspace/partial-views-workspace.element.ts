@@ -24,7 +24,6 @@ export class UmbPartialViewsWorkspaceElement extends UmbLitElement {
 				const parentKey = info.match.params.parentKey;
 				const decodePath = decodeURIComponent(parentKey);
 				const snippetName = info.match.params.snippetName;
-
 				this.#partialViewsWorkspaceContext.create(decodePath === 'null' ? null : parentKey, snippetName);
 
 				new UmbWorkspaceIsNewRedirectController(

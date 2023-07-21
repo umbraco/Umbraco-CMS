@@ -202,14 +202,20 @@ export class UmbPartialViewsRepository
 	createScaffold(parentId: string | null, preset: string): Promise<DataSourceResponse<TextFileResponseModelBaseModel>> {
 		return this.#detailDataSource.createScaffold(parentId, preset);
 	}
-	create(data: CreatePartialViewRequestModel): Promise<DataSourceResponse<any>> {
-		return this.#detailDataSource.insert(data);
+	async create(data: CreatePartialViewRequestModel): Promise<DataSourceResponse<any>> {
+		const promise = this.#detailDataSource.insert(data);
+		await promise;
+		this.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
+		return promise;
 	}
 	save(id: string, requestBody: UpdatePartialViewRequestModel): Promise<UmbDataSourceErrorResponse> {
 		return this.#detailDataSource.update(id, requestBody);
 	}
-	delete(id: string): Promise<UmbDataSourceErrorResponse> {
-		return this.#detailDataSource.delete(id);
+	async delete(id: string): Promise<UmbDataSourceErrorResponse> {
+		const promise = this.#detailDataSource.delete(id);
+		const parentPath = id.substring(0, id.lastIndexOf('/'));
+		this.requestTreeItemsOf(parentPath ? parentPath : null);
+		return promise;
 	}
 
 	getSnippets({ skip = 0, take = 100 }): Promise<DataSourceResponse<PagedSnippetItemResponseModel>> {

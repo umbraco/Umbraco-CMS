@@ -7,6 +7,6 @@ export class UmbCreateEmptyPartialViewAction<T extends { copy(): Promise<void> }
 	}
 
 	async execute() {
-		history.pushState(null, '', `section/settings/workspace/partial-view/create/${this.unique ?? 'null'}/`);
+		history.pushState(null, '', `section/settings/workspace/partial-view/create/${this.unique ?? 'null'}/Empty`);
 	}
 }
