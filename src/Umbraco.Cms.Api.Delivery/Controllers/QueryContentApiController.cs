@@ -1,9 +1,11 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -15,14 +17,33 @@ namespace Umbraco.Cms.Api.Delivery.Controllers;
 [ApiVersion("1.0")]
 public class QueryContentApiController : ContentApiControllerBase
 {
+    private readonly IRequestMemberService _requestMemberService;
     private readonly IApiContentQueryService _apiContentQueryService;
 
+    [Obsolete($"Please use the constructor that accepts {nameof(IRequestMemberService)}. Will be removed in V14.")]
     public QueryContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilderBuilder,
         IApiContentQueryService apiContentQueryService)
+        : this(
+            apiPublishedContentCache,
+            apiContentResponseBuilderBuilder,
+            apiContentQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberService>())
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public QueryContentApiController(
+        IApiPublishedContentCache apiPublishedContentCache,
+        IApiContentResponseBuilder apiContentResponseBuilderBuilder,
+        IApiContentQueryService apiContentQueryService,
+        IRequestMemberService requestMemberService)
         : base(apiPublishedContentCache, apiContentResponseBuilderBuilder)
-        => _apiContentQueryService = apiContentQueryService;
+    {
+        _apiContentQueryService = apiContentQueryService;
+        _requestMemberService = requestMemberService;
+    }
 
     /// <summary>
     ///     Gets a paginated list of content item(s) from query.
@@ -45,7 +66,8 @@ public class QueryContentApiController : ContentApiControllerBase
         int skip = 0,
         int take = 10)
     {
-        Attempt<PagedModel<Guid>, ApiContentQueryOperationStatus> queryAttempt = _apiContentQueryService.ExecuteQuery(fetch, filter, sort, skip, take);
+        ProtectedAccess protectedAccess = await _requestMemberService.MemberAccessAsync();
+        Attempt<PagedModel<Guid>, ApiContentQueryOperationStatus> queryAttempt = _apiContentQueryService.ExecuteQuery(fetch, filter, sort, protectedAccess, skip, take);
 
         if (queryAttempt.Success is false)
         {
@@ -62,6 +84,6 @@ public class QueryContentApiController : ContentApiControllerBase
             Items = apiContentItems
         };
 
-        return await Task.FromResult(Ok(model));
+        return Ok(model);
     }
 }

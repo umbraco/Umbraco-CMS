@@ -1,9 +1,8 @@
 ﻿namespace Umbraco.Cms.Core;
 
-// TODO: move this class to Umbraco.Cms.Core as a partial class
 public static partial class Constants
 {
-    public static partial class OauthClientIds
+    public static class OAuthClientIds
     {
         /// <summary>
         /// Client ID used for default back-office access
@@ -19,5 +18,10 @@ public static partial class Constants
         /// Client ID used for Postman API access
         /// </summary>
         public const string Postman = "umbraco-postman";
+
+        /// <summary>
+        /// Client ID used for member access
+        /// </summary>
+        public const string Member = "umbraco-member";
     }
 }

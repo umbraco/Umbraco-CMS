@@ -2,7 +2,6 @@
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Delivery.Filters;
 using Umbraco.Cms.Api.Delivery.Routing;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -39,5 +38,6 @@ public abstract class ContentApiControllerBase : DeliveryApiControllerBase
                 .WithTitle("Sort option not found")
                 .WithDetail("One of the attempted 'sort' options does not exist")
                 .Build()),
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, $"Invalid {nameof(ApiContentQueryOperationStatus)} value.")
         };
 }

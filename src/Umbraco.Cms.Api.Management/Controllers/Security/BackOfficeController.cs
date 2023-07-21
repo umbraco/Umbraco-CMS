@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute(Paths.BackOfficeApiEndpointTemplate)]
+[VersionedApiBackOfficeRoute(Common.Security.Paths.BackOfficeApi.EndpointTemplate)]
 [ApiExplorerSettings(GroupName = "Security")]
 public class BackOfficeController : ManagementApiControllerBase
 {
@@ -80,6 +80,12 @@ public class BackOfficeController : ManagementApiControllerBase
         if (request == null)
         {
             return BadRequest("Unable to obtain OpenID data from the current request");
+        }
+
+        // make sure we keep member authentication away from this endpoint
+        if (request.ClientId is Constants.OAuthClientIds.Member)
+        {
+            return BadRequest("The specified client ID cannot be used here.");
         }
 
         return request.IdentityProvider.IsNullOrWhiteSpace()

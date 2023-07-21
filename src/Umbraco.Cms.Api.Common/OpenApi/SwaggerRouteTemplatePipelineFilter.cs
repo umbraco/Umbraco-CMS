@@ -43,7 +43,7 @@ public class SwaggerRouteTemplatePipelineFilter : UmbracoPipelineFilter
                     swaggerUiOptions.SwaggerEndpoint($"{name}/swagger.json", $"{apiInfo.Title}");
                 }
 
-                swaggerUiOptions.OAuthClientId(Constants.OauthClientIds.Swagger);
+                swaggerUiOptions.OAuthClientId(Constants.OAuthClientIds.Swagger);
                 swaggerUiOptions.OAuthUsePkce();
             });
     }

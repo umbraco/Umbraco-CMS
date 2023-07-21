@@ -1,7 +1,9 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
@@ -11,13 +13,40 @@ namespace Umbraco.Cms.Api.Delivery.Controllers;
 [ApiVersion("1.0")]
 public class ByIdContentApiController : ContentApiItemControllerBase
 {
+    private readonly IRequestMemberService _requestMemberService;
+
+    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
     public ByIdContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,
         IPublicAccessService publicAccessService)
-        : base(apiPublishedContentCache, apiContentResponseBuilder, publicAccessService)
+        : this(
+            apiPublishedContentCache,
+            apiContentResponseBuilder,
+            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberService>())
     {
     }
+
+    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
+    public ByIdContentApiController(
+        IApiPublishedContentCache apiPublishedContentCache,
+        IApiContentResponseBuilder apiContentResponseBuilder,
+        IPublicAccessService publicAccessService,
+        IRequestMemberService requestMemberService)
+        : this(
+            apiPublishedContentCache,
+            apiContentResponseBuilder,
+            requestMemberService)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public ByIdContentApiController(
+        IApiPublishedContentCache apiPublishedContentCache,
+        IApiContentResponseBuilder apiContentResponseBuilder,
+        IRequestMemberService requestMemberService)
+        : base(apiPublishedContentCache, apiContentResponseBuilder)
+        => _requestMemberService = requestMemberService;
 
     /// <summary>
     ///     Gets a content item by id.
@@ -38,7 +67,7 @@ public class ByIdContentApiController : ContentApiItemControllerBase
             return NotFound();
         }
 
-        if (IsProtected(contentItem))
+        if (await _requestMemberService.MemberHasAccessToAsync(contentItem) is false)
         {
             return Unauthorized();
         }
@@ -49,6 +78,6 @@ public class ByIdContentApiController : ContentApiItemControllerBase
             return NotFound();
         }
 
-        return await Task.FromResult(Ok(apiContentResponse));
+        return Ok(apiContentResponse);
     }
 }

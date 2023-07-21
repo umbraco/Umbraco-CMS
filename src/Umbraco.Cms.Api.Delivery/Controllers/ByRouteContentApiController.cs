@@ -2,8 +2,10 @@ using System.Net;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
@@ -17,7 +19,9 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     private readonly IRequestRoutingService _requestRoutingService;
     private readonly IRequestRedirectService _requestRedirectService;
     private readonly IRequestPreviewService _requestPreviewService;
+    private readonly IRequestMemberService _requestMemberService;
 
+    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
     public ByRouteContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,
@@ -25,11 +29,49 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
         IRequestRoutingService requestRoutingService,
         IRequestRedirectService requestRedirectService,
         IRequestPreviewService requestPreviewService)
-        : base(apiPublishedContentCache, apiContentResponseBuilder, publicAccessService)
+        : this(
+            apiPublishedContentCache,
+            apiContentResponseBuilder,
+            requestRoutingService,
+            requestRedirectService,
+            requestPreviewService,
+            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberService>())
+    {
+    }
+
+    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
+    public ByRouteContentApiController(
+        IApiPublishedContentCache apiPublishedContentCache,
+        IApiContentResponseBuilder apiContentResponseBuilder,
+        IPublicAccessService publicAccessService,
+        IRequestRoutingService requestRoutingService,
+        IRequestRedirectService requestRedirectService,
+        IRequestPreviewService requestPreviewService,
+        IRequestMemberService requestMemberService)
+        : this(
+            apiPublishedContentCache,
+            apiContentResponseBuilder,
+            requestRoutingService,
+            requestRedirectService,
+            requestPreviewService,
+            requestMemberService)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public ByRouteContentApiController(
+        IApiPublishedContentCache apiPublishedContentCache,
+        IApiContentResponseBuilder apiContentResponseBuilder,
+        IRequestRoutingService requestRoutingService,
+        IRequestRedirectService requestRedirectService,
+        IRequestPreviewService requestPreviewService,
+        IRequestMemberService requestMemberService)
+        : base(apiPublishedContentCache, apiContentResponseBuilder)
     {
         _requestRoutingService = requestRoutingService;
         _requestRedirectService = requestRedirectService;
         _requestPreviewService = requestPreviewService;
+        _requestMemberService = requestMemberService;
     }
 
     /// <summary>
@@ -64,7 +106,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
         IPublishedContent? contentItem = GetContent(path);
         if (contentItem is not null)
         {
-            if (IsProtected(contentItem))
+            if (await _requestMemberService.MemberHasAccessToAsync(contentItem) is false)
             {
                 return Unauthorized();
             }
