@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <IsTestProject>true</IsTestProject>
     <PackageId>Umbraco.Cms.Tests.Integration</PackageId>
     <Title>Umbraco CMS - Integration tests</Title>
     <Description>Contains helper classes for integration tests with Umbraco CMS, including all internal integration tests.</Description>
-    <IsPackable>true</IsPackable>
-    <IsTestProject>true</IsTestProject>
     <RootNamespace>Umbraco.Cms.Tests.Integration</RootNamespace>
+    <IsPackable>true</IsPackable>
     <EnablePackageValidation>true</EnablePackageValidation>
   </PropertyGroup>
 

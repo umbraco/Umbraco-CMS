@@ -3,7 +3,6 @@
     <PackageId>Umbraco.Cms.Web.Website</PackageId>
     <Title>Umbraco CMS - Web - Website</Title>
     <Description>Contains the website assembly needed to run the frontend of Umbraco CMS.</Description>
-    <OutputType>Library</OutputType>
     <RootNamespace>Umbraco.Cms.Web.Website</RootNamespace>
   </PropertyGroup>
 
