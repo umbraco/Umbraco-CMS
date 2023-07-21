@@ -96,13 +96,6 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
         // Would be nice to maybe have this in a little nicer way, but for now it should be okay.
         IContentTypeComposition[] allContentTypes = _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
 
-        IEnumerable<Guid> allowedCompositionKeys =
-            // NOTE: Here if we're checking for create we should pass null, otherwise the updated content type.
-            _contentTypeService.GetAvailableCompositeContentTypes(null, allContentTypes, isElement: model.IsElement)
-                .Results
-                .Where(x => x.Allowed)
-                .Select(x => x.Composition.Key);
-
         // Both inheritance and compositions.
         Guid[] allCompositionKeys = inheritedCompositions.Select(x => x.Key).Union(compositionKeys).ToArray();
         IContentTypeComposition[] allCompositionTypes = allContentTypes.Where(x => allCompositionKeys.Contains(x.Key)).ToArray();
@@ -122,6 +115,13 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
             // If our list shrank when doing distinct there was duplicates.
             return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.DuplicatePropertyTypeAlias, null);
         }
+
+        IEnumerable<Guid> allowedCompositionKeys =
+            // NOTE: Here if we're checking for create we should pass null, otherwise the updated content type.
+            _contentTypeService.GetAvailableCompositeContentTypes(null, allContentTypes, isElement: model.IsElement)
+                .Results
+                .Where(x => x.Allowed)
+                .Select(x => x.Composition.Key);
 
         // We only care about the keys used for composition.
         if (compositionKeys
