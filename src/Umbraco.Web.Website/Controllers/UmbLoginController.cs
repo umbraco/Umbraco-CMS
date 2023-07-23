@@ -1,4 +1,5 @@
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -120,7 +121,7 @@ public class UmbLoginController : SurfaceController
         }
 
         // send the email
-        await SendMemberResetEmailAsync(memberIdentity);
+        await SendMemberResetEmailAsync(memberIdentity, null, null, null);
 
         TempData["ForgottenPasswordSuccess"] = true;
 
@@ -246,6 +247,14 @@ public class UmbLoginController : SurfaceController
         return CurrentUmbracoPage();
     }
 
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> VerifyReset(string reset)
+    {
+        // TODO: Verify reset token.
+        await Task.CompletedTask;
+    }
+
     /// <summary>
     ///     We pass in values via encrypted route values so they cannot be tampered with and merge them into the model for use.
     /// </summary>
@@ -274,9 +283,9 @@ public class UmbLoginController : SurfaceController
 
         // Get an mvc helper to get the URL
         var action = _linkGenerator.GetPathByAction(
-            nameof(BackOfficeController.VerifyInvite),
+            nameof(UmbLoginController.VerifyReset),
             ControllerExtensions.GetControllerName<UmbLoginController>(),
-            new { area = Constants.Web.Mvc.BackOfficeArea, reset = resetToken });
+            new { area = Core.Constants.Web.Mvc.BackOfficeApiArea, reset = resetToken });
 
         // Construct full URL using configured application URL (which will fall back to request)
         Uri applicationUri = _httpContextAccessor.GetRequiredHttpContext().Request
