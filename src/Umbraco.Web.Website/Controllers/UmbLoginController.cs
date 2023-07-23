@@ -252,7 +252,7 @@ public class UmbLoginController : SurfaceController
     public async Task<IActionResult> VerifyReset(string reset)
     {
         // TODO: Verify reset token.
-        await Task.CompletedTask;
+        return await Task.FromResult(new EmptyResult());
     }
 
     /// <summary>
