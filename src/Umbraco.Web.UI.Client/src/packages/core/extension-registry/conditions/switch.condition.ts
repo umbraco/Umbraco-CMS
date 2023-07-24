@@ -15,6 +15,7 @@ export class UmbSwitchCondition extends UmbBaseController implements UmbExtensio
 	}
 
 	startApprove() {
+		clearTimeout(this.#timer);
 		this.#timer = setTimeout(() => {
 			this.permitted = true;
 			this.#onChange();
@@ -23,6 +24,7 @@ export class UmbSwitchCondition extends UmbBaseController implements UmbExtensio
 	}
 
 	startDisapprove() {
+		clearTimeout(this.#timer);
 		this.#timer = setTimeout(() => {
 			this.permitted = false;
 			this.#onChange();
@@ -31,8 +33,8 @@ export class UmbSwitchCondition extends UmbBaseController implements UmbExtensio
 	}
 
 	destroy() {
-		super.destroy();
 		clearTimeout(this.#timer);
+		super.destroy();
 	}
 }
 

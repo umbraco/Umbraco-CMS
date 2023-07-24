@@ -1,13 +1,14 @@
 import { expect, fixture } from '@open-wc/testing';
 import type { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfig } from '../types.js';
-import { UmbExtensionCondition, UmbExtensionRegistry } from '../index.js';
-import { UmbBaseExtensionController } from './base-extension-controller.js';
+import { UmbExtensionRegistry } from '../registry/extension.registry.js';
+import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
 import {
-	UmbBaseController,
-	UmbControllerHost,
 	UmbControllerHostElement,
 	UmbControllerHostElementMixin,
-} from '@umbraco-cms/backoffice/controller-api';
+} from '../../controller-api/controller-host-element.mixin.js';
+import { UmbBaseController } from '../../controller-api/controller.class.js';
+import { UmbControllerHost } from '../../controller-api/controller-host.interface.js';
+import { UmbBaseExtensionController } from './index.js';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -218,6 +219,7 @@ describe('UmbBaseExtensionController', () => {
 						// Check that the promise has been resolved for the first render to ensure timing is right.
 						expect(initialPromiseResolved).to.be.true;
 						done();
+						extensionController.destroy();
 					}
 				}
 			);
@@ -270,11 +272,16 @@ describe('UmbBaseExtensionController', () => {
 				extensionRegistry,
 				'Umb.Test.Section.1',
 				() => {
-					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
-					expect(extensionController?.permitted).to.be.false;
-					done();
+					// This should not be called.
+					expect(true).to.be.false;
 				}
 			);
+			Promise.resolve().then(() => {
+				expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
+				expect(extensionController?.permitted).to.be.false;
+				done();
+				extensionController.destroy();
+			});
 		});
 
 		it('does permit when having a late coming extension', (done) => {
@@ -283,17 +290,19 @@ describe('UmbBaseExtensionController', () => {
 				extensionRegistry,
 				'Umb.Test.Section.1',
 				() => {
-					// We want the controller callback to first fire when conditions are initialized.
-					expect(extensionController.manifest?.conditions?.length).to.be.equal(1);
-					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
-					expect(extensionController?.permitted).to.be.false;
-					done();
+					// This should not be called.
+					expect(true).to.be.false;
 				}
 			);
 
 			extensionRegistry.register(manifest);
 			Promise.resolve().then(() => {
 				extensionRegistry.register(conditionManifest);
+				expect(extensionController.manifest?.conditions?.length).to.be.equal(1);
+				expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
+				expect(extensionController?.permitted).to.be.false;
+				done();
+				extensionController.destroy();
 			});
 		});
 
@@ -366,10 +375,8 @@ describe('UmbBaseExtensionController', () => {
 					expect(extensionController.manifest?.conditions?.length).to.be.equal(1);
 					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
 					if (count === 1) {
-						expect(extensionController?.permitted).to.be.false;
-					} else if (count === 2) {
 						expect(extensionController?.permitted).to.be.true;
-					} else if (count === 3) {
+					} else if (count === 2) {
 						expect(extensionController?.permitted).to.be.false;
 						extensionController.destroy(); // need to destroy the conditions.
 						done();
@@ -433,14 +440,12 @@ describe('UmbBaseExtensionController', () => {
 					expect(extensionController.manifest?.conditions?.length).to.be.equal(2);
 					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
 					if (count === 1) {
-						expect(extensionController?.permitted).to.be.false;
-					} else if (count === 2) {
 						expect(extensionController?.permitted).to.be.true;
 						// Hack to double check that its two conditions that make up the state:
 						expect(extensionController.getControllers((controller) => (controller as any).permitted).length).to.equal(
 							2
 						);
-					} else if (count === 3) {
+					} else if (count === 2) {
 						expect(extensionController?.permitted).to.be.false;
 						// Hack to double check that its two conditions that make up the state, in this case its one, cause we already got the callback when one of the conditions changed. meaning in this split second one is still good:
 						expect(extensionController.getControllers((controller) => (controller as any).permitted).length).to.equal(

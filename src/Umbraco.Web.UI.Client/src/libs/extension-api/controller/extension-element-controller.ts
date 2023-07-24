@@ -1,12 +1,9 @@
+import { createExtensionElement } from '../create-extension-element.function.js';
+import { UmbExtensionRegistry } from '../registry/extension.registry.js';
+import { isManifestElementableType } from '../type-guards/is-manifest-elementable-type.function.js';
+import { ManifestCondition, ManifestWithDynamicConditions } from '../types.js';
 import { UmbBaseExtensionController } from './base-extension-controller.js';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import {
-	ManifestCondition,
-	ManifestWithDynamicConditions,
-	UmbExtensionRegistry,
-	createExtensionElement,
-	isManifestElementableType,
-} from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbExtensionElementController<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,

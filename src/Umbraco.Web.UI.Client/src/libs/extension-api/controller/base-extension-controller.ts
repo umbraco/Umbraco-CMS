@@ -151,7 +151,7 @@ export abstract class UmbBaseExtensionController<
 	}
 
 	#onConditionsChangedCallback = async () => {
-		const oldValue = this.#isPermitted;
+		const oldValue = this.#isPermitted ?? false;
 		// Find a condition that is not permitted (Notice how no conditions, means that this extension is permitted)
 		const conditionsArePositive =
 			this.#conditionsAreInitialized() &&
@@ -183,10 +183,12 @@ export abstract class UmbBaseExtensionController<
 	}
 
 	public destroy(): void {
-		this.#isPermitted = undefined;
 		this.#promiseResolvers = [];
-		this._conditionsAreBad();
-		this.#onPermissionChanged(false, this as any);
+		if (this.#isPermitted === true) {
+			this.#isPermitted = undefined;
+			this._conditionsAreBad();
+			this.#onPermissionChanged(false, this as any);
+		}
 		super.destroy();
 		// Destroy the conditions controllers, are begin destroyed cause they are controllers.
 	}

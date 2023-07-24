@@ -1,5 +1,6 @@
 import { expect, fixture } from '@open-wc/testing';
-import { UmbExtensionElementController, UmbExtensionRegistry } from '../index.js';
+import { UmbExtensionRegistry } from '../registry/extension.registry.js';
+import { UmbExtensionElementController } from './index.js';
 import { UmbControllerHostElement, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { type ManifestSection, UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
@@ -31,16 +32,21 @@ describe('UmbExtensionElementController', () => {
 		});
 
 		it('permits when there is no conditions', (done) => {
+			let called = false;
 			const extensionController = new UmbExtensionElementController(
 				hostElement,
 				extensionRegistry,
 				'Umb.Test.Section.1',
 				(permitted) => {
-					expect(permitted).to.be.true;
-					if (permitted) {
-						expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
-						expect(extensionController.component?.nodeName).to.eq('SECTION');
-						done();
+					if (called === false) {
+						called = true;
+						expect(permitted).to.be.true;
+						if (permitted) {
+							expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
+							expect(extensionController.component?.nodeName).to.eq('SECTION');
+							done();
+							extensionController.destroy();
+						}
 					}
 				}
 			);
@@ -98,20 +104,18 @@ describe('UmbExtensionElementController', () => {
 				'Umb.Test.Section.1',
 				async () => {
 					count++;
+					console.log('call', count, 'with', extensionController?.permitted);
 					// We want the controller callback to first fire when conditions are initialized.
 					expect(extensionController.manifest?.conditions?.length).to.be.equal(2);
 					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
 					if (count === 1) {
-						expect(extensionController?.permitted).to.be.false;
-						expect(extensionController.component).to.be.undefined;
-					} else if (count === 2) {
 						expect(extensionController?.permitted).to.be.true;
 						expect(extensionController.component?.nodeName).to.eq('SECTION');
-					} else if (count === 3) {
+					} else if (count === 2) {
 						expect(extensionController?.permitted).to.be.false;
 						expect(extensionController.component).to.be.undefined;
-						extensionController.destroy(); // need to destroy the conditions.
 						done();
+						extensionController.destroy(); // need to destroy the controller.
 					}
 				}
 			);
