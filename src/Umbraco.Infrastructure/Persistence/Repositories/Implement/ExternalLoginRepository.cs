@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using NPoco;
+using SixLabors.ImageSharp.Formats;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Entities;
@@ -89,6 +90,22 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
 
         foreach (ExternalLoginDto? existing in existingLogins)
         {
+            // Distinct by provider key, as providers such as AzureB2C will have multiple provider keys
+            // if you for example sign in with Google, and then Facebook
+            var loginsByProvider = logins.Where(x => x.LoginProvider == existing.LoginProvider).ToList();
+            if (loginsByProvider.Count > 1)
+            {
+                IExternalLogin? uniqueLogin = loginsByProvider.FirstOrDefault(x => x.ProviderKey == existing.ProviderKey);
+                if (uniqueLogin is not null)
+                {
+                    loginsByProvider.Remove(uniqueLogin);
+                    foreach (IExternalLogin externalLogin in loginsByProvider)
+                    {
+                        toInsert.Remove(externalLogin);
+                    }
+                }
+            }
+
             IExternalLogin? found = logins.FirstOrDefault(x =>
                 x.LoginProvider.Equals(existing.LoginProvider, StringComparison.InvariantCultureIgnoreCase)
                 && x.ProviderKey.Equals(existing.ProviderKey, StringComparison.InvariantCultureIgnoreCase));
@@ -98,7 +115,7 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
                 toUpdate.Add(existing.Id, found);
 
                 // if it's an update then it's not an insert
-                toInsert.RemoveAll(x => x.ProviderKey == found.ProviderKey && x.LoginProvider == found.LoginProvider);
+                toInsert.RemoveAll(x => x.LoginProvider == found.LoginProvider);
             }
             else
             {
