@@ -39,6 +39,7 @@ export class UmbFileSystemTreeItemElement extends UmbLitElement implements UmbTr
 	public set item(value: FileSystemTreeItemPresentationModel | undefined) {
 		this._item = value;
 		this.#context.setTreeItem(value);
+		this.#context.checkIfIsFolder();
 	}
 
 	#context = new UmbFileSystemTreeItemContext(this);

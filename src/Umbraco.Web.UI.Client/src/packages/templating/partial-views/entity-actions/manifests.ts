@@ -1,7 +1,17 @@
-import { PARTIAL_VIEW_ENTITY_TYPE, PARTIAL_VIEW_FOLDER_ENTITY_TYPE, PARTIAL_VIEW_REPOSITORY_ALIAS } from '../config.js';
+import {
+	PARTIAL_VIEW_ENTITY_TYPE,
+	PARTIAL_VIEW_FOLDER_EMPTY_ENTITY_TYPE,
+	PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
+	PARTIAL_VIEW_REPOSITORY_ALIAS,
+	PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+} from '../config.js';
 import { UmbCreateFromSnippetPartialViewAction } from './create/create-from-snippet.action.js';
 import { UmbCreateEmptyPartialViewAction } from './create/create-empty.action.js';
-import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbCreateFolderEntityAction,
+	UmbDeleteEntityAction,
+	UmbDeleteFolderEntityAction,
+} from '@umbraco-cms/backoffice/entity-action';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 //TODO: this is temporary until we have a proper way of registering actions for folder types in a specific tree
@@ -38,7 +48,7 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
 		},
 		conditions: {
-			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
+			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE, PARTIAL_VIEW_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -52,9 +62,48 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
 		},
 		conditions: {
-			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
+			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE, PARTIAL_VIEW_ROOT_ENTITY_TYPE],
+		},
+	},
+	{
+		type: 'entityAction',
+		alias: 'Umb.EntityAction.PartialViewFolder.DeleteFolder',
+		name: 'Remove empty folder',
+		meta: {
+			icon: 'umb:trash',
+			label: 'Remove folder',
+			api: UmbDeleteFolderEntityAction,
+			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
+		},
+		conditions: {
+			entityTypes: [PARTIAL_VIEW_FOLDER_EMPTY_ENTITY_TYPE],
+		},
+	},
+	{
+		type: 'entityAction',
+		alias: 'Umb.EntityAction.PartialViewFolder.CreateFolder',
+		name: 'Create empty folder',
+		meta: {
+			icon: 'umb:add',
+			label: 'Create folder',
+			api: UmbCreateFolderEntityAction,
+			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
+		},
+		conditions: {
+			entityTypes: [
+				PARTIAL_VIEW_FOLDER_EMPTY_ENTITY_TYPE,
+				PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
+				PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+			],
 		},
 	},
 ];
 
-export const manifests = [...partialViewActions, ...partialViewFolderActions];
+const createFromSnippetActionModal = {
+	type: 'modal',
+	alias: 'Umb.Modal.CreateFromSnippetPartialView',
+	name: 'Choose insert type sidebar',
+	loader: () => import('./create/create-from-snippet.modal.js'),
+};
+
+export const manifests = [...partialViewActions, ...partialViewFolderActions, createFromSnippetActionModal];

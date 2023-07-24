@@ -4,6 +4,7 @@ import { FolderReponseModel } from '@umbraco-cms/backoffice/backend-api';
 export interface UmbFolderModalData {
 	repositoryAlias: string;
 	unique?: string;
+	parentUnique?: string | null;
 }
 
 export interface UmbFolderModalResult {

@@ -7,6 +7,7 @@ import type {
 	DocumentTypeResponseModel,
 	FileSystemTreeItemPresentationModel,
 	DocumentResponseModel,
+	TextFileResponseModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => {
@@ -73,3 +74,9 @@ export const createFileSystemTreeItem = (item: any): FileSystemTreeItemPresentat
 		isFolder: item.isFolder,
 	};
 };
+
+export const createTextFileItem = (item: any): TextFileResponseModelBaseModel => ({
+	path: item.path,
+	name: item.name,
+	content: item.content,
+});

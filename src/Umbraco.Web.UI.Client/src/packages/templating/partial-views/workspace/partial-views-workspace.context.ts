@@ -1,32 +1,68 @@
 import { UmbPartialViewsRepository } from '../repository/partial-views.repository.js';
-import { createObservablePart, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
-import { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { PartialViewDetails } from '../config.js';
+import { createObservablePart, UmbBooleanState, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
+import { UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<
-	UmbPartialViewsRepository,
-	TemplateResponseModel
-> {
+export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<UmbPartialViewsRepository, PartialViewDetails> {
 	getEntityId(): string | undefined {
-		throw new Error('Method not implemented.');
+		return this.getData()?.path;
 	}
 	getEntityType(): string {
 		throw new Error('Method not implemented.');
 	}
 	save(): Promise<void> {
-		throw new Error('Method not implemented.');
+		const partialView = this.getData();
+
+		if (!partialView)
+			return Promise.reject('Something went wrong, there is no data for partial view you want to save...');
+		if (this.getIsNew()) {
+
+			const createRequestBody = {
+				name: partialView.name,
+				content: partialView.content,
+				parentPath: partialView.path + '/',
+			}
+
+			this.repository.create(createRequestBody)
+			console.log('create');
+			return Promise.resolve();
+		}
+		if (!partialView.path) return Promise.reject('There is no path');
+		const updateRequestBody: UpdatePartialViewRequestModel = {
+			name: partialView.name,
+			existingPath: partialView.path,
+			content: partialView.content,
+		};
+		this.repository.save(partialView.path, updateRequestBody);
+		return Promise.resolve();
 	}
 	destroy(): void {
 		throw new Error('Method not implemented.');
 	}
-	#data = new UmbDeepState<TemplateResponseModel | undefined>(undefined);
+	#data = new UmbDeepState<PartialViewDetails | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = createObservablePart(this.#data, (data) => data?.name);
 	content = createObservablePart(this.#data, (data) => data?.content);
+	path = createObservablePart(this.#data, (data) => data?.path);
+
+	#isCodeEditorReady = new UmbBooleanState(false);
+	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbPartialViewsRepository(host));
+		this.#loadCodeEditor();
+	}
+
+	async #loadCodeEditor() {
+		try {
+			await loadCodeEditor();
+			this.#isCodeEditorReady.next(true);
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	getData() {
@@ -49,10 +85,15 @@ export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<
 		}
 	}
 
-	async create(parentKey: string | null) {
-		const { data } = await this.repository.createScaffold(parentKey);
+	async create(parentKey: string | null, name = 'Empty') {
+		const { data } = await this.repository.createScaffold(parentKey, name);
+		const newPartial = {
+			...data,
+			name: '',
+			path: parentKey ?? '',
+		};
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next(data);
+		this.#data.next(newPartial);
 	}
 }

@@ -5,3 +5,4 @@ export * from './folder-update/folder-update.action.js';
 export * from './move/move.action.js';
 export * from './sort-children-of/sort-children-of.action.js';
 export * from './trash/trash.action.js';
+export * from './create-folder/create-folder.action.js';

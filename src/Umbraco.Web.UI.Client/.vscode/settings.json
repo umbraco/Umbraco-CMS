@@ -14,5 +14,6 @@
 		"variantable"
 	],
 	"exportall.config.folderListener": [],
-	"exportall.config.relExclusion": []
+	"exportall.config.relExclusion": [],
+	"conventionalCommits.scopes": ["partial views"]
 }
