@@ -9,7 +9,7 @@
  * @doc https://www.tiny.cloud/docs/tinymce/6/
  */
 function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
-  $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService, mediaHelper) {
+  $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService, mediaHelper, fileManager) {
 
   //These are absolutely required in order for the macros to render inline
   //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
@@ -202,6 +202,17 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
   function uploadImageHandler(blobInfo, progress) {
     return new Promise(function (resolve, reject) {
+      const blob = blobInfo.blob();
+
+      // if the file size is greater than the max file size, reject it
+      if (fileManager.maxFileSize > 0 && blob.size > fileManager.maxFileSize) {
+        reject({
+          message: `The file size (${blob.size / 1000} KB) exceeded the maximum allowed size of ${fileManager.maxFileSize / 1000} KB.`,
+          remove: true
+        });
+        return;
+      }
+
       const xhr = new XMLHttpRequest();
       xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
 
@@ -222,12 +233,18 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       };
 
       xhr.onerror = function () {
-        reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+        reject({
+          message: 'Image upload failed due to a XHR Transport error. Code: ' + xhr.status,
+          remove: true
+        });
       };
 
       xhr.onload = function () {
         if (xhr.status < 200 || xhr.status >= 300) {
-          reject('HTTP Error: ' + xhr.status);
+          reject({
+            message: 'HTTP Error: ' + xhr.status,
+            remove: true
+          });
           return;
         }
 
@@ -237,7 +254,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         data = data.split("\n");
 
         if (!data.length > 1) {
-          reject('Unrecognized text string: ' + data);
+          reject({
+            message: 'Unrecognized text string: ' + data,
+            remove: true
+          });
           return;
         }
 
@@ -246,12 +266,18 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         try {
           json = JSON.parse(data[1]);
         } catch (e) {
-          reject('Invalid JSON: ' + data + ' - ' + e.message);
+          reject({
+            message: 'Invalid JSON: ' + data + ' - ' + e.message,
+            remove: true
+          });
           return;
         }
 
         if (!json || typeof json.tmpLocation !== 'string') {
-          reject('Invalid JSON: ' + data);
+          reject({
+            message: 'Invalid JSON: ' + data,
+            remove: true
+          });
           return;
         }
 
@@ -265,7 +291,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       };
 
       const formData = new FormData();
-      formData.append('file', blobInfo.blob(), blobInfo.blob().name);
+      formData.append('file', blob, blob.name);
 
       xhr.send(formData);
     });
