@@ -11,11 +11,11 @@ namespace Umbraco.Cms.Core.Models.ContentTypeEditing;
 /// To allow for common validation and such, the property types are required to inherit from the same base.
 /// The same goes for the property type containers. (I.E Tabs and Groups)
 /// </summary>
-/// <typeparam name="TPropertyType">The type of the property types, I.E <see cref="DocumentPropertyType"/>.</typeparam>
-/// <typeparam name="TPropertyTypeContainer">The type of the content type containers, I.E <see cref="DocumentTypePropertyContainer"/>.</typeparam>
-public class ContentTypeBase<TPropertyType, TPropertyTypeContainer>
-    where TPropertyType : PropertyTypeBase
-    where TPropertyTypeContainer : PropertyTypeContainerBase
+/// <typeparam name="TPropertyType">The type of the property types, I.E <see cref="DocumentPropertyTypeModel"/>.</typeparam>
+/// <typeparam name="TPropertyTypeContainer">The type of the content type containers, I.E <see cref="DocumentTypePropertyContainerModel"/>.</typeparam>
+public abstract class ContentTypeModelBase<TPropertyType, TPropertyTypeContainer>
+    where TPropertyType : PropertyTypeModelBase
+    where TPropertyTypeContainer : PropertyTypeContainerModelBase
 {
     public required string Alias { get; set; }
 
@@ -39,5 +39,5 @@ public class ContentTypeBase<TPropertyType, TPropertyTypeContainer>
 
     public IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; } = Array.Empty<ContentTypeSort>();
 
-    public IEnumerable<ContentTypeComposition> Compositions { get; set; } = Array.Empty<ContentTypeComposition>();
+    public IEnumerable<Composition> Compositions { get; set; } = Array.Empty<Composition>();
 }

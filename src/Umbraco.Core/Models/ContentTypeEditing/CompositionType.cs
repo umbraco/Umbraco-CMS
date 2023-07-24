@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.Models.ContentTypeEditing;
 
-public enum ContentTypeCompositionType
+public enum CompositionType
 {
     Composition,
     Inheritance

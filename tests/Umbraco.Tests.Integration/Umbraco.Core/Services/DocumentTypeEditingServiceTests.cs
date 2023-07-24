@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing.Document;
@@ -36,22 +35,22 @@ public partial class DocumentTypeEditingServiceTests : UmbracoIntegrationTest
         Guid? key = null,
         bool isElement = false,
         Guid? parentKey = null,
-        IEnumerable<DocumentPropertyType>? propertyTypes = null,
-        IEnumerable<DocumentTypePropertyContainer>? containers = null,
-        IEnumerable<ContentTypeComposition>? compositions = null) =>
+        IEnumerable<DocumentPropertyTypeModel>? propertyTypes = null,
+        IEnumerable<DocumentTypePropertyContainerModel>? containers = null,
+        IEnumerable<Composition>? compositions = null) =>
         new()
         {
             Name = name,
             Alias = alias ?? ShortStringHelper.CleanStringForSafeAlias(name),
             Key = key ?? Guid.NewGuid(),
-            Properties = propertyTypes ?? Enumerable.Empty<DocumentPropertyType>(),
-            Containers = containers ?? Enumerable.Empty<DocumentTypePropertyContainer>(),
-            Compositions = compositions ?? Enumerable.Empty<ContentTypeComposition>(),
+            Properties = propertyTypes ?? Enumerable.Empty<DocumentPropertyTypeModel>(),
+            Containers = containers ?? Enumerable.Empty<DocumentTypePropertyContainerModel>(),
+            Compositions = compositions ?? Enumerable.Empty<Composition>(),
             IsElement = isElement,
             ParentKey = parentKey,
         };
 
-    private DocumentPropertyType CreatePropertyType(
+    private DocumentPropertyTypeModel CreatePropertyType(
         string name = "Title",
         string? alias = null,
         Guid? key = null,
@@ -68,7 +67,7 @@ public partial class DocumentTypeEditingServiceTests : UmbracoIntegrationTest
             Appearance = new PropertyTypeAppearance(),
         };
 
-    private DocumentTypePropertyContainer CreateContainer(
+    private DocumentTypePropertyContainerModel CreateContainer(
         string name = "Container",
         string type = TabContainerType,
         Guid? key = null) =>

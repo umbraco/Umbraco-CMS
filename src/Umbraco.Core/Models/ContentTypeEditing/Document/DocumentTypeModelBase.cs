@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.Models.ContentTypeEditing.Document;
 
-public class DocumentTypeBase : ContentTypeBase<DocumentPropertyType, DocumentTypePropertyContainer>
+public class DocumentTypeModelBase : ContentTypeModelBase<DocumentPropertyTypeModel, DocumentTypePropertyContainerModel>
 {
     public bool IsElement { get; set; }
 

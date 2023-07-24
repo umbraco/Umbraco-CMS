@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Core.Models.ContentTypeEditing.Document;
 
-public class DocumentPropertyType : PropertyTypeBase
+public class DocumentPropertyTypeModel : PropertyTypeModelBase
 {
 
 }

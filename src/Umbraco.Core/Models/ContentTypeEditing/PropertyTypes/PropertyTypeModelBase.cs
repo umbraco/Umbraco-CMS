@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.Models.ContentTypeEditing.PropertyTypes;
 
-public class PropertyTypeBase
+public abstract class PropertyTypeModelBase
 {
     public Guid Key { get; set; }
 

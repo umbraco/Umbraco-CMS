@@ -54,7 +54,7 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
         var reservedPropertyTypeNames = typeof(IPublishedContent).GetProperties().Select(x => x.Name)
             .Union(typeof(IPublishedContent).GetMethods().Select(x => x.Name))
             .ToArray();
-        foreach (DocumentPropertyType propertyType in model.Properties)
+        foreach (DocumentPropertyTypeModel propertyType in model.Properties)
         {
             if (propertyType.Alias.Equals(model.Alias, StringComparison.OrdinalIgnoreCase)
                 || reservedPropertyTypeNames.InvariantContains(propertyType.Alias))
@@ -74,13 +74,13 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
         }
 
         // Only one composition can be inherited, and the key of that composition must be the parent ID.
-        ContentTypeComposition[] inheritedCompositions = model
+        Composition[] inheritedCompositions = model
             .Compositions
-            .Where(x => x.CompositionType is ContentTypeCompositionType.Inheritance)
+            .Where(x => x.CompositionType is CompositionType.Inheritance)
             .ToArray();
         Guid[] compositionKeys = model
             .Compositions
-            .Where(x => x.CompositionType is ContentTypeCompositionType.Composition)
+            .Where(x => x.CompositionType is CompositionType.Composition)
             .Select(x => x.Key)
             .ToArray();
 
@@ -285,12 +285,12 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
             .ToArray();
 
         // Handle orphaned properties
-        IEnumerable<DocumentPropertyType> orphanedPropertyTypeModels = model.Properties.Where(x => x.ContainerKey is null).ToArray();
+        IEnumerable<DocumentPropertyTypeModel> orphanedPropertyTypeModels = model.Properties.Where(x => x.ContainerKey is null).ToArray();
 
         if(orphanedPropertyTypeModels.Any())
         {
             var orphanedProperties = new List<IPropertyType>();
-            foreach (DocumentPropertyType propertyTypeModel in orphanedPropertyTypeModels)
+            foreach (DocumentPropertyTypeModel propertyTypeModel in orphanedPropertyTypeModels)
             {
                 // TODO: Don't duplicate the code above
                 IDataType dataType = dataTypesByKey[propertyTypeModel.DataTypeKey];
@@ -355,8 +355,8 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
 
         // We need to handle the parent as well
         // We've already validated that there is only one
-        ContentTypeComposition? parent = model.Compositions
-            .FirstOrDefault(x => x.CompositionType is ContentTypeCompositionType.Inheritance);
+        Composition? parent = model.Compositions
+            .FirstOrDefault(x => x.CompositionType is CompositionType.Inheritance);
         if(parent is not null)
         {
             IContentType? parentType = await _contentTypeService.GetAsync(parent.Key);

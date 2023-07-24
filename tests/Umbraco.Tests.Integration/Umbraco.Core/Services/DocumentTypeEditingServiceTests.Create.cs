@@ -105,9 +105,9 @@ public partial class DocumentTypeEditingServiceTests
             isElement: documentTypeIsElement,
             compositions: new[]
             {
-                new ContentTypeComposition
+                new Composition
                 {
-                CompositionType = ContentTypeCompositionType.Composition,
+                CompositionType = CompositionType.Composition,
                 Key = compositionType.Key,
                 },
             }
@@ -148,9 +148,9 @@ public partial class DocumentTypeEditingServiceTests
             name: "Document Type Using Composition",
             compositions: new[]
             {
-                new ContentTypeComposition
+                new Composition
                 {
-                    CompositionType = ContentTypeCompositionType.Composition,
+                    CompositionType = CompositionType.Composition,
                     Key = compositionType.Key,
                 },
             },
@@ -178,9 +178,9 @@ public partial class DocumentTypeEditingServiceTests
             name: "Composition",
             compositions: new[]
             {
-                new ContentTypeComposition
+                new Composition
                 {
-                    CompositionType = ContentTypeCompositionType.Composition, Key = baseResult.Result!.Key
+                    CompositionType = CompositionType.Composition, Key = baseResult.Result!.Key
                 }
             });
 
@@ -192,9 +192,9 @@ public partial class DocumentTypeEditingServiceTests
             name: "Invalid",
             compositions: new[]
             {
-                new ContentTypeComposition
+                new Composition
                 {
-                    CompositionType = ContentTypeCompositionType.Composition,
+                    CompositionType = CompositionType.Composition,
                     Key = compositionResult.Result!.Key
                 },
             });
@@ -223,11 +223,11 @@ public partial class DocumentTypeEditingServiceTests
 
         var childProperty = CreatePropertyType("Child Property", "childProperty");
         var parentKey = parentResult.Result!.Key;
-        ContentTypeComposition[] composition =
+        Composition[] composition =
         {
             new()
             {
-                CompositionType = ContentTypeCompositionType.Inheritance, Key = parentKey,
+                CompositionType = CompositionType.Inheritance, Key = parentKey,
             },
         };
 
@@ -267,11 +267,11 @@ public partial class DocumentTypeEditingServiceTests
 
         var childProperty = CreatePropertyType("Child Property", "childProperty");
         var rootKey = rootResult.Result!.Key;
-        ContentTypeComposition[] composition =
+        Composition[] composition =
         {
             new()
             {
-                CompositionType = ContentTypeCompositionType.Inheritance, Key = rootKey,
+                CompositionType = CompositionType.Inheritance, Key = rootKey,
             },
         };
 
@@ -286,11 +286,11 @@ public partial class DocumentTypeEditingServiceTests
 
         var grandchildProperty = CreatePropertyType("Grandchild Property", "grandchildProperty");
         var childKey = childResult.Result!.Key;
-        ContentTypeComposition[] grandchildComposition =
+        Composition[] grandchildComposition =
         {
             new()
             {
-                CompositionType = ContentTypeCompositionType.Inheritance, Key = childKey,
+                CompositionType = CompositionType.Inheritance, Key = childKey,
             },
         };
 
@@ -336,13 +336,13 @@ public partial class DocumentTypeEditingServiceTests
         var createModel = CreateCreateModel(
             compositions: new[]
             {
-                new ContentTypeComposition
+                new Composition
                 {
-                    CompositionType = ContentTypeCompositionType.Composition, Key = baseResult.Result!.Key
+                    CompositionType = CompositionType.Composition, Key = baseResult.Result!.Key
                 },
-                new ContentTypeComposition
+                new Composition
                 {
-                    CompositionType = ContentTypeCompositionType.Inheritance, Key = baseResult.Result!.Key
+                    CompositionType = CompositionType.Inheritance, Key = baseResult.Result!.Key
                 },
             },
             parentKey: baseResult.Result.Key);
@@ -370,9 +370,9 @@ public partial class DocumentTypeEditingServiceTests
         var createModel = CreateCreateModel(
             compositions: new[]
             {
-                new ContentTypeComposition
+                new Composition
                 {
-                    CompositionType = ContentTypeCompositionType.Composition, Key = compositionBaseResult.Result!.Key
+                    CompositionType = CompositionType.Composition, Key = compositionBaseResult.Result!.Key
                 },
             },
             propertyTypes: new[]
@@ -393,9 +393,9 @@ public partial class DocumentTypeEditingServiceTests
         var createModel = CreateCreateModel(
             compositions: new[]
             {
-                new ContentTypeComposition
+                new Composition
                 {
-                    CompositionType = ContentTypeCompositionType.Composition, Key = Guid.NewGuid()
+                    CompositionType = CompositionType.Composition, Key = Guid.NewGuid()
                 },
             });
 
