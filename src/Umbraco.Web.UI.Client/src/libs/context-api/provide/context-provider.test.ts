@@ -58,8 +58,8 @@ describe('UmbContextProvider', () => {
 		const localConsumer = new UmbContextConsumer(
 			element,
 			'my-test-context',
-			(_instance: UmbTestContextProviderClass) => {
-				expect(_instance.prop).to.eq('value from provider');
+			(_instance: UmbTestContextProviderClass | undefined) => {
+				expect(_instance?.prop).to.eq('value from provider');
 				done();
 				localConsumer.hostDisconnected();
 			}

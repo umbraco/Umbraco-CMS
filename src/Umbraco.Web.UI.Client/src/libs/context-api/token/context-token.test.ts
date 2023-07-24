@@ -9,9 +9,9 @@ class UmbTestContextTokenClass {
 	prop = 'value from provider';
 }
 
-describe('ContextAlias', () => {
-	const contextAlias = new UmbContextToken<UmbTestContextTokenClass>(testContextAlias);
-	const typedProvider = new UmbContextProvider(document.body, contextAlias, new UmbTestContextTokenClass());
+describe('UmbContextToken', () => {
+	const contextToken = new UmbContextToken<UmbTestContextTokenClass>(testContextAlias);
+	const typedProvider = new UmbContextProvider(document.body, contextToken, new UmbTestContextTokenClass());
 	typedProvider.hostConnected();
 
 	after(() => {
@@ -19,31 +19,41 @@ describe('ContextAlias', () => {
 	});
 
 	it('toString returns the alias', () => {
-		expect(contextAlias.toString()).to.eq(testContextAlias);
+		expect(contextToken.toString()).to.eq(testContextAlias);
 	});
 
-	it('can be consumed directly', (done) => {
+	it('can be used to consume a context API', (done) => {
 		const element = document.createElement('div');
 		document.body.appendChild(element);
 
-		const localConsumer = new UmbContextConsumer(element, contextAlias, (_instance) => {
-			expect(_instance).to.be.instanceOf(UmbTestContextTokenClass);
-			expect(_instance.prop).to.eq('value from provider');
-			done();
-		});
+		const localConsumer = new UmbContextConsumer(
+			element,
+			contextToken,
+			(_instance: UmbTestContextTokenClass | undefined) => {
+				expect(_instance).to.be.instanceOf(UmbTestContextTokenClass);
+				expect(_instance?.prop).to.eq('value from provider');
+				done();
+				localConsumer.destroy(); // We do not want to react to when the provider is disconnected.
+			}
+		);
 
 		localConsumer.hostConnected();
 	});
 
-	it('can be consumed using the inner string alias', (done) => {
+	it('gives the same result when using the string alias', (done) => {
 		const element = document.createElement('div');
 		document.body.appendChild(element);
 
-		const localConsumer = new UmbContextConsumer(element, testContextAlias, (_instance: UmbTestContextTokenClass) => {
-			expect(_instance).to.be.instanceOf(UmbTestContextTokenClass);
-			expect(_instance.prop).to.eq('value from provider');
-			done();
-		});
+		const localConsumer = new UmbContextConsumer(
+			element,
+			testContextAlias,
+			(_instance: UmbTestContextTokenClass | undefined) => {
+				expect(_instance).to.be.instanceOf(UmbTestContextTokenClass);
+				expect(_instance?.prop).to.eq('value from provider');
+				done();
+				localConsumer.destroy(); // We do not want to react to when the provider is disconnected.
+			}
+		);
 
 		localConsumer.hostConnected();
 	});

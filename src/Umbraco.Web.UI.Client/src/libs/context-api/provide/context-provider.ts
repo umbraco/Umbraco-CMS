@@ -4,7 +4,10 @@ import {
 	umbDebugContextEventType,
 } from '../consume/context-request.event.js';
 import { UmbContextToken } from '../token/context-token.js';
-import { UmbContextProvideEventImplementation } from './context-provide.event.js';
+import {
+	UmbContextProvideEventImplementation,
+	UmbContextUnprovidedEventImplementation,
+} from './context-provide.event.js';
 
 /**
  * @export
@@ -39,10 +42,23 @@ export class UmbContextProvider {
 	}
 
 	/**
+	 * @private
+	 * @param {UmbContextRequestEvent} event
+	 * @memberof UmbContextProvider
+	 */
+	#handleContextRequest = (event: Event) => {
+		if (!isUmbContextRequestEvent(event)) return;
+		if (event.contextAlias !== this._contextAlias) return;
+
+		event.stopPropagation();
+		event.callback(this.#instance);
+	};
+
+	/**
 	 * @memberof UmbContextProvider
 	 */
 	public hostConnected() {
-		this.hostElement.addEventListener(umbContextRequestEventType, this._handleContextRequest);
+		this.hostElement.addEventListener(umbContextRequestEventType, this.#handleContextRequest);
 		this.hostElement.dispatchEvent(new UmbContextProvideEventImplementation(this._contextAlias));
 
 		// Listen to our debug event 'umb:debug-contexts'
@@ -53,22 +69,12 @@ export class UmbContextProvider {
 	 * @memberof UmbContextProvider
 	 */
 	public hostDisconnected() {
-		this.hostElement.removeEventListener(umbContextRequestEventType, this._handleContextRequest);
-		// TODO: fire unprovided event.
+		this.hostElement.removeEventListener(umbContextRequestEventType, this.#handleContextRequest);
+		this.hostElement.dispatchEvent(new UmbContextUnprovidedEventImplementation(this._contextAlias, this.#instance));
+
+		// Stop listen to our debug event 'umb:debug-contexts'
+		this.hostElement.removeEventListener(umbDebugContextEventType, this._handleDebugContextRequest);
 	}
-
-	/**
-	 * @private
-	 * @param {UmbContextRequestEvent} event
-	 * @memberof UmbContextProvider
-	 */
-	private _handleContextRequest = (event: Event) => {
-		if (!isUmbContextRequestEvent(event)) return;
-		if (event.contextAlias !== this._contextAlias) return;
-
-		event.stopPropagation();
-		event.callback(this.#instance);
-	};
 
 	private _handleDebugContextRequest = (event: any) => {
 		// If the event doesn't have an instances property, create it.
@@ -85,7 +91,7 @@ export class UmbContextProvider {
 	};
 
 	destroy(): void {
-		// I want to make sure to call this, but for now it was too overwhelming to require the destroy method on context instances.
+		// We want to call a destroy method on the instance, if it has one.
 		(this.#instance as any)?.destroy?.();
 	}
 }

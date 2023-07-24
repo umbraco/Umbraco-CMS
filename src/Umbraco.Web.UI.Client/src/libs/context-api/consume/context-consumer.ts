@@ -1,5 +1,10 @@
 import { UmbContextToken } from '../token/context-token.js';
-import { isUmbContextProvideEventType, umbContextProvideEventType } from '../provide/context-provide.event.js';
+import {
+	isUmbContextProvideEventType,
+	isUmbContextUnprovidedEventType,
+	umbContextProvideEventType,
+	umbContextUnprovidedEventType,
+} from '../provide/context-provide.event.js';
 import { UmbContextRequestEventImplementation, UmbContextCallback } from './context-request.event.js';
 
 /**
@@ -7,7 +12,7 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  * @class UmbContextConsumer
  */
 export class UmbContextConsumer<T = unknown> {
-	#callback?: UmbContextCallback<T>;
+	#callback?: UmbContextCallback<T | undefined>;
 	#promise?: Promise<T>;
 	#promiseResolver?: (instance: T) => void;
 
@@ -28,7 +33,7 @@ export class UmbContextConsumer<T = unknown> {
 	constructor(
 		protected hostElement: EventTarget,
 		contextAlias: string | UmbContextToken<T>,
-		callback?: UmbContextCallback<T>
+		callback?: UmbContextCallback<T | undefined>
 	) {
 		this.#contextAlias = contextAlias.toString();
 		this.#callback = callback;
@@ -40,7 +45,9 @@ export class UmbContextConsumer<T = unknown> {
 		}
 		this.#instance = instance;
 		this.#callback?.(instance);
-		this.#promiseResolver?.(instance);
+		if (instance !== undefined) {
+			this.#promiseResolver?.(instance);
+		}
 	};
 
 	public asPromise() {
@@ -63,19 +70,36 @@ export class UmbContextConsumer<T = unknown> {
 	public hostConnected() {
 		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
 		window.addEventListener(umbContextProvideEventType, this._handleNewProvider);
+		window.addEventListener(umbContextUnprovidedEventType, this._handleRemovedProvider);
 		this.request();
 	}
 
 	public hostDisconnected() {
 		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
 		window.removeEventListener(umbContextProvideEventType, this._handleNewProvider);
+		window.removeEventListener(umbContextUnprovidedEventType, this._handleRemovedProvider);
 	}
 
 	private _handleNewProvider = (event: Event) => {
+		// Does seem a bit unnecessary, we could just assume the type via type casting...
 		if (!isUmbContextProvideEventType(event)) return;
 
 		if (this.#contextAlias === event.contextAlias) {
 			this.request();
+		}
+	};
+
+	private _handleRemovedProvider = (event: Event) => {
+		// Does seem a bit unnecessary, we could just assume the type via type casting...
+		if (!isUmbContextUnprovidedEventType(event)) return;
+
+		if (
+			this.#instance !== undefined &&
+			this.#contextAlias === event.contextAlias &&
+			event.instance === this.#instance
+		) {
+			this.#instance = undefined;
+			this.#callback?.(undefined);
 		}
 	};
 
