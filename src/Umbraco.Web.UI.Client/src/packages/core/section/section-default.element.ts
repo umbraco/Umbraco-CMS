@@ -33,6 +33,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 
 		// It was important to ensure that the UmbExtensionsElementController first got created a little later.
 		// TODO: this needs further investigation, to figure out why it happens.
+		// Note: It might be because we have no system for Context-APIs to inform when the leave the DOM.
 		if (!this._extensionController) {
 			this._extensionController = new UmbExtensionsElementController(this, 'sectionSidebarApp', null, (sidebarApps) => {
 				this._sidebarApps = sidebarApps;
