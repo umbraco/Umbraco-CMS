@@ -406,7 +406,7 @@ internal class DatabaseDataCreator
                 Path = $"-1,{Constants.DataTypes.Boolean}",
                 SortOrder = 2,
                 UniqueId = Constants.DataTypes.Guids.CheckboxGuid,
-                Text = "Checkbox",
+                Text = "Toggle",
                 NodeObjectType = Constants.ObjectTypes.DataType,
                 CreateDate = DateTime.Now,
             },
