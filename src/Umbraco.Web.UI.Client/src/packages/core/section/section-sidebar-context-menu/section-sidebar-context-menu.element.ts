@@ -1,6 +1,6 @@
 import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '../section-sidebar/index.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-section-sidebar-context-menu')
@@ -25,10 +25,22 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 		this.consumeContext(UMB_SECTION_SIDEBAR_CONTEXT_TOKEN, (instance) => {
 			this.#sectionSidebarContext = instance;
 
-			this.observe(this.#sectionSidebarContext.contextMenuIsOpen, (value) => (this._isOpen = value));
-			this.observe(this.#sectionSidebarContext.unique, (value) => (this._unique = value));
-			this.observe(this.#sectionSidebarContext.entityType, (value) => (this._entityType = value));
-			this.observe(this.#sectionSidebarContext.headline, (value) => (this._headline = value));
+			if (this.#sectionSidebarContext) {
+				// make prettier not break the lines on the next 4 lines:
+				// prettier-ignore
+				this.observe( this.#sectionSidebarContext.contextMenuIsOpen, (value) => (this._isOpen = value), '_observeContextMenuIsOpen');
+				// prettier-ignore
+				this.observe(this.#sectionSidebarContext.unique, (value) => (this._unique = value), '_observeUnique');
+				// prettier-ignore
+				this.observe(this.#sectionSidebarContext.entityType, (value) => (this._entityType = value), '_observeEntityType');
+				// prettier-ignore
+				this.observe(this.#sectionSidebarContext.headline, (value) => (this._headline = value), '_observeHeadline');
+			} else {
+				this.removeControllerByAlias('_observeContextMenuIsOpen');
+				this.removeControllerByAlias('_observeUnique');
+				this.removeControllerByAlias('_observeEntityType');
+				this.removeControllerByAlias('_observeHeadline');
+			}
 		});
 	}
 
@@ -59,7 +71,7 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 
 	// TODO: allow different views depending on left or right click
 	#renderModal() {
-		return this._isOpen && this._unique !== undefined
+		return this._isOpen && this._unique && this._entityType
 			? html`<div id="action-modal">
 					<h3>${this._headline}</h3>
 					<umb-entity-action-list
