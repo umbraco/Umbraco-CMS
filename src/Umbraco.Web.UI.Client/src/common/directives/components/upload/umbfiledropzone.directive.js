@@ -31,7 +31,7 @@ angular.module("umbraco.directives")
                     propertyAlias: '@',
                     accept: '@',
                     maxFileSize: '@',
- 
+
                     compact: '@',
                     hideDropzone: '@',
                     acceptedMediatypes: '=',
@@ -87,7 +87,7 @@ angular.module("umbraco.directives")
                         // Add the processed length, as we might be uploading in stages
                         scope.totalQueued = scope.queue.length + scope.processed.length;
 
-                        _processQueueItems();                        
+                        _processQueueItems();
                     }
 
                     function _processQueueItems() {
@@ -114,6 +114,18 @@ angular.module("umbraco.directives")
                     }
 
                     function _upload(file) {
+
+                        if (!file) {
+                            return;
+                        }
+
+                        if (file.$error) {
+                            scope.processed.push(file);
+                            scope.currentFile = undefined;
+                            file.messages.push({type: "Error"});
+                            _processQueueItems();
+                            return;
+                        }
 
                         scope.propertyAlias = scope.propertyAlias ? scope.propertyAlias : "umbracoFile";
                         scope.contentTypeAlias = scope.contentTypeAlias ? scope.contentTypeAlias : "Image";
@@ -158,11 +170,22 @@ angular.module("umbraco.directives")
                                 } else if (evt && typeof evt === "string") {
                                     file.messages.push({message: evt, type: "Error"});
                                 }
-                                // If file not found, server will return a 404 and display this message
-                                if (status === 404) {
-                                    file.messages.push({message: "File not found", type: "Error"});
+
+                                // If there were no errors with the request, but the status code was 404, we'll add a custom message
+                                // or a generic message for all other status codes.
+                                if (!file.messages.length) {
+                                    if (status === 404) {
+                                        file.messages.push({message: "File not found", type: "Error"});
+                                    } else {
+                                        file.messages.push({message: "Error uploading file", type: "Error"});
+                                    }
                                 }
+
+                                // The file has been processed, even though it resulted in an error, so we add it to the processed queue
+                                scope.processed.push(file);
                                 scope.currentFile = undefined;
+
+                                // Return to queue processing
                                 _processQueueItems();
                             });
                     }

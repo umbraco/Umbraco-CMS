@@ -41,7 +41,7 @@
         <ul class="file-list" ng-show="queue.length > 0 || processed.length > 0 || filesHolder.length > 0">
 
 
-          <li class="file" ng-if="totalMessages > 1">
+            <li class="file" ng-if="totalMessages > 1">
               <div class="file-description">
                 <!-- Okay all -->
                 <button class="btn btn-primary ok-all" type="button" ng-click="dismissAllMessages()">
@@ -56,7 +56,7 @@
                   <div>
                     <span>{{ file.name }}</span>
                     <span ng-if="file.messages.length > 0 || file.$error" class="file-messages">
-                      <span class="errorMessage color-red" ng-repeat="message in file.messages">{{message.header}}: {{message.message}}</span>
+                      <span class="errorMessage color-red" ng-repeat="message in ::file.messages">{{::message.message}}</span>
                       <span ng-if="file.$error === 'pattern'" class="errorMessage color-red"><localize key="media_disallowedFileType"></localize></span>
                       <span ng-if="file.$error === 'maxSize'" class="errorMessage color-red"><localize key="media_maxFileSize"></localize> "{{maxFileSize}}"</span>
                     </span>
@@ -84,7 +84,7 @@
             <li class="file" ng-repeat="file in queue track by file.key">
                 <div class="file-description">{{ file.name }}</div>
             </li>
-                       
+
         </ul>
     </ng-form>
 
