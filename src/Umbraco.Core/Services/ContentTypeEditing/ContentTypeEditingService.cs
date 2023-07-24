@@ -1,7 +1,6 @@
 ﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
-using Umbraco.Cms.Core.Models.ContentTypeEditing.Document;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
@@ -9,7 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 
-public class DocumentTypeEditingService : IDocumentTypeEditingService
+public class ContentTypeEditingService : IContentTypeEditingService
 {
     private readonly IContentTypeService _contentTypeService;
     private readonly IDataTypeService _dataTypeService;
@@ -18,7 +17,7 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
     private readonly ITemplateService _templateService;
     private const int MaxInheritance = 1;
 
-    public DocumentTypeEditingService(
+    public ContentTypeEditingService(
         IContentTypeService contentTypeService,
         IDataTypeService dataTypeService,
         IEntityService entityService,
@@ -32,7 +31,7 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
         _templateService = templateService;
     }
 
-    public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(DocumentTypeCreateModel model, Guid performingUserId)
+    public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(ContentTypeCreateModel model, Guid performingUserId)
     {
         // Ensure no duplicate alias across documents, members, and media. Since this would break ModelsBuilder/published cache.
         // This this method gets aliases across documents, members, and media, so it covers it all
@@ -54,7 +53,7 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
         var reservedPropertyTypeNames = typeof(IPublishedContent).GetProperties().Select(x => x.Name)
             .Union(typeof(IPublishedContent).GetMethods().Select(x => x.Name))
             .ToArray();
-        foreach (DocumentPropertyTypeModel propertyType in model.Properties)
+        foreach (ContentTypePropertyTypeModel propertyType in model.Properties)
         {
             if (propertyType.Alias.Equals(model.Alias, StringComparison.OrdinalIgnoreCase)
                 || reservedPropertyTypeNames.InvariantContains(propertyType.Alias))
@@ -285,12 +284,12 @@ public class DocumentTypeEditingService : IDocumentTypeEditingService
             .ToArray();
 
         // Handle orphaned properties
-        IEnumerable<DocumentPropertyTypeModel> orphanedPropertyTypeModels = model.Properties.Where(x => x.ContainerKey is null).ToArray();
+        IEnumerable<ContentTypePropertyTypeModel> orphanedPropertyTypeModels = model.Properties.Where(x => x.ContainerKey is null).ToArray();
 
         if(orphanedPropertyTypeModels.Any())
         {
             var orphanedProperties = new List<IPropertyType>();
-            foreach (DocumentPropertyTypeModel propertyTypeModel in orphanedPropertyTypeModels)
+            foreach (ContentTypePropertyTypeModel propertyTypeModel in orphanedPropertyTypeModels)
             {
                 // TODO: Don't duplicate the code above
                 IDataType dataType = dataTypesByKey[propertyTypeModel.DataTypeKey];

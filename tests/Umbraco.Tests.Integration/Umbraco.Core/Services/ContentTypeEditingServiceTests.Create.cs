@@ -2,34 +2,33 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
-using Umbraco.Cms.Core.Models.ContentTypeEditing.Document;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class DocumentTypeEditingServiceTests
+public partial class ContentTypeEditingServiceTests
 {
     [Test]
-    public async Task Can_Create_Basic_DocumentType()
+    public async Task Can_Create_Basic_ContentType()
     {
         var name = "Test";
         var alias = "test";
 
         var createModel = CreateCreateModel(alias: alias, name: name, isElement: true);
-        var response = await DocumentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         // Ensure it's actually persisted
-        var documentType = await ContentTypeService.GetAsync(response.Result!.Key);
+        var contentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(response.Success);
-            Assert.IsNotNull(documentType);
-            Assert.IsTrue(documentType.IsElement);
-            Assert.AreEqual(alias, documentType.Alias);
-            Assert.AreEqual(name, documentType.Name);
-            Assert.AreEqual(response.Result.Id, documentType.Id);
-            Assert.AreEqual(response.Result.Key, documentType.Key);
+            Assert.IsTrue(result.Success);
+            Assert.IsNotNull(contentType);
+            Assert.IsTrue(contentType.IsElement);
+            Assert.AreEqual(alias, contentType.Alias);
+            Assert.AreEqual(name, contentType.Name);
+            Assert.AreEqual(result.Result.Id, contentType.Id);
+            Assert.AreEqual(result.Result.Key, contentType.Key);
         });
     }
 
@@ -39,15 +38,15 @@ public partial class DocumentTypeEditingServiceTests
         var key = new Guid("33C326F6-CB5E-43D6-9730-E946AA5F9C7B");
         var createModel = CreateCreateModel(key: key);
 
-        var response = await DocumentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        var documentType = await ContentTypeService.GetAsync(response.Result!.Key);
+        var contentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(response.Success);
-            Assert.IsNotNull(documentType);
-            Assert.AreEqual(key, documentType.Key);
+            Assert.IsTrue(result.Success);
+            Assert.IsNotNull(contentType);
+            Assert.AreEqual(key, contentType.Key);
         });
     }
 
@@ -63,15 +62,15 @@ public partial class DocumentTypeEditingServiceTests
             propertyTypes: new[] { propertyTypeCreateModel },
             containers: new[] { propertyTypeContainer });
 
-        var response = await DocumentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        var documentType = await ContentTypeService.GetAsync(response.Result!.Key);
+        var contentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(response.Success);
-            Assert.IsNotNull(documentType);
-            var propertyType = documentType.PropertyGroups.FirstOrDefault()?.PropertyTypes?.FirstOrDefault();
+            Assert.IsTrue(result.Success);
+            Assert.IsNotNull(contentType);
+            var propertyType = contentType.PropertyGroups.FirstOrDefault()?.PropertyTypes?.FirstOrDefault();
             Assert.IsNotNull(propertyType);
             Assert.AreEqual(propertyTypeKey, propertyType.Key);
         });
@@ -82,7 +81,7 @@ public partial class DocumentTypeEditingServiceTests
     [TestCase(true, false)]
     [TestCase(false, false)]
     // Wondering where the last case is? Look at the test below.
-    public async Task Can_Create_Composite_DocumentType(bool compositionIsElement, bool documentTypeIsElement)
+    public async Task Can_Create_Composite_ContentType(bool compositionIsElement, bool contentTypeIsElement)
     {
         var compositionBase = CreateCreateModel(
             alias: "compositionBase",
@@ -96,13 +95,13 @@ public partial class DocumentTypeEditingServiceTests
         var compositionProperty = CreatePropertyType(name: "Composition Property", alias: "compositionProperty", containerKey: container.Key);
         compositionBase.Properties = new[] { compositionProperty };
 
-        var compositionResult = await DocumentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
+        var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(compositionResult.Success);
         var compositionType = compositionResult.Result;
 
         // Create doc type using the composition
-        var documentType = CreateCreateModel(
-            isElement: documentTypeIsElement,
+        var createModel = CreateCreateModel(
+            isElement: contentTypeIsElement,
             compositions: new[]
             {
                 new Composition
@@ -113,14 +112,14 @@ public partial class DocumentTypeEditingServiceTests
             }
         );
 
-        var result = await DocumentTypeEditingService.CreateAsync(documentType, Constants.Security.SuperUserKey);
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
-        var createdDocumentType = await ContentTypeService.GetAsync(result.Result!.Key);
+        var contentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, createdDocumentType.ContentTypeComposition.Count());
-            Assert.AreEqual(compositionType.Key, createdDocumentType.ContentTypeComposition.First().Key);
+            Assert.AreEqual(1, contentType.ContentTypeComposition.Count());
+            Assert.AreEqual(compositionType.Key, contentType.ContentTypeComposition.First().Key);
             Assert.AreEqual(1, compositionType.CompositionPropertyGroups.Count());
             Assert.AreEqual(container.Key, compositionType.CompositionPropertyGroups.First().Key);
             Assert.AreEqual(1, compositionType.CompositionPropertyTypes.Count());
@@ -140,11 +139,11 @@ public partial class DocumentTypeEditingServiceTests
             name: "Composition Base",
             isElement: false);
 
-        var compositionResult = await DocumentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
+        var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(compositionResult.Success);
         var compositionType = compositionResult.Result;
 
-        var documentType = CreateCreateModel(
+        var createModel = CreateCreateModel(
             name: "Document Type Using Composition",
             compositions: new[]
             {
@@ -156,22 +155,22 @@ public partial class DocumentTypeEditingServiceTests
             },
             isElement: true);
 
-        var documentTypeResult = await DocumentTypeEditingService.CreateAsync(documentType, Constants.Security.SuperUserKey);
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(documentTypeResult.Success);
-            Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, documentTypeResult.Status);
-            Assert.IsNull(documentTypeResult.Result);
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, result.Status);
+            Assert.IsNull(result.Result);
         });
     }
 
     [Test]
-    public async Task DocumentType_Containing_Composition_Cannot_Be_Used_As_Composition()
+    public async Task ContentType_Containing_Composition_Cannot_Be_Used_As_Composition()
     {
         var compositionBase = CreateCreateModel(name: "CompositionBase");
 
-        var baseResult = await DocumentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
+        var baseResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(baseResult.Success);
 
         var composition = CreateCreateModel(
@@ -184,7 +183,7 @@ public partial class DocumentTypeEditingServiceTests
                 }
             });
 
-        var compositionResult = await DocumentTypeEditingService.CreateAsync(composition, Constants.Security.SuperUserKey);
+        var compositionResult = await ContentTypeEditingService.CreateAsync(composition, Constants.Security.SuperUserKey);
         Assert.IsTrue(compositionResult.Success);
 
         // This is not allowed because the composition also has a composition (compositionBase).
@@ -199,7 +198,7 @@ public partial class DocumentTypeEditingServiceTests
                 },
             });
 
-        var invalidAttempt = await DocumentTypeEditingService.CreateAsync(invalidComposition, Constants.Security.SuperUserKey);
+        var invalidAttempt = await ContentTypeEditingService.CreateAsync(invalidComposition, Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
         {
@@ -218,7 +217,7 @@ public partial class DocumentTypeEditingServiceTests
             name: "Parent",
             propertyTypes: new[] { parentProperty });
 
-        var parentResult = await DocumentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey);
+        var parentResult = await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(parentResult.Success);
 
         var childProperty = CreatePropertyType("Child Property", "childProperty");
@@ -237,32 +236,32 @@ public partial class DocumentTypeEditingServiceTests
             compositions: composition,
             parentKey: parentKey);
 
-        var result = await DocumentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
+        var result = await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
 
         Assert.IsTrue(result.Success);
 
         Assert.Multiple(() =>
         {
-            var documentType = result.Result!;
-            Assert.AreEqual(parentResult.Result.Id, documentType.ParentId);
-            Assert.AreEqual(1, documentType.ContentTypeComposition.Count());
-            Assert.AreEqual(parentResult.Result.Key, documentType.ContentTypeComposition.FirstOrDefault()?.Key);
-            Assert.AreEqual(2, documentType.CompositionPropertyTypes.Count());
-            Assert.IsTrue(documentType.CompositionPropertyTypes.Any(x => x.Alias == parentProperty.Alias));
-            Assert.IsTrue(documentType.CompositionPropertyTypes.Any(x => x.Alias == childProperty.Alias));
+            var contentType = result.Result!;
+            Assert.AreEqual(parentResult.Result.Id, contentType.ParentId);
+            Assert.AreEqual(1, contentType.ContentTypeComposition.Count());
+            Assert.AreEqual(parentResult.Result.Key, contentType.ContentTypeComposition.FirstOrDefault()?.Key);
+            Assert.AreEqual(2, contentType.CompositionPropertyTypes.Count());
+            Assert.IsTrue(contentType.CompositionPropertyTypes.Any(x => x.Alias == parentProperty.Alias));
+            Assert.IsTrue(contentType.CompositionPropertyTypes.Any(x => x.Alias == childProperty.Alias));
         });
     }
 
     // Unlike compositions, it is allowed to inherit on multiple levels
     [Test]
-    public async Task Can_Create_Grandchild_DocumentType()
+    public async Task Can_Create_Grandchild_ContentType()
     {
         var rootProperty = CreatePropertyType("Root property");
-        DocumentTypeCreateModel rootModel = CreateCreateModel(
+        ContentTypeCreateModel rootModel = CreateCreateModel(
             name: "Root",
             propertyTypes: new[] { rootProperty });
 
-        var rootResult = await DocumentTypeEditingService.CreateAsync(rootModel, Constants.Security.SuperUserKey);
+        var rootResult = await ContentTypeEditingService.CreateAsync(rootModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(rootResult.Success);
 
         var childProperty = CreatePropertyType("Child Property", "childProperty");
@@ -281,7 +280,7 @@ public partial class DocumentTypeEditingServiceTests
             compositions: composition,
             parentKey: rootKey);
 
-        var childResult = await DocumentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
+        var childResult = await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(childResult.Success);
 
         var grandchildProperty = CreatePropertyType("Grandchild Property", "grandchildProperty");
@@ -300,7 +299,7 @@ public partial class DocumentTypeEditingServiceTests
             compositions: grandchildComposition,
             parentKey: childKey);
 
-        var grandchildResult = await DocumentTypeEditingService.CreateAsync(grandchildModel, Constants.Security.SuperUserKey);
+        var grandchildResult = await ContentTypeEditingService.CreateAsync(grandchildModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(grandchildResult.Success);
 
         var root = rootResult.Result!;
@@ -326,11 +325,11 @@ public partial class DocumentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task DocumentType_Cannot_Be_Both_Parent_And_Composition()
+    public async Task ContentType_Cannot_Be_Both_Parent_And_Composition()
     {
         var compositionBase = CreateCreateModel(name: "CompositionBase");
 
-        var baseResult = await DocumentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
+        var baseResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(baseResult.Success);
 
         var createModel = CreateCreateModel(
@@ -347,7 +346,7 @@ public partial class DocumentTypeEditingServiceTests
             },
             parentKey: baseResult.Result.Key);
 
-        var result = await DocumentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
             Assert.IsFalse(result.Success);
@@ -364,7 +363,7 @@ public partial class DocumentTypeEditingServiceTests
             name: "CompositionBase",
             propertyTypes: new[] { compositionPropertyType });
 
-        var compositionBaseResult = await DocumentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
+        var compositionBaseResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(compositionBaseResult.Success);
 
         var createModel = CreateCreateModel(
@@ -379,7 +378,7 @@ public partial class DocumentTypeEditingServiceTests
             {
                 CreatePropertyType("Test Property", propertyTypeAlias)
             });
-        var result = await DocumentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
             Assert.IsFalse(result.Success);
@@ -399,7 +398,7 @@ public partial class DocumentTypeEditingServiceTests
                 },
             });
 
-        var result = await DocumentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
             Assert.IsFalse(result.Success);

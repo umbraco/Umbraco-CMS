@@ -1,43 +1,12 @@
-﻿using Umbraco.Cms.Core.Models.ContentTypeEditing.Document;
-using Umbraco.Cms.Core.Models.ContentTypeEditing.PropertyTypes;
+﻿namespace Umbraco.Cms.Core.Models.ContentTypeEditing;
 
-namespace Umbraco.Cms.Core.Models.ContentTypeEditing;
-
-/// <summary>
-/// <para>
-/// This is the common model for all content types, Documents, Media, Members.
-/// All the properties are common across all content types. Additionally most properties of the property types are shared as well.
-/// </para>
-/// To allow for common validation and such, the property types are required to inherit from the same base.
-/// The same goes for the property type containers. (I.E Tabs and Groups)
-/// </summary>
-/// <typeparam name="TPropertyType">The type of the property types, I.E <see cref="DocumentPropertyTypeModel"/>.</typeparam>
-/// <typeparam name="TPropertyTypeContainer">The type of the content type containers, I.E <see cref="DocumentTypePropertyContainerModel"/>.</typeparam>
-public abstract class ContentTypeModelBase<TPropertyType, TPropertyTypeContainer>
-    where TPropertyType : PropertyTypeModelBase
-    where TPropertyTypeContainer : PropertyTypeContainerModelBase
+public class ContentTypeModelBase : ContentTypeEditingModelBase<ContentTypePropertyTypeModel, ContentTypePropertyContainerModel>
 {
-    public required string Alias { get; set; }
+    public bool IsElement { get; set; }
 
-    public required string Name { get; set; }
+    public ContentTypeCleanup Cleanup { get; set; } = new();
 
-    public string? Description { get; set; }
+    public IEnumerable<Guid> AllowedTemplateKeys { get; set; } = Array.Empty<Guid>();
 
-    public string Icon { get; set; } = string.Empty;
-
-    public bool AllowedAsRoot { get; set; }
-
-    public bool VariesByCulture { get; set; }
-
-    public bool VariesBySegment { get; set; }
-
-    public Guid? ParentKey { get; set; }
-
-    public IEnumerable<TPropertyType> Properties { get; set; } = Array.Empty<TPropertyType>();
-
-    public IEnumerable<TPropertyTypeContainer> Containers { get; set; } = Array.Empty<TPropertyTypeContainer>();
-
-    public IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; } = Array.Empty<ContentTypeSort>();
-
-    public IEnumerable<Composition> Compositions { get; set; } = Array.Empty<Composition>();
+    public Guid? DefaultTemplateKey { get; set; }
 }

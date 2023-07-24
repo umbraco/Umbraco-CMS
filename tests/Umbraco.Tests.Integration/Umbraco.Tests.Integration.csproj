@@ -90,8 +90,8 @@
     <Compile Update="Umbraco.Core\Services\UserServiceCrudTests.PartialUpdates.cs">
       <DependentUpon>UserServiceCrudTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Core\Services\DocumentTypeEditingServiceTests.Create.cs">
-      <DependentUpon>DocumentTypeEditingServiceTests.cs</DependentUpon>
+    <Compile Update="Umbraco.Core\Services\ContentTypeEditingServiceTests.Create.cs">
+      <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

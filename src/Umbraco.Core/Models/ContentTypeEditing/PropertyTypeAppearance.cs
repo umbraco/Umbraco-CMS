@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.ContentTypeEditing.PropertyTypes;
+﻿namespace Umbraco.Cms.Core.Models.ContentTypeEditing;
 
 public class PropertyTypeAppearance
 {

@@ -1,14 +1,12 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
-using Umbraco.Cms.Core.Models.ContentTypeEditing.Document;
-using Umbraco.Cms.Core.Models.ContentTypeEditing.PropertyTypes;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using PropertyTypeValidation = Umbraco.Cms.Core.Models.ContentTypeEditing.PropertyTypes.PropertyTypeValidation;
+using PropertyTypeValidation = Umbraco.Cms.Core.Models.ContentTypeEditing.PropertyTypeValidation;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -17,9 +15,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
     Database = UmbracoTestOptions.Database.NewSchemaPerTest,
     PublishedRepositoryEvents = true,
     WithApplication = true)]
-public partial class DocumentTypeEditingServiceTests : UmbracoIntegrationTest
+public partial class ContentTypeEditingServiceTests : UmbracoIntegrationTest
 {
-    private IDocumentTypeEditingService DocumentTypeEditingService => GetRequiredService<IDocumentTypeEditingService>();
+    private IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -29,28 +27,28 @@ public partial class DocumentTypeEditingServiceTests : UmbracoIntegrationTest
 
     private const string GroupContainerType = "Group";
 
-    private DocumentTypeCreateModel CreateCreateModel(
+    private ContentTypeCreateModel CreateCreateModel(
         string name = "Test",
         string? alias = null,
         Guid? key = null,
         bool isElement = false,
         Guid? parentKey = null,
-        IEnumerable<DocumentPropertyTypeModel>? propertyTypes = null,
-        IEnumerable<DocumentTypePropertyContainerModel>? containers = null,
+        IEnumerable<ContentTypePropertyTypeModel>? propertyTypes = null,
+        IEnumerable<ContentTypePropertyContainerModel>? containers = null,
         IEnumerable<Composition>? compositions = null) =>
         new()
         {
             Name = name,
             Alias = alias ?? ShortStringHelper.CleanStringForSafeAlias(name),
             Key = key ?? Guid.NewGuid(),
-            Properties = propertyTypes ?? Enumerable.Empty<DocumentPropertyTypeModel>(),
-            Containers = containers ?? Enumerable.Empty<DocumentTypePropertyContainerModel>(),
+            Properties = propertyTypes ?? Enumerable.Empty<ContentTypePropertyTypeModel>(),
+            Containers = containers ?? Enumerable.Empty<ContentTypePropertyContainerModel>(),
             Compositions = compositions ?? Enumerable.Empty<Composition>(),
             IsElement = isElement,
             ParentKey = parentKey,
         };
 
-    private DocumentPropertyTypeModel CreatePropertyType(
+    private ContentTypePropertyTypeModel CreatePropertyType(
         string name = "Title",
         string? alias = null,
         Guid? key = null,
@@ -67,7 +65,7 @@ public partial class DocumentTypeEditingServiceTests : UmbracoIntegrationTest
             Appearance = new PropertyTypeAppearance(),
         };
 
-    private DocumentTypePropertyContainerModel CreateContainer(
+    private ContentTypePropertyContainerModel CreateContainer(
         string name = "Container",
         string type = TabContainerType,
         Guid? key = null) =>
