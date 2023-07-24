@@ -22,7 +22,7 @@ internal static class ExamineExtensions
     /// <returns></returns>
     internal static bool IsExamineElement(this XElement x)
     {
-        var id = (string)x.Attribute("id");
+        var id = (string)x.Attribute("id")!;
         if (string.IsNullOrEmpty(id))
         {
             return false;

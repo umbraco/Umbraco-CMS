@@ -10,7 +10,7 @@ public class ExamineDemoDataContentService
 
     private readonly XDocument _xContent;
 
-    public ExamineDemoDataContentService(string contentXml = null)
+    public ExamineDemoDataContentService(string? contentXml = null)
     {
         if (contentXml == null)
         {
@@ -28,10 +28,13 @@ public class ExamineDemoDataContentService
     /// <remarks>
     ///     This is no different in the test suite as published content
     /// </remarks>
-    public XDocument GetLatestContentByXPath(string xpath)
+    public XDocument? GetLatestContentByXPath(string? xpath)
     {
         var xdoc = XDocument.Parse("<content></content>");
-        xdoc.Root.Add(_xContent.XPathSelectElements(xpath));
+        if (xpath != null)
+        {
+            xdoc?.Root?.Add(_xContent.XPathSelectElements(xpath));
+        }
 
         return xdoc;
     }
@@ -41,12 +44,12 @@ public class ExamineDemoDataContentService
     /// </summary>
     /// <param name="xpath"></param>
     /// <returns></returns>
-    public XDocument GetPublishedContentByXPath(string xpath) => GetContentByXPath(xpath, _xContent);
+    public XDocument? GetPublishedContentByXPath(string xpath) => GetContentByXPath(xpath, _xContent);
 
-    private XDocument GetContentByXPath(string xpath, XDocument content)
+    private XDocument? GetContentByXPath(string xpath, XDocument content)
     {
         var xdoc = XDocument.Parse("<content></content>");
-        xdoc.Root.Add(content.XPathSelectElements(xpath));
+        xdoc?.Root?.Add(content.XPathSelectElements(xpath));
 
         return xdoc;
     }

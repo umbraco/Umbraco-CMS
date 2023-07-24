@@ -26,6 +26,7 @@ public interface IUmbracoSearcher
     IUmbracoSearchResults Search(ISearchRequest searchRequest);
     public ISearchRequest CreateSearchRequest();
 
+    IEnumerable<PublishedSearchResult> GetAll();
 }
 
 public interface ISearchRequest

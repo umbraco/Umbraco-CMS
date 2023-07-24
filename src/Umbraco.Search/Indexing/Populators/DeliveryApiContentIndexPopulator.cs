@@ -7,7 +7,7 @@ using Umbraco.Search.Services;
 
 namespace Umbraco.Search.Indexing.Populators;
 
-internal sealed class DeliveryApiContentIndexPopulator : IndexPopulator
+public sealed class DeliveryApiContentIndexPopulator : IndexPopulator
 {
    private readonly IDeliveryApiContentIndexHelper _deliveryApiContentIndexHelper;
     private readonly ILogger<DeliveryApiContentIndexPopulator> _logger;

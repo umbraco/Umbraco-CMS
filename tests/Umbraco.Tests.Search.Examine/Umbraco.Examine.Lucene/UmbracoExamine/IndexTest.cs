@@ -25,9 +25,8 @@ public class IndexTest : ExamineBaseTest
     [Test]
     public void GivenValidationParentNode_WhenContentIndexedUnderDifferentParent_DocumentIsNotIndexed()
     {
-        using (GetSynchronousContentIndex(false, out var index, out _, out _, 999))
+        using (GetSynchronousContentIndex(false, out var index, out var searcher, out _, 999))
         {
-            var searcher = index.Searcher;
 
             var contentService = new ExamineDemoDataContentService();
             //get a node from the data repo

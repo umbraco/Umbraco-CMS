@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Search.Configuration;
 
-public interface IExamineIndexConfigurationFactory
+public interface IIndexConfigurationFactory
 {
     public IUmbracoIndexesConfiguration GetConfiguration();
 }

@@ -14,16 +14,16 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Search;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.Examine;
 using Umbraco.Search.Examine.Configuration;
+using Umbraco.Search.Examine.Extensions;
 using Umbraco.Search.Examine.Lucene;
 using Umbraco.Search.Examine.ValueSetBuilders;
 using Umbraco.Search.Indexing.Populators;
@@ -248,9 +248,10 @@ public class IndexInitializer
         var i = new UmbracoExamineLuceneIndex( _loggerFactory,
             "testIndexer",
             options, new UmbracoIndexesConfiguration(new Dictionary<string, IUmbracoIndexConfiguration>()), hostingEnvironment, runtimeState);
+        var syncMode = i.WithThreadingMode(IndexThreadingMode.Synchronous);
 
 
-        return new UmbracoExamineIndex<IContent>(i, new ContentValueSetBuilder());
+        return new UmbracoExamineIndex<IContent>(i, new ContentValueSetBuilder(),syncMode);
     }
 
     private void I_IndexOperationComplete(object sender, IndexOperationEventArgs e)
@@ -268,4 +269,39 @@ public class IndexInitializer
 
     internal void IndexingError(object sender, IndexingErrorEventArgs e) =>
         throw new ApplicationException(e.Message, e.Exception);
+
+    public IUmbracoSearcher GetUmbracoSearcher(IHostingEnvironment hostingEnvironment, IRuntimeState runningRuntimeState, RandomIdRAMDirectory luceneDir, ContentValueSetValidator validator)
+    {
+        if (languageService == null)
+        {
+            languageService = GetMockLocalizationService();
+        }
+
+        if (analyzer == null)
+        {
+            analyzer = new StandardAnalyzer(LuceneInfo.CurrentVersion);
+        }
+
+        if (validator == null)
+        {
+            validator = new ContentValueSetValidator(true);
+        }
+
+        var options = GetOptions(
+            "testIndexer",
+            new LuceneDirectoryIndexOptions
+            {
+                Analyzer = analyzer,
+                Validator = validator,
+                DirectoryFactory = new GenericDirectoryFactory(s => luceneDir),
+                FieldDefinitions = new UmbracoFieldDefinitionCollection().toExamineFieldDefinitionCollection()
+            });
+
+        var i = new UmbracoExamineLuceneIndex( _loggerFactory,
+            "testIndexer",
+            options, new UmbracoIndexesConfiguration(new Dictionary<string, IUmbracoIndexConfiguration>()), hostingEnvironment, runtimeState);
+
+
+        return new UmbracoExamineSearcher<IContent>(i.Searcher,);
+    }
 }

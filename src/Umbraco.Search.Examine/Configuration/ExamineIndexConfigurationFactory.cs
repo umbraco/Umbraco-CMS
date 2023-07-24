@@ -5,18 +5,18 @@ using Umbraco.Search.Configuration;
 
 namespace Umbraco.Search.Examine.Configuration;
 
-public class ExamineIndexConfigurationFactory : IExamineIndexConfigurationFactory
+public class IndexConfigurationFactory : IIndexConfigurationFactory
 {
     private readonly Dictionary<string, IUmbracoIndexConfiguration> configurationObjects;
 
-    public ExamineIndexConfigurationFactory(IPublicAccessService publicAccessService, IScopeProvider provider)
+    public IndexConfigurationFactory(IPublicAccessService publicAccessService, IScopeProvider provider)
     {
         configurationObjects = new Dictionary<string, IUmbracoIndexConfiguration>()
         {
-            { Constants.UmbracoIndexes.InternalIndexName, new UmbracoIndexConfig(publicAccessService, provider)  },
-            { Constants.UmbracoIndexes.ExternalIndexName, new UmbracoIndexConfig(publicAccessService, provider) { PublishedValuesOnly = true}},
-            { Constants.UmbracoIndexes.MembersIndexName, new UmbracoIndexConfig(publicAccessService, provider) },
-            { Constants.UmbracoIndexes.DeliveryApiContentIndexName, new UmbracoIndexConfig(publicAccessService, provider) }
+            { Constants.UmbracoIndexes.InternalIndexName, new UmbracoExamineIndexConfig(publicAccessService, provider)  },
+            { Constants.UmbracoIndexes.ExternalIndexName, new UmbracoExamineIndexConfig(publicAccessService, provider) { PublishedValuesOnly = true}},
+            { Constants.UmbracoIndexes.MembersIndexName, new UmbracoExamineIndexConfig(publicAccessService, provider) },
+            { Constants.UmbracoIndexes.DeliveryApiContentIndexName, new UmbracoExamineIndexConfig(publicAccessService, provider) }
         };
     }
 

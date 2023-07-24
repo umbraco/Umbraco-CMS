@@ -52,14 +52,13 @@ public class SearchTests : ExamineBaseTest
                  ==
                  allRecs);
 
-        using (GetSynchronousContentIndex(false, out var index, out var contentRebuilder, out _, null, contentService))
+        using (GetSynchronousContentIndex(false, out var index, out var searcher, out var contentRebuilder, out _, null, contentService))
         {
             index.Create();
-            contentRebuilder.Populate(index);
+            contentRebuilder.Populate(index.Name);
 
-            var searcher = index;
 
-            Assert.Greater(searcher.CreateQuery().All().Execute().TotalItemCount, 0);
+            Assert.Greater(searcher.GetAll().Count(), 0);
 
             var numberSortedCriteria = searcher.CreateQuery()
                 .ParentId(1148)

@@ -12,10 +12,10 @@ internal class ExamineDemoDataMediaService
 
     #region IMediaService Members
 
-    public XDocument GetLatestMediaByXpath(string xpath)
+    public XDocument? GetLatestMediaByXpath(string xpath)
     {
         var xdoc = XDocument.Parse("<media></media>");
-        xdoc.Root.Add(_doc.XPathSelectElements(xpath));
+        xdoc?.Root?.Add(_doc.XPathSelectElements(xpath));
         return xdoc;
     }
 

@@ -14,6 +14,7 @@ using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Search;
 using Umbraco.Search.Examine;
+using Umbraco.Search.Examine.Lucene;
 using Umbraco.Search.Examine.ValueSetBuilders;
 using Directory = Lucene.Net.Store.Directory;
 
@@ -35,7 +36,10 @@ public class PublishedContentQueryTests : ExamineBaseTest
                     new LuceneDirectoryIndexOptions
                     {
                         DirectoryFactory = new GenericDirectoryFactory(s => luceneDirectory)
-                    })), new ContentValueSetBuilder());
+                    })), new ContentValueSetBuilder())
+        {
+            _fieldNames = fieldNames;
+        }
 
         public bool EnableDefaultEventHandler => throw new NotImplementedException();
         public bool PublishedValuesOnly => throw new NotImplementedException();

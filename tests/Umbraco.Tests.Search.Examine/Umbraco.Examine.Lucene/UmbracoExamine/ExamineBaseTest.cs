@@ -14,7 +14,9 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Search;
 using Umbraco.Search.Examine.ValueSetBuilders;
-using Umbraco.Search.Indexing.Populators;
+using ContentIndexPopulator = Umbraco.Search.Indexing.Populators.ContentIndexPopulator;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Examine.Lucene.UmbracoExamine;
 
@@ -47,7 +49,7 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
         out ContentIndexPopulator contentRebuilder,
         out ContentValueSetBuilder contentValueSetBuilder,
         int? parentId = null,
-        IContentService contentService = null)
+        IContentService? contentService = null)
     {
         contentValueSetBuilder = IndexInitializer.GetContentValueSetBuilder(publishedValuesOnly);
 
@@ -110,10 +112,13 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
             RunningRuntimeState,
             luceneDir,
             validator: validator);
+        searcher = IndexInitializer.GetUmbracoSearcher(
+            HostingEnvironment,
+            RunningRuntimeState,
+            luceneDir,
+            validator: validator);
 
-        var syncMode = index.WithThreadingMode(IndexThreadingMode.Synchronous);
-
-        return new DisposableWrapper(syncMode, index, luceneDir);
+        return new DisposableWrapper( index, luceneDir);
     }
 
     private class DisposableWrapper : IDisposable

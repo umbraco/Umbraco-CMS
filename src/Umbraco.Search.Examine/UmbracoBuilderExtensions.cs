@@ -32,17 +32,6 @@ public static partial class UmbracoBuilderExtensions
 {
     public static IUmbracoBuilder AddExamine(this IUmbracoBuilder builder)
     {
-        // populators are not a collection: one cannot remove ours, and can only add more
-        // the container can inject IEnumerable<IIndexPopulator> and get them all
-        builder.Services.AddSingleton<IIndexPopulator, MemberIndexPopulator>();
-        builder.Services.AddSingleton<IIndexPopulator, ContentIndexPopulator>();
-        builder.Services.AddSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
-        builder.Services.AddSingleton<IIndexPopulator, MediaIndexPopulator>();
-        builder.Services.AddSingleton<IExamineIndexConfigurationFactory, ExamineIndexConfigurationFactory>();
-        builder.Services.AddSingleton<IIndexRebuilder, IndexRebuilder>();
-        builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();
-        builder.Services.AddSingleton<ISearchMainDomHandler,ExamineIndexingMainDomHandler>();
-        builder.Services.AddUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
         builder.Services.AddUnique<IPublishedContentValueSetBuilder>(factory =>
             new ContentValueSetBuilder(
                 factory.GetRequiredService<PropertyEditorCollection>(),

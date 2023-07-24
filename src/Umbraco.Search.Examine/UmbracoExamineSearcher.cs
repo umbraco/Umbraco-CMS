@@ -1,4 +1,5 @@
 ﻿using Examine;
+using Examine.Lucene.Search;
 using Examine.Search;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.Search;
@@ -89,37 +90,8 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
         {
             booleanOperation = booleanOperation.And().Field(UmbracoSearchFieldNames.DeliveryApiContentIndex.Published, "y");
         }
-        /*foreach (var filter in searchRequest.Filters)
-        {
-            switch (searchRequest.FiltersLogicOperator)
-            {
-                case LogicOperator.OR:
-                    booleanOperation = booleanOperation.Or(x =>
-                    {
-                        if (filter.Values.Any())
-                        {
-                            if (filter.Values.Count == 1)
-                            {
-                                return x.Field(filter.FieldName, filter.Values.First());
-                            }
 
-                            return x.GroupedOr(new[] { filter.FieldName }, filter.Values.ToArray());
-                        }
-
-                        if (filter.SubFilters.Any())
-                        {
-                            switch (filter.LogicOperator)
-                            {
-                                case LogicOperator.OR:
-                                    f
-                            }
-                        }
-                    })
-                    break;
-            }
-
-            (searchRequest.FiltersLogicOperator)
-        }*/
+        PrepareFilters((LuceneSearchQuery)query, booleanOperation, searchRequest.Filters, searchRequest.FiltersLogicOperator);
         using (var contextReference = _umbracoContextFactory.EnsureUmbracoContext())
         {
             IUmbracoContext umbracoContext = contextReference.UmbracoContext;
@@ -129,8 +101,103 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
         }
     }
 
+    private void PrepareFilters(LuceneSearchQuery searchQuery, IBooleanOperation booleanOperation, IList<ISearchFilter> searchRequestFilters, LogicOperator logicOperator)
+    {
+        foreach (var filter in searchRequestFilters)
+        {
+            if (filter.Values.Any() || filter.SubFilters.Any())
+            {
+                switch (logicOperator)
+                {
+                    case LogicOperator.OR:
+                        booleanOperation = booleanOperation.Or(x =>
+                        {
+                            if (filter.Values.Any())
+                            {
+                                if (filter.Values.Count == 1)
+                                {
+                                    return x.Field(filter.FieldName, filter.Values.First());
+                                }
+
+                                return x.GroupedOr(new[] { filter.FieldName }, filter.Values.ToArray());
+                            }
+
+                            if (filter.SubFilters.Any())
+                            {
+                                return PrepareSubFilters(searchQuery,x, filter.SubFilters, filter.LogicOperator);
+                            }
+                            //this is not possible
+                            return null;
+
+                        });
+                        break;
+                }
+            }
+
+        }
+    }
+
+    private INestedBooleanOperation? PrepareSubFilters(LuceneSearchQuery luceneSearchQuery, INestedQuery nestedQuery, IList<ISearchFilter> filterSubFilters, LogicOperator filterLogicOperator)
+    {
+
+        INestedBooleanOperation? targetquery = new LuceneBooleanOperation(luceneSearchQuery);
+
+        foreach (var subfilter in filterSubFilters)
+        {
+            switch (filterLogicOperator)
+            {
+                case LogicOperator.OR:
+               targetquery = targetquery.Or(x =>
+               {
+                   if (subfilter.Values.Any())
+                   {
+                       if (subfilter.Values.Count == 1)
+                       {
+                           return x.Field(subfilter.FieldName, subfilter.Values.First());
+                       }
+
+                       return x.GroupedOr(new[] { subfilter.FieldName }, subfilter.Values.ToArray());
+                   }
+
+                   return PrepareSubFilters(luceneSearchQuery,x, subfilter.SubFilters, subfilter.LogicOperator);
+
+               });
+                    break;
+                case LogicOperator.And:
+                    targetquery = targetquery.And(x =>
+                    {
+                        if (subfilter.Values.Any())
+                        {
+                            if (subfilter.Values.Count == 1)
+                            {
+                                return x.Field(subfilter.FieldName, subfilter.Values.First());
+                            }
+
+                            return x.GroupedOr(new[] { subfilter.FieldName }, subfilter.Values.ToArray());
+                        }
+
+                        return PrepareSubFilters(luceneSearchQuery,x, subfilter.SubFilters, subfilter.LogicOperator);
+
+                    });
+                    break;
+            }
+        }
+
+        return targetquery;
+    }
+
     public ISearchRequest CreateSearchRequest()
     {
         return new DefaultSearchRequest(string.Empty, new List<ISearchFilter>(), LogicOperator.OR);
+    }
+
+    public IEnumerable<PublishedSearchResult> GetAll()
+    {
+        IOrdering query = _examineIndex.CreateQuery()
+            .All();
+        using (var contextReference = _umbracoContextFactory.EnsureUmbracoContext())
+        {
+            return query.Execute().ToPublishedSearchResults(contextReference.UmbracoContext.Content);
+        }
     }
 }

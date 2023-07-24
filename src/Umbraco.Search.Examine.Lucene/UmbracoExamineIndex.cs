@@ -10,14 +10,23 @@ public class UmbracoExamineIndex
     public UmbracoExamineIndex(UmbracoExamineLuceneIndex examineIndex) => ExamineIndex = examineIndex;
 };
 
-public class UmbracoExamineIndex<T> : UmbracoExamineIndex,IUmbracoIndex<T>
+public class UmbracoExamineIndex<T> : UmbracoExamineIndex, IUmbracoIndex<T>
 {
-
     private readonly IValueSetBuilder<T> _valueSetBuilder;
+    private readonly IDisposable[]? _attachedDisposables;
 
-    public UmbracoExamineIndex(IIndex examineIndex, IValueSetBuilder<T> valueSetBuilder): base((UmbracoExamineLuceneIndex)examineIndex)
+    public UmbracoExamineIndex(IIndex examineIndex, IValueSetBuilder<T> valueSetBuilder) : base(
+        (UmbracoExamineLuceneIndex)examineIndex)
     {
         _valueSetBuilder = valueSetBuilder;
+        examineIndex.IndexOperationComplete += runIndexOperationComplete;
+    }
+
+    public UmbracoExamineIndex(IIndex examineIndex, IValueSetBuilder<T> valueSetBuilder,
+        params IDisposable[]? attachedDisposables) : base((UmbracoExamineLuceneIndex)examineIndex)
+    {
+        _valueSetBuilder = valueSetBuilder;
+        _attachedDisposables = attachedDisposables;
         examineIndex.IndexOperationComplete += runIndexOperationComplete;
     }
 
@@ -33,7 +42,7 @@ public class UmbracoExamineIndex<T> : UmbracoExamineIndex,IUmbracoIndex<T>
     public long GetDocumentCount() => ExamineIndex.GetDocumentCount();
 
     public void Create() => ExamineIndex.CreateIndex();
-    public IEnumerable<string> GetFieldNames() => ExamineIndex.FieldDefinitions.Select(x=>x.Name);
+    public IEnumerable<string> GetFieldNames() => ExamineIndex.FieldDefinitions.Select(x => x.Name);
     public void RemoveFromIndex(IEnumerable<string> ids) => throw new NotImplementedException();
 
     /// <summary>
@@ -47,4 +56,16 @@ public class UmbracoExamineIndex<T> : UmbracoExamineIndex,IUmbracoIndex<T>
         ExamineIndex.IndexItems(valueSet);
     }
 
+    public void Dispose()
+    {
+        if (_attachedDisposables?.Any() == true)
+        {
+            foreach (var disposable in _attachedDisposables)
+            {
+                disposable.Dispose();
+            }
+        }
+
+        ExamineIndex.Dispose();
+    }
 }

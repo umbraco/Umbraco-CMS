@@ -8,7 +8,7 @@ public interface IUmbracoIndex<T> : IUmbracoIndex
     void IndexItems(T[] members);
 }
 
-public interface IUmbracoIndex
+public interface IUmbracoIndex : IDisposable
 {
     string Name { get; }
     Action<object?, EventArgs>? IndexOperationComplete { get; set; }

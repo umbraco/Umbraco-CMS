@@ -8,9 +8,9 @@ using Umbraco.Search.Examine.ValueSetBuilders;
 
 namespace Umbraco.Search.Examine;
 
-public class UmbracoIndexConfig : IUmbracoExamineIndexConfig
+public class UmbracoExamineIndexConfig : IUmbracoExamineIndexConfig
 {
-    public UmbracoIndexConfig(IPublicAccessService publicAccessService, IScopeProvider scopeProvider)
+    public UmbracoExamineIndexConfig(IPublicAccessService publicAccessService, IScopeProvider scopeProvider)
     {
         ScopeProvider = scopeProvider;
         PublicAccessService = publicAccessService;
