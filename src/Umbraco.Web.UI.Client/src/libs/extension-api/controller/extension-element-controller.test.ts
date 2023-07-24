@@ -2,7 +2,7 @@ import { expect, fixture } from '@open-wc/testing';
 import { UmbExtensionElementController, UmbExtensionRegistry } from '../index.js';
 import { UmbControllerHostElement, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
-import { ManifestSection, UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
+import { type ManifestSection, UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
