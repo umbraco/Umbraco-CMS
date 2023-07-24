@@ -11,7 +11,6 @@ export const data: Array<FileSystemTreeItemPresentationModel> = [
 		isFolder: true,
 		name: 'blockgrid',
 		type: 'partial-view',
-		icon: 'umb:folder',
 		hasChildren: true,
 	},
 	{
@@ -19,7 +18,6 @@ export const data: Array<FileSystemTreeItemPresentationModel> = [
 		isFolder: true,
 		name: 'blocklist',
 		type: 'partial-view',
-		icon: 'umb:folder',
 		hasChildren: true,
 	},
 	{
@@ -27,7 +25,6 @@ export const data: Array<FileSystemTreeItemPresentationModel> = [
 		isFolder: true,
 		name: 'grid',
 		type: 'partial-view',
-		icon: 'umb:folder',
 		hasChildren: true,
 	},
 	{
@@ -35,7 +32,6 @@ export const data: Array<FileSystemTreeItemPresentationModel> = [
 		isFolder: false,
 		name: 'area.cshtml',
 		type: 'partial-view',
-		icon: 'umb:article',
 		hasChildren: false,
 	},
 	{
@@ -43,7 +39,6 @@ export const data: Array<FileSystemTreeItemPresentationModel> = [
 		isFolder: false,
 		name: 'items.cshtml',
 		type: 'partial-view',
-		icon: 'umb:article',
 		hasChildren: false,
 	},
 	{
@@ -51,7 +46,6 @@ export const data: Array<FileSystemTreeItemPresentationModel> = [
 		isFolder: false,
 		name: 'default.cshtml',
 		type: 'partial-view',
-		icon: 'umb:article',
 		hasChildren: false,
 	},
 	{
@@ -59,7 +53,6 @@ export const data: Array<FileSystemTreeItemPresentationModel> = [
 		isFolder: false,
 		name: 'editors',
 		type: 'partial-view',
-		icon: 'umb:folder',
 		hasChildren: false,
 	},
 	{
@@ -67,7 +60,6 @@ export const data: Array<FileSystemTreeItemPresentationModel> = [
 		isFolder: false,
 		name: 'items.cshtml',
 		type: 'partial-view',
-		icon: 'umb:article',
 		hasChildren: false,
 	},
 ];

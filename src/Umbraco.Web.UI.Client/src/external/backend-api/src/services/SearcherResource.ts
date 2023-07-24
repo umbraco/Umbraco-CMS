@@ -1,3 +1,4 @@
+/* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -16,7 +17,7 @@ export class SearcherResource {
      */
     public static getSearcher({
         skip,
-        take,
+        take = 100,
     }: {
         skip?: number,
         take?: number,
@@ -39,7 +40,7 @@ export class SearcherResource {
         searcherName,
         term,
         skip,
-        take,
+        take = 100,
     }: {
         searcherName: string,
         term?: string,

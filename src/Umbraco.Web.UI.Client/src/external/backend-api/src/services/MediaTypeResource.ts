@@ -1,9 +1,10 @@
+/* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 import type { MediaTypeItemResponseModel } from '../models/MediaTypeItemResponseModel';
 import type { MediaTypeResponseModel } from '../models/MediaTypeResponseModel';
-import type { PagedFolderTreeItemResponseModel } from '../models/PagedFolderTreeItemResponseModel';
+import type { PagedMediaTypeTreeItemResponseModel } from '../models/PagedMediaTypeTreeItemResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -51,7 +52,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns PagedFolderTreeItemResponseModel Success
+     * @returns PagedMediaTypeTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeMediaTypeChildren({
@@ -64,7 +65,7 @@ export class MediaTypeResource {
         skip?: number,
         take?: number,
         foldersOnly?: boolean,
-    }): CancelablePromise<PagedFolderTreeItemResponseModel> {
+    }): CancelablePromise<PagedMediaTypeTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media-type/children',
@@ -78,7 +79,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns PagedFolderTreeItemResponseModel Success
+     * @returns PagedMediaTypeTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeMediaTypeRoot({
@@ -89,7 +90,7 @@ export class MediaTypeResource {
         skip?: number,
         take?: number,
         foldersOnly?: boolean,
-    }): CancelablePromise<PagedFolderTreeItemResponseModel> {
+    }): CancelablePromise<PagedMediaTypeTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media-type/root',

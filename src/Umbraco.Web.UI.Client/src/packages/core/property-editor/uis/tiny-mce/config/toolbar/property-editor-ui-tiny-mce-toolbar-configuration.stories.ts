@@ -14,10 +14,11 @@ export default {
 } as Meta;
 
 export const AAAOverview = ({ value }: any) =>
-	html`<umb-property-editor-ui-tiny-mce-toolbar-configuration .value=${value}></umb-property-editor-ui-tiny-mce-toolbar-configuration>`;
+	html`<umb-property-editor-ui-tiny-mce-toolbar-configuration
+		.value=${value}></umb-property-editor-ui-tiny-mce-toolbar-configuration>`;
 
-	AAAOverview.storyName = 'Overview';
+AAAOverview.storyName = 'Overview';
 
-	AAAOverview.args = {
-		value: dataTypeData?.values?.find(x => x.alias === 'toolbar')?.value ?? []
-	}
+AAAOverview.args = {
+	value: dataTypeData?.values?.find((x) => x.alias === 'toolbar')?.value ?? [],
+};

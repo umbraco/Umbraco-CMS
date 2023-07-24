@@ -14,14 +14,12 @@ const uploadResponse: ImportDictionaryRequestModel = {
 
 /// TODO: get correct type
 const importResponse: DictionaryItemResponseModel & EntityTreeItemResponseModel = {
-	$type: '',
 	parentId: null,
 	name: 'Uploaded dictionary',
 	id: 'b7e7d0ab-53ba-485d-dddd-12537f9925cb',
 	hasChildren: false,
 	type: 'dictionary-item',
 	isContainer: false,
-	icon: 'umb:book-alt',
 	translations: [
 		{
 			isoCode: 'en',

@@ -51,15 +51,15 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 	}
 
 	setName(value: string) {
-		this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', name: value });
+		this.#data.next({ ...this.#data.value, name: value });
 	}
 
 	setAlias(value: string) {
-		this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', alias: value });
+		this.#data.next({ ...this.#data.value, alias: value });
 	}
 
 	setContent(value: string) {
-		this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', content: value });
+		this.#data.next({ ...this.#data.value, content: value });
 	}
 
 	getLayoutBlockRegexPattern() {
@@ -156,7 +156,7 @@ ${currentContent}`;
 		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next({ ...data, id: '', name: '', alias: '', $type: 'TemplateResponseModel' });
+		this.#data.next({ ...data, id: '', name: '', alias: '' });
 		if (!parentId) return;
 		await this.setMasterTemplate(parentId);
 	}

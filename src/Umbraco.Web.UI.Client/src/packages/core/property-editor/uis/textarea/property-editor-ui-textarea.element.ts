@@ -42,8 +42,6 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
-	//TODO: uui-textarea needs a rows property
-
 	render() {
 		return html` <uui-textarea
 			label="Textarea"

@@ -1,3 +1,4 @@
+/* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -38,7 +39,7 @@ export class RelationResource {
     public static getRelationChildRelationByChildId({
         childId,
         skip,
-        take,
+        take = 100,
         relationTypeAlias = '',
     }: {
         childId: number,

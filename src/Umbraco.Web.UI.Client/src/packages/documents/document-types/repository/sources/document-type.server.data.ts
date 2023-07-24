@@ -56,10 +56,8 @@ export class UmbDocumentTypeServerDataSource
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async createScaffold(parentId: string | null) {
-		// TODO: Type hack to append $type and parentId to the DocumentTypeResponseModel.
 		//, parentId: string | null
-		const data: DocumentTypeResponseModel & { $type: string } = {
-			$type: 'string',
+		const data: DocumentTypeResponseModel = {
 			id: UmbId.new(),
 			//parentId: parentId,
 			name: '',
@@ -99,7 +97,6 @@ export class UmbDocumentTypeServerDataSource
 		documentType = { ...documentType };
 
 		// TODO: Hack to remove some props that ruins the document-type post end-point.
-		(documentType as any).$type = undefined;
 		(documentType as any).id = undefined;
 
 		// TODO: Investigate if this matters (should go away anyway when we have the end-point accepts us defining the ids.)
@@ -131,7 +128,6 @@ export class UmbDocumentTypeServerDataSource
 		documentType = { ...documentType };
 
 		// TODO: Hack to remove some props that ruins the document-type post end-point.
-		(documentType as any).$type = undefined;
 		(documentType as any).id = undefined;
 
 		return tryExecuteAndNotify(this.#host, DocumentTypeResource.putDocumentTypeById({ id, requestBody: documentType }));

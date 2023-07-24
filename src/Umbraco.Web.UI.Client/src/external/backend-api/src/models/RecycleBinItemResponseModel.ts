@@ -1,9 +1,9 @@
+/* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 
 export type RecycleBinItemResponseModel = {
-    $type: string;
     id?: string;
     name?: string;
     type?: string;

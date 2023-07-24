@@ -111,7 +111,7 @@ export interface UmbTreeItemContext<T> {
 
 	requestChildren(): Promise<{
 		data: PagedResponse<T> | undefined;
-		error: ProblemDetailsModel | undefined;
+		error: ProblemDetails | undefined;
 		asObservable?: () => Observable<T[]>;
 	}>;
 	toggleContextMenu(): void;

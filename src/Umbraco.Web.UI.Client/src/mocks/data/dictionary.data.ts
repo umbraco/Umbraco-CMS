@@ -4,7 +4,6 @@ import type { DictionaryItemResponseModel, EntityTreeItemResponseModel } from '@
 
 export const data: Array<DictionaryItemResponseModel> = [
 	{
-		$type: '',
 		name: 'Hello',
 		id: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		translations: [
@@ -19,7 +18,6 @@ export const data: Array<DictionaryItemResponseModel> = [
 		],
 	},
 	{
-		$type: '',
 		name: 'Hello again',
 		id: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb',
 		translations: [
@@ -37,24 +35,20 @@ export const data: Array<DictionaryItemResponseModel> = [
 
 const dictionaryTree: Array<EntityTreeItemResponseModel> = [
 	{
-		$type: '',
 		parentId: null,
 		name: 'Hello',
 		id: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		hasChildren: true,
 		type: 'dictionary-item',
 		isContainer: false,
-		icon: 'umb:book-alt',
 	},
 	{
-		$type: '',
 		parentId: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		name: 'Hello again',
 		id: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb',
 		hasChildren: false,
 		type: 'dictionary-item',
 		isContainer: false,
-		icon: 'umb:book-alt',
 	},
 ];
 

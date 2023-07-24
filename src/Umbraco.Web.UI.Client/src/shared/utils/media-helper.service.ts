@@ -1,15 +1,14 @@
 // TODO => this is NOT a full reimplementation of the existing media helper service, currently
 // contains only functions referenced by the TinyMCE editor
 
-import { Editor, EditorEvent } from "tinymce";
+import { Editor, EditorEvent } from 'tinymce';
 
-export class UmbMediaHelper {	
-
+export class UmbMediaHelper {
 	/**
-	 * 
-	 * @param editor 
-	 * @param imageDomElement 
-	 * @param imgUrl 
+	 *
+	 * @param editor
+	 * @param imageDomElement
+	 * @param imgUrl
 	 */
 	async sizeImageInEditor(editor: Editor, imageDomElement: HTMLElement, imgUrl?: string) {
 		const size = editor.dom.getSize(imageDomElement);
@@ -35,12 +34,12 @@ export class UmbMediaHelper {
 		}
 	}
 
-    /**
-	 * 
-	 * @param maxSize 
-	 * @param width 
-	 * @param height 
-	 * @returns 
+	/**
+	 *
+	 * @param maxSize
+	 * @param width
+	 * @param height
+	 * @returns
 	 */
 	scaleToMaxSize(maxSize: number, width: number, height: number) {
 		const retval = { width, height };
@@ -73,10 +72,10 @@ export class UmbMediaHelper {
 	}
 
 	/**
-	 * 
-	 * @param imagePath 
-	 * @param options 
-	 * @returns 
+	 *
+	 * @param imagePath
+	 * @param options
+	 * @returns
 	 */
 	async getProcessedImageUrl(imagePath: string, options: any) {
 		if (!options) {
@@ -85,14 +84,14 @@ export class UmbMediaHelper {
 
 		// TODO => use backend cli when available
 		const result = await fetch('/umbraco/management/api/v1/images/GetProcessedImageUrl');
-		const url = await result.json() as string;
+		const url = (await result.json()) as string;
 
 		return url;
 	}
 
 	/**
-	 * 
-	 * @param editor 
+	 *
+	 * @param editor
 	 */
 	async uploadBlobImages(editor: Editor) {
 		const content = editor.getContent();
@@ -163,9 +162,9 @@ export class UmbMediaHelper {
 	}
 
 	/**
-	 * 
-	 * @param e 
-	 * @returns 
+	 *
+	 * @param e
+	 * @returns
 	 */
 	async onResize(
 		e: EditorEvent<{

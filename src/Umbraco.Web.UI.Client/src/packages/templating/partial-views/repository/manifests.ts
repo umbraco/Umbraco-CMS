@@ -1,4 +1,4 @@
-import { UmbTemplateRepository } from '../repository/partial-views.repository.js';
+import { UmbPartialViewsRepository } from '../repository/partial-views.repository.js';
 import { PARTIAL_VIEW_REPOSITORY_ALIAS } from '../config.js';
 import { UmbPartialViewsTreeStore } from './partial-views.tree.store.js';
 import { UmbPartialViewsStore } from './partial-views.store.js';
@@ -8,7 +8,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: PARTIAL_VIEW_REPOSITORY_ALIAS,
 	name: 'Partial Views Repository',
-	class: UmbTemplateRepository,
+	class: UmbPartialViewsRepository,
 };
 
 export const PARTIAL_VIEW_STORE_ALIAS = 'Umb.Store.PartialViews';

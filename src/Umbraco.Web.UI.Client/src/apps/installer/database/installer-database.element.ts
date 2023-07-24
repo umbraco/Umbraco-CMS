@@ -16,7 +16,7 @@ import {
 	DatabaseInstallResponseModel,
 	DatabaseSettingsPresentationModel,
 	InstallResource,
-	ProblemDetailsModel,
+	ProblemDetails,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
@@ -216,7 +216,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		history.replaceState(null, '', 'section/content');
 	}
 
-	private _handleRejected(e: ProblemDetailsModel) {
+	private _handleRejected(e: ProblemDetails) {
 		this._installerContext?.setInstallStatus(e);
 	}
 

@@ -56,6 +56,7 @@ export class UmbDocumentRepository
 	// TODO: Move
 
 	// TREE:
+
 	async requestTreeRoot() {
 		await this.#init;
 
@@ -93,6 +94,17 @@ export class UmbDocumentRepository
 		}
 
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
+	}
+
+	// Structure permissions;
+
+	async requestAllowedDocumentTypesAtRoot() {
+		return this.#detailDataSource.getAllowedDocumentTypesAtRoot();
+	}
+	async requestAllowedDocumentTypesOf(id: string) {
+		if (!id) throw new Error('Id is missing');
+		await this.#init;
+		return this.#detailDataSource.getAllowedDocumentTypesOf(id);
 	}
 
 	async requestItemsLegacy(ids: Array<string>) {

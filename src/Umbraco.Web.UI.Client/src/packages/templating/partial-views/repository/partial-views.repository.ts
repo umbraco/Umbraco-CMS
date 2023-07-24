@@ -4,11 +4,14 @@ import { UmbPartialViewsTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } f
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import { EntityTreeItemResponseModel, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbTreeRootEntityModel } from '@umbraco-cms/backoffice/tree';
+import { PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../config.js';
 
-export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailRepository<any> {
+export class UmbPartialViewsRepository
+	implements UmbTreeRepository<EntityTreeItemResponseModel>, UmbDetailRepository<any>
+{
 	#init;
 	#host: UmbControllerHostElement;
 
@@ -30,15 +33,10 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 		]);
 	}
 
-	requestTreeRoot(): Promise<{ data?: UmbTreeRootEntityModel | undefined; error?: ProblemDetailsModel | undefined }> {
-		//throw new Error('Method not implemented.');
-		return { data: undefined, error: undefined } as any;
-	}
-
 	requestItemsLegacy?:
 		| ((uniques: string[]) => Promise<{
 				data?: any[] | undefined;
-				error?: ProblemDetailsModel | undefined;
+				error?: ProblemDetails | undefined;
 				asObservable?: (() => Observable<any[]>) | undefined;
 		  }>)
 		| undefined;
@@ -52,11 +50,26 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 	// TODO: This method to be done, or able to go away?
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
-	requestById(id: string): Promise<{ data?: any; error?: ProblemDetailsModel | undefined }> {
+	requestById(id: string): Promise<{ data?: any; error?: ProblemDetails | undefined }> {
 		throw new Error('Method not implemented.');
 	}
 
 	// TREE:
+
+	async requestTreeRoot() {
+
+		await this.#init;
+
+		const data = {
+			id: null,
+			path: null,
+			type: PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+			name: 'Partial Views',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+		return { data };
+	}
 
 	async requestRootTreeItems() {
 		await this.#init;
@@ -71,8 +84,10 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 	}
 
 	async requestTreeItemsOf(path: string | null) {
-		if (!path) throw new Error('Cannot request tree item with missing path');
-
+		if (path === null) {
+			return this.requestRootTreeItems();
+		}
+		
 		await this.#init;
 
 		const { data, error } = await this.#treeDataSource.getChildrenOf({ path });
@@ -88,7 +103,7 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 		await this.#init;
 
 		if (!keys) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
+			const error: ProblemDetails = { title: 'Keys are missing' };
 			return { data: undefined, error };
 		}
 

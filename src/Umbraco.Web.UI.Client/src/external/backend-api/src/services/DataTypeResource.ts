@@ -1,3 +1,4 @@
+/* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -9,7 +10,7 @@ import type { DataTypeReferenceResponseModel } from '../models/DataTypeReference
 import type { DataTypeResponseModel } from '../models/DataTypeResponseModel';
 import type { FolderReponseModel } from '../models/FolderReponseModel';
 import type { MoveDataTypeRequestModel } from '../models/MoveDataTypeRequestModel';
-import type { PagedFolderTreeItemResponseModel } from '../models/PagedFolderTreeItemResponseModel';
+import type { PagedDataTypeTreeItemResponseModel } from '../models/PagedDataTypeTreeItemResponseModel';
 import type { UpdateDataTypeRequestModel } from '../models/UpdateDataTypeRequestModel';
 import type { UpdateFolderReponseModel } from '../models/UpdateFolderReponseModel';
 
@@ -325,7 +326,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns PagedFolderTreeItemResponseModel Success
+     * @returns PagedDataTypeTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeDataTypeChildren({
@@ -338,7 +339,7 @@ export class DataTypeResource {
         skip?: number,
         take?: number,
         foldersOnly?: boolean,
-    }): CancelablePromise<PagedFolderTreeItemResponseModel> {
+    }): CancelablePromise<PagedDataTypeTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/data-type/children',
@@ -352,7 +353,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns PagedFolderTreeItemResponseModel Success
+     * @returns PagedDataTypeTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeDataTypeRoot({
@@ -363,7 +364,7 @@ export class DataTypeResource {
         skip?: number,
         take?: number,
         foldersOnly?: boolean,
-    }): CancelablePromise<PagedFolderTreeItemResponseModel> {
+    }): CancelablePromise<PagedDataTypeTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/data-type/root',

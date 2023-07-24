@@ -1,3 +1,4 @@
+/* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -17,7 +18,7 @@ export class HelpResource {
         section,
         tree,
         skip,
-        take,
+        take = 100,
         baseUrl = 'https://our.umbraco.com',
     }: {
         section?: string,

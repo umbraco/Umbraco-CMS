@@ -365,7 +365,6 @@ export const createTreeItem = (item: CreateDataTypeRequestModel): FolderTreeItem
 	if (!item.id) throw new Error('item.id is null or undefined');
 
 	return {
-		$type: 'FolderTreeItemResponseModel',
 		type: 'data-type',
 		parentId: item.parentId,
 		name: item.name,

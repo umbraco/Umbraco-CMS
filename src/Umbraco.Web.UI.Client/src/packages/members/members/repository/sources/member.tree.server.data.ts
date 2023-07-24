@@ -45,7 +45,7 @@ export class UmbMemberTreeServerDataSource implements MemberTreeDataSource {
 		return { data, error: undefined };
 
 		// if (ids) {
-		// 	const error: ProblemDetailsModel = { title: 'Ids are missing' };
+		// 	const error: ProblemDetails = { title: 'Ids are missing' };
 		// 	return { error };
 		// }
 

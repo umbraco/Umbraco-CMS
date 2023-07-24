@@ -1,3 +1,4 @@
+/* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -45,7 +46,7 @@ export class TrackedReferenceResource {
     public static getTrackedReferenceDescendantsByParentId({
         parentId,
         skip,
-        take,
+        take = 20,
         filterMustBeIsDependency = true,
     }: {
         parentId: string,

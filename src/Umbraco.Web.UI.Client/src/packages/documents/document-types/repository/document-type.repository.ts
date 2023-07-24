@@ -14,7 +14,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
-type ItemType = DocumentTypeResponseModel & { $type: string };
+type ItemType = DocumentTypeResponseModel;
 
 export class UmbDocumentTypeRepository
 	implements
@@ -181,7 +181,7 @@ export class UmbDocumentTypeRepository
 
 			// Temporary hack while we are not in control of IDs:
 
-			const newDocument = { ...(await this.requestById(newId)).data, $type: '' };
+			const newDocument = { ...(await this.requestById(newId)).data };
 
 			if (newDocument) {
 				const notification = { data: { message: `Document Type created` } };
@@ -255,7 +255,6 @@ export const createTreeItem = (item: ItemType): FolderTreeItemResponseModel => {
 
 	// TODO: needs parentID, this is missing in the current model. Should be good when updated to a createModel.
 	return {
-		$type: 'FolderTreeItemResponseModel',
 		type: 'document-type',
 		parentId: null,
 		name: item.name,

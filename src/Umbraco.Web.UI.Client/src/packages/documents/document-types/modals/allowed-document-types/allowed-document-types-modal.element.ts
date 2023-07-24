@@ -1,16 +1,16 @@
-import { UmbDocumentTypeRepository } from '../../repository/document-type.repository.js';
 import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbAllowedDocumentTypesModalData, UmbAllowedDocumentTypesModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
-import { DocumentTypeResponseModel, DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-allowed-document-types-modal')
 export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	UmbAllowedDocumentTypesModalData,
 	UmbAllowedDocumentTypesModalResult
 > {
-	#documentTypeRepository = new UmbDocumentTypeRepository(this);
+	#documentRepository = new UmbDocumentRepository(this);
 
 	@state()
 	private _allowedDocumentTypes: DocumentTypeTreeItemResponseModel[] = [];
@@ -39,34 +39,21 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	}
 
 	private async _retrieveAllowedChildrenOf(id: string) {
-		const { data } = await this.#documentTypeRepository.requestAllowedChildTypesOf(id);
+		const { data } = await this.#documentRepository.requestAllowedDocumentTypesOf(id);
 
 		if (data) {
-			this._allowedDocumentTypes = data;
+			// TODO: implement pagination, or get 1000?
+			this._allowedDocumentTypes = data.items;
 		}
 	}
 
 	private async _retrieveAllowedChildrenOfRoot() {
-		// TODO: This is a hack until we get the right end points (Which will become a Document end point. meaning this modal should have another name, it should be named so its clear that this is for documents, not document types. ex.: 'create-document-modal')
-		const { data } = await this.#documentTypeRepository.requestRootTreeItems();
-		if (!data) return;
+		const { data } = await this.#documentRepository.requestAllowedDocumentTypesAtRoot();
 
-		const allFullModels: Array<DocumentTypeResponseModel & { $type: '' }> = [];
-		await Promise.all(
-			data.items.map((item) => {
-				if (item.id) {
-					return this.#documentTypeRepository.requestById(item.id).then((result) => {
-						if (result.data) {
-							allFullModels.push({ $type: '', ...result.data });
-						}
-					});
-				}
-				return Promise.resolve();
-			})
-		);
-
-		this._allowedDocumentTypes = allFullModels.filter((item) => item.allowedAsRoot) ?? [];
-		// End of hack...^^
+		if (data) {
+			// TODO: implement pagination, or get 1000?
+			this._allowedDocumentTypes = data.items;
+		}
 	}
 
 	private _handleCancel() {
@@ -83,7 +70,7 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 
 	render() {
 		return html`
-			<umb-body-layout headline=${this._headline}>
+			<umb-body-layout headline=${this._headline ?? ''}>
 				<uui-box>
 					${this._allowedDocumentTypes.length === 0 ? html`<p>No allowed types</p>` : nothing}
 					${this._allowedDocumentTypes.map(
