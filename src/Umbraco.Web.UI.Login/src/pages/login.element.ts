@@ -168,15 +168,11 @@ export default class UmbLoginElement extends LitElement {
 				width: 100%;
 				border-radius: var(--uui-border-radius);
 			}
-			uui-label {
-				font-weight: 400;
-			}
 			#login-button {
 				width: 100%;
 				margin-top: var(--uui-size-space-5);
-				/* margin-left: auto;
-				display: flex;
-				width: fit-content; */
+				--uui-button-padding-top-factor: 1.5;
+				--uui-button-padding-bottom-factor: 1.5;
 			}
 			#forgot-password {
 				color: var(--uui-color-interactive);
