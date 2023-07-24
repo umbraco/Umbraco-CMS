@@ -11,6 +11,7 @@ public enum ContentTypeOperationStatus
     DataTypeNotFound,
     InvalidInheritance,
     InvalidComposition,
+    InvalidParent,
     CompositionTypeNotFound,
     NotFound,
     ParentNotFound,

@@ -41,11 +41,11 @@ public partial class ContentTypeEditingServiceTests : UmbracoIntegrationTest
             Name = name,
             Alias = alias ?? ShortStringHelper.CleanStringForSafeAlias(name),
             Key = key ?? Guid.NewGuid(),
+            ParentKey = parentKey,
             Properties = propertyTypes ?? Enumerable.Empty<ContentTypePropertyTypeModel>(),
             Containers = containers ?? Enumerable.Empty<ContentTypePropertyContainerModel>(),
             Compositions = compositions ?? Enumerable.Empty<Composition>(),
-            IsElement = isElement,
-            ParentKey = parentKey,
+            IsElement = isElement
         };
 
     private ContentTypePropertyTypeModel CreatePropertyType(

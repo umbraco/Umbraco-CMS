@@ -47,6 +47,9 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
             ContentTypeOperationStatus.InvalidComposition => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid composition")
                 .WithDetail("The specified composition is invalid")),
+            ContentTypeOperationStatus.InvalidParent => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid parent")
+                .WithDetail("The specified parent is invalid, or cannot be used in combination with the specified composition/inheritance")),
             ContentTypeOperationStatus.ParentNotFound => NotFound(new ProblemDetailsBuilder()
                 .WithTitle("Parent not found")
                 .WithDetail("The specified parent was not found")

@@ -8,13 +8,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 public partial class ContentTypeEditingServiceTests
 {
-    [Test]
-    public async Task Can_Create_Basic_ContentType()
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Can_Create_Basic_ContentType(bool isElement)
     {
         var name = "Test";
         var alias = "test";
 
-        var createModel = CreateCreateModel(alias: alias, name: name, isElement: true);
+        var createModel = CreateCreateModel(alias: alias, name: name, isElement: isElement);
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         // Ensure it's actually persisted
@@ -24,12 +25,32 @@ public partial class ContentTypeEditingServiceTests
         {
             Assert.IsTrue(result.Success);
             Assert.IsNotNull(contentType);
-            Assert.IsTrue(contentType.IsElement);
+            Assert.AreEqual(isElement, contentType.IsElement);
             Assert.AreEqual(alias, contentType.Alias);
             Assert.AreEqual(name, contentType.Name);
             Assert.AreEqual(result.Result.Id, contentType.Id);
             Assert.AreEqual(result.Result.Key, contentType.Key);
         });
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Create_ContentType_In_A_Folder(bool isElement)
+    {
+        var containerResult = ContentTypeService.CreateContainer(Constants.System.Root, Guid.NewGuid(), "Test folder");
+        Assert.IsTrue(containerResult.Success);
+        var container = containerResult.Result?.Entity;
+        Assert.IsNotNull(container);
+
+        var createModel = CreateCreateModel("Test", "test", isElement: isElement, parentKey: container.Key);
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        // Ensure it's actually persisted in the folder
+        var contentType = await ContentTypeService.GetAsync(result.Result!.Key);
+        Assert.IsNotNull(contentType);
+        Assert.AreEqual(container.Id, contentType.ParentId);
+        Assert.AreEqual(isElement, contentType.IsElement);
     }
 
     [Test]
@@ -233,8 +254,7 @@ public partial class ContentTypeEditingServiceTests
         var childModel = CreateCreateModel(
             name: "Child",
             propertyTypes: new[] { childProperty },
-            compositions: composition,
-            parentKey: parentKey);
+            compositions: composition);
 
         var result = await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
 
@@ -277,8 +297,7 @@ public partial class ContentTypeEditingServiceTests
         var childModel = CreateCreateModel(
             name: "Child",
             propertyTypes: new[] { childProperty },
-            compositions: composition,
-            parentKey: rootKey);
+            compositions: composition);
 
         var childResult = await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(childResult.Success);
@@ -296,8 +315,7 @@ public partial class ContentTypeEditingServiceTests
         var grandchildModel = CreateCreateModel(
             name: "Grandchild",
             propertyTypes: new[] { grandchildProperty },
-            compositions: grandchildComposition,
-            parentKey: childKey);
+            compositions: grandchildComposition);
 
         var grandchildResult = await ContentTypeEditingService.CreateAsync(grandchildModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(grandchildResult.Success);
@@ -343,8 +361,7 @@ public partial class ContentTypeEditingServiceTests
                 {
                     CompositionType = CompositionType.Inheritance, Key = baseResult.Result!.Key
                 },
-            },
-            parentKey: baseResult.Result.Key);
+            });
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
@@ -352,6 +369,41 @@ public partial class ContentTypeEditingServiceTests
             Assert.IsFalse(result.Success);
             Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
         });
+    }
+
+    [Test]
+    public async Task Cannot_Have_Multiple_Inheritance()
+    {
+        var parentModel1 = CreateCreateModel(name: "Parent1");
+        var parentModel2 = CreateCreateModel(name: "Parent2");
+
+        var parentKey1 = (await ContentTypeEditingService.CreateAsync(parentModel1, Constants.Security.SuperUserKey)).Result?.Key;
+        Assert.IsTrue(parentKey1.HasValue);
+        var parentKey2 = (await ContentTypeEditingService.CreateAsync(parentModel2, Constants.Security.SuperUserKey)).Result?.Key;
+        Assert.IsTrue(parentKey2.HasValue);
+
+        var childProperty = CreatePropertyType("Child Property", "childProperty");
+        Composition[] composition =
+        {
+            new()
+            {
+                CompositionType = CompositionType.Inheritance, Key = parentKey1.Value,
+            },
+            new()
+            {
+                CompositionType = CompositionType.Inheritance, Key = parentKey2.Value,
+            },
+        };
+
+        var childModel = CreateCreateModel(
+            name: "Child",
+            propertyTypes: new[] { childProperty },
+            compositions: composition);
+
+        var result = await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
     }
 
     [Test]
@@ -404,5 +456,53 @@ public partial class ContentTypeEditingServiceTests
             Assert.IsFalse(result.Success);
             Assert.AreEqual(ContentTypeOperationStatus.CompositionTypeNotFound, result.Status);
         });
+    }
+
+    [Test]
+    public async Task Cannot_Mix_Inheritance_And_ParentKey()
+    {
+        var parentModel = CreateCreateModel(name: "Parent");
+        var parentKey = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result?.Key;
+        Assert.IsTrue(parentKey.HasValue);
+
+        var containerResult = ContentTypeService.CreateContainer(Constants.System.Root, Guid.NewGuid(), "Test folder");
+        Assert.IsTrue(containerResult.Success);
+        var container = containerResult.Result?.Entity;
+        Assert.IsNotNull(container);
+
+        Composition[] composition =
+        {
+            new()
+            {
+                CompositionType = CompositionType.Inheritance, Key = parentKey.Value,
+            }
+        };
+
+        var childModel = CreateCreateModel(
+            name: "Child",
+            parentKey: container.Key,
+            compositions: composition);
+
+        var result = await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidParent, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Use_ContentType_As_ParentKey()
+    {
+        var parentModel = CreateCreateModel(name: "Parent");
+        var parentKey = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result?.Key;
+        Assert.IsTrue(parentKey.HasValue);
+
+        var childModel = CreateCreateModel(
+            name: "Child",
+            parentKey: parentKey.Value);
+
+        var result = await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.ParentNotFound, result.Status);
     }
 }

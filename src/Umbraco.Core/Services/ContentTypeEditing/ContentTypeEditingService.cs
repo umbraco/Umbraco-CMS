@@ -64,31 +64,30 @@ public class ContentTypeEditingService : IContentTypeEditingService
 
         // validate property data types exists.
         Guid[] dataTypeKeys = model.Properties.Select(property => property.DataTypeKey).ToArray();
-        Dictionary<Guid, IDataType> dataTypesByKey = (await _dataTypeService.GetAllAsync(dataTypeKeys))
-            .ToDictionary(x => x.Key);
-
+        var dataTypesByKey = (await _dataTypeService.GetAllAsync(dataTypeKeys)).ToDictionary(x => x.Key);
         if (dataTypeKeys.Length != dataTypesByKey.Count)
         {
             return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidDataType, null);
         }
 
-        // Only one composition can be inherited, and the key of that composition must be the parent ID.
-        Composition[] inheritedCompositions = model
+        Guid[] KeysForCompositionType(CompositionType compositionType) => model
             .Compositions
-            .Where(x => x.CompositionType is CompositionType.Inheritance)
+            .Where(c => c.CompositionType == compositionType)
+            .Select(c => c.Key)
             .ToArray();
-        Guid[] compositionKeys = model
-            .Compositions
-            .Where(x => x.CompositionType is CompositionType.Composition)
-            .Select(x => x.Key)
-            .ToArray();
+        Guid[] inheritedKeys = KeysForCompositionType(CompositionType.Inheritance);
+        Guid[] compositionKeys = KeysForCompositionType(CompositionType.Composition);
 
-        if (inheritedCompositions.Any() &&
-             (inheritedCompositions.Length > MaxInheritance
-            || inheritedCompositions.First().Key != model.ParentKey
-            || compositionKeys.Contains(inheritedCompositions.First().Key)))
+        // Only one composition can be of type inheritance, and composed items cannot also be inherited.
+        if (inheritedKeys.Length > MaxInheritance || compositionKeys.Intersect(inheritedKeys).Any())
         {
             return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidInheritance, null);
+        }
+
+        // a content type cannot be created/saved in an entity container (a folder) if has an inheritance type composition
+        if (inheritedKeys.Any() && model.ParentKey.HasValue)
+        {
+            return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidParent, null);
         }
 
         // Validate that the all the compositions are allowed
@@ -103,7 +102,7 @@ public class ContentTypeEditingService : IContentTypeEditingService
                 .Select(x => x.Composition.Key);
 
         // Both inheritance and compositions.
-        Guid[] allCompositionKeys = inheritedCompositions.Select(x => x.Key).Union(compositionKeys).ToArray();
+        Guid[] allCompositionKeys = inheritedKeys.Union(compositionKeys).ToArray();
         IContentTypeComposition[] allCompositionTypes = allContentTypes.Where(x => allCompositionKeys.Contains(x.Key)).ToArray();
 
         if (allCompositionKeys.Length != allCompositionTypes.Length)
@@ -136,38 +135,38 @@ public class ContentTypeEditingService : IContentTypeEditingService
         model.Properties = model.Properties.Where(propertyType => propertyType.Alias.IsNullOrWhiteSpace() is false).ToArray();
         model.Containers = model.Containers.Where(container => container.Name.IsNullOrWhiteSpace() is false).ToArray();
 
-        int? parentId = null;
-        if (model.ParentKey is not null)
+        // figure out the content type parent; it is either
+        // - the specified composition of type inheritance (the content type has a parent content type)
+        // - the specified parent ID (the content type is placed in a container/folder)
+        // - root if none of the above
+        int? parentId;
+        if (inheritedKeys.Any())
         {
-            Attempt<int> parentContentTypeIdAttempt = _entityService.GetId(model.ParentKey.Value, UmbracoObjectTypes.DocumentType);
+            Attempt<int> parentContentTypeIdAttempt = _entityService.GetId(inheritedKeys.First(), UmbracoObjectTypes.DocumentType);
             if (parentContentTypeIdAttempt.Success is false)
             {
-                // Of course document document type container is a separate thing, so we have to try again if we can't find it >:(
-                // We can probably do this smarter....
-
-                // TODO: Make this not suck
-                // Try container...
-                Attempt<int> containerIdAttempt = _entityService.GetId(model.ParentKey.Value, UmbracoObjectTypes.DocumentTypeContainer);
-
-                if (containerIdAttempt.Success is false)
-                {
-                    return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.ParentNotFound, null);
-                }
-
-                parentId = containerIdAttempt.Result;
+                return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidInheritance, null);
             }
-            else
+
+            parentId = parentContentTypeIdAttempt.Result;
+        }
+        else if (model.ParentKey.HasValue)
+        {
+            Attempt<int> containerIdAttempt = _entityService.GetId(model.ParentKey.Value, UmbracoObjectTypes.DocumentTypeContainer);
+            if (containerIdAttempt.Success is false)
             {
-                parentId = parentContentTypeIdAttempt.Result;
+                return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.ParentNotFound, null);
             }
+
+            parentId = containerIdAttempt.Result;
         }
         else
         {
             parentId = Constants.System.Root;
         }
 
-
         var contentType = new ContentType(_shortStringHelper, parentId.Value);
+
         // update basic content type settings
         // We want to allow the FE to specify a key
         if (model.Key is not null)
