@@ -23,7 +23,7 @@ function fileManager($rootScope) {
          * @description
          * The max file size allowed to be uploaded to the server in bytes
          */
-        maxFileSize: parseInt(Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize ?? '0', 10),
+        maxFileSize: parseInt(Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize ?? '0', 10) * 1000,
 
         /**
          * @ngdoc function
