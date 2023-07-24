@@ -53,6 +53,57 @@ public partial class ContentTypeEditingServiceTests
         Assert.AreEqual(isElement, contentType.IsElement);
     }
 
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Can_Create_ContentType_With_Properties_In_A_Container(bool isElement)
+    {
+        var createModel = CreateCreateModel("Test", "test", isElement: isElement);
+        var container = CreateContainer();
+        createModel.Containers = new[] { container };
+
+        var propertyType = CreatePropertyType(name: "Test Property", alias: "testProperty", containerKey: container.Key);
+        createModel.Properties = new[] { propertyType };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        // Ensure it's actually persisted
+        var contentType = await ContentTypeService.GetAsync(result.Result!.Key);
+
+        Assert.IsNotNull(contentType);
+        Assert.AreEqual(isElement, contentType.IsElement);
+        Assert.AreEqual(1, contentType.PropertyGroups.Count);
+        Assert.AreEqual(1, contentType.PropertyTypes.Count());
+        Assert.AreEqual(1, contentType.PropertyGroups.First().PropertyTypes!.Count);
+        Assert.AreEqual("testProperty", contentType.PropertyTypes.First().Alias);
+        Assert.AreEqual("testProperty", contentType.PropertyGroups.First().PropertyTypes!.First().Alias);
+        Assert.IsEmpty(contentType.NoGroupPropertyTypes);
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Can_Create_ContentType_With_Orphaned_Properties(bool isElement)
+    {
+        var createModel = CreateCreateModel("Test", "test", isElement: isElement);
+
+        var propertyType = CreatePropertyType(name: "Test Property", alias: "testProperty");
+        createModel.Properties = new[] { propertyType };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        // Ensure it's actually persisted
+        var contentType = await ContentTypeService.GetAsync(result.Result!.Key);
+
+        Assert.IsNotNull(contentType);
+        Assert.AreEqual(isElement, contentType.IsElement);
+        Assert.IsEmpty(contentType.PropertyGroups);
+        Assert.AreEqual(1, contentType.PropertyTypes.Count());
+        Assert.AreEqual("testProperty", contentType.PropertyTypes.First().Alias);
+        Assert.AreEqual(1, contentType.NoGroupPropertyTypes.Count());
+        Assert.AreEqual("testProperty", contentType.NoGroupPropertyTypes.First().Alias);
+    }
+
     [Test]
     public async Task Can_Specify_Key()
     {

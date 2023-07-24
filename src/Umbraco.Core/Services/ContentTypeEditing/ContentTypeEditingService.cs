@@ -35,7 +35,6 @@ public class ContentTypeEditingService : IContentTypeEditingService
     {
         // Ensure no duplicate alias across documents, members, and media. Since this would break ModelsBuilder/published cache.
         // This this method gets aliases across documents, members, and media, so it covers it all
-        // TODO: This can probably be optimized, we need all the content types later anyway to validate the compositions.
         if (_contentTypeService.GetAllContentTypeAliases().Contains(model.Alias))
         {
             return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.DuplicateAlias, null);
@@ -91,19 +90,19 @@ public class ContentTypeEditingService : IContentTypeEditingService
         }
 
         // Validate that the all the compositions are allowed
-        // Would be nice to maybe have this in a little nicer way, but for now it should be okay.
-        IContentTypeComposition[] allContentTypes = _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+        IContentType[] allContentTypes = _contentTypeService.GetAll().ToArray();
+        IContentTypeComposition[] allContentTypesCompositions = allContentTypes.OfType<IContentTypeComposition>().ToArray();
 
         IEnumerable<Guid> allowedCompositionKeys =
             // NOTE: Here if we're checking for create we should pass null, otherwise the updated content type.
-            _contentTypeService.GetAvailableCompositeContentTypes(null, allContentTypes, isElement: model.IsElement)
+            _contentTypeService.GetAvailableCompositeContentTypes(null, allContentTypesCompositions, isElement: model.IsElement)
                 .Results
                 .Where(x => x.Allowed)
                 .Select(x => x.Composition.Key);
 
         // Both inheritance and compositions.
         Guid[] allCompositionKeys = inheritedKeys.Union(compositionKeys).ToArray();
-        IContentTypeComposition[] allCompositionTypes = allContentTypes.Where(x => allCompositionKeys.Contains(x.Key)).ToArray();
+        IContentTypeComposition[] allCompositionTypes = allContentTypesCompositions.Where(x => allCompositionKeys.Contains(x.Key)).ToArray();
 
         if (allCompositionKeys.Length != allCompositionTypes.Length)
         {
@@ -193,7 +192,7 @@ public class ContentTypeEditingService : IContentTypeEditingService
         if (allowedContentTypesUnchanged is false)
         {
             // need the content type IDs here - yet, anyway - see FIXME in Umbraco.Cms.Core.Models.ContentTypeSort
-            var allContentTypesByKey = _contentTypeService.GetAll().ToDictionary(c => c.Key);
+            var allContentTypesByKey = allContentTypes.ToDictionary(c => c.Key);
             contentType.AllowedContentTypes = model
                 .AllowedContentTypes
                 .Select((contentTypeSort, index) => allContentTypesByKey.TryGetValue(contentTypeSort.Key, out IContentType? ct)
@@ -215,6 +214,40 @@ public class ContentTypeEditingService : IContentTypeEditingService
         // FIXME: when refactoring for media and member types, this needs to be some kind of abstract implementation - media and member types do not support publishing
         const bool supportsPublishing = true;
 
+        IPropertyType MapProperty(ContentTypePropertyTypeModel property, PropertyGroup? propertyGroup)
+        {
+            // get the selected data type
+            // NOTE: this only works because we already ensured that the data type is present in the dataTypesByKey dictionary
+            IDataType dataType = dataTypesByKey[property.DataTypeKey];
+
+            // get the current property type (if it exists)
+            IPropertyType propertyType = contentType.PropertyTypes.FirstOrDefault(pt => pt.Key == property.Key)
+                                         ?? new PropertyType(_shortStringHelper, dataType);
+
+            // We are demanding a property type key in the model, so we should probably ensure that it's the on that's actually used.
+            propertyType.Key = property.Key;
+            propertyType.Name = property.Name;
+            propertyType.DataTypeId = dataType.Id;
+            propertyType.DataTypeKey = dataType.Key;
+            propertyType.Mandatory = property.Validation.Mandatory;
+            propertyType.MandatoryMessage = property.Validation.MandatoryMessage;
+            propertyType.ValidationRegExp = property.Validation.RegularExpression;
+            propertyType.ValidationRegExpMessage = property.Validation.RegularExpressionMessage;
+            propertyType.SetVariesBy(ContentVariation.Culture, property.VariesByCulture);
+            propertyType.SetVariesBy(ContentVariation.Segment, property.VariesBySegment);
+            propertyType.Alias = property.Alias;
+            propertyType.Description = property.Description;
+            propertyType.SortOrder = property.SortOrder;
+            propertyType.LabelOnTop = property.Appearance.LabelOnTop;
+
+            if (propertyGroup is not null)
+            {
+                propertyType.PropertyGroupId = new Lazy<int>(() => propertyGroup.Id, false);
+            }
+
+            return propertyType;
+        }
+
         // update properties and groups
         PropertyGroup[] propertyGroups = model.Containers.Select(container =>
             {
@@ -235,35 +268,7 @@ public class ContentTypeEditingService : IContentTypeEditingService
                 IPropertyType[] properties = model
                     .Properties
                     .Where(property => property.ContainerKey == container.Key)
-                    .Select(property =>
-                    {
-                        // get the selected data type
-                        // NOTE: this only works because we already ensured that the data type is present in the dataTypesByKey dictionary
-                        IDataType dataType = dataTypesByKey[property.DataTypeKey];
-
-                        // get the current property type (if it exists)
-                        IPropertyType propertyType = contentType.PropertyTypes.FirstOrDefault(pt => pt.Key == property.Key)
-                                                     ?? new PropertyType(_shortStringHelper, dataType);
-
-                        // We are demanding a property type key in the model, so we should probably ensure that it's the on that's actually used.
-                        propertyType.Key = property.Key;
-                        propertyType.Name = property.Name;
-                        propertyType.DataTypeId = dataType.Id;
-                        propertyType.DataTypeKey = dataType.Key;
-                        propertyType.Mandatory = property.Validation.Mandatory;
-                        propertyType.MandatoryMessage = property.Validation.MandatoryMessage;
-                        propertyType.ValidationRegExp = property.Validation.RegularExpression;
-                        propertyType.ValidationRegExpMessage = property.Validation.RegularExpressionMessage;
-                        propertyType.SetVariesBy(ContentVariation.Culture, property.VariesByCulture);
-                        propertyType.SetVariesBy(ContentVariation.Segment, property.VariesBySegment);
-                        propertyType.PropertyGroupId = new Lazy<int>(() => propertyGroup.Id, false);
-                        propertyType.Alias = property.Alias;
-                        propertyType.Description = property.Description;
-                        propertyType.SortOrder = property.SortOrder;
-                        propertyType.LabelOnTop = property.Appearance.LabelOnTop;
-
-                        return propertyType;
-                    })
+                    .Select(property => MapProperty(property, propertyGroup))
                     .ToArray();
 
                 if (properties.Any() is false && parentContainerNamesById.ContainsKey(container.Key) is false)
@@ -282,46 +287,19 @@ public class ContentTypeEditingService : IContentTypeEditingService
             .WhereNotNull()
             .ToArray();
 
-        // Handle orphaned properties
-        IEnumerable<ContentTypePropertyTypeModel> orphanedPropertyTypeModels = model.Properties.Where(x => x.ContainerKey is null).ToArray();
-
-        if(orphanedPropertyTypeModels.Any())
-        {
-            var orphanedProperties = new List<IPropertyType>();
-            foreach (ContentTypePropertyTypeModel propertyTypeModel in orphanedPropertyTypeModels)
-            {
-                // TODO: Don't duplicate the code above
-                IDataType dataType = dataTypesByKey[propertyTypeModel.DataTypeKey];
-
-                IPropertyType existing = contentType.PropertyTypes.FirstOrDefault(pt => pt.Key == propertyTypeModel.Key)
-                                         ?? new PropertyType(_shortStringHelper, dataType);
-                existing.Name = propertyTypeModel.Name;
-                existing.DataTypeId = dataType.Id;
-                existing.DataTypeKey = dataType.Key;
-                existing.Mandatory = propertyTypeModel.Validation.Mandatory;
-                existing.MandatoryMessage = propertyTypeModel.Validation.MandatoryMessage;
-                existing.ValidationRegExp = propertyTypeModel.Validation.RegularExpression;
-                existing.ValidationRegExpMessage = propertyTypeModel.Validation.RegularExpressionMessage;
-                existing.SetVariesBy(ContentVariation.Culture, propertyTypeModel.VariesByCulture);
-                existing.SetVariesBy(ContentVariation.Segment, propertyTypeModel.VariesBySegment);
-                // existing.PropertyGroupId = new Lazy<int>(() => propertyGroup.Id, false);
-                existing.Alias = propertyTypeModel.Alias;
-                existing.Description = propertyTypeModel.Description;
-                existing.SortOrder = propertyTypeModel.SortOrder;
-                existing.LabelOnTop = propertyTypeModel.Appearance.LabelOnTop;
-
-                orphanedProperties.Add(existing);
-            }
-
-            contentType.NoGroupPropertyTypes = new PropertyTypeCollection(supportsPublishing, orphanedProperties);
-        }
-
         if (contentType.PropertyGroups.SequenceEqual(propertyGroups) is false)
         {
             contentType.PropertyGroups = new PropertyGroupCollection(propertyGroups);
         }
 
-        // FIXME: handle properties outside containers ("generic properties") if they still exist
+        // Handle orphaned properties
+        IEnumerable<ContentTypePropertyTypeModel> orphanedPropertyTypeModels = model.Properties.Where (x => x.ContainerKey is null).ToArray();
+        IPropertyType[] orphanedPropertyTypes = orphanedPropertyTypeModels.Select(property => MapProperty(property, null)).ToArray();
+        if (contentType.NoGroupPropertyTypes.SequenceEqual(orphanedPropertyTypes) is false)
+        {
+            contentType.NoGroupPropertyTypes = new PropertyTypeCollection(supportsPublishing, orphanedPropertyTypes);
+        }
+
         // Updates compositions
         // We don't actually have to worry about alias collision here because that's also checked in the service
         // We'll probably want to refactor this to be able to return a proper ContentTypeOperationStatus.
@@ -340,25 +318,22 @@ public class ContentTypeEditingService : IContentTypeEditingService
         }
 
         // We have to look up the content types we want to add to composition, since we keep a full reference.
-        // TODO: Make Async
         if (add.Any())
         {
-            IContentType[] contentTypesToAdd = _contentTypeService.GetAll(add).ToArray();
+            IContentType[] contentTypesToAdd = allContentTypes.Where(c => add.Contains(c.Key)).ToArray();
             foreach (IContentType contentTypeToAdd in contentTypesToAdd)
             {
                 contentType.AddContentType(contentTypeToAdd);
             }
-
         }
 
         // We need to handle the parent as well
-        // We've already validated that there is only one
-        Composition? parent = model.Compositions
-            .FirstOrDefault(x => x.CompositionType is CompositionType.Inheritance);
-        if(parent is not null)
+        // We've already validated that there is at most one and that it exists if it there
+        Guid? parentKey = inheritedKeys.Any() ? inheritedKeys.First() : null;
+        if (parentKey.HasValue)
         {
-            IContentType? parentType = await _contentTypeService.GetAsync(parent.Key);
-            contentType.SetParent(parentType);
+            IContentType parentContentType = allContentTypes.First(c => c.Key == parentKey.Value);
+            contentType.SetParent(parentContentType);
         }
 
         // update content type history clean-up
