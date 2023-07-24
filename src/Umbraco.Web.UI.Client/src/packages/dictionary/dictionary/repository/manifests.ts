@@ -1,4 +1,4 @@
-import { UmbDictionaryRepository } from '../repository/dictionary.repository.js';
+import { UmbDictionaryRepository } from './dictionary.repository.js';
 import { UmbDictionaryTreeStore } from './dictionary.tree.store.js';
 import { UmbDictionaryStore } from './dictionary.store.js';
 import { ManifestStore, ManifestTreeStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
