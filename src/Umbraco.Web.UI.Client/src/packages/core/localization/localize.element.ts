@@ -50,18 +50,17 @@ export class UmbLocalizeElement extends UmbLitElement {
 			this.#subscription.destroy();
 		}
 
-		this.#subscription = this.observe(localizationContext!.localize(this.key), {
-			next: (value) => {
+		this.#subscription = this.observe(localizationContext!.localize(this.key), (value) => {
+			if (value) {
 				(this.getHostElement() as HTMLElement).removeAttribute('data-umb-localize-error');
 				this.value = value;
-			},
-			error: (error) => {
-				(this.getHostElement() as HTMLElement).setAttribute('data-umb-localize-error', (error as Error).message);
+			} else {
+				(this.getHostElement() as HTMLElement).setAttribute('data-umb-localize-error', `Key not found: ${this.key}`);
+				console.warn('Key not found:', this.key);
 				if (this.debug) {
-					console.error('Failed to localize key:', this.key, error);
 					this.value = this.key;
 				}
-			},
+			}
 		});
 	}
 
