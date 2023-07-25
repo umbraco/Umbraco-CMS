@@ -10,6 +10,7 @@
 		"./controller-api": "./dist-cms/libs/controller-api/index.js",
 		"./element-api": "./dist-cms/libs/element-api/index.js",
 		"./extension-api": "./dist-cms/libs/extension-api/index.js",
+		"./localization-api": "./dist-cms/libs/localization-api/index.js",
 		"./observable-api": "./dist-cms/libs/observable-api/index.js",
 		"./auth": "./dist-cms/shared/auth/index.js",
 		"./context": "./dist-cms/shared/context/index.js",
