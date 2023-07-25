@@ -28,11 +28,11 @@ export class UmbAuthLegacyRepository {
 		};
 	}
 
-	public async resetPassword(username: string): Promise<ResetPasswordResponse> {
+	public async resetPassword(email: string): Promise<ResetPasswordResponse> {
 		const request = new Request('/umbraco/backoffice/umbracoapi/authentication/PostRequestPasswordReset', {
 			method: 'POST',
 			body: JSON.stringify({
-				username,
+				email,
 			}),
 			headers: {
 				'Content-Type': 'application/json',
