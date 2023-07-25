@@ -18,6 +18,7 @@ export abstract class UmbBaseExtensionController<
 	#manifest?: ManifestType;
 	#conditionControllers: Array<UmbExtensionCondition> = [];
 	#onPermissionChanged: (isPermitted: boolean, controller: SubClassType) => void;
+	protected _positive?: boolean;
 	#isPermitted?: boolean;
 
 	get weight() {
@@ -153,11 +154,13 @@ export abstract class UmbBaseExtensionController<
 	#onConditionsChangedCallback = async () => {
 		const oldValue = this.#isPermitted ?? false;
 		// Find a condition that is not permitted (Notice how no conditions, means that this extension is permitted)
-		const conditionsArePositive =
+		const isPositive =
 			this.#conditionsAreInitialized() &&
 			this.#conditionControllers.find((condition) => condition.permitted === false) === undefined;
 
-		if (conditionsArePositive) {
+		this._positive = isPositive;
+
+		if (isPositive) {
 			if (this.#isPermitted !== true) {
 				this.#isPermitted = await this._conditionsAreGood();
 			}
