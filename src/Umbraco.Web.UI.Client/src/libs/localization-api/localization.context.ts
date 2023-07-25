@@ -47,8 +47,8 @@ export class UmbLocalizationContext {
 	 * @param keys
 	 * @see localize
 	 */
-	localizeMany(keys: string[]): Observable<string> {
-		return of(...keys).pipe(switchMap((key) => this.localize(key)));
+	localizeMany(keys: string[]): Observable<Record<string, string>> {
+		return of(...keys).pipe(switchMap((key) => this.localize(key).pipe(map((value) => ({ [key]: value })))));
 	}
 }
 
