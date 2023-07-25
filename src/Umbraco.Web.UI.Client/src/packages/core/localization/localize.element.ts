@@ -1,7 +1,7 @@
-import { UMB_LOCALIZATION_CONTEXT } from './localization.context.js';
+import { UMB_LOCALIZATION_CONTEXT } from '@umbraco-cms/backoffice/localization-api';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { Subscription } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * This element allows you to localize a string with optional interpolation values.
@@ -24,36 +24,22 @@ export class UmbLocalizeElement extends UmbLitElement {
 	}
 
 	#value: string = '';
-	#localizationContext?: typeof UMB_LOCALIZATION_CONTEXT.TYPE;
-	#subscription?: Subscription;
+	#subscription?: UmbObserverController<string>;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_LOCALIZATION_CONTEXT, (instance) => {
-			this.#localizationContext = instance;
-			this.#load();
+			this.#load(instance);
 		});
 	}
 
-	connectedCallback() {
-		super.connectedCallback();
-		this.#load();
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		if (this.#subscription) {
-			this.#subscription.unsubscribe();
-		}
-	}
-
-	async #load() {
+	async #load(localizationContext: typeof UMB_LOCALIZATION_CONTEXT.TYPE) {
 		try {
 			if (this.#subscription) {
-				this.#subscription.unsubscribe();
+				this.#subscription.destroy();
 			}
 
-			this.#subscription = this.#localizationContext!.localize(this.key).subscribe((value) => {
+			this.#subscription = this.observe(localizationContext!.localize(this.key), (value) => {
 				this.value = value;
 			});
 		} catch (error: any) {

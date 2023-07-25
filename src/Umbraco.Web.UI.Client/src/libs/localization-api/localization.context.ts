@@ -1,10 +1,28 @@
-import { umbTranslationRegistry } from '@umbraco-cms/backoffice/localization-api';
+import { UmbTranslationRegistry } from './registry/translation.registry.js';
+import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbElement } from '@umbraco-cms/backoffice/element-api';
+import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { map, of, switchMap, type Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbLocalizationContext {
+	#translationRegistry;
+
+	constructor(host: UmbElement, umbExtensionRegistry: UmbBackofficeExtensionRegistry) {
+		this.#translationRegistry = new UmbTranslationRegistry(umbExtensionRegistry);
+
+		host.consumeContext(UMB_AUTH, (auth) => {
+			host.observe(auth.currentUser, (user) => {
+				if (user) {
+					const languageIsoCode = user.languageIsoCode ?? 'en';
+					this.#translationRegistry.register(languageIsoCode);
+				}
+			});
+		});
+	}
+
 	get translations() {
-		return umbTranslationRegistry.translations;
+		return this.#translationRegistry.translations;
 	}
 
 	/**

@@ -1,11 +1,16 @@
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { ReplaySubject } from '@umbraco-cms/backoffice/external/rxjs';
 
 export type UmbTranslationDictionary = Map<string, string>;
 
 export class UmbTranslationRegistry {
+	#extensionRegistry;
 	#innerDictionary = new ReplaySubject<UmbTranslationDictionary>(1);
 	#innerDictionaryValue: UmbTranslationDictionary = new Map();
+
+	constructor(umbExtensionRegistry: UmbBackofficeExtensionRegistry) {
+		this.#extensionRegistry = umbExtensionRegistry;
+	}
 
 	get translations() {
 		return this.#innerDictionary.asObservable();
@@ -16,7 +21,7 @@ export class UmbTranslationRegistry {
 		this.#innerDictionaryValue = new Map();
 
 		// Load new translations
-		umbExtensionsRegistry.extensionsOfType('translations').subscribe(async (extensions) => {
+		this.#extensionRegistry.extensionsOfType('translations').subscribe(async (extensions) => {
 			console.log(
 				'🚀 ~ file: translation.registry.ts:13 ~ UmbTranslationRegistry ~ this.#umbExtensionRegistry.extensionsOfType ~ extension:',
 				extensions,
@@ -72,5 +77,3 @@ export class UmbTranslationRegistry {
 		}
 	}
 }
-
-export const umbTranslationRegistry = new UmbTranslationRegistry();

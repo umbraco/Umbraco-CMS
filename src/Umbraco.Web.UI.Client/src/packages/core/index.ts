@@ -8,7 +8,6 @@ import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as modalManifests } from './modal/common/manifests.js';
 import { manifests as themeManifests } from './themes/manifests.js';
 
-import { UMB_LOCALIZATION_CONTEXT, UmbLocalizationContext } from './localization/localization.context.js';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
@@ -65,7 +64,6 @@ export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	const modalContainerElement = new UmbBackofficeModalContainerElement();
 	host.appendChild(modalContainerElement);
 
-	new UmbContextProviderController(host, UMB_LOCALIZATION_CONTEXT, new UmbLocalizationContext());
 	new UmbContextProviderController(host, UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());
 	new UmbContextProviderController(host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, new UmbModalManagerContext(host));
 };

@@ -11,6 +11,13 @@ import {
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export declare class UmbElement extends UmbControllerHostElement {
+	/**
+	 * @description Observe a RxJS source of choice.
+	 * @param {Observable<T>} source RxJS source
+	 * @param {method} callback Callback method called when data is changed.
+	 * @return {UmbObserverController} Reference to a Observer Controller instance
+	 * @memberof UmbElementMixin
+	 */
 	observe<T>(
 		source: Observable<T> | { asObservable: () => Observable<T> },
 		callback: (_value: T) => void,
