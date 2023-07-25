@@ -10,6 +10,9 @@ export default class UmbNewPasswordElement extends LitElement {
 	code: string = '';
 
 	@state()
+	user: string = '';
+
+	@state()
 	newCallState: UUIButtonState = undefined;
 
 	@state()
@@ -25,9 +28,10 @@ export default class UmbNewPasswordElement extends LitElement {
 	#validateCode = async () => {
 		// get url params
 		const urlParams = new URLSearchParams(window.location.search);
-		this.code = urlParams.get('code') || '';
+		this.code = urlParams.get('r') || '';
+		this.user = urlParams.get('u') || '';
 
-		const response = await UmbAuthMainContext.Instance.validatePasswordResetCode(this.code);
+		const response = await UmbAuthMainContext.Instance.validatePasswordResetCode(this.user, this.code);
 
 		this.page = response.status === 200 ? 'new' : 'error';
 	};

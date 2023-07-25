@@ -46,11 +46,12 @@ export class UmbAuthLegacyRepository {
 		};
 	}
 
-	public async validatePasswordResetCode(code: string): Promise<ValidatePasswordResetCodeResponse> {
+	public async validatePasswordResetCode(user: string, code: string): Promise<ValidatePasswordResetCodeResponse> {
 		const request = new Request('/umbraco/backoffice/umbracoapi/authentication/validatepasswordresetcode', {
 			method: 'POST',
 			body: JSON.stringify({
-				code,
+				userId: user,
+				resetCode: code,
 			}),
 			headers: {
 				'Content-Type': 'application/json',
