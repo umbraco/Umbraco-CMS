@@ -1,15 +1,15 @@
 import type { ManifestDashboard, ManifestSection, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const sectionAlias = 'Umb.Section.Translation';
+const sectionAlias = 'Umb.Section.Dictionary';
 
 const section: ManifestSection = {
 	type: 'section',
 	alias: sectionAlias,
-	name: 'Translation Section',
+	name: 'Dictionary Section',
 	weight: 100,
 	meta: {
-		label: 'Translation',
-		pathname: 'translation',
+		label: 'Dictionary',
+		pathname: 'dictionary',
 	},
 };
 

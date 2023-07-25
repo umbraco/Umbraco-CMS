@@ -1,13 +1,8 @@
+import { UmbPartialViewsRepository } from '../../repository/index.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbPartialViewsRepository } from '../../repository/index.js';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import {
-	UMB_CONFIRM_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UmbModalManagerContext,
-	UmbModalToken,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext, UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { SnippetItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbCreateFromSnippetPartialViewModalData {

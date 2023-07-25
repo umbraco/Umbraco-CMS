@@ -1,9 +1,7 @@
+import { UmbCreateFromSnippetPartialViewModalData } from './create-from-snippet.action.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbPartialViewPickerModalData, UmbPartialViewPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
-import { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
-import { UmbCreateFromSnippetPartialViewModalData } from './create-from-snippet.action.js';
 import { SnippetItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-partial-view-create-from-snippet-modal')
