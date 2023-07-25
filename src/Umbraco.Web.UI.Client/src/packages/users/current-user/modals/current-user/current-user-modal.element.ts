@@ -38,8 +38,8 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 
 		this.consumeContext(UMB_LOCALIZATION_CONTEXT, (instance) => {
 			instance.localizeMany(['general_close', 'general_logout']).subscribe((values) => {
-				if (values['general_close']) this.labelClose = values['general_close'];
-				if (values['general_logout']) this.labelLogout = values['general_logout'];
+				this.labelClose = values[0];
+				this.labelLogout = values[1];
 			});
 		});
 	}
@@ -72,11 +72,9 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 					<umb-extension-slot id="userProfileApps" type="userProfileApp"></umb-extension-slot>
 				</div>
 				<div slot="actions">
-					<uui-button @click=${this._close} look="secondary" label=${this.labelClose}>
-						<umb-localize key="general_close">Close</umb-localize>
-					</uui-button>
+					<uui-button @click=${this._close} look="secondary" label=${this.labelClose}> ${this.labelClose} </uui-button>
 					<uui-button @click=${this._logout} look="primary" color="danger" label=${this.labelLogout}>
-						<umb-localize key="general_logout">Log out</umb-localize>
+						${this.labelLogout}
 					</uui-button>
 				</div>
 			</umb-body-layout>
