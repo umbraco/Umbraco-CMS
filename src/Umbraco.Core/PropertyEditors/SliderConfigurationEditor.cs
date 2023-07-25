@@ -25,4 +25,19 @@ public class SliderConfigurationEditor : ConfigurationEditor<SliderConfiguration
         ioHelper, editorConfigurationParser)
     {
     }
+
+    public override Dictionary<string, object> ToConfigurationEditor(SliderConfiguration? configuration)
+    {
+        // negative step increments can be configured in the back-office. they will cause the slider to
+        // crash the entire back-office. as we can't configure min and max values for the number prevalue
+        // editor, we have to this instead to limit the damage.
+        // logically, the step increments should be inverted instead of hardcoding them to 1, but the
+        // latter might point people in the direction of their misconfiguration.
+        if (configuration?.StepIncrements <= 0)
+        {
+            configuration.StepIncrements = 1;
+        }
+
+        return base.ToConfigurationEditor(configuration);
+    }
 }
