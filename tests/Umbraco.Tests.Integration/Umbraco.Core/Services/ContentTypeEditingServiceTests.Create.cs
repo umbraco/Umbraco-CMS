@@ -216,7 +216,7 @@ public partial class ContentTypeEditingServiceTests
         var compositionType = compositionResult.Result;
 
         var createModel = CreateCreateModel(
-            name: "Document Type Using Composition",
+            name: "Content Type Using Composition",
             compositions: new[]
             {
                 new Composition
@@ -281,7 +281,7 @@ public partial class ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Can_Create_Child_Document_Type()
+    public async Task Can_Create_Child_ContentType()
     {
 
         var parentProperty = CreatePropertyType("Parent Property", "parentProperty");

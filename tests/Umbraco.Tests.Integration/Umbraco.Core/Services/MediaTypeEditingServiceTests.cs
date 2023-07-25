@@ -9,29 +9,32 @@ using PropertyTypeValidation = Umbraco.Cms.Core.Models.ContentTypeEditing.Proper
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
+/// <summary>
+/// Tests for the media type editing service. Please notice that a lot of functional test is covered by the content type
+/// editing service tests, since these services share the same base implementation.
+/// </summary>
 [TestFixture]
 [UmbracoTest(
     Database = UmbracoTestOptions.Database.NewSchemaPerTest,
     PublishedRepositoryEvents = true,
     WithApplication = true)]
-public partial class ContentTypeEditingServiceTests : UmbracoIntegrationTest
+public partial class MediaTypeEditingServiceTests : UmbracoIntegrationTest
 {
-    private IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
+    private IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService>();
 
-    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+    private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
     private const string TabContainerType = "Tab";
 
     private const string GroupContainerType = "Group";
 
-    private ContentTypeCreateModel CreateCreateModel(
+    private MediaTypeCreateModel CreateCreateModel(
         string name = "Test",
         string? alias = null,
         Guid? key = null,
-        bool isElement = false,
         Guid? parentKey = null,
-        IEnumerable<ContentTypePropertyTypeModel>? propertyTypes = null,
-        IEnumerable<ContentTypePropertyContainerModel>? containers = null,
+        IEnumerable<MediaTypePropertyTypeModel>? propertyTypes = null,
+        IEnumerable<MediaTypePropertyContainerModel>? containers = null,
         IEnumerable<Composition>? compositions = null) =>
         new()
         {
@@ -39,13 +42,12 @@ public partial class ContentTypeEditingServiceTests : UmbracoIntegrationTest
             Alias = alias ?? ShortStringHelper.CleanStringForSafeAlias(name),
             Key = key ?? Guid.NewGuid(),
             ParentKey = parentKey,
-            Properties = propertyTypes ?? Enumerable.Empty<ContentTypePropertyTypeModel>(),
-            Containers = containers ?? Enumerable.Empty<ContentTypePropertyContainerModel>(),
+            Properties = propertyTypes ?? Enumerable.Empty<MediaTypePropertyTypeModel>(),
+            Containers = containers ?? Enumerable.Empty<MediaTypePropertyContainerModel>(),
             Compositions = compositions ?? Enumerable.Empty<Composition>(),
-            IsElement = isElement
         };
 
-    private ContentTypePropertyTypeModel CreatePropertyType(
+    private MediaTypePropertyTypeModel CreatePropertyType(
         string name = "Title",
         string? alias = null,
         Guid? key = null,
@@ -62,7 +64,7 @@ public partial class ContentTypeEditingServiceTests : UmbracoIntegrationTest
             Appearance = new PropertyTypeAppearance(),
         };
 
-    private ContentTypePropertyContainerModel CreateContainer(
+    private MediaTypePropertyContainerModel CreateContainer(
         string name = "Container",
         string type = TabContainerType,
         Guid? key = null) =>
