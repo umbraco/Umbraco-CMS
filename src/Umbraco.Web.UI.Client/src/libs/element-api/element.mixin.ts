@@ -8,7 +8,7 @@ import {
 	UmbContextConsumerController,
 	UmbContextProviderController,
 } from '@umbraco-cms/backoffice/context-api';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { ObserverCallback, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export declare class UmbElement extends UmbControllerHostElement {
 	/**
@@ -20,7 +20,7 @@ export declare class UmbElement extends UmbControllerHostElement {
 	 */
 	observe<T>(
 		source: Observable<T> | { asObservable: () => Observable<T> },
-		callback: (_value: T) => void,
+		callback: ObserverCallback<T>,
 		unique?: string
 	): UmbObserverController<T>;
 	provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R>;
@@ -41,7 +41,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 */
 		observe<T>(
 			source: Observable<T> | { asObservable: () => Observable<T> },
-			callback: (_value: T) => void,
+			callback: ObserverCallback<T>,
 			unique?: string
 		) {
 			return new UmbObserverController<T>(

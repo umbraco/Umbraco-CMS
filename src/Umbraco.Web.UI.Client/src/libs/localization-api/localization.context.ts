@@ -3,7 +3,7 @@ import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbElement } from '@umbraco-cms/backoffice/element-api';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { map, of, switchMap, type Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { of, switchMap, throwError, type Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbLocalizationContext {
 	#translationRegistry;
@@ -33,7 +33,11 @@ export class UmbLocalizationContext {
 	 * @param fallback The fallback text to use if the key is not found (default: undefined).
 	 */
 	localize(key: string, fallback?: string): Observable<string> {
-		return this.translations.pipe(map((dictionary) => dictionary.get(key) ?? fallback ?? ''));
+		return this.translations.pipe(
+			switchMap((dictionary) => {
+				return dictionary.get(key) ?? fallback ?? throwError(() => new Error(`Key not found: ${key}`));
+			})
+		);
 	}
 
 	/**
