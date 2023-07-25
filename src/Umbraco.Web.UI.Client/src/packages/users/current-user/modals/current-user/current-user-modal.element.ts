@@ -1,3 +1,4 @@
+import { UMB_LOCALIZATION_CONTEXT } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_AUTH, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { UMB_APP } from '@umbraco-cms/backoffice/context';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
@@ -9,6 +10,12 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 export class UmbCurrentUserModalElement extends UmbLitElement {
 	@property({ attribute: false })
 	modalContext?: UmbModalContext;
+
+	@state()
+	protected labelClose = 'Close';
+
+	@state()
+	protected labelLogout = 'Log out';
 
 	@state()
 	private _currentUser?: UmbLoggedInUser;
@@ -25,15 +32,16 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 			this._observeCurrentUser();
 		});
 
-		this.consumeContext(UMB_AUTH, (instance) => {
-			this.#auth = instance;
-		});
-
 		this.consumeContext(UMB_APP, (instance) => {
 			this.#appContext = instance;
 		});
 
-		this._observeCurrentUser();
+		this.consumeContext(UMB_LOCALIZATION_CONTEXT, (instance) => {
+			instance.localizeMany(['general_close', 'general_logout']).subscribe((values) => {
+				if (values['general_close']) this.labelClose = values['general_close'];
+				if (values['general_logout']) this.labelLogout = values['general_logout'];
+			});
+		});
 	}
 
 	private async _observeCurrentUser() {
@@ -64,10 +72,10 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 					<umb-extension-slot id="userProfileApps" type="userProfileApp"></umb-extension-slot>
 				</div>
 				<div slot="actions">
-					<uui-button @click=${this._close} look="secondary">
+					<uui-button @click=${this._close} look="secondary" label=${this.labelClose}>
 						<umb-localize key="general_close">Close</umb-localize>
 					</uui-button>
-					<uui-button @click=${this._logout} look="primary" color="danger">
+					<uui-button @click=${this._logout} look="primary" color="danger" label=${this.labelLogout}>
 						<umb-localize key="general_logout">Log out</umb-localize>
 					</uui-button>
 				</div>
