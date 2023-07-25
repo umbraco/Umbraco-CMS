@@ -6,7 +6,7 @@ import {
 import { UmbContextToken } from '../token/context-token.js';
 import {
 	UmbContextProvideEventImplementation,
-	UmbContextUnprovidedEventImplementation,
+	//UmbContextUnprovidedEventImplementation,
 } from './context-provide.event.js';
 
 /**
@@ -70,7 +70,8 @@ export class UmbContextProvider {
 	 */
 	public hostDisconnected() {
 		this.hostElement.removeEventListener(umbContextRequestEventType, this.#handleContextRequest);
-		this.hostElement.dispatchEvent(new UmbContextUnprovidedEventImplementation(this._contextAlias, this.#instance));
+		// Out-commented for now, but kept if we like to reintroduce this:
+		//window.dispatchEvent(new UmbContextUnprovidedEventImplementation(this._contextAlias, this.#instance));
 
 		// Stop listen to our debug event 'umb:debug-contexts'
 		this.hostElement.removeEventListener(umbDebugContextEventType, this._handleDebugContextRequest);
@@ -93,5 +94,6 @@ export class UmbContextProvider {
 	destroy(): void {
 		// We want to call a destroy method on the instance, if it has one.
 		(this.#instance as any)?.destroy?.();
+		this.#instance = undefined;
 	}
 }

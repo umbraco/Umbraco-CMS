@@ -16,17 +16,21 @@ export class UmbSectionAliasCondition extends UmbBaseController implements UmbEx
 				this.observe(
 					context.alias,
 					(sectionAlias) => {
-						// TODO: Would be nice to change to match:
+						// TODO: Would be nice to make the object fully controllable by each condition, but requires some typing system.
 						this.permitted = sectionAlias === this.config.value;
 						this.#onChange();
 					},
 					'_observeSectionAlias'
 				);
-			} else {
-				this.permitted = false;
-				this.#onChange();
-				this.removeControllerByAlias('_observeSectionAlias');
 			}
+			// Niels: As is of this state, contexts cannot be unprovided, so this code is not needed:
+			/*else {
+				this.removeControllerByAlias('_observeSectionAlias');
+				if (this.permitted === true) {
+					this.permitted = false;
+					this.#onChange();
+				}
+			}*/
 		});
 	}
 
