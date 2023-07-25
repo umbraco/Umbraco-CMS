@@ -13,7 +13,6 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  */
 export class UmbContextConsumer<T = unknown> {
 	#callback?: UmbContextCallback<T | undefined>;
-	#promise?: Promise<T>;
 	#promiseResolver?: (instance: T) => void;
 
 	#instance?: T;
@@ -51,12 +50,9 @@ export class UmbContextConsumer<T = unknown> {
 	};
 
 	public asPromise() {
-		return (
-			this.#promise ||
-			(this.#promise = new Promise<T>((resolve) => {
-				this.#instance ? resolve(this.#instance) : (this.#promiseResolver = resolve);
-			}))
-		);
+		return new Promise<T>((resolve) => {
+			this.#instance ? resolve(this.#instance) : (this.#promiseResolver = resolve);
+		});
 	}
 
 	/**
@@ -107,7 +103,6 @@ export class UmbContextConsumer<T = unknown> {
 	public destroy() {
 		this.hostDisconnected();
 		this.#callback = undefined;
-		this.#promise = undefined;
 		this.#promiseResolver = undefined;
 		this.#instance = undefined;
 	}
