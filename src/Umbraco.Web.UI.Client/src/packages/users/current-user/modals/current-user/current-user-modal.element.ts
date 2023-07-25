@@ -64,8 +64,12 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 					<umb-extension-slot id="userProfileApps" type="userProfileApp"></umb-extension-slot>
 				</div>
 				<div slot="actions">
-					<uui-button @click=${this._close} look="secondary">Close</uui-button>
-					<uui-button @click=${this._logout} look="primary" color="danger">Logout</uui-button>
+					<uui-button @click=${this._close} look="secondary">
+						<umb-localize key="general_close">Close</umb-localize>
+					</uui-button>
+					<uui-button @click=${this._logout} look="primary" color="danger">
+						<umb-localize key="general_logout">Log out</umb-localize>
+					</uui-button>
 				</div>
 			</umb-body-layout>
 		`;
