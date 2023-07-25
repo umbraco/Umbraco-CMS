@@ -1,12 +1,12 @@
+import { UmbTemplatingInsertMenuElement } from '../../components/index.js';
+import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../../templates/modals/modal-tokens.js';
+import { getQuerySnippet } from '../../utils.js';
 import { UmbPartialViewsWorkspaceContext } from './partial-views-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UmbTemplatingInsertMenuElement } from '../../components/index.js';
-import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../../templates/modals/modal-tokens.js';
-import { getQuerySnippet } from '../../utils.js';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-partial-views-workspace-edit')
