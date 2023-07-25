@@ -53,6 +53,7 @@ public static class HtmlHelperBackOfficeExtensions
     /// <param name="html"></param>
     /// <param name="externalLogins"></param>
     /// <returns></returns>
+    [Obsolete("This is no longer used and will be removed in V14")]
     public static async Task<IHtmlContent> AngularValueExternalLoginInfoScriptAsync(this IHtmlHelper html,
         IBackOfficeExternalLoginProviders externalLogins,
         BackOfficeExternalLoginProviderErrors externalLoginErrors)
@@ -104,6 +105,7 @@ public static class HtmlHelperBackOfficeExtensions
     /// <param name="html"></param>
     /// <param name="val"></param>
     /// <returns></returns>
+    [Obsolete("This is no longer used and will be removed in V14")]
     public static IHtmlContent AngularValueResetPasswordCodeInfoScript(this IHtmlHelper html, object? val)
     {
         var sb = new StringBuilder();
