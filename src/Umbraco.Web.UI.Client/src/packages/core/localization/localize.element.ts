@@ -47,7 +47,7 @@ export class UmbLocalizeElement extends UmbLitElement {
 				this.value = value;
 			} else {
 				(this.getHostElement() as HTMLElement).setAttribute('data-umb-localize-error', `Key not found: ${this.key}`);
-				console.warn('Key not found:', this.key);
+				console.warn('Key not found:', this.key, this);
 				if (this.debug) {
 					this.value = this.key;
 				}
