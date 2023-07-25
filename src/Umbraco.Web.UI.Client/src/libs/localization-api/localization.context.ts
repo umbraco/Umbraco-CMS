@@ -3,7 +3,7 @@ import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbElement } from '@umbraco-cms/backoffice/element-api';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { of, switchMap, type Observable, map } from '@umbraco-cms/backoffice/external/rxjs';
+import { combineLatest, distinctUntilChanged, type Observable, map } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbLocalizationContext {
 	#translationRegistry;
@@ -29,8 +29,12 @@ export class UmbLocalizationContext {
 	 * Localize a key.
 	 * If the key is not found, the fallback is returned.
 	 * If the fallback is not provided, the key is returned.
+	 *
 	 * @param key The key to localize. The key is case sensitive.
 	 * @param fallback The fallback text to use if the key is not found (default: undefined).
+	 * @example localize('general_close').subscribe((value) => {
+	 * 	console.log(value); // 'Close'
+	 * });
 	 */
 	localize(key: string, fallback?: string): Observable<string> {
 		return this.translations.pipe(
@@ -43,12 +47,17 @@ export class UmbLocalizationContext {
 	/**
 	 * Localize many keys at once.
 	 * If a key is not found, the key is returned.
+	 *
 	 * @description This method combines the results of multiple calls to localize.
-	 * @param keys
+	 * @param keys The keys to localize. The keys are case sensitive.
+	 * @example localizeMany(['general_close', 'general_logout']).subscribe((values) => {
+	 * 	console.log(values[0]); // 'Close'
+	 * 	console.log(values[1]); // 'Log out'
+	 * });
 	 * @see localize
 	 */
-	localizeMany(keys: string[]): Observable<Record<string, string>> {
-		return of(...keys).pipe(switchMap((key) => this.localize(key).pipe(map((value) => ({ [key]: value })))));
+	localizeMany(keys: string[]) {
+		return combineLatest(keys.map((key) => this.localize(key).pipe(distinctUntilChanged())));
 	}
 }
 
