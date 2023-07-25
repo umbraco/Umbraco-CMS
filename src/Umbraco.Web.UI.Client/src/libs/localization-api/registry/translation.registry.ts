@@ -22,13 +22,6 @@ export class UmbTranslationRegistry {
 
 		// Load new translations
 		this.#extensionRegistry.extensionsOfType('translations').subscribe(async (extensions) => {
-			console.log(
-				'🚀 ~ file: translation.registry.ts:13 ~ UmbTranslationRegistry ~ this.#umbExtensionRegistry.extensionsOfType ~ extension:',
-				extensions,
-				userCulture,
-				fallbackCulture
-			);
-
 			await Promise.all(
 				extensions
 					.filter((x) => x.meta.culture === userCulture || x.meta.culture === fallbackCulture)
@@ -63,11 +56,11 @@ export class UmbTranslationRegistry {
 						}
 					})
 			);
-			this.#innerDictionary.next(this.#innerDictionaryValue);
-			console.log(
-				'🚀 ~ file: translation.registry.ts:61 ~ UmbTranslationRegistry ~ this.#umbExtensionRegistry.extensionsOfType ~ innerDictionary:',
-				this.#innerDictionaryValue
-			);
+
+			// Notify subscribers that the inner dictionary has changed.
+			if (this.#innerDictionaryValue.size > 0) {
+				this.#innerDictionary.next(this.#innerDictionaryValue);
+			}
 		});
 	}
 
