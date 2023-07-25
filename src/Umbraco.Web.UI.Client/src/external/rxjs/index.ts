@@ -15,4 +15,5 @@ export {
 	lastValueFrom,
 	firstValueFrom,
 	switchMap,
+	throwError,
 } from 'rxjs';
