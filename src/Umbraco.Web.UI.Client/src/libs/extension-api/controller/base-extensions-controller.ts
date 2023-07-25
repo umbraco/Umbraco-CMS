@@ -35,7 +35,7 @@ export abstract class UmbBaseExtensionsController<
 		// TODO: This could be optimized by just getting the aliases, well depends on the filter. (revisit one day to see how much filter is used)
 		let source = umbExtensionsRegistry?.extensionsOfType<ManifestTypeName, ManifestType>(type);
 		if (filter) {
-			source = source.pipe(map((extensions) => extensions.filter(filter)));
+			source = source.pipe(map((extensions: Array<ManifestType>) => extensions.filter(filter)));
 		}
 		this.observe(source, this.#gotManifests);
 	}
