@@ -138,7 +138,7 @@ public class BackOfficeController : UmbracoController
         // if we are not authenticated then we need to redirect to the login page
         if (!result.Succeeded)
         {
-            return RedirectToLogin(null);
+            return RedirectToLogin(null, null);
         }
 
         var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
@@ -183,7 +183,7 @@ public class BackOfficeController : UmbracoController
         if (invite == null)
         {
             _logger.LogWarning("VerifyUser endpoint reached with invalid token: NULL");
-            return RedirectToAction(nameof(Default));
+            return RedirectToLogin(null, "status=invalidToken");
         }
 
         var parts = WebUtility.UrlDecode(invite).Split('|');
@@ -191,7 +191,7 @@ public class BackOfficeController : UmbracoController
         if (parts.Length != 2)
         {
             _logger.LogWarning("VerifyUser endpoint reached with invalid token: {Invite}", invite);
-            return RedirectToAction(nameof(Default));
+            return RedirectToLogin(null, "status=invalidToken");
         }
 
         var token = parts[1];
@@ -200,7 +200,7 @@ public class BackOfficeController : UmbracoController
         if (decoded.IsNullOrWhiteSpace())
         {
             _logger.LogWarning("VerifyUser endpoint reached with invalid token: {Invite}", invite);
-            return RedirectToAction(nameof(Default));
+            return RedirectToLogin(null, "status=invalidToken");
         }
 
         var id = parts[0];
@@ -209,7 +209,7 @@ public class BackOfficeController : UmbracoController
         if (identityUser == null)
         {
             _logger.LogWarning("VerifyUser endpoint reached with non existing user: {UserId}", id);
-            return RedirectToAction(nameof(Default));
+            return RedirectToLogin(null, "status=nonExistingUser");
         }
 
         IdentityResult result = await _userManager.ConfirmEmailAsync(identityUser, decoded!);
@@ -217,7 +217,7 @@ public class BackOfficeController : UmbracoController
         if (result.Succeeded == false)
         {
             _logger.LogWarning("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
-            return RedirectToLogin("status=false&invite=3");
+            return RedirectToLogin(null, "status=false&invite=3");
         }
 
         // sign the user in
@@ -228,7 +228,7 @@ public class BackOfficeController : UmbracoController
         identityUser.LastLoginDateUtc = previousLastLoginDate;
         await _userManager.UpdateAsync(identityUser);
 
-        return RedirectToLogin("status=false&invite=1");
+        return RedirectToLogin(null, "status=false&invite=1");
     }
 
     /// <summary>
@@ -252,8 +252,7 @@ public class BackOfficeController : UmbracoController
         }
 
         // Redirect to login if we're not authorized
-        return RedirectToLogin("returnPath=" + Url.Action(nameof(AuthorizeUpgrade), this.GetControllerName()));
-
+        return RedirectToLogin(null, "returnPath=" + Url.Action(nameof(AuthorizeUpgrade), this.GetControllerName()));
     }
 
     /// <summary>
@@ -389,18 +388,13 @@ public class BackOfficeController : UmbracoController
             var result = await _userManager.VerifyUserTokenAsync(user, "Default", "ResetPassword", resetCode);
             if (result)
             {
-                //Add a flag and redirect for it to be displayed
-                TempData[ViewDataExtensions.TokenPasswordResetCode] =
-                    _jsonSerializer.Serialize(
-                        new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode });
-                return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
+                // Redirect to login with userId and resetCode
+                return RedirectToLogin("new", "userId=" + userId + "&resetCode=" + resetCode);
             }
         }
 
-        //Add error and redirect for it to be displayed
-        TempData[ViewDataExtensions.TokenPasswordResetCode] =
-            new[] { _textService.Localize("login", "resetCodeExpired") };
-        return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
+        // Redirect to login with error code
+        return RedirectToLogin(null, "status=resetCodeExpired");
     }
 
     /// <summary>
@@ -622,9 +616,14 @@ public class BackOfficeController : UmbracoController
         return Redirect("/");
     }
 
-    private LocalRedirectResult RedirectToLogin(string? parameters)
+    private LocalRedirectResult RedirectToLogin(string? path, string? parameters)
     {
         var loginUrl = Url.Action(nameof(Login), this.GetControllerName())?.ToLowerInvariant().EnsureEndsWith("/");
+
+        if (string.IsNullOrWhiteSpace(path) is false)
+        {
+            loginUrl += path;
+        }
 
         if (string.IsNullOrWhiteSpace(parameters) is false)
         {
