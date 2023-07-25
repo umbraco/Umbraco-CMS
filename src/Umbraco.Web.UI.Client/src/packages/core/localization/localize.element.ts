@@ -9,8 +9,20 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
  */
 @customElement('umb-localize')
 export class UmbLocalizeElement extends UmbLitElement {
+	/**
+	 * The key to localize. The key is case sensitive.
+	 * @attr
+	 * @example key="general_ok"
+	 */
 	@property({ type: String })
 	key!: string;
+
+	/**
+	 * If true, the key will be rendered instead of the localized value if the key is not found.
+	 * @attr
+	 */
+	@property({ type: Boolean })
+	debug = false;
 
 	@state()
 	get value(): string {
@@ -34,21 +46,31 @@ export class UmbLocalizeElement extends UmbLitElement {
 	}
 
 	async #load(localizationContext: typeof UMB_LOCALIZATION_CONTEXT.TYPE) {
-		try {
-			if (this.#subscription) {
-				this.#subscription.destroy();
-			}
-
-			this.#subscription = this.observe(localizationContext!.localize(this.key), (value) => {
-				this.value = value;
-			});
-		} catch (error: any) {
-			console.error('Failed to localize key:', this.key, error);
+		if (this.#subscription) {
+			this.#subscription.destroy();
 		}
+
+		this.#subscription = this.observe(localizationContext!.localize(this.key), {
+			next: (value) => {
+				(this.getHostElement() as HTMLElement).removeAttribute('data-umb-localize-error');
+				this.value = value;
+			},
+			error: (error) => {
+				(this.getHostElement() as HTMLElement).setAttribute('data-umb-localize-error', (error as Error).message);
+				if (this.debug) {
+					console.error('Failed to localize key:', this.key, error);
+					this.value = this.key;
+				}
+			},
+		});
 	}
 
-	render() {
+	protected render() {
 		return this.value ? html`${this.value}` : html`<slot></slot>`;
+	}
+
+	protected createRenderRoot(): this {
+		return this;
 	}
 }
 
