@@ -1,3 +1,4 @@
+import { hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { ReplaySubject } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -31,27 +32,15 @@ export class UmbTranslationRegistry {
 							for (const [dictionaryName, dictionary] of Object.entries(extension.meta.translations)) {
 								this.#addOrUpdateDictionary(dictionaryName, dictionary);
 							}
+							return;
 						}
 
 						// If extension contains a js file, load it and add the default dictionary to the inner dictionary.
-						if (extension.loader) {
-							const loader = await extension.loader();
-							if (loader.default) {
-								for (const [dictionaryName, dictionary] of Object.entries(loader.default)) {
-									this.#addOrUpdateDictionary(dictionaryName, dictionary);
-								}
-							}
-						}
+						const loadedExtension = await loadExtension(extension);
 
-						// If extension contains a json file, load it and add the default dictionary to the inner dictionary.
-						if (extension.js) {
-							const js = await import(extension.js);
-							if (js.default) {
-								for (const [dictionaryName, dictionary] of Object.entries(js.default)) {
-									if (dictionary && typeof dictionary === 'object') {
-										this.#addOrUpdateDictionary(dictionaryName, dictionary as Record<string, string>);
-									}
-								}
+						if (loadedExtension && hasDefaultExport(loadedExtension)) {
+							for (const [dictionaryName, dictionary] of Object.entries(loadedExtension.default)) {
+								this.#addOrUpdateDictionary(dictionaryName, dictionary);
 							}
 						}
 					})
