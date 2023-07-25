@@ -25,17 +25,8 @@ export class UmbLocalizeElement extends UmbLitElement {
 	debug = false;
 
 	@state()
-	get value(): string {
-		return this.#value;
-	}
+	protected value?: string;
 
-	set value(value: string) {
-		const oldValue = this.#value;
-		this.#value = value;
-		this.requestUpdate('value', oldValue);
-	}
-
-	#value: string = '';
 	#subscription?: UmbObserverController<string>;
 
 	constructor() {
