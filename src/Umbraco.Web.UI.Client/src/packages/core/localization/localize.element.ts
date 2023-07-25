@@ -67,13 +67,6 @@ export class UmbLocalizeElement extends UmbLitElement {
 	protected render() {
 		return this.value ? html`${this.value}` : html`<slot></slot>`;
 	}
-
-	/**
-	 * This element does not use a shadow root and will render directly into the DOM.
-	 */
-	protected createRenderRoot(): this {
-		return this;
-	}
 }
 
 declare global {
