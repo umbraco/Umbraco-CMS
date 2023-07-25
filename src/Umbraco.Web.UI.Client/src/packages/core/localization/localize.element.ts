@@ -17,13 +17,6 @@ export class UmbLocalizeElement extends UmbLitElement {
 	@property({ type: String })
 	key!: string;
 
-	/**
-	 * If true, the key will be rendered instead of the localized value if the key is not found.
-	 * @attr
-	 */
-	@property({ type: Boolean })
-	debug = false;
-
 	@state()
 	get value(): string {
 		return this.#value;
@@ -56,11 +49,9 @@ export class UmbLocalizeElement extends UmbLitElement {
 				this.value = value;
 			},
 			error: (error) => {
+				console.warn('Failed to localize key:', this.key, error);
 				(this.getHostElement() as HTMLElement).setAttribute('data-umb-localize-error', (error as Error).message);
-				if (this.debug) {
-					console.error('Failed to localize key:', this.key, error);
-					this.value = this.key;
-				}
+				this.value = this.key;
 			},
 		});
 	}
