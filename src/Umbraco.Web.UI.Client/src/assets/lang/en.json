@@ -1,5 +1,6 @@
 {
 	"general": {
-		"logout": "Log out"
+		"logout": "Log out",
+		"close": "Close"
 	}
 }
