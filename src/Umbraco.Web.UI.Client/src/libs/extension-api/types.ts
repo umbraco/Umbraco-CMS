@@ -100,6 +100,15 @@ export interface ManifestClassWithClassConstructor<T = unknown> extends Manifest
 	class: ClassConstructor<T>;
 }
 
+export interface ManifestDefaultExport<T = unknown> extends ManifestWithLoader<{ default: T }> {
+	/**
+	 * The file location of the javascript file to load
+	 *
+	 * @TJS-require
+	 */
+	js?: string;
+}
+
 export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
 	extends ManifestWithLoader<{ default: ClassConstructor<ElementType> } | Omit<object, 'default'>> {
 	/**
