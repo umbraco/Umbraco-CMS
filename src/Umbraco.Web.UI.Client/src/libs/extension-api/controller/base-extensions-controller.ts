@@ -99,4 +99,10 @@ export abstract class UmbBaseExtensionsController<
 			// Idea: could be abstracted into a requestChange method, so we can override it in a subclass.
 		}
 	};
+
+	public destroy() {
+		super.destroy();
+		this._extensions = [];
+		this._permittedExts = [];
+	}
 }
