@@ -44,6 +44,7 @@
 		"./tree": "./dist-cms/packages/core/tree/index.js",
 		"./variant": "./dist-cms/packages/core/variant/index.js",
 		"./workspace": "./dist-cms/packages/core/workspace/index.js",
+		"./dictionary": "./dist-cms/packages/dictionary/dictionary/index.js",
 		"./document": "./dist-cms/packages/documents/documents/index.js",
 		"./document-blueprint": "./dist-cms/packages/documents/document-blueprints/index.js",
 		"./document-type": "./dist-cms/packages/documents/document-types/index.js",

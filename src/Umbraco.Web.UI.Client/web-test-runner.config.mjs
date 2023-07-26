@@ -88,6 +88,8 @@ export default {
 						'@umbraco-cms/backoffice/variant': './src/packages/core/variant/index.ts',
 						'@umbraco-cms/backoffice/workspace': './src/packages/core/workspace/index.ts',
 
+						'@umbraco-cms/backoffice/dictionary': './src/packages/dictionary/dictionary/index.ts',
+
 						'@umbraco-cms/backoffice/document': './src/packages/documents/documents/index.ts',
 						'@umbraco-cms/backoffice/document-blueprint': './src/packages/documents/document-blueprints/index.ts',
 						'@umbraco-cms/backoffice/document-type': './src/packages/documents/document-types/index.ts',
