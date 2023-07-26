@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -9,10 +9,8 @@ namespace Umbraco.Cms.Api.Delivery.Rendering;
 internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionStrategy
 {
     private readonly IApiPropertyRenderer _propertyRenderer;
-    private readonly bool _expandAll;
+    private bool _expandAll;
     private readonly string[] _expandAliases;
-
-    private ExpansionState _state;
 
     public RequestContextOutputExpansionStrategy(IHttpContextAccessor httpContextAccessor, IApiPropertyRenderer propertyRenderer)
     {
@@ -20,13 +18,12 @@ internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionSt
         (bool ExpandAll, string[] ExpanedAliases) initialState = InitialRequestState(httpContextAccessor);
         _expandAll = initialState.ExpandAll;
         _expandAliases = initialState.ExpanedAliases;
-        _state = ExpansionState.Initial;
     }
 
     public IDictionary<string, object?> MapElementProperties(IPublishedElement element)
         => element.Properties.ToDictionary(
             p => p.Alias,
-            p => GetPropertyValue(p, _state == ExpansionState.Expanding));
+            p => GetPropertyValue(p, _expandAll));
 
     public IDictionary<string, object?> MapContentProperties(IPublishedContent content)
         => content.ItemType == PublishedItemType.Content
@@ -52,46 +49,27 @@ internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionSt
 
     private IDictionary<string, object?> MapProperties(IEnumerable<IPublishedProperty> properties)
     {
-        // in the initial state, content properties should always be rendered (expanded if the requests dictates it).
-        // this corresponds to the root level of a content item, i.e. when the initial content rendering starts.
-        if (_state == ExpansionState.Initial)
+        var result = new Dictionary<string, object?>();
+
+        switch (_expandAll)
         {
-            // update state to pending so we don't end up here the next time around
-            _state = ExpansionState.Pending;
-            var rendered = properties.ToDictionary(
-                property => property.Alias,
-                property =>
+            case true:
+                result = properties.ToDictionary(property => property.Alias, property => GetPropertyValue(property, false));
+                break;
+            default:
+            {
+                foreach (IPublishedProperty property in properties)
                 {
-                    // update state to expanding if the property should be expanded (needed for nested elements)
-                    if (_expandAll || _expandAliases.Contains(property.Alias))
-                    {
-                        _state = ExpansionState.Expanding;
-                    }
+                    if (_expandAliases.Contains(property.Alias))
+                        _expandAll = true;
 
-                    var value = GetPropertyValue(property, _state == ExpansionState.Expanding);
-
-                    // always revert to pending after rendering the property value
-                    _state = ExpansionState.Pending;
-                    return value;
-                });
-            _state = ExpansionState.Initial;
-            return rendered;
+                    result.Add(property.Alias, GetPropertyValue(property, _expandAll));
+                }
+                break;
+            }
         }
 
-        // in an expanding state, properties should always be rendered as collapsed.
-        // this corresponds to properties of a content based property placed directly below a root level property that is being expanded
-        // (i.e. properties for picked content for an expanded content picker at root level).
-        if (_state == ExpansionState.Expanding)
-        {
-            _state = ExpansionState.Expanded;
-            var rendered = properties.ToDictionary(
-                property => property.Alias,
-                property => GetPropertyValue(property, false));
-            _state = ExpansionState.Expanding;
-            return rendered;
-        }
-
-        return new Dictionary<string, object?>();
+        return result;
     }
 
     private (bool ExpandAll, string[] ExpanedAliases) InitialRequestState(IHttpContextAccessor httpContextAccessor)
@@ -112,12 +90,4 @@ internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionSt
 
     private object? GetPropertyValue(IPublishedProperty property, bool expanding)
         => _propertyRenderer.GetPropertyValue(property, expanding);
-
-    private enum ExpansionState
-    {
-        Initial,
-        Pending,
-        Expanding,
-        Expanded
-    }
 }
