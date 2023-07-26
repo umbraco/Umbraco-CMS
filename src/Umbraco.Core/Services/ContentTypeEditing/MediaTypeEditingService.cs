@@ -5,13 +5,13 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 
-public class MediaTypeEditingService : ContentTypeEditingServiceBase<IMediaType, IMediaTypeService, MediaTypeCreateModel, MediaTypePropertyTypeModel, MediaTypePropertyContainerModel>, IMediaTypeEditingService
+public class MediaTypeEditingService : ContentTypeEditingServiceBase<IMediaType, IMediaTypeService, MediaTypePropertyTypeModel, MediaTypePropertyContainerModel>, IMediaTypeEditingService
 {
     private readonly IMediaTypeService _mediaTypeService;
 
     public async Task<Attempt<IMediaType?, ContentTypeOperationStatus>> CreateAsync(MediaTypeCreateModel model, Guid userKey)
     {
-        Attempt<IMediaType?, ContentTypeOperationStatus> result = await HandleCreateAsync(model);
+        Attempt<IMediaType?, ContentTypeOperationStatus> result = await HandleCreateAsync(model, model.Key, model.ParentKey);
         if (result.Success)
         {
             // TODO: userKey => ID (or create async save with key)

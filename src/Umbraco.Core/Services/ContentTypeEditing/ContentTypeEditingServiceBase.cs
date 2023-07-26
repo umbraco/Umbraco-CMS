@@ -7,10 +7,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 
-public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeService, TContentTypeCreateModel, TPropertyTypeModel, TPropertyTypeContainer>
+public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeService, TPropertyTypeModel, TPropertyTypeContainer>
     where TContentType : class, IContentTypeComposition
     where TContentTypeService : IContentTypeBaseService<TContentType>
-    where TContentTypeCreateModel : ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer>, IContentTypeCreate
     where TPropertyTypeModel : PropertyTypeModelBase
     where TPropertyTypeContainer : PropertyTypeContainerModelBase
 {
@@ -44,7 +43,7 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
 
     protected abstract UmbracoObjectTypes ContainerObjectType { get; }
 
-    protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> HandleCreateAsync(TContentTypeCreateModel model)
+    protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> HandleCreateAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? key, Guid? parentKey)
     {
         SanitizeModelAliases(model);
 
@@ -59,20 +58,19 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
         IContentTypeComposition[] allContentTypeCompositions = _concreteContentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
 
         // now validate the model
-        ContentTypeOperationStatus operationStatus = await ValidateAsync(model, model.ParentKey, allContentTypeCompositions);
+        ContentTypeOperationStatus operationStatus = await ValidateAsync(model, parentKey, allContentTypeCompositions);
         if (operationStatus is not ContentTypeOperationStatus.Success)
         {
             return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
         }
 
-        var parentId = GetParentId(model, model.ParentKey) ?? throw new ArgumentException("Parent ID could not be found", nameof(model));
+        var parentId = GetParentId(model, parentKey) ?? throw new ArgumentException("Parent ID could not be found", nameof(model));
         TContentType contentType = CreateContentType(_shortStringHelper, parentId);
 
-        // update basic content type settings
-        // We want to allow the FE to specify a key
-        if (model.Key is not null)
+        // if the key is specified explicitly, set it (create only)
+        if (key is not null)
         {
-            contentType.Key = model.Key.Value;
+            contentType.Key = key.Value;
         }
 
         contentType = await UpdateAsync(contentType, model, allContentTypeCompositions);

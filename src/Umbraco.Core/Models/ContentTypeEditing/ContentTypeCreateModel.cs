@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.Models.ContentTypeEditing;
 
-public class ContentTypeCreateModel : ContentTypeModelBase, IContentTypeCreate
+public class ContentTypeCreateModel : ContentTypeModelBase
 {
     public Guid? Key { get; set; }
 

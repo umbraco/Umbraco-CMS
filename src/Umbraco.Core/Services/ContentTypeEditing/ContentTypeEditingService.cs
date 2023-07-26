@@ -7,7 +7,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 
-public class ContentTypeEditingService : ContentTypeEditingServiceBase<IContentType, IContentTypeService, ContentTypeCreateModel, ContentTypePropertyTypeModel, ContentTypePropertyContainerModel>, IContentTypeEditingService
+public class ContentTypeEditingService : ContentTypeEditingServiceBase<IContentType, IContentTypeService, ContentTypePropertyTypeModel, ContentTypePropertyContainerModel>, IContentTypeEditingService
 {
     private readonly ITemplateService _templateService;
     private readonly IContentTypeService _contentTypeService;
@@ -26,7 +26,7 @@ public class ContentTypeEditingService : ContentTypeEditingServiceBase<IContentT
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(ContentTypeCreateModel model, Guid userKey)
     {
-        Attempt<IContentType?, ContentTypeOperationStatus> result = await HandleCreateAsync(model);
+        Attempt<IContentType?, ContentTypeOperationStatus> result = await HandleCreateAsync(model, model.Key, model.ParentKey);
         if (result.Success is false)
         {
             return result;
