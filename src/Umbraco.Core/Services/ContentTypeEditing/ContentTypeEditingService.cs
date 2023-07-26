@@ -33,7 +33,6 @@ public class ContentTypeEditingService : ContentTypeEditingServiceBase<IContentT
         }
 
         IContentType contentType = result.Result ?? throw new InvalidOperationException($"{nameof(HandleCreateAsync)} succeeded but did not yield any result");
-        contentType.IsElement = model.IsElement;
 
         // update content type history clean-up
         contentType.HistoryCleanup ??= new HistoryCleanup();

@@ -46,6 +46,8 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
 
     protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> HandleCreateAsync(TContentTypeCreateModel model)
     {
+        SanitizeModelAliases(model);
+
         // validate that this is a new content type alias
         if (ContentTypeAliasIsInUse(model.Alias))
         {
@@ -76,6 +78,19 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
         contentType = await UpdateAsync(contentType, model, allContentTypeCompositions);
         return Attempt.SucceedWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
     }
+
+    #region Sanitization
+
+    private void SanitizeModelAliases(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+    {
+        model.Alias = model.Alias.ToSafeAlias(_shortStringHelper);
+        foreach (TPropertyTypeModel property in model.Properties)
+        {
+            property.Alias = property.Alias.ToSafeAlias(_shortStringHelper);
+        }
+    }
+
+    #endregion
 
     #region Model validation
 
@@ -122,7 +137,7 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
     private ContentTypeOperationStatus ValidateModelAliases(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
     {
         // Validate model alias is not reserved.
-        if (IsReservedContentTypeAlias(model.Alias))
+        if (IsReservedContentTypeAlias(model.Alias) || IsUnsafeAlias(model.Alias))
         {
             return ContentTypeOperationStatus.InvalidAlias;
         }
@@ -134,7 +149,7 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
         }
 
         // properties must have aliases
-        if (model.Properties.Any(p => p.Alias.IsNullOrWhiteSpace()))
+        if (model.Properties.Any(p => IsUnsafeAlias(p.Alias)))
         {
             return ContentTypeOperationStatus.InvalidPropertyTypeAlias;
         }
@@ -216,7 +231,7 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
 
         // add all the aliases we're going to try to add as well
         allPropertyTypeAliases.AddRange(model.Properties.Select(x => x.Alias));
-        if (allPropertyTypeAliases.HasDuplicates(true))
+        if (allPropertyTypeAliases.Select(a => a.ToLowerInvariant()).HasDuplicates(true))
         {
             return ContentTypeOperationStatus.DuplicatePropertyTypeAlias;
         }
@@ -237,13 +252,16 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
     {
         // Because of models builder you cannot have an alias that already exists in IPublishedContent, for instance Path.
         // Since MyModel.Path would conflict with IPublishedContent.Path.
-        var reservedPropertyTypeNames = typeof(IPublishedContent).GetProperties().Select(x => x.Name)
-            .Union(typeof(IPublishedContent).GetMethods().Select(x => x.Name))
+        var reservedPropertyTypeNames = typeof(IPublishedContent).GetPublicProperties().Select(x => x.Name)
+            .Union(typeof(IPublishedContent).GetPublicMethods().Select(x => x.Name))
             .ToArray();
 
         return model.Properties.Any(propertyType => propertyType.Alias.Equals(model.Alias, StringComparison.OrdinalIgnoreCase)
                                                    || reservedPropertyTypeNames.InvariantContains(propertyType.Alias));
     }
+
+    private bool IsUnsafeAlias(string alias) => alias.IsNullOrWhiteSpace()
+                                                || alias.Length != alias.ToSafeAlias(_shortStringHelper).Length;
 
     #endregion
 
@@ -259,6 +277,7 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
         contentType.Icon = model.Icon;
         contentType.Name = model.Name;
         contentType.AllowedAsRoot = model.AllowedAsRoot;
+        contentType.IsElement = model.IsElement;
         contentType.SetVariesBy(ContentVariation.Culture, model.VariesByCulture);
         contentType.SetVariesBy(ContentVariation.Segment, model.VariesBySegment);
 
