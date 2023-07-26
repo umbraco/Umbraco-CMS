@@ -75,8 +75,10 @@ export default class UmbNewPasswordElement extends LitElement {
 		return html`
 			<uui-form>
 				<form id="LoginForm" name="login" @submit="${this.#handleResetSubmit}">
-					<h2>Create new password</h2>
-					Enter a new password for your account.
+					<div>
+						<h2>Create new password</h2>
+						Enter a new password for your account.
+					</div>
 					<uui-form-layout-item>
 						<uui-label id="passwordLabel" for="password" slot="label" required>Password</uui-label>
 						<uui-input-password

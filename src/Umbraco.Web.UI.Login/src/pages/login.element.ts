@@ -152,7 +152,7 @@ export default class UmbLoginElement extends LitElement {
 			#greeting {
 				text-align: center;
 				margin: 0px;
-				font-weight: 400;
+				font-weight: 600;
 				font-size: 1.4rem;
 			}
 			form {
