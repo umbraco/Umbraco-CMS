@@ -13,11 +13,12 @@ import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/co
 export abstract class UmbBaseExtensionsController<
 	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
-	ControllerType extends UmbBaseExtensionController<ManifestType> = UmbBaseExtensionController<ManifestType>
+	ControllerType extends UmbBaseExtensionController<ManifestType> = UmbBaseExtensionController<ManifestType>,
+	PermittedControllerType extends ControllerType = ControllerType
 > extends UmbBaseController {
-	#onChange: (permittedManifests: Array<ControllerType>, controller: ControllerType) => void;
+	#onChange: (permittedManifests: Array<PermittedControllerType>, controller: PermittedControllerType) => void;
 	private _extensions: Array<ControllerType> = [];
-	private _permittedExts: Array<ControllerType> = [];
+	private _permittedExts: Array<PermittedControllerType> = [];
 
 	get permittedExtensions(): Array<ControllerType> {
 		return this._permittedExts;
@@ -27,7 +28,7 @@ export abstract class UmbBaseExtensionsController<
 		host: UmbControllerHost,
 		type: ManifestTypeName,
 		filter: null | ((manifest: ManifestType) => boolean),
-		onChange: (permittedManifests: Array<ControllerType>, controller: ControllerType) => void
+		onChange: (permittedManifests: Array<PermittedControllerType>, controller: PermittedControllerType) => void
 	) {
 		super(host);
 		this.#onChange = onChange;
@@ -80,10 +81,10 @@ export abstract class UmbBaseExtensionsController<
 
 	protected _extensionChanged = (isPermitted: boolean, controller: ControllerType) => {
 		let hasChanged = false;
-		const existingIndex = this._permittedExts.indexOf(controller);
+		const existingIndex = this._permittedExts.indexOf(controller as PermittedControllerType);
 		if (isPermitted) {
 			if (existingIndex === -1) {
-				this._permittedExts.push(controller);
+				this._permittedExts.push(controller as PermittedControllerType);
 				hasChanged = true;
 			}
 		} else {
@@ -95,7 +96,7 @@ export abstract class UmbBaseExtensionsController<
 		if (hasChanged) {
 			//this._permittedExts = this._permittedExts.filter((a) => a.permitted);
 			this._permittedExts.sort((a, b) => b.weight - a.weight);
-			this.#onChange(this._permittedExts, this as unknown as ControllerType);
+			this.#onChange(this._permittedExts, this as unknown as PermittedControllerType);
 			// Idea: could be abstracted into a requestChange method, so we can override it in a subclass.
 		}
 	};

@@ -20,7 +20,6 @@ import { UmbExtensionElementController, UmbExtensionsElementController } from '@
 @customElement('umb-section-default')
 export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectionExtensionElement {
 	private _manifest?: ManifestSection | undefined;
-	private _extensionController?: UmbExtensionsElementController<'sectionSidebarApp'>;
 
 	@property({ type: Object, attribute: false })
 	public get manifest(): ManifestSection | undefined {
@@ -45,7 +44,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	constructor() {
 		super();
 
-		this._extensionController = new UmbExtensionsElementController(this, 'sectionSidebarApp', null, (sidebarApps) => {
+		new UmbExtensionsElementController(this, 'sectionSidebarApp', null, (sidebarApps) => {
 			this._sidebarApps = sidebarApps;
 			this.requestUpdate('_sidebarApps');
 		});

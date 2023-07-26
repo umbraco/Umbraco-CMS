@@ -9,7 +9,10 @@ export const dashboard: ManifestDashboard = {
 	meta: {
 		label: 'Welcome',
 	},
-	conditions: {
-		sections: ['Umb.Section.Content'],
-	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionAlias',
+			match: 'Umb.Section.Content',
+		},
+	],
 };

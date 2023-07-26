@@ -10,7 +10,7 @@ import {
 	UmbSectionViewExtensionElement,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestController, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
@@ -37,9 +37,9 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	private _routes: Array<UmbRoute> = [];
 
 	private _sectionContext?: UmbSectionContext;
-	private _extensionsObserver?: UmbObserverController<ManifestSectionView[]>;
+
 	private _viewsObserver?: UmbObserverController<ManifestSectionView[]>;
-	private _dashboardObserver?: UmbObserverController<ManifestDashboard[]>;
+	private _dashboardObserver?: UmbExtensionsManifestController<ManifestDashboard['type']>;
 
 	constructor() {
 		super();
@@ -117,6 +117,11 @@ export class UmbSectionViewsElement extends UmbLitElement {
 		this._dashboardObserver?.destroy();
 
 		if (sectionAlias) {
+			this._dashboardObserver = new UmbExtensionsManifestController(this, 'dashboard', null, (views) => {
+				this._dashboards = views.map((view) => view.manifest);
+				this.#createRoutes();
+			});
+			/*
 			this._dashboardObserver = this.observe(
 				umbExtensionsRegistry
 					?.extensionsOfType('dashboard')
@@ -126,6 +131,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 					this.#createRoutes();
 				}
 			);
+			*/
 		}
 	}
 

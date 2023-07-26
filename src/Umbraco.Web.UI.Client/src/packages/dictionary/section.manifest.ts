@@ -42,9 +42,12 @@ const dashboards: Array<ManifestDashboard> = [
 			label: 'Dictionary overview',
 			pathname: '',
 		},
-		conditions: {
-			sections: [sectionAlias],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: sectionAlias,
+			},
+		],
 	},
 ];
 

@@ -54,9 +54,12 @@ describe('UmbExtensionSlotElement', () => {
 				meta: {
 					pathname: 'test/test',
 				},
-				conditions: {
-					sections: ['test'],
-				},
+				conditions: [
+					{
+						alias: 'Umb.Condition.SectionAlias',
+						match: 'test',
+					},
+				],
 			});
 		});
 

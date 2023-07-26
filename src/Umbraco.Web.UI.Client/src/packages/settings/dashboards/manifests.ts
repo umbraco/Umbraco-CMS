@@ -1,5 +1,7 @@
 import type { ManifestDashboard } from '@umbraco-cms/backoffice/extension-registry';
 
+const sectionAlias = 'Umb.Section.Settings';
+
 const dashboards: Array<ManifestDashboard> = [
 	{
 		type: 'dashboard',
@@ -12,9 +14,12 @@ const dashboards: Array<ManifestDashboard> = [
 			label: 'Welcome',
 			pathname: 'welcome',
 		},
-		conditions: {
-			sections: ['Umb.Section.Settings'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: sectionAlias,
+			},
+		],
 	},
 	{
 		type: 'dashboard',
@@ -27,9 +32,12 @@ const dashboards: Array<ManifestDashboard> = [
 			label: 'Models Builder',
 			pathname: 'models-builder',
 		},
-		conditions: {
-			sections: ['Umb.Section.Settings'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: sectionAlias,
+			},
+		],
 	},
 	{
 		type: 'dashboard',
@@ -42,9 +50,12 @@ const dashboards: Array<ManifestDashboard> = [
 			label: 'Published Status',
 			pathname: 'published-status',
 		},
-		conditions: {
-			sections: ['Umb.Section.Settings'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: sectionAlias,
+			},
+		],
 	},
 	{
 		type: 'dashboard',
@@ -57,9 +68,12 @@ const dashboards: Array<ManifestDashboard> = [
 			label: 'Health Check',
 			pathname: 'health-check',
 		},
-		conditions: {
-			sections: ['Umb.Section.Settings'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: sectionAlias,
+			},
+		],
 	},
 	{
 		type: 'dashboard',
@@ -72,9 +86,12 @@ const dashboards: Array<ManifestDashboard> = [
 			label: 'Profiling',
 			pathname: 'profiling',
 		},
-		conditions: {
-			sections: ['Umb.Section.Settings'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: sectionAlias,
+			},
+		],
 	},
 	{
 		type: 'dashboard',
@@ -87,9 +104,12 @@ const dashboards: Array<ManifestDashboard> = [
 			label: 'Telemetry Data',
 			pathname: 'telemetry',
 		},
-		conditions: {
-			sections: ['Umb.Section.Settings'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: sectionAlias,
+			},
+		],
 	},
 ];
 

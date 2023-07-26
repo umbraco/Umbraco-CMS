@@ -24,9 +24,12 @@ const dashboards: Array<ManifestDashboard> = [
 			label: 'Members',
 			pathname: 'members',
 		},
-		conditions: {
-			sections: [sectionAlias],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: sectionAlias,
+			},
+		],
 	},
 ];
 

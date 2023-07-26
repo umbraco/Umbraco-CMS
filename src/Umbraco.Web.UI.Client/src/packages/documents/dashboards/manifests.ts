@@ -11,9 +11,12 @@ const dashboards: Array<ManifestDashboard> = [
 			label: 'Redirect Management',
 			pathname: 'redirect-management',
 		},
-		conditions: {
-			sections: ['Umb.Section.Content'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: 'Umb.Section.Content',
+			},
+		],
 	},
 ];
 
