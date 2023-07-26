@@ -20,9 +20,6 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
     private readonly IDataTypeService _dataTypeService;
 
     private readonly ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
-
-    private readonly ICoreScopeProvider _scopeProvider;
-
     protected ContentEditingServiceBase(
         TContentService contentService,
         TContentTypeService contentTypeService,
@@ -34,12 +31,14 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
         _propertyEditorCollection = propertyEditorCollection;
         _dataTypeService = dataTypeService;
         _logger = logger;
-        _scopeProvider = scopeProvider;
+        CoreScopeProvider = scopeProvider;
         ContentService = contentService;
         ContentTypeService = contentTypeService;
     }
 
     protected abstract TContent Create(string? name, int parentId, TContentType contentType);
+
+    protected ICoreScopeProvider CoreScopeProvider { get; }
 
     protected TContentService ContentService { get; }
 
@@ -85,7 +84,7 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
     // helper method to perform move-to-recycle-bin and delete for content as they are very much handled in the same way
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid id, Func<TContent, OperationResult?> performDelete, bool allowForTrashed)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(id);
         if (content == null)
         {
@@ -106,7 +105,7 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid id, Guid? parentId, Func<TContent, int, OperationResult?> performMove)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(id);
         if (content is null)
         {
@@ -142,7 +141,7 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleCopyAsync(Guid id, Guid? parentId, Func<TContent, int, TContent?> performCopy)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(id);
         if (content is null)
         {
