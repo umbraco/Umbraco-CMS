@@ -1,17 +1,18 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import {css, CSSResultGroup, html, LitElement} from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import {styleMap} from 'lit-html/directives/style-map.js';
 
 @customElement('umb-auth-layout')
 export class UmbAuthLayoutElement extends LitElement {
-	@property({ type: String, attribute: 'background-image' })
-	backgroundImage = 'login.svg';
+	@property()
+	backgroundImage = 'login/login.svg';
 
-	@property({ type: String, attribute: 'logo-image' })
-	logoImage = 'umbraco_logomark_white.svg';
+	@property()
+	logoImage = 'login/umbraco_logomark_white.svg';
 
 	render() {
 		return html`
-			<div id="background"></div>
+			<div id="background" style=${styleMap({backgroundImage: `url('${this.backgroundImage}')`})}></div>
 
 			<div id="logo"><img src=${this.logoImage} alt="Umbraco" /></div>
 
@@ -31,7 +32,6 @@ export class UmbAuthLayoutElement extends LitElement {
 				background-position: 50%;
 				background-repeat: no-repeat;
 				background-size: cover;
-				background-image: url('login.svg');
 				width: 100vw;
 				height: 100vh;
 			}
