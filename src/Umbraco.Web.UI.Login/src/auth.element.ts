@@ -37,13 +37,21 @@ export default class UmbAuthElement extends LitElement {
 	}
 
 	async firstUpdated(): Promise<void> {
-    const router = new Router(this.shadowRoot?.getElementById('outlet'));
+    // We need to find the value of the base tag to make sure the router works without trailing slash
+    // even though the router normally finds the base tag automatically, but it does not seem to work
+    // in this case where we want to use the router on /umbraco/login as well as /umbraco/login/
+    const baseValue = document.querySelector('base')?.getAttribute('href') ?? '/umbraco/';
+    const router = new Router(this.shadowRoot?.getElementById('outlet'), {
+      baseUrl: baseValue.replace('login/', '') // Remove the "login/" part of the base url to make sure the router works without trailing slash
+    });
 
     await router.setRoutes([
-      { path: '', component: 'umb-login' },
-      { path: 'reset', component: 'umb-reset-password' },
-      { path: 'new', component: 'umb-new-password' },
-      { path: '(.*)', redirect: '' }
+      { path: 'login', children: [
+        { path: '', component: 'umb-login' },
+        { path: 'reset', component: 'umb-reset-password' },
+        { path: 'new', component: 'umb-new-password' },
+        ] },
+      { path: '(.*)', redirect: 'login' }
     ]);
 	}
 
