@@ -26,7 +26,7 @@ umbExtensionsRegistry.register(manifest);
 export class UmbSectionSidebarMenuElement<
 	ManifestType extends ManifestSectionSidebarAppBaseMenu = ManifestSectionSidebarAppMenuKind
 > extends UmbLitElement {
-	@property({type: Object, attribute: false})
+	@property({ type: Object, attribute: false })
 	manifest?: ManifestType;
 
 	renderHeader() {
