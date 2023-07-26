@@ -505,7 +505,7 @@ public partial class ContentTypeEditingServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentTypeOperationStatus.CompositionTypeNotFound, result.Status);
+            Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, result.Status);
         });
     }
 
@@ -554,6 +554,6 @@ public partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
 
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.ParentNotFound, result.Status);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidParent, result.Status);
     }
 }

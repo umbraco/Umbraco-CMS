@@ -93,5 +93,8 @@
     <Compile Update="Umbraco.Core\Services\ContentTypeEditingServiceTests.Create.cs">
       <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.Create.cs">
+      <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

@@ -13,6 +13,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult OperationStatusResult(ContentTypeOperationStatus status) =>
+        // TODO: rephrase all these error messages
+        // TODO: ensure the switch case covers all operation status values
         status switch
         {
             ContentTypeOperationStatus.Success => Ok(),
@@ -28,13 +30,13 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid alias")
                 .WithDetail("The alias is invalid")
                 .Build()),
-            ContentTypeOperationStatus.InvalidDataType => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Invalid data type")
-                .WithDetail("The data type is invalid")
-                .Build()),
             ContentTypeOperationStatus.InvalidPropertyTypeAlias => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid property type alias")
                 .WithDetail("The property type alias is invalid")
+                .Build()),
+            ContentTypeOperationStatus.InvalidContainerName => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid container name")
+                .WithDetail("The container name is invalid")
                 .Build()),
             ContentTypeOperationStatus.DataTypeNotFound => NotFound(new ProblemDetailsBuilder()
                 .WithTitle("Data Type not found")
@@ -50,14 +52,6 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
             ContentTypeOperationStatus.InvalidParent => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid parent")
                 .WithDetail("The specified parent is invalid, or cannot be used in combination with the specified composition/inheritance")),
-            ContentTypeOperationStatus.ParentNotFound => NotFound(new ProblemDetailsBuilder()
-                .WithTitle("Parent not found")
-                .WithDetail("The specified parent was not found")
-                .Build()),
-            ContentTypeOperationStatus.CompositionTypeNotFound => NotFound(new ProblemDetailsBuilder()
-                .WithTitle("Composition type not found")
-                .WithDetail("One or more types specified for composition was not found.")
-                .Build()),
             ContentTypeOperationStatus.DuplicatePropertyTypeAlias => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Duplicate property type alias")
                 .WithDetail("The property type alias is already in use, all property type aliases must be unique.")

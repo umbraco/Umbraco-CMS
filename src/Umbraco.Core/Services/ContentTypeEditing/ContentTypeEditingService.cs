@@ -26,7 +26,7 @@ public class ContentTypeEditingService : ContentTypeEditingServiceBase<IContentT
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(ContentTypeCreateModel model, Guid userKey)
     {
-        Attempt<IContentType?, ContentTypeOperationStatus> result = await HandleCreateAsync(model, userKey);
+        Attempt<IContentType?, ContentTypeOperationStatus> result = await HandleCreateAsync(model);
         if (result.Success is false)
         {
             return result;
@@ -54,13 +54,14 @@ public class ContentTypeEditingService : ContentTypeEditingServiceBase<IContentT
 
         // save content type
         // FIXME: create and use an async get method here.
+        // TODO: userKey => ID (or create async save with key)
         _contentTypeService.Save(contentType);
 
         return Attempt.SucceedWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
     }
 
-    protected override Guid[] GetAvailableCompositionKeys(IContentTypeComposition? source, IContentTypeComposition[] allContentTypes, ContentTypeCreateModel model)
-        => _contentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, isElement: model.IsElement)
+    protected override Guid[] GetAvailableCompositionKeys(IContentTypeComposition? source, IContentTypeComposition[] allContentTypes, bool isElement)
+        => _contentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, isElement: isElement)
             .Results
             .Where(x => x.Allowed)
             .Select(x => x.Composition.Key)

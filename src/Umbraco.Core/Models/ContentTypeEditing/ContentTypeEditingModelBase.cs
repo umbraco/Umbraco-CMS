@@ -28,6 +28,8 @@ public abstract class ContentTypeEditingModelBase<TPropertyType, TPropertyTypeCo
 
     public bool VariesBySegment { get; set; }
 
+    public bool IsElement { get; set; }
+
     public IEnumerable<TPropertyType> Properties { get; set; } = Array.Empty<TPropertyType>();
 
     public IEnumerable<TPropertyTypeContainer> Containers { get; set; } = Array.Empty<TPropertyTypeContainer>();

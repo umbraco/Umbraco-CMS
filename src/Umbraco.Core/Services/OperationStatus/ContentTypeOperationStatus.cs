@@ -7,12 +7,10 @@ public enum ContentTypeOperationStatus
     InvalidAlias,
     InvalidPropertyTypeAlias,
     DuplicatePropertyTypeAlias,
-    InvalidDataType,
     DataTypeNotFound,
     InvalidInheritance,
     InvalidComposition,
     InvalidParent,
-    CompositionTypeNotFound,
+    InvalidContainerName,
     NotFound,
-    ParentNotFound,
 }

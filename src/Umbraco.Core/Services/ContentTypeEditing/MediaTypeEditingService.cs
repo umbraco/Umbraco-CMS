@@ -11,9 +11,10 @@ public class MediaTypeEditingService : ContentTypeEditingServiceBase<IMediaType,
 
     public async Task<Attempt<IMediaType?, ContentTypeOperationStatus>> CreateAsync(MediaTypeCreateModel model, Guid userKey)
     {
-        Attempt<IMediaType?, ContentTypeOperationStatus> result = await HandleCreateAsync(model, userKey);
+        Attempt<IMediaType?, ContentTypeOperationStatus> result = await HandleCreateAsync(model);
         if (result.Success)
         {
+            // TODO: userKey => ID (or create async save with key)
             _mediaTypeService.Save(result.Result);
         }
 
@@ -29,7 +30,7 @@ public class MediaTypeEditingService : ContentTypeEditingServiceBase<IMediaType,
         : base(contentTypeService, mediaTypeService, dataTypeService, entityService, shortStringHelper)
         => _mediaTypeService = mediaTypeService;
 
-    protected override Guid[] GetAvailableCompositionKeys(IContentTypeComposition? source, IContentTypeComposition[] allContentTypes, MediaTypeCreateModel model)
+    protected override Guid[] GetAvailableCompositionKeys(IContentTypeComposition? source, IContentTypeComposition[] allContentTypes, bool isElement)
         => Array.Empty<Guid>();
 
     protected override IMediaType CreateContentType(IShortStringHelper shortStringHelper, int parentId)

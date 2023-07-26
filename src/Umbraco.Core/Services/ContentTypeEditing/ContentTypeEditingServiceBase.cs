@@ -19,7 +19,6 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
     private readonly IDataTypeService _dataTypeService;
     private readonly IEntityService _entityService;
     private readonly IShortStringHelper _shortStringHelper;
-    private const int MaxInheritance = 1;
 
     protected ContentTypeEditingServiceBase(
         IContentTypeService contentTypeService,
@@ -35,7 +34,7 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
         _shortStringHelper = shortStringHelper;
     }
 
-    protected abstract Guid[] GetAvailableCompositionKeys(IContentTypeComposition? source, IContentTypeComposition[] allContentTypes, TContentTypeCreateModel model);
+    protected abstract Guid[] GetAvailableCompositionKeys(IContentTypeComposition? source, IContentTypeComposition[] allContentTypes, bool isElement);
 
     protected abstract TContentType CreateContentType(IShortStringHelper shortStringHelper, int parentId);
 
@@ -45,138 +44,27 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
 
     protected abstract UmbracoObjectTypes ContainerObjectType { get; }
 
-    protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> HandleCreateAsync(TContentTypeCreateModel model, Guid userKey)
+    protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> HandleCreateAsync(TContentTypeCreateModel model)
     {
-        // Ensure no duplicate alias across documents, members, and media. Since this would break ModelsBuilder/published cache.
-        // This this method gets aliases across documents, members, and media, so it covers it all
-        if (_contentTypeService.GetAllContentTypeAliases().Contains(model.Alias))
+        // validate that this is a new content type alias
+        if (ContentTypeAliasIsInUse(model.Alias))
         {
             return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.DuplicateAlias, null);
         }
 
-        var reservedModelAliases = new[] { "system" };
-        if (reservedModelAliases.InvariantContains(model.Alias))
+        // get all existing content types as content type compositions
+        // NOTE: using Cast here is OK, because we implicitly enforce the constraint TContentType : IContentTypeComposition
+        IContentTypeComposition[] allContentTypeCompositions = _concreteContentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+
+        // now validate the model
+        ContentTypeOperationStatus operationStatus = await ValidateAsync(model, model.ParentKey, allContentTypeCompositions);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
         {
-            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidAlias, null);
+            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
         }
 
-        // Validate properties for reserved names.
-        // Because of models builder you cannot have an alias that already exists in IPublishedContent, for instance Path.
-        // Since MyModel.Path would conflict with IPublishedContent.Path.
-        var reservedPropertyTypeNames = typeof(IPublishedContent).GetProperties().Select(x => x.Name)
-            .Union(typeof(IPublishedContent).GetMethods().Select(x => x.Name))
-            .ToArray();
-        foreach (TPropertyTypeModel propertyType in model.Properties)
-        {
-            if (propertyType.Alias.Equals(model.Alias, StringComparison.OrdinalIgnoreCase)
-                || reservedPropertyTypeNames.InvariantContains(propertyType.Alias))
-            {
-                return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidPropertyTypeAlias, null);
-            }
-        }
-
-        // validate property data types exists.
-        Guid[] dataTypeKeys = model.Properties.Select(property => property.DataTypeKey).ToArray();
-        var dataTypesByKey = (await _dataTypeService.GetAllAsync(dataTypeKeys)).ToDictionary(x => x.Key);
-        if (dataTypeKeys.Length != dataTypesByKey.Count)
-        {
-            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidDataType, null);
-        }
-
-        Guid[] KeysForCompositionType(CompositionType compositionType) => model
-            .Compositions
-            .Where(c => c.CompositionType == compositionType)
-            .Select(c => c.Key)
-            .ToArray();
-        Guid[] inheritedKeys = KeysForCompositionType(CompositionType.Inheritance);
-        Guid[] compositionKeys = KeysForCompositionType(CompositionType.Composition);
-
-        // Only one composition can be of type inheritance, and composed items cannot also be inherited.
-        if (inheritedKeys.Length > MaxInheritance || compositionKeys.Intersect(inheritedKeys).Any())
-        {
-            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidInheritance, null);
-        }
-
-        // a content type cannot be created/saved in an entity container (a folder) if has an inheritance type composition
-        if (inheritedKeys.Any() && model.ParentKey.HasValue)
-        {
-            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidParent, null);
-        }
-
-        // Validate that the all the compositions are allowed
-        TContentType[] allContentTypes = _concreteContentTypeService.GetAll().ToArray();
-        // NOTE: using Cast here to implicitly enforce the constraint TContentType : IContentTypeComposition
-        IContentTypeComposition[] allContentTypesCompositions = allContentTypes.Cast<IContentTypeComposition>().ToArray();
-
-        // TODO: handle update here (source is not null)
-        // NOTE: Here if we're checking for create we should pass null, otherwise the updated content type.
-        Guid[] allowedCompositionKeys = GetAvailableCompositionKeys(null, allContentTypesCompositions, model);
-
-        // Both inheritance and compositions.
-        Guid[] allCompositionKeys = inheritedKeys.Union(compositionKeys).ToArray();
-        IContentTypeComposition[] allCompositionTypes = allContentTypesCompositions.Where(x => allCompositionKeys.Contains(x.Key)).ToArray();
-
-        if (allCompositionKeys.Length != allCompositionTypes.Length)
-        {
-            // We must be missing one.
-            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.CompositionTypeNotFound, null);
-        }
-
-        var allPropertyTypeAliases = allCompositionTypes.SelectMany(x => x.CompositionPropertyTypes).Select(x => x.Alias).ToList();
-        // Add all the aliases we're going to try to add as well.
-        allPropertyTypeAliases.AddRange(model.Properties.Select(x => x.Alias));
-        IEnumerable<string> allPropertyTypeAliasesDistinct = allPropertyTypeAliases.Distinct();
-        if (allPropertyTypeAliases.Count != allPropertyTypeAliasesDistinct.Count())
-        {
-            // If our list shrank when doing distinct there was duplicates.
-            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.DuplicatePropertyTypeAlias, null);
-        }
-
-        // We only care about the keys used for composition.
-        if (compositionKeys
-            .Except(allowedCompositionKeys)
-            .Any())
-        {
-            // We have a composition key that's not in the allowed composition keys
-            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidComposition, null);
-        }
-
-        // filter out properties and containers with no name/alias
-        // TODO: Let's be predictable and fail instead of trying to guess intentions.
-        model.Properties = model.Properties.Where(propertyType => propertyType.Alias.IsNullOrWhiteSpace() is false).ToArray();
-        model.Containers = model.Containers.Where(container => container.Name.IsNullOrWhiteSpace() is false).ToArray();
-
-        // figure out the content type parent; it is either
-        // - the specified composition of type inheritance (the content type has a parent content type)
-        // - the specified parent ID (the content type is placed in a container/folder)
-        // - root if none of the above
-        int? parentId;
-        if (inheritedKeys.Any())
-        {
-            Attempt<int> parentContentTypeIdAttempt = _entityService.GetId(inheritedKeys.First(), ContentObjectType);
-            if (parentContentTypeIdAttempt.Success is false)
-            {
-                return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidInheritance, null);
-            }
-
-            parentId = parentContentTypeIdAttempt.Result;
-        }
-        else if (model.ParentKey.HasValue)
-        {
-            Attempt<int> containerIdAttempt = _entityService.GetId(model.ParentKey.Value, ContainerObjectType);
-            if (containerIdAttempt.Success is false)
-            {
-                return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.ParentNotFound, null);
-            }
-
-            parentId = containerIdAttempt.Result;
-        }
-        else
-        {
-            parentId = Constants.System.Root;
-        }
-
-        TContentType? contentType = CreateContentType(_shortStringHelper, parentId.Value);
+        var parentId = GetParentId(model, model.ParentKey) ?? throw new ArgumentException("Parent ID could not be found", nameof(model));
+        TContentType contentType = CreateContentType(_shortStringHelper, parentId);
 
         // update basic content type settings
         // We want to allow the FE to specify a key
@@ -185,6 +73,187 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
             contentType.Key = model.Key.Value;
         }
 
+        contentType = await UpdateAsync(contentType, model, allContentTypeCompositions);
+        return Attempt.SucceedWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
+    }
+
+    #region Model validation
+
+    private async Task<ContentTypeOperationStatus> ValidateAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? parentKey, IContentTypeComposition[] allContentTypeCompositions)
+    {
+        // validate all model aliases (content type alias, property type aliases)
+        ContentTypeOperationStatus operationStatus = ValidateModelAliases(model);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return operationStatus;
+        }
+
+        // validate property data types exists.
+        operationStatus = await ValidateDataTypesAsync(model);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return operationStatus;
+        }
+
+        // validate inheritance and find the correct content type parent ID (can be both a parent content type and a container)
+        operationStatus = ValidateParent(model, parentKey);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return operationStatus;
+        }
+
+        // TODO: handle update here (contentType is not null)
+        // verify that all compositions are valid)
+        operationStatus = ValidateCompositions(null, model, allContentTypeCompositions);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return operationStatus;
+        }
+
+        operationStatus = ValidateProperties(model, allContentTypeCompositions);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return operationStatus;
+        }
+
+        return ContentTypeOperationStatus.Success;
+    }
+
+    private ContentTypeOperationStatus ValidateModelAliases(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+    {
+        // Validate model alias is not reserved.
+        if (IsReservedContentTypeAlias(model.Alias))
+        {
+            return ContentTypeOperationStatus.InvalidAlias;
+        }
+
+        // Validate properties for reserved aliases.
+        if (ContainsReservedPropertyTypeAlias(model))
+        {
+            return ContentTypeOperationStatus.InvalidPropertyTypeAlias;
+        }
+
+        // properties must have aliases
+        if (model.Properties.Any(p => p.Alias.IsNullOrWhiteSpace()))
+        {
+            return ContentTypeOperationStatus.InvalidPropertyTypeAlias;
+        }
+
+        // containers must names
+        if (model.Containers.Any(p => p.Name.IsNullOrWhiteSpace()))
+        {
+            return ContentTypeOperationStatus.InvalidContainerName;
+        }
+
+        return ContentTypeOperationStatus.Success;
+    }
+
+    private async Task<ContentTypeOperationStatus> ValidateDataTypesAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+    {
+        Guid[] dataTypeKeys = GetDataTypeKeys(model);
+        IDataType[] dataTypes = await GetDataTypesAsync(model);
+
+        if (dataTypeKeys.Length != dataTypes.Length)
+        {
+            return ContentTypeOperationStatus.DataTypeNotFound;
+        }
+
+        return ContentTypeOperationStatus.Success;
+    }
+
+    private ContentTypeOperationStatus ValidateParent(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? parentKey)
+    {
+        Guid[] inheritedKeys = KeysForCompositionTypes(model, CompositionType.Inheritance);
+        Guid[] compositionKeys = KeysForCompositionTypes(model, CompositionType.Composition);
+
+        // Only one composition can be of type inheritance, and composed items cannot also be inherited.
+        if (inheritedKeys.Length > 1 || compositionKeys.Intersect(inheritedKeys).Any())
+        {
+            return ContentTypeOperationStatus.InvalidInheritance;
+        }
+
+        // a content type cannot be created/saved in an entity container (a folder) if has an inheritance type composition
+        if (inheritedKeys.Any() && parentKey.HasValue)
+        {
+            return ContentTypeOperationStatus.InvalidParent;
+        }
+
+        var parentId = GetParentId(model, parentKey);
+        if (parentId.HasValue)
+        {
+            return ContentTypeOperationStatus.Success;
+        }
+
+        // no parent ID => must be either an invalid inheritance (if attempted) or an invalid container
+        return inheritedKeys.Any()
+            ? ContentTypeOperationStatus.InvalidInheritance
+            : ContentTypeOperationStatus.InvalidParent;
+    }
+
+    private ContentTypeOperationStatus ValidateCompositions(TContentType? contentType, ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, IContentTypeComposition[] allContentTypeCompositions)
+    {
+        // get the content type keys we want to use for compositions
+        Guid[] compositionKeys = KeysForCompositionTypes(model, CompositionType.Composition);
+
+        // verify that all compositions keys are allowed
+        Guid[] allowedCompositionKeys = GetAvailableCompositionKeys(contentType, allContentTypeCompositions, model.IsElement);
+        if (allowedCompositionKeys.ContainsAll(compositionKeys) is false)
+        {
+            return ContentTypeOperationStatus.InvalidComposition;
+        }
+
+        return ContentTypeOperationStatus.Success;
+    }
+
+    private ContentTypeOperationStatus ValidateProperties(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, IContentTypeComposition[] allContentTypeCompositions)
+    {
+        // grab all content types used for composition and/or inheritance
+        Guid[] allCompositionKeys = KeysForCompositionTypes(model, CompositionType.Composition, CompositionType.Inheritance);
+        IContentTypeComposition[] allCompositionTypes = allContentTypeCompositions.Where(c => allCompositionKeys.Contains(c.Key)).ToArray();
+
+        // get the aliases of all properties across these content types
+        var allPropertyTypeAliases = allCompositionTypes.SelectMany(x => x.CompositionPropertyTypes).Select(x => x.Alias).ToList();
+
+        // add all the aliases we're going to try to add as well
+        allPropertyTypeAliases.AddRange(model.Properties.Select(x => x.Alias));
+        if (allPropertyTypeAliases.HasDuplicates(true))
+        {
+            return ContentTypeOperationStatus.DuplicatePropertyTypeAlias;
+        }
+
+        return ContentTypeOperationStatus.Success;
+    }
+
+    // This this method gets aliases across documents, members, and media, so it covers it all
+    private bool ContentTypeAliasIsInUse(string alias) => _contentTypeService.GetAllContentTypeAliases().Contains(alias);
+
+    private bool IsReservedContentTypeAlias(string alias)
+    {
+        var reservedAliases = new[] { "system" };
+        return reservedAliases.InvariantContains(alias);
+    }
+
+    private bool ContainsReservedPropertyTypeAlias(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+    {
+        // Because of models builder you cannot have an alias that already exists in IPublishedContent, for instance Path.
+        // Since MyModel.Path would conflict with IPublishedContent.Path.
+        var reservedPropertyTypeNames = typeof(IPublishedContent).GetProperties().Select(x => x.Name)
+            .Union(typeof(IPublishedContent).GetMethods().Select(x => x.Name))
+            .ToArray();
+
+        return model.Properties.Any(propertyType => propertyType.Alias.Equals(model.Alias, StringComparison.OrdinalIgnoreCase)
+                                                   || reservedPropertyTypeNames.InvariantContains(propertyType.Alias));
+    }
+
+    #endregion
+
+    #region Model update
+
+    private async Task<TContentType> UpdateAsync(
+        TContentType contentType,
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model,
+        IContentTypeComposition[] allContentTypeCompositions)
+    {
         contentType.Alias = model.Alias;
         contentType.Description = model.Description;
         contentType.Icon = model.Icon;
@@ -193,25 +262,55 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
         contentType.SetVariesBy(ContentVariation.Culture, model.VariesByCulture);
         contentType.SetVariesBy(ContentVariation.Segment, model.VariesBySegment);
 
-        // update allowed content types
+        // update the allowed content types
+        UpdateAllowedContentTypes(contentType, model, allContentTypeCompositions);
+
+        // update/map all properties
+        await UpdatePropertiesAsync(contentType, model);
+
+        // update all compositions
+        UpdateCompositions(contentType, model, allContentTypeCompositions);
+
+        // ensure parent content type assignment (inheritance) if any
+        UpdateParentContentType(contentType, model, allContentTypeCompositions);
+
+        return contentType;
+    }
+
+    private void UpdateAllowedContentTypes(
+        TContentType contentType,
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model,
+        IContentTypeComposition[] allContentTypeCompositions)
+    {
         var allowedContentTypesUnchanged = contentType.AllowedContentTypes?
             .OrderBy(contentTypeSort => contentTypeSort.SortOrder)
             .Select(contentTypeSort => contentTypeSort.Key)
             .SequenceEqual(model.AllowedContentTypes
                 .OrderBy(contentTypeSort => contentTypeSort.SortOrder)
                 .Select(contentTypeSort => contentTypeSort.Key)) ?? false;
-        if (allowedContentTypesUnchanged is false)
+
+        if (allowedContentTypesUnchanged)
         {
-            // need the content type IDs here - yet, anyway - see FIXME in Umbraco.Cms.Core.Models.ContentTypeSort
-            var allContentTypesByKey = allContentTypes.ToDictionary(c => c.Key);
-            contentType.AllowedContentTypes = model
-                .AllowedContentTypes
-                .Select((contentTypeSort, index) => allContentTypesByKey.TryGetValue(contentTypeSort.Key, out TContentType? ct)
-                    ? new ContentTypeSort(new Lazy<int>(() => ct.Id), contentTypeSort.Key, index, ct.Alias)
-                    : null)
-                .WhereNotNull()
-                .ToArray();
+            return;
         }
+
+        // need the content type IDs here - yet, anyway - see FIXME in Umbraco.Cms.Core.Models.ContentTypeSort
+        var allContentTypesByKey = allContentTypeCompositions.ToDictionary(c => c.Key);
+        contentType.AllowedContentTypes = model
+            .AllowedContentTypes
+            .Select((contentTypeSort, index) => allContentTypesByKey.TryGetValue(contentTypeSort.Key, out IContentTypeComposition? ct)
+                ? new ContentTypeSort(new Lazy<int>(() => ct.Id), contentTypeSort.Key, index, ct.Alias)
+                : null)
+            .WhereNotNull()
+            .ToArray();
+    }
+
+    private async Task UpdatePropertiesAsync(
+        TContentType contentType,
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+    {
+        // build a dictionary of all data types within the model by their keys (we need it when mapping properties)
+        var dataTypesByKey = (await GetDataTypesAsync(model)).ToDictionary(d => d.Key);
 
         // build a dictionary of parent container IDs and their names (we need it when mapping property groups)
         var parentContainerNamesById = model
@@ -222,41 +321,7 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
                 container => container.ParentKey!.Value,
                 container => model.Containers.First(c => c.Key == container.ParentKey).Name!);
 
-        IPropertyType MapProperty(TPropertyTypeModel property, PropertyGroup? propertyGroup)
-        {
-            // get the selected data type
-            // NOTE: this only works because we already ensured that the data type is present in the dataTypesByKey dictionary
-            IDataType dataType = dataTypesByKey[property.DataTypeKey];
-
-            // get the current property type (if it exists)
-            IPropertyType propertyType = contentType.PropertyTypes.FirstOrDefault(pt => pt.Key == property.Key)
-                                         ?? new PropertyType(_shortStringHelper, dataType);
-
-            // We are demanding a property type key in the model, so we should probably ensure that it's the on that's actually used.
-            propertyType.Key = property.Key;
-            propertyType.Name = property.Name;
-            propertyType.DataTypeId = dataType.Id;
-            propertyType.DataTypeKey = dataType.Key;
-            propertyType.Mandatory = property.Validation.Mandatory;
-            propertyType.MandatoryMessage = property.Validation.MandatoryMessage;
-            propertyType.ValidationRegExp = property.Validation.RegularExpression;
-            propertyType.ValidationRegExpMessage = property.Validation.RegularExpressionMessage;
-            propertyType.SetVariesBy(ContentVariation.Culture, property.VariesByCulture);
-            propertyType.SetVariesBy(ContentVariation.Segment, property.VariesBySegment);
-            propertyType.Alias = property.Alias;
-            propertyType.Description = property.Description;
-            propertyType.SortOrder = property.SortOrder;
-            propertyType.LabelOnTop = property.Appearance.LabelOnTop;
-
-            if (propertyGroup is not null)
-            {
-                propertyType.PropertyGroupId = new Lazy<int>(() => propertyGroup.Id, false);
-            }
-
-            return propertyType;
-        }
-
-        // update properties and groups
+        // handle properties in groups
         PropertyGroup[] propertyGroups = model.Containers.Select(container =>
             {
                 PropertyGroup propertyGroup = contentType.PropertyGroups.FirstOrDefault(group => group.Key == container.Key) ??
@@ -276,7 +341,7 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
                 IPropertyType[] properties = model
                     .Properties
                     .Where(property => property.ContainerKey == container.Key)
-                    .Select(property => MapProperty(property, propertyGroup))
+                    .Select(property => MapProperty(contentType, property, propertyGroup, dataTypesByKey))
                     .ToArray();
 
                 if (properties.Any() is false && parentContainerNamesById.ContainsKey(container.Key) is false)
@@ -300,14 +365,61 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
             contentType.PropertyGroups = new PropertyGroupCollection(propertyGroups);
         }
 
-        // Handle orphaned properties
+        // handle orphaned properties
         IEnumerable<TPropertyTypeModel> orphanedPropertyTypeModels = model.Properties.Where (x => x.ContainerKey is null).ToArray();
-        IPropertyType[] orphanedPropertyTypes = orphanedPropertyTypeModels.Select(property => MapProperty(property, null)).ToArray();
+        IPropertyType[] orphanedPropertyTypes = orphanedPropertyTypeModels.Select(property => MapProperty(contentType, property, null, dataTypesByKey)).ToArray();
         if (contentType.NoGroupPropertyTypes.SequenceEqual(orphanedPropertyTypes) is false)
         {
             contentType.NoGroupPropertyTypes = new PropertyTypeCollection(SupportsPublishing, orphanedPropertyTypes);
         }
+    }
 
+    private IPropertyType MapProperty(
+        TContentType contentType,
+        TPropertyTypeModel property,
+        PropertyGroup? propertyGroup,
+        IDictionary<Guid, IDataType> dataTypesByKey)
+    {
+        // get the selected data type
+        // NOTE: this only works because we already ensured that the data type is present in the dataTypesByKey dictionary
+        if (dataTypesByKey.TryGetValue(property.DataTypeKey, out IDataType? dataType) is false)
+        {
+            throw new ArgumentException("One or more data types could not be found", nameof(dataTypesByKey));
+        }
+
+        // get the current property type (if it exists)
+        IPropertyType propertyType = contentType.PropertyTypes.FirstOrDefault(pt => pt.Key == property.Key)
+                                     ?? new PropertyType(_shortStringHelper, dataType);
+
+        // We are demanding a property type key in the model, so we should probably ensure that it's the on that's actually used.
+        propertyType.Key = property.Key;
+        propertyType.Name = property.Name;
+        propertyType.DataTypeId = dataType.Id;
+        propertyType.DataTypeKey = dataType.Key;
+        propertyType.Mandatory = property.Validation.Mandatory;
+        propertyType.MandatoryMessage = property.Validation.MandatoryMessage;
+        propertyType.ValidationRegExp = property.Validation.RegularExpression;
+        propertyType.ValidationRegExpMessage = property.Validation.RegularExpressionMessage;
+        propertyType.SetVariesBy(ContentVariation.Culture, property.VariesByCulture);
+        propertyType.SetVariesBy(ContentVariation.Segment, property.VariesBySegment);
+        propertyType.Alias = property.Alias;
+        propertyType.Description = property.Description;
+        propertyType.SortOrder = property.SortOrder;
+        propertyType.LabelOnTop = property.Appearance.LabelOnTop;
+
+        if (propertyGroup is not null)
+        {
+            propertyType.PropertyGroupId = new Lazy<int>(() => propertyGroup.Id, false);
+        }
+
+        return propertyType;
+    }
+
+    private void UpdateCompositions(
+        TContentType contentType,
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model,
+        IContentTypeComposition[] allContentTypeCompositions)
+    {
         // Updates compositions
         // We don't actually have to worry about alias collision here because that's also checked in the service
         // We'll probably want to refactor this to be able to return a proper ContentTypeOperationStatus.
@@ -328,22 +440,67 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
         // We have to look up the content types we want to add to composition, since we keep a full reference.
         if (add.Any())
         {
-            TContentType[] contentTypesToAdd = allContentTypes.Where(c => add.Contains(c.Key)).ToArray();
-            foreach (TContentType contentTypeToAdd in contentTypesToAdd)
+            IContentTypeComposition[] contentTypesToAdd = allContentTypeCompositions.Where(c => add.Contains(c.Key)).ToArray();
+            foreach (IContentTypeComposition contentTypeToAdd in contentTypesToAdd)
             {
                 contentType.AddContentType(contentTypeToAdd);
             }
         }
+    }
 
-        // We need to handle the parent as well
-        // We've already validated that there is at most one and that it exists if it there
-        Guid? parentKey = inheritedKeys.Any() ? inheritedKeys.First() : null;
-        if (parentKey.HasValue)
+    private void UpdateParentContentType(
+        TContentType contentType,
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model,
+        IContentTypeComposition[] allContentTypeCompositions)
+    {
+        // at this point, we should have already validated that there is at most one and that it exists if it there
+        Guid parentContentTypeKey = KeysForCompositionTypes(model, CompositionType.Inheritance).FirstOrDefault();
+        if (parentContentTypeKey != Guid.Empty)
         {
-            TContentType parentContentType = allContentTypes.First(c => c.Key == parentKey.Value);
+            IContentTypeComposition parentContentType = allContentTypeCompositions.FirstOrDefault(c => c.Key == parentContentTypeKey)
+                                                        ?? throw new ArgumentException("Parent content type could not be found", nameof(model));
             contentType.SetParent(parentContentType);
         }
-
-        return Attempt.SucceedWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
     }
+
+    #endregion
+
+    #region Shared between model validation and model update
+
+    private Guid[] GetDataTypeKeys(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+        => model.Properties.Select(property => property.DataTypeKey).Distinct().ToArray();
+
+    private async Task<IDataType[]> GetDataTypesAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+        => (await _dataTypeService.GetAllAsync(GetDataTypeKeys(model))).ToArray();
+
+    private int? GetParentId(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? parentKey)
+    {
+        Guid[] inheritedKeys = KeysForCompositionTypes(model, CompositionType.Inheritance);
+
+        // figure out the content type parent; it is either
+        // - the specified composition of type inheritance (the content type has a parent content type)
+        // - the specified parent ID (the content type is placed in a container/folder)
+        // - root if none of the above
+        if (inheritedKeys.Any())
+        {
+            Attempt<int> parentContentTypeIdAttempt = _entityService.GetId(inheritedKeys.First(), ContentObjectType);
+            return parentContentTypeIdAttempt.Success ? parentContentTypeIdAttempt.Result : null;
+        }
+
+        if (parentKey.HasValue)
+        {
+            Attempt<int> containerIdAttempt = _entityService.GetId(parentKey.Value, ContainerObjectType);
+            return containerIdAttempt.Success ? containerIdAttempt.Result : null;
+        }
+
+        return Constants.System.Root;
+    }
+
+    private Guid[] KeysForCompositionTypes(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, params CompositionType[] compositionTypes)
+        => model.Compositions
+            .Where(c => compositionTypes.Contains(c.CompositionType))
+            .Select(c => c.Key)
+            .ToArray();
+
+    #endregion
 }
