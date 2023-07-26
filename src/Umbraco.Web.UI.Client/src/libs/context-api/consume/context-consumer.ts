@@ -12,7 +12,7 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  * @class UmbContextConsumer
  */
 export class UmbContextConsumer<T = unknown> {
-	#callback?: UmbContextCallback<T | undefined>;
+	#callback?: UmbContextCallback<T>;
 	#promise?: Promise<T>;
 	#promiseResolver?: (instance: T) => void;
 
@@ -33,14 +33,14 @@ export class UmbContextConsumer<T = unknown> {
 	constructor(
 		protected hostElement: EventTarget,
 		contextAlias: string | UmbContextToken<T>,
-		callback?: UmbContextCallback<T | undefined>
+		callback?: UmbContextCallback<T>
 	) {
 		this.#contextAlias = contextAlias.toString();
 		this.#callback = callback;
 	}
 
 	/* Idea: Niels: If we need to filter for specific contexts, we could make the response method return true/false. If false, the event should then then not be stopped. Alternatively parse the event it self on to the response-callback. This will enable the event to continue to bubble up finding a context that matches. The reason for such would be to have some who are more specific than others. For example, some might just need the current workspace-context, others might need the closest handling a certain entityType. As I'm writting this is not relevant, but I wanted to keep the idea as we have had some circumstance that might be solved with this approach.*/
-	protected _onResponse = (instance: T | undefined) => {
+	protected _onResponse = (instance: T) => {
 		if (this.#instance === instance) {
 			return;
 		}
