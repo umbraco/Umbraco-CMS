@@ -16,8 +16,8 @@ export default class UmbNewPasswordElement extends LitElement {
 	newCallState: UUIButtonState = undefined;
 
 	@state()
-	private page: (typeof this.pages)[number] = 'validate';
-	pages = ['validate', 'new', 'done', 'error'] as const;
+	private state: (typeof this.states)[number] = 'validate';
+	states = ['validate', 'new', 'done', 'error'] as const;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -35,9 +35,9 @@ export default class UmbNewPasswordElement extends LitElement {
 		this.resetCode = this.resetCode.replace(/ /g, '+');
 
 		if (this.resetCode && this.userId) {
-			this.page = 'new';
+			this.state = 'new';
 		} else {
-			this.page = 'error';
+			this.state = 'error';
 		}
 	};
 
@@ -64,10 +64,10 @@ export default class UmbNewPasswordElement extends LitElement {
 
 		if (response.status === 200) {
 			this.newCallState = 'success';
-			this.page = 'done';
+			this.state = 'done';
 		} else {
 			this.newCallState = 'failed';
-			this.page = 'error';
+			this.state = 'error';
 		}
 	};
 
@@ -128,7 +128,7 @@ export default class UmbNewPasswordElement extends LitElement {
 	}
 
 	#renderRoute() {
-		switch (this.page) {
+		switch (this.state) {
 			case 'validate':
 				return this.#renderValidatePage();
 			case 'new':
