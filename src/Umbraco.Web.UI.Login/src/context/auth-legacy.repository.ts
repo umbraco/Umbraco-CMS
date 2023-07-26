@@ -65,12 +65,13 @@ export class UmbAuthLegacyRepository {
 		};
 	}
 
-	public async newPassword(password: string, code: string): Promise<LoginResponse> {
-		const request = new Request('/umbraco/backoffice/umbracoapi/authentication/newpassword', {
+	public async newPassword(password: string, resetCode: string, userId: number): Promise<LoginResponse> {
+		const request = new Request('/umbraco/backoffice/umbracoapi/authentication/PostSetPassword', {
 			method: 'POST',
 			body: JSON.stringify({
 				password,
-				code,
+				resetCode,
+				userId,
 			}),
 			headers: {
 				'Content-Type': 'application/json',

@@ -7,10 +7,10 @@ import { UmbAuthMainContext } from '../context/auth-main.context';
 @customElement('umb-new-password')
 export default class UmbNewPasswordElement extends LitElement {
 	@state()
-	code: string = '';
+	resetCode?: string;
 
 	@state()
-	user: string = '';
+	userId?: string;
 
 	@state()
 	newCallState: UUIButtonState = undefined;
@@ -28,12 +28,17 @@ export default class UmbNewPasswordElement extends LitElement {
 	#validateCode = async () => {
 		// get url params
 		const urlParams = new URLSearchParams(window.location.search);
-		this.code = urlParams.get('r') || '';
-		this.user = urlParams.get('u') || '';
+		this.resetCode = urlParams.get('resetCode') || '';
+		this.userId = urlParams.get('userId') || '';
 
-		const response = await UmbAuthMainContext.Instance.validatePasswordResetCode(this.user, this.code);
+		//TODO: TEMP FIX
+		this.resetCode = this.resetCode.replace(/ /g, '+');
 
-		this.page = response.status === 200 ? 'new' : 'error';
+		if (this.resetCode && this.userId) {
+			this.page = 'new';
+		} else {
+			this.page = 'error';
+		}
 	};
 
 	#handleResetSubmit = async (e: SubmitEvent) => {
@@ -52,8 +57,10 @@ export default class UmbNewPasswordElement extends LitElement {
 			return;
 		}
 
+		if (!this.resetCode || !this.userId) return;
+
 		this.newCallState = 'waiting';
-		const response = await UmbAuthMainContext.Instance.newPassword(this.code, password);
+		const response = await UmbAuthMainContext.Instance.newPassword(password, this.resetCode, this.userId);
 
 		if (response.status === 200) {
 			this.newCallState = 'success';

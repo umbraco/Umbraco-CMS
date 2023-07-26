@@ -23,11 +23,12 @@ export class UmbAuthLegacyContext implements IUmbAuthContext {
 		return this.#authRepository.resetPassword(username);
 	}
 
-	async validatePasswordResetCode(user: string, code: string): Promise<ValidatePasswordResetCodeResponse> {
-		return this.#authRepository.validatePasswordResetCode(user, code);
+	async validatePasswordResetCode(userId: string, resetCode: string): Promise<ValidatePasswordResetCodeResponse> {
+		return this.#authRepository.validatePasswordResetCode(userId, resetCode);
 	}
 
-	async newPassword(password: string, code: string): Promise<NewPasswordResponse> {
-		return this.#authRepository.newPassword(password, code);
+	async newPassword(password: string, resetCode: string, userId: string): Promise<NewPasswordResponse> {
+		const userIdAsNumber = Number.parseInt(userId);
+		return this.#authRepository.newPassword(password, resetCode, userIdAsNumber);
 	}
 }
