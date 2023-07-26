@@ -19,4 +19,8 @@ public interface IContentEditingService
     Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid id, Guid? parentId, Guid userKey);
 
     Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid id, Guid? parentId, bool relateToOriginal, bool includeDescendants, Guid userKey);
+
+    Task<Attempt<ContentEditingOperationStatus>> PublishAsync(Guid id,  Guid userKey, string culture = "*");
+
+    Task<Attempt<ContentEditingOperationStatus>> PublishAsync(Guid id,  Guid userKey, string[] culture);
 }
