@@ -2,5 +2,8 @@
 	"general": {
 		"logout": "Log out",
 		"close": "Close"
+	},
+	"user": {
+		"yourProfile": "Your profile"
 	}
 }
