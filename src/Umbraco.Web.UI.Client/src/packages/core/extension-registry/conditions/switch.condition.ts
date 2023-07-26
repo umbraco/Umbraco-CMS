@@ -1,13 +1,17 @@
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { ManifestCondition, UmbConditionConfig, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
+import {
+	ManifestCondition,
+	UmbConditionConfigBase,
+	UmbExtensionCondition,
+} from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbSwitchCondition extends UmbBaseController implements UmbExtensionCondition {
 	#timer?: any;
-	config: UmbConditionConfig<string>;
+	config: SwitchConditionConfig;
 	permitted = false;
 	#onChange: () => void;
 
-	constructor(args: { host: UmbControllerHost; config: UmbConditionConfig<string>; onChange: () => void }) {
+	constructor(args: { host: UmbControllerHost; config: SwitchConditionConfig; onChange: () => void }) {
 		super(args.host);
 		this.config = args.config;
 		this.#onChange = args.onChange;
@@ -20,7 +24,7 @@ export class UmbSwitchCondition extends UmbBaseController implements UmbExtensio
 			this.permitted = true;
 			this.#onChange();
 			this.startDisapprove();
-		}, parseInt(this.config.value));
+		}, parseInt(this.config.frequency));
 	}
 
 	startDisapprove() {
@@ -29,7 +33,7 @@ export class UmbSwitchCondition extends UmbBaseController implements UmbExtensio
 			this.permitted = false;
 			this.#onChange();
 			this.startApprove();
-		}, parseInt(this.config.value));
+		}, parseInt(this.config.frequency));
 	}
 
 	destroy() {
@@ -43,4 +47,8 @@ export const manifest: ManifestCondition = {
 	name: 'Switch Condition',
 	alias: 'Umb.Condition.Switch',
 	class: UmbSwitchCondition,
+};
+
+export type SwitchConditionConfig = UmbConditionConfigBase & {
+	frequency: string;
 };

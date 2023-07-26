@@ -56,23 +56,35 @@ export interface ManifestKind<ManifestTypes> {
 }
 
 // TODO: Get rid of this type and implements ManifestWithDynamicConditions instead.
-export interface ManifestWithConditions<ConditionsType> {
+export interface ManifestWithConditions<ConditionType> {
 	/**
 	 * Set the conditions for when the extension should be loaded
 	 */
-	conditions: ConditionsType;
+	conditions: ConditionType;
 }
-export interface ManifestWithDynamicConditions extends ManifestBase {
+
+export interface UmbConditionConfigBase {
+	alias: string;
+}
+
+export type ConditionTypeMap<ConditionTypes extends UmbConditionConfigBase> = {
+	[Condition in ConditionTypes as Condition['alias']]: Condition;
+} & {
+	[key: string]: UmbConditionConfigBase;
+};
+
+export type SpecificConditionTypeOrUmbConditionConfigBase<
+	ConditionTypes extends UmbConditionConfigBase,
+	T extends keyof ConditionTypeMap<ConditionTypes> | string
+> = T extends keyof ConditionTypeMap<ConditionTypes> ? ConditionTypeMap<ConditionTypes>[T] : UmbConditionConfigBase;
+
+export interface ManifestWithDynamicConditions<ConditionTypes extends UmbConditionConfigBase = UmbConditionConfigBase>
+	extends ManifestBase {
 	/**
 	 * Set the conditions for when the extension should be loaded
 	 */
 	// TODO: Can this be a type union? can we compose types for the ones we know.
-	conditions?: Array<UmbConditionConfig>;
-}
-
-export interface UmbConditionConfig<ValueType = unknown> {
-	alias: string;
-	value: ValueType;
+	conditions?: Array<ConditionTypes>;
 }
 
 export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {

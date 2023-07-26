@@ -70,11 +70,11 @@ describe('UmbExtensionElementController', () => {
 				conditions: [
 					{
 						alias: 'Umb.Test.Condition.Delay',
-						value: '100',
+						frequency: '100',
 					},
 					{
 						alias: 'Umb.Test.Condition.Delay',
-						value: '200',
+						frequency: '200',
 					},
 				],
 			} as any;

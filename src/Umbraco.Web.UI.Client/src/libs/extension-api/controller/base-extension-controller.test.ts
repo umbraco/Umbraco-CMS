@@ -1,5 +1,5 @@
 import { expect, fixture } from '@open-wc/testing';
-import type { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfig } from '../types.js';
+import type { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types.js';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
 import {
@@ -35,16 +35,16 @@ class UmbTestExtensionController extends UmbBaseExtensionController {
 }
 
 class UmbTestConditionAlwaysValid extends UmbBaseController implements UmbExtensionCondition {
-	config: UmbConditionConfig;
-	constructor(args: { host: UmbControllerHost; config: UmbConditionConfig }) {
+	config: UmbConditionConfigBase;
+	constructor(args: { host: UmbControllerHost; config: UmbConditionConfigBase }) {
 		super(args.host);
 		this.config = args.config;
 	}
 	permitted = true;
 }
 class UmbTestConditionAlwaysInvalid extends UmbBaseController implements UmbExtensionCondition {
-	config: UmbConditionConfig;
-	constructor(args: { host: UmbControllerHost; config: UmbConditionConfig }) {
+	config: UmbConditionConfigBase;
+	constructor(args: { host: UmbControllerHost; config: UmbConditionConfigBase }) {
 		super(args.host);
 		this.config = args.config;
 	}
@@ -143,7 +143,6 @@ describe('UmbBaseExtensionController', () => {
 				conditions: [
 					{
 						alias: 'Umb.Test.Condition.Valid',
-						value: 'Always valid condition',
 					},
 				],
 			};
@@ -252,7 +251,6 @@ describe('UmbBaseExtensionController', () => {
 				conditions: [
 					{
 						alias: 'Umb.Test.Condition.Invalid',
-						value: 'Always valid condition',
 					},
 				],
 			};
@@ -330,7 +328,7 @@ describe('UmbBaseExtensionController', () => {
 	describe('Manifest with one condition that changes over time', () => {
 		let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
-		let manifest: ManifestWithDynamicConditions;
+		let manifest: ManifestWithDynamicConditions<UmbConditionConfigBase & { value: string }>;
 
 		beforeEach(async () => {
 			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
@@ -389,7 +387,7 @@ describe('UmbBaseExtensionController', () => {
 	describe('Manifest with multiple conditions that changes over time', () => {
 		let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
-		let manifest: ManifestWithDynamicConditions;
+		let manifest: ManifestWithDynamicConditions<UmbConditionConfigBase & { value: string }>;
 
 		beforeEach(async () => {
 			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);

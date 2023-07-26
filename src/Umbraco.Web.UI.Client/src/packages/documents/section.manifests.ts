@@ -31,7 +31,7 @@ const menuSectionSidebarApp: ManifestSectionSidebarAppMenuWithEntityActionsKind 
 	conditions: [
 		{
 			alias: 'Umb.Condition.SectionAlias',
-			value: sectionAlias,
+			match: sectionAlias,
 		},
 	],
 };

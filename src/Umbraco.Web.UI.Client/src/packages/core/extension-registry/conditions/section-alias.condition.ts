@@ -1,13 +1,17 @@
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { ManifestCondition, UmbConditionConfig, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
+import {
+	ManifestCondition,
+	UmbConditionConfigBase,
+	UmbExtensionCondition,
+} from '@umbraco-cms/backoffice/extension-api';
 import { UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 
 export class UmbSectionAliasCondition extends UmbBaseController implements UmbExtensionCondition {
-	config: UmbConditionConfig<string>;
+	config: SectionAliasConditionConfig;
 	permitted = false;
 	#onChange: () => void;
 
-	constructor(args: { host: UmbControllerHost; config: UmbConditionConfig<string>; onChange: () => void }) {
+	constructor(args: { host: UmbControllerHost; config: SectionAliasConditionConfig; onChange: () => void }) {
 		super(args.host);
 		this.config = args.config;
 		this.#onChange = args.onChange;
@@ -17,7 +21,7 @@ export class UmbSectionAliasCondition extends UmbBaseController implements UmbEx
 				context.alias,
 				(sectionAlias) => {
 					// TODO: Would be nice to make the object fully controllable by each condition, but requires some typing system.
-					this.permitted = sectionAlias === this.config.value;
+					this.permitted = sectionAlias === this.config.match;
 					this.#onChange();
 				}
 				//,
@@ -49,4 +53,8 @@ export const manifest: ManifestCondition = {
 	name: 'Section Alias Condition',
 	alias: 'Umb.Condition.SectionAlias',
 	class: UmbSectionAliasCondition,
+};
+
+export type SectionAliasConditionConfig = UmbConditionConfigBase & {
+	match: string;
 };

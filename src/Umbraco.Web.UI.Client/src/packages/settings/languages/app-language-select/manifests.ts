@@ -16,7 +16,7 @@ const entityActions: Array<ManifestTypes> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.SectionAlias',
-				value: 'Umb.Section.Content',
+				match: 'Umb.Section.Content',
 			},
 		],
 	},
