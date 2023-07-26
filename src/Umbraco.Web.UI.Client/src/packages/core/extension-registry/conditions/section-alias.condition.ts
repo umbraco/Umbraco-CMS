@@ -19,8 +19,9 @@ export class UmbSectionAliasCondition extends UmbBaseController implements UmbEx
 					// TODO: Would be nice to make the object fully controllable by each condition, but requires some typing system.
 					this.permitted = sectionAlias === this.config.value;
 					this.#onChange();
-				},
-				'_observeSectionAlias'
+				}
+				//,
+				//'_observeSectionAlias'
 			);
 			//}
 			// Niels: As is of this state, contexts cannot be unprovided, so this code is not needed:
