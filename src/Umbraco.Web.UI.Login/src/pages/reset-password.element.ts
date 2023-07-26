@@ -5,6 +5,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbAuthMainContext } from '../context/auth-main.context';
 import { when } from 'lit/directives/when.js';
 
+import './back-to-login-button.element.js';
+
 @customElement('umb-reset-password')
 export default class UmbResetPasswordElement extends LitElement {
 	@state()
@@ -38,10 +40,13 @@ export default class UmbResetPasswordElement extends LitElement {
 		return html`
 			<uui-form>
 				<form id="LoginForm" name="login" @submit="${this.#handleResetSubmit}">
-					<div>
+					<div id="header">
 						<h2>Forgot your password?</h2>
-						Enter the email address associated with your account and we'll send you the reset instructions.
+						<span>
+							Enter the email address associated with your account and we'll send you the reset instructions.
+						</span>
 					</div>
+
 					<uui-form-layout-item>
 						<uui-label for="email" slot="label" required>Email</uui-label>
 						<uui-input
@@ -72,23 +77,16 @@ export default class UmbResetPasswordElement extends LitElement {
 				</form>
 			</uui-form>
 
-			<a href="" id="back-to-login">
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-					<path
-						fill="currentColor"
-						d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"></path>
-				</svg>
-				<span>Back to log in</span>
-			</a>
+			<umb-back-to-login-button style="margin-top: var(--uui-size-space-6)"></umb-back-to-login-button>
 		`;
 	}
 
 	#renderConfirmationPage() {
 		return html`
 			<div id="confirm-page">
-				<div>
+				<div id="header">
 					<h2>Email has been sent!</h2>
-					Check your inbox and click the received link to reset your password.
+					<span>Check your inbox and click the received link to reset your password.</span>
 				</div>
 
 				<uui-button type="submit" label="Login" look="primary" color="default" href=" "></uui-button>
@@ -105,9 +103,20 @@ export default class UmbResetPasswordElement extends LitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
-			:host {
+			#header {
+				text-align: center;
 				display: flex;
 				flex-direction: column;
+				gap: var(--uui-size-space-5);
+			}
+			#header span {
+				color: #868686; /* TODO Change to uui color when uui gets a muted text variable */
+				font-size: 14px;
+			}
+			#header h2 {
+				margin: 0px;
+				font-weight: bold;
+				font-size: 1.4rem;
 			}
 			form,
 			#confirm-page {
@@ -122,13 +131,6 @@ export default class UmbResetPasswordElement extends LitElement {
 			uui-input-password {
 				width: 100%;
 				border-radius: var(--uui-border-radius);
-			}
-			h2 {
-				text-align: center;
-				margin: 0px;
-				font-weight: 600;
-				font-size: 1.4rem;
-				margin-bottom: var(--uui-size-space-5);
 			}
 			uui-input {
 				width: 100%;

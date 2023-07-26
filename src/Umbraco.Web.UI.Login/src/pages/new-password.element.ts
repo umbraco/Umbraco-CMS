@@ -75,9 +75,9 @@ export default class UmbNewPasswordElement extends LitElement {
 		return html`
 			<uui-form>
 				<form id="LoginForm" name="login" @submit="${this.#handleResetSubmit}">
-					<div>
+					<div id="header">
 						<h2>Create new password</h2>
-						Enter a new password for your account.
+						<span> Enter a new password for your account. </span>
 					</div>
 					<uui-form-layout-item>
 						<uui-label id="passwordLabel" for="password" slot="label" required>Password</uui-label>
@@ -107,10 +107,12 @@ export default class UmbNewPasswordElement extends LitElement {
 						type="submit"
 						label="Continue"
 						look="primary"
-						color="positive"
+						color="default"
 						.state=${this.newCallState}></uui-button>
 				</form>
 			</uui-form>
+
+			<umb-back-to-login-button style="margin-top: var(--uui-size-space-6)"></umb-back-to-login-button>
 		`;
 	}
 
@@ -149,13 +151,43 @@ export default class UmbNewPasswordElement extends LitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
+			#header {
+				text-align: center;
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-5);
+			}
+			#header span {
+				color: #868686; /* TODO Change to uui color when uui gets a muted text variable */
+				font-size: 14px;
+			}
+			#header h2 {
+				margin: 0px;
+				font-weight: bold;
+				font-size: 1.4rem;
+			}
+			form {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-5);
+			}
+			uui-form-layout-item {
+				margin: 0;
+			}
+			h2 {
+				margin: 0px;
+				font-weight: 600;
+				font-size: 1.4rem;
+				margin-bottom: var(--uui-size-space-4);
+			}
 			uui-input-password {
 				width: 100%;
 			}
 			uui-button {
-				margin-left: auto;
-				display: flex;
-				width: fit-content;
+				width: 100%;
+				margin-top: var(--uui-size-space-5);
+				--uui-button-padding-top-factor: 1.5;
+				--uui-button-padding-bottom-factor: 1.5;
 			}
 		`,
 	];
