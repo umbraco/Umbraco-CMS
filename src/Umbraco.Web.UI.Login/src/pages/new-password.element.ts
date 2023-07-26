@@ -124,11 +124,20 @@ export default class UmbNewPasswordElement extends LitElement {
 	}
 
 	#renderConfirmationPage() {
-		return html` PASSWORD SUCCESSFULLY CHANGED PAGE `;
+		return html`
+			<div id="confirm-page">
+				<div id="header">
+					<h2>Success!</h2>
+					<span>Your password has been successfully updated</span>
+				</div>
+
+				<uui-button type="submit" label="Login" look="primary" color="default" href=" "></uui-button>
+			</div>
+		`;
 	}
 
 	#renderErrorPage() {
-		return html` ERROR PAGE use param ?code=valid to test`;
+		return html` TODO MAKE ERROR PAGE`;
 	}
 
 	#renderRoute() {
