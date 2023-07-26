@@ -1,15 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { Router } from '@vaadin/router';
+import { UmbAuthMainContext } from './context/auth-main.context.js';
 
 import './auth-layout.element.js';
 import './pages/reset-password.element.js';
 import './pages/new-password.element.js';
 import './pages/login.element.js';
-import { Router } from '@vaadin/router';
-import { UmbAuthMainContext } from './context/auth-main.context.js';
 
 @customElement('umb-auth')
 export default class UmbAuthElement extends LitElement {
@@ -37,19 +36,15 @@ export default class UmbAuthElement extends LitElement {
 		return new URLSearchParams(window.location.search).get('returnPath') || this.#returnPath;
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	async firstUpdated(): Promise<void> {
+    const router = new Router(this.shadowRoot?.getElementById('outlet'));
 
-		requestAnimationFrame(() => {
-			const router = new Router(this.shadowRoot?.getElementById('outlet'));
-
-			router.setRoutes([
-				{ path: '', component: 'umb-login' },
-				{ path: 'reset', component: 'umb-reset-password' },
-				{ path: 'new', component: 'umb-new-password' },
-				{ path: '(.*)', redirect: '' },
-			]);
-		});
+    await router.setRoutes([
+      { path: '', component: 'umb-login' },
+      { path: 'reset', component: 'umb-reset-password' },
+      { path: 'new', component: 'umb-new-password' },
+      { path: '(.*)', redirect: '' }
+    ]);
 	}
 
 	render() {
