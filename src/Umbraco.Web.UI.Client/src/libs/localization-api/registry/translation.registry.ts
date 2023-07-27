@@ -18,7 +18,10 @@ export class UmbTranslationRegistry {
 		return this.#innerDictionary.asObservable();
 	}
 
-	register(userCulture: string, fallbackCulture = 'en') {
+	register(userCulture: string, fallbackCulture = 'en_us') {
+		userCulture = userCulture.toLowerCase();
+		fallbackCulture = fallbackCulture.toLowerCase();
+
 		// Reset the inner dictionary.
 		this.#innerDictionaryValue = new Map();
 
