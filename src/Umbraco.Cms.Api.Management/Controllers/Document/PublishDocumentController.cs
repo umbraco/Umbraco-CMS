@@ -10,12 +10,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
 public class PublishDocumentController : DocumentControllerBase
 {
-    private readonly IContentEditingService _contentEditingService;
+    private readonly IContentPublishingService _contentPublishingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public PublishDocumentController(IContentEditingService contentEditingService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public PublishDocumentController(IContentPublishingService contentPublishingService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
-        _contentEditingService = contentEditingService;
+        _contentPublishingService = contentPublishingService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -29,11 +29,11 @@ public class PublishDocumentController : DocumentControllerBase
         Attempt<ContentPublishingOperationStatus> attempt;
         if (cultures is null || cultures.Length is 0)
         {
-            attempt = await _contentEditingService.PublishAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
+            attempt = await _contentPublishingService.PublishAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
         }
         else
         {
-            attempt = await _contentEditingService.PublishAsync(id, CurrentUserKey(_backOfficeSecurityAccessor), cultures);
+            attempt = await _contentPublishingService.PublishAsync(id, CurrentUserKey(_backOfficeSecurityAccessor), cultures);
         }
 
         return attempt.Success ? Ok() : ContentPublishingOperationStatusResult(attempt.Result);
