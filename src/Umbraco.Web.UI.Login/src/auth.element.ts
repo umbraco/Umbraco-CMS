@@ -27,10 +27,15 @@ export default class UmbAuthElement extends LitElement {
 	usernameIsEmail = false;
 
 	@property({ type: Boolean, attribute: 'allow-password-reset' })
-	allowPasswordReset = true;
+	set allowPasswordReset(value: boolean) {
+		UmbAuthMainContext.Instance.allowPasswordReset = value;
+	}
+	get allowPasswordReset() {
+		return UmbAuthMainContext.Instance.allowPasswordReset;
+	}
 
 	@property({ type: Boolean, attribute: 'allow-user-invite' })
-	allowUserInvite = true;
+	allowUserInvite = false;
 
 	@property({ type: String, attribute: 'return-url' })
 	set returnPath(value: string) {
@@ -49,17 +54,32 @@ export default class UmbAuthElement extends LitElement {
 			{
 				path: 'login',
 				children: [
-					{ path: '', component: 'umb-login', action: this.#test },
-					{ path: 'reset', component: 'umb-reset-password' },
-					{ path: 'new', component: 'umb-new-password' },
+					{ path: '', component: 'umb-login', action: this.#checkResetCode.bind(this) },
+					{ path: 'reset', component: 'umb-reset-password', action: this.#checkRouteAllowReset.bind(this) },
+					{ path: 'new', component: 'umb-new-password', action: this.#checkRouteAllowReset.bind(this) },
+					{ path: 'invite', component: 'umb-invite', action: this.#checkRouteAllowInvite.bind(this) },
+					{ path: '(.*)', redirect: '' },
 				],
 			},
 			{ path: '(.*)', redirect: 'login' },
 		]);
 	}
 
-	#test(context: Context, commands: Commands) {
+	#checkRouteAllowReset(context: Context, commands: Commands) {
+		if (!this.allowPasswordReset) {
+			return commands.redirect('login');
+		}
+	}
+
+	#checkRouteAllowInvite(context: Context, commands: Commands) {
+		if (!this.allowUserInvite) {
+			return commands.redirect('login');
+		}
+	}
+
+	#checkResetCode(context: Context, commands: Commands) {
 		//TODO: You should be able to use the router to redirect, but the commands.redirect() doesn't work with params.
+		//TODO: And the Router.go() doesn't work at all for some reason.
 		const flow = new URLSearchParams(window.location.search).get('flow');
 		const status = new URLSearchParams(window.location.search).get('status');
 
