@@ -1,5 +1,10 @@
 import { expect, fixture } from '@open-wc/testing';
-import type { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types.js';
+import type {
+	ManifestCondition,
+	ManifestKind,
+	ManifestWithDynamicConditions,
+	UmbConditionConfigBase,
+} from '../types.js';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
 import {
@@ -192,15 +197,19 @@ describe('UmbBaseExtensionController', () => {
 			extensionRegistry.register(manifest);
 		});
 
-		it('works with extension manifest begin changed during usage.', (done) => {
+		it('works with extension manifest with conditions begin changed during usage.', (done) => {
 			let count = 0;
 			let initialPromiseResolved = false;
-			const noConditionsManifest = {
+			const extensionWithConditions = {
 				type: 'section',
 				name: 'test-section-1',
 				alias: 'Umb.Test.Section.1',
 				weight: 2,
-				conditions: [],
+				conditions: [
+					{
+						alias: 'Umb.Test.Condition.Valid',
+					},
+				],
 			};
 			const extensionController = new UmbTestExtensionController(
 				hostElement,
@@ -210,7 +219,8 @@ describe('UmbBaseExtensionController', () => {
 					count++;
 					if (count === 1) {
 						// First time render, there is no conditions.
-						expect(extensionController.manifest?.conditions?.length).to.be.equal(0);
+						expect(extensionController.manifest?.weight).to.be.equal(2);
+						expect(extensionController.manifest?.conditions?.length).to.be.equal(1);
 					} else if (count === 2) {
 						// Second time render, there is conditions and weight is 22.
 						expect(extensionController.manifest?.weight).to.be.equal(22);
@@ -224,13 +234,153 @@ describe('UmbBaseExtensionController', () => {
 			);
 			extensionController.asPromise().then(() => {
 				initialPromiseResolved = true;
-				extensionRegistry.unregister(noConditionsManifest.alias);
+				extensionRegistry.unregister(extensionWithConditions.alias);
 				Promise.resolve().then(() => {
-					extensionRegistry.register({ ...manifest, weight: 22 });
+					extensionRegistry.register({ ...extensionWithConditions, weight: 22 });
 				});
 			});
 
-			extensionRegistry.register(noConditionsManifest);
+			extensionRegistry.register(extensionWithConditions);
+			extensionRegistry.register(conditionManifest);
+		});
+
+		it('works with extension manifest without conditions begin changed during usage.', (done) => {
+			let count = 0;
+			let initialPromiseResolved = false;
+			const extensionWithNoConditions = {
+				type: 'section',
+				name: 'test-section-1',
+				alias: 'Umb.Test.Section.1',
+				weight: 3,
+				conditions: [],
+			};
+			const extensionController = new UmbTestExtensionController(
+				hostElement,
+				extensionRegistry,
+				'Umb.Test.Section.1',
+				() => {
+					count++;
+					if (count === 1) {
+						// First time render, there is no conditions.
+						expect(extensionController.manifest?.weight).to.be.equal(3);
+						expect(extensionController.manifest?.conditions?.length).to.be.equal(0);
+					} else if (count === 2) {
+						// Second time render, there is conditions and weight is 33.
+						expect(extensionController.manifest?.weight).to.be.equal(33);
+						expect(extensionController.manifest?.conditions?.length).to.be.equal(0);
+						// Check that the promise has been resolved for the first render to ensure timing is right.
+						expect(initialPromiseResolved).to.be.true;
+						done();
+						extensionController.destroy();
+					}
+				}
+			);
+			extensionController.asPromise().then(() => {
+				initialPromiseResolved = true;
+				extensionRegistry.unregister(extensionWithNoConditions.alias);
+				Promise.resolve().then(() => {
+					extensionRegistry.register({ ...extensionWithNoConditions, weight: 33 });
+				});
+			});
+
+			extensionRegistry.register(extensionWithNoConditions);
+			extensionRegistry.register(conditionManifest);
+		});
+
+		it('works with extension manifest without conditions begin changed to have conditions during usage.', (done) => {
+			let count = 0;
+			let initialPromiseResolved = false;
+			const extensionWithNoConditions = {
+				type: 'section',
+				name: 'test-section-1',
+				alias: 'Umb.Test.Section.1',
+				weight: 4,
+				conditions: [],
+			};
+			const extensionController = new UmbTestExtensionController(
+				hostElement,
+				extensionRegistry,
+				'Umb.Test.Section.1',
+				() => {
+					count++;
+					if (count === 1) {
+						// First time render, there is no conditions.
+						expect(extensionController.manifest?.weight).to.be.equal(4);
+						expect(extensionController.manifest?.conditions?.length).to.be.equal(0);
+					} else if (count === 2) {
+						// Second time render, there is conditions and weight is 33.
+						expect(extensionController.manifest?.weight).to.be.equal(44);
+						expect(extensionController.manifest?.conditions?.length).to.be.equal(1);
+						// Check that the promise has been resolved for the first render to ensure timing is right.
+						expect(initialPromiseResolved).to.be.true;
+						done();
+						extensionController.destroy();
+					}
+				}
+			);
+			extensionController.asPromise().then(() => {
+				initialPromiseResolved = true;
+				extensionRegistry.unregister(extensionWithNoConditions.alias);
+				Promise.resolve().then(() => {
+					extensionRegistry.register({ ...manifest, weight: 44 });
+				});
+			});
+
+			extensionRegistry.register(extensionWithNoConditions);
+			extensionRegistry.register(conditionManifest);
+		});
+
+		it('works with extension manifest without conditions to pair with a late coming kind.', (done) => {
+			let count = 0;
+			let initialPromiseResolved = false;
+			const extensionWithNoConditions = {
+				type: 'section',
+				name: 'test-section-1',
+				alias: 'Umb.Test.Section.1',
+				kind: 'test-kind',
+				conditions: [],
+			};
+			const lateComingKind: ManifestKind<ManifestWithDynamicConditions> = {
+				type: 'kind',
+				alias: 'Umb.Test.Kind',
+				matchType: 'section',
+				matchKind: 'test-kind',
+				manifest: {
+					type: 'section',
+					weight: 123,
+				},
+			};
+			const extensionController = new UmbTestExtensionController(
+				hostElement,
+				extensionRegistry,
+				'Umb.Test.Section.1',
+				() => {
+					count++;
+					if (count === 1) {
+						// First time render, there is no conditions.
+						expect(extensionController.manifest?.weight).to.be.undefined;
+						expect(extensionController.manifest?.conditions?.length).to.be.equal(0);
+					} else if (count === 2) {
+						console.log('Kind change was tricked');
+						// Second time render, there is a matching kind and then weight is 123.
+						expect(extensionController.manifest?.weight).to.be.equal(123);
+						expect(extensionController.manifest?.conditions?.length).to.be.equal(0);
+						// Check that the promise has been resolved for the first render to ensure timing is right.
+						expect(initialPromiseResolved).to.be.true;
+						done();
+						extensionController.destroy();
+					}
+				}
+			);
+			extensionController.asPromise().then(() => {
+				initialPromiseResolved = true;
+				console.log('Was resolved.');
+				Promise.resolve().then(() => {
+					extensionRegistry.register(lateComingKind);
+				});
+			});
+
+			extensionRegistry.register(extensionWithNoConditions);
 			extensionRegistry.register(conditionManifest);
 		});
 	});

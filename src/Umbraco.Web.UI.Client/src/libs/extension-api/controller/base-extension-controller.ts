@@ -63,7 +63,7 @@ export abstract class UmbBaseExtensionController<
 				this.#isPermitted = undefined;
 				this.#manifest = extensionManifest;
 				if (extensionManifest) {
-					this.#gotManifest(extensionManifest);
+					this.#gotManifest();
 				} else {
 					this.#cleanConditions();
 				}
@@ -83,8 +83,8 @@ export abstract class UmbBaseExtensionController<
 		this.removeControllerByAlias('_observeConditions');
 	}
 
-	#gotManifest(extensionManifest: ManifestType) {
-		const conditionConfigs = extensionManifest.conditions ?? [];
+	#gotManifest() {
+		const conditionConfigs = this.#manifest?.conditions ?? [];
 
 		if (conditionConfigs.length === 0) {
 			this.#cleanConditions();
@@ -96,6 +96,7 @@ export abstract class UmbBaseExtensionController<
 			.map((condition) => condition.alias)
 			.filter((value, index, array) => array.indexOf(value) === index);
 
+		const oldAmountOfControllers = this.#conditionControllers.length;
 		// Clean up conditions controllers based on keepers:
 		this.#conditionControllers = this.#conditionControllers.filter((current) => {
 			const continueExistence = conditionConfigs.find((config) => config === current.config);
@@ -105,6 +106,13 @@ export abstract class UmbBaseExtensionController<
 			}
 			return continueExistence;
 		});
+
+		// Check if there was no change in conditions:
+		// First check if any got removed(old amount equal controllers after clean-up)
+		// && check if any new is about to be added(old equal new amount):
+		const noChangeInConditions =
+			oldAmountOfControllers === this.#conditionControllers.length &&
+			oldAmountOfControllers === conditionConfigs.length;
 
 		if (conditionConfigs.length > 0) {
 			// Observes the conditions and initialize as they come in.
@@ -144,6 +152,11 @@ export abstract class UmbBaseExtensionController<
 			);
 		} else {
 			this.removeControllerByAlias('_observeConditions');
+		}
+
+		if (noChangeInConditions) {
+			// There was not change in the amount of conditions, but the manifest was changed, this means this.#isPermitted is set to undefined and this will always fire the callback:
+			this.#onConditionsChangedCallback();
 		}
 	}
 
