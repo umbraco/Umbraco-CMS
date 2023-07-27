@@ -1,10 +1,10 @@
 import { expect, fixture, html } from '@open-wc/testing';
+import { UmbLocalizeElement } from './localize.element.js';
 import {
 	UMB_LOCALIZATION_CONTEXT,
 	UmbLocalizationContext,
 	UmbTranslationRegistry,
 } from '@umbraco-cms/backoffice/localization-api';
-import { UmbLocalizeElement } from './localize.element.js';
 import { UmbExtensionRegistry } from '@umbraco-cms/backoffice/extension-api';
 
 import '@umbraco-cms/backoffice/context-api';
