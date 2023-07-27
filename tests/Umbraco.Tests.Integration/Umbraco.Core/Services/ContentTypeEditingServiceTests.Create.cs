@@ -11,7 +11,7 @@ public partial class ContentTypeEditingServiceTests
 {
     [TestCase(false)]
     [TestCase(true)]
-    public async Task Can_Create_ContentType_With_All_Basic_Settings(bool isElement)
+    public async Task Can_Create_With_All_Basic_Settings(bool isElement)
     {
         var createModel = CreateCreateModel("Test", "test", isElement: isElement);
         createModel.Description = "This is the Test description";
@@ -39,7 +39,7 @@ public partial class ContentTypeEditingServiceTests
     [TestCase(true, false)]
     [TestCase(false, true)]
     [TestCase(true, true)]
-    public async Task Can_Create_ContentType_With_Variation(bool variesByCulture, bool variesBySegment)
+    public async Task Can_Create_With_Variation(bool variesByCulture, bool variesBySegment)
     {
         var createModel = CreateCreateModel("Test", "test");
         createModel.VariesByCulture = variesByCulture;
@@ -58,7 +58,7 @@ public partial class ContentTypeEditingServiceTests
 
     [TestCase(true)]
     [TestCase(false)]
-    public async Task Can_Create_ContentType_In_A_Folder(bool isElement)
+    public async Task Can_Create_In_A_Folder(bool isElement)
     {
         var containerResult = ContentTypeService.CreateContainer(Constants.System.Root, Guid.NewGuid(), "Test folder");
         Assert.IsTrue(containerResult.Success);
@@ -78,13 +78,13 @@ public partial class ContentTypeEditingServiceTests
 
     [TestCase(false)]
     [TestCase(true)]
-    public async Task Can_Create_ContentType_With_Properties_In_A_Container(bool isElement)
+    public async Task Can_Create_With_Properties_In_A_Container(bool isElement)
     {
         var createModel = CreateCreateModel("Test", "test", isElement: isElement);
         var container = CreateContainer();
         createModel.Containers = new[] { container };
 
-        var propertyType = CreatePropertyType(name: "Test Property", alias: "testProperty", containerKey: container.Key);
+        var propertyType = CreatePropertyType("Test Property", "testProperty", containerKey: container.Key);
         createModel.Properties = new[] { propertyType };
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -105,11 +105,11 @@ public partial class ContentTypeEditingServiceTests
 
     [TestCase(false)]
     [TestCase(true)]
-    public async Task Can_Create_ContentType_With_Orphaned_Properties(bool isElement)
+    public async Task Can_Create_With_Orphaned_Properties(bool isElement)
     {
         var createModel = CreateCreateModel("Test", "test", isElement: isElement);
 
-        var propertyType = CreatePropertyType(name: "Test Property", alias: "testProperty");
+        var propertyType = CreatePropertyType("Test Property", "testProperty");
         createModel.Properties = new[] { propertyType };
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -172,14 +172,14 @@ public partial class ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Can_Assign_Allowed_Types_To_ContentType()
+    public async Task Can_Assign_Allowed_Types()
     {
-        var allowedOne = (await ContentTypeEditingService.CreateAsync(CreateCreateModel(name: "Allowed One", alias: "allowedOne"), Constants.Security.SuperUserKey)).Result;
-        var allowedTwo = (await ContentTypeEditingService.CreateAsync(CreateCreateModel(name: "Allowed Two", alias: "allowedTwo"), Constants.Security.SuperUserKey)).Result;
+        var allowedOne = (await ContentTypeEditingService.CreateAsync(CreateCreateModel("Allowed One", "allowedOne"), Constants.Security.SuperUserKey)).Result;
+        var allowedTwo = (await ContentTypeEditingService.CreateAsync(CreateCreateModel("Allowed Two", "allowedTwo"), Constants.Security.SuperUserKey)).Result;
         Assert.IsNotNull(allowedOne);
         Assert.IsNotNull(allowedTwo);
 
-        var createModel = CreateCreateModel(name: "Test", alias: "test");
+        var createModel = CreateCreateModel("Test", "test");
         createModel.AllowedContentTypes = new[]
         {
             new ContentTypeSort(new Lazy<int>(() => allowedOne.Id), allowedOne.Key, 10, allowedOne.Alias),
@@ -200,9 +200,9 @@ public partial class ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Can_Assign_History_Cleanup_To_ContentType()
+    public async Task Can_Assign_History_Cleanup()
     {
-        var createModel = CreateCreateModel(name: "Test", alias: "test");
+        var createModel = CreateCreateModel("Test", "test");
         createModel.Cleanup = new ContentTypeCleanup
         {
             PreventCleanup = true, KeepAllVersionsNewerThanDays = 123, KeepLatestVersionPerDayForDays = 456
@@ -224,18 +224,18 @@ public partial class ContentTypeEditingServiceTests
     [TestCase(true, false)]
     [TestCase(false, false)]
     // Wondering where the last case is? Look at the test below.
-    public async Task Can_Create_Composite_ContentType(bool compositionIsElement, bool contentTypeIsElement)
+    public async Task Can_Create_Composite(bool compositionIsElement, bool contentTypeIsElement)
     {
         var compositionBase = CreateCreateModel(
-            alias: "compositionBase",
-            name: "Composition Base",
+            "Composition Base",
+            "compositionBase",
             isElement: compositionIsElement);
 
         // Let's add a property to ensure that it passes through
         var container = CreateContainer();
         compositionBase.Containers = new[] { container };
 
-        var compositionProperty = CreatePropertyType(name: "Composition Property", alias: "compositionProperty", containerKey: container.Key);
+        var compositionProperty = CreatePropertyType("Composition Property", "compositionProperty", containerKey: container.Key);
         compositionBase.Properties = new[] { compositionProperty };
 
         var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
@@ -279,7 +279,7 @@ public partial class ContentTypeEditingServiceTests
         // We see that element types are not suppose to be allowed to be composed by non-element types.
         // Since this breaks models builder evidently.
         var compositionBase = CreateCreateModel(
-            name: "Composition Base",
+            "Composition Base",
             isElement: false);
 
         var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
@@ -287,7 +287,7 @@ public partial class ContentTypeEditingServiceTests
         var compositionType = compositionResult.Result;
 
         var createModel = CreateCreateModel(
-            name: "Content Type Using Composition",
+            "Content Type Using Composition",
             compositions: new[]
             {
                 new Composition
@@ -311,13 +311,13 @@ public partial class ContentTypeEditingServiceTests
     [Test]
     public async Task ContentType_Containing_Composition_Cannot_Be_Used_As_Composition()
     {
-        var compositionBase = CreateCreateModel(name: "CompositionBase");
+        var compositionBase = CreateCreateModel("CompositionBase");
 
         var baseResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(baseResult.Success);
 
         var composition = CreateCreateModel(
-            name: "Composition",
+            "Composition",
             compositions: new[]
             {
                 new Composition
@@ -331,7 +331,7 @@ public partial class ContentTypeEditingServiceTests
 
         // This is not allowed because the composition also has a composition (compositionBase).
         var invalidComposition = CreateCreateModel(
-            name: "Invalid",
+            "Invalid",
             compositions: new[]
             {
                 new Composition
@@ -352,12 +352,12 @@ public partial class ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Can_Create_Child_ContentType()
+    public async Task Can_Create_Child()
     {
 
         var parentProperty = CreatePropertyType("Parent Property", "parentProperty");
         var parentModel = CreateCreateModel(
-            name: "Parent",
+            "Parent",
             propertyTypes: new[] { parentProperty });
 
         var parentResult = await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey);
@@ -374,7 +374,7 @@ public partial class ContentTypeEditingServiceTests
         };
 
         var childModel = CreateCreateModel(
-            name: "Child",
+            "Child",
             propertyTypes: new[] { childProperty },
             compositions: composition);
 
@@ -396,11 +396,11 @@ public partial class ContentTypeEditingServiceTests
 
     // Unlike compositions, it is allowed to inherit on multiple levels
     [Test]
-    public async Task Can_Create_Grandchild_ContentType()
+    public async Task Can_Create_Grandchild()
     {
         var rootProperty = CreatePropertyType("Root property");
         ContentTypeCreateModel rootModel = CreateCreateModel(
-            name: "Root",
+            "Root",
             propertyTypes: new[] { rootProperty });
 
         var rootResult = await ContentTypeEditingService.CreateAsync(rootModel, Constants.Security.SuperUserKey);
@@ -417,7 +417,7 @@ public partial class ContentTypeEditingServiceTests
         };
 
         var childModel = CreateCreateModel(
-            name: "Child",
+            "Child",
             propertyTypes: new[] { childProperty },
             compositions: composition);
 
@@ -435,7 +435,7 @@ public partial class ContentTypeEditingServiceTests
         };
 
         var grandchildModel = CreateCreateModel(
-            name: "Grandchild",
+            "Grandchild",
             propertyTypes: new[] { grandchildProperty },
             compositions: grandchildComposition);
 
@@ -465,9 +465,9 @@ public partial class ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task ContentType_Cannot_Be_Both_Parent_And_Composition()
+    public async Task Cannot_Be_Both_Parent_And_Composition()
     {
-        var compositionBase = CreateCreateModel(name: "CompositionBase");
+        var compositionBase = CreateCreateModel("CompositionBase");
 
         var baseResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
         Assert.IsTrue(baseResult.Success);
@@ -496,8 +496,8 @@ public partial class ContentTypeEditingServiceTests
     [Test]
     public async Task Cannot_Have_Multiple_Inheritance()
     {
-        var parentModel1 = CreateCreateModel(name: "Parent1");
-        var parentModel2 = CreateCreateModel(name: "Parent2");
+        var parentModel1 = CreateCreateModel("Parent1");
+        var parentModel2 = CreateCreateModel("Parent2");
 
         var parentKey1 = (await ContentTypeEditingService.CreateAsync(parentModel1, Constants.Security.SuperUserKey)).Result?.Key;
         Assert.IsTrue(parentKey1.HasValue);
@@ -518,7 +518,7 @@ public partial class ContentTypeEditingServiceTests
         };
 
         var childModel = CreateCreateModel(
-            name: "Child",
+            "Child",
             propertyTypes: new[] { childProperty },
             compositions: composition);
 
@@ -534,7 +534,7 @@ public partial class ContentTypeEditingServiceTests
         var propertyTypeAlias = "testproperty";
         var compositionPropertyType = CreatePropertyType("Test Property", propertyTypeAlias);
         var compositionBase = CreateCreateModel(
-            name: "CompositionBase",
+            "CompositionBase",
             propertyTypes: new[] { compositionPropertyType });
 
         var compositionBaseResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
@@ -583,7 +583,7 @@ public partial class ContentTypeEditingServiceTests
     [Test]
     public async Task Cannot_Mix_Inheritance_And_ParentKey()
     {
-        var parentModel = CreateCreateModel(name: "Parent");
+        var parentModel = CreateCreateModel("Parent");
         var parentKey = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result?.Key;
         Assert.IsTrue(parentKey.HasValue);
 
@@ -601,7 +601,7 @@ public partial class ContentTypeEditingServiceTests
         };
 
         var childModel = CreateCreateModel(
-            name: "Child",
+            "Child",
             parentKey: container.Key,
             compositions: composition);
 
@@ -612,14 +612,14 @@ public partial class ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Cannot_Use_ContentType_As_ParentKey()
+    public async Task Cannot_Use_As_ParentKey()
     {
-        var parentModel = CreateCreateModel(name: "Parent");
+        var parentModel = CreateCreateModel("Parent");
         var parentKey = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result?.Key;
         Assert.IsTrue(parentKey.HasValue);
 
         var childModel = CreateCreateModel(
-            name: "Child",
+            "Child",
             parentKey: parentKey.Value);
 
         var result = await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
@@ -656,7 +656,7 @@ public partial class ContentTypeEditingServiceTests
         foreach (var alias in propertyTypeAliases)
         {
             var propertyType = CreatePropertyType("Test Property", alias);
-            var createModel = CreateCreateModel(name: "Test", propertyTypes: new[] { propertyType });
+            var createModel = CreateCreateModel("Test", propertyTypes: new[] { propertyType });
 
             var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
             Assert.IsFalse(result.Success);
@@ -672,7 +672,7 @@ public partial class ContentTypeEditingServiceTests
     {
         var propertyType1 = CreatePropertyType("Test Property", propertyTypeAlias1);
         var propertyType2 = CreatePropertyType("Test Property", propertyTypeAlias2);
-        var createModel = CreateCreateModel(name: "Test", propertyTypes: new[] { propertyType1, propertyType2 });
+        var createModel = CreateCreateModel("Test", propertyTypes: new[] { propertyType1, propertyType2 });
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
@@ -685,10 +685,10 @@ public partial class ContentTypeEditingServiceTests
     [TestCase("testAlias", "testAlias")]
     [TestCase("testalias", "testAlias")]
     [TestCase("TESTALIAS", "testAlias")]
-    public async Task Cannot_Use_ContentType_Alias_As_PropertyType_Alias(string contentTypeAlias, string propertyTypeAlias)
+    public async Task Cannot_Use_Alias_As_PropertyType_Alias(string contentTypeAlias, string propertyTypeAlias)
     {
         var propertyType = CreatePropertyType("Test Property", propertyTypeAlias);
-        var createModel = CreateCreateModel(name: "Test", alias: contentTypeAlias, propertyTypes: new[] { propertyType });
+        var createModel = CreateCreateModel("Test", contentTypeAlias, propertyTypes: new[] { propertyType });
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
@@ -699,7 +699,7 @@ public partial class ContentTypeEditingServiceTests
     public async Task Cannot_Use_Non_Existing_DataType_For_PropertyType()
     {
         var propertyType = CreatePropertyType("Test Property", "testProperty", dataTypeKey: Guid.NewGuid());
-        var createModel = CreateCreateModel(name: "Test", alias: "test", propertyTypes: new[] { propertyType });
+        var createModel = CreateCreateModel("Test", "test", propertyTypes: new[] { propertyType });
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
@@ -710,7 +710,7 @@ public partial class ContentTypeEditingServiceTests
     public async Task Cannot_Use_Empty_Alias_For_PropertyType()
     {
         var propertyType = CreatePropertyType("Test Property", string.Empty);
-        var createModel = CreateCreateModel(name: "Test", alias: "test", propertyTypes: new[] { propertyType });
+        var createModel = CreateCreateModel("Test", "test", propertyTypes: new[] { propertyType });
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
@@ -720,9 +720,9 @@ public partial class ContentTypeEditingServiceTests
     [Test]
     public async Task Cannot_Use_Empty_Name_For_PropertyType_Container()
     {
-        var container = CreateContainer(name: string.Empty);
+        var container = CreateContainer(string.Empty);
         var propertyType = CreatePropertyType("Test Property", "testProperty", containerKey: container.Key);
-        var createModel = CreateCreateModel(name: "Test", alias: "test", propertyTypes: new[] { propertyType });
+        var createModel = CreateCreateModel("Test", "test", propertyTypes: new[] { propertyType });
         createModel.Containers = new[] { container };
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -739,9 +739,9 @@ public partial class ContentTypeEditingServiceTests
     [TestCase("system")]
     [TestCase("System")]
     [TestCase("SYSTEM")]
-    public async Task Cannot_Use_Invalid_Alias_For_ContentType(string contentTypeAlias)
+    public async Task Cannot_Use_Invalid_Alias(string contentTypeAlias)
     {
-        var createModel = CreateCreateModel(name: "Test", alias: contentTypeAlias);
+        var createModel = CreateCreateModel("Test", contentTypeAlias);
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
@@ -749,13 +749,13 @@ public partial class ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Cannot_Use_Existing_ContentType_Alias_For_ContentType()
+    public async Task Cannot_Use_Existing_Alias()
     {
-        var createModel = CreateCreateModel(name: "Test", alias: "test");
+        var createModel = CreateCreateModel("Test", "test");
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
-        createModel = CreateCreateModel(name: "Test 2", alias: "test");
+        createModel = CreateCreateModel("Test 2", "test");
         result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.DuplicateAlias, result.Status);

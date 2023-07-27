@@ -43,7 +43,7 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
 
     protected abstract UmbracoObjectTypes ContainerObjectType { get; }
 
-    protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> HandleCreateAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? key, Guid? parentKey)
+    protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> MapCreateAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? key, Guid? parentKey)
     {
         SanitizeModelAliases(model);
 
@@ -53,17 +53,24 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
             return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.DuplicateAlias, null);
         }
 
-        // get all existing content types as content type compositions
-        // NOTE: using Cast here is OK, because we implicitly enforce the constraint TContentType : IContentTypeComposition
-        IContentTypeComposition[] allContentTypeCompositions = _concreteContentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+        // get all existing content type compositions
+        IContentTypeComposition[] allContentTypeCompositions = GetAllContentTypeCompositions();
 
-        // now validate the model
-        ContentTypeOperationStatus operationStatus = await ValidateAsync(model, parentKey, allContentTypeCompositions);
+        // validate inheritance and find the correct content type parent ID (can be both a parent content type and a container)
+        ContentTypeOperationStatus operationStatus = ValidateParent(model, parentKey);
         if (operationStatus is not ContentTypeOperationStatus.Success)
         {
             return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
         }
 
+        // validate the rest of the model
+        operationStatus = await ValidateAsync(model, null, allContentTypeCompositions);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
+        }
+
+        // get the ID of the parent to create the content type under (we already validated that it exists)
         var parentId = GetParentId(model, parentKey) ?? throw new ArgumentException("Parent ID could not be found", nameof(model));
         TContentType contentType = CreateContentType(_shortStringHelper, parentId);
 
@@ -73,6 +80,31 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
             contentType.Key = key.Value;
         }
 
+        // map the model to the content type
+        contentType = await UpdateAsync(contentType, model, allContentTypeCompositions);
+        return Attempt.SucceedWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
+    }
+
+    protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> MapUpdateAsync(TContentType contentType, ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+    {
+        SanitizeModelAliases(model);
+
+        if (ContentTypeAliasCanBeUsedFor(model.Alias, contentType.Key) is false)
+        {
+            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidAlias, null);
+        }
+
+        // get all existing content type compositions
+        IContentTypeComposition[] allContentTypeCompositions = GetAllContentTypeCompositions();
+
+        // validate the model
+        ContentTypeOperationStatus operationStatus = await ValidateAsync(model, contentType, allContentTypeCompositions);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
+        }
+
+        // map the model to the content type
         contentType = await UpdateAsync(contentType, model, allContentTypeCompositions);
         return Attempt.SucceedWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
     }
@@ -92,7 +124,7 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
 
     #region Model validation
 
-    private async Task<ContentTypeOperationStatus> ValidateAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? parentKey, IContentTypeComposition[] allContentTypeCompositions)
+    private async Task<ContentTypeOperationStatus> ValidateAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, TContentType? contentType, IContentTypeComposition[] allContentTypeCompositions)
     {
         // validate all model aliases (content type alias, property type aliases)
         ContentTypeOperationStatus operationStatus = ValidateModelAliases(model);
@@ -108,16 +140,8 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
             return operationStatus;
         }
 
-        // validate inheritance and find the correct content type parent ID (can be both a parent content type and a container)
-        operationStatus = ValidateParent(model, parentKey);
-        if (operationStatus is not ContentTypeOperationStatus.Success)
-        {
-            return operationStatus;
-        }
-
-        // TODO: handle update here (contentType is not null)
         // verify that all compositions are valid)
-        operationStatus = ValidateCompositions(null, model, allContentTypeCompositions);
+        operationStatus = ValidateCompositions(contentType, model, allContentTypeCompositions);
         if (operationStatus is not ContentTypeOperationStatus.Success)
         {
             return operationStatus;
@@ -240,6 +264,17 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
     // This this method gets aliases across documents, members, and media, so it covers it all
     private bool ContentTypeAliasIsInUse(string alias) => _contentTypeService.GetAllContentTypeAliases().Contains(alias);
 
+    private bool ContentTypeAliasCanBeUsedFor(string alias, Guid key)
+    {
+        IContentType? existingContentType = _contentTypeService.Get(alias);
+        if (existingContentType is null || existingContentType.Key == key)
+        {
+            return true;
+        }
+
+        return ContentTypeAliasIsInUse(alias) is false;
+    }
+
     private bool IsReservedContentTypeAlias(string alias)
     {
         var reservedAliases = new[] { "system" };
@@ -315,6 +350,7 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
         var allContentTypesByKey = allContentTypeCompositions.ToDictionary(c => c.Key);
         contentType.AllowedContentTypes = model
             .AllowedContentTypes
+            .OrderBy(contentTypeSort => contentTypeSort.SortOrder)
             .Select((contentTypeSort, index) => allContentTypesByKey.TryGetValue(contentTypeSort.Key, out IContentTypeComposition? ct)
                 ? new ContentTypeSort(new Lazy<int>(() => ct.Id), contentTypeSort.Key, index, ct.Alias)
                 : null)
@@ -518,6 +554,10 @@ public abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeSe
             .Where(c => compositionTypes.Contains(c.CompositionType))
             .Select(c => c.Key)
             .ToArray();
+
+    private IContentTypeComposition[] GetAllContentTypeCompositions()
+        // NOTE: using Cast here is OK, because we implicitly enforce the constraint TContentType : IContentTypeComposition
+        => _concreteContentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
 
     #endregion
 }

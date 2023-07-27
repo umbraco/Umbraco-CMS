@@ -11,7 +11,7 @@ public class MediaTypeEditingService : ContentTypeEditingServiceBase<IMediaType,
 
     public async Task<Attempt<IMediaType?, ContentTypeOperationStatus>> CreateAsync(MediaTypeCreateModel model, Guid userKey)
     {
-        Attempt<IMediaType?, ContentTypeOperationStatus> result = await HandleCreateAsync(model, model.Key, model.ParentKey);
+        Attempt<IMediaType?, ContentTypeOperationStatus> result = await MapCreateAsync(model, model.Key, model.ParentKey);
         if (result.Success)
         {
             // TODO: userKey => ID (or create async save with key)

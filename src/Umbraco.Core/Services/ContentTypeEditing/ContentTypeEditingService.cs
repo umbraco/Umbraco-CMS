@@ -26,37 +26,69 @@ public class ContentTypeEditingService : ContentTypeEditingServiceBase<IContentT
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(ContentTypeCreateModel model, Guid userKey)
     {
-        Attempt<IContentType?, ContentTypeOperationStatus> result = await HandleCreateAsync(model, model.Key, model.ParentKey);
+        Attempt<IContentType?, ContentTypeOperationStatus> result = await MapCreateAsync(model, model.Key, model.ParentKey);
         if (result.Success is false)
         {
             return result;
         }
 
-        IContentType contentType = result.Result ?? throw new InvalidOperationException($"{nameof(HandleCreateAsync)} succeeded but did not yield any result");
+        IContentType contentType = result.Result ?? throw new InvalidOperationException($"{nameof(MapCreateAsync)} succeeded but did not yield any result");
 
-        // update content type history clean-up
+        UpdateHistoryCleanup(contentType, model);
+        UpdateTemplates(contentType, model);
+
+        // save content type
+        await SaveAsync(contentType, userKey);
+
+        return Attempt.SucceedWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
+    }
+
+    public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> UpdateAsync(IContentType contentType, ContentTypeUpdateModel model, Guid userKey)
+    {
+        Attempt<IContentType?, ContentTypeOperationStatus> result = await MapUpdateAsync(contentType, model);
+        if (result.Success is false)
+        {
+            return result;
+        }
+
+        contentType = result.Result ?? throw new InvalidOperationException($"{nameof(MapUpdateAsync)} succeeded but did not yield any result");
+
+        UpdateHistoryCleanup(contentType, model);
+        UpdateTemplates(contentType, model);
+
+        await SaveAsync(contentType, userKey);
+
+        return Attempt.SucceedWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
+    }
+
+    // update content type history clean-up
+    private void UpdateHistoryCleanup(IContentType contentType, ContentTypeModelBase model)
+    {
         contentType.HistoryCleanup ??= new HistoryCleanup();
         contentType.HistoryCleanup.PreventCleanup = model.Cleanup.PreventCleanup;
         contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = model.Cleanup.KeepAllVersionsNewerThanDays;
         contentType.HistoryCleanup.KeepLatestVersionPerDayForDays = model.Cleanup.KeepLatestVersionPerDayForDays;
+    }
 
-        // update allowed templates and assign default template
+    // update allowed templates and assign default template
+    private void UpdateTemplates(IContentType contentType, ContentTypeModelBase model)
+    {
         ITemplate[] allowedTemplates = model.AllowedTemplateKeys
             .Select(async templateId => await _templateService.GetAsync(templateId))
             .Select(t => t.Result)
             .WhereNotNull()
             .ToArray();
         contentType.AllowedTemplates = allowedTemplates;
-        // NOTE: incidentally this also covers removing the default template; when requestModel.DefaultTemplateId is null,
+        // NOTE: incidentally this also covers removing the default template; when model.DefaultTemplateId is null,
         //       contentType.SetDefaultTemplate() will be called with a null value, which will reset the default template.
         contentType.SetDefaultTemplate(allowedTemplates.FirstOrDefault(t => t.Key == model.DefaultTemplateKey));
+    }
 
-        // save content type
-        // FIXME: create and use an async get method here.
-        // TODO: userKey => ID (or create async save with key)
+    private async Task SaveAsync(IContentType contentType, Guid userKey)
+    {
+        // TODO: implement async save with the userKey
         _contentTypeService.Save(contentType);
-
-        return Attempt.SucceedWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
+        await Task.CompletedTask;
     }
 
     protected override Guid[] GetAvailableCompositionKeys(IContentTypeComposition? source, IContentTypeComposition[] allContentTypes, bool isElement)

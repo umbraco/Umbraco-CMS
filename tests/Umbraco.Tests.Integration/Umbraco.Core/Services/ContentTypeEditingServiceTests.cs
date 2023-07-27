@@ -45,6 +45,23 @@ public partial class ContentTypeEditingServiceTests : UmbracoIntegrationTest
             IsElement = isElement
         };
 
+    private ContentTypeUpdateModel CreateUpdateModel(
+        string name = "Test",
+        string? alias = null,
+        bool isElement = false,
+        IEnumerable<ContentTypePropertyTypeModel>? propertyTypes = null,
+        IEnumerable<ContentTypePropertyContainerModel>? containers = null,
+        IEnumerable<Composition>? compositions = null) =>
+        new()
+        {
+            Name = name,
+            Alias = alias ?? ShortStringHelper.CleanStringForSafeAlias(name),
+            Properties = propertyTypes ?? Enumerable.Empty<ContentTypePropertyTypeModel>(),
+            Containers = containers ?? Enumerable.Empty<ContentTypePropertyContainerModel>(),
+            Compositions = compositions ?? Enumerable.Empty<Composition>(),
+            IsElement = isElement
+        };
+
     private ContentTypePropertyTypeModel CreatePropertyType(
         string name = "Title",
         string? alias = null,

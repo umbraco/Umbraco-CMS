@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.Models.ContentTypeEditing;
 
-public class ContentTypeModelBase : ContentTypeEditingModelBase<ContentTypePropertyTypeModel, ContentTypePropertyContainerModel>
+public abstract class ContentTypeModelBase : ContentTypeEditingModelBase<ContentTypePropertyTypeModel, ContentTypePropertyContainerModel>
 {
     public ContentTypeCleanup Cleanup { get; set; } = new();
 
