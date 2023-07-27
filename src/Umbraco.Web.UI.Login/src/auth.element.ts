@@ -54,10 +54,10 @@ export default class UmbAuthElement extends LitElement {
 			{
 				path: 'login',
 				children: [
-					{ path: '', component: 'umb-login', action: this.#checkResetCode.bind(this) },
-					{ path: 'reset', component: 'umb-reset-password', action: this.#checkRouteAllowReset.bind(this) },
-					{ path: 'new', component: 'umb-new-password', action: this.#checkRouteAllowReset.bind(this) },
-					{ path: 'invite', component: 'umb-invite', action: this.#checkRouteAllowInvite.bind(this) },
+					{ path: '', component: 'umb-login', action: this.#checkResetCode },
+					{ path: 'reset', component: 'umb-reset-password', action: this.#checkRouteAllowReset },
+					{ path: 'new', component: 'umb-new-password', action: this.#checkRouteAllowReset },
+					{ path: 'invite', component: 'umb-invite', action: this.#checkRouteAllowInvite },
 					{ path: '(.*)', redirect: '' },
 				],
 			},
@@ -65,19 +65,19 @@ export default class UmbAuthElement extends LitElement {
 		]);
 	}
 
-	#checkRouteAllowReset(context: Context, commands: Commands) {
+	#checkRouteAllowReset = (_context: Context, commands: Commands) => {
 		if (!this.allowPasswordReset) {
 			return commands.redirect('login');
 		}
-	}
+	};
 
-	#checkRouteAllowInvite(context: Context, commands: Commands) {
+	#checkRouteAllowInvite = (_context: Context, commands: Commands) => {
 		if (!this.allowUserInvite) {
 			return commands.redirect('login');
 		}
-	}
+	};
 
-	#checkResetCode(context: Context, commands: Commands) {
+	#checkResetCode = (_context: Context, _commands: Commands) => {
 		//TODO: You should be able to use the router to redirect, but the commands.redirect() doesn't work with params.
 		//TODO: And the Router.go() doesn't work at all for some reason.
 		const flow = new URLSearchParams(window.location.search).get('flow');
@@ -87,7 +87,7 @@ export default class UmbAuthElement extends LitElement {
 			window.history.replaceState({}, '', 'login/reset?status=resetCodeExpired');
 			window.history.go(0);
 		}
-	}
+	};
 
 	render() {
 		return html`
