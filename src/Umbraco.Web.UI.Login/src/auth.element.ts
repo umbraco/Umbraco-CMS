@@ -91,7 +91,7 @@ export default class UmbAuthElement extends LitElement {
 
 	render() {
 		return html`
-			<umb-auth-layout .backgroundImage=${ifDefined(this.backgroundImage)} .logoImage=${ifDefined(this.logoImage)}>
+			<umb-auth-layout backgroundImage=${ifDefined(this.backgroundImage)} logoImage=${ifDefined(this.logoImage)}>
 				<div id="outlet"></div>
 			</umb-auth-layout>
 		`;
