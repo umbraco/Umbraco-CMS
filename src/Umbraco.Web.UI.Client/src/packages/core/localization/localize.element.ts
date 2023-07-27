@@ -15,7 +15,19 @@ export class UmbLocalizeElement extends UmbLitElement {
 	 * @example key="general_ok"
 	 */
 	@property({ type: String })
-	key!: string;
+	set key(value: string) {
+		const isNewKey = this.#key !== value;
+		this.#key = value;
+
+		// Only reload translations if the key has changed, otherwise the load happens when the context is there.
+		if (isNewKey) {
+			this.#load();
+		}
+	}
+
+	get key() {
+		return this.#key;
+	}
 
 	/**
 	 * If true, the key will be rendered instead of the localized value if the key is not found.
@@ -27,21 +39,28 @@ export class UmbLocalizeElement extends UmbLitElement {
 	@state()
 	protected value?: string;
 
+	#key = '';
+	#localizationContext?: typeof UMB_LOCALIZATION_CONTEXT.TYPE;
 	#subscription?: UmbObserverController<string>;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_LOCALIZATION_CONTEXT, (instance) => {
-			this.#load(instance);
+			this.#localizationContext = instance;
+			this.#load();
 		});
 	}
 
-	async #load(localizationContext: typeof UMB_LOCALIZATION_CONTEXT.TYPE) {
+	async #load() {
 		if (this.#subscription) {
 			this.#subscription.destroy();
 		}
 
-		this.#subscription = this.observe(localizationContext!.localize(this.key), (value) => {
+		if (!this.#localizationContext) {
+			return;
+		}
+
+		this.#subscription = this.observe(this.#localizationContext!.localize(this.key), (value) => {
 			if (value) {
 				(this.getHostElement() as HTMLElement).removeAttribute('data-umb-localize-error');
 				this.value = value;
