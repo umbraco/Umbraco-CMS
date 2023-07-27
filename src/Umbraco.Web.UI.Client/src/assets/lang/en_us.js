@@ -1,4 +1,4 @@
-{
+export default {
 	"actions": {
 		"assigndomain": "Culture and Hostnames",
 		"auditTrail": "Audit Trail",

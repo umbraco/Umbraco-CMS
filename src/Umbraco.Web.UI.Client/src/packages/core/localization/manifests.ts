@@ -10,7 +10,7 @@ const translationManifests: Array<ManifestTranslations> = [
 		meta: {
 			culture: 'en_us',
 		},
-		loader: () => import('../../../assets/lang/en_us.json'),
+		loader: () => import('../../../assets/lang/en_us.js')
 	},
 ];
 
