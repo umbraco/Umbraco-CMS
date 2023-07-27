@@ -12,6 +12,16 @@ const translationManifests: Array<ManifestTranslations> = [
 		},
 		loader: () => import('../../../assets/lang/en-us.js'),
 	},
+	{
+		type: 'translations',
+		alias: 'Umb.Translations.Da_DK',
+		weight: -100,
+		name: 'Dansk (Danmark)',
+		meta: {
+			culture: 'da-dk',
+		},
+		loader: () => import('../../../assets/lang/da-dk.js'),
+	},
 ];
 
 export const manifests: Array<ManifestTypes> = [...translationManifests];
