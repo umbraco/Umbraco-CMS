@@ -174,7 +174,8 @@ internal sealed class ContentEditingService
         // if culture is '*', then publish them all (including variants)
 
         // this will create the correct culture impact even if culture is * or null
-        CultureImpact? impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), foundContent);
+        CultureImpact? impact =
+            _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), foundContent);
 
         // publish the culture(s)
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -190,8 +191,57 @@ internal sealed class ContentEditingService
             : Attempt.Fail(ContentEditingOperationStatus.Unknown);
     }
 
-    public Task<Attempt<ContentEditingOperationStatus>> PublishAsync(Guid id, Guid userKey, string[] culture) =>
-        throw new NotImplementedException();
+    public async Task<Attempt<ContentEditingOperationStatus>> PublishAsync(Guid id, Guid userKey, string[] cultures)
+    {
+        IContent? content = ContentService.GetById(id);
+
+        if (content is null)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.NotFound);
+        }
+
+        if (content.Name != null && content.Name.Length > 255)
+        {
+            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+        }
+
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        IEnumerable<ILanguage> allLangs = await _languageService.GetAllAsync();
+
+        var varies = content.ContentType.VariesByCulture();
+
+        if (cultures.Length == 0 && !varies)
+        {
+            // No cultures specified and doesn't vary, so publish it, else nothing to publish
+            return await PublishAsync(id, userKey);
+        }
+
+        if (cultures.Any(x => x == null || x == "*"))
+        {
+            throw new InvalidOperationException(
+                "Only valid cultures are allowed to be used in this method, wildcards or nulls are not allowed");
+        }
+
+        IEnumerable<CultureImpact> impacts =
+            cultures.Select(x => _cultureImpactFactory.ImpactExplicit(x, IsDefaultCulture(allLangs, x)));
+
+        // publish the culture(s)
+        // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+        foreach (CultureImpact impact in impacts)
+        {
+            content.PublishCulture(impact);
+        }
+
+        PublishResult result = Publish(content, allLangs, userKey, scope);
+        scope.Complete();
+
+        // TODO: use publish result instead of unknown status
+        return result.Success
+            ? Attempt.Succeed(ContentEditingOperationStatus.Success)
+            : Attempt.Fail(ContentEditingOperationStatus.Unknown);
+    }
 
     protected override IContent Create(string? name, int parentId, IContentType contentType) =>
         new Content(name, parentId, contentType);
@@ -199,7 +249,8 @@ internal sealed class ContentEditingService
     private bool IsDefaultCulture(IEnumerable<ILanguage>? langs, string culture) =>
         langs?.Any(x => x.IsDefault && x.IsoCode.InvariantEquals(culture)) ?? false;
 
-    private PublishResult Publish(IContent content, IEnumerable<ILanguage> languages, Guid userKey, ICoreScope scope, bool branchOne = false, bool branchRoot = false)
+    private PublishResult Publish(IContent content, IEnumerable<ILanguage> languages, Guid userKey, ICoreScope scope,
+        bool branchOne = false, bool branchRoot = false)
     {
         var userId = -1;
         PublishResult? publishResult = null;
@@ -353,7 +404,7 @@ internal sealed class ContentEditingService
         // beware! contents contains all published version below content
         // including those that are not directly published because below an unpublished content
         // these must be filtered out here
-        var parents = new List<int> { content.Id };
+        var parents = new List<int> {content.Id};
         if (contents is not null)
         {
             foreach (IContent c in contents)
@@ -661,5 +712,6 @@ internal sealed class ContentEditingService
     private async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey);
 
     private void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.Document.GetName(), message, parameters));
+        _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.Document.GetName(), message,
+            parameters));
 }

@@ -22,5 +22,5 @@ public interface IContentEditingService
 
     Task<Attempt<ContentEditingOperationStatus>> PublishAsync(Guid id,  Guid userKey, string culture = "*");
 
-    Task<Attempt<ContentEditingOperationStatus>> PublishAsync(Guid id,  Guid userKey, string[] culture);
+    Task<Attempt<ContentEditingOperationStatus>> PublishAsync(Guid id,  Guid userKey, string[] cultures);
 }
