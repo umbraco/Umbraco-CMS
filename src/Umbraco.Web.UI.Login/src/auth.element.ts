@@ -23,8 +23,14 @@ export default class UmbAuthElement extends LitElement {
 	@property({ type: String, attribute: 'logo-image' })
 	logoImage = '';
 
+	@property({ type: Boolean, attribute: 'username-is-email' })
+	usernameIsEmail = false;
+
 	@property({ type: Boolean, attribute: 'allow-password-reset' })
 	allowPasswordReset = true;
+
+	@property({ type: Boolean, attribute: 'allow-user-invite' })
+	allowUserInvite = true;
 
 	@property({ type: String, attribute: 'return-url' })
 	set returnPath(value: string) {
