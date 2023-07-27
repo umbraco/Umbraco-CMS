@@ -1,10 +1,4 @@
-import type {
-	ManifestTypeMap,
-	ManifestBase,
-	SpecificManifestTypeOrManifestBase,
-	ManifestKind,
-	UmbConditionConfigBase,
-} from '../types.js';
+import type { ManifestTypeMap, ManifestBase, SpecificManifestTypeOrManifestBase, ManifestKind } from '../types.js';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import { map, Observable, distinctUntilChanged, combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -51,12 +45,23 @@ function extensionAndKindMatchArrayMemoization<T extends Pick<ManifestBase, 'ali
 	return true;
 }
 
-function extensionSingleMemoization<T extends { alias: string }>(
+function extensionSingleMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	previousValue: T | undefined,
 	currentValue: T | undefined
 ): boolean {
 	if (previousValue && currentValue) {
 		return previousValue.alias === currentValue.alias;
+	}
+	return previousValue === currentValue;
+}
+
+function extensionAndKindMatchSingleMemoization<
+	T extends Pick<ManifestBase, 'alias'> & { isMatchedWithKind?: boolean }
+>(previousValue: T | undefined, currentValue: T | undefined): boolean {
+	if (previousValue && currentValue) {
+		return (
+			previousValue.alias === currentValue.alias && previousValue.isMatchedWithKind === currentValue.isMatchedWithKind
+		);
 	}
 	return previousValue === currentValue;
 }
@@ -196,7 +201,7 @@ export class UmbExtensionRegistry<
 				}
 				return ext;
 			}),
-			distinctUntilChanged(extensionSingleMemoization)
+			distinctUntilChanged(extensionAndKindMatchSingleMemoization)
 		) as Observable<T | undefined>;
 	}
 
@@ -226,7 +231,7 @@ export class UmbExtensionRegistry<
 				}
 				return ext;
 			}),
-			distinctUntilChanged(extensionSingleMemoization)
+			distinctUntilChanged(extensionAndKindMatchSingleMemoization)
 		) as Observable<T | undefined>;
 	}
 
