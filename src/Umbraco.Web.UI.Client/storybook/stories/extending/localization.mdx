@@ -26,7 +26,7 @@ The manifest can be added through the `umbraco-package.json` file like this:
 			"meta": {
 				"culture": "en_us"
 			},
-			"js": "/App_Plugins/MyPackage/lang/en_us.json"
+			"js": "/App_Plugins/MyPackage/lang/en_us.js"
 		}
 	]
 }
@@ -48,10 +48,10 @@ If you do not have many translations, you can also choose to include them direct
 
 ### Layout of the language file
 
-The language file is a simple JSON file with a key-value structure organised in sections.
+The language file is a simple JS module with a default export containing a key-value structure organised in sections.
 
 ```json
-{
+export default {
 	"section": {
 		"key1": "value1",
 		"key2": "value2"
