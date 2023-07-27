@@ -24,9 +24,9 @@ The manifest can be added through the `umbraco-package.json` file like this:
 			"alias": "MyPackage.Lang.EnUS",
 			"name": "English (United States)",
 			"meta": {
-				"culture": "en_us"
+				"culture": "en-us"
 			},
-			"js": "/App_Plugins/MyPackage/lang/en_us.js"
+			"js": "/App_Plugins/MyPackage/lang/en-us.js"
 		}
 	]
 }
@@ -36,7 +36,7 @@ If you do not have many translations, you can also choose to include them direct
 
 ```json
 "meta": {
-	"culture": "en_us",
+	"culture": "en-us",
 	"translations": {
 		"section": {
 			"key1": "value1",
