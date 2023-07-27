@@ -3,7 +3,7 @@ import { UmbUserRepository } from '../repository/user.repository.js';
 import { UmbUserGroupInputElement } from '../../user-groups/components/input-user-group/user-group-input.element.js';
 import { type UmbUserDetail } from '../index.js';
 import { UmbUserWorkspaceContext } from './user-workspace.context.js';
-import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement, UUIInputEvent, UUISelectElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
 	html,
@@ -149,6 +149,15 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		}
 	}
 
+	#onLanguageChange(event: Event) {
+		const target = event.composedPath()[0] as UUISelectElement;
+
+		if (typeof target?.value === 'string') {
+			console.log('value', target.value);
+			this.#workspaceContext?.updateProperty('languageIsoCode', target.value);
+		}
+	}
+
 	#onPasswordChange() {
 		// TODO: check if current user is admin
 		this.#modalContext?.open(UMB_CHANGE_PASSWORD_MODAL, {
@@ -185,12 +194,18 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		if (!this._user) return nothing;
 
 		return html` <uui-box>
-				<div slot="headline">Profile</div>
+				<div slot="headline"><umb-localize key="user_profile">Profile</umb-localize></div>
 				<umb-workspace-property-layout label="Email">
 					<uui-input slot="editor" name="email" label="email" readonly value=${ifDefined(this._user.email)}></uui-input>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout label="Language" description="The language of the UI in the Backoffice">
-					<uui-select slot="editor" name="language" label="language" .options=${this.languages}> </uui-select>
+					<uui-select
+						slot="editor"
+						name="language"
+						label="language"
+						.options=${this.languages}
+						@change="${this.#onLanguageChange}">
+					</uui-select>
 				</umb-workspace-property-layout>
 			</uui-box>
 			<uui-box>
