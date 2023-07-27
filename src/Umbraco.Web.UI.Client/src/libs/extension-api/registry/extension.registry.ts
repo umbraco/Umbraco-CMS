@@ -1,3 +1,4 @@
+import { of, switchMap } from 'rxjs';
 import type { ManifestTypeMap, ManifestBase, SpecificManifestTypeOrManifestBase, ManifestKind } from '../types.js';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import { map, Observable, distinctUntilChanged, combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
@@ -178,29 +179,33 @@ export class UmbExtensionRegistry<
 	}
 
 	getByAlias<T extends ManifestBase = ManifestBase>(alias: string) {
-		return combineLatest([
-			this.extensions.pipe(
-				map((exts) => exts.find((ext) => ext.alias === alias)),
-				distinctUntilChanged(extensionSingleMemoization)
-			),
-		]).pipe(
-			map(([ext]) => {
-				// Specific Extension Meta merge (does not merge conditions)
-				if (ext) {
-					// Since we dont have the type up front in this request, we will just get all kinds here and find the matching one:
-					const baseManifest = this._kinds
-						.getValue()
-						.find((kind) => kind.matchType === ext.type && kind.matchKind === ext.kind)?.manifest;
-					if (baseManifest) {
-						const merged = { isMatchedWithKind: true, ...baseManifest, ...ext } as any;
-						if ((baseManifest as any).meta) {
-							merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
-						}
-						return merged;
-					}
+		return this.extensions.pipe(
+			map((exts) => exts.find((ext) => ext.alias === alias)),
+			distinctUntilChanged(extensionSingleMemoization),
+			switchMap((ext) => {
+				if (ext?.kind) {
+					return this._kindsOfType(ext.type).pipe(
+						map((kinds) => {
+							// Specific Extension Meta merge (does not merge conditions)
+							if (ext) {
+								// Since we dont have the type up front in this request, we will just get all kinds here and find the matching one:
+								const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
+								// TODO: This check can go away when making a find kind based on type and kind.
+								if (baseManifest) {
+									const merged = { isMatchedWithKind: true, ...baseManifest, ...ext } as any;
+									if ((baseManifest as any).meta) {
+										merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
+									}
+									return merged;
+								}
+							}
+							return ext;
+						})
+					);
 				}
-				return ext;
+				return of(ext);
 			}),
+
 			distinctUntilChanged(extensionAndKindMatchSingleMemoization)
 		) as Observable<T | undefined>;
 	}

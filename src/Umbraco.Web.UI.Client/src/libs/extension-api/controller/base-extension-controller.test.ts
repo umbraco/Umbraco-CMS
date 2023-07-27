@@ -361,7 +361,6 @@ describe('UmbBaseExtensionController', () => {
 						expect(extensionController.manifest?.weight).to.be.undefined;
 						expect(extensionController.manifest?.conditions?.length).to.be.equal(0);
 					} else if (count === 2) {
-						console.log('Kind change was tricked');
 						// Second time render, there is a matching kind and then weight is 123.
 						expect(extensionController.manifest?.weight).to.be.equal(123);
 						expect(extensionController.manifest?.conditions?.length).to.be.equal(0);
@@ -374,7 +373,6 @@ describe('UmbBaseExtensionController', () => {
 			);
 			extensionController.asPromise().then(() => {
 				initialPromiseResolved = true;
-				console.log('Was resolved.');
 				Promise.resolve().then(() => {
 					extensionRegistry.register(lateComingKind);
 				});
