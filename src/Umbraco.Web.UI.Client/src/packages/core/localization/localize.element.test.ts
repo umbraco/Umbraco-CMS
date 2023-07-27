@@ -1,4 +1,4 @@
-import { expect, fixture, html } from '@open-wc/testing';
+import { aTimeout, expect, fixture, html } from '@open-wc/testing';
 import { UmbLocalizeElement } from './localize.element.js';
 import {
 	UMB_LOCALIZATION_CONTEXT,
@@ -8,7 +8,6 @@ import {
 import { UmbExtensionRegistry } from '@umbraco-cms/backoffice/extension-api';
 
 import '@umbraco-cms/backoffice/context-api';
-import { sleep } from '@umbraco-cms/internal/test-utils';
 
 const english = {
 	type: 'translations',
@@ -92,7 +91,7 @@ describe('umb-localize', () => {
 			context.setLanguage(danish.meta.culture);
 			await element.updateComplete;
 
-			await sleep(0);
+			await aTimeout(0);
 
 			expect(element.shadowRoot?.innerHTML).to.contain('Luk');
 		});
