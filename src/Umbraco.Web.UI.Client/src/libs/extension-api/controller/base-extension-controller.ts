@@ -37,6 +37,10 @@ export abstract class UmbBaseExtensionController<
 		return this.#alias;
 	}
 
+	get overwrites() {
+		return this.#manifest?.overwrites ?? [];
+	}
+
 	hasConditions = async () => {
 		await this.#manifestObserver.asPromise();
 		return (this.#manifest?.conditions ?? []).length > 0;

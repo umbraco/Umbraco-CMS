@@ -83,8 +83,11 @@ export interface ManifestWithDynamicConditions<ConditionTypes extends UmbConditi
 	/**
 	 * Set the conditions for when the extension should be loaded
 	 */
-	// TODO: Can this be a type union? can we compose types for the ones we know.
 	conditions?: Array<ConditionTypes>;
+	/**
+	 * Define an extension that this extension should overwrite.
+	 */
+	overwrites?: Array<string>;
 }
 
 export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {

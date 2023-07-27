@@ -20,10 +20,6 @@ export abstract class UmbBaseExtensionsController<
 	private _extensions: Array<ControllerType> = [];
 	private _permittedExts: Array<PermittedControllerType> = [];
 
-	get permittedExtensions(): Array<ControllerType> {
-		return this._permittedExts;
-	}
-
 	constructor(
 		host: UmbControllerHost,
 		type: ManifestTypeName,
@@ -94,12 +90,41 @@ export abstract class UmbBaseExtensionsController<
 			}
 		}
 		if (hasChanged) {
-			//this._permittedExts = this._permittedExts.filter((a) => a.permitted);
-			this._permittedExts.sort((a, b) => b.weight - a.weight);
-			this.#onChange(this._permittedExts, this as unknown as PermittedControllerType);
-			// Idea: could be abstracted into a requestChange method, so we can override it in a subclass.
+			// The final list of permitted extensions to be displayed, this will be stripped from extensions that are overwritten by another extension and sorted accordingly.
+			const exposedPermittedExts = [...this._permittedExts];
+
+			// Removal of overwritten extensions:
+			this._permittedExts.forEach((extCtrl) => {
+				// Check if it overwrites another extension:
+				// if so, look up the extension it overwrites, and remove it from the list. and check that for if it overwrites another extension and so on.
+				if (extCtrl.overwrites.length > 0) {
+					extCtrl.overwrites.forEach((overwrite) => {
+						this.#removeOverwrittenExtensions(exposedPermittedExts, overwrite);
+					});
+				}
+			});
+
+			// Sorting:
+			exposedPermittedExts.sort((a, b) => b.weight - a.weight);
+
+			this.#onChange(exposedPermittedExts, this as unknown as PermittedControllerType);
 		}
 	};
+
+	#removeOverwrittenExtensions(list: Array<PermittedControllerType>, alias: string) {
+		const index = list.findIndex((a) => a.alias === alias);
+		if (index !== -1) {
+			const entry = list[index];
+			// Remove this extension:
+			list.splice(index, 1);
+			// Then remove other extensions that this was replacing:
+			if (entry.overwrites.length > 0) {
+				entry.overwrites.forEach((overwrite) => {
+					this.#removeOverwrittenExtensions(list, overwrite);
+				});
+			}
+		}
+	}
 
 	public destroy() {
 		super.destroy();
