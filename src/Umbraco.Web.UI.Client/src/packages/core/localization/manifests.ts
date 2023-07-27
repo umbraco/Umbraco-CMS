@@ -4,13 +4,13 @@ import { ManifestTranslations } from '../extension-registry/models/translations.
 const translationManifests: Array<ManifestTranslations> = [
 	{
 		type: 'translations',
-		alias: 'Umb.Translations.En',
+		alias: 'Umb.Translations.En_US',
 		weight: -100,
 		name: 'English (UK)',
 		meta: {
-			culture: 'en',
+			culture: 'en_us',
 		},
-		loader: () => import('../../../assets/lang/en.json'),
+		loader: () => import('../../../assets/lang/en_us.json'),
 	},
 ];
 

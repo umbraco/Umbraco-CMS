@@ -46,7 +46,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.consumeContext(UMB_AUTH, (auth) => {
 			this.observe(auth.currentUser, (user) => {
 				if (user) {
-					const languageIsoCode = user.languageIsoCode ?? 'en';
+					const languageIsoCode = user.languageIsoCode ?? 'en_us';
 					localizationContext.setLanguage(languageIsoCode);
 				}
 			});
