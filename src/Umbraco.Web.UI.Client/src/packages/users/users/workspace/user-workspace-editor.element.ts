@@ -153,7 +153,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		const target = event.composedPath()[0] as UUISelectElement;
 
 		if (typeof target?.value === 'string') {
-			console.log('value', target.value);
 			this.#workspaceContext?.updateProperty('languageIsoCode', target.value);
 		}
 	}
