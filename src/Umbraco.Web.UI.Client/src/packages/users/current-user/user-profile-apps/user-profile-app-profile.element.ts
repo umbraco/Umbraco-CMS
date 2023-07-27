@@ -18,10 +18,10 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	protected _labelYourProfile = 'Your profile';
 
 	@state()
-	protected _labelEditProfile = 'Edit your profile';
+	protected _labelEditProfile = 'Edit';
 
 	@state()
-	protected _labelChangePassword = 'Change your password';
+	protected _labelChangePassword = 'Change password';
 
 	private _modalContext?: UmbModalManagerContext;
 	private _auth?: typeof UMB_AUTH.TYPE;
@@ -39,13 +39,11 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_LOCALIZATION_CONTEXT, (instance) => {
-			instance
-				.localizeMany(['user_yourProfile', 'user_editProfileLabel', 'user_changePasswordLabel'])
-				.subscribe((value) => {
-					this._labelYourProfile = value[0];
-					this._labelEditProfile = value[1];
-					this._labelChangePassword = value[2];
-				});
+			instance.localizeMany(['user_yourProfile', 'general_edit', 'general_changePassword']).subscribe((value) => {
+				this._labelYourProfile = value[0];
+				this._labelEditProfile = value[1];
+				this._labelChangePassword = value[2];
+			});
 		});
 	}
 
@@ -76,10 +74,10 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 		return html`
 			<uui-box .headline=${this._labelYourProfile}>
 				<uui-button look="primary" label=${this._labelEditProfile} @click=${this._edit}>
-					<umb-localize key="user_editProfile">Edit profile</umb-localize>
+					${this._labelEditProfile}
 				</uui-button>
 				<uui-button look="primary" label=${this._labelChangePassword} @click=${this._changePassword}>
-					<umb-localize key="user_changePassword">Change password</umb-localize>
+					${this._labelChangePassword}
 				</uui-button>
 			</uui-box>
 		`;
