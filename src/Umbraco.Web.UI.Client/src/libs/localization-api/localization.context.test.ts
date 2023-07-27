@@ -1,4 +1,4 @@
-import { expect } from '@open-wc/testing';
+import { expect, aTimeout } from '@open-wc/testing';
 import { firstValueFrom } from 'rxjs';
 import { UmbLocalizationContext } from './localization.context.js';
 import { UmbTranslationRegistry } from './registry/translation.registry.js';
@@ -120,6 +120,61 @@ describe('Localization', () => {
 				expect(values[0]).to.equal('Close');
 				expect(values[1]).to.equal('Log out');
 			});
+
+			it('should return empty values if keys are not found', async () => {
+				const values = await firstValueFrom(context.localizeMany(['general_close', 'general_not_found']));
+				expect(values[0]).to.equal('Close');
+				expect(values[1]).to.equal('');
+			});
+
+			it('should update values if a key is overridden', async () => {
+				const values = await firstValueFrom(context.localizeMany(['general_close', 'general_logout']));
+				expect(values[0]).to.equal('Close');
+				expect(values[1]).to.equal('Log out');
+
+				extensionRegistry.register(englishOverride);
+
+				const values2 = await firstValueFrom(context.localizeMany(['general_close', 'general_logout']));
+				expect(values2[0]).to.equal('Close 2');
+				expect(values2[1]).to.equal('Log out');
+			});
+
+			it('should return new values if a language is changed', async () => {
+				const values = await firstValueFrom(context.localizeMany(['general_close', 'general_logout']));
+				expect(values[0]).to.equal('Close');
+				expect(values[1]).to.equal('Log out');
+
+				context.setLanguage(danish.meta.culture);
+
+				await aTimeout(0);
+
+				const values2 = await firstValueFrom(context.localizeMany(['general_close', 'general_logout']));
+				expect(values2[0]).to.equal('Luk');
+				expect(values2[1]).to.equal('Log out'); // This key does not exist in the danish translation so should use 'en' fallback.
+			});
+		});
+
+		it('should emit new values in same subscription', async () => {
+			const values: string[][] = [];
+
+			context.localizeMany(['general_close', 'general_logout']).subscribe((value) => {
+				values.push(value);
+			});
+
+			// Let the subscription run (values are available statically)
+			await aTimeout(0);
+
+			expect(values[0][0]).to.equal('Close');
+			expect(values[0][1]).to.equal('Log out');
+
+			// it should return new values if a key is overridden
+			extensionRegistry.register(englishOverride);
+
+			// Let the subscription run again
+			await aTimeout(0);
+
+			expect(values[1][0]).to.equal('Close 2');
+			expect(values[1][1]).to.equal('Log out');
 		});
 	});
 });
