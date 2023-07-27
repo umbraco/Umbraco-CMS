@@ -23,7 +23,6 @@ internal sealed class ContentEditingService
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly ILanguageService _languageService;
     private readonly ICultureImpactFactory _cultureImpactFactory;
-    private readonly Lazy<IPropertyValidationService> _propertyValidationService;
     private readonly IDocumentRepository _documentRepository;
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IAuditRepository _auditRepository;
@@ -39,7 +38,6 @@ internal sealed class ContentEditingService
         IUserIdKeyResolver userIdKeyResolver,
         ILanguageService languageService,
         ICultureImpactFactory cultureImpactFactory,
-        Lazy<IPropertyValidationService> propertyValidationService,
         IDocumentRepository documentRepository,
         IEventMessagesFactory eventMessagesFactory,
         IAuditRepository auditRepository)
@@ -50,7 +48,6 @@ internal sealed class ContentEditingService
         _userIdKeyResolver = userIdKeyResolver;
         _languageService = languageService;
         _cultureImpactFactory = cultureImpactFactory;
-        _propertyValidationService = propertyValidationService;
         _documentRepository = documentRepository;
         _eventMessagesFactory = eventMessagesFactory;
         _auditRepository = auditRepository;
@@ -495,17 +492,6 @@ internal sealed class ContentEditingService
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, eventMessages, content);
         }
 
-        // Validate the property values
-        IProperty[]? invalidProperties = null;
-        if (!impactsToPublish.All(x =>
-                _propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties, x)))
-        {
-            return new PublishResult(PublishResultType.FailedPublishContentInvalid, eventMessages, content)
-            {
-                InvalidProperties = invalidProperties,
-            };
-        }
-
         // Check if mandatory languages fails, if this fails it will mean anything that the published flag on the document will
         // be changed to Unpublished and any culture currently published will not be visible.
         if (variesByCulture)
@@ -516,7 +502,7 @@ internal sealed class ContentEditingService
                     "Internal error, variesByCulture but culturesPublishing is null.");
             }
 
-            if (content.Published || culturesPublishing.Any())
+            if (content.Published && culturesPublishing.Any() is false)
             {
                 // no published cultures = cannot be published
                 // there will be nothing to publish

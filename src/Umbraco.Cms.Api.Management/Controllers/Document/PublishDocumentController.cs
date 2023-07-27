@@ -34,7 +34,6 @@ public class PublishDocumentController : DocumentControllerBase
         else
         {
             attempt = await _contentEditingService.PublishAsync(id, CurrentUserKey(_backOfficeSecurityAccessor), cultures);
-
         }
 
         return attempt.Success ? Ok() : ContentEditingOperationStatusResult(attempt.Result);
