@@ -20,7 +20,7 @@ public interface IContentEditingService
 
     Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid id, Guid? parentId, bool relateToOriginal, bool includeDescendants, Guid userKey);
 
-    Task<Attempt<ContentEditingOperationStatus>> PublishAsync(Guid id,  Guid userKey, string culture = "*");
+    Task<Attempt<ContentPublishingOperationStatus>> PublishAsync(Guid id,  Guid userKey, string culture = "*");
 
-    Task<Attempt<ContentEditingOperationStatus>> PublishAsync(Guid id,  Guid userKey, string[] cultures);
+    Task<Attempt<ContentPublishingOperationStatus>> PublishAsync(Guid id,  Guid userKey, string[] cultures);
 }

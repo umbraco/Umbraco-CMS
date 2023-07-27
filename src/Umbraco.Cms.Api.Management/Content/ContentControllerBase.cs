@@ -44,6 +44,54 @@ public class ContentControllerBase : ManagementApiControllerBase
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status.")
         };
 
+    protected IActionResult ContentPublishingOperationStatusResult(ContentPublishingOperationStatus status) =>
+        status switch
+        {
+            ContentPublishingOperationStatus.ContentNotFound => NotFound("The content type could not be found"),
+            ContentPublishingOperationStatus.FailedCancelledByEvent => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Publish cancelled by event")
+                .WithDetail("The publish operation was cancelled by an event.")
+                .Build()),
+            ContentPublishingOperationStatus.FailedContentInvalid => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("The content was invalid")
+                .WithDetail("The content with the given key, had an invalid configuration.")
+                .Build()),
+            ContentPublishingOperationStatus.FailedNothingToPublish => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Nothing to publish")
+                .WithDetail("None of the cultures given needed publishing.")
+                .Build()),
+            ContentPublishingOperationStatus.FailedMandatoryCultureMissing => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Mandatory culture missing")
+                .WithDetail("Cannot publish some cultures, without all the mandatory cultures.")
+                .Build()),
+            ContentPublishingOperationStatus.FailedHasExpired => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Content has expired")
+                .WithDetail("Cannot publish as the content status was expired.")
+                .Build()),
+            ContentPublishingOperationStatus.FailedCultureHasExpired => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Content has expired")
+                .WithDetail("Cannot publish as one of the given cultures content status was expired.")
+                .Build()),
+            ContentPublishingOperationStatus.FailedAwaitingRelease => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Content is awaiting release")
+                .WithDetail("Cannot publish as the content status was awaiting release.")
+                .Build()),
+            ContentPublishingOperationStatus.FailedCultureAwaitingRelease => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Content is awaiting release")
+                .WithDetail("Cannot publish as the content status was awaiting release.")
+                .Build()),
+            ContentPublishingOperationStatus.FailedIsTrashed => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Content is trashed")
+                .WithDetail("Cannot publish as the content status was trashed")
+                .Build()),
+            ContentPublishingOperationStatus.FailedPathNotPublished => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Parent is not published")
+                .WithDetail("Cannot publish as the contents parent is allowed.")
+                .Build()),
+
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status."),
+        };
+
     protected IActionResult ContentCreatingOperationStatusResult(ContentCreatingOperationStatus status) =>
         status switch
         {

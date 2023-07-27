@@ -132,13 +132,13 @@ internal sealed class ContentEditingService
                 ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, currentUserId));
     }
 
-    public async Task<Attempt<ContentEditingOperationStatus>> PublishAsync(Guid id, Guid userKey, string culture = "*")
+    public async Task<Attempt<ContentPublishingOperationStatus>> PublishAsync(Guid id, Guid userKey, string culture = "*")
     {
         IContent? foundContent = ContentService.GetById(id);
 
         if (foundContent is null)
         {
-            return Attempt.Fail(ContentEditingOperationStatus.NotFound);
+            return Attempt.Fail(ContentPublishingOperationStatus.ContentNotFound);
         }
 
         // cannot accept invariant (null or empty) culture for variant content type
@@ -178,23 +178,25 @@ internal sealed class ContentEditingService
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
         foundContent.PublishCulture(impact);
 
-        PublishResult publishResult = Publish(foundContent, allLangs, userKey, scope);
+        ContentPublishingOperationStatus contentPublishingOperationStatus = Publish(foundContent, allLangs, userKey, scope);
 
         scope.Complete();
 
-        // TODO: use publish result instead of unknown status
-        return publishResult.Success
-            ? Attempt.Succeed(ContentEditingOperationStatus.Success)
-            : Attempt.Fail(ContentEditingOperationStatus.Unknown);
+        if (contentPublishingOperationStatus is ContentPublishingOperationStatus.Success or ContentPublishingOperationStatus.SuccessPublishCulture)
+        {
+            Attempt.Succeed(contentPublishingOperationStatus);
+        }
+
+        return Attempt.Fail(contentPublishingOperationStatus);
     }
 
-    public async Task<Attempt<ContentEditingOperationStatus>> PublishAsync(Guid id, Guid userKey, string[] cultures)
+    public async Task<Attempt<ContentPublishingOperationStatus>> PublishAsync(Guid id, Guid userKey, string[] cultures)
     {
         IContent? content = ContentService.GetById(id);
 
         if (content is null)
         {
-            return Attempt.Fail(ContentEditingOperationStatus.NotFound);
+            return Attempt.Fail(ContentPublishingOperationStatus.ContentNotFound);
         }
 
         if (content.Name != null && content.Name.Length > 255)
@@ -231,13 +233,16 @@ internal sealed class ContentEditingService
             content.PublishCulture(impact);
         }
 
-        PublishResult result = Publish(content, allLangs, userKey, scope);
+        ContentPublishingOperationStatus contentPublishingOperationStatus = Publish(content, allLangs, userKey, scope);
+
         scope.Complete();
 
-        // TODO: use publish result instead of unknown status
-        return result.Success
-            ? Attempt.Succeed(ContentEditingOperationStatus.Success)
-            : Attempt.Fail(ContentEditingOperationStatus.Unknown);
+        if (contentPublishingOperationStatus is ContentPublishingOperationStatus.Success or ContentPublishingOperationStatus.SuccessPublishCulture)
+        {
+            Attempt.Succeed(contentPublishingOperationStatus);
+        }
+
+        return Attempt.Fail(contentPublishingOperationStatus);
     }
 
     protected override IContent Create(string? name, int parentId, IContentType contentType) =>
@@ -246,11 +251,9 @@ internal sealed class ContentEditingService
     private bool IsDefaultCulture(IEnumerable<ILanguage>? langs, string culture) =>
         langs?.Any(x => x.IsDefault && x.IsoCode.InvariantEquals(culture)) ?? false;
 
-    private PublishResult Publish(IContent content, IEnumerable<ILanguage> languages, Guid userKey, ICoreScope scope,
-        bool branchOne = false, bool branchRoot = false)
+    private ContentPublishingOperationStatus Publish(IContent content, IEnumerable<ILanguage> languages, Guid userKey, ICoreScope scope, bool branchOne = false, bool branchRoot = false)
     {
         var userId = -1;
-        PublishResult? publishResult = null;
         PublishResult? unpublishResult = null;
         EventMessages eventMessages = _eventMessagesFactory.Get();
         var isNew = !content.HasIdentity;
@@ -267,24 +270,24 @@ internal sealed class ContentEditingService
             : null;
 
         // ensure that the document can be published, and publish handling events, business rules, etc
-        publishResult = StrategyCanPublish(
+        ContentPublishingOperationStatus publishOperationStatus = StrategyCanPublish(
             scope,
             content, /*checkPath:*/
             !branchOne || branchRoot,
             culturesPublishing,
             languages,
             eventMessages);
-        if (publishResult.Success)
+        if (publishOperationStatus is ContentPublishingOperationStatus.Success)
         {
             // note: StrategyPublish flips the PublishedState to Publishing!
-            publishResult = StrategyPublish(content, culturesPublishing, eventMessages);
+            publishOperationStatus = StrategyPublish(content, culturesPublishing, eventMessages);
         }
         else
         {
             // in a branch, just give up
             if (branchOne && !branchRoot)
             {
-                return publishResult;
+                return publishOperationStatus;
             }
 
             // // Check for mandatory culture missing, and then unpublish document as a whole
@@ -312,7 +315,7 @@ internal sealed class ContentEditingService
             new ContentSavedNotification(content, eventMessages));
 
         // and succeeded, trigger events
-        if (publishResult?.Success ?? false)
+        if (publishOperationStatus is not ContentPublishingOperationStatus.Success)
         {
             if (isNew == false && previouslyPublished == false)
             {
@@ -343,12 +346,12 @@ internal sealed class ContentEditingService
                     new ContentPublishedNotification(descendants, eventMessages));
             }
 
-            switch (publishResult.Result)
+            switch (publishOperationStatus)
             {
-                case PublishResultType.SuccessPublish:
+                case ContentPublishingOperationStatus.Success:
                     Audit(AuditType.Publish, userId, content.Id);
                     break;
-                case PublishResultType.SuccessPublishCulture:
+                case ContentPublishingOperationStatus.SuccessPublishCulture:
                     if (culturesPublishing != null)
                     {
                         var langs = string.Join(", ", languages
@@ -360,7 +363,7 @@ internal sealed class ContentEditingService
                     break;
             }
 
-            return publishResult;
+            return publishOperationStatus;
         }
 
         // should not happen
@@ -370,7 +373,7 @@ internal sealed class ContentEditingService
         }
 
         // if publishing didn't happen or if it has failed, we still need to log which cultures were saved
-        if (!branchOne && (publishResult == null || !publishResult.Success))
+        if (!branchOne && (publishOperationStatus is not ContentPublishingOperationStatus.Success || publishOperationStatus is not ContentPublishingOperationStatus.SuccessPublishCulture))
         {
             if (culturesChanging != null)
             {
@@ -388,7 +391,7 @@ internal sealed class ContentEditingService
         // or, failed
         scope.Notifications.Publish(new ContentTreeChangeNotification(content, changeType, eventMessages));
 
-        return publishResult!;
+        return publishOperationStatus!;
     }
 
     internal IEnumerable<IContent> GetPublishedDescendantsLocked(IContent content)
@@ -426,7 +429,7 @@ internal sealed class ContentEditingService
         }
     }
 
-    private PublishResult StrategyPublish(
+    private ContentPublishingOperationStatus StrategyPublish(
         IContent content,
         IReadOnlyCollection<string>? culturesPublishing,
         EventMessages eventMessages)
@@ -439,7 +442,7 @@ internal sealed class ContentEditingService
         {
             if (content.Published && culturesPublishing?.Count == 0)
             {
-                return new PublishResult(PublishResultType.FailedPublishNothingToPublish, eventMessages, content);
+                return ContentPublishingOperationStatus.FailedNothingToPublish;
             }
 
             if (culturesPublishing?.Count > 0)
@@ -451,14 +454,14 @@ internal sealed class ContentEditingService
                     string.Join(",", culturesPublishing));
             }
 
-            return new PublishResult(PublishResultType.SuccessPublishCulture, eventMessages, content);
+            return ContentPublishingOperationStatus.SuccessPublishCulture;
         }
 
         _logger.LogInformation("Document {ContentName} (id={ContentId}) has been published.", content.Name, content.Id);
-        return new PublishResult(eventMessages, content);
+        return ContentPublishingOperationStatus.Success;
     }
 
-    private PublishResult StrategyCanPublish(
+    private ContentPublishingOperationStatus StrategyCanPublish(
         ICoreScope scope,
         IContent content,
         bool checkPath,
@@ -470,9 +473,8 @@ internal sealed class ContentEditingService
         if (scope.Notifications.PublishCancelable(
                 new ContentPublishingNotification(content, eventMessages)))
         {
-            _logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
-                content.Name, content.Id, "publishing was cancelled");
-            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, eventMessages, content);
+            _logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
+            return ContentPublishingOperationStatus.FailedCancelledByEvent;
         }
 
         var variesByCulture = content.ContentType.VariesByCulture();
@@ -489,7 +491,7 @@ internal sealed class ContentEditingService
         // publish the culture(s)
         if (!impactsToPublish.All(content.PublishCulture))
         {
-            return new PublishResult(PublishResultType.FailedPublishContentInvalid, eventMessages, content);
+            return ContentPublishingOperationStatus.FailedContentInvalid;
         }
 
         // Check if mandatory languages fails, if this fails it will mean anything that the published flag on the document will
@@ -506,7 +508,7 @@ internal sealed class ContentEditingService
             {
                 // no published cultures = cannot be published
                 // there will be nothing to publish
-                return new PublishResult(PublishResultType.FailedPublishNothingToPublish, eventMessages, content);
+                return ContentPublishingOperationStatus.FailedContentInvalid;
             }
 
             // missing mandatory culture = cannot be published
@@ -515,8 +517,7 @@ internal sealed class ContentEditingService
                 !content.PublishedCultures.Contains(x, StringComparer.OrdinalIgnoreCase));
             if (mandatoryMissing)
             {
-                return new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, eventMessages,
-                    content);
+                return ContentPublishingOperationStatus.FailedMandatoryCultureMissing;
             }
         }
 
@@ -529,7 +530,7 @@ internal sealed class ContentEditingService
                 content.Name,
                 content.Id,
                 "document does not have published values");
-            return new PublishResult(PublishResultType.FailedPublishNothingToPublish, eventMessages, content);
+            return ContentPublishingOperationStatus.FailedNothingToPublish;
         }
 
         ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(content.Id);
@@ -545,22 +546,17 @@ internal sealed class ContentEditingService
                     if (!variesByCulture)
                     {
                         _logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name,
-                            content.Id, "document has expired");
+                            "Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document has expired");
                     }
                     else
                     {
                         _logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}",
-                            content.Name, content.Id, culture, "document culture has expired");
+                            "Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, culture, "document culture has expired");
                     }
 
-                    return new PublishResult(
-                        !variesByCulture
-                            ? PublishResultType.FailedPublishHasExpired
-                            : PublishResultType.FailedPublishCultureHasExpired,
-                        eventMessages,
-                        content);
+                    return !variesByCulture
+                        ? ContentPublishingOperationStatus.FailedHasExpired
+                        : ContentPublishingOperationStatus.FailedCultureHasExpired;
 
                 case ContentStatus.AwaitingRelease:
                     if (!variesByCulture)
@@ -581,12 +577,9 @@ internal sealed class ContentEditingService
                             "document is culture awaiting release");
                     }
 
-                    return new PublishResult(
-                        !variesByCulture
-                            ? PublishResultType.FailedPublishAwaitingRelease
-                            : PublishResultType.FailedPublishCultureAwaitingRelease,
-                        eventMessages,
-                        content);
+                    return !variesByCulture
+                        ? ContentPublishingOperationStatus.FailedAwaitingRelease
+                        : ContentPublishingOperationStatus.FailedCultureAwaitingRelease;
 
                 case ContentStatus.Trashed:
                     _logger.LogInformation(
@@ -594,7 +587,7 @@ internal sealed class ContentEditingService
                         content.Name,
                         content.Id,
                         "document is trashed");
-                    return new PublishResult(PublishResultType.FailedPublishIsTrashed, eventMessages, content);
+                    return ContentPublishingOperationStatus.FailedIsTrashed;
             }
         }
 
@@ -611,11 +604,11 @@ internal sealed class ContentEditingService
                     content.Name,
                     content.Id,
                     "parent is not published");
-                return new PublishResult(PublishResultType.FailedPublishPathNotPublished, eventMessages, content);
+                return ContentPublishingOperationStatus.FailedPathNotPublished;
             }
         }
 
-        return new PublishResult(eventMessages, content);
+        return ContentPublishingOperationStatus.Success;
     }
 
     public IContent? GetParent(IContent? content)

@@ -26,7 +26,7 @@ public class PublishDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Publish(Guid id, [FromQuery] string[]? cultures)
     {
-        Attempt<ContentEditingOperationStatus> attempt;
+        Attempt<ContentPublishingOperationStatus> attempt;
         if (cultures is null)
         {
             attempt = await _contentEditingService.PublishAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
@@ -36,6 +36,6 @@ public class PublishDocumentController : DocumentControllerBase
             attempt = await _contentEditingService.PublishAsync(id, CurrentUserKey(_backOfficeSecurityAccessor), cultures);
         }
 
-        return attempt.Success ? Ok() : ContentEditingOperationStatusResult(attempt.Result);
+        return attempt.Success ? Ok() : ContentPublishingOperationStatusResult(attempt.Result);
     }
 }
