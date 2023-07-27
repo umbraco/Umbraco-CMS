@@ -14,8 +14,15 @@ export class UmbLocalizationContext {
 		return this.#translationRegistry.translations;
 	}
 
-	setLanguage(languageIsoCode: string) {
-		this.#translationRegistry.register(languageIsoCode);
+	/**
+	 * Set a new language which will query the manifests for translations and register them.
+	 * Eventually it will update all codes visible on the screen.
+	 *
+	 * @param languageIsoCode The language to use (example: 'en_us')
+	 * @param fallbackLanguageIsoCode The fallback language to use (example: 'en_us', default: 'en_us')
+	 */
+	setLanguage(languageIsoCode: string, fallbackLanguageIsoCode?: string) {
+		this.#translationRegistry.register(languageIsoCode, fallbackLanguageIsoCode);
 	}
 
 	/**
