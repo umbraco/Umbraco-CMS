@@ -85,9 +85,9 @@ export interface ManifestWithDynamicConditions<ConditionTypes extends UmbConditi
 	 */
 	conditions?: Array<ConditionTypes>;
 	/**
-	 * Define an extension that this extension should overwrite.
+	 * Define one or more extension aliases that this extension should overwrite.
 	 */
-	overwrites?: Array<string>;
+	overwrites?: string | Array<string>;
 }
 
 export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {

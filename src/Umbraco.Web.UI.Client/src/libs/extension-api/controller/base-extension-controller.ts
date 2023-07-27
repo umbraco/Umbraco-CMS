@@ -15,6 +15,7 @@ export abstract class UmbBaseExtensionController<
 	#manifestObserver;
 	#extensionRegistry: UmbExtensionRegistry<ManifestCondition>;
 	#alias: string;
+	#overwrites?: Array<string>;
 	#manifest?: ManifestType;
 	#conditionControllers: Array<UmbExtensionCondition> = [];
 	#onPermissionChanged: (isPermitted: boolean, controller: SubClassType) => void;
@@ -38,7 +39,7 @@ export abstract class UmbBaseExtensionController<
 	}
 
 	get overwrites() {
-		return this.#manifest?.overwrites ?? [];
+		return this.#overwrites;
 	}
 
 	hasConditions = async () => {
@@ -63,8 +64,16 @@ export abstract class UmbBaseExtensionController<
 				this.#isPermitted = undefined;
 				this.#manifest = extensionManifest;
 				if (extensionManifest) {
-					this.#gotManifest();
+					if (extensionManifest.overwrites) {
+						if (typeof extensionManifest.overwrites === 'string') {
+							this.#overwrites = [extensionManifest.overwrites];
+						} else if (Array.isArray(extensionManifest.overwrites)) {
+							this.#overwrites = extensionManifest.overwrites;
+						}
+					}
+					this.#gotConditions();
 				} else {
+					this.#overwrites = undefined;
 					this.#cleanConditions();
 				}
 			}
@@ -83,7 +92,7 @@ export abstract class UmbBaseExtensionController<
 		this.removeControllerByAlias('_observeConditions');
 	}
 
-	#gotManifest() {
+	#gotConditions() {
 		const conditionConfigs = this.#manifest?.conditions ?? [];
 
 		if (conditionConfigs.length === 0) {
