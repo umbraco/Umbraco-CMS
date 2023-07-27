@@ -3,6 +3,7 @@ import { firstValueFrom } from 'rxjs';
 import { UmbLocalizationContext } from './localization.context.js';
 import { UmbTranslationRegistry } from './registry/translation.registry.js';
 import { UmbExtensionRegistry } from '@umbraco-cms/backoffice/extension-api';
+import { sleep } from '@umbraco-cms/internal/test-utils';
 
 const english = {
 	type: 'translations',
@@ -19,6 +20,20 @@ const english = {
 	},
 };
 
+const danish = {
+	type: 'translations',
+	alias: 'test.da',
+	name: 'Test Danish',
+	meta: {
+		culture: 'da',
+		translations: {
+			general: {
+				close: 'Luk',
+			},
+		},
+	},
+};
+
 describe('Localization', () => {
 	let registry: UmbTranslationRegistry;
 	let extensionRegistry: UmbExtensionRegistry<any>;
@@ -27,6 +42,7 @@ describe('Localization', () => {
 		extensionRegistry = new UmbExtensionRegistry();
 		registry = new UmbTranslationRegistry(extensionRegistry);
 		extensionRegistry.register(english);
+		extensionRegistry.register(danish);
 		registry.register(english.meta.culture);
 	});
 
@@ -63,7 +79,7 @@ describe('Localization', () => {
 				expect(value).to.equal('');
 			});
 
-			it('should return a new value if the translation changes', async () => {
+			it('should return a new value if a key is overridden', async () => {
 				const value = await firstValueFrom(context.localize('general_close'));
 				expect(value).to.equal('Close');
 
@@ -84,6 +100,18 @@ describe('Localization', () => {
 				const value2 = await firstValueFrom(context.localize('general_close'));
 				expect(value2).to.equal('Close 2');
 			});
+		});
+
+		it('should return a new value if a language is changed', async () => {
+			const value = await firstValueFrom(context.localize('general_close'));
+			expect(value).to.equal('Close');
+
+			context.setLanguage(danish.meta.culture);
+
+			await sleep(0);
+
+			const value2 = await firstValueFrom(context.localize('general_close'));
+			expect(value2).to.equal('Luk');
 		});
 
 		describe('localizeMany', () => {
