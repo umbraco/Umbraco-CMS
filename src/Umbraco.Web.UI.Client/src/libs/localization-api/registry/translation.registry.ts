@@ -1,6 +1,6 @@
 import { hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { ReplaySubject } from '@umbraco-cms/backoffice/external/rxjs';
+import { ReplaySubject, Subscription } from '@umbraco-cms/backoffice/external/rxjs';
 
 export type UmbTranslationDictionary = Map<string, string>;
 
@@ -8,6 +8,7 @@ export class UmbTranslationRegistry {
 	#extensionRegistry;
 	#innerDictionary = new ReplaySubject<UmbTranslationDictionary>(1);
 	#innerDictionaryValue: UmbTranslationDictionary = new Map();
+	#subscription?: Subscription;
 
 	constructor(umbExtensionRegistry: UmbBackofficeExtensionRegistry) {
 		this.#extensionRegistry = umbExtensionRegistry;
@@ -21,8 +22,13 @@ export class UmbTranslationRegistry {
 		// Reset the inner dictionary.
 		this.#innerDictionaryValue = new Map();
 
+		// Cancel any previous subscription.
+		if (this.#subscription) {
+			this.#subscription.unsubscribe();
+		}
+
 		// Load new translations
-		this.#extensionRegistry.extensionsOfType('translations').subscribe(async (extensions) => {
+		this.#subscription = this.#extensionRegistry.extensionsOfType('translations').subscribe(async (extensions) => {
 			await Promise.all(
 				extensions
 					.filter((x) => x.meta.culture === userCulture || x.meta.culture === fallbackCulture)
