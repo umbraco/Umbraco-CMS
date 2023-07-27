@@ -4,8 +4,9 @@ import {
 	ManifestTypeMap,
 	SpecificManifestTypeOrManifestBase,
 	UmbBaseExtensionController,
+	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -22,6 +23,7 @@ export abstract class UmbBaseExtensionsController<
 
 	constructor(
 		host: UmbControllerHost,
+		extensionRegistry: UmbExtensionRegistry<ManifestType>,
 		type: ManifestTypeName,
 		filter: null | ((manifest: ManifestType) => boolean),
 		onChange: (permittedManifests: Array<PermittedControllerType>, controller: PermittedControllerType) => void
@@ -30,7 +32,7 @@ export abstract class UmbBaseExtensionsController<
 		this.#onChange = onChange;
 
 		// TODO: This could be optimized by just getting the aliases, well depends on the filter. (revisit one day to see how much filter is used)
-		let source = umbExtensionsRegistry?.extensionsOfType<ManifestTypeName, ManifestType>(type);
+		let source = extensionRegistry.extensionsOfType<ManifestTypeName, ManifestType>(type);
 		if (filter) {
 			source = source.pipe(map((extensions: Array<ManifestType>) => extensions.filter(filter)));
 		}

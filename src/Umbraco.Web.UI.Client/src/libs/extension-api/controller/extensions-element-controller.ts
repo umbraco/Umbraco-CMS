@@ -24,7 +24,7 @@ export class UmbExtensionsElementController<
 		onChange: (permittedManifests: Array<ControllerType>, controller: ControllerType) => void,
 		defaultElement?: string
 	) {
-		super(host, type, filter, onChange);
+		super(host, umbExtensionsRegistry, type, filter, onChange);
 		this._defaultElement = defaultElement;
 	}
 
