@@ -38,7 +38,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 
 	private _sectionContext?: UmbSectionContext;
 
-	private _viewsObserver?: UmbObserverController<ManifestSectionView[]>;
+	private _viewsObserver?: UmbExtensionsManifestController<ManifestSectionView['type']>;
 	private _dashboardObserver?: UmbExtensionsManifestController<ManifestDashboard['type']>;
 
 	constructor() {
@@ -94,13 +94,18 @@ export class UmbSectionViewsElement extends UmbLitElement {
 				this._observeViews(sectionAlias);
 				this._observeDashboards(sectionAlias);
 			},
-			'viewsObserver'
+			'_aliasObserver'
 		);
 	}
 
 	private _observeViews(sectionAlias?: string) {
 		this._viewsObserver?.destroy();
 		if (sectionAlias) {
+			this._viewsObserver = new UmbExtensionsManifestController(this, 'sectionView', null, (views) => {
+				this._views = views.map((view) => view.manifest);
+				this.#createRoutes();
+			});
+			/*
 			this._viewsObserver = this.observe(
 				umbExtensionsRegistry
 					?.extensionsOfType('sectionView')
@@ -110,6 +115,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 					this.#createRoutes();
 				}
 			);
+			*/
 		}
 	}
 
@@ -117,8 +123,8 @@ export class UmbSectionViewsElement extends UmbLitElement {
 		this._dashboardObserver?.destroy();
 
 		if (sectionAlias) {
-			this._dashboardObserver = new UmbExtensionsManifestController(this, 'dashboard', null, (views) => {
-				this._dashboards = views.map((view) => view.manifest);
+			this._dashboardObserver = new UmbExtensionsManifestController(this, 'dashboard', null, (dashboards) => {
+				this._dashboards = dashboards.map((dashboard) => dashboard.manifest);
 				this.#createRoutes();
 			});
 			/*
