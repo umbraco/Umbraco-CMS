@@ -30,3 +30,10 @@ export default meta;
 type Story = StoryObj<UmbLocalizeElement>;
 
 export const Overview: Story = {};
+
+export const KeyNotFound: Story = {
+	args: {
+		key: 'general_ok_not_found',
+		debug: true,
+	},
+};
