@@ -3,8 +3,8 @@ import { firstValueFrom } from 'rxjs';
 import { UmbLocalizationContext } from './localization.context.js';
 import { UmbTranslationRegistry } from './registry/translation.registry.js';
 import { UmbExtensionRegistry } from '@umbraco-cms/backoffice/extension-api';
-import { sleep } from '@umbraco-cms/internal/test-utils';
 
+//#region Translations
 const english = {
 	type: 'translations',
 	alias: 'test.en',
@@ -15,6 +15,20 @@ const english = {
 			general: {
 				close: 'Close',
 				logout: 'Log out',
+			},
+		},
+	},
+};
+
+const englishOverride = {
+	type: 'translations',
+	alias: 'test.en.override',
+	name: 'Test English',
+	meta: {
+		culture: 'en',
+		translations: {
+			general: {
+				close: 'Close 2',
 			},
 		},
 	},
@@ -33,6 +47,7 @@ const danish = {
 		},
 	},
 };
+//#endregion
 
 describe('Localization', () => {
 	let registry: UmbTranslationRegistry;
@@ -83,35 +98,35 @@ describe('Localization', () => {
 				const value = await firstValueFrom(context.localize('general_close'));
 				expect(value).to.equal('Close');
 
-				extensionRegistry.register({
-					type: 'translations',
-					alias: 'test.en.override',
-					name: 'Test English',
-					meta: {
-						culture: 'en',
-						translations: {
-							general: {
-								close: 'Close 2',
-							},
-						},
-					},
-				});
+				extensionRegistry.register(englishOverride);
 
 				const value2 = await firstValueFrom(context.localize('general_close'));
 				expect(value2).to.equal('Close 2');
 			});
-		});
 
-		it('should return a new value if a language is changed', async () => {
-			const value = await firstValueFrom(context.localize('general_close'));
-			expect(value).to.equal('Close');
+			it('should return a new value if the language is changed', async () => {
+				const value = await firstValueFrom(context.localize('general_close'));
+				expect(value).to.equal('Close');
 
-			context.setLanguage(danish.meta.culture);
+				context.setLanguage(danish.meta.culture);
 
-			await sleep(0);
+				await aTimeout(0);
 
-			const value2 = await firstValueFrom(context.localize('general_close'));
-			expect(value2).to.equal('Luk');
+				const value2 = await firstValueFrom(context.localize('general_close'));
+				expect(value2).to.equal('Luk');
+			});
+
+			it('should use fallback language if key is not found', async () => {
+				const value = await firstValueFrom(context.localize('general_logout'));
+				expect(value).to.equal('Log out');
+
+				context.setLanguage(danish.meta.culture);
+
+				await aTimeout(0);
+
+				const value2 = await firstValueFrom(context.localize('general_logout'));
+				expect(value2).to.equal('Log out');
+			});
 		});
 
 		describe('localizeMany', () => {
