@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
+using Umbraco.Cms.Infrastructure.Macros;
 using Umbraco.Cms.Infrastructure.Templates;
 using Umbraco.Extensions;
 
@@ -115,7 +116,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public override IPropertyIndexValueFactory PropertyIndexValueFactory => new GridPropertyIndexValueFactory();
 
         /// <summary>
-        /// Overridden to ensure that the value is validated
+        /// Overridden to ensure that the value is validated.
         /// </summary>
         /// <returns></returns>
         protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<GridPropertyValueEditor>(Attribute!);
@@ -125,6 +126,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         internal class GridPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+            private readonly IHtmlSanitizer _htmlSanitizer;
             private readonly HtmlImageSourceParser _imageSourceParser;
             private readonly RichTextEditorPastedImages _pastedImages;
             private readonly RichTextPropertyEditor.RichTextPropertyValueEditor _richTextPropertyValueEditor;
@@ -143,7 +145,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 IImageUrlGenerator imageUrlGenerator,
                 IJsonSerializer jsonSerializer,
                 IIOHelper ioHelper,
-                IHtmlMacroParameterParser macroParameterParser)
+                IHtmlMacroParameterParser macroParameterParser,
+                IHtmlSanitizer htmlSanitizer)
                 : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
             {
                 _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -155,6 +158,36 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     dataValueEditorFactory.Create<MediaPickerPropertyEditor.MediaPickerPropertyValueEditor>(attribute);
                 _imageUrlGenerator = imageUrlGenerator;
                 _macroParameterParser = macroParameterParser;
+                _htmlSanitizer = htmlSanitizer;
+            }
+
+            [Obsolete("Use the constructor which takes an IHtmlSanitizer instead")]
+            public GridPropertyValueEditor(
+                IDataValueEditorFactory dataValueEditorFactory,
+                DataEditorAttribute attribute,
+                IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+                ILocalizedTextService localizedTextService,
+                HtmlImageSourceParser imageSourceParser,
+                RichTextEditorPastedImages pastedImages,
+                IShortStringHelper shortStringHelper,
+                IImageUrlGenerator imageUrlGenerator,
+                IJsonSerializer jsonSerializer,
+                IIOHelper ioHelper,
+                IHtmlMacroParameterParser macroParameterParser)
+                : this(
+                    dataValueEditorFactory,
+                    attribute,
+                    backOfficeSecurityAccessor,
+                    localizedTextService,
+                    imageSourceParser,
+                    pastedImages,
+                    shortStringHelper,
+                    imageUrlGenerator,
+                    jsonSerializer,
+                    ioHelper,
+                    macroParameterParser,
+                    StaticServiceProvider.Instance.GetRequiredService<IHtmlSanitizer>())
+            {
             }
 
             [Obsolete("Use the constructor which takes an IHtmlMacroParameterParser instead")]
@@ -180,14 +213,15 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     imageUrlGenerator,
                     jsonSerializer,
                     ioHelper,
-                    StaticServiceProvider.Instance.GetRequiredService<IHtmlMacroParameterParser>())
+                    StaticServiceProvider.Instance.GetRequiredService<IHtmlMacroParameterParser>(),
+                    StaticServiceProvider.Instance.GetRequiredService<IHtmlSanitizer>())
             {
             }
 
             /// <summary>
             /// Format the data for persistence
             /// This to ensure if a RTE is used in a Grid cell/control that we parse it for tmp stored images
-            /// to persist to the media library when we go to persist this to the DB
+            /// to persist to the media library when we go to persist this to the DB.
             /// </summary>
             /// <param name="editorValue"></param>
             /// <param name="currentValue"></param>
@@ -218,6 +252,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 {
                     return JsonConvert.SerializeObject(grid, Formatting.None);
                 }
+
                 // Process the rte values
                 foreach (GridValue.GridControl rte in rtes)
                 {
@@ -228,7 +263,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     {
                         var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(html, mediaParentId, userId, _imageUrlGenerator);
                         var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
-                        rte.Value = editorValueWithMediaUrlsRemoved;
+                        var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
+                        var sanitized = _htmlSanitizer.Sanitize(parsed);
+
+                        rte.Value = sanitized.NullOrWhiteSpaceAsNull();
                     }
                 }
 
@@ -237,7 +275,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
 
             /// <summary>
-            /// Ensures that the rich text editor values are processed within the grid
+            /// Ensures that the rich text editor values are processed within the grid.
             /// </summary>
             /// <param name="property"></param>
             /// <param name="culture"></param>
@@ -257,7 +295,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 {
                     return null;
                 }
-                //process the rte values
+
+                // Process the rte values
                 foreach (GridValue.GridControl rte in rtes.ToList())
                 {
                     var html = rte.Value?.ToString();
@@ -265,9 +304,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     if (html is not null)
                     {
                         var propertyValueWithMediaResolved = _imageSourceParser.EnsureImageSources(html);
-                        rte.Value = propertyValueWithMediaResolved;
-                    }
+                        var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(
+                            propertyValueWithMediaResolved,
+                            new Dictionary<string, string>());
 
+                        rte.Value = parsed;
+                    }
                 }
 
                 return grid;
@@ -289,7 +331,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
 
             /// <summary>
-            /// Resolve references from <see cref="IDataValueEditor"/> values
+            /// Resolve references from <see cref="IDataValueEditor"/> values.
             /// </summary>
             /// <param name="value"></param>
             /// <returns></returns>

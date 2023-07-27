@@ -116,7 +116,7 @@ public class RichTextPropertyEditor : DataEditor
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => new RichTextPropertyIndexValueFactory();
 
     /// <summary>
-    ///     Create a custom value editor
+    ///     Create a custom value editor.
     /// </summary>
     /// <returns></returns>
     protected override IDataValueEditor CreateValueEditor() =>
@@ -127,7 +127,7 @@ public class RichTextPropertyEditor : DataEditor
 
     /// <summary>
     ///     A custom value editor to ensure that macro syntax is parsed when being persisted and formatted correctly for
-    ///     display in the editor
+    ///     display in the editor.
     /// </summary>
     internal class RichTextPropertyValueEditor : DataValueEditor, IDataValueReference
     {
@@ -217,7 +217,7 @@ public class RichTextPropertyEditor : DataEditor
         }
 
         /// <summary>
-        ///     Resolve references from <see cref="IDataValueEditor" /> values
+        ///     Resolve references from <see cref="IDataValueEditor" /> values.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -248,7 +248,7 @@ public class RichTextPropertyEditor : DataEditor
         }
 
         /// <summary>
-        ///     Format the data for the editor
+        ///     Format the data for the editor.
         /// </summary>
         /// <param name="property"></param>
         /// <param name="culture"></param>
@@ -265,11 +265,12 @@ public class RichTextPropertyEditor : DataEditor
             var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(
                 propertyValueWithMediaResolved,
                 new Dictionary<string, string>());
+
             return parsed;
         }
 
         /// <summary>
-        ///     Format the data for persistence
+        ///     Format the data for persistence.
         /// </summary>
         /// <param name="editorValue"></param>
         /// <param name="currentValue"></param>
