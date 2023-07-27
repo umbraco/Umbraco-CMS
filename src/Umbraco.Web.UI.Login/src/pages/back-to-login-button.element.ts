@@ -6,7 +6,7 @@ import { customElement } from 'lit/decorators.js';
 export default class UmbBackToLoginButtonElement extends LitElement {
 	render() {
 		return html`
-			<a href="">
+			<a href="login">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 					<path
 						fill="currentColor"

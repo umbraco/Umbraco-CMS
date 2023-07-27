@@ -9,6 +9,7 @@ import { UmbAuthMainContext } from '../context/auth-main.context.js';
 import '../auth-layout.element.js';
 import './reset-password.element.js';
 import './new-password.element.js';
+import { Commands, RedirectResult, Router } from '@vaadin/router';
 
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {
@@ -113,7 +114,7 @@ export default class UmbLoginElement extends LitElement {
 						${when(
 							this._allowPasswordReset,
 							() =>
-								html`<a id="forgot-password" href="reset"
+								html`<a id="forgot-password" href="login/reset"
 									><umb-localize key="user_forgotPassword">Forgot password?</umb-localize></a
 								>`
 						)}

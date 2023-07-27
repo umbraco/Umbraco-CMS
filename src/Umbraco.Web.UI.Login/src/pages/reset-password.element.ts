@@ -1,6 +1,6 @@
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { CSSResultGroup, LitElement, css, html } from 'lit';
+import { CSSResultGroup, LitElement, PropertyValueMap, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbAuthMainContext } from '../context/auth-main.context';
 import { when } from 'lit/directives/when.js';
@@ -11,6 +11,15 @@ import './back-to-login-button.element.js';
 export default class UmbResetPasswordElement extends LitElement {
 	@state()
 	resetCallState: UUIButtonState = undefined;
+
+	@state()
+	resetCodeExpired = false;
+
+	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.firstUpdated(_changedProperties);
+
+		this.resetCodeExpired = new URLSearchParams(window.location.search).get('status') === 'resetCodeExpired';
+	}
 
 	#handleResetSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
@@ -34,6 +43,9 @@ export default class UmbResetPasswordElement extends LitElement {
 
 	#resend() {
 		this.resetCallState = undefined;
+		this.resetCodeExpired = false;
+		let urlWithoutParams = window.location.href.split('?')[0];
+		window.history.replaceState({}, document.title, urlWithoutParams);
 	}
 
 	#renderResetPage() {
@@ -81,6 +93,29 @@ export default class UmbResetPasswordElement extends LitElement {
 		`;
 	}
 
+	#renderExpiredPage() {
+		return html`
+			<div id="code-expired-page">
+				<div id="header">
+					<h2>Reset code expired</h2>
+					<span>
+						Password reset links are only valid for a limited time for security reasons. To reset your password, please
+						request a new reset link.
+					</span>
+				</div>
+
+				<uui-button
+					type="submit"
+					label="Request new link"
+					look="primary"
+					color="default"
+					@click=${this.#resend}></uui-button>
+
+				<umb-back-to-login-button></umb-back-to-login-button>
+			</div>
+		`;
+	}
+
 	#renderConfirmationPage() {
 		return html`
 			<div id="confirm-page">
@@ -97,7 +132,11 @@ export default class UmbResetPasswordElement extends LitElement {
 	}
 
 	render() {
-		return this.resetCallState === 'success' ? this.#renderConfirmationPage() : this.#renderResetPage();
+		return this.resetCodeExpired
+			? this.#renderExpiredPage()
+			: this.resetCallState === 'success'
+			? this.#renderConfirmationPage()
+			: this.#renderResetPage();
 	}
 
 	static styles: CSSResultGroup = [
@@ -119,7 +158,8 @@ export default class UmbResetPasswordElement extends LitElement {
 				font-size: 1.4rem;
 			}
 			form,
-			#confirm-page {
+			#confirm-page,
+			#code-expired-page {
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-layout-2);

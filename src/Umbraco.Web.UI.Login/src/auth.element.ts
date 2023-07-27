@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { Router } from '@vaadin/router';
+import { Commands, Context, Router } from '@vaadin/router';
 import { UmbAuthMainContext } from './context/auth-main.context.js';
 
 import './auth-layout.element.js';
@@ -43,13 +43,24 @@ export default class UmbAuthElement extends LitElement {
 			{
 				path: 'login',
 				children: [
-					{ path: '', component: 'umb-login' },
+					{ path: '', component: 'umb-login', action: this.#test },
 					{ path: 'reset', component: 'umb-reset-password' },
 					{ path: 'new', component: 'umb-new-password' },
 				],
 			},
 			{ path: '(.*)', redirect: 'login' },
 		]);
+	}
+
+	#test(context: Context, commands: Commands) {
+		//TODO: You should be able to use the router to redirect, but the commands.redirect() doesn't work with params.
+		const flow = new URLSearchParams(window.location.search).get('flow');
+		const status = new URLSearchParams(window.location.search).get('status');
+
+		if (flow === 'reset-password' && status === 'resetCodeExpired') {
+			window.history.replaceState({}, '', 'login/reset?status=resetCodeExpired');
+			window.history.go(0);
+		}
 	}
 
 	render() {
