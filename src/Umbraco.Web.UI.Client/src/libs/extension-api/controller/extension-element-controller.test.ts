@@ -104,7 +104,6 @@ describe('UmbExtensionElementController', () => {
 				'Umb.Test.Section.1',
 				async () => {
 					count++;
-					console.log('call', count, 'with', extensionController?.permitted);
 					// We want the controller callback to first fire when conditions are initialized.
 					expect(extensionController.manifest?.conditions?.length).to.be.equal(2);
 					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
