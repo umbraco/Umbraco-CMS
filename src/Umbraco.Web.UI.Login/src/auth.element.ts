@@ -37,16 +37,19 @@ export default class UmbAuthElement extends LitElement {
 	}
 
 	async firstUpdated(): Promise<void> {
-    const router = new Router(this.shadowRoot?.getElementById('outlet'));
+		const router = new Router(this.shadowRoot?.getElementById('outlet'));
 
-    await router.setRoutes([
-      { path: 'login', children: [
-        { path: '', component: 'umb-login' },
-        { path: 'reset', component: 'umb-reset-password' },
-        { path: 'new', component: 'umb-new-password' },
-        ] },
-      { path: '(.*)', redirect: 'login' }
-    ]);
+		await router.setRoutes([
+			{
+				path: 'login',
+				children: [
+					{ path: '', component: 'umb-login' },
+					{ path: 'reset', component: 'umb-reset-password' },
+					{ path: 'new', component: 'umb-new-password' },
+				],
+			},
+			{ path: '(.*)', redirect: 'login' },
+		]);
 	}
 
 	render() {

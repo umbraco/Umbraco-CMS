@@ -1,6 +1,6 @@
-import {html, LitElement} from "lit";
-import {customElement, property, state} from "lit/decorators.js";
-import {umbLocalizationContext} from "./localization-context.ts";
+import { html, LitElement } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { umbLocalizationContext } from './localization-context.ts';
 
 /**
  * The localize element.
@@ -11,39 +11,38 @@ import {umbLocalizationContext} from "./localization-context.ts";
  * @element umb-localize
  * @example <umb-localize key="login_loginButton">Login</umb-localize>
  */
-@customElement("umb-localize")
+@customElement('umb-localize')
 export class UmbLocalizeElement extends LitElement {
+	@property({ type: String })
+	key!: string;
 
-  @property({type: String})
-  key!: string;
+	@state()
+	value = '';
 
-  @state()
-  value = '';
+	connectedCallback() {
+		super.connectedCallback();
+		this.#load();
+	}
 
-  connectedCallback() {
-    super.connectedCallback();
-    this.#load();
-  }
+	async #load() {
+		try {
+			this.value = await this.localize(this.key);
+		} catch (error: any) {
+			console.error('Failed to localize key:', this.key, error);
+		}
+	}
 
-  async #load() {
-    try {
-      this.value = await this.localize(this.key);
-    } catch (error: any) {
-      console.error('Failed to localize key:', this.key, error);
-    }
-  }
+	async localize(key: string, fallback?: string): Promise<string> {
+		return umbLocalizationContext.localize(key, fallback);
+	}
 
-  async localize(key: string, fallback?: string): Promise<string> {
-    return umbLocalizationContext.localize(key, fallback);
-  }
-
-  render() {
-    return this.value ? html`${this.value}` : html`<slot></slot>`;
-  }
+	render() {
+		return this.value ? html`${this.value}` : html`<slot></slot>`;
+	}
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    "umb-localize": UmbLocalizeElement;
-  }
+	interface HTMLElementTagNameMap {
+		'umb-localize': UmbLocalizeElement;
+	}
 }

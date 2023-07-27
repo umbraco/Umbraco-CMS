@@ -1,6 +1,6 @@
-import {css, CSSResultGroup, html, LitElement} from 'lit';
+import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import {styleMap} from 'lit-html/directives/style-map.js';
+import { styleMap } from 'lit-html/directives/style-map.js';
 
 @customElement('umb-auth-layout')
 export class UmbAuthLayoutElement extends LitElement {
@@ -12,7 +12,7 @@ export class UmbAuthLayoutElement extends LitElement {
 
 	render() {
 		return html`
-			<div id="background" style=${styleMap({backgroundImage: `url('${this.backgroundImage}')`})}></div>
+			<div id="background" style=${styleMap({ backgroundImage: `url('${this.backgroundImage}')` })}></div>
 
 			<div id="logo"><img src=${this.logoImage} alt="Umbraco" /></div>
 
