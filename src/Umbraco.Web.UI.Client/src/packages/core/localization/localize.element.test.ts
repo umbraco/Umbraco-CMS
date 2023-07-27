@@ -1,4 +1,4 @@
-import { aTimeout, expect, fixture, html } from '@open-wc/testing';
+import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
 import { UmbLocalizeElement } from './localize.element.js';
 import {
 	UMB_LOCALIZATION_CONTEXT,
@@ -71,25 +71,25 @@ describe('umb-localize', () => {
 		});
 
 		it('should localize a key', async () => {
-			await element.updateComplete;
+			await elementUpdated(element);
 			expect(element.shadowRoot?.innerHTML).to.contain('Close');
 		});
 
 		it('should change the value if a new key is set', async () => {
-			await element.updateComplete;
+			await elementUpdated(element);
 			expect(element.shadowRoot?.innerHTML).to.contain('Close');
 
 			element.key = 'general_logout';
-			await element.updateComplete;
+			await elementUpdated(element);
 			expect(element.shadowRoot?.innerHTML).to.contain('Log out');
 		});
 
 		it('should change the value if the language is changed', async () => {
-			await element.updateComplete;
+			await elementUpdated(element);
 			expect(element.shadowRoot?.innerHTML).to.contain('Close');
 
 			context.setLanguage(danish.meta.culture);
-			await element.updateComplete;
+			await elementUpdated(element);
 
 			await aTimeout(0);
 
