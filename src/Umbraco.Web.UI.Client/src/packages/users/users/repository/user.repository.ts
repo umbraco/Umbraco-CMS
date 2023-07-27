@@ -1,3 +1,4 @@
+import { UMB_LOCALIZATION_CONTEXT } from '@umbraco-cms/backoffice/localization-api';
 import {
 	UmbUserCollectionFilterModel,
 	UmbUserDetail,
@@ -53,6 +54,10 @@ export class UmbUserRepository
 
 	#notificationContext?: UmbNotificationContext;
 
+	#labels = {
+		userEditSaved: 'User saved',
+	};
+
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
@@ -77,6 +82,12 @@ export class UmbUserRepository
 				this.#notificationContext = instance;
 			}).asPromise(),
 		]);
+
+		new UmbContextConsumerController(this.#host, UMB_LOCALIZATION_CONTEXT, (instance) => {
+			instance.localizeMany(['speechBubbles_editUserSaved']).subscribe((values) => {
+				this.#labels.userEditSaved = values[0];
+			});
+		});
 	}
 
 	// COLLECTION
@@ -187,7 +198,7 @@ export class UmbUserRepository
 		if (data) {
 			this.#detailStore?.append(data);
 
-			const notification = { data: { message: `User saved` } };
+			const notification = { data: { message: this.#labels.userEditSaved } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 
