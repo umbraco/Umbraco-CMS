@@ -101,7 +101,7 @@
 		"lint": "eslint src apps e2e",
 		"lint:errors": "npm run lint -- --quiet",
 		"lint:fix": "npm run lint -- --fix",
-		"format": "prettier 'src/**/*.ts'",
+		"format": "prettier 'src/**/*.ts' -- check",
 		"format:fix": "npm run format -- --write",
 		"generate:api": "openapi --input https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v14/dev/src/Umbraco.Cms.Api.Management/OpenApi.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
 		"generate:api-dev": "openapi --input http://localhost:11000/umbraco/swagger/management/swagger.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
