@@ -11,6 +11,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './components/index.js';
+import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
 
 // TODO: temp solution to load core packages
 const CORE_PACKAGES = [
@@ -30,16 +31,26 @@ const CORE_PACKAGES = [
 
 @customElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
-	#extensionInitializer;
-
 	constructor() {
 		super();
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
-		this.#extensionInitializer = new UmbExtensionInitializer(this, umbExtensionsRegistry);
-		this.#extensionInitializer.setLocalPackages(CORE_PACKAGES);
-		this.provideContext(UMB_LOCALIZATION_CONTEXT, new UmbLocalizationContext(this, umbExtensionsRegistry));
+
+		const extensionInitializer = new UmbExtensionInitializer(this, umbExtensionsRegistry);
+		extensionInitializer.setLocalPackages(CORE_PACKAGES);
+
+		const localizationContext = new UmbLocalizationContext(umbExtensionsRegistry);
+		this.provideContext(UMB_LOCALIZATION_CONTEXT, localizationContext);
+
+		this.consumeContext(UMB_AUTH, (auth) => {
+			this.observe(auth.currentUser, (user) => {
+				if (user) {
+					const languageIsoCode = user.languageIsoCode ?? 'en';
+					localizationContext.setLanguage(languageIsoCode);
+				}
+			});
+		});
 	}
 
 	render() {
