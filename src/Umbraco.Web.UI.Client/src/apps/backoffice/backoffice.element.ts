@@ -44,12 +44,13 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_LOCALIZATION_CONTEXT, localizationContext);
 
 		this.consumeContext(UMB_AUTH, (auth) => {
-			this.observe(auth.currentUser, (user) => {
-				if (user) {
-					const languageIsoCode = user.languageIsoCode ?? 'en-us';
-					localizationContext.setLanguage(languageIsoCode);
-				}
-			});
+			this.observe(
+				auth.languageIsoCode,
+				(currentLanguageIsoCode) => {
+					localizationContext.setLanguage(currentLanguageIsoCode);
+				},
+				'languageIsoCode'
+			);
 		});
 	}
 
