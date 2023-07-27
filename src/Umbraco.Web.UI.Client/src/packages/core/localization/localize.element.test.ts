@@ -1,10 +1,6 @@
 import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
 import { UmbLocalizeElement } from './localize.element.js';
-import {
-	UMB_LOCALIZATION_CONTEXT,
-	UmbLocalizationContext,
-	UmbTranslationRegistry,
-} from '@umbraco-cms/backoffice/localization-api';
+import { UMB_LOCALIZATION_CONTEXT, UmbLocalizationContext } from '@umbraco-cms/backoffice/localization-api';
 import { UmbExtensionRegistry } from '@umbraco-cms/backoffice/extension-api';
 
 import '@umbraco-cms/backoffice/context-api';
@@ -58,10 +54,8 @@ describe('umb-localize', () => {
 			extensionRegistry = new UmbExtensionRegistry();
 			extensionRegistry.register(english);
 			extensionRegistry.register(danish);
-			const registry = new UmbTranslationRegistry(extensionRegistry);
-			registry.register(english.meta.culture);
 			context = new UmbLocalizationContext(extensionRegistry);
-			context.setLanguage(english.meta.culture);
+			context.setLanguage(english.meta.culture, english.meta.culture);
 			hostElement = await fixture(
 				html`<umb-context-provider .key=${UMB_LOCALIZATION_CONTEXT} .value=${context}>
 					<umb-localize key="general_close"></umb-localize>

@@ -58,7 +58,7 @@ describe('Localization', () => {
 		registry = new UmbTranslationRegistry(extensionRegistry);
 		extensionRegistry.register(english);
 		extensionRegistry.register(danish);
-		registry.register(english.meta.culture);
+		registry.register(english.meta.culture, english.meta.culture);
 	});
 
 	describe('UmbTranslationRegistry', () => {
@@ -75,7 +75,7 @@ describe('Localization', () => {
 
 		beforeEach(async () => {
 			context = new UmbLocalizationContext(extensionRegistry);
-			context.setLanguage(english.meta.culture);
+			context.setLanguage(english.meta.culture, english.meta.culture);
 		});
 
 		describe('localize', () => {
@@ -108,7 +108,7 @@ describe('Localization', () => {
 				const value = await firstValueFrom(context.localize('general_close'));
 				expect(value).to.equal('Close');
 
-				context.setLanguage(danish.meta.culture);
+				context.setLanguage(danish.meta.culture, english.meta.culture);
 
 				await aTimeout(0);
 
@@ -120,7 +120,7 @@ describe('Localization', () => {
 				const value = await firstValueFrom(context.localize('general_logout'));
 				expect(value).to.equal('Log out');
 
-				context.setLanguage(danish.meta.culture);
+				context.setLanguage(danish.meta.culture, english.meta.culture);
 
 				await aTimeout(0);
 
@@ -159,7 +159,7 @@ describe('Localization', () => {
 				expect(values[0]).to.equal('Close');
 				expect(values[1]).to.equal('Log out');
 
-				context.setLanguage(danish.meta.culture);
+				context.setLanguage(danish.meta.culture, english.meta.culture);
 
 				await aTimeout(0);
 
