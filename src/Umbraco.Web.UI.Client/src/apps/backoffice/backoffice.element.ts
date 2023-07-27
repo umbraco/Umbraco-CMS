@@ -1,6 +1,7 @@
 import { UMB_LOCALIZATION_CONTEXT, UmbLocalizationContext } from '@umbraco-cms/backoffice/localization-api';
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context.js';
 import { UmbExtensionInitializer } from './extension.controller.js';
+import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -11,7 +12,6 @@ import {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './components/index.js';
-import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
 
 // TODO: temp solution to load core packages
 const CORE_PACKAGES = [
