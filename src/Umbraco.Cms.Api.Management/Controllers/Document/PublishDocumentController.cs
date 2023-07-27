@@ -27,7 +27,7 @@ public class PublishDocumentController : DocumentControllerBase
     public async Task<IActionResult> Publish(Guid id, [FromQuery] string[]? cultures)
     {
         Attempt<ContentPublishingOperationStatus> attempt;
-        if (cultures is null)
+        if (cultures is null || cultures.Length is 0)
         {
             attempt = await _contentEditingService.PublishAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
         }

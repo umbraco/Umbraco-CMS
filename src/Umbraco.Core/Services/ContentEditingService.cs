@@ -184,7 +184,7 @@ internal sealed class ContentEditingService
 
         if (contentPublishingOperationStatus is ContentPublishingOperationStatus.Success or ContentPublishingOperationStatus.SuccessPublishCulture)
         {
-            Attempt.Succeed(contentPublishingOperationStatus);
+            return Attempt.Succeed(contentPublishingOperationStatus);
         }
 
         return Attempt.Fail(contentPublishingOperationStatus);
