@@ -12,8 +12,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
 
 // TODO: this might need a new name, since it's both views and dashboards
-@customElement('umb-section-views')
-export class UmbSectionViewsElement extends UmbLitElement {
+@customElement('umb-section-main-views')
+export class UmbSectionMainViewElement extends UmbLitElement {
 	@property({ type: String, attribute: 'section-alias' })
 	public sectionAlias?: string;
 
@@ -214,10 +214,10 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	];
 }
 
-export default UmbSectionViewsElement;
+export default UmbSectionMainViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section-views': UmbSectionViewsElement;
+		'umb-section-main-views': UmbSectionMainViewElement;
 	}
 }

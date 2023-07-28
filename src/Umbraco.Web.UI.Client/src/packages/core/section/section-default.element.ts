@@ -1,5 +1,5 @@
 import type { UmbWorkspaceElement } from '../workspace/workspace.element.js';
-import type { UmbSectionViewsElement } from './section-views/section-views.element.js';
+import type { UmbSectionMainViewElement } from './section-main-views/section-main-views.element.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import {
@@ -63,9 +63,9 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 			},
 			{
 				path: '**',
-				component: () => import('./section-views/section-views.element.js'),
+				component: () => import('./section-main-views/section-main-views.element.js'),
 				setup: (element) => {
-					(element as UmbSectionViewsElement).sectionAlias = this.manifest?.alias;
+					(element as UmbSectionMainViewElement).sectionAlias = this.manifest?.alias;
 				},
 			},
 		];
