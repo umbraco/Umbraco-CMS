@@ -75,10 +75,12 @@ export default class UmbLoginElement extends LitElement {
 				<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
 					<uui-form-layout-item>
 						<uui-label id="emailLabel" for="email" slot="label" required>
-							<umb-localize key="user_email">Email</umb-localize>
+							${this.#authContext.usernameIsEmail
+								? html`<umb-localize key="user_email">Email</umb-localize>`
+								: html`<umb-localize key="user_username">Name</umb-localize>`}
 						</uui-label>
 						<uui-input
-							type="email"
+							type=${this.#authContext.usernameIsEmail ? 'email' : 'text'}
 							id="email"
 							name="email"
 							label="Email"

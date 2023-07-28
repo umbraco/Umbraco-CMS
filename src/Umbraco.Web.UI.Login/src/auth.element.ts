@@ -25,8 +25,12 @@ export default class UmbAuthElement extends LitElement {
 	logoImage = '';
 
 	@property({ type: Boolean, attribute: 'username-is-email' })
-	usernameIsEmail = false;
-
+	set usernameIsEmail(value: boolean) {
+		UmbAuthMainContext.Instance.usernameIsEmail = value;
+	}
+	get usernameIsEmail() {
+		return UmbAuthMainContext.Instance.usernameIsEmail;
+	}
 	@property({ type: Boolean, attribute: 'allow-password-reset' })
 	set allowPasswordReset(value: boolean) {
 		UmbAuthMainContext.Instance.allowPasswordReset = value;

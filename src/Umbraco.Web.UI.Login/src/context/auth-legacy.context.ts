@@ -15,6 +15,7 @@ export class UmbAuthLegacyContext implements IUmbAuthContext {
 
 	public returnPath = '';
 	public allowPasswordReset = false;
+	public usernameIsEmail = false;
 
 	async login(data: LoginRequestModel): Promise<LoginResponse> {
 		return this.#authRepository.login(data);

@@ -11,6 +11,7 @@ export interface IUmbAuthContext {
 	newPassword(password: string, resetCode: string, userId: string): Promise<NewPasswordResponse>;
 	supportsPersistLogin: boolean;
 	allowPasswordReset: boolean;
+	usernameIsEmail: boolean;
 	returnPath: string;
 }
 
