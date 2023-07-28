@@ -169,7 +169,6 @@ export default class UmbLoginElement extends LitElement {
 			}
 			#login-button {
 				width: 100%;
-				margin-top: var(--uui-size-space-5);
 				--uui-button-padding-top-factor: 1.5;
 				--uui-button-padding-bottom-factor: 1.5;
 			}

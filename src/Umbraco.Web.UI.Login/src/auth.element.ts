@@ -10,6 +10,8 @@ import './pages/reset-password.element.js';
 import './pages/new-password.element.js';
 import './pages/login.element.js';
 import './pages/invite.element.js';
+import './external-login-providers-layout.element.js';
+import { InterfaceLookValues } from '@umbraco-ui/uui';
 
 @customElement('umb-auth')
 export default class UmbAuthElement extends LitElement {
@@ -98,6 +100,11 @@ export default class UmbAuthElement extends LitElement {
 		return html`
 			<umb-auth-layout backgroundImage=${ifDefined(this.backgroundImage)} logoImage=${ifDefined(this.logoImage)}>
 				<div id="outlet"></div>
+				<umb-external-login-providers-layout>
+					<umb-login-external></umb-login-external>
+					<umb-login-external></umb-login-external>
+					<umb-login-external></umb-login-external>
+				</umb-external-login-providers-layout>
 			</umb-auth-layout>
 		`;
 	}
