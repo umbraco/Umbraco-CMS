@@ -197,7 +197,9 @@ export class UmbUserRepository
 
 		if (data) {
 			this.#detailStore?.append(data);
+		}
 
+		if (!error) {
 			const notification = { data: { message: this.#labels.userEditSaved } };
 			this.#notificationContext?.peek('positive', notification);
 		}
