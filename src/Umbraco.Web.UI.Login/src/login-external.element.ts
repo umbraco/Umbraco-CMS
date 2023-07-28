@@ -29,6 +29,8 @@ export class UmbLoginExternalElement extends LitElement {
 		css`
 			uui-button {
 				width: 100%;
+				--uui-button-padding-top-factor: 1.5;
+				--uui-button-padding-bottom-factor: 1.5;
 			}
 		`,
 	];
