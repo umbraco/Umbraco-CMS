@@ -99,7 +99,7 @@ export abstract class UmbBaseExtensionsController<
 			this._permittedExts.forEach((extCtrl) => {
 				// Check if it overwrites another extension:
 				// if so, look up the extension it overwrites, and remove it from the list. and check that for if it overwrites another extension and so on.
-				if (extCtrl.overwrites && extCtrl.overwrites.length > 0) {
+				if (extCtrl.overwrites.length > 0) {
 					extCtrl.overwrites.forEach((overwrite) => {
 						this.#removeOverwrittenExtensions(exposedPermittedExts, overwrite);
 					});

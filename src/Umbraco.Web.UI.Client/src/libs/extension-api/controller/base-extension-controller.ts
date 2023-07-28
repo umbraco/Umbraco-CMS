@@ -15,7 +15,7 @@ export abstract class UmbBaseExtensionController<
 	#manifestObserver;
 	#extensionRegistry: UmbExtensionRegistry<ManifestCondition>;
 	#alias: string;
-	#overwrites?: Array<string>;
+	#overwrites: Array<string> = [];
 	#manifest?: ManifestType;
 	#conditionControllers: Array<UmbExtensionCondition> = [];
 	#onPermissionChanged: (isPermitted: boolean, controller: SubClassType) => void;
@@ -73,7 +73,7 @@ export abstract class UmbBaseExtensionController<
 					}
 					this.#gotConditions();
 				} else {
-					this.#overwrites = undefined;
+					this.#overwrites = [];
 					this.#cleanConditions();
 				}
 			}
