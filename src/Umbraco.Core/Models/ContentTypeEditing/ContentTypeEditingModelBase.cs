@@ -14,9 +14,9 @@ public abstract class ContentTypeEditingModelBase<TPropertyType, TPropertyTypeCo
     where TPropertyType : PropertyTypeModelBase
     where TPropertyTypeContainer : PropertyTypeContainerModelBase
 {
-    public required string Alias { get; set; }
+    public string Alias { get; set; } = string.Empty;
 
-    public required string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     public string? Description { get; set; }
 

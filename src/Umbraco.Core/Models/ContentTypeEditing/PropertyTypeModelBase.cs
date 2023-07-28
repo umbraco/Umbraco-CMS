@@ -8,9 +8,9 @@ public abstract class PropertyTypeModelBase
 
     public int SortOrder { get; set; }
 
-    public required string Alias { get; set; }
+    public string Alias { get; set; } = string.Empty;
 
-    public required string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     public string? Description { get; set; }
 
@@ -20,7 +20,7 @@ public abstract class PropertyTypeModelBase
 
     public bool VariesBySegment { get; set; }
 
-    public required PropertyTypeValidation Validation { get; set; }
+    public PropertyTypeValidation Validation { get; set; } = new();
 
-    public required PropertyTypeAppearance Appearance { get; set; }
+    public PropertyTypeAppearance Appearance { get; set; } = new();
 }

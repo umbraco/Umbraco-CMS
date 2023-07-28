@@ -9,7 +9,7 @@ public abstract class PropertyTypeContainerModelBase
     public string? Name { get; set; }
 
     // NOTE: This needs to be a string because it can be anything in the future (= not necessarily limited to "tab" or "group")
-    public required string Type { get; set; }
+    public string Type { get; set; } = string.Empty;
 
     public int SortOrder { get; set; }
 }
