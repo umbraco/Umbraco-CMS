@@ -1,4 +1,5 @@
 using System.Runtime.Serialization;
+using System.Xml.Linq;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
@@ -20,6 +21,9 @@ public class DataTypeReferences
         [DataMember(Name = "properties")]
         public object? Properties { get; set; }
 
+        [DataMember(Name = "listViews")]
+        public object? ListViews { get; set; }
+
         [DataContract(Name = "property", Namespace = "")]
         public class PropertyTypeReferences
         {
@@ -28,6 +32,13 @@ public class DataTypeReferences
 
             [DataMember(Name = "alias")]
             public string? Alias { get; set; }
+        }
+
+        [DataContract(Name = "listView", Namespace = "")]
+        public class ListViewReferences
+        {
+            [DataMember(Name = "name")]
+            public string? Name { get; set; }
         }
     }
 }
