@@ -69,6 +69,12 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
 
     void Save(TItem? item, int userId = Constants.Security.SuperUserId);
 
+    Task SaveAsync(TItem item, Guid performingUserKey)
+    {
+        Save(item);
+        return Task.CompletedTask;
+    }
+
     void Save(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId);
 
     void Delete(TItem item, int userId = Constants.Security.SuperUserId);
