@@ -1,21 +1,17 @@
-import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { map, of } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import {
 	ManifestDashboard,
 	ManifestSectionView,
 	UmbDashboardExtensionElement,
 	UmbSectionViewExtensionElement,
-	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestController, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
 
-// TODO: this might need a new name, since it's both view and dashboard now
+// TODO: this might need a new name, since it's both views and dashboards
 @customElement('umb-section-views')
 export class UmbSectionViewsElement extends UmbLitElement {
 	@property({ type: String, attribute: 'section-alias' })
@@ -36,19 +32,71 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	@state()
 	private _routes: Array<UmbRoute> = [];
 
-	private _sectionContext?: UmbSectionContext;
-
-	private _viewsObserver?: UmbExtensionsManifestController<ManifestSectionView['type']>;
-	private _dashboardObserver?: UmbExtensionsManifestController<ManifestDashboard['type']>;
-
 	constructor() {
 		super();
 
+		new UmbExtensionsManifestController(this, 'dashboard', null, (dashboards) => {
+			this._dashboards = dashboards.map((dashboard) => dashboard.manifest);
+			this.#createRoutes();
+		});
+
+		new UmbExtensionsManifestController(this, 'sectionView', null, (views) => {
+			this._views = views.map((view) => view.manifest);
+			this.#createRoutes();
+		});
+
+		/*
 		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (sectionContext) => {
 			this._sectionContext = sectionContext;
 			this._observeSectionAlias();
 		});
+		*/
 	}
+
+	/*
+	private _observeSectionAlias() {
+		if (!this._sectionContext) return;
+
+		this.observe(
+			this._sectionContext.alias,
+			(sectionAlias) => {
+				this._observeViews(sectionAlias);
+				this._observeDashboards(sectionAlias);
+			},
+			'_aliasObserver'
+		);
+	}
+
+	private _observeViews(sectionAlias?: string) {
+		if (sectionAlias) {
+
+			this.observe(
+				umbExtensionsRegistry
+					?.extensionsOfType('sectionView')
+					.pipe(map((views) => views.filter((view) => view.conditions.sections.includes(sectionAlias)))) ?? of([]),
+				(views) => {
+					this._views = views;
+					this.#createRoutes();
+				}
+			);
+
+		}
+	}
+
+	private _observeDashboards(sectionAlias?: string) {
+
+		if (sectionAlias) {this.observe(
+				umbExtensionsRegistry
+					?.extensionsOfType('dashboard')
+					.pipe(map((views) => views.filter((view) => view.conditions.sections.includes(sectionAlias)))) ?? of([]),
+				(views) => {
+					this._dashboards = views;
+					this.#createRoutes();
+				}
+			);
+		}
+	}
+	*/
 
 	#constructDashboardPath(manifest: ManifestDashboard) {
 		const dashboardName = manifest.meta.label ?? manifest.name;
@@ -83,62 +131,6 @@ export class UmbSectionViewsElement extends UmbLitElement {
 
 		const routes = [...dashboardRoutes, ...viewRoutes];
 		this._routes = routes?.length > 0 ? [...routes, { path: '', redirectTo: routes?.[0]?.path }] : [];
-	}
-
-	private _observeSectionAlias() {
-		if (!this._sectionContext) return;
-
-		this.observe(
-			this._sectionContext.alias,
-			(sectionAlias) => {
-				this._observeViews(sectionAlias);
-				this._observeDashboards(sectionAlias);
-			},
-			'_aliasObserver'
-		);
-	}
-
-	private _observeViews(sectionAlias?: string) {
-		this._viewsObserver?.destroy();
-		if (sectionAlias) {
-			this._viewsObserver = new UmbExtensionsManifestController(this, 'sectionView', null, (views) => {
-				this._views = views.map((view) => view.manifest);
-				this.#createRoutes();
-			});
-			/*
-			this._viewsObserver = this.observe(
-				umbExtensionsRegistry
-					?.extensionsOfType('sectionView')
-					.pipe(map((views) => views.filter((view) => view.conditions.sections.includes(sectionAlias)))) ?? of([]),
-				(views) => {
-					this._views = views;
-					this.#createRoutes();
-				}
-			);
-			*/
-		}
-	}
-
-	private _observeDashboards(sectionAlias?: string) {
-		this._dashboardObserver?.destroy();
-
-		if (sectionAlias) {
-			this._dashboardObserver = new UmbExtensionsManifestController(this, 'dashboard', null, (dashboards) => {
-				this._dashboards = dashboards.map((dashboard) => dashboard.manifest);
-				this.#createRoutes();
-			});
-			/*
-			this._dashboardObserver = this.observe(
-				umbExtensionsRegistry
-					?.extensionsOfType('dashboard')
-					.pipe(map((views) => views.filter((view) => view.conditions.sections.includes(sectionAlias)))) ?? of([]),
-				(views) => {
-					this._dashboards = views;
-					this.#createRoutes();
-				}
-			);
-			*/
-		}
 	}
 
 	render() {
