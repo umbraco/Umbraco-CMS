@@ -85,11 +85,7 @@ public class ContentTypeEditingService : ContentTypeEditingServiceBase<IContentT
     }
 
     private async Task SaveAsync(IContentType contentType, Guid userKey)
-    {
-        // TODO: implement async save with the userKey
-        _contentTypeService.Save(contentType);
-        await Task.CompletedTask;
-    }
+        => await _contentTypeService.SaveAsync(contentType, userKey);
 
     protected override Guid[] GetAvailableCompositionKeys(IContentTypeComposition? source, IContentTypeComposition[] allContentTypes, bool isElement)
         => _contentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, isElement: isElement)
