@@ -7,19 +7,19 @@ const meta: Meta<UmbLocalizeElement> = {
 	title: 'Localization/Localize',
 	component: 'umb-localize',
 	args: {
-		key: 'general_ok',
+		key: 'general_areyousure',
 	},
 	decorators: [
 		(story) => {
 			return html`<div style="padding: 1rem; margin: 1rem; border: 1px solid green; max-width:50%;">
-				Component output: ${story()}
+				Localized text: "${story()}"
 			</div>`;
 		},
 	],
 	parameters: {
 		docs: {
 			source: {
-				code: `<umb-localize key="general_ok"></umb-localize>`,
+				code: `<umb-localize key="general_areyousure"></umb-localize>`,
 			},
 		},
 	},
