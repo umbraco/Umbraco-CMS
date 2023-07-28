@@ -31,7 +31,7 @@ export class UmbExternalLoginProvidersLayoutElement extends LitElement {
 				margin-bottom: 16px;
 			}
 			#divider span {
-				background-color: #fff;
+				background-color: var(--uui-color-surface-alt);
 				padding: 0 9px;
 			}
 			#divider::before {

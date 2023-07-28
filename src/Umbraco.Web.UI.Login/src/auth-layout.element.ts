@@ -59,7 +59,7 @@ export class UmbAuthLayoutElement extends LitElement {
 			#box {
 				width: 500px;
 				padding: var(--uui-size-layout-3);
-				background-color: var(--uui-color-surface);
+				background-color: var(--uui-color-surface-alt);
 				box-sizing: border-box;
 				box-shadow: var(--uui-shadow-depth-5);
 				border-radius: calc(var(--uui-border-radius) * 2);

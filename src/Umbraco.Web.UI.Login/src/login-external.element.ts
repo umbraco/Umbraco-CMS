@@ -10,27 +10,40 @@ export class UmbLoginExternalElement extends LitElement {
 	@property({ attribute: 'custom-view' })
 	options!: {
 		name: string;
-		buttonLook: InterfaceLook;
-		buttonColor: InterfaceColor;
 		icon: string;
 	};
 
 	render() {
 		return html`
 			<uui-icon-registry-essential>
-				<uui-button compact look=${this.options.buttonLook} color=${this.options.buttonColor}>
-					<div><uui-icon name=${this.options.icon}></uui-icon> Continue with ${this.options.name}</div>
-				</uui-button>
+				<button><uui-icon name=${this.options.icon}></uui-icon> Continue with ${this.options.name}</button>
 			</uui-icon-registry-essential>
 		`;
 	}
 
 	static styles: CSSResultGroup = [
 		css`
-			uui-button {
+			button {
+				font-size: var(--uui-button-font-size);
+				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
 				width: 100%;
-				--uui-button-padding-top-factor: 1.5;
-				--uui-button-padding-bottom-factor: 1.5;
+				padding: 9px;
+				text-align: left;
+				background-color: var(--uui-color-surface);
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-2);
+				box-sizing: border-box;
+
+				line-height: 1.1; /* makes the text vertically centered */
+				color: var(--uui-color-interactive);
+			}
+
+			button:hover {
+				color: var(--uui-color-interactive-emphasis);
+				border-color: var(--uui-color-border-standalone);
 			}
 		`,
 	];

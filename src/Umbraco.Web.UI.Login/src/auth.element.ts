@@ -104,8 +104,6 @@ export default class UmbAuthElement extends LitElement {
 					<umb-login-external
 						.options=${{
 							name: 'Google',
-							buttonLook: 'outline',
-							buttonColor: 'danger',
 							icon: 'info',
 						}}></umb-login-external>
 				</umb-external-login-providers-layout>
