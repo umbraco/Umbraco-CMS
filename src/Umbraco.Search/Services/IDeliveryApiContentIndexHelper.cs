@@ -2,7 +2,7 @@
 
 namespace Umbraco.Search.Services;
 
-internal interface IDeliveryApiContentIndexHelper
+public interface IDeliveryApiContentIndexHelper
 {
     void EnumerateApplicableDescendantsForContentIndex(int rootContentId, Action<IContent[]> actionToPerform);
 }

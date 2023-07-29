@@ -1,9 +1,11 @@
+using Umbraco.Cms.Core.Models.Entities;
+
 namespace Umbraco.Search;
 
 /// <summary>
 ///     A Marker interface for defining an Umbraco indexer
 /// </summary>
-public interface IUmbracoIndex<T> : IUmbracoIndex
+public interface IUmbracoIndex<T> : IUmbracoIndex where T : IUmbracoEntity
 {
     void IndexItems(T[] members);
 }

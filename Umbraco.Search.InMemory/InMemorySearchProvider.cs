@@ -1,26 +1,29 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Search.InMemory;
 
 public class InMemorySearchProvider : ISearchProvider
 {
-    private readonly IMemoryCache _memoryCache;
+    private readonly IInMemoryIndexManager _inMemoryIndexManager;
     private readonly ILogger<InMemorySearchProvider> _logger;
 
-    public InMemorySearchProvider(IMemoryCache memoryCache, ILogger<InMemorySearchProvider> logger)
+    public InMemorySearchProvider(IInMemoryIndexManager inMemoryIndexManager, ILogger<InMemorySearchProvider> logger)
     {
-        _memoryCache = memoryCache;
+        _inMemoryIndexManager = inMemoryIndexManager;
         _logger = logger;
     }
 
     public IUmbracoIndex? GetIndex(string index)
     {
-return new UmbracoMemoryIndex<>()
+        return _inMemoryIndexManager.GetIndex(index);
     }
 
-    public IUmbracoIndex<T>? GetIndex<T>(string index) => throw new NotImplementedException();
+    public IUmbracoIndex<T>? GetIndex<T>(string index) where T : IUmbracoEntity  {
+        return _inMemoryIndexManager.GetIndex<T>(index);
+    }
 
     public IUmbracoSearcher? GetSearcher(string index) => throw new NotImplementedException();
 

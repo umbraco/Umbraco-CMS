@@ -1,4 +1,5 @@
 ﻿using Examine;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Search.Examine.ValueSetBuilders;
 
 namespace Umbraco.Search.Examine.Lucene;
@@ -10,7 +11,7 @@ public class UmbracoExamineIndex
     public UmbracoExamineIndex(UmbracoExamineLuceneIndex examineIndex) => ExamineIndex = examineIndex;
 };
 
-public class UmbracoExamineIndex<T> : UmbracoExamineIndex, IUmbracoIndex<T>
+public class UmbracoExamineIndex<T> : UmbracoExamineIndex, IUmbracoIndex<T> where T : IUmbracoEntity
 {
     private readonly IValueSetBuilder<T> _valueSetBuilder;
     private readonly IDisposable[]? _attachedDisposables;

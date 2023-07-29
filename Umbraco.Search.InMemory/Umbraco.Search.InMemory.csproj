@@ -10,8 +10,5 @@
       <ProjectReference Include="..\src\Umbraco.Search\Umbraco.Search.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Extensions\" />
-    </ItemGroup>
 
 </Project>

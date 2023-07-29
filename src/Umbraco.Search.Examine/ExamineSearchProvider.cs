@@ -1,6 +1,7 @@
 ﻿using Examine;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Examine.ValueSetBuilders;
@@ -28,7 +29,7 @@ public class ExamineSearchProvider : ISearchProvider
         return _indexers.FirstOrDefault(x => x.Name == index);
     }
 
-    public IUmbracoIndex<T>? GetIndex<T>(string index)
+    public IUmbracoIndex<T>? GetIndex<T>(string index) where T : IUmbracoEntity
     {
         return GetIndex(index) as IUmbracoIndex<T>;
     }

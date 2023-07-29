@@ -1,6 +1,7 @@
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Search.DependencyInjection;
 using Umbraco.Search.Examine.Lucene.DependencyInjection;
+using Umbraco.Search.InMemory.DepedencyInjection;
 
 namespace Umbraco.Cms.Web.UI
 {
@@ -35,7 +36,8 @@ namespace Umbraco.Cms.Web.UI
         {
             services.AddUmbraco(_env, _config)
                 .AddSearchServices()
-                .AddExamineLuceneIndexes()
+               // .AddExamineLuceneIndexes()
+                .AddInMemoryIndexes()
                 .AddBackOffice()
                 .AddWebsite()
                 .AddDeliveryApi()

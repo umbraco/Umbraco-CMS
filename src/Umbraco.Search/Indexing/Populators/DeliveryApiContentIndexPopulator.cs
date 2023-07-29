@@ -9,10 +9,11 @@ namespace Umbraco.Search.Indexing.Populators;
 
 public sealed class DeliveryApiContentIndexPopulator : IndexPopulator
 {
-   private readonly IDeliveryApiContentIndexHelper _deliveryApiContentIndexHelper;
+    private readonly IDeliveryApiContentIndexHelper _deliveryApiContentIndexHelper;
     private readonly ILogger<DeliveryApiContentIndexPopulator> _logger;
     private DeliveryApiSettings _deliveryApiSettings;
     private readonly ISearchProvider _provider;
+
     public DeliveryApiContentIndexPopulator(
         IDeliveryApiContentIndexHelper deliveryApiContentIndexHelper,
         ILogger<DeliveryApiContentIndexPopulator> logger,
@@ -47,8 +48,6 @@ public sealed class DeliveryApiContentIndexPopulator : IndexPopulator
                 {
                     _provider.GetIndex<IContent>(index)?.IndexItems(descendants);
                 }
-
-
             });
     }
 
@@ -64,7 +63,8 @@ public sealed class DeliveryApiContentIndexPopulator : IndexPopulator
         {
             // IsRegistered() is currently invoked only when Umbraco starts and when loading the Examine dashboard,
             // so we won't be flooding the logs with info messages here
-            _logger.LogInformation("The Delivery API is not enabled, no indexing will performed for the Delivery API content index.");
+            _logger.LogInformation(
+                "The Delivery API is not enabled, no indexing will performed for the Delivery API content index.");
         }
 
         return false;
