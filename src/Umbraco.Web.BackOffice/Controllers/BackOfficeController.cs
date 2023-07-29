@@ -329,7 +329,9 @@ public class BackOfficeController : UmbracoController
     [AllowAnonymous]
     public ActionResult ExternalLogin(string provider, string? redirectUrl = null)
     {
-        if (redirectUrl == null || !redirectUrl.StartsWith("/"))
+        // Only relative urls are accepted as redirect url
+        // We can't simply use Uri.TryCreate with kind Absolute, as in Linux any relative url would be seen as an absolute file uri
+        if (redirectUrl == null || !Uri.TryCreate(redirectUrl, UriKind.RelativeOrAbsolute, out Uri? redirectUri) || redirectUri.IsAbsoluteUri)
         {
             redirectUrl = Url.Action(nameof(Default), this.GetControllerName());
         }
