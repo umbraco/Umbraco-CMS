@@ -25,7 +25,10 @@ import {
 import type { UmbTreeRootFileSystemModel } from '@umbraco-cms/backoffice/tree';
 import { StylesheetDetails } from '../index.js';
 import { Observable } from 'rxjs';
-import { UmbStylesheetFolderServerDataSource } from './sources/stylesheet.folder.server.data.js';
+import {
+	StylesheetGetFolderResponse,
+	UmbStylesheetFolderServerDataSource,
+} from './sources/stylesheet.folder.server.data.js';
 
 export class UmbStylesheetRepository
 	implements
@@ -58,17 +61,31 @@ export class UmbStylesheetRepository
 	createFolderScaffold(
 		parentId: string | null
 	): Promise<{ data?: FolderReponseModel | undefined; error?: ProblemDetails | undefined }> {
-		throw new Error('Method not implemented.');
+		const data: FolderReponseModel = {
+			name: '',
+			parentId,
+		};
+		return Promise.resolve({ data, error: undefined });
 	}
-	createFolder(
+
+	async createFolder(
 		folderRequest: CreateFolderRequestModel
 	): Promise<{ data?: string | undefined; error?: ProblemDetails | undefined }> {
-		throw new Error('Method not implemented.');
+		await this.#init;
+		const req = {
+			parentPath: folderRequest.parentId,
+			name: folderRequest.name,
+		};
+		const promise = this.#folderDataSource.insert(req);
+		await promise;
+		this.requestTreeItemsOf(folderRequest.parentId ? folderRequest.parentId : null);
+		return promise;
 	}
-	requestFolder(
+	async requestFolder(
 		unique: string
-	): Promise<{ data?: FolderReponseModel | undefined; error?: ProblemDetails | undefined }> {
-		throw new Error('Method not implemented.');
+	): Promise<{ data?: StylesheetGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
+		await this.#init;
+		return this.#folderDataSource.get(unique);
 	}
 	updateFolder(
 		unique: string,
@@ -76,8 +93,13 @@ export class UmbStylesheetRepository
 	): Promise<{ data?: FolderModelBaseModel | undefined; error?: ProblemDetails | undefined }> {
 		throw new Error('Method not implemented.');
 	}
-	deleteFolder(id: string): Promise<{ error?: ProblemDetails | undefined }> {
-		throw new Error('Method not implemented.');
+	async deleteFolder(path: string): Promise<{ error?: ProblemDetails | undefined }> {
+		await this.#init;
+		const { data } = await this.requestFolder(path);
+		const promise = this.#folderDataSource.delete(path);
+		await promise;
+		this.requestTreeItemsOf(data?.parentPath ? data?.parentPath : null);
+		return promise;
 	}
 
 	//#endregion
