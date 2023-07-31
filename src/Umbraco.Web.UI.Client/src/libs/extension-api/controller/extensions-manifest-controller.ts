@@ -1,5 +1,5 @@
 import { UmbExtensionManifestController } from './extension-manifest-controller.js';
-import { UmbBaseExtensionsController } from './base-extensions-controller.js';
+import { type PermittedControllerType, UmbBaseExtensionsController } from './base-extensions-controller.js';
 import {
 	ManifestBase,
 	ManifestTypeMap,
@@ -14,15 +14,13 @@ export class UmbExtensionsManifestController<
 	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbExtensionManifestController<ManifestType> = UmbExtensionManifestController<ManifestType>,
-	PermittedControllerType extends ControllerType = ControllerType & {
-		manifest: Required<Pick<ControllerType, 'manifest'>>;
-	}
-> extends UmbBaseExtensionsController<ManifestTypeName, ManifestType, ControllerType, PermittedControllerType> {
+	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
+> extends UmbBaseExtensionsController<ManifestTypeName, ManifestType, ControllerType, MyPermittedControllerType> {
 	constructor(
 		host: UmbControllerHost,
 		type: ManifestTypeName,
 		filter: null | ((manifest: ManifestType) => boolean),
-		onChange: (permittedManifests: Array<PermittedControllerType>, controller: PermittedControllerType) => void
+		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void
 	) {
 		super(host, umbExtensionsRegistry, type, filter, onChange);
 	}

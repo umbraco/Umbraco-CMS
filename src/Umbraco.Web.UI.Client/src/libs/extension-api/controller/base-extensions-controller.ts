@@ -9,24 +9,28 @@ import {
 import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
+	manifest: Required<Pick<ControllerType, 'manifest'>>;
+};
+
 /**
  */
 export abstract class UmbBaseExtensionsController<
 	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbBaseExtensionController<ManifestType> = UmbBaseExtensionController<ManifestType>,
-	PermittedControllerType extends ControllerType = ControllerType
+	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
 > extends UmbBaseController {
-	#onChange: (permittedManifests: Array<PermittedControllerType>, controller: PermittedControllerType) => void;
+	#onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void;
 	private _extensions: Array<ControllerType> = [];
-	private _permittedExts: Array<PermittedControllerType> = [];
+	private _permittedExts: Array<MyPermittedControllerType> = [];
 
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestType>,
 		type: ManifestTypeName,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
-		onChange: (permittedManifests: Array<PermittedControllerType>, controller: PermittedControllerType) => void
+		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void
 	) {
 		super(host);
 		this.#onChange = onChange;
@@ -79,10 +83,10 @@ export abstract class UmbBaseExtensionsController<
 
 	protected _extensionChanged = (isPermitted: boolean, controller: ControllerType) => {
 		let hasChanged = false;
-		const existingIndex = this._permittedExts.indexOf(controller as PermittedControllerType);
+		const existingIndex = this._permittedExts.indexOf(controller as MyPermittedControllerType);
 		if (isPermitted) {
 			if (existingIndex === -1) {
-				this._permittedExts.push(controller as PermittedControllerType);
+				this._permittedExts.push(controller as MyPermittedControllerType);
 				hasChanged = true;
 			}
 		} else {
@@ -109,11 +113,11 @@ export abstract class UmbBaseExtensionsController<
 			// Sorting:
 			exposedPermittedExts.sort((a, b) => b.weight - a.weight);
 
-			this.#onChange(exposedPermittedExts, this as unknown as PermittedControllerType);
+			this.#onChange(exposedPermittedExts, this as unknown as MyPermittedControllerType);
 		}
 	};
 
-	#removeOverwrittenExtensions(list: Array<PermittedControllerType>, alias: string) {
+	#removeOverwrittenExtensions(list: Array<MyPermittedControllerType>, alias: string) {
 		const index = list.findIndex((a) => a.alias === alias);
 		if (index !== -1) {
 			const entry = list[index];
