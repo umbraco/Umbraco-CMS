@@ -3,17 +3,41 @@ import { UmbStylesheetTreeServerDataSource } from './sources/stylesheet.tree.ser
 import { UmbStylesheetServerDataSource } from './sources/stylesheet.server.data.js';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	DataSourceResponse,
+	UmbDataSourceErrorResponse,
+	UmbDetailRepository,
+	UmbFolderRepository,
+	UmbTreeRepository,
+} from '@umbraco-cms/backoffice/repository';
+import {
+	CreateFolderRequestModel,
+	CreateStylesheetRequestModel,
+	CreateTextFileViewModelBaseModel,
+	FileSystemTreeItemPresentationModel,
+	FolderModelBaseModel,
+	FolderReponseModel,
+	ProblemDetails,
+	TextFileResponseModelBaseModel,
+	UpdateStylesheetRequestModel,
+	UpdateTextFileViewModelBaseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import type { UmbTreeRootFileSystemModel } from '@umbraco-cms/backoffice/tree';
+import { StylesheetDetails } from '../index.js';
+import { Observable } from 'rxjs';
+import { UmbStylesheetFolderServerDataSource } from './sources/stylesheet.folder.server.data.js';
 
 export class UmbStylesheetRepository
-	implements UmbTreeRepository<FileSystemTreeItemPresentationModel, UmbTreeRootFileSystemModel>
+	implements
+		UmbTreeRepository<FileSystemTreeItemPresentationModel, UmbTreeRootFileSystemModel>,
+		UmbDetailRepository<CreateStylesheetRequestModel, string, UpdateStylesheetRequestModel, StylesheetDetails>,
+		UmbFolderRepository
 {
 	#host;
 	#dataSource;
 	#treeDataSource;
 	#treeStore?: UmbStylesheetTreeStore;
+	#folderDataSource;
 	#init;
 
 	constructor(host: UmbControllerHostElement) {
@@ -22,13 +46,73 @@ export class UmbStylesheetRepository
 		// TODO: figure out how spin up get the correct data source
 		this.#dataSource = new UmbStylesheetServerDataSource(this.#host);
 		this.#treeDataSource = new UmbStylesheetTreeServerDataSource(this.#host);
+		this.#folderDataSource = new UmbStylesheetFolderServerDataSource(this.#host);
 
 		this.#init = new UmbContextConsumerController(this.#host, UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 			this.#treeStore = instance;
 		}).asPromise();
 	}
 
-	// TREE:
+	//#region FOLDER:
+
+	createFolderScaffold(
+		parentId: string | null
+	): Promise<{ data?: FolderReponseModel | undefined; error?: ProblemDetails | undefined }> {
+		throw new Error('Method not implemented.');
+	}
+	createFolder(
+		folderRequest: CreateFolderRequestModel
+	): Promise<{ data?: string | undefined; error?: ProblemDetails | undefined }> {
+		throw new Error('Method not implemented.');
+	}
+	requestFolder(
+		unique: string
+	): Promise<{ data?: FolderReponseModel | undefined; error?: ProblemDetails | undefined }> {
+		throw new Error('Method not implemented.');
+	}
+	updateFolder(
+		unique: string,
+		folder: FolderModelBaseModel
+	): Promise<{ data?: FolderModelBaseModel | undefined; error?: ProblemDetails | undefined }> {
+		throw new Error('Method not implemented.');
+	}
+	deleteFolder(id: string): Promise<{ error?: ProblemDetails | undefined }> {
+		throw new Error('Method not implemented.');
+	}
+
+	//#endregion
+
+	//#region DETAIL:
+
+	createScaffold(
+		parentId: string | null,
+		preset?: Partial<CreateTextFileViewModelBaseModel> | undefined
+	): Promise<DataSourceResponse<CreateTextFileViewModelBaseModel>> {
+		throw new Error('Method not implemented.');
+	}
+
+	async requestById(id: string): Promise<DataSourceResponse<TextFileResponseModelBaseModel | undefined>> {
+		if (!id) throw new Error('id is missing');
+		await this.#init;
+		const { data, error } = await this.#dataSource.get(id);
+		return { data, error };
+	}
+	byId(id: string): Promise<Observable<TextFileResponseModelBaseModel | undefined>> {
+		throw new Error('Method not implemented.');
+	}
+	create(data: CreateTextFileViewModelBaseModel): Promise<DataSourceResponse<string>> {
+		throw new Error('Method not implemented.');
+	}
+	save(id: string, data: UpdateTextFileViewModelBaseModel): Promise<UmbDataSourceErrorResponse> {
+		throw new Error('Method not implemented.');
+	}
+	delete(id: string): Promise<UmbDataSourceErrorResponse> {
+		throw new Error('Method not implemented.');
+	}
+
+	//#endregion
+
+	//#region TREE:
 	async requestTreeRoot() {
 		await this.#init;
 
@@ -93,11 +177,5 @@ export class UmbStylesheetRepository
 		return this.#treeStore!.items(paths);
 	}
 
-	// DETAILS
-	async requestByPath(path: string) {
-		if (!path) throw new Error('Path is missing');
-		await this.#init;
-		const { data, error } = await this.#dataSource.get(path);
-		return { data, error };
-	}
+	//#endregion
 }
