@@ -51,6 +51,33 @@ describe('UmbExtensionElementController', () => {
 				}
 			);
 		});
+
+		it('utilized the default element when there is none provided by manifest', (done) => {
+			extensionRegistry.unregister(manifest.alias);
+
+			const noElementManifest = { ...manifest, elementName: undefined };
+			extensionRegistry.register(noElementManifest);
+
+			let called = false;
+			const extensionController = new UmbExtensionElementController(
+				hostElement,
+				extensionRegistry,
+				'Umb.Test.Section.1',
+				(permitted) => {
+					if (called === false) {
+						called = true;
+						expect(permitted).to.be.true;
+						if (permitted) {
+							expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
+							expect(extensionController.component?.nodeName).to.eq('UMB-TEST-FALLBACK-ELEMENT');
+							done();
+							extensionController.destroy();
+						}
+					}
+				},
+				'umb-test-fallback-element'
+			);
+		});
 	});
 
 	describe('Manifest with multiple conditions that changes over time', () => {

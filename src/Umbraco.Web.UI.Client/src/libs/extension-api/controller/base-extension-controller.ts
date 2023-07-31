@@ -57,9 +57,10 @@ export abstract class UmbBaseExtensionController<
 		this.#extensionRegistry = extensionRegistry;
 		this.#alias = alias;
 		this.#onPermissionChanged = onPermissionChanged;
-
+	}
+	protected _init() {
 		this.#manifestObserver = this.observe(
-			extensionRegistry.getByAlias<ManifestType>(alias),
+			this.#extensionRegistry.getByAlias<ManifestType>(this.#alias),
 			async (extensionManifest) => {
 				this.#isPermitted = undefined;
 				this.#manifest = extensionManifest;

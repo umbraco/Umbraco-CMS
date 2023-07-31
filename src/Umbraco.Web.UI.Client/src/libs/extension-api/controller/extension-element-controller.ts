@@ -54,6 +54,7 @@ export class UmbExtensionElementController<
 	) {
 		super(host, extensionRegistry, alias, onPermissionChanged);
 		this._defaultElement = defaultElement;
+		this._init();
 	}
 
 	#assignProperties = () => {
