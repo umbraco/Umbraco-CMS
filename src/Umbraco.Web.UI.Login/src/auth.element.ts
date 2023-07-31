@@ -4,6 +4,8 @@ import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { Commands, Context, Router } from '@vaadin/router';
 import { UmbAuthMainContext } from './context/auth-main.context.js';
+import {UUIIconRegistryEssential} from "@umbraco-ui/uui";
+import {UmbIconRegistry} from "./icon.registry.ts";
 
 import './auth-layout.element.js';
 import './pages/reset-password.element.js';
@@ -55,6 +57,13 @@ export default class UmbAuthElement extends LitElement {
 		// Check if there is a ?redir querystring or else return the returnUrl attribute
 		return new URLSearchParams(window.location.search).get('returnPath') || this.#returnPath;
 	}
+
+  constructor() {
+    super();
+
+    new UUIIconRegistryEssential().attach(this);
+    new UmbIconRegistry().attach(this);
+  }
 
 	async firstUpdated(): Promise<void> {
 		const router = new Router(this.shadowRoot?.getElementById('outlet'));
