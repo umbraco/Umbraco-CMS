@@ -11,7 +11,7 @@ export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<UmbPart
 		return this.getData()?.path;
 	}
 	getEntityType(): string {
-		throw new Error('Method not implemented.');
+		return 'partial-views';
 	}
 	save(): Promise<void> {
 		const partialView = this.getData();
