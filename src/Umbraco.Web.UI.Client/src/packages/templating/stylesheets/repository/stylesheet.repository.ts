@@ -14,10 +14,15 @@ import {
 	CreateFolderRequestModel,
 	CreateStylesheetRequestModel,
 	CreateTextFileViewModelBaseModel,
+	ExtractRichTextStylesheetRulesRequestModel,
+	ExtractRichTextStylesheetRulesResponseModel,
 	FileSystemTreeItemPresentationModel,
 	FolderModelBaseModel,
 	FolderReponseModel,
+	InterpolateRichTextStylesheetRequestModel,
+	InterpolateRichTextStylesheetResponseModel,
 	ProblemDetails,
+	RichTextStylesheetRulesResponseModel,
 	TextFileResponseModelBaseModel,
 	UpdateStylesheetRequestModel,
 	UpdateTextFileViewModelBaseModel,
@@ -122,14 +127,38 @@ export class UmbStylesheetRepository
 	byId(id: string): Promise<Observable<TextFileResponseModelBaseModel | undefined>> {
 		throw new Error('Method not implemented.');
 	}
-	create(data: CreateTextFileViewModelBaseModel): Promise<DataSourceResponse<string>> {
-		throw new Error('Method not implemented.');
+	async create(data: CreateTextFileViewModelBaseModel): Promise<DataSourceResponse<string>> {
+		const promise = this.#dataSource.insert(data);
+		await promise;
+		this.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
+		return promise;
 	}
 	save(id: string, data: UpdateTextFileViewModelBaseModel): Promise<UmbDataSourceErrorResponse> {
-		throw new Error('Method not implemented.');
+		return this.#dataSource.update(id, data);
 	}
 	delete(id: string): Promise<UmbDataSourceErrorResponse> {
-		throw new Error('Method not implemented.');
+		const promise = this.#dataSource.delete(id);
+		const parentPath = id.substring(0, id.lastIndexOf('/'));
+		this.requestTreeItemsOf(parentPath ? parentPath : null);
+		return promise;
+	}
+
+	getStylesheetRules(
+		path: string
+	): Promise<DataSourceResponse<RichTextStylesheetRulesResponseModel | ExtractRichTextStylesheetRulesResponseModel>> {
+		return this.#dataSource.getStylesheetRichTextRules(path);
+	}
+
+	interpolateStylesheetRules(
+		data: InterpolateRichTextStylesheetRequestModel
+	): Promise<DataSourceResponse<InterpolateRichTextStylesheetResponseModel>> {
+		return this.#dataSource.postStylesheetRichTextInterpolateRules(data);
+	}
+
+	extractStylesheetRules(
+		data: ExtractRichTextStylesheetRulesRequestModel
+	): Promise<DataSourceResponse<ExtractRichTextStylesheetRulesResponseModel>> {
+		return this.#dataSource.postStylesheetRichTextExtractRules(data);
 	}
 
 	//#endregion
