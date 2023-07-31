@@ -30,7 +30,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IUmbracoTreeSearcherFields, Configuration.UmbracoTreeSearcherFields>();
 
-        builder.Services.AddSingleton<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
+        builder.Services.AddUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
         builder.Services.AddScoped<SpecialisedSearchers.Tree.UmbracoTreeSearcher>();
         builder.Services.AddSingleton<IIndexPopulator, MemberIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, ContentIndexPopulator>();

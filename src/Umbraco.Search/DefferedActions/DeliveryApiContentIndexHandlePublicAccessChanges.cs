@@ -80,9 +80,12 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
                 IUmbracoSearchResults? results =
                     searcher.Search(  searchRequest);
 
-                total = results.TotalItemCount;
+                total = results.TotalRecords;
 
-                ids.AddRange(results.Select(result => result.Id));
+                if (results.Results != null)
+                {
+                    ids.AddRange(results.Results.Select(result => result.Id));
+                }
 
                 page++;
             }

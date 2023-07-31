@@ -1,9 +1,8 @@
-using Examine;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
 
-namespace Umbraco.Search.Examine.ValueSetBuilders;
+namespace Umbraco.Search.ValueSet.ValueSetBuilders;
 
 /// <inheritdoc />
 public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
@@ -20,7 +19,7 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
     protected bool PublishedValuesOnly { get; }
 
     /// <inheritdoc />
-    public abstract IEnumerable<ValueSet> GetValueSets(params TContent[] content);
+    public abstract IEnumerable<UmbracoValueSet> GetValueSets(params TContent[] content);
 
     protected void AddPropertyValue(IProperty property, string? culture, string? segment, IDictionary<string, IEnumerable<object?>>? values)
     {

@@ -1,6 +1,6 @@
 using Examine;
 
-namespace Umbraco.Search.Examine.ValueSetBuilders;
+namespace Umbraco.Search.ValueSet.ValueSetBuilders;
 
 /// <summary>
 ///     Creates a collection of <see cref="ValueSet" /> to be indexed based on a collection of <see cref="T" />
@@ -13,5 +13,5 @@ public interface IValueSetBuilder<in T>
     /// </summary>
     /// <param name="content"></param>
     /// <returns></returns>
-    IEnumerable<ValueSet> GetValueSets(params T[] content);
+    IEnumerable<UmbracoValueSet> GetValueSets(params T[] content);
 }

@@ -27,7 +27,7 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
     {
         var searchResult = _examineIndex.CreateQuery().ManagedQuery(term)
             .Execute(QueryOptions.SkipTake(pageSize * page, pageSize));
-        return new UmbracoSearchResults(searchResult.TotalItemCount,
+        return new UmbracoSearchResults(searchResult.TotalItemCount, pageSize,
             searchResult.Select(x => new UmbracoSearchResult(x.Id, x.Score, x.Values)));
     }
 
@@ -37,7 +37,7 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
     {
         var searchResult = _examineIndex.CreateQuery().NativeQuery(query)
             .Execute(QueryOptions.SkipTake(pageSize * page, pageSize));
-        return new UmbracoSearchResults(searchResult.TotalItemCount,
+        return new UmbracoSearchResults(searchResult.TotalItemCount,pageSize,
             searchResult.Select(x => new UmbracoSearchResult(x.Id, x.Score, x.Values)));
     }
 
@@ -96,7 +96,7 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
         {
             IUmbracoContext umbracoContext = contextReference.UmbracoContext;
             var searchResult = booleanOperation.Execute();
-            return new UmbracoSearchResults(searchResult.TotalItemCount,
+            return new UmbracoSearchResults(searchResult.TotalItemCount,searchRequest.PageSize,
                 searchResult.Select(x => new UmbracoSearchResult(x.Id, x.Score, x.Values)));
         }
     }

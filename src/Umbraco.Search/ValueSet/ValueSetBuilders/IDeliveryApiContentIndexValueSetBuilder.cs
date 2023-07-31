@@ -1,6 +1,6 @@
 ﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Search.Examine.ValueSetBuilders;
+namespace Umbraco.Search.ValueSet.ValueSetBuilders;
 
 public interface IDeliveryApiContentIndexValueSetBuilder : IValueSetBuilder<IContent>
 {

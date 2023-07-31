@@ -9,6 +9,7 @@ using Lucene.Net.Documents;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Search;
@@ -17,6 +18,7 @@ using Umbraco.Extensions;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Examine.Configuration;
+using Umbraco.Search.Indexing.Notifications;
 using Umbraco.Search.Models;
 
 namespace Umbraco.Search.Examine.Lucene;
@@ -87,7 +89,7 @@ public class UmbracoExamineLuceneIndex : LuceneIndex, IUmbracoExamineIndex, IInd
         }
     }
 
-    protected override void PerformIndexItems(IEnumerable<ValueSet> values, Action<IndexOperationEventArgs> onComplete)
+    protected override void PerformIndexItems(IEnumerable<global::Examine.ValueSet> values, Action<IndexOperationEventArgs> onComplete)
     {
         if (CanInitialize())
         {

@@ -1,4 +1,3 @@
-using Examine;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -8,7 +7,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
-namespace Umbraco.Search.Examine.ValueSetBuilders;
+namespace Umbraco.Search.ValueSet.ValueSetBuilders;
 
 public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
 {
@@ -35,7 +34,7 @@ public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
     }
 
     /// <inheritdoc />
-    public override IEnumerable<ValueSet> GetValueSets(params IMedia[] media)
+    public override IEnumerable<UmbracoValueSet> GetValueSets(params IMedia[] media)
     {
         foreach (IMedia m in media)
         {
@@ -70,7 +69,7 @@ public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
                 AddPropertyValue(property, null, null, values);
             }
 
-            var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Media, m.ContentType.Alias, values);
+            var vs = new UmbracoValueSet(m.Id.ToInvariantString(), IndexTypes.Media, m.ContentType.Alias, values!);
 
             yield return vs;
         }

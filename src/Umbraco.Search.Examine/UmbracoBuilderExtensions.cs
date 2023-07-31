@@ -11,11 +11,11 @@ using Umbraco.Extensions;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Examine.Configuration;
-using Umbraco.Search.Examine.ValueSetBuilders;
 using Umbraco.Search.Indexing;
 using Umbraco.Search.Indexing.Populators;
 using Umbraco.Search.NotificationHandlers;
 using Umbraco.Search.Services;
+using Umbraco.Search.ValueSet.ValueSetBuilders;
 using ContentIndexingNotificationHandler = Umbraco.Search.NotificationHandlers.ContentIndexingNotificationHandler;
 using ContentTypeIndexingNotificationHandler = Umbraco.Search.NotificationHandlers.ContentTypeIndexingNotificationHandler;
 using IUmbracoIndexingHandler = Umbraco.Search.NotificationHandlers.IUmbracoIndexingHandler;
@@ -62,6 +62,9 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationHandler<LanguageCacheRefresherNotification, LanguageIndexingNotificationHandler>();
 
         builder.AddNotificationHandler<UmbracoRequestBeginNotification, RebuildOnStartupHandler>();
+        builder.Services.AddTransient<ISearchMainDomHandler, ExamineIndexingMainDomHandler>();
+        builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();
+        builder.Services.AddSingleton<IIndexConfigurationFactory, IndexConfigurationFactory>();
         builder.Services.AddSingleton<ISearchProvider, ExamineSearchProvider>();
         return builder;
     }

@@ -1,14 +1,15 @@
-using Examine;
 using Umbraco.Extensions;
+using Umbraco.Search.ValueSet;
+using Umbraco.Search.ValueSet.Validators;
 
 namespace Umbraco.Search.Examine;
 
 /// <summary>
 ///     Performing basic validation of a value set
 /// </summary>
-public class ValueSetValidator : IValueSetValidator
+public class UmbracoValueSetValidator : IUmbracoValueSetValidator
 {
-    public ValueSetValidator(
+    public UmbracoValueSetValidator(
         IEnumerable<string>? includeItemTypes,
         IEnumerable<string>? excludeItemTypes,
         IEnumerable<string>? includeFields,
@@ -55,7 +56,7 @@ public class ValueSetValidator : IValueSetValidator
 
     protected virtual IEnumerable<string>? ValidIndexCategories { get; }
 
-    public virtual ValueSetValidationResult Validate(ValueSet valueSet)
+    public virtual UmbracoValueSetValidationResult Validate(UmbracoValueSet valueSet)
     {
         /* Notes on status on the result:
          * A result status of filtered means that this whole value set result is to be filtered from the index
@@ -63,44 +64,44 @@ public class ValueSetValidator : IValueSetValidator
          * It does not mean that the values it contains have been through a filtering (for example if an language variant is not published)
          * See notes on issue 11383 */
 
-        if (ValidIndexCategories != null && !ValidIndexCategories.InvariantContains(valueSet.Category))
+        if (ValidIndexCategories != null && !ValidIndexCategories.InvariantContains(valueSet.Category!))
         {
-            return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
+            return new UmbracoValueSetValidationResult(UmbracoValueSetValidationStatus.Failed, valueSet);
         }
 
         // check if this document is of a correct type of node type alias
-        if (IncludeItemTypes != null && !IncludeItemTypes.InvariantContains(valueSet.ItemType))
+        if (IncludeItemTypes != null && !IncludeItemTypes.InvariantContains(valueSet.ItemType!))
         {
-            return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
+            return new UmbracoValueSetValidationResult(UmbracoValueSetValidationStatus.Failed, valueSet);
         }
 
         // if this node type is part of our exclusion list
-        if (ExcludeItemTypes != null && ExcludeItemTypes.InvariantContains(valueSet.ItemType))
+        if (ExcludeItemTypes != null && ExcludeItemTypes.InvariantContains(valueSet.ItemType!))
         {
-            return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
+            return new UmbracoValueSetValidationResult(UmbracoValueSetValidationStatus.Failed, valueSet);
         }
 
-        var filteredValues = valueSet.Values.ToDictionary(x => x.Key, x => x.Value.ToList());
+        var filteredValues = valueSet.Values?.ToDictionary(x => x.Key, x => x.Value.ToList());
 
         // filter based on the fields provided (if any)
         if (IncludeFields != null || ExcludeFields != null)
         {
-            foreach (var key in valueSet.Values.Keys.ToArray())
+            foreach (var key in valueSet.Values?.Keys?.ToArray()!)
             {
                 if (IncludeFields != null && !IncludeFields.InvariantContains(key))
                 {
-                    filteredValues.Remove(key); // remove any value with a key that doesn't match the inclusion list
+                    filteredValues?.Remove(key); // remove any value with a key that doesn't match the inclusion list
                 }
 
                 if (ExcludeFields != null && ExcludeFields.InvariantContains(key))
                 {
-                    filteredValues.Remove(key); // remove any value with a key that matches the exclusion list
+                    filteredValues?.Remove(key); // remove any value with a key that matches the exclusion list
                 }
 
             }
         }
 
-        var filteredValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType, filteredValues.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
-        return new ValueSetValidationResult(ValueSetValidationStatus.Valid, filteredValueSet);
+        var filteredValueSet = new UmbracoValueSet(valueSet.Id, valueSet.Category!, valueSet.ItemType!, filteredValues?.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value)!);
+        return new UmbracoValueSetValidationResult(UmbracoValueSetValidationStatus.Valid, filteredValueSet);
     }
 }

@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Extensions;
 
-namespace Umbraco.Search.Examine.ValueSetBuilders;
+namespace Umbraco.Search.ValueSet.ValueSetBuilders;
 
 internal sealed class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryApiContentIndexFieldDefinitionBuilder
 {

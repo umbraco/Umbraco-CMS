@@ -4,7 +4,8 @@ using Lucene.Net.Analysis;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Search.Examine.Configuration;
-using Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.ValueSet.Validators;
+using Umbraco.Search.ValueSet.ValueSetBuilders;
 
 namespace Umbraco.Search.Examine;
 
@@ -23,14 +24,14 @@ public class UmbracoExamineIndexConfig : IUmbracoExamineIndexConfig
     public IContentValueSetValidator GetContentValueSetValidator() =>
         new ContentValueSetValidator(false, true, PublicAccessService, ScopeProvider);
 
-    public IContentValueSetValidator GetPublishedContentValueSetValidator() =>
+    public IContentValueSetValidator? GetPublishedContentValueSetValidator() =>
         new ContentValueSetValidator(true, false, PublicAccessService, ScopeProvider);
 
     /// <summary>
     ///     Returns the <see cref="IValueSetValidator" /> for the member indexer
     /// </summary>
     /// <returns></returns>
-    public IValueSetValidator GetMemberValueSetValidator() => new MemberValueSetValidator();
+    public IUmbracoValueSetValidator GetMemberValueSetValidator() => new MemberValueSetValidator();
 
     public bool PublishedValuesOnly { get; set; }
     public bool EnableDefaultEventHandler { get; set; } = true;

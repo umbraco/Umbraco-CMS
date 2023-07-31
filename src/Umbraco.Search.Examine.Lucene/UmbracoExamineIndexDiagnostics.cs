@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.Examine.Configuration;
-using Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.ValueSet.ValueSetBuilders;
 
 namespace Umbraco.Search.Examine.Lucene;
 
@@ -37,9 +37,9 @@ public class UmbracoExamineIndexDiagnostics : LuceneIndexDiagnostics
             d[nameof(configuration.EnableDefaultEventHandler)] = configuration.EnableDefaultEventHandler;
             d[nameof(configuration.PublishedValuesOnly)] = configuration.PublishedValuesOnly;
 
-            if (_luceneIndex.ValueSetValidator is ValueSetValidator vsv)
+            if (_luceneIndex.ValueSetValidator is UmbracoValueSetValidator vsv)
             {
-                d[nameof(ValueSetValidator.IncludeItemTypes)] = vsv.IncludeItemTypes;
+                d[nameof(UmbracoValueSetValidator.IncludeItemTypes)] = vsv.IncludeItemTypes;
                 d[nameof(ContentValueSetValidator.ExcludeItemTypes)] = vsv.ExcludeItemTypes;
                 d[nameof(ContentValueSetValidator.IncludeFields)] = vsv.IncludeFields;
                 d[nameof(ContentValueSetValidator.ExcludeFields)] = vsv.ExcludeFields;

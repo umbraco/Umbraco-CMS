@@ -12,7 +12,7 @@ using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Search.Examine;
-using Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.ValueSet.ValueSetBuilders;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Examine;
 
@@ -95,7 +95,7 @@ public class UmbracoContentValueSetValidatorTests
     [Test]
     public void Inclusion_Field_List()
     {
-        var validator = new ValueSetValidator(
+        var validator = new UmbracoValueSetValidator(
             null,
             null,
             new[] { "hello", "world" },
@@ -119,7 +119,7 @@ public class UmbracoContentValueSetValidatorTests
     [Test]
     public void Exclusion_Field_List()
     {
-        var validator = new ValueSetValidator(
+        var validator = new UmbracoValueSetValidator(
             null,
             null,
             null,
@@ -143,7 +143,7 @@ public class UmbracoContentValueSetValidatorTests
     [Test]
     public void Inclusion_Exclusion_Field_List()
     {
-        var validator = new ValueSetValidator(
+        var validator = new UmbracoValueSetValidator(
             null,
             null,
             new[] { "hello", "world" },

@@ -1,9 +1,18 @@
-﻿namespace Umbraco.Cms.Core.Models.Search;
+﻿using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Models.ContentEditing;
 
-public interface IUmbracoSearchResults : IEnumerable<IUmbracoSearchResult>
+namespace Umbraco.Cms.Core.Models.Search;
+
+public interface IUmbracoSearchResults
 {
-    /// <summary>
-    /// Returns the Total item count for the search regardless of skip/take/max count values
-    /// </summary>
-    long TotalItemCount { get; }
+
+    [DataMember(Name = "pageSize")]
+    public int PageSize { get; set; }
+
+    [DataMember(Name = "totalRecords")]
+    public long TotalRecords { get; set; }
+
+    [DataMember(Name = "results")]
+    public IEnumerable<UmbracoSearchResult>? Results { get; set; }
+
 }

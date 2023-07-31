@@ -13,7 +13,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Search;
-using Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.ValueSet.ValueSetBuilders;
 using ContentIndexPopulator = Umbraco.Search.Indexing.Populators.ContentIndexPopulator;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;

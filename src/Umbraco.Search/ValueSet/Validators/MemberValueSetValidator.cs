@@ -1,8 +1,9 @@
 using Umbraco.Cms.Core.Search;
+using Umbraco.Search.Examine;
 
-namespace Umbraco.Search.Examine.ValueSetBuilders;
+namespace Umbraco.Search.ValueSet.ValueSetBuilders;
 
-public class MemberValueSetValidator : ValueSetValidator
+public class MemberValueSetValidator : UmbracoValueSetValidator
 {
     /// <summary>
     ///     By default these are the member fields we index

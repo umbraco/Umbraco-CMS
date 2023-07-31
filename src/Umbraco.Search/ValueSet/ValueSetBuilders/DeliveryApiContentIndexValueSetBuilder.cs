@@ -1,4 +1,3 @@
-using Examine;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -8,7 +7,7 @@ using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Search.Examine.ValueSetBuilders;
+namespace Umbraco.Search.ValueSet.ValueSetBuilders;
 
 internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiContentIndexValueSetBuilder
 {
@@ -34,7 +33,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
     }
 
     /// <inheritdoc />
-    public IEnumerable<ValueSet> GetValueSets(params IContent[] contents)
+    public IEnumerable<UmbracoValueSet> GetValueSets(params IContent[] contents)
     {
         foreach (IContent content in contents.Where(CanIndex))
         {
@@ -56,7 +55,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
 
                 AddContentIndexHandlerFields(content, culture, indexValues);
 
-                yield return new ValueSet(DeliveryApiContentIndexUtilites.IndexId(content, indexCulture), IndexTypes.Content, content.ContentType.Alias, indexValues);
+                yield return new UmbracoValueSet(DeliveryApiContentIndexUtilites.IndexId(content, indexCulture), IndexTypes.Content, content.ContentType.Alias, indexValues);
             }
         }
     }

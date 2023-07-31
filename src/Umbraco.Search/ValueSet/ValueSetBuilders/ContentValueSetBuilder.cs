@@ -1,4 +1,3 @@
-using Examine;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -7,10 +6,9 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
-using Umbraco.Search.Examine.Configuration;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
-namespace Umbraco.Search.Examine.ValueSetBuilders;
+namespace Umbraco.Search.ValueSet.ValueSetBuilders;
 
 /// <summary>
 ///     Builds <see cref="ValueSet" />s for <see cref="IContent" /> items
@@ -43,7 +41,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
     }
 
     /// <inheritdoc />
-    public override IEnumerable<ValueSet> GetValueSets(params IContent[] content)
+    public override IEnumerable<UmbracoValueSet> GetValueSets(params IContent[] content)
     {
         Dictionary<int, IProfile> creatorIds;
         Dictionary<int, IProfile> writerIds;
@@ -62,7 +60,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         return GetValueSetsEnumerable(content, creatorIds, writerIds);
     }
 
-    private IEnumerable<ValueSet> GetValueSetsEnumerable(IContent[] content, Dictionary<int, IProfile> creatorIds, Dictionary<int, IProfile> writerIds)
+    private IEnumerable<UmbracoValueSet> GetValueSetsEnumerable(IContent[] content, Dictionary<int, IProfile> creatorIds, Dictionary<int, IProfile> writerIds)
     {
         // TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways
         // but I wonder if there's a way to reduce the boxing that we have to do or if it will matter in the end since
@@ -146,7 +144,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                 }
             }
 
-            var vs = new ValueSet(c.Id.ToInvariantString(), IndexTypes.Content, c.ContentType.Alias, values);
+            var vs = new UmbracoValueSet(c.Id.ToInvariantString(), IndexTypes.Content, c.ContentType.Alias, values!);
 
             yield return vs;
         }

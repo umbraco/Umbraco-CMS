@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.Examine.Configuration;
 using Umbraco.Search.Examine.Extensions;
+using Umbraco.Search.Examine.ValueSet;
 
 namespace Umbraco.Search.Examine.Lucene.DependencyInjection;
 
@@ -34,7 +35,7 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
         }
         var configuration = _umbracoIndexesConfiguration.Configuration(name) as IUmbracoExamineIndexConfig;
         options.Analyzer = configuration?.Analyzer ?? new StandardAnalyzer(LuceneVersion.LUCENE_48);
-        options.Validator = configuration?.PublishedValuesOnly ?? false ? configuration.GetPublishedContentValueSetValidator() : configuration?.GetContentValueSetValidator();
+        options.Validator = new ExamineValueSetValidator( configuration?.PublishedValuesOnly ?? false ? configuration.GetPublishedContentValueSetValidator() : configuration?.GetContentValueSetValidator());
         options.FieldDefinitions = new UmbracoFieldDefinitionCollection().toExamineFieldDefinitionCollection();
 
 

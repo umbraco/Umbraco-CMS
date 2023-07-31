@@ -4,7 +4,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Search.Diagnostics;
-using Umbraco.Search.Examine.ValueSetBuilders;
 
 namespace Umbraco.Search.Examine;
 

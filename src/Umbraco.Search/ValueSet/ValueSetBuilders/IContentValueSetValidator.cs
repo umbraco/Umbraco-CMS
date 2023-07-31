@@ -1,11 +1,12 @@
-using Examine;
 
-namespace Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.ValueSet.Validators;
+
+namespace Umbraco.Search.ValueSet.ValueSetBuilders;
 
 /// <summary>
 ///     An extended <see cref="IValueSetValidator" /> for content indexes
 /// </summary>
-public interface IContentValueSetValidator : IValueSetValidator
+public interface IContentValueSetValidator : IUmbracoValueSetValidator
 {
     /// <summary>
     ///     When set to true the index will only retain published values

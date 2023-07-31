@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure;
 using Umbraco.Search.Services;
 
-namespace Umbraco.Search.Examine.ValueSetBuilders;
+namespace Umbraco.Search.Examine;
 
 internal class ExamineIndexingMainDomHandler : ISearchMainDomHandler
 {

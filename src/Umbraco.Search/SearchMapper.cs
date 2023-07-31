@@ -14,8 +14,6 @@ public class SearchMapper : IMapDefinition
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IUmbracoSearchResult, SearchResultEntity>((source, context) => new SearchResultEntity(), Map);
-        mapper.Define<IUmbracoSearchResults, IEnumerable<SearchResultEntity>>((source, context) =>
-            context.MapEnumerable<IUmbracoSearchResult, SearchResultEntity>(source).WhereNotNull());
         mapper.Define<IEnumerable<IUmbracoSearchResult>, IEnumerable<SearchResultEntity>>((source, context) =>
             context.MapEnumerable<IUmbracoSearchResult, SearchResultEntity>(source).WhereNotNull());
     }

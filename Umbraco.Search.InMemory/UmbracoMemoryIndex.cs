@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Search.InMemory.Extensions;
 
 namespace Umbraco.Search.InMemory;
 
@@ -15,14 +16,14 @@ public class UmbracoMemoryIndex<T> : IUmbracoIndex<T> where T : IUmbracoEntity
 
     public void IndexItems(T[] members)
     {
-        var existingObjects = _memoryCache.Get(Name) as List<T>;
+        var existingObjects = _memoryCache.Get(Name) as IList<InMemorySearchEntity>;
         if (existingObjects == null)
         {
-            existingObjects = members.ToList();
+            existingObjects = members.ToSearchEntities();
         }
         else
         {
-            existingObjects = existingObjects.Where(x => members.All(y => y.Id != x.Id)).Union(members).ToList();
+            existingObjects = existingObjects.Where(x => members.All(y => y.Key != x.Key)).Union(members.ToSearchEntities()).ToList();
         }
 
         _memoryCache.Set(Name, existingObjects);

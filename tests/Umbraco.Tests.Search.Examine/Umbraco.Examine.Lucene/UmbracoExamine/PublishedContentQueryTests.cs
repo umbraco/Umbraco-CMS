@@ -15,7 +15,6 @@ using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Search;
 using Umbraco.Search.Examine;
 using Umbraco.Search.Examine.Lucene;
-using Umbraco.Search.Examine.ValueSetBuilders;
 using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Examine.Lucene.UmbracoExamine;

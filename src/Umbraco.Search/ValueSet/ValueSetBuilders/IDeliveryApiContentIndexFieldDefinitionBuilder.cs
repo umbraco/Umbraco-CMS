@@ -1,6 +1,6 @@
 ﻿using Examine;
 
-namespace Umbraco.Search.Examine.ValueSetBuilders;
+namespace Umbraco.Search.ValueSet.ValueSetBuilders;
 
 public interface IDeliveryApiContentIndexFieldDefinitionBuilder
 {

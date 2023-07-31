@@ -1,10 +1,9 @@
-using Examine;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Extensions;
 
-namespace Umbraco.Search.Examine.ValueSetBuilders;
+namespace Umbraco.Search.ValueSet.ValueSetBuilders;
 
 public class MemberValueSetBuilder : BaseValueSetBuilder<IMember>
 {
@@ -14,7 +13,7 @@ public class MemberValueSetBuilder : BaseValueSetBuilder<IMember>
     }
 
     /// <inheritdoc />
-    public override IEnumerable<ValueSet> GetValueSets(params IMember[] members)
+    public override IEnumerable<UmbracoValueSet> GetValueSets(params IMember[] members)
     {
         foreach (IMember m in members)
         {
@@ -42,7 +41,7 @@ public class MemberValueSetBuilder : BaseValueSetBuilder<IMember>
                 AddPropertyValue(property, null, null, values);
             }
 
-            var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Member, m.ContentType.Alias, values);
+            var vs = new UmbracoValueSet(m.Id.ToInvariantString(), IndexTypes.Member, m.ContentType.Alias, values!);
 
             yield return vs;
         }

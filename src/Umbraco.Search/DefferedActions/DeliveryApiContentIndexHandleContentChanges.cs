@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
@@ -79,37 +80,41 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         searchRequest.Page = 0;
         searchRequest.PageSize = 10000;
         // get the currently indexed cultures for the content
-        var existingIndexCultures = searcher.Search(searchRequest)
-            .SelectMany(f => f.Values[UmbracoSearchFieldNames.DeliveryApiContentIndex.Culture])
-            .ToArray();
-
-        // index the content
-        var indexedCultures = UpdateIndex(content, index);
-        if (indexedCultures.Any() is false)
+        var umbracoSearchResults = searcher.Search(searchRequest).Results;
+        if (umbracoSearchResults != null)
         {
-            // we likely got here because unpublishing triggered a "refresh branch" notification, now we
-            // need to delete every last culture of this content and all descendants
-            RemoveFromIndex(content.Id, index);
-            return;
-        }
+            var existingIndexCultures = umbracoSearchResults
+                .SelectMany(f => f.Values[UmbracoSearchFieldNames.DeliveryApiContentIndex.Culture])
+                .ToArray();
 
-        // if any of the content cultures did not exist in the index before, nor will any of its published descendants
-        // in those cultures be at this point, so make sure those are added as well
-        if (indexedCultures.Except(existingIndexCultures).Any())
-        {
-            ReindexDescendants(content, index);
-        }
+            // index the content
+            var indexedCultures = UpdateIndex(content, index);
+            if (indexedCultures.Any() is false)
+            {
+                // we likely got here because unpublishing triggered a "refresh branch" notification, now we
+                // need to delete every last culture of this content and all descendants
+                RemoveFromIndex(content.Id, index);
+                return;
+            }
 
-        // ensure that any unpublished cultures are removed from the index
-        var unpublishedCultures = existingIndexCultures.Except(indexedCultures).ToArray();
-        if (unpublishedCultures.Any() is false)
-        {
-            return;
-        }
+            // if any of the content cultures did not exist in the index before, nor will any of its published descendants
+            // in those cultures be at this point, so make sure those are added as well
+            if (indexedCultures.Except(existingIndexCultures).Any())
+            {
+                ReindexDescendants(content, index);
+            }
 
-        var idsToDelete = unpublishedCultures
-            .Select(culture => DeliveryApiContentIndexUtilites.IndexId(content, culture.ToString())).ToArray();
-        RemoveFromIndex(idsToDelete, index);
+            // ensure that any unpublished cultures are removed from the index
+            var unpublishedCultures = existingIndexCultures.Except(indexedCultures).ToArray();
+            if (unpublishedCultures.Any() is false)
+            {
+                return;
+            }
+
+            var idsToDelete = unpublishedCultures
+                .Select(culture => DeliveryApiContentIndexUtilites.IndexId(content, culture.ToString())).ToArray();
+            RemoveFromIndex(idsToDelete, index);
+        }
     }
 
     private string[] UpdateIndex(IContent content, IUmbracoIndex<IContent> index)

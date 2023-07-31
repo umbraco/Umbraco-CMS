@@ -1,14 +1,27 @@
 ﻿using Examine;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.Examine.Extensions;
+using Umbraco.Search.Indexing.Notifications;
+using Umbraco.Search.ValueSet.ValueSetBuilders;
 
 namespace Umbraco.Search.Examine.Lucene;
 
 public class UmbracoExamineIndex
 {
     public UmbracoExamineLuceneIndex ExamineIndex;
+    public IEventAggregator EventAggregator;
 
-    public UmbracoExamineIndex(UmbracoExamineLuceneIndex examineIndex) => ExamineIndex = examineIndex;
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="examineIndex"></param>
+    /// <param name="eventAggregator"></param>
+    public UmbracoExamineIndex(UmbracoExamineLuceneIndex examineIndex, IEventAggregator eventAggregator)
+    {
+        ExamineIndex = examineIndex;
+        EventAggregator = eventAggregator;
+    }
 };
 
 public class UmbracoExamineIndex<T> : UmbracoExamineIndex, IUmbracoIndex<T> where T : IUmbracoEntity
@@ -16,15 +29,15 @@ public class UmbracoExamineIndex<T> : UmbracoExamineIndex, IUmbracoIndex<T> wher
     private readonly IValueSetBuilder<T> _valueSetBuilder;
     private readonly IDisposable[]? _attachedDisposables;
 
-    public UmbracoExamineIndex(IIndex examineIndex, IValueSetBuilder<T> valueSetBuilder) : base(
-        (UmbracoExamineLuceneIndex)examineIndex)
+    public UmbracoExamineIndex(IIndex examineIndex, IValueSetBuilder<T> valueSetBuilder, IEventAggregator eventAggregator) : base(
+        (UmbracoExamineLuceneIndex)examineIndex,eventAggregator)
     {
         _valueSetBuilder = valueSetBuilder;
         examineIndex.IndexOperationComplete += runIndexOperationComplete;
     }
 
-    public UmbracoExamineIndex(IIndex examineIndex, IValueSetBuilder<T> valueSetBuilder,
-        params IDisposable[]? attachedDisposables) : base((UmbracoExamineLuceneIndex)examineIndex)
+    public UmbracoExamineIndex(IIndex examineIndex, IValueSetBuilder<T> valueSetBuilder, IEventAggregator eventAggregator,
+        params IDisposable[]? attachedDisposables) : base((UmbracoExamineLuceneIndex)examineIndex,eventAggregator)
     {
         _valueSetBuilder = valueSetBuilder;
         _attachedDisposables = attachedDisposables;
@@ -44,7 +57,13 @@ public class UmbracoExamineIndex<T> : UmbracoExamineIndex, IUmbracoIndex<T> wher
 
     public void Create() => ExamineIndex.CreateIndex();
     public IEnumerable<string> GetFieldNames() => ExamineIndex.FieldDefinitions.Select(x => x.Name);
-    public void RemoveFromIndex(IEnumerable<string> ids) => throw new NotImplementedException();
+
+    public void RemoveFromIndex(IEnumerable<string> ids)
+    {
+        EventAggregator.Publish(new RemoveFromIndexNotification(ids));
+
+        ExamineIndex.DeleteFromIndex(ids);
+    }
 
     /// <summary>
     ///
@@ -54,7 +73,10 @@ public class UmbracoExamineIndex<T> : UmbracoExamineIndex, IUmbracoIndex<T> wher
     public void IndexItems(T[] items)
     {
         var valueSet = _valueSetBuilder.GetValueSets(items);
-        ExamineIndex.IndexItems(valueSet);
+        EventAggregator.Publish(new IndexingNotification(valueSet));
+
+
+        ExamineIndex.IndexItems(valueSet.Select(x=>x.ToExamineValueSet()));
     }
 
     public void Dispose()

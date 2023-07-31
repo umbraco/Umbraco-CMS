@@ -62,19 +62,19 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
         IUmbracoSearchResults? results =
             searcher.Search(queryOperation);
 
-        if (results is null)
+        if (results is null || results.Results is null)
         {
             // The query yield no results
             return new PagedModel<Guid>();
         }
 
-        Guid[] items = results
+        Guid[] items = results.Results
             .Where(r => r.Values.ContainsKey(ItemIdFieldName))
             .Select(r => r.Values[ItemIdFieldName][0]?.ToString() ?? string.Empty)
             .Where(r => !string.IsNullOrWhiteSpace(r)).Select(Guid.Parse)
             .ToArray();
 
-        return new PagedModel<Guid>(results.TotalItemCount, items);
+        return new PagedModel<Guid>(results.TotalRecords, items);
     }
 
 

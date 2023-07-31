@@ -12,9 +12,11 @@ using Umbraco.Extensions;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.DefferedActions;
 using Umbraco.Search.Examine.Configuration;
-using Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.Examine.Extensions;
 using Umbraco.Search.NotificationHandlers;
 using Umbraco.Search.Services;
+using Umbraco.Search.ValueSet;
+using Umbraco.Search.ValueSet.ValueSetBuilders;
 
 namespace Umbraco.Search.Examine;
 
@@ -297,7 +299,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
 
                 // for content we have a different builder for published vs unpublished
                 // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
-                var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
+                var builders = new Dictionary<bool, Lazy<List<UmbracoValueSet>>>
                 {
                     [true] =
                         new(() => examineUmbracoIndexingHandler._publishedContentValueSetBuilder
@@ -315,8 +317,8 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                     {
                         continue;
                     }
-                    List<ValueSet> valueSet = builders[configuration.PublishedValuesOnly].Value;
-                    index.IndexItems(valueSet);
+                    List<UmbracoValueSet> valueSet = builders[configuration.PublishedValuesOnly].Value;
+                    index.IndexItems(valueSet.Select(x=>x.ToExamineValueSet()));
                 }
 
                 return Task.CompletedTask;
@@ -367,7 +369,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                     {
                         continue;
                     }
-                    index.IndexItems(valueSet);
+                    index.IndexItems(valueSet.Select(x=>x.ToExamineValueSet()));
                 }
 
                 return Task.CompletedTask;
@@ -414,7 +416,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                     {
                         continue;
                     }
-                    index.IndexItems(valueSet);
+                    index.IndexItems(valueSet.Select(x=>x.ToExamineValueSet()));
                 }
 
                 return Task.CompletedTask;
