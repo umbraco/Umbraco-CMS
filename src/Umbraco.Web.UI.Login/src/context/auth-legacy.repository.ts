@@ -6,7 +6,7 @@ import type {
 } from '../types.js';
 
 export class UmbAuthLegacyRepository {
-	readonly #authURL = '/umbraco/backoffice/umbracoapi/authentication/postlogin';
+	readonly #authURL = 'backoffice/umbracoapi/authentication/postlogin';
 
 	public async login(data: LoginRequestModel): Promise<LoginResponse> {
 		const request = new Request(this.#authURL, {
@@ -29,7 +29,7 @@ export class UmbAuthLegacyRepository {
 	}
 
 	public async resetPassword(email: string): Promise<ResetPasswordResponse> {
-		const request = new Request('/umbraco/backoffice/umbracoapi/authentication/PostRequestPasswordReset', {
+		const request = new Request('backoffice/umbracoapi/authentication/PostRequestPasswordReset', {
 			method: 'POST',
 			body: JSON.stringify({
 				email,
@@ -47,7 +47,7 @@ export class UmbAuthLegacyRepository {
 	}
 
 	public async validatePasswordResetCode(user: string, code: string): Promise<ValidatePasswordResetCodeResponse> {
-		const request = new Request('/umbraco/backoffice/umbracoapi/authentication/validatepasswordresetcode', {
+		const request = new Request('backoffice/umbracoapi/authentication/validatepasswordresetcode', {
 			method: 'POST',
 			body: JSON.stringify({
 				userId: user,
@@ -66,7 +66,7 @@ export class UmbAuthLegacyRepository {
 	}
 
 	public async newPassword(password: string, resetCode: string, userId: number): Promise<LoginResponse> {
-		const request = new Request('/umbraco/backoffice/umbracoapi/authentication/PostSetPassword', {
+		const request = new Request('backoffice/umbracoapi/authentication/PostSetPassword', {
 			method: 'POST',
 			body: JSON.stringify({
 				password,
