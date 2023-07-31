@@ -10,7 +10,7 @@ export class UmbExtensionManifestController<
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
-		onPermissionChanged: (isPermitted: boolean, controller: UmbExtensionManifestController<ManifestType>) => void
+		onPermissionChanged: (isPermitted: boolean, controller: UmbBaseExtensionController<ManifestType>) => void
 	) {
 		super(host, extensionRegistry, alias, onPermissionChanged);
 		this._init();

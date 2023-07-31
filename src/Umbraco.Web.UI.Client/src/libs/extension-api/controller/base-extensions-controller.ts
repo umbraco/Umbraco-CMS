@@ -81,7 +81,7 @@ export abstract class UmbBaseExtensionsController<
 
 	protected abstract _createController(manifest: ManifestType): ControllerType;
 
-	protected _extensionChanged = (isPermitted: boolean, controller: ControllerType) => {
+	protected _extensionChanged = (isPermitted: boolean, controller: UmbBaseExtensionController) => {
 		let hasChanged = false;
 		const existingIndex = this._permittedExts.indexOf(controller as MyPermittedControllerType);
 		if (isPermitted) {
