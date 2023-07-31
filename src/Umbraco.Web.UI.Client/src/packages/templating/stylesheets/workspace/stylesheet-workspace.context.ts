@@ -61,6 +61,30 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 
 	public async save() {
 		throw new Error('Save method not implemented.');
+
+		// const stylesheet = this.getData();
+
+		// if (!stylesheet)
+		// 	return Promise.reject('Something went wrong, there is no data for partial view you want to save...');
+		// if (this.getIsNew()) {
+
+		// 	const createRequestBody = {
+		// 		name: stylesheet.name,
+		// 		content: stylesheet.content,
+		// 		parentPath: stylesheet.path + '/',
+		// 	}
+
+		// 	this.repository.create(createRequestBody);
+		// 	return Promise.resolve();
+		// }
+		// if (!stylesheet.path) return Promise.reject('There is no path');
+		// const updateRequestBody: UpdatePartialViewRequestModel = {
+		// 	name: stylesheet.name,
+		// 	existingPath: stylesheet.path,
+		// 	content: stylesheet.content,
+		// };
+		// this.repository.save(stylesheet.path, updateRequestBody);
+		// return Promise.resolve();
 	}
 
 	async create(parentKey: string | null) {
