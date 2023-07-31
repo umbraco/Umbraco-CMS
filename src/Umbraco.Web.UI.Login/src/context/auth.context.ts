@@ -10,6 +10,8 @@ import {
 export class UmbAuthContext implements IUmbAuthContext {
 	supportsPersistLogin = false;
 	returnPath = '';
+  allowPasswordReset = false;
+  usernameIsEmail = true;
 
 	resetPassword(_username: string): Promise<ResetPasswordResponse> {
 		throw new Error('Method not implemented.');
