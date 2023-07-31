@@ -81,16 +81,16 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
         _userDataService = userDataService;
     }
 
-        /// <summary>
-        /// Returns permissions for all nodes passed in for the current user
-        /// </summary>
-        /// <param name="nodeIds"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
-        {
-            EntityPermissionCollection permissions = _userService
-            .GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, nodeIds);
+    /// <summary>
+    /// Returns permissions for all nodes passed in for the current user
+    /// </summary>
+    /// <param name="nodeIds"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
+    {
+        EntityPermissionCollection permissions = _userService
+        .GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, nodeIds);
 
         var permissionsDictionary = new Dictionary<int, string[]>();
         foreach (var nodeId in nodeIds)
@@ -204,7 +204,8 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
             throw new InvalidOperationException("Could not find user Id");
         }
         var user = await _backOfficeUserManager.FindByIdAsync(userId);
-        if (user == null) throw new InvalidOperationException("Could not find user");
+        if (user == null)
+            throw new InvalidOperationException("Could not find user");
 
         IdentityResult result = await _backOfficeUserManager.AddPasswordAsync(user, newPassword);
 
@@ -217,14 +218,11 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
             return ValidationProblem(ModelState);
         }
 
-        if (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is not null)
-        {
-            //They've successfully set their password, we can now update their user account to be approved
-            _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsApproved = true;
-            //They've successfully set their password, and will now get fully logged into the back office, so the lastlogindate is set so the backoffice shows they have logged in
-            _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.LastLoginDate = DateTime.UtcNow;
-            _userService.Save(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser);
-        }
+        //They've successfully set their password, we can now update their user account to be approved
+        user.IsApproved = true;
+        //They've successfully set their password, and will now get fully logged into the back office, so the lastlogindate is set so the backoffice shows they have logged in
+        user.LastLoginDateUtc = DateTime.UtcNow;
+        await _backOfficeUserManager.UpdateAsync(user);
 
 
         //now we can return their full object since they are now really logged into the back office
