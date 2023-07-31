@@ -1,13 +1,13 @@
 import { UmbEntityData } from './entity.data.js';
-import { createFileSystemTreeItem } from './utils.js';
+import { createFileSystemTreeItem, createTextFileItem } from './utils.js';
 import {
+	CreateTextFileViewModelBaseModel,
 	FileSystemTreeItemPresentationModel,
 	PagedFileSystemTreeItemPresentationModel,
+	StylesheetResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-type StylesheetDBItem = FileSystemTreeItemPresentationModel & {
-	content: string;
-};
+type StylesheetDBItem = StylesheetResponseModel & FileSystemTreeItemPresentationModel;
 
 export const data: Array<StylesheetDBItem> = [
 	{
@@ -16,7 +16,26 @@ export const data: Array<StylesheetDBItem> = [
 		name: 'Stylesheet File 1.css',
 		type: 'stylesheet',
 		hasChildren: false,
-		content: `Stylesheet content 1`,
+		content: `
+		h1 {
+			color: blue;
+		}
+		
+		/**umb_name:bjjh*/
+		h1 {
+			color: blue;
+		}
+		
+		/**umb_name:comeone*/
+		h1 {
+			color: blue;
+		}
+		
+		/**umb_name:lol*/
+		h1 {
+			color: blue;
+		}
+		`,
 	},
 	{
 		path: 'Stylesheet File 2.css',
@@ -24,7 +43,24 @@ export const data: Array<StylesheetDBItem> = [
 		name: 'Stylesheet File 2.css',
 		type: 'stylesheet',
 		hasChildren: false,
-		content: `Stylesheet content 2`,
+		content: `		h1 {
+			color: green;
+		}
+		
+		/**umb_name:bjjh*/
+		h1 {
+			color: green;
+		}
+		
+		/**umb_name:comeone*/
+		h1 {
+			color: green;
+		}
+		
+		/**umb_name:lol*/
+		h1 {
+			color: green;
+		}`,
 	},
 	{
 		path: 'Folder 1',
@@ -32,7 +68,24 @@ export const data: Array<StylesheetDBItem> = [
 		name: 'Folder 1',
 		type: 'stylesheet',
 		hasChildren: true,
-		content: `Stylesheet content 3`,
+		content: `		h1 {
+			color: pink;
+		}
+		
+		/**umb_name:bjjh*/
+		h1 {
+			color: pink;
+		}
+		
+		/**umb_name:comeone*/
+		h1 {
+			color: pink;
+		}
+		
+		/**umb_name:lol*/
+		h1 {
+			color: pink;
+		}`,
 	},
 	{
 		path: 'Folder 1/Stylesheet File 3.css',
@@ -40,7 +93,24 @@ export const data: Array<StylesheetDBItem> = [
 		name: 'Stylesheet File 3.css',
 		type: 'stylesheet',
 		hasChildren: false,
-		content: `Stylesheet content 3`,
+		content: `		h1 {
+			color: red;
+		}
+		
+		/**umb_name:bjjh*/
+		h1 {
+			color: red;
+		}
+		
+		/**umb_name:comeone*/
+		h1 {
+			color: red;
+		}
+		
+		/**umb_name:lol*/
+		h1 {
+			color: red;
+		}`,
 	},
 ];
 
@@ -70,6 +140,23 @@ class UmbStylesheetData extends UmbEntityData<StylesheetDBItem> {
 	getTreeItem(paths: Array<string>): Array<FileSystemTreeItemPresentationModel> {
 		const items = this.data.filter((item) => paths.includes(item.path ?? ''));
 		return items.map((item) => createFileSystemTreeItem(item));
+	}
+
+	getStylesheet(path: string): StylesheetDBItem | undefined {
+		return createTextFileItem(this.data.find((item) => item.path === path));
+	}
+
+	insertStyleSheet(item: CreateTextFileViewModelBaseModel) {
+		const newItem: StylesheetDBItem = {
+			...item,
+			path: `${item.parentPath}/${item.name}.cshtml}`,
+			isFolder: false,
+			hasChildren: false,
+			type: 'partial-view',
+		};
+
+		this.insert(newItem);
+		return newItem;
 	}
 }
 
