@@ -6,6 +6,7 @@ import {
 	ResetPasswordResponse,
 	ValidatePasswordResetCodeResponse,
 } from '../types.ts';
+import {Observable} from "rxjs";
 
 export class UmbAuthContext implements IUmbAuthContext {
 	supportsPersistLogin = false;
@@ -26,4 +27,8 @@ export class UmbAuthContext implements IUmbAuthContext {
 	login(_data: LoginRequestModel): Promise<LoginResponse> {
 		throw new Error('Method not implemented.');
 	}
+
+  getIcons(): Observable<Record<string, string>> {
+    throw new Error('Method not implemented.');
+  }
 }
