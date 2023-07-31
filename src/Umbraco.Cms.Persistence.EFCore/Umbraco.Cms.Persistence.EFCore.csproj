@@ -1,14 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Title>Umbraco CMS - Persistence - EFCore</Title>
-    <!-- TODO: Enable when final version is shipped (because there's currently no previous version) -->
-    <EnablePackageValidation>false</EnablePackageValidation>
+    <Title>Umbraco CMS - Persistence - Entity Framework Core</Title>
+    <Description>Adds support for Entity Framework Core to Umbraco CMS.</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.7" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="4.5.0" />
   </ItemGroup>
 
@@ -22,5 +20,4 @@
       <_Parameter1>Umbraco.Tests.Integration</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
-
 </Project>

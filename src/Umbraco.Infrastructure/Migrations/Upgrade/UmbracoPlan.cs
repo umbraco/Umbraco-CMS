@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_7_0;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -68,11 +69,20 @@ public class UmbracoPlan : MigrationPlan
         // To 10.5.0 / 11.2.0
         To<V_10_5_0.AddPrimaryKeyConstrainToContentVersionCleanupDtos>("{83AF7945-DADE-4A02-9041-F3F6EBFAC319}");
 
+        // to 10.7.0
+        To<MigrateTagsFromNVarcharToNText>("{EF93F398-1385-4F07-808A-D3C518984442}");
+
         // To 11.3.0
         To<V_11_3_0.AddDomainSortOrder>("{BB3889ED-E2DE-49F2-8F71-5FD8616A2661}");
 
         // To 11.4.0
         To<V_11_4_0.AlterKeyValueDataType>("{FFB6B9B0-F1A8-45E9-9CD7-25700577D1CA}");
+
+        // to 11.4.3
+        // This is here twice since it was added in 10, so if you had already upgraded you wouldn't get it
+        // But we still need the first once, since if you upgraded to 10.7.0 then the "From" state would be unknown otherwise.
+        // This has it's own key, we essentially consider it a separate migration.
+        To<MigrateTagsFromNVarcharToNText>("{2CA0C5BB-170B-45E5-8179-E73DA4B41A46}");
 
         // To 12.0.0
         To<V_12_0_0.UseNvarcharInsteadOfNText>("{888A0D5D-51E4-4C7E-AA0A-01306523C7FB}");
@@ -80,5 +90,9 @@ public class UmbracoPlan : MigrationPlan
 
         // To 12.1.0
         To<V_12_1_0.TablesIndexesImprovement>("{1187192D-EDB5-4619-955D-91D48D738871}");
+        To<V_12_1_0.AddOpenIddict>("{47DE85CE-1E16-42A0-8AF6-3EC3BCEF5471}");
+
+        // And once more for 12
+        To<MigrateTagsFromNVarcharToNText>("{2D4C9FBD-08B3-472D-A76C-6ED467A0CD20}");
     }
 }

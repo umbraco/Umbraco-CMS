@@ -13,7 +13,7 @@ public sealed class ApiContentResponseBuilder : ApiContentBuilderBase<IApiConten
         : base(apiContentNameProvider, apiContentRouteBuilder, outputExpansionStrategyAccessor)
         => _apiContentRouteBuilder = apiContentRouteBuilder;
 
-    protected override IApiContentResponse Create(IPublishedContent content, Guid id, string name, string contentType, IApiContentRoute route, IDictionary<string, object?> properties)
+    protected override IApiContentResponse Create(IPublishedContent content, string name, IApiContentRoute route, IDictionary<string, object?> properties)
     {
         var routesByCulture = new Dictionary<string, IApiContentRoute>();
 
@@ -35,6 +35,6 @@ public sealed class ApiContentResponseBuilder : ApiContentBuilderBase<IApiConten
             routesByCulture[publishedCultureInfo.Culture] = cultureRoute;
         }
 
-        return new ApiContentResponse(id, name, contentType, route, properties, routesByCulture);
+        return new ApiContentResponse(content.Key, name, content.ContentType.Alias, content.CreateDate, content.UpdateDate, route, properties, routesByCulture);
     }
 }

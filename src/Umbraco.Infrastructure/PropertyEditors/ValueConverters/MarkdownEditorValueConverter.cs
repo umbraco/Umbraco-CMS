@@ -56,6 +56,7 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase, IDeliver
         return new HtmlEncodedString(inter == null ? string.Empty : mark.Transform((string)inter));
     }
 
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview) =>
 
         // source should come from ConvertSource and be a string (or null) already
@@ -72,7 +73,6 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase, IDeliver
             return string.Empty;
         }
 
-        var mark = new Markdown();
-        return mark.Transform(markdownString);
+        return markdownString;
     }
 }
