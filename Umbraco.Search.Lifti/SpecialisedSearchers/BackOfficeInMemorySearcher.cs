@@ -20,7 +20,7 @@ namespace Umbraco.Search.InMemory.SpecialisedSearchers;
 
 public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
 {
-    private readonly IInMemoryIndexManager _inMemoryIndexManager;
+    private readonly ILiftiIndexManager _liftiIndexManager;
     private readonly ILocalizationService _languageService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IEntityService _entityService;
@@ -30,7 +30,7 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
     public BackOfficeInMemorySearcher(
-        IInMemoryIndexManager inMemoryIndexManager,
+        ILiftiIndexManager liftiIndexManager,
         ILocalizationService languageService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IEntityService entityService,
@@ -39,7 +39,7 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
         IUmbracoMapper umbracoMapper,
         IPublishedUrlProvider publishedUrlProvider)
     {
-        _inMemoryIndexManager = inMemoryIndexManager;
+        _liftiIndexManager = liftiIndexManager;
         _languageService = languageService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _entityService = entityService;

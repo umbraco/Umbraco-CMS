@@ -4,10 +4,15 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RootNamespace>Umbraco.Search.InMemory</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\src\Umbraco.Search\Umbraco.Search.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Lifti.Core" Version="5.0.0" />
     </ItemGroup>
 
 

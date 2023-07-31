@@ -167,7 +167,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Search.Examine.Luce
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Search.Examine", "tests\Umbraco.Tests.Search.Examine\Umbraco.Tests.Search.Examine.csproj", "{70D59911-72C8-48EB-A5F1-93C4EA57C9F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Search.InMemory", "Umbraco.Search.InMemory\Umbraco.Search.InMemory.csproj", "{820E1D68-B6A3-4BD6-AF7F-FFB6545A0B33}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Search.Lifti", "Umbraco.Search.Lifti\Umbraco.Search.Lifti.csproj", "{820E1D68-B6A3-4BD6-AF7F-FFB6545A0B33}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

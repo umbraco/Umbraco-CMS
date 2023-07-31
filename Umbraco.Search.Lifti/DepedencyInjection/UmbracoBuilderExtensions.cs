@@ -1,4 +1,5 @@
 ﻿using Examine;
+using Lifti;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ using Umbraco.Search.Configuration;
 using Umbraco.Search.Indexing;
 using Umbraco.Search.Indexing.Populators;
 using Umbraco.Search.InMemory.SpecialisedSearchers;
+using Umbraco.Search.ValueSet;
 using IBackOfficeExamineSearcher = Umbraco.Search.SpecialisedSearchers.IBackOfficeExamineSearcher;
 using IIndexDiagnosticsFactory = Umbraco.Search.Diagnostics.IIndexDiagnosticsFactory;
 
@@ -46,10 +48,12 @@ public static class UmbracoBuilderExtensions
         this IServiceCollection serviceCollection,
         string name) where T : IUmbracoEntity
     {
-        // This is the long way to add IOptions but gives us access to the
-        // services collection which we need to get the dir factory
+        serviceCollection.AddSingleton<ILiftiIndex>(serviceCollection => new UmbracoLiftiIndex(name,
+            new FullTextIndexBuilder<string>()
+                .Build()));
         serviceCollection.AddSingleton<IUmbracoIndex>(serviceCollection =>
-            new UmbracoMemoryIndex<T>(serviceCollection.GetRequiredService<IMemoryCache>(), name))
+            new UmbracoMemoryIndex<T>(serviceCollection.GetRequiredService<ILiftiIndexManager>().GetIndex(name),
+                serviceCollection.GetRequiredService<ValueSet.ValueSetBuilders.IValueSetBuilder<T>>()));
         return serviceCollection;
     }
 
@@ -66,9 +70,11 @@ public static class UmbracoBuilderExtensions
         // This is the long way to add IOptions but gives us access to the
         // services collection which we need to get the dir factory
         services.AddSingleton<IUmbracoIndex>(serviceCollection =>
-            new DeliveryApiContentInMemoryIndex(serviceCollection.GetRequiredService<IMemoryCache>(), Constants
-                .UmbracoIndexes
-                .DeliveryApiContentIndexName));
+            new DeliveryApiContentInMemoryIndex(serviceCollection.GetRequiredService<ILiftiIndexManager>().GetIndex(
+                    Constants
+                        .UmbracoIndexes
+                        .DeliveryApiContentIndexName),
+                serviceCollection.GetRequiredService<ValueSet.ValueSetBuilders.IValueSetBuilder<IContent>>()));
         return services;
     }
 

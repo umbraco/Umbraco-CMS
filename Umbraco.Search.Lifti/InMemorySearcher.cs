@@ -20,7 +20,14 @@ public class UmbracoMemorySearcher<T> : IUmbracoSearcher<T>
 
     }
     public string Name { get; }
-    public UmbracoSearchResults? NativeQuery(string query, int page, int pageSize) => throw new NotImplementedException();
+
+    public UmbracoSearchResults? NativeQuery(string query, int page, int pageSize)
+    {
+        if (query.Contains(":"))
+        {
+
+        }
+    }
 
     public IEnumerable<PublishedSearchResult> SearchDescendants(IPublishedContent content, string term) => throw new NotImplementedException();
 
