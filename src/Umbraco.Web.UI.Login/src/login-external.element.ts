@@ -1,5 +1,6 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import {InterfaceColor, InterfaceLook} from "@umbraco-ui/uui";
 
 @customElement('umb-login-external')
 export class UmbLoginExternalElement extends LitElement {
@@ -13,7 +14,13 @@ export class UmbLoginExternalElement extends LitElement {
 	externalLoginUrl = '';
 
 	@property({ attribute: 'icon' })
-	icon = '';
+	icon = 'icon-lock';
+
+  @property({ attribute: 'button-look' })
+  buttonLook: InterfaceLook = 'outline';
+
+  @property({ attribute: 'button-color' })
+  buttonColor: InterfaceColor = 'default';
 
   @state()
   protected externalComponent: HTMLElement | null = null;
@@ -40,7 +47,7 @@ export class UmbLoginExternalElement extends LitElement {
   protected renderDefaultView() {
     return html`
         <form method="post" action="${this.externalLoginUrl}">
-					<uui-button><uui-icon name=${this.icon}></uui-icon> Continue with ${this.name}</uui-button>
+					<uui-button .look=${this.buttonLook} .color=${this.buttonColor}><uui-icon name=${this.icon}></uui-icon> Continue with ${this.name}</uui-button>
 				</form>
     `;
   }
