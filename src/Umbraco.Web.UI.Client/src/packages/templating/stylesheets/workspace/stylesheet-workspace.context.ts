@@ -52,7 +52,7 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 	}
 
 	async load(path: string) {
-		const { data } = await this.repository.requestByPath(path);
+		const { data } = await this.repository.requestById(path);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);
