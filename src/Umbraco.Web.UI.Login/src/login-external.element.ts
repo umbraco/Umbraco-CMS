@@ -34,11 +34,7 @@ export class UmbLoginExternalElement extends LitElement {
   }
 
   render() {
-		return html`
-			<uui-icon-registry-essential>
-        ${this.loading ? html`<uui-button state="waiting" disabled label="Loading provider"></uui-button>` : (this.externalComponent ?? this.renderDefaultView())}
-			</uui-icon-registry-essential>
-		`;
+		return this.loading ? html`<uui-button state="waiting" disabled label="Loading provider"></uui-button>` : (this.externalComponent ?? this.renderDefaultView());
 	}
 
   protected renderDefaultView() {
