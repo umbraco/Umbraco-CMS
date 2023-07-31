@@ -96,7 +96,8 @@ export abstract class UmbBaseExtensionController<
 	#gotConditions() {
 		const conditionConfigs = this.#manifest?.conditions ?? [];
 
-		if (conditionConfigs.length === 0) {
+		// As conditionConfigs might have been configured as something else than an array, then we ignorer them.
+		if (conditionConfigs.length === undefined || conditionConfigs.length === 0) {
 			this.#cleanConditions();
 			this.#onConditionsChangedCallback();
 			return;
