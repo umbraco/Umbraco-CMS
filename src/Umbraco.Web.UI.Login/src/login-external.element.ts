@@ -15,8 +15,6 @@ export class UmbLoginExternalElement extends LitElement {
 	@property({ attribute: 'icon' })
 	icon = '';
 
-	#onProviderClicked() {}
-
 	render() {
 		return html`
 			<uui-icon-registry-essential>
