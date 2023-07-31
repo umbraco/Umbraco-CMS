@@ -1,10 +1,13 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Routing
 @using Microsoft.Extensions.Options;
+@using Umbraco.Cms.Core
 @using Umbraco.Cms.Core.Configuration
 @using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Hosting
 @using Umbraco.Cms.Core.Mail
 @using Umbraco.Cms.Core.Services
+@using Umbraco.Cms.Web.BackOffice.Controllers
 @using Umbraco.Cms.Web.BackOffice.Security
 @using Umbraco.Extensions
 @inject IOptions<ContentSettings> ContentSettings
@@ -15,6 +18,7 @@
 @inject IOptions<GlobalSettings> GlobalSettings
 @inject IIconService IconService
 @inject IBackOfficeExternalLoginProviders ExternalLogins
+@inject LinkGenerator LinkGenerator
 @{
     var backOfficePath = GlobalSettings.Value.GetBackOfficePath(HostingEnvironment);
     var loginLogoImage = ContentSettings.Value.LoginLogoImage;
@@ -22,6 +26,8 @@
     var usernameIsEmail = SecuritySettings.Value.UsernameIsEmail;
     var allowUserInvite = EmailSender.CanSendRequiredEmail();
     var allowPasswordReset = SecuritySettings.Value.AllowPasswordReset && EmailSender.CanSendRequiredEmail();
+    var disableLocalLogin = ExternalLogins.HasDenyLocalLogin();
+    var externalLoginsUrl = LinkGenerator.GetPathByAction(nameof(BackOfficeController.ExternalLogin), ControllerExtensions.GetControllerName<BackOfficeController>(), new { area = Constants.Web.Mvc.BackOfficeArea });
 }
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
@@ -52,6 +58,7 @@
             username-is-email="@usernameIsEmail"
             allow-user-invite="@allowUserInvite"
             allow-password-reset="@allowPasswordReset"
+            disable-local-login="@disableLocalLogin"
         >
             <umb-login-external slot="external" name="Google" icon="info"></umb-login-external>
             <umb-login-external slot="external" name="Amazon" icon="info"></umb-login-external>
