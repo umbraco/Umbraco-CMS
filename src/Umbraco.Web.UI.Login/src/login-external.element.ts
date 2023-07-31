@@ -1,10 +1,10 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 
 @customElement('umb-login-external')
 export class UmbLoginExternalElement extends LitElement {
-	@property({ attribute: 'custom-view' }) //PATH to ESModule
-	customView?: any; // LOOK AT EXTENSION API IN NEW BACKOFFICE
+	@property({ attribute: 'custom-view' })
+	customView?: string;
 
 	@property({ attribute: 'name' })
 	name = '';
@@ -15,15 +15,46 @@ export class UmbLoginExternalElement extends LitElement {
 	@property({ attribute: 'icon' })
 	icon = '';
 
-	render() {
+  @state()
+  protected externalComponent: HTMLElement | null = null;
+
+  @state()
+  protected loading = false;
+
+  connectedCallback() {
+    super.connectedCallback();
+    if (this.customView) {
+      this.loading = true;
+    }
+  }
+
+  async firstUpdated() {
+    await this.loadCustomView();
+    this.loading = false;
+  }
+
+  render() {
 		return html`
 			<uui-icon-registry-essential>
-				<form method="post" action="${this.externalLoginUrl}">
-					<button><uui-icon name=${this.icon}></uui-icon> Continue with ${this.name}</button>
-				</form>
+        ${this.loading ? html`<uui-button state="waiting" disabled label="Loading provider"></uui-button>` : (this.externalComponent ?? this.renderDefaultView())}
 			</uui-icon-registry-essential>
 		`;
 	}
+
+  protected renderDefaultView() {
+    return html`
+        <form method="post" action="${this.externalLoginUrl}">
+					<uui-button><uui-icon name=${this.icon}></uui-icon> Continue with ${this.name}</uui-button>
+				</form>
+    `;
+  }
+
+  protected async loadCustomView() {
+    if (!this.customView) return;
+    const customViewModule = await import(this.customView);
+    const customView = customViewModule.default;
+    this.externalComponent = new customView();
+  }
 
 	static styles: CSSResultGroup = [
 		css`
