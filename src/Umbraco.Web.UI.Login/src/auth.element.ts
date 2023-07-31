@@ -11,7 +11,6 @@ import './pages/new-password.element.js';
 import './pages/login.element.js';
 import './pages/invite.element.js';
 import './external-login-providers-layout.element.js';
-import { InterfaceLookValues } from '@umbraco-ui/uui';
 
 @customElement('umb-auth')
 export default class UmbAuthElement extends LitElement {
@@ -19,6 +18,9 @@ export default class UmbAuthElement extends LitElement {
 
 	@property({ type: Boolean, attribute: 'is-legacy' })
 	isLegacy = false;
+
+	@property({ type: Boolean, attribute: 'disable-local-login' })
+	disableLocalLogin = false;
 
 	@property({ type: String, attribute: 'background-image' })
 	backgroundImage = '';
