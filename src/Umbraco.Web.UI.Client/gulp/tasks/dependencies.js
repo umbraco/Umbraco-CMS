@@ -2,7 +2,6 @@
 
 var config = require('../config');
 var gulp = require('gulp');
-var flatten = require('gulp-flatten');
 
 var MergeStream = require('merge-stream');
 
@@ -193,13 +192,6 @@ function dependencies() {
             "base": "./node_modules/font-awesome"
         },
         {
-            "name": "remixicon",
-            "src":  ["./node_modules/remixicon/icons/**/*.svg"],
-            "base": "./node_modules/remixicon/icons",
-            "dest": config.targets.assets + "/icons",
-            "flatten": true
-        },
-        {
             "name": "jquery",
             "src":  [
                 "./node_modules/jquery/dist/jquery.min.js",
@@ -307,11 +299,7 @@ function dependencies() {
         var task = gulp.src(module.src, { base: module.base, allowEmpty: true });
 
         _.forEach(config.roots, function(root){
-            // If flatten is provided
-            if (module.flatten) {
-                task = task.pipe(flatten());
-            }
-            task = task.pipe(gulp.dest(root + (module.dest || (config.targets.lib + "/" + module.name))))
+            task = task.pipe(gulp.dest(root + config.targets.lib + "/" + module.name))
         });
 
         stream.add(task);
