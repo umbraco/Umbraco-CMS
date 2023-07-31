@@ -3,19 +3,26 @@ import { customElement, property } from 'lit/decorators.js';
 
 @customElement('umb-login-external')
 export class UmbLoginExternalElement extends LitElement {
-	@property({ attribute: 'custom-view' })
-	customView?: any;
+	@property({ attribute: 'custom-view' }) //PATH to ESModule
+	customView?: any; // LOOK AT EXTENSION API IN NEW BACKOFFICE
 
 	@property({ attribute: 'name' })
 	name = '';
 
+	@property({ attribute: 'external-login-url' })
+	externalLoginUrl = '';
+
 	@property({ attribute: 'icon' })
 	icon = '';
+
+	#onProviderClicked() {}
 
 	render() {
 		return html`
 			<uui-icon-registry-essential>
-				<button><uui-icon name=${this.icon}></uui-icon> Continue with ${this.name}</button>
+				<form method="post" action="${this.externalLoginUrl}">
+					<button><uui-icon name=${this.icon}></uui-icon> Continue with ${this.name}</button>
+				</form>
 			</uui-icon-registry-essential>
 		`;
 	}
