@@ -77,7 +77,7 @@ public class ContentBlueprintTreeController : TreeController
         var nodes = new TreeNodeCollection();
 
         //get all blueprints
-        IEntitySlim[] entities = _entityService.GetChildren(Constants.System.Root, UmbracoObjectTypes.DocumentBlueprint);
+        IEnumerable<IEntitySlim> entities = _entityService.GetChildren(Constants.System.Root, UmbracoObjectTypes.DocumentBlueprint);
 
         //check if we're rendering the root in which case we'll render the content types that have blueprints
         if (id == Constants.System.RootString)
@@ -91,7 +91,7 @@ public class ContentBlueprintTreeController : TreeController
             if (contentTypeIds.Any())
             {
                 //now get the entities ... it's a bit round about but still smaller queries than getting all document types
-                IEntitySlim[] docTypeEntities = _entityService.GetAll(UmbracoObjectTypes.DocumentType, contentTypeIds);
+                IEnumerable<IEntitySlim> docTypeEntities = _entityService.GetAll(UmbracoObjectTypes.DocumentType, contentTypeIds);
 
                 nodes.AddRange(docTypeEntities
                     .OrderBy(entity => entity.Name)
