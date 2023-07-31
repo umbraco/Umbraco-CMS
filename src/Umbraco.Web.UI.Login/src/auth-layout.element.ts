@@ -1,6 +1,8 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit-html/directives/style-map.js';
+import {UmbIconRegistry} from "./icon.registry.ts";
+import {UUIIconRegistryEssential} from "@umbraco-ui/uui";
 
 @customElement('umb-auth-layout')
 export class UmbAuthLayoutElement extends LitElement {
@@ -9,6 +11,13 @@ export class UmbAuthLayoutElement extends LitElement {
 
 	@property()
 	logoImage = 'login/umbraco_logomark_white.svg';
+
+  constructor() {
+    super();
+
+    new UUIIconRegistryEssential().attach(this);
+    new UmbIconRegistry().attach(this);
+  }
 
 	render() {
 		return html`
