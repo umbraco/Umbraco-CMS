@@ -45,8 +45,9 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 		super();
 
 		new UmbExtensionsElementController(this, 'sectionSidebarApp', null, (sidebarApps) => {
+			const oldValue = this._sidebarApps;
 			this._sidebarApps = sidebarApps;
-			this.requestUpdate('_sidebarApps');
+			this.requestUpdate('_sidebarApps', oldValue);
 		});
 
 		this.#createRoutes();
