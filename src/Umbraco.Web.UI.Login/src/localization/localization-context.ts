@@ -2,7 +2,7 @@ import { firstValueFrom, ReplaySubject } from 'rxjs';
 
 class UmbLocalizationContext {
 	#init = false;
-	readonly #apiBasePath = '/umbraco/localizedtext';
+	readonly #apiBasePath = 'localizedtext';
 	#innerDictionary = new ReplaySubject<Map<string, string>>(1);
 
 	async #initLocalizedResources(): Promise<void> {
