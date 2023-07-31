@@ -21,6 +21,9 @@ export abstract class UmbBaseExtensionsController<
 	ControllerType extends UmbBaseExtensionController<ManifestType> = UmbBaseExtensionController<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
 > extends UmbBaseController {
+	#extensionRegistry: UmbExtensionRegistry<ManifestType>;
+	#type: ManifestTypeName;
+	#filter: undefined | null | ((manifest: ManifestType) => boolean);
 	#onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void;
 	private _extensions: Array<ControllerType> = [];
 	private _permittedExts: Array<MyPermittedControllerType> = [];
@@ -33,12 +36,15 @@ export abstract class UmbBaseExtensionsController<
 		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void
 	) {
 		super(host);
+		this.#extensionRegistry = extensionRegistry;
+		this.#type = type;
+		this.#filter = filter;
 		this.#onChange = onChange;
-
-		// TODO: This could be optimized by just getting the aliases, well depends on the filter. (revisit one day to see how much filter is used)
-		let source = extensionRegistry.extensionsOfType<ManifestTypeName, ManifestType>(type);
-		if (filter) {
-			source = source.pipe(map((extensions: Array<ManifestType>) => extensions.filter(filter)));
+	}
+	protected _init() {
+		let source = this.#extensionRegistry.extensionsOfType<ManifestTypeName, ManifestType>(this.#type);
+		if (this.#filter) {
+			source = source.pipe(map((extensions: Array<ManifestType>) => extensions.filter(this.#filter!)));
 		}
 		this.observe(source, this.#gotManifests);
 	}
@@ -81,12 +87,12 @@ export abstract class UmbBaseExtensionsController<
 
 	protected abstract _createController(manifest: ManifestType): ControllerType;
 
-	protected _extensionChanged = (isPermitted: boolean, controller: UmbBaseExtensionController) => {
+	protected _extensionChanged = (isPermitted: boolean, controller: UmbBaseExtensionController<ManifestType>) => {
 		let hasChanged = false;
-		const existingIndex = this._permittedExts.indexOf(controller as MyPermittedControllerType);
+		const existingIndex = this._permittedExts.indexOf(controller as unknown as MyPermittedControllerType);
 		if (isPermitted) {
 			if (existingIndex === -1) {
-				this._permittedExts.push(controller as MyPermittedControllerType);
+				this._permittedExts.push(controller as unknown as MyPermittedControllerType);
 				hasChanged = true;
 			}
 		} else {

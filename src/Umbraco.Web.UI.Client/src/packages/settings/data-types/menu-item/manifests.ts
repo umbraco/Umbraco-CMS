@@ -11,8 +11,6 @@ const menuItem: ManifestTypes = {
 		icon: 'umb:folder',
 		entityType: 'data-type',
 		treeAlias: 'Umb.Tree.DataTypes',
-	},
-	conditions: {
 		menus: ['Umb.Menu.Settings'],
 	},
 };

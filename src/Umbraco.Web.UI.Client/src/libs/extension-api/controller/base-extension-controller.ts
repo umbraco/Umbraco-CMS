@@ -6,13 +6,14 @@ import {
 	type UmbExtensionRegistry,
 	createExtensionClass,
 } from '@umbraco-cms/backoffice/extension-api';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export abstract class UmbBaseExtensionController<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
 	SubClassType = never
 > extends UmbBaseController {
 	#promiseResolvers: Array<() => void> = [];
-	#manifestObserver;
+	#manifestObserver!: UmbObserverController<ManifestType | undefined>;
 	#extensionRegistry: UmbExtensionRegistry<ManifestCondition>;
 	#alias: string;
 	#overwrites: Array<string> = [];

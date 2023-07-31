@@ -1,8 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { css, repeat, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { ManifestBase, UmbExtensionElementController } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionElementController, UmbExtensionsElementController } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 export type InitializedExtension = { alias: string; weight: number; component: HTMLElement | null };
@@ -20,6 +17,8 @@ export type InitializedExtension = { alias: string; weight: number; component: H
 // TODO: Make property that reveals the amount of displayed/permitted extensions.
 @customElement('umb-extension-slot')
 export class UmbExtensionSlotElement extends UmbLitElement {
+	#extensionsController?: UmbExtensionsElementController;
+
 	@state()
 	private _extensions: Array<UmbExtensionElementController> = [];
 
@@ -51,69 +50,23 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	}
 
 	private _observeExtensions() {
-		// TODO: This could be optimized by just getting the aliases, well depends on the filter (revisit one day to see how much filter is used)
-		this.observe(
-			umbExtensionsRegistry?.extensionsOfType(this.type).pipe(map((extensions) => extensions.filter(this.filter))),
-			this.#gotManifests,
-			'_observeExtensions'
+		this.#extensionsController?.destroy();
+		console.log('observe', this.type, this.defaultElement);
+		this.#extensionsController = new UmbExtensionsElementController(
+			this,
+			this.type,
+			this.filter,
+			(extensionControllers) => {
+				if (extensionControllers[0].manifest?.type === 'menuItem') {
+					console.log('extensionControllers', extensionControllers);
+				}
+				this._permittedExts = extensionControllers;
+			},
+			this.defaultElement
 		);
 	}
 
-	#gotManifests = (manifests: Array<ManifestBase>) => {
-		const oldValue = this._extensions;
-		const oldLength = this._extensions.length;
-
-		// Clean up extensions that are no longer.
-		this._extensions = this._extensions.filter((controller) => {
-			if (!manifests.find((manifest) => manifest.alias === controller.alias)) {
-				controller.destroy();
-				// destroying the controller will, if permitted, make a last callback with isPermitted = false. And thereby call a requestUpdate.
-				return false;
-			}
-			return true;
-		});
-
-		// ---------------------------------------------------------------
-		// May change this into a Extensions Manager Controller???
-		// ---------------------------------------------------------------
-
-		manifests.forEach((manifest) => {
-			const existing = this._extensions.find((x) => x.alias === manifest.alias);
-			if (!existing) {
-				const controller = new UmbExtensionElementController(
-					this,
-					umbExtensionsRegistry,
-					manifest.alias,
-					this.#extensionChanged,
-					this.defaultElement
-				);
-				controller.properties = this._props;
-				this._extensions.push(controller);
-			}
-		});
-	};
-
-	#extensionChanged = (isPermitted: boolean, controller: UmbExtensionElementController) => {
-		const oldValue = this._permittedExts;
-		const oldLength = oldValue.length;
-		const existingIndex = this._permittedExts.indexOf(controller);
-		if (isPermitted) {
-			if (existingIndex === -1) {
-				this._permittedExts.push(controller);
-			}
-		} else {
-			if (existingIndex !== -1) {
-				this._permittedExts.splice(existingIndex, 1);
-			}
-		}
-		if (oldLength !== this._permittedExts.length) {
-			this._permittedExts.sort((a, b) => b.weight - a.weight);
-			this.requestUpdate('_permittedExts', oldValue);
-		}
-	};
-
 	render() {
-		// TODO: check if we can use repeat directly.
 		return repeat(
 			this._permittedExts,
 			(ext) => ext.alias,

@@ -11,8 +11,6 @@ const menuItem: ManifestTypes = {
 		label: 'Stylesheets',
 		icon: 'umb:folder',
 		treeAlias: STYLESHEET_TREE_ALIAS,
-	},
-	conditions: {
 		menus: ['Umb.Menu.Templating'],
 	},
 };

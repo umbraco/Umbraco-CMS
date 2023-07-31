@@ -12,7 +12,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 // TODO: Move to separate file:
 const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',
-	alias: 'Umb.Kind.Menu',
+	alias: 'Umb.Kind.SectionSidebarAppMenu',
 	matchKind: 'menu',
 	matchType: 'sectionSidebarApp',
 	manifest: {
@@ -34,11 +34,10 @@ export class UmbSectionSidebarMenuElement<
 	}
 
 	render() {
-		// TODO: link to dashboards when clicking on the menu item header
 		return html`${this.renderHeader()}
 			<umb-extension-slot
 				type="menu"
-				.filter=${(menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu}
+				.filter="${(menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu}"
 				default-element="umb-menu"></umb-extension-slot>`;
 	}
 

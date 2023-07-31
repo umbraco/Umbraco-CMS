@@ -7,14 +7,20 @@ import './menu-item/menu-item.element.js';
 
 @customElement('umb-menu')
 export class UmbMenuElement extends UmbLitElement {
-	@property()
+	@property({ attribute: false })
 	manifest?: ManifestMenu;
 
+	constructor() {
+		super();
+		//this.provideContext(UMB_MENU_CONTEXT_TOKEN, new UmbMenuContext());
+	}
+
 	render() {
-		return html` <umb-extension-slot
-			type="menuItem"
-			.filter=${(items: ManifestMenuItem) => items.conditions.menus.includes(this.manifest!.alias)}
-			default-element="umb-menu-item"></umb-extension-slot>`;
+		return html` <h4>MENU: ${this.manifest?.alias}, menuItem:</h4>
+			<umb-extension-slot
+				type="menuItem"
+				.filter=${(items: ManifestMenuItem) => items.meta.menus.includes(this.manifest!.alias)}
+				default-element="umb-menu-item"></umb-extension-slot>`;
 	}
 
 	static styles = [UUITextStyles];

@@ -28,9 +28,13 @@ export class UmbExtensionsElementController<
 	) {
 		super(host, umbExtensionsRegistry, type, filter, onChange);
 		this._defaultElement = defaultElement;
+		this._init();
 	}
 
 	protected _createController(manifest: ManifestType) {
+		if (manifest.type === 'menuItem') {
+			console.log('create for', manifest);
+		}
 		return new UmbExtensionElementController<ManifestType>(
 			this,
 			umbExtensionsRegistry,

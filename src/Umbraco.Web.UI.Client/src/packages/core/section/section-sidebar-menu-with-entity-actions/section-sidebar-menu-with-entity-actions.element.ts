@@ -10,7 +10,7 @@ import '../../menu/menu.element.js';
 
 const manifestWithEntityActions: UmbBackofficeManifestKind = {
 	type: 'kind',
-	alias: 'Umb.Kind.Menu',
+	alias: 'Umb.Kind.SectionSidebarAppMenuWithEntityActions',
 	matchKind: 'menuWithEntityActions',
 	matchType: 'sectionSidebarApp',
 	manifest: {

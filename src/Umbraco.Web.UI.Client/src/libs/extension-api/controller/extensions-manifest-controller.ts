@@ -23,6 +23,7 @@ export class UmbExtensionsManifestController<
 		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void
 	) {
 		super(host, umbExtensionsRegistry, type, filter, onChange);
+		this._init();
 	}
 
 	protected _createController(manifest: ManifestType) {
