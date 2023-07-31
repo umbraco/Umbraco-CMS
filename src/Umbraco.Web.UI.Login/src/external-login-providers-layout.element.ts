@@ -22,6 +22,12 @@ export class UmbExternalLoginProvidersLayoutElement extends LitElement {
 				flex-direction: column;
 			}
 
+			slot {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+			}
+
 			#divider {
 				width: 100%;
 				text-align: center;

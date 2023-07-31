@@ -101,11 +101,7 @@ export default class UmbAuthElement extends LitElement {
 			<umb-auth-layout backgroundImage=${ifDefined(this.backgroundImage)} logoImage=${ifDefined(this.logoImage)}>
 				<div id="outlet"></div>
 				<umb-external-login-providers-layout>
-					<umb-login-external
-						.options=${{
-							name: 'Google',
-							icon: 'info',
-						}}></umb-login-external>
+					<slot name="external"></slot>
 				</umb-external-login-providers-layout>
 			</umb-auth-layout>
 		`;

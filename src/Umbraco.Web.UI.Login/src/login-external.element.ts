@@ -1,22 +1,21 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui';
 
 @customElement('umb-login-external')
 export class UmbLoginExternalElement extends LitElement {
 	@property({ attribute: 'custom-view' })
 	customView?: any;
 
-	@property({ attribute: 'custom-view' })
-	options!: {
-		name: string;
-		icon: string;
-	};
+	@property({ attribute: 'name' })
+	name = '';
+
+	@property({ attribute: 'icon' })
+	icon = '';
 
 	render() {
 		return html`
 			<uui-icon-registry-essential>
-				<button><uui-icon name=${this.options.icon}></uui-icon> Continue with ${this.options.name}</button>
+				<button><uui-icon name=${this.icon}></uui-icon> Continue with ${this.name}</button>
 			</uui-icon-registry-essential>
 		`;
 	}
