@@ -11,7 +11,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  */
 export class UmbExtensionsElementController<
-	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string,
+	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string = string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbExtensionElementController<ManifestType> = UmbExtensionElementController<ManifestType>
 > extends UmbBaseExtensionsController<ManifestTypeName, ManifestType, ControllerType> {
@@ -20,7 +20,7 @@ export class UmbExtensionsElementController<
 	constructor(
 		host: UmbControllerHost,
 		type: ManifestTypeName,
-		filter: null | ((manifest: ManifestType) => boolean),
+		filter: undefined | null | ((manifest: ManifestType) => boolean),
 		onChange: (permittedManifests: Array<ControllerType>, controller: ControllerType) => void,
 		defaultElement?: string
 	) {

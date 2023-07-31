@@ -25,7 +25,7 @@ export abstract class UmbBaseExtensionsController<
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestType>,
 		type: ManifestTypeName,
-		filter: null | ((manifest: ManifestType) => boolean),
+		filter: undefined | null | ((manifest: ManifestType) => boolean),
 		onChange: (permittedManifests: Array<PermittedControllerType>, controller: PermittedControllerType) => void
 	) {
 		super(host);
