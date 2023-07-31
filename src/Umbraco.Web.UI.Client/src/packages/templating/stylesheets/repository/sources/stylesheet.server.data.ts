@@ -1,6 +1,12 @@
 import type { StylesheetDetails } from '../../index.js';
 import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import {
+	CreateStylesheetRequestModel,
+	StylesheetResource,
+	UpdateStylesheetRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Stylesheet that fetches data from the server
@@ -8,7 +14,9 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
  * @class UmbStylesheetServerDataSource
  * @implements {UmbStylesheetServerDataSource}
  */
-export class UmbStylesheetServerDataSource implements UmbDataSource<any, any, any, StylesheetDetails> {
+export class UmbStylesheetServerDataSource
+	implements UmbDataSource<CreateStylesheetRequestModel, string, UpdateStylesheetRequestModel, StylesheetDetails>
+{
 	#host: UmbControllerHostElement;
 
 	/**
@@ -31,17 +39,16 @@ export class UmbStylesheetServerDataSource implements UmbDataSource<any, any, an
 	 */
 	async get(path: string) {
 		if (!path) throw new Error('Path is missing');
-		console.log('GET STYLESHEET WITH PATH', path);
-		return { data: undefined, error: undefined };
+		return tryExecuteAndNotify(this.#host, StylesheetResource.getStylesheet({ path }));
 	}
 
-	insert(data: StylesheetDetails): Promise<DataSourceResponse<StylesheetDetails>> {
-		throw new Error('Method not implemented.');
+	insert(data: StylesheetDetails): Promise<DataSourceResponse<any>> {
+		return tryExecuteAndNotify(this.#host, StylesheetResource.postStylesheet({ requestBody: data }));
 	}
 	update(path: string, data: StylesheetDetails): Promise<DataSourceResponse<StylesheetDetails>> {
-		throw new Error('Method not implemented.');
+		return tryExecuteAndNotify(this.#host, StylesheetResource.putStylesheet({ requestBody: data }));
 	}
 	delete(path: string): Promise<DataSourceResponse> {
-		throw new Error('Method not implemented.');
+		return tryExecuteAndNotify(this.#host, StylesheetResource.deleteStylesheet({ path }));
 	}
 }
