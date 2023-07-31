@@ -1,4 +1,3 @@
-import { UMB_LOCALIZATION_CONTEXT } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_AUTH, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { UMB_APP } from '@umbraco-cms/backoffice/context';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
@@ -10,12 +9,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 export class UmbCurrentUserModalElement extends UmbLitElement {
 	@property({ attribute: false })
 	modalContext?: UmbModalContext;
-
-	@state()
-	protected labelClose = 'Close';
-
-	@state()
-	protected labelLogout = 'Log out';
 
 	@state()
 	private _currentUser?: UmbLoggedInUser;
@@ -34,13 +27,6 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 
 		this.consumeContext(UMB_APP, (instance) => {
 			this.#appContext = instance;
-		});
-
-		this.consumeContext(UMB_LOCALIZATION_CONTEXT, (instance) => {
-			instance.localizeMany(['general_close', 'general_logout']).subscribe((values) => {
-				this.labelClose = values[0];
-				this.labelLogout = values[1];
-			});
 		});
 	}
 
@@ -72,9 +58,15 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 					<umb-extension-slot id="userProfileApps" type="userProfileApp"></umb-extension-slot>
 				</div>
 				<div slot="actions">
-					<uui-button @click=${this._close} look="secondary" label=${this.labelClose}> ${this.labelClose} </uui-button>
-					<uui-button @click=${this._logout} look="primary" color="danger" label=${this.labelLogout}>
-						${this.labelLogout}
+					<uui-button @click=${this._close} look="secondary" .label=${this.localize.term('general_close')}>
+						${this.localize.term('general_close')}
+					</uui-button>
+					<uui-button
+						@click=${this._logout}
+						look="primary"
+						color="danger"
+						.label=${this.localize.term('general_logout')}>
+						${this.localize.term('general_logout')}
 					</uui-button>
 				</div>
 			</umb-body-layout>

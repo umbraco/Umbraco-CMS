@@ -126,7 +126,7 @@ export default {
 		reporters: ['lcovonly', 'text-summary'],
 	},
 	testRunnerHtml: (testFramework) =>
-		`<html>
+		`<html lang="en-us">
 			<head>
 				<meta charset="UTF-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />

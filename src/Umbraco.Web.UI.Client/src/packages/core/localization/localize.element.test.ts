@@ -1,9 +1,9 @@
-import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
+import { elementUpdated, expect, fixture, html } from '@open-wc/testing';
 import { UmbLocalizeElement } from './localize.element.js';
-import { UMB_LOCALIZATION_CONTEXT, UmbLocalizationContext } from '@umbraco-cms/backoffice/localization-api';
-import { UmbExtensionRegistry } from '@umbraco-cms/backoffice/extension-api';
 
 import '@umbraco-cms/backoffice/context-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbTranslationRegistry } from '@umbraco-cms/backoffice/localization-api';
 
 const english = {
 	type: 'translations',
@@ -46,22 +46,13 @@ describe('umb-localize', () => {
 	});
 
 	describe('localization', () => {
-		let hostElement: HTMLElement;
-		let extensionRegistry: UmbExtensionRegistry<never>;
-		let context: UmbLocalizationContext;
+		umbExtensionsRegistry.register(english);
+		umbExtensionsRegistry.register(danish);
+		const translationRegistry = new UmbTranslationRegistry(umbExtensionsRegistry);
+		translationRegistry.loadLanguage(english.meta.culture);
 
 		beforeEach(async () => {
-			extensionRegistry = new UmbExtensionRegistry();
-			extensionRegistry.register(english);
-			extensionRegistry.register(danish);
-			context = new UmbLocalizationContext(extensionRegistry);
-			context.setLanguage(english.meta.culture, english.meta.culture);
-			hostElement = await fixture(
-				html`<umb-context-provider .key=${UMB_LOCALIZATION_CONTEXT} .value=${context}>
-					<umb-localize key="general_close"></umb-localize>
-				</umb-context-provider>`
-			);
-			element = hostElement.querySelector('umb-localize') as UmbLocalizeElement;
+			element = await fixture(html`<umb-localize key="general_close"></umb-localize>`);
 		});
 
 		it('should localize a key', async () => {
@@ -79,13 +70,10 @@ describe('umb-localize', () => {
 		});
 
 		it('should change the value if the language is changed', async () => {
-			await elementUpdated(element);
 			expect(element.shadowRoot?.innerHTML).to.contain('Close');
 
-			context.setLanguage(danish.meta.culture);
+			element.lang = danish.meta.culture;
 			await elementUpdated(element);
-
-			await aTimeout(0);
 
 			expect(element.shadowRoot?.innerHTML).to.contain('Luk');
 		});

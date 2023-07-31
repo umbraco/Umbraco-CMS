@@ -9,6 +9,7 @@ import {
 	UmbContextProviderController,
 } from '@umbraco-cms/backoffice/context-api';
 import { ObserverCallback, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
 
 export declare class UmbElement extends UmbControllerHostElement {
 	/**
@@ -28,10 +29,21 @@ export declare class UmbElement extends UmbControllerHostElement {
 		alias: string | UmbContextToken<R>,
 		callback: UmbContextCallback<R>
 	): UmbContextConsumerController<R>;
+	get localize(): UmbLocalizeController;
 }
 
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbElementMixinClass extends UmbControllerHostElementMixin(superClass) implements UmbElement {
+		#localizeController = new UmbLocalizeController(this);
+
+		/**
+		 * Get the localize controller.
+		 * @readonly
+		 */
+		get localize(): UmbLocalizeController {
+			return this.#localizeController;
+		}
+
 		/**
 		 * @description Observe a RxJS source of choice.
 		 * @param {Observable<T>} source RxJS source

@@ -3,8 +3,10 @@ import { UmbControllerAlias } from './controller-alias.type.js';
 import { UmbControllerHostBaseMixin } from './controller-host-base.mixin.js';
 import { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbController } from './controller.interface.js';
+import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
 
 export declare class UmbControllerHostElement extends HTMLElement implements UmbControllerHost {
+	get localize(): UmbLocalizeController | undefined;
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;

@@ -1,4 +1,3 @@
-import { UMB_LOCALIZATION_CONTEXT } from '@umbraco-cms/backoffice/localization-api';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -14,15 +13,6 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	@state()
 	private _currentUser?: UmbLoggedInUser;
 
-	@state()
-	protected _labelYourProfile = 'Your profile';
-
-	@state()
-	protected _labelEditProfile = 'Edit';
-
-	@state()
-	protected _labelChangePassword = 'Change password';
-
 	private _modalContext?: UmbModalManagerContext;
 	private _auth?: typeof UMB_AUTH.TYPE;
 
@@ -36,14 +26,6 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 		this.consumeContext(UMB_AUTH, (instance) => {
 			this._auth = instance;
 			this._observeCurrentUser();
-		});
-
-		this.consumeContext(UMB_LOCALIZATION_CONTEXT, (instance) => {
-			instance.localizeMany(['user_yourProfile', 'general_edit', 'general_changePassword']).subscribe((value) => {
-				this._labelYourProfile = value[0];
-				this._labelEditProfile = value[1];
-				this._labelChangePassword = value[2];
-			});
 		});
 	}
 
@@ -72,12 +54,12 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-box .headline=${this._labelYourProfile}>
-				<uui-button look="primary" label=${this._labelEditProfile} @click=${this._edit}>
-					${this._labelEditProfile}
+			<uui-box .headline=${this.localize.term('user_yourProfile')}>
+				<uui-button look="primary" label=${this.localize.term('general_edit')} @click=${this._edit}>
+					${this.localize.term('general_edit')}
 				</uui-button>
-				<uui-button look="primary" label=${this._labelChangePassword} @click=${this._changePassword}>
-					${this._labelChangePassword}
+				<uui-button look="primary" label=${this.localize.term('general_changePassword')} @click=${this._changePassword}>
+					${this.localize.term('general_changePassword')}
 				</uui-button>
 			</uui-box>
 		`;

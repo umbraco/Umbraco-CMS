@@ -1,6 +1,6 @@
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context.js';
 import { UmbExtensionInitializer } from './extension.controller.js';
-import { UMB_LOCALIZATION_CONTEXT, UmbLocalizationContext } from '@umbraco-cms/backoffice/localization-api';
+import { UmbTranslationRegistry } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
@@ -40,14 +40,14 @@ export class UmbBackofficeElement extends UmbLitElement {
 		const extensionInitializer = new UmbExtensionInitializer(this, umbExtensionsRegistry);
 		extensionInitializer.setLocalPackages(CORE_PACKAGES);
 
-		const localizationContext = new UmbLocalizationContext(umbExtensionsRegistry);
-		this.provideContext(UMB_LOCALIZATION_CONTEXT, localizationContext);
-
+		const translationRegistry = new UmbTranslationRegistry(umbExtensionsRegistry);
+		translationRegistry.loadLanguage('en-us');
 		this.consumeContext(UMB_AUTH, (auth) => {
 			this.observe(
 				auth.languageIsoCode,
 				(currentLanguageIsoCode) => {
-					localizationContext.setLanguage(currentLanguageIsoCode);
+					translationRegistry.loadLanguage(currentLanguageIsoCode);
+					document.documentElement.lang = currentLanguageIsoCode;
 				},
 				'languageIsoCode'
 			);

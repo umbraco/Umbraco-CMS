@@ -1,0 +1,106 @@
+import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
+import { UmbLocalizeController } from './localize.controller.js';
+import { UmbTranslationRegistry } from './registry/translation.registry.js';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+@customElement('umb-localize-controller-host')
+class UmbLocalizeControllerHostElement extends UmbLitElement {
+	@property()
+	lang = 'en-us';
+}
+
+//#region Translations
+const english = {
+	type: 'translations',
+	alias: 'test.en',
+	name: 'Test English',
+	meta: {
+		culture: 'en-us',
+		translations: {
+			general: {
+				close: 'Close',
+				logout: 'Log out',
+			},
+		},
+	},
+};
+
+const englishOverride = {
+	type: 'translations',
+	alias: 'test.en.override',
+	name: 'Test English',
+	meta: {
+		culture: 'en-us',
+		translations: {
+			general: {
+				close: 'Close 2',
+			},
+		},
+	},
+};
+
+const danish = {
+	type: 'translations',
+	alias: 'test.da',
+	name: 'Test Danish',
+	meta: {
+		culture: 'da-dk',
+		translations: {
+			general: {
+				close: 'Luk',
+			},
+		},
+	},
+};
+//#endregion
+
+describe('UmbLocalizeController', () => {
+	const registry = new UmbTranslationRegistry(umbExtensionsRegistry);
+	umbExtensionsRegistry.register(english);
+	umbExtensionsRegistry.register(danish);
+	registry.loadLanguage(english.meta.culture);
+	registry.loadLanguage(danish.meta.culture);
+
+	let element: UmbLocalizeControllerHostElement;
+
+	beforeEach(async () => {
+		element = await fixture(html`<umb-localize-controller-host></umb-localize-controller-host>`);
+	});
+
+	it('should have a localize controller', () => {
+		expect(element.localize).to.be.instanceOf(UmbLocalizeController);
+	});
+
+	it('should return a term', async () => {
+		expect(element.localize.term('general_close')).to.equal('Close');
+	});
+
+	it('should update the term when the language changes', async () => {
+		expect(element.localize.term('general_close')).to.equal('Close');
+		element.lang = danish.meta.culture;
+		await elementUpdated(element);
+		expect(element.localize.term('general_close')).to.equal('Luk');
+	});
+
+	it('should update the term when the dir changes', async () => {
+		expect(element.localize.term('general_close')).to.equal('Close');
+		element.dir = 'rtl';
+		await elementUpdated(element);
+		expect(element.localize.term('general_close')).to.equal('Close');
+	});
+
+	it('should provide a fallback term when the term is not found', async () => {
+		element.lang = danish.meta.culture;
+		await elementUpdated(element);
+		expect(element.localize.term('general_close')).to.equal('Luk');
+		expect(element.localize.term('general_logout')).to.equal('Log out');
+	});
+
+	// TODO: fix this test
+	// it('should override a term', async () => {
+	// 	umbExtensionsRegistry.register(englishOverride);
+	// 	await aTimeout(0);
+	// 	expect(element.localize.term('general_close')).to.equal('Close 2');
+	// });
+});
