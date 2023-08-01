@@ -1,6 +1,6 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import {InterfaceColor, InterfaceLook} from "@umbraco-ui/uui";
+import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui';
 
 @customElement('umb-login-external')
 export class UmbLoginExternalElement extends LitElement {
@@ -16,51 +16,68 @@ export class UmbLoginExternalElement extends LitElement {
 	@property({ attribute: 'icon' })
 	icon = 'icon-lock';
 
-  @property({ attribute: 'button-look' })
-  buttonLook: InterfaceLook = 'outline';
+	@property({ attribute: 'button-look' })
+	buttonLook: InterfaceLook = 'outline';
 
-  @property({ attribute: 'button-color' })
-  buttonColor: InterfaceColor = 'default';
+	@property({ attribute: 'button-color' })
+	buttonColor: InterfaceColor = 'default';
 
-  @state()
-  protected externalComponent: HTMLElement | null = null;
+	@state()
+	protected externalComponent: HTMLElement | null = null;
 
-  @state()
-  protected loading = false;
+	@state()
+	protected loading = false;
 
-  connectedCallback() {
-    super.connectedCallback();
-    if (this.customView) {
-      this.loading = true;
-    }
-  }
-
-  async firstUpdated() {
-    await this.loadCustomView();
-    this.loading = false;
-  }
-
-  render() {
-		return this.loading ? html`<uui-button state="waiting" disabled label="Loading provider"></uui-button>` : (this.externalComponent ?? this.renderDefaultView());
+	connectedCallback() {
+		super.connectedCallback();
+		if (this.customView) {
+			this.loading = true;
+		}
 	}
 
-  protected renderDefaultView() {
-    return html`
-        <form method="post" action="${this.externalLoginUrl}">
-					<uui-button .look=${this.buttonLook} .color=${this.buttonColor}><uui-icon name=${this.icon}></uui-icon> Continue with ${this.name}</uui-button>
-				</form>
-    `;
-  }
+	async firstUpdated() {
+		await this.loadCustomView();
+		this.loading = false;
+	}
 
-  protected async loadCustomView() {
-    if (!this.customView) return;
-    const customViewModule = await import(this.customView);
-    const customView = customViewModule.default;
-    this.externalComponent = new customView();
-  }
+	render() {
+		return this.loading
+			? html`<uui-button state="waiting" disabled label="Loading provider"></uui-button>`
+			: this.externalComponent ?? this.renderDefaultView();
+	}
+
+	protected renderDefaultView() {
+		return html`
+			<form method="post" action="${this.externalLoginUrl}">
+				<uui-button .look=${this.buttonLook} .color=${this.buttonColor}>
+					<div><uui-icon name=${this.icon}></uui-icon> Continue with ${this.name}</div>
+				</uui-button>
+			</form>
+		`;
+	}
+
+	protected async loadCustomView() {
+		if (!this.customView) return;
+		const customViewModule = await import(this.customView);
+		const customView = customViewModule.default;
+		this.externalComponent = new customView();
+	}
 
 	static styles: CSSResultGroup = [
 		css`
+			uui-button {
+				width: 100%;
+				--uui-button-padding-top-factor: 1.5;
+				--uui-button-padding-bottom-factor: 1.5;
+			}
+			uui-button div {
+				position: absolute;
+				left: 9px;
+				margin: auto;
+				text-align: left;
+				top: 50%;
+				transform: translateY(-50%);
+			}
 			button {
 				font-size: var(--uui-button-font-size);
 				border: 1px solid var(--uui-color-border);
