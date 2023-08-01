@@ -72,43 +72,127 @@ describe('UmbLocalizeController', () => {
 		expect(element.localize).to.be.instanceOf(UmbLocalizeController);
 	});
 
-	it('should return a term', async () => {
-		expect(element.localize.term('general_close')).to.equal('Close');
+	describe('term', () => {
+		it('should return a term', async () => {
+			expect(element.localize.term('general_close')).to.equal('Close');
+		});
+
+		it('should update the term when the language changes', async () => {
+			expect(element.localize.term('general_close')).to.equal('Close');
+			// Load Danish
+			registry.loadLanguage(danish.meta.culture);
+			// Switch browser to Danish
+			element.lang = danish.meta.culture;
+
+			await elementUpdated(element);
+			expect(element.localize.term('general_close')).to.equal('Luk');
+		});
+
+		it('should update the term when the dir changes', async () => {
+			expect(element.localize.term('general_close')).to.equal('Close');
+			element.dir = 'rtl';
+			await elementUpdated(element);
+			expect(element.localize.term('general_close')).to.equal('Close');
+		});
+
+		it('should provide a fallback term when the term is not found', async () => {
+			// Load Danish
+			registry.loadLanguage(danish.meta.culture);
+			// Switch browser to Danish
+			element.lang = danish.meta.culture;
+			await elementUpdated(element);
+			expect(element.localize.term('general_close')).to.equal('Luk');
+			expect(element.localize.term('general_logout')).to.equal('Log out');
+		});
+
+		it('should override a term if new extension is registered', async () => {
+			umbExtensionsRegistry.register(englishOverride);
+			// Let the registry load the new extension
+			await aTimeout(0);
+			await elementUpdated(element);
+			expect(element.localize.term('general_close')).to.equal('Close 2');
+		});
 	});
 
-	it('should update the term when the language changes', async () => {
-		expect(element.localize.term('general_close')).to.equal('Close');
-		// Load Danish
-		registry.loadLanguage(danish.meta.culture);
-		// Switch browser to Danish
-		element.lang = danish.meta.culture;
+	describe('date', () => {
+		it('should return a date', async () => {
+			expect(element.localize.date(new Date(2020, 0, 1))).to.equal('1/1/2020');
+		});
 
-		await elementUpdated(element);
-		expect(element.localize.term('general_close')).to.equal('Luk');
+		it('should accept a string input', async () => {
+			expect(element.localize.date('2020-01-01')).to.equal('1/1/2020');
+		});
+
+		it('should update the date when the language changes', async () => {
+			expect(element.localize.date(new Date(2020, 11, 31))).to.equal('12/31/2020');
+
+			// Switch browser to Danish
+			element.lang = danish.meta.culture;
+
+			await elementUpdated(element);
+			expect(element.localize.date(new Date(2020, 11, 31))).to.equal('31.12.2020');
+		});
+
+		it('should update the date when the dir changes', async () => {
+			expect(element.localize.date(new Date(2020, 11, 31))).to.equal('12/31/2020');
+			element.dir = 'rtl';
+			await elementUpdated(element);
+			expect(element.localize.date(new Date(2020, 11, 31))).to.equal('12/31/2020');
+		});
+
+		it('should return a date with a custom format', async () => {
+			expect(
+				element.localize.date(new Date(2020, 11, 31), { month: 'long', day: '2-digit', year: 'numeric' })
+			).to.equal('December 31, 2020');
+		});
 	});
 
-	it('should update the term when the dir changes', async () => {
-		expect(element.localize.term('general_close')).to.equal('Close');
-		element.dir = 'rtl';
-		await elementUpdated(element);
-		expect(element.localize.term('general_close')).to.equal('Close');
+	describe('number', () => {
+		it('should return a number', async () => {
+			expect(element.localize.number(123456.789)).to.equal('123,456.789');
+		});
+
+		it('should accept a string input', async () => {
+			expect(element.localize.number('123456.789')).to.equal('123,456.789');
+		});
+
+		it('should update the number when the language changes', async () => {
+			expect(element.localize.number(123456.789)).to.equal('123,456.789');
+
+			// Switch browser to Danish
+			element.lang = danish.meta.culture;
+
+			await elementUpdated(element);
+			expect(element.localize.number(123456.789)).to.equal('123.456,789');
+		});
+
+		it('should update the number when the dir changes', async () => {
+			expect(element.localize.number(123456.789)).to.equal('123,456.789');
+			element.dir = 'rtl';
+			await elementUpdated(element);
+			expect(element.localize.number(123456.789)).to.equal('123,456.789');
+		});
+
+		it('should return a number with a custom format', async () => {
+			expect(element.localize.number(123456.789, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).to.equal(
+				'123,456.79'
+			);
+		});
 	});
 
-	it('should provide a fallback term when the term is not found', async () => {
-		// Load Danish
-		registry.loadLanguage(danish.meta.culture);
-		// Switch browser to Danish
-		element.lang = danish.meta.culture;
-		await elementUpdated(element);
-		expect(element.localize.term('general_close')).to.equal('Luk');
-		expect(element.localize.term('general_logout')).to.equal('Log out');
-	});
+	describe('relative time', () => {
+		it('should return a relative time', async () => {
+			expect(element.localize.relativeTime(2, 'days')).to.equal('in 2 days');
+		});
 
-	it('should override a term if new extension is registered', async () => {
-		umbExtensionsRegistry.register(englishOverride);
-		// Let the registry load the new extension
-		await aTimeout(0);
-		await elementUpdated(element);
-		expect(element.localize.term('general_close')).to.equal('Close 2');
+		it('should update the relative time when the language changes', async () => {
+			expect(element.localize.relativeTime(2, 'days')).to.equal('in 2 days');
+
+			// Switch browser to Danish
+			element.lang = danish.meta.culture;
+
+			await elementUpdated(element);
+			expect(element.localize.relativeTime(2, 'days')).to.equal('om 2 dage');
+		});
 	});
 });
