@@ -6,10 +6,6 @@ import { ManifestDashboard, umbExtensionsRegistry } from '@umbraco-cms/backoffic
 @customElement('umb-test-extension-slot-manifest-element')
 class UmbTestExtensionSlotManifestElement extends HTMLElement {}
 
-function sleep(ms: number) {
-	return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 describe('UmbExtensionSlotElement', () => {
 	let element: UmbExtensionSlotElement;
 
@@ -74,7 +70,7 @@ describe('UmbExtensionSlotElement', () => {
 					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}></umb-extension-slot>`
 			);
 
-			await sleep(0);
+			await element.updateComplete;
 
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
 		});
@@ -88,12 +84,27 @@ describe('UmbExtensionSlotElement', () => {
 				</umb-extension-slot>`
 			);
 
-			await sleep(0);
+			await element.updateComplete;
 
 			expect(element.shadowRoot!.firstElementChild?.nodeName).to.be.equal('BLA');
 			expect(element.shadowRoot!.firstElementChild?.firstElementChild).to.be.instanceOf(
 				UmbTestExtensionSlotManifestElement
 			);
+		});
+
+		it('parses the props', async () => {
+			element = await fixture(
+				html` <umb-extension-slot
+					type="dashboard"
+					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}
+					.props=${{ testProp: 'fooBar' }}>
+				</umb-extension-slot>`
+			);
+
+			await element.updateComplete;
+
+			expect((element.shadowRoot!.firstElementChild as any).testProp).to.be.equal('fooBar');
+			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
 		});
 	});
 });
