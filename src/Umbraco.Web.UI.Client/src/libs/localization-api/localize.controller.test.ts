@@ -97,10 +97,9 @@ describe('UmbLocalizeController', () => {
 		expect(element.localize.term('general_logout')).to.equal('Log out');
 	});
 
-	// TODO: fix this test
-	// it('should override a term', async () => {
-	// 	umbExtensionsRegistry.register(englishOverride);
-	// 	await aTimeout(0);
-	// 	expect(element.localize.term('general_close')).to.equal('Close 2');
-	// });
+	it('should override a term', async () => {
+		umbExtensionsRegistry.register(englishOverride);
+		await aTimeout(0);
+		expect(element.localize.term('general_close')).to.equal('Close 2');
+	});
 });

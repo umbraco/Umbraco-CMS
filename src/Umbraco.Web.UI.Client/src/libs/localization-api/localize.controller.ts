@@ -75,7 +75,6 @@ export class UmbLocalizeController<UserTranslation extends Translation = Default
 		} else if (fallback && fallback[key as keyof Translation]) {
 			term = fallback[key as keyof Translation];
 		} else {
-			console.error(`No translation found for: ${String(key)}`);
 			return String(key);
 		}
 
