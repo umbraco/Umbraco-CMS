@@ -9,8 +9,6 @@ import {
 	UMB_EXPORT_DICTIONARY_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 
-import './export-dictionary-modal.element.js';
-
 export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryRepository> {
 	static styles = [UUITextStyles];
 

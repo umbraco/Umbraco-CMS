@@ -1,1 +1,1 @@
-export * from './section-views.element.js';
+export type * from './section-views.element.js';
