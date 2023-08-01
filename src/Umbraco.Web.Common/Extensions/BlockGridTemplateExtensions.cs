@@ -14,6 +14,7 @@ public static class BlockGridTemplateExtensions
     public const string DefaultTemplate = "default";
     public const string DefaultItemsTemplate = "items";
     public const string DefaultItemAreasTemplate = "areas";
+    public const string DefaultItemAreaTemplate = "area";
 
     #region Async
 
@@ -29,7 +30,7 @@ public static class BlockGridTemplateExtensions
     /// The partial views are found in "/src/Umbraco.Cms.StaticAssets/Views/Partials/blockgrid/" on GitHub and should
     /// be copied to "Views/Partials/BlockGrid/" on your local disk.
     /// </remarks>
-    /// <seealso href="https://our.umbraco.com/documentation/Fundamentals/Backoffice/Property-Editors/Built-in-Property-Editors/Block-Editor/Block-Grid-Editor/#1-default-rendering"/>
+    /// <seealso href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/property-editors/built-in-umbraco-property-editors/block-editor/block-grid-editor#1.-default-rendering"/>
     public static async Task<IHtmlContent> GetBlockGridHtmlAsync(this IHtmlHelper html, BlockGridModel? model, string template = DefaultTemplate)
     {
         if (model?.Count == 0)
@@ -59,6 +60,20 @@ public static class BlockGridTemplateExtensions
 
     public static async Task<IHtmlContent> GetBlockGridItemAreasHtmlAsync(this IHtmlHelper html, BlockGridItem item, string template = DefaultItemAreasTemplate)
         => await html.PartialAsync(DefaultFolderTemplate(template), item);
+
+    public static async Task<IHtmlContent> GetBlockGridItemAreaHtmlAsync(this IHtmlHelper html, BlockGridArea area, string template = DefaultItemAreaTemplate)
+        => await html.PartialAsync(DefaultFolderTemplate(template), area);
+
+    public static async Task<IHtmlContent> GetBlockGridItemAreaHtmlAsync(this IHtmlHelper html, BlockGridItem item, string areaAlias, string template = DefaultItemAreaTemplate)
+    {
+        BlockGridArea? area = item.Areas.FirstOrDefault(a => a.Alias == areaAlias);
+        if (area == null)
+        {
+            return new HtmlString(string.Empty);
+        }
+
+        return await GetBlockGridItemAreaHtmlAsync(html, area, template);
+    }
 
     #endregion
 
@@ -94,6 +109,17 @@ public static class BlockGridTemplateExtensions
 
     public static IHtmlContent GetBlockGridItemAreasHtml(this IHtmlHelper html, BlockGridItem item, string template = DefaultItemAreasTemplate)
         => html.Partial(DefaultFolderTemplate(template), item);
+
+    public static IHtmlContent GetBlockGridItemAreaHtml(this IHtmlHelper html, BlockGridArea area, string template = DefaultItemAreaTemplate)
+        => html.Partial(DefaultFolderTemplate(template), area);
+
+    public static IHtmlContent GetBlockGridItemAreaHtml(this IHtmlHelper html, BlockGridItem item, string areaAlias, string template = DefaultItemAreaTemplate)
+    {
+        BlockGridArea? area = item.Areas.FirstOrDefault(a => a.Alias == areaAlias);
+        return area != null
+            ? GetBlockGridItemAreaHtml(html, area, template)
+            : new HtmlString(string.Empty);
+    }
 
     #endregion
 

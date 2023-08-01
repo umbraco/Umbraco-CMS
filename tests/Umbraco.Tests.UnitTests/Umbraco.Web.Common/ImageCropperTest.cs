@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -202,7 +201,7 @@ public class ImageCropperTest
     {
         var cropDataSet = CropperJson1.DeserializeImageCropperValue();
         var urlString = cropDataSet.GetCropUrl("thumb", new TestImageUrlGenerator());
-        Assert.AreEqual("?c=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&w=100&h=100", urlString);
+        Assert.AreEqual("/media/1005/img_0671.jpg?c=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&w=100&h=100", urlString);
     }
 
     /// <summary>

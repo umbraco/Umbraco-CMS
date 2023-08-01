@@ -3,12 +3,19 @@ import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 test.describe('Media', () => {
 
-    test.beforeEach(async ({page, umbracoApi, umbracoUi}) => {
+    test.beforeEach(async ({page, umbracoApi, umbracoUi}, testInfo) => {
+        await umbracoApi.report.report(testInfo);
         await umbracoApi.login();
         await umbracoUi.goToSection(ConstantHelper.sections.media);
-        await umbracoApi.media.deleteAllMedia()
+        await umbracoApi.media.deleteAllMedia();
+        await umbracoApi.media.clearRecycleBin();
     });
-    
+
+    test.afterEach(async ({page, umbracoApi, umbracoUi}, testInfo) => {
+        await umbracoApi.media.deleteAllMedia();
+        await umbracoApi.media.clearRecycleBin();
+    });
+
     test('move one of each Files into a Folder', async ({page, umbracoApi, umbracoUi}) => {
         const articleName = 'ArticleToMove';
         const audioName = 'AudioToMove';
@@ -18,7 +25,7 @@ test.describe('Media', () => {
         const vectorGraphicsName = 'VectorGraphicsToMove';
         const videoName = 'VideoToMove';
         const folderToMoveTooName = 'MoveHere';
-        
+
         const mediaFileTypes = [
             {fileTypeNames: articleName},
             {fileTypeNames: audioName},
@@ -27,10 +34,7 @@ test.describe('Media', () => {
             {fileTypeNames: vectorGraphicsName},
             {fileTypeNames: videoName}
         ];
-        
-        await umbracoApi.media.deleteAllFiles(articleName,audioName,fileName,folderName,imageName,vectorGraphicsName,videoName);
-        await umbracoApi.media.ensureNameNotExists(folderToMoveTooName);
-        
+
         // Action
         await umbracoApi.media.createAllFileTypes(articleName, audioName, fileName, folderName, imageName, vectorGraphicsName, videoName);
         await umbracoApi.media.createDefaultFolder(folderToMoveTooName);
@@ -49,29 +53,22 @@ test.describe('Media', () => {
         await page.locator('[label-key="actions_move"]').click();
         await page.locator('[data-element="editor-container"] >> "' + folderToMoveTooName + '"').click();
         await page.locator('[label-key="general_submit"]').click();
-  
+
         // Assert
         // Needs to wait before refreshing the media tree, otherwise the media files wont be moved to the folder yet
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(2500);
         await umbracoUi.refreshMediaTree();
         await page.locator('[data-element="tree-item-' + folderToMoveTooName + '"]').click();
         for (const names of mediaFileTypes) {
             await expect(page.locator('[data-element="media-grid"]', {hasText: names.fileTypeNames})).toBeVisible();
         }
         await expect(page.locator(".umb-folder-grid", {hasText: folderName})).toBeVisible();
-
-        // Clean
-        await umbracoApi.media.deleteAllFiles(articleName, audioName, fileName, folderName, imageName, vectorGraphicsName, videoName);
-        await umbracoApi.media.ensureNameNotExists(folderToMoveTooName);
     });
-    
+
     test('sort by Name', async ({page, umbracoApi, umbracoUi}) => {
         const FolderNameA = 'A';
         const FolderNameB = 'B';
         const FolderNameC = 'C';
-        await umbracoApi.media.ensureNameNotExists(FolderNameA);
-        await umbracoApi.media.ensureNameNotExists(FolderNameB);
-        await umbracoApi.media.ensureNameNotExists(FolderNameC);
 
         // Action
         await umbracoApi.media.createDefaultFolder(FolderNameC);
@@ -87,16 +84,10 @@ test.describe('Media', () => {
         // Assert
         const item = await page.locator('[ui-sortable="vm.sortableOptions"]').locator("xpath=/*[1]")
         await expect(item).toContainText(FolderNameA);
-
-        // Clean
-        await umbracoApi.media.ensureNameNotExists(FolderNameA);
-        await umbracoApi.media.ensureNameNotExists(FolderNameB);
-        await umbracoApi.media.ensureNameNotExists(FolderNameC);
     });
 
     test('search after a specific Folder', async ({page, umbracoApi, umbracoUi}) => {
         const FolderSearchName = 'SearchMe';
-        await umbracoApi.media.ensureNameNotExists(FolderSearchName);
 
         // Action
         await umbracoApi.media.createDefaultFolder(FolderSearchName)
@@ -105,16 +96,11 @@ test.describe('Media', () => {
 
         // Assert
         await expect(page.locator(".umb-folder-grid__folder-description", {hasText: FolderSearchName})).toBeVisible();
-
-        // Clean
-        await umbracoApi.media.ensureNameNotExists(FolderSearchName);
     });
 
     test('change Grid to List', async ({page, umbracoApi, umbracoUi}) => {
         const FolderOneName = 'FolderOne';
         const FolderTwoName = 'FolderTwo';
-        await umbracoApi.media.ensureNameNotExists(FolderOneName);
-        await umbracoApi.media.ensureNameNotExists(FolderTwoName);
 
         // Action
         await umbracoApi.media.createDefaultFolder(FolderOneName);
@@ -125,17 +111,11 @@ test.describe('Media', () => {
 
         // Assert
         await expect(page.locator('[icon="icon-list"]')).toBeVisible();
-
-        // Clean
-        await umbracoApi.media.ensureNameNotExists(FolderOneName);
-        await umbracoApi.media.ensureNameNotExists(FolderTwoName);
     });
 
     test('change List to Grid', async ({page, umbracoApi, umbracoUi}) => {
         const FolderOneName = 'FolderOne';
         const FolderTwoName = 'FolderTwo';
-        await umbracoApi.media.ensureNameNotExists(FolderOneName);
-        await umbracoApi.media.ensureNameNotExists(FolderTwoName);
 
         // Action
         await umbracoApi.media.createDefaultFolder(FolderOneName);
@@ -149,9 +129,5 @@ test.describe('Media', () => {
 
         // Assert
         await expect(page.locator('[icon="icon-thumbnails-small"]')).toBeVisible();
-
-        // Clean
-        await umbracoApi.media.ensureNameNotExists(FolderOneName);
-        await umbracoApi.media.ensureNameNotExists(FolderTwoName);
     });
 });

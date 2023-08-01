@@ -49,6 +49,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 [ParameterSwapControllerActionSelector(nameof(GetChildren), "id", typeof(int), typeof(Guid), typeof(Udi))]
 public class MediaController : ContentControllerBase
 {
+    private static readonly Semaphore _postAddFileSemaphore = new(1, 1);
     private readonly AppCaches _appCaches;
     private readonly IAuthorizationService _authorizationService;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
@@ -574,245 +575,276 @@ public class MediaController : ContentControllerBase
     public async Task<IActionResult> PostAddFile([FromForm] string path, [FromForm] string currentFolder,
         [FromForm] string contentTypeAlias, List<IFormFile> file)
     {
-        var root = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
-        //ensure it exists
-        Directory.CreateDirectory(root);
-
-        //must have a file
-        if (file.Count == 0)
+        await _postAddFileSemaphore.WaitOneAsync();
+        try
         {
-            return NotFound();
-        }
+            var root = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
+            //ensure it exists
+            Directory.CreateDirectory(root);
 
-        //get the string json from the request
-        ActionResult<int?>? parentIdResult = await GetParentIdAsIntAsync(currentFolder, true);
-        if (!(parentIdResult?.Result is null))
-        {
-            return parentIdResult.Result;
-        }
-
-        var parentId = parentIdResult?.Value;
-        if (!parentId.HasValue)
-        {
-            return NotFound("The passed id doesn't exist");
-        }
-
-        var tempFiles = new PostedFiles();
-
-        //in case we pass a path with a folder in it, we will create it and upload media to it.
-        if (!string.IsNullOrEmpty(path))
-        {
-            if (!IsFolderCreationAllowedHere(parentId.Value))
+            //must have a file
+            if (file is null || file.Count == 0)
             {
-                AddCancelMessage(tempFiles, _localizedTextService.Localize("speechBubbles", "folderUploadNotAllowed"));
-                return Ok(tempFiles);
+                _postAddFileSemaphore.Release();
+                return NotFound("No file was uploaded");
             }
 
-            var folders = path.Split(Constants.CharArrays.ForwardSlash);
-
-            for (var i = 0; i < folders.Length - 1; i++)
+            //get the string json from the request
+            ActionResult<int?>? parentIdResult = await GetParentIdAsIntAsync(currentFolder, true);
+            if (!(parentIdResult?.Result is null))
             {
-                var folderName = folders[i];
-                IMedia? folderMediaItem;
+                _postAddFileSemaphore.Release();
+                return parentIdResult.Result;
+            }
 
-                //if uploading directly to media root and not a subfolder
-                if (parentId == Constants.System.Root)
+            var parentId = parentIdResult?.Value;
+            if (!parentId.HasValue)
+            {
+                _postAddFileSemaphore.Release();
+                return NotFound("The passed id doesn't exist");
+            }
+
+            var tempFiles = new PostedFiles();
+
+            //in case we pass a path with a folder in it, we will create it and upload media to it.
+            if (!string.IsNullOrEmpty(path))
+            {
+                if (!IsFolderCreationAllowedHere(parentId.Value))
                 {
-                    //look for matching folder
-                    folderMediaItem =
-                        _mediaService.GetRootMedia()?.FirstOrDefault(x =>
-                            x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
-                    if (folderMediaItem == null)
+                    AddCancelMessage(tempFiles, _localizedTextService.Localize("speechBubbles", "folderUploadNotAllowed"));
+                    _postAddFileSemaphore.Release();
+                    return Ok(tempFiles);
+                }
+
+                var folders = path.Split(Constants.CharArrays.ForwardSlash);
+
+                for (var i = 0; i < folders.Length - 1; i++)
+                {
+                    var folderName = folders[i];
+                    IMedia? folderMediaItem;
+
+                    //if uploading directly to media root and not a subfolder
+                    if (parentId == Constants.System.Root)
                     {
-                        //if null, create a folder
+                        //look for matching folder
                         folderMediaItem =
-                            _mediaService.CreateMedia(folderName, -1, Constants.Conventions.MediaTypes.Folder);
-                        _mediaService.Save(folderMediaItem);
-                    }
-                }
-                else
-                {
-                    //get current parent
-                    IMedia? mediaRoot = _mediaService.GetById(parentId.Value);
-
-                    //if the media root is null, something went wrong, we'll abort
-                    if (mediaRoot == null)
-                    {
-                        return Problem(
-                            "The folder: " + folderName + " could not be used for storing images, its ID: " + parentId +
-                            " returned null");
-                    }
-
-                    //look for matching folder
-                    folderMediaItem = FindInChildren(mediaRoot.Id, folderName, Constants.Conventions.MediaTypes.Folder);
-
-                    if (folderMediaItem == null)
-                    {
-                        //if null, create a folder
-                        folderMediaItem = _mediaService.CreateMedia(folderName, mediaRoot,
-                            Constants.Conventions.MediaTypes.Folder);
-                        _mediaService.Save(folderMediaItem);
-                    }
-                }
-
-                //set the media root to the folder id so uploaded files will end there.
-                parentId = folderMediaItem.Id;
-            }
-        }
-
-        var mediaTypeAlias = string.Empty;
-        var allMediaTypes = _mediaTypeService.GetAll().ToList();
-        var allowedContentTypes = new HashSet<IMediaType>();
-
-        if (parentId != Constants.System.Root)
-        {
-            IMedia? mediaFolderItem = _mediaService.GetById(parentId.Value);
-            IMediaType? mediaFolderType =
-                allMediaTypes.FirstOrDefault(x => x.Alias == mediaFolderItem?.ContentType.Alias);
-
-            if (mediaFolderType != null)
-            {
-                IMediaType? mediaTypeItem = null;
-
-                if (mediaFolderType.AllowedContentTypes is not null)
-                {
-                    foreach (ContentTypeSort allowedContentType in mediaFolderType.AllowedContentTypes)
-                    {
-                        IMediaType? checkMediaTypeItem =
-                            allMediaTypes.FirstOrDefault(x => x.Id == allowedContentType.Id.Value);
-                        if (checkMediaTypeItem is not null)
+                            _mediaService.GetRootMedia()?.FirstOrDefault(x =>
+                                x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
+                        if (folderMediaItem == null)
                         {
-                            allowedContentTypes.Add(checkMediaTypeItem);
-                        }
-
-                        IPropertyType? fileProperty =
-                            checkMediaTypeItem?.CompositionPropertyTypes.FirstOrDefault(x =>
-                                x.Alias == Constants.Conventions.Media.File);
-                        if (fileProperty != null)
-                        {
-                            mediaTypeItem = checkMediaTypeItem;
+                            //if null, create a folder
+                            folderMediaItem =
+                                _mediaService.CreateMedia(folderName, -1, Constants.Conventions.MediaTypes.Folder);
+                            _mediaService.Save(folderMediaItem);
                         }
                     }
-                }
+                    else
+                    {
+                        //get current parent
+                        IMedia? mediaRoot = _mediaService.GetById(parentId.Value);
 
-                //Only set the permission-based mediaType if we only allow 1 specific file under this parent.
-                if (allowedContentTypes.Count == 1 && mediaTypeItem != null)
-                {
-                    mediaTypeAlias = mediaTypeItem.Alias;
+                        //if the media root is null, something went wrong, we'll abort
+                        if (mediaRoot == null)
+                        {
+                            _postAddFileSemaphore.Release();
+                            return Problem(
+                                "The folder: " + folderName + " could not be used for storing images, its ID: " + parentId +
+                                " returned null");
+                        }
+
+                        //look for matching folder
+                        folderMediaItem = FindInChildren(mediaRoot.Id, folderName, Constants.Conventions.MediaTypes.Folder);
+
+                        if (folderMediaItem == null)
+                        {
+                            //if null, create a folder
+                            folderMediaItem = _mediaService.CreateMedia(folderName, mediaRoot,
+                                Constants.Conventions.MediaTypes.Folder);
+                            _mediaService.Save(folderMediaItem);
+                        }
+                    }
+
+                    //set the media root to the folder id so uploaded files will end there.
+                    parentId = folderMediaItem.Id;
                 }
             }
-        }
-        else
-        {
-            var typesAllowedAtRoot = allMediaTypes.Where(x => x.AllowedAsRoot).ToList();
-            allowedContentTypes.UnionWith(typesAllowedAtRoot);
-        }
 
-        //get the files
-        foreach (IFormFile formFile in file)
-        {
-            var fileName = formFile.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
-            var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
-            var ext = safeFileName[(safeFileName.LastIndexOf('.') + 1)..].ToLowerInvariant();
+            var mediaTypeAlias = string.Empty;
+            var allMediaTypes = _mediaTypeService.GetAll().ToList();
+            var allowedContentTypes = new HashSet<IMediaType>();
 
-            if (!_contentSettings.IsFileAllowedForUpload(ext))
+            if (parentId != Constants.System.Root)
             {
-                tempFiles.Notifications.Add(new BackOfficeNotification(
-                    _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
-                    _localizedTextService.Localize("media", "disallowedFileType"),
-                    NotificationStyle.Warning));
-                continue;
-            }
+                IMedia? mediaFolderItem = _mediaService.GetById(parentId.Value);
+                IMediaType? mediaFolderType =
+                    allMediaTypes.FirstOrDefault(x => x.Alias == mediaFolderItem?.ContentType.Alias);
 
-            if (string.IsNullOrEmpty(mediaTypeAlias))
-            {
-                mediaTypeAlias = Constants.Conventions.MediaTypes.File;
-
-                if (contentTypeAlias == Constants.Conventions.MediaTypes.AutoSelect)
+                if (mediaFolderType != null)
                 {
-                    // Look up MediaTypes
-                    foreach (IMediaType mediaTypeItem in allMediaTypes)
+                    IMediaType? mediaTypeItem = null;
+
+                    if (mediaFolderType.AllowedContentTypes is not null)
                     {
-                        IPropertyType? fileProperty =
-                            mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x =>
-                                x.Alias == Constants.Conventions.Media.File);
-                        if (fileProperty == null)
+                        foreach (ContentTypeSort allowedContentType in mediaFolderType.AllowedContentTypes)
                         {
-                            continue;
+                            IMediaType? checkMediaTypeItem =
+                                allMediaTypes.FirstOrDefault(x => x.Id == allowedContentType.Id.Value);
+                            if (checkMediaTypeItem is not null)
+                            {
+                                allowedContentTypes.Add(checkMediaTypeItem);
+                            }
+
+                            IPropertyType? fileProperty =
+                                checkMediaTypeItem?.CompositionPropertyTypes.FirstOrDefault(x =>
+                                    x.Alias == Constants.Conventions.Media.File);
+                            if (fileProperty != null)
+                            {
+                                mediaTypeItem = checkMediaTypeItem;
+                            }
                         }
+                    }
 
-                        Guid dataTypeKey = fileProperty.DataTypeKey;
-                        IDataType? dataType = _dataTypeService.GetDataType(dataTypeKey);
-
-                        if (dataType == null ||
-                            dataType.Configuration is not IFileExtensionsConfig fileExtensionsConfig)
-                        {
-                            continue;
-                        }
-
-                        List<FileExtensionConfigItem>? fileExtensions = fileExtensionsConfig.FileExtensions;
-                        if (fileExtensions == null || fileExtensions.All(x => x.Value != ext))
-                        {
-                            continue;
-                        }
-
+                    //Only set the permission-based mediaType if we only allow 1 specific file under this parent.
+                    if (allowedContentTypes.Count == 1 && mediaTypeItem != null)
+                    {
                         mediaTypeAlias = mediaTypeItem.Alias;
-                        break;
-                    }
-
-                    // If media type is still File then let's check if it's an image.
-                    if (mediaTypeAlias == Constants.Conventions.MediaTypes.File &&
-                        _imageUrlGenerator.IsSupportedImageFormat(ext))
-                    {
-                        mediaTypeAlias = Constants.Conventions.MediaTypes.Image;
                     }
                 }
-                else
+            }
+            else
+            {
+                var typesAllowedAtRoot = allMediaTypes.Where(x => x.AllowedAsRoot).ToList();
+                allowedContentTypes.UnionWith(typesAllowedAtRoot);
+            }
+
+            //get the files
+            foreach (IFormFile formFile in file)
+            {
+                var fileName = formFile.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
+                var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
+                var ext = safeFileName[(safeFileName.LastIndexOf('.') + 1)..].ToLowerInvariant();
+
+                if (!_contentSettings.IsFileAllowedForUpload(ext))
                 {
-                    mediaTypeAlias = contentTypeAlias;
+                    tempFiles.Notifications.Add(new BackOfficeNotification(
+                        _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
+                        _localizedTextService.Localize("media", "disallowedFileType"),
+                        NotificationStyle.Warning));
+                    continue;
+                }
+
+                if (string.IsNullOrEmpty(mediaTypeAlias))
+                {
+                    mediaTypeAlias = Constants.Conventions.MediaTypes.File;
+
+                    if (contentTypeAlias == Constants.Conventions.MediaTypes.AutoSelect)
+                    {
+                        // Look up MediaTypes
+                        foreach (IMediaType mediaTypeItem in allMediaTypes)
+                        {
+                            IPropertyType? fileProperty =
+                                mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x =>
+                                    x.Alias == Constants.Conventions.Media.File);
+                            if (fileProperty == null)
+                            {
+                                continue;
+                            }
+
+                            Guid dataTypeKey = fileProperty.DataTypeKey;
+                            IDataType? dataType = _dataTypeService.GetDataType(dataTypeKey);
+
+                            if (dataType == null ||
+                                dataType.Configuration is not IFileExtensionsConfig fileExtensionsConfig)
+                            {
+                                continue;
+                            }
+
+                            List<FileExtensionConfigItem>? fileExtensions = fileExtensionsConfig.FileExtensions;
+                            if (fileExtensions == null || fileExtensions.All(x => x.Value != ext))
+                            {
+                                continue;
+                            }
+
+                            mediaTypeAlias = mediaTypeItem.Alias;
+                            break;
+                        }
+
+                        // If media type is still File then let's check if it's an imageor a custom image type.
+                        if (mediaTypeAlias == Constants.Conventions.MediaTypes.File &&
+                            _imageUrlGenerator.IsSupportedImageFormat(ext))
+                        {
+                            if (allowedContentTypes.Any(mt => mt.Alias == Constants.Conventions.MediaTypes.Image))
+                        {
+                            mediaTypeAlias = Constants.Conventions.MediaTypes.Image;
+                        }
+                        else
+                        {
+                            IMediaType? customType = allowedContentTypes.FirstOrDefault(mt =>
+                                mt.CompositionPropertyTypes.Any(pt =>
+                                    pt.PropertyEditorAlias == Constants.PropertyEditors.Aliases.ImageCropper));
+
+                            if (customType is not null)
+                            {
+                                mediaTypeAlias = customType.Alias;
+                            }
+                        }
+                        }
+                    }
+                    else
+                    {
+                        mediaTypeAlias = contentTypeAlias;
+                    }
+                }
+
+                if (allowedContentTypes.Any(x => x.Alias == mediaTypeAlias) == false)
+                {
+                    tempFiles.Notifications.Add(new BackOfficeNotification(
+                        _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
+                        _localizedTextService.Localize("media", "disallowedMediaType", new[] { mediaTypeAlias }),
+                        NotificationStyle.Warning));
+                    continue;
+                }
+
+                var mediaItemName = fileName.ToFriendlyName();
+
+                IMedia createdMediaItem = _mediaService.CreateMedia(mediaItemName, parentId.Value, mediaTypeAlias,
+                    _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+
+                await using (Stream stream = formFile.OpenReadStream())
+                {
+                    createdMediaItem.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper,
+                        _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, fileName, stream);
+                }
+
+                Attempt<OperationResult?> saveResult = _mediaService.Save(createdMediaItem,
+                    _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+                if (saveResult == false)
+                {
+                    AddCancelMessage(tempFiles,
+                        _localizedTextService.Localize("speechBubbles", "operationCancelledText") + " -- " + mediaItemName);
                 }
             }
 
-            if (allowedContentTypes.Any(x => x.Alias == mediaTypeAlias) == false)
+            //Different response if this is a 'blueimp' request
+            if (HttpContext.Request.Query.Any(x => x.Key == "origin"))
             {
-                tempFiles.Notifications.Add(new BackOfficeNotification(
-                    _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
-                    _localizedTextService.Localize("media", "disallowedMediaType", new[] { mediaTypeAlias }),
-                    NotificationStyle.Warning));
-                continue;
+                KeyValuePair<string, StringValues> origin = HttpContext.Request.Query.First(x => x.Key == "origin");
+                if (origin.Value == "blueimp")
+                {
+                    _postAddFileSemaphore.Release();
+                    return new JsonResult(tempFiles); //Don't output the angular xsrf stuff, blue imp doesn't like that
+                }
             }
 
-            var mediaItemName = fileName.ToFriendlyName();
-
-            IMedia createdMediaItem = _mediaService.CreateMedia(mediaItemName, parentId.Value, mediaTypeAlias,
-                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
-
-            await using (Stream stream = formFile.OpenReadStream())
-            {
-                createdMediaItem.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper,
-                    _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, fileName, stream);
-            }
-
-            Attempt<OperationResult?> saveResult = _mediaService.Save(createdMediaItem,
-                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
-            if (saveResult == false)
-            {
-                AddCancelMessage(tempFiles,
-                    _localizedTextService.Localize("speechBubbles", "operationCancelledText") + " -- " + mediaItemName);
-            }
+            _postAddFileSemaphore.Release();
+            return Ok(tempFiles);
         }
-
-        //Different response if this is a 'blueimp' request
-        if (HttpContext.Request.Query.Any(x => x.Key == "origin"))
+        catch (Exception ex)
         {
-            KeyValuePair<string, StringValues> origin = HttpContext.Request.Query.First(x => x.Key == "origin");
-            if (origin.Value == "blueimp")
-            {
-                return new JsonResult(tempFiles); //Don't output the angular xsrf stuff, blue imp doesn't like that
-            }
+            _postAddFileSemaphore.Release();
+            _logger.LogError(ex, "Something went wrong adding files");
+            throw;
         }
-
-        return Ok(tempFiles);
     }
 
     private bool IsFolderCreationAllowedHere(int parentId)

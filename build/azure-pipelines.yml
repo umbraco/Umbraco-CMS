@@ -23,7 +23,7 @@ parameters:
     default: false
 
 variables:
-  nodeVersion: 16.17.0
+  nodeVersion: 18.16.0
   dotnetVersion: 7.x
   dotnetIncludePreviewVersions: true
   solution: umbraco.sln
@@ -86,31 +86,16 @@ stages:
               arguments: '--configuration $(buildConfiguration) --no-restore -p:ContinuousIntegrationBuild=true'
           - script: |
               version="$(Build.BuildNumber)"
-              echo "varsion: $version"
+              echo "Version: $version"
 
               major="$(echo $version | cut -d '.' -f 1)"
-              echo "major version: $major"
+              echo "Major version: $major"
 
               echo "##vso[task.setvariable variable=majorVersion;isOutput=true]$major"
             displayName: Set major version
             name: determineMajorVersion
-          - task: PowerShell@2
-            displayName: Prepare nupkg
-            inputs:
-              targetType: inline
-              script: |
-                $umbracoVersion = "$(Build.BuildNumber)" -replace "\+",".g"
-                $templatePaths = Get-ChildItem 'templates/**/.template.config/template.json'
-
-                foreach ($templatePath in $templatePaths) {
-                  $a = Get-Content $templatePath -Raw | ConvertFrom-Json
-                  if ($a.symbols -and $a.symbols.UmbracoVersion) {
-                    $a.symbols.UmbracoVersion.defaultValue = $umbracoVersion
-                    $a | ConvertTo-Json -Depth 32 | Set-Content $templatePath
-                  }
-                }
-
-                dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)/nupkg
+          - script: dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
+            displayName: Run dotnet pack
           - script: |
               sha="$(Build.SourceVersion)"
               sha=${sha:0:7}
@@ -146,7 +131,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                choco install docfx --version=2.59.2 -y
+                choco install docfx --version=2.59.4 -y
                 if ($lastexitcode -ne 0){
                     throw ("Error installing DocFX")
                 }
@@ -307,7 +292,7 @@ stages:
             Linux:
               vmImage: 'ubuntu-latest'
               testDb: SqlServer
-              connectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
+              connectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=true'
         pool:
           vmImage: $(vmImage)
         variables:
@@ -452,6 +437,8 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
             env:
               CI: true
+              CommitId: $(Build.SourceVersion)
+              AgentOs: $(Agent.OS)
           - pwsh: |
               docker logs $(dockerImageName) > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1
               docker stop $(dockerImageName)

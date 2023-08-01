@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource,
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, memberTypeResource,
         $filter, iconHelper, $q, $timeout, notificationsService,
         localizationService, editorService, eventsService, overlayService) {
 
@@ -158,6 +158,9 @@
                     items: ".umb-group-builder__property-sortable",
                     stop: (e, ui) => {
                         updatePropertiesSortOrder();
+
+                        // when a property is dropped we need to reset the requested tab hover alias
+                        scope.sortableRequestedTabAlias = undefined;
                     }
                 };
 
@@ -212,7 +215,7 @@
                             scope.sortableRequestedTabTimeout = $timeout(() => {
                                 scope.openTabAlias = scope.sortableRequestedTabAlias;
                                 scope.sortableRequestedTabTimeout = null;
-                                /* hack to update sortable positions when switching from one tab to another. 
+                                /* hack to update sortable positions when switching from one tab to another.
                                 without this sorting direct properties doesn't work correctly */
                                 scope.$apply();
                                 $('.umb-group-builder__ungrouped-properties .umb-group-builder__properties').sortable('refresh');
@@ -235,7 +238,7 @@
                 if (items && items.length <= 1) {
                     return;
                 }
-                
+
                 // update the moved item sort order to fit into where it is dragged
                 const movedItem = items[movedIndex];
 
@@ -247,8 +250,8 @@
                     movedItem.sortOrder = prevItem.sortOrder + 1;
                 }
 
-                /* After the above two items next to each other might have the same sort order 
-                 to prevent this we run through the rest of the 
+                /* After the above two items next to each other might have the same sort order
+                 to prevent this we run through the rest of the
                  items and update the sort order if they are next to each other.
                  This will make it possible to make gaps without the number being updated */
                 for (let i = movedIndex; i < items.length; i++) {
@@ -286,7 +289,12 @@
                 });
 
                 //use a different resource lookup depending on the content type type
-                var resourceLookup = scope.contentType === "documentType" ? contentTypeResource.getAvailableCompositeContentTypes : mediaTypeResource.getAvailableCompositeContentTypes;
+                var resourceLookup = mediaTypeResource.getAvailableCompositeContentTypes;
+                if (scope.contentType === "documentType") {
+                    resourceLookup = contentTypeResource.getAvailableCompositeContentTypes;
+                } else if (scope.contentType === "memberType") {
+                    resourceLookup = memberTypeResource.getAvailableCompositeContentTypes;
+                }
 
                 return resourceLookup(scope.model.id, selectedContentTypeAliases, propAliasesExisting).then(filteredAvailableCompositeTypes => {
                     scope.compositionsDialogModel.availableCompositeContentTypes.forEach(current => {
@@ -403,7 +411,12 @@
                             //merge composition with content type
 
                             //use a different resource lookup depending on the content type type
-                            var resourceLookup = scope.contentType === "documentType" ? contentTypeResource.getById : mediaTypeResource.getById;
+                            var resourceLookup = mediaTypeResource.getById;
+                            if (scope.contentType === "documentType") {
+                                resourceLookup = contentTypeResource.getById;
+                            } else if (scope.contentType === "memberType") {
+                                resourceLookup = memberTypeResource.getById;
+                            }
 
                             resourceLookup(selectedContentType.id).then(composition => {
                                 //based on the above filtering we shouldn't be able to select an invalid one, but let's be safe and
@@ -446,10 +459,19 @@
                     }
                 };
 
-                //select which resource methods to use, eg document Type or Media Type versions
-                var availableContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getAvailableCompositeContentTypes : mediaTypeResource.getAvailableCompositeContentTypes;
-                var whereUsedContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getWhereCompositionIsUsedInContentTypes : mediaTypeResource.getWhereCompositionIsUsedInContentTypes;
-                var countContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getCount : mediaTypeResource.getCount;
+                var availableContentTypeResource = mediaTypeResource.getAvailableCompositeContentTypes;
+                var whereUsedContentTypeResource = mediaTypeResource.getWhereCompositionIsUsedInContentTypes;
+                var countContentTypeResource = mediaTypeResource.getCount;
+
+                if (scope.contentType === "documentType") {
+                    availableContentTypeResource = contentTypeResource.getAvailableCompositeContentTypes;
+                    whereUsedContentTypeResource = contentTypeResource.getWhereCompositionIsUsedInContentTypes;
+                    countContentTypeResource = contentTypeResource.getCount;
+                } else if (scope.contentType === "memberType") {
+                    availableContentTypeResource = memberTypeResource.getAvailableCompositeContentTypes;
+                    whereUsedContentTypeResource = memberTypeResource.getWhereCompositionIsUsedInContentTypes;
+                    countContentTypeResource = memberTypeResource.getCount;
+                }
 
                 //get the currently assigned property type aliases - ensure we pass these to the server side filer
                 var propAliasesExisting = _.filter(_.flatten(_.map(scope.model.groups, g => {
@@ -545,7 +567,7 @@
 
                 const localizeMany = localizationService.localizeMany(['general_delete', 'contentTypeEditor_confirmDeleteTabNotice']);
                 const localize =  localizationService.localize('contentTypeEditor_confirmDeleteTabMessage',  [tabName]);
-                
+
                 $q.all([localizeMany, localize]).then(values => {
                     const translations = values[0];
                     const message = values[1];
@@ -749,7 +771,7 @@
 
                 const localizeMany = localizationService.localizeMany(['general_delete', 'contentTypeEditor_confirmDeleteGroupNotice']);
                 const localize =  localizationService.localize('contentTypeEditor_confirmDeleteGroupMessage',  [groupName]);
-                
+
                 $q.all([localizeMany, localize]).then(values => {
                     const translations = values[0];
                     const message = values[1];

@@ -38,12 +38,12 @@
         "groupKey": null
     };
 
-
     function BlockConfigurationController($scope, $element, $http, elementTypeResource, overlayService, localizationService, editorService, eventsService, udiService, dataTypeResource, umbRequestHelper) {
 
         var unsubscribe = [];
 
-        var vm = this;
+        const vm = this;
+
         vm.openBlock = null;
         vm.showSampleDataCTA = false;
 
@@ -57,6 +57,7 @@
             if (blockGroupModel.value == null) {
                 blockGroupModel.value = [];
             }
+
             vm.blockGroups = blockGroupModel.value;
 
             if (!$scope.model.value) {
@@ -72,12 +73,10 @@
             });
 
             loadElementTypes();
-
         }
 
-
         function loadElementTypes() {
-            return elementTypeResource.getAll().then(function (elementTypes) {
+            return elementTypeResource.getAll().then(elementTypes => {
                 vm.elementTypes = elementTypes;
             });
         }
@@ -90,13 +89,14 @@
                 }
             }
         }
+
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
         function removeReferencesToElementTypeKey(contentElementTypeKey) {
             // Clean up references to this one:
             $scope.model.value.forEach(blockType => {
                 blockType.areas.forEach(area => {
-                    area.specifiedAllowance = area.specifiedAllowance?.filter(allowance => 
+                    area.specifiedAllowance = area.specifiedAllowance?.filter(allowance =>
                         allowance.elementTypeKey !== contentElementTypeKey
                     ) || [];
                 });
@@ -107,54 +107,63 @@
             // Clean up references to this one:
             $scope.model.value.forEach(blockType => {
                 blockType.areas.forEach(area => {
-                    area.specifiedAllowance = area.specifiedAllowance?.filter(allowance => 
+                    area.specifiedAllowance = area.specifiedAllowance?.filter(allowance =>
                         allowance.groupKey !== groupKey
                     ) || [];
                 });
             });
         }
 
-        vm.requestRemoveBlockByIndex = function (index) {
-            localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockTypeMessage", "blockEditor_confirmDeleteBlockTypeNotice"]).then(function (data) {
+        vm.requestRemoveBlockByIndex = function (index, event) {
+
+            const labelKeys = [
+              "general_delete",
+              "blockEditor_confirmDeleteBlockTypeMessage",
+              "blockEditor_confirmDeleteBlockTypeNotice"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(data => {
                 var contentElementType = vm.getElementTypeByKey($scope.model.value[index].contentElementTypeKey);
                 overlayService.confirmDelete({
                     title: data[0],
                     content: localizationService.tokenReplace(data[1], [contentElementType ? contentElementType.name : "(Unavailable ElementType)"]),
                     confirmMessage: data[2],
-                    close: function () {
-                        overlayService.close();
-                    },
-                    submit: function () {
+                    submit: () => {
                         vm.removeBlockByIndex(index);
                         overlayService.close();
-                    }
+                    },
+                    close: overlayService.close()
                 });
             });
+
+            event.stopPropagation();
         }
 
         vm.removeBlockByIndex = function (index) {
             const blockType = $scope.model.value[index];
-            if(blockType) {
+            if (blockType) {
                 $scope.model.value.splice(index, 1);
                 removeReferencesToElementTypeKey(blockType.contentElementTypeKey);
             }
         };
 
         const defaultOptions = {
-            axis: '',
             tolerance: "pointer",
             opacity: 0.7,
             scroll: true
         };
+
         vm.groupSortableOptions = {
-            ...defaultOptions, 
+            ...defaultOptions,
+            axis: 'y',
             handle: '.__handle',
             items: ".umb-block-card-group",
             cursor: "grabbing",
             placeholder: 'umb-block-card-group --sortable-placeholder'
         };
+
         vm.blockSortableOptions = {
-            ...defaultOptions, 
+            ...defaultOptions,
             "ui-floating": true,
             connectWith: ".umb-block-card-grid",
             items: "umb-block-card",
@@ -162,14 +171,13 @@
             placeholder: '--sortable-placeholder',
             forcePlaceHolderSize: true,
             stop: function(e, ui) {
-                if(ui.item.sortable.droptarget && ui.item.sortable.droptarget.length > 0) {
+                if (ui.item.sortable.droptarget && ui.item.sortable.droptarget.length > 0) {
                     // We do not want sortable to actually move the data, as we are using the same ng-model. Instead we just change the groupKey and cancel the transfering.
                     ui.item.sortable.model.groupKey = ui.item.sortable.droptarget[0].dataset.groupKey || null;
                     ui.item.sortable.cancel();
                 }
             }
         };
-
 
         vm.getAvailableElementTypes = function () {
             return vm.elementTypes.filter(function (type) {
@@ -201,18 +209,18 @@
                         if (node.metaData.isElement === true) {
                             var key = udiService.getKey(node.udi);
                             // If a Block with this ElementType as content already exists, we will emit it as a possible option.
-                            return $scope.model.value.find(function (entry) {
+                            return $scope.model.value.find(function(entry) {
                                 return key === entry.contentElementTypeKey;
                             });
                         }
                         return true;
                     },
                     filterCssClass: "not-allowed",
-                    select: function (node) {
+                    select: function(node) {
                         vm.addBlockFromElementTypeKey(udiService.getKey(node.udi), groupKey);
                         editorService.close();
                     },
-                    close: function () {
+                    close: function() {
                         editorService.close();
                     },
                     extraActions: [
@@ -241,14 +249,13 @@
                 infiniteMode: true,
                 noTemplate: true,
                 isElement: true,
-                noTemplate: true,
-                submit: function (model) {
-                    loadElementTypes().then( function () {
+                submit: function(model) {
+                    loadElementTypes().then(function() {
                         callback(model.documentTypeKey);
                     });
                     editorService.close();
                 },
-                close: function () {
+                close: function() {
                     editorService.close();
                 }
             };
@@ -262,24 +269,19 @@
             $scope.model.value.push(blockType);
 
             vm.openBlockOverlay(blockType);
-
         };
-
-
-
-
 
         vm.openBlockOverlay = function (block, openAreas) {
 
             var elementType = vm.getElementTypeByKey(block.contentElementTypeKey);
 
-            if(elementType) {
+            if (elementType) {
                 localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [elementType.name]).then(function (data) {
 
                     var clonedBlockData = Utilities.copy(block);
                     vm.openBlock = block;
 
-                    var overlayModel = {
+                    const overlayModel = {
                         block: clonedBlockData,
                         allBlockTypes: $scope.model.value,
                         allBlockGroups: vm.blockGroups,
@@ -288,11 +290,11 @@
                         title: data,
                         openAreas: openAreas,
                         view: "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.overlay.html",
-                        size: "large",
+                        size: "medium",
                         submit: function(overlayModel) {
                             loadElementTypes()// lets load elementType again, to ensure we are up to date.
                             TransferProperties(overlayModel.block, block);// transfer properties back to block object. (Doing this cause we dont know if block object is added to model jet, therefor we cant use index or replace the object.)
-                            
+
                             overlayModel.close();
                         },
                         close: function() {
@@ -306,14 +308,24 @@
 
                 });
             } else {
-                alert("Cannot be edited cause ElementType does not exist.");
+
+              const overlay = {
+                close: () => {
+                  overlayService.close()
+                }
+              };
+
+              localizationService.localize("blockEditor_elementTypeDoesNotExist").then(data => {
+                overlay.content = data;
+                overlayService.open(overlay);
+              });
             }
 
         };
 
 
         vm.requestRemoveGroup = function(blockGroup) {
-            if(blockGroup.key) {
+            if (blockGroup.key) {
                 localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockGroupMessage", "blockEditor_confirmDeleteBlockGroupNotice"]).then(function (data) {
                     overlayService.confirmDelete({
                         title: data[0],
@@ -332,7 +344,7 @@
 
                                         return false;
                                     } else {
-                                        return true; 
+                                        return true;
                                     }
                                 }
                             );
@@ -341,7 +353,7 @@
 
                             // Then remove group:
                             const groupIndex = vm.blockGroups.indexOf(blockGroup);
-                            if(groupIndex !== -1) {
+                            if (groupIndex !== -1) {
                                 vm.blockGroups.splice(groupIndex, 1);
                                 removeReferencesToGroupKey(blockGroup.key);
                             }
@@ -355,10 +367,8 @@
             }
         }
 
-
-
         dataTypeResource.getAll().then(function(dataTypes) {
-            if(dataTypes.filter(x => x.alias === "Umbraco.BlockGrid").length === 0) {
+            if (dataTypes.filter(x => x.alias === "Umbraco.BlockGrid").length === 0) {
                 vm.showSampleDataCTA = true;
             }
         });
@@ -372,14 +382,14 @@
 
                         const groupName = "Demo Blocks";
                         var sampleGroup =  vm.blockGroups.find(x => x.name === groupName);
-                        if(!sampleGroup) {
+                        if (!sampleGroup) {
                             sampleGroup = {
                                 key: String.CreateGuid(),
                                 name: groupName
                             };
                             vm.blockGroups.push(sampleGroup);
                         }
-    
+
                         function initSampleBlock(udi, groupKey, options) {
                             const key = udiService.getKey(udi);
                             if ($scope.model.value.find(X => X.contentElementTypeKey === key) === undefined) {
@@ -387,10 +397,11 @@
                                 $scope.model.value.push(blockType);
                             }
                         }
-    
+
                         initSampleBlock(data.umbBlockGridDemoHeadlineBlock, sampleGroup.key, {"label": "Headline ({{headline | truncate:true:36}})", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoHeadlineBlock.html"});
                         initSampleBlock(data.umbBlockGridDemoImageBlock, sampleGroup.key, {"label": "Image", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoImageBlock.html"});
                         initSampleBlock(data.umbBlockGridDemoRichTextBlock, sampleGroup.key, { "label": "Rich Text  ({{richText | ncRichText | truncate:true:36}})", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoRichTextBlock.html"});
+
                         const twoColumnLayoutAreas = [
                             {
                                 'key': String.CreateGuid(),
@@ -411,11 +422,12 @@
                                 'specifiedAllowance': []
                             }
                         ];
+                        
                         initSampleBlock(data.umbBlockGridDemoTwoColumnLayoutBlock, sampleGroup.key, {"label": "Two Column Layout", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoTwoColumnLayoutBlock.html", "allowInAreas": false, "areas": twoColumnLayoutAreas});
-    
+
                         vm.showSampleDataCTA = false;
                     });
-                    
+
                 });
         }
 

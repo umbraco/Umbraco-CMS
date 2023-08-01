@@ -321,17 +321,34 @@
                                                                         {{ ::result.values[field] | umbCmsJoinArray:', ' }}
                                                                     </td>
                                                                     <td class="tr nowrap">
-                                                                        <button type="button" 
-                                                                            class="table__action-overlay color-green" 
-                                                                            ng-click="vm.showSearchResultDialog(result.values)">({{ ::result.fieldCount }} <localize key="examineManagement_fields">fields</localize>)</button>
+                                                                        <button type="button"
+                                                                            class="table__action-overlay color-green"
+                                                                            ng-click="vm.showSearchResultDialog(result.values)">
+                                                                          ({{ ::result.fieldCount }} <localize key="examineManagement_fields">fields</localize>)
+                                                                        </button>
                                                                     </td>
                                                                     <td class="tr nowrap umb-avatar--white">
-                                                                        <span title="{{ result.score }}">
+                                                                        <span ng-attr-title="{{ result.score }}">
                                                                             {{ ::result.score | number:4 }}
                                                                         </span>
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
+                                                            <tfoot>
+                                                                <tr>
+                                                                    <td colspan="{{vm.showSearchResultFields.length + 4}}">
+                                                                      <localize key="examineManagement_noResults" ng-if="::vm.searchResults.totalRecords === 0">
+                                                                        No results were found
+                                                                      </localize>
+                                                                      <localize key="examineManagement_searchResultsFound"
+                                                                                tokens="[(vm.searchResults.pageIndex * vm.searchResults.pageSize) + 1, (vm.searchResults.pageIndex * vm.searchResults.pageSize) + vm.searchResults.results.length, vm.searchResults.totalRecords, vm.searchResults.pageNumber, vm.searchResults.totalPages]"
+                                                                                watch-tokens="true"
+                                                                                ng-if="::vm.searchResults.totalRecords > 0">
+                                                                        Showing %0% - %1% of %2% result(s) - Page %3% of %4%
+                                                                      </localize>
+                                                                    </td>
+                                                                </tr>
+                                                            </tfoot>
                                                         </table>
                                                     </div>
 
@@ -370,7 +387,7 @@
                                 <div class="umb-panel-group__details-status-content">
 
                                     <table class="table table-bordered table-condensed">
-                                        <caption>&nbsp;</caption>
+                                        <caption class="sr-only"><localize key="examineManagement_contentInIndex">Content In Index</localize></caption>
                                         <tr ng-repeat="(key, val) in vm.selectedIndex.providerProperties track by $index">
                                             <th>{{key}}</th>
                                             <td>{{val}}</td>

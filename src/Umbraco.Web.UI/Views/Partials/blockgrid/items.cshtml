@@ -7,8 +7,7 @@
 <div class="umb-block-grid__layout-container">
     @foreach (var item in Model)
     {
-        bool attrForceLeft = item.ForceLeft;
-        bool attrForceRight = item.ForceRight;
+        
         <div
             class="umb-block-grid__layout-item"
             data-content-element-type-alias="@item.Content.ContentType.Alias"
@@ -16,8 +15,6 @@
             data-element-udi="@item.ContentUdi"
             data-col-span="@item.ColumnSpan"
             data-row-span="@item.RowSpan"
-            @(attrForceLeft ? "data-force-left" : null)
-            @(attrForceRight ? "data-force-right" : null)
             style=" --umb-block-grid--item-column-span: @item.ColumnSpan; --umb-block-grid--item-row-span: @item.RowSpan; ">
             @{
                 var partialViewName = "blockgrid/Components/" + item.Content.ContentType.Alias;

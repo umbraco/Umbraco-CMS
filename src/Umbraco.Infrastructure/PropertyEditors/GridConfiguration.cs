@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     Represents the configuration for the grid value editor.
 /// </summary>
+[Obsolete("The grid is obsolete, will be removed in V13")]
 public class GridConfiguration : IIgnoreUserStartNodesConfig
 {
     // TODO: Make these strongly typed, for now this works though

@@ -24,8 +24,7 @@ public class NuCacheSettings
     ///     The serializer type that nucache uses to persist documents in the database.
     /// </summary>
     [DefaultValue(StaticNuCacheSerializerType)]
-    public NuCacheSerializerType NuCacheSerializerType { get; set; } =
-        Enum<NuCacheSerializerType>.Parse(StaticNuCacheSerializerType);
+    public NuCacheSerializerType NuCacheSerializerType { get; set; } = Enum.Parse<NuCacheSerializerType>(StaticNuCacheSerializerType);
 
     /// <summary>
     ///     The paging size to use for nucache SQL queries.

@@ -108,7 +108,10 @@ namespace Umbraco.Cms.Core.Runtime
 
             lock (_locko)
             {
-                _logger.LogDebug("Signaled ({Signaled}) ({SignalSource})", _signaled ? "again" : "first", source);
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Signaled ({Signaled}) ({SignalSource})", _signaled ? "again" : "first", source);
+                }
                 if (_signaled)
                 {
                     return;
@@ -136,8 +139,10 @@ namespace Umbraco.Cms.Core.Runtime
                             continue;
                         }
                     }
-
-                    _logger.LogDebug("Stopped ({SignalSource})", source);
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    {
+                        _logger.LogDebug("Stopped ({SignalSource})", source);
+                    }
                 }
                 finally
                 {
@@ -201,7 +206,10 @@ namespace Umbraco.Cms.Core.Runtime
                     }
                     else
                     {
-                        _logger.LogDebug("Listening task completed with {TaskStatus}", _listenTask.Status);
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            _logger.LogDebug("Listening task completed with {TaskStatus}", _listenTask.Status);
+                        }
                     }
 
                     OnSignal("signal");

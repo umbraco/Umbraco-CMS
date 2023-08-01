@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.DependencyInjection;
 /// </summary>
 public static partial class UmbracoBuilderExtensions
 {
-    private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
+    internal static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
         where TOptions : class
     {
         UmbracoOptionsAttribute? umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
@@ -50,7 +50,9 @@ public static partial class UmbracoBuilderExtensions
         builder
             .AddUmbracoOptions<ModelsBuilderSettings>()
             .AddUmbracoOptions<ActiveDirectorySettings>()
+            .AddUmbracoOptions<MarketplaceSettings>()
             .AddUmbracoOptions<ContentSettings>()
+            .AddUmbracoOptions<DeliveryApiSettings>()
             .AddUmbracoOptions<CoreDebugSettings>()
             .AddUmbracoOptions<ExceptionFilterSettings>()
             .AddUmbracoOptions<GlobalSettings>(optionsBuilder => optionsBuilder.PostConfigure(options =>
@@ -117,6 +119,32 @@ public static partial class UmbracoBuilderExtensions
             }
         });
 
+        // TODO: Remove this in V13
+        // This is to avoid a breaking change in ContentSettings, if the old AllowedFileUploads has a value, and the new
+        // AllowedFileUploadExtensions does not, copy the value over, if the new has a value, use that instead.
+        builder.Services.Configure<ContentSettings>(settings =>
+        {
+            // We have to use Config.GetSection().Get<string[]>, as the GetSection.GetValue<string[]> simply cannot retrieve a string array
+            var allowedUploadedFileExtensionsValue = builder.Config.GetSection($"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.AllowedUploadedFileExtensions)}").Get<string[]>();
+            var allowedUploadFilesValue = builder.Config.GetSection($"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.AllowedUploadFiles)}").Get<string[]>();
+
+            if (allowedUploadedFileExtensionsValue is null && allowedUploadFilesValue is not null)
+            {
+                settings.AllowedUploadedFileExtensions = allowedUploadFilesValue;
+            }
+        });
+
+        // TODO: Remove this in V13
+        builder.Services.Configure<ContentSettings>(settings =>
+        {
+            var disallowedUploadedFileExtensionsValue = builder.Config.GetSection($"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.DisallowedUploadedFileExtensions)}").Get<string[]>();
+            var disallowedUploadFilesValue = builder.Config.GetSection($"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.DisallowedUploadFiles)}").Get<string[]>();
+
+            if (disallowedUploadedFileExtensionsValue is null && disallowedUploadFilesValue is not null)
+            {
+                settings.DisallowedUploadedFileExtensions = disallowedUploadFilesValue;
+            }
+        });
         return builder;
     }
 }

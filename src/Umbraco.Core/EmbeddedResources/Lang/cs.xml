@@ -2,7 +2,7 @@
 <language alias="cs" intName="Czech" localName="česky" lcid="5" culture="cs-CZ">
   <creator>
     <name>Umbraco komunita</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Kultura a názvy hostitelů</key>
@@ -254,7 +254,7 @@
     <key alias="childItems" version="7.0">Podřízené položky</key>
     <key alias="target" version="7.0">Cíl</key>
     <key alias="scheduledPublishServerTime">This translates to the following time on the server:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">What does this mean?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">What does this mean?</a>]]></key>
     <key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key>
     <key alias="nestedContentDeleteAllItems">Are you sure you want to delete all items?</key>
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
@@ -1194,7 +1194,6 @@
   </area>
   <area alias="rollback">
     <key alias="headline">Vyberte verzi, kterou chcete porovnat s aktuální verzí</key>
-    <key alias="currentVersion">Současná verze</key>
     <key alias="diffHelp"><![CDATA[Tohle ukazuje rozdíly mezi současnou verzi a vybranou verzi<br /><del>Červený</del> text nebude ve vybrané verzi zobrazen, <ins>zelený znamená přidaný</ins>].]]></key>
     <key alias="documentRolledBack">Dokument byl vrácen na starší verzi</key>
     <key alias="htmlHelp">Tohle zobrazuje vybranou verzi jako html, jestliže chcete vidět rozdíly mezi 2 verzemi najednou, použijte rozdílové zobrazení</key>
@@ -1870,8 +1869,8 @@
     <key alias="stateInactive">Neaktivní</key>
     <key alias="sortNameAscending">Jméno (A-Z)</key>
     <key alias="sortNameDescending">Jméno (Z-A)</key>
-    <key alias="sortCreateDateAscending">Nejnovější</key>
-    <key alias="sortCreateDateDescending">Nejstarší</key>
+    <key alias="sortCreateDateAscending">Nejstarší</key>
+    <key alias="sortCreateDateDescending">Nejnovější</key>
     <key alias="sortLastLoginDateDescending">Poslední přihlášení</key>
     <key alias="noUserGroupsAdded">Nebyly přidány žádné skupiny uživatelů</key>
   </area>
@@ -1957,7 +1956,7 @@
     <key alias="checkGroup">Zkontrolovat skupinu</key>
     <key alias="helpText">
       <![CDATA[
-        <p>Kontrola vyhodnocuje různé oblasti vašeho webu z hlediska nastavení osvědčených postupů, konfigurace, potenciálních problémů atd. Problémy lze snadno vyřešit stisknutím tlačítka. Můžete přidat své vlastní kontroly, podívejte se na <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">dokumentaci pro více informací</a> o vlastních kontrolách.</p>
+        <p>Kontrola vyhodnocuje různé oblasti vašeho webu z hlediska nastavení osvědčených postupů, konfigurace, potenciálních problémů atd. Problémy lze snadno vyřešit stisknutím tlačítka. Můžete přidat své vlastní kontroly, podívejte se na <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">dokumentaci pro více informací</a> o vlastních kontrolách.</p>
         ]]>
     </key>
   </area>
@@ -2153,7 +2152,7 @@
     <key alias="more">Zjistit více</key>
     <key alias="bulletPointOne">
       <![CDATA[
-            Další informace o práci s položkami naleznete v části Nastavení <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">v sekci Dokumentace</a> v Our Umbraco
+            Další informace o práci s položkami naleznete v části Nastavení <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections" target="_blank" rel="noopener">v sekci Dokumentace</a> v Our Umbraco
         ]]>
     </key>
     <key alias="bulletPointTwo">

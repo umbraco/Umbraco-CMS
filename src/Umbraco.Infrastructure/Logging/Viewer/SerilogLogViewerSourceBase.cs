@@ -1,9 +1,7 @@
-﻿using System.Collections.ObjectModel;
-using Microsoft.Extensions.DependencyInjection;
+using System.Collections.ObjectModel;
 using Serilog;
 using Serilog.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
@@ -12,27 +10,29 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
 {
     private readonly ILogLevelLoader _logLevelLoader;
     private readonly ILogViewerConfig _logViewerConfig;
-    private readonly ILogger _serilogLog;
 
     protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, ILogLevelLoader logLevelLoader, ILogger serilogLog)
     {
         _logViewerConfig = logViewerConfig;
         _logLevelLoader = logLevelLoader;
-        _serilogLog = serilogLog;
     }
 
     public abstract bool CanHandleLargeLogs { get; }
 
     public abstract bool CheckCanOpenLogs(LogTimePeriod logTimePeriod);
 
-    public virtual IReadOnlyList<SavedLogSearch>? GetSavedSearches()
+    public virtual IReadOnlyList<SavedLogSearch> GetSavedSearches()
         => _logViewerConfig.GetSavedSearches();
 
-    public virtual IReadOnlyList<SavedLogSearch>? AddSavedSearch(string? name, string? query)
+    public virtual IReadOnlyList<SavedLogSearch> AddSavedSearch(string name, string query)
         => _logViewerConfig.AddSavedSearch(name, query);
 
-    public virtual IReadOnlyList<SavedLogSearch>? DeleteSavedSearch(string? name, string? query)
-        => _logViewerConfig.DeleteSavedSearch(name, query);
+    [Obsolete("Use the overload that only takes a 'name' parameter instead. This will be removed in Umbraco 14.")]
+    public virtual IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query)
+        => DeleteSavedSearch(name);
+
+    public virtual IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name)
+        => _logViewerConfig.DeleteSavedSearch(name);
 
     public int GetNumberOfErrors(LogTimePeriod logTimePeriod)
     {

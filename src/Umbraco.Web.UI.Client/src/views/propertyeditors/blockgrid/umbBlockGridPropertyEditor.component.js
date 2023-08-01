@@ -13,6 +13,31 @@
         return null;
     }
 
+    function closestColumnSpanOption(target, map, max) {
+        if(map.length > 0) {
+            const result = map.reduce((a, b) => {
+                if (a.columnSpan > max) {
+                    return b;
+                }
+                let aDiff = Math.abs(a.columnSpan - target);
+                let bDiff = Math.abs(b.columnSpan - target);
+        
+                if (aDiff === bDiff) {
+                    return a.columnSpan < b.columnSpan ? a : b;
+                } else {
+                    return bDiff < aDiff ? b : a;
+                }
+            });
+            if(result) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+
+    const DefaultViewFolderPath = "views/propertyeditors/blockgrid/blockgridentryeditors/";
+
 
     /**
      * @ngdoc directive
@@ -44,14 +69,20 @@
 
         var unsubscribe = [];
         var modelObject;
+        var gridRootEl;
 
         // Property actions:
+        var propertyActions = null;
+        var enterSortModeAction = null;
+        var exitSortModeAction = null;
         var copyAllBlocksAction = null;
         var deleteAllBlocksAction = null;
 
         var liveEditing = true;
 
         var shadowRoot;
+        var firstLayoutContainer;
+
 
         var vm = this;
 
@@ -107,6 +138,8 @@
         vm.options = {
             createFlow: false
         };
+        vm.sortMode = false;
+        vm.sortModeView = DefaultViewFolderPath + "gridsortblock/gridsortblock.editor.html";
 
         localizationService.localizeMany(["grid_addElement", "content_createEmpty", "blockEditor_addThis"]).then(function (data) {
             vm.labels.grid_addElement = data[0];
@@ -114,20 +147,35 @@
             vm.labels.blockEditor_addThis = data[2]
         });
 
+        vm.onAppendProxyProperty = (event) => {
+            event.stopPropagation();
+            gridRootEl.appendChild(event.detail.property);
+            event.detail.connectedCallback();
+        };
+        vm.onRemoveProxyProperty = (event) => {
+            event.stopPropagation();
+            const el = gridRootEl.querySelector(`:scope > [slot='${event.detail.slotName}']`);
+            gridRootEl.removeChild(el);
+        };
+
         vm.$onInit = function() {
 
+            gridRootEl = $element[0].querySelector('umb-block-grid-root');
+
+            $element[0].addEventListener("UmbBlockGrid_AppendProperty", vm.onAppendProxyProperty);
+            $element[0].addEventListener("UmbBlockGrid_RemoveProperty", vm.onRemoveProxyProperty);
 
             //listen for form validation changes
-            vm.valFormManager.onValidationStatusChanged(function (evt, args) {
+            vm.valFormManager.onValidationStatusChanged(function () {
                 vm.showValidation = vm.valFormManager.showValidation;
             });
             //listen for the forms saving event
-            unsubscribe.push($scope.$on("formSubmitting", function (ev, args) {
+            unsubscribe.push($scope.$on("formSubmitting", function () {
                 vm.showValidation = true;
             }));
 
             //listen for the forms saved event
-            unsubscribe.push($scope.$on("formSubmitted", function (ev, args) {
+            unsubscribe.push($scope.$on("formSubmitted", function () {
                 vm.showValidation = false;
             }));
 
@@ -177,6 +225,19 @@
                 scopeOfExistence = vm.umbElementEditorContent.getScope();
             }
 
+            enterSortModeAction = {
+                labelKey: 'blockEditor_actionEnterSortMode',
+                icon: 'navigation-vertical',
+                method: enableSortMode,
+                isDisabled: false
+            };
+            exitSortModeAction = {
+                labelKey: 'blockEditor_actionExitSortMode',
+                icon: 'navigation-vertical',
+                method: exitSortMode,
+                isDisabled: false
+            };
+
             copyAllBlocksAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
                 labelTokens: [vm.model.label],
@@ -187,13 +248,13 @@
 
             deleteAllBlocksAction = {
                 labelKey: 'clipboard_labelForRemoveAllEntries',
-                labelTokens: [],
                 icon: 'trash',
                 method: requestDeleteAllBlocks,
                 isDisabled: true
             };
 
-            var propertyActions = [
+            propertyActions = [
+                enterSortModeAction,
                 copyAllBlocksAction,
                 deleteAllBlocksAction
             ];
@@ -205,13 +266,13 @@
             // Create Model Object, to manage our data for this Block Editor.
             modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, scopeOfExistence, $scope);
 
-            $q.all([modelObject.load(), assetsService.loadJs('lib/sortablejs/Sortable.min.js', $scope)]).then(onLoaded);
+            modelObject.load().then(onLoaded);
 
         };
 
         // Called when we save the value, the server may return an updated data and our value is re-synced
         // we need to deal with that here so that our model values are all in sync so we basically re-initialize.
-        function onServerValueChanged(newVal, oldVal) {
+        function onServerValueChanged(newVal) {
 
             // We need to ensure that the property model value is an object, this is needed for modelObject to receive a reference and keep that updated.
             if (typeof newVal !== 'object' || newVal === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
@@ -221,7 +282,6 @@
             modelObject.update(vm.model.value, $scope);
             onLoaded();
         }
-
 
 
         function onLoaded() {
@@ -241,6 +301,7 @@
 
             window.requestAnimationFrame(() => {
                 shadowRoot = $element[0].querySelector('umb-block-grid-root').shadowRoot;
+                firstLayoutContainer = shadowRoot.querySelector('.umb-block-grid__layout-container');
             })
 
         }
@@ -314,21 +375,30 @@
                     }
                 }
 
-                // if no columnSpan, then we set one:
-                if (!layoutEntry.columnSpan) {
+                // Ensure Areas are ordered like the area configuration is:
+                layoutEntry.areas.sort((left, right) => {
+                    return block.config.areas?.findIndex(config => config.key === left.key) < block.config.areas?.findIndex(config => config.key === right.key) ? -1 : 1;
+                });
 
-                    const contextColumns = getContextColumns(parentBlock, areaKey)
 
-                    if (block.config.columnSpanOptions.length > 0) {
-                        // set columnSpan to minimum allowed span for this BlockType:
-                        const minimumColumnSpan = block.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), vm.gridColumns);
+                const contextColumns = getContextColumns(parentBlock, areaKey);
+                const relevantColumnSpanOptions = block.config.columnSpanOptions?.filter(option => option.columnSpan <= contextColumns) ?? [];
 
-                        // If minimumColumnSpan is larger than contextColumns, then we will make it fit within context anyway:
-                        layoutEntry.columnSpan = Math.min(minimumColumnSpan, contextColumns)
+                // if no columnSpan or no columnSpanOptions configured, then we set(or rewrite) one:
+                if (!layoutEntry.columnSpan || layoutEntry.columnSpan > contextColumns || relevantColumnSpanOptions.length === 0) {
+                    if (relevantColumnSpanOptions.length > 0) {
+                        // Find greatest columnSpanOption within contextColumns, or fallback to contextColumns.
+                        layoutEntry.columnSpan = relevantColumnSpanOptions.reduce((prev, option) => Math.max(prev, option.columnSpan), 0) || contextColumns;
                     } else {
                         layoutEntry.columnSpan = contextColumns;
                     }
+                } else {
+                    // Check that columnSpanOption still is available or equal contextColumns, or find closest option fitting:
+                    if (relevantColumnSpanOptions.find(option => option.columnSpan === layoutEntry.columnSpan) === undefined || layoutEntry.columnSpan !== contextColumns) {
+                        layoutEntry.columnSpan = closestColumnSpanOption(layoutEntry.columnSpan, relevantColumnSpanOptions, contextColumns)?.columnSpan || contextColumns;
+                    }
                 }
+
                 // if no rowSpan, then we set one:
                 if (!layoutEntry.rowSpan) {
                     layoutEntry.rowSpan = 1;
@@ -375,12 +445,12 @@
 
         function applyDefaultViewForBlock(block) {
 
-            var defaultViewFolderPath = "views/propertyeditors/blockgrid/blockgridentryeditors/";
-
             if (block.config.unsupported === true) {
-                block.view = defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
+                block.view = DefaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
+            } else if (block.config.inlineEditing) {
+                block.view = DefaultViewFolderPath + "gridinlineblock/gridinlineblock.editor.html";
             } else {
-                block.view = defaultViewFolderPath + "gridblock/gridblock.editor.html";
+                block.view = DefaultViewFolderPath + "gridblock/gridblock.editor.html";
             }
 
         }
@@ -430,9 +500,11 @@
             block.showCopy = vm.supportCopy && block.config.contentElementTypeKey != null;
 
             block.blockUiVisibility = false;
-            block.showBlockUI = function () {
+            block.showBlockUI = () => {
                 delete block.__timeout;
-                shadowRoot.querySelector('*[data-element-udi="'+block.layout.contentUdi+'"] .umb-block-grid__block > .umb-block-grid__block--context').scrollIntoView({block: "nearest", inline: "nearest", behavior: "smooth"});
+                $timeout(() => {
+                    shadowRoot.querySelector('*[data-element-udi="'+block.layout.contentUdi+'"] > ng-form > .umb-block-grid__block > .umb-block-grid__block--context').scrollIntoView({block: "nearest", inline: "nearest", behavior: "smooth"});
+                }, 100);
                 block.blockUiVisibility = true;
             };
             block.onMouseLeave = function () {
@@ -636,7 +708,7 @@
                         } else 
                         if(allowance.elementTypeKey) {
                             const blockType = vm.availableBlockTypes.find(x => x.blockConfigModel.contentElementTypeKey === allowance.elementTypeKey);
-                            if(allowedElementTypes.indexOf(blockType) === -1) {
+                            if(blockType && allowedElementTypes.indexOf(blockType) === -1) {
                                 allowedElementTypes.push(blockType);
                             }
                         }
@@ -685,7 +757,7 @@
         function deleteAllBlocks() {
             while(vm.layout.length) {
                 deleteBlock(vm.layout[0].$block);
-            };
+            }
         }
 
         function activateBlock(blockObject) {
@@ -705,8 +777,8 @@
             */
 
             var wasNotActiveBefore = blockObject.active !== true;
-
-	        // don't open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
+            
+            // don't open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
             if (openSettings !== true && blockObject.hideContentInOverlay === true) {
                 return;
             }
@@ -778,6 +850,8 @@
         vm.requestShowCreate = requestShowCreate;
         function requestShowCreate(parentBlock, areaKey, createIndex, mouseEvent, options) {
 
+            vm.hideAreaHighlight(parentBlock, areaKey);
+
             if (vm.blockTypePickerIsOpen === true) {
                 return;
             }
@@ -801,7 +875,7 @@
 
         }
         vm.requestShowClipboard = requestShowClipboard;
-        function requestShowClipboard(parentBlock, areaKey, createIndex, mouseEvent) {
+        function requestShowClipboard(parentBlock, areaKey, createIndex) {
             showCreateDialog(parentBlock, areaKey, createIndex, true);
         }
 
@@ -909,7 +983,7 @@
                 }
             };
 
-            blockPickerModel.clickClearClipboard = function ($event) {
+            blockPickerModel.clickClearClipboard = function () {
                 clipboardService.clearEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, availableContentTypesAliases);
                 clipboardService.clearEntriesOfType(clipboardService.TYPES.BLOCK, availableContentTypesAliases);
             };
@@ -920,7 +994,7 @@
             // open block picker overlay
             editorService.open(blockPickerModel);
 
-        };
+        }
         function userFlowWhenBlockWasCreated(parentBlock, areaKey, createIndex) {
             var blockObject;
             
@@ -937,7 +1011,7 @@
                 blockObject = vm.layout[createIndex].$block;
             }
             // edit block if not `hideContentInOverlay` and there is content properties.
-            if(blockObject.hideContentInOverlay !== true && blockObject.content.variants[0].tabs[0]?.properties.length > 0) {
+            if(blockObject.hideContentInOverlay !== true && blockObject.content.variants[0].tabs.find(tab => tab.properties.length > 0) !== undefined) {
                 vm.options.createFlow = true;
                 blockObject.edit();
                 vm.options.createFlow = false;
@@ -947,10 +1021,11 @@
         function updateClipboard(firstTime) {
 
             var oldAmount = vm.clipboardItems.length;
+            var entriesForPaste;
 
             vm.clipboardItems = [];
 
-            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
+            entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.ELEMENT_TYPE,
@@ -971,7 +1046,7 @@
                 vm.clipboardItems.push(pasteEntry);
             });
 
-            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
+            entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.BLOCK,
@@ -1052,7 +1127,7 @@
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function (localizedLabel) {
                 clipboardService.copyArray(clipboardService.TYPES.BLOCK, aliases, elementTypesToCopy, localizedLabel, contentNodeIcon || "icon-thumbnail-list", vm.model.id);
             });
-        };
+        }
 
         function gatherNestedBlocks(block) {
             const nested = [];
@@ -1254,6 +1329,38 @@
             }
         }
 
+        function enableSortMode() {
+            vm.sortMode = true;
+            propertyActions.splice(propertyActions.indexOf(enterSortModeAction), 1, exitSortModeAction);
+            if (vm.umbProperty) {
+                vm.umbProperty.setPropertyActions(propertyActions);
+            }
+        }
+
+        vm.exitSortMode = exitSortMode;
+        function exitSortMode() {
+            vm.sortMode = false;
+            propertyActions.splice(propertyActions.indexOf(exitSortModeAction), 1, enterSortModeAction);
+            if (vm.umbProperty) {
+                vm.umbProperty.setPropertyActions(propertyActions);
+            }
+        }
+
+        vm.startDraggingMode = startDraggingMode;
+        function startDraggingMode() {
+
+            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", ' ');
+            firstLayoutContainer.style.minHeight = firstLayoutContainer.getBoundingClientRect().height + "px";
+            
+        }
+        vm.exitDraggingMode = exitDraggingMode;
+        function exitDraggingMode() {
+
+            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 'initial');
+            firstLayoutContainer.style.minHeight = "";
+            
+        }
+
         function onAmountOfBlocksChanged() {
 
             // enable/disable property actions
@@ -1278,9 +1385,16 @@
         unsubscribe.push($scope.$watch(() => vm.layout.length, onAmountOfBlocksChanged));
 
         $scope.$on("$destroy", function () {
+
+            $element[0].removeEventListener("UmbBlockGrid_AppendProperty", vm.onAppendProxyProperty);
+            $element[0].removeEventListener("UmbBlockGrid_RemoveProperty", vm.onRemoveProxyProperty);
+
             for (const subscription of unsubscribe) {
                 subscription();
             }
+
+            firstLayoutContainer = null;
+            gridRootEl = null;
         });
     }
 

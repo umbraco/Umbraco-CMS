@@ -265,12 +265,20 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         if (DateTime.UtcNow - found.LastValidatedUtc > _globalSettings.TimeOut)
         {
             //timeout detected, update the record
-            Logger.LogDebug("ClearLoginSession for sessionId {sessionId}", sessionId);ClearLoginSession(sessionId);
+            if (Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                Logger.LogDebug("ClearLoginSession for sessionId {sessionId}", sessionId);
+            }
+            ClearLoginSession(sessionId);
             return false;
         }
 
         //update the validate date
-        Logger.LogDebug("Updating LastValidatedUtc for sessionId {sessionId}", sessionId);found.LastValidatedUtc = DateTime.UtcNow;
+        if (Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            Logger.LogDebug("Updating LastValidatedUtc for sessionId {sessionId}", sessionId);
+        }
+        found.LastValidatedUtc = DateTime.UtcNow;
         Database.Update(found);
         return true;
     }

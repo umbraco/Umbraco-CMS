@@ -82,18 +82,6 @@ namespace Umbraco.Cms.Core.Models.Blocks
         public int ColumnSpan { get; set; }
 
         /// <summary>
-        /// Forcing the item to be located in the left side.
-        /// </summary>
-        [DataMember(Name = "forceLeft")]
-        public bool ForceLeft { get; set; }
-
-        /// <summary>
-        /// Forcing the item to be located in the right side.
-        /// </summary>
-        [DataMember(Name = "forceRight")]
-        public bool ForceRight { get; set; }
-
-        /// <summary>
         /// The grid areas within this item
         /// </summary>
         [DataMember(Name = "areas")]

@@ -146,7 +146,7 @@
       {
         "element": "#dialog [data-element='action-documentType']",
         "title": "Create Document Type",
-        "content": "<p>Click <b>Document Type</b> to create a new document type with a template. The template will be automatically created and set as the default template for this Document Type.</p><p>You will use the template in a later tour to render content.</p>",
+        "content": "<p>Click <b>Document Type with Template</b> to create a new document type with a template. The template will be automatically created and set as the default template for this Document Type.</p><p>You will use the template in a later tour to render content.</p>",
         "event": "click"
       },
       {
@@ -197,8 +197,8 @@
       },
       {
         "element": "[data-element~='editor-property-settings'] [data-element='editor-add']",
-        "title": "Add editor",
-        "content": "When you add an editor you choose what the input method for this property will be. Click <b>Add editor</b> to open the editor picker dialog.",
+        "title": "Select editor",
+        "content": "When you select an editor you choose what the input method for this property will be. Click <b>Select editor</b> to open the editor picker dialog.",
         "event": "click"
       },
       {

@@ -13,7 +13,7 @@
             </umb-editor-header>
 
             <umb-editor-container>
-                <div class="form-vertical umb-block-grid-block-configuration-layout">
+                <div class="form-vertical">
 
                     <div class="umb-group-panel">
 
@@ -27,11 +27,18 @@
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="alias"><localize key="general_alias">Alias</localize></label>
+                                    <strong class="umb-control-required">*</strong>
                                     <umb-property-info-button button-title-key="general_readMore">
-                                        <localize key="blockEditor_areaAliasHelp">The alias will be printed by GetBlockGridHTML(), use the alias to target the Element representing this area. Ex. .umb-block-grid__area[data-area-alias="MyAreaAlias"] { ... }</localize>
+                                      <localize key="blockEditor_areaAliasHelp">When using GetBlockGridHTML() to render the Block Grid, the alias will be rendered in the markup as a 'data-area-alias' attribute. Use the alias attribute to target the element for the area. Example. .umb-block-grid__area[data-area-alias="MyAreaAlias"] { ... }</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
-                                        <input type="text" name="alias" ng-model="vm.area.alias" style="width:100%" umb-auto-focus/>
+                                        <input type="text" name="alias" ng-model="vm.area.alias" val-server="alias" class="w-100" required umb-auto-focus/>
+                                    </div>
+                                    <div ng-messages="blockGridBlockConfigurationAreaForm.alias.$error" class="red">
+                                        <div ng-message="alias">
+                                            <localize key="blockEditor_areaAliasIsNotUnique" tokens="[vm.area.alias]" watch-tokens="true">This Areas Alias must be unique compared to the other Areas of this Block.</localize>
+                                        </div>
+                                        <span ng-message="valServer" ng-bind-html="blockGridBlockConfigurationAreaForm.alias.errorMsg"></span>
                                     </div>
                                 </div>
                             </div>
@@ -41,10 +48,10 @@
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="createLabel"><localize key="blockEditor_areaCreateLabelTitle">Create Button Label</localize></label>
                                     <umb-property-info-button button-title-key="general_readMore">
-                                        <localize key="blockEditor_areaCreateLabelHelp">Overwrite the label on the create button of this Area.</localize>
+                                      <localize key="blockEditor_areaCreateLabelHelp">Override the label text for adding a new Block to this Area, Example: 'Add Widget'</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
-                                        <input type="text" name="createLabel" ng-model="vm.area.createLabel" style="width:100%" umb-auto-focus/>
+                                        <input type="text" name="createLabel" ng-model="vm.area.createLabel" class="w-100" umb-auto-focus/>
                                     </div>
                                 </div>
                             </div>

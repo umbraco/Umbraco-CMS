@@ -12,14 +12,7 @@ angular.module("umbraco.directives")
                     //Select the node that will be observed for mutations (native DOM element not jQLite version)
                     var targetNode = element[0];
 
-                    //Watch for DOM changes - so when the property editor subview loads in
-                    //We can be notified its updated the child elements inside the DIV we are watching
-                    var observer = new MutationObserver(domChange);
-
-                    // Options for the observer (which mutations to observe)
-                    var config = { attributes: true, childList: true, subtree: true };
-
-                    function domChange(mutationsList, observer) {
+                    const domChange = function(mutationsList) {
                         for (var mutation of mutationsList) {
 
                             //DOM items have been added or removed
@@ -35,6 +28,13 @@ angular.module("umbraco.directives")
                             }
                         }
                     }
+
+                    //Watch for DOM changes - so when the property editor subview loads in
+                    //We can be notified its updated the child elements inside the DIV we are watching
+                    var observer = new MutationObserver(domChange);
+
+                    // Options for the observer (which mutations to observe)
+                    var config = { attributes: true, childList: true, subtree: true };
 
                     // Start observing the target node for configured mutations
                     //GO GO GO

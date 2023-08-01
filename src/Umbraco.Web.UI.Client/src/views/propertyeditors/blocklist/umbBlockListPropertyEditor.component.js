@@ -36,6 +36,7 @@
         // Property actions:
         let copyAllBlocksAction = null;
         let deleteAllBlocksAction = null;
+        let pasteSingleBlockAction = null;
 
         var inlineEditing = false;
         var liveEditing = true;
@@ -43,11 +44,12 @@
         var vm = this;
 
         vm.readonly = false;
+        vm.singleBlockMode = false;
 
         $attrs.$observe('readonly', (value) => {
             vm.readonly = value !== undefined;
 
-            vm.sortableOptions.disabled = vm.readonly;
+            vm.sortableOptions.disabled = vm.readonly || vm.singleBlockMode;
             vm.blockEditorApi.readonly = vm.readonly;
 
             if (deleteAllBlocksAction) {
@@ -106,6 +108,14 @@
             inlineEditing = vm.model.config.useInlineEditingAsDefault;
             liveEditing = vm.model.config.useLiveEditing;
 
+            vm.singleBlockMode =
+                vm.model.config.validationLimit.min == 1 &&
+                vm.model.config.validationLimit.max == 1 &&
+                vm.model.config.blocks.length == 1 &&
+                vm.model.config.useSingleBlockMode;
+            
+            vm.blockEditorApi.singleBlockMode = vm.singleBlockMode;
+
             vm.validationLimit = vm.model.config.validationLimit;
 
             vm.listWrapperStyles = {};
@@ -115,16 +125,32 @@
             }
 
             // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
-            if(typeof vm.model.value !== 'object' || vm.model.value === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
+            if (typeof vm.model.value !== 'object' || vm.model.value === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
                 vm.model.value = {};
             }
 
             var scopeOfExistence = $scope;
-            if(vm.umbVariantContentEditors && vm.umbVariantContentEditors.getScope) {
+            if (vm.umbVariantContentEditors && vm.umbVariantContentEditors.getScope) {
                 scopeOfExistence = vm.umbVariantContentEditors.getScope();
             } else if(vm.umbElementEditorContent && vm.umbElementEditorContent.getScope) {
                 scopeOfExistence = vm.umbElementEditorContent.getScope();
             }
+
+            vm.sortableOptions = {
+                axis: "y",
+                containment: "parent",
+                cursor: "grabbing",
+                handle: ".blockelement__draggable-element",
+                cancel: "input,textarea,select,option",
+                classes: ".blockelement--dragging",
+                distance: 5,
+                tolerance: "pointer",
+                scroll: true,
+                disabled: vm.readonly || vm.singleBlockMode,
+                update: function (ev, ui) {
+                    setDirty();
+                }
+            };
             
             copyAllBlocksAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
@@ -144,13 +170,25 @@
                 useLegacyIcon: false
             };
 
-            var propertyActions = [
-                copyAllBlocksAction,
-                deleteAllBlocksAction
-            ];
+            pasteSingleBlockAction = {
+                labelKey: "content_createFromClipboard",
+                labelTokens: [],
+                icon: "icon-paste-in",
+                method: requestShowClipboard,
+                isDisabled: false,
+                useLegacyIcon: false
+            };
+
+            var propertyActions = [copyAllBlocksAction, deleteAllBlocksAction];
+
+            var propertyActionsForSingleBlockMode = [pasteSingleBlockAction];
 
             if (vm.umbProperty) {
-                vm.umbProperty.setPropertyActions(propertyActions);
+                if (vm.singleBlockMode) {
+                  vm.umbProperty.setPropertyActions(propertyActionsForSingleBlockMode);
+                } else {
+                  vm.umbProperty.setPropertyActions(propertyActions);
+                }
             }
 
             // Create Model Object, to manage our data for this Block Editor.
@@ -217,6 +255,20 @@
             vm.availableBlockTypes = modelObject.getAvailableBlocksForBlockPicker();
 
             updateClipboard(true);
+
+            if (vm.singleBlockMode && vm.layout.length == 0) {
+                var wasAdded = false;
+                var blockType = vm.availableBlockTypes[0];
+
+                wasAdded = addNewBlock(1, blockType.blockConfigModel.contentElementTypeKey);
+
+                if (wasAdded && inlineEditing === true) {
+                    var blockObject = vm.layout[0]?.$block;
+                    if (blockObject) {
+                        blockObject.activate();
+                    }
+                }
+            }
 
             vm.loading = false;
 
@@ -485,6 +537,7 @@
         }
 
         vm.requestShowCreate = requestShowCreate;
+        
         function requestShowCreate(createIndex, mouseEvent) {
 
             if (vm.blockTypePicker) {
@@ -505,12 +558,15 @@
             }
 
         }
+        
         vm.requestShowClipboard = requestShowClipboard;
-        function requestShowClipboard(createIndex, mouseEvent) {
+        
+        function requestShowClipboard(createIndex) {
             showCreateDialog(createIndex, true);
         }
 
         vm.showCreateDialog = showCreateDialog;
+        
         function showCreateDialog(createIndex, openClipboard) {
 
             if (vm.blockTypePicker) {
@@ -528,6 +584,7 @@
                 availableItems: vm.availableBlockTypes,
                 title: vm.labels.grid_addElement,
                 openClipboard: openClipboard,
+                singleBlockMode: vm.singleBlockMode,
                 orderBy: "$index",
                 view: "views/common/infiniteeditors/blockpicker/blockpicker.html",
                 size: (amountOfAvailableTypes > 8 ? "medium" : "small"),
@@ -581,12 +638,13 @@
             editorService.open(blockPickerModel);
 
         };
+
         function userFlowWhenBlockWasCreated(createIndex) {
             if (vm.layout.length > createIndex) {
                 var blockObject = vm.layout[createIndex].$block;
                 if (inlineEditing === true) {
                     blockObject.activate();
-                } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true && blockObject.content.variants[0].tabs[0]?.properties.length > 0) {
+                } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true && blockObject.content.variants[0].tabs.find(tab => tab.properties.length > 0) !== undefined) {
                     vm.options.createFlow = true;
                     blockObject.edit();
                     vm.options.createFlow = false;
@@ -617,10 +675,10 @@
                         pasteEntry.blockConfigModel = modelObject.getBlockConfiguration(scaffold.contentTypeKey);
                     }
                 }
-                blockPickerModel.clipboardItems.push(pasteEntry);
+                vm.clipboardItems.push(pasteEntry);
             });
 
-            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
+            entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.BLOCK,
@@ -641,15 +699,17 @@
                 return b.date - a.date
             });
 
-            if(firstTime !== true && vm.clipboardItems.length > oldAmount) {
+            if (firstTime !== true && vm.clipboardItems.length > oldAmount) {
                 jumpClipboard();
             }
+
+            pasteSingleBlockAction.isDisabled = vm.clipboardItems.length === 0;
         }
 
         var jumpClipboardTimeout;
         function jumpClipboard() {
 
-            if(jumpClipboardTimeout) {
+            if (jumpClipboardTimeout) {
                 return;
             }
 
@@ -704,6 +764,13 @@
 
             if (pasteEntry === undefined) {
                 return false;
+            }
+
+            if (vm.singleBlockMode) {
+                if (vm.layout.length > 0) {
+                  deleteBlock(vm.layout[0].$block);
+                  index = 1;
+                }
             }
 
             var layoutEntry;
@@ -787,23 +854,8 @@
             requestDeleteBlock: requestDeleteBlock,
             deleteBlock: deleteBlock,
             openSettingsForBlock: openSettingsForBlock,
-            readonly: vm.readonly
-        };
-
-        vm.sortableOptions = {
-            axis: "y",
-            containment: "parent",
-            cursor: "grabbing",
-            handle: ".blockelement__draggable-element",
-            cancel: "input,textarea,select,option",
-            classes: ".blockelement--dragging",
-            distance: 5,
-            tolerance: "pointer",
-            scroll: true,
-            disabled: vm.readonly,
-            update: function (ev, ui) {
-                setDirty();
-            }
+            readonly: vm.readonly,
+            singleBlockMode: vm.singleBlockMode
         };
 
         function onAmountOfBlocksChanged() {
@@ -812,6 +864,7 @@
             if (copyAllBlocksAction) {
                 copyAllBlocksAction.isDisabled = vm.layout.length === 0;
             }
+            
             if (deleteAllBlocksAction) {
                 deleteAllBlocksAction.isDisabled = vm.layout.length === 0 || vm.readonly;
             }

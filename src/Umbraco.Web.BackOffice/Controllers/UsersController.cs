@@ -35,6 +35,7 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Models;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
@@ -758,7 +759,7 @@ public class UsersController : BackOfficeNotificationsController
         }
 
         Attempt<PasswordChangedModel?> passwordChangeResult =
-            await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager);
+            await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager, currentUser);
 
         if (passwordChangeResult.Success)
         {
@@ -795,22 +796,44 @@ public class UsersController : BackOfficeNotificationsController
             return ValidationProblem("The current user cannot disable itself");
         }
 
-        IUser[] users = _userService.GetUsersById(userIds).ToArray();
+        var users = _userService.GetUsersById(userIds).ToList();
+        List<IUser> skippedUsers = new();
         foreach (IUser u in users)
         {
+            if (u.UserState is UserState.Invited)
+            {
+                _logger.LogWarning("Could not disable invited user {Username}", u.Name);
+                skippedUsers.Add(u);
+                continue;
+            }
+
             u.IsApproved = false;
             u.InvitedDate = null;
         }
 
-        _userService.Save(users);
+        users = users.Except(skippedUsers).ToList();
 
-        if (users.Length > 1)
+        if (users.Any())
         {
-            return Ok(_localizedTextService.Localize("speechBubbles", "disableUsersSuccess",
-                new[] { userIds.Length.ToString() }));
+            _userService.Save(users);
+        }
+        else
+        {
+            return Ok(new DisabledUsersModel());
         }
 
-        return Ok(_localizedTextService.Localize("speechBubbles", "disableUserSuccess", new[] { users[0].Name }));
+        var disabledUsersModel = new DisabledUsersModel
+        {
+            DisabledUserIds = users.Select(x => x.Id),
+        };
+
+        var message= users.Count > 1
+            ? _localizedTextService.Localize("speechBubbles", "disableUsersSuccess", new[] { userIds.Length.ToString() })
+            : _localizedTextService.Localize("speechBubbles", "disableUserSuccess", new[] { users[0].Name });
+
+        var header = _localizedTextService.Localize("general", "success");
+        disabledUsersModel.Notifications.Add(new BackOfficeNotification(header, message, NotificationStyle.Success));
+        return Ok(disabledUsersModel);
     }
 
     /// <summary>

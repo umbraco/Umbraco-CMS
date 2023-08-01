@@ -1,18 +1,5 @@
 <style>
-
-    .umb-icon {
-        display: inline-block;
-        width: 1em;
-        height: 1em;
-        flex-shrink: 0;
-    }
-
-    .umb-icon svg {
-        width: 100%;
-        height: 100%;
-        fill: currentColor;
-        animation: inherit;
-    }
+    @import 'assets/css/icons.css';
 
     .blockelement-gridblock-editor {
         position: relative;
@@ -53,6 +40,23 @@
         padding-top:2px;
         padding-bottom:2px;
     }
+    
+    :host {
+        --inherited--areas-column-gap: var(--umb-block-grid--areas-column-gap, 0);
+        --inherited--areas-row-gap: var(--umb-block-grid--areas-row-gap, 0);
+    }
+
+    [part='area-container'] {
+        box-sizing: border-box;
+        padding: 10px;
+        --umb-block-grid--areas-column-gap: 10px;
+        --umb-block-grid--areas-row-gap: 10px;
+    }
+    [part='area-container'] slot {
+        --umb-block-grid--areas-column-gap: var(--inherited--areas-column-gap, 0);
+        --umb-block-grid--areas-row-gap: var(--inherited--areas-row-gap, 0);
+    }
+
 </style>
 
 <div class="blockelement-gridblock-editor" ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">
@@ -64,6 +68,6 @@
         <span>{{block.label}}</span>
     </button>
 
-    <slot name="area-container" part="area-container"></slot>
+    <umb-block-grid-render-area-slots ng-if="block.layout.areas.length > 0"></umb-block-grid-render-area-slots>
 
 </div>

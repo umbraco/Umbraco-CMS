@@ -278,7 +278,8 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *      alert("node wasnt unpublished:" + err.data.Message);
          *    });
           * </pre>
-         * @param {Int} id the ID of the node to unpublish
+         * @param {Int} id the ID of the node to unpublish.
+         * @param {array} cultures the cultures to unpublish.
          * @returns {Promise} resourcePromise object.
          *
          */
@@ -1086,23 +1087,31 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * </pre>
           *
          * @param {Int} id The ID of the conten to publish
+         * @param {array} cultures the cultures to publish.
          * @returns {Promise} resourcePromise object containing the published content item.
          *
          */
-        publishById: function (id) {
-
+        publishById: function (id, cultures) {
             if (!id) {
                 throw "id cannot be null";
             }
 
-            return umbRequestHelper.resourcePromise(
-                $http.post(
+            if (!cultures) {
+                return umbRequestHelper.resourcePromise(
+                  $http.post(
                     umbRequestHelper.getApiUrl(
-                        "contentApiBaseUrl",
-                        "PostPublishById",
-                        [{ id: id }])),
-                'Failed to publish content with id ' + id);
-
+                      "contentApiBaseUrl",
+                      "PostPublishById"), { id: id }),
+                  'Failed to publish content with id ' + id);
+            }
+            else {
+                return umbRequestHelper.resourcePromise(
+                  $http.post(
+                    umbRequestHelper.getApiUrl(
+                      "contentApiBaseUrl",
+                      "PostPublishByIdAndCulture"), { id: id, cultures: cultures }),
+                  'Failed to publish content with id ' + id);
+            }
         },
 
         /**

@@ -42,7 +42,7 @@ angular.module('umbraco.mocks').
             /** Creats a mock content object */
             getMockContent: function (id, key, udi) {
                 key = key || String.CreateGuid();
-                var udi = udi || udiService.build("content", key);
+                udi = udi || udiService.build("content", key);
                 var node = {
                     name: "My content with id: " + id,
                     updateDate: new Date().toIsoDateTimeString(),
@@ -288,7 +288,7 @@ angular.module('umbraco.mocks').
             /** Creats a mock variant content object */
             getMockVariantContent: function(id, key, udi) {
                 key = key || String.CreateGuid();
-                var udi = udi || udiService.build("content", key);
+                udi = udi || udiService.build("content", key);
                 var node = {
                     name: "My content with id: " + id,
                     updateDate: new Date().toIsoDateTimeString(),

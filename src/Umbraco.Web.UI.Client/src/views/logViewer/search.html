@@ -203,7 +203,12 @@
                                                         <a class="btn-reset" ng-switch-when="RequestUrl" href="{{val.Value}}" target="_blank" rel="noopener" localize="title" title="@logViewer_Open" aria-describedby="{{key}}">
                                                             {{val.Value}} <umb-icon icon="icon-link"></umb-icon>
                                                         </a>
-                                                        <span ng-switch-default>{{val.Value}}</span>
+                                                        <span ng-switch-default>
+                                                            <span ng-if="val.Value">
+                                                                {{val.Value}}
+                                                            </span>
+                                                            <pre ng-if="!val.Value">{{val | json}}</pre>
+                                                        </span>
                                                     </td>
                                                 </tr>
                                             </tbody>

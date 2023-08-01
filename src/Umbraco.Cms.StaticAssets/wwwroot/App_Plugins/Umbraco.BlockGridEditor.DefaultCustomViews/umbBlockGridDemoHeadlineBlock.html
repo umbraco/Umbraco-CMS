@@ -1,11 +1,4 @@
 <style>
-
-    :host {
-        position: relative;
-        border-radius: 3px;
-        height: 100%;/* Add this to fill the cell fully */
-        box-sizing: border-box;
-    }
     
     button {
         position: relative;
@@ -34,4 +27,3 @@
 <button type="button" ng-click="block.edit()" ng-focus="block.focus">
     <h1 style="margin: 0 20px;">{{block.data.headline}}</h1>
 </button>
-<slot name="area-container" part="area-container"></slot>

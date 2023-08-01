@@ -22,6 +22,8 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddUmbracoSqlServerSupport(this IUmbracoBuilder builder)
     {
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IProviderSpecificMapperFactory, SqlServerSpecificMapperFactory>());
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>());
         builder.Services.TryAddEnumerable(ServiceDescriptor
             .Singleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>());

@@ -141,5 +141,26 @@ public sealed class ProfilingLogger : IProfilingLogger
     public void LogTrace(string messageTemplate, params object[] propertyValues)
         => Logger.LogTrace(messageTemplate, propertyValues);
 
+    ///<inheritdoc>/>
+    public bool IsEnabled(LogLevel logLevel)
+    {
+        switch (logLevel)
+        {
+            case LogLevel.Verbose:
+                return Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace);
+            case LogLevel.Debug:
+                return Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug);
+            case LogLevel.Information:
+                return Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information);
+            case LogLevel.Warning:
+                return Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Warning);
+            case LogLevel.Error:
+                return Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Error);
+            case LogLevel.Fatal:
+                return Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Critical);
+            default:
+                return true;
+        }
+    }
     #endregion
 }

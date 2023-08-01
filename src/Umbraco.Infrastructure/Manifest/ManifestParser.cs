@@ -1,19 +1,26 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Runtime.Loader;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Manifest;
 
 /// <summary>
-///     Parses the Main.js file and replaces all tokens accordingly.
+/// Parses the Main.js file and replaces all tokens accordingly.
 /// </summary>
 public class ManifestParser : IManifestParser
 {
@@ -21,6 +28,7 @@ public class ManifestParser : IManifestParser
 
     private readonly IAppPolicyCache _cache;
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
+    private readonly IManifestFileProviderFactory _manifestFileProviderFactory;
     private readonly ManifestFilterCollection _filters;
     private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -34,7 +42,7 @@ public class ManifestParser : IManifestParser
     private string _path = null!;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ManifestParser" /> class.
+    /// Initializes a new instance of the <see cref="ManifestParser" /> class.
     /// </summary>
     public ManifestParser(
         AppCaches appCaches,
@@ -46,7 +54,8 @@ public class ManifestParser : IManifestParser
         IJsonSerializer jsonSerializer,
         ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
-        IDataValueEditorFactory dataValueEditorFactory)
+        IDataValueEditorFactory dataValueEditorFactory,
+        IManifestFileProviderFactory manifestFileProviderFactory)
     {
         if (appCaches == null)
         {
@@ -64,6 +73,34 @@ public class ManifestParser : IManifestParser
         _localizedTextService = localizedTextService;
         _shortStringHelper = shortStringHelper;
         _dataValueEditorFactory = dataValueEditorFactory;
+        _manifestFileProviderFactory = manifestFileProviderFactory;
+    }
+
+    [Obsolete("Use other ctor - Will be removed in Umbraco 13")]
+    public ManifestParser(
+        AppCaches appCaches,
+        ManifestValueValidatorCollection validators,
+        ManifestFilterCollection filters,
+        ILogger<ManifestParser> logger,
+        IIOHelper ioHelper,
+        IHostingEnvironment hostingEnvironment,
+        IJsonSerializer jsonSerializer,
+        ILocalizedTextService localizedTextService,
+        IShortStringHelper shortStringHelper,
+        IDataValueEditorFactory dataValueEditorFactory)
+        : this(
+              appCaches,
+              validators,
+              filters,
+              logger,
+              ioHelper,
+              hostingEnvironment,
+              jsonSerializer,
+              localizedTextService,
+              shortStringHelper,
+              dataValueEditorFactory,
+              StaticServiceProvider.Instance.GetRequiredService<IManifestFileProviderFactory>())
+    {
     }
 
     public string AppPluginsPath
@@ -89,12 +126,20 @@ public class ManifestParser : IManifestParser
     public IEnumerable<PackageManifest> GetManifests()
     {
         var manifests = new List<PackageManifest>();
+        IFileProvider? manifestFileProvider = _manifestFileProviderFactory.Create();
 
-        foreach (var path in GetManifestFiles())
+        if (manifestFileProvider is null)
+        {
+            throw new ArgumentNullException(nameof(manifestFileProvider));
+        }
+
+        foreach (IFileInfo file in GetManifestFiles(manifestFileProvider, Constants.SystemDirectories.AppPlugins))
         {
             try
             {
-                var text = File.ReadAllText(path);
+                using Stream stream = file.CreateReadStream();
+                using var reader = new StreamReader(stream, Encoding.UTF8);
+                var text = reader.ReadToEnd();
                 text = TrimPreamble(text);
                 if (string.IsNullOrWhiteSpace(text))
                 {
@@ -102,12 +147,12 @@ public class ManifestParser : IManifestParser
                 }
 
                 PackageManifest manifest = ParseManifest(text);
-                manifest.Source = path;
+                manifest.Source = file.PhysicalPath!; // We assure that the PhysicalPath is not null in GetManifestFiles()
                 manifests.Add(manifest);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to parse manifest at '{Path}', ignoring.", path);
+                _logger.LogError(e, "Failed to parse manifest at '{Path}', ignoring.", file.PhysicalPath);
             }
         }
 
@@ -121,31 +166,44 @@ public class ManifestParser : IManifestParser
     /// </summary>
     public PackageManifest ParseManifest(string text)
     {
-        if (text == null)
-        {
-            throw new ArgumentNullException(nameof(text));
-        }
+        ArgumentNullException.ThrowIfNull(text);
 
         if (string.IsNullOrWhiteSpace(text))
         {
             throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
         }
 
-        PackageManifest? manifest = JsonConvert.DeserializeObject<PackageManifest>(
+        PackageManifest manifest = JsonConvert.DeserializeObject<PackageManifest>(
             text,
             new DataEditorConverter(_dataValueEditorFactory, _ioHelper, _localizedTextService, _shortStringHelper, _jsonSerializer),
             new ValueValidatorConverter(_validators),
-            new DashboardAccessRuleConverter());
+            new DashboardAccessRuleConverter())!;
+
+        if (string.IsNullOrEmpty(manifest.Version))
+        {
+            string? assemblyName = manifest.VersionAssemblyName;
+            if (string.IsNullOrEmpty(assemblyName))
+            {
+                // Fallback to package ID
+                assemblyName = manifest.PackageId;
+            }
+
+            if (!string.IsNullOrEmpty(assemblyName) &&
+                TryGetAssemblyInformationalVersion(assemblyName, out string? version))
+            {
+                manifest.Version = version;
+            }
+        }
 
         // scripts and stylesheets are raw string, must process here
-        for (var i = 0; i < manifest!.Scripts.Length; i++)
+        for (var i = 0; i < manifest.Scripts.Length; i++)
         {
-            manifest.Scripts[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Scripts[i])!;
+            manifest.Scripts[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Scripts[i]);
         }
 
         for (var i = 0; i < manifest.Stylesheets.Length; i++)
         {
-            manifest.Stylesheets[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Stylesheets[i])!;
+            manifest.Stylesheets[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Stylesheets[i]);
         }
 
         foreach (ManifestContentAppDefinition contentApp in manifest.ContentApps)
@@ -155,7 +213,7 @@ public class ManifestParser : IManifestParser
 
         foreach (ManifestDashboard dashboard in manifest.Dashboards)
         {
-            dashboard.View = _ioHelper.ResolveRelativeOrVirtualUrl(dashboard.View)!;
+            dashboard.View = _ioHelper.ResolveRelativeOrVirtualUrl(dashboard.View);
         }
 
         foreach (GridEditor gridEditor in manifest.GridEditors)
@@ -173,6 +231,22 @@ public class ManifestParser : IManifestParser
         }
 
         return manifest;
+    }
+
+    private bool TryGetAssemblyInformationalVersion(string name, [NotNullWhen(true)] out string? version)
+    {
+        foreach (Assembly assembly in AssemblyLoadContext.Default.Assemblies)
+        {
+            AssemblyName assemblyName = assembly.GetName();
+            if (string.Equals(assemblyName.Name, name, StringComparison.OrdinalIgnoreCase) &&
+                assembly.TryGetInformationalVersion(out version))
+            {
+                return true;
+            }
+        }
+
+        version = null;
+        return false;
     }
 
     /// <summary>
@@ -242,14 +316,44 @@ public class ManifestParser : IManifestParser
         return text;
     }
 
-    // gets all manifest files (recursively)
-    private IEnumerable<string> GetManifestFiles()
+    // Gets all manifest files
+    private static IEnumerable<IFileInfo> GetManifestFiles(IFileProvider fileProvider, string path)
     {
-        if (Directory.Exists(_path) == false)
+        var manifestFiles = new List<IFileInfo>();
+        IEnumerable<IFileInfo> pluginFolders = fileProvider.GetDirectoryContents(path);
+
+        foreach (IFileInfo pluginFolder in pluginFolders)
         {
-            return Array.Empty<string>();
+            if (!pluginFolder.IsDirectory)
+            {
+                continue;
+            }
+
+            manifestFiles.AddRange(GetNestedManifestFiles(fileProvider, $"{path}/{pluginFolder.Name}"));
         }
 
-        return Directory.GetFiles(_path, "package.manifest", SearchOption.AllDirectories);
+        return manifestFiles;
+    }
+
+    // Helper method to get all nested package.manifest files (recursively)
+    private static IEnumerable<IFileInfo> GetNestedManifestFiles(IFileProvider fileProvider, string path)
+    {
+        foreach (IFileInfo file in fileProvider.GetDirectoryContents(path))
+        {
+            if (file.IsDirectory)
+            {
+                var virtualPath = WebPath.Combine(path, file.Name);
+
+                // Recursively find nested package.manifest files
+                foreach (IFileInfo nested in GetNestedManifestFiles(fileProvider, virtualPath))
+                {
+                    yield return nested;
+                }
+            }
+            else if (file.Name.InvariantEquals("package.manifest") && !string.IsNullOrEmpty(file.PhysicalPath))
+            {
+                yield return file;
+            }
+        }
     }
 }

@@ -3,7 +3,8 @@ import {expect} from "@playwright/test";
 
 test.describe('Languages', () => {
 
-  test.beforeEach(async ({page, umbracoApi}) => {
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 
@@ -23,6 +24,10 @@ test.describe('Languages', () => {
     // Save and assert success
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
     await umbracoUi.isSuccessNotificationVisible();
+    // await expect(umbracoApi.languages.exists(culture)).toBe(true);
+
+    const doesExistDA = await umbracoApi.languages.exists(culture);
+    await expect(doesExistDA).toBe(true);
 
     // Cleanup
     await umbracoApi.languages.ensureCultureNotExists(culture);
@@ -44,19 +49,29 @@ test.describe('Languages', () => {
 
     // Enter language tree and select the language we just created
     await umbracoUi.clickElement(umbracoUi.getTreeItem('settings', ['languages']));
-    
-    // Assert there are 3 languages
-    await expect(await page.locator('tbody > tr')).toHaveCount(3);
+
+    // Assert that the 2 languages exists
+    // DA
+    let doesExistDA = await umbracoApi.languages.exists(language1);
+    await expect(doesExistDA).toBe(true);
+    // EN
+    let doesExistEN = await umbracoApi.languages.exists(language2);
+    await expect(doesExistEN).toBe(true);
 
     // Delete UK Language
-    await page.locator('umb-button[label-key="general_delete"]').last().click();
-    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey('contentTypeEditor_yesDelete'));
+    await page.getByRole('button', {name: language2}).locator('[label-key=' + ConstantHelper.buttons.delete + ']').click();
+    await umbracoUi.clickDataElementByElementName('button-overlaySubmit');
 
-    // Assert there is only 2 languages
-    await expect(await page.locator('tbody > tr')).toHaveCount(2);
+    // Assert the da language still exists and that the uk is deleted
+    // DA
+    doesExistDA = await umbracoApi.languages.exists(language1);
+    await expect(doesExistDA).toBe(true);
+    // EN
+    await expect(page.getByRole('button', {name: language2})).not.toBeVisible();
+    doesExistEN = await umbracoApi.languages.exists(language2);
+    await expect(doesExistEN).toBe(false);
 
     // Cleanup
     await umbracoApi.languages.ensureCultureNotExists(language1);
-    await umbracoApi.languages.ensureCultureNotExists(language2);
   });
 });

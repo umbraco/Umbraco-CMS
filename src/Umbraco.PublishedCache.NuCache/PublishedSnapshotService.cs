@@ -181,7 +181,10 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
 
         foreach (ContentTypeCacheRefresher.JsonPayload payload in payloads)
         {
-            _logger.LogDebug("Notified {ChangeTypes} for {ItemType} {ItemId}", payload.ChangeTypes, payload.ItemType, payload.Id);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Notified {ChangeTypes} for {ItemType} {ItemId}", payload.ChangeTypes, payload.ItemType, payload.Id);
+            }
         }
 
         Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);
@@ -230,10 +233,13 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
 
         foreach (DataTypeCacheRefresher.JsonPayload payload in payloads)
         {
-            _logger.LogDebug(
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(
                 "Notified {RemovedStatus} for data type {DataTypeId}",
                 payload.Removed ? "Removed" : "Refreshed",
                 payload.Id);
+            }
         }
 
         using (_contentStore.GetScopedWriteLock(_scopeProvider))
@@ -298,15 +304,15 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
                             continue; // anomaly
                         }
 
-                        if (domain.LanguageIsoCode.IsNullOrWhiteSpace())
+                        var culture = domain.LanguageIsoCode;
+                        if (string.IsNullOrWhiteSpace(culture))
                         {
                             continue; // anomaly
                         }
 
-                        var culture = domain.LanguageIsoCode;
                         _domainStore.SetLocked(
                             domain.Id,
-                            new Domain(domain.Id, domain.DomainName, domain.RootContentId.Value, culture, domain.IsWildcard));
+                            new Domain(domain.Id, domain.DomainName, domain.RootContentId.Value, culture, domain.IsWildcard, domain.SortOrder));
                         break;
                 }
             }
@@ -622,15 +628,23 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
     /// </remarks>
     private void MainDomRelease()
     {
-        _logger.LogDebug("Releasing from MainDom...");
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug("Releasing from MainDom...");
+        }
 
         lock (_storesLock)
         {
-            _logger.LogDebug("Releasing content store...");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Releasing content store...");
+            }
             _contentStore?.ReleaseLocalDb(); // null check because we could shut down before being assigned
             _localContentDb = null;
-
-            _logger.LogDebug("Releasing media store...");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Releasing media store...");
+            }
             _mediaStore?.ReleaseLocalDb(); // null check because we could shut down before being assigned
             _localMediaDb = null;
 
@@ -742,8 +756,10 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
             // beware! at that point the cache is inconsistent,
             // assuming we are going to SetAll content items!
             _localMediaDb?.Clear();
-
-            _logger.LogDebug("Loading media from database...");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Loading media from database...");
+            }
 
             // IMPORTANT GetAllMediaSources sorts kits by level + parentId + sortOrder
             try
@@ -832,7 +848,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
         {
             foreach (Domain domain in domains
                          .Where(x => x.RootContentId.HasValue && x.LanguageIsoCode.IsNullOrWhiteSpace() == false)
-                         .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId!.Value, x.LanguageIsoCode!, x.IsWildcard)))
+                         .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId!.Value, x.LanguageIsoCode!, x.IsWildcard, x.SortOrder)))
             {
                 _domainStore.SetLocked(domain.Id, domain);
             }
@@ -852,7 +868,10 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
         // contentStore is write-locked during changes - see note above, calls to this method are wrapped in contentStore.GetScopedWriteLock
         foreach (ContentCacheRefresher.JsonPayload payload in payloads)
         {
-            _logger.LogDebug("Notified {ChangeTypes} for content {ContentId}", payload.ChangeTypes, payload.Id);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Notified {ChangeTypes} for content {ContentId}", payload.ChangeTypes, payload.Id);
+            }
 
             if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
             {
@@ -926,7 +945,10 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
         // see notes for content cache refresher
         foreach (MediaCacheRefresher.JsonPayload payload in payloads)
         {
-            _logger.LogDebug("Notified {ChangeTypes} for media {MediaId}", payload.ChangeTypes, payload.Id);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Notified {ChangeTypes} for media {MediaId}", payload.ChangeTypes, payload.Id);
+            }
 
             if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
             {

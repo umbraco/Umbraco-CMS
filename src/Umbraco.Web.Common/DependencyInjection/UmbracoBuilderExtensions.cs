@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +26,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Diagnostics;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Net;
@@ -46,8 +46,10 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Web.Common;
 using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.Configuration;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Cms.Web.Common.FileProviders;
 using Umbraco.Cms.Web.Common.Localization;
 using Umbraco.Cms.Web.Common.Macros;
 using Umbraco.Cms.Web.Common.Middleware;
@@ -145,6 +147,11 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<DatabaseSchemaCreatorFactory>();
         builder.Services.TryAddEnumerable(ServiceDescriptor
             .Singleton<IDatabaseProviderMetadata, CustomConnectionStringDatabaseProviderMetadata>());
+
+        // WebRootFileProviderFactory is just a wrapper around the IWebHostEnvironment.WebRootFileProvider,
+        // therefore no need to register it as singleton
+        builder.Services.AddSingleton<IManifestFileProviderFactory, ContentAndWebRootFileProviderFactory>();
+        builder.Services.AddSingleton<IGridEditorsConfigFileProviderFactory, WebRootFileProviderFactory>();
 
         // Must be added here because DbProviderFactories is netstandard 2.1 so cannot exist in Infra for now
         builder.Services.AddSingleton<IDbProviderFactoryCreator>(factory => new DbProviderFactoryCreator(
@@ -285,6 +292,9 @@ public static partial class UmbracoBuilderExtensions
             options.Cookie.HttpOnly = true;
         });
 
+        builder.Services.ConfigureOptions<ConfigureApiVersioningOptions>();
+        builder.Services.ConfigureOptions<ConfigureApiExplorerOptions>();
+        builder.Services.AddApiVersioning().AddApiExplorer();
         builder.Services.ConfigureOptions<UmbracoMvcConfigureOptions>();
         builder.Services.ConfigureOptions<UmbracoRequestLocalizationOptions>();
         builder.Services.TryAddEnumerable(ServiceDescriptor

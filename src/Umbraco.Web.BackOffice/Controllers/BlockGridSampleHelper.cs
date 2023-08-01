@@ -172,7 +172,7 @@ public sealed class BlockGridSampleHelper
     internal void CreateSamplePartialViews()
     {
         var embeddedBasePath = $"{_partialViewPopulator.CoreEmbeddedPath}.BlockGrid.Components";
-        var fileSystemBasePath = "/Views/partials/blockgrid/Components";
+        var fileSystemBasePath = "/Views/Partials/blockgrid/Components";
         var filesToMove = new[]
         {
             "umbBlockGridDemoHeadlineBlock.cshtml",

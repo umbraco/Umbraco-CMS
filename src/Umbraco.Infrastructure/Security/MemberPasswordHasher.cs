@@ -5,8 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security;
@@ -107,8 +107,11 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
             }
             else
             {
-                _logger.LogDebug(
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug(
                     "Unable to determine member password hashing algorithm, but this can happen when member enters a wrong password, before it has be rehashed");
+                }
             }
 
             return PasswordVerificationResult.Failed;

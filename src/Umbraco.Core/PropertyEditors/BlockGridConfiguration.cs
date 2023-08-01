@@ -10,13 +10,13 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class BlockGridConfiguration
 {
-    [ConfigurationField("blocks", "Blocks", "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.html", Description = "Define Blocks based on Element Types.")]
+    [ConfigurationField("blocks", "Blocks", "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.html", Description = "Define Blocks based on Element Types. Use Groups to help organise their selection. Example Groups: 'Layout' and 'Content'")]
     public BlockGridBlockConfiguration[] Blocks { get; set; }  = Array.Empty<BlockGridBlockConfiguration>();
 
     [ConfigurationField("blockGroups", "Block Groups", "views/propertyeditors/blockgrid/prevalue/blockgrid.groupconfiguration.html", HideLabel = true)]
     public BlockGridGroupConfiguration[] BlockGroups { get; set; } = Array.Empty<BlockGridGroupConfiguration>();
 
-    [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of blocks")]
+    [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set the required range for the allowed number of blocks")]
     public NumberRange ValidationLimit { get; set; } = new NumberRange();
 
     [ConfigurationField("useLiveEditing", "Live editing mode", "boolean", Description = "Live update content when editing in overlay")]
@@ -28,10 +28,10 @@ public class BlockGridConfiguration
     [ConfigurationField("gridColumns", "Grid Columns", "number", Description = "Set the number of columns for the layout. (defaults to 12)")]
     public int? GridColumns { get; set; }
 
-    [ConfigurationField("layoutStylesheet", "Layout Stylesheet", "views/propertyeditors/blockgrid/prevalue/blockgrid.stylesheetpicker.html", Description = "Overwrite default stylesheet for layout.")]
+    [ConfigurationField("layoutStylesheet", "Layout Stylesheet", "views/propertyeditors/blockgrid/prevalue/blockgrid.stylesheetpicker.html", Description = "Override default stylesheet for backoffice layout.")]
     public string? LayoutStylesheet { get; set; }
 
-    [ConfigurationField("createLabel", "Create Button Label", "textstring", Description = "Overwrite the root create button label")]
+    [ConfigurationField("createLabel", "Create Button Label", "textstring", Description = "Override the label text for adding a new block, Example 'Add Widget'")]
     public string? CreateLabel { get; set; }
 
     [DataContract]
@@ -39,6 +39,9 @@ public class BlockGridConfiguration
     {
         [DataMember(Name ="columnSpanOptions")]
         public BlockGridColumnSpanOption[] ColumnSpanOptions { get; set; }  = Array.Empty<BlockGridColumnSpanOption>();
+
+        [DataMember(Name ="rowMinSpan")]
+        public int? RowMinSpan { get; set; }
 
         [DataMember(Name ="rowMaxSpan")]
         public int? RowMaxSpan { get; set; }
@@ -81,6 +84,9 @@ public class BlockGridConfiguration
 
         [DataMember(Name ="editorSize")]
         public string? EditorSize { get; set; }
+
+        [DataMember(Name ="inlineEditing")]
+        public bool InlineEditing { get; set; }
 
         [DataMember(Name ="forceHideContentEditorInOverlay")]
         public bool ForceHideContentEditorInOverlay { get; set; }

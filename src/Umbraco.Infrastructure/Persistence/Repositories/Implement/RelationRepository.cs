@@ -447,6 +447,9 @@ internal class RelationItemDto
     [Column(Name = "nodeName")]
     public string? ChildNodeName { get; set; }
 
+    [Column(Name = "nodePublished")]
+    public bool? ChildNodePublished { get; set; }
+
     [Column(Name = "nodeObjectType")]
     public Guid ChildNodeObjectType { get; set; }
 

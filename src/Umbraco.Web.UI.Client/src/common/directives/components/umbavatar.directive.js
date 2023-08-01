@@ -69,8 +69,9 @@ Use this directive to render an avatar.
             }
 
             function getNameInitials(name) {
-                if(name) {
-                    var names = name.split(' '),
+                if (name) {
+                    const notAllowedRegex = /[^\p{Letter}\p{Number} ]+/gu;
+                    var names = name.replace(notAllowedRegex, '').trim().split(' '),
                         initials = names[0].substring(0, 1);
 
                     if (names.length > 1) {

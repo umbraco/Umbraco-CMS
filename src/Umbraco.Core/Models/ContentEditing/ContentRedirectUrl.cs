@@ -2,6 +2,7 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
+[Obsolete("Will be replace in new backoffice in V13, RedirectUrlViewModel will be used instead.")]
 [DataContract(Name = "contentRedirectUrl", Namespace = "")]
 public class ContentRedirectUrl
 {

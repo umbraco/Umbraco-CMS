@@ -1,9 +1,11 @@
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Sync;
 
 [Serializable]
+[DataContract]
 public class RefreshInstruction
 {
     // NOTE
@@ -15,7 +17,7 @@ public class RefreshInstruction
     // can de-serialize the instructions it receives
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="CacheInstructionService" /> class.
+    ///     Initializes a new instance of the <see cref="RefreshInstruction" /> class.
     /// </summary>
     /// <remarks>
     ///     Need this public, parameter-less constructor so the web service messenger can de-serialize the instructions it
@@ -27,7 +29,7 @@ public class RefreshInstruction
         JsonIdCount = 1;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="CacheInstructionService" /> class.
+    ///     Initializes a new instance of the <see cref="RefreshInstruction" /> class.
     /// </summary>
     /// <remarks>
     ///     Need this public one so it can be de-serialized - used by the Json thing
@@ -83,26 +85,31 @@ public class RefreshInstruction
     /// <summary>
     ///     Gets or sets the refresh action type.
     /// </summary>
+    [DataMember]
     public RefreshMethodType RefreshType { get; set; }
 
     /// <summary>
     ///     Gets or sets the refresher unique identifier.
     /// </summary>
+    [DataMember]
     public Guid RefresherId { get; set; }
 
     /// <summary>
     ///     Gets or sets the Guid data value.
     /// </summary>
+    [DataMember]
     public Guid GuidId { get; set; }
 
     /// <summary>
     ///     Gets or sets the int data value.
     /// </summary>
+    [DataMember]
     public int IntId { get; set; }
 
     /// <summary>
     ///     Gets or sets the ids data value.
     /// </summary>
+    [DataMember]
     public string? JsonIds { get; set; }
 
     /// <summary>
@@ -116,6 +123,7 @@ public class RefreshInstruction
     /// <summary>
     ///     Gets or sets the payload data value.
     /// </summary>
+    [DataMember]
     public string? JsonPayload { get; set; }
 
     public static bool operator ==(RefreshInstruction left, RefreshInstruction right) => Equals(left, right);

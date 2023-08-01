@@ -29,7 +29,6 @@ module.exports = function (config) {
       'lib/umbraco/Extensions.js',
       'node_modules/lazyload-js/LazyLoad.min.js',
       'node_modules/angular-dynamic-locale/dist/tmhDynamicLocale.min.js',
-      'node_modules/sortablejs/Sortable.min.js',
 
       //app bootstrap and loader
       'test/config/app.unit.js',
@@ -79,6 +78,9 @@ module.exports = function (config) {
     // cli runner port
     // CLI --runner-port 9100
     runnerPort: 9100,
+
+    // Add support for new DNS resolution in Node 17+
+    listenAddress: '::',
 
     // enable / disable colors in the output (reporters and logs)
     // CLI --colors --no-colors

@@ -1,23 +1,25 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 namespace Umbraco.Cms.Core.Actions;
 
 /// <summary>
-///     This action is invoked when children to a document is being sent to published (by an editor without publishrights)
+///     This action is invoked when children to a document is being sent to published (by an editor without publishrights).
 /// </summary>
+[Obsolete("Scheduled for removal in v13")]
 public class ActionToPublish : IAction
 {
-    /// <summary>
-    ///     The unique action letter
-    /// </summary>
+    /// <inheritdoc cref="IAction.ActionLetter"/>
     public const char ActionLetter = 'H';
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IAction.ActionAlias"/>
+    public const string ActionAlias = "sendtopublish";
+
+    /// <inheritdoc/>
     public char Letter => ActionLetter;
 
-    /// <inheritdoc />
-    public string Alias => "sendtopublish";
+    /// <inheritdoc/>
+    public string Alias => ActionAlias;
 
     /// <inheritdoc />
     public string Category => Constants.Conventions.PermissionCategories.ContentCategory;

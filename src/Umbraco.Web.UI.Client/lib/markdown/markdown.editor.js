@@ -1,4 +1,4 @@
-﻿// needs Markdown.Converter.js at the moment
+// needs Markdown.Converter.js at the moment
 
 (function () {
 
@@ -1590,7 +1590,7 @@
     };
 
     // takes the line as entered into the add link/as image dialog and makes
-    // sure the URL and the optinal title are "nice".
+    // sure the URL and the optional title are "nice".
     function properlyEncoded(linkdef) {
         return linkdef.replace(/^\s*(.*?)(?:\s+"(.+)")?\s*$/, function (wholematch, link, title) {
             link = link.replace(/\?.*$/, function (querypart) {

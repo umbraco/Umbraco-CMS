@@ -728,6 +728,8 @@ namespace Umbraco.Cms.Core.Services
                     media.CreatorId = userId;
                 }
 
+                media.WriterId = userId;
+
                 _mediaRepository.Save(media);
                 scope.Notifications.Publish(new MediaSavedNotification(media, eventMessages).WithStateFrom(savingNotification));
                 // TODO: See note about suppressing events in content service

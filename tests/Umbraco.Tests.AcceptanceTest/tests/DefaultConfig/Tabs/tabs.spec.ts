@@ -6,8 +6,9 @@ const tabsDocTypeName = 'Tabs Test Document';
 const tabsDocTypeAlias = AliasHelper.toAlias(tabsDocTypeName);
 
 test.describe('Tabs', () => {
-  
-  test.beforeEach(async ({ umbracoApi, page }) => {
+
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 
@@ -45,6 +46,17 @@ test.describe('Tabs', () => {
     await openDocTypeFolder(umbracoUi, page);
   }
 
+  test('Click dashboard tabs', async ({umbracoUi, page}) => {
+    await umbracoUi.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.clickDataElementByElementName('tab-contentRedirectManager');
+    await expect(page.locator('[data-element="tab-content-contentRedirectManager"]')).toBeVisible();
+    await umbracoUi.clickDataElementByElementName('tab-contentIntro');
+
+    // Assert
+    await expect(page.locator('[data-element="tab-contentIntro"]')).toHaveClass(/umb-tab--active/);
+    await expect(page.locator('[data-element="tab-content-contentIntro"]')).toBeVisible();
+  });
+
   test('Create tab', async ({umbracoUi, umbracoApi, page}) => {
     await umbracoApi.documentTypes.ensureNameNotExists(tabsDocTypeName);
     await umbracoApi.content.deleteAllContent();
@@ -66,7 +78,7 @@ test.describe('Tabs', () => {
     await umbracoUi.waitForTreeLoad('settings');
 
     await umbracoUi.clickElement(umbracoUi.getTreeItem("settings", ["Document Types", tabsDocTypeName]))
-    // Create a tab 
+    // Create a tab
     await page.locator('.umb-group-builder__tabs__add-tab').click();
     await page.locator('ng-form.ng-invalid > .umb-group-builder__group-title-input').fill('Tab 1');
     // Create a 2nd tab manually
@@ -177,7 +189,7 @@ test.describe('Tabs', () => {
     await expect(await page.locator('[title=urlPicker]')).toHaveCount(0);
   });
 
-  test('Reorders tab', async ({umbracoUi, umbracoApi, page}) => { 
+  test('Reorders tab', async ({umbracoUi, umbracoApi, page}) => {
     await umbracoApi.documentTypes.ensureNameNotExists(tabsDocTypeName);
 
     const tabsDocType = new DocumentTypeBuilder()
@@ -484,7 +496,7 @@ test.describe('Tabs', () => {
     await openDocTypeFolder(umbracoUi, page);
     await page.locator('[alias="reorder"]').click();
     await page.locator('.umb-group-builder__tab').last().click();
-    
+
     // Drag and drop property from tab 2 into tab 1
     await page.locator('.umb-group-builder__property-meta > .flex > .icon >> nth=1').last().hover();
     await page.mouse.down();
@@ -492,16 +504,16 @@ test.describe('Tabs', () => {
     await page.waitForTimeout(500);
     await page.locator('[data-element="group-Tab group"]').hover({force:true});
     await page.mouse.up();
-    
+
     // Stop reordering and save
     await page.locator('[alias="reorder"]').click();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
-    
+
     // Assert
     await umbracoUi.isSuccessNotificationVisible();
     await expect(await page.locator('[title="urlPickerTabTwo"]')).toBeVisible();
   });
-  
+
   test('Drags and drops a group and converts to tab', async ({umbracoUi, umbracoApi, page}) => {
     await umbracoApi.documentTypes.ensureNameNotExists(tabsDocTypeName);
     const tabsDocType = new DocumentTypeBuilder()

@@ -313,7 +313,7 @@ function mediaHelper(umbRequestHelper, $http, $log) {
             var thumbnailUrl = umbRequestHelper.getApiUrl(
                 "imagesApiBaseUrl",
                 "GetBigThumbnail",
-                [{ originalImagePath: imagePath }]) + '&rnd=' + Math.random();
+                [{ originalImagePath: imagePath }]);
 
             return thumbnailUrl;
         },
