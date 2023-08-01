@@ -137,7 +137,7 @@ internal class NotificationAsyncHandlerWrapperImpl<TNotification> : Notification
     ///         confusion.
     ///     </para>
     /// </remarks>
-    public override Task HandleAsync(
+    public override async Task HandleAsync(
         INotification notification,
         CancellationToken cancellationToken,
         ServiceFactory serviceFactory,
@@ -155,7 +155,7 @@ internal class NotificationAsyncHandlerWrapperImpl<TNotification> : Notification
                 (theNotification, theToken) =>
                     x.HandleAsync((TNotification)theNotification, theToken)));
 
-        return publish(handlers, notification, cancellationToken);
+        await publish(handlers, notification, cancellationToken);
     }
 }
 
