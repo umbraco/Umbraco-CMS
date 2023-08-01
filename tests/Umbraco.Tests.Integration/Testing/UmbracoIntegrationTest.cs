@@ -19,6 +19,9 @@ using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
+using Umbraco.Search;
+using Umbraco.Search.DependencyInjection;
+using Umbraco.Search.InMemory.DepedencyInjection;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
@@ -50,6 +53,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     /// </summary>
     protected ILoggerFactory LoggerFactory => Services.GetRequiredService<ILoggerFactory>();
 
+    protected ISearchProvider SearchProvider => Services.GetRequiredService<ISearchProvider>();
     protected AppCaches AppCaches => Services.GetRequiredService<AppCaches>();
 
     protected IIOHelper IOHelper => Services.GetRequiredService<IIOHelper>();
@@ -121,7 +125,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         return hostBuilder;
     }
 
-    protected void ConfigureServices(IServiceCollection services)
+    protected virtual void ConfigureServices(IServiceCollection services)
     {
         services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
         var webHostEnvironment = TestHelper.GetWebHostEnvironment();
@@ -150,7 +154,8 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
             .AddBackOfficeAuthentication()
             .AddBackOfficeIdentity()
             .AddMembersIdentity()
-            .AddExamine()
+            .AddSearchServices()
+            .AddInMemoryIndexes()
             .AddUmbracoSqlServerSupport()
             .AddUmbracoSqliteSupport()
             .AddTestServices(TestHelper);

@@ -23,6 +23,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms\Umbraco.Cms.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Search.Examine.Lucene\Umbraco.Search.Examine.Lucene.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Search.Examine\Umbraco.Search.Examine.csproj" />
+    <ProjectReference Include="..\..\Umbraco.Search.Lifti\Umbraco.Search.Lifti.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
   </ItemGroup>
 
@@ -53,6 +57,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Umbraco.Search\" />
+    <Folder Include="Umbraco.Search\Umbraco.Search.Lifti\" />
   </ItemGroup>
+
 </Project>
