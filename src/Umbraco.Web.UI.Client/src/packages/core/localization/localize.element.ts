@@ -35,7 +35,7 @@ export class UmbLocalizeElement extends UmbLitElement {
 	debug = false;
 
 	@state()
-	get text(): string {
+	protected get text(): string {
 		const localizedValue = this.localize.term(this.key, ...(this.args ?? []));
 
 		// If the value is the same as the key, it means the key was not found.
