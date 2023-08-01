@@ -63,6 +63,28 @@ public static class HttpContextExtensions
     }
 
     /// <summary>
+    ///     Runs the authentication process
+    /// </summary>
+    public static async Task<AuthenticateResult> AuthenticateMemberAsync(this HttpContext? httpContext)
+    {
+        if (httpContext == null)
+        {
+            return AuthenticateResult.NoResult();
+        }
+
+        AuthenticateResult result =
+            await httpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType); // which to user for member?
+
+        if (!result.Succeeded)
+        {
+            result =
+                await httpContext.AuthenticateAsync(Constants.Security.BackOfficeExternalAuthenticationType); // which to user for member?
+        }
+
+        return result;
+    }
+
+    /// <summary>
     ///     Get the value in the request form or query string for the key
     /// </summary>
     public static string? GetRequestValue(this HttpContext context, string key)

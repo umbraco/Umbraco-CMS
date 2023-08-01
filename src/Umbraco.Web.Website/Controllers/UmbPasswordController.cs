@@ -1,4 +1,6 @@
+using System.ComponentModel;
 using System.Net;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -158,7 +160,65 @@ public class UmbPasswordController : SurfaceController
     public async Task<IActionResult> VerifyReset(string reset)
     {
         // TODO: Verify reset token.
-        return await Task.FromResult(new EmptyResult());
+
+        AuthenticateResult authenticate = await this.AuthenticateMemberAsync();
+
+        //if you are hitting VerifyReset, you're already signed in as a different member, and the token is invalid
+        //you'll exit on one of the return RedirectToAction(nameof(Default)) but you're still logged in so you just get
+        //dumped at the default admin view with no detail
+        if (authenticate.Succeeded)
+        {
+            await _signInManager.SignOutAsync();
+        }
+
+        if (reset == null)
+        {
+            _logger.LogWarning("VerifyMember endpoint reached with invalid token: NULL");
+            return RedirectToAction(nameof(Default));
+        }
+
+        var parts = WebUtility.UrlDecode(invite).Split('|');
+
+        if (parts.Length != 2)
+        {
+            _logger.LogWarning("VerifyMember endpoint reached with invalid token: {Reset}", reset);
+            return RedirectToAction(nameof(Default));
+        }
+
+        var token = parts[1];
+
+        var decoded = token.FromUrlBase64();
+        if (decoded.IsNullOrWhiteSpace())
+        {
+            _logger.LogWarning("VerifyMember endpoint reached with invalid token: {Reset}", reset);
+            return RedirectToAction(nameof(Default));
+        }
+
+        var id = parts[0];
+
+        MemberIdentityUser? identityMember = await _memberManager.FindByIdAsync(id);
+        if (identityMember == null)
+        {
+            _logger.LogWarning("VerifyMember endpoint reached with non existing user: {MemberId}", id);
+            return RedirectToAction(nameof(Default));
+        }
+
+        IdentityResult result = await _memberManager.ConfirmEmailAsync(identityMember, decoded!);
+
+        if (result.Succeeded == false)
+        {
+            _logger.LogWarning("Could not verify email, Error: {Errors}, Token: {Reset}", result.Errors.ToErrorMessage(), reset);
+            return new RedirectResult(Url.Action(nameof(Default)) + "#/login/false?invite=3");
+        }
+
+        //sign the user in
+        DateTime? previousLastLoginDate = identityMember.LastLoginDateUtc;
+        await _signInManager.SignInAsync(identityMember, false);
+        //reset the lastlogindate back to previous as the user hasn't actually logged in, to add a flag or similar to BackOfficeSignInManager would be a breaking change
+        identityMember.LastLoginDateUtc = previousLastLoginDate;
+        await _memberManager.UpdateAsync(identityMember);
+
+        return new RedirectResult(Url.Action(nameof(Default)) + "#/login/false?invite=1");
     }
 
     /// <summary>

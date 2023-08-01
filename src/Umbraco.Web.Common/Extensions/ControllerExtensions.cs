@@ -14,6 +14,14 @@ public static class ControllerExtensions
         await controller.HttpContext.AuthenticateBackOfficeAsync();
 
     /// <summary>
+    ///     Runs the authentication process
+    /// </summary>
+    /// <param name="controller"></param>
+    /// <returns></returns>
+    public static async Task<AuthenticateResult> AuthenticateMemberAsync(this ControllerBase controller) =>
+        await controller.HttpContext.AuthenticateMemberAsync();
+
+    /// <summary>
     ///     Return the controller name from the controller type
     /// </summary>
     /// <param name="controllerType"></param>
