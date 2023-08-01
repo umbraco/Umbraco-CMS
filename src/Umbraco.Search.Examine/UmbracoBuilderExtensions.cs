@@ -32,28 +32,7 @@ public static partial class UmbracoBuilderExtensions
 {
     public static IUmbracoBuilder AddExamine(this IUmbracoBuilder builder)
     {
-        builder.Services.AddUnique<IPublishedContentValueSetBuilder>(factory =>
-            new ContentValueSetBuilder(
-                factory.GetRequiredService<PropertyEditorCollection>(),
-                factory.GetRequiredService<UrlSegmentProviderCollection>(),
-                factory.GetRequiredService<IUserService>(),
-                factory.GetRequiredService<IShortStringHelper>(),
-                factory.GetRequiredService<IScopeProvider>(),
-                true));
-        builder.Services.AddUnique<IContentValueSetBuilder>(factory =>
-            new ContentValueSetBuilder(
-                factory.GetRequiredService<PropertyEditorCollection>(),
-                factory.GetRequiredService<UrlSegmentProviderCollection>(),
-                factory.GetRequiredService<IUserService>(),
-                factory.GetRequiredService<IShortStringHelper>(),
-                factory.GetRequiredService<IScopeProvider>(),
-                false));
-        builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
-        builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
-        builder.Services.AddUnique<IDeliveryApiContentIndexValueSetBuilder, DeliveryApiContentIndexValueSetBuilder>();
-        builder.Services.AddUnique<IDeliveryApiContentIndexFieldDefinitionBuilder, DeliveryApiContentIndexFieldDefinitionBuilder>();
-        builder.Services.AddUnique<IDeliveryApiContentIndexHelper, DeliveryApiContentIndexHelper>();
-        builder.Services.AddSingleton<IDeliveryApiIndexingHandler, DeliveryApiIndexingHandler>();
+
 
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, ContentTypeIndexingNotificationHandler>();

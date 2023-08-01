@@ -1,5 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
+using Lifti;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Mapping;
@@ -12,6 +14,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.Models;
 using Umbraco.Search.SpecialisedSearchers;
@@ -66,12 +69,6 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
 
         ISet<string> fieldsToLoad = new HashSet<string>(_treeSearcherFields.GetBackOfficeFieldsToLoad());
 
-        // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
-        // manipulation for things like start paths, member types, etc...
-        //if (Examine.ExamineExtensions.TryParseLuceneQuery(query))
-        //{
-
-        //}
 
         //special GUID check since if a user searches on one specifically we need to escape it
         if (Guid.TryParse(query, out Guid g))
@@ -95,7 +92,7 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
                 if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId &&
                     searchFrom.Trim() != "-1")
                 {
-                    sb.Append("+__NodeTypeAlias:");
+                    sb.Append("&__NodeTypeAlias=");
                     sb.Append(searchFrom);
                     sb.Append(" ");
                 }
@@ -128,12 +125,13 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
                 AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                 break;
             default:
-                throw new NotSupportedException("The " + typeof(BackOfficeExamineSearcher) +
+                throw new NotSupportedException("The " + typeof(BackOfficeInMemorySearcher) +
                                                 " currently does not support searching against object type " +
                                                 entityType);
         }
 
-        if (!_examineManager.TryGetIndex(indexName, out IIndex? index))
+        var index = _liftiIndexManager.GetIndex(indexName);
+        if (index == null)
         {
             throw new InvalidOperationException("No index found by name " + indexName);
         }
@@ -144,16 +142,14 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
             return Enumerable.Empty<IUmbracoSearchResult>();
         }
 
-        ISearchResults? result = index.Searcher
-            .CreateQuery()
-            .NativeQuery(sb.ToString())
-            .SelectFields(fieldsToLoad)
-            //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
-            .Execute(QueryOptions.SkipTake(Convert.ToInt32(pageSize * pageIndex), pageSize));
+        var allResults = index.LiftiIndex.Search(sb.ToString());
+        IEnumerable<SearchResult<string>> result;
+        result = allResults.Skip(Convert.ToInt32(pageSize * pageIndex)).Take(pageSize);
 
-        totalFound = result.TotalItemCount;
 
-        return result.ToUmbracoResults();
+        totalFound = allResults.Count();
+
+        return result.ToUmbracoResults( );
     }
 
     private bool BuildQuery(StringBuilder sb, string query, string? searchFrom, List<string> fields, string type)
@@ -165,11 +161,6 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
 
         var allLangs = _languageService.GetAllLanguages().Select(x => x.IsoCode.ToLowerInvariant()).ToList();
 
-        // the chars [*-_] in the query will mess everything up so let's remove those
-        // However we cannot just remove - and _  since these signify a space, so we instead replace them with that.
-        query = Regex.Replace(query, "[\\*]", string.Empty);
-        query = Regex.Replace(query, "[\\-_]", " ");
-
 
         //check if text is surrounded by single or double quotes, if so, then exact match
         var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
@@ -180,7 +171,6 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
             //strip quotes, escape string, the replace again
             query = query.Trim(Constants.CharArrays.DoubleQuoteSingleQuote);
 
-            query = QueryParserBase.Escape(query);
 
             //nothing to search
             if (searchFrom.IsNullOrWhiteSpace() && query.IsNullOrWhiteSpace())
@@ -194,7 +184,7 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
                 //add back the surrounding quotes
                 query = string.Format("{0}{1}{0}", "\"", query);
 
-                sb.Append("+(");
+                sb.Append("&");
 
                 AppendNodeNamePhraseWithBoost(sb, query, allLangs);
 
@@ -202,12 +192,11 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
                 {
                     //additional fields normally
                     sb.Append(f);
-                    sb.Append(": (");
+                    sb.Append("= ");
                     sb.Append(query);
-                    sb.Append(") ");
+                    sb.Append(" ");
                 }
 
-                sb.Append(") ");
             }
         }
         else
@@ -223,11 +212,10 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
             //update the query with the query term
             if (trimmed.IsNullOrWhiteSpace() == false)
             {
-                query = QueryParserBase.Escape(query);
 
                 var querywords = query.Split(Constants.CharArrays.Space, StringSplitOptions.RemoveEmptyEntries);
 
-                sb.Append("+(");
+                sb.Append("&");
 
                 AppendNodeNameExactWithBoost(sb, query, allLangs);
 
@@ -253,24 +241,21 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
 
                     //additional fields normally
                     sb.Append(f);
-                    sb.Append(":");
-                    sb.Append("(");
+                    sb.Append("=");
                     foreach (var w in queryWordsReplaced)
                     {
                         sb.Append(w.ToLower());
                         sb.Append("* ");
                     }
 
-                    sb.Append(")");
                     sb.Append(" ");
                 }
 
-                sb.Append(") ");
             }
         }
 
         //must match index type
-        sb.Append("+__IndexType:");
+        sb.Append("&__IndexType=");
         sb.Append(type);
 
         return true;

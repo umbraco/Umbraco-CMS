@@ -14,9 +14,11 @@ using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 using Umbraco.Search.Configuration;
+using Umbraco.Search.Examine;
 using Umbraco.Search.Indexing;
 using Umbraco.Search.Indexing.Populators;
 using Umbraco.Search.InMemory.SpecialisedSearchers;
+using Umbraco.Search.Services;
 using Umbraco.Search.ValueSet;
 using IBackOfficeExamineSearcher = Umbraco.Search.SpecialisedSearchers.IBackOfficeExamineSearcher;
 using IIndexDiagnosticsFactory = Umbraco.Search.Diagnostics.IIndexDiagnosticsFactory;
@@ -54,6 +56,8 @@ public static class UmbracoBuilderExtensions
         serviceCollection.AddSingleton<IUmbracoIndex>(serviceCollection =>
             new UmbracoMemoryIndex<T>(serviceCollection.GetRequiredService<ILiftiIndexManager>().GetIndex(name),
                 serviceCollection.GetRequiredService<ValueSet.ValueSetBuilders.IValueSetBuilder<T>>()));
+        serviceCollection.AddSingleton<IUmbracoSearcher>(serviceCollection =>
+            new UmbracoMemorySearcher<T>(serviceCollection.GetRequiredService<ILiftiIndexManager>().GetIndex(name), name));
         return serviceCollection;
     }
 
@@ -93,6 +97,9 @@ public static class UmbracoBuilderExtensions
                 = services.GetRequiredService<IIndexConfigurationFactory>();
             return configuration.GetConfiguration();
         });
+        services.AddSingleton<ILiftiIndexManager, LiftiIndexManager>();
+        services.AddTransient<ISearchMainDomHandler, InMemoryIndexingMainDomHandler>();
+
         services.AddSingleton<IBackOfficeExamineSearcher, BackOfficeInMemorySearcher>();
         // Create the indexes
         services

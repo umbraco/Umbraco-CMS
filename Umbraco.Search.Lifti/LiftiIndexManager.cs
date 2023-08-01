@@ -16,8 +16,3 @@ public class LiftiIndexManager : ILiftiIndexManager
         return _liftiIndices.FirstOrDefault(x => x?.Name == name);
     }
 }
-
-public interface ILiftiIndexManager
-{
-    ILiftiIndex? GetIndex(string name);
-}

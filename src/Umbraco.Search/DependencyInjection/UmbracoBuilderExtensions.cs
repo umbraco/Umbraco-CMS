@@ -2,19 +2,29 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Infrastructure.Search;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
 using Umbraco.Extensions;
-using Umbraco.Search.Configuration;
-using Umbraco.Search.Diagnostics;
-using Umbraco.Search.Indexing;
 using Umbraco.Search.Indexing.Populators;
 using Umbraco.Search.NotificationHandlers;
 using Umbraco.Search.Services;
-using Umbraco.Search.SpecialisedSearchers;
-using Umbraco.Search.SpecialisedSearchers.Tree;
 using Umbraco.Search.Telemetry;
+using Umbraco.Search.ValueSet.ValueSetBuilders;
+using ContentIndexPopulator = Umbraco.Search.Indexing.Populators.ContentIndexPopulator;
+using IBackOfficeExamineSearcher = Umbraco.Search.SpecialisedSearchers.IBackOfficeExamineSearcher;
+using IIndexDiagnosticsFactory = Umbraco.Search.Diagnostics.IIndexDiagnosticsFactory;
+using IIndexRebuilder = Umbraco.Search.Indexing.IIndexRebuilder;
+using IndexDiagnosticsFactory = Umbraco.Search.Diagnostics.IndexDiagnosticsFactory;
+using IUmbracoTreeSearcherFields = Umbraco.Search.Configuration.IUmbracoTreeSearcherFields;
+using MediaIndexPopulator = Umbraco.Search.Indexing.Populators.MediaIndexPopulator;
+using MemberIndexPopulator = Umbraco.Search.Indexing.Populators.MemberIndexPopulator;
+using NoopBackOfficeExamineSearcher = Umbraco.Search.SpecialisedSearchers.NoopBackOfficeExamineSearcher;
+using PublishedContentIndexPopulator = Umbraco.Search.Indexing.Populators.PublishedContentIndexPopulator;
 
 namespace Umbraco.Search.DependencyInjection;
 
@@ -42,7 +52,28 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationHandler<ContentCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<PublicAccessCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
-
+        builder.Services.AddUnique<IPublishedContentValueSetBuilder>(factory =>
+            new ContentValueSetBuilder(
+                factory.GetRequiredService<PropertyEditorCollection>(),
+                factory.GetRequiredService<UrlSegmentProviderCollection>(),
+                factory.GetRequiredService<IUserService>(),
+                factory.GetRequiredService<IShortStringHelper>(),
+                factory.GetRequiredService<IScopeProvider>(),
+                true));
+        builder.Services.AddUnique<IContentValueSetBuilder>(factory =>
+            new ContentValueSetBuilder(
+                factory.GetRequiredService<PropertyEditorCollection>(),
+                factory.GetRequiredService<UrlSegmentProviderCollection>(),
+                factory.GetRequiredService<IUserService>(),
+                factory.GetRequiredService<IShortStringHelper>(),
+                factory.GetRequiredService<IScopeProvider>(),
+                false));
+        builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
+        builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
+        builder.Services.AddUnique<IDeliveryApiContentIndexValueSetBuilder, DeliveryApiContentIndexValueSetBuilder>();
+        builder.Services.AddUnique<IDeliveryApiContentIndexFieldDefinitionBuilder, DeliveryApiContentIndexFieldDefinitionBuilder>();
+        builder.Services.AddUnique<IDeliveryApiContentIndexHelper, DeliveryApiContentIndexHelper>();
+        builder.Services.AddSingleton<IDeliveryApiIndexingHandler, DeliveryApiIndexingHandler>();
         builder.Services.AddTransient<IIndexCountService, IndexCountService>();
         builder.Services.AddTransient<IDetailedTelemetryProvider, SearchTelemetryProvider>();
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<SearchMapper>();

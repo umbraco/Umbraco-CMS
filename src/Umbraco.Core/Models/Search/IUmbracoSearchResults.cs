@@ -13,6 +13,6 @@ public interface IUmbracoSearchResults
     public long TotalRecords { get; set; }
 
     [DataMember(Name = "results")]
-    public IEnumerable<UmbracoSearchResult>? Results { get; set; }
+    public IEnumerable<IUmbracoSearchResult>? Results { get; set; }
 
 }
