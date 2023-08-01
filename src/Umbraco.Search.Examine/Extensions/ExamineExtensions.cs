@@ -18,6 +18,7 @@ public static class ExamineExtensions
         var resultsTarget = results.Select(x => new UmbracoSearchResult(x.Id, x.Score, x.Values));
         return resultsTarget;
     }
+
     public static FieldDefinitionCollection toExamineFieldDefinitionCollection(
         this UmbracoFieldDefinitionCollection collection)
     {
@@ -27,40 +28,24 @@ public static class ExamineExtensions
 
     public static string ToExamineType(this UmbracoFieldType fieldType)
     {
-        switch (fieldType)
+        return fieldType switch
         {
-            case UmbracoFieldType.Integer:
-                return FieldDefinitionTypes.Integer;
-            case UmbracoFieldType.Raw:
-                return FieldDefinitionTypes.Raw;
-            case UmbracoFieldType.DateTime:
-                return FieldDefinitionTypes.DateTime;
-            case UmbracoFieldType.EmailAddress:
-                return FieldDefinitionTypes.EmailAddress;
-            case UmbracoFieldType.InvariantCultureIgnoreCase:
-                return FieldDefinitionTypes.InvariantCultureIgnoreCase;
-            case UmbracoFieldType.Double:
-                return FieldDefinitionTypes.Double;
-            case UmbracoFieldType.Float:
-                return FieldDefinitionTypes.Float;
-            case UmbracoFieldType.Long:
-                return FieldDefinitionTypes.Long;
-            case UmbracoFieldType.DateYear:
-                return FieldDefinitionTypes.DateYear;
-            case UmbracoFieldType.DateMonth:
-                return FieldDefinitionTypes.DateMonth;
-            case UmbracoFieldType.DateDay:
-                return FieldDefinitionTypes.DateDay;
-            case UmbracoFieldType.DateHour:
-                return FieldDefinitionTypes.DateDay;
-            case UmbracoFieldType.FullText :
-                return FieldDefinitionTypes.DateDay;
-            case UmbracoFieldType.FullTextSortable:
-                return FieldDefinitionTypes.DateDay;
-        }
-
-        //if type unknown return RAW
-        return FieldDefinitionTypes.Raw;
+            UmbracoFieldType.Integer => FieldDefinitionTypes.Integer,
+            UmbracoFieldType.Raw => FieldDefinitionTypes.Raw,
+            UmbracoFieldType.DateTime => FieldDefinitionTypes.DateTime,
+            UmbracoFieldType.EmailAddress => FieldDefinitionTypes.EmailAddress,
+            UmbracoFieldType.InvariantCultureIgnoreCase => FieldDefinitionTypes.InvariantCultureIgnoreCase,
+            UmbracoFieldType.Double => FieldDefinitionTypes.Double,
+            UmbracoFieldType.Float => FieldDefinitionTypes.Float,
+            UmbracoFieldType.Long => FieldDefinitionTypes.Long,
+            UmbracoFieldType.DateYear => FieldDefinitionTypes.DateYear,
+            UmbracoFieldType.DateMonth => FieldDefinitionTypes.DateMonth,
+            UmbracoFieldType.DateDay => FieldDefinitionTypes.DateDay,
+            UmbracoFieldType.DateHour => FieldDefinitionTypes.DateDay,
+            UmbracoFieldType.FullText => FieldDefinitionTypes.DateDay,
+            UmbracoFieldType.FullTextSortable => FieldDefinitionTypes.DateDay,
+            _ => FieldDefinitionTypes.Raw,
+        };
     }
 
     /// <summary>
@@ -132,24 +117,20 @@ public static class ExamineExtensions
                 result.Values.TryGetValue(ExamineFieldNames.CategoryFieldName, out var indexType))
             {
                 IPublishedContent? content;
-                switch (indexType)
+                content = indexType switch
                 {
-                    case IndexTypes.Content:
-                        content = snapshot.Content?.GetById(contentId);
-                        break;
-                    case IndexTypes.Media:
-                        content = snapshot.Media?.GetById(contentId);
-                        break;
-                    case IndexTypes.Member:
-                        throw new NotSupportedException("Cannot convert search results to member instances");
-                    default:
-                        continue;
+                    IndexTypes.Content => snapshot.Content?.GetById(contentId),
+                    IndexTypes.Media => snapshot.Media?.GetById(contentId),
+                    IndexTypes.Member => throw new NotSupportedException(
+                        "Cannot convert search results to member instances"),
+                    _ => null
+                };
+                if (content == null)
+                {
+                    continue;
                 }
 
-                if (content != null)
-                {
-                    publishedSearchResults.Add(new PublishedSearchResult(content, result.Score));
-                }
+                publishedSearchResults.Add(new PublishedSearchResult(content, result.Score));
             }
         }
 
