@@ -4,6 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 /**
  * This element allows you to localize a string with optional interpolation values.
  * @element umb-localize
+ * @slot - The fallback value if the key is not found.
  */
 @customElement('umb-localize')
 export class UmbLocalizeElement extends UmbLitElement {
