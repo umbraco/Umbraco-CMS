@@ -10,6 +10,7 @@ import {
 } from '@umbraco-cms/backoffice/context-api';
 import { ObserverCallback, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
+import { property } from '@umbraco-cms/backoffice/external/lit';
 
 export declare class UmbElement extends UmbControllerHostElement {
 	/**
@@ -29,20 +30,15 @@ export declare class UmbElement extends UmbControllerHostElement {
 		alias: string | UmbContextToken<R>,
 		callback: UmbContextCallback<R>
 	): UmbContextConsumerController<R>;
-	get localize(): UmbLocalizeController;
 }
 
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbElementMixinClass extends UmbControllerHostElementMixin(superClass) implements UmbElement {
-		#localizeController = new UmbLocalizeController(this);
+		// Make `dir` and `lang` reactive properties so they react to language changes:
+		@property() dir = '';
+		@property() lang = '';
 
-		/**
-		 * Get the localize controller.
-		 * @readonly
-		 */
-		get localize(): UmbLocalizeController {
-			return this.#localizeController;
-		}
+		localize: UmbLocalizeController = new UmbLocalizeController(this);
 
 		/**
 		 * @description Observe a RxJS source of choice.

@@ -6,7 +6,11 @@ import type { UmbController } from './controller.interface.js';
 import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
 
 export declare class UmbControllerHostElement extends HTMLElement implements UmbControllerHost {
-	get localize(): UmbLocalizeController | undefined;
+	/**
+	 * Use the UmbLocalizeController to localize your element.
+	 * @see UmbLocalizeController
+	 */
+	localize: UmbLocalizeController;
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;
