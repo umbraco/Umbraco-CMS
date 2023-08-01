@@ -22,6 +22,11 @@ const english = {
 			general: {
 				close: 'Close',
 				logout: 'Log out',
+				numUsersSelected: (count: number) => {
+					if (count === 0) return 'No users selected';
+					if (count === 1) return 'One user selected';
+					return `${count} users selected`;
+				},
 			},
 		},
 	},
@@ -111,6 +116,12 @@ describe('UmbLocalizeController', () => {
 			await aTimeout(0);
 			await elementUpdated(element);
 			expect(element.localize.term('general_close')).to.equal('Close 2');
+		});
+
+		it('should return a term with a custom format', async () => {
+			expect(element.localize.term('general_numUsersSelected', 0)).to.equal('No users selected');
+			expect(element.localize.term('general_numUsersSelected', 1)).to.equal('One user selected');
+			expect(element.localize.term('general_numUsersSelected', 2)).to.equal('2 users selected');
 		});
 	});
 
