@@ -56,21 +56,23 @@ export default class UmbLoginElement extends LitElement {
 		this.dispatchEvent(new CustomEvent('login-success', { bubbles: true, composed: true }));
 	};
 
-	get #greeting() {
+	get #greetingLocalizationKey() {
 		return [
-			'Happy super Sunday',
-			'Happy marvelous Monday',
-			'Happy tubular Tuesday',
-			'Happy wonderful Wednesday',
-			'Happy thunderous Thursday',
-			'Happy funky Friday',
-			'Happy Saturday',
+			'login_greeting0',
+			'login_greeting1',
+			'login_greeting2',
+			'login_greeting3',
+			'login_greeting4',
+			'login_greeting5',
+			'login_greeting6',
 		][new Date().getDay()];
 	}
 
 	render() {
 		return html`
-			<h1 id="greeting" class="uui-h3">${this.#greeting}</h1>
+			<h1 id="greeting" class="uui-h3">
+				<umb-localize key=${this.#greetingLocalizationKey}></umb-localize>
+			</h1>
 			<uui-form>
 				<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
 					<uui-form-layout-item>
