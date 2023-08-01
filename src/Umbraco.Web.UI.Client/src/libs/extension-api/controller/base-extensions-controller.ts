@@ -25,7 +25,7 @@ export abstract class UmbBaseExtensionsController<
 	#type: ManifestTypeName;
 	#filter: undefined | null | ((manifest: ManifestType) => boolean);
 	#onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void;
-	private _extensions: Array<ControllerType> = [];
+	protected _extensions: Array<ControllerType> = [];
 	private _permittedExts: Array<MyPermittedControllerType> = [];
 
 	constructor(

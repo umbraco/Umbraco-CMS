@@ -20,9 +20,6 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	#extensionsController?: UmbExtensionsElementController;
 
 	@state()
-	private _extensions: Array<UmbExtensionElementController> = [];
-
-	@state()
 	private _permittedExts: Array<UmbExtensionElementController> = [];
 
 	@property({ type: String })
@@ -37,8 +34,11 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		return this._props;
 	}
 	set props(newVal) {
+		// TODO, compare changes since last time. only reset the ones that changed. This might be better done by the controller is self:
 		this._props = newVal;
-		this._extensions.forEach((ext) => (ext.properties = this._props));
+		if (this.#extensionsController) {
+			this.#extensionsController.properties = newVal;
+		}
 	}
 
 	@property({ type: String, attribute: 'default-element' })
@@ -51,19 +51,22 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 
 	private _observeExtensions() {
 		this.#extensionsController?.destroy();
-		console.log('observe', this.type, this.defaultElement);
+		if (this.type === 'treeItem') {
+			console.log('observe', this.type, this.defaultElement);
+		}
 		this.#extensionsController = new UmbExtensionsElementController(
 			this,
 			this.type,
 			this.filter,
 			(extensionControllers) => {
-				if (extensionControllers[0].manifest?.type === 'menuItem') {
+				if (extensionControllers[0].manifest?.type === 'treeItem') {
 					console.log('extensionControllers', extensionControllers);
 				}
 				this._permittedExts = extensionControllers;
 			},
 			this.defaultElement
 		);
+		this.#extensionsController.properties = this._props;
 	}
 
 	render() {

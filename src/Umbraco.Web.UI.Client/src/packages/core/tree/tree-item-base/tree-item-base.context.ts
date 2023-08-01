@@ -3,19 +3,15 @@ import { UmbTreeContextBase } from '../tree.context.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT_TOKEN, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
-import { ManifestEntityAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { type ManifestEntityAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbBooleanState,
 	UmbDeepState,
 	UmbStringState,
 	UmbObserverController,
 } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import {
-	UmbContextConsumerController,
-	UmbContextProviderController,
-	UmbContextToken,
-} from '@umbraco-cms/backoffice/context-api';
+import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 // add type for unique function
@@ -24,9 +20,9 @@ export type UmbTreeItemUniqueFunction<TreeItemType extends TreeItemPresentationM
 ) => string | null | undefined;
 
 export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationModel>
+	extends UmbBaseController
 	implements UmbTreeItemContext<TreeItemType>
 {
-	public host: UmbControllerHostElement;
 	public unique?: string | null;
 	public type?: string;
 
@@ -61,13 +57,12 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 	#sectionContext?: UmbSectionContext;
 	#sectionSidebarContext?: UmbSectionSidebarContext;
 	#getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>;
-	#actionObserver?: UmbObserverController<ManifestEntityAction[]>;
 
-	constructor(host: UmbControllerHostElement, getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>) {
-		this.host = host;
+	constructor(host: UmbControllerHost, getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>) {
+		super(host);
 		this.#getUniqueFunction = getUniqueFunction;
 		this.#consumeContexts();
-		new UmbContextProviderController(host, UMB_TREE_ITEM_CONTEXT_TOKEN, this);
+		this.provideContext(UMB_TREE_ITEM_CONTEXT_TOKEN, this);
 	}
 
 	public setTreeItem(treeItem: TreeItemType | undefined) {
@@ -85,8 +80,15 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 		this.type = treeItem.type;
 
 		this.#hasChildren.next(treeItem.hasChildren || false);
-		this.#observeActions();
 		this.#treeItem.next(treeItem);
+
+		console.log('Item was set..', unique);
+
+		// Update observers:
+		this.#observeActions();
+		this.#observeIsSelectable();
+		this.#observeIsSelected();
+		this.#observeSectionPath();
 	}
 
 	public async requestChildren() {
@@ -118,16 +120,16 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 	}
 
 	#consumeContexts() {
-		new UmbContextConsumerController(this.host, UMB_SECTION_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (instance) => {
 			this.#sectionContext = instance;
 			this.#observeSectionPath();
 		});
 
-		new UmbContextConsumerController(this.host, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_SECTION_SIDEBAR_CONTEXT_TOKEN, (instance) => {
 			this.#sectionSidebarContext = instance;
 		});
 
-		new UmbContextConsumerController(this.host, 'umbTreeContext', (treeContext: UmbTreeContextBase<TreeItemType>) => {
+		this.consumeContext('umbTreeContext', (treeContext: UmbTreeContextBase<TreeItemType>) => {
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
@@ -140,53 +142,56 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 
 	#observeIsSelectable() {
 		if (!this.treeContext) return;
-		new UmbObserverController(this.host, this.treeContext.selectable, (value) => {
-			this.#isSelectableContext.next(value);
+		this.observe(
+			this.treeContext.selectable,
+			(value) => {
+				this.#isSelectableContext.next(value);
 
-			// If the tree is selectable, check if this item is selectable
-			if (value === true) {
-				const isSelectable = this.treeContext?.selectableFilter?.(this.getTreeItem()!) ?? true;
-				this.#isSelectable.next(isSelectable);
-			}
-		});
+				// If the tree is selectable, check if this item is selectable
+				if (value === true) {
+					const isSelectable = this.treeContext?.selectableFilter?.(this.getTreeItem()!) ?? true;
+					this.#isSelectable.next(isSelectable);
+				}
+			},
+			'observeIsSelectable'
+		);
 	}
 
 	#observeIsSelected() {
-		if (!this.treeContext) throw new Error('Could not request children, tree context is missing');
-		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
+		if (!this.treeContext || !this.unique) return;
 
-		new UmbObserverController(
-			this.host,
+		this.observe(
 			this.treeContext.selection.pipe(map((selection) => selection.includes(this.unique!))),
 			(isSelected) => {
 				this.#isSelected.next(isSelected);
-			}
+			},
+			'observeIsSelected'
 		);
 	}
 
 	#observeSectionPath() {
 		if (!this.#sectionContext) return;
 
-		new UmbObserverController(this.host, this.#sectionContext.pathname, (pathname) => {
-			if (!pathname) return;
-			if (!this.type) throw new Error('Cant construct path, entity type is missing');
-			if (this.unique === undefined) throw new Error('Cant construct path, unique is missing');
-			const path = this.constructPath(pathname, this.type, this.unique);
-			this.#path.next(path);
-		});
+		this.observe(
+			this.#sectionContext.pathname,
+			(pathname) => {
+				if (!pathname || !this.type || this.unique === undefined) return;
+				const path = this.constructPath(pathname, this.type, this.unique);
+				this.#path.next(path);
+			},
+			'observeSectionPath'
+		);
 	}
 
 	#observeActions() {
-		if (this.#actionObserver) this.#actionObserver.destroy();
-
-		this.#actionObserver = new UmbObserverController(
-			this.host,
+		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('entityAction')
 				.pipe(map((actions) => actions.filter((action) => action.conditions.entityTypes.includes(this.type!)))),
 			(actions) => {
 				this.#hasActions.next(actions.length > 0);
-			}
+			},
+			'observeActions'
 		);
 	}
 

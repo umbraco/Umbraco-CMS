@@ -15,7 +15,7 @@ const treeItem: ManifestTreeItem = {
 	kind: 'entity',
 	alias: 'Umb.TreeItem.RelationType',
 	name: 'Relation Type Tree Item',
-	conditions: {
+	meta: {
 		entityTypes: ['relation-type-root', 'relation-type'],
 	},
 };

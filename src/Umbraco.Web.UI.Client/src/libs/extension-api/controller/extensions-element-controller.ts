@@ -16,8 +16,19 @@ export class UmbExtensionsElementController<
 	ControllerType extends UmbExtensionElementController<ManifestType> = UmbExtensionElementController<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
 > extends UmbBaseExtensionsController<ManifestTypeName, ManifestType, ControllerType, MyPermittedControllerType> {
-	// Properties:
+	//
 	private _defaultElement?: string;
+	#props?: Record<string, unknown>;
+
+	public get properties() {
+		return this.#props;
+	}
+	public set properties(props: Record<string, unknown> | undefined) {
+		this.#props = props;
+		this._extensions.forEach((controller) => {
+			controller.properties = props;
+		});
+	}
 
 	constructor(
 		host: UmbControllerHost,
@@ -32,15 +43,16 @@ export class UmbExtensionsElementController<
 	}
 
 	protected _createController(manifest: ManifestType) {
-		if (manifest.type === 'menuItem') {
-			console.log('create for', manifest);
-		}
-		return new UmbExtensionElementController<ManifestType>(
+		const extController = new UmbExtensionElementController<ManifestType>(
 			this,
 			umbExtensionsRegistry,
 			manifest.alias,
 			this._extensionChanged,
 			this._defaultElement
 		) as ControllerType;
+
+		extController.properties = this.#props;
+
+		return extController;
 	}
 }

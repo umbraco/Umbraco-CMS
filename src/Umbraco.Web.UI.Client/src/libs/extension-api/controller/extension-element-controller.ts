@@ -35,7 +35,7 @@ export class UmbExtensionElementController<
 	 * controller.component.foo = 'bar';
 	 * ```
 	 */
-	#properties?: Record<string, any> = {};
+	#properties?: Record<string, unknown>;
 	get properties() {
 		return this.#properties;
 	}
@@ -59,10 +59,12 @@ export class UmbExtensionElementController<
 
 	#assignProperties = () => {
 		if (!this._component || !this.#properties) return;
+		console.log(this._component, 'assignProperties??', this.#properties);
 
 		// TODO: we could optimize this so we only re-set the updated props.
 		Object.keys(this.#properties).forEach((key) => {
-			(this._component as any)[key] = this.#properties?.[key];
+			console.log('prop:', key, this.#properties![key]);
+			(this._component as any)[key] = this.#properties![key];
 		});
 	};
 

@@ -13,6 +13,7 @@ export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTree
 		return this._item;
 	}
 	public set item(value: DocumentTreeItemResponseModel | undefined) {
+		console.log('Item prop', value);
 		this._item = value;
 		this.#context.setTreeItem(value);
 	}
