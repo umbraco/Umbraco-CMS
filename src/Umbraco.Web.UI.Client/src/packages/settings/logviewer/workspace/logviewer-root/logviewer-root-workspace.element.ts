@@ -1,5 +1,5 @@
 import '../../components/index.js';
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context.js';
+import { UmbLogViewerWorkspaceContext } from '../logviewer.context.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	PropertyValueMap,
@@ -39,11 +39,6 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 
 	#logViewerContext = new UmbLogViewerWorkspaceContext(this);
 
-	constructor() {
-		super();
-		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, this.#logViewerContext);
-	}
-
 	firstUpdated(props: PropertyValueMap<unknown>) {
 		super.firstUpdated(props);
 
@@ -66,10 +61,9 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 	}
 
 	private _observeWorkspaceViews() {
+		// TODO: Implement extension controller:
 		this.observe(
-			umbExtensionsRegistry
-				.extensionsOfTypes<ManifestWorkspaceEditorView>(['workspaceEditorView'])
-				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.workspaces.includes(this._alias)))),
+			umbExtensionsRegistry.extensionsOfTypes<ManifestWorkspaceEditorView>(['workspaceEditorView']),
 			(workspaceViews) => {
 				this._workspaceViews = workspaceViews;
 				this._createRoutes();

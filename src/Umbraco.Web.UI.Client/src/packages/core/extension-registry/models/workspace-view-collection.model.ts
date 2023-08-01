@@ -29,30 +29,4 @@ export interface MetaEditorViewCollection extends MetaManifestWithView {
 	 * ]
 	 */
 	repositoryAlias: string;
-
-	/**
-	 * The workspaces that this view collection should be available in
-	 *
-	 * @examples [
-	 * "Umb.Workspace.DataType",
-	 * "Umb.Workspace.Dictionary",
-	 * "Umb.Workspace.Document",
-	 * "Umb.Workspace.DocumentType",
-	 * "Umb.Workspace.Language",
-	 * "Umb.Workspace.LanguageRoot",
-	 * "Umb.Workspace.LogviewerRoot",
-	 * "Umb.Workspace.Media",
-	 * "Umb.Workspace.MediaType",
-	 * "Umb.Workspace.Member",
-	 * "Umb.Workspace.MemberType",
-	 * "Umb.Workspace.MemberGroup",
-	 * "Umb.Workspace.Package",
-	 * "Umb.Workspace.PackageBuilder",
-	 * "Umb.Workspace.PartialView",
-	 * "Umb.Workspace.RelationType",
-	 * "Umb.Workspace.Stylesheet",
-	 * "Umb.Workspace.Template"
-	 * ]
-	 */
-	workspaces: Array<string>;
 }

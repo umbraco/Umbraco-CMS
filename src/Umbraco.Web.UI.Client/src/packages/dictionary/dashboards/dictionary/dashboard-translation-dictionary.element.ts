@@ -92,7 +92,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 						columnAlias: 'name',
 						value: html`<a
 							style="font-weight:bold"
-							href="/section/translation/workspace/dictionary-item/edit/${dictionary.id}">
+							href="/section/dictionary/workspace/dictionary-item/edit/${dictionary.id}">
 							${dictionary.name}</a
 						> `,
 					},
@@ -144,7 +144,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		//TODO: Why do we need to extract the id like this?
 		const id = url.substring(url.lastIndexOf('/') + 1);
 
-		history.pushState({}, '', `/section/translation/workspace/dictionary-item/edit/${id}`);
+		history.pushState({}, '', `/section/dictionary/workspace/dictionary-item/edit/${id}`);
 	}
 
 	render() {

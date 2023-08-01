@@ -63,8 +63,8 @@ export interface ManifestWithConditions<ConditionType> {
 	conditions: ConditionType;
 }
 
-export interface UmbConditionConfigBase {
-	alias: string;
+export interface UmbConditionConfigBase<AliasType extends string = string> {
+	alias: AliasType;
 }
 
 export type ConditionTypeMap<ConditionTypes extends UmbConditionConfigBase> = {

@@ -14,6 +14,7 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-template-workspace-editor')
 export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
@@ -49,8 +50,8 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			this._modalContext = instance;
 		});
 
-		this.consumeContext('UmbEntityWorkspaceContext', (workspaceContext: UmbTemplateWorkspaceContext) => {
-			this.#templateWorkspaceContext = workspaceContext;
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#templateWorkspaceContext = workspaceContext as UmbTemplateWorkspaceContext;
 			this.observe(this.#templateWorkspaceContext.name, (name) => {
 				this._name = name;
 			});

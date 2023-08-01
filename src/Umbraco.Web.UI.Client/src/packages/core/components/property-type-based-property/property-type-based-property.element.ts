@@ -7,7 +7,7 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { DataTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
@@ -61,7 +61,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._workspaceContext = workspaceContext as UmbDocumentWorkspaceContext;
 			this._observeProperty();
 		});

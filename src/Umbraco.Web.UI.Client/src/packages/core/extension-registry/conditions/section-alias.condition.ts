@@ -7,10 +7,6 @@ import {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 
-export type SectionAliasConditionConfig = UmbConditionConfigBase & {
-	match: string;
-};
-
 export class UmbSectionAliasCondition extends UmbBaseController implements UmbExtensionCondition {
 	config: SectionAliasConditionConfig;
 	permitted = false;
@@ -28,6 +24,10 @@ export class UmbSectionAliasCondition extends UmbBaseController implements UmbEx
 		});
 	}
 }
+
+export type SectionAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.SectionAlias'> & {
+	match: string;
+};
 
 export const manifest: ManifestCondition = {
 	type: 'condition',

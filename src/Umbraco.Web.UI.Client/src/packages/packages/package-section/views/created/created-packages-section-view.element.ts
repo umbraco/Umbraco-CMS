@@ -1,7 +1,6 @@
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import {
-	ManifestTree,
 	ManifestWorkspace,
 	UmbSectionViewExtensionElement,
 	umbExtensionsRegistry,
@@ -15,8 +14,6 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 	private _routes: UmbRoute[] = [];
 
 	private _workspaces: Array<ManifestWorkspace> = [];
-
-	private _trees: Array<ManifestTree> = [];
 
 	constructor() {
 		super();

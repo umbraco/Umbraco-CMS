@@ -28,8 +28,13 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 			label: 'Media',
 			pathname: 'media',
 			icon: 'umb:picture',
-			workspaces: ['Umb.Workspace.Media'],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 	{
 		type: 'workspaceEditorView',
@@ -41,8 +46,13 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 			label: 'Info',
 			pathname: 'info',
 			icon: 'info',
-			workspaces: ['Umb.Workspace.Media'],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 
@@ -58,8 +68,13 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 			icon: 'umb:grid',
 			entityType: 'media',
 			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
-			workspaces: ['Umb.Workspace.Media'],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 
@@ -73,8 +88,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
-			workspaces: ['Umb.Workspace.Media'],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 

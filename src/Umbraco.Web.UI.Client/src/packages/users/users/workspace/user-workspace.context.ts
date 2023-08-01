@@ -10,7 +10,7 @@ export class UmbUserWorkspaceContext
 	implements UmbEntityWorkspaceContextInterface<UmbUserDetail | undefined>
 {
 	constructor(host: UmbControllerHostElement) {
-		super(host, new UmbUserRepository(host));
+		super(host, 'Umb.Workspace.User', new UmbUserRepository(host));
 	}
 
 	#data = new UmbObjectState<UmbUserDetail | undefined>(undefined);

@@ -15,7 +15,7 @@ export class UmbDictionaryWorkspaceContext
 	dictionary = this.#data.asObservablePart((data) => data);
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, new UmbDictionaryRepository(host));
+		super(host, 'Umb.Workspace.Dictionary', new UmbDictionaryRepository(host));
 	}
 
 	getData() {

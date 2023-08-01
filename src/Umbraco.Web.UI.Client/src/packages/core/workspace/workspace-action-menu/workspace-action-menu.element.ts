@@ -2,13 +2,13 @@ import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-workspace-action-menu')
 export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	@state()
 	private _actionMenuIsOpen = false;
 
-	private _workspaceContext?: typeof UMB_ENTITY_WORKSPACE_CONTEXT.TYPE;
+	private _workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	_entityId?: string;
@@ -19,7 +19,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;
 			this._observeInfo();
 		});

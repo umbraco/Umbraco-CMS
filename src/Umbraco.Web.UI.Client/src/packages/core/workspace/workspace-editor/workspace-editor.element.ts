@@ -77,9 +77,10 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	private _observeWorkspaceViews() {
 		this.observe(
-			umbExtensionsRegistry
-				.extensionsOfTypes<ManifestWorkspaceEditorView>(['workspaceEditorView', 'workspaceViewCollection'])
-				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.workspaces.includes(this.alias)))),
+			umbExtensionsRegistry.extensionsOfTypes<ManifestWorkspaceEditorView>([
+				'workspaceEditorView',
+				'workspaceViewCollection',
+			]),
 			(workspaceViews) => {
 				this._workspaceViews = workspaceViews;
 				this._createRoutes();

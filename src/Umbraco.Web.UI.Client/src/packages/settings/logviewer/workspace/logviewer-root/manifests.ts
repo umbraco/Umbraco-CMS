@@ -28,8 +28,13 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 			label: 'Overview',
 			pathname: 'overview',
 			icon: 'umb:box-alt',
-			workspaces: [workspaceAlias],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 	{
 		type: 'workspaceEditorView',
@@ -41,8 +46,13 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 			label: 'Search',
 			pathname: 'search',
 			icon: 'umb:search',
-			workspaces: [workspaceAlias],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 

@@ -5,7 +5,7 @@ import { customElement, state, css, html } from '@umbraco-cms/backoffice/externa
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { VariantModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT, ActiveVariant } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT, ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-document-workspace-editor')
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
@@ -26,7 +26,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbDocumentWorkspaceContext;
 			this.#observeVariants();
 			this.#observeSplitViews();

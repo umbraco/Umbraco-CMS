@@ -16,7 +16,7 @@ export class UmbDataTypeWorkspaceContext
 	id = this.#data.asObservablePart((data) => data?.id);
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, new UmbDataTypeRepository(host));
+		super(host, 'Umb.Workspace.DataType', new UmbDataTypeRepository(host));
 	}
 
 	async load(id: string) {

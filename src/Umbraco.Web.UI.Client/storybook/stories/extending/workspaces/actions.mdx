@@ -28,8 +28,13 @@ const manifest = {
 	meta: {
 		label: 'My Action',
 		api: MyWorkspaceAction,
-		workspaces: ['My.Workspace'],
 	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.WorkspaceAlias',
+			match: 'My.Workspace',
+		},
+	],
 };
 
 extensionRegistry.register(manifest);

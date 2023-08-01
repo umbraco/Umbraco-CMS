@@ -17,7 +17,7 @@ import {
 	PagedSavedLogSearchResponseModel,
 	SavedLogSearchPresenationBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { query } from '@umbraco-cms/backoffice/router';
 
@@ -31,8 +31,7 @@ export interface LogViewerDateRange {
 	endDate: string;
 }
 
-export class UmbLogViewerWorkspaceContext {
-	#host: UmbControllerHostElement;
+export class UmbLogViewerWorkspaceContext extends UmbBaseController {
 	#repository: UmbLogViewerRepository;
 
 	get today() {
@@ -100,8 +99,9 @@ export class UmbLogViewerWorkspaceContext {
 	currentPage = 1;
 
 	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
-		this.#repository = new UmbLogViewerRepository(this.#host);
+		super(host);
+		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, this);
+		this.#repository = new UmbLogViewerRepository(host);
 	}
 
 	onChangeState = () => {

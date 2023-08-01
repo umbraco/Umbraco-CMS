@@ -26,8 +26,13 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 			label: 'Design',
 			pathname: 'design',
 			icon: 'umb:document-dashed-line',
-			workspaces: ['Umb.Workspace.DocumentType'],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 	{
 		type: 'workspaceEditorView',
@@ -39,8 +44,13 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 			label: 'Structure',
 			pathname: 'structure',
 			icon: 'umb:mindmap',
-			workspaces: ['Umb.Workspace.DocumentType'],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 	{
 		type: 'workspaceEditorView',
@@ -52,8 +62,13 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 			label: 'Settings',
 			pathname: 'settings',
 			icon: 'umb:settings',
-			workspaces: ['Umb.Workspace.DocumentType'],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 	{
 		type: 'workspaceEditorView',
@@ -65,8 +80,13 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 			label: 'Templates',
 			pathname: 'templates',
 			icon: 'umb:layout',
-			workspaces: ['Umb.Workspace.DocumentType'],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 
@@ -80,8 +100,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
-			workspaces: ['Umb.Workspace.DocumentType'],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 

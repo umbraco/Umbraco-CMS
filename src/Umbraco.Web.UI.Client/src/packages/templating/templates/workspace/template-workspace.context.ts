@@ -25,7 +25,7 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, new UmbTemplateRepository(host));
+		super(host, 'Umb.Workspace.Template', new UmbTemplateRepository(host));
 		this.#loadCodeEditor();
 	}
 
