@@ -9,6 +9,13 @@ const meta: Meta<UmbLocalizeElement> = {
 	args: {
 		key: 'general_areyousure',
 	},
+	argTypes: {
+		args: {
+			control: {
+				type: 'array',
+			},
+		},
+	},
 	decorators: [
 		(story) => {
 			return html`<div style="padding: 1rem; margin: 1rem; border: 1px solid green; max-width:50%;">
@@ -30,6 +37,13 @@ export default meta;
 type Story = StoryObj<UmbLocalizeElement>;
 
 export const Overview: Story = {};
+
+export const WithArguments: Story = {
+	args: {
+		key: 'blueprints_createdBlueprintMessage',
+		args: ['About us'],
+	},
+};
 
 export const KeyNotFound: Story = {
 	args: {

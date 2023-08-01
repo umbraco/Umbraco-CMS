@@ -17,9 +17,10 @@ export class UmbLocalizeElement extends UmbLitElement {
 	key!: string;
 
 	/**
-	 * The comma-separated values to forward to the localization function.
+	 * The values to forward to the localization function (must be JSON compatible).
 	 * @attr
 	 * @example args="[1,2,3]"
+	 * @type {any[] | undefined}
 	 */
 	@property({
 		type: Array,
