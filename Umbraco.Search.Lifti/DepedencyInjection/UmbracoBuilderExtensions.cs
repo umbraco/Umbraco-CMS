@@ -120,14 +120,8 @@ public static class UmbracoBuilderExtensions
         return services;
     }
 
-    /// <summary>
-    ///     Adds the Examine indexes for Umbraco
-    /// </summary>
-    /// <param name="umbracoBuilder"></param>
-    /// <returns></returns>
-    public static IUmbracoBuilder AddInMemoryIndexes(this IUmbracoBuilder umbracoBuilder)
+    public static IServiceCollection AddInMemoryServices(this IServiceCollection services)
     {
-        IServiceCollection services = umbracoBuilder.Services;
         services.AddSingleton<ISearchProvider, InMemorySearchProvider>();
         services.AddSingleton<IUmbracoIndexesConfiguration>(services =>
         {
@@ -145,6 +139,17 @@ public static class UmbracoBuilderExtensions
             .RegisterIndexInternal()
             .RegisterIndexMember()
             .RegisterContentApiIndex();
+        return services;
+    }
+    /// <summary>
+    ///     Adds the Examine indexes for Umbraco
+    /// </summary>
+    /// <param name="umbracoBuilder"></param>
+    /// <returns></returns>
+    public static IUmbracoBuilder AddInMemoryIndexes(this IUmbracoBuilder umbracoBuilder)
+    {
+        IServiceCollection services = umbracoBuilder.Services;
+        services.AddInMemoryServices();
 
 
         return umbracoBuilder;

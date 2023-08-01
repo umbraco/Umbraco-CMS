@@ -29,6 +29,9 @@ using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 using Umbraco.Search;
+using Umbraco.Search.DependencyInjection;
+using Umbraco.Search.InMemory;
+using Umbraco.Search.InMemory.DepedencyInjection;
 using IIndexPopulator = Umbraco.Search.IIndexPopulator;
 using IIndexRebuilder = Umbraco.Search.Indexing.IIndexRebuilder;
 
@@ -48,17 +51,14 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddUnique(AppCaches.NoCache);
         builder.Services.AddUnique(Mock.Of<IUmbracoBootPermissionChecker>());
         builder.Services.AddUnique(testHelper.MainDom);
-
+        builder.Services.AddSearchServices();
+        builder.Services.AddInMemoryServices();
         builder.Services.AddUnique<IIndexRebuilder, TestBackgroundIndexRebuilder>();
         builder.Services.AddUnique(factory => Mock.Of<IRuntimeMinifier>());
 
         // we don't want persisted nucache files in tests
         builder.Services.AddTransient(factory => new PublishedSnapshotServiceOptions { IgnoreLocalDb = true });
 
-#if IS_WINDOWS
-        // ensure all lucene indexes are using RAM directory (no file system)
-        builder.Services.AddUnique<IDirectoryFactory, LuceneRAMDirectoryFactory>();
-#endif
 
         // replace this service so that it can lookup the correct file locations
         builder.Services.AddUnique(GetLocalizedTextService);

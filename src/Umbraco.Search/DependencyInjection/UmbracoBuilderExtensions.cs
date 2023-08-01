@@ -1,4 +1,3 @@
-
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
@@ -37,22 +36,34 @@ public static partial class UmbracoBuilderExtensions
     {
         // populators are not a collection: one cannot remove ours, and can only add more
         // the container can inject IEnumerable<IIndexPopulator> and get them all
+        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<SearchMapper>();
 
-        builder.Services.AddSingleton<IUmbracoTreeSearcherFields, Configuration.UmbracoTreeSearcherFields>();
+        builder
+            .AddNotificationHandler<ContentCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
+        builder
+            .AddNotificationHandler<ContentTypeCacheRefresherNotification,
+                DeliveryApiContentIndexingNotificationHandler>();
+        builder
+            .AddNotificationHandler<PublicAccessCacheRefresherNotification,
+                DeliveryApiContentIndexingNotificationHandler>();
+        builder.Services.AddSearchServices();
+        return builder;
+    }
 
-        builder.Services.AddUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
-        builder.Services.AddScoped<SpecialisedSearchers.Tree.UmbracoTreeSearcher>();
-        builder.Services.AddSingleton<IIndexPopulator, MemberIndexPopulator>();
-        builder.Services.AddSingleton<IIndexPopulator, ContentIndexPopulator>();
-        builder.Services.AddSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
-        builder.Services.AddSingleton<IIndexPopulator, MediaIndexPopulator>();
-        builder.Services.AddSingleton<IIndexRebuilder, IndexRebuilder>();
-        builder.Services.AddSingleton<IIndexPopulator, DeliveryApiContentIndexPopulator>();
-        builder.Services.AddUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
-        builder.AddNotificationHandler<ContentCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
-        builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
-        builder.AddNotificationHandler<PublicAccessCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
-        builder.Services.AddUnique<IPublishedContentValueSetBuilder>(factory =>
+    public static IServiceCollection AddSearchServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IUmbracoTreeSearcherFields, Configuration.UmbracoTreeSearcherFields>();
+
+        services.AddUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
+        services.AddScoped<SpecialisedSearchers.Tree.UmbracoTreeSearcher>();
+        services.AddSingleton<IIndexPopulator, MemberIndexPopulator>();
+        services.AddSingleton<IIndexPopulator, ContentIndexPopulator>();
+        services.AddSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
+        services.AddSingleton<IIndexPopulator, MediaIndexPopulator>();
+        services.AddSingleton<IIndexRebuilder, IndexRebuilder>();
+        services.AddSingleton<IIndexPopulator, DeliveryApiContentIndexPopulator>();
+        services.AddUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
+        services.AddUnique<IPublishedContentValueSetBuilder>(factory =>
             new ContentValueSetBuilder(
                 factory.GetRequiredService<PropertyEditorCollection>(),
                 factory.GetRequiredService<UrlSegmentProviderCollection>(),
@@ -60,7 +71,7 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IShortStringHelper>(),
                 factory.GetRequiredService<IScopeProvider>(),
                 true));
-        builder.Services.AddUnique<IContentValueSetBuilder>(factory =>
+        services.AddUnique<IContentValueSetBuilder>(factory =>
             new ContentValueSetBuilder(
                 factory.GetRequiredService<PropertyEditorCollection>(),
                 factory.GetRequiredService<UrlSegmentProviderCollection>(),
@@ -69,17 +80,18 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IScopeProvider>(),
                 false));
 
-        builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
-        builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
-        builder.Services.AddUnique<IDeliveryApiContentIndexValueSetBuilder, DeliveryApiContentIndexValueSetBuilder>();
-        builder.Services.AddUnique<IDeliveryApiContentIndexFieldDefinitionBuilder, DeliveryApiContentIndexFieldDefinitionBuilder>();
-        builder.Services.AddUnique<IDeliveryApiContentIndexHelper, DeliveryApiContentIndexHelper>();
-        builder.Services.AddSingleton<IDeliveryApiIndexingHandler, DeliveryApiIndexingHandler>();
-        builder.Services.AddTransient<IIndexCountService, IndexCountService>();
-        builder.Services.AddTransient<IDetailedTelemetryProvider, SearchTelemetryProvider>();
-        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<SearchMapper>();
-        return builder;
+        services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
+        services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
+        services.AddUnique<IDeliveryApiContentIndexValueSetBuilder, DeliveryApiContentIndexValueSetBuilder>();
+        services
+            .AddUnique<IDeliveryApiContentIndexFieldDefinitionBuilder, DeliveryApiContentIndexFieldDefinitionBuilder>();
+        services.AddUnique<IDeliveryApiContentIndexHelper, DeliveryApiContentIndexHelper>();
+        services.AddSingleton<IDeliveryApiIndexingHandler, DeliveryApiIndexingHandler>();
+        services.AddTransient<IIndexCountService, IndexCountService>();
+        services.AddTransient<IDetailedTelemetryProvider, SearchTelemetryProvider>();
+        return services;
     }
+
     /// <summary>
     ///     Sets the UmbracoTreeSearcherFields to change fields that can be searched in the backoffice.
     /// </summary>
@@ -110,7 +122,8 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="treeSearcherFields">An UmbracoTreeSearcherFields.</param>
-    public static IUmbracoBuilder SetTreeSearcherFields(this IUmbracoBuilder builder, IUmbracoTreeSearcherFields treeSearcherFields)
+    public static IUmbracoBuilder SetTreeSearcherFields(this IUmbracoBuilder builder,
+        IUmbracoTreeSearcherFields treeSearcherFields)
     {
         builder.Services.AddUnique(treeSearcherFields);
         return builder;
