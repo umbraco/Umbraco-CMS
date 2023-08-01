@@ -72,7 +72,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	private async _onReloadCacheHandler() {
 		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: 'Reload',
-			content: html` Trigger a in-memory and local file cache reload on all servers. `,
+			content: html` Trigger a in-memory and local file cache reload on all servers.`,
 			color: 'danger',
 			confirmLabel: 'Continue',
 		});
@@ -106,6 +106,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 
 	//Collect
 	private async _cacheCollect() {
+		this._buttonStateCollect = 'waiting';
 		const { error } = await tryExecuteAndNotify(this, PublishedCacheResource.postPublishedCacheCollect());
 		if (error) {
 			this._buttonStateCollect = 'failed';
@@ -115,8 +116,15 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	}
 
 	private async _onSnapshotCacheHandler() {
-		this._buttonStateCollect = 'waiting';
-		await this._cacheCollect();
+		const modalContex = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+			headline: 'Snapshot',
+			content: html` Trigger a NuCache snapshots collection.`,
+			color: 'danger',
+			confirmLabel: 'Continue',
+		});
+		modalContex?.onSubmit().then(() => {
+			this._cacheCollect();
+		});
 	}
 
 	render() {
