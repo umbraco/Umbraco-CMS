@@ -6,7 +6,7 @@ import {
 	UmbContextProviderController,
 	UmbContextToken,
 } from '@umbraco-cms/backoffice/context-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT, ActiveVariant } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbClassState,
