@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -56,5 +57,22 @@ public class UmbracoSearchTests : UmbracoIntegrationTest
             .UmbracoIndexes
             .DeliveryApiContentIndexName);
         Assert.AreNotEqual(null, externalIndex);
+    }
+    [Test]
+    public void IndexContent()
+    {
+
+        var internalIndex = SearchProvider.GetIndex<IContent>(Constants
+            .UmbracoIndexes
+            .DeliveryApiContentIndexName);
+       // internalIndex.IndexItems();
+    }
+    [Test]
+    public void IndexMultipleContent()
+    {
+        var internalIndex = SearchProvider.GetIndex<IContent>(Constants
+            .UmbracoIndexes
+            .DeliveryApiContentIndexName);
+       // internalIndex.IndexItems();
     }
 }
