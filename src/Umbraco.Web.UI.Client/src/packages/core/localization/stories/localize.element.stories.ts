@@ -1,10 +1,10 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import type { UmbLocalizeElement } from './localize.element.js';
-import './localize.element.js';
+import type { UmbLocalizeElement } from '../localize.element.js';
+import '../localize.element.js';
 
 const meta: Meta<UmbLocalizeElement> = {
-	title: 'Localization/Localize',
+	title: 'API/Localization/UmbLocalizeElement',
 	component: 'umb-localize',
 	args: {
 		key: 'general_areyousure',
