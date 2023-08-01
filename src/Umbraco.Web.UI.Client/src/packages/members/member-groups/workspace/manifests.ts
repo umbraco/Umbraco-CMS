@@ -26,8 +26,6 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 			label: 'Info',
 			pathname: 'info',
 			icon: 'info',
-		},
-		conditions: {
 			workspaces: ['Umb.Workspace.MemberGroup'],
 		},
 	},
@@ -43,8 +41,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
-		},
-		conditions: {
 			workspaces: ['Umb.Workspace.MemberGroup'],
 		},
 	},

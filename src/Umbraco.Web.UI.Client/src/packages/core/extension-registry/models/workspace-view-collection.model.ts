@@ -1,12 +1,13 @@
+import { ConditionTypes } from '../conditions/types.js';
 import type {
-	ManifestWithConditions,
+	ManifestWithDynamicConditions,
 	ManifestWithView,
 	MetaManifestWithView,
 } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestWorkspaceViewCollection
 	extends ManifestWithView,
-		ManifestWithConditions<ConditionsEditorViewCollection> {
+		ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'workspaceViewCollection';
 	meta: MetaEditorViewCollection;
 }
@@ -28,9 +29,7 @@ export interface MetaEditorViewCollection extends MetaManifestWithView {
 	 * ]
 	 */
 	repositoryAlias: string;
-}
 
-export interface ConditionsEditorViewCollection {
 	/**
 	 * The workspaces that this view collection should be available in
 	 *
@@ -55,5 +54,5 @@ export interface ConditionsEditorViewCollection {
 	 * "Umb.Workspace.Template"
 	 * ]
 	 */
-	workspaces: string[];
+	workspaces: Array<string>;
 }

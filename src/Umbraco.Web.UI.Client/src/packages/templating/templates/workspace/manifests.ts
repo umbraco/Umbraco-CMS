@@ -28,8 +28,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			color: 'positive',
 			label: 'Save',
 			api: UmbSaveWorkspaceAction,
-		},
-		conditions: {
 			workspaces: ['Umb.Workspace.Template'],
 		},
 	},

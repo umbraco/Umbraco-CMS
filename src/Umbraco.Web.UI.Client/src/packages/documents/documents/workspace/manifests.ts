@@ -30,8 +30,6 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 			label: 'Content',
 			pathname: 'content',
 			icon: 'document',
-		},
-		conditions: {
 			workspaces: ['Umb.Workspace.Document'],
 		},
 	},
@@ -45,8 +43,6 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 			label: 'Info',
 			pathname: 'info',
 			icon: 'info',
-		},
-		conditions: {
 			workspaces: ['Umb.Workspace.Document'],
 		},
 	},
@@ -66,8 +62,6 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 			icon: 'umb:grid',
 			entityType: 'document',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
-		},
-		conditions: {
 			workspaces: ['Umb.Workspace.Document'],
 		}
 	},
@@ -85,8 +79,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			look: 'primary',
 			color: 'positive',
 			api: UmbDocumentSaveAndPublishWorkspaceAction,
-		},
-		conditions: {
 			workspaces: ['Umb.Workspace.Document'],
 		},
 	},
@@ -99,8 +91,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			label: 'Save',
 			look: 'secondary',
 			api: UmbSaveWorkspaceAction,
-		},
-		conditions: {
 			workspaces: ['Umb.Workspace.Document'],
 		},
 	},
@@ -112,8 +102,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		meta: {
 			label: 'Save And Preview',
 			api: UmbDocumentSaveAndPreviewWorkspaceAction,
-		},
-		conditions: {
 			workspaces: ['Umb.Workspace.Document'],
 		},
 	},
@@ -125,8 +113,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		meta: {
 			label: 'Save And Schedule',
 			api: UmbSaveAndScheduleDocumentWorkspaceAction,
-		},
-		conditions: {
 			workspaces: ['Umb.Workspace.Document'],
 		},
 	},

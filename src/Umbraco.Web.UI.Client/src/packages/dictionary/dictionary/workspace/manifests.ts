@@ -28,8 +28,6 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 			label: 'Edit',
 			pathname: 'edit',
 			icon: 'edit',
-		},
-		conditions: {
 			workspaces: [workspaceAlias],
 		},
 	},
@@ -46,8 +44,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
-		},
-		conditions: {
 			workspaces: ['Umb.Workspace.Dictionary'],
 		},
 	},

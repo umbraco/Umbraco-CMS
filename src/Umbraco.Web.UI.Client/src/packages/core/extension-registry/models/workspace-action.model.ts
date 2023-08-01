@@ -5,7 +5,6 @@ import { UmbWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 export interface ManifestWorkspaceAction extends ManifestElement {
 	type: 'workspaceAction';
 	meta: MetaWorkspaceAction;
-	conditions: ConditionsWorkspaceAction;
 }
 
 export interface MetaWorkspaceAction {
@@ -13,8 +12,5 @@ export interface MetaWorkspaceAction {
 	look?: InterfaceLook;
 	color?: InterfaceColor;
 	api: ClassConstructor<UmbWorkspaceAction>;
-}
-
-export interface ConditionsWorkspaceAction {
 	workspaces: Array<string>;
 }
