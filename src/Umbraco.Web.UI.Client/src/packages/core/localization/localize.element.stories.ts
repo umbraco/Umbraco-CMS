@@ -23,6 +23,13 @@ const meta: Meta<UmbLocalizeElement> = {
 			</div>`;
 		},
 	],
+};
+
+export default meta;
+
+type Story = StoryObj<UmbLocalizeElement>;
+
+export const Default: Story = {
 	parameters: {
 		docs: {
 			source: {
@@ -32,16 +39,17 @@ const meta: Meta<UmbLocalizeElement> = {
 	},
 };
 
-export default meta;
-
-type Story = StoryObj<UmbLocalizeElement>;
-
-export const Overview: Story = {};
-
 export const WithArguments: Story = {
 	args: {
 		key: 'blueprints_createdBlueprintMessage',
 		args: ['About us'],
+	},
+	parameters: {
+		docs: {
+			source: {
+				code: `<umb-localize key="blueprints_createdBlueprintMessage" args="['About us']"></umb-localize>`,
+			},
+		},
 	},
 };
 
@@ -49,5 +57,12 @@ export const KeyNotFound: Story = {
 	args: {
 		key: 'general_ok_not_found',
 		debug: true,
+	},
+	parameters: {
+		docs: {
+			source: {
+				code: `<umb-localize key="general_ok_not_found"></umb-localize>`,
+			},
+		},
 	},
 };
