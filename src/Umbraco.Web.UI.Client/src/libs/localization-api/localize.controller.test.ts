@@ -139,6 +139,10 @@ describe('UmbLocalizeController', () => {
 			expect(element.localize.term('general_withInlineToken', 'Hello', 'World')).to.equal('Hello World');
 			expect(element.localize.term('general_withInlineTokenLegacy', 'Hello', 'World')).to.equal('Hello World');
 		});
+
+		it('should return a term with no tokens even though they are provided', async () => {
+			expect(element.localize.term('general_logout', 'Hello', 'World')).to.equal('Log out');
+		});
 	});
 
 	describe('date', () => {
