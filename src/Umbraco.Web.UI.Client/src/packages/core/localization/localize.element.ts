@@ -13,8 +13,18 @@ export class UmbLocalizeElement extends UmbLitElement {
 	 * @attr
 	 * @example key="general_ok"
 	 */
-	@property({ type: String })
+	@property()
 	key!: string;
+
+	/**
+	 * The comma-separated values to forward to the localization function.
+	 * @attr
+	 * @example args="[1,2,3]"
+	 */
+	@property({
+		type: Array,
+	})
+	args?: unknown[];
 
 	/**
 	 * If true, the key will be rendered instead of the localized value if the key is not found.
@@ -25,7 +35,7 @@ export class UmbLocalizeElement extends UmbLitElement {
 
 	@state()
 	get text(): string {
-		const localizedValue = this.localize.term(this.key);
+		const localizedValue = this.localize.term(this.key, ...(this.args ?? []));
 
 		// If the value is the same as the key, it means the key was not found.
 		if (localizedValue === this.key) {
