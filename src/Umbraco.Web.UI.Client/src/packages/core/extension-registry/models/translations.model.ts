@@ -13,6 +13,13 @@ export interface MetaTranslations {
 	culture: string;
 
 	/**
+	 * The direction of the translations (left-to-right or right-to-left).
+	 * @example "ltr"
+	 * @default "ltr"
+	 */
+	direction?: 'ltr' | 'rtl';
+
+	/**
 	 * The translations.
 	 * @example
 	 * {

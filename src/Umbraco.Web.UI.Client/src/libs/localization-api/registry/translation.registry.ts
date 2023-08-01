@@ -39,7 +39,7 @@ export class UmbTranslationRegistry {
 							// Notify subscribers that the inner dictionary has changed.
 							const translation: Translation = {
 								$code: userCulture,
-								$dir: 'ltr',
+								$dir: extension.meta.direction ?? 'ltr',
 								...innerDictionary,
 							};
 							registerTranslation(translation);
