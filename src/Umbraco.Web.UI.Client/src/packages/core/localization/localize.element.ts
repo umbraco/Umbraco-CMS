@@ -25,12 +25,24 @@ export class UmbLocalizeElement extends UmbLitElement {
 	@state()
 	get text(): string {
 		const localizedValue = this.localize.term(this.key);
-		console.log('localizedValue', localizedValue);
+
+		// If the value is the same as the key, it means the key was not found.
+		if (localizedValue === this.key) {
+			(this.getHostElement() as HTMLElement).setAttribute('data-localize-missing', this.key);
+			return '';
+		}
+
+		(this.getHostElement() as HTMLElement).removeAttribute('data-localize-missing');
+
 		return localizedValue;
 	}
 
 	protected render() {
-		return this.text ? html`${this.text}` : html`<slot></slot>`;
+		return this.text
+			? html`${this.text}`
+			: this.debug
+			? html`<span style="color:red">${this.key}</span>`
+			: html`<slot></slot>`;
 	}
 }
 
