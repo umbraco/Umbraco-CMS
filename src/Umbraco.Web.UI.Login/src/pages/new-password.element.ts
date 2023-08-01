@@ -1,11 +1,14 @@
-import type { UUIButtonState } from '@umbraco-ui/uui';
+import type { UUIButtonState, UUIInputPasswordElement } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { CSSResultGroup, LitElement, css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, query, state } from 'lit/decorators.js';
 import { UmbAuthMainContext } from '../context/auth-main.context';
 
 @customElement('umb-new-password')
 export default class UmbNewPasswordElement extends LitElement {
+	@query('#confirmPassword')
+	confirmPasswordElement!: UUIInputPasswordElement;
+
 	@state()
 	resetCode?: string;
 
@@ -50,7 +53,7 @@ export default class UmbNewPasswordElement extends LitElement {
 		const passwordConfirm = formData.get('confirmPassword') as string;
 
 		if (password !== passwordConfirm) {
-			//TODO: tell user that the passwords are not the same
+			this.confirmPasswordElement.setCustomValidity('Passwords do not match');
 			return;
 		}
 
