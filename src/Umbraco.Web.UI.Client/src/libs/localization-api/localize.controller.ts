@@ -113,6 +113,16 @@ export class UmbLocalizeController<UserTranslation extends Translation = Default
 			return term(...args) as string;
 		}
 
+		if (typeof term === 'string') {
+			if (args.length > 0) {
+				// Replace placeholders of format "%index%" and "{index}" with provided values
+				term = term.replace(/(%(\d+)%|\{(\d+)\})/g, (match, _p1, p2, p3): string => {
+					const index = p2 || p3;
+					return String(args[index] || match);
+				});
+			}
+		}
+
 		return term;
 	}
 

@@ -23,6 +23,8 @@ const english = {
 			general: {
 				close: 'Close',
 				logout: 'Log out',
+				withInlineToken: '{0} {1}',
+				withInlineTokenLegacy: '%0% %1%',
 				numUsersSelected: (count: number) => {
 					if (count === 0) return 'No users selected';
 					if (count === 1) return 'One user selected';
@@ -131,6 +133,11 @@ describe('UmbLocalizeController', () => {
 			expect(element.localize.term('general_numUsersSelected', 0)).to.equal('No users selected');
 			expect(element.localize.term('general_numUsersSelected', 1)).to.equal('One user selected');
 			expect(element.localize.term('general_numUsersSelected', 2)).to.equal('2 users selected');
+		});
+
+		it('should return a term with a custom format with inline tokens', async () => {
+			expect(element.localize.term('general_withInlineToken', 'Hello', 'World')).to.equal('Hello World');
+			expect(element.localize.term('general_withInlineTokenLegacy', 'Hello', 'World')).to.equal('Hello World');
 		});
 	});
 
