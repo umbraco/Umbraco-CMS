@@ -17,7 +17,7 @@ import { UmbDocumentTypeStore } from '../src/packages/documents/document-types/r
 import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
 import { UmbIconRegistry } from '../src/shared/icon-registry/icon.registry';
 import { UmbLitElement } from '../src/shared/lit-element';
-import { UmbLocalizationContext, UMB_LOCALIZATION_CONTEXT } from '../src/libs/localization-api';
+import { UmbTranslationRegistry } from '../src/libs/localization-api';
 import customElementManifests from '../dist-cms/custom-elements.json';
 
 import '../src/libs/context-api/provide/context-provider.element';
@@ -40,9 +40,7 @@ class UmbStoryBookElement extends UmbLitElement {
 		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalManagerContext(this));
 
 		this._registerExtensions(translationManifests);
-		const localizationContext = new UmbLocalizationContext(umbExtensionsRegistry);
-		localizationContext.setLanguage('en-US');
-		this.provideContext(UMB_LOCALIZATION_CONTEXT, localizationContext);
+		new UmbTranslationRegistry(umbExtensionsRegistry).loadLanguage('en-us'); // register default language
 	}
 
 	_registerExtensions(manifests) {

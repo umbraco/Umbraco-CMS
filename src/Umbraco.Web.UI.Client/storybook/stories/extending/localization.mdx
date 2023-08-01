@@ -73,25 +73,38 @@ The `umb-localize` component is used to translate text in the UI. It is used lik
 
 Experiment with the component here: [Localize](/story/localization-localize--overview)
 
-### UmbLocalizationContext
+### UmbLocalizeController
 
-The `UmbLocalizationContext` is used to translate text in the UI. It is used like this:
+The `UmbLocalizeController` is used to translate text in the UI. It is used like this:
+
+**UmbElementMixin**
+
+The controller is already initialised if you use the `UmbElementMixin` in your element:
 
 ```ts
-this.consumeContext(UMB_LOCALIZATION_CONTEXT, (instance) => {
-	// Localize one key
-	instance.localize('general_close').subscribe((value) => {
-		console.log(value); // should display "Close" in the console
-	});
-
-	// Localize many keys
-	instance.localizeMany(['general_close', 'general_cancel']).subscribe((values) => {
-		console.log(values); // should display ["Close", "Cancel"] in the console
-	});
-});
+export class MyElement extends UmbElementMixin(LitElement) {
+	render() {
+		return html` <uui-button .label=${this.localize.term('general_close')}></uui-button> `;
+	}
+}
 ```
 
-The values can then be assigned to a stateful property in the component and rendered to the user.
+**Reactive controller**
+
+If you do not use the `UmbElementMixin` in your element, you can use the reactive controller like this:
+
+```ts
+import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
+
+export class MyElement extends LitElement {
+	// Create a new instance of the controller and attach it to the element
+	private localize = new UmbLocalizeController(this);
+
+	render() {
+		return html` <uui-button .label=${this.localize.localize('general_close')}></uui-button> `;
+	}
+}
+```
 
 ### Fallback
 
