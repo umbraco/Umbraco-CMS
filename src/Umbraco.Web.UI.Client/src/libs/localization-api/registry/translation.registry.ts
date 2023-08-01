@@ -43,6 +43,10 @@ export class UmbTranslationRegistry {
 								...innerDictionary,
 							};
 							registerTranslation(translation);
+
+							// Set the document language and direction.
+							document.documentElement.lang = translation.$code;
+							document.documentElement.dir = translation.$dir;
 						})
 				);
 			}

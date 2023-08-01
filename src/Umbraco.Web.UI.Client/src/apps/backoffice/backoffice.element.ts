@@ -48,7 +48,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 				auth.languageIsoCode,
 				(currentLanguageIsoCode) => {
 					translationRegistry.loadLanguage(currentLanguageIsoCode);
-					document.documentElement.lang = currentLanguageIsoCode;
 				},
 				'languageIsoCode'
 			);

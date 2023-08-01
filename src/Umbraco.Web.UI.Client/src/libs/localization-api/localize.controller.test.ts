@@ -18,6 +18,7 @@ const english = {
 	name: 'Test English',
 	meta: {
 		culture: 'en-us',
+		direction: 'ltr',
 		translations: {
 			general: {
 				close: 'Close',
@@ -75,6 +76,14 @@ describe('UmbLocalizeController', () => {
 
 	it('should have a localize controller', () => {
 		expect(element.localize).to.be.instanceOf(UmbLocalizeController);
+	});
+
+	it('should have a default language', () => {
+		expect(element.localize.lang()).to.equal(english.meta.culture);
+	});
+
+	it('should have a default dir', () => {
+		expect(element.localize.dir()).to.equal(english.meta.direction);
 	});
 
 	describe('term', () => {
