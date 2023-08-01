@@ -1,6 +1,6 @@
 import type { ManifestDefaultExport } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestTranslations extends ManifestDefaultExport<Record<string, Record<string, string>>> {
+export interface ManifestTranslations extends ManifestDefaultExport<Record<string, Record<string, unknown>>> {
 	type: 'translations';
 	meta: MetaTranslations;
 }

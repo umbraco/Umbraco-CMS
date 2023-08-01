@@ -103,8 +103,6 @@ export interface ManifestClassWithClassConstructor<T = unknown> extends Manifest
 export interface ManifestDefaultExport<T = unknown> extends ManifestWithLoader<{ default: T }> {
 	/**
 	 * The file location of the javascript file to load
-	 *
-	 * @TJS-require
 	 */
 	js?: string;
 }

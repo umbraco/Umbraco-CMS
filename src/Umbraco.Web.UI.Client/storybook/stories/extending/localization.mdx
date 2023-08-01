@@ -50,18 +50,34 @@ If you do not have many translations, you can also choose to include them direct
 
 The language file is a simple JS module with a default export containing a key-value structure organised in sections.
 
-```json
+```js
 export default {
-	"section": {
-		"key1": "value1",
-		"key2": "value2"
-	}
-}
+	section: {
+		key1: 'value1',
+		key2: 'value2',
+	},
+};
 ```
 
 The sections and keys will be formatted into a map in Umbraco
 with the format `section_key1` and `section_key2` which forms the unique key
 of which they are requested by.
+
+The values can be either a string or a function that returns a string:
+
+```js
+export default {
+	section: {
+		key1: 'value1',
+		key2: (count) => {
+			count = parseInt(count, 10);
+			if (count === 0) return 'Nothing';
+			if (count === 1) return 'One thing';
+			return 'Many things';
+		},
+	},
+};
+```
 
 ## Using the translations
 

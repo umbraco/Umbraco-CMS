@@ -3,7 +3,7 @@ import { hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extensi
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { Subject, combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 
-export type UmbTranslationDictionary = Record<string, string>;
+export type UmbTranslationDictionary = Record<string, unknown>;
 
 export class UmbTranslationRegistry {
 	#registry;
@@ -60,7 +60,7 @@ export class UmbTranslationRegistry {
 	#addOrUpdateDictionary(
 		innerDictionary: UmbTranslationDictionary,
 		dictionaryName: string,
-		dictionary: Record<string, string>
+		dictionary: UmbTranslationDictionary
 	) {
 		for (const [key, value] of Object.entries(dictionary)) {
 			innerDictionary[`${dictionaryName}_${key}`] = value;
