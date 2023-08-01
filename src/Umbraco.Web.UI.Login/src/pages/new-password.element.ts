@@ -31,9 +31,6 @@ export default class UmbNewPasswordElement extends LitElement {
 		this.resetCode = urlParams.get('resetCode') || '';
 		this.userId = urlParams.get('userId') || '';
 
-		//TODO: TEMP FIX
-		this.resetCode = this.resetCode.replace(/ /g, '+');
-
 		if (this.resetCode && this.userId) {
 			this.state = 'new';
 		} else {
