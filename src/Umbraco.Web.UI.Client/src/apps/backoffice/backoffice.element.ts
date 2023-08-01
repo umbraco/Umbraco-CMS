@@ -41,6 +41,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		extensionInitializer.setLocalPackages(CORE_PACKAGES);
 
 		const translationRegistry = new UmbTranslationRegistry(umbExtensionsRegistry);
+		// Load default language
 		translationRegistry.loadLanguage('en-us');
 		this.consumeContext(UMB_AUTH, (auth) => {
 			this.observe(
