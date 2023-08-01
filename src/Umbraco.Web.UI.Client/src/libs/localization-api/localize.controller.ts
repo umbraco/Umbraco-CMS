@@ -1,3 +1,16 @@
+/*
+This module is a modified copy of the original Shoelace localize package: https://github.com/shoelace-style/localize
+
+The original license is included below.
+
+Copyright (c) 2020 A Beautiful Site, LLC
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 import {
 	DefaultTranslation,
 	FunctionParams,
@@ -10,6 +23,24 @@ import {
 } from './manager.js';
 import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
+/**
+ * The UmbLocalizeController enables localization for your element.
+ *
+ * @see UmbLocalizeElement
+ * @example
+ * ```ts
+ * import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
+ *
+ * \@customElement('my-element')
+ * export class MyElement extends LitElement {
+ *   private localize = new UmbLocalizeController(this);
+ *
+ *   render() {
+ *     return html`<p>${this.localize.term('general_close')}</p>`;
+ *   }
+ * }
+ * ```
+ */
 export class UmbLocalizeController<UserTranslation extends Translation = DefaultTranslation> implements UmbController {
 	host;
 	controllerAlias = 'localize';
