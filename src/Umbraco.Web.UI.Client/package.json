@@ -193,7 +193,7 @@
 		"vite": "^4.4.4",
 		"vite-plugin-static-copy": "^0.17.0",
 		"vite-tsconfig-paths": "^4.2.0",
-		"web-component-analyzer": "^2.0.0-next.4"
+		"web-component-analyzer": "^2.0.0-next.5"
 	},
 	"msw": {
 		"workerDirectory": "public"
