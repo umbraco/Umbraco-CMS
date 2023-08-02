@@ -49,7 +49,7 @@ export class UmbLoginExternalElement extends LitElement {
 	protected renderDefaultView() {
 		return html`
 			<form method="post" action="${this.externalLoginUrl}">
-				<uui-button .look=${this.buttonLook} .color=${this.buttonColor}>
+				<uui-button label="continue with ${this.name}" .look=${this.buttonLook} .color=${this.buttonColor}>
 					<div><uui-icon name=${this.icon}></uui-icon> Continue with ${this.name}</div>
 				</uui-button>
 			</form>
@@ -71,6 +71,7 @@ export class UmbLoginExternalElement extends LitElement {
 				--uui-button-padding-bottom-factor: 1.5;
 			}
 			uui-button div {
+				/* TODO: Remove this when uui-button has setting for aligning content */
 				position: absolute;
 				left: 9px;
 				margin: auto;

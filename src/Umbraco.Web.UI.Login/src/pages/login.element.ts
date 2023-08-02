@@ -9,6 +9,7 @@ import { UmbAuthMainContext } from '../context/auth-main.context.js';
 import '../auth-layout.element.js';
 import './reset-password.element.js';
 import './new-password.element.js';
+import '.././external-login-providers-layout.element.js';
 
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {
@@ -133,6 +134,9 @@ export default class UmbLoginElement extends LitElement {
 					</uui-button>
 				</form>
 			</uui-form>
+			<umb-external-login-providers-layout>
+				<slot name="external"></slot>
+			</umb-external-login-providers-layout>
 		`;
 	}
 
@@ -148,13 +152,13 @@ export default class UmbLoginElement extends LitElement {
 			:host {
 				display: flex;
 				flex-direction: column;
-				gap: var(--uui-size-space-6);
 			}
 			#greeting {
 				text-align: center;
 				margin: 0px;
 				font-weight: 600;
 				font-size: 1.4rem;
+				margin-bottom: var(--uui-size-space-6);
 			}
 			form {
 				display: flex;

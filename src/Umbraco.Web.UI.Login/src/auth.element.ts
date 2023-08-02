@@ -1,18 +1,18 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { Commands, Context, Router } from '@vaadin/router';
+import { Commands, Context } from '@vaadin/router';
 import { UmbAuthMainContext } from './context/auth-main.context.js';
-import {UUIIconRegistryEssential} from "@umbraco-ui/uui";
-import {UmbIconRegistry} from "./icon.registry.ts";
+import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
+import { UmbIconRegistry } from './icon.registry.ts';
 
 import './auth-layout.element.js';
 import './pages/reset-password.element.js';
 import './pages/new-password.element.js';
 import './pages/login.element.js';
 import './pages/invite.element.js';
-import './external-login-providers-layout.element.js';
+import UmbRouter from './umb-router.ts';
 
 @customElement('umb-auth')
 export default class UmbAuthElement extends LitElement {
@@ -58,29 +58,59 @@ export default class UmbAuthElement extends LitElement {
 		return new URLSearchParams(window.location.search).get('returnPath') || this.#returnPath;
 	}
 
-  constructor() {
-    super();
+	constructor() {
+		super();
 
-    new UUIIconRegistryEssential().attach(this);
-    new UmbIconRegistry().attach(this);
-  }
+		new UUIIconRegistryEssential().attach(this);
+		new UmbIconRegistry().attach(this);
+	}
+
+	@state()
+	router?: UmbRouter;
 
 	async firstUpdated(): Promise<void> {
-		const router = new Router(this.shadowRoot?.getElementById('outlet'));
-
-		await router.setRoutes([
+		this.router = new UmbRouter(this, [
 			{
 				path: 'login',
-				children: [
-					{ path: '', component: 'umb-login', action: this.#checkResetCode },
-					{ path: 'reset', component: 'umb-reset-password', action: this.#checkRouteAllowReset },
-					{ path: 'new', component: 'umb-new-password', action: this.#checkRouteAllowReset },
-					{ path: 'invite', component: 'umb-invite', action: this.#checkRouteAllowInvite },
-					{ path: '(.*)', redirect: '' },
-				],
+				component: html`<umb-login>
+					<slot name="external" slot="external"></slot>
+				</umb-login>`,
+				default: true,
+				action: (_pathName, search) => {
+					console.log(search.split('&'));
+
+					if (search.split('&').some((x) => x.startsWith('?flow=reset-password'))) {
+						return 'login/reset';
+					}
+
+					return null;
+				},
 			},
-			{ path: '(.*)', redirect: 'login' },
+			{
+				path: 'login',
+				component: html`<umb-reset-password></umb-reset-password>`,
+				search: '?flow=reset-password',
+			},
+			{
+				path: 'login/reset',
+				component: html`<umb-reset-password></umb-reset-password>`,
+			},
+			{
+				path: 'login/new',
+				component: html`<umb-new-password></umb-new-password>`,
+			},
+			{
+				path: 'login/invite',
+				component: html`<umb-invite></umb-invite>`,
+			},
 		]);
+
+		this.router.subscribe();
+	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.router?.unsubscribe();
 	}
 
 	#checkRouteAllowReset = (_context: Context, commands: Commands) => {
@@ -110,10 +140,7 @@ export default class UmbAuthElement extends LitElement {
 	render() {
 		return html`
 			<umb-auth-layout backgroundImage=${ifDefined(this.backgroundImage)} logoImage=${ifDefined(this.logoImage)}>
-				<div id="outlet"></div>
-				<umb-external-login-providers-layout>
-					<slot name="external"></slot>
-				</umb-external-login-providers-layout>
+				${this.router?.render()}
 			</umb-auth-layout>
 		`;
 	}
