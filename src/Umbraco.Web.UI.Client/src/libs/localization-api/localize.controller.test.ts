@@ -1,6 +1,6 @@
 import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
 import { UmbLocalizeController } from './localize.controller.js';
-import { UmbTranslationRegistry } from './registry/translation.registry.js';
+import { umbTranslationRegistry } from './registry/translation.registry.js';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestTranslations, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -54,7 +54,22 @@ const danish: ManifestTranslations = {
 	alias: 'test.da',
 	name: 'Test Danish',
 	meta: {
-		culture: 'da-dk',
+		culture: 'da',
+		translations: {
+			general: {
+				close: 'Luk',
+				notOnRegional: 'Not on regional',
+			},
+		},
+	},
+};
+
+const danishRegional: ManifestTranslations = {
+	type: 'translations',
+	alias: 'test.da-DK',
+	name: 'Test Danish (Denmark)',
+	meta: {
+		culture: 'da-DK',
 		translations: {
 			general: {
 				close: 'Luk',
@@ -65,14 +80,14 @@ const danish: ManifestTranslations = {
 //#endregion
 
 describe('UmbLocalizeController', () => {
-	const registry = new UmbTranslationRegistry(umbExtensionsRegistry);
 	umbExtensionsRegistry.register(english);
 	umbExtensionsRegistry.register(danish);
+	umbExtensionsRegistry.register(danishRegional);
 
 	let element: UmbLocalizeControllerHostElement;
 
 	beforeEach(async () => {
-		registry.loadLanguage(english.meta.culture);
+		umbTranslationRegistry.loadLanguage(english.meta.culture);
 		element = await fixture(html`<umb-localize-controller-host></umb-localize-controller-host>`);
 	});
 
@@ -94,12 +109,13 @@ describe('UmbLocalizeController', () => {
 		});
 
 		it('should update the term when the language changes', async () => {
-			expect(element.localize.term('general_close')).to.equal('Close');
 			// Load Danish
-			registry.loadLanguage(danish.meta.culture);
-			// Switch browser to Danish
-			element.lang = danish.meta.culture;
+			umbTranslationRegistry.loadLanguage(danishRegional.meta.culture);
+			await aTimeout(0);
+			expect(document.documentElement.lang).to.equal(danishRegional.meta.culture);
 
+			// Force an element update as well
+			element.lang = danishRegional.meta.culture;
 			await elementUpdated(element);
 			expect(element.localize.term('general_close')).to.equal('Luk');
 		});
@@ -111,11 +127,22 @@ describe('UmbLocalizeController', () => {
 			expect(element.localize.term('general_close')).to.equal('Close');
 		});
 
+		it('should provide a secondary term when the term is not found', async () => {
+			// Load Danish
+			umbTranslationRegistry.loadLanguage(danishRegional.meta.culture);
+			await aTimeout(0);
+
+			element.lang = danishRegional.meta.culture;
+			await elementUpdated(element);
+			expect(element.localize.term('general_notOnRegional')).to.equal('Not on regional');
+		});
+
 		it('should provide a fallback term when the term is not found', async () => {
 			// Load Danish
-			registry.loadLanguage(danish.meta.culture);
-			// Switch browser to Danish
-			element.lang = danish.meta.culture;
+			umbTranslationRegistry.loadLanguage(danishRegional.meta.culture);
+			await aTimeout(0);
+
+			element.lang = danishRegional.meta.culture;
 			await elementUpdated(element);
 			expect(element.localize.term('general_close')).to.equal('Luk');
 			expect(element.localize.term('general_logout')).to.equal('Log out');
