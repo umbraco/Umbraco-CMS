@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Umbraco.Cms.Core.Cache;
@@ -34,6 +35,7 @@ public class UmbPasswordController : SurfaceController
     private readonly ITwoFactorLoginService _twoFactorLoginService;
     private readonly IEmailSender _emailSender;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ILogger<UmbPasswordController> _logger;
     private readonly LinkGenerator _linkGenerator;
     private readonly WebRoutingSettings _webRoutingSettings;
     private readonly GlobalSettings _globalSettings;
@@ -52,6 +54,7 @@ public class UmbPasswordController : SurfaceController
         ITwoFactorLoginService twoFactorLoginService,
         IEmailSender emailSender,
         IHttpContextAccessor httpContextAccessor,
+        ILogger<UmbPasswordController> logger,
         LinkGenerator linkGenerator,
         IOptions<WebRoutingSettings> webRoutingSettings,
         IOptions<GlobalSettings> globalSettings)
@@ -63,6 +66,7 @@ public class UmbPasswordController : SurfaceController
         _twoFactorLoginService = twoFactorLoginService;
         _emailSender = emailSender;
         _httpContextAccessor = httpContextAccessor;
+        _logger = logger;
         _linkGenerator = linkGenerator;
         _webRoutingSettings = webRoutingSettings.Value;
         _globalSettings = globalSettings.Value;
