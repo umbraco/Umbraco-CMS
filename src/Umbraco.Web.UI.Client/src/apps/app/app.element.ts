@@ -30,9 +30,11 @@ export class UmbAppElement extends UmbLitElement {
 	 *
 	 * @attr
 	 * @remarks This is the default culture to use for localization, not the current culture.
+	 * @example "en-us"
+	 * @example "en"
 	 */
 	@property({ type: String, attribute: 'default-culture' })
-	culture: Intl.BCP47LanguageTag | Intl.Locale = 'en-us';
+	culture: string = 'en-us';
 
 	/**
 	 * The base path of the backoffice.

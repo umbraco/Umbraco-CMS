@@ -62,9 +62,8 @@ export class UmbTranslationRegistry {
 	 * Load a language from the extension registry.
 	 * @param locale The locale to load.
 	 */
-	loadLanguage(locale: Intl.BCP47LanguageTag | Intl.Locale) {
-		locale = new Intl.Locale(locale);
-		this.#currentLanguage.next(`${locale.language}-${locale.region}`.toLowerCase());
+	loadLanguage(locale: string) {
+		this.#currentLanguage.next(locale.toLowerCase());
 	}
 
 	#addOrUpdateDictionary(
