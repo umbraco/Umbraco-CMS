@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Net;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -11,13 +10,9 @@ using Microsoft.Extensions.Options;
 using MimeKit;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Email;
-using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -28,7 +23,6 @@ using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Models;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
-using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Umbraco.Cms.Web.Website.Controllers;
 
@@ -36,6 +30,7 @@ public class UmbPasswordController : SurfaceController
 {
     private readonly IMemberManager _memberManager;
     private readonly IMemberSignInManager _signInManager;
+    private readonly ILocalizedTextService _localizedTextService;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
     private readonly IEmailSender _emailSender;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -53,6 +48,7 @@ public class UmbPasswordController : SurfaceController
         IPublishedUrlProvider publishedUrlProvider,
         IMemberSignInManager signInManager,
         IMemberManager memberManager,
+        ILocalizedTextService localizedTextService,
         ITwoFactorLoginService twoFactorLoginService,
         IEmailSender emailSender,
         IHttpContextAccessor httpContextAccessor,
@@ -63,6 +59,7 @@ public class UmbPasswordController : SurfaceController
     {
         _signInManager = signInManager;
         _memberManager = memberManager;
+        _localizedTextService = localizedTextService;
         _twoFactorLoginService = twoFactorLoginService;
         _emailSender = emailSender;
         _httpContextAccessor = httpContextAccessor;
@@ -159,8 +156,6 @@ public class UmbPasswordController : SurfaceController
     [AllowAnonymous]
     public async Task<IActionResult> VerifyReset(string reset)
     {
-        // TODO: Verify reset token.
-
         AuthenticateResult authenticate = await this.AuthenticateMemberAsync();
 
         //if you are hitting VerifyReset, you're already signed in as a different member, and the token is invalid
@@ -259,21 +254,15 @@ public class UmbPasswordController : SurfaceController
 
         var resetUri = new Uri(applicationUri, action);
 
-        //var emailSubject = _localizedTextService.Localize("user", "inviteEmailCopySubject",
-        //    // Ensure the culture of the found user is used for the email!
-        //    UmbracoUserExtensions.GetUserCulture(to?.Language, _localizedTextService, _globalSettings));
+        var emailSubject = _localizedTextService.Localize("member", "resetPasswordEmailCopySubject", Thread.CurrentThread.CurrentCulture);
 
-        //var emailBody = _localizedTextService.Localize("user", "inviteEmailCopyFormat",
-        //    // Ensure the culture of the found user is used for the email!
-        //    UmbracoUserExtensions.GetUserCulture(to?.Language, _localizedTextService, _globalSettings),
-        //    new[] { userDisplay?.Name, from, message, resetUri.ToString(), senderEmail });
+        var emailBody = _localizedTextService.Localize("member", "resetPasswordEmailCopyFormat", Thread.CurrentThread.CurrentCulture,
+            new[] { member?.Name, from, message, resetUri.ToString(), senderEmail });
 
-        var passwordLink = $"<a href=\"{resetUri}?reset={resetToken}\">Reset password</a>";
+        //var passwordLink = $"<a href=\"{resetUri}?reset={resetToken}\">Reset password</a>";
 
-        var emailSubject = "Reset Password";
-
-        var emailBody = $"<h3>Reset password</h3>"
-            + $"<p>{passwordLink}</p>";
+        //var emailBody = $"<h3>Reset password</h3>"
+        //    + $"<p>{passwordLink}</p>";
 
         // This needs to be in the correct mailto format including the name, else
         // the name cannot be captured in the email sending notification.
@@ -283,21 +272,5 @@ public class UmbPasswordController : SurfaceController
         var mailMessage = new EmailMessage(senderEmail, toMailBoxAddress.ToString(), emailSubject, emailBody, true);
 
         await _emailSender.SendAsync(mailMessage, Core.Constants.Web.EmailTypes.PasswordReset, true);
-
-        //string token = await _memberManager.GeneratePasswordResetTokenAsync(memberIdentity);
-
-        //var inviteToken = $"{memberIdentity.Id}{WebUtility.UrlEncode("|")}{token.ToUrlBase64()}";
-
-        //var senderEmail = _globalSettings.Smtp?.From;
-
-        //var passwordLink = $"<a href=\"{model.RedirectUrl}?invite={inviteToken}\">Reset password</a>";
-
-        //var subject = "Reset Password";
-        //var body = $"<h3>Reset password</h3>"
-        //    + $"<p>{passwordLink}</p>";
-
-        //var mailMessage = new EmailMessage(senderEmail, memberIdentity.Email, subject, body, true);
-
-        //await _emailSender.SendAsync(mailMessage, Core.Constants.Web.EmailTypes.PasswordReset);
     }
 }
