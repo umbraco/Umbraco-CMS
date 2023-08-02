@@ -213,14 +213,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         return;
       }
 
-      const blob = blobInfo.blob();
-
-        // if the file size is greater than the max file size, reject it
-        if (fileManager.maxFileSize > 0 && blob.size > fileManager.maxFileSize) {
-            failure(`The file size (${blob.size / 1000} KB) exceeded the maximum allowed size of ${fileManager.maxFileSize / 1000} KB.`);
-            return;
-        }
-
         const xhr = new XMLHttpRequest();
       xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
 
