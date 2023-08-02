@@ -25,7 +25,7 @@ public static partial class UmbracoBuilderExtensions
     /// <summary>
     ///     Adds custom composers
     /// </summary>
-    public static IUmbracoBuilder AddComposers<TComposer>(this IUmbracoBuilder builder
+    public static IUmbracoBuilder AddComposers<TComposer>(this IUmbracoBuilder builder)
         where TComposer : ICustomComposer
     {
         IEnumerable<Type> composerTypes = builder.TypeLoader.GetTypes<TComposer>();
