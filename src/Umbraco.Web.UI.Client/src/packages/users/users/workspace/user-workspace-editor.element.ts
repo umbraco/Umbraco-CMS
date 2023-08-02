@@ -107,6 +107,8 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 			if (currentUserLanguage) {
 				currentUserLanguage.selected = true;
 			} else {
+				// If users language code did not fit any of the options. We will create an option that fits, named unknown.
+				// In this way the user can keep their choice though a given language was not present at this time.
 				this.languages.push({
 					value: currentUserLanguageCode ?? 'en-us',
 					name: currentUserLanguageCode ? `${currentUserLanguageCode} (unknown)` : 'Unknown',
