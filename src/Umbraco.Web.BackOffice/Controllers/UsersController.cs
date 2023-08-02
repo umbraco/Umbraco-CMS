@@ -597,7 +597,7 @@ public class UsersController : BackOfficeNotificationsController
         var emailBody = _localizedTextService.Localize("user", "inviteEmailCopyFormat",
             // Ensure the culture of the found user is used for the email!
             UmbracoUserExtensions.GetUserCulture(to?.Language, _localizedTextService, _globalSettings),
-            new[] { userDisplay?.Name, from, message, inviteUri.ToString(), senderEmail });
+            new[] { userDisplay?.Name, from, WebUtility.HtmlEncode(message)!.ReplaceLineEndings("<br/>"), inviteUri.ToString(), senderEmail });
 
         // This needs to be in the correct mailto format including the name, else
         // the name cannot be captured in the email sending notification.
