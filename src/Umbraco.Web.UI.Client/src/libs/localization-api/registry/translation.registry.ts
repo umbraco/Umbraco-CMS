@@ -6,22 +6,19 @@ import {
 	UmbTranslationsDictionary,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { Subject, combineLatest, map, distinctUntilChanged } from '@umbraco-cms/backoffice/external/rxjs';
+import { Subject, combineLatest, map, distinctUntilChanged, Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export type UmbTranslationsFlatDictionary = Record<string, UmbTranslationEntry>;
 
 export class UmbTranslationRegistry {
-	#registry;
 	#currentLanguage = new Subject<string>();
-	#currentLanguageUnique = this.#currentLanguage.pipe(
+	#currentLanguageUnique: Observable<string> = this.#currentLanguage.pipe(
 		map((x) => x.toLowerCase()),
 		distinctUntilChanged()
 	);
 
 	constructor(extensionRegistry: UmbBackofficeExtensionRegistry) {
-		this.#registry = extensionRegistry;
-
-		combineLatest([this.#currentLanguageUnique, this.#registry.extensionsOfType('translations')]).subscribe(
+		combineLatest([this.#currentLanguageUnique, extensionRegistry.extensionsOfType('translations')]).subscribe(
 			async ([userCulture, extensions]) => {
 				const locale = new Intl.Locale(userCulture);
 				const translations = await Promise.all(
