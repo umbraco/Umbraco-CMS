@@ -58,6 +58,11 @@
                 <p style="line-height: 1.6; margin-bottom: 25px;">
                     <localize key="user_userinviteExpiredMessage">Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.</localize>
                 </p>
+                <p>
+                  <a href="#" ng-href="#/login" style="text-decoration: underline;">
+                    <localize key="login_returnToLogin">Return to login form</localize>
+                  </a>
+                </p>
             </div>
         </div>
         <div ng-show="vm.invitedUser == null && !vm.inviteStep" class="umb-login-container">
