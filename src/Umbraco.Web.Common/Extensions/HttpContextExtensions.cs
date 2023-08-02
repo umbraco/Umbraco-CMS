@@ -73,12 +73,12 @@ public static class HttpContextExtensions
         }
 
         AuthenticateResult result =
-            await httpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType); // which to user for member?
+            await httpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType); // which to use for member?
 
         if (!result.Succeeded)
         {
             result =
-                await httpContext.AuthenticateAsync(Constants.Security.BackOfficeExternalAuthenticationType); // which to user for member?
+                await httpContext.AuthenticateAsync(Constants.Security.BackOfficeExternalAuthenticationType); // which to use for member?
         }
 
         return result;
