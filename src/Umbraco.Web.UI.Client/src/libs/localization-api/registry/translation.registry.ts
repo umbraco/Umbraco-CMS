@@ -4,6 +4,7 @@ import {
 	UmbBackofficeExtensionRegistry,
 	UmbTranslationEntry,
 	UmbTranslationsDictionary,
+	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { Subject, combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -76,3 +77,5 @@ export class UmbTranslationRegistry {
 		}
 	}
 }
+
+export const umbTranslationRegistry = new UmbTranslationRegistry(umbExtensionsRegistry);

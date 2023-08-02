@@ -1,7 +1,5 @@
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context.js';
 import { UmbExtensionInitializer } from './extension.controller.js';
-import { UmbTranslationRegistry } from '@umbraco-cms/backoffice/localization-api';
-import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -39,19 +37,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 
 		const extensionInitializer = new UmbExtensionInitializer(this, umbExtensionsRegistry);
 		extensionInitializer.setLocalPackages(CORE_PACKAGES);
-
-		const translationRegistry = new UmbTranslationRegistry(umbExtensionsRegistry);
-		// Load default language
-		translationRegistry.loadLanguage('en-us');
-		this.consumeContext(UMB_AUTH, (auth) => {
-			this.observe(
-				auth.languageIsoCode,
-				(currentLanguageIsoCode) => {
-					translationRegistry.loadLanguage(currentLanguageIsoCode);
-				},
-				'languageIsoCode'
-			);
-		});
 	}
 
 	render() {
