@@ -11,41 +11,43 @@
         <div ng-if="!vm.denyLocalLogin" ng-show="vm.invitedUser != null" class="umb-login-container">
 
             <form name="vm.inviteUserPasswordForm" novalidate="" ng-submit="vm.inviteSavePassword()" val-form-manager>
-                <div class="form" ng-if="vm.inviteStep === 1">
+                <div class="form" ng-if="vm.inviteStep === 1 || vm.inviteStep === 2">
                     <h1 style="margin-bottom: 10px; text-align: left;">Hi, {{vm.invitedUser.name}}</h1>
                     <p style="line-height: 1.6; margin-bottom: 25px;">
-                        <localize key="user_userinviteWelcomeMessage">Welcome to Umbraco! Just need to get your password and avatar setup and then you're good to go</localize>
+                        <localize key="user_userinviteWelcomeMessage">Welcome to Umbraco! Just need to get your password setup and then you're good to go</localize>
                     </p>
 
-                    <div class="control-group" ng-class="{error: vm.setPasswordForm.password.$invalid}">
-                        <label for="umb-passwordOne">
-                            <localize key="user_newPassword">New password</localize>
-                            <small style="font-size: 13px;">{{vm.invitedUserPasswordModel.passwordPolicyText}}</small>
-                        </label>
-                        <input type="password" ng-model="vm.invitedUserPasswordModel.password" name="password" id="umb-passwordOne" class="-full-width-input" umb-auto-focus required val-server-field="value" ng-minlength="{{vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength}}" spellcheck="false" />
-                        <span ng-messages="inviteUserPasswordForm.password.$error" show-validation-on-submit>
-                            <span class="help-inline" ng-message="required"><localize key="user_passwordIsBlank">Your new password cannot be blank!</localize></span>
-                            <span class="help-inline" ng-message="minlength">Minimum {{vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength}} characters</span>
-                            <span class="help-inline" ng-message="valServerField">{{inviteUserPasswordForm.password.errorMsg}}</span>
-                        </span>
-                    </div>
+                    <div ng-if="vm.inviteStep === 1">
+                        <div class="control-group" ng-class="{error: vm.setPasswordForm.password.$invalid}">
+                            <label for="umb-passwordOne">
+                                <localize key="user_newPassword">New password</localize>
+                                <small style="font-size: 13px;">{{vm.invitedUserPasswordModel.passwordPolicyText}}</small>
+                            </label>
+                            <input type="password" ng-model="vm.invitedUserPasswordModel.password" name="password" id="umb-passwordOne" class="-full-width-input" umb-auto-focus required val-server-field="value" ng-minlength="{{vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength}}" spellcheck="false" />
+                            <span ng-messages="inviteUserPasswordForm.password.$error" show-validation-on-submit>
+                                <span class="help-inline" ng-message="required"><localize key="user_passwordIsBlank">Your new password cannot be blank!</localize></span>
+                                <span class="help-inline" ng-message="minlength">Minimum {{vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength}} characters</span>
+                                <span class="help-inline" ng-message="valServerField">{{inviteUserPasswordForm.password.errorMsg}}</span>
+                            </span>
+                        </div>
 
-                    <div class="control-group" ng-class="{error: vm.setPasswordForm.confirmPassword.$invalid}">
-                        <label for="umb-confirmPasswordOne"><localize key="user_confirmNewPassword">Confirm new password</localize></label>
-                        <input type="password" ng-model="vm.invitedUserPasswordModel.confirmPassword" name="confirmPassword" id="umb-confirmPasswordOne" class="-full-width-input" required val-compare="password" spellcheck="false"/>
-                        <span ng-messages="inviteUserPasswordForm.confirmPassword.$error" show-validation-on-submit>
-                            <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
-                            <span class="help-inline" ng-message="valCompare"><localize key="user_passwordMismatch">The confirmed password doesn't match the new password!</localize></span>
-                        </span>
+                        <div class="control-group" ng-class="{error: vm.setPasswordForm.confirmPassword.$invalid}">
+                            <label for="umb-confirmPasswordOne"><localize key="user_confirmNewPassword">Confirm new password</localize></label>
+                            <input type="password" ng-model="vm.invitedUserPasswordModel.confirmPassword" name="confirmPassword" id="umb-confirmPasswordOne" class="-full-width-input" required val-compare="password" spellcheck="false"/>
+                            <span ng-messages="inviteUserPasswordForm.confirmPassword.$error" show-validation-on-submit>
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valCompare"><localize key="user_passwordMismatch">The confirmed password doesn't match the new password!</localize></span>
+                            </span>
 
-                    </div>
+                        </div>
 
-                    <div class="flex justify-between items-center">
-                        <umb-button type="submit"
-                                    button-style="success"
-                                    state="vm.invitedUserPasswordModel.buttonState"
-                                    label="Save password">
-                        </umb-button>
+                        <div class="flex justify-between items-center">
+                            <umb-button type="submit"
+                                        button-style="success"
+                                        state="vm.invitedUserPasswordModel.buttonState"
+                                        label="Save password">
+                            </umb-button>
+                        </div>
                     </div>
 
                 </div>
