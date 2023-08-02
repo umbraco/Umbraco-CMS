@@ -35,7 +35,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 				<p>
 					There is currently very limited functionality.<br />
 					Please refer to the
-					<a target="_blank" href="http://docs.umbraco.com/umbraco-backoffice/">documentation</a> to learn more about
+					<a target="_blank" href="https://docs.umbraco.com/umbraco-backoffice/">documentation</a> to learn more about
 					what is possible.
 				</p>
 			</uui-box>

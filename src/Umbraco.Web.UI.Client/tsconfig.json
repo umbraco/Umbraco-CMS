@@ -35,6 +35,7 @@
 			"@umbraco-cms/backoffice/controller-api": ["src/libs/controller-api"],
 			"@umbraco-cms/backoffice/element-api": ["src/libs/element-api"],
 			"@umbraco-cms/backoffice/extension-api": ["src/libs/extension-api"],
+			"@umbraco-cms/backoffice/localization-api": ["src/libs/localization-api"],
 			"@umbraco-cms/backoffice/observable-api": ["src/libs/observable-api"],
 
 			// SHARED

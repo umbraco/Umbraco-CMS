@@ -24,6 +24,11 @@ export interface IUmbAuth {
 	get currentUser(): Observable<UmbLoggedInUser | undefined>;
 
 	/**
+	 * Get the current user's language ISO code.
+	 */
+	languageIsoCode: Observable<string>;
+
+	/**
 	 * Make a server request for the current user and save the state
 	 */
 	fetchCurrentUser(): Promise<UmbLoggedInUser | undefined>;

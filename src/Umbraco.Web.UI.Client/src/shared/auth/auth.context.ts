@@ -11,6 +11,7 @@ export class UmbAuthContext implements IUmbAuth {
 	#currentUser = new UmbObjectState<UmbLoggedInUser | undefined>(undefined);
 	readonly currentUser = this.#currentUser.asObservable();
 	readonly isLoggedIn = new ReplaySubject<boolean>(1);
+	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode ?? 'en-us');
 
 	#host;
 	#authFlow;
@@ -32,8 +33,6 @@ export class UmbAuthContext implements IUmbAuth {
 
 	async fetchCurrentUser(): Promise<UmbLoggedInUser | undefined> {
 		const { data } = await tryExecuteAndNotify(this.#host, UserResource.getUserCurrent());
-
-		if (!data) return;
 
 		this.#currentUser.next(data);
 

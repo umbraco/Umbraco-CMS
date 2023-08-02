@@ -3,7 +3,7 @@ import { UmbUserRepository } from '../repository/user.repository.js';
 import { UmbUserGroupInputElement } from '../../user-groups/components/input-user-group/user-group-input.element.js';
 import { type UmbUserDetail } from '../index.js';
 import { UmbUserWorkspaceContext } from './user-workspace.context.js';
-import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement, UUIInputEvent, UUISelectElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
 	html,
@@ -14,6 +14,7 @@ import {
 	ifDefined,
 	repeat,
 } from '@umbraco-cms/backoffice/external/lit';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 import { UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
@@ -34,9 +35,11 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _user?: UmbUserDetail;
 
+	@state()
+	private languages: Array<{ name: string; value: string; selected: boolean }> = [];
+
 	#auth?: typeof UMB_AUTH.TYPE;
 	#modalContext?: UmbModalManagerContext;
-	#languages = []; //TODO Add languages
 	#workspaceContext?: UmbUserWorkspaceContext;
 
 	#userRepository?: UmbUserRepository;
@@ -78,7 +81,41 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 
 	#observeCurrentUser() {
 		if (!this.#auth) return;
-		this.observe(this.#auth.currentUser, (currentUser) => (this._currentUser = currentUser));
+		this.observe(this.#auth.currentUser, async (currentUser) => {
+			this._currentUser = currentUser;
+
+			if (!currentUser) {
+				return;
+			}
+
+			// Find all translations and make a unique list of iso codes
+			const translations = await firstValueFrom(umbExtensionsRegistry.extensionsOfType('translations'));
+
+			this.languages = translations
+				.filter((isoCode) => isoCode !== undefined)
+				.map((translation) => ({
+					value: translation.meta.culture.toLowerCase(),
+					name: translation.name,
+					selected: false,
+				}));
+
+			const currentUserLanguageCode = currentUser.languageIsoCode?.toLowerCase();
+
+			// Set the current user's language as selected
+			const currentUserLanguage = this.languages.find((language) => language.value === currentUserLanguageCode);
+
+			if (currentUserLanguage) {
+				currentUserLanguage.selected = true;
+			} else {
+				// If users language code did not fit any of the options. We will create an option that fits, named unknown.
+				// In this way the user can keep their choice though a given language was not present at this time.
+				this.languages.push({
+					value: currentUserLanguageCode ?? 'en-us',
+					name: currentUserLanguageCode ? `${currentUserLanguageCode} (unknown)` : 'Unknown',
+					selected: true,
+				});
+			}
+		});
 	}
 
 	#onUserStatusChange() {
@@ -111,6 +148,14 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 			if (typeof target?.value === 'string') {
 				this.#workspaceContext?.updateProperty('name', target.value);
 			}
+		}
+	}
+
+	#onLanguageChange(event: Event) {
+		const target = event.composedPath()[0] as UUISelectElement;
+
+		if (typeof target?.value === 'string') {
+			this.#workspaceContext?.updateProperty('languageIsoCode', target.value);
 		}
 	}
 
@@ -150,12 +195,18 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		if (!this._user) return nothing;
 
 		return html` <uui-box>
-				<div slot="headline">Profile</div>
+				<div slot="headline"><umb-localize key="user_profile">Profile</umb-localize></div>
 				<umb-workspace-property-layout label="Email">
-					<uui-input slot="editor" name="email" label="email" readonly value=${this._user.email}></uui-input>
+					<uui-input slot="editor" name="email" label="email" readonly value=${ifDefined(this._user.email)}></uui-input>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout label="Language" description="The language of the UI in the Backoffice">
-					<uui-select slot="editor" name="language" label="language" .options=${this.#languages}> </uui-select>
+					<uui-select
+						slot="editor"
+						name="language"
+						label="language"
+						.options=${this.languages}
+						@change="${this.#onLanguageChange}">
+					</uui-select>
 				</umb-workspace-property-layout>
 			</uui-box>
 			<uui-box>
@@ -172,7 +223,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 						label="Content start node"
 						description="Limit the content tree to specific start nodes">
 						<umb-property-editor-ui-document-picker
-							.value=${this._user.contentStartNodeIds}
+							.value=${this._user.contentStartNodeIds ?? []}
 							@property-value-change=${(e: any) =>
 								this.#workspaceContext?.updateProperty('contentStartNodeIds', e.target.value)}
 							slot="editor"></umb-property-editor-ui-document-picker>

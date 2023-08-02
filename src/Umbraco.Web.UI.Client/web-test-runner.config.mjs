@@ -48,6 +48,7 @@ export default {
 						'@umbraco-cms/backoffice/controller-api': './src/libs/controller-api/index.ts',
 						'@umbraco-cms/backoffice/element-api': './src/libs/element-api/index.ts',
 						'@umbraco-cms/backoffice/extension-api': './src/libs/extension-api/index.ts',
+						'@umbraco-cms/backoffice/localization-api': './src/libs/localization-api/index.ts',
 						'@umbraco-cms/backoffice/observable-api': './src/libs/observable-api/index.ts',
 
 						'@umbraco-cms/backoffice/auth': './src/shared/auth/index.ts',
@@ -125,7 +126,7 @@ export default {
 		reporters: ['lcovonly', 'text-summary'],
 	},
 	testRunnerHtml: (testFramework) =>
-		`<html>
+		`<html lang="en-us">
 			<head>
 				<meta charset="UTF-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
