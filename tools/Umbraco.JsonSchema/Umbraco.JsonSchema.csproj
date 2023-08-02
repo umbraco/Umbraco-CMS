@@ -1,16 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Title>Umbraco JSON schema generator</Title>
+    <Description>Generates a JSON schema from a specific type in an assembly file.</Description>
     <OutputType>Exe</OutputType>
-    <IsPackable>false</IsPackable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>umbraco-jsonschema</ToolCommandName>
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="NJsonSchema" Version="10.8.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj" />
   </ItemGroup>
 </Project>

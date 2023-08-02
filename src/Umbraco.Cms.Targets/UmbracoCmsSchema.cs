@@ -1,6 +1,8 @@
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 
+namespace Umbraco.Cms.Targets;
+
 internal class UmbracoCmsSchema
 {
     public UmbracoDefinition Umbraco { get; set; } = null!;
