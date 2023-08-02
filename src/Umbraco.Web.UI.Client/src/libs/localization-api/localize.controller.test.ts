@@ -3,7 +3,7 @@ import { UmbLocalizeController } from './localize.controller.js';
 import { UmbTranslationRegistry } from './registry/translation.registry.js';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestTranslations, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-localize-controller-host')
 class UmbLocalizeControllerHostElement extends UmbLitElement {
@@ -12,7 +12,7 @@ class UmbLocalizeControllerHostElement extends UmbLitElement {
 }
 
 //#region Translations
-const english = {
+const english: ManifestTranslations = {
 	type: 'translations',
 	alias: 'test.en',
 	name: 'Test English',
@@ -35,7 +35,7 @@ const english = {
 	},
 };
 
-const englishOverride = {
+const englishOverride: ManifestTranslations = {
 	type: 'translations',
 	alias: 'test.en.override',
 	name: 'Test English',
@@ -49,7 +49,7 @@ const englishOverride = {
 	},
 };
 
-const danish = {
+const danish: ManifestTranslations = {
 	type: 'translations',
 	alias: 'test.da',
 	name: 'Test Danish',
