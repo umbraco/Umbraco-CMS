@@ -14,6 +14,4 @@ export {
 	of,
 	lastValueFrom,
 	firstValueFrom,
-	switchMap,
-	throwError,
 } from 'rxjs';
