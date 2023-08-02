@@ -1,4 +1,4 @@
-import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -56,6 +56,14 @@ export class UmbLocalizeElement extends UmbLitElement {
 			? html`<span style="color:red">${this.key}</span>`
 			: html`<slot></slot>`;
 	}
+
+	static styles = [
+		css`
+			:host {
+				display: contents;
+			}
+		`,
+	];
 }
 
 declare global {
