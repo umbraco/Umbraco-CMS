@@ -30,10 +30,10 @@ public sealed class ComposeBeforeAttribute : Attribute
     /// <param name="requiringType">The type of the required composer.</param>
     public ComposeBeforeAttribute(Type requiringType)
     {
-        if (typeof(IComposer).IsAssignableFrom(requiringType) == false)
+        if (typeof(ICustomComposer).IsAssignableFrom(requiringType) == false)
         {
             throw new ArgumentException(
-                $"Type {requiringType.FullName} is invalid here because it does not implement {typeof(IComposer).FullName}.");
+                $"Type {requiringType.FullName} is invalid here because it does not implement {typeof(ICustomComposer).FullName}.");
         }
 
         RequiringType = requiringType;

@@ -30,10 +30,10 @@ public sealed class ComposeAfterAttribute : Attribute
     /// <param name="requiredType">The type of the required composer.</param>
     public ComposeAfterAttribute(Type requiredType)
     {
-        if (typeof(IComposer).IsAssignableFrom(requiredType) == false)
+        if (typeof(ICustomComposer).IsAssignableFrom(requiredType) == false)
         {
             throw new ArgumentException(
-                $"Type {requiredType.FullName} is invalid here because it does not implement {typeof(IComposer).FullName}.");
+                $"Type {requiredType.FullName} is invalid here because it does not implement {typeof(ICustomComposer).FullName}.");
         }
 
         RequiredType = requiredType;

@@ -21,4 +21,19 @@ public static partial class UmbracoBuilderExtensions
 
         return builder;
     }
+
+    /// <summary>
+    ///     Adds custom composers
+    /// </summary>
+    public static IUmbracoBuilder AddComposers<TComposer>(this IUmbracoBuilder builder
+        where TComposer : ICustomComposer
+    {
+        IEnumerable<Type> composerTypes = builder.TypeLoader.GetTypes<TComposer>();
+        IEnumerable<Attribute> enableDisable =
+            builder.TypeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
+
+        new ComposerGraph<TComposer>(builder, composerTypes, enableDisable, builder.BuilderLoggerFactory.CreateLogger<ComposerGraph<TComposer>>()).Compose();
+
+        return builder;
+    }
 }
