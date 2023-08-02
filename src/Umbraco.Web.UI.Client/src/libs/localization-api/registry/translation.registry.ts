@@ -13,7 +13,7 @@ export type UmbTranslationsFlatDictionary = Record<string, UmbTranslationEntry>;
 export class UmbTranslationRegistry {
 	#registry;
 	#currentLanguage = new Subject<string>();
-	#currentLanguageUniqueLowercase = this.#currentLanguage.pipe(
+	#currentLanguageUnique = this.#currentLanguage.pipe(
 		map((x) => x.toLowerCase()),
 		distinctUntilChanged()
 	);
@@ -21,11 +21,16 @@ export class UmbTranslationRegistry {
 	constructor(extensionRegistry: UmbBackofficeExtensionRegistry) {
 		this.#registry = extensionRegistry;
 
-		combineLatest([this.#currentLanguageUniqueLowercase, this.#registry.extensionsOfType('translations')]).subscribe(
+		combineLatest([this.#currentLanguageUnique, this.#registry.extensionsOfType('translations')]).subscribe(
 			async ([userCulture, extensions]) => {
-				await Promise.all(
+				const locale = new Intl.Locale(userCulture);
+				const translations = await Promise.all(
 					extensions
-						.filter((x) => x.meta.culture.toLowerCase() === userCulture)
+						.filter(
+							(x) =>
+								x.meta.culture.toLowerCase() === locale.baseName.toLowerCase() ||
+								x.meta.culture.toLowerCase() === locale.language.toLowerCase()
+						)
 						.map(async (extension) => {
 							const innerDictionary: UmbTranslationsFlatDictionary = {};
 
@@ -46,18 +51,23 @@ export class UmbTranslationRegistry {
 							}
 
 							// Notify subscribers that the inner dictionary has changed.
-							const translation: TranslationSet = {
+							return {
 								$code: userCulture,
 								$dir: extension.meta.direction ?? 'ltr',
 								...innerDictionary,
-							};
-							registerTranslation(translation);
-
-							// Set the document language and direction.
-							document.documentElement.lang = translation.$code;
-							document.documentElement.dir = translation.$dir;
+							} satisfies TranslationSet;
 						})
 				);
+
+				if (translations.length) {
+					registerTranslation(...translations);
+
+					// Set the document language
+					document.documentElement.lang = locale.baseName;
+
+					// Set the document direction to the direction of the primary language
+					document.documentElement.dir = translations[0].$dir ?? 'ltr';
+				}
 			}
 		);
 	}
