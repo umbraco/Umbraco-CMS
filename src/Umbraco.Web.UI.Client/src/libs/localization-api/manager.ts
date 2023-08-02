@@ -11,25 +11,26 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-import { LitElement } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbTranslationEntry } from '@umbraco-cms/backoffice/extension-registry';
+import type { LitElement } from '@umbraco-cms/backoffice/external/lit';
 
 export type FunctionParams<T> = T extends (...args: infer U) => string ? U : [];
 
-export interface Translation {
+export interface TranslationSet {
 	$code: string; // e.g. en, en-GB
 	$dir: 'ltr' | 'rtl';
 }
 
-export interface DefaultTranslation extends Translation {
-	[key: string]: any;
+export interface DefaultTranslationSet extends TranslationSet {
+	[key: string]: UmbTranslationEntry;
 }
 
 export const connectedElements = new Set<HTMLElement>();
 const documentElementObserver = new MutationObserver(update);
-export const translations: Map<string, Translation> = new Map();
+export const translations: Map<string, TranslationSet> = new Map();
 export let documentDirection = document.documentElement.dir || 'ltr';
 export let documentLanguage = document.documentElement.lang || navigator.language;
-export let fallback: Translation;
+export let fallback: TranslationSet;
 
 // Watch for changes on <html lang>
 documentElementObserver.observe(document.documentElement, {
@@ -38,7 +39,7 @@ documentElementObserver.observe(document.documentElement, {
 });
 
 /** Registers one or more translations */
-export function registerTranslation(...translation: Translation[]) {
+export function registerTranslation(...translation: TranslationSet[]) {
 	translation.map((t) => {
 		const code = t.$code.toLowerCase();
 
@@ -65,6 +66,7 @@ export function update() {
 
 	[...connectedElements.keys()].map((el) => {
 		if (typeof (el as LitElement).requestUpdate === 'function') {
+			// TODO: We might want to implement a specific Umbraco method for informing about this. and then make the default UmbLitElement call requestUpdate..? Cause then others can implement their own solution?
 			(el as LitElement).requestUpdate();
 		}
 	});

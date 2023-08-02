@@ -12,17 +12,18 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 import {
-	DefaultTranslation,
+	DefaultTranslationSet,
 	FunctionParams,
-	Translation,
+	TranslationSet,
 	connectedElements,
 	documentDirection,
 	documentLanguage,
 	fallback,
 	translations,
 } from './manager.js';
-import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+const LocalizeControllerAlias = Symbol();
 /**
  * The UmbLocalizeController enables localization for your element.
  *
@@ -41,31 +42,36 @@ import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice
  * }
  * ```
  */
-export class UmbLocalizeController<UserTranslation extends Translation = DefaultTranslation> implements UmbController {
-	host;
-	controllerAlias = 'localize';
+export class UmbLocalizeController<TranslationType extends TranslationSet = DefaultTranslationSet>
+	implements UmbController
+{
+	#host;
+	#hostEl;
+	controllerAlias = LocalizeControllerAlias;
 
-	constructor(host: UmbControllerHostElement) {
-		this.host = host;
-		this.host.addController(this);
+	constructor(host: UmbControllerHost) {
+		this.#host = host;
+		this.#hostEl = host.getHostElement() as HTMLElement;
+		this.#host.addController(this);
 	}
 
 	hostConnected(): void {
-		if (connectedElements.has(this.host)) {
+		if (connectedElements.has(this.#hostEl)) {
 			return;
 		}
 
-		connectedElements.add(this.host);
+		connectedElements.add(this.#hostEl);
 	}
 
 	hostDisconnected(): void {
-		connectedElements.delete(this.host);
+		connectedElements.delete(this.#hostEl);
 	}
 
 	destroy(): void {
 		// We do not need to call delete here, as hostDisconnected is called when controller is removed.
 		//connectedElements.delete(this.host);
-		this.host.removeController(this);
+		this.#host.removeController(this);
+		this.#hostEl = undefined as any;
 	}
 
 	/**
@@ -73,7 +79,7 @@ export class UmbLocalizeController<UserTranslation extends Translation = Default
 	 * lowercase.
 	 */
 	dir() {
-		return `${this.host.dir || documentDirection}`.toLowerCase();
+		return `${this.#hostEl.dir || documentDirection}`.toLowerCase();
 	}
 
 	/**
@@ -81,21 +87,21 @@ export class UmbLocalizeController<UserTranslation extends Translation = Default
 	 * lowercase.
 	 */
 	lang() {
-		return `${this.host.lang || documentLanguage}`.toLowerCase();
+		return `${this.#hostEl.lang || documentLanguage}`.toLowerCase();
 	}
 
 	private getTranslationData(lang: string) {
 		const locale = new Intl.Locale(lang);
 		const language = locale?.language.toLowerCase();
 		const region = locale?.region?.toLowerCase() ?? '';
-		const primary = <UserTranslation>translations.get(`${language}-${region}`);
-		const secondary = <UserTranslation>translations.get(language);
+		const primary = <TranslationType>translations.get(`${language}-${region}`);
+		const secondary = <TranslationType>translations.get(language);
 
 		return { locale, language, region, primary, secondary };
 	}
 
 	/** Outputs a translated term. */
-	term<K extends keyof UserTranslation>(key: K, ...args: FunctionParams<UserTranslation[K]>): string {
+	term<K extends keyof TranslationType>(key: K, ...args: FunctionParams<TranslationType[K]>): string {
 		const { primary, secondary } = this.getTranslationData(this.lang());
 		let term: any;
 
@@ -104,8 +110,8 @@ export class UmbLocalizeController<UserTranslation extends Translation = Default
 			term = primary[key];
 		} else if (secondary && secondary[key]) {
 			term = secondary[key];
-		} else if (fallback && fallback[key as keyof Translation]) {
-			term = fallback[key as keyof Translation];
+		} else if (fallback && fallback[key as keyof TranslationSet]) {
+			term = fallback[key as keyof TranslationSet];
 		} else {
 			return String(key);
 		}

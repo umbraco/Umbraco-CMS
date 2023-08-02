@@ -1,4 +1,4 @@
-import { Translation, registerTranslation } from '../manager.js';
+import { TranslationSet, registerTranslation } from '../manager.js';
 import { hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import {
 	UmbBackofficeExtensionRegistry,
@@ -41,7 +41,7 @@ export class UmbTranslationRegistry {
 							}
 
 							// Notify subscribers that the inner dictionary has changed.
-							const translation: Translation = {
+							const translation: TranslationSet = {
 								$code: userCulture,
 								$dir: extension.meta.direction ?? 'ltr',
 								...innerDictionary,
