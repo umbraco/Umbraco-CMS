@@ -1,9 +1,13 @@
 import { Translation, registerTranslation } from '../manager.js';
 import { hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
-import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	UmbBackofficeExtensionRegistry,
+	UmbTranslationEntry,
+	UmbTranslationsDictionary,
+} from '@umbraco-cms/backoffice/extension-registry';
 import { Subject, combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 
-export type UmbTranslationDictionary = Record<string, unknown>;
+export type UmbTranslationsSquashedDictionary = Record<string, UmbTranslationEntry>;
 
 export class UmbTranslationRegistry {
 	#registry;
@@ -18,7 +22,7 @@ export class UmbTranslationRegistry {
 					extensions
 						.filter((x) => x.meta.culture.toLowerCase() === userCulture)
 						.map(async (extension) => {
-							const innerDictionary: UmbTranslationDictionary = {};
+							const innerDictionary: UmbTranslationsSquashedDictionary = {};
 
 							// If extension contains a dictionary, add it to the inner dictionary.
 							if (extension.meta.translations) {
@@ -30,7 +34,7 @@ export class UmbTranslationRegistry {
 							// If extension contains a js file, load it and add the default dictionary to the inner dictionary.
 							const loadedExtension = await loadExtension(extension);
 
-							if (loadedExtension && hasDefaultExport(loadedExtension)) {
+							if (loadedExtension && hasDefaultExport<UmbTranslationsDictionary>(loadedExtension)) {
 								for (const [dictionaryName, dictionary] of Object.entries(loadedExtension.default)) {
 									this.#addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
 								}
@@ -58,9 +62,9 @@ export class UmbTranslationRegistry {
 	}
 
 	#addOrUpdateDictionary(
-		innerDictionary: UmbTranslationDictionary,
+		innerDictionary: UmbTranslationsSquashedDictionary,
 		dictionaryName: string,
-		dictionary: UmbTranslationDictionary
+		dictionary: UmbTranslationsDictionary['value']
 	) {
 		for (const [key, value] of Object.entries(dictionary)) {
 			innerDictionary[`${dictionaryName}_${key}`] = value;

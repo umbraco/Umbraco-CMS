@@ -52,6 +52,7 @@ export * from './section.model.js';
 export * from './store.model.js';
 export * from './theme.model.js';
 export * from './tinymce-plugin.model.js';
+export * from './translations.model.js';
 export * from './tree-item.model.js';
 export * from './tree.model.js';
 export * from './user-profile-app.model.js';
