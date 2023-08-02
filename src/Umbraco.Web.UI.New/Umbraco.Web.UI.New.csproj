@@ -39,10 +39,6 @@
     <_ContentIncludedByDefault Remove="umbraco\UmbracoBackOffice\Default.cshtml" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="umbraco\" />
-  </ItemGroup>
-
   <Target Name="CopyAppsettingsTemplate" BeforeTargets="Build" Condition="!Exists('appsettings.json')">
     <Message Text="Copying appsettings.template.json to appsettings.json because it doesn't exist" Importance="high" />
     <Copy SourceFiles="appsettings.template.json" DestinationFiles="appsettings.json" />
