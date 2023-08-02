@@ -158,6 +158,39 @@ public class UmbPasswordController : SurfaceController
 
     [HttpGet]
     [AllowAnonymous]
+    public async Task<IActionResult> Default()
+    {
+        // TODO: How should this part be handled for member?
+
+        // Check if we not are in an run state, if so we need to redirect
+        //if (_runtimeState.Level != RuntimeLevel.Run)
+        //{
+        //    if (_runtimeState.Level == RuntimeLevel.Upgrade)
+        //    {
+        //        return RedirectToAction(nameof(AuthorizeUpgrade), routeValues: new RouteValueDictionary()
+        //        {
+        //            ["redir"] = _globalSettings.GetBackOfficePath(_hostingEnvironment),
+        //        });
+        //    }
+        //    return Redirect("/");
+        //}
+
+        // force authentication to occur since this is not an authorized endpoint
+        //AuthenticateResult result = await this.AuthenticateMemberAsync();
+
+        //var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
+        //    .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
+
+        //return await RenderDefaultOrProcessExternalLoginAsync(
+        //    result,
+        //    () => View(viewPath),
+        //    () => View(viewPath));
+
+        return View();
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> VerifyReset(string reset)
     {
         AuthenticateResult authenticate = await this.AuthenticateMemberAsync();
@@ -176,7 +209,7 @@ public class UmbPasswordController : SurfaceController
             return RedirectToAction(nameof(Default));
         }
 
-        var parts = WebUtility.UrlDecode(invite).Split('|');
+        var parts = WebUtility.UrlDecode(reset).Split('|');
 
         if (parts.Length != 2)
         {
