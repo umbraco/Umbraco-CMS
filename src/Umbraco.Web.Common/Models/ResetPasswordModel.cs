@@ -18,8 +18,8 @@ public class ResetPasswordModel : PostRedirectModel
 
     [Required]
     [DataType(DataType.Password)]
-    [Display(Name = "Confirm Password")]
+    [Display(Name = "Confirm password")]
     [StringLength(256)]
-    [Compare(nameof(Password), ErrorMessage = "Your passwords do not match")]
+    [Compare(nameof(Password), ErrorMessage = "The password and confirmation password do not match.")]
     public string ConfirmPassword { get; set; } = null!;
 }
