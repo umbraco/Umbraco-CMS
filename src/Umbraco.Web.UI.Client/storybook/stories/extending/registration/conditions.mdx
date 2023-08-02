@@ -1,0 +1,41 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta
+	title="Guides/Extending the Backoffice/Registration/Registration"
+	parameters={{ previewTabs: { canvas: { hidden: true } } }}
+/>
+
+## UI Extension Conditions
+
+Many of the Extension Types can be configured with conditions. These conditions are used to determine if the extension should be used or not.
+
+The conditions are defined as an array of conditions. When all of the conditions are good an extension can be used.
+
+### Using conditions
+
+Describe the following example:
+
+```typescript
+... insert example here.
+```
+
+- `alias`- The alias of the condition to utilize.
+  The rest of the properties of the object are specific to the condition.
+
+### Core conditions types
+
+List the build in ones, and link to the docs for them.
+
+### Make your own conditions
+
+You can make your own conditions by creating a class that implements the `UmbExtensionCondition` interface.
+
+```typescript
+...
+```
+
+This has to be registered in the extension registry, like this:
+
+```typescript
+...
+```
