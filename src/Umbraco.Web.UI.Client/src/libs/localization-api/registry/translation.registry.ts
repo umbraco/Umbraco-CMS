@@ -7,7 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { Subject, combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 
-export type UmbTranslationsSquashedDictionary = Record<string, UmbTranslationEntry>;
+export type UmbTranslationsFlatDictionary = Record<string, UmbTranslationEntry>;
 
 export class UmbTranslationRegistry {
 	#registry;
@@ -22,7 +22,7 @@ export class UmbTranslationRegistry {
 					extensions
 						.filter((x) => x.meta.culture.toLowerCase() === userCulture)
 						.map(async (extension) => {
-							const innerDictionary: UmbTranslationsSquashedDictionary = {};
+							const innerDictionary: UmbTranslationsFlatDictionary = {};
 
 							// If extension contains a dictionary, add it to the inner dictionary.
 							if (extension.meta.translations) {
@@ -62,7 +62,7 @@ export class UmbTranslationRegistry {
 	}
 
 	#addOrUpdateDictionary(
-		innerDictionary: UmbTranslationsSquashedDictionary,
+		innerDictionary: UmbTranslationsFlatDictionary,
 		dictionaryName: string,
 		dictionary: UmbTranslationsDictionary['value']
 	) {
