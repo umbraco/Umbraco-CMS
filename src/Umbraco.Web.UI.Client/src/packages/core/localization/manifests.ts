@@ -10,7 +10,7 @@ const translationManifests: Array<ManifestTranslations> = [
 		meta: {
 			culture: 'en-us',
 		},
-		loader: () => import('../../../assets/lang/en-us.js' as unknown as string),
+		loader: () => import('../../../assets/lang/en-us.js'),
 	},
 	{
 		type: 'translations',
@@ -20,7 +20,7 @@ const translationManifests: Array<ManifestTranslations> = [
 		meta: {
 			culture: 'da-dk',
 		},
-		loader: () => import('../../../assets/lang/da-dk.js' as unknown as string),
+		loader: () => import('../../../assets/lang/da-dk.js'),
 	},
 ];
 
