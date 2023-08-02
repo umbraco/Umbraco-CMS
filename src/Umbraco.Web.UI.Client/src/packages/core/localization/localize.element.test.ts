@@ -56,10 +56,11 @@ describe('umb-localize', () => {
 	describe('localization', () => {
 		umbExtensionsRegistry.register(english);
 		umbExtensionsRegistry.register(danish);
+
 		const translationRegistry = new UmbTranslationRegistry(umbExtensionsRegistry);
-		translationRegistry.loadLanguage(english.meta.culture);
 
 		beforeEach(async () => {
+			translationRegistry.loadLanguage(english.meta.culture);
 			element = await fixture(html`<umb-localize key="general_close">Fallback value</umb-localize>`);
 		});
 
