@@ -2,9 +2,16 @@ import { expect, fixture, html } from '@open-wc/testing';
 import { InitializedExtension, UmbExtensionSlotElement } from './extension-slot.element.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { ManifestDashboard, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionElementController } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-test-extension-slot-manifest-element')
 class UmbTestExtensionSlotManifestElement extends HTMLElement {}
+
+function sleep(timeMs: number) {
+	return new Promise((resolve) => {
+		setTimeout(resolve, timeMs);
+	});
+}
 
 describe('UmbExtensionSlotElement', () => {
 	let element: UmbExtensionSlotElement;
@@ -50,12 +57,6 @@ describe('UmbExtensionSlotElement', () => {
 				meta: {
 					pathname: 'test/test',
 				},
-				conditions: [
-					{
-						alias: 'Umb.Condition.SectionAlias',
-						match: 'test',
-					},
-				],
 			});
 		});
 
@@ -64,13 +65,21 @@ describe('UmbExtensionSlotElement', () => {
 		});
 
 		it('renders a manifest element', async () => {
+			element = await fixture(html`<umb-extension-slot type="dashboard"></umb-extension-slot>`);
+
+			await sleep(0);
+
+			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
+		});
+
+		it('works with the filtering method', async () => {
 			element = await fixture(
 				html`<umb-extension-slot
 					type="dashboard"
 					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}></umb-extension-slot>`
 			);
 
-			await element.updateComplete;
+			await sleep(0);
 
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
 		});
@@ -80,11 +89,11 @@ describe('UmbExtensionSlotElement', () => {
 				html` <umb-extension-slot
 					type="dashboard"
 					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}
-					.renderMethod=${(manifest: InitializedExtension) => html`<bla>${manifest.component}</bla>`}>
+					.renderMethod=${(controller: UmbExtensionElementController) => html`<bla>${controller.component}</bla>`}>
 				</umb-extension-slot>`
 			);
 
-			await element.updateComplete;
+			await sleep(0);
 
 			expect(element.shadowRoot!.firstElementChild?.nodeName).to.be.equal('BLA');
 			expect(element.shadowRoot!.firstElementChild?.firstElementChild).to.be.instanceOf(
@@ -101,7 +110,7 @@ describe('UmbExtensionSlotElement', () => {
 				</umb-extension-slot>`
 			);
 
-			await element.updateComplete;
+			await sleep(0);
 
 			expect((element.shadowRoot!.firstElementChild as any).testProp).to.be.equal('fooBar');
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);

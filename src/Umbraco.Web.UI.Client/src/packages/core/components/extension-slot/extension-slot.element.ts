@@ -1,12 +1,10 @@
 import { type ManifestTypes, umbExtensionsRegistry } from '../../extension-registry/index.js';
-import { css, repeat, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, repeat, customElement, property, state, TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import {
 	type UmbExtensionElementController,
 	UmbExtensionsElementController,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
-export type InitializedExtension = { alias: string; weight: number; component: HTMLElement | null };
 
 /**
  * @element umb-extension-slot
@@ -48,6 +46,9 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	@property({ type: String, attribute: 'default-element' })
 	public defaultElement = '';
 
+	@property()
+	public renderMethod?: (extension: UmbExtensionElementController) => TemplateResult | HTMLElement | null | undefined;
+
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._observeExtensions();
@@ -72,7 +73,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		return repeat(
 			this._permittedExts,
 			(ext) => ext.alias,
-			(ext) => ext.component
+			(ext) => (this.renderMethod ? this.renderMethod(ext) : ext.component)
 		);
 	}
 
