@@ -131,7 +131,7 @@ export default class UmbNewPasswordElement extends LitElement {
 					<span>Your password has been successfully updated</span>
 				</div>
 
-				<uui-button type="submit" label="Login" look="primary" color="default" href=" "></uui-button>
+				<uui-button type="submit" label="Login" look="primary" color="default" href="login"></uui-button>
 			</div>
 		`;
 	}
