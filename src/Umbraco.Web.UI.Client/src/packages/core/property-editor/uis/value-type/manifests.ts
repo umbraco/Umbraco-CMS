@@ -9,6 +9,5 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Value Type',
 		icon: 'umb:autofill',
 		group: 'common',
-		propertyEditorSchemaAlias: 'Umbraco.JSON',
 	},
 };
