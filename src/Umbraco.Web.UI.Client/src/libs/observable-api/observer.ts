@@ -1,11 +1,19 @@
 import { Observable, Subscription } from '@umbraco-cms/backoffice/external/rxjs';
 
+export type ObserverCallbackStack<T> = {
+	next: (_value: T) => void;
+	error?: (_value: unknown) => void;
+	complete?: () => void;
+};
+
+export type ObserverCallback<T> = ((_value: T) => void) | ObserverCallbackStack<T>;
+
 export class UmbObserver<T> {
 	#source!: Observable<T>;
-	#callback!: (_value: T) => void;
+	#callback!: ObserverCallback<T>;
 	#subscription!: Subscription;
 
-	constructor(source: Observable<T>, callback: (_value: T) => void) {
+	constructor(source: Observable<T>, callback: ObserverCallback<T>) {
 		this.#source = source;
 		this.#subscription = source.subscribe(callback);
 	}

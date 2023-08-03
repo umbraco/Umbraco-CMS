@@ -20,6 +20,7 @@ import type { ManifestSectionView } from './section-view.model.js';
 import type { ManifestStore, ManifestTreeStore, ManifestItemStore } from './store.model.js';
 import type { ManifestTheme } from './theme.model.js';
 import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
+import type { ManifestTranslations } from './translations.model.js';
 import type { ManifestTree } from './tree.model.js';
 import type { ManifestTreeItem } from './tree-item.model.js';
 import type { ManifestUserProfileApp } from './user-profile-app.model.js';
@@ -56,6 +57,7 @@ export * from './section.model.js';
 export * from './store.model.js';
 export * from './theme.model.js';
 export * from './tinymce-plugin.model.js';
+export * from './translations.model.js';
 export * from './tree-item.model.js';
 export * from './tree.model.js';
 export * from './user-profile-app.model.js';
@@ -95,6 +97,7 @@ export type ManifestTypes =
 	| ManifestStore
 	| ManifestTheme
 	| ManifestTinyMcePlugin
+	| ManifestTranslations
 	| ManifestTree
 	| ManifestTreeItem
 	| ManifestTreeStore

@@ -27,8 +27,6 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 			this._auth = instance;
 			this._observeCurrentUser();
 		});
-
-		this._observeCurrentUser();
 	}
 
 	private async _observeCurrentUser() {
@@ -56,10 +54,13 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-box>
-				<b slot="headline">Your profile</b>
-				<uui-button look="primary" @click=${this._edit}>Edit</uui-button>
-				<uui-button look="primary" @click=${this._changePassword}>Change password</uui-button>
+			<uui-box .headline=${this.localize.term('user_yourProfile')}>
+				<uui-button look="primary" label=${this.localize.term('general_edit')} @click=${this._edit}>
+					${this.localize.term('general_edit')}
+				</uui-button>
+				<uui-button look="primary" label=${this.localize.term('general_changePassword')} @click=${this._changePassword}>
+					${this.localize.term('general_changePassword')}
+				</uui-button>
 			</uui-box>
 		`;
 	}

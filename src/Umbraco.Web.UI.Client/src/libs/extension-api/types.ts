@@ -128,6 +128,14 @@ export interface ManifestClassWithClassConstructor<T = unknown> extends Manifest
 	class: ClassConstructor<T>;
 }
 
+export interface ManifestWithLoaderIncludingDefaultExport<T = unknown>
+	extends ManifestWithLoader<{ default: T } | Omit<object, 'default'>> {
+	/**
+	 * The file location of the javascript file to load
+	 */
+	js?: string;
+}
+
 export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
 	extends ManifestWithLoader<{ default: ClassConstructor<ElementType> } | Omit<object, 'default'>> {
 	/**

@@ -1,0 +1,1 @@
+import './localize.element.js';

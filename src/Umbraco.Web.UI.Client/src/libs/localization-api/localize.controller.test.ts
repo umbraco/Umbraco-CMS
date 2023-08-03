@@ -1,0 +1,256 @@
+import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
+import { UmbLocalizeController } from './localize.controller.js';
+import { umbTranslationRegistry } from './registry/translation.registry.js';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { ManifestTranslations, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+
+@customElement('umb-localize-controller-host')
+class UmbLocalizeControllerHostElement extends UmbLitElement {
+	@property()
+	lang = 'en-us';
+}
+
+//#region Translations
+const english: ManifestTranslations = {
+	type: 'translations',
+	alias: 'test.en',
+	name: 'Test English',
+	meta: {
+		culture: 'en-us',
+		direction: 'ltr',
+		translations: {
+			general: {
+				close: 'Close',
+				logout: 'Log out',
+				withInlineToken: '{0} {1}',
+				withInlineTokenLegacy: '%0% %1%',
+				numUsersSelected: (count: number) => {
+					if (count === 0) return 'No users selected';
+					if (count === 1) return 'One user selected';
+					return `${count} users selected`;
+				},
+			},
+		},
+	},
+};
+
+const englishOverride: ManifestTranslations = {
+	type: 'translations',
+	alias: 'test.en.override',
+	name: 'Test English',
+	meta: {
+		culture: 'en-us',
+		translations: {
+			general: {
+				close: 'Close 2',
+			},
+		},
+	},
+};
+
+const danish: ManifestTranslations = {
+	type: 'translations',
+	alias: 'test.da',
+	name: 'Test Danish',
+	meta: {
+		culture: 'da',
+		translations: {
+			general: {
+				close: 'Luk',
+				notOnRegional: 'Not on regional',
+			},
+		},
+	},
+};
+
+const danishRegional: ManifestTranslations = {
+	type: 'translations',
+	alias: 'test.da-DK',
+	name: 'Test Danish (Denmark)',
+	meta: {
+		culture: 'da-DK',
+		translations: {
+			general: {
+				close: 'Luk',
+			},
+		},
+	},
+};
+//#endregion
+
+describe('UmbLocalizeController', () => {
+	umbExtensionsRegistry.register(english);
+	umbExtensionsRegistry.register(danish);
+	umbExtensionsRegistry.register(danishRegional);
+
+	let element: UmbLocalizeControllerHostElement;
+
+	beforeEach(async () => {
+		umbTranslationRegistry.loadLanguage(english.meta.culture);
+		element = await fixture(html`<umb-localize-controller-host></umb-localize-controller-host>`);
+	});
+
+	it('should have a localize controller', () => {
+		expect(element.localize).to.be.instanceOf(UmbLocalizeController);
+	});
+
+	it('should have a default language', () => {
+		expect(element.localize.lang()).to.equal(english.meta.culture);
+	});
+
+	it('should have a default dir', () => {
+		expect(element.localize.dir()).to.equal(english.meta.direction);
+	});
+
+	describe('term', () => {
+		it('should return a term', async () => {
+			expect(element.localize.term('general_close')).to.equal('Close');
+		});
+
+		it('should update the term when the language changes', async () => {
+			// Load Danish
+			umbTranslationRegistry.loadLanguage(danishRegional.meta.culture);
+			await aTimeout(0);
+			expect(document.documentElement.lang).to.equal(danishRegional.meta.culture);
+
+			// Force an element update as well
+			element.lang = danishRegional.meta.culture;
+			await elementUpdated(element);
+			expect(element.localize.term('general_close')).to.equal('Luk');
+		});
+
+		it('should update the term when the dir changes', async () => {
+			expect(element.localize.term('general_close')).to.equal('Close');
+			element.dir = 'rtl';
+			await elementUpdated(element);
+			expect(element.localize.term('general_close')).to.equal('Close');
+		});
+
+		it('should provide a secondary term when the term is not found', async () => {
+			// Load Danish
+			umbTranslationRegistry.loadLanguage(danishRegional.meta.culture);
+			await aTimeout(0);
+
+			element.lang = danishRegional.meta.culture;
+			await elementUpdated(element);
+			expect(element.localize.term('general_notOnRegional')).to.equal('Not on regional');
+		});
+
+		it('should provide a fallback term when the term is not found', async () => {
+			// Load Danish
+			umbTranslationRegistry.loadLanguage(danishRegional.meta.culture);
+			await aTimeout(0);
+
+			element.lang = danishRegional.meta.culture;
+			await elementUpdated(element);
+			expect(element.localize.term('general_close')).to.equal('Luk');
+			expect(element.localize.term('general_logout')).to.equal('Log out');
+		});
+
+		it('should override a term if new extension is registered', async () => {
+			umbExtensionsRegistry.register(englishOverride);
+			// Let the registry load the new extension
+			await aTimeout(0);
+			await elementUpdated(element);
+			expect(element.localize.term('general_close')).to.equal('Close 2');
+		});
+
+		it('should return a term with a custom format', async () => {
+			expect(element.localize.term('general_numUsersSelected', 0)).to.equal('No users selected');
+			expect(element.localize.term('general_numUsersSelected', 1)).to.equal('One user selected');
+			expect(element.localize.term('general_numUsersSelected', 2)).to.equal('2 users selected');
+		});
+
+		it('should return a term with a custom format with inline tokens', async () => {
+			expect(element.localize.term('general_withInlineToken', 'Hello', 'World')).to.equal('Hello World');
+			expect(element.localize.term('general_withInlineTokenLegacy', 'Hello', 'World')).to.equal('Hello World');
+		});
+
+		it('should return a term with no tokens even though they are provided', async () => {
+			expect(element.localize.term('general_logout', 'Hello', 'World')).to.equal('Log out');
+		});
+	});
+
+	describe('date', () => {
+		it('should return a date', async () => {
+			expect(element.localize.date(new Date(2020, 0, 1))).to.equal('1/1/2020');
+		});
+
+		it('should accept a string input', async () => {
+			expect(element.localize.date('2020-01-01')).to.equal('1/1/2020');
+		});
+
+		it('should update the date when the language changes', async () => {
+			expect(element.localize.date(new Date(2020, 11, 31))).to.equal('12/31/2020');
+
+			// Switch browser to Danish
+			element.lang = danish.meta.culture;
+
+			await elementUpdated(element);
+			expect(element.localize.date(new Date(2020, 11, 31))).to.equal('31.12.2020');
+		});
+
+		it('should update the date when the dir changes', async () => {
+			expect(element.localize.date(new Date(2020, 11, 31))).to.equal('12/31/2020');
+			element.dir = 'rtl';
+			await elementUpdated(element);
+			expect(element.localize.date(new Date(2020, 11, 31))).to.equal('12/31/2020');
+		});
+
+		it('should return a date with a custom format', async () => {
+			expect(
+				element.localize.date(new Date(2020, 11, 31), { month: 'long', day: '2-digit', year: 'numeric' })
+			).to.equal('December 31, 2020');
+		});
+	});
+
+	describe('number', () => {
+		it('should return a number', async () => {
+			expect(element.localize.number(123456.789)).to.equal('123,456.789');
+		});
+
+		it('should accept a string input', async () => {
+			expect(element.localize.number('123456.789')).to.equal('123,456.789');
+		});
+
+		it('should update the number when the language changes', async () => {
+			expect(element.localize.number(123456.789)).to.equal('123,456.789');
+
+			// Switch browser to Danish
+			element.lang = danish.meta.culture;
+
+			await elementUpdated(element);
+			expect(element.localize.number(123456.789)).to.equal('123.456,789');
+		});
+
+		it('should update the number when the dir changes', async () => {
+			expect(element.localize.number(123456.789)).to.equal('123,456.789');
+			element.dir = 'rtl';
+			await elementUpdated(element);
+			expect(element.localize.number(123456.789)).to.equal('123,456.789');
+		});
+
+		it('should return a number with a custom format', async () => {
+			expect(element.localize.number(123456.789, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).to.equal(
+				'123,456.79'
+			);
+		});
+	});
+
+	describe('relative time', () => {
+		it('should return a relative time', async () => {
+			expect(element.localize.relativeTime(2, 'days')).to.equal('in 2 days');
+		});
+
+		it('should update the relative time when the language changes', async () => {
+			expect(element.localize.relativeTime(2, 'days')).to.equal('in 2 days');
+
+			// Switch browser to Danish
+			element.lang = danish.meta.culture;
+
+			await elementUpdated(element);
+			expect(element.localize.relativeTime(2, 'days')).to.equal('om 2 dage');
+		});
+	});
+});

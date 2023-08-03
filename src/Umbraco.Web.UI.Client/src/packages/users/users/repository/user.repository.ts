@@ -186,8 +186,12 @@ export class UmbUserRepository
 
 		if (data) {
 			this.#detailStore?.append(data);
+		}
 
-			const notification = { data: { message: `User saved` } };
+		if (!error) {
+			const notification = {
+				data: { message: this.#host.localize?.term('speechBubbles_editUserSaved') ?? 'User saved' },
+			};
 			this.#notificationContext?.peek('positive', notification);
 		}
 

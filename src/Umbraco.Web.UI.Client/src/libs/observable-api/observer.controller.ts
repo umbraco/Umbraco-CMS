@@ -1,4 +1,4 @@
-import { UmbObserver } from './observer.js';
+import { ObserverCallback, UmbObserver } from './observer.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbController, UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -13,7 +13,7 @@ export class UmbObserverController<T = unknown> extends UmbObserver<T> implement
 	constructor(
 		host: UmbControllerHost,
 		source: Observable<T>,
-		callback: (_value: T) => void,
+		callback: ObserverCallback<T>,
 		alias?: UmbControllerAlias
 	) {
 		super(source, callback);
