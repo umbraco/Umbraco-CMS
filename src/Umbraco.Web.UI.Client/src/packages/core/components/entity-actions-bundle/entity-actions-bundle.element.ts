@@ -44,7 +44,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('entityAction')
-				.pipe(map((actions) => actions.filter((action) => action.conditions.entityTypes.includes(this.entityType!)))),
+				.pipe(map((actions) => actions.filter((action) => action.meta.entityTypes.includes(this.entityType!)))),
 			(actions) => {
 				this._hasActions = actions.length > 0;
 			},

@@ -22,8 +22,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Delete...',
 			repositoryAlias: DATA_TYPE_REPOSITORY_ALIAS,
 			api: UmbDeleteEntityAction,
-		},
-		conditions: {
 			entityTypes: [DATA_TYPE_ENTITY_TYPE],
 		},
 	},
@@ -37,8 +35,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Delete Folder...',
 			repositoryAlias: DATA_TYPE_REPOSITORY_ALIAS,
 			api: UmbDeleteFolderEntityAction,
-		},
-		conditions: {
 			entityTypes: [DATA_TYPE_ENTITY_TYPE, DATA_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},
@@ -52,8 +48,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Rename Folder...',
 			repositoryAlias: DATA_TYPE_REPOSITORY_ALIAS,
 			api: UmbFolderUpdateEntityAction,
-		},
-		conditions: {
 			entityTypes: [DATA_TYPE_ENTITY_TYPE, DATA_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},

@@ -71,7 +71,7 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 
 	// TODO: allow different views depending on left or right click
 	#renderModal() {
-		return this._isOpen && this._unique && this._entityType
+		return this._isOpen && this._unique !== undefined && this._entityType
 			? html`<div id="action-modal">
 					<h3>${this._headline}</h3>
 					<umb-entity-action-list

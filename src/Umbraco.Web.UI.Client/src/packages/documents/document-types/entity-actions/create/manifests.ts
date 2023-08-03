@@ -18,8 +18,6 @@ const entityActions: Array<ManifestTypes> = [
 			label: 'Create...',
 			repositoryAlias: DOCUMENT_TYPE_REPOSITORY_ALIAS,
 			api: UmbCreateDataTypeEntityAction,
-		},
-		conditions: {
 			entityTypes: [DOCUMENT_TYPE_ENTITY_TYPE, DOCUMENT_TYPE_ROOT_ENTITY_TYPE, DOCUMENT_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},

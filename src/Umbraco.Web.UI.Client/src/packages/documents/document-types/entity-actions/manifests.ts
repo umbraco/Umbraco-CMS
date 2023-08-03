@@ -21,8 +21,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Delete (TBD)',
 			repositoryAlias: DOCUMENT_TYPE_REPOSITORY_ALIAS,
 			api: UmbDeleteEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},
@@ -36,8 +34,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Move',
 			repositoryAlias: DOCUMENT_TYPE_REPOSITORY_ALIAS,
 			api: UmbMoveEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},
@@ -51,8 +47,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Copy',
 			repositoryAlias: DOCUMENT_TYPE_REPOSITORY_ALIAS,
 			api: UmbCopyEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},
@@ -66,8 +60,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Sort',
 			repositoryAlias: DOCUMENT_TYPE_REPOSITORY_ALIAS,
 			api: UmbSortChildrenOfEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},

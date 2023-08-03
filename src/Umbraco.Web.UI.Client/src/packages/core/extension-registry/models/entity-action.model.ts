@@ -1,13 +1,12 @@
-import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * An action to perform on an entity
  * For example for content you may wish to create a new document etc
  */
-export interface ManifestEntityAction extends ManifestElement {
+export interface ManifestEntityAction extends ManifestElement, ManifestWithDynamicConditions {
 	type: 'entityAction';
 	meta: MetaEntityAction;
-	conditions: ConditionsEntityAction;
 }
 
 export interface MetaEntityAction {
@@ -44,9 +43,7 @@ export interface MetaEntityAction {
 	 * ]
 	 */
 	repositoryAlias: string;
-}
 
-export interface ConditionsEntityAction {
 	/**
 	 * The entity types that this action can be performed on
 	 * @examples [

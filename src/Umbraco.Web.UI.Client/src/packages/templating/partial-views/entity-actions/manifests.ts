@@ -27,8 +27,6 @@ const partialViewActions: Array<ManifestEntityAction> = [
 			label: 'Delete',
 			api: UmbDeleteEntityAction,
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
-		},
-		conditions: {
 			entityTypes: [PARTIAL_VIEW_ENTITY_TYPE],
 		},
 	},
@@ -46,8 +44,6 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 			label: 'New empty partial view',
 			api: UmbCreateEmptyPartialViewAction,
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
-		},
-		conditions: {
 			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE, PARTIAL_VIEW_ROOT_ENTITY_TYPE],
 		},
 	},
@@ -60,8 +56,6 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 			label: 'New partial view from snippet...',
 			api: UmbCreateFromSnippetPartialViewAction,
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
-		},
-		conditions: {
 			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE, PARTIAL_VIEW_ROOT_ENTITY_TYPE],
 		},
 	},
@@ -74,8 +68,6 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 			label: 'Remove folder',
 			api: UmbDeleteFolderEntityAction,
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
-		},
-		conditions: {
 			entityTypes: [PARTIAL_VIEW_FOLDER_EMPTY_ENTITY_TYPE],
 		},
 	},
@@ -88,8 +80,6 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 			label: 'Create folder',
 			api: UmbCreateFolderEntityAction,
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
-		},
-		conditions: {
 			entityTypes: [
 				PARTIAL_VIEW_FOLDER_EMPTY_ENTITY_TYPE,
 				PARTIAL_VIEW_FOLDER_ENTITY_TYPE,

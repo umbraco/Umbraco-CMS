@@ -12,8 +12,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Trash',
 			api: UmbTrashEntityAction,
 			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
-		},
-		conditions: {
 			entityTypes: ['media'],
 		},
 	},

@@ -180,7 +180,7 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('entityAction')
-				.pipe(map((actions) => actions.filter((action) => action.conditions.entityTypes.includes(this.type!)))),
+				.pipe(map((actions) => actions.filter((action) => action.meta.entityTypes.includes(this.type!)))),
 			(actions) => {
 				this.#hasActions.next(actions.length > 0);
 			},

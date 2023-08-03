@@ -28,7 +28,15 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	public type = '';
 
 	@property({ type: Object, attribute: false })
-	public filter: (manifest: any) => boolean = () => true;
+	public get filter(): (manifest: any) => boolean {
+		return this._filter;
+	}
+	public set filter(value: (manifest: any) => boolean) {
+		if (value === this._filter) return;
+		this._filter = value;
+		this._observeExtensions();
+	}
+	private _filter: (manifest: any) => boolean = () => true;
 
 	private _props?: Record<string, any> = {};
 	@property({ type: Object, attribute: false })
