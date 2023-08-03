@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { InitializedExtension, UmbExtensionSlotElement } from './extension-slot.element.js';
+import { UmbExtensionSlotElement } from './extension-slot.element.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { ManifestDashboard, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionElementController } from '@umbraco-cms/backoffice/extension-api';
