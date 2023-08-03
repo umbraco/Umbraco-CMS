@@ -3,13 +3,8 @@ import { UmbTreeContextBase } from '../tree.context.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT_TOKEN, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
-import { type ManifestEntityAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UmbBooleanState,
-	UmbDeepState,
-	UmbStringState,
-	UmbObserverController,
-} from '@umbraco-cms/backoffice/observable-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbBooleanState, UmbDeepState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
@@ -81,8 +76,6 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 
 		this.#hasChildren.next(treeItem.hasChildren || false);
 		this.#treeItem.next(treeItem);
-
-		console.log('Item was set..', unique);
 
 		// Update observers:
 		this.#observeActions();
