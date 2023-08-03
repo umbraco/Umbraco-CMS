@@ -7,24 +7,44 @@ import { Meta } from '@storybook/addon-docs';
 
 ## UI Extension Conditions
 
-Many of the Extension Types can be configured with conditions. These conditions are used to determine if the extension should be used or not.
+Extension conditions are used to determine if an extension should be used or not.
+Many of the Extension Types supports conditions, but not all of them.
 
-The conditions are defined as an array of conditions. When all of the conditions are good an extension can be used.
+All given conditions for an extension must be valid for an extension to be utilized.
 
 ### Using conditions
 
-Describe the following example:
+In this following example we define the manifest for a Workspace Action, this action will only be available in the workspace with the alias `My.Example.Workspace`.
 
 ```typescript
-... insert example here.
+{
+	type: 'workspaceAction',
+	name: 'example-workspace-action',
+	alias: 'My.Example.WorkspaceAction',
+	elementName: 'my-workspace-action-element',
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionAlias',
+			matches: 'My.Example.Workspace'
+		}
+	]
+}
 ```
 
+The conditions are defined as an array of conditions.
+Each condition is an object with the following properties:
+
 - `alias`- The alias of the condition to utilize.
-  The rest of the properties of the object are specific to the condition.
+- `...` - The rest of the properties of the object are specific to the condition.
+
+In the above example the `Umb.Condition.SectionAlias` condition is used, this condition takes a property `matches` which must be set to the alias of the section to match.
 
 ### Core conditions types
 
-List the build in ones, and link to the docs for them.
+The following conditions are available out of the box, for all extension types that support conditions.
+
+- `Umb.Condition.SectionAlias` - Checks if the current section alias matches the one specified.
+- `Umb.Condition.WorkspaceAlias` - Checks if the current workspace alias matches the one specified.
 
 ### Make your own conditions
 
