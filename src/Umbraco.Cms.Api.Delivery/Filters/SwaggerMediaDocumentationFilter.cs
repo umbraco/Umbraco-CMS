@@ -6,7 +6,7 @@ using Umbraco.Cms.Api.Delivery.Controllers;
 
 namespace Umbraco.Cms.Api.Delivery.Filters;
 
-internal class SwaggerMediaDocumentationFilter : SwaggerDocumentationFilterBase<MediaApiControllerBase>
+internal sealed class SwaggerMediaDocumentationFilter : SwaggerDocumentationFilterBase<MediaApiControllerBase>
 {
     protected override string DocumentationLink => DeliveryApiConfiguration.ApiDocumentationMediaArticleLink;
 
@@ -44,13 +44,12 @@ internal class SwaggerMediaDocumentationFilter : SwaggerDocumentationFilterBase<
     private Dictionary<string, OpenApiExample> FetchQueryParameterExamples() =>
         new()
         {
-            { "Select all", new OpenApiExample { Value = new OpenApiString(string.Empty) } },
             {
-                "Select all children of a node by id",
+                "Select all children of a media item by id",
                 new OpenApiExample { Value = new OpenApiString("children:id") }
             },
             {
-                "Select all children of a node by path",
+                "Select all children of a media item by path",
                 new OpenApiExample { Value = new OpenApiString("children:path") }
             }
         };

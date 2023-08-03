@@ -6,7 +6,7 @@ using Umbraco.Cms.Api.Delivery.Controllers;
 
 namespace Umbraco.Cms.Api.Delivery.Filters;
 
-internal class SwaggerContentDocumentationFilter : SwaggerDocumentationFilterBase<ContentApiControllerBase>
+internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFilterBase<ContentApiControllerBase>
 {
     protected override string DocumentationLink => DeliveryApiConfiguration.ApiDocumentationContentArticleLink;
 

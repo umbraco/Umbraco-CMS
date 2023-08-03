@@ -22,7 +22,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
     private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly IApiMediaWithCropsBuilder _apiMediaWithCropsBuilder;
 
-    [Obsolete("Use constructor that takes IApiMediaWithCropsBuilder, scheduled for removal in V14")]
+    [Obsolete($"Use constructor that takes {nameof(IApiMediaWithCropsBuilder)}, scheduled for removal in V14")]
     public MediaPickerWithCropsValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedUrlProvider publishedUrlProvider,
@@ -38,7 +38,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
     {
     }
 
-    [Obsolete("Use constructor that takes IApiMediaWithCropsBuilder, scheduled for removal in V14")]
+    [Obsolete($"Use constructor that takes {nameof(IApiMediaWithCropsBuilder)}, scheduled for removal in V14")]
     public MediaPickerWithCropsValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedUrlProvider publishedUrlProvider,
@@ -54,6 +54,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
     {
     }
 
+    [Obsolete($"Use constructor that takes {nameof(IApiMediaWithCropsBuilder)} and no {nameof(IApiMediaBuilder)}, scheduled for removal in V14")]
     public MediaPickerWithCropsValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedUrlProvider publishedUrlProvider,

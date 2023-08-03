@@ -12,10 +12,10 @@ namespace Umbraco.Cms.Api.Delivery.Services;
 /// <inheritdoc />
 /// <remarks>
 /// This service has been built to mimic <see cref="ApiContentQueryService"/> with future extension in mind.
-/// At this time, "fetch=childrenOf:" option is the only supported query option, so it's been hardcoded. In the
+/// At this time, the "fetch=children:" option is the only supported query option, so it's been hardcoded. In the
 /// future we might implement fetch/filters/sorts as seen in the content equivalent.
 /// </remarks>
-public class ApiMediaQueryService : IApiMediaQueryService
+internal sealed class ApiMediaQueryService : IApiMediaQueryService
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly ILogger<ApiMediaQueryService> _logger;
@@ -62,17 +62,11 @@ public class ApiMediaQueryService : IApiMediaQueryService
             return PagedResult(mediaCache.GetAtRoot(), skip, take);
         }
 
-        IPublishedContent? startItem;
-        if (Guid.TryParse(childrenOf, out Guid startItemKey))
-        {
-            startItem = mediaCache.GetById(startItemKey);
-        }
-        else
-        {
-            startItem = TryGetByPath(childrenOf, mediaCache);
-        }
+        IPublishedContent? parent = Guid.TryParse(childrenOf, out Guid parentKey)
+            ? mediaCache.GetById(parentKey)
+            : TryGetByPath(childrenOf, mediaCache);
 
-        return PagedResult(startItem?.Children ?? Array.Empty<IPublishedContent>(), skip, take);
+        return PagedResult(parent?.Children ?? Array.Empty<IPublishedContent>(), skip, take);
     }
 
     /// <inheritdoc/>
