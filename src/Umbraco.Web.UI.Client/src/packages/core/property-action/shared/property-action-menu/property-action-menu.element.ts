@@ -65,6 +65,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 		event.stopPropagation();
 	}
 
+	// TODO: Implement extension-slot on change event. And use the extension slot instead of custom implementation.
 	render() {
 		return this._actions.length > 0
 			? html`
