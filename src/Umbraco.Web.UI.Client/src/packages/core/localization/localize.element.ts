@@ -1,4 +1,4 @@
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -51,7 +51,7 @@ export class UmbLocalizeElement extends UmbLitElement {
 
 	protected render() {
 		return this.text
-			? html`${this.text}`
+			? html`${unsafeHTML(this.text)}`
 			: this.debug
 			? html`<span style="color:red">${this.key}</span>`
 			: html`<slot></slot>`;
