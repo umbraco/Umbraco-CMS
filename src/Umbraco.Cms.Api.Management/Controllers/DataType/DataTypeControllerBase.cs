@@ -39,10 +39,19 @@ public abstract class DataTypeControllerBase : ManagementApiControllerBase
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the data type operation.")
                 .Build()),
-            DataTypeOperationStatus.PropertyEditorNotFound => NotFound("The targeted property editor was not found."),
-            DataTypeOperationStatus.ParentNotFound => NotFound("The targeted parent for the data type operation was not found."),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown data type operation status")
+            DataTypeOperationStatus.PropertyEditorNotFound => NotFound(
+                new ProblemDetailsBuilder()
+                    .WithTitle("The targeted property editor was not found.")
+                    .Build()),
+            DataTypeOperationStatus.ParentNotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("The targeted parent for the data type operation was not found.")
+                    .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown data type operation status.")
+                .Build()),
         };
 
-    protected IActionResult DataTypeNotFound() => NotFound("The data type could not be found");
+    protected IActionResult DataTypeNotFound() => NotFound(new ProblemDetailsBuilder()
+        .WithTitle("The data type could not be found")
+        .Build());
 }

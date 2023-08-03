@@ -33,7 +33,7 @@ public class UpdateLanguageController : LanguageControllerBase
 
     [HttpPut($"{{{nameof(isoCode)}}}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Update(string isoCode, UpdateLanguageRequestModel updateLanguageRequestModel)
@@ -41,7 +41,7 @@ public class UpdateLanguageController : LanguageControllerBase
         ILanguage? current = await _languageService.GetAsync(isoCode);
         if (current is null)
         {
-            return NotFound();
+            return LanguageNotFound();
         }
 
         ILanguage updated = _umbracoMapper.Map(updateLanguageRequestModel, current);

@@ -29,7 +29,7 @@ public class ByNameController : PartialViewControllerBase
 
         if (snippet is null)
         {
-            return NotFound();
+            return PartialViewNotFound();
         }
 
         PartialViewSnippetResponseModel? viewModel = _umbracoMapper.Map<PartialViewSnippetResponseModel>(snippet);

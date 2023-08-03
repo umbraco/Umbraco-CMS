@@ -44,8 +44,12 @@ public abstract class DataTypeFolderControllerBase : FolderManagementControllerB
     protected override IActionResult OperationStatusResult(DataTypeContainerOperationStatus status)
         => status switch
         {
-            DataTypeContainerOperationStatus.NotFound => NotFound("The data type folder could not be found"),
-            DataTypeContainerOperationStatus.ParentNotFound => NotFound("The data type parent folder could not be found"),
+            DataTypeContainerOperationStatus.NotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("The data type folder could not be found")
+                    .Build()),
+            DataTypeContainerOperationStatus.ParentNotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("The data type parent folder could not be found")
+                    .Build()),
             DataTypeContainerOperationStatus.DuplicateName => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("The name is already used")
                 .WithDetail("The data type folder name must be unique on this parent.")
@@ -62,6 +66,8 @@ public abstract class DataTypeFolderControllerBase : FolderManagementControllerB
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the data type folder operation.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown data type folder operation status")
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown data type folder operation status.")
+                .Build()),
         };
 }

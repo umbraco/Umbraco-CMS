@@ -25,16 +25,16 @@ public class ByKeyUserGroupController : UserGroupControllerBase
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UserGroupResponseModel), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserGroupResponseModel>> ByKey(Guid id)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ByKey(Guid id)
     {
         IUserGroup? userGroup = await _userGroupService.GetAsync(id);
 
         if (userGroup is null)
         {
-            return NotFound();
+            return UserGroupNotFound();
         }
 
-        return await _userGroupPresentationFactory.CreateAsync(userGroup);
+        return Ok(await _userGroupPresentationFactory.CreateAsync(userGroup));
     }
 }

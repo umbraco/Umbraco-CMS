@@ -28,7 +28,7 @@ public class AllowedChildrenByKeyDocumentController : DocumentControllerBase
     [HttpGet("{id:guid}/allowed-document-types")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentTypeResponseModel>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AllowedChildrenByKey(Guid id, int skip = 0, int take = 100)
     {
         Attempt<PagedModel<IContentType>?, ContentCreatingOperationStatus> allowedChildrenAttempt = await _contentCreatingService.GetAllowedChildrenContentTypesAsync(id, skip, take);

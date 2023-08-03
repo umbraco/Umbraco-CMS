@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -20,7 +21,9 @@ public abstract class FolderManagementControllerBase<TStatus> : ManagementApiCon
         EntityContainer? container = await GetContainerAsync(key);
         if (container == null)
         {
-            return NotFound($"Could not find the folder with id: {key}");
+            return NotFound(new ProblemDetailsBuilder()
+                .WithTitle($"Could not find the folder with id: {key}")
+                .Build());
         }
 
         EntityContainer? parentContainer = await GetParentContainerAsync(container);
@@ -60,7 +63,9 @@ public abstract class FolderManagementControllerBase<TStatus> : ManagementApiCon
         EntityContainer? container = await GetContainerAsync(key);
         if (container == null)
         {
-            return NotFound($"Could not find the folder with key: {key}");
+            return NotFound(new ProblemDetailsBuilder()
+                .WithTitle($"Could not find the folder with key: {key}")
+                .Build());
         }
 
         container.Name = updateFolderReponseModel.Name;

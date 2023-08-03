@@ -18,7 +18,7 @@ public class ScaffoldTemplateController : TemplateControllerBase
     [HttpGet("scaffold")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateScaffoldResponseModel), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TemplateScaffoldResponseModel>> Scaffold([FromQuery(Name = "masterTemplateId")] Guid? masterTemplateId)
     {
         var scaffoldViewModel = new TemplateScaffoldResponseModel

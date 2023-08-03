@@ -25,17 +25,17 @@ public class ExportDictionaryController : DictionaryControllerBase
     [HttpGet("{id:guid}/export")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Export(Guid id, bool includeChildren = false)
     {
         IDictionaryItem? dictionaryItem = await _dictionaryItemService.GetAsync(id);
         if (dictionaryItem is null)
         {
-            return await Task.FromResult(NotFound());
+            return DictionaryNotFound();
         }
 
         XElement xml = _entityXmlSerializer.Serialize(dictionaryItem, includeChildren);
 
-        return await Task.FromResult(File(Encoding.UTF8.GetBytes(xml.ToDataString()), MediaTypeNames.Application.Octet, $"{dictionaryItem.ItemKey}.udt"));
+        return File(Encoding.UTF8.GetBytes(xml.ToDataString()), MediaTypeNames.Application.Octet, $"{dictionaryItem.ItemKey}.udt");
     }
 }

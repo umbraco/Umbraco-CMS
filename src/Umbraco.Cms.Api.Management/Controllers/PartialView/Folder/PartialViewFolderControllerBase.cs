@@ -60,6 +60,8 @@ public class PartialViewFolderControllerBase : PathFolderManagementControllerBas
                 .WithTitle("Invalid name")
                 .WithDetail("The name specified is not a valid name.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown partial view folder operation status")
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown partial view folder operation status.")
+                .Build()),
         };
 }

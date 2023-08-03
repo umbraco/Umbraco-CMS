@@ -28,7 +28,7 @@ public class DeleteCreatedPackageController : CreatedPackageControllerBase
     /// <returns>The result of the deletion.</returns>
     [HttpDelete("{id:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(Guid id)
     {

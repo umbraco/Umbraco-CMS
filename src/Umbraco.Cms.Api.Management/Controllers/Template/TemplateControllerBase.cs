@@ -18,7 +18,7 @@ public class TemplateControllerBase : ManagementApiControllerBase
     protected IActionResult TemplateOperationStatusResult(TemplateOperationStatus status) =>
         status switch
         {
-            TemplateOperationStatus.TemplateNotFound => NotFound("The template could not be found"),
+            TemplateOperationStatus.TemplateNotFound => TemplateNotFound(),
             TemplateOperationStatus.InvalidAlias => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid alias")
                 .WithDetail("The template alias is not valid.")
@@ -31,6 +31,13 @@ public class TemplateControllerBase : ManagementApiControllerBase
                 .WithTitle("Duplicate alias")
                 .WithDetail("A template with that alias already exists.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown template operation status")
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown template operation status.")
+                .Build()),
         };
+
+    protected IActionResult TemplateNotFound() => NotFound(new ProblemDetailsBuilder()
+        .WithTitle("The template could not be found")
+        .Build());
+
 }

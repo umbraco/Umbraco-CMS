@@ -39,10 +39,15 @@ public class PartialViewControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid name")
                 .WithDetail("The partial view name is invalid.")
                 .Build()),
-            PartialViewOperationStatus.NotFound => NotFound(new ProblemDetailsBuilder()
-                .WithTitle("Partial view not found")
-                .WithDetail("The partial view was not found.")
+            PartialViewOperationStatus.NotFound => PartialViewNotFound(),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown partial view operation status.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown partial view operation status")
         };
+
+    protected IActionResult PartialViewNotFound() => NotFound(new ProblemDetailsBuilder()
+        .WithTitle("Partial view not found")
+        .WithDetail("The partial view was not found.")
+        .Build());
+
 }

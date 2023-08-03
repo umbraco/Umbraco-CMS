@@ -25,7 +25,7 @@ public class UpdateNotificationsController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [HttpPut("{id:guid}/notifications")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateNotifications(Guid id, UpdateDocumentNotificationsRequestModel updateModel)
     {
         IContent? content = await _contentEditingService.GetAsync(id);

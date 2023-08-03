@@ -23,13 +23,13 @@ public class ByKeyRelationTypeController : RelationTypeControllerBase
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(RelationTypeResponseModel), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid id)
     {
         IRelationType? relationType = _relationService.GetRelationTypeById(id);
         if (relationType is null)
         {
-            return NotFound();
+            return RelationTypeNotFound();
         }
 
         RelationTypeResponseModel mappedRelationType = _mapper.Map<RelationTypeResponseModel>(relationType)!;

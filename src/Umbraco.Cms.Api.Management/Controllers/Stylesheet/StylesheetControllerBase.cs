@@ -39,14 +39,18 @@ public class StylesheetControllerBase : ManagementApiControllerBase
                 .WithTitle("Path too long")
                 .WithDetail("The file path is too long.")
                 .Build()),
-            StylesheetOperationStatus.NotFound => NotFound(new ProblemDetailsBuilder()
-                .WithTitle("Stylesheet not found")
-                .WithDetail("The stylesheet was not found.")
-                .Build()),
+            StylesheetOperationStatus.NotFound => StylesheetNotFound(),
             StylesheetOperationStatus.InvalidName => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid name")
                 .WithDetail("The stylesheet name is invalid.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown script operation status"),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown stylesheet operation status.")
+                .Build()),
         };
+
+    protected IActionResult StylesheetNotFound() => NotFound(new ProblemDetailsBuilder()
+        .WithTitle("Stylesheet not found")
+        .WithDetail("The stylesheet was not found.")
+        .Build());
 }

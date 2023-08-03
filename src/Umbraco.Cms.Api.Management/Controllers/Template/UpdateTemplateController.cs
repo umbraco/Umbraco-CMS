@@ -32,13 +32,13 @@ public class UpdateTemplateController : TemplateControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, UpdateTemplateRequestModel requestModel)
     {
         ITemplate? template = await _templateService.GetAsync(id);
         if (template == null)
         {
-            return NotFound();
+            return TemplateNotFound();
         }
 
         template = _umbracoMapper.Map(requestModel, template);
