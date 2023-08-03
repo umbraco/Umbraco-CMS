@@ -26,6 +26,12 @@ export class UmbSectionAliasCondition extends UmbBaseController implements UmbEx
 }
 
 export type SectionAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.SectionAlias'> & {
+	/**
+	 * Define the section that this extension should be available in
+	 *
+	 * @examples
+	 * "Umb.Section.Content"
+	 */
 	match: string;
 };
 

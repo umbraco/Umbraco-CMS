@@ -24,6 +24,12 @@ export class UmbWorkspaceAliasCondition extends UmbBaseController implements Umb
 }
 
 export type WorkspaceAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.WorkspaceAlias'> & {
+	/**
+	 * Define the workspace that this extension should be available in
+	 *
+	 * @examples
+	 * "Umb.Workspace.Document"
+	 */
 	match: string;
 };
 
