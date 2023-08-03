@@ -45,59 +45,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			this._views = views.map((view) => view.manifest);
 			this.#createRoutes();
 		});
-
-		/*
-		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (sectionContext) => {
-			this._sectionContext = sectionContext;
-			this._observeSectionAlias();
-		});
-		*/
 	}
-
-	/*
-	private _observeSectionAlias() {
-		if (!this._sectionContext) return;
-
-		this.observe(
-			this._sectionContext.alias,
-			(sectionAlias) => {
-				this._observeViews(sectionAlias);
-				this._observeDashboards(sectionAlias);
-			},
-			'_aliasObserver'
-		);
-	}
-
-	private _observeViews(sectionAlias?: string) {
-		if (sectionAlias) {
-
-			this.observe(
-				umbExtensionsRegistry
-					?.extensionsOfType('sectionView')
-					.pipe(map((views) => views.filter((view) => view.conditions.sections.includes(sectionAlias)))) ?? of([]),
-				(views) => {
-					this._views = views;
-					this.#createRoutes();
-				}
-			);
-
-		}
-	}
-
-	private _observeDashboards(sectionAlias?: string) {
-
-		if (sectionAlias) {this.observe(
-				umbExtensionsRegistry
-					?.extensionsOfType('dashboard')
-					.pipe(map((views) => views.filter((view) => view.conditions.sections.includes(sectionAlias)))) ?? of([]),
-				(views) => {
-					this._dashboards = views;
-					this.#createRoutes();
-				}
-			);
-		}
-	}
-	*/
 
 	#constructDashboardPath(manifest: ManifestDashboard) {
 		const dashboardName = manifest.meta.label ?? manifest.name;
