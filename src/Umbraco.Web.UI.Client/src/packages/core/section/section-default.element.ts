@@ -7,6 +7,7 @@ import {
 	ManifestSectionSidebarApp,
 	ManifestSectionSidebarAppMenuKind,
 	UmbSectionExtensionElement,
+	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -44,7 +45,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	constructor() {
 		super();
 
-		new UmbExtensionsElementController(this, 'sectionSidebarApp', null, (sidebarApps) => {
+		new UmbExtensionsElementController(this, umbExtensionsRegistry, 'sectionSidebarApp', null, (sidebarApps) => {
 			const oldValue = this._sidebarApps;
 			this._sidebarApps = sidebarApps;
 			this.requestUpdate('_sidebarApps', oldValue);

@@ -6,6 +6,7 @@ import {
 	ManifestSectionView,
 	UmbDashboardExtensionElement,
 	UmbSectionViewExtensionElement,
+	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestController, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -35,12 +36,12 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		new UmbExtensionsManifestController(this, 'dashboard', null, (dashboards) => {
+		new UmbExtensionsManifestController(this, umbExtensionsRegistry, 'dashboard', null, (dashboards) => {
 			this._dashboards = dashboards.map((dashboard) => dashboard.manifest);
 			this.#createRoutes();
 		});
 
-		new UmbExtensionsManifestController(this, 'sectionView', null, (views) => {
+		new UmbExtensionsManifestController(this, umbExtensionsRegistry, 'sectionView', null, (views) => {
 			this._views = views.map((view) => view.manifest);
 			this.#createRoutes();
 		});

@@ -1,12 +1,11 @@
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import {
+import type {
 	ManifestBase,
 	ManifestTypeMap,
 	SpecificManifestTypeOrManifestBase,
 	UmbBaseExtensionController,
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
@@ -16,6 +15,7 @@ export type PermittedControllerType<ControllerType extends { manifest: any }> = 
 /**
  */
 export abstract class UmbBaseExtensionsController<
+	ManifestTypes extends ManifestBase,
 	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbBaseExtensionController<ManifestType> = UmbBaseExtensionController<ManifestType>,

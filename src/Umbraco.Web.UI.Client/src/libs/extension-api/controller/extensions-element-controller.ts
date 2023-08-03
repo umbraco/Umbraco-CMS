@@ -4,19 +4,27 @@ import {
 	type ManifestTypeMap,
 	type SpecificManifestTypeOrManifestBase,
 	UmbExtensionElementController,
+	type UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
-import { type ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  */
 export class UmbExtensionsElementController<
+	ManifestTypes extends ManifestBase,
 	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string = string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbExtensionElementController<ManifestType> = UmbExtensionElementController<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
-> extends UmbBaseExtensionsController<ManifestTypeName, ManifestType, ControllerType, MyPermittedControllerType> {
+> extends UmbBaseExtensionsController<
+	ManifestTypes,
+	ManifestTypeName,
+	ManifestType,
+	ControllerType,
+	MyPermittedControllerType
+> {
 	//
+	#extensionRegistry;
 	private _defaultElement?: string;
 	#props?: Record<string, unknown>;
 
@@ -32,12 +40,14 @@ export class UmbExtensionsElementController<
 
 	constructor(
 		host: UmbControllerHost,
+		extensionRegistry: UmbExtensionRegistry<ManifestTypes>,
 		type: ManifestTypeName,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
 		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void,
 		defaultElement?: string
 	) {
-		super(host, umbExtensionsRegistry, type, filter, onChange);
+		super(host, extensionRegistry, type, filter, onChange);
+		this.#extensionRegistry = extensionRegistry;
 		this._defaultElement = defaultElement;
 		this._init();
 	}
@@ -45,7 +55,7 @@ export class UmbExtensionsElementController<
 	protected _createController(manifest: ManifestType) {
 		const extController = new UmbExtensionElementController<ManifestType>(
 			this,
-			umbExtensionsRegistry,
+			this.#extensionRegistry,
 			manifest.alias,
 			this._extensionChanged,
 			this._defaultElement

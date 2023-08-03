@@ -24,13 +24,15 @@ class UmbTestExtensionController extends UmbBaseExtensionController {
 	}
 }
 
-const testExtensionRegistry = new UmbExtensionRegistry<ManifestWithDynamicConditions | ManifestCondition>();
+type myTestManifests = ManifestWithDynamicConditions | ManifestCondition;
+const testExtensionRegistry = new UmbExtensionRegistry<myTestManifests>();
 
 type PermittedControllerType = UmbTestExtensionController & {
 	manifest: Required<Pick<UmbTestExtensionController, 'manifest'>>;
 };
 
 class UmbTestExtensionsController extends UmbBaseExtensionsController<
+	myTestManifests,
 	'extension-type',
 	ManifestWithDynamicConditions,
 	UmbTestExtensionController,
