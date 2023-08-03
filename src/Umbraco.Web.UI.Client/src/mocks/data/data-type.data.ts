@@ -54,7 +54,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'My JS Property Editor',
 		id: 'dt-custom',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.JSON',
+		propertyEditorAlias: 'Umbraco.Label',
 		propertyEditorUiAlias: 'My.PropertyEditorUI.Custom',
 		values: [],
 	},
