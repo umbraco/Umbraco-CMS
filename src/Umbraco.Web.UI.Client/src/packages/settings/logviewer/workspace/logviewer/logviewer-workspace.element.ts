@@ -1,54 +1,21 @@
+// TODO: Niels: I don't feel sure this is good, seems wrong:
 import '../../components/index.js';
 import { UmbLogViewerWorkspaceContext } from '../logviewer.context.js';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import {
-	PropertyValueMap,
-	css,
-	html,
-	nothing,
-	customElement,
-	state,
-	repeat,
-} from '@umbraco-cms/backoffice/external/lit';
+import { PropertyValueMap, css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import {
-	ManifestWorkspaceEditorView,
-	ManifestWorkspaceViewCollection,
-	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent, UmbRoute } from '@umbraco-cms/backoffice/router';
 
 //TODO make uui-input accept min and max values
 @customElement('umb-logviewer-workspace')
 export class UmbLogViewerWorkspaceElement extends UmbLitElement {
-	private _alias = 'Umb.Workspace.LogviewerRoot';
-
-	@state()
-	private _workspaceViews: Array<ManifestWorkspaceEditorView | ManifestWorkspaceViewCollection> = [];
-
-	@state()
-	private _routes: UmbRoute[] = [];
-
-	@state()
-	private _activePath?: string;
-
-	@state()
-	private _routerPath?: string;
-
 	#logViewerContext = new UmbLogViewerWorkspaceContext(this);
 
 	firstUpdated(props: PropertyValueMap<unknown>) {
 		super.firstUpdated(props);
 
+		// TODO: This should be moved to the log viewer context:
 		window.addEventListener('changestate', this.#logViewerContext.onChangeState);
 		this.#logViewerContext.onChangeState();
-	}
-
-	connectedCallback() {
-		super.connectedCallback();
-		this._observeWorkspaceViews();
 	}
 
 	disconnectedCallback(): void {
@@ -60,84 +27,11 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 		// Not relevant for this workspace -added to prevent the error from popping up
 	}
 
-	private _observeWorkspaceViews() {
-		// TODO: Implement extension controller:
-		this.observe(
-			umbExtensionsRegistry.extensionsOfTypes<ManifestWorkspaceEditorView>(['workspaceEditorView']),
-			(workspaceViews) => {
-				this._workspaceViews = workspaceViews;
-				this._createRoutes();
-			}
-		);
-	}
-
 	create(): void {
 		// Not relevant for this workspace
 	}
 
-	private _createRoutes() {
-		this._routes = [];
-
-		if (this._workspaceViews.length > 0) {
-			this._routes = this._workspaceViews.map((view) => {
-				return {
-					path: `${view.meta.pathname}`,
-					component: () => createExtensionElement(view),
-					setup: (component) => {
-						(component as any).manifest = view;
-					},
-				};
-			});
-
-			this._routes.push({
-				path: '',
-				redirectTo: `${this._workspaceViews[0].meta.pathname}`,
-			});
-		}
-	}
-
-	#renderRoutes() {
-		return html`
-			${this._routes.length > 0
-				? html`
-						<umb-router-slot
-							id="router-slot"
-							.routes="${this._routes}"
-							@init=${(event: UmbRouterSlotInitEvent) => {
-								this._routerPath = event.target.absoluteRouterPath;
-							}}
-							@change=${(event: UmbRouterSlotChangeEvent) => {
-								this._activePath = event.target.localActiveViewPath;
-							}}></umb-router-slot>
-				  `
-				: nothing}
-		`;
-	}
-
-	#renderViews() {
-		return html`
-			${this._workspaceViews.length > 1
-				? html`
-						<uui-tab-group slot="navigation">
-							${repeat(
-								this._workspaceViews,
-								(view) => view.alias,
-								(view) => html`
-									<uui-tab
-										.label="${view.meta.label || view.name}"
-										href="${this._routerPath}/${view.meta.pathname}"
-										?active="${view.meta.pathname === this._activePath}">
-										<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
-										${view.meta.label || view.name}
-									</uui-tab>
-								`
-							)}
-						</uui-tab-group>
-				  `
-				: nothing}
-		`;
-	}
-
+	/*
 	render() {
 		return html`
 			<umb-body-layout main-no-padding>
@@ -149,6 +43,22 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 				${this.#renderViews()} ${this.#renderRoutes()}
 				<slot></slot>
 			</umb-body-layout>
+		`;
+	}
+	*/
+
+	render() {
+		return html`
+			<umb-workspace-editor alias="Umb.Workspace.Dictionary" .enforceNoFooter=${true}>
+				<div id="header" slot="header">
+					<h3 id="headline">
+						<!-- TODO: get the state from the context -->
+						<!--  this._activePath === 'overview' ? 'Log Overview for Selected Time Period' : 'Log search' -->
+						Log Viewer
+					</h3>
+				</div>
+				<slot></slot>
+			</umb-workspace-editor>
 		`;
 	}
 

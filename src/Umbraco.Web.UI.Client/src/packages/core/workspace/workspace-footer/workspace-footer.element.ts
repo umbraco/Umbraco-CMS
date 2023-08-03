@@ -1,6 +1,5 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';

@@ -6,6 +6,7 @@ import {
 	UmbDeepState,
 	UmbObjectState,
 	UmbStringState,
+	UmbBooleanState,
 } from '@umbraco-cms/backoffice/observable-api';
 import {
 	DirectionModel,
@@ -20,6 +21,9 @@ import {
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { query } from '@umbraco-cms/backoffice/router';
+import { UMB_WORKSPACE_CONTEXT, UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
 
 export type PoolingInterval = 0 | 2000 | 5000 | 10000 | 20000 | 30000;
 export interface PoolingCOnfig {
@@ -31,8 +35,36 @@ export interface LogViewerDateRange {
 	endDate: string;
 }
 
-export class UmbLogViewerWorkspaceContext extends UmbBaseController {
+// TODO: Revisit usage of workspace for this case...
+export class UmbLogViewerWorkspaceContext
+	extends UmbBaseController
+	implements UmbWorkspaceContextInterface<UmbEntityBase>
+{
+	public readonly workspaceAlias: string = 'Umb.Workspace.LogViewer';
 	#repository: UmbLogViewerRepository;
+
+	#isNew = new UmbBooleanState<boolean | undefined>(undefined);
+	isNew: Observable<boolean | undefined> = this.#isNew.asObservable();
+	getIsNew(): boolean | undefined {
+		return false;
+	}
+	setIsNew(value: boolean): void {}
+	getEntityId(): string | undefined {
+		return undefined;
+	}
+	getData(): UmbEntityBase {
+		return {} as any;
+	}
+	repository: any;
+	getEntityType(): string {
+		return 'log-viewer';
+	}
+	getEntityName(): string {
+		return 'Log Viewer';
+	}
+	save() {
+		return Promise.resolve();
+	}
 
 	get today() {
 		const today = new Date();
@@ -100,6 +132,8 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController {
 
 	constructor(host: UmbControllerHostElement) {
 		super(host);
+		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
+		// TODO: Revisit usage of workspace for this case... currently no other workspace context provides them self with their own token.
 		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, this);
 		this.#repository = new UmbLogViewerRepository(host);
 	}
