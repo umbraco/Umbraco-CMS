@@ -59,7 +59,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			api: UmbSaveWorkspaceAction,
 		},
 		conditions: {
-			workspaces: ['Umb.Workspace.DocumentType'],
+			workspaces: ['Umb.Workspace.StyleSheet'],
 		},
 	},
 ];

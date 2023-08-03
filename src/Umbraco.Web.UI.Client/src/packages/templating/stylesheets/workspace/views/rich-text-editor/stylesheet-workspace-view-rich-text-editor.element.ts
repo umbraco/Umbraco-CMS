@@ -16,6 +16,6 @@ export default UmbStylesheetWorkspaceViewRichTextEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-stylesheet-workspace-view-code-editor': UmbStylesheetWorkspaceViewRichTextEditorElement;
+		'umb-stylesheet-workspace-view-rich-text-editor': UmbStylesheetWorkspaceViewRichTextEditorElement;
 	}
 }

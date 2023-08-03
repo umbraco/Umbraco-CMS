@@ -41,8 +41,6 @@ export class UmbStylesheetWorkspaceEditElement extends UmbLitElement {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				const oldName = this._name;
-				const newName = event.target.value.toString();
 				this.#workspaceContext?.setName(target.value);
 			}
 		}

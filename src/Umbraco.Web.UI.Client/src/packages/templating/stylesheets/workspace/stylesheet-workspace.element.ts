@@ -20,6 +20,7 @@ export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 			setup: (_component, info) => {
 				const path = info.match.params.path;
 				const serverPath = serverFilePathFromUrlFriendlyPath(path);
+				console.log('load');
 				this.#workspaceContext.load(serverPath);
 
 				new UmbWorkspaceIsNewRedirectController(
