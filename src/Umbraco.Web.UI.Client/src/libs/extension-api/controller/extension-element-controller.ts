@@ -59,11 +59,9 @@ export class UmbExtensionElementController<
 
 	#assignProperties = () => {
 		if (!this._component || !this.#properties) return;
-		console.log(this._component, 'assignProperties??', this.#properties);
 
 		// TODO: we could optimize this so we only re-set the updated props.
 		Object.keys(this.#properties).forEach((key) => {
-			console.log('prop:', key, this.#properties![key]);
 			(this._component as any)[key] = this.#properties![key];
 		});
 	};
