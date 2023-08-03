@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-icon-picker.element.js'),
 	meta: {
 		label: 'Icon Picker',
-		propertyEditorSchemaAlias: 'Umbraco.JSON',
+		propertyEditorSchemaAlias: 'Umbraco.IconPicker',
 		icon: 'umb:autofill',
 		group: 'common',
 	},
