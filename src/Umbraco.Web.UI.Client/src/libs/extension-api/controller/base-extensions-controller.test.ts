@@ -2,11 +2,10 @@ import { expect, fixture } from '@open-wc/testing';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types.js';
 import { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
-import { UmbBaseExtensionController, UmbBaseExtensionsController } from './index.js';
+import { PermittedControllerType, UmbBaseExtensionController, UmbBaseExtensionsController } from './index.js';
 import {
 	UmbBaseController,
 	UmbControllerHost,
-	UmbControllerHostElement,
 	UmbControllerHostElementMixin,
 } from '@umbraco-cms/backoffice/controller-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
@@ -16,10 +15,10 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 
 class UmbTestExtensionController extends UmbBaseExtensionController {
 	constructor(
-		host: UmbControllerHostElement,
+		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>,
 		alias: string,
-		onPermissionChanged: (isPermitted: boolean) => void
+		onPermissionChanged: (isPermitted: boolean, controller: UmbTestExtensionController) => void
 	) {
 		super(host, extensionRegistry, alias, onPermissionChanged);
 		this._init();
@@ -37,29 +36,30 @@ class UmbTestExtensionController extends UmbBaseExtensionController {
 type myTestManifests = ManifestWithDynamicConditions | ManifestCondition;
 const testExtensionRegistry = new UmbExtensionRegistry<myTestManifests>();
 
-type PermittedControllerType = UmbTestExtensionController & {
-	manifest: Required<Pick<UmbTestExtensionController, 'manifest'>>;
-};
-
-class UmbTestExtensionsController extends UmbBaseExtensionsController<
+class UmbTestExtensionsController<
+	MyPermittedControllerType extends UmbTestExtensionController = PermittedControllerType<UmbTestExtensionController>
+> extends UmbBaseExtensionsController<
 	myTestManifests,
 	'extension-type',
 	ManifestWithDynamicConditions,
 	UmbTestExtensionController,
-	PermittedControllerType
+	MyPermittedControllerType
 > {
+	#host: UmbControllerHost;
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>,
 		type: 'extension-type',
 		filter: null | ((manifest: ManifestWithDynamicConditions) => boolean),
-		onChange: (permittedManifests: Array<PermittedControllerType>, controller: PermittedControllerType) => void
+		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void
 	) {
 		super(host, extensionRegistry, type, filter, onChange);
+		this.#host = host;
+		this._init();
 	}
 
 	protected _createController(manifest: ManifestWithDynamicConditions) {
-		return new UmbTestExtensionController(this, testExtensionRegistry, manifest.alias, this._extensionChanged);
+		return new UmbTestExtensionController(this.#host, testExtensionRegistry, manifest.alias, this._extensionChanged);
 	}
 }
 
@@ -82,7 +82,7 @@ class UmbTestConditionAlwaysInvalid extends UmbBaseController implements UmbExte
 
 describe('UmbBaseExtensionsController', () => {
 	describe('Manifests without conditions', () => {
-		let hostElement: UmbControllerHostElement;
+		let hostElement: UmbTestControllerHostElement;
 
 		beforeEach(async () => {
 			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
@@ -128,7 +128,7 @@ describe('UmbBaseExtensionsController', () => {
 	});
 
 	describe('Manifests without conditions overwrites another', () => {
-		let hostElement: UmbControllerHostElement;
+		let hostElement: UmbTestControllerHostElement;
 
 		beforeEach(async () => {
 			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
@@ -184,7 +184,7 @@ describe('UmbBaseExtensionsController', () => {
 	});
 
 	describe('Manifest with valid conditions overwrites another', () => {
-		let hostElement: UmbControllerHostElement;
+		let hostElement: UmbTestControllerHostElement;
 
 		beforeEach(async () => {
 			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
@@ -255,7 +255,7 @@ describe('UmbBaseExtensionsController', () => {
 	});
 
 	describe('Manifest with invalid conditions does not overwrite another', () => {
-		let hostElement: UmbControllerHostElement;
+		let hostElement: UmbTestControllerHostElement;
 
 		beforeEach(async () => {
 			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
