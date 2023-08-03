@@ -18,7 +18,6 @@ function extensionArrayMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	return true;
 }
 
-// Note: Keeping the memoization in two separate function, for performance concern.
 function extensionAndKindMatchArrayMemoization<T extends Pick<ManifestBase, 'alias'> & { isMatchedWithKind?: boolean }>(
 	previousValue: Array<T>,
 	currentValue: Array<T>
