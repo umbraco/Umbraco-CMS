@@ -31,22 +31,6 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 		// Not relevant for this workspace
 	}
 
-	/*
-	render() {
-		return html`
-			<umb-body-layout main-no-padding>
-				<div id="header" slot="header">
-					<h3 id="headline">
-						${this._activePath === 'overview' ? 'Log Overview for Selected Time Period' : 'Log search'}
-					</h3>
-				</div>
-				${this.#renderViews()} ${this.#renderRoutes()}
-				<slot></slot>
-			</umb-body-layout>
-		`;
-	}
-	*/
-
 	render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.Dictionary" headline="Log Viewer" .enforceNoFooter=${true}>
