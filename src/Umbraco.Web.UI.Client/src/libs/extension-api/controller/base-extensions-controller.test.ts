@@ -15,6 +15,16 @@ import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 class UmbTestExtensionController extends UmbBaseExtensionController {
+	constructor(
+		host: UmbControllerHostElement,
+		extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>,
+		alias: string,
+		onPermissionChanged: (isPermitted: boolean) => void
+	) {
+		super(host, extensionRegistry, alias, onPermissionChanged);
+		this._init();
+	}
+
 	protected async _conditionsAreGood() {
 		return true;
 	}
