@@ -1,14 +1,12 @@
-import { TranslationSet, registerTranslation } from '../manager.js';
-import { hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import {
-	UmbBackofficeExtensionRegistry,
-	UmbTranslationEntry,
 	UmbTranslationsDictionary,
-	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extension-registry';
+	UmbTranslationsFlatDictionary,
+	TranslationSet,
+	registerTranslation,
+} from '@umbraco-cms/backoffice/localization-api';
+import { hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
+import { UmbBackofficeExtensionRegistry, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { Subject, combineLatest, map, distinctUntilChanged, Observable } from '@umbraco-cms/backoffice/external/rxjs';
-
-export type UmbTranslationsFlatDictionary = Record<string, UmbTranslationEntry>;
 
 export class UmbTranslationRegistry {
 	#currentLanguage = new Subject<string>();

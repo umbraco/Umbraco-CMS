@@ -1,3 +1,4 @@
+import { umbTranslationRegistry } from '@umbraco-cms/backoffice/localization';
 import type { UmbAppErrorElement } from './app-error.element.js';
 import { UMB_AUTH, UmbAuthFlow, UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { UMB_APP, UmbAppContext } from '@umbraco-cms/backoffice/context';
@@ -10,7 +11,6 @@ import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
 import { contextData, umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
-import { umbTranslationRegistry } from '@umbraco-cms/backoffice/localization-api';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {

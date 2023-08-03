@@ -1,9 +1,7 @@
 import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
+import { umbTranslationRegistry } from '@umbraco-cms/backoffice/localization';
 import { UmbLocalizeElement } from './localize.element.js';
-
-import '@umbraco-cms/backoffice/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbTranslationRegistry } from '@umbraco-cms/backoffice/localization-api';
 
 const english = {
 	type: 'translations',
@@ -57,10 +55,8 @@ describe('umb-localize', () => {
 		umbExtensionsRegistry.register(english);
 		umbExtensionsRegistry.register(danish);
 
-		const translationRegistry = new UmbTranslationRegistry(umbExtensionsRegistry);
-
 		beforeEach(async () => {
-			translationRegistry.loadLanguage(english.meta.culture);
+			umbTranslationRegistry.loadLanguage(english.meta.culture);
 			element = await fixture(html`<umb-localize key="general_close">Fallback value</umb-localize>`);
 		});
 
@@ -114,7 +110,7 @@ describe('umb-localize', () => {
 		it('should change the value if the language is changed', async () => {
 			expect(element.shadowRoot?.innerHTML).to.contain('Close');
 
-			translationRegistry.loadLanguage(danish.meta.culture);
+			umbTranslationRegistry.loadLanguage(danish.meta.culture);
 			await aTimeout(0);
 			await elementUpdated(element);
 
