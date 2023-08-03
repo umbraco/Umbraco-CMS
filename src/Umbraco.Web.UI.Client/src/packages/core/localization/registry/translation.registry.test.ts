@@ -60,7 +60,7 @@ const danishRegional: ManifestTranslations = {
 	alias: 'test.da-DK',
 	name: 'Test Danish (Denmark)',
 	meta: {
-		culture: 'da-DK',
+		culture: 'da-dk',
 		translations: {
 			general: {
 				close: 'Luk',
@@ -72,6 +72,8 @@ const danishRegional: ManifestTranslations = {
 
 describe('UmbLocalizeController', () => {
 	umbExtensionsRegistry.register(english);
+	umbExtensionsRegistry.register(danish);
+	umbExtensionsRegistry.register(danishRegional);
 
 	let registry: UmbTranslationRegistry;
 
@@ -83,6 +85,11 @@ describe('UmbLocalizeController', () => {
 
 	afterEach(() => {
 		registry.translations.clear();
+	});
+
+	it('should set the document language and direction', async () => {
+		expect(document.documentElement.lang).to.equal(english.meta.culture);
+		expect(document.documentElement.dir).to.equal(english.meta.direction);
 	});
 
 	it('should load translations for the current language', async () => {
@@ -104,23 +111,24 @@ describe('UmbLocalizeController', () => {
 	});
 
 	it('should load a new language', async () => {
-		umbExtensionsRegistry.register(danish);
 		registry.loadLanguage(danish.meta.culture);
 
 		await aTimeout(0);
 
+		// Check that the new language is loaded.
 		expect(registry.translations.has(danish.meta.culture)).to.be.true;
+
+		// Check that the new language has the correct translations.
 		const current = registry.translations.get(danish.meta.culture);
 		expect(current).to.have.property('general_close', 'Luk');
 	});
 
 	it('should load translations for the current language and regional', async () => {
+		// Load the regional language.
 		registry.loadLanguage(danishRegional.meta.culture);
-		umbExtensionsRegistry.register(danish);
-		umbExtensionsRegistry.register(danishRegional);
-
 		await aTimeout(0);
 
+		// Check that both the regional and the base language is loaded.
 		expect(registry.translations.has(danishRegional.meta.culture), 'expected "da-dk" to be present').to.be.true;
 		expect(registry.translations.has(danish.meta.culture), 'expected "da" to be present').to.be.true;
 	});

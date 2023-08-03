@@ -55,7 +55,7 @@ export class UmbTranslationRegistry {
 
 							// Notify subscribers that the inner dictionary has changed.
 							return {
-								$code: userCulture,
+								$code: extension.meta.culture.toLowerCase(),
 								$dir: extension.meta.direction ?? 'ltr',
 								...innerDictionary,
 							} satisfies TranslationSet;
@@ -66,7 +66,7 @@ export class UmbTranslationRegistry {
 					registerTranslation(...translations);
 
 					// Set the document language
-					document.documentElement.lang = locale.baseName;
+					document.documentElement.lang = locale.baseName.toLowerCase();
 
 					// Set the document direction to the direction of the primary language
 					document.documentElement.dir = translations[0].$dir ?? 'ltr';
