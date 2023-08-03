@@ -49,15 +49,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.Dictionary" .enforceNoFooter=${true}>
-				<div id="header" slot="header">
-					<h3 id="headline">
-						<!-- TODO: get the state from the context -->
-						<!--  this._activePath === 'overview' ? 'Log Overview for Selected Time Period' : 'Log search' -->
-						Log Viewer
-					</h3>
-				</div>
-				<slot></slot>
+			<umb-workspace-editor alias="Umb.Workspace.Dictionary" headline="Log Viewer" .enforceNoFooter=${true}>
 			</umb-workspace-editor>
 		`;
 	}
@@ -76,13 +68,6 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 				--umb-log-viewer-error-color: var(--uui-color-danger);
 				--umb-log-viewer-fatal-color: var(--uui-palette-black);
 				--umb-log-viewer-verbose-color: var(--uui-color-current);
-			}
-
-			#header {
-				display: flex;
-				padding: 0 var(--uui-size-space-6);
-				gap: var(--uui-size-space-4);
-				align-items: center;
 			}
 
 			uui-tab-group {
