@@ -1,2 +1,2 @@
-export * from './extension-condition.interface';
-export * from './condition-controller-arguments.type';
+export * from './extension-condition.interface.js';
+export * from './condition-controller-arguments.type.js';
