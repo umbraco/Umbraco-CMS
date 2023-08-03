@@ -52,8 +52,6 @@ export default class UmbRouter {
 		// to see if a redirect is needed (newPath)
 		const newPathName = originalPath?.action?.(this.#currentPath, this.#currentSearch, this.#currentHash);
 
-		console.log(newPathName);
-
 		if (newPathName) {
 			this.#updateUrl(newPathName, this.#currentSearch, this.#currentHash);
 		}
@@ -110,9 +108,8 @@ export default class UmbRouter {
 		if (this.#isExternalURL(anchor)) return;
 
 		event.preventDefault();
-		const { pathname, search, hash } = anchor;
 
-		const fullPath = `${pathname}${search}${hash}`;
+		const { pathname, search, hash } = anchor;
 
 		this.#updateUrl(pathname, search, hash);
 	}

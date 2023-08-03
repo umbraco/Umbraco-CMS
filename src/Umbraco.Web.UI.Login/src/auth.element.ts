@@ -81,10 +81,12 @@ export default class UmbAuthElement extends LitElement {
 			{
 				path: 'login/reset',
 				component: html`<umb-reset-password></umb-reset-password>`,
+				action: () => (UmbAuthMainContext.Instance.allowPasswordReset ? null : 'login'),
 			},
 			{
 				path: 'login/new',
 				component: html`<umb-new-password></umb-new-password>`,
+				action: () => (UmbAuthMainContext.Instance.allowPasswordReset ? null : 'login'),
 			},
 			{
 				path: 'login/invite',
