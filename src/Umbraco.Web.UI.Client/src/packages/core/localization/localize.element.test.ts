@@ -2,6 +2,7 @@ import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testin
 import { umbTranslationRegistry } from '@umbraco-cms/backoffice/localization';
 import { UmbLocalizeElement } from './localize.element.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
 
 const english = {
 	type: 'translations',
@@ -58,6 +59,10 @@ describe('umb-localize', () => {
 		beforeEach(async () => {
 			umbTranslationRegistry.loadLanguage(english.meta.culture);
 			element = await fixture(html`<umb-localize key="general_close">Fallback value</umb-localize>`);
+		});
+
+		it('should have a localize controller', () => {
+			expect(element.localize).to.be.instanceOf(UmbLocalizeController);
 		});
 
 		it('should localize a key', async () => {
