@@ -1,5 +1,5 @@
+import type { UmbExtensionCondition } from './condition/index.js';
 import type { UmbEntryPointModule } from './entry-point.interface.js';
-import type { UmbExtensionCondition } from './index.js';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;

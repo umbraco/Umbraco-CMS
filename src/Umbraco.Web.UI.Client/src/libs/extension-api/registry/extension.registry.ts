@@ -1,7 +1,13 @@
-import { of, switchMap } from 'rxjs';
 import type { ManifestTypeMap, ManifestBase, SpecificManifestTypeOrManifestBase, ManifestKind } from '../types.js';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
-import { map, Observable, distinctUntilChanged, combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
+import {
+	map,
+	Observable,
+	distinctUntilChanged,
+	combineLatest,
+	of,
+	switchMap,
+} from '@umbraco-cms/backoffice/external/rxjs';
 
 function extensionArrayMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	previousValue: Array<T>,
