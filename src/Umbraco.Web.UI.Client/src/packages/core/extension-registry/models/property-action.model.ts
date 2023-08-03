@@ -1,9 +1,11 @@
-import type { ManifestElement, ManifestWithConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { ConditionTypes } from '../conditions/types.js';
+import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestPropertyAction extends ManifestElement, ManifestWithConditions<ConditionsPropertyAction> {
+export interface ManifestPropertyAction extends ManifestElement, ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'propertyAction';
+	meta: MetaPropertyAction;
 }
 
-export interface ConditionsPropertyAction {
+export interface MetaPropertyAction {
 	propertyEditors: string[];
 }
