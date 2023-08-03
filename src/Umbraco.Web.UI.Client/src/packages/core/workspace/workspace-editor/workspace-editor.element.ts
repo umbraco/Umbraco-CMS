@@ -36,10 +36,10 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@property()
 	public headline = '';
 
-	@property()
+	@property({type: Boolean})
 	public hideNavigation = false;
 
-	@property()
+	@property({type: Boolean})
 	public enforceNoFooter = false;
 
 	private _alias = '';
