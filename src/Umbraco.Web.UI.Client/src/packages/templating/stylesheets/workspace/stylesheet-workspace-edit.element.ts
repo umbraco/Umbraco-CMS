@@ -22,11 +22,18 @@ export class UmbStylesheetWorkspaceEditElement extends UmbLitElement {
 
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbStylesheetWorkspaceContext;
+			this.#observeNameAndPath();
 		});
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
+	}
+
+	#observeNameAndPath() {
+		if (!this.#workspaceContext) return;
+		this.observe(this.#workspaceContext.name, (name) => (this._name = name));
+		this.observe(this.#workspaceContext.path, (path) => (this._path = path));
 	}
 
 	#onNameChange(event: UUIInputEvent) {
@@ -46,6 +53,7 @@ export class UmbStylesheetWorkspaceEditElement extends UmbLitElement {
 			<umb-workspace-editor alias="Umb.Workspace.StyleSheet">
 				<div id="header" slot="header">
 					<uui-input id="name" .value=${this._name} @input="${this.#onNameChange}"> </uui-input>
+					<small>${this._path}</small>
 				</div>
 
 				<div slot="footer-info">
@@ -72,6 +80,18 @@ export class UmbStylesheetWorkspaceEditElement extends UmbLitElement {
 				display: block;
 				width: 100%;
 				height: 100%;
+			}
+
+			#header {
+				display: flex;
+				flex: 1 1 auto;
+				flex-direction: column;
+			}
+
+			#name {
+				width: 100%;
+				flex: 1 1 auto;
+				align-items: center;
 			}
 		`,
 	];
