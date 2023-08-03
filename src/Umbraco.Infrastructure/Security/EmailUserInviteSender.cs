@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Net;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Umbraco.Cms.Core;
@@ -48,7 +49,7 @@ public class EmailUserInviteSender : IUserInviteSender
         {
             invite.Recipient.Name,
             invite.Sender.Name ?? invite.Sender.Email,
-            invite.Message,
+            WebUtility.HtmlEncode(invite.Message)!.ReplaceLineEndings("<br/>"),
             invite.InviteUri.ToString(),
             senderEmail,
         };

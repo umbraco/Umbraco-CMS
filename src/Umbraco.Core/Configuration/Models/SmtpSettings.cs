@@ -74,8 +74,7 @@ public class SmtpSettings : ValidatableEntryBase
     ///     Gets or sets a value for the secure socket options.
     /// </summary>
     [DefaultValue(StaticSecureSocketOptions)]
-    public SecureSocketOptions SecureSocketOptions { get; set; } =
-        Enum<SecureSocketOptions>.Parse(StaticSecureSocketOptions);
+    public SecureSocketOptions SecureSocketOptions { get; set; } = Enum.Parse<SecureSocketOptions>(StaticSecureSocketOptions);
 
     /// <summary>
     ///     Gets or sets a value for the SMTP pick-up directory.
@@ -86,7 +85,7 @@ public class SmtpSettings : ValidatableEntryBase
     ///     Gets or sets a value for the SMTP delivery method.
     /// </summary>
     [DefaultValue(StaticDeliveryMethod)]
-    public SmtpDeliveryMethod DeliveryMethod { get; set; } = Enum<SmtpDeliveryMethod>.Parse(StaticDeliveryMethod);
+    public SmtpDeliveryMethod DeliveryMethod { get; set; } = Enum.Parse<SmtpDeliveryMethod>(StaticDeliveryMethod);
 
     /// <summary>
     ///     Gets or sets a value for the SMTP user name.

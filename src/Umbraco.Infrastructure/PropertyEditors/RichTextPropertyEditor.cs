@@ -328,6 +328,6 @@ public class RichTextPropertyEditor : DataEditor
 
         [Obsolete("Use the overload with the 'availableCultures' parameter instead, scheduled for removal in v14")]
         public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
-            => GetIndexValues(property, culture, segment, published);
+            => GetIndexValues(property, culture, segment, published, Enumerable.Empty<string>());
     }
 }
