@@ -36,11 +36,14 @@ class UmbTestExtensionController extends UmbBaseExtensionController {
 type myTestManifests = ManifestWithDynamicConditions | ManifestCondition;
 const testExtensionRegistry = new UmbExtensionRegistry<myTestManifests>();
 
+type myTestManifestTypesUnion = 'extension-type-extra' | 'extension-type';
+type myTestManifestTypes = myTestManifestTypesUnion | myTestManifestTypesUnion[];
+
 class UmbTestExtensionsController<
 	MyPermittedControllerType extends UmbTestExtensionController = PermittedControllerType<UmbTestExtensionController>
 > extends UmbBaseExtensionsController<
 	myTestManifests,
-	'extension-type',
+	myTestManifestTypesUnion,
 	ManifestWithDynamicConditions,
 	UmbTestExtensionController,
 	MyPermittedControllerType
@@ -49,7 +52,7 @@ class UmbTestExtensionsController<
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>,
-		type: 'extension-type',
+		type: myTestManifestTypes,
 		filter: null | ((manifest: ManifestWithDynamicConditions) => boolean),
 		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void
 	) {

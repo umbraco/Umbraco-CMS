@@ -6,7 +6,7 @@ import {
 	ManifestWorkspaceViewCollection,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbExtensionsElementController, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestController, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { componentHasManifestProperty } from '@umbraco-cms/backoffice/utils';
@@ -36,26 +36,15 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@property({ type: Boolean })
 	public enforceNoFooter = false;
 
-	private _alias = '';
+	// TODO: Revisit if we can remove the alias from the workspace-editor. Its not used for anything, as the context now takes care of it.
 	/**
-	 * Alias of the workspace. The Layout will render the workspace views that are registered for this workspace alias.
+	 * Alias of the workspace. Currently not used for anything.
 	 * @public
-	 * @type {string}
+	 * @type {string | undefined}
 	 * @attr
-	 * @default ''
 	 */
 	@property()
-	public get alias() {
-		return this._alias;
-	}
-	public set alias(value) {
-		const oldValue = this._alias;
-		this._alias = value;
-		if (oldValue !== this._alias) {
-			this._observeWorkspaceViews();
-			this.requestUpdate('alias', oldValue);
-		}
-	}
+	public alias?: string;
 
 	@state()
 	private _workspaceViews: Array<ManifestWorkspaceEditorView | ManifestWorkspaceViewCollection> = [];
@@ -71,29 +60,15 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		new UmbExtensionsElementController(
+		new UmbExtensionsManifestController(
 			this,
 			umbExtensionsRegistry,
 			['workspaceEditorView', 'workspaceViewCollection'],
 			null,
 			(workspaceViews) => {
-				this._workspaceViews = workspaceViews;
+				this._workspaceViews = workspaceViews.map((view) => view.manifest);
 				this._createRoutes();
 			}
-		);
-	}
-
-	private _observeWorkspaceViews() {
-		this.observe(
-			umbExtensionsRegistry.extensionsOfTypes<ManifestWorkspaceEditorView>([
-				'workspaceEditorView',
-				'workspaceViewCollection',
-			]),
-			(workspaceViews) => {
-				this._workspaceViews = workspaceViews;
-				this._createRoutes();
-			},
-			'_observeWorkspaceViews'
 		);
 	}
 
@@ -142,7 +117,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				${this.enforceNoFooter
 					? ''
 					: html`
-							<umb-workspace-footer slot="footer" alias=${this.alias}>
+							<umb-workspace-footer slot="footer">
 								<slot name="footer-info"></slot>
 								<slot name="actions" slot="actions"></slot>
 							</umb-workspace-footer>
