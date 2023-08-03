@@ -63,13 +63,17 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 		let query = (event.target.value as string) || '';
 		query = query.toLowerCase();
 
-		const result = !query
+		let result = !query
 			? this._propertyEditorUIs
 			: this._propertyEditorUIs.filter((propertyEditorUI) => {
 					return (
 						propertyEditorUI.name.toLowerCase().includes(query) || propertyEditorUI.alias.toLowerCase().includes(query)
 					);
 			  });
+
+		// TODO: Should this be done in the registry or somewhere else a *little* more central?
+		// Only include property editor UIs that have a property editor schema alias
+		result = result.filter((propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias);
 
 		this._groupedPropertyEditorUIs = groupBy(result, 'meta.group');
 	}
