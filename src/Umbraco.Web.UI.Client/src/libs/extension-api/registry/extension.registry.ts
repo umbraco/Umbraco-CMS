@@ -87,6 +87,16 @@ export class UmbExtensionRegistry<
 	public readonly kinds = this._kinds.asObservable();
 
 	defineKind(kind: ManifestKind<ManifestTypes>) {
+		const extensionsValues = this._extensions.getValue();
+		const extension = extensionsValues.find(
+			(extension) => extension.alias === (kind as ManifestKind<ManifestTypes>).alias
+		);
+
+		if (extension) {
+			console.error(`Extension Kind with alias ${(kind as ManifestKind<ManifestTypes>).alias} is already registered`);
+			return;
+		}
+
 		const nextData = this._kinds
 			.getValue()
 			.filter(
@@ -102,6 +112,15 @@ export class UmbExtensionRegistry<
 
 	register(manifest: ManifestTypes | ManifestKind<ManifestTypes>): void {
 		// TODO: Consider if we need to implement some safety features here, like checking if the object has a 'type' and/or 'alias'?
+		if (!manifest.type) {
+			console.error(`Extension is missing type`, manifest);
+			return;
+		}
+
+		if (!manifest.alias) {
+			console.error(`Extension is missing alias`, manifest);
+			return;
+		}
 
 		if (manifest.type === 'kind') {
 			this.defineKind(manifest as ManifestKind<ManifestTypes>);
