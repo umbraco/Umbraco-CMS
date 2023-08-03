@@ -1,4 +1,4 @@
-import {Observable} from "rxjs";
+import { Observable } from 'rxjs';
 
 export type LoginRequestModel = {
 	username: string;
@@ -11,10 +11,8 @@ export interface IUmbAuthContext {
 	resetPassword(username: string): Promise<ResetPasswordResponse>;
 	validatePasswordResetCode(userId: string, resetCode: string): Promise<ValidatePasswordResetCodeResponse>;
 	newPassword(password: string, resetCode: string, userId: string): Promise<NewPasswordResponse>;
-  getIcons(): Observable<Record<string, string>>;
+	getIcons(): Observable<Record<string, string>>;
 	supportsPersistLogin: boolean;
-	allowPasswordReset: boolean;
-	usernameIsEmail: boolean;
 	returnPath: string;
 }
 

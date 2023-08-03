@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 
 import type { UUIButtonState } from '@umbraco-ui/uui';
@@ -14,6 +14,12 @@ import '.././external-login-providers-layout.element.js';
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {
 	#authContext = UmbAuthMainContext.Instance;
+
+	@property({ type: Boolean, attribute: 'username-is-email' })
+	usernameIsEmail = false;
+
+	@property({ type: Boolean, attribute: 'allow-password-reset' })
+	allowPasswordReset = false;
 
 	@state()
 	private _loginState: UUIButtonState = undefined;
@@ -78,12 +84,12 @@ export default class UmbLoginElement extends LitElement {
 				<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
 					<uui-form-layout-item>
 						<uui-label id="emailLabel" for="email" slot="label" required>
-							${this.#authContext.usernameIsEmail
+							${this.usernameIsEmail
 								? html`<umb-localize key="user_email">Email</umb-localize>`
 								: html`<umb-localize key="user_username">Name</umb-localize>`}
 						</uui-label>
 						<uui-input
-							type=${this.#authContext.usernameIsEmail ? 'email' : 'text'}
+							type=${this.usernameIsEmail ? 'email' : 'text'}
 							id="email"
 							name="email"
 							label="Email"
@@ -113,7 +119,7 @@ export default class UmbLoginElement extends LitElement {
 							</uui-form-layout-item>`
 						)}
 						${when(
-							this.#authContext.allowPasswordReset,
+							this.allowPasswordReset,
 							() =>
 								html`<a id="forgot-password" href="login/reset"
 									><umb-localize key="user_forgotPassword">Forgot password?</umb-localize></a

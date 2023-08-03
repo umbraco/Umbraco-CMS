@@ -7,7 +7,7 @@ import {
 	NewPasswordResponse,
 } from '../types.js';
 import { UmbAuthLegacyRepository } from './auth-legacy.repository.ts';
-import {Observable, ReplaySubject} from "rxjs";
+import { Observable, ReplaySubject } from 'rxjs';
 
 export class UmbAuthLegacyContext implements IUmbAuthContext {
 	readonly supportsPersistLogin = true;
@@ -15,8 +15,6 @@ export class UmbAuthLegacyContext implements IUmbAuthContext {
 	#authRepository = new UmbAuthLegacyRepository();
 
 	public returnPath = '';
-	public allowPasswordReset = false;
-	public usernameIsEmail = false;
 
 	async login(data: LoginRequestModel): Promise<LoginResponse> {
 		return this.#authRepository.login(data);
@@ -35,26 +33,25 @@ export class UmbAuthLegacyContext implements IUmbAuthContext {
 		return this.#authRepository.newPassword(password, resetCode, userIdAsNumber);
 	}
 
-  #iconsLoaded = false;
-  #icons = new ReplaySubject<Record<string, string>>(1);
-  getIcons(): Observable<Record<string, string>> {
-    if (!this.#iconsLoaded) {
-      this.#iconsLoaded = true;
-      fetch('backoffice/umbracoapi/icon/geticons')
-        .then((response) => {
+	#iconsLoaded = false;
+	#icons = new ReplaySubject<Record<string, string>>(1);
+	getIcons(): Observable<Record<string, string>> {
+		if (!this.#iconsLoaded) {
+			this.#iconsLoaded = true;
+			fetch('backoffice/umbracoapi/icon/geticons')
+				.then((response) => {
+					if (!response.ok) {
+						throw new Error('Could not fetch icons');
+					}
 
-          if (!response.ok) {
-            throw new Error('Could not fetch icons');
-          }
+					return response.json();
+				})
+				.then((icons) => {
+					this.#icons.next(icons);
+					this.#icons.complete();
+				});
+		}
 
-          return response.json();
-        })
-        .then(icons => {
-          this.#icons.next(icons);
-          this.#icons.complete();
-        });
-    }
-
-    return this.#icons.asObservable();
-  }
+		return this.#icons.asObservable();
+	}
 }

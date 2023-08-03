@@ -31,19 +31,10 @@ export default class UmbAuthElement extends LitElement {
 	logoImage = '';
 
 	@property({ type: Boolean, attribute: 'username-is-email' })
-	set usernameIsEmail(value: boolean) {
-		UmbAuthMainContext.Instance.usernameIsEmail = value;
-	}
-	get usernameIsEmail() {
-		return UmbAuthMainContext.Instance.usernameIsEmail;
-	}
+	usernameIsEmail = false;
+
 	@property({ type: Boolean, attribute: 'allow-password-reset' })
-	set allowPasswordReset(value: boolean) {
-		UmbAuthMainContext.Instance.allowPasswordReset = value;
-	}
-	get allowPasswordReset() {
-		return UmbAuthMainContext.Instance.allowPasswordReset;
-	}
+	allowPasswordReset = false;
 
 	@property({ type: Boolean, attribute: 'allow-user-invite' })
 	allowUserInvite = false;
@@ -72,7 +63,9 @@ export default class UmbAuthElement extends LitElement {
 		this.router = new UmbRouter(this, [
 			{
 				path: 'login',
-				component: html`<umb-login>
+				component: html`<umb-login
+					?allow-password-reset=${this.allowPasswordReset}
+					?username-is-email=${this.usernameIsEmail}>
 					<slot name="external" slot="external"></slot>
 				</umb-login>`,
 				default: true,
@@ -81,12 +74,12 @@ export default class UmbAuthElement extends LitElement {
 			{
 				path: 'login/reset',
 				component: html`<umb-reset-password></umb-reset-password>`,
-				action: () => (UmbAuthMainContext.Instance.allowPasswordReset ? null : 'login'),
+				action: () => (this.allowPasswordReset ? null : 'login'),
 			},
 			{
 				path: 'login/new',
 				component: html`<umb-new-password></umb-new-password>`,
-				action: () => (UmbAuthMainContext.Instance.allowPasswordReset ? null : 'login'),
+				action: () => (this.allowPasswordReset ? null : 'login'),
 			},
 			{
 				path: 'login/invite',
