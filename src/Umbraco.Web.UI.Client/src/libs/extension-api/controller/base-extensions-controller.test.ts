@@ -125,6 +125,41 @@ describe('UmbBaseExtensionsController', () => {
 				}
 			);
 		});
+
+		it('consumed multiple types', (done) => {
+			const manifestExtra = {
+				type: 'extension-type-extra',
+				name: 'test-extension-extra',
+				alias: 'Umb.Test.Extension.Extra',
+			};
+			testExtensionRegistry.register(manifestExtra);
+			let count = 0;
+			const extensionController = new UmbTestExtensionsController(
+				hostElement,
+				testExtensionRegistry,
+				['extension-type', 'extension-type-extra'],
+				null,
+				(permitted) => {
+					count++;
+					if (count === 1) {
+						// First callback gives just one. We need to make a feature to gather changes to only reply after a computation cycle if we like to avoid this.
+						expect(permitted.length).to.eq(1);
+					}
+					if (count === 2) {
+						expect(permitted.length).to.eq(2);
+					}
+					if (count === 3) {
+						expect(permitted.length).to.eq(3);
+						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
+						expect(permitted[1].alias).to.eq('Umb.Test.Extension.B');
+						expect(permitted[2].alias).to.eq('Umb.Test.Extension.Extra');
+
+						done();
+						extensionController.destroy();
+					}
+				}
+			);
+		});
 	});
 
 	describe('Manifests without conditions overwrites another', () => {

@@ -22,7 +22,7 @@ export abstract class UmbBaseExtensionsController<
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
 > extends UmbBaseController {
 	#extensionRegistry: UmbExtensionRegistry<ManifestType>;
-	#type: ManifestTypeName;
+	#type: ManifestTypeName | Array<ManifestTypeName>;
 	#filter: undefined | null | ((manifest: ManifestType) => boolean);
 	#onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void;
 	protected _extensions: Array<ControllerType> = [];
@@ -31,7 +31,7 @@ export abstract class UmbBaseExtensionsController<
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestType>,
-		type: ManifestTypeName,
+		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
 		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void
 	) {
@@ -42,7 +42,9 @@ export abstract class UmbBaseExtensionsController<
 		this.#onChange = onChange;
 	}
 	protected _init() {
-		let source = this.#extensionRegistry.extensionsOfType<ManifestTypeName, ManifestType>(this.#type);
+		let source = Array.isArray(this.#type)
+			? this.#extensionRegistry.extensionsOfTypes<ManifestType>(this.#type as string[])
+			: this.#extensionRegistry.extensionsOfType<ManifestTypeName, ManifestType>(this.#type as ManifestTypeName);
 		if (this.#filter) {
 			source = source.pipe(map((extensions: Array<ManifestType>) => extensions.filter(this.#filter!)));
 		}

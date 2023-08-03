@@ -27,7 +27,7 @@ export class UmbExtensionElementController<
 	 * @memberof UmbElementExtensionController
 	 * @example
 	 * ```ts
-	 * const controller = new UmbElementExtensionController(host, alias, onPermissionChanged);
+	 * const controller = new UmbElementExtensionController(host, extensionRegistry, alias, onPermissionChanged);
 	 * controller.props = { foo: 'bar' };
 	 * ```
 	 * Is equivalent to:

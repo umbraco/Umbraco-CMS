@@ -29,7 +29,7 @@ export class UmbExtensionsManifestController<
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestTypes>,
-		type: ManifestTypeName,
+		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: null | ((manifest: ManifestType) => boolean),
 		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void
 	) {

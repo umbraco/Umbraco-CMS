@@ -1,18 +1,12 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import type {
-	PageComponent,
-	UmbRoute,
-	UmbRouterSlotInitEvent,
-	UmbRouterSlotChangeEvent,
-} from '@umbraco-cms/backoffice/router';
+import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import {
 	ManifestWorkspaceEditorView,
 	ManifestWorkspaceViewCollection,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsElementController, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { componentHasManifestProperty } from '@umbraco-cms/backoffice/utils';
@@ -74,6 +68,20 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	@state()
 	private _activePath?: string;
+
+	constructor() {
+		super();
+		new UmbExtensionsElementController(
+			this,
+			umbExtensionsRegistry,
+			['workspaceEditorView', 'workspaceViewCollection'],
+			null,
+			(workspaceViews) => {
+				this._workspaceViews = workspaceViews;
+				this._createRoutes();
+			}
+		);
+	}
 
 	private _observeWorkspaceViews() {
 		this.observe(
