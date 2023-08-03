@@ -76,20 +76,7 @@ export default class UmbAuthElement extends LitElement {
 					<slot name="external" slot="external"></slot>
 				</umb-login>`,
 				default: true,
-				action: (_pathName, search) => {
-					console.log(search.split('&'));
-
-					if (search.split('&').some((x) => x.startsWith('?flow=reset-password'))) {
-						return 'login/reset';
-					}
-
-					return null;
-				},
-			},
-			{
-				path: 'login',
-				component: html`<umb-reset-password></umb-reset-password>`,
-				search: '?flow=reset-password',
+				action: this.#checkRouteForResetParams,
 			},
 			{
 				path: 'login/reset',
@@ -108,34 +95,25 @@ export default class UmbAuthElement extends LitElement {
 		this.router.subscribe();
 	}
 
+	#checkRouteForResetParams(_path: string, search: string) {
+		const searchParams = new URLSearchParams(search);
+		const flow = searchParams.get('flow');
+		const resetId = searchParams.get('userId');
+		const resetCode = searchParams.get('resetCode');
+
+		console.log(flow, resetId, resetCode);
+
+		if (flow === 'reset-password' && resetId && resetCode) {
+			return 'login/new';
+		}
+
+		return null;
+	}
+
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this.router?.unsubscribe();
 	}
-
-	#checkRouteAllowReset = (_context: Context, commands: Commands) => {
-		if (!this.allowPasswordReset) {
-			return commands.redirect('login');
-		}
-	};
-
-	#checkRouteAllowInvite = (_context: Context, commands: Commands) => {
-		if (!this.allowUserInvite) {
-			return commands.redirect('login');
-		}
-	};
-
-	#checkResetCode = (_context: Context, _commands: Commands) => {
-		//TODO: You should be able to use the router to redirect, but the commands.redirect() doesn't work with params.
-		//TODO: And the Router.go() doesn't work at all for some reason.
-		const flow = new URLSearchParams(window.location.search).get('flow');
-		const status = new URLSearchParams(window.location.search).get('status');
-
-		if (flow === 'reset-password' && status === 'resetCodeExpired') {
-			window.history.replaceState({}, '', 'login/reset?status=resetCodeExpired');
-			window.history.go(0);
-		}
-	};
 
 	render() {
 		return html`
