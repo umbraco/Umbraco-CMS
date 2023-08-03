@@ -80,3 +80,9 @@ export const createTextFileItem = (item: any): TextFileResponseModelBaseModel =>
 	name: item.name,
 	content: item.content,
 });
+
+export const createItem = (item: any): any => ({
+	path: item.path,
+	name: item.name,
+	icon: item.icon,
+});
