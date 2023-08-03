@@ -36,10 +36,10 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@property()
 	public headline = '';
 
-	@property({type: Boolean})
+	@property({ type: Boolean })
 	public hideNavigation = false;
 
-	@property({type: Boolean})
+	@property({ type: Boolean })
 	public enforceNoFooter = false;
 
 	private _alias = '';
@@ -87,11 +87,6 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			},
 			'_observeWorkspaceViews'
 		);
-	}
-
-	// TODO: Move into a helper function:
-	private componentHasManifest(component: HTMLElement): component is HTMLElement & { manifest: unknown } {
-		return component ? 'manifest' in component : false;
 	}
 
 	private _createRoutes() {
