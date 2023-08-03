@@ -84,6 +84,7 @@ export default class UmbAuthElement extends LitElement {
 			{
 				path: 'login/invite',
 				component: html`<umb-invite></umb-invite>`,
+				action: () => (this.allowUserInvite ? null : 'login'),
 			},
 		]);
 
