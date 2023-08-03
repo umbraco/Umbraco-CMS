@@ -71,17 +71,8 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 		 * @return {UmbObserverController} Reference to a Observer Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		observe<T>(
-			source: Observable<T> | { asObservable: () => Observable<T> },
-			callback: (_value: T) => void,
-			controllerAlias?: UmbControllerAlias
-		) {
-			return new UmbObserverController<T>(
-				this,
-				(source as any).asObservable ? (source as any).asObservable() : source,
-				callback,
-				controllerAlias
-			);
+		observe<T>(source: Observable<T>, callback: (_value: T) => void, controllerAlias?: UmbControllerAlias) {
+			return new UmbObserverController<T>(this, source, callback, controllerAlias);
 		}
 
 		/**
