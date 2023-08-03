@@ -52,6 +52,12 @@ export default class UmbRouter {
 		// to see if a redirect is needed (newPath)
 		const newPathName = originalPath?.action?.(this.#currentPath, this.#currentSearch, this.#currentHash);
 
+		console.log(newPathName);
+
+		if (newPathName) {
+			this.#updateUrl(newPathName, this.#currentSearch, this.#currentHash);
+		}
+
 		// If newPath is not null and not undefined, find the corresponding path object
 		const newPath = newPathName && this.#paths.find((p) => p.path === newPathName);
 
@@ -64,10 +70,12 @@ export default class UmbRouter {
 	};
 
 	#updateUrl(path: string, search: string, hash: string) {
-		const pathName = path.substring(new URL(document.baseURI).pathname.length);
+		if (path.startsWith(new URL(document.baseURI).pathname)) {
+			path = path.substring(new URL(document.baseURI).pathname.length);
+		}
 
 		// Check if temp exists in paths or find the default path
-		const pathToUse = this.#paths.find((p) => p.path === pathName) || this.#paths.find((p) => p.default);
+		const pathToUse = this.#paths.find((p) => p.path === path) || this.#paths.find((p) => p.default);
 
 		if (pathToUse) {
 			this.#currentPath = pathToUse.path;
