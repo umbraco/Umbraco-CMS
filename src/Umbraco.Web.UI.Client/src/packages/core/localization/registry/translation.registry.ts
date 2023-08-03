@@ -3,12 +3,20 @@ import {
 	UmbTranslationsFlatDictionary,
 	TranslationSet,
 	registerTranslation,
+	translations,
 } from '@umbraco-cms/backoffice/localization-api';
 import { hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBackofficeExtensionRegistry, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { Subject, combineLatest, map, distinctUntilChanged, Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbTranslationRegistry {
+	/**
+	 * Get the current registered translations.
+	 */
+	get translations() {
+		return translations;
+	}
+
 	#currentLanguage = new Subject<string>();
 	#currentLanguageUnique: Observable<string> = this.#currentLanguage.pipe(
 		map((x) => x.toLowerCase()),
