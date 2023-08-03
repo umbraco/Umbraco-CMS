@@ -13,8 +13,8 @@ class UmbLocalizeControllerHostElement extends UmbElementMixin(LitElement) {
 interface TestTranslation extends TranslationSet {
 	close: string;
 	logout: string;
-	withInlineToken: string;
-	withInlineTokenLegacy: string;
+	withInlineToken: any;
+	withInlineTokenLegacy: any;
 	notOnRegional: string;
 	numUsersSelected: (count: number) => string;
 }
@@ -148,7 +148,8 @@ describe('UmbLocalizeController', () => {
 		});
 
 		it('should return a term with no tokens even though they are provided', async () => {
-			expect(controller.term('logout', 'Hello', 'World')).to.equal('Log out');
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			expect((controller.term as any)('logout', 'Hello', 'World')).to.equal('Log out');
 		});
 	});
 
