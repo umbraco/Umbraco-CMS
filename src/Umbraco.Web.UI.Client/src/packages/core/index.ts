@@ -1,5 +1,6 @@
 import { UmbBackofficeNotificationContainerElement, UmbBackofficeModalContainerElement } from './components/index.js';
 import { manifests as debugManifests } from './debug/manifests.js';
+import { manifests as localizationManifests } from './localization/manifests.js';
 import { manifests as propertyActionManifests } from './property-action/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
 import { manifests as tinyMcePluginManifests } from './property-editor/uis/tiny-mce/plugins/manifests.js';
@@ -17,6 +18,7 @@ import {
 	UmbClassExtensionsInitializer,
 } from '@umbraco-cms/backoffice/extension-registry';
 
+export * from './localization/index.js';
 export * from './action/index.js';
 export * from './collection/index.js';
 export * from './components/index.js';
@@ -42,6 +44,7 @@ export * from './workspace/index.js';
 
 const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...debugManifests,
+	...localizationManifests,
 	...propertyActionManifests,
 	...propertyEditorManifests,
 	...tinyMcePluginManifests,

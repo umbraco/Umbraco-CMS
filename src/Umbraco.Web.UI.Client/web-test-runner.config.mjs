@@ -1,30 +1,18 @@
 import { esbuildPlugin } from '@web/dev-server-esbuild';
 import { playwrightLauncher } from '@web/test-runner-playwright';
 import { importMapsPlugin } from '@web/dev-server-import-maps';
-import rollupUrl from 'rollup-plugin-url';
-import { fromRollup } from '@web/dev-server-rollup';
 
-const url = fromRollup(rollupUrl);
+const mode = process.env.MODE || 'dev';
+if (!['dev', 'prod'].includes(mode)) {
+	throw new Error(`MODE must be "dev" or "prod", was "${mode}"`);
+}
 
 /** @type {import('@web/dev-server').DevServerConfig} */
 export default {
-	nodeResolve: true,
-	files: ['src/**/*.test.ts'],
-	mimeTypes: {
-		'./public/**/*': 'js',
-	},
+	rootDir: '.',
+	files: ['./src/**/*.test.ts'],
+	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [] },
 	plugins: [
-		{
-			name: 'resolve-umbraco-and-vite-imports',
-			// Rewrite Vite's root imports to the public folder
-			transformImport(args) {
-				if (args.source.match(/^\/.*?\.(png|gif|jpg|jpeg|svg)$/is)) {
-					return `/public${args.source}`;
-				}
-			},
-		},
-		// Serve images from the public folder as JS modules
-		url({ include: ['public/**/*'] }),
 		esbuildPlugin({ ts: true, tsconfig: './tsconfig.json', target: 'auto', json: true }),
 		importMapsPlugin({
 			inject: {
@@ -48,6 +36,7 @@ export default {
 						'@umbraco-cms/backoffice/controller-api': './src/libs/controller-api/index.ts',
 						'@umbraco-cms/backoffice/element-api': './src/libs/element-api/index.ts',
 						'@umbraco-cms/backoffice/extension-api': './src/libs/extension-api/index.ts',
+						'@umbraco-cms/backoffice/localization-api': './src/libs/localization-api/index.ts',
 						'@umbraco-cms/backoffice/observable-api': './src/libs/observable-api/index.ts',
 
 						'@umbraco-cms/backoffice/auth': './src/shared/auth/index.ts',
@@ -125,7 +114,7 @@ export default {
 		reporters: ['lcovonly', 'text-summary'],
 	},
 	testRunnerHtml: (testFramework) =>
-		`<html>
+		`<html lang="en-us">
 			<head>
 				<meta charset="UTF-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />

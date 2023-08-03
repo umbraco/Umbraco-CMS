@@ -25,15 +25,9 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 			this._observeCurrentUser();
 		});
 
-		this.consumeContext(UMB_AUTH, (instance) => {
-			this.#auth = instance;
-		});
-
 		this.consumeContext(UMB_APP, (instance) => {
 			this.#appContext = instance;
 		});
-
-		this._observeCurrentUser();
 	}
 
 	private async _observeCurrentUser() {
@@ -64,8 +58,16 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 					<umb-extension-slot id="userProfileApps" type="userProfileApp"></umb-extension-slot>
 				</div>
 				<div slot="actions">
-					<uui-button @click=${this._close} look="secondary">Close</uui-button>
-					<uui-button @click=${this._logout} look="primary" color="danger">Logout</uui-button>
+					<uui-button @click=${this._close} look="secondary" .label=${this.localize.term('general_close')}>
+						${this.localize.term('general_close')}
+					</uui-button>
+					<uui-button
+						@click=${this._logout}
+						look="primary"
+						color="danger"
+						.label=${this.localize.term('general_logout')}>
+						${this.localize.term('general_logout')}
+					</uui-button>
 				</div>
 			</umb-body-layout>
 		`;

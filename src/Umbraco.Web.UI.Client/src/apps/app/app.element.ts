@@ -10,6 +10,7 @@ import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
 import { contextData, umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
+import { umbTranslationRegistry } from '@umbraco-cms/backoffice/localization-api';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -23,6 +24,19 @@ export class UmbAppElement extends UmbLitElement {
 	serverUrl = window.location.origin;
 
 	/**
+	 * The default culture to use for localization.
+	 *
+	 * When the current user is resolved, the culture will be set to the user's culture.
+	 *
+	 * @attr
+	 * @remarks This is the default culture to use for localization, not the current culture.
+	 * @example "en-us"
+	 * @example "en"
+	 */
+	@property({ type: String, attribute: 'default-culture' })
+	culture: string = 'en-us';
+
+	/**
 	 * The base path of the backoffice.
 	 *
 	 * @attr
@@ -33,7 +47,6 @@ export class UmbAppElement extends UmbLitElement {
 
 	/**
 	 * Bypass authentication.
-	 * @type {boolean}
 	 */
 	// TODO: this might not be the right solution
 	@property({ type: Boolean })
@@ -70,7 +83,23 @@ export class UmbAppElement extends UmbLitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
+
+		this.#setLanguage();
 		this.#setup();
+	}
+
+	#setLanguage() {
+		umbTranslationRegistry.loadLanguage(this.culture);
+	}
+
+	#listenForLanguageChange(authContext: UmbAuthContext) {
+		this.observe(
+			authContext.languageIsoCode,
+			(currentLanguageIsoCode) => {
+				umbTranslationRegistry.loadLanguage(currentLanguageIsoCode);
+			},
+			'languageIsoCode'
+		);
 	}
 
 	async #setup() {
@@ -164,6 +193,8 @@ export class UmbAppElement extends UmbLitElement {
 			OpenAPI.TOKEN = () => this.#authFlow!.performWithFreshTokens();
 			OpenAPI.WITH_CREDENTIALS = true;
 		}
+
+		this.#listenForLanguageChange(authContext);
 
 		authContext.isLoggedIn.next(true);
 	}

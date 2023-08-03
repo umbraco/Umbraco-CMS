@@ -1,1 +1,1 @@
-export * from './section-views.element.js';
+export type { UmbSectionViewsElement } from './section-views.element.js';
