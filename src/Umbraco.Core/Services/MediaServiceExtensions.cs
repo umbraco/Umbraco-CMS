@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core;
@@ -34,8 +34,13 @@ public static class MediaServiceExtensions
         return mediaService.GetByIds(guids.Select(x => x.Guid));
     }
 
-    public static IMedia CreateMedia(this IMediaService mediaService, string name, Udi parentId, string mediaTypeAlias, int userId = 0)
+    public static IMedia CreateMedia(this IMediaService mediaService, string name, Udi parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         if (parentId is not GuidUdi guidUdi)
         {
             throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) +

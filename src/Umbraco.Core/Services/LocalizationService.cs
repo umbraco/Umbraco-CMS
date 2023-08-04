@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -312,6 +312,11 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <param name="userId">Optional id of the user saving the dictionary item</param>
     public void Save(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -343,6 +348,11 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <param name="userId">Optional id of the user deleting the dictionary item</param>
     public void Delete(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -454,6 +464,11 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <param name="userId">Optional id of the user saving the language</param>
     public void Save(ILanguage language, int userId = Constants.Security.SuperUserId)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // write-lock languages to guard against race conds when dealing with default language
@@ -501,6 +516,11 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <param name="userId">Optional id of the user deleting the language</param>
     public void Delete(ILanguage language, int userId = Constants.Security.SuperUserId)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // write-lock languages to guard against race conds when dealing with default language

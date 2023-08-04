@@ -464,6 +464,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     public void Save(TItem? item, int userId = Constants.Security.SuperUserId)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         if (item is null)
         {
             return;
@@ -519,6 +524,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     public void Save(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         TItem[] itemsA = items.ToArray();
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -572,6 +582,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     public void Delete(TItem item, int userId = Constants.Security.SuperUserId)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -638,6 +653,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     public void Delete(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         TItem[] itemsA = items.ToArray();
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -904,6 +924,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         EventMessages eventMessages = EventMessagesFactory.Get();
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds); // also for containers
@@ -944,6 +969,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         Guid containerObjectType = ContainerObjectType;
@@ -1027,6 +1057,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         EventMessages eventMessages = EventMessagesFactory.Get();
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds); // also for containers
@@ -1066,6 +1101,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         EventMessages eventMessages = EventMessagesFactory.Get();
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {

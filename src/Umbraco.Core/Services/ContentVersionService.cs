@@ -66,8 +66,13 @@ internal class ContentVersionService : IContentVersionService
     }
 
     /// <inheritdoc />
-    public void SetPreventCleanup(int versionId, bool preventCleanup, int userId = -1)
+    public void SetPreventCleanup(int versionId, bool preventCleanup, int userId = Constants.Security.SuperUserId)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.WriteLock(Constants.Locks.ContentTree);

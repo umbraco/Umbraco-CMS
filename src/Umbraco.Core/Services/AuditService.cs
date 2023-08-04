@@ -54,6 +54,11 @@ public sealed class AuditService : RepositoryService, IAuditService
 
     public void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, comment, parameters));
@@ -73,6 +78,11 @@ public sealed class AuditService : RepositoryService, IAuditService
 
     public IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             IEnumerable<IAuditItem> result = sinceDate.HasValue == false
@@ -186,6 +196,11 @@ public sealed class AuditService : RepositoryService, IAuditService
         AuditType[]? auditTypeFilter = null,
         IQuery<IAuditItem>? customFilter = null)
     {
+        if (userId == 0)
+        {
+            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+        }
+
         if (pageIndex < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(pageIndex));
