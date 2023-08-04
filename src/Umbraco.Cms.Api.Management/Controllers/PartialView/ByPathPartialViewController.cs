@@ -30,7 +30,7 @@ public class ByPathPartialViewController : PartialViewControllerBase
         IPartialView? partialView = await _partialViewService.GetAsync(path);
 
         return partialView is null
-            ? NotFound()
+            ? PartialViewNotFound()
             : Ok(_mapper.Map<PartialViewResponseModel>(partialView));
     }
 }

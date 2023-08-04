@@ -23,9 +23,9 @@ public class CheckHealthCheckGroupController : HealthCheckGroupControllerBase
     /// <returns>The health check group or not found result.</returns>
     [HttpPost("{name}/check")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HealthCheckGroupWithResultResponseModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<HealthCheckGroupWithResultResponseModel>> ByNameWithResult(string name)
+    public async Task<IActionResult> ByNameWithResult(string name)
     {
         IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>> groups = _healthCheckGroupPresentationFactory
             .CreateGroupingFromHealthCheckCollection();
@@ -34,7 +34,7 @@ public class CheckHealthCheckGroupController : HealthCheckGroupControllerBase
 
         if (group is null)
         {
-            return NotFound();
+            return HealthCheckGroupNotFound();
         }
 
         return await Task.FromResult(Ok(_healthCheckGroupPresentationFactory.CreateHealthCheckGroupWithResultViewModel(group)));

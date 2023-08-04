@@ -25,8 +25,8 @@ public class MoveDocumentController : DocumentControllerBase
     [HttpPut("{id:guid}/move")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Move(Guid id, MoveDocumentRequestModel moveDocumentRequestModel)
     {
         Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.MoveAsync(

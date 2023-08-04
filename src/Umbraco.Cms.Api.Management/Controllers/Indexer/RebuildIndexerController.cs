@@ -33,6 +33,8 @@ public class RebuildIndexerController : IndexerControllerBase
     [HttpPost("{indexName}/rebuild")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(OkResult), StatusCodes.Status200OK)]
     public async Task<IActionResult> Rebuild(string indexName)
     {
@@ -46,7 +48,7 @@ public class RebuildIndexerController : IndexerControllerBase
                 Type = "Error",
             };
 
-            return await Task.FromResult(BadRequest(invalidModelProblem));
+            return await Task.FromResult(NotFound(invalidModelProblem));
         }
 
         if (!_indexingRebuilderService.CanRebuild(index.Name))

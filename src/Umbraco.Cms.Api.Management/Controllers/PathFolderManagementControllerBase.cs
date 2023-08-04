@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -20,7 +21,9 @@ public abstract class PathFolderManagementControllerBase<TStatus> : ManagementAp
         PathContainer? container = await GetContainerAsync(path);
         if (container == null)
         {
-            return NotFound();
+            return NotFound(new ProblemDetailsBuilder()
+                .WithTitle("The container could not be found")
+                .Build());
         }
 
         PathFolderResponseModel? viewModel = Mapper.Map<PathFolderResponseModel>(container);

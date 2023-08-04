@@ -21,8 +21,10 @@ public abstract class DictionaryControllerBase : ManagementApiControllerBase
                 .WithTitle("Duplicate dictionary item name detected")
                 .WithDetail("Another dictionary item exists with the same name. Dictionary item names must be unique.")
                 .Build()),
-            DictionaryItemOperationStatus.ItemNotFound => NotFound("The dictionary item could not be found"),
-            DictionaryItemOperationStatus.ParentNotFound => NotFound("The dictionary item parent could not be found"),
+            DictionaryItemOperationStatus.ItemNotFound => DictionaryNotFound(),
+            DictionaryItemOperationStatus.ParentNotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("The dictionary item parent could not be found")
+                    .Build()),
             DictionaryItemOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the dictionary item operation.")
@@ -31,6 +33,13 @@ public abstract class DictionaryControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid parent")
                 .WithDetail("The targeted parent dictionary item is not valid for this dictionary item operation.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown dictionary operation status")
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown dictionary operation status.")
+                .Build()),
         };
+
+
+    protected IActionResult DictionaryNotFound() => NotFound(new ProblemDetailsBuilder()
+        .WithTitle("The dictionary item could not be found")
+        .Build());
 }

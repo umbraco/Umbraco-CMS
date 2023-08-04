@@ -22,7 +22,7 @@ public class CreateDocumentTypeController : CreateUpdateDocumentTypeControllerBa
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Create(CreateDocumentTypeRequestModel requestModel)
     {
         // FIXME: support document type folders (and creation within folders)

@@ -19,7 +19,10 @@ public abstract class UserControllerBase : ManagementApiControllerBase
         status switch
         {
             UserOperationStatus.Success => Ok(),
-            UserOperationStatus.MissingUser => StatusCode(StatusCodes.Status500InternalServerError, "A performing user is required for the operation, but none was found."),
+            UserOperationStatus.MissingUser =>
+                StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                    .WithTitle("A performing user is required for the operation, but none was found")
+                    .Build()),
             UserOperationStatus.MissingUserGroup => NotFound(new ProblemDetailsBuilder()
                 .WithTitle("Missing User Group")
                 .WithDetail("The specified user group was not found.")
@@ -49,7 +52,10 @@ public abstract class UserControllerBase : ManagementApiControllerBase
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the user operation.")
                 .Build()),
-            UserOperationStatus.CannotInvite => StatusCode(StatusCodes.Status500InternalServerError, "Cannot send user invitation."),
+            UserOperationStatus.CannotInvite =>
+                StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                    .WithTitle("Cannot send user invitation")
+                    .Build()),
             UserOperationStatus.CannotDelete => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Cannot delete user")
                 .WithDetail("The user cannot be deleted.")
@@ -111,6 +117,8 @@ public abstract class UserControllerBase : ManagementApiControllerBase
                 .WithDetail("The specified content node was not found.")
                 .Build()),
             UserOperationStatus.Forbidden => Forbid(),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user operation status."),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                    .WithTitle("Unknown user operation status.")
+                    .Build()),
         };
 }

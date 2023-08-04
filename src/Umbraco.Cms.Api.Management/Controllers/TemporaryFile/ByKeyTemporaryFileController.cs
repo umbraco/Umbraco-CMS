@@ -32,7 +32,7 @@ public class ByKeyTemporaryFileController : TemporaryFileControllerBase
         TemporaryFileModel? model = await _temporaryFileService.GetAsync(id);
         if (model == null)
         {
-            return NotFound();
+            return TemporaryFileNotFound();
         }
 
         return Ok(_umbracoMapper.Map<TemporaryFileModel, TemporaryFileResponseModel>(model));

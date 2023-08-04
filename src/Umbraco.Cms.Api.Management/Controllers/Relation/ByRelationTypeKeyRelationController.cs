@@ -26,6 +26,7 @@ public class ByRelationTypeKeyRelationController : RelationControllerBase
     [HttpGet("type/{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<ProblemDetails>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByRelationTypeKey(Guid id, int skip = 0, int take = 100)
     {
         Attempt<PagedModel<IRelation>, RelationOperationStatus> relationsAttempt = await _relationService.GetPagedByRelationTypeKey(id, skip, take);

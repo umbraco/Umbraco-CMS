@@ -14,7 +14,7 @@ public class DeletePublicAccessDocumentController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [HttpDelete("{id:guid}/public-access")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _publicAccessService.DeleteAsync(id);

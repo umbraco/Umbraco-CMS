@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Content;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
@@ -13,5 +14,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media;
 [Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessMedia)]
 public class MediaControllerBase : ContentControllerBase
 {
-    protected IActionResult MediaNotFound() => NotFound("The requested Media could not be found");
+    protected IActionResult MediaNotFound() => NotFound(new ProblemDetailsBuilder()
+        .WithTitle("The requested Media could not be found")
+        .Build());
 }
