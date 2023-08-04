@@ -11,7 +11,15 @@ export class UmbLoginExternalElement extends LitElement {
 	name = '';
 
 	@property({ attribute: 'external-login-url' })
-	externalLoginUrl = '';
+  get externalLoginUrl() {
+    return this._externalLoginUrl;
+  }
+	set externalLoginUrl(value: string) {
+    const tempUrl = new URL(value, window.location.origin);
+    const searchParams = new URLSearchParams(tempUrl.search);
+    tempUrl.searchParams.append("redirectUrl", decodeURIComponent(searchParams.get('returnPath') ?? ''));
+    this._externalLoginUrl = tempUrl.pathname + tempUrl.search;
+  }
 
 	@property({ attribute: 'icon' })
 	icon = 'icon-lock';
@@ -27,6 +35,8 @@ export class UmbLoginExternalElement extends LitElement {
 
 	@state()
 	protected loading = false;
+
+  private _externalLoginUrl = '';
 
 	async connectedCallback() {
 		super.connectedCallback();
@@ -45,8 +55,8 @@ export class UmbLoginExternalElement extends LitElement {
 
 	protected renderDefaultView() {
 		return html`
-			<form id="defaultView" method="post" action="${this.externalLoginUrl}">
-				<uui-button label="continue with ${this.name}" .look=${this.buttonLook} .color=${this.buttonColor}>
+			<form id="defaultView" method="post" action=${this.externalLoginUrl}>
+				<uui-button type="submit" name="provider" .value=${this.name} label="continue with ${this.name}" .look=${this.buttonLook} .color=${this.buttonColor}>
 					<div><uui-icon name=${this.icon}></uui-icon> Continue with ${this.name}</div>
 				</uui-button>
 			</form>
