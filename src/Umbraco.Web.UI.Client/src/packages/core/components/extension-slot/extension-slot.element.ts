@@ -30,49 +30,66 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	 * @type {string | string[]}
 	 * @memberof UmbExtensionSlot
 	 * @example
-	 * <umb-extension-slot type="umb-editor-footer"></umb-extension-slot>
+	 * <umb-extension-slot type="my-extension-type"></umb-extension-slot>
 	 * or multiple:
-	 * <umb-extension-slot .type=${['umb-editor-footer','umb-editor-header']}></umb-extension-slot>
+	 * <umb-extension-slot .type=${['my-extension-type','another-extension-type']}></umb-extension-slot>
 	 *
 	 */
 	@property({ type: String })
 	public get type(): string | string[] | undefined {
-		return this._type;
+		return this.#type;
 	}
 	public set type(value: string | string[] | undefined) {
-		if (value === this._type) return;
-		this._type = value;
+		if (value === this.#type) return;
+		this.#type = value;
 		if (this.#attached) {
 			this._observeExtensions();
 		}
 	}
-	private _type?: string | string[] | undefined;
+	#type?: string | string[] | undefined;
 
+	/**
+	 * Filter method for extension manifests.
+	 * This is an initial filter taking effect before conditions or overwrites, the extensions will still be filtered by the conditions defined in the manifest.
+	 * @type {(manifest: any) => boolean}
+	 * @memberof UmbExtensionSlot
+	 * @example
+	 * <umb-extension-slot type="my-extension-type" .filter=${(ext) => ext.meta.anyPropToFilter === 'foo'}></umb-extension-slot>
+	 *
+	 */
 	@property({ type: Object, attribute: false })
 	public get filter(): (manifest: any) => boolean {
-		return this._filter;
+		return this.#filter;
 	}
 	public set filter(value: (manifest: any) => boolean) {
-		if (value === this._filter) return;
-		this._filter = value;
+		if (value === this.#filter) return;
+		this.#filter = value;
 		if (this.#attached) {
 			this._observeExtensions();
 		}
 	}
-	private _filter: (manifest: any) => boolean = () => true;
+	#filter: (manifest: any) => boolean = () => true;
 
-	private _props?: Record<string, any> = {};
+	/**
+	 * Properties to pass to the extensions elements.
+	 * Notice: The individual manifest of the extension is parsed to each extension element no matter if this is set or not.
+	 * @type {Record<string, any>}
+	 * @memberof UmbExtensionSlot
+	 * @example
+	 * <umb-extension-slot type="my-extension-type" .props=${{foo: 'bar'}}></umb-extension-slot>
+	 */
 	@property({ type: Object, attribute: false })
 	get props() {
-		return this._props;
+		return this.#props;
 	}
-	set props(newVal) {
+	set props(newVal: Record<string, unknown> | undefined) {
 		// TODO, compare changes since last time. only reset the ones that changed. This might be better done by the controller is self:
-		this._props = newVal;
+		this.#props = newVal;
 		if (this.#extensionsController) {
 			this.#extensionsController.properties = newVal;
 		}
 	}
+	#props?: Record<string, unknown> = {};
 
 	@property({ type: String, attribute: 'default-element' })
 	public defaultElement = '';
@@ -88,18 +105,18 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 
 	private _observeExtensions() {
 		this.#extensionsController?.destroy();
-		if (this._type) {
+		if (this.#type) {
 			this.#extensionsController = new UmbExtensionsElementController(
 				this,
 				umbExtensionsRegistry,
-				this._type,
+				this.#type,
 				this.filter,
 				(extensionControllers) => {
 					this._permittedExts = extensionControllers;
 				},
 				this.defaultElement
 			);
-			this.#extensionsController.properties = this._props;
+			this.#extensionsController.properties = this.#props;
 		}
 	}
 

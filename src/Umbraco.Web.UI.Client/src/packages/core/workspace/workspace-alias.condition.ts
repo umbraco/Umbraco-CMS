@@ -27,7 +27,7 @@ export type WorkspaceAliasConditionConfig = UmbConditionConfigBase<'Umb.Conditio
 	/**
 	 * Define the workspace that this extension should be available in
 	 *
-	 * @examples
+	 * @example
 	 * "Umb.Workspace.Document"
 	 */
 	match: string;
