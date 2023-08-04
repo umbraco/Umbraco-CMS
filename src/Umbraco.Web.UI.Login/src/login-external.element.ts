@@ -48,7 +48,7 @@ export class UmbLoginExternalElement extends LitElement {
 
 	protected renderDefaultView() {
 		return html`
-			<form method="post" action="${this.externalLoginUrl}">
+			<form id="defaultView" method="post" action="${this.externalLoginUrl}">
 				<uui-button label="continue with ${this.name}" .look=${this.buttonLook} .color=${this.buttonColor}>
 					<div><uui-icon name=${this.icon}></uui-icon> Continue with ${this.name}</div>
 				</uui-button>
@@ -65,12 +65,12 @@ export class UmbLoginExternalElement extends LitElement {
 
 	static styles: CSSResultGroup = [
 		css`
-			uui-button {
+			#defaultView uui-button {
 				width: 100%;
 				--uui-button-padding-top-factor: 1.5;
 				--uui-button-padding-bottom-factor: 1.5;
 			}
-			uui-button div {
+      #defaultView uui-button div {
 				/* TODO: Remove this when uui-button has setting for aligning content */
 				position: absolute;
 				left: 9px;
@@ -79,7 +79,7 @@ export class UmbLoginExternalElement extends LitElement {
 				top: 50%;
 				transform: translateY(-50%);
 			}
-			button {
+      #defaultView button {
 				font-size: var(--uui-button-font-size);
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
@@ -97,7 +97,7 @@ export class UmbLoginExternalElement extends LitElement {
 				color: var(--uui-color-interactive);
 			}
 
-			button:hover {
+      #defaultView button:hover {
 				color: var(--uui-color-interactive-emphasis);
 				border-color: var(--uui-color-border-standalone);
 			}
