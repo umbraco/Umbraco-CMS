@@ -73,6 +73,7 @@ export class UmbLoginExternalElement extends LitElement {
       const customView = customViewModule.default;
       this.externalComponent = new customView();
       this.externalComponent.providerName = this.name;
+      this.externalComponent.externalLoginUrl = this.externalLoginUrl;
     } catch (error: unknown) {
       this.externalComponent = nothing;
       console.group('[External login] Failed to load');
