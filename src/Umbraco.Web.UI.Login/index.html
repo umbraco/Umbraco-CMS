@@ -15,6 +15,10 @@
 		</style>
 	</head>
 	<body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
-		<umb-auth is-legacy></umb-auth>
+		<umb-auth is-legacy logo-image="/umbraco_logo_white.svg" background-image="/login.svg">
+      <umb-login-external slot="external" name="Google" icon="info" external-logins-url="https://google.com"></umb-login-external>
+      <umb-login-external slot="external" name="Azure ID" icon="info" external-logins-url="https://microsoft.com"></umb-login-external>
+      <umb-login-external slot="external" name="My provider" custom-view="/src/mocks/customViews/my-custom-view.js"></umb-login-external>
+    </umb-auth>
 	</body>
 </html>
