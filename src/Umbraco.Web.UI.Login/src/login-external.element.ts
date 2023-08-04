@@ -1,4 +1,4 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import {css, CSSResultGroup, html, LitElement, nothing} from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui';
 
@@ -28,16 +28,13 @@ export class UmbLoginExternalElement extends LitElement {
 	@state()
 	protected loading = false;
 
-	connectedCallback() {
+	async connectedCallback() {
 		super.connectedCallback();
 		if (this.customView) {
 			this.loading = true;
+      await this.loadCustomView();
+      this.loading = false;
 		}
-	}
-
-	async firstUpdated() {
-		await this.loadCustomView();
-		this.loading = false;
 	}
 
 	render() {
@@ -57,10 +54,23 @@ export class UmbLoginExternalElement extends LitElement {
 	}
 
 	protected async loadCustomView() {
-		if (!this.customView) return;
-		const customViewModule = await import(this.customView /* @vite-ignore */);
-		const customView = customViewModule.default;
-		this.externalComponent = new customView();
+    try {
+      if (!this.customView) return;
+      const customViewModule = await import(this.customView /* @vite-ignore */);
+
+      if (!customViewModule.default) throw new Error(`Custom view ${this.customView} does not export a default`);
+
+      const customView = customViewModule.default;
+      this.externalComponent = new customView();
+    } catch (error: unknown) {
+      this.externalComponent = nothing;
+      console.group('[External login] Failed to load');
+      console.log('Provider name', this.name);
+      console.log('Element reference', this);
+      console.log('Custom view', this.customView);
+      console.error('Failed to load custom view:', error);
+      console.groupEnd();
+    }
 	}
 
 	static styles: CSSResultGroup = [
