@@ -28,6 +28,8 @@
     var allowPasswordReset = SecuritySettings.Value.AllowPasswordReset && EmailSender.CanSendRequiredEmail();
     var disableLocalLogin = ExternalLogins.HasDenyLocalLogin();
     var externalLoginsUrl = LinkGenerator.GetPathByAction(nameof(BackOfficeController.ExternalLogin), ControllerExtensions.GetControllerName<BackOfficeController>(), new { area = Constants.Web.Mvc.BackOfficeArea });
+    IEnumerable<BackOfficeExternaLoginProviderScheme>
+        externalLoginProviders = await ExternalLogins.GetBackOfficeProvidersAsync()
 }
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
@@ -50,16 +52,27 @@
     </head>
 
     <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
-        <umb-auth
-            is-legacy
-            return-url="@backOfficePath"
-            logo-image="@loginLogoImage"
-            background-image="@loginBackgroundImage"
-            username-is-email="@usernameIsEmail"
-            allow-user-invite="@allowUserInvite"
-            allow-password-reset="@allowPasswordReset"
-            disable-local-login="@disableLocalLogin"
-        >
-        </umb-auth>
+    <umb-auth
+        is-legacy
+        return-url="@backOfficePath"
+        logo-image="@loginLogoImage"
+        background-image="@loginBackgroundImage"
+        username-is-email="@usernameIsEmail"
+        allow-user-invite="@allowUserInvite"
+        allow-password-reset="@allowPasswordReset"
+        disable-local-login="@disableLocalLogin">
+        @foreach (var provider in externalLoginProviders)
+        {
+            <umb-login-external
+                slot="external"
+                name="@provider.ExternalLoginProvider.AuthenticationType"
+                icon="@provider.ExternalLoginProvider.Options.Icon"
+                external-login-url="@externalLoginsUrl"
+                button-look="@provider.ExternalLoginProvider.Options.ButtonLook.ToString().ToLowerInvariant()"
+                button-color="@provider.ExternalLoginProvider.Options.ButtonColor.ToString().ToLowerInvariant()"
+                custom-view="@provider.ExternalLoginProvider.Options.CustomBackOfficeView">
+            </umb-login-external>
+        }
+    </umb-auth>
     </body>
 </html>
