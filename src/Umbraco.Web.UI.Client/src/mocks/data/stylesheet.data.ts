@@ -93,33 +93,6 @@ export const data: Array<StylesheetDBItem> = [
 			color: pink;
 		}`,
 	},
-	{
-		path: 'Folder 1/Stylesheet File 3.css',
-		isFolder: false,
-		icon: 'style',
-
-		name: 'Stylesheet File 3.css',
-		type: 'stylesheet',
-		hasChildren: false,
-		content: `		h1 {
-			color: red;
-		}
-		
-		/**umb_name:bjjh*/
-		h1 {
-			color: red;
-		}
-		
-		/**umb_name:comeone*/
-		h1 {
-			color: red;
-		}
-		
-		/**umb_name:lol*/
-		h1 {
-			color: red;
-		}`,
-	},
 ];
 
 // Temp mocked database

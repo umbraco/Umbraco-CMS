@@ -1,8 +1,8 @@
 import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, LitElement, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context.js';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-stylesheet-workspace-edit')
@@ -20,7 +20,7 @@ export class UmbStylesheetWorkspaceEditElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbStylesheetWorkspaceContext;
 			this.#observeNameAndPath();
 		});
@@ -50,7 +50,7 @@ export class UmbStylesheetWorkspaceEditElement extends UmbLitElement {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.StyleSheet">
 				<div id="header" slot="header">
-					<uui-input id="name" .value=${this._name} @input="${this.#onNameChange}"> </uui-input>
+					<uui-input label="stylesheet name" id="name" .value=${this._name} @input="${this.#onNameChange}"> </uui-input>
 					<small>${this._path}</small>
 				</div>
 

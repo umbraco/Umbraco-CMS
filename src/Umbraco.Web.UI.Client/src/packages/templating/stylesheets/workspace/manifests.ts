@@ -27,9 +27,12 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 			pathname: 'code',
 			icon: 'umb:brackets',
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.StyleSheet'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: 'Umb.Workspace.StyleSheet',
+			},
+		],
 	},
 	{
 		type: 'workspaceEditorView',
@@ -42,9 +45,12 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 			pathname: 'rich-text-editor',
 			icon: 'umb:font',
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.StyleSheet'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: 'Umb.Workspace.StyleSheet',
+			},
+		],
 	},
 ];
 const workspaceActions: Array<ManifestWorkspaceAction> = [
@@ -58,9 +64,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.StyleSheet'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: 'Umb.Workspace.StyleSheet',
+			},
+		],
 	},
 ];
 

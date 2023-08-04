@@ -14,20 +14,31 @@ export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 
 	@state()
 	_routes: UmbRoute[] = [
+		// {
+		// 	path: 'create/:parentId',
+		// 	component: () => this.#element,
+		// 	setup: async (_component, info) => {
+		// 		const path = info.match.params.path;
+		// 		const serverPath = serverFilePathFromUrlFriendlyPath(path);
+		// 		this.#workspaceContext.setIsNew(false);
+		// 		console.log('load');
+		// 		await this.#workspaceContext.load(serverPath);
+
+		// 		new UmbWorkspaceIsNewRedirectController(
+		// 			this,
+		// 			this.#workspaceContext,
+		// 			this.shadowRoot!.querySelector('umb-router-slot')!
+		// 		);
+		// 	},
+		// },
 		{
 			path: 'edit/:path',
 			component: () => this.#element,
 			setup: (_component, info) => {
+				this.removeControllerByAlias('_observeIsNew');
 				const path = info.match.params.path;
 				const serverPath = serverFilePathFromUrlFriendlyPath(path);
-				console.log('load');
 				this.#workspaceContext.load(serverPath);
-
-				new UmbWorkspaceIsNewRedirectController(
-					this,
-					this.#workspaceContext,
-					this.shadowRoot!.querySelector('umb-router-slot')!
-				);
 			},
 		},
 	];
