@@ -7,6 +7,8 @@ namespace Umbraco.Cms.Web.BackOffice.Security;
 /// </summary>
 public class BackOfficeExternalLoginProviderOptions
 {
+    private string _buttonStyle = "btn-openid";
+
     public BackOfficeExternalLoginProviderOptions(
         string buttonStyle,
         string icon,
@@ -27,7 +29,43 @@ public class BackOfficeExternalLoginProviderOptions
     {
     }
 
-    public string ButtonStyle { get; set; } = "btn-openid";
+    /// <summary>
+    ///     Gets or sets the icon to use for the login button.
+    /// </summary>
+    [Obsolete("This is no longer used and will be removed in V14. Please set the ButtonLook and ButtonColor properties instead.")]
+    public string ButtonStyle
+    {
+        get => _buttonStyle;
+        set
+        {
+            _buttonStyle = value;
+
+            // Map cases from buttons.less
+            switch (value.ToLowerInvariant())
+            {
+                case "btn-primary":
+                    ButtonColor = UuiButtonColor.Default;
+                    ButtonLook = UuiButtonLook.Primary;
+                    break;
+                case "btn-warning":
+                    ButtonColor = UuiButtonColor.Warning;
+                    ButtonLook = UuiButtonLook.Primary;
+                    break;
+                case "btn-danger":
+                    ButtonColor = UuiButtonColor.Danger;
+                    ButtonLook = UuiButtonLook.Primary;
+                    break;
+                case "btn-success":
+                    ButtonColor = UuiButtonColor.Positive;
+                    ButtonLook = UuiButtonLook.Primary;
+                    break;
+                default:
+                    ButtonColor = UuiButtonColor.Default;
+                    ButtonLook = UuiButtonLook.Outline;
+                    break;
+            }
+        }
+    }
 
     /// <summary>
     ///     Gets or sets the look to use for the login button.
