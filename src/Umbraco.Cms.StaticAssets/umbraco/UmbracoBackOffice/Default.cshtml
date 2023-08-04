@@ -120,6 +120,7 @@
 
     <script>
         document.angularReady = function(app) {
+            @await Html.AngularValueExternalLoginInfoScriptAsync(externalLogins, ViewData.GetExternalSignInProviderErrors()!)
             @await Html.AngularValueTinyMceAssetsAsync(runtimeMinifier)
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";
