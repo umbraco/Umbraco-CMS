@@ -14,10 +14,9 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 
 	#isCodeEditorReady = new UmbBooleanState(false);
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
-	
+
 	constructor(host: UmbControllerHostElement) {
-		
-		super(host, 'Umb.Workspace.Stylesheet', new UmbStylesheetRepository(host));
+		super(host, 'Umb.Workspace.StyleSheet', new UmbStylesheetRepository(host));
 		this.#loadCodeEditor();
 	}
 
@@ -29,7 +28,6 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 			console.error(error);
 		}
 	}
-
 
 	getEntityType(): string {
 		return 'stylesheet';
@@ -99,7 +97,6 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 		// this.#data.next(newStylesheet);
 
 		throw new Error('Create method not implemented.');
-
 	}
 
 	public destroy(): void {
