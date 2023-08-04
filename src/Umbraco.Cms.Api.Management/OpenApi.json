@@ -2514,8 +2514,25 @@
           "200": {
             "description": "Success"
           },
-          "400": {
-            "description": "Bad Request"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2728,9 +2745,6 @@
         "responses": {
           "200": {
             "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request"
           },
           "404": {
             "description": "Not Found",
@@ -3015,9 +3029,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request"
-          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -3143,9 +3154,6 @@
           "200": {
             "description": "Success"
           },
-          "400": {
-            "description": "Bad Request"
-          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -3223,9 +3231,6 @@
         "responses": {
           "200": {
             "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request"
           },
           "404": {
             "description": "Not Found",
@@ -3401,9 +3406,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request"
-          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -3451,7 +3453,56 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DomainsResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DomainsResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DomainsResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3570,9 +3621,6 @@
         "responses": {
           "200": {
             "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request"
           },
           "404": {
             "description": "Not Found",
@@ -3829,9 +3877,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request"
-          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -3923,8 +3968,25 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3983,9 +4045,6 @@
         "responses": {
           "200": {
             "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request"
           },
           "404": {
             "description": "Not Found",
@@ -5002,6 +5061,46 @@
         "responses": {
           "400": {
             "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/json": {
                 "schema": {
@@ -6709,9 +6808,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request"
-          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -6837,9 +6933,6 @@
           "200": {
             "description": "Success"
           },
-          "400": {
-            "description": "Bad Request"
-          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -6917,9 +7010,6 @@
         "responses": {
           "200": {
             "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request"
           },
           "404": {
             "description": "Not Found",
@@ -7000,9 +7090,6 @@
         "responses": {
           "200": {
             "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request"
           },
           "404": {
             "description": "Not Found",
@@ -9011,6 +9098,26 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -10295,6 +10402,26 @@
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedRelationResponseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedProblemDetailsModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedProblemDetailsModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedProblemDetailsModel"
                 }
               }
             }
@@ -15360,8 +15487,25 @@
           "200": {
             "description": "Success"
           },
-          "400": {
-            "description": "Bad Request"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -15416,8 +15560,25 @@
           "200": {
             "description": "Success"
           },
-          "400": {
-            "description": "Bad Request"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -18829,6 +18990,26 @@
                   "$ref": "#/components/schemas/PackageMigrationStatusResponseModel"
                 }
               ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedProblemDetailsModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProblemDetails"
             }
           }
         },
