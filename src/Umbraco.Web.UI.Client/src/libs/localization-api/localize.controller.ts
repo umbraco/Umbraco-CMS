@@ -68,8 +68,6 @@ export class UmbLocalizeController<TranslationType extends TranslationSet = Defa
 	}
 
 	destroy(): void {
-		// We do not need to call delete here, as hostDisconnected is called when controller is removed.
-		//connectedElements.delete(this.host);
 		this.#host.removeController(this);
 		this.#hostEl = undefined as any;
 	}
