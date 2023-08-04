@@ -1,4 +1,4 @@
-import { LitElement, TemplateResult, html, nothing } from 'lit';
+import { LitElement, TemplateResult } from 'lit';
 
 interface AnchorElement extends HTMLElement {
 	nodeName: string;

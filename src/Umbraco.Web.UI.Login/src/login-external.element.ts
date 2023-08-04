@@ -1,4 +1,4 @@
-import {css, CSSResultGroup, html, LitElement, nothing} from 'lit';
+import {css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui';
 
@@ -23,7 +23,7 @@ export class UmbLoginExternalElement extends LitElement {
 	buttonColor: InterfaceColor = 'default';
 
 	@state()
-	protected externalComponent: HTMLElement | null = null;
+	protected externalComponent: HTMLElement | typeof nothing | null = null;
 
 	@state()
 	protected loading = false;
