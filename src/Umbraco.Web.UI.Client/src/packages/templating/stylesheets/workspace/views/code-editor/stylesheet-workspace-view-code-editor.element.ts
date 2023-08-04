@@ -5,6 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-stylesheet-workspace-view-code-editor')
 export class UmbStylesheetWorkspaceViewCodeEditorElement extends UmbLitElement {
@@ -29,7 +30,7 @@ export class UmbStylesheetWorkspaceViewCodeEditorElement extends UmbLitElement {
 		super();
 
 		//tODO: should this be called something else here?
-		this.consumeContext('UmbEntityWorkspaceContext', (workspaceContext: UmbStylesheetWorkspaceContext) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext: UmbStylesheetWorkspaceContext) => {
 			this.#stylesheetWorkspaceContext = workspaceContext;
 
 			this.observe(this.#stylesheetWorkspaceContext.content, (content) => {
