@@ -11,7 +11,7 @@
         <div ng-if="!vm.denyLocalLogin" ng-show="vm.invitedUser != null" class="umb-login-container">
 
             <form name="vm.inviteUserPasswordForm" novalidate="" ng-submit="vm.inviteSavePassword()" val-form-manager>
-                <div class="form" ng-if="vm.inviteStep === 1 || vm.inviteStep === 2">
+                <div class="form" ng-if="vm.inviteStep === 1">
                     <h1 style="margin-bottom: 10px; text-align: left;">Hi, {{vm.invitedUser.name}}</h1>
                     <p style="line-height: 1.6; margin-bottom: 25px;">
                         <localize key="user_userinviteWelcomeMessage">Welcome to Umbraco! Just need to get your password setup and then you're good to go</localize>
@@ -50,6 +50,10 @@
                         </div>
                     </div>
 
+                </div>
+                <div class="form" ng-if="vm.inviteStep === 2">
+                  <h1 style="margin-bottom: 10px; text-align: left;">
+                    <localize key="general_welcome">Welcome...</localize></h1>
                 </div>
             </form>
 
