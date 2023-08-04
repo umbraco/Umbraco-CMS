@@ -3,7 +3,7 @@ import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/back
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 /**
  * @element umb-data-type-workspace-editor
  * @description - Element for displaying the Data Type Workspace edit route.
@@ -21,7 +21,7 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext as UmbDataTypeWorkspaceContext;
 			this.#observeIsNew();
 			this.#observeName();

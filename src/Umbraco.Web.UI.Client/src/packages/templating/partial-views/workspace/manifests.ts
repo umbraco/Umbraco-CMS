@@ -23,9 +23,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			label: 'Save',
 			api: UmbSaveWorkspaceAction,
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.PartialView'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 

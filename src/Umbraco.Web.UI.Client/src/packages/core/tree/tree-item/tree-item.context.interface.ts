@@ -1,10 +1,8 @@
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ProblemDetails, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbPagedData } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbTreeItemContext<TreeItemType extends TreeItemPresentationModel> {
-	host: UmbControllerHostElement;
 	unique?: string | null;
 	type?: string;
 	treeItem: Observable<TreeItemType | undefined>;

@@ -25,3 +25,30 @@ export class UmbContextProvideEventImplementation extends Event implements UmbCo
 export const isUmbContextProvideEventType = (event: Event): event is UmbContextProvideEventImplementation => {
 	return event.type === umbContextProvideEventType;
 };
+
+export const umbContextUnprovidedEventType = 'umb:context-unprovided';
+
+/**
+ * @export
+ * @interface UmbContextProvideEvent
+ */
+export interface UmbContextUnprovidedEvent extends Event {
+	readonly contextAlias: string | UmbContextToken;
+	readonly instance: unknown;
+}
+
+/**
+ * @export
+ * @class UmbContextUnprovidedEventImplementation
+ * @extends {Event}
+ * @implements {UmbContextUnprovidedEvent}
+ */
+export class UmbContextUnprovidedEventImplementation extends Event implements UmbContextUnprovidedEvent {
+	public constructor(public readonly contextAlias: string | UmbContextToken, public readonly instance: unknown) {
+		super(umbContextUnprovidedEventType, { bubbles: true, composed: true });
+	}
+}
+
+export const isUmbContextUnprovidedEventType = (event: Event): event is UmbContextUnprovidedEventImplementation => {
+	return event.type === umbContextUnprovidedEventType;
+};

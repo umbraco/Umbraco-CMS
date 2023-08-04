@@ -3,9 +3,9 @@ import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestTreeItem extends ManifestElement<UmbTreeItemExtensionElement> {
 	type: 'treeItem';
-	conditions: ConditionsTreeItem;
+	meta: MetaTreeItem;
 }
 
-export interface ConditionsTreeItem {
+export interface MetaTreeItem {
 	entityTypes: Array<string>;
 }

@@ -29,9 +29,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			label: 'Save',
 			api: UmbSaveWorkspaceAction,
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.Template'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 

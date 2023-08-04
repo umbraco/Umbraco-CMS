@@ -5,11 +5,9 @@ import type {
 	ManifestWorkspaceEditorView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-const workspaceAlias = 'Umb.Workspace.Dictionary';
-
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
-	alias: workspaceAlias,
+	alias: 'Umb.Workspace.Dictionary',
 	name: 'Dictionary Workspace',
 	loader: () => import('./dictionary-workspace.element.js'),
 	meta: {
@@ -29,9 +27,12 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 			pathname: 'edit',
 			icon: 'edit',
 		},
-		conditions: {
-			workspaces: [workspaceAlias],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 
@@ -47,9 +48,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.Dictionary'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: 'Umb.Workspace.Dictionary',
+			},
+		],
 	},
 ];
 

@@ -14,8 +14,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Create',
 			api: UmbCreateEntityAction,
 			repositoryAlias: TEMPLATE_REPOSITORY_ALIAS,
-		},
-		conditions: {
 			entityTypes: [TEMPLATE_ENTITY_TYPE, TEMPLATE_ROOT_ENTITY_TYPE],
 		},
 	},
@@ -28,8 +26,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Delete',
 			api: UmbDeleteEntityAction,
 			repositoryAlias: TEMPLATE_REPOSITORY_ALIAS,
-		},
-		conditions: {
 			entityTypes: [TEMPLATE_ENTITY_TYPE],
 		},
 	},

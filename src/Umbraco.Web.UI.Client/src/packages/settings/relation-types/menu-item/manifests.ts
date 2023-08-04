@@ -10,8 +10,6 @@ const menuItem: ManifestTypes = {
 		treeAlias: 'Umb.Tree.RelationTypes',
 		label: 'Relation Types',
 		icon: 'umb:folder',
-	},
-	conditions: {
 		menus: ['Umb.Menu.Settings'],
 	},
 };

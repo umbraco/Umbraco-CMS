@@ -7,7 +7,7 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_ICON_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 @customElement('umb-document-type-workspace-editor')
 export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
@@ -34,7 +34,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbDocumentTypeWorkspaceContext;
 			this.#observeDocumentType();
 		});

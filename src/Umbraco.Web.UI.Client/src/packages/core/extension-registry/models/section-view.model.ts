@@ -1,9 +1,10 @@
+import { ConditionTypes } from '../conditions/types.js';
 import type { UmbSectionViewExtensionElement } from '../interfaces/section-view-extension-element.interface.js';
-import type { ManifestElement, ManifestWithConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestSectionView
 	extends ManifestElement<UmbSectionViewExtensionElement>,
-		ManifestWithConditions<ConditionsSectionView> {
+		ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'sectionView';
 	meta: MetaSectionView;
 }
@@ -33,8 +34,4 @@ export interface MetaSectionView {
 	 * ]
 	 */
 	icon: string;
-}
-
-export interface ConditionsSectionView {
-	sections: Array<string>;
 }

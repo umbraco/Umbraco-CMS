@@ -7,7 +7,7 @@ import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cm
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-language-details-workspace-view')
@@ -36,7 +36,7 @@ export class UmbLanguageDetailsWorkspaceViewElement
 		 In the language workspace we want to clear a default language change warning and reset the initial state after a save action has been executed. */
 		let initialStateSet = false;
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#languageWorkspaceContext = instance as UmbLanguageWorkspaceContext;
 
 			this.observe(this.#languageWorkspaceContext.data, (language) => {

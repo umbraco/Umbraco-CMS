@@ -1,7 +1,7 @@
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 
-interface UmbClassStateData {
-	equal(otherClass: UmbClassStateData | undefined): boolean;
+export interface UmbClassStateData {
+	equal(otherClass: this | undefined): boolean;
 }
 
 /**

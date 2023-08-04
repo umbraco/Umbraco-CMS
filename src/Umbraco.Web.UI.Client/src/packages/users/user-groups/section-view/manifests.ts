@@ -13,9 +13,12 @@ const sectionsViews: Array<ManifestSectionView> = [
 			pathname: 'user-groups',
 			icon: 'umb:users',
 		},
-		conditions: {
-			sections: [UMB_USER_SECTION_ALIAS],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: UMB_USER_SECTION_ALIAS,
+			},
+		],
 	},
 ];
 

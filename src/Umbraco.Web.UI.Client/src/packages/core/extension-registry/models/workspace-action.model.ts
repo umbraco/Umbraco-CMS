@@ -1,11 +1,15 @@
+import type { ConditionTypes } from '../conditions/types.js';
 import type { InterfaceColor, InterfaceLook } from '@umbraco-cms/backoffice/external/uui';
-import type { ManifestElement, ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
-import { UmbWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import type {
+	ManifestElement,
+	ClassConstructor,
+	ManifestWithDynamicConditions,
+} from '@umbraco-cms/backoffice/extension-api';
+import type { UmbWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
-export interface ManifestWorkspaceAction extends ManifestElement {
+export interface ManifestWorkspaceAction extends ManifestElement, ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'workspaceAction';
 	meta: MetaWorkspaceAction;
-	conditions: ConditionsWorkspaceAction;
 }
 
 export interface MetaWorkspaceAction {
@@ -13,8 +17,4 @@ export interface MetaWorkspaceAction {
 	look?: InterfaceLook;
 	color?: InterfaceColor;
 	api: ClassConstructor<UmbWorkspaceAction>;
-}
-
-export interface ConditionsWorkspaceAction {
-	workspaces: Array<string>;
 }

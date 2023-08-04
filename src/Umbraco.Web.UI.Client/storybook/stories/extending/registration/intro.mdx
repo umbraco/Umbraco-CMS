@@ -1,0 +1,60 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta
+	title="Guides/Extending the Backoffice/Registration/Intro"
+	parameters={{ previewTabs: { canvas: { hidden: true } } }}
+/>
+
+# Extension Registry
+
+TODO: describe the registration process and the extension registry.
+TODO: add typescript interface
+
+Most of BackOffice is based on Extensions making it crucial to understand how to register your own extensions.
+This introduction will give you an outline of the abilities with the extension registry.
+
+## Registration
+
+The extension registry is a global registry that can be accessed and changed at anytime while Backoffice is running.
+
+To provide new UI to backoffice, you need to register them via a extension manifest.
+This has to initially hapen on the server, via a JSON Package Manifest.
+This will enable you to registere one or more extensions.
+
+[Read more about registration here](?path=/docs/guides-extending-the-backoffice-registration-registration--docs)
+
+## Extension types
+
+The abilities of the extensions relies of the speicfic extension type.
+The Type sets the scene for what the extension can do and what it needs to be utilized.
+
+Some extension types rely on a reference to other extensions.
+
+[Read about the different core extension types here](?path=/docs/guides-extending-the-backoffice-registration-types-index--docs)
+[Learn how to develop your own extension types here (TBD)](?path=/docs/guides-extending-the-backoffice-registration-registration--docs)
+
+## Conditions
+
+Most extension types supports conditions.
+Defining conditions enables you to control when and where the extension is available.
+
+[Read more about the core conditions here](?path=/docs/guides-extending-the-backoffice-registration-conditions--docs)
+
+## Kinds
+
+The kinds feature enables you to base your extension registration on a preset.
+A kind provides the base manifest which you like to extend.
+
+[Read more about kinds here](?path=/docs/guides-extending-the-backoffice-registration-types-kind--docs)
+
+```ts
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+```
+
+## Package Manifest
+
+TODO: Describe the Package Manifest
+
+```json
+// show example of package-manifest.json
+```

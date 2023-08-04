@@ -1,8 +1,9 @@
 import { UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context.js';
 import type { UmbBackofficeContext } from '../backoffice.context.js';
-import { css, CSSResultGroup, html, when, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, CSSResultGroup, html, when, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbExtensionManifestController } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
@@ -10,10 +11,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	private _open = false;
 
 	@state()
-	private _sections: Array<ManifestSection> = [];
-
-	@state()
-	private _visibleSections: Array<ManifestSection> = [];
+	private _sections: Array<UmbExtensionManifestController<ManifestSection>> = [];
 
 	@state()
 	private _extraSections: Array<ManifestSection> = [];
@@ -38,10 +36,6 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		this._open = !this._open;
 	}
 
-	private _handleSectionTabClick(alias: string) {
-		this._backofficeContext?.setActiveSectionAlias(alias);
-	}
-
 	private _handleLabelClick() {
 		const moreTab = this.shadowRoot?.getElementById('moreTab');
 		moreTab?.setAttribute('active', 'true');
@@ -53,8 +47,9 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		if (!this._backofficeContext) return;
 
 		this.observe(this._backofficeContext.allowedSections, (allowedSections) => {
+			const oldValue = this._sections;
 			this._sections = allowedSections;
-			this._visibleSections = this._sections;
+			this.requestUpdate('_sections', oldValue);
 		});
 	}
 
@@ -69,13 +64,14 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	private _renderSections() {
 		return html`
 			<uui-tab-group id="tabs">
-				${this._visibleSections.map(
-					(section: ManifestSection) => html`
+				${repeat(
+					this._sections,
+					(section) => section.alias,
+					(section) => html`
 						<uui-tab
-							@click="${() => this._handleSectionTabClick(section.alias)}"
 							?active="${this._currentSectionAlias === section.alias}"
-							href="${`section/${section.meta.pathname}`}"
-							label="${section.meta.label || section.name}"></uui-tab>
+							href="${`section/${section.manifest?.meta.pathname}`}"
+							label="${section.manifest?.meta.label ?? section.manifest?.name ?? ''}"></uui-tab>
 					`
 				)}
 				${this._renderExtraSections()}

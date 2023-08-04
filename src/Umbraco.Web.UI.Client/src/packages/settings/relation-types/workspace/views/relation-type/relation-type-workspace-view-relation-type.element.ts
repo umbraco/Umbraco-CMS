@@ -9,7 +9,7 @@ import {
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-relation-type-workspace-view-relation-type')
@@ -25,7 +25,7 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbRelationTypeWorkspaceContext;
 			this._observeRelationType();
 		});

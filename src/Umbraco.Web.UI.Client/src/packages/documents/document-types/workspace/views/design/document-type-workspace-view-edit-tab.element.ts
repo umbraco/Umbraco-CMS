@@ -4,7 +4,7 @@ import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 import './document-type-workspace-view-edit-properties.element.js';
 
@@ -63,7 +63,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
 			this._groupStructureHelper.setStructureManager((context as UmbDocumentTypeWorkspaceContext).structure);
 		});
 		this.observe(this._groupStructureHelper.containers, (groups) => {

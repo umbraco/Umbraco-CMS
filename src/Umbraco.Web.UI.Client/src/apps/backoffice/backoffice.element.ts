@@ -1,5 +1,5 @@
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context.js';
-import { UmbExtensionInitializer } from './extension.controller.js';
+import { UmbExtensionInitializer } from './extension-initializer.controller.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -31,7 +31,7 @@ const CORE_PACKAGES = [
 export class UmbBackofficeElement extends UmbLitElement {
 	constructor() {
 		super();
-		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
+		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext(this));
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 

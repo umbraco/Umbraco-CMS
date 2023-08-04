@@ -9,7 +9,7 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 	data = this.#data.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, new UmbStylesheetRepository(host));
+		super(host, 'Umb.Workspace.Stylesheet', new UmbStylesheetRepository(host));
 	}
 
 	getEntityType(): string {

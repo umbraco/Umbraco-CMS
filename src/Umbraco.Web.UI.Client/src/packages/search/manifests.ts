@@ -30,9 +30,12 @@ export const manifests: Array<ManifestTypes> = [
 			label: 'Examine Management',
 			pathname: 'examine-management',
 		},
-		conditions: {
-			sections: ['Umb.Section.Settings'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: 'Umb.Section.Settings',
+			},
+		],
 	},
 	{
 		type: 'headerApp',

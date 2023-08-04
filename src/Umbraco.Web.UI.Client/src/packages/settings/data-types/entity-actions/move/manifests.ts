@@ -14,8 +14,6 @@ const entityActions: Array<ManifestTypes> = [
 			label: 'Move to...',
 			repositoryAlias: DATA_TYPE_REPOSITORY_ALIAS,
 			api: UmbMoveDataTypeEntityAction,
-		},
-		conditions: {
 			entityTypes: [DATA_TYPE_ENTITY_TYPE],
 		},
 	},

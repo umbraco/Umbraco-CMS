@@ -1,9 +1,10 @@
+import { ConditionTypes } from '../conditions/types.js';
 import type { UmbDashboardExtensionElement } from '../interfaces/index.js';
-import type { ManifestElement, ManifestWithConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestDashboard
 	extends ManifestElement<UmbDashboardExtensionElement>,
-		ManifestWithConditions<ConditionsDashboard> {
+		ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'dashboard';
 	meta: MetaDashboard;
 }
@@ -26,17 +27,8 @@ export interface MetaDashboard {
 	pathname?: string;
 }
 
+/*
 export interface ConditionsDashboard {
-	/**
-	 * An array of section aliases that the dashboard should be available in
-	 *
-	 * @uniqueItems true
-	 * @minItems 1
-	 * @items.examples [
-	 *   "Umb.Section.Content",
-	 *   "Umb.Section.Settings"
-	 * ]
-	 *
-	 */
 	sections: string[];
 }
+*/

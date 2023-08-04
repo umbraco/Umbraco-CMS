@@ -1,7 +1,7 @@
 import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface.js';
 import { UmbPropertyEditorExtensionElement } from '../../extension-registry/interfaces/property-editor-ui-extension-element.interface.js';
 import { type WorkspacePropertyData } from '../types/workspace-property-data.type.js';
-import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN, UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -56,7 +56,7 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
-		new UmbContextConsumerController(host, UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
+		new UmbContextConsumerController(host, UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._workspaceContext = workspaceContext as UmbWorkspaceVariableEntityContextInterface;
 		});
 

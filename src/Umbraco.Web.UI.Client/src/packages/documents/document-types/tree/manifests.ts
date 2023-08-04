@@ -17,7 +17,7 @@ const treeItem: ManifestTreeItem = {
 	kind: 'entity',
 	alias: 'Umb.TreeItem.DocumentType',
 	name: 'Document Type Tree Item',
-	conditions: {
+	meta: {
 		entityTypes: ['document-type-root', 'document-type'],
 	},
 };

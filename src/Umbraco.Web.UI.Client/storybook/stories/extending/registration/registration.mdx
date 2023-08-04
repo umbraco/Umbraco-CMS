@@ -1,0 +1,47 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta
+	title="Guides/Extending the Backoffice/Registration/Registration"
+	parameters={{ previewTabs: { canvas: { hidden: true } } }}
+/>
+
+## UI Extension Registration
+
+Registering UI extensions happens through the global extension registry.
+
+There are two ways to register UI extensions:
+
+1. Via a manifest JSON file on the server.
+2. In JavaScript code.
+
+These two options can be combined by defining a small extension in a JSON Manifest, which uses the extension type `entryPoint` or `bundle` to registrer a JS file, which then registers the rest of the extensions.
+
+### Extension Manifest
+
+.. Describe the extension manifest format.
+
+insert example here.
+
+- `type` - The type define the type of extension. The type is used to determine where extension is will be used, this defines the data needed for this manifest.
+- `alias`- The alias is used to identify the extension. This has to be unique for each extension.
+- `name` - The name of the extension. This is used to identify the extension in the UI.
+
+### Registration via a Package Manifest
+
+...Describe and show the pakcage manifest format.
+
+... Describe the configuration etc.
+
+### Registering via a Manifest in JS.
+
+... Describe the JS API for registering extensions. (How to import and method to call)
+
+Example of manifest registration.
+
+### Using the Entry Point Extension Type via Pakcage Manifest
+
+I want us to bring this example as it ties above nicely together.
+
+### Using the Bundle Extension Type via Pakcage Manifest
+
+Describe and bring and example of how to make a Package using the bundle extension type.

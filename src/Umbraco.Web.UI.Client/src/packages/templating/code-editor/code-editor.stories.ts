@@ -124,7 +124,7 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 		content = createObservablePart(this.#data, (data) => data?.content);
 
 		constructor(host: UmbControllerHostElement) {
-			super(host, new UmbTemplateRepository(host));
+			super(host, 'Umb.Workspace.Template', new UmbTemplateRepository(host));
 		}
 
 		getData() {

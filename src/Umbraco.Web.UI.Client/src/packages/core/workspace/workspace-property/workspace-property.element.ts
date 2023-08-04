@@ -259,6 +259,10 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 			#property-action-menu[open] {
 				opacity: 1;
 			}
+
+			uui-tag {
+				margin-top: var(--uui-size-space-4);
+			}
 		`,
 	];
 }

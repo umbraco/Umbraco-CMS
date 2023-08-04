@@ -24,9 +24,12 @@ const dashboards: Array<ManifestDashboard> = [
 			label: 'Members',
 			pathname: 'members',
 		},
-		conditions: {
-			sections: [sectionAlias],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: sectionAlias,
+			},
+		],
 	},
 ];
 
@@ -40,9 +43,12 @@ const menuSectionSidebarApp: ManifestTypes = {
 		label: 'Members',
 		menu: 'Umb.Menu.Members',
 	},
-	conditions: {
-		sections: [sectionAlias],
-	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionAlias',
+			match: sectionAlias,
+		},
+	],
 };
 
 export const manifests = [section, menuSectionSidebarApp, ...dashboards];

@@ -48,13 +48,45 @@ describe('UmbContextConsumer', () => {
 		const localConsumer = new UmbContextConsumer(
 			element,
 			testContextAlias,
-			(_instance: UmbTestContextConsumerClass) => {
-				expect(_instance.prop).to.eq('value from provider');
-				done();
+			(_instance: UmbTestContextConsumerClass | undefined) => {
+				if (_instance) {
+					expect(_instance.prop).to.eq('value from provider');
+					done();
+					localConsumer.hostDisconnected();
+					provider.hostDisconnected();
+				}
 			}
 		);
 		localConsumer.hostConnected();
-
-		provider.hostDisconnected();
 	});
+
+	/*
+	Unprovided feature is out commented currently. I'm not sure there is a use case. So lets leave the code around until we know for sure.
+	it('acts to Context API disconnected', (done) => {
+		const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+		provider.hostConnected();
+
+		const element = document.createElement('div');
+		document.body.appendChild(element);
+
+		let callbackNum = 0;
+
+		const localConsumer = new UmbContextConsumer(
+			element,
+			testContextAlias,
+			(_instance: UmbTestContextConsumerClass | undefined) => {
+				callbackNum++;
+				if (callbackNum === 1) {
+					expect(_instance?.prop).to.eq('value from provider');
+					// unregister.
+					provider.hostDisconnected();
+				} else if (callbackNum === 2) {
+					expect(_instance?.prop).to.be.undefined;
+					done();
+				}
+			}
+		);
+		localConsumer.hostConnected();
+	});
+	*/
 });

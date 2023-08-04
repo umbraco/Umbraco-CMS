@@ -1,1 +1,1 @@
-export * from './workspace-property-data.type';
+export * from './workspace-property-data.type.js';

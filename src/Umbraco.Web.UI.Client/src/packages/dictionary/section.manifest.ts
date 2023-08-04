@@ -23,9 +23,12 @@ const menuSectionSidebarApp: ManifestTypes = {
 		label: 'Dictionary',
 		menu: 'Umb.Menu.Dictionary',
 	},
-	conditions: {
-		sections: [sectionAlias],
-	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionAlias',
+			match: sectionAlias,
+		},
+	],
 };
 
 const dashboards: Array<ManifestDashboard> = [
@@ -39,9 +42,12 @@ const dashboards: Array<ManifestDashboard> = [
 			label: 'Dictionary overview',
 			pathname: '',
 		},
-		conditions: {
-			sections: [sectionAlias],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: sectionAlias,
+			},
+		],
 	},
 ];
 
