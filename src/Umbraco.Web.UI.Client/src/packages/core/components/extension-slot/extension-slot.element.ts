@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-extension-slot
- * @description
+ * @description A element which renderers the extensions of a given type or types.
  * @slot default - slot for inserting additional things into this slot.
  * @export
  * @class UmbExtensionSlot
@@ -19,13 +19,34 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 // TODO: Make property that reveals the amount of displayed/permitted extensions.
 @customElement('umb-extension-slot')
 export class UmbExtensionSlotElement extends UmbLitElement {
+	#attached = false;
 	#extensionsController?: UmbExtensionsElementController<ManifestTypes>;
 
 	@state()
 	private _permittedExts: Array<UmbExtensionElementController> = [];
 
+	/**
+	 * The type or types of extensions to render.
+	 * @type {string | string[]}
+	 * @memberof UmbExtensionSlot
+	 * @example
+	 * <umb-extension-slot type="umb-editor-footer"></umb-extension-slot>
+	 * or multiple:
+	 * <umb-extension-slot .type=${['umb-editor-footer','umb-editor-header']}></umb-extension-slot>
+	 *
+	 */
 	@property({ type: String })
-	public type = '';
+	public get type(): string | string[] | undefined {
+		return this._type;
+	}
+	public set type(value: string | string[] | undefined) {
+		if (value === this._type) return;
+		this._type = value;
+		if (this.#attached) {
+			this._observeExtensions();
+		}
+	}
+	private _type?: string | string[] | undefined;
 
 	@property({ type: Object, attribute: false })
 	public get filter(): (manifest: any) => boolean {
@@ -34,7 +55,9 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	public set filter(value: (manifest: any) => boolean) {
 		if (value === this._filter) return;
 		this._filter = value;
-		this._observeExtensions();
+		if (this.#attached) {
+			this._observeExtensions();
+		}
 	}
 	private _filter: (manifest: any) => boolean = () => true;
 
@@ -60,21 +83,24 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._observeExtensions();
+		this.#attached = true;
 	}
 
 	private _observeExtensions() {
 		this.#extensionsController?.destroy();
-		this.#extensionsController = new UmbExtensionsElementController(
-			this,
-			umbExtensionsRegistry,
-			this.type,
-			this.filter,
-			(extensionControllers) => {
-				this._permittedExts = extensionControllers;
-			},
-			this.defaultElement
-		);
-		this.#extensionsController.properties = this._props;
+		if (this._type) {
+			this.#extensionsController = new UmbExtensionsElementController(
+				this,
+				umbExtensionsRegistry,
+				this._type,
+				this.filter,
+				(extensionControllers) => {
+					this._permittedExts = extensionControllers;
+				},
+				this.defaultElement
+			);
+			this.#extensionsController.properties = this._props;
+		}
 	}
 
 	render() {
