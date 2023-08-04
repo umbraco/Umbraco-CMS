@@ -1,3 +1,5 @@
+using Umbraco.Cms.Core.Models;
+
 namespace Umbraco.Cms.Web.BackOffice.Security;
 
 /// <summary>
@@ -27,6 +29,26 @@ public class BackOfficeExternalLoginProviderOptions
 
     public string ButtonStyle { get; set; } = "btn-openid";
 
+    /// <summary>
+    ///     Gets or sets the look to use for the login button.
+    ///     See the UUI documentation for more details: https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors.
+    /// </summary>
+    public UuiButtonLook ButtonLook { get; set; } = UuiButtonLook.Outline;
+
+    /// <summary>
+    ///     Gets or sets the color to use for the login button.
+    ///     See the UUI documentation for more details: https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors.
+    /// </summary>
+    public UuiButtonColor ButtonColor { get; set; } = UuiButtonColor.Default;
+
+    /// <summary>
+    ///     Gets or sets the icon to use for the login button.
+    ///     The standard icons of the Backoffice is available.
+    /// </summary>
+    /// <remarks>
+    ///     It is possible to add custom icons to your provider by adding the icons to the
+    ///     <c>~/App_Plugins/{providerAlias}/icons</c> folder as SVG files. The icon name should be the same as the file name.
+    /// </remarks>
     public string Icon { get; set; } = "icon-user";
 
     /// <summary>
