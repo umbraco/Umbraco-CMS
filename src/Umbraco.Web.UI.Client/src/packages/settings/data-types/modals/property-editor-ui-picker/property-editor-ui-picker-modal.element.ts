@@ -71,8 +71,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 					);
 			  });
 
-		// TODO: Should this be done in the registry or somewhere else a *little* more central?
-		// Only include property editor UIs that have a property editor schema alias
+		// Only include Property Editor UIs which has Property Editor Schema Alias
 		result = result.filter((propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias);
 
 		this._groupedPropertyEditorUIs = groupBy(result, 'meta.group');
