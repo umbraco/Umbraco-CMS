@@ -6,6 +6,7 @@ import {
 } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbSwitchCondition extends UmbBaseController implements UmbExtensionCondition {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	#timer?: any;
 	config: SwitchConditionConfig;
 	permitted = false;
