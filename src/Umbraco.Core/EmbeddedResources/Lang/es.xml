@@ -1394,8 +1394,7 @@
     <key alias="usergroup">Grupo de usuario</key>
     <key alias="userInvited">ha sido invitado</key>
     <key alias="userInvitedSuccessHelp">Se ha enviado una invitación al nuevo usuario con detalles sobre cómo acceder a Umbraco.</key>
-    <key alias="userinviteWelcomeMessage">¡Hola y bienvenido a Umbraco!. En un minuto todo estará listo para empezar, sólo necesitamos que configures tu contraseña y una imagen para tu avatar.</key>
-    <key alias="userinviteAvatarMessage">Sube una foto para que otros usuarios te reconozcan más fácilmente.</key>
+    <key alias="userinviteWelcomeMessage">¡Hola y bienvenido a Umbraco!. En un minuto todo estará listo para empezar, sólo necesitamos que configures tu contraseña.</key>
     <key alias="writer">Redactor</key>
     <key alias="change">Cambiar</key>
     <key alias="yourProfile" version="7.0">Tu perfil</key>
