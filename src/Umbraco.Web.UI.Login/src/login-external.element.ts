@@ -58,7 +58,7 @@ export class UmbLoginExternalElement extends LitElement {
 
 	protected async loadCustomView() {
 		if (!this.customView) return;
-		const customViewModule = await import(this.customView);
+		const customViewModule = await import(this.customView /* @vite-ignore */);
 		const customView = customViewModule.default;
 		this.externalComponent = new customView();
 	}
