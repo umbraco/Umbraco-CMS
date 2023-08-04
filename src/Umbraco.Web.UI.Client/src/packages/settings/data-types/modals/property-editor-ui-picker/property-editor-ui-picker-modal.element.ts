@@ -46,8 +46,11 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 		if (!this.data) return;
 
 		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUi'), (propertyEditorUIs) => {
-			this._propertyEditorUIs = propertyEditorUIs;
-			this._groupedPropertyEditorUIs = groupBy(propertyEditorUIs, 'meta.group');
+
+			// Only include Property Editor UIs which has Property Editor Schema Alias
+			this._propertyEditorUIs = propertyEditorUIs.filter((propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias);
+
+			this._groupedPropertyEditorUIs = groupBy(this._propertyEditorUIs, 'meta.group');
 		});
 	}
 
@@ -63,16 +66,13 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 		let query = (event.target.value as string) || '';
 		query = query.toLowerCase();
 
-		let result = !query
+		const result = !query
 			? this._propertyEditorUIs
 			: this._propertyEditorUIs.filter((propertyEditorUI) => {
 					return (
 						propertyEditorUI.name.toLowerCase().includes(query) || propertyEditorUI.alias.toLowerCase().includes(query)
 					);
 			  });
-
-		// Only include Property Editor UIs which has Property Editor Schema Alias
-		result = result.filter((propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias);
 
 		this._groupedPropertyEditorUIs = groupBy(result, 'meta.group');
 	}
