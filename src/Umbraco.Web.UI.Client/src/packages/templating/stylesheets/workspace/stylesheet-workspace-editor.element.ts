@@ -21,7 +21,7 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance as UmbStylesheetWorkspaceContext;
+			this.#workspaceContext = instance as unknown as UmbStylesheetWorkspaceContext;
 			this.#observeNameAndPath();
 		});
 
