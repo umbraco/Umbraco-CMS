@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorExtensionElement } from '../interfaces/index.js';
-import { type UmbDataTypeConfig } from '../../property-editor/index.js';
+import type { UmbDataTypeConfig } from '../../property-editor/index.js';
 import type { ManifestElement, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestPropertyEditorUi extends ManifestElement<UmbPropertyEditorExtensionElement> {
@@ -9,9 +9,28 @@ export interface ManifestPropertyEditorUi extends ManifestElement<UmbPropertyEdi
 
 export interface MetaPropertyEditorUi {
 	label: string;
-	propertyEditorSchemaAlias: string;
 	icon: string;
+	/**
+	 * The group that this property editor UI belongs to, which will be used to group the property editor UIs in the property editor picker.
+	 * If not specified, the property editor UI will be grouped under "Common".
+	 * @default "Common"
+	 * @examples [
+	 *  "Common",
+	 * 	"Content",
+	 * 	"Media"
+	 * ]
+	 */
 	group: string;
+	/**
+	 * The alias of the property editor schema that this property editor UI is for.
+	 * If not specified, the property editor UI can only be used to configure other property editors.
+	 * @examples [
+	 * 	"Umbraco.TextBox",
+	 * 	"Umbraco.TextArea",
+	 * 	"Umbraco.Label",
+	 * ]
+	 */
+	propertyEditorSchemaAlias?: string;
 	settings?: PropertyEditorSettings;
 	supportsReadOnly?: boolean;
 }
