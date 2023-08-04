@@ -7,6 +7,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-media-workspace')
 export class UmbMediaWorkspaceElement extends UmbLitElement {
+	public readonly workspaceAlias = 'Umb.Workspace.Media';
+
 	#workspaceContext = new UmbMediaWorkspaceContext(this);
 	#element = new UmbMediaWorkspaceEditorElement();
 

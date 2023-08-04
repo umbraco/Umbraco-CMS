@@ -1,3 +1,3 @@
-import { manifests as logviewerRootManifests } from './logviewer-root/manifests.js';
+import { manifests as logViewerRootManifests } from './logviewer/manifests.js';
 
-export const manifests = [...logviewerRootManifests];
+export const manifests = [...logViewerRootManifests];

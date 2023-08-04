@@ -27,9 +27,12 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 			pathname: 'relation-type',
 			icon: 'umb:info',
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.RelationType'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 	{
 		type: 'workspaceEditorView',
@@ -42,9 +45,12 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 			pathname: 'relation',
 			icon: 'umb:trafic',
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.RelationType'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 
@@ -59,9 +65,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.RelationType'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 

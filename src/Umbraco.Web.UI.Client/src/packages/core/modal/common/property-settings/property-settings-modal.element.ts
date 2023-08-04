@@ -9,6 +9,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbPropertySettingsModalResult, UmbPropertySettingsModalData } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 // TODO: Could base take a token to get its types?.
+// TODO: Missing a workspace context... unless this should not be a workspace any way.
 @customElement('umb-property-settings-modal')
 export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	UmbPropertySettingsModalData,

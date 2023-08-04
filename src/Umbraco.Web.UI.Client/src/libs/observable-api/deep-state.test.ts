@@ -13,12 +13,12 @@ describe('UmbDeepState', () => {
 	});
 
 	it('getValue gives the initial data', () => {
-		expect(subject.value.another).to.be.equal(initialData.another);
+		expect(subject.getValue().another).to.be.equal(initialData.another);
 	});
 
 	it('update via next', () => {
 		subject.next({ key: 'some', another: 'myNewValue' });
-		expect(subject.value.another).to.be.equal('myNewValue');
+		expect(subject.getValue().another).to.be.equal('myNewValue');
 	});
 
 	it('replays latests, no matter the amount of subscriptions.', (done) => {

@@ -29,9 +29,12 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 			pathname: 'details',
 			icon: 'edit',
 		},
-		conditions: {
-			workspaces: [DATA_TYPE_WORKSPACE_ALIAS],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 	{
 		type: 'workspaceEditorView',
@@ -44,9 +47,12 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 			pathname: 'info',
 			icon: 'info',
 		},
-		conditions: {
-			workspaces: [DATA_TYPE_WORKSPACE_ALIAS],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 
@@ -61,9 +67,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
 		},
-		conditions: {
-			workspaces: [DATA_TYPE_WORKSPACE_ALIAS],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 

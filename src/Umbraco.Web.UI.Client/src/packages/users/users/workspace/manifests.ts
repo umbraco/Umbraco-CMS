@@ -27,9 +27,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.User'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 

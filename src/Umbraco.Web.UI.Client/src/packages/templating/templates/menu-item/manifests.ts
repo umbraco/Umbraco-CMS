@@ -11,8 +11,6 @@ const menuItem: ManifestTypes = {
 		icon: 'umb:folder',
 		entityType: 'template',
 		treeAlias: 'Umb.Tree.Templates',
-	},
-	conditions: {
 		menus: ['Umb.Menu.Templating'],
 	},
 };

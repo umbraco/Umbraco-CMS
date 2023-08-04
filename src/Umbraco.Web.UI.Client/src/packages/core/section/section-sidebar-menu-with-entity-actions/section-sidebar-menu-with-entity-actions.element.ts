@@ -10,7 +10,7 @@ import '../../menu/menu.element.js';
 
 const manifestWithEntityActions: UmbBackofficeManifestKind = {
 	type: 'kind',
-	alias: 'Umb.Kind.Menu',
+	alias: 'Umb.Kind.SectionSidebarAppMenuWithEntityActions',
 	matchKind: 'menuWithEntityActions',
 	matchType: 'sectionSidebarApp',
 	manifest: {
@@ -28,7 +28,7 @@ export class UmbSectionSidebarMenuWithEntityActionsElement extends UmbSectionSid
 			<umb-entity-actions-bundle
 				slot="actions"
 				.unique=${null}
-				entity-type=${this.manifest?.meta.entityType}
+				.entityType=${this.manifest?.meta.entityType}
 				.label=${this.manifest?.meta.label}>
 			</umb-entity-actions-bundle>
 		</div> `;

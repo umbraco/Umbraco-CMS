@@ -10,8 +10,6 @@ const menuItem: ManifestTypes = {
 		label: 'Media Types',
 		icon: 'umb:folder',
 		treeAlias: 'Umb.Tree.MediaTypes',
-	},
-	conditions: {
 		menus: ['Umb.Menu.Settings'],
 	},
 };

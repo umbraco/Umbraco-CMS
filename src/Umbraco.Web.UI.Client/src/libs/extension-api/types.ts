@@ -1,5 +1,5 @@
-import { UmbEntryPointModule } from './entry-point.interface.js';
-import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionCondition } from './condition/index.js';
+import type { UmbEntryPointModule } from './entry-point.interface.js';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
@@ -55,11 +55,39 @@ export interface ManifestKind<ManifestTypes> {
 	manifest: Partial<ManifestTypes>;
 }
 
-export interface ManifestWithConditions<ConditionsType> {
+// TODO: Get rid of this type and implements ManifestWithDynamicConditions instead.
+export interface ManifestWithConditions<ConditionType> {
 	/**
 	 * Set the conditions for when the extension should be loaded
 	 */
-	conditions: ConditionsType;
+	conditions: ConditionType;
+}
+
+export interface UmbConditionConfigBase<AliasType extends string = string> {
+	alias: AliasType;
+}
+
+export type ConditionTypeMap<ConditionTypes extends UmbConditionConfigBase> = {
+	[Condition in ConditionTypes as Condition['alias']]: Condition;
+} & {
+	[key: string]: UmbConditionConfigBase;
+};
+
+export type SpecificConditionTypeOrUmbConditionConfigBase<
+	ConditionTypes extends UmbConditionConfigBase,
+	T extends keyof ConditionTypeMap<ConditionTypes> | string
+> = T extends keyof ConditionTypeMap<ConditionTypes> ? ConditionTypeMap<ConditionTypes>[T] : UmbConditionConfigBase;
+
+export interface ManifestWithDynamicConditions<ConditionTypes extends UmbConditionConfigBase = UmbConditionConfigBase>
+	extends ManifestBase {
+	/**
+	 * Set the conditions for when the extension should be loaded
+	 */
+	conditions?: Array<ConditionTypes>;
+	/**
+	 * Define one or more extension aliases that this extension should overwrite.
+	 */
+	overwrites?: string | Array<string>;
 }
 
 export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
@@ -169,18 +197,30 @@ export interface ManifestEntryPoint extends ManifestWithLoader<UmbEntryPointModu
 	/**
 	 * The file location of the javascript file to load in the backoffice
 	 */
-	js: string;
+	js?: string;
 }
 
 /**
  * This type of extension takes a JS module and registers all exported manifests from the pointed JS file.
  */
-export interface ManifestBundle
-	extends ManifestWithLoader<{ [key: string]: Array<UmbBackofficeExtensionRegistry['MANIFEST_TYPES']> }> {
+export interface ManifestBundle<UmbManifestTypes extends ManifestBase = ManifestBase>
+	extends ManifestWithLoader<{ [key: string]: Array<UmbManifestTypes> }> {
 	type: 'bundle';
 
 	/**
 	 * The file location of the javascript file to load in the backoffice
 	 */
-	js: string;
+	js?: string;
+}
+
+/**
+ * This type of extension takes a JS module and registers all exported manifests from the pointed JS file.
+ */
+export interface ManifestCondition extends ManifestClass<UmbExtensionCondition> {
+	type: 'condition';
+
+	/**
+	 * The file location of the javascript file to load in the backoffice
+	 */
+	js?: string;
 }

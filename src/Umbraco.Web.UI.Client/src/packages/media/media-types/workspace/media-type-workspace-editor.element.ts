@@ -2,7 +2,7 @@ import { UmbWorkspaceMediaTypeContext } from './media-type-workspace.context.js'
 import { UUITextStyles, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-media-type-workspace-editor')
 export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 	@state()
@@ -12,7 +12,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbWorkspaceMediaTypeContext;
 			this.#observeName();
 		});

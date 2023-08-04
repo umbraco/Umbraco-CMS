@@ -5,13 +5,13 @@ import type {
 	ManifestWorkspaceEditorView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-const workspaceAlias = 'Umb.Workspace.LogviewerRoot';
+const workspaceAlias = 'Umb.Workspace.LogViewer';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: workspaceAlias,
 	name: 'LogViewer Root Workspace',
-	loader: () => import('./logviewer-root-workspace.element.js'),
+	loader: () => import('./logviewer-workspace.element.js'),
 	meta: {
 		entityType: 'logviewer',
 	},
@@ -20,7 +20,7 @@ const workspace: ManifestWorkspace = {
 const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 	{
 		type: 'workspaceEditorView',
-		alias: 'Umb.WorkspaceView.Logviewer.Overview',
+		alias: 'Umb.WorkspaceView.LogViewer.Overview',
 		name: 'LogViewer Root Workspace Overview View',
 		loader: () => import('../views/overview/index.js'),
 		weight: 300,
@@ -29,13 +29,16 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 			pathname: 'overview',
 			icon: 'umb:box-alt',
 		},
-		conditions: {
-			workspaces: [workspaceAlias],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 	{
 		type: 'workspaceEditorView',
-		alias: 'Umb.WorkspaceView.Logviewer.Search',
+		alias: 'Umb.WorkspaceView.LogViewer.Search',
 		name: 'LogViewer Root Workspace Search View',
 		loader: () => import('../views/search/index.js'),
 		weight: 200,
@@ -44,9 +47,12 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 			pathname: 'search',
 			icon: 'umb:search',
 		},
-		conditions: {
-			workspaces: [workspaceAlias],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 

@@ -16,9 +16,9 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 	
 	constructor(host: UmbControllerHostElement) {
-		super(host, new UmbStylesheetRepository(host));
+		
+		super(host, 'Umb.Workspace.Stylesheet', new UmbStylesheetRepository(host));
 		this.#loadCodeEditor();
-
 	}
 
 	async #loadCodeEditor() {

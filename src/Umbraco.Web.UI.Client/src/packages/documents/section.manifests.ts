@@ -28,9 +28,12 @@ const menuSectionSidebarApp: ManifestSectionSidebarAppMenuWithEntityActionsKind 
 		menu: 'Umb.Menu.Content',
 		entityType: DOCUMENT_ROOT_ENTITY_TYPE,
 	},
-	conditions: {
-		sections: [sectionAlias],
-	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionAlias',
+			match: sectionAlias,
+		},
+	],
 };
 
 export const manifests = [section, menuSectionSidebarApp];

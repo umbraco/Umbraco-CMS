@@ -1,3 +1,4 @@
+export * from './component-has-manifest-property.function.js';
 export * from './diff.type.js';
 export * from './ensure-path-ends-with-slash.function.js';
 export * from './generate-umbraco-alias.function.js';

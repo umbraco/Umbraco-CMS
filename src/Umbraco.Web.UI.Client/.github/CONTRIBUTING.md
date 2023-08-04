@@ -122,9 +122,12 @@ To declare the Published Cache Status Dashboard as a new manifest, we need to ad
 		label: 'Published Status',
 		pathname: 'published-status',
 	},
-	conditions: {
-		sections: ['Umb.Section.Settings'],
-	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionAlias',
+			match: 'Umb.Section.Settings',
+		},
+	],
 },
 ```
 

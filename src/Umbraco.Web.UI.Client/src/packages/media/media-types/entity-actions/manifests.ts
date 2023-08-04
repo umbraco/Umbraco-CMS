@@ -18,8 +18,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Create',
 			repositoryAlias,
 			api: UmbCreateMediaTypeEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},
@@ -33,8 +31,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Move',
 			repositoryAlias,
 			api: UmbMoveEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},
@@ -48,8 +44,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Copy',
 			repositoryAlias,
 			api: UmbCopyEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},
@@ -63,8 +57,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Delete',
 			repositoryAlias,
 			api: UmbDeleteEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},
@@ -78,8 +70,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Reload',
 			repositoryAlias,
 			api: UmbReloadMediaTypeEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},

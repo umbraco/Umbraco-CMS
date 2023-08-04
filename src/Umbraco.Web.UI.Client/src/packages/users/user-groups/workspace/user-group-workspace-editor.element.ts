@@ -5,7 +5,7 @@ import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffic
 //import { UmbUserInputElement } from '../../users/components/user-input/user-input.element.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	UMB_CONFIRM_MODAL,
@@ -27,7 +27,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbUserGroupWorkspaceContext;
 			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup));
 			this.observe(this.#workspaceContext.userIds, (userKeys) => (this._userKeys = userKeys));

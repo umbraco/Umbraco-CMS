@@ -27,8 +27,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Create',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbCreateDocumentEntityAction,
-		},
-		conditions: {
 			entityTypes: [DOCUMENT_ROOT_ENTITY_TYPE, DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -42,8 +40,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Trash',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbTrashEntityAction,
-		},
-		conditions: {
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -57,8 +53,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Create Content Template',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbCreateDocumentBlueprintEntityAction,
-		},
-		conditions: {
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -72,8 +66,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Move',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbMoveEntityAction,
-		},
-		conditions: {
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -87,8 +79,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Copy',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbCopyEntityAction,
-		},
-		conditions: {
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -102,8 +92,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Sort',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbSortChildrenOfEntityAction,
-		},
-		conditions: {
 			entityTypes: [DOCUMENT_ROOT_ENTITY_TYPE, DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -117,8 +105,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Culture And Hostnames',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbDocumentCultureAndHostnamesEntityAction,
-		},
-		conditions: {
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -131,8 +117,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Permissions',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbDocumentPermissionsEntityAction,
-		},
-		conditions: {
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -145,8 +129,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Public Access',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbDocumentPublicAccessEntityAction,
-		},
-		conditions: {
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -159,8 +141,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Publish',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbPublishDocumentEntityAction,
-		},
-		conditions: {
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -173,8 +153,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Unpublish',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbUnpublishDocumentEntityAction,
-		},
-		conditions: {
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -187,8 +165,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Rollback',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbRollbackDocumentEntityAction,
-		},
-		conditions: {
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},

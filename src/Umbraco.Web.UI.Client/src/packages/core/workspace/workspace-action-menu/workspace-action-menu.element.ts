@@ -2,13 +2,13 @@ import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-workspace-action-menu')
 export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	@state()
 	private _actionMenuIsOpen = false;
 
-	private _workspaceContext?: typeof UMB_ENTITY_WORKSPACE_CONTEXT.TYPE;
+	private _workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	_entityId?: string;
@@ -19,7 +19,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;
 			this._observeInfo();
 		});
@@ -49,15 +49,17 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	}
 
 	#renderActionsMenu() {
-		return this._entityId
+		return this._entityId && this._entityType
 			? html`
 			<uui-popover  id="action-menu-popover" .open=${this._actionMenuIsOpen} @close=${this.#close}>
 				<uui-button slot="trigger" label="Actions" @click=${this.#open}></uui-button>
 				<div id="action-menu-dropdown" slot="popover">
 					<uui-scroll-container>
-						<umb-entity-action-list @executed=${this.#onActionExecuted} entity-type=${this._entityType as string} unique=${
-					this._entityId
-			  }></umb-entity-action-list>
+						<umb-entity-action-list
+							@executed=${this.#onActionExecuted}
+							.entityType=${this._entityType}
+							.unique=${this._entityId}>
+						</umb-entity-action-list>
 					</uui-scroll-container>
 				</div>
 			</uui-popover>

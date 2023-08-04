@@ -3,7 +3,7 @@ import { UmbWorkspaceMemberGroupContext } from './member-group-workspace.context
 import { UUITextStyles, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 /**
  * @element umb-member-group-edit-workspace
  * @description - Element for displaying a Member Group Workspace
@@ -18,7 +18,7 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbWorkspaceMemberGroupContext;
 			this.#observeMemberGroup();
 		});

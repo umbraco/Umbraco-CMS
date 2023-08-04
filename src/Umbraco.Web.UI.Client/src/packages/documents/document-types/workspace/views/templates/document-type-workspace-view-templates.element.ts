@@ -4,7 +4,7 @@ import '../../../../../templating/templates/components/input-template/input-temp
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-type-workspace-view-templates')
@@ -22,7 +22,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (documentTypeContext) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (documentTypeContext) => {
 			this.#workspaceContext = documentTypeContext as UmbDocumentTypeWorkspaceContext;
 			this._observeDocumentType();
 		});

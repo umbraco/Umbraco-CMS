@@ -1,20 +1,15 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import type {
-	PageComponent,
-	UmbRoute,
-	UmbRouterSlotInitEvent,
-	UmbRouterSlotChangeEvent,
-} from '@umbraco-cms/backoffice/router';
+import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import {
 	ManifestWorkspaceEditorView,
 	ManifestWorkspaceViewCollection,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestController, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { componentHasManifestProperty } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @element umb-workspace-editor
@@ -35,32 +30,21 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@property()
 	public headline = '';
 
-	@property()
+	@property({ type: Boolean })
 	public hideNavigation = false;
 
-	@property()
+	@property({ type: Boolean })
 	public enforceNoFooter = false;
 
-	private _alias = '';
+	// TODO: Revisit if we can remove the alias from the workspace-editor. Its not used for anything, as the context now takes care of it.
 	/**
-	 * Alias of the workspace. The Layout will render the workspace views that are registered for this workspace alias.
+	 * Alias of the workspace. Currently not used for anything.
 	 * @public
-	 * @type {string}
+	 * @type {string | undefined}
 	 * @attr
-	 * @default ''
 	 */
 	@property()
-	public get alias() {
-		return this._alias;
-	}
-	public set alias(value) {
-		const oldValue = this._alias;
-		this._alias = value;
-		if (oldValue !== this._alias) {
-			this._observeWorkspaceViews();
-			this.requestUpdate('alias', oldValue);
-		}
-	}
+	public alias?: string;
 
 	@state()
 	private _workspaceViews: Array<ManifestWorkspaceEditorView | ManifestWorkspaceViewCollection> = [];
@@ -74,24 +58,18 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _activePath?: string;
 
-	private _observeWorkspaceViews() {
-		this.observe(
-			umbExtensionsRegistry
-				.extensionsOfTypes<ManifestWorkspaceEditorView>(['workspaceEditorView', 'workspaceViewCollection'])
-				.pipe(
-					map((extensions) => extensions.filter((extension) => extension.conditions.workspaces.includes(this.alias)))
-				),
+	constructor() {
+		super();
+		new UmbExtensionsManifestController(
+			this,
+			umbExtensionsRegistry,
+			['workspaceEditorView', 'workspaceViewCollection'],
+			null,
 			(workspaceViews) => {
-				this._workspaceViews = workspaceViews;
+				this._workspaceViews = workspaceViews.map((view) => view.manifest);
 				this._createRoutes();
-			},
-			'_observeWorkspaceViews'
+			}
 		);
-	}
-
-	// TODO: Move into a helper function:
-	private componentHasManifest(component: PageComponent): component is HTMLElement & { manifest: unknown } {
-		return component ? 'manifest' in component : false;
 	}
 
 	private _createRoutes() {
@@ -110,8 +88,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 						return createExtensionElement(manifest);
 					},
 					setup: (component) => {
-						// TODO: We could just always parse it on and instead we should make a element interface for the workspace views.
-						if (this.componentHasManifest(component)) {
+						if (component && componentHasManifestProperty(component)) {
 							component.manifest = manifest;
 						}
 					},
@@ -140,7 +117,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				${this.enforceNoFooter
 					? ''
 					: html`
-							<umb-workspace-footer slot="footer" alias=${this.alias}>
+							<umb-workspace-footer slot="footer">
 								<slot name="footer-info"></slot>
 								<slot name="actions" slot="actions"></slot>
 							</umb-workspace-footer>

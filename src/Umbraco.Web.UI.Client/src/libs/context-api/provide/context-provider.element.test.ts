@@ -17,7 +17,7 @@ export class UmbTestContextElement extends UmbControllerHostElementMixin(HTMLEle
 }
 
 describe('UmbContextProvider', () => {
-	let element: UmbContextProviderElement;
+	let element: HTMLElement;
 	let consumer: UmbTestContextElement;
 	const contextValue = 'test-value';
 
@@ -27,7 +27,7 @@ describe('UmbContextProvider', () => {
 				<umb-test-context></umb-test-context>
 			</umb-context-provider>`
 		);
-		consumer = element.getElementsByTagName('umb-test-context')[0] as UmbTestContextElement;
+		consumer = element.getElementsByTagName('umb-test-context')[0] as unknown as UmbTestContextElement;
 	});
 
 	it('is defined with its own instance', () => {

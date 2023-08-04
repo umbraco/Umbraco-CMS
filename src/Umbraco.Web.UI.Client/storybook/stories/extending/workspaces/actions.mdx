@@ -29,9 +29,12 @@ const manifest = {
 		label: 'My Action',
 		api: MyWorkspaceAction,
 	},
-	conditions: {
-		workspaces: ['My.Workspace'],
-	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.WorkspaceAlias',
+			match: 'My.Workspace',
+		},
+	],
 };
 
 extensionRegistry.register(manifest);

@@ -12,8 +12,6 @@ const menuItem: ManifestTypes = {
 		icon: 'umb:folder',
 		entityType: 'partial-view',
 		treeAlias: PARTIAL_VIEW_TREE_ALIAS,
-	},
-	conditions: {
 		menus: ['Umb.Menu.Templating'],
 	},
 };

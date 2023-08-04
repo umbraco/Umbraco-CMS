@@ -50,6 +50,6 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 		//TODO: Why do we need to extract the id like this?
 		const id = url.substring(url.lastIndexOf('/') + 1);
 
-		history.pushState({}, '', `/section/translation/workspace/dictionary-item/edit/${id}`);
+		history.pushState({}, '', `/section/dictionary/workspace/dictionary-item/edit/${id}`);
 	}
 }

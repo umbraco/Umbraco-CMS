@@ -1,7 +1,7 @@
 import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { ActiveVariant, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { ActiveVariant, UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-document-workspace-split-view')
 export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
@@ -16,7 +16,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context as UmbDocumentWorkspaceContext;
 			this._observeActiveVariantInfo();
 		});

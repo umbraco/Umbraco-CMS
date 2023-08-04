@@ -4,7 +4,7 @@ import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 import '../../../../collection/dashboards/dashboard-collection.element.js';
 
@@ -12,7 +12,7 @@ import '../../../../collection/dashboards/dashboard-collection.element.js';
 export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 	public manifest!: ManifestWorkspaceViewCollection;
 
-	private _workspaceContext?: typeof UMB_ENTITY_WORKSPACE_CONTEXT.TYPE;
+	private _workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
 
 	// TODO: add type for the collection context.
 	private _collectionContext?: UmbCollectionContext<FolderTreeItemResponseModel, any>;
@@ -20,7 +20,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (nodeContext) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (nodeContext) => {
 			this._workspaceContext = nodeContext;
 			this._provideWorkspace();
 		});

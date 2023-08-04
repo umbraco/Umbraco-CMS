@@ -15,7 +15,7 @@ export class UmbUserWorkspaceContext
 	#authContext?: typeof UMB_AUTH.TYPE;
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, new UmbUserRepository(host));
+		super(host, 'Umb.Workspace.User', new UmbUserRepository(host));
 
 		new UmbContextConsumerController(host, UMB_AUTH, (auth) => {
 			this.#authContext = auth;

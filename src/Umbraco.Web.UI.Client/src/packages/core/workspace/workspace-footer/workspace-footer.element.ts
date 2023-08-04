@@ -1,6 +1,5 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
@@ -17,27 +16,6 @@ import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffic
 // TODO: stop naming this something with layout. as its not just an layout. it hooks up with extensions.
 @customElement('umb-workspace-footer')
 export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
-	private _alias = '';
-
-	/**
-	 * Alias of the workspace. The Layout will render the workspace actions that are registered for this workspace alias.
-	 * @public
-	 * @type {string}
-	 * @attr
-	 * @default ''
-	 */
-	@property()
-	public get alias() {
-		return this._alias;
-	}
-	public set alias(value) {
-		const oldValue = this._alias;
-		this._alias = value;
-		if (oldValue !== this._alias) {
-			this.requestUpdate('alias', oldValue);
-		}
-	}
-
 	@state()
 	_withinModal = false;
 
@@ -67,7 +45,6 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 				<umb-extension-slot
 					slot="actions"
 					type="workspaceAction"
-					.filter=${(extension: ManifestWorkspaceAction) => extension.conditions.workspaces.includes(this.alias)}
 					default-element="umb-workspace-action"></umb-extension-slot>
 				<slot name="actions" slot="actions"></slot>
 			</umb-footer-layout>

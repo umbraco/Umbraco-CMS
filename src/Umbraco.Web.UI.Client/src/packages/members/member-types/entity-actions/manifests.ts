@@ -16,8 +16,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Delete',
 			repositoryAlias,
 			api: UmbDeleteEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},

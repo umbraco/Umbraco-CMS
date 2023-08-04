@@ -21,7 +21,7 @@ const treeItem: ManifestTreeItem = {
 	kind: 'fileSystem',
 	alias: 'Umb.TreeItem.PartialViews',
 	name: 'Partial Views Tree Item',
-	conditions: {
+	meta: {
 		entityTypes: [PARTIAL_VIEW_ROOT_ENTITY_TYPE, PARTIAL_VIEW_ENTITY_TYPE],
 	},
 };

@@ -85,7 +85,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 	#renderTrigger() {
 		return html`<button id="toggle" slot="trigger" @click=${this.#onClick}>
-			${this._appLanguage?.name} <uui-symbol-expand></uui-symbol-expand>
+			${this._appLanguage?.name} <uui-symbol-expand .open=${this._isOpen}></uui-symbol-expand>
 		</button>`;
 	}
 
@@ -132,10 +132,6 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 			#toggle:hover {
 				background-color: var(--uui-color-surface-emphasis);
-			}
-
-			[open] uui-symbol-expand {
-				transform: rotate(90deg);
 			}
 		`,
 	];
