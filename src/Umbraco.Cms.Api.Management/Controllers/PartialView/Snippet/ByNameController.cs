@@ -23,6 +23,7 @@ public class ByNameController : PartialViewControllerBase
     [HttpGet("snippet/{name}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PartialViewSnippetResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetByName(string name)
     {
         PartialViewSnippet? snippet = await _partialViewService.GetSnippetByNameAsync(name);
