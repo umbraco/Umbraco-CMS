@@ -30,7 +30,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: 'Umb.Workspace.StyleSheet',
+				match: workspace.alias,
 			},
 		],
 	},
@@ -48,7 +48,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: 'Umb.Workspace.StyleSheet',
+				match: workspace.alias,
 			},
 		],
 	},
@@ -67,7 +67,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: 'Umb.Workspace.StyleSheet',
+				match: workspace.alias,
 			},
 		],
 	},
