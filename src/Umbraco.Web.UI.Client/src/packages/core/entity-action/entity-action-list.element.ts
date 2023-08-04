@@ -5,7 +5,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-entity-action-list')
 export class UmbEntityActionListElement extends UmbLitElement {
 	@property({ type: String, attribute: 'entity-type' })
-	private _entityType: string = '';
 	public get entityType(): string {
 		return this._entityType;
 	}
@@ -16,6 +15,7 @@ export class UmbEntityActionListElement extends UmbLitElement {
 		this._filter = (extension: ManifestEntityAction) => extension.meta.entityTypes.includes(this.entityType);
 		this.requestUpdate('_filter', oldValue);
 	}
+	private _entityType: string = '';
 
 	@state()
 	_filter?: (extension: ManifestEntityAction) => boolean;

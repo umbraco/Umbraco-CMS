@@ -49,15 +49,17 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	}
 
 	#renderActionsMenu() {
-		return this._entityId
+		return this._entityId && this._entityType
 			? html`
 			<uui-popover  id="action-menu-popover" .open=${this._actionMenuIsOpen} @close=${this.#close}>
 				<uui-button slot="trigger" label="Actions" @click=${this.#open}></uui-button>
 				<div id="action-menu-dropdown" slot="popover">
 					<uui-scroll-container>
-						<umb-entity-action-list @executed=${this.#onActionExecuted} entity-type=${this._entityType as string} unique=${
-					this._entityId
-			  }></umb-entity-action-list>
+						<umb-entity-action-list
+							@executed=${this.#onActionExecuted}
+							.entityType=${this._entityType}
+							.unique=${this._entityId}>
+						</umb-entity-action-list>
 					</uui-scroll-container>
 				</div>
 			</uui-popover>
