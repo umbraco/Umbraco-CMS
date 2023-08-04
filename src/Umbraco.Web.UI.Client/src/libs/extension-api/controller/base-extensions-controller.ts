@@ -57,7 +57,7 @@ export abstract class UmbBaseExtensionsController<
 			this._extensions.forEach((controller) => {
 				controller.destroy();
 			});
-			this._extensions = [];
+			this._extensions.length = 0;
 			// _permittedExts should have been cleared via the destroy callbacks.
 			return;
 		}
@@ -142,7 +142,7 @@ export abstract class UmbBaseExtensionsController<
 
 	public destroy() {
 		super.destroy();
-		this._extensions = [];
-		this._permittedExts = [];
+		this._extensions.length = 0;
+		this._permittedExts.length = 0;
 	}
 }
