@@ -29,7 +29,7 @@
     var disableLocalLogin = ExternalLogins.HasDenyLocalLogin();
     var externalLoginsUrl = LinkGenerator.GetPathByAction(nameof(BackOfficeController.ExternalLogin), ControllerExtensions.GetControllerName<BackOfficeController>(), new { area = Constants.Web.Mvc.BackOfficeArea });
     IEnumerable<BackOfficeExternaLoginProviderScheme>
-        externalLoginProviders = await ExternalLogins.GetBackOfficeProvidersAsync()
+        externalLoginProviders = await ExternalLogins.GetBackOfficeProvidersAsync();
 }
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
