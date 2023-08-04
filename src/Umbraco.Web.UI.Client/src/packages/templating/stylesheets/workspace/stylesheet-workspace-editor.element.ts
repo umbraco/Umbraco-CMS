@@ -5,8 +5,8 @@ import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbrac
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-@customElement('umb-stylesheet-workspace-edit')
-export class UmbStylesheetWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-stylesheet-workspace-editor')
+export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: UmbStylesheetWorkspaceContext;
 
 	@state()
@@ -32,8 +32,8 @@ export class UmbStylesheetWorkspaceEditElement extends UmbLitElement {
 
 	#observeNameAndPath() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.name, (name) => (this._name = name));
-		this.observe(this.#workspaceContext.path, (path) => (this._path = path));
+		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeName');
+		this.observe(this.#workspaceContext.path, (path) => (this._path = path), '_observePath');
 	}
 
 	#onNameChange(event: UUIInputEvent) {
@@ -95,10 +95,10 @@ export class UmbStylesheetWorkspaceEditElement extends UmbLitElement {
 	];
 }
 
-export default UmbStylesheetWorkspaceEditElement;
+export default UmbStylesheetWorkspaceEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-stylesheet-workspace-edit': UmbStylesheetWorkspaceEditElement;
+		'umb-stylesheet-workspace-editor': UmbStylesheetWorkspaceEditorElement;
 	}
 }

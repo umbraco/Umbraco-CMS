@@ -1,5 +1,5 @@
 import { serverFilePathFromUrlFriendlyPath } from '../../utils.js';
-import { UmbStylesheetWorkspaceEditElement } from './stylesheet-workspace-edit.element.js';
+import { UmbStylesheetWorkspaceEditorElement } from './stylesheet-workspace-editor.element.js';
 import { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -10,7 +10,7 @@ import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/wor
 @customElement('umb-stylesheet-workspace')
 export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbStylesheetWorkspaceContext(this);
-	#element = new UmbStylesheetWorkspaceEditElement();
+	#element = new UmbStylesheetWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [
