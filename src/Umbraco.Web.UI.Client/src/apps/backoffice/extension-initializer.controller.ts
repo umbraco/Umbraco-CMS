@@ -5,6 +5,8 @@ import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extensio
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { ManifestBase, isManifestJSType } from '@umbraco-cms/backoffice/extension-api';
 
+// TODO: consider if this can be replaced by the new extension controllers.
+// TODO: move local part out of this, and name something with server.
 export class UmbExtensionInitializer extends UmbBaseController {
 	#extensionRegistry: UmbBackofficeExtensionRegistry;
 	#unobserve = new Subject<void>();

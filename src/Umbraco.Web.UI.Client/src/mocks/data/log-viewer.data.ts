@@ -22,7 +22,7 @@ class UmbLogViewerSearchesData extends UmbData<SavedLogSearchResponseModel> {
 	}
 }
 
-class UmbLogviewerTemplatesData extends UmbData<LogTemplateResponseModel> {
+class UmbLogViewerTemplatesData extends UmbData<LogTemplateResponseModel> {
 	constructor(data: LogTemplateResponseModel[]) {
 		super(data);
 	}
@@ -33,7 +33,7 @@ class UmbLogviewerTemplatesData extends UmbData<LogTemplateResponseModel> {
 	}
 }
 
-class UmbLogviewerMessagesData extends UmbData<LogMessageResponseModel> {
+class UmbLogViewerMessagesData extends UmbData<LogMessageResponseModel> {
 	constructor(data: LogTemplateResponseModel[]) {
 		super(data);
 	}
@@ -411,7 +411,7 @@ export const logLevels = {
 
 export const umbLogViewerData = {
 	searches: new UmbLogViewerSearchesData(savedSearches),
-	templates: new UmbLogviewerTemplatesData(messageTemplates),
-	logs: new UmbLogviewerMessagesData(logs),
+	templates: new UmbLogViewerTemplatesData(messageTemplates),
+	logs: new UmbLogViewerMessagesData(logs),
 	logLevels: logLevels,
 };

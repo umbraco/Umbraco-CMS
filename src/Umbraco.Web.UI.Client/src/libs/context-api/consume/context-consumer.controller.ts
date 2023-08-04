@@ -19,8 +19,6 @@ export class UmbContextConsumerController<T = unknown> extends UmbContextConsume
 
 	public destroy() {
 		super.destroy();
-		if (this.#host) {
-			this.#host.removeController(this);
-		}
+		this.#host.removeController(this);
 	}
 }

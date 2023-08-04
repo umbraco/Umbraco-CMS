@@ -18,7 +18,7 @@ export class UmbUserGroupWorkspaceContext
 	#userRepository: UmbUserRepository;
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, new UmbUserGroupRepository(host));
+		super(host, 'Umb.Workspace.UserGroup', new UmbUserGroupRepository(host));
 
 		this.#userRepository = new UmbUserRepository(host);
 	}

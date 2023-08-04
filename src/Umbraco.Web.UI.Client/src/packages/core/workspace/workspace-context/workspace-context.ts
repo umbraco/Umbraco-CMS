@@ -3,7 +3,7 @@ import { UmbContextConsumerController, UmbContextProviderController } from '@umb
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
 /*
@@ -15,6 +15,7 @@ export abstract class UmbWorkspaceContext<RepositoryType, EntityType extends Umb
 	implements UmbEntityWorkspaceContextInterface<EntityType>
 {
 	public readonly host: UmbControllerHostElement;
+	public readonly workspaceAlias: string;
 	public readonly repository: RepositoryType;
 
 	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique.
@@ -23,10 +24,11 @@ export abstract class UmbWorkspaceContext<RepositoryType, EntityType extends Umb
 	#isNew = new UmbBooleanState(undefined);
 	isNew = this.#isNew.asObservable();
 
-	constructor(host: UmbControllerHostElement, repository: RepositoryType) {
+	constructor(host: UmbControllerHostElement, workspaceAlias: string, repository: RepositoryType) {
 		this.host = host;
+		this.workspaceAlias = workspaceAlias;
 		this.repository = repository;
-		new UmbContextProviderController(host, UMB_ENTITY_WORKSPACE_CONTEXT, this);
+		new UmbContextProviderController(host, UMB_WORKSPACE_CONTEXT, this);
 		new UmbContextConsumerController(host, UMB_MODAL_CONTEXT_TOKEN, (context) => {
 			(this.modalContext as UmbModalContext) = context;
 		});

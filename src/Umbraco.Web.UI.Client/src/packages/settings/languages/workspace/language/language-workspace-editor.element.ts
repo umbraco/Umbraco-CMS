@@ -3,8 +3,7 @@ import { UUITextStyles, UUIInputElement, UUIInputEvent } from '@umbraco-cms/back
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-language-workspace-editor')
 export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: UmbLanguageWorkspaceContext;
@@ -18,7 +17,7 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context as UmbLanguageWorkspaceContext;
 			this.#observeData();
 		});

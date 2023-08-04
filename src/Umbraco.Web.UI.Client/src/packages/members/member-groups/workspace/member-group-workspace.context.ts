@@ -14,7 +14,7 @@ export class UmbWorkspaceMemberGroupContext
 	name = this.#data.asObservablePart((data) => data?.name);
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, new UmbMemberGroupRepository(host));
+		super(host, 'Umb.Workspace.MemberGroup', new UmbMemberGroupRepository(host));
 	}
 
 	getData() {

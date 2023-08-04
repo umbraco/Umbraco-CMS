@@ -19,7 +19,7 @@ const treeItem: ManifestTreeItem = {
 	kind: 'fileSystem',
 	alias: 'Umb.TreeItem.Stylesheet',
 	name: 'Stylesheet Tree Item',
-	conditions: {
+	meta: {
 		entityTypes: ['stylesheet-root', STYLESHEET_ENTITY_TYPE],
 	},
 };

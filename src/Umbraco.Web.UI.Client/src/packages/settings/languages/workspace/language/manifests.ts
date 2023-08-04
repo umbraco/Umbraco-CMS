@@ -27,9 +27,12 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 			pathname: 'details',
 			icon: 'edit',
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.Language'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 
@@ -44,9 +47,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			label: 'Save',
 			api: UmbSaveWorkspaceAction,
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.Language'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 

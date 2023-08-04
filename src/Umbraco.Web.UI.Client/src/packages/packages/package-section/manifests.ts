@@ -25,9 +25,12 @@ const sectionsViews: Array<ManifestSectionView> = [
 			pathname: 'packages',
 			icon: 'umb:cloud',
 		},
-		conditions: {
-			sections: [sectionAlias],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: sectionAlias,
+			},
+		],
 	},
 	{
 		type: 'sectionView',
@@ -40,9 +43,12 @@ const sectionsViews: Array<ManifestSectionView> = [
 			pathname: 'installed',
 			icon: 'umb:box',
 		},
-		conditions: {
-			sections: [sectionAlias],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: sectionAlias,
+			},
+		],
 	},
 	{
 		type: 'sectionView',
@@ -55,9 +61,12 @@ const sectionsViews: Array<ManifestSectionView> = [
 			pathname: 'created',
 			icon: 'umb:files',
 		},
-		conditions: {
-			sections: [sectionAlias],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: sectionAlias,
+			},
+		],
 	},
 ];
 

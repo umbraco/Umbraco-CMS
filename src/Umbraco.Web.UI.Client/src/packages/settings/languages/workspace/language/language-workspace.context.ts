@@ -16,7 +16,7 @@ export class UmbLanguageWorkspaceContext
 	validationErrors = this.#validationErrors.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, new UmbLanguageRepository(host));
+		super(host, 'Umb.Workspace.Language', new UmbLanguageRepository(host));
 	}
 
 	async load(isoCode: string) {

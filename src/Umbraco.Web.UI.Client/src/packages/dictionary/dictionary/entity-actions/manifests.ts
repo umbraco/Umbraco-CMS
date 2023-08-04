@@ -20,8 +20,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Create',
 			repositoryAlias,
 			api: UmbCreateDictionaryEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},
@@ -35,8 +33,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Move',
 			repositoryAlias,
 			api: UmbMoveEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},
@@ -50,8 +46,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Export',
 			repositoryAlias,
 			api: UmbExportDictionaryEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},
@@ -65,8 +59,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Import',
 			repositoryAlias,
 			api: UmbImportDictionaryEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},
@@ -80,8 +72,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Reload',
 			repositoryAlias,
 			api: UmbReloadDictionaryEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},
@@ -95,8 +85,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Delete',
 			repositoryAlias,
 			api: UmbDeleteEntityAction,
-		},
-		conditions: {
 			entityTypes: [entityType],
 		},
 	},

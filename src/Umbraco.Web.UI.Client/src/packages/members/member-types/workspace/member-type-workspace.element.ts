@@ -7,6 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-member-type-workspace')
 export class UmbMemberTypeWorkspaceElement extends UmbLitElement {
+	public readonly workspaceAlias = 'Umb.Workspace.MemberType';
 	#workspaceContext = new UmbMemberTypeWorkspaceContext(this);
 	#element = new UmbMemberTypeWorkspaceEditorElement();
 

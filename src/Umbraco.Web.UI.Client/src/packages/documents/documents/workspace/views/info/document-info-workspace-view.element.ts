@@ -1,7 +1,7 @@
 import { css, html, nothing, repeat, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 interface HistoryNode {
 	userId?: number;
@@ -92,7 +92,7 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 	@state()
 	private _documentTypeId = '';
 
-	private _workspaceContext?: typeof UMB_ENTITY_WORKSPACE_CONTEXT.TYPE;
+	private _workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
 	private itemsPerPage = 10;
 
 	@state()
@@ -110,7 +110,7 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 				this._editDocumentTypePath = routeBuilder({});
 			});
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (nodeContext) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (nodeContext) => {
 			this._workspaceContext = nodeContext;
 			this._observeContent();
 		});

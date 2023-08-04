@@ -14,8 +14,6 @@ const entityActions: Array<ManifestTypes> = [
 			label: 'Copy to...',
 			repositoryAlias: DATA_TYPE_REPOSITORY_ALIAS,
 			api: UmbCopyDataTypeEntityAction,
-		},
-		conditions: {
 			entityTypes: [DATA_TYPE_ENTITY_TYPE],
 		},
 	},

@@ -8,6 +8,7 @@ import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-partial-views-workspace-edit')
 export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
@@ -49,8 +50,8 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 		});
 
 		//tODO: should this be called something else here?
-		this.consumeContext('UmbEntityWorkspaceContext', (workspaceContext: UmbPartialViewsWorkspaceContext) => {
-			this.#partialViewsWorkspaceContext = workspaceContext;
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#partialViewsWorkspaceContext = workspaceContext as UmbPartialViewsWorkspaceContext;
 			this.observe(this.#partialViewsWorkspaceContext.name, (name) => {
 				this._name = name;
 			});

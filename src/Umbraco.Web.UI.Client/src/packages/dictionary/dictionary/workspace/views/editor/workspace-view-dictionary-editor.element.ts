@@ -4,7 +4,7 @@ import { UUITextStyles, UUITextareaElement, UUITextareaEvent } from '@umbraco-cm
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DictionaryItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-workspace-view-dictionary-editor')
 export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	@state()
@@ -23,7 +23,7 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 		this.#repo = new UmbDictionaryRepository(this);
 		this._languages = await this.#repo.getLanguages();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (_instance) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (_instance) => {
 			this.#workspaceContext = _instance as UmbDictionaryWorkspaceContext;
 			this.#observeDictionary();
 		});

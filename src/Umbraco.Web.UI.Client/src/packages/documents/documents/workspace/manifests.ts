@@ -31,9 +31,12 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 			pathname: 'content',
 			icon: 'document',
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.Document'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 	{
 		type: 'workspaceEditorView',
@@ -46,9 +49,12 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 			pathname: 'info',
 			icon: 'info',
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.Document'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 
@@ -66,9 +72,6 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 			icon: 'umb:grid',
 			entityType: 'document',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
-		},
-		conditions: {
-			workspaces: ['Umb.Workspace.Document'],
 		}
 	},
 	*/
@@ -86,9 +89,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			color: 'positive',
 			api: UmbDocumentSaveAndPublishWorkspaceAction,
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.Document'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 	{
 		type: 'workspaceAction',
@@ -100,9 +106,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			look: 'secondary',
 			api: UmbSaveWorkspaceAction,
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.Document'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 	{
 		type: 'workspaceAction',
@@ -113,9 +122,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			label: 'Save And Preview',
 			api: UmbDocumentSaveAndPreviewWorkspaceAction,
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.Document'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 	{
 		type: 'workspaceAction',
@@ -126,9 +138,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			label: 'Save And Schedule',
 			api: UmbSaveAndScheduleDocumentWorkspaceAction,
 		},
-		conditions: {
-			workspaces: ['Umb.Workspace.Document'],
-		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
 	},
 ];
 

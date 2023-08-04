@@ -8,7 +8,7 @@ export class UmbMemberWorkspaceContext
 	implements UmbEntityWorkspaceContextInterface<MemberDetails | undefined>
 {
 	constructor(host: UmbControllerHostElement) {
-		super(host, new UmbMemberRepository(host));
+		super(host, 'Umb.Workspace.Member', new UmbMemberRepository(host));
 	}
 
 	getEntityType(): string {

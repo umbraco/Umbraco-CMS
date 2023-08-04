@@ -12,8 +12,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			label: 'Delete',
 			api: UmbDeleteEntityAction,
 			repositoryAlias: MEMBER_GROUP_REPOSITORY_ALIAS,
-		},
-		conditions: {
 			entityTypes: ['member-group'],
 		},
 	},

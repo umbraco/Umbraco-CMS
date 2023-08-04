@@ -37,7 +37,7 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly structure;
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, new UmbDocumentTypeRepository(host));
+		super(host, 'Umb.Workspace.DocumentType', new UmbDocumentTypeRepository(host));
 
 		this.structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
 

@@ -9,8 +9,6 @@ const menuItem: ManifestMenuItem = {
 		label: 'Document Blueprints',
 		icon: 'umb:blueprint',
 		entityType: 'document-blueprint-root',
-	},
-	conditions: {
 		menus: ['Umb.Menu.Settings'],
 	},
 };

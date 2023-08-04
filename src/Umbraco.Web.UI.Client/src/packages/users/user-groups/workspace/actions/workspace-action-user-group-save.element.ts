@@ -3,7 +3,7 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-workspace-action-user-group-save')
 export class UmbWorkspaceActionUserGroupSaveElement extends UmbLitElement {
 	@state()
@@ -14,7 +14,7 @@ export class UmbWorkspaceActionUserGroupSaveElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this._workspaceContext = instance as UmbUserWorkspaceContext;
 		});
 	}

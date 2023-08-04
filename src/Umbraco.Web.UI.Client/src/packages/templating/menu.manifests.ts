@@ -1,5 +1,7 @@
 import { ManifestMenu, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
+const sectionAlias = 'Umb.Section.Settings';
+
 const menu: ManifestMenu = {
 	type: 'menu',
 	alias: 'Umb.Menu.Templating',
@@ -19,9 +21,12 @@ const menuSectionSidebarApp: ManifestTypes = {
 		label: 'Templating',
 		menu: 'Umb.Menu.Templating',
 	},
-	conditions: {
-		sections: ['Umb.Section.Settings'],
-	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionAlias',
+			match: sectionAlias,
+		},
+	],
 };
 
 export const manifests = [menu, menuSectionSidebarApp];

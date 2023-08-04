@@ -6,7 +6,11 @@ import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<UmbPartialViewsRepository, PartialViewDetails> {
+// TODO: I think this should be named PartialViewWorkspace... not with an 's'
+export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<
+	UmbPartialViewsRepository,
+	PartialViewDetails
+> {
 	getEntityId(): string | undefined {
 		return this.getData()?.path;
 	}
@@ -19,14 +23,13 @@ export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<UmbPart
 		if (!partialView)
 			return Promise.reject('Something went wrong, there is no data for partial view you want to save...');
 		if (this.getIsNew()) {
-
 			const createRequestBody = {
 				name: partialView.name,
 				content: partialView.content,
 				parentPath: partialView.path + '/',
-			}
+			};
 
-			this.repository.create(createRequestBody)
+			this.repository.create(createRequestBody);
 			console.log('create');
 			return Promise.resolve();
 		}
@@ -52,7 +55,7 @@ export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<UmbPart
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, new UmbPartialViewsRepository(host));
+		super(host, 'Umb.Workspace.PartialViews', new UmbPartialViewsRepository(host));
 		this.#loadCodeEditor();
 	}
 

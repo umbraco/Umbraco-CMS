@@ -1,119 +1,128 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { css, repeat, TemplateResult, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { createExtensionElement, isManifestElementableType } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { type ManifestTypes, umbExtensionsRegistry } from '../../extension-registry/index.js';
+import { css, repeat, customElement, property, state, TemplateResult } from '@umbraco-cms/backoffice/external/lit';
+import {
+	type UmbExtensionElementController,
+	UmbExtensionsElementController,
+} from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
-export type InitializedExtension = { alias: string; weight: number; component: HTMLElement | null };
 
 /**
  * @element umb-extension-slot
- * @description
+ * @description A element which renderers the extensions of a given type or types.
  * @slot default - slot for inserting additional things into this slot.
  * @export
  * @class UmbExtensionSlot
  * @extends {UmbLitElement}
  */
+
+// TODO: Fire change event.
+// TODO: Make property that reveals the amount of displayed/permitted extensions.
 @customElement('umb-extension-slot')
 export class UmbExtensionSlotElement extends UmbLitElement {
+	#attached = false;
+	#extensionsController?: UmbExtensionsElementController<ManifestTypes>;
+
 	@state()
-	private _extensions: InitializedExtension[] = [];
+	private _permittedExts: Array<UmbExtensionElementController> = [];
 
+	/**
+	 * The type or types of extensions to render.
+	 * @type {string | string[]}
+	 * @memberof UmbExtensionSlot
+	 * @example
+	 * <umb-extension-slot type="my-extension-type"></umb-extension-slot>
+	 * or multiple:
+	 * <umb-extension-slot .type=${['my-extension-type','another-extension-type']}></umb-extension-slot>
+	 *
+	 */
 	@property({ type: String })
-	public type = '';
+	public get type(): string | string[] | undefined {
+		return this.#type;
+	}
+	public set type(value: string | string[] | undefined) {
+		if (value === this.#type) return;
+		this.#type = value;
+		if (this.#attached) {
+			this._observeExtensions();
+		}
+	}
+	#type?: string | string[] | undefined;
 
+	/**
+	 * Filter method for extension manifests.
+	 * This is an initial filter taking effect before conditions or overwrites, the extensions will still be filtered by the conditions defined in the manifest.
+	 * @type {(manifest: any) => boolean}
+	 * @memberof UmbExtensionSlot
+	 * @example
+	 * <umb-extension-slot type="my-extension-type" .filter=${(ext) => ext.meta.anyPropToFilter === 'foo'}></umb-extension-slot>
+	 *
+	 */
 	@property({ type: Object, attribute: false })
-	public filter: (manifest: any) => boolean = () => true;
+	public get filter(): (manifest: any) => boolean {
+		return this.#filter;
+	}
+	public set filter(value: (manifest: any) => boolean) {
+		if (value === this.#filter) return;
+		this.#filter = value;
+		if (this.#attached) {
+			this._observeExtensions();
+		}
+	}
+	#filter: (manifest: any) => boolean = () => true;
 
-	private _props?: Record<string, any> = {};
+	/**
+	 * Properties to pass to the extensions elements.
+	 * Notice: The individual manifest of the extension is parsed to each extension element no matter if this is set or not.
+	 * @type {Record<string, any>}
+	 * @memberof UmbExtensionSlot
+	 * @example
+	 * <umb-extension-slot type="my-extension-type" .props=${{foo: 'bar'}}></umb-extension-slot>
+	 */
 	@property({ type: Object, attribute: false })
 	get props() {
-		return this._props;
+		return this.#props;
 	}
-	set props(newVal) {
-		this._props = newVal;
-		// TODO: we could optimize this so we only re-set the updated props.
-		this.#assignPropsToAllComponents();
+	set props(newVal: Record<string, unknown> | undefined) {
+		// TODO, compare changes since last time. only reset the ones that changed. This might be better done by the controller is self:
+		this.#props = newVal;
+		if (this.#extensionsController) {
+			this.#extensionsController.properties = newVal;
+		}
 	}
+	#props?: Record<string, unknown> = {};
 
 	@property({ type: String, attribute: 'default-element' })
 	public defaultElement = '';
 
 	@property()
-	public renderMethod?: (extension: InitializedExtension) => TemplateResult<1 | 2> | HTMLElement | null;
+	public renderMethod?: (extension: UmbExtensionElementController) => TemplateResult | HTMLElement | null | undefined;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._observeExtensions();
+		this.#attached = true;
 	}
 
 	private _observeExtensions() {
-		this.observe(
-			umbExtensionsRegistry?.extensionsOfType(this.type).pipe(map((extensions) => extensions.filter(this.filter))),
-			async (extensions) => {
-				const oldValue = this._extensions;
-				const oldLength = this._extensions.length;
-				this._extensions = this._extensions.filter((current) =>
-					extensions.find((incoming) => incoming.alias === current.alias)
-				);
-
-				if (this._extensions.length !== oldLength) {
-					this.requestUpdate('_extensions', oldValue);
-				}
-
-				extensions.forEach(async (extension) => {
-					const hasExt = this._extensions.find((x) => x.alias === extension.alias);
-					if (!hasExt) {
-						const extensionObject: InitializedExtension = {
-							alias: extension.alias,
-							weight: (extension as any).weight || 0,
-							component: null,
-						};
-						this._extensions.push(extensionObject);
-						// sort:
-						this._extensions.sort((a, b) => b.weight - a.weight);
-						let component;
-
-						if (isManifestElementableType(extension)) {
-							component = await createExtensionElement(extension);
-						} else if (this.defaultElement) {
-							component = document.createElement(this.defaultElement);
-						} else {
-							// TODO: Lets make an console.error in this case?
-						}
-						if (component) {
-							this.#assignProps(component);
-							(component as any).manifest = extension;
-							extensionObject.component = component;
-						} else {
-							// Remove cause we could not get the component, so we will get rid of this.
-							//this._extensions.splice(this._extensions.indexOf(extensionObject), 1);
-							// Actually not, because if, then the same extension would come around again in next update.
-						}
-						this.requestUpdate('_extensions', oldValue);
-					}
-				});
-			}
-		);
+		this.#extensionsController?.destroy();
+		if (this.#type) {
+			this.#extensionsController = new UmbExtensionsElementController(
+				this,
+				umbExtensionsRegistry,
+				this.#type,
+				this.filter,
+				(extensionControllers) => {
+					this._permittedExts = extensionControllers;
+				},
+				this.defaultElement
+			);
+			this.#extensionsController.properties = this.#props;
+		}
 	}
-
-	#assignPropsToAllComponents() {
-		this._extensions.forEach((ext) => this.#assignProps(ext.component));
-	}
-
-	#assignProps = (component: HTMLElement | null) => {
-		if (!component || !this._props) return;
-
-		Object.keys(this._props).forEach((key) => {
-			(component as any)[key] = this._props?.[key];
-		});
-	};
 
 	render() {
-		// TODO: check if we can use repeat directly.
 		return repeat(
-			this._extensions,
+			this._permittedExts,
 			(ext) => ext.alias,
 			(ext) => (this.renderMethod ? this.renderMethod(ext) : ext.component)
 		);
