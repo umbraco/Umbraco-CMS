@@ -1,6 +1,7 @@
 ﻿using Examine;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Examine.Extensions;
 using Umbraco.Search.Indexing.Notifications;
 using Umbraco.Search.ValueSet.ValueSetBuilders;
@@ -29,15 +30,17 @@ public class UmbracoExamineIndex<T> : UmbracoExamineIndex, IUmbracoIndex<T> wher
     private readonly IValueSetBuilder<T> _valueSetBuilder;
     private readonly IDisposable[]? _attachedDisposables;
 
-    public UmbracoExamineIndex(IIndex examineIndex, IValueSetBuilder<T> valueSetBuilder, IEventAggregator eventAggregator) : base(
-        (UmbracoExamineLuceneIndex)examineIndex,eventAggregator)
+    public UmbracoExamineIndex(IIndex examineIndex, IValueSetBuilder<T> valueSetBuilder,
+        IEventAggregator eventAggregator) : base(
+        (UmbracoExamineLuceneIndex)examineIndex, eventAggregator)
     {
         _valueSetBuilder = valueSetBuilder;
         examineIndex.IndexOperationComplete += runIndexOperationComplete;
     }
 
-    public UmbracoExamineIndex(IIndex examineIndex, IValueSetBuilder<T> valueSetBuilder, IEventAggregator eventAggregator,
-        params IDisposable[]? attachedDisposables) : base((UmbracoExamineLuceneIndex)examineIndex,eventAggregator)
+    public UmbracoExamineIndex(IIndex examineIndex, IValueSetBuilder<T> valueSetBuilder,
+        IEventAggregator eventAggregator,
+        params IDisposable[]? attachedDisposables) : base((UmbracoExamineLuceneIndex)examineIndex, eventAggregator)
     {
         _valueSetBuilder = valueSetBuilder;
         _attachedDisposables = attachedDisposables;
@@ -53,6 +56,7 @@ public class UmbracoExamineIndex<T> : UmbracoExamineIndex, IUmbracoIndex<T> wher
     public Action<object?, EventArgs>? IndexOperationComplete { get; set; }
     public bool Exists() => ExamineIndex.IndexExists();
 
+    public ISearchEngine? SearchEngine { get { return ExamineIndex.SearchEngine; } }
     public long GetDocumentCount() => ExamineIndex.GetDocumentCount();
 
     public void Create() => ExamineIndex.CreateIndex();
@@ -76,7 +80,7 @@ public class UmbracoExamineIndex<T> : UmbracoExamineIndex, IUmbracoIndex<T> wher
         EventAggregator.Publish(new IndexingNotification(valueSet));
 
 
-        ExamineIndex.IndexItems(valueSet.Select(x=>x.ToExamineValueSet()));
+        ExamineIndex.IndexItems(valueSet.Select(x => x.ToExamineValueSet()));
     }
 
     public void Dispose()
