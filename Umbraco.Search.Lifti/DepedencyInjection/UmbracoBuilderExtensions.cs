@@ -14,7 +14,6 @@ using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 using Umbraco.Search.Configuration;
-using Umbraco.Search.Examine;
 using Umbraco.Search.Indexing;
 using Umbraco.Search.Indexing.Populators;
 using Umbraco.Search.InMemory.SpecialisedSearchers;

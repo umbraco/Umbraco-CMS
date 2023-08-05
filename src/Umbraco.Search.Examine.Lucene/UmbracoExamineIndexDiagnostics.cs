@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.Examine.Configuration;
+using Umbraco.Search.ValueSet.Validators;
 using Umbraco.Search.ValueSet.ValueSetBuilders;
 
 namespace Umbraco.Search.Examine.Lucene;

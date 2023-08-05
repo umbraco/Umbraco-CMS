@@ -1,10 +1,6 @@
-using Umbraco.Cms.Core.Models;
 using Umbraco.Extensions;
-using Umbraco.Search.ValueSet;
-using Umbraco.Search.ValueSet.Validators;
-using IValueSetValidator = Examine.IValueSetValidator;
 
-namespace Umbraco.Search.Examine;
+namespace Umbraco.Search.ValueSet.Validators;
 
 /// <summary>
 ///     Performing basic validation of a value set

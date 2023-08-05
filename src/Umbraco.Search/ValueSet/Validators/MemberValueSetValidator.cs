@@ -1,7 +1,6 @@
 using Umbraco.Cms.Core.Search;
-using Umbraco.Search.Examine;
 
-namespace Umbraco.Search.ValueSet.ValueSetBuilders;
+namespace Umbraco.Search.ValueSet.Validators;
 
 public class MemberValueSetValidator : UmbracoValueSetValidator
 {
