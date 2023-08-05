@@ -176,7 +176,7 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
                 return false;
             }
 
-            GenerateExactSearch(sb, query, searchFrom, fields, type, allLangs);
+            GeneratePhraseSearch(sb, query, searchFrom, fields, type, allLangs);
         }
         else
         {
@@ -208,7 +208,7 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
 
             sb.Append("&");
 
-            AppendNodeNameExactWithBoost(sb, query, allLangs);
+            AppendNodeNameExactWithBoost(sb, new QueryWithLanguages(query, allLangs));
 
             AppendNodeNameWithWildcards(sb, querywords, allLangs);
 
@@ -244,7 +244,7 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
         }
     }
 
-    private void GenerateExactSearch(StringBuilder sb, string query, string? searchFrom, List<string> fields,
+    private void GeneratePhraseSearch(StringBuilder sb, string query, string? searchFrom, List<string> fields,
         string type, List<string> allLangs)
     {
         //strip quotes, escape string, the replace again
@@ -259,7 +259,7 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
 
             sb.Append("&");
 
-            AppendNodeNamePhraseWithBoost(sb, query, allLangs);
+            AppendNodeNamePhraseWithBoost(sb, new QueryWithLanguages(query, allLangs));
 
             foreach (var f in fields)
             {
@@ -272,38 +272,38 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
         }
     }
 
-    private void AppendNodeNamePhraseWithBoost(StringBuilder sb, string query, IEnumerable<string> allLangs)
+    private void AppendNodeNamePhraseWithBoost(StringBuilder sb, QueryWithLanguages queryWithLanguages)
     {
         //node name exactly boost x 10
         sb.Append("nodeName=");
-        sb.Append(query.ToLower());
+        sb.Append(queryWithLanguages.Query.ToLower());
         sb.Append("");
 
         //also search on all variant node names
-        foreach (var lang in allLangs)
+        foreach (var lang in queryWithLanguages.Languages)
         {
             //node name exactly boost x 10
             sb.Append($"|nodeName_{lang}= ");
-            sb.Append(query.ToLower());
+            sb.Append(queryWithLanguages.Query.ToLower());
             sb.Append("");
         }
     }
 
-    private void AppendNodeNameExactWithBoost(StringBuilder sb, string query, IEnumerable<string> allLangs)
+    private void AppendNodeNameExactWithBoost(StringBuilder sb, QueryWithLanguages queryWithLanguages)
     {
         //node name exactly boost x 10
         sb.Append("nodeName=");
         sb.Append("\"");
-        sb.Append(query.ToLower());
+        sb.Append(queryWithLanguages.Query.ToLower());
         sb.Append("\"");
         sb.Append("");
         //also search on all variant node names
-        foreach (var lang in allLangs)
+        foreach (var lang in queryWithLanguages.Languages)
         {
             //node name exactly boost x 10
             sb.Append($"|nodeName_{lang}=");
             sb.Append("\"");
-            sb.Append(query.ToLower());
+            sb.Append(queryWithLanguages.Query.ToLower());
             sb.Append("\"");
             sb.Append("");
         }
@@ -407,5 +407,17 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
 
         sb.Append(path);
         sb.Append("\\,*");
+    }
+
+    private class QueryWithLanguages
+    {
+        public QueryWithLanguages(string query, List<string> languages)
+        {
+            Query = query;
+            Languages = languages;
+        }
+
+        public string Query { get; set; }
+        public List<string> Languages { get; set; }
     }
 }
