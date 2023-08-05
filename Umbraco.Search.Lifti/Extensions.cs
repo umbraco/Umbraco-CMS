@@ -1,8 +1,7 @@
 ﻿using Lifti;
 using Umbraco.Cms.Core.Models.Search;
-using Umbraco.Search.ValueSet;
 
-namespace Umbraco.Search.InMemory;
+namespace Umbraco.Search.Lifti;
 
 public static class Extensions
 {

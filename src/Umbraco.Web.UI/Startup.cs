@@ -1,7 +1,7 @@
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Search.DependencyInjection;
 using Umbraco.Search.Examine.Lucene.DependencyInjection;
-using Umbraco.Search.InMemory.DepedencyInjection;
+using Umbraco.Search.Lifti.DepedencyInjection;
 
 namespace Umbraco.Cms.Web.UI
 {

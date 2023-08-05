@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Search.Diagnostics;
 
-namespace Umbraco.Search.InMemory;
+namespace Umbraco.Search.Lifti;
 
 public class InMemorySearchProvider : ISearchProvider
 {

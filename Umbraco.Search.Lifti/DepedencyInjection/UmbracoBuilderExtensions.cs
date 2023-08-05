@@ -1,29 +1,16 @@
-﻿using Examine;
-using Lifti;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Lifti;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Infrastructure.DependencyInjection;
-using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Extensions;
 using Umbraco.Search.Configuration;
-using Umbraco.Search.Indexing;
-using Umbraco.Search.Indexing.Populators;
-using Umbraco.Search.InMemory.SpecialisedSearchers;
+using Umbraco.Search.Lifti.SpecialisedSearchers;
 using Umbraco.Search.Services;
-using Umbraco.Search.ValueSet;
 using IBackOfficeExamineSearcher = Umbraco.Search.SpecialisedSearchers.IBackOfficeExamineSearcher;
 using IContentValueSetBuilder = Umbraco.Search.ValueSet.ValueSetBuilders.IContentValueSetBuilder;
-using IIndexDiagnosticsFactory = Umbraco.Search.Diagnostics.IIndexDiagnosticsFactory;
 
-namespace Umbraco.Search.InMemory.DepedencyInjection;
+namespace Umbraco.Search.Lifti.DepedencyInjection;
 
 public static class UmbracoBuilderExtensions
 {

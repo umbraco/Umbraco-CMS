@@ -48,6 +48,8 @@ public class GenericIndexDiagnostics : IIndexDiagnostics
         }
     }
 
+    public ISearchEngine? SearchEngine { get=> _index?.SearchEngine; }
+
     public Attempt<HealthStatus?> IsHealthy()
     {
         if (!_index?.Exists() ?? false)

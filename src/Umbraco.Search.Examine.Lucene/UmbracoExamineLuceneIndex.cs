@@ -48,6 +48,7 @@ public class UmbracoExamineLuceneIndex : LuceneIndex, IUmbracoExamineIndex, IInd
         _logger = loggerFactory.CreateLogger<UmbracoExamineLuceneIndex>();
     }
 
+    public ISearchEngine? SearchEngine { get; } = new ExamineLuceneSearchEngine();
     public Attempt<HealthStatus?> IsHealthy() => _diagnostics.IsHealthy();
     public virtual IReadOnlyDictionary<string, object?> Metadata => _diagnostics.Metadata;
 

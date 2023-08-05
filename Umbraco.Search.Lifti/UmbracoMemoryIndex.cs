@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Umbraco.Cms.Core.Models.Entities;
+﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Search.Diagnostics;
 using Umbraco.Search.ValueSet.ValueSetBuilders;
 
-namespace Umbraco.Search.InMemory;
+namespace Umbraco.Search.Lifti;
 
 public class UmbracoMemoryIndex<T> : IUmbracoIndex<T> where T : IUmbracoEntity
 {
@@ -31,6 +31,8 @@ public class UmbracoMemoryIndex<T> : IUmbracoIndex<T> where T : IUmbracoEntity
     ///    An event that is triggered when an index operation is complete
     /// </summary>
     public Action<object?, EventArgs>? IndexOperationComplete { get; set; }
+
+    public ISearchEngine? SearchEngine { get; } = new LiftiSearchEngine();
 
     public long GetDocumentCount()
     {

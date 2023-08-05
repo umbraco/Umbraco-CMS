@@ -1,6 +1,6 @@
 ﻿using Lifti;
 
-namespace Umbraco.Search.InMemory;
+namespace Umbraco.Search.Lifti;
 
 public interface ILiftiIndex
 {

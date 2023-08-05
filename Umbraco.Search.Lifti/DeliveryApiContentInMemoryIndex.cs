@@ -1,8 +1,7 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Search.ValueSet.ValueSetBuilders;
 
-namespace Umbraco.Search.InMemory;
+namespace Umbraco.Search.Lifti;
 
 public class DeliveryApiContentInMemoryIndex : UmbracoMemoryIndex<IContent>
 {

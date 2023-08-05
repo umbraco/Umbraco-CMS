@@ -1,10 +1,9 @@
 ﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Search.Configuration;
 
-namespace Umbraco.Search.InMemory.Configuration;
+namespace Umbraco.Search.Lifti.Configuration;
 
 public class InMemoryIndexConfigurationFactory : IIndexConfigurationFactory
 {

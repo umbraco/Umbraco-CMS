@@ -1,8 +1,7 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Umbraco.Cms.Core.Models.PublishedContent;
+﻿using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.Search;
 
-namespace Umbraco.Search.InMemory;
+namespace Umbraco.Search.Lifti;
 
 public class UmbracoMemorySearcher<T> : IUmbracoSearcher<T>
 {

@@ -21,6 +21,8 @@ public interface IIndexDiagnostics
     /// </remarks>
     IReadOnlyDictionary<string, object?> Metadata { get; }
 
+    ISearchEngine? SearchEngine { get; }
+
     /// <summary>
     ///     If the index can be open/read
     /// </summary>

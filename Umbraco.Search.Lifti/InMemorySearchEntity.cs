@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Umbraco.Search.InMemory;
+﻿namespace Umbraco.Search.Lifti;
 
 public class InMemorySearchEntity : Dictionary<string, object>
 {

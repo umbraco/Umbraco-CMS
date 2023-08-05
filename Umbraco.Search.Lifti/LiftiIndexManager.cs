@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
-
-namespace Umbraco.Search.InMemory;
+﻿namespace Umbraco.Search.Lifti;
 
 public class LiftiIndexManager : ILiftiIndexManager
 {

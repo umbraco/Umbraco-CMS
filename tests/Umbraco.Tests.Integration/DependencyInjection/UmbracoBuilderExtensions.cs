@@ -30,8 +30,7 @@ using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 using Umbraco.Search;
 using Umbraco.Search.DependencyInjection;
-using Umbraco.Search.InMemory;
-using Umbraco.Search.InMemory.DepedencyInjection;
+using Umbraco.Search.Lifti.DepedencyInjection;
 using IIndexPopulator = Umbraco.Search.IIndexPopulator;
 using IIndexRebuilder = Umbraco.Search.Indexing.IIndexRebuilder;
 

@@ -1,6 +1,6 @@
 ﻿using Umbraco.Search.Configuration;
 
-namespace Umbraco.Search.InMemory.Configuration;
+namespace Umbraco.Search.Lifti.Configuration;
 
 public class UmbracoInMemoryIndexConfig : IUmbracoIndexConfiguration
 {

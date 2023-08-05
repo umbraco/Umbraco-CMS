@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure;
 using Umbraco.Search.Services;
 
-namespace Umbraco.Search.InMemory;
+namespace Umbraco.Search.Lifti;
 
 internal class InMemoryIndexingMainDomHandler : ISearchMainDomHandler
 {

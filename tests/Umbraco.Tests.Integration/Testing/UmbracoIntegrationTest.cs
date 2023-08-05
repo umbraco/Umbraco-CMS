@@ -21,7 +21,7 @@ using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
 using Umbraco.Search;
 using Umbraco.Search.DependencyInjection;
-using Umbraco.Search.InMemory.DepedencyInjection;
+using Umbraco.Search.Lifti.DepedencyInjection;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;

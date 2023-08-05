@@ -87,4 +87,6 @@ public class LuceneIndexDiagnostics : IIndexDiagnostics
             return d;
         }
     }
+
+    public ISearchEngine? SearchEngine { get; } = new ExamineLuceneSearchEngine();
 }

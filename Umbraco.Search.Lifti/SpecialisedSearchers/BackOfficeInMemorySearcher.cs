@@ -16,10 +16,9 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Search.Configuration;
-using Umbraco.Search.Models;
 using Umbraco.Search.SpecialisedSearchers;
 
-namespace Umbraco.Search.InMemory.SpecialisedSearchers;
+namespace Umbraco.Search.Lifti.SpecialisedSearchers;
 
 public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
 {
