@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.baseTests;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-public class UmbracoSearchTests : UmbracoIntegrationTest
+public class UmbracoSearchTests : UmbracoSearchBaseTests
 {
     [Test]
     public void Create_New()

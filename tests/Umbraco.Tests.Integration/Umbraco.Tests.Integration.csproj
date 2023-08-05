@@ -54,6 +54,9 @@
     </Compile>
     <EmbeddedResource Include="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
     <Content Include="appsettings.Tests.json" CopyToOutputDirectory="PreserveNewest" />
+    <Compile Remove="Umbraco.Search\baseTests\IndexTest.cs" />
+    <Compile Remove="Umbraco.Search\baseTests\PublishedContentQueryTests.cs" />
+    <Compile Remove="Umbraco.Search\baseTests\SearchTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

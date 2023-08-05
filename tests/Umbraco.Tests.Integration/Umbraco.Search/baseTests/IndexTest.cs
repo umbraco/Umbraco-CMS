@@ -10,8 +10,10 @@ using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Search.baseTests;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
+using IndexTypes = Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations.IndexTypes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Examine.Lucene.UmbracoExamine;
 
@@ -20,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Examine.Lucene.UmbracoExa
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.None)]
-public class IndexTest : ExamineBaseTest
+public class IndexTest : UmbracoSearchBaseTests
 {
     [Test]
     public void GivenValidationParentNode_WhenContentIndexedUnderDifferentParent_DocumentIsNotIndexed()

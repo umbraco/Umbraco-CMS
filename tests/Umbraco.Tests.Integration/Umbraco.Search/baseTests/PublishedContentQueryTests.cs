@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Search.baseTests;
 using Umbraco.Search;
 using Umbraco.Search.Examine;
 using Umbraco.Search.Examine.Lucene;
@@ -21,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Examine.Lucene.UmbracoExa
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.None)]
-public class PublishedContentQueryTests
+public class PublishedContentQueryTests : UmbracoSearchBaseTests
 {
 
     private PublishedContentQuery CreatePublishedContentQuery(IIndex indexer)

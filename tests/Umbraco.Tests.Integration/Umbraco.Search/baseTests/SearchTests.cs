@@ -10,13 +10,14 @@ using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Search.baseTests;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Examine.Lucene.UmbracoExamine;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
-public class SearchTests : ExamineBaseTest
+public class SearchTests : UmbracoSearchBaseTests
 {
     [Test]
     public void Test_Sort_Order_Sorting()
