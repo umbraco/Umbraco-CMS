@@ -17,7 +17,6 @@ public class UmbracoFieldDefinitionCollection : IEnumerable<FieldDefinition>
     public UmbracoFieldDefinitionCollection(params FieldDefinition[] definitions)
         : this((IEnumerable<FieldDefinition>)definitions)
     {
-
     }
 
 
@@ -47,18 +46,23 @@ public class UmbracoFieldDefinitionCollection : IEnumerable<FieldDefinition>
         foreach (var f in definitions.GroupBy(x => x.Name))
         {
             var indexField = f.FirstOrDefault();
-            if (indexField is not null)
+            if (indexField is null)
             {
-                Definitions.TryAdd(f.Key, indexField);
+                continue;
             }
+
+            Definitions.TryAdd(f.Key, indexField);
         }
+
         foreach (var f in UmbracoIndexFieldDefinitions.GroupBy(x => x.Name))
         {
             var indexField = f.FirstOrDefault();
-            if (indexField is not null)
+            if (indexField is null)
             {
-                Definitions.TryAdd(f.Key, indexField);
+                continue;
             }
+
+            Definitions.TryAdd(f.Key, indexField);
         }
     }
 
@@ -116,7 +120,10 @@ public class UmbracoFieldDefinitionCollection : IEnumerable<FieldDefinition>
     public IEnumerator<FieldDefinition> GetEnumerator() => Definitions.Values.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    public FieldDefinition GetOrAdd(string fieldName, Func<string, FieldDefinition> add) => Definitions.GetOrAdd(fieldName, add);
+
+    public FieldDefinition GetOrAdd(string fieldName, Func<string, FieldDefinition> add) =>
+        Definitions.GetOrAdd(fieldName, add);
+
     public void AddOrUpdate(FieldDefinition definition) =>
         Definitions.AddOrUpdate(definition.Name, definition, (s, factory) => definition);
 
