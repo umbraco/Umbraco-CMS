@@ -9,7 +9,8 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Search.DefferedActions;
 
-internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : DeliveryApiContentIndexDeferredBase, IDeferredAction
+internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : DeliveryApiContentIndexDeferredBase,
+    IDeferredAction
 {
     private const int PageSize = 500;
 
@@ -56,17 +57,20 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
         }
 
         IUmbracoIndex<IContent> index = _deliveryApiIndexingHandler.GetIndex() ??
-                                        throw new InvalidOperationException("Could not obtain the delivery API content index");
+                                        throw new InvalidOperationException(
+                                            "Could not obtain the delivery API content index");
 
         IUmbracoSearcher searcher = _deliveryApiIndexingHandler.GetSearcher() ??
-                                        throw new InvalidOperationException("Could not obtain the delivery API content searcher");
+                                    throw new InvalidOperationException(
+                                        "Could not obtain the delivery API content searcher");
 
-        HandleUpdatedContentTypes(updatedContentTypeIds,index, searcher);
+        HandleUpdatedContentTypes(updatedContentTypeIds, index, searcher);
 
         return Task.CompletedTask;
     });
 
-    private void HandleUpdatedContentTypes(IEnumerable<int> updatedContentTypesIds, IUmbracoIndex<IContent> index, IUmbracoSearcher searcher)
+    private void HandleUpdatedContentTypes(IEnumerable<int> updatedContentTypesIds, IUmbracoIndex<IContent> index,
+        IUmbracoSearcher searcher)
     {
         foreach (var contentTypeId in updatedContentTypesIds)
         {
@@ -77,18 +81,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
             // however, we need to keep track of the mapping between content IDs and their current (composite) index
             // IDs, since the index IDs can change here (if the content type culture variance is changed), and thus
             // we may have to clean up the current documents after reindexing.
-            var indexIdsByContentIds = indexIds
-                .Select(id =>
-                {
-                    var parts = id.Split(Constants.CharArrays.VerticalTab);
-                    return parts.Length == 2 && int.TryParse(parts[0], out var contentId)
-                        ? (ContentId: contentId, IndexId: id)
-                        : throw new InvalidOperationException($"Delivery API identifier should be composite of ID and culture, got: {id}");
-                })
-                .GroupBy(tuple => tuple.ContentId)
-                .ToDictionary(
-                    group => group.Key,
-                    group => group.Select(t => t.IndexId).ToArray());
+            var indexIdsByContentIds = GetIndexIdsbyContenIds(indexIds, index);
 
             // keep track of the IDs of the documents that must be removed, so we can remove them all in one go
             var indexIdsToRemove = new List<string>();
@@ -107,8 +100,10 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
                 // reindex the documents for this content
                 contentToBeIndex.Add(content);
                 // if any of the document IDs have changed, make sure we clean up the previous ones
-                indexIdsToRemove.AddRange(indexIdsByContentId.Value.Except(contentToBeIndex.Select(set => set.Id.ToString())));
+                indexIdsToRemove.AddRange(
+                    indexIdsByContentId.Value.Except(contentToBeIndex.Select(set => set.Id.ToString())));
             }
+
             if (contentToBeIndex.Any())
             {
                 index.IndexItems(contentToBeIndex.ToArray());
@@ -116,6 +111,24 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
 
             RemoveFromIndex(indexIdsToRemove, index);
         }
+    }
+
+    private IEnumerable<KeyValuePair<int, string[]>> GetIndexIdsbyContenIds(List<string> indexIds,
+        IUmbracoIndex<IContent> index)
+    {
+        return indexIds
+            .Select(id =>
+            {
+                var parts = id.Split(Constants.CharArrays.VerticalTab);
+                return parts.Length == 2 && int.TryParse(parts[0], out var contentId)
+                    ? (ContentId: contentId, IndexId: id)
+                    : throw new InvalidOperationException(
+                        $"Delivery API identifier should be composite of ID and culture, got: {id}");
+            })
+            .GroupBy(tuple => tuple.ContentId)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(t => t.IndexId).ToArray());
     }
 
     private List<string> FindIdsForContentType(int contentTypeId, IUmbracoSearcher index)
@@ -127,7 +140,8 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
         while (page * PageSize < total)
         {
             var searchRequest = index.CreateSearchRequest();
-            searchRequest.CreateFilter(UmbracoSearchFieldNames.DeliveryApiContentIndex.ContentTypeId,new[] { contentTypeId.ToString() }.ToList(), LogicOperator.OR);
+            searchRequest.CreateFilter(UmbracoSearchFieldNames.DeliveryApiContentIndex.ContentTypeId,
+                new[] { contentTypeId.ToString() }.ToList(), LogicOperator.OR);
             searchRequest.Page = page;
             searchRequest.PageSize = PageSize;
             IUmbracoSearchResults? results =
