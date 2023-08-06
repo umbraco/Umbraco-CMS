@@ -197,7 +197,7 @@ public static class UserExtensions
             : user.Groups.SelectMany(x => x.AllowedLanguages).Distinct().ToArray();
     }
 
-    public static int[]? CalculateContentStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
+    public static int[]? CalculateContentStartNodeIds(this IUser? user, IEntityService entityService, AppCaches appCaches)
     {
         var cacheKey = CacheKeys.UserAllContentStartNodesPrefix + user.Id;
         IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
@@ -231,7 +231,7 @@ public static class UserExtensions
     /// <param name="entityService"></param>
     /// <param name="appCaches"></param>
     /// <returns></returns>
-    public static int[]? CalculateMediaStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
+    public static int[]? CalculateMediaStartNodeIds(this IUser? user, IEntityService entityService, AppCaches appCaches)
     {
         var cacheKey = CacheKeys.UserAllMediaStartNodesPrefix + user.Id;
         IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();

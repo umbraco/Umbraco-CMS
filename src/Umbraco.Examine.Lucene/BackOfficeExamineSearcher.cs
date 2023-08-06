@@ -20,8 +20,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
-[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
 
+[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
 public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 {
     private readonly AppCaches _appCaches;
@@ -64,7 +64,6 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
     {
         var sb = new StringBuilder();
 
-        string type;
         var indexName = Constants.UmbracoIndexes.InternalIndexName;
         var fields = _treeSearcherFields.GetBackOfficeFields().ToList();
 
@@ -84,59 +83,17 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         }
 
         IUser? currentUser = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
-
-        switch (entityType)
+        string type = entityType switch
         {
-            case UmbracoEntityTypes.Member:
-                indexName = Constants.UmbracoIndexes.MembersIndexName;
-                type = "member";
-                fields.AddRange(_treeSearcherFields.GetBackOfficeMembersFields());
-                foreach (var field in _treeSearcherFields.GetBackOfficeMembersFieldsToLoad())
-                {
-                    fieldsToLoad.Add(field);
-                }
-
-                if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId &&
-                    searchFrom.Trim() != "-1")
-                {
-                    sb.Append("+__NodeTypeAlias:");
-                    sb.Append(searchFrom);
-                    sb.Append(" ");
-                }
-
-                break;
-            case UmbracoEntityTypes.Media:
-                type = "media";
-                fields.AddRange(_treeSearcherFields.GetBackOfficeMediaFields());
-                foreach (var field in _treeSearcherFields.GetBackOfficeMediaFieldsToLoad())
-                {
-                    fieldsToLoad.Add(field);
-                }
-
-                var allMediaStartNodes = currentUser != null
-                    ? currentUser.CalculateMediaStartNodeIds(_entityService, _appCaches)
-                    : Array.Empty<int>();
-                AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
-                break;
-            case UmbracoEntityTypes.Document:
-                type = "content";
-                fields.AddRange(_treeSearcherFields.GetBackOfficeDocumentFields());
-                foreach (var field in _treeSearcherFields.GetBackOfficeDocumentFieldsToLoad())
-                {
-                    fieldsToLoad.Add(field);
-                }
-
-                var allContentStartNodes = currentUser != null
-                    ? currentUser.CalculateContentStartNodeIds(_entityService, _appCaches)
-                    : Array.Empty<int>();
-                AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
-                break;
-            default:
-                throw new NotSupportedException("The " + typeof(BackOfficeExamineSearcher) +
-                                                " currently does not support searching against object type " +
-                                                entityType);
-        }
-
+            UmbracoEntityTypes.Member => PrepareMemberQuery(sb, fields, fieldsToLoad, searchFrom, out indexName),
+            UmbracoEntityTypes.Media => PrepareMediaQuery(sb, fields, fieldsToLoad, currentUser, searchFrom,
+                ignoreUserStartNodes),
+            UmbracoEntityTypes.Document => PrepareDocumentQuery(sb, fields, fieldsToLoad, currentUser, searchFrom,
+                ignoreUserStartNodes),
+            _ => throw new NotSupportedException("The " + typeof(BackOfficeExamineSearcher) +
+                                                 " currently does not support searching against object type " +
+                                                 entityType)
+        };
         if (!_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
             throw new InvalidOperationException("No index found by name " + indexName);
@@ -158,6 +115,61 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         totalFound = result.TotalItemCount;
 
         return result;
+    }
+
+    private string PrepareDocumentQuery(StringBuilder sb, List<string> fields, ISet<string> fieldsToLoad,
+        IUser? currentUser, string? searchFrom, bool ignoreUserStartNodes)
+    {
+        fields.AddRange(_treeSearcherFields.GetBackOfficeDocumentFields());
+        foreach (var field in _treeSearcherFields.GetBackOfficeDocumentFieldsToLoad())
+        {
+            fieldsToLoad.Add(field);
+        }
+
+        var allContentStartNodes = currentUser != null
+            ? currentUser.CalculateContentStartNodeIds(_entityService, _appCaches)
+            : Array.Empty<int>();
+        AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes,
+            _entityService);
+        return "content";
+    }
+
+    private string PrepareMediaQuery(StringBuilder sb, List<string> fields, ISet<string> fieldsToLoad,
+        IUser? currentUser, string? searchFrom, bool ignoreUserStartNodes)
+    {
+        fields.AddRange(_treeSearcherFields.GetBackOfficeMediaFields());
+        foreach (var field in _treeSearcherFields.GetBackOfficeMediaFieldsToLoad())
+        {
+            fieldsToLoad.Add(field);
+        }
+
+        var allMediaStartNodes = currentUser != null
+            ? currentUser.CalculateMediaStartNodeIds(_entityService, _appCaches)
+            : Array.Empty<int>();
+        AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes,
+            _entityService);
+        return "media";
+    }
+
+    private string PrepareMemberQuery(StringBuilder sb, List<string> fields, ISet<string> fieldsToLoad,
+        string? searchFrom, out string indexName)
+    {
+        indexName = Constants.UmbracoIndexes.MembersIndexName;
+        fields.AddRange(_treeSearcherFields.GetBackOfficeMembersFields());
+        foreach (var field in _treeSearcherFields.GetBackOfficeMembersFieldsToLoad())
+        {
+            fieldsToLoad.Add(field);
+        }
+
+        if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId &&
+            searchFrom.Trim() != "-1")
+        {
+            sb.Append("+__NodeTypeAlias:");
+            sb.Append(searchFrom);
+            sb.Append(" ");
+        }
+
+        return "member";
     }
 
     private bool BuildQuery(StringBuilder sb, string query, string? searchFrom, List<string> fields, string type)
@@ -345,7 +357,8 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         }
     }
 
-    private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[]? startNodeIds, string? searchFrom, bool ignoreUserStartNodes, IEntityService entityService)
+    private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[]? startNodeIds, string? searchFrom,
+        bool ignoreUserStartNodes, IEntityService entityService)
     {
         if (sb == null)
         {
