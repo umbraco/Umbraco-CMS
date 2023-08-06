@@ -22,5 +22,5 @@ public interface IDataTypeRepository : IReadWriteQueryRepository<int, IDataType>
     /// <param name="id"></param>
     /// <returns></returns>
 
-    IReadOnlyDictionary<Udi, IEnumerable<string>> FindListViewUsages(int id);
+    IReadOnlyDictionary<Udi, IEnumerable<string>> FindListViewUsages(int id) => throw new NotImplementedException();
 }
