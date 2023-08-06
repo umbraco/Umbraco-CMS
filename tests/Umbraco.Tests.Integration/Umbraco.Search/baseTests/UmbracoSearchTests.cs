@@ -37,6 +37,8 @@ public class UmbracoSearchTests : UmbracoSearchBaseTests
             .UmbracoIndexes
             .DeliveryApiContentIndexName);
         Assert.AreNotEqual(null, externalIndex);
+        var allIndexes = SearchProvider.GetAllIndexes();
+        Assert.AreEqual(4, allIndexes.Count());
     }
     [Test]
     public void GetSearchers()
@@ -57,6 +59,8 @@ public class UmbracoSearchTests : UmbracoSearchBaseTests
             .UmbracoIndexes
             .DeliveryApiContentIndexName);
         Assert.AreNotEqual(null, externalIndex);
+        var allIndexes = SearchProvider.GetAllSearchers();
+        Assert.AreEqual(4, allIndexes.Count());
     }
     [Test]
     public void IndexContent()

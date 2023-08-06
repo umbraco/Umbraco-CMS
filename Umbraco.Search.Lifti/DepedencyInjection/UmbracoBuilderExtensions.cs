@@ -16,6 +16,11 @@ public static class UmbracoBuilderExtensions
 {
     public static IServiceCollection RegisterIndexExternal(this IServiceCollection services)
     {
+        services.AddSingleton<ILiftiIndex>(serviceCollection => new UmbracoLiftiIndex( Constants
+                .UmbracoIndexes
+                .ExternalIndexName,
+            new FullTextIndexBuilder<string>()
+                .Build()));
         // This is the long way to add IOptions but gives us access to the
         // services collection which we need to get the dir factory
         services.AddSingleton<IUmbracoIndex>(serviceCollection =>
@@ -36,6 +41,11 @@ public static class UmbracoBuilderExtensions
 
     public static IServiceCollection RegisterIndexInternal(this IServiceCollection services)
     {
+        services.AddSingleton<ILiftiIndex>(serviceCollection => new UmbracoLiftiIndex( Constants
+                .UmbracoIndexes
+                .InternalIndexName,
+            new FullTextIndexBuilder<string>()
+                .Build()));
         // This is the long way to add IOptions but gives us access to the
         // services collection which we need to get the dir factory
         services.AddSingleton<IUmbracoIndex>(serviceCollection =>

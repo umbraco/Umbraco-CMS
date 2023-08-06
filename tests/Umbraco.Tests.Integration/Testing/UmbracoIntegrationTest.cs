@@ -21,6 +21,7 @@ using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
 using Umbraco.Search;
 using Umbraco.Search.DependencyInjection;
+using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Lifti.DepedencyInjection;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -54,6 +55,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     protected ILoggerFactory LoggerFactory => Services.GetRequiredService<ILoggerFactory>();
 
     protected ISearchProvider SearchProvider => Services.GetRequiredService<ISearchProvider>();
+    protected IIndexDiagnosticsFactory IndexDiagnosticsFactory => Services.GetRequiredService<IIndexDiagnosticsFactory>();
     protected AppCaches AppCaches => Services.GetRequiredService<AppCaches>();
 
     protected IIOHelper IOHelper => Services.GetRequiredService<IIOHelper>();
