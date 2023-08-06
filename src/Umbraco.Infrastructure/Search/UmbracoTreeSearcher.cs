@@ -18,7 +18,6 @@ namespace Umbraco.Cms.Infrastructure.Search;
 ///     Used for internal Umbraco implementations of <see cref="ISearchableTree" />
 /// </summary>
 [Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
-
 public class UmbracoTreeSearcher
 {
     private readonly IBackOfficeExamineSearcher _backOfficeExamineSearcher;
@@ -68,21 +67,18 @@ public class UmbracoTreeSearcher
         string? searchFrom = null,
         bool ignoreUserStartNodes = false)
     {
-        IEnumerable<ISearchResult> pagedResult = _backOfficeExamineSearcher.Search(query, entityType, pageSize, pageIndex, out totalFound, searchFrom, ignoreUserStartNodes);
+        IEnumerable<ISearchResult> pagedResult = _backOfficeExamineSearcher.Search(query, entityType, pageSize,
+            pageIndex, out totalFound, searchFrom, ignoreUserStartNodes);
 
-        switch (entityType)
+        return entityType switch
         {
-            case UmbracoEntityTypes.Member:
-                return MemberFromSearchResults(pagedResult.ToArray());
-            case UmbracoEntityTypes.Media:
-                return MediaFromSearchResults(pagedResult);
-            case UmbracoEntityTypes.Document:
-                return ContentFromSearchResults(pagedResult, culture);
-            default:
-                throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) +
-                                                " currently does not support searching against object type " +
-                                                entityType);
-        }
+            UmbracoEntityTypes.Member => MemberFromSearchResults(pagedResult.ToArray()),
+            UmbracoEntityTypes.Media => MediaFromSearchResults(pagedResult),
+            UmbracoEntityTypes.Document => ContentFromSearchResults(pagedResult, culture),
+            _ => throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) +
+                                                 " currently does not support searching against object type " +
+                                                 entityType)
+        };
     }
 
     /// <summary>
@@ -95,7 +91,8 @@ public class UmbracoTreeSearcher
     /// <param name="totalFound"></param>
     /// <param name="searchFrom"></param>
     /// <returns></returns>
-    public IEnumerable<SearchResultEntity?> EntitySearch(UmbracoObjectTypes objectType, string query, int pageSize, long pageIndex, out long totalFound, string? searchFrom = null)
+    public IEnumerable<SearchResultEntity?> EntitySearch(UmbracoObjectTypes objectType, string query, int pageSize,
+        long pageIndex, out long totalFound, string? searchFrom = null)
     {
         // if it's a GUID, match it
         Guid.TryParse(query, out Guid g);
@@ -139,12 +136,10 @@ public class UmbracoTreeSearcher
             }
 
             if (result.Values.ContainsKey(UmbracoExamineFieldNames.NodeKeyFieldName) &&
-                result.Values[UmbracoExamineFieldNames.NodeKeyFieldName] != null)
+                result.Values[UmbracoExamineFieldNames.NodeKeyFieldName] != null &&
+                Guid.TryParse(result.Values[UmbracoExamineFieldNames.NodeKeyFieldName], out Guid key))
             {
-                if (Guid.TryParse(result.Values[UmbracoExamineFieldNames.NodeKeyFieldName], out Guid key))
-                {
-                    m.Key = key;
-                }
+                m.Key = key;
             }
 
             yield return m;
@@ -174,12 +169,12 @@ public class UmbracoTreeSearcher
         foreach (ISearchResult result in results)
         {
             SearchResultEntity? entity = _mapper.Map<SearchResultEntity>(result, context =>
+            {
+                if (culture != null)
                 {
-                    if (culture != null)
-                    {
-                        context.SetCulture(culture);
-                    }
-                });
+                    context.SetCulture(culture);
+                }
+            });
 
             if (entity is null)
             {
