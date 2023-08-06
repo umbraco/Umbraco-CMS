@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
+using Umbraco.Search.Models;
 using Umbraco.Search.SpecialisedSearchers.Tree;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees;
@@ -45,8 +46,9 @@ public class MediaTypeTreeController : TreeController, ISearchableTree
     public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex,
         string? searchFrom = null)
     {
-        IEnumerable<SearchResultEntity?> results = _treeSearcher.EntitySearch(UmbracoObjectTypes.MediaType, query,
-            pageSize, pageIndex, out var totalFound, searchFrom);
+        IEnumerable<SearchResultEntity?> results = _treeSearcher.EntitySearch(
+            new BackofficeSearchRequest(query, UmbracoObjectTypes.MediaType, pageIndex, pageSize, searchFrom),
+            out var totalFound);
         return new EntitySearchResults(results, totalFound);
     }
 

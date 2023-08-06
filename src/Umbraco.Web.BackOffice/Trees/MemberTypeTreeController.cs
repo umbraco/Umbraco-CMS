@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Search.Models;
 using Umbraco.Search.SpecialisedSearchers.Tree;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees;
@@ -40,8 +41,9 @@ public class MemberTypeTreeController : MemberTypeAndGroupTreeControllerBase, IS
     public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex,
         string? searchFrom = null)
     {
-        IEnumerable<SearchResultEntity?> results = _treeSearcher.EntitySearch(UmbracoObjectTypes.MemberType, query,
-            pageSize, pageIndex, out var totalFound, searchFrom);
+
+        IEnumerable<SearchResultEntity?> results = _treeSearcher.EntitySearch( new BackofficeSearchRequest(query, UmbracoObjectTypes.MemberType, pageIndex, pageSize, searchFrom),
+            out var totalFound);
         return new EntitySearchResults(results, totalFound);
     }
 

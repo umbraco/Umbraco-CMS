@@ -199,7 +199,7 @@ public static class UserExtensions
 
     public static int[]? CalculateContentStartNodeIds(this IUser? user, IEntityService entityService, AppCaches appCaches)
     {
-        var cacheKey = CacheKeys.UserAllContentStartNodesPrefix + user.Id;
+        var cacheKey = CacheKeys.UserAllContentStartNodesPrefix + user!.Id;
         IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
         var result = runtimeCache.GetCacheItem(
             cacheKey,
@@ -233,7 +233,7 @@ public static class UserExtensions
     /// <returns></returns>
     public static int[]? CalculateMediaStartNodeIds(this IUser? user, IEntityService entityService, AppCaches appCaches)
     {
-        var cacheKey = CacheKeys.UserAllMediaStartNodesPrefix + user.Id;
+        var cacheKey = CacheKeys.UserAllMediaStartNodesPrefix + user!.Id;
         IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
         var result = runtimeCache.GetCacheItem(
             cacheKey,

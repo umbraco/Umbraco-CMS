@@ -14,12 +14,14 @@ using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
+using Umbraco.Search.Models;
 using Umbraco.Search.SpecialisedSearchers.Tree;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees;
 
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-[Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, SortOrder = 0, TreeGroup = Constants.Trees.Groups.Settings)]
+[Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, SortOrder = 0,
+    TreeGroup = Constants.Trees.Groups.Settings)]
 [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
 [CoreTree]
 public class ContentTypeTreeController : TreeController, ISearchableTree
@@ -45,9 +47,12 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
         _entityService = entityService;
     }
 
-    public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
+    public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex,
+        string? searchFrom = null)
     {
-        IEnumerable<SearchResultEntity?> results = _treeSearcher.EntitySearch(UmbracoObjectTypes.DocumentType, query, pageSize, pageIndex, out var totalFound, searchFrom);
+        IEnumerable<SearchResultEntity?> results = _treeSearcher.EntitySearch(
+            new BackofficeSearchRequest(query, UmbracoObjectTypes.DocumentType, pageIndex, pageSize, searchFrom),
+            out var totalFound);
         return new EntitySearchResults(results, totalFound);
     }
 
@@ -84,7 +89,8 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
                 .OrderBy(entity => entity.Name)
                 .Select(dt =>
                 {
-                    TreeNode node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, Constants.Icons.Folder, dt.HasChildren, string.Empty);
+                    TreeNode node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, Constants.Icons.Folder,
+                        dt.HasChildren, string.Empty);
                     node.Path = dt.Path;
                     node.NodeType = "container";
 
@@ -113,7 +119,8 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
                     // since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to.
                     // need this check to keep supporting sites where children have already been created.
                     var hasChildren = dt.HasChildren;
-                    TreeNode node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentType, id, queryStrings, contentType?.Icon ?? Constants.Icons.ContentType, hasChildren);
+                    TreeNode node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentType, id, queryStrings,
+                        contentType?.Icon ?? Constants.Icons.ContentType, hasChildren);
 
                     node.Path = dt.Path;
 
@@ -133,17 +140,14 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
 
         if (id == Constants.System.RootString)
         {
-                //set the default to create
+            //set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
             // root actions
             menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             menu.Items.Add(new MenuItem("importdocumenttype", LocalizedTextService)
             {
-                Icon = "icon-page-up",
-                SeparatorBefore = true,
-                OpensDialog = true,
-                UseLegacyIcon = false,
+                Icon = "icon-page-up", SeparatorBefore = true, OpensDialog = true, UseLegacyIcon = false,
             });
 
             menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
@@ -151,7 +155,8 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
             return menu;
         }
 
-        IEntitySlim? container = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture), UmbracoObjectTypes.DocumentTypeContainer);
+        IEntitySlim? container = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture),
+            UmbracoObjectTypes.DocumentTypeContainer);
         if (container != null)
         {
             //set the default to create
@@ -159,16 +164,13 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
 
             menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
-            menu.Items.Add(new MenuItem("rename", LocalizedTextService)
-            {
-                Icon = "icon-edit",
-                UseLegacyIcon = false
-            });
+            menu.Items.Add(new MenuItem("rename", LocalizedTextService) { Icon = "icon-edit", UseLegacyIcon = false });
 
             if (container.HasChildren == false)
             {
                 //can delete doc type
-                menu.Items.Add<ActionDelete>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
+                menu.Items.Add<ActionDelete>(LocalizedTextService, hasSeparator: true, opensDialog: true,
+                    useLegacyIcon: false);
             }
 
             menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
@@ -183,19 +185,18 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
             // No move action if this is a child doc type
             if (parent == null)
             {
-                menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
+                menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true,
+                    useLegacyIcon: false);
             }
 
             menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             menu.Items.Add(new MenuItem("export", LocalizedTextService)
             {
-                Icon = "icon-download-alt",
-                SeparatorBefore = true,
-                OpensDialog = true,
-                UseLegacyIcon = false,
+                Icon = "icon-download-alt", SeparatorBefore = true, OpensDialog = true, UseLegacyIcon = false,
             });
 
-            menu.Items.Add<ActionDelete>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, hasSeparator: true, opensDialog: true,
+                useLegacyIcon: false);
             menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
         }
 

@@ -30,6 +30,7 @@ using Umbraco.Cms.Web.BackOffice.ModelBinders;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Extensions;
+using Umbraco.Search.Models;
 using Umbraco.Search.SpecialisedSearchers.Tree;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
@@ -162,7 +163,8 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// <param name="dataTypeKey">If set used to look up whether user and group start node permissions will be ignored.</param>
     /// <returns></returns>
     [HttpGet]
-    public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string? searchFrom = null, Guid? dataTypeKey = null)
+    public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string? searchFrom = null,
+        Guid? dataTypeKey = null)
     {
         // NOTE: Theoretically you shouldn't be able to see member data if you don't have access to members right? ... but there is a member picker, so can't really do that
 
@@ -178,97 +180,97 @@ public class EntityController : UmbracoAuthorizedJsonController
         return ExamineSearch(query, type, searchFrom, ignoreUserStartNodes);
     }
 
-        /// <summary>
-        ///     Searches for all content that the user is allowed to see (based on their allowed sections)
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        /// <remarks>
-        ///     Even though a normal entity search will allow any user to search on a entity type that they may not have access to
-        ///     edit, we need
-        ///     to filter these results to the sections they are allowed to edit since this search function is explicitly for the
-        ///     global search
-        ///     so if we showed entities that they weren't allowed to edit they would get errors when clicking on the result.
-        ///     The reason a user is allowed to search individual entity types that they are not allowed to edit is because those
-        ///     search
-        ///     methods might be used in things like pickers in the content editor.
-        /// </remarks>
-        [HttpGet]
-        public async Task<IDictionary<string, TreeSearchResult>> SearchAll(string query)
+    /// <summary>
+    ///     Searches for all content that the user is allowed to see (based on their allowed sections)
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    /// <remarks>
+    ///     Even though a normal entity search will allow any user to search on a entity type that they may not have access to
+    ///     edit, we need
+    ///     to filter these results to the sections they are allowed to edit since this search function is explicitly for the
+    ///     global search
+    ///     so if we showed entities that they weren't allowed to edit they would get errors when clicking on the result.
+    ///     The reason a user is allowed to search individual entity types that they are not allowed to edit is because those
+    ///     search
+    ///     methods might be used in things like pickers in the content editor.
+    /// </remarks>
+    [HttpGet]
+    public async Task<IDictionary<string, TreeSearchResult>> SearchAll(string query)
+    {
+        if (string.IsNullOrEmpty(query))
         {
-            if (string.IsNullOrEmpty(query))
-            {
-                return new Dictionary<string, TreeSearchResult>();
-            }
-
-            var culture = ClientCulture();
-            var allowedSections = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.AllowedSections.ToArray();
-
-            var searchTasks = new List<Task<KeyValuePair<string, TreeSearchResult>>>();
-            foreach (KeyValuePair<string, SearchableApplicationTree> searchableTree in _searchableTreeCollection
-                         .SearchableApplicationTrees.OrderBy(t => t.Value.SortOrder))
-            {
-                if (allowedSections?.Contains(searchableTree.Value.AppAlias) ?? false)
-                {
-                    Tree? tree = _treeService.GetByAlias(searchableTree.Key);
-                    if (tree == null)
-                    {
-                        continue; //shouldn't occur
-                    }
-
-                    var rootNodeDisplayName = Tree.GetRootNodeDisplayName(tree, _localizedTextService);
-                    if (rootNodeDisplayName is not null)
-                    {
-                        searchTasks.Add(ExecuteSearchAsync(query, culture, searchableTree, rootNodeDisplayName));
-                    }
-                }
-            }
-
-            var taskResults = await Task.WhenAll(searchTasks);
-
-            return new Dictionary<string, TreeSearchResult>(taskResults);
+            return new Dictionary<string, TreeSearchResult>();
         }
 
-        private static async Task<KeyValuePair<string, TreeSearchResult>> ExecuteSearchAsync(
-            string query,
-            string? culture,
-            KeyValuePair<string, SearchableApplicationTree> searchableTree,
-            string rootNodeDisplayName)
+        var culture = ClientCulture();
+        var allowedSections = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.AllowedSections.ToArray();
+
+        var searchTasks = new List<Task<KeyValuePair<string, TreeSearchResult>>>();
+        foreach (KeyValuePair<string, SearchableApplicationTree> searchableTree in _searchableTreeCollection
+                     .SearchableApplicationTrees.OrderBy(t => t.Value.SortOrder))
         {
-            ISearchableTree searcher = searchableTree.Value.SearchableTree;
-            const int pageSize = 200;
-            IEnumerable<SearchResultEntity> results = (
+            if (allowedSections?.Contains(searchableTree.Value.AppAlias) ?? false)
+            {
+                Tree? tree = _treeService.GetByAlias(searchableTree.Key);
+                if (tree == null)
+                {
+                    continue; //shouldn't occur
+                }
+
+                var rootNodeDisplayName = Tree.GetRootNodeDisplayName(tree, _localizedTextService);
+                if (rootNodeDisplayName is not null)
+                {
+                    searchTasks.Add(ExecuteSearchAsync(query, culture, searchableTree, rootNodeDisplayName));
+                }
+            }
+        }
+
+        var taskResults = await Task.WhenAll(searchTasks);
+
+        return new Dictionary<string, TreeSearchResult>(taskResults);
+    }
+
+    private static async Task<KeyValuePair<string, TreeSearchResult>> ExecuteSearchAsync(
+        string query,
+        string? culture,
+        KeyValuePair<string, SearchableApplicationTree> searchableTree,
+        string rootNodeDisplayName)
+    {
+        ISearchableTree searcher = searchableTree.Value.SearchableTree;
+        const int pageSize = 200;
+        IEnumerable<SearchResultEntity> results = (
                 searcher is ISearchableTreeWithCulture searcherWithCulture
                     ? await searcherWithCulture.SearchAsync(query, pageSize, 0, culture: culture)
                     : await searcher.SearchAsync(query, pageSize, 0))
             .WhereNotNull();
 
-            var searchResult = new TreeSearchResult
-            {
-                Results = results,
-                TreeAlias = searchableTree.Key,
-                AppAlias = searchableTree.Value.AppAlias,
-                JsFormatterService = searchableTree.Value.FormatterService,
-                JsFormatterMethod = searchableTree.Value.FormatterMethod
-            };
-
-            return new KeyValuePair<string, TreeSearchResult>(rootNodeDisplayName, searchResult);
-        }
-
-        /// <summary>
-        ///     Gets the path for a given node ID
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public IConvertToActionResult GetPath(int id, UmbracoEntityTypes type)
+        var searchResult = new TreeSearchResult
         {
-            ActionResult<EntityBasic?> foundContentResult = GetResultForId(id, type);
-            EntityBasic? foundContent = foundContentResult.Value;
-            if (foundContent is null)
-            {
-                return foundContentResult;
-            }
+            Results = results,
+            TreeAlias = searchableTree.Key,
+            AppAlias = searchableTree.Value.AppAlias,
+            JsFormatterService = searchableTree.Value.FormatterService,
+            JsFormatterMethod = searchableTree.Value.FormatterMethod
+        };
+
+        return new KeyValuePair<string, TreeSearchResult>(rootNodeDisplayName, searchResult);
+    }
+
+    /// <summary>
+    ///     Gets the path for a given node ID
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public IConvertToActionResult GetPath(int id, UmbracoEntityTypes type)
+    {
+        ActionResult<EntityBasic?> foundContentResult = GetResultForId(id, type);
+        EntityBasic? foundContent = foundContentResult.Value;
+        if (foundContent is null)
+        {
+            return foundContentResult;
+        }
 
         return new ActionResult<IEnumerable<int>>(foundContent.Path
             .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(
@@ -359,7 +361,8 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// </remarks>
     [HttpGet]
     [HttpPost]
-    public IDictionary<int, string?> GetUrlsByIds([FromJsonPath] int[] ids, [FromQuery] UmbracoEntityTypes type, [FromQuery] string? culture = null)
+    public IDictionary<int, string?> GetUrlsByIds([FromJsonPath] int[] ids, [FromQuery] UmbracoEntityTypes type,
+        [FromQuery] string? culture = null)
     {
         if (ids == null || !ids.Any())
         {
@@ -405,7 +408,8 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// </remarks>
     [HttpGet]
     [HttpPost]
-    public IDictionary<Guid, string?> GetUrlsByIds([FromJsonPath] Guid[] ids, [FromQuery] UmbracoEntityTypes type, [FromQuery] string? culture = null)
+    public IDictionary<Guid, string?> GetUrlsByIds([FromJsonPath] Guid[] ids, [FromQuery] UmbracoEntityTypes type,
+        [FromQuery] string? culture = null)
     {
         if (ids == null || !ids.Any())
         {
@@ -444,7 +448,8 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// </remarks>
     [HttpGet]
     [HttpPost]
-    public IDictionary<Udi, string?> GetUrlsByIds([FromJsonPath] Udi[] ids, [FromQuery] UmbracoEntityTypes type, [FromQuery] string? culture = null)
+    public IDictionary<Udi, string?> GetUrlsByIds([FromJsonPath] Udi[] ids, [FromQuery] UmbracoEntityTypes type,
+        [FromQuery] string? culture = null)
     {
         if (ids == null || !ids.Any())
         {
@@ -461,7 +466,8 @@ public class EntityController : UmbracoAuthorizedJsonController
 
             return type switch
             {
-                UmbracoEntityTypes.Document => _publishedUrlProvider.GetUrl(guidUdi.Guid, culture: culture ?? ClientCulture()),
+                UmbracoEntityTypes.Document => _publishedUrlProvider.GetUrl(guidUdi.Guid,
+                    culture: culture ?? ClientCulture()),
 
                 // NOTE: If culture is passed here we get an empty string rather than a media item URL.
                 UmbracoEntityTypes.Media => _publishedUrlProvider.GetMediaUrl(guidUdi.Guid, culture: null),
@@ -523,7 +529,8 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// <param name="type"></param>
     /// <returns></returns>
     [Obsolete("This will be removed in Umbraco 13. Use GetByXPath instead")]
-    public ActionResult<EntityBasic?>? GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type) => GetByXPath(query, nodeContextId, null, type);
+    public ActionResult<EntityBasic?>? GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type) =>
+        GetByXPath(query, nodeContextId, null, type);
 
     /// <summary>
     ///     Gets an entity by a xpath query
@@ -533,8 +540,10 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// <param name="type"></param>
     /// <param name="parentId"></param>
     /// <returns></returns>
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public ActionResult<EntityBasic?>? GetByXPath(string query, int nodeContextId, int? parentId, UmbracoEntityTypes type)
+    [Obsolete(
+        "The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
+    public ActionResult<EntityBasic?>? GetByXPath(string query, int nodeContextId, int? parentId,
+        UmbracoEntityTypes type)
     {
         if (type != UmbracoEntityTypes.Document)
         {
@@ -698,14 +707,9 @@ public class EntityController : UmbracoAuthorizedJsonController
         //TODO: We should really fix this in the EntityService but if we don't we should allow the ISearchableTree for the members controller
         // to be used for this search instead of the built in/internal searcher
 
-        IEnumerable<SearchResultEntity> searchResult = _treeSearcher.ExamineSearch(
-            filter ?? string.Empty,
-            type,
-            pageSize,
-            pageNumber - 1,
-            out var total,
-            null,
-            id);
+        IEnumerable<SearchResultEntity> searchResult = _treeSearcher.IndexSearch(
+            new BackofficeSearchRequest(filter ?? string.Empty, type, pageNumber - 1, pageSize, id),
+            out var total);
 
         return new PagedResult<EntityBasic>(total, pageNumber, pageSize) { Items = searchResult };
     }
@@ -757,6 +761,7 @@ public class EntityController : UmbracoAuthorizedJsonController
             {
                 return new PagedResult<EntityBasic>(0, 0, 0);
             }
+
             //adding multiple conditions ,considering id,key & name as filter param
             //for id as int
             int.TryParse(filter, out int filterAsIntId);
@@ -772,8 +777,8 @@ public class EntityController : UmbracoAuthorizedJsonController
                 filter.IsNullOrWhiteSpace()
                     ? null
                     : _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(filter)
-                      || x.Id == filterAsIntId
-                      || x.Key == filterAsGuid),
+                                                                     || x.Id == filterAsIntId
+                                                                     || x.Key == filterAsGuid),
                 Ordering.By(orderBy, orderDirection));
 
 
@@ -935,10 +940,12 @@ public class EntityController : UmbracoAuthorizedJsonController
                                                                             .IsDataTypeIgnoringUserStartNodes(
                                                                                 dataTypeKey.Value);
 
-    public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings) =>
+    public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type,
+        [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings) =>
         GetResultForAncestors(id, type, queryStrings);
 
-    public ActionResult<IEnumerable<EntityBasic>> GetAncestors(Guid id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings)
+    public ActionResult<IEnumerable<EntityBasic>> GetAncestors(Guid id, UmbracoEntityTypes type,
+        [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings)
     {
         IEntitySlim? entity = _entityService.Get(id);
         if (entity is null)
@@ -957,10 +964,11 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// <param name="searchFrom"></param>
     /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
     /// <returns></returns>
-    private IEnumerable<SearchResultEntity> ExamineSearch(string query, UmbracoEntityTypes entityType, string? searchFrom = null, bool ignoreUserStartNodes = false)
+    private IEnumerable<SearchResultEntity> ExamineSearch(string query, UmbracoEntityTypes entityType,
+        string? searchFrom = null, bool ignoreUserStartNodes = false)
     {
         var culture = ClientCulture();
-        return _treeSearcher.ExamineSearch(query, entityType, 200, 0, out _, culture, searchFrom, ignoreUserStartNodes);
+        return _treeSearcher.IndexSearch( new BackofficeSearchRequest(query, entityType, 0, 200, searchFrom, ignoreUserStartNodes, culture), out var total);
     }
 
     private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)
@@ -987,7 +995,8 @@ public class EntityController : UmbracoAuthorizedJsonController
         }
     }
 
-    private IEnumerable<EntityBasic> GetResultForAncestors(int id, UmbracoEntityTypes entityType, FormCollection? queryStrings = null)
+    private IEnumerable<EntityBasic> GetResultForAncestors(int id, UmbracoEntityTypes entityType,
+        FormCollection? queryStrings = null)
     {
         UmbracoObjectTypes? objectType = ConvertToObjectType(entityType);
         if (objectType.HasValue)
@@ -1409,7 +1418,8 @@ public class EntityController : UmbracoAuthorizedJsonController
 
         var propertyName = postFilterParts[0];
         var constraintValue = postFilterParts[1];
-        var stringOperator = postFilter.Substring(propertyName.Length, postFilter.Length - propertyName.Length - constraintValue.Length);
+        var stringOperator = postFilter.Substring(propertyName.Length,
+            postFilter.Length - propertyName.Length - constraintValue.Length);
         Operator binaryOperator;
 
         try
@@ -1436,9 +1446,7 @@ public class EntityController : UmbracoAuthorizedJsonController
             ConstraintValue = constraintValue,
             Property = new PropertyModel
             {
-                Alias = propertyName,
-                Name = propertyName,
-                Type = property.PropertyType.Name
+                Alias = propertyName, Name = propertyName, Type = property.PropertyType.Name
             }
         };
 
@@ -1510,7 +1518,8 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// </remarks>
     [HttpGet]
     [HttpPost]
-    public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath] int[] ids, [FromQuery] UmbracoEntityTypes type)
+    public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath] int[] ids,
+        [FromQuery] UmbracoEntityTypes type)
     {
         if (ids == null)
         {
@@ -1531,7 +1540,8 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// </remarks>
     [HttpGet]
     [HttpPost]
-    public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath] Guid[] ids, [FromQuery] UmbracoEntityTypes type)
+    public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath] Guid[] ids,
+        [FromQuery] UmbracoEntityTypes type)
     {
         if (ids == null)
         {
@@ -1554,7 +1564,8 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// </remarks>
     [HttpGet]
     [HttpPost]
-    public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath] Udi[] ids, [FromQuery] UmbracoEntityTypes type)
+    public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath] Udi[] ids,
+        [FromQuery] UmbracoEntityTypes type)
     {
         if (ids == null)
         {

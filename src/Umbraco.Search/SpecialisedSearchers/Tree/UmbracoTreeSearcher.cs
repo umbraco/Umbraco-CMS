@@ -56,28 +56,20 @@ public class UmbracoTreeSearcher
     /// <param name="pageIndex"></param>
     /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
     /// <returns></returns>
-    public IEnumerable<SearchResultEntity> ExamineSearch(
-        string query,
-        UmbracoEntityTypes entityType,
-        int pageSize,
-        long pageIndex,
-        out long totalFound,
-        string? culture = null,
-        string? searchFrom = null,
-        bool ignoreUserStartNodes = false)
+    public IEnumerable<SearchResultEntity> IndexSearch(
+        IBackofficeSearchRequest request,
+        out long totalFound)
     {
-        IEnumerable<IUmbracoSearchResult> pagedResult = _backOfficeExamineSearcher.Search(
-            new BackofficeSearchRequest(query, entityType, pageIndex, pageSize, searchFrom, ignoreUserStartNodes),
-            out totalFound);
+        IEnumerable<IUmbracoSearchResult> pagedResult = _backOfficeExamineSearcher.Search(request, out totalFound);
 
-        return entityType switch
+        return request.EntityType switch
         {
             UmbracoEntityTypes.Member => MemberFromSearchResults(pagedResult.ToArray()),
             UmbracoEntityTypes.Media => MediaFromSearchResults(pagedResult),
-            UmbracoEntityTypes.Document => ContentFromSearchResults(pagedResult, culture),
+            UmbracoEntityTypes.Document => ContentFromSearchResults(pagedResult, request.Culture),
             _ => throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) +
                                                  " currently does not support searching against object type " +
-                                                 entityType)
+                                                 request.EntityType)
         };
     }
 
@@ -91,19 +83,19 @@ public class UmbracoTreeSearcher
     /// <param name="totalFound"></param>
     /// <param name="searchFrom"></param>
     /// <returns></returns>
-    public IEnumerable<SearchResultEntity?> EntitySearch(UmbracoObjectTypes objectType, string query, int pageSize,
-        long pageIndex, out long totalFound, string? searchFrom = null)
+    public IEnumerable<SearchResultEntity?> EntitySearch(IBackofficeSearchRequest request,
+        out long totalFound)
     {
         // if it's a GUID, match it
-        Guid.TryParse(query, out Guid g);
+        Guid.TryParse(request.Query, out Guid g);
 
         IEnumerable<IEntitySlim> results = _entityService.GetPagedDescendants(
-            objectType,
-            pageIndex,
-            pageSize,
+            request.ObjectType,
+            request.Page,
+            request.PageSize,
             out totalFound,
             _sqlContext.Query<IUmbracoEntity>()
-                .Where(x => x.Name!.Contains(query) || x.Key == g));
+                .Where(x => x.Name!.Contains(request.Query) || x.Key == g));
         return _mapper.MapEnumerable<IEntitySlim, SearchResultEntity>(results);
     }
 

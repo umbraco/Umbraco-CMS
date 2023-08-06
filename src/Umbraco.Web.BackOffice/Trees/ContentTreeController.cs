@@ -19,6 +19,7 @@ using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
+using Umbraco.Search.Models;
 using Umbraco.Search.SpecialisedSearchers.Tree;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees;
@@ -94,13 +95,18 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeW
 
     protected override int[] UserStartNodes
         => _userStartNodes ??=
-            _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.CalculateContentStartNodeIds(_entityService, _appCaches) ?? Array.Empty<int>();
+            _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.CalculateContentStartNodeIds(_entityService,
+                _appCaches) ?? Array.Empty<int>();
 
     protected override UmbracoObjectTypes UmbracoObjectType => UmbracoObjectTypes.Document;
 
-    public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
+    public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex,
+        string? searchFrom = null)
     {
-        IEnumerable<SearchResultEntity> results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out var totalFound, searchFrom);
+        IEnumerable<SearchResultEntity?> results = _treeSearcher.EntitySearch(
+            new BackofficeSearchRequest(query, UmbracoObjectTypes.DocumentType, pageIndex, pageSize, searchFrom),
+            out var totalFound);
+
         return new EntitySearchResults(results, totalFound);
     }
 
@@ -109,7 +115,7 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeW
     {
         var culture = queryStrings?["culture"].ToString();
 
-        if(culture.IsNullOrWhiteSpace())
+        if (culture.IsNullOrWhiteSpace())
         {
             culture = _localizationService.GetDefaultLanguageIsoCode();
         }
@@ -201,7 +207,8 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeW
 
             //these two are the standard items
             menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
-            menu.Items.Add<ActionSort>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add<ActionSort>(LocalizedTextService, hasSeparator: true, opensDialog: true,
+                useLegacyIcon: false);
 
             //filter the standard items
             FilterUserAllowedMenuItems(menu, nodeActions);
@@ -231,7 +238,8 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeW
         }
 
         //if the user has no path access for this node, all they can do is refresh
-        if (!_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasContentPathAccess(item, _entityService, _appCaches) ?? false)
+        if (!_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasContentPathAccess(item, _entityService,
+                _appCaches) ?? false)
         {
             MenuItemCollection menu = _menuItemCollectionFactory.Create();
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
@@ -319,10 +327,7 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeW
         {
             menu.Items.Add(new MenuItem("notify", LocalizedTextService)
             {
-                Icon = "icon-megaphone",
-                SeparatorBefore = true,
-                OpensDialog = true,
-                UseLegacyIcon = false
+                Icon = "icon-megaphone", SeparatorBefore = true, OpensDialog = true, UseLegacyIcon = false
             });
         }
 
@@ -397,15 +402,19 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeW
         }
     }
 
-    private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool opensDialog = false, bool useLegacyIcon = true)
+    private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false,
+        bool opensDialog = false, bool useLegacyIcon = true)
         where TAction : IAction
     {
         MenuItem? menuItem = menu.Items.Add<TAction>(LocalizedTextService, hasSeparator, opensDialog, useLegacyIcon);
     }
 
-    public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null, string? culture = null)
+    public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex,
+        string? searchFrom = null, string? culture = null)
     {
-        var results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out long totalFound, culture: culture, searchFrom: searchFrom);
+        IEnumerable<SearchResultEntity?> results = _treeSearcher.EntitySearch(
+            new BackofficeSearchRequest(query, UmbracoEntityTypes.DocumentType, 0, 200, searchFrom, false, culture),
+            out var totalFound);
         return new EntitySearchResults(results, totalFound);
     }
 }
