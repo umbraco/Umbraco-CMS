@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
+using Umbraco.Search.Models;
 
 namespace Umbraco.Search.SpecialisedSearchers.Tree;
 
@@ -65,7 +66,7 @@ public class UmbracoTreeSearcher
         string? searchFrom = null,
         bool ignoreUserStartNodes = false)
     {
-        IEnumerable<IUmbracoSearchResult> pagedResult = _backOfficeExamineSearcher.Search(query, entityType, pageSize, pageIndex, out totalFound, searchFrom, ignoreUserStartNodes);
+        IEnumerable<IUmbracoSearchResult> pagedResult = _backOfficeExamineSearcher.Search(new  BackofficeSearchRequest(query,entityType,pageIndex,pageSize, searchFrom, ignoreUserStartNodes)  , out totalFound);
 
         switch (entityType)
         {

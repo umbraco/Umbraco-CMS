@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Search;
+using Umbraco.Search.Models;
 
 namespace Umbraco.Search.SpecialisedSearchers;
 
@@ -9,11 +10,6 @@ namespace Umbraco.Search.SpecialisedSearchers;
 public interface IBackOfficeExamineSearcher
 {
     IEnumerable<IUmbracoSearchResult> Search(
-        string query,
-        UmbracoEntityTypes entityType,
-        int pageSize,
-        long pageIndex,
-        out long totalFound,
-        string? searchFrom = null,
-        bool ignoreUserStartNodes = false);
+        IBackofficeSearchRequest request,
+        out long totalFound);
 }

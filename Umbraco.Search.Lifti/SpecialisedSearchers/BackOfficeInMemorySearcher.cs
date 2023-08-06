@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Search.Configuration;
+using Umbraco.Search.Models;
 using Umbraco.Search.SpecialisedSearchers;
 
 namespace Umbraco.Search.Lifti.SpecialisedSearchers;
@@ -52,13 +53,8 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
     }
 
     public IEnumerable<IUmbracoSearchResult> Search(
-        string query,
-        UmbracoEntityTypes entityType,
-        int pageSize,
-        long pageIndex,
-        out long totalFound,
-        string? searchFrom = null,
-        bool ignoreUserStartNodes = false)
+        IBackofficeSearchRequest request,
+        out long totalFound)
     {
         var sb = new StringBuilder();
 
@@ -67,17 +63,17 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
         var fields = _treeSearcherFields.GetBackOfficeFields().ToList();
 
         ISet<string> fieldsToLoad = new HashSet<string>(_treeSearcherFields.GetBackOfficeFieldsToLoad());
-
+        var query = request.Query;
 
         //special GUID check since if a user searches on one specifically we need to escape it
-        if (Guid.TryParse(query, out Guid g))
+        if (Guid.TryParse(request.Query, out Guid g))
         {
             query = "\"" + g + "\"";
         }
 
         IUser? currentUser = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
 
-        switch (entityType)
+        switch (request.EntityType)
         {
             case UmbracoEntityTypes.Member:
                 indexName = Constants.UmbracoIndexes.MembersIndexName;
@@ -88,11 +84,11 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
                     fieldsToLoad.Add(field);
                 }
 
-                if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId &&
-                    searchFrom.Trim() != "-1")
+                if (request.SearchFrom != null && request.SearchFrom != Constants.Conventions.MemberTypes.AllMembersListId &&
+                    request.SearchFrom.Trim() != "-1")
                 {
                     sb.Append("&__NodeTypeAlias=");
-                    sb.Append(searchFrom);
+                    sb.Append(request.SearchFrom);
                     sb.Append(" ");
                 }
 
@@ -108,7 +104,7 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
                 var allMediaStartNodes = currentUser != null
                     ? currentUser.CalculateMediaStartNodeIds(_entityService, _appCaches)
                     : Array.Empty<int>();
-                AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes,
+                AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, request.SearchFrom, request.IgnoreUserStartNodes,
                     _entityService);
                 break;
             case UmbracoEntityTypes.Document:
@@ -122,13 +118,13 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
                 var allContentStartNodes = currentUser != null
                     ? currentUser.CalculateContentStartNodeIds(_entityService, _appCaches)
                     : Array.Empty<int>();
-                AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes,
+                AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, request.SearchFrom, request.IgnoreUserStartNodes,
                     _entityService);
                 break;
             default:
                 throw new NotSupportedException("The " + typeof(BackOfficeInMemorySearcher) +
                                                 " currently does not support searching against object type " +
-                                                entityType);
+                                                request.EntityType);
         }
 
         var index = _liftiIndexManager.GetIndex(indexName);
@@ -137,7 +133,7 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
             throw new InvalidOperationException("No index found by name " + indexName);
         }
 
-        if (!BuildQuery(sb, query, searchFrom, fields, type))
+        if (!BuildQuery(sb, query, request.SearchFrom, fields, type))
         {
             totalFound = 0;
             return Enumerable.Empty<IUmbracoSearchResult>();
@@ -145,7 +141,7 @@ public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
 
         var allResults = index.LiftiIndex.Search(sb.ToString());
         IEnumerable<SearchResult<string>> result;
-        result = allResults.Skip(Convert.ToInt32(pageSize * pageIndex)).Take(pageSize);
+        result = allResults.Skip(Convert.ToInt32(request.PageSize * request.Page)).Take(request.PageSize);
 
 
         totalFound = allResults.Count();
