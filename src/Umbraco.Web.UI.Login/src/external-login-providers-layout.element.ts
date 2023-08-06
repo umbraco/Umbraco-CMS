@@ -1,75 +1,73 @@
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, queryAssignedElements, state } from 'lit/decorators.js';
 
-import './login-external.element.js';
-
 @customElement('umb-external-login-providers-layout')
 export class UmbExternalLoginProvidersLayoutElement extends LitElement {
+	@queryAssignedElements({ flatten: true })
+	protected slottedElements?: HTMLElement[];
 
-  @queryAssignedElements({ flatten: true })
-  protected slottedElements?: HTMLElement[];
+	firstUpdated() {
+		!!this.slottedElements?.length ? this.toggleAttribute('empty', false) : this.toggleAttribute('empty', true);
+	}
 
-  @state()
-  protected hasSlottedElements: boolean = false;
+	render() {
+		return html`
+			<div id="divider"><span>or</span></div>
+			<div>
+				<slot></slot>
+			</div>
+		`;
+	}
 
-  firstUpdated() {
-    this.hasSlottedElements = !!this.slottedElements?.length;
-  }
+	static styles: CSSResultGroup = [
+		css`
+			:host {
+				margin-top: 16px;
+				display: flex;
+				flex-direction: column;
+			}
 
-  render() {
-      return html`
-        ${this.hasSlottedElements ? html`<div id="divider"><span>or</span></div>` : nothing}
-        <div>
-          <slot></slot>
-        </div>
-      `;
-  }
+			:host([empty]) {
+				display: none;
+			}
 
-  static styles: CSSResultGroup = [
-    css`
-      :host {
-        margin-top: 16px;
-        display: flex;
-        flex-direction: column;
-      }
+			slot {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+			}
 
-      slot {
-        display: flex;
-        flex-direction: column;
-        gap: var(--uui-size-space-4);
-      }
+			#divider {
+				width: 100%;
+				text-align: center;
+				color: #868686; /* TODO: Change to uui color when uui gets a muted text variable */
+				position: relative;
+				z-index: 0;
+				margin-bottom: 16px;
+			}
 
-      #divider {
-        width: 100%;
-        text-align: center;
-        color: #868686; /* TODO: Change to uui color when uui gets a muted text variable */
-        position: relative;
-        z-index: 0;
-        margin-bottom: 16px;
-      }
+			#divider span {
+				background-color: var(--uui-color-surface-alt);
+				padding: 0 9px;
+			}
 
-      #divider span {
-        background-color: var(--uui-color-surface-alt);
-        padding: 0 9px;
-      }
-
-      #divider::before {
-        content: '';
-        display: block;
-        width: 100%;
-        height: 1px;
-        background-color: var(--uui-color-border);
-        position: absolute;
-        top: calc(50% + 1px);
-        transform: translateY(-50%);
-        z-index: -1;
-      }
-    `,
-  ];
+			#divider::before {
+				content: '';
+				display: block;
+				width: 100%;
+				height: 1px;
+				background-color: var(--uui-color-border);
+				position: absolute;
+				top: calc(50% + 1px);
+				transform: translateY(-50%);
+				z-index: -1;
+			}
+		`,
+	];
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    'umb-external-login-providers-layout': UmbExternalLoginProvidersLayoutElement;
-  }
+	interface HTMLElementTagNameMap {
+		'umb-external-login-providers-layout': UmbExternalLoginProvidersLayoutElement;
+	}
 }

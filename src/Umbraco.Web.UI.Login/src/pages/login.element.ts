@@ -6,11 +6,6 @@ import { when } from 'lit/directives/when.js';
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { UmbAuthMainContext } from '../context/auth-main.context.js';
 
-import '../auth-layout.element.js';
-import './reset-password.element.js';
-import './new-password.element.js';
-import '.././external-login-providers-layout.element.js';
-
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {
 	#authContext = UmbAuthMainContext.Instance;

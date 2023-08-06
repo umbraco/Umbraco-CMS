@@ -7,12 +7,6 @@ import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { UmbIconRegistry } from './icon.registry.js';
 import UmbRouter from './umb-router.js';
 
-import './auth-layout.element.js';
-import './pages/reset-password.element.js';
-import './pages/new-password.element.js';
-import './pages/login.element.js';
-import './pages/invite.element.js';
-
 @customElement('umb-auth')
 export default class UmbAuthElement extends LitElement {
 	#returnPath = '';

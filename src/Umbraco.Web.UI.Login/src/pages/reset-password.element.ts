@@ -5,8 +5,6 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbAuthMainContext } from '../context/auth-main.context';
 import { when } from 'lit/directives/when.js';
 
-import './back-to-login-button.element.js';
-
 @customElement('umb-reset-password')
 export default class UmbResetPasswordElement extends LitElement {
 	@state()
