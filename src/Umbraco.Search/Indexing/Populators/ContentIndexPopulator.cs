@@ -35,7 +35,7 @@ public class ContentIndexPopulator : IndexPopulator
         ISearchProvider provider,
         IUmbracoIndexesConfiguration configuration,
         IUmbracoDatabaseFactory umbracoDatabaseFactory)
-        : this(logger, provider, false, null, contentService,configuration, umbracoDatabaseFactory)
+        : this(logger, provider, false, null, contentService, configuration, umbracoDatabaseFactory)
     {
         _provider = provider;
         _configuration = configuration;
@@ -156,14 +156,11 @@ public class ContentIndexPopulator : IndexPopulator
                     indexableContent.Add(item);
                     publishedPages.Add(item.Id);
                 }
-                else
+                else if (publishedPages.Contains(item.ParentId))
                 {
-                    if (publishedPages.Contains(item.ParentId))
-                    {
-                        // only index when parent is published
-                        publishedPages.Add(item.Id);
-                        indexableContent.Add(item);
-                    }
+                    // only index when parent is published
+                    publishedPages.Add(item.Id);
+                    indexableContent.Add(item);
                 }
             }
 
