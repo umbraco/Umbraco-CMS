@@ -78,12 +78,12 @@ export default class UmbAuthElement extends LitElement {
 			{
 				path: 'login/new',
 				component: html`<umb-new-password></umb-new-password>`,
-				action: () => (this.allowPasswordReset ? null : 'login'),
+				action: () => (this.allowPasswordReset ? null : 'login'), //TODO: Also check if there is a reset code
 			},
 			{
 				path: 'login/invite',
 				component: html`<umb-invite></umb-invite>`,
-				action: () => (this.allowUserInvite ? null : 'login'),
+				action: () => (this.allowUserInvite ? null : 'login'), //TODO: Also check if there is an invite code
 			},
 		]);
 
@@ -95,8 +95,6 @@ export default class UmbAuthElement extends LitElement {
 		const flow = searchParams.get('flow');
 		const resetId = searchParams.get('userId');
 		const resetCode = searchParams.get('resetCode');
-
-		console.log(flow, resetId, resetCode);
 
 		if (flow === 'reset-password' && resetId && resetCode) {
 			return 'login/new';
