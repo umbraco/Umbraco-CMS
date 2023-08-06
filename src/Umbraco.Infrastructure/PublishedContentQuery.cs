@@ -123,6 +123,7 @@ public class PublishedContentQuery : IPublishedContentQuery
         return null;
     }
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public IPublishedContent? ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         => ItemByXPath(xpath, vars, _publishedSnapshot.Content);
 
@@ -135,9 +136,11 @@ public class PublishedContentQuery : IPublishedContentQuery
     public IEnumerable<IPublishedContent> Content(IEnumerable<object> ids)
         => ids.Select(Content).WhereNotNull();
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars)
         => ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         => ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
 

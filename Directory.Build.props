@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>11.0</LangVersion>
     <Company>Umbraco HQ</Company>
     <Authors>Umbraco</Authors>
     <Copyright>Copyright © Umbraco $([System.DateTime]::Today.ToString('yyyy'))</Copyright>
@@ -31,7 +31,7 @@
   <PropertyGroup>
     <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
     <EnablePackageValidation>false</EnablePackageValidation>
-    <PackageValidationBaselineVersion>11.0.0</PackageValidationBaselineVersion>
+    <PackageValidationBaselineVersion>12.0.0</PackageValidationBaselineVersion>
     <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
     <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
   </PropertyGroup>

@@ -75,7 +75,7 @@ public class WebRoutingSettings
     ///     Gets or sets a value for the URL provider mode (<see cref="UrlMode" />).
     /// </summary>
     [DefaultValue(StaticUrlProviderMode)]
-    public UrlMode UrlProviderMode { get; set; } = Enum<UrlMode>.Parse(StaticUrlProviderMode);
+    public UrlMode UrlProviderMode { get; set; } = Enum.Parse<UrlMode>(StaticUrlProviderMode);
 
     /// <summary>
     ///     Gets or sets a value for the Umbraco application URL.

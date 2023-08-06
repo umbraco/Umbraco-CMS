@@ -19,7 +19,7 @@
                 <div class="umb-control-group" ng-if="vm.model.filter === true" style="margin-bottom: 20px;">
                     <umb-search-filter
                         input-id="block-search"
-                        model="vm.filterSearchTerm"
+                        model="vm.filter.searchTerm"
                         label-key="placeholders_filter"
                         text="Type to filter..."
                         css-class="w-100"
@@ -27,11 +27,11 @@
                     </umb-search-filter>
                 </div>
 
-                <div class="umb-block-card-grid" ng-if="vm.filteredItems.length > 0">
+                <div class="umb-block-card-grid" ng-if="vm.filterByGroup(null).length > 0">
 
                     <umb-block-card
                         class="umb-outline"
-                        ng-repeat="block in (vm.filteredItems | filter:{blockConfigModel:{groupKey: null}})"
+                        ng-repeat="block in vm.filterByGroup(null)"
                         block-config-model="block.blockConfigModel"
                         element-type-model="block.elementTypeModel"
                         ng-click="vm.selectItem(block, $event)">
@@ -39,14 +39,14 @@
 
                 </div>
                 
-                <div ng-repeat="blockGroup in model.blockGroups" ng-if="vm.filteredItems.length > 0">
+                <div ng-repeat="blockGroup in model.blockGroups" ng-if="vm.filterByGroup(blockGroup).length > 0">
                     <h5>{{blockGroup.name}}</h5>
 
                     <div class="umb-block-card-grid">
 
                         <umb-block-card
                             class="umb-outline"
-                            ng-repeat="block in (vm.filteredItems | filter:{blockConfigModel:{groupKey: blockGroup.key}})"
+                            ng-repeat="block in vm.filterByGroup(blockGroup)"
                             block-config-model="block.blockConfigModel"
                             element-type-model="block.elementTypeModel"
                             ng-click="vm.selectItem(block, $event)">
