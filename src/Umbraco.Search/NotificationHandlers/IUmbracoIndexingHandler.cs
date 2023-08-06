@@ -18,6 +18,10 @@ public interface IUmbracoIndexingHandler
     void ReIndexForMember(IMember member);
 
     void ReIndexForMedia(IMedia sender, bool isPublished);
+    /// <summary>
+    ///     Removes any content that is flagged as protected
+    /// </summary>
+    void RemoveProtectedContent();
 
     /// <summary>
     ///     Deletes all documents for the content type Ids

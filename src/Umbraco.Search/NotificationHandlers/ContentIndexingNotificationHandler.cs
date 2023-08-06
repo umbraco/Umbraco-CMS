@@ -15,7 +15,7 @@ public sealed class ContentIndexingNotificationHandler : INotificationHandler<Co
     private readonly IContentService _contentService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
 
-    public ContentIndexingNotificationHandler(
+   public ContentIndexingNotificationHandler(
         IUmbracoIndexingHandler umbracoIndexingHandler,
         IContentService contentService)
     {
@@ -30,12 +30,7 @@ public sealed class ContentIndexingNotificationHandler : INotificationHandler<Co
     /// <param name="args"></param>
     public void Handle(ContentCacheRefresherNotification args)
     {
-        if (!_umbracoIndexingHandler.Enabled)
-        {
-            return;
-        }
-
-        if (Suspendable.SearchIndexEvents.CanIndex == false)
+        if (!_umbracoIndexingHandler.Enabled || Suspendable.SearchIndexEvents.CanIndex == false)
         {
             return;
         }
@@ -73,72 +68,7 @@ public sealed class ContentIndexingNotificationHandler : INotificationHandler<Co
             // RefreshNode or RefreshBranch (maybe trashed)
             else
             {
-                if (deleteBatch != null && deleteBatch.Contains(payload.Id))
-                {
-                    // the same node has already been deleted, to ensure ordering is
-                    // handled, we'll need to execute all queued deleted items now
-                    // and reset the deleted items list.
-                    _umbracoIndexingHandler.DeleteIndexForEntities(deleteBatch, false);
-                    deleteBatch = null;
-                }
-
-                // don't try to be too clever - refresh entirely
-                // there has to be race conditions in there ;-(
-                IContent? content = _contentService.GetById(payload.Id);
-                if (content == null)
-                {
-                    // gone fishing, remove entirely from all indexes (with descendants)
-                    _umbracoIndexingHandler.DeleteIndexForEntity(payload.Id, false);
-                    continue;
-                }
-
-                IContent? published = null;
-                if (content.Published && _contentService.IsPathPublished(content))
-                {
-                    published = content;
-                }
-
-                if (published == null)
-                {
-                    _umbracoIndexingHandler.DeleteIndexForEntity(payload.Id, true);
-                }
-
-                // just that content
-                _umbracoIndexingHandler.ReIndexForContent(content, published != null);
-
-                // branch
-                if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
-                {
-                    List<int>? masked = published == null ? null : new List<int>();
-                    const int pageSize = 500;
-                    var page = 0;
-                    var total = long.MaxValue;
-                    while (page * pageSize < total)
-                    {
-                        // order by shallowest to deepest, this allows us to check it's published state without checking every item
-                        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(content.Id, page++, pageSize, out total, ordering: Ordering.By("Path"));
-
-                        foreach (IContent descendant in descendants)
-                        {
-                            published = null;
-
-                            // else everything is masked
-                            if (masked != null)
-                            {
-                                if (masked.Contains(descendant.ParentId) || !descendant.Published)
-                                {
-                                    masked.Add(descendant.Id);
-                                }
-                                else
-                                {
-                                    published = descendant;
-                                }
-                            }
-
-                            _umbracoIndexingHandler.ReIndexForContent(descendant, published != null);
-                        }
-                    }
-                }
+                RefreshBranchOrNode(deleteBatch, payload);
             }
 
             // NOTE
@@ -159,4 +89,80 @@ public sealed class ContentIndexingNotificationHandler : INotificationHandler<Co
             _umbracoIndexingHandler.DeleteIndexForEntities(deleteBatch, false);
         }
     }
+
+    private void RefreshBranchOrNode(HashSet<int>? deleteBatch, ContentCacheRefresher.JsonPayload payload)
+    {
+        if (deleteBatch != null && deleteBatch.Contains(payload.Id))
+        {
+            // the same node has already been deleted, to ensure ordering is
+            // handled, we'll need to execute all queued deleted items now
+            // and reset the deleted items list.
+            _umbracoIndexingHandler.DeleteIndexForEntities(deleteBatch, false);
+            deleteBatch = null;
+        }
+
+        // don't try to be too clever - refresh entirely
+        // there has to be race conditions in there ;-(
+        IContent? content = _contentService.GetById(payload.Id);
+        if (content == null)
+        {
+            // gone fishing, remove entirely from all indexes (with descendants)
+            _umbracoIndexingHandler.DeleteIndexForEntity(payload.Id, false);
+            return;
+        }
+
+        IContent? published = null;
+        if (content.Published && _contentService.IsPathPublished(content))
+        {
+            published = content;
+        }
+
+        if (published == null)
+        {
+            _umbracoIndexingHandler.DeleteIndexForEntity(payload.Id, true);
+        }
+
+        // just that content
+        _umbracoIndexingHandler.ReIndexForContent(content, published != null);
+
+        // branch
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        {
+            return;
+        }
+
+        List<int>? masked = published == null ? null : new List<int>();
+        const int pageSize = 500;
+        var page = 0;
+        var total = long.MaxValue;
+        while (page * pageSize < total)
+        {
+            // order by shallowest to deepest, this allows us to check it's published state without checking every item
+            IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(content.Id, page++, pageSize,
+                out total, ordering: Ordering.By("Path"));
+
+            foreach (IContent descendant in descendants)
+            {
+                published = null;
+
+                // else everything is masked
+                if (masked != null)
+                {
+                    if (masked.Contains(descendant.ParentId) || !descendant.Published)
+                    {
+                        masked.Add(descendant.Id);
+                    }
+                    else
+                    {
+                        published = descendant;
+                    }
+                }
+
+                _umbracoIndexingHandler.ReIndexForContent(descendant, published != null);
+            }
+        }
+    }
+
+    public void Handle(PublicAccessCacheRefresherNotification notification)
+        => _umbracoIndexingHandler.RemoveProtectedContent();
 }

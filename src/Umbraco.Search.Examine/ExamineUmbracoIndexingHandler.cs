@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Extensions;
@@ -16,7 +17,8 @@ using Umbraco.Search.Examine.Extensions;
 using Umbraco.Search.NotificationHandlers;
 using Umbraco.Search.Services;
 using Umbraco.Search.ValueSet;
-using Umbraco.Search.ValueSet.ValueSetBuilders;
+using IContentValueSetBuilder = Umbraco.Search.ValueSet.ValueSetBuilders.IContentValueSetBuilder;
+using IPublishedContentValueSetBuilder = Umbraco.Search.ValueSet.ValueSetBuilders.IPublishedContentValueSetBuilder;
 
 namespace Umbraco.Search.Examine;
 
@@ -35,13 +37,14 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     private readonly IExamineManager _examineManager;
     private readonly ILogger<ExamineUmbracoIndexingHandler> _logger;
     private readonly IMainDom _mainDom;
-    private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
-    private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
+    private readonly Search.ValueSet.ValueSetBuilders.IValueSetBuilder<IMedia> _mediaValueSetBuilder;
+    private readonly Search.ValueSet.ValueSetBuilders.IValueSetBuilder<IMember> _memberValueSetBuilder;
     private readonly IUmbracoIndexesConfiguration _configuration;
     private readonly IProfilingLogger _profilingLogger;
     private readonly IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ISearchMainDomHandler _mainDomHandler;
+    private readonly IPublicAccessService _publicAccessService;
 
     public ExamineUmbracoIndexingHandler(
         IMainDom mainDom,
@@ -52,10 +55,11 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         IBackgroundTaskQueue backgroundTaskQueue,
         IContentValueSetBuilder contentValueSetBuilder,
         IPublishedContentValueSetBuilder publishedContentValueSetBuilder,
-        IValueSetBuilder<IMedia> mediaValueSetBuilder,
-        IValueSetBuilder<IMember> memberValueSetBuilder,
+        Search.ValueSet.ValueSetBuilders.IValueSetBuilder<IMedia> mediaValueSetBuilder,
+        Search.ValueSet.ValueSetBuilders.IValueSetBuilder<IMember> memberValueSetBuilder,
         IUmbracoIndexesConfiguration configuration,
-        ISearchMainDomHandler mainDomHandler)
+        ISearchMainDomHandler mainDomHandler, IPublicAccessService publicAccessService)
+
     {
         _mainDom = mainDom;
         _logger = logger;
@@ -69,6 +73,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         _memberValueSetBuilder = memberValueSetBuilder;
         _configuration = configuration;
         _mainDomHandler = mainDomHandler;
+        _publicAccessService = publicAccessService;
         _enabled = new Lazy<bool>(IsEnabled);
     }
 
@@ -109,7 +114,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         var actions = DeferedActions.Get(_scopeProvider);
         if (actions != null)
         {
-            actions.Add(new DeferedReIndexForContent(_backgroundTaskQueue, _configuration,this, sender, isPublished));
+            actions.Add(new DeferedReIndexForContent(_backgroundTaskQueue, _configuration, this, sender, isPublished));
         }
         else
         {
@@ -127,7 +132,22 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         }
         else
         {
-            DeferedReIndexForMedia.Execute(_backgroundTaskQueue, _configuration , this, sender, isPublished);
+            DeferedReIndexForMedia.Execute(_backgroundTaskQueue, _configuration, this, sender, isPublished);
+        }
+    }
+
+    /// <inheritdoc />
+    public void RemoveProtectedContent()
+    {
+        var actions = DeferredActions.Get(_scopeProvider);
+        if (actions != null)
+        {
+            actions.Add(new DeferredRemoveProtectedContent(_backgroundTaskQueue, this, _configuration,
+                _publicAccessService));
+        }
+        else
+        {
+            DeferredRemoveProtectedContent.Execute(_backgroundTaskQueue, this, _configuration, _publicAccessService);
         }
     }
 
@@ -209,7 +229,8 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         _logger.LogDebug("Examine shutdown registered with MainDom");
 
         var registeredIndexers =
-            _examineManager.Indexes.OfType<IUmbracoExamineIndex>().Count(x => _configuration.Configuration(x.Name).EnableDefaultEventHandler);
+            _examineManager.Indexes.OfType<IUmbracoExamineIndex>()
+                .Count(x => _configuration.Configuration(x.Name).EnableDefaultEventHandler);
 
         _logger.LogInformation("Adding examine event handlers for {RegisteredIndexers} index providers.",
             registeredIndexers);
@@ -288,9 +309,10 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         }
 
         public void Execute() =>
-            Execute(_backgroundTaskQueue,_configuration, _examineUmbracoIndexingHandler, _content, _isPublished);
+            Execute(_backgroundTaskQueue, _configuration, _examineUmbracoIndexingHandler, _content, _isPublished);
 
-        public static void Execute(IBackgroundTaskQueue backgroundTaskQueue, IUmbracoIndexesConfiguration umbracoIndexesConfiguration,
+        public static void Execute(IBackgroundTaskQueue backgroundTaskQueue,
+            IUmbracoIndexesConfiguration umbracoIndexesConfiguration,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IContent content, bool isPublished)
             => backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
             {
@@ -317,8 +339,9 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                     {
                         continue;
                     }
+
                     List<UmbracoValueSet> valueSet = builders[configuration.PublishedValuesOnly].Value;
-                    index.IndexItems(valueSet.Select(x=>x.ToExamineValueSet()));
+                    index.IndexItems(valueSet.Select(x => x.ToExamineValueSet()));
                 }
 
                 return Task.CompletedTask;
@@ -348,9 +371,10 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         }
 
         public void Execute() =>
-            Execute(_backgroundTaskQueue,_configuration, _examineUmbracoIndexingHandler, _media, _isPublished);
+            Execute(_backgroundTaskQueue, _configuration, _examineUmbracoIndexingHandler, _media, _isPublished);
 
-        public static void Execute(IBackgroundTaskQueue backgroundTaskQueue, IUmbracoIndexesConfiguration umbracoIndexesConfiguration,
+        public static void Execute(IBackgroundTaskQueue backgroundTaskQueue,
+            IUmbracoIndexesConfiguration umbracoIndexesConfiguration,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IMedia media, bool isPublished) =>
             // perform the ValueSet lookup on a background thread
             backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
@@ -369,7 +393,8 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                     {
                         continue;
                     }
-                    index.IndexItems(valueSet.Select(x=>x.ToExamineValueSet()));
+
+                    index.IndexItems(valueSet.Select(x => x.ToExamineValueSet()));
                 }
 
                 return Task.CompletedTask;
@@ -386,7 +411,8 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
         private readonly IMember _member;
 
-        public DeferedReIndexForMember(IBackgroundTaskQueue backgroundTaskQueue, IUmbracoIndexesConfiguration configuration,
+        public DeferedReIndexForMember(IBackgroundTaskQueue backgroundTaskQueue,
+            IUmbracoIndexesConfiguration configuration,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IMember member)
         {
             _examineUmbracoIndexingHandler = examineUmbracoIndexingHandler;
@@ -395,9 +421,10 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             _configuration = configuration;
         }
 
-        public void Execute() => Execute(_backgroundTaskQueue, _configuration,_examineUmbracoIndexingHandler, _member);
+        public void Execute() => Execute(_backgroundTaskQueue, _configuration, _examineUmbracoIndexingHandler, _member);
 
-        public static void Execute(IBackgroundTaskQueue backgroundTaskQueue, IUmbracoIndexesConfiguration examinConfiguration,
+        public static void Execute(IBackgroundTaskQueue backgroundTaskQueue,
+            IUmbracoIndexesConfiguration examinConfiguration,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IMember member) =>
             // perform the ValueSet lookup on a background thread
             backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
@@ -416,7 +443,8 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                     {
                         continue;
                     }
-                    index.IndexItems(valueSet.Select(x=>x.ToExamineValueSet()));
+
+                    index.IndexItems(valueSet.Select(x => x.ToExamineValueSet()));
                 }
 
                 return Task.CompletedTask;
@@ -431,7 +459,8 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         private readonly IReadOnlyCollection<int>? _ids;
         private readonly bool _keepIfUnpublished;
 
-        public DeferedDeleteIndex(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IUmbracoIndexesConfiguration configuration, int id,
+        public DeferedDeleteIndex(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
+            IUmbracoIndexesConfiguration configuration, int id,
             bool keepIfUnpublished)
         {
             _examineUmbracoIndexingHandler = examineUmbracoIndexingHandler;
@@ -440,7 +469,8 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             _keepIfUnpublished = keepIfUnpublished;
         }
 
-        public DeferedDeleteIndex(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IUmbracoIndexesConfiguration configuration,
+        public DeferedDeleteIndex(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
+            IUmbracoIndexesConfiguration configuration,
             IReadOnlyCollection<int> ids, bool keepIfUnpublished)
         {
             _examineUmbracoIndexingHandler = examineUmbracoIndexingHandler;
@@ -449,11 +479,11 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             _keepIfUnpublished = keepIfUnpublished;
         }
 
-        public  void Execute()
+        public void Execute()
         {
             if (_ids is null)
             {
-                Execute(_examineUmbracoIndexingHandler, _configuration,_id, _keepIfUnpublished);
+                Execute(_examineUmbracoIndexingHandler, _configuration, _id, _keepIfUnpublished);
             }
             else
             {
@@ -461,7 +491,8 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             }
         }
 
-        public static void Execute(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IUmbracoIndexesConfiguration umbracoIndexesConfiguration, int id,
+        public static void Execute(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
+            IUmbracoIndexesConfiguration umbracoIndexesConfiguration, int id,
             bool keepIfUnpublished)
         {
             foreach (IIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
@@ -472,14 +503,15 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                 {
                     continue;
                 }
+
                 index.DeleteFromIndex(id.ToString(CultureInfo.InvariantCulture));
             }
         }
 
-        public static void Execute(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,IUmbracoIndexesConfiguration umbracoIndexesConfiguration,
+        public static void Execute(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
+            IUmbracoIndexesConfiguration umbracoIndexesConfiguration,
             IReadOnlyCollection<int> ids, bool keepIfUnpublished)
         {
-
             foreach (IIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
                          .OfType<IUmbracoExamineIndex>())
             {
@@ -488,9 +520,68 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                 {
                     continue;
                 }
+
                 index.DeleteFromIndex(ids.Select(x => x.ToString(CultureInfo.InvariantCulture)));
             }
         }
+    }
+
+    /// <summary>
+    ///     Removes all protected content from applicable indexes on a background thread
+    /// </summary>
+    private class DeferredRemoveProtectedContent : IDeferredAction
+    {
+        private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+        private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
+        private readonly IUmbracoIndexesConfiguration _configuration;
+        private readonly IPublicAccessService _publicAccessService;
+
+        public DeferredRemoveProtectedContent(IBackgroundTaskQueue backgroundTaskQueue,
+            ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IUmbracoIndexesConfiguration configuration,
+            IPublicAccessService publicAccessService)
+        {
+            _backgroundTaskQueue = backgroundTaskQueue;
+            _examineUmbracoIndexingHandler = examineUmbracoIndexingHandler;
+            _configuration = configuration;
+            _publicAccessService = publicAccessService;
+        }
+
+        public void Execute() => Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _configuration,
+            _publicAccessService);
+
+        public static void Execute(IBackgroundTaskQueue backgroundTaskQueue,
+            ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
+            IUmbracoIndexesConfiguration umbracoIndexesConfiguration, IPublicAccessService publicAccessService)
+            => backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
+            {
+                using ICoreScope scope =
+                    examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true);
+
+                var protectedContentIds = publicAccessService.GetAll().Select(entry => entry.ProtectedNodeId).ToArray();
+                if (protectedContentIds.Any() is false)
+                {
+                    return Task.CompletedTask;
+                }
+
+                foreach (IIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
+                             .OfType<IUmbracoExamineIndex>())
+                {
+                    var configuration = umbracoIndexesConfiguration.Configuration(index.Name);
+                    if (!configuration.EnableDefaultEventHandler || !configuration.PublishedValuesOnly)
+                    {
+                        continue;
+                    }
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return Task.CompletedTask;
+                    }
+
+                    index.DeleteFromIndex(protectedContentIds.Select(id => id.ToString()));
+                }
+
+                return Task.CompletedTask;
+            });
     }
 
     #endregion
