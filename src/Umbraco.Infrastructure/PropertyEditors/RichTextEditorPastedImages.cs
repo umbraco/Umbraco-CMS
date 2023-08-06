@@ -105,7 +105,7 @@ public sealed class RichTextEditorPastedImages
     }
 
     /// <summary>
-    ///     Used by the RTE (and grid RTE) for drag/drop/persisting images
+    ///     Used by the RTE (and grid RTE) for drag/drop/persisting images.
     /// </summary>
     public async Task<string> FindAndPersistPastedTempImagesAsync(string html, Guid mediaParentFolder, Guid userKey, IImageUrlGenerator imageUrlGenerator)
     {
@@ -115,7 +115,7 @@ public sealed class RichTextEditorPastedImages
         htmlDoc.LoadHtml(html);
 
         HtmlNodeCollection? tmpImages = htmlDoc.DocumentNode.SelectNodes($"//img[@{TemporaryImageDataAttribute}]");
-        if (tmpImages == null || tmpImages.Count == 0)
+        if (tmpImages is null || tmpImages.Count is 0)
         {
             return html;
         }

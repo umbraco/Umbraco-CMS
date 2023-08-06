@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using OpenIddict.Validation.AspNetCore;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Api.Management.Middleware;
 using Umbraco.Cms.Api.Management.Security;
-using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
@@ -27,7 +24,7 @@ public static class BackOfficeAuthBuilderExtensions
     private static IUmbracoBuilder AddOpenIddict(this IUmbracoBuilder builder)
     {
         builder.Services.AddAuthentication();
-        builder.Services.AddAuthorization(CreatePolicies);
+        builder.AddAuthorizationPolicies();
 
         builder.Services.AddOpenIddict()
             // Register the OpenIddict server components.
@@ -112,32 +109,6 @@ public static class BackOfficeAuthBuilderExtensions
 
         return builder;
     }
-
-
-    // TODO: move this to an appropriate location and implement the policy scheme that should be used for the new management APIs
-    private static void CreatePolicies(AuthorizationOptions options)
-    {
-        void AddPolicy(string policyName, string claimType, params string[] allowedClaimValues)
-        {
-            options.AddPolicy($"New{policyName}", policy =>
-            {
-                policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-                policy.RequireClaim(claimType, allowedClaimValues);
-            });
-        }
-
-        options.AddPolicy($"New{AuthorizationPolicies.BackOfficeAccess}", policy =>
-        {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-            policy.RequireAuthenticatedUser();
-        });
-        // NOTE: these are ONLY sample policies that allow us to test the new management APIs
-        AddPolicy(AuthorizationPolicies.SectionAccessContent, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Content);
-        AddPolicy(AuthorizationPolicies.SectionAccessForContentTree, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Content);
-        AddPolicy(AuthorizationPolicies.SectionAccessForMediaTree, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Media);
-        AddPolicy(AuthorizationPolicies.SectionAccessMedia, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Media);
-        AddPolicy(AuthorizationPolicies.SectionAccessContentOrMedia, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Content, Constants.Applications.Media);
-       }
 }
 
 internal class BackofficePipelineFilter : UmbracoPipelineFilter

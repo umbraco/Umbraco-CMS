@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
@@ -8,12 +8,14 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Script.Folder;
 
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Script}/folder")]
 [ApiExplorerSettings(GroupName = "Script")]
+[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessScripts)]
 public class ScriptFolderControllerBase : PathFolderManagementControllerBase<ScriptFolderOperationStatus>
 {
     private readonly IScriptFolderService _scriptFolderService;

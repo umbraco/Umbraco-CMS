@@ -113,6 +113,7 @@ public interface IPublishedPropertyType
     /// <remarks>
     ///     <para>The XPath value can be either a string or an XPathNavigator.</para>
     /// </remarks>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     object? ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
 
     /// <summary>

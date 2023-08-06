@@ -1907,7 +1907,7 @@ internal class DatabaseDataCreator
                 new DataTypeDto
                 {
                     NodeId = -87,
-                    EditorAlias = Constants.PropertyEditors.Aliases.TinyMce,
+                    EditorAlias = Constants.PropertyEditors.Aliases.RichText,
                     DbType = "Ntext",
                     Configuration =
                         "{\"value\":\",code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|\"}",

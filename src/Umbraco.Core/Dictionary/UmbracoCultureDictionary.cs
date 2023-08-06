@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -47,7 +48,7 @@ internal class DefaultCultureDictionary : ICultureDictionary
     }
 
     /// <summary>
-    ///     Returns the current culture
+    ///     Returns the defualt umbraco's back office culture
     /// </summary>
     public CultureInfo Culture => _specificCulture ?? Thread.CurrentThread.CurrentUICulture;
 

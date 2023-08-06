@@ -1,37 +1,33 @@
 using System.Collections.ObjectModel;
-using Serilog.Events;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Core.Logging;
-using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
+using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
-namespace Umbraco.Cms.Core.Services.Implement;
+namespace Umbraco.Cms.Core.Services;
 
-// FIXME: Get rid of ILogViewer and ILogLevelLoader dependencies (as they are obsolete)
-// and fix the implementation of the methods using it
 public class LogViewerService : ILogViewerService
 {
+    private const int FileSizeCap = 100;
     private readonly ILogViewerQueryRepository _logViewerQueryRepository;
-    private readonly ILogViewer _logViewer;
-    private readonly ILogLevelLoader _logLevelLoader;
     private readonly ICoreScopeProvider _provider;
-    private readonly IJsonSerializer _jsonSerializer;
+    private readonly ILoggingConfiguration _loggingConfiguration;
+    private readonly ILogViewerRepository _logViewerRepository;
 
     public LogViewerService(
         ILogViewerQueryRepository logViewerQueryRepository,
-        ILogViewer logViewer,
-        ILogLevelLoader logLevelLoader,
         ICoreScopeProvider provider,
-        IJsonSerializer jsonSerializer)
+        ILoggingConfiguration loggingConfiguration,
+        ILogViewerRepository logViewerRepository)
     {
         _logViewerQueryRepository = logViewerQueryRepository;
-        _logViewer = logViewer;
-        _logLevelLoader = logLevelLoader;
         _provider = provider;
-        _jsonSerializer = jsonSerializer;
+        _loggingConfiguration = loggingConfiguration;
+        _logViewerRepository = logViewerRepository;
     }
 
     /// <inheritdoc/>
@@ -54,14 +50,12 @@ public class LogViewerService : ILogViewerService
                 null);
         }
 
-        PagedModel<LogMessage> logMessages =
-            _logViewer.GetLogsAsPagedModel(logTimePeriod, skip, take, orderDirection, filterExpression, logLevels);
 
-        var logEntries = new PagedModel<ILogEntry>(logMessages.Total, logMessages.Items.Select(x => ToLogEntry(x)));
+        PagedModel<ILogEntry> filteredLogs = GetFilteredLogs(logTimePeriod, filterExpression, logLevels, orderDirection, skip, take);
 
         return Attempt.SucceedWithStatus<PagedModel<ILogEntry>?, LogViewerOperationStatus>(
             LogViewerOperationStatus.Success,
-            logEntries);
+            filteredLogs);
     }
 
     /// <inheritdoc/>
@@ -141,9 +135,11 @@ public class LogViewerService : ILogViewerService
                 null);
         }
 
+        LogLevelCounts counter = _logViewerRepository.GetLogCount(logTimePeriod);
+
         return Attempt.SucceedWithStatus<LogLevelCounts?, LogViewerOperationStatus>(
             LogViewerOperationStatus.Success,
-            _logViewer.GetLogLevelCounts(logTimePeriod));
+            counter);
     }
 
     /// <inheritdoc/>
@@ -159,7 +155,7 @@ public class LogViewerService : ILogViewerService
                 null!);
         }
 
-        LogTemplate[] messageTemplates = _logViewer.GetMessageTemplates(logTimePeriod).ToArray();
+        LogTemplate[] messageTemplates = _logViewerRepository.GetMessageTemplates(logTimePeriod);
 
         return Attempt.SucceedWithStatus(
             LogViewerOperationStatus.Success,
@@ -169,18 +165,17 @@ public class LogViewerService : ILogViewerService
     /// <inheritdoc/>
     public ReadOnlyDictionary<string, LogLevel> GetLogLevelsFromSinks()
     {
-        ReadOnlyDictionary<string, LogEventLevel?> configuredLogLevels = _logLevelLoader.GetLogLevelsFromSinks();
+        var configuredLogLevels = new Dictionary<string, LogLevel>
+        {
+            { "Global", GetGlobalMinLogLevel() },
+            { "UmbracoFile", _logViewerRepository.RestrictedToMinimumLevel() },
+        };
 
-        return configuredLogLevels.ToDictionary(logLevel => logLevel.Key, logLevel => Enum.Parse<LogLevel>(logLevel.Value!.ToString()!)).AsReadOnly();
+        return configuredLogLevels.AsReadOnly();
     }
 
     /// <inheritdoc/>
-    public LogLevel GetGlobalMinLogLevel()
-    {
-        LogEventLevel? serilogLogLevel = _logLevelLoader.GetGlobalMinLogLevel();
-
-        return Enum.Parse<LogLevel>(serilogLogLevel!.ToString()!);
-    }
+    public LogLevel GetGlobalMinLogLevel() => _logViewerRepository.GetGlobalMinLogLevel();
 
     /// <summary>
     ///     Returns a <see cref="LogTimePeriod" /> representation from a start and end date for filtering log files.
@@ -214,58 +209,73 @@ public class LogViewerService : ILogViewerService
     /// <returns>The value whether or not you are able to view the logs.</returns>
     private bool CanViewLogs(LogTimePeriod logTimePeriod)
     {
-        // Check if the interface can deal with large files
-        if (_logViewer.CanHandleLargeLogs)
+        // Number of entries
+        long fileSizeCount = 0;
+
+        // foreach full day in the range - see if we can find one or more filenames that end with
+        // yyyyMMdd.json - Ends with due to MachineName in filenames - could be 1 or more due to load balancing
+        for (DateTime day = logTimePeriod.StartTime.Date; day.Date <= logTimePeriod.EndTime.Date; day = day.AddDays(1))
         {
-            return true;
+            // Filename ending to search for (As could be multiple)
+            var filesToFind = GetSearchPattern(day);
+
+            var filesForCurrentDay = Directory.GetFiles(_loggingConfiguration.LogDirectory, filesToFind);
+
+            fileSizeCount += filesForCurrentDay.Sum(x => new FileInfo(x).Length);
         }
 
-        return _logViewer.CheckCanOpenLogs(logTimePeriod);
+        // The GetLogSize call on JsonLogViewer returns the total file size in bytes
+        // Check if the log size is not greater than 100Mb (FileSizeCap)
+        var logSizeAsMegabytes = fileSizeCount / 1024 / 1024;
+        return logSizeAsMegabytes <= FileSizeCap;
     }
 
-    private ILogEntry ToLogEntry(LogMessage logMessage)
+    private PagedModel<ILogEntry> GetFilteredLogs(
+        LogTimePeriod logTimePeriod,
+        string? filterExpression,
+        string[]? logLevels,
+        Direction orderDirection,
+        int skip,
+        int take)
     {
-        return new LogEntry()
-        {
-            Timestamp = logMessage.Timestamp,
-            Level = Enum.Parse<LogLevel>(logMessage.Level.ToString()),
-            MessageTemplateText = logMessage.MessageTemplateText,
-            RenderedMessage = logMessage.RenderedMessage,
-            Properties = MapLogMessageProperties(logMessage.Properties),
-            Exception = logMessage.Exception
-        };
-    }
+        IEnumerable<ILogEntry> logs = _logViewerRepository.GetLogs(logTimePeriod, filterExpression).ToArray();
 
-    private IReadOnlyDictionary<string, string?> MapLogMessageProperties(IReadOnlyDictionary<string, LogEventPropertyValue>? properties)
-    {
-        var result = new Dictionary<string, string?>();
-
-        if (properties is not null)
+        // This is user used the checkbox UI to toggle which log levels they wish to see
+        // If an empty array or null - its implied all levels to be viewed
+        if (logLevels?.Length > 0)
         {
-            foreach (KeyValuePair<string, LogEventPropertyValue> property in properties)
+            var logsAfterLevelFilters = new List<ILogEntry>();
+            var validLogType = true;
+            foreach (var level in logLevels)
             {
-                string? value;
-
-
-                if (property.Value is ScalarValue scalarValue)
+                // Check if level string is part of the LogEventLevel enum
+                if (Enum.IsDefined(typeof(LogLevel), level))
                 {
-                    value = scalarValue.Value?.ToString();
-                }
-                else if (property.Value is StructureValue structureValue)
-                {
-                    var textWriter = new StringWriter();
-                    structureValue.Render(textWriter);
-                    value = textWriter.ToString();
+                    validLogType = true;
+                    logsAfterLevelFilters.AddRange(logs.Where(x =>
+                        string.Equals(x.Level.ToString(), level, StringComparison.InvariantCultureIgnoreCase)));
                 }
                 else
                 {
-                    value = _jsonSerializer.Serialize(property.Value);
+                    validLogType = false;
                 }
+            }
 
-                result.Add(property.Key, value);
+            if (validLogType)
+            {
+                logs = logsAfterLevelFilters;
             }
         }
 
-        return result.AsReadOnly();
+        return new PagedModel<ILogEntry>
+        {
+            Total = logs.Count(),
+            Items = logs
+                .OrderBy(l => l.Timestamp, orderDirection)
+                .Skip(skip)
+                .Take(take),
+        };
     }
+
+    private string GetSearchPattern(DateTime day) => $"*{day:yyyyMMdd}*.json";
 }

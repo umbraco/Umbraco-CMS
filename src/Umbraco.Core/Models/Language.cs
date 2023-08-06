@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Runtime.Serialization;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;

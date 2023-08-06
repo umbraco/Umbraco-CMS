@@ -1,4 +1,4 @@
-using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -6,12 +6,14 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/dictionary")]
 [ApiExplorerSettings(GroupName = "Dictionary")]
+[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDictionaryOrTemplates)]
 // NOTE: at the moment dictionary items (renamed to dictionary tree) aren't supported by EntityService, so we have little use of the
 // tree controller base. We'll keep it though, in the hope that we can mend EntityService.
 public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeItemResponseModel>
@@ -32,7 +34,6 @@ public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeI
             var hasChildren = (await DictionaryItemService.GetChildrenAsync(dictionaryItem.Key)).Any();
             return new EntityTreeItemResponseModel
             {
-                Icon = Constants.Icons.Dictionary,
                 Name = dictionaryItem.ItemKey,
                 Id = dictionaryItem.Key,
                 Type = Constants.UdiEntityType.DictionaryItem,

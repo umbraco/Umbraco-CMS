@@ -151,10 +151,6 @@ public class BackOfficeController : ManagementApiControllerBase
         ClaimsPrincipal backOfficePrincipal = await _backOfficeSignInManager.CreateUserPrincipalAsync(backOfficeUser);
         backOfficePrincipal.SetClaim(OpenIddictConstants.Claims.Subject, backOfficeUser.Key.ToString());
 
-        // TODO: it is not optimal to append all claims to the token.
-        // the token size grows with each claim, although it is still smaller than the old cookie.
-        // see if we can find a better way so we do not risk leaking sensitive data in bearer tokens.
-        // maybe work with scopes instead?
         Claim[] backOfficeClaims = backOfficePrincipal.Claims.ToArray();
         foreach (Claim backOfficeClaim in backOfficeClaims)
         {

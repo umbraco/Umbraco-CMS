@@ -20,4 +20,6 @@ public interface ICoreBackOfficeUserManager
     Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockUser(IUser user);
 
     Task<Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus>> GetLoginsAsync(IUser user);
+
+    Task<bool> IsEmailConfirmationTokenValidAsync(IUser user, string token);
 }

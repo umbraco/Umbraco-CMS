@@ -1,15 +1,18 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
 [ApiController]
 [VersionedApiBackOfficeRoute("user")]
 [ApiExplorerSettings(GroupName = "User")]
+[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessUsers)]
 public abstract class UserControllerBase : ManagementApiControllerBase
 {
     protected IActionResult UserOperationStatusResult(UserOperationStatus status, ErrorMessageResult? errorMessageResult = null) =>
@@ -80,7 +83,7 @@ public abstract class UserControllerBase : ManagementApiControllerBase
                 .WithDetail("Some of the provided media start nodes was not found.")
                 .Build()),
             UserOperationStatus.UserNotFound => NotFound(new ProblemDetailsBuilder()
-                .WithTitle("The was not found")
+                .WithTitle("The user was not found")
                 .WithDetail("The specified user was not found.")
                 .Build()),
             UserOperationStatus.CannotDisableInvitedUser => BadRequest(new ProblemDetailsBuilder()
@@ -94,6 +97,10 @@ public abstract class UserControllerBase : ManagementApiControllerBase
             UserOperationStatus.InvalidIsoCode => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid ISO code")
                 .WithDetail("The specified ISO code is invalid.")
+                .Build()),
+            UserOperationStatus.InvalidVerificationToken => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid verification token")
+                .WithDetail("The specified verification token is invalid.")
                 .Build()),
             UserOperationStatus.MediaNodeNotFound => NotFound(new ProblemDetailsBuilder()
                 .WithTitle("Media node not found")

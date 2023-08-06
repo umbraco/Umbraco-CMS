@@ -1,3 +1,4 @@
+using System.Globalization;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Services;
 
@@ -23,4 +24,7 @@ public class DefaultCultureDictionaryFactory : ICultureDictionaryFactory
 
     public ICultureDictionary CreateDictionary() =>
         new DefaultCultureDictionary(_localizationService, _appCaches.RequestCache);
+
+    public ICultureDictionary CreateDictionary(CultureInfo specificCulture) =>
+        new DefaultCultureDictionary(specificCulture, _localizationService, _appCaches.RequestCache);
 }

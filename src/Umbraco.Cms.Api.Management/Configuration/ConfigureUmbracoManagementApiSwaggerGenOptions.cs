@@ -20,6 +20,7 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
 
     public void Configure(SwaggerGenOptions swaggerGenOptions)
     {
+
         swaggerGenOptions.SwaggerDoc(
             ManagementApiConfiguration.ApiName,
             new OpenApiInfo
@@ -31,10 +32,12 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
 
         swaggerGenOptions.OperationFilter<ResponseHeaderOperationFilter>();
         swaggerGenOptions.SelectSubTypesUsing(_umbracoJsonTypeInfoResolver.FindSubTypes);
+        swaggerGenOptions.UseOneOfForPolymorphism();
+        swaggerGenOptions.UseAllOfForInheritance();
 
         swaggerGenOptions.AddSecurityDefinition(
             ManagementApiConfiguration.ApiSecurityName,
-             new OpenApiSecurityScheme
+            new OpenApiSecurityScheme
              {
                  In = ParameterLocation.Header,
                  Name = "Umbraco",
@@ -54,4 +57,5 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
         // Sets Security requirement on backoffice apis
         swaggerGenOptions.OperationFilter<BackOfficeSecurityRequirementsOperationFilter>();
     }
+
 }

@@ -24,6 +24,8 @@ public class ContentErrorPage : ValidatableEntryBase
     /// <summary>
     ///     Gets or sets a value for the content XPath.
     /// </summary>
+
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public string? ContentXPath { get; set; }
 
     /// <summary>
@@ -39,6 +41,7 @@ public class ContentErrorPage : ValidatableEntryBase
     /// <summary>
     ///     Gets a value indicating whether the <see cref="ContentXPath" /> field is populated.
     /// </summary>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public bool HasContentXPath => !string.IsNullOrEmpty(ContentXPath);
 
     /// <summary>

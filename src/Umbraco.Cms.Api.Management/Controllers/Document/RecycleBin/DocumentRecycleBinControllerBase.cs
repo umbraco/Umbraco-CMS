@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
@@ -9,6 +9,7 @@ using Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 
@@ -17,6 +18,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 [RequireDocumentTreeRootAccess]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
+[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocuments)]
 public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<RecycleBinItemResponseModel>
 {
     public DocumentRecycleBinControllerBase(IEntityService entityService)

@@ -19,7 +19,7 @@
     "wait-on": "^6.0.1"
   },
   "dependencies": {
-    "@umbraco/json-models-builders": "^1.0.5",
+    "@umbraco/json-models-builders": "^1.0.6",
     "@umbraco/playwright-testhelpers": "2.0.0-beta.2",
     "camelize": "^1.0.0",
     "dotenv": "^16.3.1",
