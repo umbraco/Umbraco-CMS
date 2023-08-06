@@ -43,7 +43,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
             return;
         }
 
-        if (Suspendable.ExamineEvents.CanIndex == false)
+        if (Suspendable.SearchIndexEvents.CanIndex == false)
         {
             return;
         }

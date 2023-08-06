@@ -35,7 +35,7 @@ public sealed class ContentIndexingNotificationHandler : INotificationHandler<Co
             return;
         }
 
-        if (Suspendable.ExamineEvents.CanIndex == false)
+        if (Suspendable.SearchIndexEvents.CanIndex == false)
         {
             return;
         }

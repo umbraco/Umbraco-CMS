@@ -29,7 +29,7 @@ public sealed class MemberIndexingNotificationHandler : INotificationHandler<Mem
             return;
         }
 
-        if (Suspendable.ExamineEvents.CanIndex == false)
+        if (Suspendable.SearchIndexEvents.CanIndex == false)
         {
             return;
         }

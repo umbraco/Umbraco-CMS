@@ -80,7 +80,7 @@ internal sealed class DeliveryApiContentIndexingNotificationHandler :
             return true;
         }
 
-        if (Suspendable.ExamineEvents.CanIndex == false)
+        if (Suspendable.SearchIndexEvents.CanIndex == false)
         {
             return true;
         }

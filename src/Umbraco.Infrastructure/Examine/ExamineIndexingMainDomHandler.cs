@@ -42,7 +42,7 @@ internal class ExamineIndexingMainDomHandler
                 "Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
 
             //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
-            Suspendable.ExamineEvents.SuspendIndexers(_logger);
+            Suspendable.SearchIndexEvents.SuspendIndexers(_logger);
             return false; //exit, do not continue
         }
 

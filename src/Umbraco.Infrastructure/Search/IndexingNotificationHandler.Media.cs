@@ -29,7 +29,7 @@ public sealed class MediaIndexingNotificationHandler : INotificationHandler<Medi
             return;
         }
 
-        if (Suspendable.ExamineEvents.CanIndex == false)
+        if (Suspendable.SearchIndexEvents.CanIndex == false)
         {
             return;
         }
