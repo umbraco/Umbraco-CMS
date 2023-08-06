@@ -115,4 +115,5 @@ public sealed class MediaIndexingNotificationHandler : INotificationHandler<Medi
             _umbracoIndexingHandler.DeleteIndexForEntities(deleteBatch, false);
         }
     }
+
 }
