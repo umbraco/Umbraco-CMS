@@ -62,7 +62,7 @@ export default class UmbAuthElement extends LitElement {
 					<slot name="external" slot="external"></slot>
 				</umb-login>`,
 				default: true,
-				action: this.#checkRouteForResetParams,
+				action: this.#checkForParams,
 			},
 			{
 				path: 'login/reset',
@@ -84,14 +84,20 @@ export default class UmbAuthElement extends LitElement {
 		this.router.subscribe();
 	}
 
-	#checkRouteForResetParams(_path: string, search: string) {
+	#checkForParams(_path: string, search: string) {
 		const searchParams = new URLSearchParams(search);
 		const flow = searchParams.get('flow');
-		const resetId = searchParams.get('userId');
-		const resetCode = searchParams.get('resetCode');
 
-		if (flow === 'reset-password' && resetId && resetCode) {
-			return 'login/new';
+		if (flow === 'reset-password') {
+			const resetId = searchParams.get('userId');
+			const resetCode = searchParams.get('resetCode');
+			if (resetId && resetCode) {
+				return 'login/new';
+			}
+		}
+
+		if (flow === 'invite-user') {
+			return 'login/invite';
 		}
 
 		return null;
