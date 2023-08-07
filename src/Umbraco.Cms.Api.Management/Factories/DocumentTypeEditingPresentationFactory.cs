@@ -18,8 +18,8 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
 
         MapCleanup(createModel, requestModel.Cleanup);
 
-        createModel.Key = requestModel.Key;
-        createModel.ParentKey = requestModel.ParentKey;
+        createModel.Key = requestModel.DefaultTemplateId;
+        createModel.ParentKey = requestModel.ParentId;
         createModel.AllowedTemplateKeys = requestModel.AllowedTemplateIds;
         createModel.DefaultTemplateKey = requestModel.DefaultTemplateId;
 

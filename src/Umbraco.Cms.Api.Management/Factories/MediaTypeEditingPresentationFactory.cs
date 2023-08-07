@@ -15,8 +15,8 @@ internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPr
             CreateMediaTypePropertyTypeContainerRequestModel
         >(requestModel);
 
-        createModel.Key = requestModel.Key;
-        createModel.ParentKey = requestModel.ParentKey;
+        createModel.Key = requestModel.Id;
+        createModel.ParentKey = requestModel.ParentId;
 
         return createModel;
     }
