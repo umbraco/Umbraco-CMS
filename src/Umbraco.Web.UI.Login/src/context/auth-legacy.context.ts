@@ -11,6 +11,7 @@ import { Observable, ReplaySubject } from 'rxjs';
 
 export class UmbAuthLegacyContext implements IUmbAuthContext {
 	readonly supportsPersistLogin = true;
+	disableLocalLogin = false;
 
 	#authRepository = new UmbAuthLegacyRepository();
 

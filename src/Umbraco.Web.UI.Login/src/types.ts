@@ -7,6 +7,7 @@ export type LoginRequestModel = {
 };
 
 export interface IUmbAuthContext {
+	disableLocalLogin: boolean;
 	login(data: LoginRequestModel): Promise<LoginResponse>;
 	resetPassword(username: string): Promise<ResetPasswordResponse>;
 	validatePasswordResetCode(userId: string, resetCode: string): Promise<ValidatePasswordResetCodeResponse>;

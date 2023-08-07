@@ -1,8 +1,11 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement, queryAssignedElements } from 'lit/decorators.js';
+import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
+import { customElement, property, queryAssignedElements } from 'lit/decorators.js';
 
 @customElement('umb-external-login-providers-layout')
 export class UmbExternalLoginProvidersLayoutElement extends LitElement {
+	@property({ type: Boolean, attribute: 'divider' })
+	showDivider = true;
+
 	@queryAssignedElements({ flatten: true })
 	protected slottedElements?: HTMLElement[];
 
@@ -12,7 +15,7 @@ export class UmbExternalLoginProvidersLayoutElement extends LitElement {
 
 	render() {
 		return html`
-			<div id="divider"><span>or</span></div>
+			${this.showDivider ? html` <div id="divider"><span>or</span></div> ` : nothing}
 			<div>
 				<slot></slot>
 			</div>

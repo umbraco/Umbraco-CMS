@@ -14,8 +14,15 @@ export default class UmbAuthElement extends LitElement {
 	@property({ type: Boolean, attribute: 'is-legacy' })
 	isLegacy = false;
 
+	/**
+	 * Disables the local login form and only allows external login providers.
+	 *
+	 * @attr disable-local-login
+	 */
 	@property({ type: Boolean, attribute: 'disable-local-login' })
-	disableLocalLogin = false;
+	set disableLocalLogin(value: boolean) {
+		UmbAuthMainContext.Instance.disableLocalLogin = value;
+	}
 
 	@property({ type: String, attribute: 'background-image' })
 	backgroundImage = '';
@@ -67,17 +74,17 @@ export default class UmbAuthElement extends LitElement {
 			{
 				path: 'login/reset',
 				component: html`<umb-reset-password-page></umb-reset-password-page>`,
-				action: () => (this.allowPasswordReset ? null : 'login'),
+				action: () => (this.allowPasswordReset && !this.disableLocalLogin ? null : 'login'),
 			},
 			{
 				path: 'login/new',
 				component: html`<umb-new-password-page></umb-new-password-page>`,
-				action: () => (this.allowPasswordReset ? null : 'login'), //TODO: Also check if there is a reset code
+				action: () => (this.allowPasswordReset && !this.disableLocalLogin ? null : 'login'), //TODO: Also check if there is a reset code
 			},
 			{
 				path: 'login/invite',
 				component: html`<umb-invite-page></umb-invite-page>`,
-				action: () => (this.allowUserInvite ? null : 'login'), //TODO: Also check if there is an invite code
+				action: () => (this.allowUserInvite && !this.disableLocalLogin ? null : 'login'), //TODO: Also check if there is an invite code
 			},
 		]);
 

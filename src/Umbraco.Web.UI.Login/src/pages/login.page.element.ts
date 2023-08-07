@@ -22,6 +22,11 @@ export default class UmbLoginPageElement extends LitElement {
 	@state()
 	private _loginError = '';
 
+	@state()
+	private get disableLocalLogin() {
+		return UmbAuthMainContext.Instance.disableLocalLogin;
+	}
+
 	#handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
 
@@ -75,67 +80,71 @@ export default class UmbLoginPageElement extends LitElement {
 			<h1 id="greeting" class="uui-h3">
 				<umb-localize key=${this.#greetingLocalizationKey}></umb-localize>
 			</h1>
-			<uui-form>
-				<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
-					<uui-form-layout-item>
-						<uui-label id="emailLabel" for="email" slot="label" required>
-							${this.usernameIsEmail
-								? html`<umb-localize key="user_email">Email</umb-localize>`
-								: html`<umb-localize key="user_username">Name</umb-localize>`}
-						</uui-label>
-						<uui-input
-							type=${this.usernameIsEmail ? 'email' : 'text'}
-							id="email"
-							name="email"
-							label="Email"
-							required
-							required-message="Email is required"></uui-input>
-					</uui-form-layout-item>
+			${this.disableLocalLogin
+				? nothing
+				: html`
+						<uui-form>
+							<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
+								<uui-form-layout-item>
+									<uui-label id="emailLabel" for="email" slot="label" required>
+										${this.usernameIsEmail
+											? html`<umb-localize key="user_email">Email</umb-localize>`
+											: html`<umb-localize key="user_username">Name</umb-localize>`}
+									</uui-label>
+									<uui-input
+										type=${this.usernameIsEmail ? 'email' : 'text'}
+										id="email"
+										name="email"
+										label="Email"
+										required
+										required-message="Email is required"></uui-input>
+								</uui-form-layout-item>
 
-					<uui-form-layout-item>
-						<uui-label id="passwordLabel" for="password" slot="label" required>
-							<umb-localize key="user_password">Password</umb-localize>
-						</uui-label>
-						<uui-input-password
-							id="password"
-							name="password"
-							label="Password"
-							required
-							required-message="Password is required"></uui-input-password>
-					</uui-form-layout-item>
+								<uui-form-layout-item>
+									<uui-label id="passwordLabel" for="password" slot="label" required>
+										<umb-localize key="user_password">Password</umb-localize>
+									</uui-label>
+									<uui-input-password
+										id="password"
+										name="password"
+										label="Password"
+										required
+										required-message="Password is required"></uui-input-password>
+								</uui-form-layout-item>
 
-					<div id="secondary-actions">
-						${when(
-							this.#authContext.supportsPersistLogin,
-							() => html`<uui-form-layout-item>
-								<uui-checkbox name="persist" label="Remember me">
-									<umb-localize ="user_rememberMe">Remember me</umb-localize>
-								</uui-checkbox>
-							</uui-form-layout-item>`
-						)}
-						${when(
-							this.allowPasswordReset,
-							() =>
-								html`<a id="forgot-password" href="login/reset"
-									><umb-localize key="user_forgotPassword">Forgot password?</umb-localize></a
-								>`
-						)}
-					</div>
+								<div id="secondary-actions">
+									${when(
+										this.#authContext.supportsPersistLogin,
+										() => html`<uui-form-layout-item>
+											<uui-checkbox name="persist" label="Remember me">
+												<umb-localize ="user_rememberMe">Remember me</umb-localize>
+											</uui-checkbox>
+										</uui-form-layout-item>`
+									)}
+									${when(
+										this.allowPasswordReset,
+										() =>
+											html`<a id="forgot-password" href="login/reset"
+												><umb-localize key="user_forgotPassword">Forgot password?</umb-localize></a
+											>`
+									)}
+								</div>
 
-					${this.#renderErrorMessage()}
+								${this.#renderErrorMessage()}
 
-					<uui-button
-						type="submit"
-						id="login-button"
-						look="primary"
-						label="Login"
-						color="default"
-						.state=${this._loginState}>
-						<umb-localize key="general_login">Login</umb-localize>
-					</uui-button>
-				</form>
-			</uui-form>
-			<umb-external-login-providers-layout>
+								<uui-button
+									type="submit"
+									id="login-button"
+									look="primary"
+									label="Login"
+									color="default"
+									.state=${this._loginState}>
+									<umb-localize key="general_login">Login</umb-localize>
+								</uui-button>
+							</form>
+						</uui-form>
+				  `}
+			<umb-external-login-providers-layout .showDivider=${!this.disableLocalLogin}>
 				<slot name="external"></slot>
 			</umb-external-login-providers-layout>
 		`;

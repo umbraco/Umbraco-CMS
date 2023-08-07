@@ -6,13 +6,14 @@ import {
 	ResetPasswordResponse,
 	ValidatePasswordResetCodeResponse,
 } from '../types.ts';
-import {Observable} from "rxjs";
+import { Observable } from 'rxjs';
 
 export class UmbAuthContext implements IUmbAuthContext {
 	supportsPersistLogin = false;
 	returnPath = '';
-  allowPasswordReset = false;
-  usernameIsEmail = true;
+	allowPasswordReset = false;
+	usernameIsEmail = true;
+	disableLocalLogin = false;
 
 	resetPassword(_username: string): Promise<ResetPasswordResponse> {
 		throw new Error('Method not implemented.');
@@ -28,7 +29,7 @@ export class UmbAuthContext implements IUmbAuthContext {
 		throw new Error('Method not implemented.');
 	}
 
-  getIcons(): Observable<Record<string, string>> {
-    throw new Error('Method not implemented.');
-  }
+	getIcons(): Observable<Record<string, string>> {
+		throw new Error('Method not implemented.');
+	}
 }

@@ -6,13 +6,13 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Umbraco</title>
-    <script type="module">
-      import { startMockServiceWorker } from "./src/mocks/index.ts";
+		<script type="module">
+			import { startMockServiceWorker } from './src/mocks/index.ts';
 
-      if (import.meta.env.DEV) {
-        startMockServiceWorker();
-      }
-    </script>
+			if (import.meta.env.DEV) {
+				startMockServiceWorker();
+			}
+		</script>
 		<script type="module" src="/src/index.ts"></script>
 		<style>
 			body {
@@ -22,10 +22,33 @@
 		</style>
 	</head>
 	<body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
-		<umb-auth is-legacy logo-image="/umbraco_logo_white.svg" background-image="/login.svg" allow-password-reset allow-user-invite>
-      <umb-login-external slot="external" display-name="Google" provider-name="Umbraco.Google" icon="info" external-logins-url="https://google.com" button-look="primary" button-color="positive"></umb-login-external>
-      <umb-login-external slot="external" display-name="Azure ID" provider-name="Umbraco.Azure" icon="lock" external-logins-url="https://microsoft.com" button-look="primary" button-color="warning"></umb-login-external>
-      <umb-login-external slot="external" display-name="My provider" provider-name="MyCustomScheme" custom-view="/src/mocks/customViews/my-custom-view.js"></umb-login-external>
-    </umb-auth>
+		<umb-auth
+			is-legacy
+			logo-image="/umbraco_logo_white.svg"
+			background-image="/login.svg"
+			allow-password-reset
+			allow-user-invite>
+			<umb-login-external
+				slot="external"
+				display-name="Google"
+				provider-name="Umbraco.Google"
+				icon="info"
+				external-logins-url="https://google.com"
+				button-look="primary"
+				button-color="positive"></umb-login-external>
+			<umb-login-external
+				slot="external"
+				display-name="Azure ID"
+				provider-name="Umbraco.Azure"
+				icon="lock"
+				external-logins-url="https://microsoft.com"
+				button-look="primary"
+				button-color="warning"></umb-login-external>
+			<umb-login-external
+				slot="external"
+				display-name="My provider"
+				provider-name="MyCustomScheme"
+				custom-view="/src/mocks/customViews/my-custom-view.js"></umb-login-external>
+		</umb-auth>
 	</body>
 </html>
