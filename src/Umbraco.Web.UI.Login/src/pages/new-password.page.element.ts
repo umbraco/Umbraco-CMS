@@ -4,8 +4,8 @@ import { CSSResultGroup, LitElement, css, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UmbAuthMainContext } from '../context/auth-main.context';
 
-@customElement('umb-new-password')
-export default class UmbNewPasswordElement extends LitElement {
+@customElement('umb-new-password-page')
+export default class UmbNewPasswordPageElement extends LitElement {
 	@query('#confirmPassword')
 	confirmPasswordElement!: UUIInputPasswordElement;
 
@@ -204,6 +204,6 @@ export default class UmbNewPasswordElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-new-password': UmbNewPasswordElement;
+		'umb-new-password-page': UmbNewPasswordPageElement;
 	}
 }

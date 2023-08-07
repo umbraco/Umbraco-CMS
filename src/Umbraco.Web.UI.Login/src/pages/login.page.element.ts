@@ -6,8 +6,8 @@ import { when } from 'lit/directives/when.js';
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { UmbAuthMainContext } from '../context/auth-main.context.js';
 
-@customElement('umb-login')
-export default class UmbLoginElement extends LitElement {
+@customElement('umb-login-page')
+export default class UmbLoginPageElement extends LitElement {
 	#authContext = UmbAuthMainContext.Instance;
 
 	@property({ type: Boolean, attribute: 'username-is-email' })
@@ -200,6 +200,6 @@ export default class UmbLoginElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-login': UmbLoginElement;
+		'umb-login-page': UmbLoginPageElement;
 	}
 }

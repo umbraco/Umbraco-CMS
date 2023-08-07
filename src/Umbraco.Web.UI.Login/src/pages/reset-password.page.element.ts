@@ -5,8 +5,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbAuthMainContext } from '../context/auth-main.context';
 import { when } from 'lit/directives/when.js';
 
-@customElement('umb-reset-password')
-export default class UmbResetPasswordElement extends LitElement {
+@customElement('umb-reset-password-page')
+export default class UmbResetPasswordPageElement extends LitElement {
 	@state()
 	resetCallState: UUIButtonState = undefined;
 
@@ -215,6 +215,6 @@ export default class UmbResetPasswordElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-reset-password': UmbResetPasswordElement;
+		'umb-reset-password-page': UmbResetPasswordPageElement;
 	}
 }

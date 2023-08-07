@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { CSSResultGroup, LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-@customElement('umb-invite')
-export default class UmbInviteElement extends LitElement {
+@customElement('umb-invite-page')
+export default class UmbInvitePageElement extends LitElement {
 	render() {
 		return html`INVITE PAGE`;
 	}
@@ -13,6 +13,6 @@ export default class UmbInviteElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-invite': UmbInviteElement;
+		'umb-invite-page': UmbInvitePageElement;
 	}
 }
