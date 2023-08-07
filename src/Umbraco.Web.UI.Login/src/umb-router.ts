@@ -34,6 +34,25 @@ export default class UmbRouter {
 		this.#paths = paths;
 
 		this.#updateUrl(window.location.pathname, window.location.search, window.location.hash);
+
+		window.addEventListener('umbroute:statechange', () => {
+			this.#updateUrl(window.location.pathname, window.location.search, window.location.hash);
+		});
+	}
+
+	/**
+	 * Push or replace a new state to the browser history and route immediately
+	 * @param path The local path
+	 * @param replace Replace the current state instead of pushing a new one
+	 */
+	static changeState(path: string, replace = false): void {
+		if (replace) {
+			history.replaceState({}, '', path);
+		} else {
+			history.pushState({}, '', path);
+		}
+
+		window.dispatchEvent(new CustomEvent('umbroute:statechange', { detail: { path } }));
 	}
 
 	public subscribe() {
