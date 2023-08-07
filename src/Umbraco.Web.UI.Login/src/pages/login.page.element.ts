@@ -54,6 +54,12 @@ export default class UmbLoginPageElement extends LitElement {
 		this._loginError = response.error || '';
 		this._loginState = response.error ? 'failed' : 'success';
 
+		// Check for 402 status code indicating that MFA is required
+		if (response.status === 402) {
+			history.pushState(null, '', 'login/?flow=mfa');
+			return;
+		}
+
 		if (response.error) return;
 
 		const returnPath = this.#authContext.returnPath;
