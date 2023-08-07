@@ -121,13 +121,13 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			headline: 'Delete tab',
 			content: html`Are you sure you want to delete the tab (${tab?.name || tab?.id})?
 				<div style="color:var(--uui-color-danger-emphasis)">
-					This will also delete all items below this tab that doesn't belong to a composition.
+					This will delete all items that doesn't belong to a composition.
 				</div>`,
 			confirmLabel: 'Delete',
 			color: 'danger',
 		};
 
-		const ComposedMessageRemove: UmbConfirmModalData = {
+		const ComposedMessage: UmbConfirmModalData = {
 			headline: 'Remove composed tab',
 			content: html`This tab is a composed tab. Are you sure you want to remove the composed tab
 			(${tab?.name || tab?.id})?`,
@@ -138,7 +138,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		// TODO: If this tab is composed of other tabs, then notify that it will only delete the local tab.
 		const modalHandler = this._tabsStructureHelper?.isOwnerContainer(tab?.id)
 			? this._modalManagerContext?.open(UMB_CONFIRM_MODAL, LocalMessage)
-			: this._modalManagerContext?.open(UMB_CONFIRM_MODAL, ComposedMessageRemove);
+			: this._modalManagerContext?.open(UMB_CONFIRM_MODAL, ComposedMessage);
 
 		modalHandler?.onSubmit().then(() => {
 			this.#remove(tab?.id);
