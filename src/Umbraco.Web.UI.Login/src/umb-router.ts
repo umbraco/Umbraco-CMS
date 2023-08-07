@@ -16,7 +16,7 @@ interface AnchorElement extends HTMLElement {
 
 type UmbRouterPath = {
 	path: string;
-	component: TemplateResult;
+	component: TemplateResult | (() => TemplateResult);
 	search?: string;
 	default?: boolean;
 	action?(pathname: string, search: string, hash: string): string | null;
@@ -60,11 +60,12 @@ export default class UmbRouter {
 		const newPath = newPathName && this.#paths.find((p) => p.path === newPathName);
 
 		// Return the component based on the conditions using the ternary operator
-		return (
+		const cmp =
 			(newPath && newPath.component) || // Return new path component if newPath is not null
 			(originalPath && originalPath.component) || // Return original path component if newPath is not null
-			this.#paths.find((p) => p.default)?.component // Find and return default path component
-		);
+			this.#paths.find((p) => p.default)?.component; // Find and return default path component
+
+		return typeof cmp === 'function' ? cmp() : cmp;
 	};
 
 	#updateUrl(path: string, search: string, hash: string) {
