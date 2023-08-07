@@ -56,27 +56,27 @@ export default class UmbAuthElement extends LitElement {
 		this.router = new UmbRouter(this, [
 			{
 				path: 'login',
-				component: html`<umb-login
+				component: html`<umb-login-page
 					?allow-password-reset=${this.allowPasswordReset}
 					?username-is-email=${this.usernameIsEmail}>
 					<slot name="external" slot="external"></slot>
-				</umb-login>`,
+				</umb-login-page>`,
 				default: true,
 				action: this.#checkForParams,
 			},
 			{
 				path: 'login/reset',
-				component: html`<umb-reset-password></umb-reset-password>`,
+				component: html`<umb-reset-password-page></umb-reset-password-page>`,
 				action: () => (this.allowPasswordReset ? null : 'login'),
 			},
 			{
 				path: 'login/new',
-				component: html`<umb-new-password></umb-new-password>`,
+				component: html`<umb-new-password-page></umb-new-password-page>`,
 				action: () => (this.allowPasswordReset ? null : 'login'), //TODO: Also check if there is a reset code
 			},
 			{
 				path: 'login/invite',
-				component: html`<umb-invite></umb-invite>`,
+				component: html`<umb-invite-page></umb-invite-page>`,
 				action: () => (this.allowUserInvite ? null : 'login'), //TODO: Also check if there is an invite code
 			},
 		]);
