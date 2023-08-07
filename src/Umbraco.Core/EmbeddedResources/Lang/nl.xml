@@ -795,6 +795,7 @@
     <key alias="noItemsInList">Er zijn geen items toegevoegd</key>
     <key alias="server">Server</key>
     <key alias="settings">Instellingen</key>
+    <key alias="shared">Gedeeld</key>
     <key alias="show">Toon</key>
     <key alias="showPageOnSend">Toon pagina na verzenden</key>
     <key alias="size">Grootte</key>
