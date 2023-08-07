@@ -133,7 +133,7 @@ export class UmbDocumentWorkspaceViewEditElement
 								(tab) => tab.name,
 								(tab) => {
 									const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
-									return html`<uui-tab label=${tab.name!} .active=${path === this._activePath} href=${path}
+									return html`<uui-tab label=${tab.name ?? 'unnanmed'} .active=${path === this._activePath} href=${path}
 										>${tab.name}</uui-tab
 									>`;
 								}

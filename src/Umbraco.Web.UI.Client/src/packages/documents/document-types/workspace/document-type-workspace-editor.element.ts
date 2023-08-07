@@ -1,6 +1,6 @@
 import { UmbDocumentTypeWorkspaceContext } from './document-type-workspace.context.js';
 import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	UmbModalManagerContext,
@@ -116,15 +116,16 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.DocumentType">
 				<div id="header" slot="header">
-					<uui-button id="icon" @click=${this._handleIconClick} compact>
-						<uui-icon name="${this._icon}" style="color: ${this._iconColorAlias}"></uui-icon>
+					<uui-button id="icon" @click=${this._handleIconClick} label="icon" compact>
+						<uui-icon name="${ifDefined(this._icon)}" style="color: ${this._iconColorAlias}"></uui-icon>
 					</uui-button>
 
-					<uui-input id="name" .value=${this._name} @input="${this.#onNameChange}">
+					<uui-input id="name" .value=${this._name} @input="${this.#onNameChange}" label="name">
 						<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
 						<uui-input
 							name="alias"
 							slot="append"
+							label="alias"
 							@input=${this.#onAliasChange}
 							.value=${this._alias}
 							placeholder="Enter alias..."

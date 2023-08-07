@@ -50,7 +50,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 					<div slot="editor">
 						<uui-toggle
 							label="Allow as root"
-							.checked=${this._allowedAsRoot}
+							?checked=${this._allowedAsRoot}
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setAllowedAsRoot((e.target as UUIToggleElement).checked);
 							}}></uui-toggle>
@@ -63,7 +63,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 					<div slot="editor">
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
 						<umb-input-document-type
-							.selectedIds=${this._allowedContentTypeIDs}
+							.selectedIds=${this._allowedContentTypeIDs ?? []}
 							@change="${(e: CustomEvent) => {
 								const sortedContentTypesList = (e.target as UmbInputDocumentTypeElement).selectedIds.map(
 									(id, index) => ({

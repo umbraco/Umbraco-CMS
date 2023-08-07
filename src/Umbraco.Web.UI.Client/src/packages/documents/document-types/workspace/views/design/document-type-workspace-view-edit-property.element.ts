@@ -1,5 +1,5 @@
 import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -120,12 +120,14 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 							name="label"
 							id="label-input"
 							placeholder="Label..."
+							label="label"
 							.value=${this.property.name}
 							@input=${this.#onNameChange}></uui-input>
 						<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
 						<uui-input
 							name="alias"
 							id="alias-input"
+							label="alias"
 							placeholder="Alias..."
 							.value=${this.property.alias}
 							?disabled=${this._aliasLocked}
@@ -140,6 +142,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 						<slot name="property-action-menu"></slot>
 						<p>
 							<uui-textarea
+								label="description"
 								name="description"
 								id="description-input"
 								placeholder="Enter a description..."
@@ -149,7 +152,9 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 								}}></uui-textarea>
 						</p>
 					</div>
-					<uui-button id="editor" label="Edit property settings" href=${this._modalRoute}><b></b></uui-button>
+					<uui-button id="editor" label="Edit property settings" href=${ifDefined(this._modalRoute)}>
+						<b></b>
+					</uui-button>
 			  `
 			: '';
 	}
