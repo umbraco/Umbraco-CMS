@@ -65,7 +65,8 @@
         {
             <umb-login-external
                 slot="external"
-                name="@provider.ExternalLoginProvider.AuthenticationType"
+                display-name="@provider.AuthenticationScheme.DisplayName"
+                provider-name="@provider.ExternalLoginProvider.AuthenticationType"
                 icon="@provider.ExternalLoginProvider.Options.Icon"
                 external-login-url="@externalLoginsUrl"
                 button-look="@provider.ExternalLoginProvider.Options.ButtonLook.ToString().ToLowerInvariant()"
