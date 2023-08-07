@@ -1,5 +1,5 @@
-import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
-import { customElement, queryAssignedElements, state } from 'lit/decorators.js';
+import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { customElement, queryAssignedElements } from 'lit/decorators.js';
 
 @customElement('umb-external-login-providers-layout')
 export class UmbExternalLoginProvidersLayoutElement extends LitElement {
