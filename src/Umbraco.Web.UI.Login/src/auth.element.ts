@@ -6,6 +6,7 @@ import { UmbAuthMainContext } from './context/auth-main.context.js';
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { UmbIconRegistry } from './icon.registry.js';
 import UmbRouter from './umb-router.js';
+import './pages/mfa.pga.element.js';
 
 @customElement('umb-auth')
 export default class UmbAuthElement extends LitElement {
@@ -63,11 +64,21 @@ export default class UmbAuthElement extends LitElement {
 		this.router = new UmbRouter(this, [
 			{
 				path: 'login',
-				component: html`<umb-login-page
-					?allow-password-reset=${this.allowPasswordReset}
-					?username-is-email=${this.usernameIsEmail}>
-					<slot name="external" slot="external"></slot>
-				</umb-login-page>`,
+				component: () => {
+					const searchParams = new URLSearchParams(window.location.search);
+					const flow = searchParams.get('flow');
+					switch (flow) {
+						case 'mfa':
+							return html`<umb-mfa-page></umb-mfa-page>`;
+
+						default:
+							return html`<umb-login-page
+								?allow-password-reset=${this.allowPasswordReset}
+								?username-is-email=${this.usernameIsEmail}>
+								<slot name="external" slot="external"></slot>
+							</umb-login-page>`;
+					}
+				},
 				default: true,
 				action: this.#checkForParams,
 			},
