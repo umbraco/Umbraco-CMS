@@ -1,6 +1,7 @@
 import type {
 	LoginRequestModel,
 	LoginResponse,
+	MfaProvidersResponse,
 	ResetPasswordResponse,
 	ValidatePasswordResetCodeResponse,
 } from '../types.js';
@@ -85,6 +86,42 @@ export class UmbAuthLegacyRepository {
 		};
 	}
 
+	public async getMfaProviders(): Promise<MfaProvidersResponse> {
+		const request = new Request('backoffice/umbracoapi/authentication/Get2faProviders', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		const response = await fetch(request);
+
+		return {
+			status: response.status,
+			error: response.ok ? undefined : this.#getErrorText(response),
+			providers: response.ok ? await response.json() : [],
+		};
+	}
+
+	public async validateMfaCode(code: string, provider: string): Promise<LoginResponse> {
+		const request = new Request('backoffice/umbracoapi/authentication/PostVerify2faCode', {
+			method: 'POST',
+			body: JSON.stringify({
+				code,
+				provider,
+			}),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+
+		const response = await fetch(request);
+
+		return {
+			status: response.status,
+			error: response.ok ? undefined : await response.text(),
+		};
+	}
+
 	#getErrorText(response: Response) {
 		switch (response.status) {
 			case 400:
@@ -92,6 +129,9 @@ export class UmbAuthLegacyRepository {
 
 			case 401:
 				return 'Oops! It seems like your login credentials are invalid or expired. Please double-check your username and password and try again.';
+
+			case 402:
+				return 'You are required to authenticate with multi-factor authentication.';
 
 			case 500:
 				return "We're sorry, but the server encountered an unexpected error. Please refresh the page or try again later..";

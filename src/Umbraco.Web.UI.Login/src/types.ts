@@ -12,6 +12,8 @@ export interface IUmbAuthContext {
 	resetPassword(username: string): Promise<ResetPasswordResponse>;
 	validatePasswordResetCode(userId: string, resetCode: string): Promise<ValidatePasswordResetCodeResponse>;
 	newPassword(password: string, resetCode: string, userId: string): Promise<NewPasswordResponse>;
+	getMfaProviders(): Promise<MfaProvidersResponse>;
+	validateMfaCode(code: string, provider: string): Promise<LoginResponse>;
 	getIcons(): Observable<Record<string, string>>;
 	supportsPersistLogin: boolean;
 	returnPath: string;
@@ -36,4 +38,10 @@ export type ValidatePasswordResetCodeResponse = {
 export type NewPasswordResponse = {
 	error?: string;
 	status: number;
+};
+
+export type MfaProvidersResponse = {
+	error?: string;
+	status: number;
+	providers: string[];
 };

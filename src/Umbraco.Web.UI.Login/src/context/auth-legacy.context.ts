@@ -5,6 +5,7 @@ import {
 	ResetPasswordResponse,
 	ValidatePasswordResetCodeResponse,
 	NewPasswordResponse,
+	MfaProvidersResponse,
 } from '../types.js';
 import { UmbAuthLegacyRepository } from './auth-legacy.repository.ts';
 import { Observable, ReplaySubject } from 'rxjs';
@@ -32,6 +33,14 @@ export class UmbAuthLegacyContext implements IUmbAuthContext {
 	async newPassword(password: string, resetCode: string, userId: string): Promise<NewPasswordResponse> {
 		const userIdAsNumber = Number.parseInt(userId);
 		return this.#authRepository.newPassword(password, resetCode, userIdAsNumber);
+	}
+
+	getMfaProviders(): Promise<MfaProvidersResponse> {
+		return this.#authRepository.getMfaProviders();
+	}
+
+	validateMfaCode(code: string, provider: string): Promise<LoginResponse> {
+		return this.#authRepository.validateMfaCode(code, provider);
 	}
 
 	#iconsLoaded = false;

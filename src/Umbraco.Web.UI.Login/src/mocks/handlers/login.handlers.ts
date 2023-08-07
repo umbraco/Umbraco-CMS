@@ -30,4 +30,16 @@ export const handlers = [
 	rest.post('backoffice/umbracoapi/authentication/newpassword', async (_req, res, ctx) => {
 		return res(ctx.delay(), ctx.status(200));
 	}),
+
+	rest.get('backoffice/umbracoapi/authentication/Get2faProviders', async (_req, res, ctx) => {
+		return res(ctx.delay(), ctx.status(200), ctx.json(['Google', 'Lastpass']));
+	}),
+
+	rest.post('backoffice/umbracoapi/authentication/PostVerify2faCode', async (req, res, ctx) => {
+		const body = await req.json();
+		if (body.code === 'fail') {
+			return res(ctx.delay(), ctx.status(400), ctx.text('Invalid code'));
+		}
+		return res(ctx.delay(), ctx.status(200));
+	}),
 ];

@@ -2,6 +2,7 @@ import {
 	IUmbAuthContext,
 	LoginRequestModel,
 	LoginResponse,
+	MfaProvidersResponse,
 	NewPasswordResponse,
 	ResetPasswordResponse,
 	ValidatePasswordResetCodeResponse,
@@ -26,6 +27,14 @@ export class UmbAuthContext implements IUmbAuthContext {
 	}
 
 	login(_data: LoginRequestModel): Promise<LoginResponse> {
+		throw new Error('Method not implemented.');
+	}
+
+	getMfaProviders(): Promise<MfaProvidersResponse> {
+		throw new Error('Method not implemented.');
+	}
+
+	validateMfaCode(code: string, provider: string): Promise<LoginResponse> {
 		throw new Error('Method not implemented.');
 	}
 
