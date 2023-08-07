@@ -20,6 +20,9 @@ public class PublishedValueFallback : IPublishedValueFallback
         _variationContextAccessor = variationContextAccessor;
     }
 
+    [Obsolete("Scheduled for removal in v14")]
+    public IVariationContextAccessor VariationContextAccessor { get { return _variationContextAccessor; } }
+
     /// <inheritdoc />
     public bool TryGetValue(IPublishedProperty property, string? culture, string? segment, Fallback fallback, object? defaultValue, out object? value) =>
         TryGetValue<object>(property, culture, segment, fallback, defaultValue, out value);
