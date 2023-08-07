@@ -8,7 +8,7 @@ import { umbLocalizationContext } from '../localization/localization-context';
 @customElement('umb-mfa-page')
 export default class UmbMfaPageElement extends LitElement {
 	@state()
-	protected providers: Option[] = [];
+	protected providers: Array<{ name: string, value: string, selected: boolean }> = [];
 
 	@state()
 	private loading = true;
@@ -27,7 +27,7 @@ export default class UmbMfaPageElement extends LitElement {
 	async #loadProviders() {
 		try {
 			const response = await UmbAuthMainContext.Instance.getMfaProviders();
-			this.providers = response.providers.map((provider) => ({ name: provider, value: provider }));
+			this.providers = response.providers.map((provider) => ({ name: provider, value: provider, selected: false }));
 
 			if (this.providers.length) {
 				this.providers[0].selected = true;
