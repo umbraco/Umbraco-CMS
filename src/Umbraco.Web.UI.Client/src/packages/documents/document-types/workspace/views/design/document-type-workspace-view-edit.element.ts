@@ -120,26 +120,25 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		const LocalMessage: UmbConfirmModalData = {
 			headline: 'Delete tab',
 			content: html`Are you sure you want to delete the tab (${tab?.name || tab?.id})?
-				<div style="color:var(--uui-color-danger-emphasis)">This will also delete all items below this tab.</div>`,
-			confirmLabel: 'Delete',
-			color: 'danger',
-		};
-
-		const ComposedMessage: UmbConfirmModalData = {
-			headline: 'Delete local tab',
-			content: html`This tab is part of a composed tab. Are you sure you want to delete the local tab
-				(${tab?.name || tab?.id})?
 				<div style="color:var(--uui-color-danger-emphasis)">
-					This will delete all the local items that do not belong to the composed tab.
+					This will also delete all items below this tab that doesn't belong to a composition.
 				</div>`,
 			confirmLabel: 'Delete',
 			color: 'danger',
 		};
 
+		const ComposedMessageRemove: UmbConfirmModalData = {
+			headline: 'Remove composed tab',
+			content: html`This tab is a composed tab. Are you sure you want to remove the composed tab
+			(${tab?.name || tab?.id})?`,
+			confirmLabel: 'Remove',
+			color: 'danger',
+		};
+
 		// TODO: If this tab is composed of other tabs, then notify that it will only delete the local tab.
-		const modalHandler = this._tabsStructureHelper?.isOwnerContainer()
-			? this._modalManagerContext?.open(UMB_CONFIRM_MODAL, ComposedMessage)
-			: this._modalManagerContext?.open(UMB_CONFIRM_MODAL, LocalMessage);
+		const modalHandler = this._tabsStructureHelper?.isOwnerContainer(tab?.id)
+			? this._modalManagerContext?.open(UMB_CONFIRM_MODAL, LocalMessage)
+			: this._modalManagerContext?.open(UMB_CONFIRM_MODAL, ComposedMessageRemove);
 
 		modalHandler?.onSubmit().then(() => {
 			this.#remove(tab?.id);
@@ -244,7 +243,12 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 												</uui-button>
 											</uui-input>
 									  `
-									: html`<span class="tab-inactive">${tab.name}</span>
+									: html` <span class="no-edit">
+												${!this._tabsStructureHelper.isOwnerContainer(tab.id!)
+													? html`<uui-icon name="umb:merge"></uui-icon>`
+													: ''}
+												${tab.name}
+											</span>
 											<uui-button class="trash" label="Remove tab" @click=${() => this.#requestRemoveTab(tab)} compact>
 												<uui-icon name="umb:trash"></uui-icon>
 											</uui-button>`}
@@ -328,9 +332,13 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				border-right: 1px solid var(--uui-color-border);
 			}
 
-			.tab-inactive {
+			.no-edit {
 				padding: 0 var(--uui-size-space-3);
 				border: 1px solid transparent;
+			}
+
+			.no-edit uui-icon {
+				vertical-align: sub;
 			}
 
 			uui-input:not(:focus, :hover) {
