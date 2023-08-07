@@ -15,14 +15,14 @@ export default class UmbInvitePageElement extends LitElement {
 	async #onSubmit(event: CustomEvent) {
 		event.preventDefault();
 		const urlParams = new URLSearchParams(window.location.search);
-		const resetCode = urlParams.get('resetCode');
+		const resetCode = urlParams.get('resetCode'); //TODO: Invite code?
 		const userId = urlParams.get('userId');
 		const password = event.detail.password;
 
 		if (!resetCode || !userId) return;
 
 		this.state = 'waiting';
-		const response = await UmbAuthMainContext.Instance.newPassword(password, resetCode, userId);
+		const response = await UmbAuthMainContext.Instance.newPassword(password, resetCode, userId); //TODO: should this be a new invite method?
 		this.state = response.status === 200 ? 'success' : 'failed';
 		this.page = response.status === 200 ? 'done' : 'error';
 	}
