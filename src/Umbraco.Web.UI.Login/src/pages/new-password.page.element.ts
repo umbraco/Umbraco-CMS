@@ -30,77 +30,21 @@ export default class UmbNewPasswordPageElement extends LitElement {
 		this.page = response.status === 200 ? 'done' : 'error';
 	}
 
-	#renderConfirmationPage() {
-		return html`
-			<div id="confirm-page">
-				<div id="header">
-					<h2>Success!</h2>
-					<span>Your password has been successfully updated</span>
-				</div>
-
-				<uui-button type="submit" label="Login" look="primary" color="default" href="login"></uui-button>
-			</div>
-		`;
-	}
-
-	#renderErrorPage() {
-		return html` TODO MAKE ERROR PAGE`;
-	}
-
 	render() {
 		switch (this.page) {
 			case 'new':
 				return html`<umb-new-password-layout @submit=${this.#onSubmit} .state=${this.state}></umb-new-password-layout>`;
 			case 'done':
-				return this.#renderConfirmationPage();
+				return html`<umb-confirmation-layout>
+					<span slot="header">Success!</span>
+					<span>Your password has been successfully updated</span>
+				</umb-confirmation-layout>`;
 			case 'error':
-				return this.#renderErrorPage();
+				return html`ERROR PAGE`;
 		}
 	}
 
-	static styles: CSSResultGroup = [
-		UUITextStyles,
-		css`
-			#header {
-				text-align: center;
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-5);
-			}
-			#header span {
-				color: #868686; /* TODO Change to uui color when uui gets a muted text variable */
-				font-size: 14px;
-			}
-			#header h2 {
-				margin: 0px;
-				font-weight: bold;
-				font-size: 1.4rem;
-			}
-			form {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-5);
-			}
-			uui-form-layout-item {
-				margin: 0;
-			}
-			h2 {
-				margin: 0px;
-				font-weight: 600;
-				font-size: 1.4rem;
-				margin-bottom: var(--uui-size-space-4);
-			}
-			uui-input-password {
-				width: 100%;
-			}
-			uui-button {
-				width: 100%;
-				margin-top: var(--uui-size-space-5);
-				--uui-button-padding-top-factor: 1.5;
-				--uui-button-padding-bottom-factor: 1.5;
-			}
-		`,
-	];
+	static styles: CSSResultGroup = [UUITextStyles, css``];
 }
 
 declare global {

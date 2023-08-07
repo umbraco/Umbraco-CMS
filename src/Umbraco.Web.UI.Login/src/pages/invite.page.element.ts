@@ -32,7 +32,10 @@ export default class UmbInvitePageElement extends LitElement {
 			case 'new':
 				return html`<umb-new-password-layout @submit=${this.#onSubmit} .state=${this.state}></umb-new-password-layout>`;
 			case 'done':
-				return html`CONFIRM PAGE`;
+				return html`<umb-confirmation-layout>
+					<span slot="header">Success!</span>
+					<span>Your account has been created, go ahead and login to get started</span>
+				</umb-confirmation-layout>`;
 			case 'error':
 				return html`ERROR PAGE`;
 		}

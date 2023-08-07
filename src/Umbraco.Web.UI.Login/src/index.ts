@@ -16,3 +16,4 @@ import './external-login-providers-layout.element.js';
 import './login-external.element.js';
 
 import './new-password-layout.element.js';
+import './confirmation-layout.element.js';
