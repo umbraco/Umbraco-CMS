@@ -5,4 +5,7 @@ public abstract class CreateContentTypeRequestModelBase<TPropertyType, TProperty
     where TPropertyType : PropertyTypeModelBase
     where TPropertyTypeContainer : PropertyTypeContainerModelBase
 {
+    public Guid? Key { get; set; }
+
+    public Guid? ParentKey { get; set; }
 }

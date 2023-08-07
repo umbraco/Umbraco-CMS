@@ -37,7 +37,7 @@ public abstract class CreateUpdateDocumentTypeControllerBase : DocumentTypeContr
     }
 
     protected async Task<ContentTypeOperationStatus> HandleRequest<TRequestModel, TPropertyType, TPropertyTypeContainer>(IContentType contentType, TRequestModel requestModel)
-        where TRequestModel : ContentTypeModelBase<TPropertyType, TPropertyTypeContainer>, IDocumentTypeRequestModel
+        where TRequestModel : ContentTypeModelBase<TPropertyType, TPropertyTypeContainer>
         where TPropertyType : PropertyTypeModelBase
         where TPropertyTypeContainer : PropertyTypeContainerModelBase
     {

@@ -1,9 +1,10 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using ContentTypeCleanupViewModel = Umbraco.Cms.Api.Management.ViewModels.ContentType.ContentTypeCleanup;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal class DocumentTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory
+internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory, IDocumentTypeEditingPresentationFactory
 {
     public ContentTypeCreateModel MapCreateModel(CreateDocumentTypeRequestModel requestModel)
     {
@@ -15,7 +16,12 @@ internal class DocumentTypeEditingPresentationFactory : ContentTypeEditingPresen
             CreateDocumentTypePropertyTypeContainerRequestModel
         >(requestModel);
 
-        // TODO: fill in the blanks
+        MapCleanup(createModel, requestModel.Cleanup);
+
+        createModel.Key = requestModel.Key;
+        createModel.ParentKey = requestModel.ParentKey;
+        createModel.AllowedTemplateKeys = requestModel.AllowedTemplateIds;
+        createModel.DefaultTemplateKey = requestModel.DefaultTemplateId;
 
         return createModel;
     }
@@ -30,8 +36,19 @@ internal class DocumentTypeEditingPresentationFactory : ContentTypeEditingPresen
             UpdateDocumentTypePropertyTypeContainerRequestModel
         >(requestModel);
 
-        // TODO: fill in the blanks
+        MapCleanup(updateModel, requestModel.Cleanup);
+
+        updateModel.AllowedTemplateKeys = requestModel.AllowedTemplateIds;
+        updateModel.DefaultTemplateKey = requestModel.DefaultTemplateId;
 
         return updateModel;
     }
+
+    private void MapCleanup(ContentTypeModelBase model, ContentTypeCleanupViewModel cleanup)
+        => model.Cleanup = new ContentTypeCleanup
+        {
+            PreventCleanup = cleanup.PreventCleanup,
+            KeepAllVersionsNewerThanDays = cleanup.KeepAllVersionsNewerThanDays,
+            KeepLatestVersionPerDayForDays = cleanup.KeepLatestVersionPerDayForDays
+        };
 }

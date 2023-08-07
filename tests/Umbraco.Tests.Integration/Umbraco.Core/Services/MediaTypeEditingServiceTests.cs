@@ -47,6 +47,21 @@ public partial class MediaTypeEditingServiceTests : UmbracoIntegrationTest
             Compositions = compositions ?? Enumerable.Empty<Composition>(),
         };
 
+    private MediaTypeUpdateModel CreateUpdateModel(
+        string name = "Test",
+        string? alias = null,
+        IEnumerable<MediaTypePropertyTypeModel>? propertyTypes = null,
+        IEnumerable<MediaTypePropertyContainerModel>? containers = null,
+        IEnumerable<Composition>? compositions = null) =>
+        new()
+        {
+            Name = name,
+            Alias = alias ?? ShortStringHelper.CleanStringForSafeAlias(name),
+            Properties = propertyTypes ?? Enumerable.Empty<MediaTypePropertyTypeModel>(),
+            Containers = containers ?? Enumerable.Empty<MediaTypePropertyContainerModel>(),
+            Compositions = compositions ?? Enumerable.Empty<Composition>()
+        };
+
     private MediaTypePropertyTypeModel CreatePropertyType(
         string name = "Title",
         string? alias = null,

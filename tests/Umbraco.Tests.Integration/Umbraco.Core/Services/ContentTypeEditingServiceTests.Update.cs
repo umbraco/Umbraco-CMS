@@ -192,7 +192,7 @@ public partial class ContentTypeEditingServiceTests
 
     [TestCase(false)]
     [TestCase(true)]
-    public async Task Can_Add_Properties_To_ContentType(bool isElement)
+    public async Task Can_Add_Properties(bool isElement)
     {
         var createModel = CreateCreateModel("Test", "test", isElement: isElement);
         var container = CreateContainer();
@@ -281,7 +281,7 @@ public partial class ContentTypeEditingServiceTests
         var updateModel = CreateUpdateModel("Test", "test", isElement: isElement);
         propertyType = CreatePropertyType("Test Property 2", "testProperty", key: originalPropertyTypeKey);
         propertyType.Description = "The updated description";
-        updateModel.Properties = new[] { propertyType};
+        updateModel.Properties = new[] { propertyType };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
@@ -579,5 +579,34 @@ public partial class ContentTypeEditingServiceTests
         Assert.AreEqual(2, propertyTypeAliases.Length);
         Assert.IsTrue(propertyTypeAliases.Contains("testProperty1"));
         Assert.IsTrue(propertyTypeAliases.Contains("testProperty2"));
+    }
+
+    [Test]
+    public async Task Can_Update_History_Cleanup()
+    {
+        var createModel = CreateCreateModel("Test", "test");
+        createModel.Cleanup = new ContentTypeCleanup
+        {
+            PreventCleanup = true, KeepAllVersionsNewerThanDays = 123, KeepLatestVersionPerDayForDays = 456
+        };
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = CreateUpdateModel("Test updated", "testUpdated");
+        updateModel.Cleanup = new ContentTypeCleanup
+        {
+            PreventCleanup = false, KeepAllVersionsNewerThanDays = 234, KeepLatestVersionPerDayForDays = 567
+        };
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        // Ensure it's actually persisted
+        contentType = await ContentTypeService.GetAsync(result.Result!.Key);
+        Assert.IsNotNull(contentType);
+
+        Assert.IsNotNull(contentType.HistoryCleanup);
+        Assert.IsFalse(contentType.HistoryCleanup.PreventCleanup);
+        Assert.AreEqual(234, contentType.HistoryCleanup.KeepAllVersionsNewerThanDays);
+        Assert.AreEqual(567, contentType.HistoryCleanup.KeepLatestVersionPerDayForDays);
     }
 }
