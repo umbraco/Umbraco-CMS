@@ -11,7 +11,7 @@ using Umbraco.Cms.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    partial class UmbracoOpenIddictDbContextModelSnapshot : ModelSnapshot
+    partial class UmbracoDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
