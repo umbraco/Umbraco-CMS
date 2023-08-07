@@ -10,11 +10,11 @@ export const handlers = [
 
 		const { status, data } = umbLoginData.login(username, password);
 
-		return res(ctx.status(status), ctx.delay(), ctx.json(data));
+		return res(ctx.delay(), ctx.status(status), ctx.json(data));
 	}),
 
 	rest.post('backoffice/umbracoapi/authentication/PostRequestPasswordReset', async (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.delay());
+		return res(ctx.delay(), ctx.status(200));
 	}),
 
 	rest.post('backoffice/umbracoapi/authentication/validatepasswordresetcode', async (req, res, ctx) => {
@@ -24,10 +24,10 @@ export const handlers = [
 
 		const { status } = umbLoginData.validatePasswordResetCode(code);
 
-		return res(ctx.status(status), ctx.delay());
+		return res(ctx.delay(), ctx.status(status));
 	}),
 
 	rest.post('backoffice/umbracoapi/authentication/newpassword', async (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.delay());
+		return res(ctx.delay(), ctx.status(200));
 	}),
 ];

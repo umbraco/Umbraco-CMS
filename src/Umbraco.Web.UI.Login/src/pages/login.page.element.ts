@@ -2,9 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
+import { until } from 'lit/directives/until.js';
 
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { UmbAuthMainContext } from '../context/auth-main.context.js';
+import { umbLocalizationContext } from '../localization/localization-context.js';
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends LitElement {
@@ -95,7 +97,9 @@ export default class UmbLoginPageElement extends LitElement {
 										type=${this.usernameIsEmail ? 'email' : 'text'}
 										id="email"
 										name="email"
-										label="Email"
+										label=${this.usernameIsEmail
+											? until(umbLocalizationContext.localize('user_email'), 'Email')
+											: until(umbLocalizationContext.localize('user_username'), 'Username')}
 										required
 										required-message="Email is required"></uui-input>
 								</uui-form-layout-item>
@@ -107,7 +111,7 @@ export default class UmbLoginPageElement extends LitElement {
 									<uui-input-password
 										id="password"
 										name="password"
-										label="Password"
+										label=${until(umbLocalizationContext.localize('user_password'), 'Password')}
 										required
 										required-message="Password is required"></uui-input-password>
 								</uui-form-layout-item>
@@ -124,9 +128,9 @@ export default class UmbLoginPageElement extends LitElement {
 									${when(
 										this.allowPasswordReset,
 										() =>
-											html`<a id="forgot-password" href="login/reset"
-												><umb-localize key="user_forgotPassword">Forgot password?</umb-localize></a
-											>`
+											html`<a id="forgot-password" href="login/reset"></a>
+												<umb-localize key="user_forgotPassword">Forgot password?</umb-localize>
+											</a>`
 									)}
 								</div>
 
