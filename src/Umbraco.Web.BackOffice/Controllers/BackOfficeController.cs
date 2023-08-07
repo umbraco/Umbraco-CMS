@@ -228,7 +228,7 @@ public class BackOfficeController : UmbracoController
         identityUser.LastLoginDateUtc = previousLastLoginDate;
         await _userManager.UpdateAsync(identityUser);
 
-        return RedirectToLogin(new { flow = "invite-user", status = "false", invite = "3" });
+        return RedirectToLogin(new { flow = "invite-user", invite = "1" });
     }
 
     /// <summary>
