@@ -15,6 +15,7 @@ template.innerHTML = `
 
 export class MyCustomView extends HTMLElement {
   providerName = '';
+  displayName = '';
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
