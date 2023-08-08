@@ -125,7 +125,7 @@
         };
 
         vm.selectItem = function (item, $index, $event) {
-            if (vm.allowSelect !== false && vm.onSelect) {
+            if (vm.allowSelect !== false && item.bulkActionsAllowed !== false && vm.onSelect) {
                 vm.onSelect({ item: item, $index: $index, $event: $event });
                 $event.stopPropagation();
             }

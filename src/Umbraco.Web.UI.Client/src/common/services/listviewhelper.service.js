@@ -436,6 +436,11 @@
 
                 // select all items
                 items.forEach(function (item) {
+                    if (item.bulkActionsAllowed === false) {
+                      item.selected = false;
+                      return;
+                    }
+
                     var obj = {
                         id: item.id
                     };
@@ -479,10 +484,11 @@
                         numberOfSelectedItem++;
                     }
                 }
-
             }
 
-            if (numberOfSelectedItem === items.length) {
+            // items may have been excluded from bulk actions - these can not be selected, so adjust the
+            // number of valid items to account for exclusions
+            if (numberOfSelectedItem === items.filter(x => x.bulkActionsAllowed !== false).length) {
                 return true;
             }
 

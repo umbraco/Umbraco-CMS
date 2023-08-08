@@ -37,7 +37,7 @@
             <div class="umb-table-row umb-outline"
                  ng-repeat="item in vm.items track by $index"
                  ng-init="item.icon = vm.getIcon(item)"
-                 ng-class="{'-selected':item.selected, '-light':!item.published && item.updater != null, '-selectable': vm.allowSelect !== false }"
+                 ng-class="{'-selected':item.selected, '-light':!item.published && item.updater != null, '-selectable': vm.allowSelect !== false && item.bulkActionsAllowed !== false, '-no-bulk-actions': item.bulkActionsAllowed === false }"
                  ng-click="vm.selectItem(item, $index, $event)">
 
                 <div class="umb-table-cell">
