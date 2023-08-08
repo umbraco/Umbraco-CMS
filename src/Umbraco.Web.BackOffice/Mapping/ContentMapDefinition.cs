@@ -349,6 +349,10 @@ internal class ContentMapDefinition : IMapDefinition
         target.UpdateDate = GetUpdateDate(source, context);
         target.Updater = _commonMapper.GetCreator(source, context);
         target.VariesByCulture = source.ContentType.VariesByCulture();
+
+        // For now, this should be true, knowing it may be modified in a notification handler
+        // In future IContent might provide a value for this property.
+        target.BulkActionsAllowed = true;
     }
 
     private IEnumerable<string> GetActions(IContent source, IContent? parent, MapperContext context)

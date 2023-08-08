@@ -42,6 +42,9 @@ public class ContentItemBasic : EntityBasic
     [DataMember(Name = "sortOrder")]
     public int SortOrder { get; set; }
 
+    [DataMember(Name = "bulkActionsAllowed")]
+    public bool BulkActionsAllowed { get; set; } = true;
+
     /// <summary>
     ///     The saved/published state of an item
     /// </summary>
