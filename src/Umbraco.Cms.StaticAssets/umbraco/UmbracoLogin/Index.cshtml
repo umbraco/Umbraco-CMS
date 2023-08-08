@@ -1,22 +1,17 @@
-@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using Microsoft.AspNetCore.Routing
 @using Microsoft.Extensions.Options;
 @using Umbraco.Cms.Core
-@using Umbraco.Cms.Core.Configuration
 @using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Hosting
 @using Umbraco.Cms.Core.Mail
-@using Umbraco.Cms.Core.Services
 @using Umbraco.Cms.Web.BackOffice.Controllers
 @using Umbraco.Cms.Web.BackOffice.Security
 @using Umbraco.Extensions
 @inject IOptions<ContentSettings> ContentSettings
 @inject IOptions<SecuritySettings> SecuritySettings
 @inject IEmailSender EmailSender
-@inject IUmbracoVersion UmbracoVersion
 @inject IHostingEnvironment HostingEnvironment
 @inject IOptions<GlobalSettings> GlobalSettings
-@inject IIconService IconService
 @inject IBackOfficeExternalLoginProviders ExternalLogins
 @inject LinkGenerator LinkGenerator
 @{
@@ -28,8 +23,7 @@
     var allowPasswordReset = SecuritySettings.Value.AllowPasswordReset && EmailSender.CanSendRequiredEmail();
     var disableLocalLogin = ExternalLogins.HasDenyLocalLogin();
     var externalLoginsUrl = LinkGenerator.GetPathByAction(nameof(BackOfficeController.ExternalLogin), ControllerExtensions.GetControllerName<BackOfficeController>(), new { area = Constants.Web.Mvc.BackOfficeArea });
-    IEnumerable<BackOfficeExternaLoginProviderScheme>
-        externalLoginProviders = await ExternalLogins.GetBackOfficeProvidersAsync();
+    var externalLoginProviders = await ExternalLogins.GetBackOfficeProvidersAsync();
 }
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
