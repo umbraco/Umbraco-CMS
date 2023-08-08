@@ -140,14 +140,22 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return operationStatus;
         }
 
-        // verify that all compositions are valid)
+        // verify that all compositions are valid
         operationStatus = ValidateCompositions(contentType, model, allContentTypeCompositions);
         if (operationStatus is not ContentTypeOperationStatus.Success)
         {
             return operationStatus;
         }
 
+        // verify that all properties are valid
         operationStatus = ValidateProperties(model, allContentTypeCompositions);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return operationStatus;
+        }
+
+        // verify that all property/container relationships (groups/tabs) are valid
+        operationStatus = ValidateContainers(model, allContentTypeCompositions);
         if (operationStatus is not ContentTypeOperationStatus.Success)
         {
             return operationStatus;
@@ -261,6 +269,42 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         return ContentTypeOperationStatus.Success;
     }
 
+    private ContentTypeOperationStatus ValidateContainers(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, IContentTypeComposition[] allContentTypeCompositions)
+    {
+        // all property container keys must be present in the model
+        Guid[] modelContainerKeys = model.Containers.Select(c => c.Key).ToArray();
+        if (model.Properties.Any(p => p.ContainerKey is not null && modelContainerKeys.Contains(p.ContainerKey.Value) is false))
+        {
+            return ContentTypeOperationStatus.MissingContainer;
+        }
+
+        // duplicate container keys are not allowed
+        if (modelContainerKeys.Distinct().Count() != modelContainerKeys.Length)
+        {
+            return ContentTypeOperationStatus.DuplicateContainer;
+        }
+
+        // all container parent keys must also be present in the model
+        if (model.Containers.Any(c => c.ParentKey.HasValue && modelContainerKeys.Contains(c.ParentKey.Value) is false))
+        {
+            return ContentTypeOperationStatus.MissingContainer;
+        }
+
+        // make sure no container keys in the model originate from compositions
+        Guid[] allCompositionKeys = KeysForCompositionTypes(model, CompositionType.Composition, CompositionType.Inheritance);
+        Guid[] compositionContainerKeys = allContentTypeCompositions
+            .Where(c => allCompositionKeys.Contains(c.Key))
+            .SelectMany(c => c.CompositionPropertyGroups.Select(g => g.Key))
+            .Distinct()
+            .ToArray();
+        if (model.Containers.Any(c => compositionContainerKeys.Contains(c.Key)))
+        {
+            return ContentTypeOperationStatus.DuplicateContainer;
+        }
+
+        return ContentTypeOperationStatus.Success;
+    }
+
     // This this method gets aliases across documents, members, and media, so it covers it all
     private bool ContentTypeAliasIsInUse(string alias) => _contentTypeService.GetAllContentTypeAliases().Contains(alias);
 
@@ -317,14 +361,14 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         // update the allowed content types
         UpdateAllowedContentTypes(contentType, model, allContentTypeCompositions);
 
-        // update/map all properties
-        await UpdatePropertiesAsync(contentType, model);
-
         // update all compositions
         UpdateCompositions(contentType, model, allContentTypeCompositions);
 
         // ensure parent content type assignment (inheritance) if any
         UpdateParentContentType(contentType, model, allContentTypeCompositions);
+
+        // update/map all properties
+        await UpdatePropertiesAsync(contentType, model);
 
         return contentType;
     }
@@ -372,7 +416,9 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             .DistinctBy(container => container.ParentKey)
             .ToDictionary(
                 container => container.ParentKey!.Value,
-                container => model.Containers.First(c => c.Key == container.ParentKey).Name!);
+                // NOTE: this look-up appears to be a little dangerous, but at this point we should have validated
+                //       the containers and their parent relationships in the model, so it's ok
+                container => model.Containers.First(c => c.Key == container.ParentKey).Name);
 
         // handle properties in groups
         PropertyGroup[] propertyGroups = model.Containers.Select(container =>
@@ -383,10 +429,10 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
                 propertyGroup.Type = Enum.Parse<PropertyGroupType>(container.Type);
                 propertyGroup.Name = container.Name;
                 // this is not pretty, but this is how the data structure is at the moment; we just have to live with it for the time being.
-                var alias = container.Name!;
+                var alias = PropertyGroupAlias(container.Name);
                 if (container.ParentKey is not null)
                 {
-                    alias = $"{parentContainerNamesById[container.ParentKey.Value]}/{alias}";
+                    alias = $"{PropertyGroupAlias(parentContainerNamesById[container.ParentKey.Value])}/{alias}";
                 }
                 propertyGroup.Alias = alias;
                 propertyGroup.SortOrder = container.SortOrder;
@@ -425,6 +471,17 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         {
             contentType.NoGroupPropertyTypes = new PropertyTypeCollection(SupportsPublishing, orphanedPropertyTypes);
         }
+    }
+
+    private string PropertyGroupAlias(string? containerName)
+    {
+        if (containerName.IsNullOrWhiteSpace())
+        {
+            throw new ArgumentException("Container name cannot be empty", nameof(containerName));
+        }
+
+        var parts = containerName.Split(Constants.CharArrays.Space);
+        return $"{parts.First().ToFirstLowerInvariant()}{string.Join(string.Empty, parts.Skip(1).Select(part => part.ToFirstUpperInvariant()))}";
     }
 
     private IPropertyType MapProperty(

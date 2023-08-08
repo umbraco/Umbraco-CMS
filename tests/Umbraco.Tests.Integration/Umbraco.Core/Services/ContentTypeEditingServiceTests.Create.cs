@@ -271,6 +271,88 @@ public partial class ContentTypeEditingServiceTests
     }
 
     [Test]
+    public async Task Can_Create_Property_Container_Structure_Matching_Composition_Container_Structure()
+    {
+        var compositionBase = CreateCreateModel(
+            "Composition Base",
+            "compositionBase");
+
+        // Let's add a property to ensure that it passes through
+        var compositionTab = CreateContainer("Composition Tab", type: TabContainerType);
+        var compositionGroup = CreateContainer("Composition Group", type: GroupContainerType);
+        compositionGroup.ParentKey = compositionTab.Key;
+        compositionBase.Containers = new[] { compositionTab, compositionGroup };
+
+        var compositionProperty = CreatePropertyType("Composition Property", "compositionProperty", containerKey: compositionGroup.Key);
+        compositionBase.Properties = new[] { compositionProperty };
+
+        var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
+        Assert.IsTrue(compositionResult.Success);
+        var compositionType = compositionResult.Result;
+
+        // Create doc type using the composition
+        var createModel = CreateCreateModel(
+            compositions: new[]
+            {
+                new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
+            }
+        );
+
+        var tab = CreateContainer("Composition Tab", type: TabContainerType);
+        var group = CreateContainer("Composition Group", type: GroupContainerType);
+        group.ParentKey = tab.Key;
+        createModel.Containers = new[] { tab, group };
+
+        var property = CreatePropertyType("My Property", "myProperty", containerKey: group.Key);
+        createModel.Properties = new[] { property };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        var contentType = await ContentTypeService.GetAsync(result.Result!.Key);
+        Assert.AreEqual(2, contentType.PropertyGroups.Count);
+        var contentTypeTab = contentType.PropertyGroups.First(g => g.Name == "Composition Tab");
+        Assert.AreEqual(tab.Key, contentTypeTab.Key);
+        Assert.AreEqual(PropertyGroupType.Tab, contentTypeTab.Type);
+        var contentTypeGroup = contentType.PropertyGroups.First(g => g.Name == "Composition Group");
+        Assert.AreEqual(group.Key, contentTypeGroup.Key);
+        Assert.AreEqual(PropertyGroupType.Group, contentTypeGroup.Type);
+        var propertyTypeKeys = contentType.CompositionPropertyTypes.Select(t => t.Key).ToArray();
+        Assert.AreEqual(2, propertyTypeKeys.Length);
+        Assert.IsTrue(propertyTypeKeys.Contains(compositionProperty.Key));
+        Assert.IsTrue(propertyTypeKeys.Contains(property.Key));
+        Assert.IsTrue(contentTypeGroup.PropertyTypes?.Contains("myProperty"));
+        Assert.IsFalse(contentTypeGroup.PropertyTypes?.Contains("compositionProperty"));
+    }
+
+    [Test]
+    public async Task Property_Container_Aliases_Are_CamelCased_Names()
+    {
+        var createModel = CreateCreateModel("Test", "test");
+        var tab = CreateContainer("My Tab", type: TabContainerType);
+        var group1 = CreateContainer("My Group", type: GroupContainerType);
+        group1.ParentKey = tab.Key;
+        var group2 = CreateContainer("AnotherGroup", type: GroupContainerType);
+        createModel.Containers = new[] { tab, group1, group2 };
+        var property = CreatePropertyType("My Property", "myProperty", containerKey: group1.Key);
+        // assign some properties to the groups to make sure they're not cleaned out as "empty groups"
+        createModel.Properties = new[]
+        {
+            CreatePropertyType("My Property 1", "myProperty1", containerKey: group1.Key),
+            CreatePropertyType("My Property 2", "myProperty2", containerKey: group2.Key)
+        };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        var contentType = await ContentTypeService.GetAsync(result.Result!.Key);
+
+        Assert.AreEqual(3, contentType.PropertyGroups.Count);
+        Assert.AreEqual("myTab", contentType.PropertyGroups.First(g => g.Name == "My Tab").Alias);
+        Assert.AreEqual("myTab/myGroup", contentType.PropertyGroups.First(g => g.Name == "My Group").Alias);
+        Assert.AreEqual("anotherGroup", contentType.PropertyGroups.First(g => g.Name == "AnotherGroup").Alias);
+    }
+
+    [Test]
     public async Task Element_Types_Must_Not_Be_Composed_By_non_element_type()
     {
         // This is a pretty interesting one, since it actually seems to be broken in the old backoffice,
@@ -759,5 +841,201 @@ public partial class ContentTypeEditingServiceTests
         result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.DuplicateAlias, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Add_Container_From_Composition()
+    {
+        var compositionBase = CreateCreateModel(
+            "Composition Base",
+            "compositionBase");
+
+        // Let's add a property to ensure that it passes through
+        var compositionContainer = CreateContainer("Composition Tab");
+        compositionBase.Containers = new[] { compositionContainer };
+
+        var compositionProperty = CreatePropertyType("Composition Property", "compositionProperty", containerKey: compositionContainer.Key);
+        compositionBase.Properties = new[] { compositionProperty };
+
+        var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
+        Assert.IsTrue(compositionResult.Success);
+        var compositionType = compositionResult.Result;
+
+        // Create doc type using the composition
+        var createModel = CreateCreateModel(
+            compositions: new[]
+            {
+                new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
+            }
+        );
+
+        // this is invalid; the model should not contain the composition container definitions (they will be resolved by ContentTypeEditingService)
+        createModel.Containers = new[] { compositionContainer };
+        var property = CreatePropertyType("My Property", "myProperty", containerKey: compositionContainer.Key);
+        createModel.Properties = new[] { property };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.DuplicateContainer, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Duplicate_Container_Key_From_Composition()
+    {
+        var compositionBase = CreateCreateModel(
+            "Composition Base",
+            "compositionBase");
+
+        var compositionContainer = CreateContainer("Composition Tab");
+        compositionBase.Containers = new[] { compositionContainer };
+
+        var compositionProperty = CreatePropertyType("Composition Property", "compositionProperty", containerKey: compositionContainer.Key);
+        compositionBase.Properties = new[] { compositionProperty };
+
+        var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
+        Assert.IsTrue(compositionResult.Success);
+        var compositionType = compositionResult.Result;
+
+        // Create doc type using the composition
+        var createModel = CreateCreateModel(
+            compositions: new[]
+            {
+                new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
+            }
+        );
+
+        // this is invalid; cannot reuse the container key
+        var container = CreateContainer("My Group", type: GroupContainerType, key: compositionContainer.Key);
+        createModel.Containers = new[] { container };
+        var property = CreatePropertyType("My Property", "myProperty", containerKey: container.Key);
+        createModel.Properties = new[] { property };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.DuplicateContainer, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Have_Duplicate_Container_Key()
+    {
+        // Create doc type using the composition
+        var createModel = CreateCreateModel("Test", "test");
+
+        // this is invalid; cannot reuse the container key
+        var containerKey = Guid.NewGuid();
+        var container1 = CreateContainer("My Group 1", key: containerKey);
+        var container2 = CreateContainer("My Group 2", key: containerKey);
+        createModel.Containers = new[] { container1, container2 };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.DuplicateContainer, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Add_Property_To_Missing_Container()
+    {
+        var compositionBase = CreateCreateModel(
+            "Composition Base",
+            "compositionBase");
+
+        var compositionContainer = CreateContainer("Composition Tab");
+        compositionBase.Containers = new[] { compositionContainer };
+
+        var compositionProperty = CreatePropertyType("Composition Property", "compositionProperty", containerKey: compositionContainer.Key);
+        compositionBase.Properties = new[] { compositionProperty };
+
+        var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
+        Assert.IsTrue(compositionResult.Success);
+        var compositionType = compositionResult.Result;
+
+        // Create doc type using the composition
+        var createModel = CreateCreateModel(
+            compositions: new[]
+            {
+                new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
+            }
+        );
+
+        // this is invalid; cannot add properties to non-existing containers
+        var property = CreatePropertyType("My Property", "myProperty", containerKey: Guid.NewGuid());
+        createModel.Properties = new[] { property };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Create_Property_In_Composition_Container()
+    {
+        var compositionBase = CreateCreateModel(
+            "Composition Base",
+            "compositionBase");
+
+        // Let's add a property to ensure that it passes through
+        var compositionContainer = CreateContainer("Composition Tab");
+        compositionBase.Containers = new[] { compositionContainer };
+
+        var compositionProperty = CreatePropertyType("Composition Property", "compositionProperty", containerKey: compositionContainer.Key);
+        compositionBase.Properties = new[] { compositionProperty };
+
+        var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
+        Assert.IsTrue(compositionResult.Success);
+        var compositionType = compositionResult.Result;
+
+        // Create doc type using the composition
+        var createModel = CreateCreateModel(
+            compositions: new[]
+            {
+                new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
+            }
+        );
+
+        // this is invalid; cannot add a property on a container that belongs to the composition (the container must be duplicated to the content type itself)
+        var property = CreatePropertyType("My Property", "myProperty", containerKey: compositionContainer.Key);
+        createModel.Properties = new[] { property };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Create_Property_Container_In_Composition_Container()
+    {
+        var compositionBase = CreateCreateModel(
+            "Composition Base",
+            "compositionBase");
+
+        // Let's add a property to ensure that it passes through
+        var compositionContainer = CreateContainer("Composition Tab");
+        compositionBase.Containers = new[] { compositionContainer };
+
+        var compositionProperty = CreatePropertyType("Composition Property", "compositionProperty", containerKey: compositionContainer.Key);
+        compositionBase.Properties = new[] { compositionProperty };
+
+        var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
+        Assert.IsTrue(compositionResult.Success);
+        var compositionType = compositionResult.Result;
+
+        // Create doc type using the composition
+        var createModel = CreateCreateModel(
+            compositions: new[]
+            {
+                new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
+            }
+        );
+
+        // this is invalid; cannot create a new container within a parent container that belongs to the composition (the parent container must be duplicated to the content type itself)
+        var container = CreateContainer("My Group", type: GroupContainerType);
+        container.ParentKey = compositionContainer.Key;
+        createModel.Containers = new[] { container };
+        var property = CreatePropertyType("My Property", "myProperty", containerKey: container.Key);
+        createModel.Properties = new[] { property };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
     }
 }
