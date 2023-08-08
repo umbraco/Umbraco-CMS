@@ -121,8 +121,6 @@ export default class UmbRouter {
 	#onPopState(event: PopStateEvent) {
 		event.preventDefault();
 
-		console.log('popstate', window.location);
-
 		const { pathname, search, hash } = window.location;
 		this.#updateUrl(pathname, search, hash, true);
 	}
@@ -149,7 +147,6 @@ export default class UmbRouter {
 		event.preventDefault();
 
 		const { pathname, search, hash } = anchor;
-		console.log('click', pathname, search, hash);
 
 		this.#updateUrl(pathname, search, hash);
 	}
