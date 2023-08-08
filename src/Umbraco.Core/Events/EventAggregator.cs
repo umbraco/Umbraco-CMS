@@ -50,7 +50,7 @@ public partial class EventAggregator : IEventAggregator
         => _serviceFactory = serviceFactory;
 
     /// <inheritdoc />
-    public Task PublishAsync<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
+    public async Task PublishAsync<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
         where TNotification : INotification
     {
         // TODO: Introduce codegen efficient Guard classes to reduce noise.
@@ -60,7 +60,7 @@ public partial class EventAggregator : IEventAggregator
         }
 
         PublishNotification(notification);
-        return PublishNotificationAsync(notification, cancellationToken);
+        await PublishNotificationAsync(notification, cancellationToken);
     }
 
     /// <inheritdoc />
