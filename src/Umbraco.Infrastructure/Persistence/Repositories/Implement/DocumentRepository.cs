@@ -1082,8 +1082,13 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         }
 
         // whatever we do, we must check that we are saving the current version
-        ContentVersionDto? version = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>()
-            .From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == entity.VersionId)).FirstOrDefault();
+        // but since we can be saving an alternate version, we still need the name of the current
+        // to ensure the saved nodeDto keeps the correct name
+        IEnumerable<ContentVersionDto> versionAndCurrent = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>()
+            .From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == entity.VersionId || x.Current));
+
+        ContentVersionDto? version = versionAndCurrent.FirstOrDefault(x => x.Id == entity.VersionId);
+        string? currentName = versionAndCurrent.FirstOrDefault(x => x.Current)?.Text;
 
         if (version == null || (!version.Current && !version.Alternate))
         {
@@ -1158,7 +1163,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         // only update on publishing
         if (version.Alternate && !publishing)
         {
-            nodeDto.Text = version.Text;
+            nodeDto.Text = currentName;
         }
 
         nodeDto.ValidatePathWithException();
