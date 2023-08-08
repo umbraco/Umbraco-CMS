@@ -45,12 +45,15 @@ public static class UmbracoBuilderExtensions
     /// <summary>
     ///     Uses/Replaces services with testing services
     /// </summary>
-    public static IUmbracoBuilder AddTestServices(this IUmbracoBuilder builder, TestHelper testHelper)
+    public static IUmbracoBuilder AddTestServices(this IUmbracoBuilder builder, TestHelper testHelper, bool useInMemorySearchProvider = true)
     {
         builder.Services.AddUnique(AppCaches.NoCache);
         builder.Services.AddUnique(Mock.Of<IUmbracoBootPermissionChecker>());
         builder.Services.AddUnique(testHelper.MainDom);
+        if(useInMemorySearchProvider){
         builder.Services.AddSearchServices();
+        builder.Services.AddInMemoryServices();
+        }
         builder.Services.AddUnique<IIndexRebuilder, TestBackgroundIndexRebuilder>();
         builder.Services.AddUnique(factory => Mock.Of<IRuntimeMinifier>());
 

@@ -156,8 +156,6 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
             .AddBackOfficeAuthentication()
             .AddBackOfficeIdentity()
             .AddMembersIdentity()
-            .AddSearchServices()
-            .AddInMemoryIndexes()
             .AddUmbracoSqlServerSupport()
             .AddUmbracoSqliteSupport()
             .AddTestServices(TestHelper);

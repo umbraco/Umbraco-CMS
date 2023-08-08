@@ -53,7 +53,7 @@ public class UmbracoSearchExamineTests : UmbracoSearchTests
             .AddExamineLuceneIndexes()
             .AddUmbracoSqlServerSupport()
             .AddUmbracoSqliteSupport()
-            .AddTestServices(TestHelper);
+            .AddTestServices(TestHelper, false);
 
         if (TestOptions.Mapper)
         {

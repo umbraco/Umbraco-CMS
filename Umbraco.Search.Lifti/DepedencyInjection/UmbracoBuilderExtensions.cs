@@ -42,7 +42,7 @@ public static class UmbracoBuilderExtensions
             new FullTextIndexBuilder<string>()
                 .WithObjectTokenization<UmbracoValueSet>(o => o
                     .WithKey(c => c.Id)
-                    .WithDynamicFields("Fields", c => c.Values?.ToDictionary(x => x.Key, x => x.Value.Select(x=>x.ToString()))!))
+                    .WithDynamicFields("Fields", c => c.Values?.ToDictionary(x => x.Key, x => x.Value.Select(x=>x.ToString()))!, tokenizationOptions: tokenOptions => tokenOptions.WithStemming()))
                 .Build()));
         serviceCollection.AddSingleton<IUmbracoIndex>(serviceCollection =>
             new UmbracoMemoryIndex<TIndexedModelType>(
@@ -67,7 +67,9 @@ public static class UmbracoBuilderExtensions
         services.AddSingleton<ILiftiIndex>(serviceCollection => new UmbracoLiftiIndex(Constants
                 .UmbracoIndexes
                 .DeliveryApiContentIndexName,
-            new FullTextIndexBuilder<string>()
+            new FullTextIndexBuilder<string>().WithObjectTokenization<UmbracoValueSet>(o => o
+                    .WithKey(c => c.Id)
+                    .WithDynamicFields("Fields", c => c.Values?.ToDictionary(x => x.Key, x => x.Value.Select(x=>x.ToString()))!, tokenizationOptions: tokenOptions => tokenOptions.WithStemming()))
                 .Build()));
         // This is the long way to add IOptions but gives us access to the
         // services collection which we need to get the dir factory

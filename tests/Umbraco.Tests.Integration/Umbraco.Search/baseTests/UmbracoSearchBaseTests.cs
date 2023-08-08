@@ -23,40 +23,55 @@ public class UmbracoSearchBaseTests : UmbracoIntegrationTest
 
 
     private IContentService ContentService => GetRequiredService<IContentService>();
-    protected void IndexContent()
+
+    protected IEnumerable<IContent> CreateContent()
     {
+        var list = new List<IContent>();
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         ContentTypeService.Save(contentType);
         IContent content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
-        content.SetValue("author", "John Doe");
-
-            ContentService.SaveAndPublish(content);
-
+        content.SetValue("author", "John Test Doe");
+        content.Id = 1;
+        list.Add(content);
+        IContent content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2");
+        content2.SetValue("author", "John Test 2 Doe");
+        content.Id = 2;
+        list.Add(content2);
+        return list;
     }
-        [Test]
-        public void Indexing_On_Publish_Works()
-        {
-            IndexContent();
-            var apiIndex = SearchProvider.GetSearcher(Constants
-                .UmbracoIndexes
-                .DeliveryApiContentIndexName);
-            Assert.AreNotEqual(null, apiIndex);
-            var apiIndexResult = apiIndex.Search("test", 1, 10);
-            Assert.AreEqual(1, apiIndexResult.TotalItemCount);
-            var internalIndex = SearchProvider.GetSearcher(Constants
-                .UmbracoIndexes
-                .InternalIndexName);
-            Assert.AreNotEqual(null, internalIndex);
-            var internalIndexResult = internalIndex.Search("test", 1, 10);
-            Assert.AreEqual(1, internalIndexResult.TotalItemCount);
-            var externalIndex = SearchProvider.GetSearcher(Constants
-                .UmbracoIndexes
-                .DeliveryApiContentIndexName);
-            Assert.AreNotEqual(null, externalIndex);
 
-            var externalIndexResult = internalIndex.Search("test", 1, 10);
-            Assert.AreEqual(1, externalIndexResult.TotalItemCount);
-        }
+    [Test]
+    public void CanIndexSingle()
+    {
+     var content =CreateContent();
+        var apiIndex = SearchProvider.GetIndex<IContent>(Constants
+            .UmbracoIndexes
+            .DeliveryApiContentIndexName);
+        apiIndex.IndexItems(content.First().AsEnumerableOfOne().ToArray());
+
+        var apiSearch = SearchProvider.GetSearcher(Constants
+            .UmbracoIndexes
+            .DeliveryApiContentIndexName);
+        Assert.AreNotEqual(null, apiSearch);
+        var apiIndexResult = apiSearch.Search("test", 1, 10);
+        Assert.AreEqual(1, apiIndexResult.TotalItemCount);
+    }
+    [Test]
+    public void CanIndexMultiple()
+    {
+        var content =CreateContent();
+        var apiIndex = SearchProvider.GetIndex<IContent>(Constants
+            .UmbracoIndexes
+            .DeliveryApiContentIndexName);
+        apiIndex.IndexItems(content.ToArray());
+
+        var apiSearch = SearchProvider.GetSearcher(Constants
+            .UmbracoIndexes
+            .DeliveryApiContentIndexName);
+        Assert.AreNotEqual(null, apiSearch);
+        var apiIndexResult = apiSearch.Search("test", 1, 10);
+        Assert.AreEqual(2, apiIndexResult.TotalItemCount);
+    }
 }
