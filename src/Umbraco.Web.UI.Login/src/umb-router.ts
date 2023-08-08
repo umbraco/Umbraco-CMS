@@ -151,7 +151,7 @@ export default class UmbRouter {
 		const { pathname, search, hash } = anchor;
 		console.log('click', pathname, search, hash);
 
-		// this.#updateUrl(pathname, search, hash);
+		this.#updateUrl(pathname, search, hash);
 	}
 
 	#isModifierKeyPressed(event: MouseEvent): boolean {
