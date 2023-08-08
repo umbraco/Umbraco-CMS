@@ -7,7 +7,7 @@ import {
 	NewPasswordResponse,
 	MfaProvidersResponse,
 } from '../types.js';
-import { UmbAuthLegacyRepository } from './auth-legacy.repository.ts';
+import { UmbAuthLegacyRepository } from './auth-legacy.repository.js';
 import { Observable, ReplaySubject } from 'rxjs';
 
 export class UmbAuthLegacyContext implements IUmbAuthContext {

@@ -113,7 +113,7 @@ export default class UmbMfaPageElement extends LitElement {
 		}
 	}
 
-	renderProviderStep() {
+	protected renderDefaultView() {
 		return html`
 			<uui-form>
 				<form id="LoginForm" @submit=${this.handleSubmit}>
@@ -184,8 +184,34 @@ export default class UmbMfaPageElement extends LitElement {
 		`;
 	}
 
-	render() {
-		return this.loading ? html`<uui-loader-bar></uui-loader-bar>` : this.renderProviderStep();
+  protected renderCustomView() {
+    const view = UmbAuthMainContext.Instance.twoFactorView;
+    try {
+      if (view) {
+        return html`
+          <div id="custom-view">
+            ${view}
+          </div>
+        `;
+      }
+    } catch (e) {
+      const error = e instanceof Error ? e.message : 'Unknown error';
+      console.group('[MFA login] Failed to load custom view');
+      console.log('Element reference', this);
+      console.log('Custom view', view);
+      console.error('Failed to load custom view:', e);
+      console.groupEnd();
+      return html`<span class="text-danger">${error}</span>`;
+    }
+  }
+
+	protected render() {
+		return this.loading
+      ? html`<uui-loader-bar></uui-loader-bar>`
+      : (UmbAuthMainContext.Instance.twoFactorView
+        ? this.renderCustomView()
+        : this.renderDefaultView()
+      );
 	}
 
 	static styles = [

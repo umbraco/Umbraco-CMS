@@ -357,11 +357,6 @@ public class AuthenticationController : UmbracoApiControllerBase
         if (result.RequiresTwoFactor)
         {
             var twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(loginModel.Username);
-            if (twofactorView.IsNullOrWhiteSpace())
-            {
-                return new ValidationErrorResult(
-                    $"The registered {typeof(IBackOfficeTwoFactorOptions)} of type {_backOfficeTwoFactorOptions.GetType()} did not return a view for two factor auth ");
-            }
 
             IUser? attemptedUser = _userService.GetByUsername(loginModel.Username);
 

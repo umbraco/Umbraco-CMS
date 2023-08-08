@@ -17,12 +17,14 @@ export interface IUmbAuthContext {
 	getIcons(): Observable<Record<string, string>>;
 	supportsPersistLogin: boolean;
 	returnPath: string;
+  twoFactorView?: string;
 }
 
 export type LoginResponse = {
 	data?: string;
 	error?: string;
 	status: number;
+  twoFactorView?: string;
 };
 
 export type ResetPasswordResponse = {

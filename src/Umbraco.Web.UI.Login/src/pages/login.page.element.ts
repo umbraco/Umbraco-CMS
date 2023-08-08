@@ -57,7 +57,10 @@ export default class UmbLoginPageElement extends LitElement {
 
 		// Check for 402 status code indicating that MFA is required
 		if (response.status === 402) {
-			UmbRouter.redirect('login?flow=mfa');
+      if (response.twoFactorView) {
+        UmbAuthMainContext.Instance.twoFactorView = response.twoFactorView;
+      }
+			history.pushState(null, '', 'login?flow=mfa');
 			return;
 		}
 
@@ -87,7 +90,7 @@ export default class UmbLoginPageElement extends LitElement {
 	render() {
 		return html`
 			<h1 id="greeting" class="uui-h3">
-				<umb-localize key=${this.#greetingLocalizationKey}>Welcome to Umbraco</umb-localize>
+				<umb-localize .key=${this.#greetingLocalizationKey}>Welcome to Umbraco</umb-localize>
 			</h1>
 			${this.disableLocalLogin
 				? nothing
@@ -97,7 +100,7 @@ export default class UmbLoginPageElement extends LitElement {
 								<uui-form-layout-item>
 									<uui-label id="emailLabel" for="email" slot="label" required>
 										${this.usernameIsEmail
-											? html`<umb-localize key="user_email">Email</umb-localize>`
+											? html`<umb-localize key="general_email">Email</umb-localize>`
 											: html`<umb-localize key="user_username">Name</umb-localize>`}
 									</uui-label>
 									<uui-input
@@ -105,8 +108,8 @@ export default class UmbLoginPageElement extends LitElement {
 										id="email"
 										name="email"
 										label=${this.usernameIsEmail
-											? until(umbLocalizationContext.localize('user_email'), 'Email')
-											: until(umbLocalizationContext.localize('user_username'), 'Username')}
+											? until(umbLocalizationContext.localize('general_email', 'Email'))
+											: until(umbLocalizationContext.localize('user_username', 'Username'))}
 										required
 										required-message="Email is required"></uui-input>
 								</uui-form-layout-item>
@@ -128,7 +131,7 @@ export default class UmbLoginPageElement extends LitElement {
 										this.#authContext.supportsPersistLogin,
 										() => html`<uui-form-layout-item>
 											<uui-checkbox name="persist" label="Remember me">
-												<umb-localize ="user_rememberMe">Remember me</umb-localize>
+												<umb-localize key="user_rememberMe">Remember me</umb-localize>
 											</uui-checkbox>
 										</uui-form-layout-item>`
 									)}
