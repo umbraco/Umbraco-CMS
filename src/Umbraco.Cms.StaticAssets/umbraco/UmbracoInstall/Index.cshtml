@@ -1,3 +1,4 @@
+@using System.Globalization
 @using Microsoft.Extensions.Options
 @using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Hosting
@@ -17,7 +18,7 @@
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@CultureInfo.CurrentCulture.Name">
 <head>
     <base href="@backOfficePath.EnsureEndsWith('/')" />
     <meta charset="UTF-8" />

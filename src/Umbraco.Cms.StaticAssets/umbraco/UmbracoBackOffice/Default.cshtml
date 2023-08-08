@@ -1,3 +1,4 @@
+@using System.Globalization
 @using Microsoft.Extensions.Options
 @using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Hosting
@@ -17,7 +18,7 @@
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@CultureInfo.CurrentCulture.Name">
 <head>
     <base href="@backOfficePath.EnsureEndsWith('/')" />
     <meta charset="UTF-8" />
@@ -114,6 +115,6 @@
     <script type="module" src="@backofficeAssetsPath/apps/app/app.element.js"></script>
 </head>
 <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
-    <umb-app></umb-app>
+    <umb-app culture="@CultureInfo.CurrentCulture.Name"></umb-app>
 </body>
 </html>
