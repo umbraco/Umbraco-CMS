@@ -33,7 +33,10 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (_instance) => {
 			this._modalContext = _instance;
 		});
+	}
 
+	connectedCallback() {
+		super.connectedCallback();
 		this._getIndexData();
 	}
 
