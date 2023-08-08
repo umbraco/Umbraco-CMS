@@ -15,50 +15,62 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocumentTypes)]
 public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
 {
-    protected IActionResult OperationStatusResult(ContentTypeOperationStatus status) =>
-        // TODO: rephrase all these error messages
-        // TODO: ensure the switch case covers all operation status values
+    protected IActionResult OperationStatusResult(ContentTypeOperationStatus status)
+        => ContentTypeOperationStatusResult(status, "content");
+
+    internal static IActionResult ContentTypeOperationStatusResult(ContentTypeOperationStatus status, string type) =>
         status switch
         {
-            ContentTypeOperationStatus.Success => Ok(),
-            ContentTypeOperationStatus.NotFound => NotFound(new ProblemDetailsBuilder()
+            ContentTypeOperationStatus.Success => new OkResult(),
+            ContentTypeOperationStatus.NotFound => new NotFoundObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Not Found")
-                .WithDetail("The content type was not found")
+                .WithDetail($"The specified {type} type was not found")
                 .Build()),
-            ContentTypeOperationStatus.DuplicateAlias => BadRequest(new ProblemDetailsBuilder()
+            ContentTypeOperationStatus.DuplicateAlias => new BadRequestObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Duplicate alias")
-                .WithDetail("The alias is already in use")
+                .WithDetail($"The specified {type} type alias is already in use")
                 .Build()),
-            ContentTypeOperationStatus.InvalidAlias => BadRequest(new ProblemDetailsBuilder()
+            ContentTypeOperationStatus.InvalidAlias => new BadRequestObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Invalid alias")
-                .WithDetail("The alias is invalid")
+                .WithDetail($"The specified {type} type alias is invalid")
                 .Build()),
-            ContentTypeOperationStatus.InvalidPropertyTypeAlias => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Invalid property type alias")
-                .WithDetail("The property type alias is invalid")
-                .Build()),
-            ContentTypeOperationStatus.InvalidContainerName => BadRequest(new ProblemDetailsBuilder()
+            ContentTypeOperationStatus.InvalidPropertyTypeAlias => new BadRequestObjectResult(
+                new ProblemDetailsBuilder()
+                    .WithTitle("Invalid property type alias")
+                    .WithDetail("One or more property type aliases are invalid")
+                    .Build()),
+            ContentTypeOperationStatus.InvalidContainerName => new BadRequestObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Invalid container name")
-                .WithDetail("The container name is invalid")
+                .WithDetail("One or more container names are invalid")
                 .Build()),
-            ContentTypeOperationStatus.DataTypeNotFound => NotFound(new ProblemDetailsBuilder()
+            ContentTypeOperationStatus.MissingContainer => new BadRequestObjectResult(new ProblemDetailsBuilder()
+                .WithTitle("Missing container")
+                .WithDetail("One or more containers or properties are listed as parents to containers that are not defined.")
+                .Build()),
+            ContentTypeOperationStatus.DuplicateContainer => new BadRequestObjectResult(new ProblemDetailsBuilder()
+                .WithTitle("Duplicate container")
+                .WithDetail("One or more containers (or container keys) are defined multiple times.")
+                .Build()),
+            ContentTypeOperationStatus.DataTypeNotFound => new NotFoundObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Data Type not found")
-                .WithDetail("The requested data type was not found")
+                .WithDetail("One or more of the specified data types were not found")
                 .Build()),
-            ContentTypeOperationStatus.InvalidInheritance => BadRequest(new ProblemDetailsBuilder()
+            ContentTypeOperationStatus.InvalidInheritance => new BadRequestObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Invalid inheritance")
-                .WithDetail("The specified inheritance is invalid")
+                .WithDetail($"The specified {type} type inheritance is invalid")
                 .Build()),
-            ContentTypeOperationStatus.InvalidComposition => BadRequest(new ProblemDetailsBuilder()
+            ContentTypeOperationStatus.InvalidComposition => new BadRequestObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Invalid composition")
-                .WithDetail("The specified composition is invalid")),
-            ContentTypeOperationStatus.InvalidParent => BadRequest(new ProblemDetailsBuilder()
+                .WithDetail($"The specified {type} type composition is invalid")),
+            ContentTypeOperationStatus.InvalidParent => new BadRequestObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Invalid parent")
-                .WithDetail("The specified parent is invalid, or cannot be used in combination with the specified composition/inheritance")),
-            ContentTypeOperationStatus.DuplicatePropertyTypeAlias => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Duplicate property type alias")
-                .WithDetail("The property type alias is already in use, all property type aliases must be unique.")
-                .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content type operation status"),
+                .WithDetail(
+                    "The specified parent is invalid, or cannot be used in combination with the specified composition/inheritance")),
+            ContentTypeOperationStatus.DuplicatePropertyTypeAlias => new BadRequestObjectResult(
+                new ProblemDetailsBuilder()
+                    .WithTitle("Duplicate property type alias")
+                    .WithDetail("One or more property type aliases are already in use, all property type aliases must be unique.")
+                    .Build()),
+            _ => new ObjectResult("Unknown content type operation status") { StatusCode = StatusCodes.Status500InternalServerError },
         };
 }
