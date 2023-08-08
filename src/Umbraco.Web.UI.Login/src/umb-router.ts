@@ -33,34 +33,24 @@ export default class UmbRouter {
 		this.#host = host;
 		this.#paths = paths;
 
-		this.#updateUrl(window.location.pathname, window.location.search, window.location.hash);
-
-		window.addEventListener('umbroute:statechange', () => {
-			this.#updateUrl(window.location.pathname, window.location.search, window.location.hash);
-		});
-	}
-
-	/**
-	 * Push or replace a new state to the browser history and route immediately
-	 * @param path The local path
-	 * @param replace Replace the current state instead of pushing a new one
-	 */
-	static changeState(path: string, replace = false): void {
-		if (replace) {
-			history.replaceState({}, '', path);
-		} else {
-			history.pushState({}, '', path);
-		}
-
-		window.dispatchEvent(new CustomEvent('umbroute:statechange', { detail: { path } }));
+		this.#updateUrl(window.location.pathname, window.location.search, window.location.hash, true);
 	}
 
 	public subscribe() {
-		this.#host.addEventListener('click', this.#handleClick.bind(this));
+		this.#host.addEventListener('click', this.#onClick.bind(this));
+		window.addEventListener('popstate', this.#onPopState.bind(this));
+
+		window.history.pushState = new Proxy(window.history.pushState, {
+			apply: (target, thisArg, argArray: [data: any, unused: string, url?: string | URL | null]) => {
+				this.#host.requestUpdate();
+				return target.apply(thisArg, argArray);
+			},
+		});
 	}
 
 	public unsubscribe() {
-		this.#host.removeEventListener('click', this.#handleClick.bind(this));
+		this.#host.removeEventListener('click', this.#onClick.bind(this));
+		window.removeEventListener('popstate', this.#onPopState.bind(this));
 	}
 
 	public render = () => {
@@ -87,7 +77,7 @@ export default class UmbRouter {
 		return typeof cmp === 'function' ? cmp() : cmp;
 	};
 
-	#updateUrl(path: string, search: string, hash: string) {
+	#updateUrl(path: string, search: string, hash: string, replace = false) {
 		if (path.startsWith(new URL(document.baseURI).pathname)) {
 			path = path.substring(new URL(document.baseURI).pathname.length);
 		}
@@ -97,9 +87,14 @@ export default class UmbRouter {
 
 		if (pathToUse) {
 			this.#currentPath = pathToUse.path;
-			history.pushState({}, '', `${pathToUse.path}${search || ''}${hash || ''}`);
+
+			replace
+				? history.replaceState({}, '', `${pathToUse.path}${search || ''}${hash || ''}`)
+				: history.pushState({}, '', `${pathToUse.path}${search || ''}${hash || ''}`);
 		} else {
-			history.pushState({}, '', `${path}${search || ''}${hash || ''}`);
+			replace
+				? history.replaceState({}, '', `${path}${search || ''}${hash || ''}`)
+				: history.pushState({}, '', `${path}${search || ''}${hash || ''}`);
 		}
 
 		this.#currentSearch = search;
@@ -108,7 +103,19 @@ export default class UmbRouter {
 		this.#host.requestUpdate();
 	}
 
-	#handleClick(event: any) {
+	#onPopState(event: PopStateEvent) {
+		console.log('popstate');
+
+		event.preventDefault();
+		event.stopImmediatePropagation();
+
+		const { pathname, search, hash } = window.location;
+		this.#updateUrl(pathname, search, hash, true);
+	}
+
+	#onClick(event: any) {
+		console.log('click');
+
 		if (event.defaultPrevented) return;
 
 		if (this.#isModifierKeyPressed(event)) return;

@@ -57,7 +57,7 @@ export default class UmbLoginPageElement extends LitElement {
 
 		// Check for 402 status code indicating that MFA is required
 		if (response.status === 402) {
-			UmbRouter.changeState('login/?flow=mfa');
+			history.pushState(null, '', 'login/?flow=mfa');
 			return;
 		}
 
@@ -135,7 +135,7 @@ export default class UmbLoginPageElement extends LitElement {
 									${when(
 										this.allowPasswordReset,
 										() =>
-											html`<a id="forgot-password" href="login/reset"></a>
+											html`<a id="forgot-password" href="login/reset">
 												<umb-localize key="user_forgotPassword">Forgot password?</umb-localize>
 											</a>`
 									)}
