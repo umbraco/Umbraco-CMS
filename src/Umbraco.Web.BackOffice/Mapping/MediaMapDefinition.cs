@@ -56,7 +56,7 @@ public class MediaMapDefinition : IMapDefinition
     private static void Map(IMedia source, ContentPropertyCollectionDto target, MapperContext context) =>
         target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties).WhereNotNull();
 
-    // Umbraco.Code.MapAll -Properties -Errors -Edited -Updater -Alias -IsContainer
+    // Umbraco.Code.MapAll -Properties -Errors -Edited -Updater -Alias -IsContainer -BulkActionsAllowed
     private void Map(IMedia source, MediaItemDisplay target, MapperContext context)
     {
         target.ContentApps = _commonMapper.GetContentAppsForEntity(source);
@@ -84,7 +84,7 @@ public class MediaMapDefinition : IMapDefinition
         target.VariesByCulture = source.ContentType.VariesByCulture();
     }
 
-    // Umbraco.Code.MapAll -Edited -Updater -Alias
+    // Umbraco.Code.MapAll -Edited -Updater -Alias -BulkActionsAllowed
     private void Map(IMedia source, ContentItemBasic<ContentPropertyBasic> target, MapperContext context)
     {
         target.ContentTypeId = source.ContentType.Id;

@@ -326,7 +326,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.ExpireDate = GetScheduledDate(source, ContentScheduleAction.Expire, context);
     }
 
-    // Umbraco.Code.MapAll -Alias
+    // Umbraco.Code.MapAll -Alias -BulkActionsAllowed
     private void Map(IContent source, ContentItemBasic<ContentPropertyBasic> target, MapperContext context)
     {
         target.ContentTypeId = source.ContentType.Id;
@@ -349,10 +349,6 @@ internal class ContentMapDefinition : IMapDefinition
         target.UpdateDate = GetUpdateDate(source, context);
         target.Updater = _commonMapper.GetCreator(source, context);
         target.VariesByCulture = source.ContentType.VariesByCulture();
-
-        // For now, this should be true, knowing it may be modified in a notification handler
-        // In future IContent might provide a value for this property.
-        target.BulkActionsAllowed = true;
     }
 
     private IEnumerable<string> GetActions(IContent source, IContent? parent, MapperContext context)

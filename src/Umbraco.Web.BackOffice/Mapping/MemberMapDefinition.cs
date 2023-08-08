@@ -37,7 +37,7 @@ public class MemberMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll -Properties -Errors -Edited -Updater -Alias -IsChildOfListView
-    // Umbraco.Code.MapAll -Trashed -IsContainer -VariesByCulture
+    // Umbraco.Code.MapAll -Trashed -IsContainer -VariesByCulture -BulkActionsAllowed
     private void Map(IMember source, MemberDisplay target, MapperContext context)
     {
         target.ContentApps = _commonMapper.GetContentAppsForEntity(source);
@@ -68,7 +68,7 @@ public class MemberMapDefinition : IMapDefinition
         target.MembershipProperties = _tabsAndPropertiesMapper.MapMembershipProperties(source, context);
     }
 
-    // Umbraco.Code.MapAll -Trashed -Edited -Updater -Alias -VariesByCulture
+    // Umbraco.Code.MapAll -Trashed -Edited -Updater -Alias -VariesByCulture -BulkActionsAllowed
     private void Map(IMember source, MemberBasic target, MapperContext context)
     {
         target.ContentTypeId = source.ContentType.Id;
