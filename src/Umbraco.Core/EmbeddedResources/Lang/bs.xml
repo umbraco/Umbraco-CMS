@@ -1948,7 +1948,7 @@ Da upravljate svojom web lokacijom, jednostavno otvorite Umbraco backoffice i po
     <key alias="mailBody"><![CDATA[
       Zdravo %0%
 
-      Ovo je automatska pošta koja vas obavještava da je za 
+      Ovo je automatska pošta koja vas obavještava da je za
 	  dokument '%1%' zatražen prevod na '%5%' od %2%.
 
       Idi na http://%3%/translation/details.aspx?id=%4% za uređivanje.
@@ -2116,14 +2116,9 @@ Da upravljate svojom web lokacijom, jednostavno otvorite Umbraco backoffice i po
     <key alias="userInvitedSuccessHelp">Novom korisniku je poslana pozivnica s detaljima o tome kako se prijaviti
       Umbraco.
     </key>
-    <key alias="userinviteWelcomeMessage">Pozdrav i dobrodošli u Umbraco! Za samo 1 minut možete krenuti, mi
-      samo trebate postaviti lozinku i dodati sliku za svoj avatar.
-    </key>
+    <key alias="userinviteWelcomeMessage">Pozdrav i dobrodošli u Umbraco! Za samo 1 minut možete krenuti, mi samo trebate postaviti lozinku.</key>
     <key alias="userinviteExpiredMessage">Dobrodošli u Umbraco! Nažalost, vaš poziv je istekao. Molimo kontaktirajte svoju
       administratora i zamolite ih da ga ponovo pošalju.
-    </key>
-    <key alias="userinviteAvatarMessage">Ako otpremite svoju fotografiju, drugi korisnici će ga lako prepoznati
-       ti. Kliknite na krug iznad da otpremite svoju fotografiju.
     </key>
     <key alias="writer">Pisac</key>
     <key alias="change">Promjena</key>
@@ -2296,7 +2291,7 @@ Da upravljate svojom web lokacijom, jednostavno otvorite Umbraco backoffice i po
 		   1: Recommended value
 	  -->
     <key alias="macroErrorModeCheckSuccessMessage">Makro greške su postavljene na '%0%'.</key>
-    <key alias="macroErrorModeCheckErrorMessage">Greške makroa su postavljene na '%0%' što će spriječiti potpuno učitavanje nekih ili svih stranica 
+    <key alias="macroErrorModeCheckErrorMessage">Greške makroa su postavljene na '%0%' što će spriječiti potpuno učitavanje nekih ili svih stranica
 	  na vašem sajtu ako postoje greške u makroima. Ako ovo ispravite, vrijednost će biti postavljena na '%1%'.
     </key>
     <!-- The following keys get these tokens passed in:

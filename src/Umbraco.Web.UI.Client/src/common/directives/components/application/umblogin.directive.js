@@ -14,7 +14,7 @@
         });
 
     function UmbLoginController($scope, $location, currentUserResource, formHelper,
-        mediaHelper, umbRequestHelper, Upload, localizationService,
+        mediaHelper, umbRequestHelper, localizationService,
         userService, externalLoginInfo, externalLoginInfoService,
         resetPasswordCodeInfo, authResource, $q) {
 
@@ -32,15 +32,6 @@
 
         vm.loginStates = {
             submitButton: "init"
-        };
-
-        vm.avatarFile = {
-            filesHolder: null,
-            uploadStatus: null,
-            uploadProgress: 0,
-            maxFileSize: Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB",
-            acceptedFileTypes: mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes),
-            uploaded: false
         };
 
         vm.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.canSendRequiredEmail && Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
@@ -66,7 +57,6 @@
 
         vm.$onInit = onInit;
         vm.togglePassword = togglePassword;
-        vm.changeAvatar = changeAvatar;
         vm.getStarted = getStarted;
         vm.inviteSavePassword = inviteSavePassword;
         vm.showLogin = showLogin;
@@ -154,12 +144,6 @@
             $(".password-text.show, .password-text.hide").toggle();
         }
 
-        function changeAvatar(files, event) {
-            if (files && files.length > 0) {
-                upload(files[0]);
-            }
-        }
-
         function getStarted() {
             $location.search('invite', null);
             if (vm.onLogin) {
@@ -179,11 +163,16 @@
                         //success
                         formHelper.resetForm({ scope: $scope, formCtrl: vm.inviteUserPasswordForm });
                         vm.invitedUserPasswordModel.buttonState = "success";
-                        //set the user and set them as logged in
-                        vm.invitedUser = data;
-                        userService.setAuthenticationSuccessful(data);
 
+                        //set the user
+                        vm.invitedUser = data;
+
+                        // hide the password form
                         vm.inviteStep = 2;
+
+                        // set the user as logged in, which will initialise the app flow in init.js
+                        // and eventually redirect the user to the content section when it's ready
+                        userService.setAuthenticationSuccessful(data);
 
                     }, function (err) {
                         formHelper.resetForm({ scope: $scope, hasErrors: true, formCtrl: vm.inviteUserPasswordForm });
@@ -376,69 +365,6 @@
             const date = new Date();
             localizationService.localize("login_greeting" + date.getDay()).then(function (label) {
                 $scope.greeting = label;
-            });
-        }
-
-        function upload(file) {
-
-            vm.avatarFile.uploadProgress = 0;
-
-            Upload.upload({
-                url: umbRequestHelper.getApiUrl("currentUserApiBaseUrl", "PostSetAvatar"),
-                fields: {},
-                file: file
-            }).progress(function (evt) {
-
-                if (vm.avatarFile.uploadStatus !== "done" && vm.avatarFile.uploadStatus !== "error") {
-                    // set uploading status on file
-                    vm.avatarFile.uploadStatus = "uploading";
-
-                    // calculate progress in percentage
-                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
-
-                    // set percentage property on file
-                    vm.avatarFile.uploadProgress = progressPercentage;
-                }
-
-            }).success(function (data, status, headers, config) {
-
-                vm.avatarFile.uploadProgress = 100;
-
-                // set done status on file
-                vm.avatarFile.uploadStatus = "done";
-
-                vm.invitedUser.avatars = data;
-
-                vm.avatarFile.uploaded = true;
-
-            }).error(function (evt, status, headers, config) {
-
-                // set status done
-                vm.avatarFile.uploadStatus = "error";
-
-                // If file not found, server will return a 404 and display this message
-                if (status === 404) {
-                    vm.avatarFile.serverErrorMessage = "File not found";
-                }
-                else if (status == 400) {
-                    //it's a validation error
-                    vm.avatarFile.serverErrorMessage = evt.message;
-                }
-                else {
-                    //it's an unhandled error
-                    //if the service returns a detailed error
-                    if (evt.InnerException) {
-                        vm.avatarFile.serverErrorMessage = evt.InnerException.ExceptionMessage;
-
-                        //Check if its the common "too large file" exception
-                        if (evt.InnerException.StackTrace && evt.InnerException.StackTrace.indexOf("ValidateRequestEntityLength") > 0) {
-                            vm.avatarFile.serverErrorMessage = "File too large to upload";
-                        }
-
-                    } else if (evt.Message) {
-                        vm.avatarFile.serverErrorMessage = evt.Message;
-                    }
-                }
             });
         }
 
