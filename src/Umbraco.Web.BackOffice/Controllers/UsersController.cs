@@ -187,8 +187,6 @@ public class UsersController : BackOfficeNotificationsController
             //generate a path of known data, we don't want this path to be guessable
             user.Avatar = "UserAvatars/" + (user.Id + safeFileName).GenerateHash<SHA1>() + "." + ext;
 
-            //todo implement Filestreamsecurity
-
             using (Stream fs = file.OpenReadStream())
             {
                 mediaFileManager.FileSystem.AddFile(user.Avatar, fs, true);
