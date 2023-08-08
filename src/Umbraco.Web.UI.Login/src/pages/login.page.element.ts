@@ -7,6 +7,7 @@ import { until } from 'lit/directives/until.js';
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { UmbAuthMainContext } from '../context/auth-main.context.js';
 import { umbLocalizationContext } from '../localization/localization-context.js';
+import UmbRouter from '../umb-router.js';
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends LitElement {
@@ -56,10 +57,10 @@ export default class UmbLoginPageElement extends LitElement {
 
 		// Check for 402 status code indicating that MFA is required
 		if (response.status === 402) {
-      if (response.twoFactorView) {
-        UmbAuthMainContext.Instance.twoFactorView = response.twoFactorView;
-      }
-			history.pushState(null, '', 'login?flow=mfa');
+			if (response.twoFactorView) {
+				UmbAuthMainContext.Instance.twoFactorView = response.twoFactorView;
+			}
+			UmbRouter.redirect('login?flow=mfa');
 			return;
 		}
 

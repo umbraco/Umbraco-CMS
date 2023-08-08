@@ -34,24 +34,38 @@ export default class UmbRouter {
 		this.#paths = paths;
 
 		this.#updateUrl(window.location.pathname, window.location.search, window.location.hash, true);
+
+		window.addEventListener('umbroute:change', this.#onUmbRouteChange.bind(this));
 	}
 
 	public subscribe() {
 		this.#host.addEventListener('click', this.#onClick.bind(this));
 		window.addEventListener('popstate', this.#onPopState.bind(this));
-
-		window.history.pushState = new Proxy(window.history.pushState, {
-			apply: (target, thisArg, argArray: [data: any, unused: string, url?: string | URL | null]) => {
-				const { pathname, search, hash } = new URL(argArray[2] || '', document.baseURI);
-				this.#updateUrl(pathname, search, hash, true);
-				return target.apply(thisArg, argArray);
-			},
-		});
 	}
 
 	public unsubscribe() {
 		this.#host.removeEventListener('click', this.#onClick.bind(this));
 		window.removeEventListener('popstate', this.#onPopState.bind(this));
+	}
+
+	/**
+	 * Push or replace a new state to the browser history and route immediately
+	 * @param path The local path
+	 * @param replace Replace the current state instead of pushing a new one
+	 */
+	static redirect(path: string, replace = false): void {
+		const { pathname, search, hash } = new URL(path, document.baseURI);
+
+		window.dispatchEvent(
+			new CustomEvent('umbroute:change', {
+				detail: {
+					pathname,
+					search,
+					hash,
+					replace,
+				},
+			})
+		);
 	}
 
 	public render = () => {
@@ -77,6 +91,11 @@ export default class UmbRouter {
 
 		return typeof cmp === 'function' ? cmp() : cmp;
 	};
+
+	#onUmbRouteChange(event: any) {
+		const { pathname, search, hash, replace } = event.detail;
+		this.#updateUrl(pathname, search, hash, replace);
+	}
 
 	#updateUrl(path: string, search: string, hash: string, replace = false) {
 		if (path.startsWith(new URL(document.baseURI).pathname)) {
