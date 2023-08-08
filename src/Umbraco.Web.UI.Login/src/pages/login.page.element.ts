@@ -57,10 +57,10 @@ export default class UmbLoginPageElement extends LitElement {
 
 		// Check for 402 status code indicating that MFA is required
 		if (response.status === 402) {
-      if (response.twoFactorView) {
-        UmbAuthMainContext.Instance.twoFactorView = response.twoFactorView;
-      }
-			history.pushState(null, '', 'login?flow=mfa');
+			if (response.twoFactorView) {
+				UmbAuthMainContext.Instance.twoFactorView = response.twoFactorView;
+			}
+			UmbRouter.redirect('login?flow=mfa');
 			return;
 		}
 
