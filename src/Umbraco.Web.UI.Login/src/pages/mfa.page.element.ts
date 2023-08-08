@@ -2,13 +2,18 @@ import { UUIButtonState, UUIInputElement, UUITextStyles } from '@umbraco-ui/uui'
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { UmbAuthMainContext } from '../context/auth-main.context';
 import { umbLocalizationContext } from '../localization/localization-context';
+
+type MfaCustomViewElement = HTMLElement & {
+	providers: string[];
+};
 
 @customElement('umb-mfa-page')
 export default class UmbMfaPageElement extends LitElement {
 	@state()
-	protected providers: Array<{ name: string, value: string, selected: boolean }> = [];
+	protected providers: Array<{ name: string; value: string; selected: boolean }> = [];
 
 	@state()
 	private loading = true;
@@ -184,34 +189,41 @@ export default class UmbMfaPageElement extends LitElement {
 		`;
 	}
 
-  protected renderCustomView() {
-    const view = UmbAuthMainContext.Instance.twoFactorView;
-    try {
-      if (view) {
-        return html`
-          <div id="custom-view">
-            ${view}
-          </div>
-        `;
-      }
-    } catch (e) {
-      const error = e instanceof Error ? e.message : 'Unknown error';
-      console.group('[MFA login] Failed to load custom view');
-      console.log('Element reference', this);
-      console.log('Custom view', view);
-      console.error('Failed to load custom view:', e);
-      console.groupEnd();
-      return html`<span class="text-danger">${error}</span>`;
-    }
-  }
+	protected async renderCustomView() {
+		const view = UmbAuthMainContext.Instance.twoFactorView;
+		if (!view) return nothing;
+
+		try {
+			if (view.endsWith('.html')) {
+				const textContent = await fetch(view).then((response) => response.text());
+				return html` <div id="custom-view">${unsafeHTML(textContent)}</div>`;
+			}
+
+			const module = await import(view /* @vite-ignore */);
+
+			if (!module.default) throw new Error('No default export found');
+
+			const customView = module.default;
+			const component = new customView() as MfaCustomViewElement;
+			component.providers = this.providers.map((provider) => provider.value);
+			return component;
+		} catch (e) {
+			const error = e instanceof Error ? e.message : 'Unknown error';
+			console.group('[MFA login] Failed to load custom view');
+			console.log('Element reference', this);
+			console.log('Custom view', view);
+			console.error('Failed to load custom view:', e);
+			console.groupEnd();
+			return html`<span class="text-danger">${error}</span>`;
+		}
+	}
 
 	protected render() {
 		return this.loading
-      ? html`<uui-loader-bar></uui-loader-bar>`
-      : (UmbAuthMainContext.Instance.twoFactorView
-        ? this.renderCustomView()
-        : this.renderDefaultView()
-      );
+			? html`<uui-loader-bar></uui-loader-bar>`
+			: UmbAuthMainContext.Instance.twoFactorView
+			? until(this.renderCustomView(), html`<uui-loader-bar></uui-loader-bar>`)
+			: this.renderDefaultView();
 	}
 
 	static styles = [
