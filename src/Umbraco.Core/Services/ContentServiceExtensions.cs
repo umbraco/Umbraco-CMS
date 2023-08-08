@@ -47,11 +47,6 @@ public static class ContentServiceExtensions
     /// <returns></returns>
     public static IContent CreateContent(this IContentService contentService, string name, Udi parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
     {
-        if (userId == 0)
-        {
-            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-        }
-
         if (parentId is not GuidUdi guidUdi)
         {
             throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) +

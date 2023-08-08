@@ -118,11 +118,6 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             EventMessages evtMsgs = EventMessagesFactory.Get();
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
@@ -199,11 +194,6 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             if (container.ContainedObjectType != Constants.ObjectTypes.DataType)
@@ -239,11 +229,6 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             EventMessages evtMsgs = EventMessagesFactory.Get();
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
@@ -281,11 +266,6 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             EventMessages evtMsgs = EventMessagesFactory.Get();
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
@@ -470,11 +450,6 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             var evtMsgs = EventMessagesFactory.Get();
 
             IDataType copy;
@@ -510,11 +485,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="userId">Id of the user issuing the save</param>
         public void Save(IDataType dataType, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             EventMessages evtMsgs = EventMessagesFactory.Get();
             dataType.CreatorId = userId;
 
@@ -553,11 +523,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="userId">Id of the user issuing the save</param>
         public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             EventMessages evtMsgs = EventMessagesFactory.Get();
             IDataType[] dataTypeDefinitionsA = dataTypeDefinitions.ToArray();
 
@@ -593,11 +558,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="userId">Optional Id of the user issuing the deletion</param>
         public void Delete(IDataType dataType, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             EventMessages evtMsgs = EventMessagesFactory.Get();
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
             var deletingDataTypeNotification = new DataTypeDeletingNotification(dataType, evtMsgs);

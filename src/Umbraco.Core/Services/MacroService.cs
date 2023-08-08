@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -100,11 +100,6 @@ internal class MacroService : RepositoryService, IMacroService
     /// <param name="userId">Optional id of the user deleting the macro</param>
     public void Delete(IMacro macro, int userId = Constants.Security.SuperUserId)
     {
-        if (userId == 0)
-        {
-            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-        }
-
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -132,11 +127,6 @@ internal class MacroService : RepositoryService, IMacroService
     /// <param name="userId">Optional Id of the user deleting the macro</param>
     public void Save(IMacro macro, int userId = Constants.Security.SuperUserId)
     {
-        if (userId == 0)
-        {
-            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-        }
-
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             EventMessages eventMessages = EventMessagesFactory.Get();

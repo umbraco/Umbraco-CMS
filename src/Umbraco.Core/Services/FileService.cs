@@ -86,12 +86,6 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public void SaveStylesheet(IStylesheet? stylesheet, int? userId = null)
     {
-        userId ??= Constants.Security.SuperUserId;
-        if (userId == 0)
-        {
-            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-        }
-
         if (stylesheet is null)
         {
             return;
@@ -107,6 +101,7 @@ public class FileService : RepositoryService, IFileService
                 return;
             }
 
+            userId ??= Constants.Security.SuperUserId;
             _stylesheetRepository.Save(stylesheet);
             scope.Notifications.Publish(
                 new StylesheetSavedNotification(stylesheet, eventMessages).WithStateFrom(savingNotification));
@@ -119,12 +114,6 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public void DeleteStylesheet(string path, int? userId)
     {
-        userId ??= Constants.Security.SuperUserId;
-        if (userId == 0)
-        {
-            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-        }
-
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             IStylesheet? stylesheet = _stylesheetRepository.Get(path);
@@ -142,6 +131,7 @@ public class FileService : RepositoryService, IFileService
                 return; // causes rollback
             }
 
+            userId ??= Constants.Security.SuperUserId;
             _stylesheetRepository.Delete(stylesheet);
 
             scope.Notifications.Publish(
@@ -225,10 +215,9 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public void SaveScript(IScript? script, int? userId)
     {
-        userId ??= Constants.Security.SuperUserId;
-        if (userId == 0)
+        if (userId is null)
         {
-            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
+            userId = Constants.Security.SuperUserId;
         }
 
         if (script is null)
@@ -258,12 +247,6 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public void DeleteScript(string path, int? userId = null)
     {
-        userId ??= Constants.Security.SuperUserId;
-        if (userId == 0)
-        {
-            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-        }
-
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             IScript? script = _scriptRepository.Get(path);
@@ -281,6 +264,7 @@ public class FileService : RepositoryService, IFileService
                 return;
             }
 
+            userId ??= Constants.Security.SuperUserId;
             _scriptRepository.Delete(script);
             scope.Notifications.Publish(
                 new ScriptDeletedNotification(script, eventMessages).WithStateFrom(deletingNotification));
@@ -354,11 +338,6 @@ public class FileService : RepositoryService, IFileService
     public Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(
         string contentTypeAlias, string? contentTypeName, int userId = Constants.Security.SuperUserId)
     {
-        if (userId == 0)
-        {
-            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-        }
-
         var template = new Template(_shortStringHelper, contentTypeName,
 
             // NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
@@ -422,11 +401,6 @@ public class FileService : RepositoryService, IFileService
         ITemplate? masterTemplate = null,
         int userId = Constants.Security.SuperUserId)
     {
-        if (userId == 0)
-        {
-            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-        }
-
         if (name == null)
         {
             throw new ArgumentNullException(nameof(name));
@@ -539,11 +513,6 @@ public class FileService : RepositoryService, IFileService
     /// <param name="userId"></param>
     public void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId)
     {
-        if (userId == 0)
-        {
-            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-        }
-
         if (template == null)
         {
             throw new ArgumentNullException(nameof(template));
@@ -582,11 +551,6 @@ public class FileService : RepositoryService, IFileService
     /// <param name="userId">Optional id of the user</param>
     public void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId)
     {
-        if (userId == 0)
-        {
-            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-        }
-
         ITemplate[] templatesA = templates.ToArray();
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -618,11 +582,6 @@ public class FileService : RepositoryService, IFileService
     /// <param name="userId"></param>
     public void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId)
     {
-        if (userId == 0)
-        {
-            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-        }
-
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             ITemplate? template = _templateRepository.Get(alias);
@@ -778,12 +737,6 @@ public class FileService : RepositoryService, IFileService
         string? snippetName = null,
         int? userId = Constants.Security.SuperUserId)
     {
-        userId ??= Constants.Security.SuperUserId;
-        if (userId == 0)
-        {
-            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-        }
-
         string partialViewHeader;
         switch (partialViewType)
         {
@@ -861,12 +814,6 @@ public class FileService : RepositoryService, IFileService
 
     private bool DeletePartialViewMacro(string path, PartialViewType partialViewType, int? userId = null)
     {
-        userId ??= Constants.Security.SuperUserId;
-        if (userId == 0)
-        {
-            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-        }
-
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
@@ -885,6 +832,7 @@ public class FileService : RepositoryService, IFileService
                 return false;
             }
 
+            userId ??= Constants.Security.SuperUserId;
             repository.Delete(partialView);
             scope.Notifications.Publish(
                 new PartialViewDeletedNotification(partialView, eventMessages).WithStateFrom(deletingNotification));
@@ -916,12 +864,6 @@ public class FileService : RepositoryService, IFileService
 
     private Attempt<IPartialView?> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int? userId = null)
     {
-        userId ??= Constants.Security.SuperUserId;
-        if (userId == 0)
-        {
-            throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-        }
-
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -932,6 +874,7 @@ public class FileService : RepositoryService, IFileService
                 return Attempt<IPartialView?>.Fail();
             }
 
+            userId ??= Constants.Security.SuperUserId;
             IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
             repository.Save(partialView);
 

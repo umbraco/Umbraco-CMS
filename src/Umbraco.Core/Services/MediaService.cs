@@ -123,11 +123,6 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia CreateMedia(string name, Guid parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             IMedia? parent = GetById(parentId);
             return CreateMedia(name, parent, mediaTypeAlias, userId);
         }
@@ -146,11 +141,6 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>The media object.</returns>
         public IMedia CreateMedia(string? name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             IMediaType? mediaType = GetMediaType(mediaTypeAlias);
             if (mediaType == null)
             {
@@ -189,11 +179,6 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>The media object.</returns>
         public IMedia CreateMedia(string name, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             // not locking since not saving anything
 
             IMediaType? mediaType = GetMediaType(mediaTypeAlias);
@@ -229,11 +214,6 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>The media object.</returns>
         public IMedia CreateMedia(string name, IMedia? parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             if (parent == null)
             {
                 throw new ArgumentNullException(nameof(parent));
@@ -271,11 +251,6 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>The media object.</returns>
         public IMedia CreateMediaWithIdentity(string name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
             // locking the media tree secures media types too
             scope.WriteLock(Constants.Locks.MediaTree);
@@ -310,11 +285,6 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>The media object.</returns>
         public IMedia CreateMediaWithIdentity(string name, IMedia parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             if (parent == null)
             {
                 throw new ArgumentNullException(nameof(parent));
@@ -730,11 +700,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">Id of the User saving the Media</param>
         public Attempt<OperationResult?> Save(IMedia media, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             EventMessages eventMessages = EventMessagesFactory.Get();
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -784,11 +749,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">Id of the User saving the Media</param>
         public Attempt<OperationResult?> Save(IEnumerable<IMedia> medias, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             EventMessages messages = EventMessagesFactory.Get();
             IMedia[] mediasA = medias.ToArray();
 
@@ -836,11 +796,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">Id of the User deleting the Media</param>
         public Attempt<OperationResult?> Delete(IMedia media, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             EventMessages messages = EventMessagesFactory.Get();
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -904,11 +859,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">Optional Id of the User deleting versions of a Media object</param>
         public void DeleteVersions(int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
             DeleteVersions(scope, true, id, versionDate, userId);
             scope.Complete();
@@ -945,11 +895,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">Optional Id of the User deleting versions of a Media object</param>
         public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -992,11 +937,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">Id of the User deleting the Media</param>
         public Attempt<OperationResult?> MoveToRecycleBin(IMedia media, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             EventMessages messages = EventMessagesFactory.Get();
             var moves = new List<(IMedia, string)>();
 
@@ -1039,11 +979,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">Id of the User moving the Media</param>
         public Attempt<OperationResult?> Move(IMedia media, int parentId, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             EventMessages messages = EventMessagesFactory.Get();
 
             // if moving to the recycle bin then use the proper method
@@ -1158,11 +1093,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>
         public OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             var deleted = new List<IMedia>();
             EventMessages messages = EventMessagesFactory.Get(); // TODO: and then?
 
@@ -1215,11 +1145,6 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>True if sorting succeeded, otherwise False</returns>
         public bool Sort(IEnumerable<IMedia> items, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             IMedia[] itemsA = items.ToArray();
             if (itemsA.Length == 0)
             {
@@ -1350,11 +1275,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">Optional id of the user deleting the media</param>
         public void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = Constants.Security.SuperUserId)
         {
-            if (userId == 0)
-            {
-                throw new ArgumentException("The User id 0 isn't possible. Please specify a valid user id.", nameof(userId));
-            }
-
             // TODO: This currently this is called from the ContentTypeService but that needs to change,
             // if we are deleting a content type, we should just delete the data and do this operation slightly differently.
             // This method will recursively go lookup every content item, check if any of it's descendants are
