@@ -428,7 +428,7 @@ export class UserResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `Bad Request`,
+                404: `Not Found`,
             },
         });
     }
@@ -448,7 +448,7 @@ export class UserResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `Bad Request`,
+                404: `Not Found`,
             },
         });
     }

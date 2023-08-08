@@ -2,7 +2,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbFolderDataSource } from '@umbraco-cms/backoffice/repository';
 import {
 	DataTypeResource,
-	FolderReponseModel,
+	FolderResponseModel,
 	CreateFolderRequestModel,
 	FolderModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -34,7 +34,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
 	async createScaffold(parentId: string | null) {
-		const scaffold: FolderReponseModel = {
+		const scaffold: FolderResponseModel = {
 			name: '',
 			id: UmbId.new(),
 			parentId,

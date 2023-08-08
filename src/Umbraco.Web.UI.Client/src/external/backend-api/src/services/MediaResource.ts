@@ -33,7 +33,6 @@ export class MediaResource {
             mediaType: 'application/json',
             responseHeader: 'Location',
             errors: {
-                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
@@ -76,7 +75,6 @@ export class MediaResource {
                 'id': id,
             },
             errors: {
-                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
@@ -102,7 +100,6 @@ export class MediaResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
@@ -128,7 +125,6 @@ export class MediaResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `Bad Request`,
                 404: `Not Found`,
             },
         });

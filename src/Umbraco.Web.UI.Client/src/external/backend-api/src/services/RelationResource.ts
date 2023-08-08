@@ -84,6 +84,9 @@ export class RelationResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                404: `Not Found`,
+            },
         });
     }
 

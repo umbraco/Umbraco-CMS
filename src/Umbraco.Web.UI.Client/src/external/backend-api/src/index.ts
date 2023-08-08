@@ -92,7 +92,7 @@ export type { FieldPresentationModel } from './models/FieldPresentationModel';
 export type { FileItemResponseModelBaseModel } from './models/FileItemResponseModelBaseModel';
 export type { FileSystemTreeItemPresentationModel } from './models/FileSystemTreeItemPresentationModel';
 export type { FolderModelBaseModel } from './models/FolderModelBaseModel';
-export type { FolderReponseModel } from './models/FolderReponseModel';
+export type { FolderResponseModel } from './models/FolderResponseModel';
 export type { FolderTreeItemResponseModel } from './models/FolderTreeItemResponseModel';
 export type { HealthCheckActionRequestModel } from './models/HealthCheckActionRequestModel';
 export type { HealthCheckGroupPresentationBaseModel } from './models/HealthCheckGroupPresentationBaseModel';
@@ -176,6 +176,7 @@ export type { PagedMediaTypeTreeItemResponseModel } from './models/PagedMediaTyp
 export type { PagedObjectTypeResponseModel } from './models/PagedObjectTypeResponseModel';
 export type { PagedPackageDefinitionResponseModel } from './models/PagedPackageDefinitionResponseModel';
 export type { PagedPackageMigrationStatusResponseModel } from './models/PagedPackageMigrationStatusResponseModel';
+export type { PagedProblemDetailsModel } from './models/PagedProblemDetailsModel';
 export type { PagedRecycleBinItemResponseModel } from './models/PagedRecycleBinItemResponseModel';
 export type { PagedRedirectUrlResponseModel } from './models/PagedRedirectUrlResponseModel';
 export type { PagedRelationItemResponseModel } from './models/PagedRelationItemResponseModel';

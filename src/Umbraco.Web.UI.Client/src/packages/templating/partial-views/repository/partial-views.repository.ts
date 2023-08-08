@@ -14,7 +14,7 @@ import {
 	CreatePartialViewRequestModel,
 	FileSystemTreeItemPresentationModel,
 	FolderModelBaseModel,
-	FolderReponseModel,
+	FolderResponseModel,
 	PagedSnippetItemResponseModel,
 	PartialViewItemResponseModel,
 	PartialViewResponseModel,
@@ -68,8 +68,8 @@ export class UmbPartialViewsRepository
 	//#region FOLDER
 	createFolderScaffold(
 		parentId: string | null
-	): Promise<{ data?: FolderReponseModel | undefined; error?: ProblemDetails | undefined }> {
-		const data: FolderReponseModel = {
+	): Promise<{ data?: FolderResponseModel | undefined; error?: ProblemDetails | undefined }> {
+		const data: FolderResponseModel = {
 			name: '',
 			parentId,
 		};

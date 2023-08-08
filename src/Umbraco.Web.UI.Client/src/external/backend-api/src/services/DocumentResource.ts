@@ -7,6 +7,7 @@ import type { CreateDocumentRequestModel } from '../models/CreateDocumentRequest
 import type { DocumentItemResponseModel } from '../models/DocumentItemResponseModel';
 import type { DocumentNotificationResponseModel } from '../models/DocumentNotificationResponseModel';
 import type { DocumentResponseModel } from '../models/DocumentResponseModel';
+import type { DomainsResponseModel } from '../models/DomainsResponseModel';
 import type { MoveDocumentRequestModel } from '../models/MoveDocumentRequestModel';
 import type { PagedDocumentTreeItemResponseModel } from '../models/PagedDocumentTreeItemResponseModel';
 import type { PagedDocumentTypeResponseModel } from '../models/PagedDocumentTypeResponseModel';
@@ -38,7 +39,6 @@ export class DocumentResource {
             mediaType: 'application/json',
             responseHeader: 'Location',
             errors: {
-                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
@@ -81,7 +81,6 @@ export class DocumentResource {
                 'id': id,
             },
             errors: {
-                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
@@ -107,7 +106,6 @@ export class DocumentResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
@@ -163,7 +161,6 @@ export class DocumentResource {
             mediaType: 'application/json',
             responseHeader: 'Location',
             errors: {
-                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
@@ -177,12 +174,15 @@ export class DocumentResource {
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<DomainsResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document/{id}/domains',
             path: {
                 'id': id,
+            },
+            errors: {
+                404: `Not Found`,
             },
         });
     }
@@ -229,7 +229,6 @@ export class DocumentResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
@@ -302,7 +301,6 @@ export class DocumentResource {
             mediaType: 'application/json',
             responseHeader: 'Location',
             errors: {
-                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
@@ -330,19 +328,22 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns void
      * @throws ApiError
      */
     public static getDocumentByIdPublicAccess({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document/{id}/public-access',
             path: {
                 'id': id,
+            },
+            errors: {
+                404: `Not Found`,
             },
         });
     }
@@ -367,7 +368,6 @@ export class DocumentResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `Bad Request`,
                 404: `Not Found`,
             },
         });

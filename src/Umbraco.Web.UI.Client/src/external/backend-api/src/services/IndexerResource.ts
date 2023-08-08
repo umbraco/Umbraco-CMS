@@ -71,6 +71,8 @@ export class IndexerResource {
             },
             errors: {
                 400: `Bad Request`,
+                404: `Not Found`,
+                409: `Conflict`,
             },
         });
     }
