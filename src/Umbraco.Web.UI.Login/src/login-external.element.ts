@@ -1,11 +1,13 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
 import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui';
+import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { until } from 'lit/directives/until.js';
+import { loadCustomView, renderCustomView } from './load-custom-view.function';
 
 type ExternalLoginCustomViewElement = HTMLElement & {
-  displayName: string;
-  providerName: string;
-  externalLoginUrl: string;
+	displayName: string;
+	providerName: string;
+	externalLoginUrl: string;
 };
 
 /**
@@ -15,142 +17,132 @@ type ExternalLoginCustomViewElement = HTMLElement & {
  */
 @customElement('umb-login-external')
 export class UmbLoginExternalElement extends LitElement {
-
-  /**
-   * Gets or sets the path to the module that should be loaded as the custom view.
-   * The module should export a default class that extends HTMLElement.
-   *
-   * Setting this property will cause the default view to be hidden and the custom view to be loaded.
-   * The icon, button look and button color will be ignored.
-   *
-   * @example App_Plugins/MyPackage/MyCustomLoginView.js
-   * @attr custom-view
-   */
+	/**
+	 * Gets or sets the path to the module that should be loaded as the custom view.
+	 * The module should export a default class that extends HTMLElement.
+	 *
+	 * Setting this property will cause the default view to be hidden and the custom view to be loaded.
+	 * The icon, button look and button color will be ignored.
+	 *
+	 * @example App_Plugins/MyPackage/MyCustomLoginView.js
+	 * @attr custom-view
+	 */
 	@property({ attribute: 'custom-view' })
 	customView?: string;
 
-  /**
-   * Gets or sets the display name of the provider.
-   *
-   * @attr display-name
-   * @example Google
-   */
+	/**
+	 * Gets or sets the display name of the provider.
+	 *
+	 * @attr display-name
+	 * @example Google
+	 */
 	@property({ attribute: 'display-name' })
 	displayName = '';
 
-  /**
-   * Gets or sets the name of the provider (otherwise known as authentication type).
-   *
-   * @attr provider-name
-   * @example Umbraco.Google
-   */
-  @property({ attribute: 'provider-name' })
-  providerName = '';
+	/**
+	 * Gets or sets the name of the provider (otherwise known as authentication type).
+	 *
+	 * @attr provider-name
+	 * @example Umbraco.Google
+	 */
+	@property({ attribute: 'provider-name' })
+	providerName = '';
 
-  /**
-   * Gets or sets the url to the external login provider.
-   *
-   * @attr external-login-url
-   * @example /umbraco/ExternalLogin
-   */
+	/**
+	 * Gets or sets the url to the external login provider.
+	 *
+	 * @attr external-login-url
+	 * @example /umbraco/ExternalLogin
+	 */
 	@property({ attribute: 'external-login-url' })
-  get externalLoginUrl() {
-    return this.#externalLoginUrl;
-  }
+	get externalLoginUrl() {
+		return this.#externalLoginUrl;
+	}
 	set externalLoginUrl(value: string) {
-    const tempUrl = new URL(value, window.location.origin);
-    const searchParams = new URLSearchParams(tempUrl.search);
-    tempUrl.searchParams.append("redirectUrl", decodeURIComponent(searchParams.get('returnPath') ?? ''));
-    this.#externalLoginUrl = tempUrl.pathname + tempUrl.search;
-  }
+		const tempUrl = new URL(value, window.location.origin);
+		const searchParams = new URLSearchParams(tempUrl.search);
+		tempUrl.searchParams.append('redirectUrl', decodeURIComponent(searchParams.get('returnPath') ?? ''));
+		this.#externalLoginUrl = tempUrl.pathname + tempUrl.search;
+	}
 
-  /**
-   * Gets or sets the icon to display next to the provider name.
-   * This should be the name of an icon in the Umbraco Backoffice icon set.
-   *
-   * @attr icon
-   * @example icon-google-fill
-   * @default icon-lock
-   */
+	/**
+	 * Gets or sets the icon to display next to the provider name.
+	 * This should be the name of an icon in the Umbraco Backoffice icon set.
+	 *
+	 * @attr icon
+	 * @example icon-google-fill
+	 * @default icon-lock
+	 */
 	@property({ attribute: 'icon' })
 	icon = 'icon-lock';
 
-  /**
-   * Gets or sets the look of the underlying uui-button.
-   *
-   * @attr button-look
-   * @example outline
-   * @default outline
-   * @see https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors
-   */
+	/**
+	 * Gets or sets the look of the underlying uui-button.
+	 *
+	 * @attr button-look
+	 * @example outline
+	 * @default outline
+	 * @see https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors
+	 */
 	@property({ attribute: 'button-look' })
 	buttonLook: InterfaceLook = 'outline';
 
-  /**
-   * Gets or sets the color of the underlying uui-button.
-   *
-   * @attr button-color
-   * @example danger
-   * @default default
-   * @see https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors
-   */
+	/**
+	 * Gets or sets the color of the underlying uui-button.
+	 *
+	 * @attr button-color
+	 * @example danger
+	 * @default default
+	 * @see https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors
+	 */
 	@property({ attribute: 'button-color' })
 	buttonColor: InterfaceColor = 'default';
 
-	@state()
-	protected externalComponent: ExternalLoginCustomViewElement | null = null;
-
-	@state()
-	protected loading = false;
-
-  #externalLoginUrl = '';
-
-	async connectedCallback() {
-		super.connectedCallback();
-		if (this.customView) {
-			this.loading = true;
-      await this.loadCustomView();
-      this.loading = false;
-		}
-	}
+	#externalLoginUrl = '';
 
 	protected render() {
-		return this.loading
-			? html`<uui-button state="waiting" disabled label="Loading provider"></uui-button>`
-			: this.externalComponent ?? this.renderDefaultView();
+		return this.customView
+			? until(this.renderCustomView(), html`<uui-loader-bar></uui-loader-bar>`)
+			: this.renderDefaultView();
 	}
 
 	protected renderDefaultView() {
 		return html`
 			<form id="defaultView" method="post" action=${this.externalLoginUrl}>
-				<uui-button type="submit" name="provider" .value=${this.providerName} label="Continue with ${this.displayName}" .look=${this.buttonLook} .color=${this.buttonColor}>
+				<uui-button
+					type="submit"
+					name="provider"
+					.value=${this.providerName}
+					label="Continue with ${this.displayName}"
+					.look=${this.buttonLook}
+					.color=${this.buttonColor}>
 					<div><uui-icon name=${this.icon}></uui-icon> Continue with ${this.displayName}</div>
 				</uui-button>
 			</form>
 		`;
 	}
 
-	protected async loadCustomView() {
-    try {
-      if (!this.customView) return;
-      const customViewModule = await import(this.customView /* @vite-ignore */);
+	protected async renderCustomView() {
+		try {
+			if (!this.customView) return;
 
-      if (!customViewModule.default) throw new Error(`Custom view ${this.customView} does not export a default`);
+			const customView = await loadCustomView<ExternalLoginCustomViewElement>(this.customView);
 
-      const customView = customViewModule.default;
-      this.externalComponent = new customView() as ExternalLoginCustomViewElement;
-      this.externalComponent.displayName = this.displayName;
-      this.externalComponent.providerName = this.providerName;
-      this.externalComponent.externalLoginUrl = this.externalLoginUrl;
-    } catch (error: unknown) {
-      this.externalComponent = null;
-      console.group('[External login] Failed to load custom view');
-      console.log('Provider name', this.providerName);
-      console.log('Element reference', this);
-      console.log('Custom view', this.customView);
-      console.error('Failed to load custom view:', error);
-      console.groupEnd();
-    }
+			if (typeof customView === 'object') {
+				customView.displayName = this.displayName;
+				customView.providerName = this.providerName;
+				customView.externalLoginUrl = this.externalLoginUrl;
+			}
+
+			return renderCustomView(customView);
+		} catch (error: unknown) {
+			console.group('[External login] Failed to load custom view');
+			console.log('Provider name', this.providerName);
+			console.log('Element reference', this);
+			console.log('Custom view', this.customView);
+			console.error('Failed to load custom view:', error);
+			console.groupEnd();
+		}
 	}
 
 	static styles: CSSResultGroup = [
@@ -160,7 +152,7 @@ export class UmbLoginExternalElement extends LitElement {
 				--uui-button-padding-top-factor: 1.5;
 				--uui-button-padding-bottom-factor: 1.5;
 			}
-      #defaultView uui-button div {
+			#defaultView uui-button div {
 				/* TODO: Remove this when uui-button has setting for aligning content */
 				position: absolute;
 				left: 9px;
@@ -169,7 +161,7 @@ export class UmbLoginExternalElement extends LitElement {
 				top: 50%;
 				transform: translateY(-50%);
 			}
-      #defaultView button {
+			#defaultView button {
 				font-size: var(--uui-button-font-size);
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
@@ -187,7 +179,7 @@ export class UmbLoginExternalElement extends LitElement {
 				color: var(--uui-color-interactive);
 			}
 
-      #defaultView button:hover {
+			#defaultView button:hover {
 				color: var(--uui-color-interactive-emphasis);
 				border-color: var(--uui-color-border-standalone);
 			}
