@@ -65,7 +65,15 @@ export default class UmbAuthElement extends LitElement {
 				path: 'login',
 				component: () => {
 					const searchParams = new URLSearchParams(window.location.search);
-					const flow = searchParams.get('flow');
+					let flow = searchParams.get('flow')?.toLowerCase();
+
+          // validate
+          if (flow) {
+            if (flow === 'mfa' && !UmbAuthMainContext.Instance.isMfaEnabled) {
+              flow = undefined;
+            }
+          }
+
 					switch (flow) {
 						case 'mfa':
 							return html`<umb-mfa-page></umb-mfa-page>`;

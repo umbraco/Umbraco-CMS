@@ -7,7 +7,6 @@ export type LoginRequestModel = {
 };
 
 export interface IUmbAuthContext {
-	disableLocalLogin: boolean;
 	login(data: LoginRequestModel): Promise<LoginResponse>;
 	resetPassword(username: string): Promise<ResetPasswordResponse>;
 	validatePasswordResetCode(userId: string, resetCode: string): Promise<ValidatePasswordResetCodeResponse>;
@@ -15,9 +14,11 @@ export interface IUmbAuthContext {
 	getMfaProviders(): Promise<MfaProvidersResponse>;
 	validateMfaCode(code: string, provider: string): Promise<LoginResponse>;
 	getIcons(): Observable<Record<string, string>>;
+  disableLocalLogin: boolean;
 	supportsPersistLogin: boolean;
 	returnPath: string;
   twoFactorView?: string;
+  isMfaEnabled?: boolean;
 }
 
 export type LoginResponse = {
