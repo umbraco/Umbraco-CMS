@@ -6,7 +6,6 @@ import { UmbAuthMainContext } from './context/auth-main.context.js';
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { UmbIconRegistry } from './icon.registry.js';
 import UmbRouter from './umb-router.js';
-import './pages/mfa.pga.element.js';
 
 @customElement('umb-auth')
 export default class UmbAuthElement extends LitElement {
@@ -70,6 +69,10 @@ export default class UmbAuthElement extends LitElement {
 					switch (flow) {
 						case 'mfa':
 							return html`<umb-mfa-page></umb-mfa-page>`;
+						case 'reset-password':
+							return html`<umb-new-password-page></umb-new-password-page>`;
+						case 'invite-user':
+							return html`<umb-invite-page></umb-invite-page>`;
 
 						default:
 							return html`<umb-login-page
@@ -86,16 +89,6 @@ export default class UmbAuthElement extends LitElement {
 				path: 'login/reset',
 				component: html`<umb-reset-password-page></umb-reset-password-page>`,
 				action: () => (this.allowPasswordReset && !this.disableLocalLogin ? null : 'login'),
-			},
-			{
-				path: 'login/new',
-				component: html`<umb-new-password-page></umb-new-password-page>`,
-				action: () => (this.allowPasswordReset && !this.disableLocalLogin ? null : 'login'), //TODO: Also check if there is a reset code
-			},
-			{
-				path: 'login/invite',
-				component: html`<umb-invite-page></umb-invite-page>`,
-				action: () => (this.allowUserInvite && !this.disableLocalLogin ? null : 'login'), //TODO: Also check if there is an invite code
 			},
 		]);
 

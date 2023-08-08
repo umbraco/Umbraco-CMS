@@ -7,7 +7,6 @@ import { until } from 'lit/directives/until.js';
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { UmbAuthMainContext } from '../context/auth-main.context.js';
 import { umbLocalizationContext } from '../localization/localization-context.js';
-import UmbRouter from '../umb-router.js';
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends LitElement {
@@ -60,7 +59,7 @@ export default class UmbLoginPageElement extends LitElement {
       if (response.twoFactorView) {
         UmbAuthMainContext.Instance.twoFactorView = response.twoFactorView;
       }
-			UmbRouter.changeState('login/?flow=mfa');
+			history.pushState(null, '', 'login?flow=mfa');
 			return;
 		}
 
@@ -138,7 +137,7 @@ export default class UmbLoginPageElement extends LitElement {
 									${when(
 										this.allowPasswordReset,
 										() =>
-											html`<a id="forgot-password" href="login/reset"></a>
+											html`<a id="forgot-password" href="login/reset">
 												<umb-localize key="user_forgotPassword">Forgot password?</umb-localize>
 											</a>`
 									)}
