@@ -42,7 +42,8 @@ export default class UmbRouter {
 
 		window.history.pushState = new Proxy(window.history.pushState, {
 			apply: (target, thisArg, argArray: [data: any, unused: string, url?: string | URL | null]) => {
-				this.#host.requestUpdate();
+				const { pathname, search, hash } = new URL(argArray[2] || '', document.baseURI);
+				this.#updateUrl(pathname, search, hash, true);
 				return target.apply(thisArg, argArray);
 			},
 		});
