@@ -2,9 +2,9 @@ import { UUIButtonState, UUIInputElement, UUITextStyles } from '@umbraco-ui/uui'
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { UmbAuthMainContext } from '../context/auth-main.context';
 import { umbLocalizationContext } from '../localization/localization-context';
+import { loadCustomView, renderCustomView } from '../load-custom-view.function';
 
 type MfaCustomViewElement = HTMLElement & {
 	providers: string[];
@@ -194,19 +194,11 @@ export default class UmbMfaPageElement extends LitElement {
 		if (!view) return nothing;
 
 		try {
-			if (view.endsWith('.html')) {
-				const textContent = await fetch(view).then((response) => response.text());
-				return html` <div id="custom-view">${unsafeHTML(textContent)}</div>`;
+			const customView = await loadCustomView<MfaCustomViewElement>(view);
+			if (typeof customView === 'object') {
+				customView.providers = this.providers.map((provider) => provider.value);
 			}
-
-			const module = await import(view /* @vite-ignore */);
-
-			if (!module.default) throw new Error('No default export found');
-
-			const customView = module.default;
-			const component = new customView() as MfaCustomViewElement;
-			component.providers = this.providers.map((provider) => provider.value);
-			return component;
+			return renderCustomView(customView);
 		} catch (e) {
 			const error = e instanceof Error ? e.message : 'Unknown error';
 			console.group('[MFA login] Failed to load custom view');
