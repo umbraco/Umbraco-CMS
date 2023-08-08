@@ -85,18 +85,13 @@ export default class UmbRouter {
 		// Check if temp exists in paths or find the default path
 		const pathToUse = this.#paths.find((p) => p.path === path) || this.#paths.find((p) => p.default);
 
-		if (pathToUse) {
-			this.#currentPath = pathToUse.path;
+		path = pathToUse ? pathToUse.path : path;
 
-			replace
-				? history.replaceState({}, '', `${pathToUse.path}${search || ''}${hash || ''}`)
-				: history.pushState({}, '', `${pathToUse.path}${search || ''}${hash || ''}`);
-		} else {
-			replace
-				? history.replaceState({}, '', `${path}${search || ''}${hash || ''}`)
-				: history.pushState({}, '', `${path}${search || ''}${hash || ''}`);
-		}
+		replace
+			? history.replaceState({}, '', `${path}${search || ''}${hash || ''}`)
+			: history.pushState({}, '', `${path}${search || ''}${hash || ''}`);
 
+		this.#currentPath = path;
 		this.#currentSearch = search;
 		this.#currentHash = hash;
 
@@ -104,18 +99,13 @@ export default class UmbRouter {
 	}
 
 	#onPopState(event: PopStateEvent) {
-		console.log('popstate');
-
 		event.preventDefault();
-		event.stopImmediatePropagation();
 
 		const { pathname, search, hash } = window.location;
 		this.#updateUrl(pathname, search, hash, true);
 	}
 
 	#onClick(event: any) {
-		console.log('click');
-
 		if (event.defaultPrevented) return;
 
 		if (this.#isModifierKeyPressed(event)) return;
