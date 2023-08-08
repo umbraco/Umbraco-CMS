@@ -6,7 +6,6 @@ import { UmbAuthMainContext } from './context/auth-main.context.js';
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { UmbIconRegistry } from './icon.registry.js';
 import UmbRouter from './umb-router.js';
-import './pages/mfa.pga.element.js';
 
 @customElement('umb-auth')
 export default class UmbAuthElement extends LitElement {

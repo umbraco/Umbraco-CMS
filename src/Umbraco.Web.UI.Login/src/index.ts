@@ -9,6 +9,7 @@ import './auth-layout.element.js';
 
 import './pages/reset-password.page.element.js';
 import './pages/new-password.page.element.js';
+import './pages/mfa.page.element.js';
 import './pages/login.page.element.js';
 import './pages/invite.page.element.js';
 
