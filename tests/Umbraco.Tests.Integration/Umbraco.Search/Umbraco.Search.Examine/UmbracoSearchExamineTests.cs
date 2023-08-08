@@ -16,7 +16,7 @@ using Umbraco.Search.Examine.Lucene.DependencyInjection;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Umbraco.Search.Examine;
 
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class UmbracoSearchExamineTests : UmbracoSearchTests
 {
     protected override void ConfigureServices(IServiceCollection services)

@@ -8,7 +8,7 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.baseTests;
 
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class UmbracoSearchTests : UmbracoSearchBaseTests
 {
     [Test]

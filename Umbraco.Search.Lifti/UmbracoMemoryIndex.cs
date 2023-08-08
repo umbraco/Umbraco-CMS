@@ -18,8 +18,7 @@ public class UmbracoMemoryIndex<T> : IUmbracoIndex<T> where T : IUmbracoEntity
     public void IndexItems(T[] members)
     {
         var valueSets = _valueSetBuilder.GetValueSets(members);
-        var t = Task.Factory.StartNew(async () => await   _index?.LiftiIndex.AddRangeAsync(valueSets)!);
-
+        var t = Task.Factory.StartNew(async () => await  _index?.LiftiIndex.AddRangeAsync(valueSets)!);
         t.Result.Wait();
         t.Wait();
     }

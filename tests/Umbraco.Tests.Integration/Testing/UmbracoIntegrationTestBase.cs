@@ -135,8 +135,9 @@ public abstract class UmbracoIntegrationTestBase
     {
         // It's just been pulled from container and wasn't used to create test database
         Assert.IsFalse(factory.Configured);
+        Assert.IsNotNull(meta);
 
-        factory.Configure(meta.ToStronglyTypedConnectionString());
+        factory.Configure(meta?.ToStronglyTypedConnectionString());
         connectionStrings.CurrentValue.ConnectionString = meta.ConnectionString;
         connectionStrings.CurrentValue.ProviderName = meta.Provider;
         state.DetermineRuntimeLevel();
