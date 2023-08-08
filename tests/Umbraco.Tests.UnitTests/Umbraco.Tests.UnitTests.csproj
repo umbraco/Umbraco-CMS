@@ -12,6 +12,8 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="System.Data.Odbc" Version="8.0.0-preview.5.*" />
     <PackageReference Include="System.Data.OleDb" Version="8.0.0-preview.5.*" />
+    <PackageReference Include="System.Data.Odbc" Version="8.0.0-preview.6.*" />
+    <PackageReference Include="System.Data.OleDb" Version="8.0.0-preview.6.*" />
   </ItemGroup>
 
   <ItemGroup>

@@ -291,7 +291,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             using (var scope = _scopeProvider.CreateCoreScope())
             {
                 var result = CreateSchemaAndData(scope);
-                scope.Notifications.Publish(new DatabaseSchemaAndDataCreatedNotification());
+                if (result?.Success is true)
+                {
+                    scope.Notifications.Publish(new DatabaseSchemaAndDataCreatedNotification(result!.RequiresUpgrade));
+                }
                 scope.Complete();
                 return result;
             }
