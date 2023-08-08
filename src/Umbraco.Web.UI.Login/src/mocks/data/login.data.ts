@@ -9,18 +9,12 @@ class UmbLoginData {
 			};
 		else if (user.twoFactor)
 			return {
-				data: `
-				<div>
-					<h3>Custom Two Factor</h3>
-					<p>Enter the code from your authenticator app</p>
-					<uui-input></uui-input>
-				</div>
-				`,
+				data: user,
 				status: 402,
 			};
 		else
 			return {
-				data: user.id,
+				data: user,
 				status: 200,
 			};
 	}
@@ -52,6 +46,22 @@ class UmbLoginData {
 		},
 		{
 			id: '2',
+			name: '2fa',
+			email: '2fa@umbraco.com',
+			password: 'html',
+			twoFactor: true,
+			twoFactorView: 'src/mocks/customViews/my-custom-view.html',
+		},
+		{
+			id: '3',
+			name: '2fa',
+			email: '2fa@umbraco.com',
+			password: 'js',
+			twoFactor: true,
+			twoFactorView: 'src/mocks/customViews/my-custom-view.js',
+		},
+		{
+			id: '4',
 			name: 'test',
 			email: 'test@umbraco.com',
 			password: 'test',

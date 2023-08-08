@@ -10,34 +10,34 @@ export class UmbAuthLegacyRepository {
 	readonly #authURL = 'backoffice/umbracoapi/authentication/postlogin';
 
 	public async login(data: LoginRequestModel): Promise<LoginResponse> {
-    try {
-      const request = new Request(this.#authURL, {
-        method: 'POST',
-        body: JSON.stringify({
-          username: data.username,
-          password: data.password,
-          rememberMe: data.persist,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const response = await fetch(request);
+		try {
+			const request = new Request(this.#authURL, {
+				method: 'POST',
+				body: JSON.stringify({
+					username: data.username,
+					password: data.password,
+					rememberMe: data.persist,
+				}),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			const response = await fetch(request);
 
-      const text = await response.text();
-      const responseData = JSON.parse(this.#removeAngularJSResponseData(text));
+			const text = await response.text();
+			const responseData = JSON.parse(this.#removeAngularJSResponseData(text));
 
-      return {
-        status: response.status,
-        error: response.ok ? undefined : this.#getErrorText(response),
-        twoFactorView: responseData.twoFactorView,
-      };
-    } catch (error) {
-      return {
-        status: 500,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      }
-    }
+			return {
+				status: response.status,
+				error: response.ok ? undefined : this.#getErrorText(response),
+				twoFactorView: responseData?.twoFactorView,
+			};
+		} catch (error) {
+			return {
+				status: 500,
+				error: error instanceof Error ? error.message : 'Unknown error',
+			};
+		}
 	}
 
 	public async resetPassword(email: string): Promise<ResetPasswordResponse> {
@@ -106,23 +106,23 @@ export class UmbAuthLegacyRepository {
 		});
 		const response = await fetch(request);
 
-    // Check if response contains AngularJS response data
-    if (response.ok) {
-      let text = await response.text();
-      text = this.#removeAngularJSResponseData(text);
-      const providers = JSON.parse(text);
+		// Check if response contains AngularJS response data
+		if (response.ok) {
+			let text = await response.text();
+			text = this.#removeAngularJSResponseData(text);
+			const providers = JSON.parse(text);
 
-      return {
-        status: response.status,
-        providers,
-      };
-    }
+			return {
+				status: response.status,
+				providers,
+			};
+		}
 
-    return {
-      status: response.status,
-      error: this.#getErrorText(response),
-      providers: [],
-    };
+		return {
+			status: response.status,
+			error: this.#getErrorText(response),
+			providers: [],
+		};
 	}
 
 	public async validateMfaCode(code: string, provider: string): Promise<LoginResponse> {
@@ -139,16 +139,16 @@ export class UmbAuthLegacyRepository {
 
 		const response = await fetch(request);
 
-    if (response.ok) {
-      return {
-        status: response.status
-      }
-    }
+		if (response.ok) {
+			return {
+				status: response.status,
+			};
+		}
 
-    let text = await response.text();
-    text = this.#removeAngularJSResponseData(text);
+		let text = await response.text();
+		text = this.#removeAngularJSResponseData(text);
 
-    const data = JSON.parse(text);
+		const data = JSON.parse(text);
 
 		return {
 			status: response.status,
@@ -175,14 +175,14 @@ export class UmbAuthLegacyRepository {
 		}
 	}
 
-  /**
-   * AngularJS adds a prefix to the response data, which we need to remove
-   */
-  #removeAngularJSResponseData(text: string) {
-    if (text.startsWith(')]}\',\n')) {
-      text = text.split('\n')[1];
-    }
+	/**
+	 * AngularJS adds a prefix to the response data, which we need to remove
+	 */
+	#removeAngularJSResponseData(text: string) {
+		if (text.startsWith(")]}',\n")) {
+			text = text.split('\n')[1];
+		}
 
-    return text;
-  }
+		return text;
+	}
 }
