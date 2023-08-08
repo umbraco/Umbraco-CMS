@@ -116,7 +116,7 @@
 		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile dist-cms/vscode-html-custom-data.json",
 		"new-extension": "plop  --plopfile ./devops/plop/plop.js",
 		"compile": "tsc",
-		"check": "npm run lint && npm run compile && npm run build-storybook",
+		"check": "npm run lint:errors && npm run compile && npm run build-storybook && npm run generate:jsonschema:dist",
 		"prepublishOnly": "node ./devops/publish/cleanse-pkg.js"
 	},
 	"engines": {
