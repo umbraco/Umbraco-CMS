@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.Lifti.SpecialisedSearchers;
 using Umbraco.Search.Services;
+using Umbraco.Search.ValueSet;
 using Umbraco.Search.ValueSet.ValueSetBuilders;
 using IBackOfficeExamineSearcher = Umbraco.Search.SpecialisedSearchers.IBackOfficeExamineSearcher;
 using IContentValueSetBuilder = Umbraco.Search.ValueSet.ValueSetBuilders.IContentValueSetBuilder;
@@ -17,20 +18,8 @@ public static class UmbracoBuilderExtensions
 {
     public static IServiceCollection RegisterIndexExternal(this IServiceCollection services)
     {
-        services.AddInMemoryIndex<IContent,IContentValueSetBuilder>(Constants.UmbracoIndexes
+        services.AddInMemoryIndex<IContent, IContentValueSetBuilder>(Constants.UmbracoIndexes
             .ExternalIndexName);
-        services.AddSingleton<ILiftiIndex>(serviceCollection => new UmbracoLiftiIndex(Constants
-                .UmbracoIndexes
-                .ExternalIndexName,
-            new FullTextIndexBuilder<string>()
-                .Build()));
-        services.AddSingleton<IUmbracoSearcher>(serviceCollection =>
-            new UmbracoMemorySearcher<IContent>(serviceCollection.GetRequiredService<ILiftiIndexManager>().GetIndex(
-                Constants
-                    .UmbracoIndexes
-                    .ExternalIndexName), Constants
-                .UmbracoIndexes
-                .ExternalIndexName));
         return services;
     }
 
@@ -44,25 +33,31 @@ public static class UmbracoBuilderExtensions
     /// <summary>
     /// Registers an Examine index
     /// </summary>
-    public static IServiceCollection AddInMemoryIndex<TIndexedModelType,TValueSetBuilder>(
+    public static IServiceCollection AddInMemoryIndex<TIndexedModelType, TValueSetBuilder>(
         this IServiceCollection serviceCollection,
-        string name) where TIndexedModelType : IUmbracoEntity where TValueSetBuilder : notnull, IValueSetBuilder<TIndexedModelType>
+        string name) where TIndexedModelType : IUmbracoEntity
+        where TValueSetBuilder : notnull, IValueSetBuilder<TIndexedModelType>
     {
         serviceCollection.AddSingleton<ILiftiIndex>(serviceCollection => new UmbracoLiftiIndex(name,
             new FullTextIndexBuilder<string>()
+                .WithObjectTokenization<UmbracoValueSet>(o => o
+                    .WithKey(c => c.Id)
+                    .WithDynamicFields("Fields", c => c.Values?.ToDictionary(x => x.Key, x => x.Value.Select(x=>x.ToString()))!))
                 .Build()));
         serviceCollection.AddSingleton<IUmbracoIndex>(serviceCollection =>
-            new UmbracoMemoryIndex<TIndexedModelType>(serviceCollection.GetRequiredService<ILiftiIndexManager>().GetIndex(name),
+            new UmbracoMemoryIndex<TIndexedModelType>(
+                serviceCollection.GetRequiredService<ILiftiIndexManager>().GetIndex(name),
                 serviceCollection.GetRequiredService<TValueSetBuilder>()));
         serviceCollection.AddSingleton<IUmbracoSearcher>(serviceCollection =>
-            new UmbracoMemorySearcher<TIndexedModelType>(serviceCollection.GetRequiredService<ILiftiIndexManager>().GetIndex(name),
+            new UmbracoMemorySearcher<TIndexedModelType>(
+                serviceCollection.GetRequiredService<ILiftiIndexManager>().GetIndex(name),
                 name));
         return serviceCollection;
     }
 
     public static IServiceCollection RegisterIndexMember(this IServiceCollection services)
     {
-        services.AddInMemoryIndex<IMember,IValueSetBuilder<IMember>>(Constants.UmbracoIndexes
+        services.AddInMemoryIndex<IMember, IValueSetBuilder<IMember>>(Constants.UmbracoIndexes
             .MembersIndexName);
         return services;
     }

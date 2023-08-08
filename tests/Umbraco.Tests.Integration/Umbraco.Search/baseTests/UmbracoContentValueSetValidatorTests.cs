@@ -10,9 +10,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Search.ValueSet;
 using Umbraco.Search.ValueSet.Validators;
-using Umbraco.Search.ValueSet.ValueSetBuilders;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Examine;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.baseTests;
 
 [TestFixture]
 public class UmbracoContentValueSetValidatorTests
@@ -99,7 +98,7 @@ public class UmbracoContentValueSetValidatorTests
             new[] { "hello", "world" },
             null);
 
-        var UmbracoValueSet = Search.ValueSet.UmbracoValueSet.FromObject(
+        var UmbracoValueSet = global::Umbraco.Search.ValueSet.UmbracoValueSet.FromObject(
             "555",
             IndexTypes.Content,
             "test-content",
@@ -123,7 +122,7 @@ public class UmbracoContentValueSetValidatorTests
             null,
             new[] { "hello", "world" });
 
-        var UmbracoValueSet = Search.ValueSet.UmbracoValueSet.FromObject(
+        var UmbracoValueSet = global::Umbraco.Search.ValueSet.UmbracoValueSet.FromObject(
             "555",
             IndexTypes.Content,
             "test-content",
@@ -147,7 +146,7 @@ public class UmbracoContentValueSetValidatorTests
             new[] { "hello", "world" },
             new[] { "world" });
 
-        var UmbracoValueSet = Search.ValueSet.UmbracoValueSet.FromObject(
+        var UmbracoValueSet = global::Umbraco.Search.ValueSet.UmbracoValueSet.FromObject(
             "555",
             IndexTypes.Content,
             "test-content",

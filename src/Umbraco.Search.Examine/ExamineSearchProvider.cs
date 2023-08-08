@@ -33,7 +33,7 @@ public class ExamineSearchProvider : ISearchProvider
         return GetIndex(index) as IUmbracoIndex<T>;
     }
 
-    public IUmbracoSearcher? GetSearcher(string index) => _searchers.FirstOrDefault(x => x.Name == index);
+    public IUmbracoSearcher? GetSearcher(string index) => _searchers.FirstOrDefault(x => x.Name.Replace("Searcher","").Replace("Index","").ToLowerInvariant() == index.Replace("Searcher","").Replace("Index","").ToLowerInvariant());
 
     public IUmbracoSearcher<T>? GetSearcher<T>(string index)
     {

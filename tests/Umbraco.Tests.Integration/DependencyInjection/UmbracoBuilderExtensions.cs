@@ -51,7 +51,6 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddUnique(Mock.Of<IUmbracoBootPermissionChecker>());
         builder.Services.AddUnique(testHelper.MainDom);
         builder.Services.AddSearchServices();
-        builder.Services.AddInMemoryServices();
         builder.Services.AddUnique<IIndexRebuilder, TestBackgroundIndexRebuilder>();
         builder.Services.AddUnique(factory => Mock.Of<IRuntimeMinifier>());
 
