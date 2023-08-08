@@ -1,10 +1,14 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -14,12 +18,22 @@ internal sealed class BlockValuePropertyIndexValueFactory :
 {
     private readonly IContentTypeService _contentTypeService;
 
+    public BlockValuePropertyIndexValueFactory(
+        PropertyEditorCollection propertyEditorCollection,
+        IContentTypeService contentTypeService,
+        IJsonSerializer jsonSerializer,
+        IOptionsMonitor<IndexCreatorSettings> indexCreatorSettings)
+        : base(propertyEditorCollection, jsonSerializer, indexCreatorSettings)
+    {
+        _contentTypeService = contentTypeService;
+    }
 
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 14.")]
     public BlockValuePropertyIndexValueFactory(
         PropertyEditorCollection propertyEditorCollection,
         IContentTypeService contentTypeService,
         IJsonSerializer jsonSerializer)
-        : base(propertyEditorCollection, jsonSerializer)
+        : this(propertyEditorCollection, contentTypeService, jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexCreatorSettings>>())
     {
         _contentTypeService = contentTypeService;
     }

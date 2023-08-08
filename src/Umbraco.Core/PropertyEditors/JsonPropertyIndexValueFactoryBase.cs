@@ -1,5 +1,9 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -11,13 +15,28 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IPropertyIndexValueFactory
 {
     private readonly IJsonSerializer _jsonSerializer;
+    private IndexCreatorSettings _indexCreatorSettings;
+
+    protected bool ForceExplicitlyIndexEachNestedProperty { get; set; }
 
     /// <summary>
     ///  Constructor for the JsonPropertyIndexValueFactoryBase.
     /// </summary>
-    protected JsonPropertyIndexValueFactoryBase(IJsonSerializer jsonSerializer)
+    protected JsonPropertyIndexValueFactoryBase(IJsonSerializer jsonSerializer, IOptionsMonitor<IndexCreatorSettings> indexCreatorSettings)
     {
         _jsonSerializer = jsonSerializer;
+        _indexCreatorSettings = indexCreatorSettings.CurrentValue;
+        indexCreatorSettings.OnChange(x => _indexCreatorSettings = x);
+    }
+
+
+    /// <summary>
+    ///  Constructor for the JsonPropertyIndexValueFactoryBase.
+    /// </summary>
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 14.")]
+    protected JsonPropertyIndexValueFactoryBase(IJsonSerializer jsonSerializer): this(jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexCreatorSettings>>())
+    {
+
     }
 
     /// <inheritdoc />
@@ -58,9 +77,14 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
             }
         }
 
-        result.AddRange(HandleResume(result, property, culture, segment, published));
+        IEnumerable<KeyValuePair<string, IEnumerable<object?>>> summary = HandleResume(result, property, culture, segment, published);
+        if (_indexCreatorSettings.ExplicitlyIndexEachNestedProperty || ForceExplicitlyIndexEachNestedProperty)
+        {
+            result.AddRange(summary);
+            return result;
+        }
 
-        return result;
+        return summary;
     }
 
     [Obsolete("Use method overload that has availableCultures, scheduled for removal in v14")]
@@ -68,7 +92,7 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
         => GetIndexValues(property, culture, segment, published, Enumerable.Empty<string>());
 
     /// <summary>
-    ///  Method to return a list of resume of the content. By default this returns an empty list
+    ///  Method to return a list of summary of the content. By default this returns an empty list
     /// </summary>
     protected virtual IEnumerable<KeyValuePair<string, IEnumerable<object?>>> HandleResume(
         List<KeyValuePair<string, IEnumerable<object?>>> result,
