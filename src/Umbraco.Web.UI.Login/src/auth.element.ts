@@ -122,6 +122,8 @@ export default class UmbAuthElement extends LitElement {
 	render() {
 		return html`
 			<umb-auth-layout backgroundImage=${ifDefined(this.backgroundImage)} logoImage=${ifDefined(this.logoImage)}>
+				<button @click=${() => UmbRouter.redirect('?flow=mfa')}>MFA</button>
+				<button @click=${() => UmbRouter.redirect('?flow=reset-password')}>RESET</button>
 				${this.router?.render()}
 			</umb-auth-layout>
 		`;
