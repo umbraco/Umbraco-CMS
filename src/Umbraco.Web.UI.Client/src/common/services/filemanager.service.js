@@ -15,6 +15,17 @@ function fileManager($rootScope) {
 
     var mgr = {
         /**
+         * @ngdoc property
+         * @name umbraco.services.fileManager#maxFileSize
+         * @propertyOf umbraco.services.fileManager
+         * @type {Number}
+         * @default 0
+         * @description
+         * The max file size allowed to be uploaded to the server in bytes
+         */
+        maxFileSize: parseInt(Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize ?? '0', 10) * 1000,
+
+        /**
          * @ngdoc function
          * @name umbraco.services.fileManager#setFiles
          * @methodOf umbraco.services.fileManager
