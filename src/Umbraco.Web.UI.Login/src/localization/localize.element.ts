@@ -1,5 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { umbLocalizationContext } from './localization-context.ts';
 
 /**
@@ -37,7 +38,7 @@ export class UmbLocalizeElement extends LitElement {
 	}
 
 	render() {
-		return this.value ? html`${this.value}` : html`<slot></slot>`;
+		return this.value ? html`${unsafeHTML(this.value)}` : html`<slot></slot>`;
 	}
 }
 
