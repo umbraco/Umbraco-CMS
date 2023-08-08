@@ -10,23 +10,34 @@ export class UmbAuthLegacyRepository {
 	readonly #authURL = 'backoffice/umbracoapi/authentication/postlogin';
 
 	public async login(data: LoginRequestModel): Promise<LoginResponse> {
-		const request = new Request(this.#authURL, {
-			method: 'POST',
-			body: JSON.stringify({
-				username: data.username,
-				password: data.password,
-				rememberMe: data.persist,
-			}),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-		const response = await fetch(request);
+    try {
+      const request = new Request(this.#authURL, {
+        method: 'POST',
+        body: JSON.stringify({
+          username: data.username,
+          password: data.password,
+          rememberMe: data.persist,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const response = await fetch(request);
 
-		return {
-			status: response.status,
-			error: response.ok ? undefined : this.#getErrorText(response),
-		};
+      const text = await response.text();
+      const responseData = JSON.parse(this.#removeAngularJSResponseData(text));
+
+      return {
+        status: response.status,
+        error: response.ok ? undefined : this.#getErrorText(response),
+        twoFactorView: responseData.twoFactorView,
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    }
 	}
 
 	public async resetPassword(email: string): Promise<ResetPasswordResponse> {
