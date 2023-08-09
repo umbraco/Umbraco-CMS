@@ -152,6 +152,7 @@ public class CoreRuntime : IRuntime
         // Store token, so we can re-use this during restart
         _cancellationToken = cancellationToken;
 
+        _logger.LogError("cancellationToken: {0}",_cancellationToken.GetHashCode());
         // Just in-case HostBuilder.ConfigureUmbracoDefaults() isn't used (e.g. upgrade from 9 and ignored advice).
         if (StaticServiceProvider.Instance == null!)
         {
@@ -228,6 +229,7 @@ public class CoreRuntime : IRuntime
 
     private async Task StopAsync(CancellationToken cancellationToken, bool isRestarting)
     {
+        _logger.LogError("cancellationToken: {0}",_cancellationToken.GetHashCode());
         _components.Terminate();
         await _eventAggregator.PublishAsync(
             new UmbracoApplicationStoppingNotification(isRestarting),

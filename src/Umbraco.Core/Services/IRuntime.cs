@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Defines the Umbraco runtime.
 /// </summary>
-public interface IRuntime : IHostedService
+public interface IRuntime
 {
     /// <summary>
     ///     Gets the runtime state.
@@ -16,4 +16,7 @@ public interface IRuntime : IHostedService
     ///     Stops and Starts the runtime using the original cancellation token.
     /// </summary>
     Task RestartAsync();
+
+    Task StartAsync(CancellationToken cancellationToken);
+    Task StopAsync(CancellationToken cancellationToken);
 }

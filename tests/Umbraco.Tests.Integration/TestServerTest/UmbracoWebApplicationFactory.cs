@@ -25,6 +25,7 @@ public class UmbracoWebApplicationFactory<TStartup> : WebApplicationFactory<TSta
     {
         var host = builder.Build();
 
+
         _beforeStart?.Invoke(host);
 
         host.Start();

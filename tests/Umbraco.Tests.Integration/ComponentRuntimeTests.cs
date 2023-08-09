@@ -31,6 +31,9 @@ public class ComponentRuntimeTests : UmbracoIntegrationTest
         var mainDom = Services.GetRequiredService<IMainDom>();
         var components = Services.GetRequiredService<ComponentCollection>();
 
+        // start the runtime
+        await runtime.StartAsync(CancellationToken.None);
+
         var myComponent = components.OfType<MyComponent>().First();
 
         Assert.IsTrue(mainDom.IsMainDom);
