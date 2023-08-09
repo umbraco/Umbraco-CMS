@@ -98,10 +98,10 @@ export class UmbAuthLegacyRepository {
 	}
 
 	public async newInvitedUserPassword(newPassWord: string): Promise<LoginResponse> {
-		const request = new Request('backoffice/umbracoapi/currentUser/PostSetInvitedUserPassword', {
+		const request = new Request('backoffice/umbracoapi/authentication/PostSetInvitedUserPassword', {
 			method: 'POST',
 			body: JSON.stringify({
-				newPassWord,
+        newPassWord,
 			}),
 			headers: {
 				'Content-Type': 'application/json',
