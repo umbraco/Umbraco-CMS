@@ -1085,7 +1085,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         // but since we can be saving an alternate version, we still need the name of the current
         // to ensure the saved nodeDto keeps the correct name
         IEnumerable<ContentVersionDto> versionAndCurrent = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>()
-            .From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == entity.VersionId || x.Current));
+            .From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == entity.VersionId || (x.NodeId == entity.Id && x.Current)));
 
         ContentVersionDto? version = versionAndCurrent.FirstOrDefault(x => x.Id == entity.VersionId);
         string? currentName = versionAndCurrent.FirstOrDefault(x => x.Current)?.Text;
