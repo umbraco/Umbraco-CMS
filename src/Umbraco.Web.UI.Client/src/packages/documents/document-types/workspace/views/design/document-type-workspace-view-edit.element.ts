@@ -117,7 +117,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	}
 
 	#requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
-		const LocalMessage: UmbConfirmModalData = {
+		const Message: UmbConfirmModalData = {
 			headline: 'Delete tab',
 			content: html`Are you sure you want to delete the tab (${tab?.name || tab?.id})?
 				<div style="color:var(--uui-color-danger-emphasis)">
@@ -127,18 +127,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			color: 'danger',
 		};
 
-		const ComposedMessage: UmbConfirmModalData = {
-			headline: 'Remove composed tab',
-			content: html`This tab is a composed tab. Are you sure you want to remove the composed tab
-			(${tab?.name || tab?.id})?`,
-			confirmLabel: 'Remove',
-			color: 'danger',
-		};
-
 		// TODO: If this tab is composed of other tabs, then notify that it will only delete the local tab.
-		const modalHandler = this._tabsStructureHelper?.isOwnerContainer(tab?.id)
-			? this._modalManagerContext?.open(UMB_CONFIRM_MODAL, LocalMessage)
-			: this._modalManagerContext?.open(UMB_CONFIRM_MODAL, ComposedMessage);
+
+		const modalHandler = this._modalManagerContext?.open(UMB_CONFIRM_MODAL, Message);
 
 		modalHandler?.onSubmit().then(() => {
 			this.#remove(tab?.id);
@@ -243,12 +234,12 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 												</uui-button>
 											</uui-input>
 									  `
-									: html` <span class="no-edit">
-												${!this._tabsStructureHelper.isOwnerContainer(tab.id!)
-													? html`<uui-icon name="umb:merge"></uui-icon>`
-													: ''}
-												${tab.name}
-											</span>
+									: !this._tabsStructureHelper.isOwnerContainer(tab.id!)
+									? html` <span class="no-edit">
+											<uui-icon name="umb:merge"></uui-icon>
+											${tab.name}
+									  </span>`
+									: html` <span class="no-edit">${tab.name}</span>
 											<uui-button class="trash" label="Remove tab" @click=${() => this.#requestRemoveTab(tab)} compact>
 												<uui-icon name="umb:trash"></uui-icon>
 											</uui-button>`}
@@ -269,9 +260,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				<uui-icon name="umb:merge"></uui-icon>
 				Compositions
 			</uui-button>
-			<uui-button label="Recorder" compact>
+			<uui-button label="Reorder" compact>
 				<uui-icon name="umb:navigation"></uui-icon>
-				Recorder
+				Reorder
 			</uui-button>
 		</div>`;
 	}
