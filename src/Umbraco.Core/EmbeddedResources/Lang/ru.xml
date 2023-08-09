@@ -1703,8 +1703,7 @@
     <key alias="usergroup">Группа пользователей</key>
     <key alias="userInvited"> был приглашен</key>
     <key alias="userInvitedSuccessHelp">Новому пользователю было отправлено приглашение, в котором содержатся инструкции для входа в панель Umbraco.</key>
-    <key alias="userinviteWelcomeMessage">Здравствуйте и добро пожаловать в Umbraco! Все будет готово в течении пары минут, нам лишь нужно задать Ваш пароль для входа и добавить аватар.</key>
-    <key alias="userinviteAvatarMessage">Загрузите изображение, это поможет другим пользователям идентифицировать Вас.</key>
+    <key alias="userinviteWelcomeMessage">Здравствуйте и добро пожаловать в Umbraco! Все будет готово в течении пары минут, нам лишь нужно задать Ваш пароль для входа.</key>
     <key alias="userManagement">Управление пользователями</key>
     <key alias="userPermissions">Разрешения для пользователя</key>
     <key alias="writer">Автор</key>

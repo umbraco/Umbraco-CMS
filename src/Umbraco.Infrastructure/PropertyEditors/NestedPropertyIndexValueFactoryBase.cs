@@ -1,8 +1,12 @@
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -11,12 +15,23 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
 
+
+    protected NestedPropertyIndexValueFactoryBase(
+        PropertyEditorCollection propertyEditorCollection,
+        IJsonSerializer jsonSerializer,
+        IOptionsMonitor<IndexingSettings> indexingSettings)
+        : base(jsonSerializer, indexingSettings)
+    {
+        _propertyEditorCollection = propertyEditorCollection;
+    }
+
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 14.")]
     protected NestedPropertyIndexValueFactoryBase(
         PropertyEditorCollection propertyEditorCollection,
         IJsonSerializer jsonSerializer)
-        : base(jsonSerializer)
+        : this(propertyEditorCollection, jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
     {
-        _propertyEditorCollection = propertyEditorCollection;
+
     }
 
     [Obsolete("Use the overload that specifies availableCultures, scheduled for removal in v14")]
