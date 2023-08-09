@@ -192,10 +192,12 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
     /// </summary>
     /// <param name="newPassword"></param>
     /// <returns></returns>
+    /// <seealso cref="AuthenticationController.PostSetInvitedUserPassword"/>
     /// <remarks>
     ///     This only works when the user is logged in (partially)
     /// </remarks>
     [AllowAnonymous]
+    [Obsolete("This is no longer used and will be removed in future versions. Use the AuthenticationController.PostSetInvitedUserPassword instead.")]
     public async Task<ActionResult<UserDetail?>> PostSetInvitedUserPassword([FromBody] string newPassword)
     {
         var userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().ResultOr(0).ToString();
