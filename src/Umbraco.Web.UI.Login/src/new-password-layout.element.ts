@@ -15,6 +15,8 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 		event.preventDefault();
 		const form = event.target as HTMLFormElement;
 
+		this.confirmPasswordElement.setCustomValidity('');
+
 		if (!form) return;
 		if (!form.checkValidity()) return;
 
