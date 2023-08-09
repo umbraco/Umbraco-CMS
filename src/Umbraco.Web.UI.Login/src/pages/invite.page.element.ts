@@ -31,7 +31,7 @@ export default class UmbInvitePageElement extends LitElement {
 	}
 
 	render() {
-		html`<umb-new-password-layout
+		return html`<umb-new-password-layout
 			@submit=${this.#onSubmit}
 			.state=${this.state}
 			.error=${this.error}></umb-new-password-layout>`;
