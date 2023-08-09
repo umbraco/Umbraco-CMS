@@ -1,6 +1,6 @@
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { CSSResultGroup, LitElement, css, html } from 'lit';
+import { CSSResultGroup, LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbAuthMainContext } from '../context/auth-main.context';
 import { when } from 'lit/directives/when.js';
@@ -9,6 +9,9 @@ import { when } from 'lit/directives/when.js';
 export default class UmbResetPasswordPageElement extends LitElement {
 	@state()
 	resetCallState: UUIButtonState = undefined;
+
+	@state()
+	error = '';
 
 	#handleResetSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
@@ -22,12 +25,8 @@ export default class UmbResetPasswordPageElement extends LitElement {
 
 		this.resetCallState = 'waiting';
 		const response = await UmbAuthMainContext.Instance.resetPassword(username);
-
-		if (response.status === 200) {
-			this.resetCallState = 'success';
-		} else {
-			this.resetCallState = 'failed';
-		}
+		this.resetCallState = response.status === 200 ? 'success' : 'failed';
+		this.error = response.error || '';
 	};
 
 	#renderResetPage() {
@@ -52,15 +51,7 @@ export default class UmbResetPasswordPageElement extends LitElement {
 							required-message="Email is required"></uui-input>
 					</uui-form-layout-item>
 
-					${when(
-						this.resetCallState === 'success',
-						() => html`
-							<span>
-								An email with password reset instructions will be sent to the specified address if it matched our
-								records
-							</span>
-						`
-					)}
+					${this.#renderErrorMessage()}
 
 					<uui-button
 						type="submit"
@@ -73,6 +64,12 @@ export default class UmbResetPasswordPageElement extends LitElement {
 
 			<umb-back-to-login-button style="margin-top: var(--uui-size-space-6)"></umb-back-to-login-button>
 		`;
+	}
+
+	#renderErrorMessage() {
+		if (!this.error || this.resetCallState !== 'failed') return nothing;
+
+		return html`<span class="text-danger">${this.error}</span>`;
 	}
 
 	#renderConfirmationPage() {
