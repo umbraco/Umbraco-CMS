@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { CSSResultGroup, LitElement, css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-@customElement('umb-confirmation-layout')
-export default class UmbConfirmationLayoutElement extends LitElement {
+@customElement('umb-error-layout')
+export default class UmbErrorLayoutElement extends LitElement {
 	@property({ type: String })
 	header = '';
 
@@ -16,9 +16,6 @@ export default class UmbConfirmationLayoutElement extends LitElement {
 				<h2>${this.header}</h2>
 				<span>${this.message}</span>
 			</div>
-
-			<uui-button type="submit" label="Login" look="primary" color="default" href="login"></uui-button>
-
 			<slot></slot>
 		`;
 	}
@@ -46,18 +43,12 @@ export default class UmbConfirmationLayoutElement extends LitElement {
 				font-weight: bold;
 				font-size: 1.4rem;
 			}
-			uui-button {
-				width: 100%;
-				margin-top: var(--uui-size-space-5);
-				--uui-button-padding-top-factor: 1.5;
-				--uui-button-padding-bottom-factor: 1.5;
-			}
 		`,
 	];
 }
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-confirmation-layout': UmbConfirmationLayoutElement;
+		'umb-error-layout': UmbErrorLayoutElement;
 	}
 }

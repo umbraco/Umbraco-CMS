@@ -18,3 +18,4 @@ import './login-external.element.js';
 
 import './new-password-layout.element.js';
 import './confirmation-layout.element.js';
+import './error-layout.element.js';

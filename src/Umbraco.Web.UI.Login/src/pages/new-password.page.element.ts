@@ -35,10 +35,9 @@ export default class UmbNewPasswordPageElement extends LitElement {
 			case 'new':
 				return html`<umb-new-password-layout @submit=${this.#onSubmit} .state=${this.state}></umb-new-password-layout>`;
 			case 'done':
-				return html`<umb-confirmation-layout>
-					<span slot="header">Success!</span>
-					<span>Your password has been successfully updated</span>
-				</umb-confirmation-layout>`;
+				return html`<umb-confirmation-layout
+					header="Success!"
+					message="Your password has been successfully updated"></umb-confirmation-layout>`;
 			case 'error':
 				return html`ERROR PAGE`;
 		}

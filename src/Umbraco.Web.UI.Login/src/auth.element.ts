@@ -66,6 +66,23 @@ export default class UmbAuthElement extends LitElement {
 				component: () => {
 					const searchParams = new URLSearchParams(window.location.search);
 					let flow = searchParams.get('flow')?.toLowerCase();
+					const status = searchParams.get('status');
+
+					if (status === 'resetCodeExpired') {
+						return html` <umb-error-layout
+							header="Reset code expired"
+							message="Password reset links are only valid for a limited time for security reasons. To reset your password, please
+						request a new reset link.">
+							<uui-button
+								type="submit"
+								label="Request new link"
+								look="primary"
+								color="default"
+								href="login/reset"></uui-button>
+
+							<umb-back-to-login-button></umb-back-to-login-button>
+						</umb-error-layout>`;
+					}
 
 					// validate
 					if (flow) {

@@ -1,6 +1,6 @@
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { CSSResultGroup, LitElement, PropertyValueMap, css, html } from 'lit';
+import { CSSResultGroup, LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbAuthMainContext } from '../context/auth-main.context';
 import { when } from 'lit/directives/when.js';
@@ -9,15 +9,6 @@ import { when } from 'lit/directives/when.js';
 export default class UmbResetPasswordPageElement extends LitElement {
 	@state()
 	resetCallState: UUIButtonState = undefined;
-
-	@state()
-	resetCodeExpired = false;
-
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.firstUpdated(_changedProperties);
-
-		this.resetCodeExpired = new URLSearchParams(window.location.search).get('status') === 'resetCodeExpired';
-	}
 
 	#handleResetSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
@@ -38,13 +29,6 @@ export default class UmbResetPasswordPageElement extends LitElement {
 			this.resetCallState = 'failed';
 		}
 	};
-
-	#resend() {
-		this.resetCallState = undefined;
-		this.resetCodeExpired = false;
-		let urlWithoutParams = window.location.href.split('?')[0];
-		window.history.replaceState({}, document.title, urlWithoutParams);
-	}
 
 	#renderResetPage() {
 		return html`
@@ -91,50 +75,21 @@ export default class UmbResetPasswordPageElement extends LitElement {
 		`;
 	}
 
-	#renderExpiredPage() {
-		return html`
-			<div id="code-expired-page">
-				<div id="header">
-					<h2>Reset code expired</h2>
-					<span>
-						Password reset links are only valid for a limited time for security reasons. To reset your password, please
-						request a new reset link.
-					</span>
-				</div>
-
-				<uui-button
-					type="submit"
-					label="Request new link"
-					look="primary"
-					color="default"
-					@click=${this.#resend}></uui-button>
-
-				<umb-back-to-login-button></umb-back-to-login-button>
-			</div>
-		`;
-	}
-
 	#renderConfirmationPage() {
 		return html`
-			<div id="confirm-page">
-				<div id="header">
-					<h2>Email has been sent!</h2>
-					<span>Check your inbox and click the received link to reset your password.</span>
-				</div>
-
-				<uui-button type="submit" label="Login" look="primary" color="default" href=" "></uui-button>
-
-				<span id="resend">Didn't receive the email? <a href="reset" @click=${this.#resend} compact>Resend</a></span>
-			</div>
+			<umb-confirmation-layout
+				header="Email has been sent!"
+				message="Check your inbox and click the received link to reset your password.">
+				<span id="resend">
+					Didn't receive the email?
+					<a @click=${() => (this.resetCallState = undefined)} href="login/reset" compact>Resend</a>
+				</span>
+			</umb-confirmation-layout>
 		`;
 	}
 
 	render() {
-		return this.resetCodeExpired
-			? this.#renderExpiredPage()
-			: this.resetCallState === 'success'
-			? this.#renderConfirmationPage()
-			: this.#renderResetPage();
+		return this.resetCallState === 'success' ? this.#renderConfirmationPage() : this.#renderResetPage();
 	}
 
 	static styles: CSSResultGroup = [
