@@ -549,7 +549,7 @@ stages:
       vmImage: 'windows-latest' # Apparently AzureFileCopy is windows only :(
     variables:
       umbracoMajorVersion:  $[ stageDependencies.Build.A.outputs['determineMajorVersion.majorVersion'] ]
-    displayName: Upload API Documention
+    displayName: Upload API Documentation
     dependsOn:
       - Build
       - Build_Docs
