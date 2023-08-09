@@ -11,15 +11,15 @@ public class TagPropertyIndexValueFactory : JsonPropertyIndexValueFactoryBase<st
 {
     public TagPropertyIndexValueFactory(
         IJsonSerializer jsonSerializer,
-        IOptionsMonitor<IndexCreatorSettings> indexCreatorSettings)
-        : base(jsonSerializer, indexCreatorSettings)
+        IOptionsMonitor<IndexingSettings> indexingSettings)
+        : base(jsonSerializer, indexingSettings)
     {
         ForceExplicitlyIndexEachNestedProperty = true;
     }
 
     [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 14.")]
     public TagPropertyIndexValueFactory(IJsonSerializer jsonSerializer)
-        : this(jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexCreatorSettings>>())
+        : this(jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
     {
 
     }

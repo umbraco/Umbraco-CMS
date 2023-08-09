@@ -18,8 +18,8 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
     protected NestedPropertyIndexValueFactoryBase(
         PropertyEditorCollection propertyEditorCollection,
         IJsonSerializer jsonSerializer,
-        IOptionsMonitor<IndexCreatorSettings> indexCreatorSettings)
-        : base(jsonSerializer, indexCreatorSettings)
+        IOptionsMonitor<IndexingSettings> indexingSettings)
+        : base(jsonSerializer, indexingSettings)
     {
         _propertyEditorCollection = propertyEditorCollection;
     }
@@ -28,7 +28,7 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
     protected NestedPropertyIndexValueFactoryBase(
         PropertyEditorCollection propertyEditorCollection,
         IJsonSerializer jsonSerializer)
-        : this(propertyEditorCollection, jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexCreatorSettings>>())
+        : this(propertyEditorCollection, jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
     {
 
     }

@@ -15,18 +15,18 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IPropertyIndexValueFactory
 {
     private readonly IJsonSerializer _jsonSerializer;
-    private IndexCreatorSettings _indexCreatorSettings;
+    private IndexingSettings _indexingSettings;
 
     protected bool ForceExplicitlyIndexEachNestedProperty { get; set; }
 
     /// <summary>
     ///  Constructor for the JsonPropertyIndexValueFactoryBase.
     /// </summary>
-    protected JsonPropertyIndexValueFactoryBase(IJsonSerializer jsonSerializer, IOptionsMonitor<IndexCreatorSettings> indexCreatorSettings)
+    protected JsonPropertyIndexValueFactoryBase(IJsonSerializer jsonSerializer, IOptionsMonitor<IndexingSettings> indexingSettings)
     {
         _jsonSerializer = jsonSerializer;
-        _indexCreatorSettings = indexCreatorSettings.CurrentValue;
-        indexCreatorSettings.OnChange(x => _indexCreatorSettings = x);
+        _indexingSettings = indexingSettings.CurrentValue;
+        indexingSettings.OnChange(x => _indexingSettings = x);
     }
 
 
@@ -34,7 +34,7 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
     ///  Constructor for the JsonPropertyIndexValueFactoryBase.
     /// </summary>
     [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 14.")]
-    protected JsonPropertyIndexValueFactoryBase(IJsonSerializer jsonSerializer): this(jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexCreatorSettings>>())
+    protected JsonPropertyIndexValueFactoryBase(IJsonSerializer jsonSerializer): this(jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
     {
 
     }
@@ -78,7 +78,7 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
         }
 
         IEnumerable<KeyValuePair<string, IEnumerable<object?>>> summary = HandleResume(result, property, culture, segment, published);
-        if (_indexCreatorSettings.ExplicitlyIndexEachNestedProperty || ForceExplicitlyIndexEachNestedProperty)
+        if (_indexingSettings.ExplicitlyIndexEachNestedProperty || ForceExplicitlyIndexEachNestedProperty)
         {
             result.AddRange(summary);
             return result;

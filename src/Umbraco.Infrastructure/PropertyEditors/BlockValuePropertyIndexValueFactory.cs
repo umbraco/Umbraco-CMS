@@ -22,8 +22,8 @@ internal sealed class BlockValuePropertyIndexValueFactory :
         PropertyEditorCollection propertyEditorCollection,
         IContentTypeService contentTypeService,
         IJsonSerializer jsonSerializer,
-        IOptionsMonitor<IndexCreatorSettings> indexCreatorSettings)
-        : base(propertyEditorCollection, jsonSerializer, indexCreatorSettings)
+        IOptionsMonitor<IndexingSettings> indexingSettings)
+        : base(propertyEditorCollection, jsonSerializer, indexingSettings)
     {
         _contentTypeService = contentTypeService;
     }
@@ -33,7 +33,7 @@ internal sealed class BlockValuePropertyIndexValueFactory :
         PropertyEditorCollection propertyEditorCollection,
         IContentTypeService contentTypeService,
         IJsonSerializer jsonSerializer)
-        : this(propertyEditorCollection, contentTypeService, jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexCreatorSettings>>())
+        : this(propertyEditorCollection, contentTypeService, jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
     {
         _contentTypeService = contentTypeService;
     }

@@ -51,6 +51,7 @@ namespace JsonSchema
                 public ImagingSettings? Imaging { get; set; }
 
                 public IndexCreatorSettings? Examine { get; set; }
+                public IndexingSettings? Indexing { get; set; }
 
                 public KeepAliveSettings? KeepAlive { get; set; }
 
