@@ -110,9 +110,7 @@ export default class UmbResetPasswordPageElement extends LitElement {
 				font-weight: bold;
 				font-size: 1.4rem;
 			}
-			form,
-			#confirm-page,
-			#code-expired-page {
+			form {
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-layout-2);
@@ -146,22 +144,7 @@ export default class UmbResetPasswordPageElement extends LitElement {
 				font-weight: 600;
 				text-decoration: none;
 			}
-			#back-to-login {
-				height: 1rem;
-				margin-top: var(--uui-size-layout-2);
-				color: #868686; /* TODO Change to uui color when uui gets a muted text variable */
-				font-size: 14px;
-				gap: var(--uui-size-space-1);
-				align-self: center;
-				text-decoration: none;
-				display: inline-flex;
-				line-height: 1;
-				font-weight: 600;
-			}
-			a svg {
-				width: 1rem;
-			}
-			a:hover {
+			#resend a:hover {
 				color: var(--uui-color-interactive-emphasis);
 			}
 		`,
