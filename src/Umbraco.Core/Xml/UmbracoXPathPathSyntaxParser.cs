@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Xml;
 ///     This is used to parse our customize Umbraco XPath expressions (i.e. that include special tokens like $site) into
 ///     a real XPath statement
 /// </summary>
+[Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
 public class UmbracoXPathPathSyntaxParser
 {
     [Obsolete("This will be removed in Umbraco 13. Use ParseXPathQuery which accepts a parentId instead")]

@@ -218,7 +218,7 @@ public class RuntimeState : IRuntimeState
                     if (_globalSettings.Value.InstallMissingDatabase || _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory))
                     {
                         // ok to install on a configured but missing database
-                        Level = RuntimeLevel.Install;
+                        Level = RuntimeLevel.BootFailed;
                         Reason = RuntimeLevelReason.InstallMissingDatabase;
                         return;
                     }
