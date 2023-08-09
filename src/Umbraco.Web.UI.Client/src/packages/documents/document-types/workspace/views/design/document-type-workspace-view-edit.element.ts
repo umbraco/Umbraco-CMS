@@ -40,6 +40,8 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	constructor() {
 		super();
 
+		//TODO: We need to differentiate between local and composition tabs (and hybrids)
+
 		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
 		this.observe(this._tabsStructureHelper.containers, (tabs) => {
@@ -214,7 +216,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 						return html`<uui-tab label=${tab.name ?? 'unnamed'} .active=${tabActive} href=${path}>
 							<div class="tab">
 								${!this._tabsStructureHelper.isOwnerContainer(tab.id!)
-									? html`<uui-icon name="umb:merge"></uui-icon>`
+									? html`<uui-icon class="external" name="umb:merge"></uui-icon> `
 									: nothing}
 								${tabActive
 									? html`<uui-input
@@ -329,6 +331,14 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			uui-tab:not(:hover, :focus) .trash {
 				opacity: 0;
 				transition: opacity 120ms;
+			}
+
+			.tab {
+				position: relative;
+			}
+
+			.external {
+				vertical-align: sub;
 			}
 
 			uui-input:not(:focus, :hover) {
