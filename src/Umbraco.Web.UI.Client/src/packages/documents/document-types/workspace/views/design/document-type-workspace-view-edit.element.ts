@@ -1,6 +1,6 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { encodeFolderName, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
@@ -212,37 +212,40 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 						const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
 						const tabActive = path === this._activePath;
 						return html`<uui-tab label=${tab.name ?? 'unnamed'} .active=${tabActive} href=${path}>
-							<div class="tab-wrapper">
-								${tabActive && this._tabsStructureHelper.isOwnerContainer(tab.id!)
-									? html`
-											<uui-input
-												id="input"
-												label="Tab name"
-												look="placeholder"
-												value="${tab.name!}"
-												placeholder="Enter a name"
-												@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-												@blur=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-												auto-width>
-												<uui-button
-													label="Remove tab"
-													class="trash"
-													slot="append"
-													@click=${() => this.#requestRemoveTab(tab)}
-													compact>
-													<uui-icon name="umb:trash"></uui-icon>
-												</uui-button>
-											</uui-input>
-									  `
-									: !this._tabsStructureHelper.isOwnerContainer(tab.id!)
-									? html` <span class="no-edit">
-											<uui-icon name="umb:merge"></uui-icon>
-											${tab.name}
-									  </span>`
-									: html` <span class="no-edit">${tab.name}</span>
-											<uui-button class="trash" label="Remove tab" @click=${() => this.#requestRemoveTab(tab)} compact>
+							<div class="tab">
+								${!this._tabsStructureHelper.isOwnerContainer(tab.id!)
+									? html`<uui-icon name="umb:merge"></uui-icon>`
+									: nothing}
+								${tabActive
+									? html`<uui-input
+											id="input"
+											label="Tab name"
+											look="placeholder"
+											value="${tab.name!}"
+											placeholder="Enter a name"
+											@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
+											@blur=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
+											auto-width>
+											<uui-button
+												label="Remove tab"
+												class="trash"
+												slot="append"
+												@click=${() => this.#requestRemoveTab(tab)}
+												compact>
 												<uui-icon name="umb:trash"></uui-icon>
-											</uui-button>`}
+											</uui-button>
+									  </uui-input>`
+									: html`<div class="no-edit">
+											${tab.name!}
+											<uui-button
+												label="Remove tab"
+												class="trash"
+												slot="append"
+												@click=${() => this.#requestRemoveTab(tab)}
+												compact>
+												<uui-icon name="umb:trash"></uui-icon>
+											</uui-button>
+									  </div>`}
 							</div>
 						</uui-tab>`;
 					}
@@ -323,26 +326,25 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				border-right: 1px solid var(--uui-color-border);
 			}
 
-			.no-edit {
-				padding: 0 var(--uui-size-space-3);
-				border: 1px solid transparent;
-			}
-
-			.no-edit uui-icon {
-				vertical-align: sub;
+			uui-tab:not(:hover, :focus) .trash {
+				opacity: 0;
+				transition: opacity 120ms;
 			}
 
 			uui-input:not(:focus, :hover) {
 				border: 1px solid transparent;
 			}
 
-			.trash {
-				opacity: 1;
-				transition: opacity 120ms;
+			.no-edit {
+				display: inline-flex;
+				padding-left: var(--uui-size-space-3);
+				border: 1px solid transparent;
+				align-items: center;
+				gap: var(--uui-size-space-3);
 			}
 
-			uui-tab:not(:hover, :focus) .trash {
-				opacity: 0;
+			.trash {
+				opacity: 1;
 				transition: opacity 120ms;
 			}
 		`,
