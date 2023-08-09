@@ -194,7 +194,7 @@ public static class StringExtensions
     /// <returns></returns>
     /// <remarks>
     ///     This methods ensures that the resulting URL is structured correctly, that there's only one '?' and that things are
-    ///     delimited properly with '&'
+    ///     delimited properly with '&amp;'
     /// </remarks>
     public static string AppendQueryStringToUrl(this string url, params string[] queryStrings)
     {

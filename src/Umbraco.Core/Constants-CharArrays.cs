@@ -53,7 +53,7 @@ public static partial class Constants
         public static readonly char[] Comma = { ',' };
 
         /// <summary>
-        ///     Char array containing only &
+        ///     Char array containing only &amp;
         /// </summary>
         public static readonly char[] Ampersand = { '&' };
 
@@ -88,7 +88,7 @@ public static partial class Constants
         public static readonly char[] QuestionMark = { '?' };
 
         /// <summary>
-        ///     Char array containing ? &
+        ///     Char array containing ? &amp;
         /// </summary>
         public static readonly char[] QuestionMarkAmpersand = { '?', '&' };
 

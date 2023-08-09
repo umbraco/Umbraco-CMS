@@ -58,7 +58,7 @@ public class Media : ContentBase, IMedia
     /// <summary>
     ///     Changes the <see cref="IMediaType" /> for the current Media object
     /// </summary>
-    /// <param name="contentType">New MediaType for this Media</param>
+    /// <param name="mediaType">New MediaType for this Media</param>
     /// <remarks>Leaves PropertyTypes intact after change</remarks>
     internal void ChangeContentType(IMediaType mediaType) => ChangeContentType(mediaType, false);
 

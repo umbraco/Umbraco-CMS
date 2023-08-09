@@ -10,6 +10,7 @@ public interface IMediaUrlGenerator
     /// </summary>
     /// <param name="propertyEditorAlias">The property editor alias</param>
     /// <param name="value">The value of the property</param>
+    /// <param name="mediaPath">The media path</param>
     /// <returns>
     ///     True if a media path was returned
     /// </returns>
