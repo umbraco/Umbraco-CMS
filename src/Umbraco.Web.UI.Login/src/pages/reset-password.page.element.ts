@@ -3,7 +3,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { CSSResultGroup, LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbAuthMainContext } from '../context/auth-main.context';
-import { when } from 'lit/directives/when.js';
 
 @customElement('umb-reset-password-page')
 export default class UmbResetPasswordPageElement extends LitElement {
