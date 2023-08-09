@@ -65,7 +65,7 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<HealthChecksSettings>()
             .AddUmbracoOptions<HostingSettings>()
             .AddUmbracoOptions<ImagingSettings>()
-            .AddUmbracoOptions<IndexCreatorSettings>()
+            .AddUmbracoOptions<IndexingSettings>()
             .AddUmbracoOptions<KeepAliveSettings>()
             .AddUmbracoOptions<LoggingSettings>()
             .AddUmbracoOptions<MemberPasswordConfigurationSettings>()
