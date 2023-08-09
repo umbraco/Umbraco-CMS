@@ -1,6 +1,6 @@
 import type { UUIButtonState, UUIInputPasswordElement } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { CSSResultGroup, LitElement, css, html } from 'lit';
+import { CSSResultGroup, LitElement, css, html, nothing } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 
 @customElement('umb-new-password-layout')
@@ -10,6 +10,9 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 
 	@property()
 	state: UUIButtonState = undefined;
+
+	@property()
+	error: string = '';
 
 	#onSubmit(event: Event) {
 		event.preventDefault();
@@ -64,12 +67,20 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 							required-message="ConfirmPassword is required"></uui-input-password>
 					</uui-form-layout-item>
 
+					${this.#renderErrorMessage()}
+
 					<uui-button type="submit" label="Continue" look="primary" color="default" .state=${this.state}></uui-button>
 				</form>
 			</uui-form>
 
 			<umb-back-to-login-button style="margin-top: var(--uui-size-space-6)"></umb-back-to-login-button>
 		`;
+	}
+
+	#renderErrorMessage() {
+		if (!this.error || this.state !== 'failed') return nothing;
+
+		return html`<span class="text-danger">${this.error}</span>`;
 	}
 
 	static styles: CSSResultGroup = [
@@ -112,6 +123,9 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 				margin-top: var(--uui-size-space-5);
 				--uui-button-padding-top-factor: 1.5;
 				--uui-button-padding-bottom-factor: 1.5;
+			}
+			.text-danger {
+				color: var(--uui-color-danger-standalone);
 			}
 		`,
 	];

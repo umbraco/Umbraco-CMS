@@ -13,7 +13,10 @@ export default class UmbNewPasswordPageElement extends LitElement {
 	state: UUIButtonState = undefined;
 
 	@state()
-	page: 'new' | 'done' | 'error' = 'new';
+	page: 'new' | 'done' = 'new';
+
+	@state()
+	error = '';
 
 	async #onSubmit(event: CustomEvent) {
 		event.preventDefault();
@@ -27,19 +30,21 @@ export default class UmbNewPasswordPageElement extends LitElement {
 		this.state = 'waiting';
 		const response = await UmbAuthMainContext.Instance.newPassword(password, resetCode, userId);
 		this.state = response.status === 200 ? 'success' : 'failed';
-		this.page = response.status === 200 ? 'done' : 'error';
+		this.page = response.status === 200 ? 'done' : 'new';
+		this.error = response.error || '';
 	}
 
 	render() {
 		switch (this.page) {
 			case 'new':
-				return html`<umb-new-password-layout @submit=${this.#onSubmit} .state=${this.state}></umb-new-password-layout>`;
+				return html`<umb-new-password-layout
+					@submit=${this.#onSubmit}
+					.state=${this.state}
+					.error=${this.error}></umb-new-password-layout>`;
 			case 'done':
 				return html`<umb-confirmation-layout
 					header="Success!"
 					message="Your password has been successfully updated"></umb-confirmation-layout>`;
-			case 'error':
-				return html`ERROR PAGE`;
 		}
 	}
 
