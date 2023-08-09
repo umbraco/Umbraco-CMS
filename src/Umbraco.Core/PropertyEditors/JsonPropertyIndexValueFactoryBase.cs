@@ -26,7 +26,7 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
     {
         _jsonSerializer = jsonSerializer;
         _indexingSettings = indexingSettings.CurrentValue;
-        indexingSettings.OnChange(x => _indexingSettings = x);
+        indexingSettings.OnChange(newValue => _indexingSettings = newValue);
     }
 
 
