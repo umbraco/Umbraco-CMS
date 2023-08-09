@@ -67,12 +67,12 @@ export default class UmbAuthElement extends LitElement {
 					const searchParams = new URLSearchParams(window.location.search);
 					let flow = searchParams.get('flow')?.toLowerCase();
 
-          // validate
-          if (flow) {
-            if (flow === 'mfa' && !UmbAuthMainContext.Instance.isMfaEnabled) {
-              flow = undefined;
-            }
-          }
+					// validate
+					if (flow) {
+						if (flow === 'mfa' && !UmbAuthMainContext.Instance.isMfaEnabled) {
+							flow = undefined;
+						}
+					}
 
 					switch (flow) {
 						case 'mfa':
