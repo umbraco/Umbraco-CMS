@@ -10,32 +10,30 @@ export default class UmbInvitePageElement extends LitElement {
 	state: UUIButtonState = undefined;
 
 	@state()
-	page: 'new' | 'done' | 'error' = 'new';
+	page: 'new' | 'error' = 'new';
 
 	async #onSubmit(event: CustomEvent) {
 		event.preventDefault();
-		const urlParams = new URLSearchParams(window.location.search);
-		const resetCode = urlParams.get('resetCode'); //TODO: Invite code?
-		const userId = urlParams.get('userId');
 		const password = event.detail.password;
 
-		if (!resetCode || !userId) return;
+		if (!password) return;
 
 		this.state = 'waiting';
-		const response = await UmbAuthMainContext.Instance.newPassword(password, resetCode, userId); //TODO: should this be a new invite method?
-		this.state = response.status === 200 ? 'success' : 'failed';
-		this.page = response.status === 200 ? 'done' : 'error';
+		const response = await UmbAuthMainContext.Instance.newInvitedUserPassword(password);
+
+		if (response.status === 200) {
+			window.location.href = UmbAuthMainContext.Instance.returnPath;
+			this.state = 'success';
+		} else {
+			this.page = 'error';
+			this.state = 'failed';
+		}
 	}
 
 	render() {
 		switch (this.page) {
 			case 'new':
 				return html`<umb-new-password-layout @submit=${this.#onSubmit} .state=${this.state}></umb-new-password-layout>`;
-			case 'done':
-				return html`<umb-confirmation-layout>
-					<span slot="header">Success!</span>
-					<span>Your account has been created, go ahead and login to get started</span>
-				</umb-confirmation-layout>`;
 			case 'error':
 				return html`ERROR PAGE`;
 		}

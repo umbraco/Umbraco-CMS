@@ -35,6 +35,10 @@ export class UmbAuthLegacyContext implements IUmbAuthContext {
 		return this.#authRepository.newPassword(password, resetCode, userIdAsNumber);
 	}
 
+	async newInvitedUserPassword(password: string): Promise<NewPasswordResponse> {
+		return this.#authRepository.newInvitedUserPassword(password);
+	}
+
 	getMfaProviders(): Promise<MfaProvidersResponse> {
 		return this.#authRepository.getMfaProviders();
 	}

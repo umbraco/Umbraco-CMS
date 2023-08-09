@@ -97,6 +97,26 @@ export class UmbAuthLegacyRepository {
 		};
 	}
 
+	public async newInvitedUserPassword(newPassWord: string): Promise<LoginResponse> {
+		console.log('newInvitedUserPassword', newPassWord);
+
+		const request = new Request('backoffice/umbracoapi/currentUser/PostSetInvitedUserPassword', {
+			method: 'POST',
+			body: JSON.stringify({
+				newPassWord,
+			}),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		const response = await fetch(request);
+
+		return {
+			status: response.status,
+			error: response.ok ? undefined : this.#getErrorText(response),
+		};
+	}
+
 	public async getMfaProviders(): Promise<MfaProvidersResponse> {
 		const request = new Request('backoffice/umbracoapi/authentication/Get2faProviders', {
 			method: 'GET',

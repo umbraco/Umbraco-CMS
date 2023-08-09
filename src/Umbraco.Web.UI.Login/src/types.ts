@@ -11,21 +11,22 @@ export interface IUmbAuthContext {
 	resetPassword(username: string): Promise<ResetPasswordResponse>;
 	validatePasswordResetCode(userId: string, resetCode: string): Promise<ValidatePasswordResetCodeResponse>;
 	newPassword(password: string, resetCode: string, userId: string): Promise<NewPasswordResponse>;
+	newInvitedUserPassword(password: string): Promise<NewPasswordResponse>;
 	getMfaProviders(): Promise<MfaProvidersResponse>;
 	validateMfaCode(code: string, provider: string): Promise<LoginResponse>;
 	getIcons(): Observable<Record<string, string>>;
-  disableLocalLogin: boolean;
+	disableLocalLogin: boolean;
 	supportsPersistLogin: boolean;
 	returnPath: string;
-  twoFactorView?: string;
-  isMfaEnabled?: boolean;
+	twoFactorView?: string;
+	isMfaEnabled?: boolean;
 }
 
 export type LoginResponse = {
 	data?: string;
 	error?: string;
 	status: number;
-  twoFactorView?: string;
+	twoFactorView?: string;
 };
 
 export type ResetPasswordResponse = {
