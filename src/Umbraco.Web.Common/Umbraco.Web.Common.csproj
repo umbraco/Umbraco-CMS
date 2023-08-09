@@ -10,8 +10,8 @@
     <PackageReference Include="Asp.Versioning.Mvc" Version="7.0.0" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.0.0" />
     <PackageReference Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0-preview.6.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.0-preview.6.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0-preview.7.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.0-preview.7.*" />
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.3.8" />
     <PackageReference Include="Smidge.InMemory" Version="4.3.0" />
     <PackageReference Include="Smidge.Nuglify" Version="4.3.0" />
