@@ -10,7 +10,7 @@ export default class UmbInvitePageElement extends LitElement {
 	state: UUIButtonState = undefined;
 
 	@state()
-	page: 'new' | 'error' = 'new';
+	error = '';
 
 	async #onSubmit(event: CustomEvent) {
 		event.preventDefault();
@@ -20,23 +20,21 @@ export default class UmbInvitePageElement extends LitElement {
 
 		this.state = 'waiting';
 		const response = await UmbAuthMainContext.Instance.newInvitedUserPassword(password);
+		this.error = response.error || '';
 
 		if (response.status === 200) {
 			window.location.href = UmbAuthMainContext.Instance.returnPath;
 			this.state = 'success';
 		} else {
-			this.page = 'error';
 			this.state = 'failed';
 		}
 	}
 
 	render() {
-		switch (this.page) {
-			case 'new':
-				return html`<umb-new-password-layout @submit=${this.#onSubmit} .state=${this.state}></umb-new-password-layout>`;
-			case 'error':
-				return html`ERROR PAGE`;
-		}
+		html`<umb-new-password-layout
+			@submit=${this.#onSubmit}
+			.state=${this.state}
+			.error=${this.error}></umb-new-password-layout>`;
 	}
 
 	static styles: CSSResultGroup = [UUITextStyles, css``];
