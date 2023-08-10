@@ -1941,12 +1941,11 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       te loggen in Umbraco
     </key>
     <key alias="userinviteWelcomeMessage">Hallo en welkom in Umbraco! Binnen ongeveer één minuut kan je aan de slag. Je
-      moet enkel je wachtwoord instellen en een foto toevoegen.
+      moet enkel je wachtwoord instellen.
     </key>
     <key alias="userinviteExpiredMessage">Welkom bij Umbraco! Helaas is je uitnodiging vervallen. Vraag aan je
       administrator om de uitnodiging opnieuw te versturen.
     </key>
-    <key alias="userinviteAvatarMessage">Wijzig je foto zodat andere gebruikers je makkelijk kunnen herkennen.</key>
     <key alias="writer">Auteur</key>
     <key alias="configureTwoFactor">Configureer tweestapsverificatie</key>
     <key alias="change">Wijzig</key>

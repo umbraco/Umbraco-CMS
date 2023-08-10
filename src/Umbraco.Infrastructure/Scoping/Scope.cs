@@ -357,7 +357,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             EnsureNotDisposed();
 
@@ -402,16 +402,21 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 Completed = true;
             }
 
-            if (ParentScope != null)
-            {
-                ParentScope.ChildCompleted(Completed);
-            }
-            else
+            // CoreScope.Dispose will handle file systems and notifications, as well as notifying any parent scope of the child scope's completion.
+            // In this overridden class, we re-use that functionality and also handle scope context (including enlisted actions) and detached scopes.
+            // We retain order of events behaviour from Umbraco 11:
+            // - handle file systems (in CoreScope)
+            // - handle scoped notifications (in CoreScope)
+            // - handle scope context (in Scope)
+            // - handle detatched scopes (in Scope)
+            if (ParentScope is null)
             {
                 DisposeLastScope();
             }
-
-            base.Dispose();
+            else
+            {
+                ParentScope.ChildCompleted(Completed);
+            }
 
             _disposed = true;
         }
@@ -559,6 +564,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
 
             TryFinally(
+                HandleScopedFileSystems,
+                HandleScopedNotifications,
                 HandleScopeContext,
                 HandleDetachedScopes);
         }

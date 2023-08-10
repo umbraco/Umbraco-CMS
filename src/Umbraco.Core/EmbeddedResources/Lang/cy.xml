@@ -576,7 +576,7 @@
   <area alias="dictionary">
     <key alias="noItems">Nid oes unrhyw eitemau geiriadur.</key>
     <key alias="importDictionaryItemHelp">
-      I fewnforio eitem geiriadur, dewch o hyd i'r ffeil ".udt" ar eich cyfrifiadur trwy glicio 
+      I fewnforio eitem geiriadur, dewch o hyd i'r ffeil ".udt" ar eich cyfrifiadur trwy glicio
       ar y botwm "Mewnforio" (bydd gofyn i chi am gadarnhad ar y sgrin nesaf)
     </key>
     <key alias="itemDoesNotExists">Nid yw eitem geiriadur yn bodoli.</key>
@@ -2308,9 +2308,8 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="userGroups">Grwpiau defnyddiwr</key>
     <key alias="userInvited">wedi'i wahodd</key>
     <key alias="userInvitedSuccessHelp">Mae gwahoddiad wedi cael ei anfon at y defnyddiwr newydd gyda manylion ar sut i fewngofnodi i Umbraco.</key>
-    <key alias="userinviteWelcomeMessage">Helo a chroeso i Umbraco! Mewn 1 munud yn unig, byddech chi'n barod i fynd, rydym dim ond angen gosod cyfrinair a llun ar gyfer eich avatar.</key>
+    <key alias="userinviteWelcomeMessage">Helo a chroeso i Umbraco! Mewn 1 munud yn unig, byddech chi'n barod i fynd, rydym dim ond angen gosod cyfrinair.</key>
     <key alias="userinviteExpiredMessage">Croeso i Umbraco! Yn anffodus, mae eich gwahoddiad wedi terfynu. Cysylltwch â'ch gweinyddwr a gofynnwch iddynt ail-anfon.</key>
-    <key alias="userinviteAvatarMessage">Lanlwythwch lun i wneud o'n haws i boble eich adnabod chi.</key>
     <key alias="writer">Ysgrifennydd</key>
     <key alias="translator">Cyfieithydd</key>
     <key alias="change">Newid</key>
