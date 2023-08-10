@@ -1,4 +1,6 @@
 ﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 using ContentTypeEditingModels = Umbraco.Cms.Core.Models.ContentTypeEditing;
 using ContentTypeViewModels = Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
@@ -6,6 +8,11 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 internal abstract class ContentTypeEditingPresentationFactory
 {
+    private readonly IContentTypeService _contentTypeService;
+
+    protected ContentTypeEditingPresentationFactory(IContentTypeService contentTypeService)
+        => _contentTypeService = contentTypeService;
+
     protected TContentTypeEditingModel MapContentTypeEditingModel<
         TContentTypeEditingModel,
         TPropertyTypeEditingModel,
@@ -38,12 +45,24 @@ internal abstract class ContentTypeEditingPresentationFactory
         return editingModel;
     }
 
-    private ContentTypeSort[] MapAllowedContentTypes(
-        IEnumerable<ContentTypeViewModels.ContentTypeSort> allowedContentTypes)
+    private ContentTypeSort[] MapAllowedContentTypes(IEnumerable<ContentTypeViewModels.ContentTypeSort> allowedContentTypes)
     {
-        // FIXME: we need to get rid of the integer ID in ContentTypeSort before we can implement this
-        //        - see also FIXME in ContentTypeSort constructor
-        return Array.Empty<ContentTypeSort>();
+        // need to fetch the content type aliases to construct the corresponding ContentTypeSort entities
+        ContentTypeViewModels.ContentTypeSort[] allowedContentTypesArray = allowedContentTypes as ContentTypeViewModels.ContentTypeSort[]
+                                                                           ?? allowedContentTypes.ToArray();
+        Guid[] contentTypeKeys = allowedContentTypesArray.Select(a => a.Id).ToArray();
+        IDictionary<Guid, string> contentTypeAliasesByKey = _contentTypeService
+            .GetAll()
+            .Where(c => contentTypeKeys.Contains(c.Key))
+            .ToDictionary(c => c.Key, c => c.Alias);
+
+        return allowedContentTypesArray
+            .Select(a =>
+                contentTypeAliasesByKey.TryGetValue(a.Id, out var alias)
+                    ? new ContentTypeSort(a.Id, a.SortOrder, alias)
+                    : null)
+            .WhereNotNull()
+            .ToArray();
     }
 
     private TPropertyTypeEditingModel[] MapProperties<TPropertyTypeEditingModel>(

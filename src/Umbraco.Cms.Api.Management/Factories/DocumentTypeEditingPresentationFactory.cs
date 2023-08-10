@@ -1,11 +1,17 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Core.Services;
 using ContentTypeCleanupViewModel = Umbraco.Cms.Api.Management.ViewModels.ContentType.ContentTypeCleanup;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
 internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory, IDocumentTypeEditingPresentationFactory
 {
+    public DocumentTypeEditingPresentationFactory(IContentTypeService contentTypeService)
+        : base(contentTypeService)
+    {
+    }
+
     public ContentTypeCreateModel MapCreateModel(CreateDocumentTypeRequestModel requestModel)
     {
         ContentTypeCreateModel createModel = MapContentTypeEditingModel<
