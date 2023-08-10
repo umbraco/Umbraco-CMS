@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
@@ -29,7 +30,7 @@ public class ByKeyDocumentTypeController : DocumentTypeControllerBase
         IContentType? contentType = await _contentTypeService.GetAsync(id);
         if (contentType is null)
         {
-            return DocumentTypeNotFound();
+            return OperationStatusResult(ContentTypeOperationStatus.NotFound);
         }
 
         DocumentTypeResponseModel model = _umbracoMapper.Map<DocumentTypeResponseModel>(contentType)!;
