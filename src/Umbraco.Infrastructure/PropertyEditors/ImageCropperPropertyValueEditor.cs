@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core vs web?
 {
     private readonly IDataTypeService _dataTypeService;
-    private readonly IFileStreamSecuritySanitizationOrchestrator _fileStreamSanitizer;
+    private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
     private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
     private ContentSettings _contentSettings;
@@ -40,14 +40,14 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
         IDataTypeService dataTypeService,
-        IFileStreamSecuritySanitizationOrchestrator fileStreamSanitizer)
+        IFileStreamSecurityValidator fileStreamSecurityValidator)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
         _contentSettings = contentSettings.CurrentValue;
         _dataTypeService = dataTypeService;
-        _fileStreamSanitizer = fileStreamSanitizer;
+        _fileStreamSecurityValidator = fileStreamSecurityValidator;
         contentSettings.OnChange(x => _contentSettings = x);
     }
 
@@ -240,8 +240,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
 
         using (FileStream filestream = File.OpenRead(file.TempFilePath))
         {
-            //??? are we allowed to return null here?
-            if (_fileStreamSanitizer.Sanitize(filestream, false) == false)
+            if (_fileStreamSecurityValidator.IsConsideredSafe(filestream) == false)
                 return null;
 
             // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right

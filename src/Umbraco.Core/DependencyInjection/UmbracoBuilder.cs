@@ -328,9 +328,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDictionaryService, DictionaryService>();
             Services.AddUnique<ITemporaryMediaService, TemporaryMediaService>();
 
-            // Register filestream security sanitizers
-            Services.AddUnique<IFileStreamSecuritySanitizationOrchestrator,FileStreamSecuritySanitizationOrchestrator>();
-            Services.AddSingleton<IFileStreamSecuritySanitizer, SvgFileStreamSecuritySanitizer>();
+            // Register filestream security analyzers
+            Services.AddUnique<IFileStreamSecurityValidator,FileStreamSecurityValidator>();
         }
     }
 }
