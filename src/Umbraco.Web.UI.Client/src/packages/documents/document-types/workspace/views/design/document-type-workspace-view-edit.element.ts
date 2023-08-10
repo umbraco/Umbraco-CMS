@@ -1,7 +1,7 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
-import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UUIInputElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state, repeat, nothing, query } from '@umbraco-cms/backoffice/external/lit';
+import { UUIInputElement, UUIInputEvent, UUITabElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { encodeFolderName, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -31,11 +31,17 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	@state()
 	private _activePath = '';
 
+	@state()
+	private _buttonDisabled: boolean = false;
+
 	private _workspaceContext?: UmbDocumentTypeWorkspaceContext;
 
 	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper(this);
 
 	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
+
+	@query('uui-tab')
+	private _tabElements!: UUITabElement[];
 
 	constructor() {
 		super();
@@ -71,7 +77,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				this._hasRootGroups = hasRootGroups;
 				this._createRoutes();
 			},
-			'_observeGroups'
+			'_observeGroups',
 		);
 	}
 
@@ -168,6 +174,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	}
 
 	async #tabNameChanged(event: InputEvent, tab: PropertyTypeContainerModelBaseModel) {
+		if (this._buttonDisabled) this._buttonDisabled = !this._buttonDisabled;
 		let newName = (event.target as HTMLInputElement).value;
 
 		if (newName === '') {
@@ -178,7 +185,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		const changedName = this._workspaceContext?.structure.makeContainerNameUniqueForOwnerDocument(
 			newName,
 			'Tab',
-			tab.id
+			tab.id,
 		);
 
 		// Check if it collides with another tab name of this same document-type, if so adjust name:
@@ -218,20 +225,23 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 								${!this._tabsStructureHelper.isOwnerContainer(tab.id!)
 									? html`<uui-icon class="external" name="umb:merge"></uui-icon> `
 									: nothing}
-								${tabActive
+								${tabActive && this._tabsStructureHelper.isOwnerContainer(tab.id!)
 									? html`<uui-input
 											id="input"
 											label="Tab name"
 											look="placeholder"
 											value="${tab.name!}"
-											placeholder="Enter a name"
+											placeholder="Unnamed"
 											@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
 											@blur=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
+											@input=${() => (this._buttonDisabled = true)}
+											@focus=${(e: UUIInputEvent) => (e.target.value ? nothing : (this._buttonDisabled = true))}
 											auto-width>
 											<uui-button
 												label="Remove tab"
 												class="trash"
 												slot="append"
+												?disabled=${this._buttonDisabled}
 												@click=${() => this.#requestRemoveTab(tab)}
 												compact>
 												<uui-icon name="umb:trash"></uui-icon>
@@ -239,18 +249,20 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 									  </uui-input>`
 									: html`<div class="no-edit">
 											${tab.name!}
-											<uui-button
-												label="Remove tab"
-												class="trash"
-												slot="append"
-												@click=${() => this.#requestRemoveTab(tab)}
-												compact>
-												<uui-icon name="umb:trash"></uui-icon>
-											</uui-button>
+											${this._tabsStructureHelper.isOwnerContainer(tab.id!)
+												? html`<uui-button
+														label="Remove tab"
+														class="trash"
+														slot="append"
+														@click=${() => this.#requestRemoveTab(tab)}
+														compact>
+														<uui-icon name="umb:trash"></uui-icon>
+												  </uui-button> `
+												: nothing}
 									  </div>`}
 							</div>
 						</uui-tab>`;
-					}
+					},
 				)}
 			</uui-tab-group>
 			<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab" compact>
