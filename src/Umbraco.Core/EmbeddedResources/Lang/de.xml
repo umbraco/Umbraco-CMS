@@ -679,7 +679,7 @@
     <key alias="folderWasRenamed">%0% wurde umbenannt in %1%</key>
   </area>
   <area alias="editdatatype">
-  <key alias="canChangePropertyEditorHelp">Ändern des Editors in einem Datatyps mit gespeicherten Werten ist nicht erlaubt. Um es zu erlauben müssen Sie die Umbraco:CMS:DataTypes:CanBeChanged Einstellung in der appsettings.json ändern.</key>
+    <key alias="canChangePropertyEditorHelp">Ändern des Editors in einem Datatyps mit gespeicherten Werten ist nicht erlaubt. Um es zu erlauben müssen Sie die Umbraco:CMS:DataTypes:CanBeChanged Einstellung in der appsettings.json ändern.</key>
     <key alias="addPrevalue">Neuer Vorgabewert</key>
     <key alias="dataBaseDatatype">Feldtyp in der Datenbank</key>
     <key alias="guid">Datentyp-GUID</key>
@@ -1780,10 +1780,9 @@
       Erlaubt es Inhalt der angegebenen Typen unterhalb Inhalten dieses Typs anzulegen
     </key>
     <key alias="chooseChildNode">Wählen Sie einen Unterknoten</key>
-    <!--???-->
-    <key alias="compositionsDescription">Übernimm Tabs und Eigenschaften vone einem vorhandenen Dokumenttyp. Neue Tabs werden zum vorliegenden Dokumenttyp hinzugefügt oder mit einem gleichnamigen Tab zusammengeführt.</key>
-    <key alias="compositionInUse">Dieser Dokumenttyp wird in einer Mischung verwendet und kann deshalb nicht selbst zusammengemischt werden.</key>
-    <key alias="noAvailableCompositions">Es sind keine Dokumenttypen für eine Mischung vorhanden.</key>
+    <key alias="compositionsDescription">Übernimm Tabs und Eigenschaften vone einem vorhandenen Inhaltstyp. Neue Tabs werden zum vorliegenden Inhaltstyp hinzugefügt oder mit einem gleichnamigen Tab zusammengeführt.</key>
+    <key alias="compositionInUse">Dieser Inhaltstyp wird in einer Mischung verwendet und kann deshalb nicht selbst zusammengemischt werden.</key>
+    <key alias="noAvailableCompositions">Es sind keine Inhaltstypen für eine Mischung vorhanden.</key>
     <key alias="availableEditors">Neu anlegen</key>
     <key alias="reuse">Vorhandenen nutzen</key>
     <key alias="editorSettings">Editor-Einstellungen</key>
