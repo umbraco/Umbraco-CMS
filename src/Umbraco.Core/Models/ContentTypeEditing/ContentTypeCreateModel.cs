@@ -4,5 +4,5 @@ public class ContentTypeCreateModel : ContentTypeModelBase
 {
     public Guid? Key { get; set; }
 
-    public Guid? ParentKey { get; set; }
+    public Guid? ContainerKey { get; set; }
 }

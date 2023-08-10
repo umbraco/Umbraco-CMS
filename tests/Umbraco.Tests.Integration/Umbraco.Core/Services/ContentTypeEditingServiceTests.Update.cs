@@ -538,48 +538,38 @@ public partial class ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Can_Change_Composition_To_Inheritance()
+    public async Task Can_Reapply_Inheritance()
     {
-        var propertyType1 = CreatePropertyType("Test Property 1", "testProperty1");
-        var propertyType2 = CreatePropertyType("Test Property 2", "testProperty2");
+        var parentContentType = (await ContentTypeEditingService.CreateAsync(CreateCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
 
-        var compositionCreateModel = CreateCreateModel("Composition", "composition");
-        compositionCreateModel.Properties = new[] { propertyType1 };
-        var compositionContentType = (await ContentTypeEditingService.CreateAsync(compositionCreateModel, Constants.Security.SuperUserKey)).Result!;
+        var createModel = CreateCreateModel(
+            "Child",
+            compositions: new Composition[]
+            {
+                new() { CompositionType = CompositionType.Inheritance, Key = parentContentType.Key }
+            });
 
-        var createModel = CreateCreateModel("Test", "test");
-        createModel.Properties = new[] { propertyType2 };
-        createModel.Compositions = new[]
-        {
-            new Composition { Key = compositionContentType.Key, CompositionType = CompositionType.Composition }
-        };
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
         var originalPath = contentType.Path;
 
-        var updateModel = CreateUpdateModel("Test", "test");
-        updateModel.Properties = new[] { propertyType2 };
-        updateModel.Compositions = new[]
-        {
-            new Composition { Key = compositionContentType.Key, CompositionType = CompositionType.Inheritance }
-        };
+        var updateModel = CreateUpdateModel(
+            "Child",
+            compositions: new Composition[]
+            {
+                new() { CompositionType = CompositionType.Inheritance, Key = parentContentType.Key }
+            });
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
         Assert.IsNotNull(contentType);
         Assert.AreEqual(1, contentType.ContentTypeComposition.Count());
-        Assert.AreEqual(2, contentType.CompositionPropertyTypes.Count());
-        Assert.AreEqual(compositionContentType.Id, contentType.ParentId);
-        Assert.AreNotEqual(originalPath, contentType.Path);
-        Assert.AreEqual($"-1,{compositionContentType.Id},{contentType.Id}", contentType.Path);
-        var propertyTypeAliases = contentType.CompositionPropertyTypes.Select(c => c.Alias).ToArray();
-        Assert.AreEqual(2, propertyTypeAliases.Length);
-        Assert.IsTrue(propertyTypeAliases.Contains("testProperty1"));
-        Assert.IsTrue(propertyTypeAliases.Contains("testProperty2"));
+        Assert.AreEqual(parentContentType.Id, contentType.ParentId);
+        Assert.AreEqual(originalPath, contentType.Path);
+        Assert.AreEqual($"-1,{parentContentType.Id},{contentType.Id}", contentType.Path);
     }
 
     [Test]
@@ -655,5 +645,161 @@ public partial class ContentTypeEditingServiceTests
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Add_Self_As_Composition()
+    {
+        var property = CreatePropertyType("Test Property", "testProperty");
+        var createModel = CreateCreateModel("Test", "test");
+        createModel.Properties = new[] { property };
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = CreateUpdateModel("Test", "test");
+        updateModel.Properties = new[] { property };
+        updateModel.Compositions = new[]
+        {
+            new Composition { Key = contentType.Key, CompositionType = CompositionType.Composition }
+        };
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Change_Inheritance()
+    {
+        var parentContentType1 = (await ContentTypeEditingService.CreateAsync(CreateCreateModel("Parent1"), Constants.Security.SuperUserKey)).Result!;
+        var parentContentType2 = (await ContentTypeEditingService.CreateAsync(CreateCreateModel("Parent2"), Constants.Security.SuperUserKey)).Result!;
+
+        var createModel = CreateCreateModel(
+            "Child",
+            compositions: new Composition[]
+            {
+                new() { CompositionType = CompositionType.Inheritance, Key = parentContentType1.Key }
+            });
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = CreateUpdateModel(
+            "Child",
+            compositions: new Composition[]
+            {
+                new() { CompositionType = CompositionType.Inheritance, Key = parentContentType2.Key }
+            });
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Add_Inheritance()
+    {
+        var parentContentType = (await ContentTypeEditingService.CreateAsync(CreateCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
+        var contentType = (await ContentTypeEditingService.CreateAsync(CreateCreateModel("Child"), Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = CreateUpdateModel(
+            "Child",
+            compositions: new Composition[]
+            {
+                new() { CompositionType = CompositionType.Inheritance, Key = parentContentType.Key }
+            });
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Add_Multiple_Inheritance()
+    {
+        var parentContentType1 = (await ContentTypeEditingService.CreateAsync(CreateCreateModel("Parent1"), Constants.Security.SuperUserKey)).Result!;
+        var parentContentType2 = (await ContentTypeEditingService.CreateAsync(CreateCreateModel("Parent2"), Constants.Security.SuperUserKey)).Result!;
+
+        var createModel = CreateCreateModel(
+            "Child",
+            compositions: new Composition[]
+            {
+                new() { CompositionType = CompositionType.Inheritance, Key = parentContentType1.Key }
+            });
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = CreateUpdateModel(
+            "Child",
+            compositions: new Composition[]
+            {
+                new() { CompositionType = CompositionType.Inheritance, Key = parentContentType1.Key },
+                new() { CompositionType = CompositionType.Inheritance, Key = parentContentType2.Key }
+            });
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Add_Self_As_Inheritance()
+    {
+        var createModel = CreateCreateModel("Test", "test");
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = CreateUpdateModel("Test", "test");
+        updateModel.Compositions = new Composition[]
+        {
+            new() { CompositionType = CompositionType.Inheritance, Key = contentType.Key }
+        };
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Add_Inheritance_When_Created_In_A_Folder()
+    {
+        EntityContainer container = ContentTypeService.CreateContainer(Constants.System.Root, Guid.NewGuid(), "Test folder").Result!.Entity;
+
+        var parentContentType = (await ContentTypeEditingService.CreateAsync(CreateCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
+        var contentType = (await ContentTypeEditingService.CreateAsync(CreateCreateModel("Child", parentKey: container.Key), Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = CreateUpdateModel(
+            "Child",
+            compositions: new Composition[]
+            {
+                new() { CompositionType = CompositionType.Inheritance, Key = parentContentType.Key }
+            });
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+    }
+
+    [TestCase(CompositionType.Composition, CompositionType.Inheritance)]
+    [TestCase(CompositionType.Inheritance, CompositionType.Composition)]
+    public async Task Cannot_Change_Composition_To_Inheritance(CompositionType from, CompositionType to)
+    {
+        var compositionCreateModel = CreateCreateModel("Composition", "composition");
+        var compositionContentType = (await ContentTypeEditingService.CreateAsync(compositionCreateModel, Constants.Security.SuperUserKey)).Result!;
+
+        var createModel = CreateCreateModel("Test", "test");
+        createModel.Compositions = new[]
+        {
+            new Composition { Key = compositionContentType.Key, CompositionType = from }
+        };
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = CreateUpdateModel("Test", "test");
+        updateModel.Compositions = new[]
+        {
+            new Composition { Key = compositionContentType.Key, CompositionType = to }
+        };
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
     }
 }

@@ -50,7 +50,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
 
     protected override bool SupportsPublishing => false;
 
-    protected override UmbracoObjectTypes ContentObjectType => UmbracoObjectTypes.MediaType;
+    protected override UmbracoObjectTypes ContentTypeObjectType => UmbracoObjectTypes.MediaType;
 
     protected override UmbracoObjectTypes ContainerObjectType => UmbracoObjectTypes.MediaTypeContainer;
 }

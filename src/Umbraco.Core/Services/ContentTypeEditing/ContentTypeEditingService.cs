@@ -26,7 +26,7 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(ContentTypeCreateModel model, Guid userKey)
     {
-        Attempt<IContentType?, ContentTypeOperationStatus> result = await MapCreateAsync(model, model.Key, model.ParentKey);
+        Attempt<IContentType?, ContentTypeOperationStatus> result = await MapCreateAsync(model, model.Key, model.ContainerKey);
         if (result.Success is false)
         {
             return result;
@@ -99,7 +99,7 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
 
     protected override bool SupportsPublishing => true;
 
-    protected override UmbracoObjectTypes ContentObjectType => UmbracoObjectTypes.DocumentType;
+    protected override UmbracoObjectTypes ContentTypeObjectType => UmbracoObjectTypes.DocumentType;
 
     protected override UmbracoObjectTypes ContainerObjectType => UmbracoObjectTypes.DocumentTypeContainer;
 }

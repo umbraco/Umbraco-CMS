@@ -39,11 +39,11 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
 
     protected abstract bool SupportsPublishing { get; }
 
-    protected abstract UmbracoObjectTypes ContentObjectType { get; }
+    protected abstract UmbracoObjectTypes ContentTypeObjectType { get; }
 
     protected abstract UmbracoObjectTypes ContainerObjectType { get; }
 
-    protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> MapCreateAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? key, Guid? parentKey)
+    protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> MapCreateAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? key, Guid? containerKey)
     {
         SanitizeModelAliases(model);
 
@@ -56,8 +56,8 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         // get all existing content type compositions
         IContentTypeComposition[] allContentTypeCompositions = GetAllContentTypeCompositions();
 
-        // validate inheritance and find the correct content type parent ID (can be both a parent content type and a container)
-        ContentTypeOperationStatus operationStatus = ValidateParent(model, parentKey);
+        // validate inheritance or parent container - a content type can be created either under another content type (inheritance) or inside a container (folder)
+        ContentTypeOperationStatus operationStatus = ValidateInheritanceAndParent(model, containerKey);
         if (operationStatus is not ContentTypeOperationStatus.Success)
         {
             return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
@@ -71,7 +71,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         }
 
         // get the ID of the parent to create the content type under (we already validated that it exists)
-        var parentId = GetParentId(model, parentKey) ?? throw new ArgumentException("Parent ID could not be found", nameof(model));
+        var parentId = GetParentId(model, containerKey) ?? throw new ArgumentException("Parent ID could not be found", nameof(model));
         TContentType contentType = CreateContentType(_shortStringHelper, parentId);
 
         // if the key is specified explicitly, set it (create only)
@@ -97,8 +97,15 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         // get all existing content type compositions
         IContentTypeComposition[] allContentTypeCompositions = GetAllContentTypeCompositions();
 
-        // validate the model
-        ContentTypeOperationStatus operationStatus = await ValidateAsync(model, contentType, allContentTypeCompositions);
+        // validate that inheritance or parent relationship hasn't changed
+        ContentTypeOperationStatus operationStatus = ValidateInheritanceAndParent(contentType, model);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
+        }
+
+        // validate the rest of the model
+        operationStatus = await ValidateAsync(model, contentType, allContentTypeCompositions);
         if (operationStatus is not ContentTypeOperationStatus.Success)
         {
             return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
@@ -206,7 +213,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         return ContentTypeOperationStatus.Success;
     }
 
-    private ContentTypeOperationStatus ValidateParent(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? parentKey)
+    private ContentTypeOperationStatus ValidateInheritanceAndParent(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? containerKey)
     {
         Guid[] inheritedKeys = KeysForCompositionTypes(model, CompositionType.Inheritance);
         Guid[] compositionKeys = KeysForCompositionTypes(model, CompositionType.Composition);
@@ -218,12 +225,12 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         }
 
         // a content type cannot be created/saved in an entity container (a folder) if has an inheritance type composition
-        if (inheritedKeys.Any() && parentKey.HasValue)
+        if (inheritedKeys.Any() && containerKey.HasValue)
         {
             return ContentTypeOperationStatus.InvalidParent;
         }
 
-        var parentId = GetParentId(model, parentKey);
+        var parentId = GetParentId(model, containerKey);
         if (parentId.HasValue)
         {
             return ContentTypeOperationStatus.Success;
@@ -233,6 +240,45 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         return inheritedKeys.Any()
             ? ContentTypeOperationStatus.InvalidInheritance
             : ContentTypeOperationStatus.InvalidParent;
+    }
+
+    private ContentTypeOperationStatus ValidateInheritanceAndParent(TContentType contentType, ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+    {
+        Guid[] inheritedKeys = KeysForCompositionTypes(model, CompositionType.Inheritance);
+        if (inheritedKeys.Length > 1)
+        {
+            return ContentTypeOperationStatus.InvalidInheritance;
+        }
+
+        if (contentType.ParentId == Constants.System.Root)
+        {
+            // the content type does not inherit from another content type, nor does it reside in a container
+            return inheritedKeys.Any()
+                ? ContentTypeOperationStatus.InvalidInheritance
+                : ContentTypeOperationStatus.Success;
+        }
+
+        Attempt<Guid> parentContentTypeKeyAttempt = _entityService.GetKey(contentType.ParentId, ContentTypeObjectType);
+        if (parentContentTypeKeyAttempt.Success)
+        {
+            // the content type inherits from another content type - the model must specify that content type as inheritance
+            return inheritedKeys.Any() is false || inheritedKeys.First() != parentContentTypeKeyAttempt.Result
+                ? ContentTypeOperationStatus.InvalidInheritance
+                : ContentTypeOperationStatus.Success;
+        }
+
+        Attempt<Guid> parentContainerKeyAttempt = _entityService.GetKey(contentType.ParentId, ContainerObjectType);
+        if (parentContainerKeyAttempt.Success)
+        {
+            // the content resides within a container (folder) - the model must not specify any inheritance
+            return inheritedKeys.Any()
+                ? ContentTypeOperationStatus.InvalidInheritance
+                : ContentTypeOperationStatus.Success;
+        }
+
+        // something went terribly wrong here; the existing content type parent ID does not match the root, another
+        // content type or a container. this should not be possible.
+        throw new ArgumentException("The content type parent ID does not match another content type, nor a container", nameof(contentType));
     }
 
     private ContentTypeOperationStatus ValidateCompositions(TContentType? contentType, ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, IContentTypeComposition[] allContentTypeCompositions)
@@ -583,7 +629,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     private async Task<IDataType[]> GetDataTypesAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
         => (await _dataTypeService.GetAllAsync(GetDataTypeKeys(model))).ToArray();
 
-    private int? GetParentId(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? parentKey)
+    private int? GetParentId(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? containerKey)
     {
         Guid[] inheritedKeys = KeysForCompositionTypes(model, CompositionType.Inheritance);
 
@@ -593,13 +639,13 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         // - root if none of the above
         if (inheritedKeys.Any())
         {
-            Attempt<int> parentContentTypeIdAttempt = _entityService.GetId(inheritedKeys.First(), ContentObjectType);
+            Attempt<int> parentContentTypeIdAttempt = _entityService.GetId(inheritedKeys.First(), ContentTypeObjectType);
             return parentContentTypeIdAttempt.Success ? parentContentTypeIdAttempt.Result : null;
         }
 
-        if (parentKey.HasValue)
+        if (containerKey.HasValue)
         {
-            Attempt<int> containerIdAttempt = _entityService.GetId(parentKey.Value, ContainerObjectType);
+            Attempt<int> containerIdAttempt = _entityService.GetId(containerKey.Value, ContainerObjectType);
             return containerIdAttempt.Success ? containerIdAttempt.Result : null;
         }
 
