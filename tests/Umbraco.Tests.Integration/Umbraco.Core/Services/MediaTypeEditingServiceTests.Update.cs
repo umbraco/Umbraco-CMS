@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentTypeEditing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -44,16 +43,16 @@ public partial class MediaTypeEditingServiceTests
         var createModel = CreateCreateModel("Test", "test");
         createModel.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => allowedOne.Id), allowedOne.Key, 10, allowedOne.Alias),
-            new ContentTypeSort(new Lazy<int>(() => allowedTwo.Id), allowedTwo.Key, 20, allowedTwo.Alias),
+            new ContentTypeSort(allowedOne.Key, 10, allowedOne.Alias),
+            new ContentTypeSort(allowedTwo.Key, 20, allowedTwo.Alias),
         };
         var mediaType = (await MediaTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
         var updateModel = CreateUpdateModel("Test", "test");
         updateModel.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => allowedTwo.Id), allowedTwo.Key, 20, allowedTwo.Alias),
-            new ContentTypeSort(new Lazy<int>(() => allowedThree.Id), allowedThree.Key, 30, allowedThree.Alias),
+            new ContentTypeSort(allowedTwo.Key, 20, allowedTwo.Alias),
+            new ContentTypeSort(allowedThree.Key, 30, allowedThree.Alias),
         };
 
         var result = await MediaTypeEditingService.UpdateAsync(mediaType, updateModel, Constants.Security.SuperUserKey);

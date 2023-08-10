@@ -217,7 +217,7 @@ public class LoadTestController : Controller
         };
         containerType.AllowedContentTypes = containerType.AllowedContentTypes.Union(new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => contentType.Id), contentType.Key, 0, contentType.Alias)
+            new ContentTypeSort(contentType.Key, 0, contentType.Alias)
         });
         containerType.AllowedTemplates = containerType.AllowedTemplates.Union(new[] { containerTemplate });
         containerType.SetDefaultTemplate(containerTemplate);

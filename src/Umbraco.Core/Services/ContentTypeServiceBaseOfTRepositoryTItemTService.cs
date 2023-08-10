@@ -658,10 +658,10 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
 
             // Next find all other document types that have a reference to this content type
-            IEnumerable<TItem> referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes?.Any(p=>p.Id.Value==item.Id) ?? false);
+            IEnumerable<TItem> referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes?.Any(p => p.Key == item.Key) ?? false);
             foreach (TItem reference in referenceToAllowedContentTypes)
             {
-                reference.AllowedContentTypes = reference.AllowedContentTypes?.Where(p => p.Id.Value != item.Id);
+                reference.AllowedContentTypes = reference.AllowedContentTypes?.Where(p => p.Key != item.Key);
                 var changedRef = new List<ContentTypeChange<TItem>>() { new ContentTypeChange<TItem>(reference, ContentTypeChangeTypes.RefreshMain) };
                 // Fire change event
                 scope.Notifications.Publish(GetContentTypeChangedNotification(changedRef, eventMessages));

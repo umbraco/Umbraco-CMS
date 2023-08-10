@@ -182,8 +182,8 @@ public partial class ContentTypeEditingServiceTests
         var createModel = CreateCreateModel("Test", "test");
         createModel.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => allowedOne.Id), allowedOne.Key, 10, allowedOne.Alias),
-            new ContentTypeSort(new Lazy<int>(() => allowedTwo.Id), allowedTwo.Key, 20, allowedTwo.Alias),
+            new ContentTypeSort(allowedOne.Key, 10, allowedOne.Alias),
+            new ContentTypeSort(allowedTwo.Key, 20, allowedTwo.Alias),
         };
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
@@ -959,6 +959,25 @@ public partial class ContentTypeEditingServiceTests
 
         // this is invalid; cannot add properties to non-existing containers
         var property = CreatePropertyType("My Property", "myProperty", containerKey: Guid.NewGuid());
+        createModel.Properties = new[] { property };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Add_Property_Container_To_Missing_Container()
+    {
+        // Create doc type using the composition
+        var createModel = CreateCreateModel();
+
+        var group = CreateContainer("My Group", type: GroupContainerType);
+        // this is invalid; a container cannot have a non-existing parent container key
+        group.ParentKey = Guid.NewGuid();
+        createModel.Containers = new[] { group };
+
+        var property = CreatePropertyType("My Property", "myProperty", containerKey: group.Key);
         createModel.Properties = new[] { property };
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);

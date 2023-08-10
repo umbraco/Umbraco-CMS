@@ -396,7 +396,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             .AllowedContentTypes
             .OrderBy(contentTypeSort => contentTypeSort.SortOrder)
             .Select((contentTypeSort, index) => allContentTypesByKey.TryGetValue(contentTypeSort.Key, out IContentTypeComposition? ct)
-                ? new ContentTypeSort(new Lazy<int>(() => ct.Id), contentTypeSort.Key, index, ct.Alias)
+                ? new ContentTypeSort(contentTypeSort.Key, index, ct.Alias)
                 : null)
             .WhereNotNull()
             .ToArray();

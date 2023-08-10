@@ -553,7 +553,7 @@ public class ContentTypeMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll -CreatorId -Level -SortOrder -Variations
     // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
     // Umbraco.Code.MapAll -ContentTypeComposition (done by AfterMapSaveToType)
-    private static void MapSaveToTypeBase<TSource, TSourcePropertyType>(
+    private void MapSaveToTypeBase<TSource, TSourcePropertyType>(
         TSource source,
         IContentTypeComposition target,
         MapperContext context)
@@ -582,13 +582,12 @@ public class ContentTypeMapDefinition : IMapDefinition
 
         target.AllowedAsRoot = source.AllowAsRoot;
 
-        var allowedContentTypesUnchanged = target.AllowedContentTypes?.Select(x => x.Id.Value)
-            .SequenceEqual(source.AllowedContentTypes) ?? false;
-
-        if (allowedContentTypesUnchanged is false)
-        {
-            target.AllowedContentTypes = source.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i));
-        }
+        // NOTE: we're now always overwriting the AllowedContentTypes instead of checking for changes. it is
+        //       OK because this mapping method will be gone for V14 anyway (along with the old view models).
+        IContentType[] allowedContentTypes = target.AllowedContentTypes?.Any() is true
+            ? _contentTypeService.GetAll(target.AllowedContentTypes.Select(c => c.Key)).ToArray()
+            : Array.Empty<IContentType>();
+        target.AllowedContentTypes = allowedContentTypes.Select((c, i) => new ContentTypeSort(c.Key, i, c.Alias));
 
         if (!(target is IMemberType))
         {
@@ -710,7 +709,15 @@ public class ContentTypeMapDefinition : IMapDefinition
         target.Udi = MapContentTypeUdi(source);
         target.UpdateDate = source.UpdateDate;
 
-        target.AllowedContentTypes = source.AllowedContentTypes?.OrderBy(c => c.SortOrder).Select(x => x.Id.Value);
+        // NOTE: this mapping is somewhat cumbersome at this point. it is OK because it will
+        //       be gone for V14 anyway (along with the old view models).
+        IContentType[] allowedContentTypes = source.AllowedContentTypes?.Any() is true
+            ? _contentTypeService.GetAll(source.AllowedContentTypes.Select(c => c.Key)).ToArray()
+            : Array.Empty<IContentType>();
+        Guid[] allowedContentTypesSortOrder = source.AllowedContentTypes?.Any() is true
+            ? source.AllowedContentTypes.OrderBy(c => c.SortOrder).Select(c => c.Key).ToArray()
+            : Array.Empty<Guid>();
+        target.AllowedContentTypes = allowedContentTypes.OrderBy(c => allowedContentTypesSortOrder.IndexOf(c.Key)).Select(c => c.Id).ToArray();
         target.CompositeContentTypes = source.ContentTypeComposition.Select(x => x.Alias);
         target.LockedCompositeContentTypes = MapLockedCompositions(source);
         target.Variations = source.Variations;

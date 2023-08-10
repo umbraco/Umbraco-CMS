@@ -427,7 +427,7 @@ public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotifi
             {
                 newCt.AllowedContentTypes =
                     newCt.AllowedContentTypes?.Union(
-                        new[] { new ContentTypeSort(newCt.Id, allowIfselfAsChildSortOrder) });
+                        new[] { new ContentTypeSort(newCt.Key, allowIfselfAsChildSortOrder, newCt.Alias) });
                 saveContentType(newCt);
             }
 

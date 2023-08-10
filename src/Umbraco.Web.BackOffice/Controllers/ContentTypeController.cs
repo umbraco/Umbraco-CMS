@@ -590,14 +590,14 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
             }
 
             IContentTypeComposition? contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(contentItem);
-            var ids = contentType?.AllowedContentTypes?.OrderBy(c => c.SortOrder).Select(x => x.Id.Value).ToArray();
+            var keys = contentType?.AllowedContentTypes?.OrderBy(c => c.SortOrder).Select(x => x.Key).ToArray();
 
-            if (ids is null || ids.Any() == false)
+            if (keys is null || keys.Any() == false)
             {
                 return Enumerable.Empty<ContentTypeBasic>();
             }
 
-            types = _contentTypeService.GetAll(ids).OrderBy(c => ids.IndexOf(c.Id)).ToList();
+            types = _contentTypeService.GetAll(keys).OrderBy(c => keys.IndexOf(c.Key)).ToList();
         }
 
         var basics = types.Where(type => type.IsElement == false)

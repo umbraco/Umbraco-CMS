@@ -2649,8 +2649,8 @@ public class ContentController : ContentControllerBase
 
             IContentType? parentContentType = _contentTypeService.Get(parent.ContentTypeId);
             //check if the item is allowed under this one
-            if (parentContentType?.AllowedContentTypes?.Select(x => x.Id).ToArray()
-                    .Any(x => x.Value == toMove.ContentType.Id) == false)
+            if (parentContentType?.AllowedContentTypes?.Select(x => x.Key).ToArray()
+                    .Any(x => x == toMove.ContentType.Key) == false)
             {
                 return ValidationProblem(
                     _localizedTextService.Localize("moveOrCopy", "notAllowedByContentType"));

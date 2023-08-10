@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -75,15 +76,15 @@ public partial class ContentTypeEditingServiceTests
         var createModel = CreateCreateModel("Test", "test");
         createModel.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => allowedOne.Id), allowedOne.Key, 10, allowedOne.Alias),
+            new ContentTypeSort(allowedOne.Key, 10, allowedOne.Alias),
         };
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
         var updateModel = CreateUpdateModel("Test", "test");
         updateModel.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => allowedOne.Id), allowedOne.Key, 10, allowedOne.Alias),
-            new ContentTypeSort(new Lazy<int>(() => allowedTwo.Id), allowedTwo.Key, 20, allowedTwo.Alias),
+            new ContentTypeSort(allowedOne.Key, 10, allowedOne.Alias),
+            new ContentTypeSort(allowedTwo.Key, 20, allowedTwo.Alias),
         };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
@@ -109,8 +110,8 @@ public partial class ContentTypeEditingServiceTests
         var createModel = CreateCreateModel("Test", "test");
         createModel.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => allowedOne.Id), allowedOne.Key, 10, allowedOne.Alias),
-            new ContentTypeSort(new Lazy<int>(() => allowedTwo.Id), allowedTwo.Key, 20, allowedTwo.Alias),
+            new ContentTypeSort(allowedOne.Key, 10, allowedOne.Alias),
+            new ContentTypeSort(allowedTwo.Key, 20, allowedTwo.Alias),
         };
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
@@ -138,16 +139,16 @@ public partial class ContentTypeEditingServiceTests
         var createModel = CreateCreateModel("Test", "test");
         createModel.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => allowedOne.Id), allowedOne.Key, 0, allowedOne.Alias),
-            new ContentTypeSort(new Lazy<int>(() => allowedTwo.Id), allowedTwo.Key, 1, allowedTwo.Alias),
+            new ContentTypeSort(allowedOne.Key, 0, allowedOne.Alias),
+            new ContentTypeSort(allowedTwo.Key, 1, allowedTwo.Alias),
         };
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
         var updateModel = CreateUpdateModel("Test", "test");
         updateModel.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => allowedOne.Id), allowedOne.Key, 1, allowedOne.Alias),
-            new ContentTypeSort(new Lazy<int>(() => allowedTwo.Id), allowedTwo.Key, 0, allowedTwo.Alias),
+            new ContentTypeSort(allowedOne.Key, 1, allowedOne.Alias),
+            new ContentTypeSort(allowedTwo.Key, 0, allowedTwo.Alias),
         };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
@@ -174,7 +175,7 @@ public partial class ContentTypeEditingServiceTests
         var updateModel = CreateUpdateModel("Test", "test");
         updateModel.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => id), contentType.Key, 0, contentType.Alias)
+            new ContentTypeSort(contentType.Key, 0, contentType.Alias)
         };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
@@ -608,5 +609,51 @@ public partial class ContentTypeEditingServiceTests
         Assert.IsFalse(contentType.HistoryCleanup.PreventCleanup);
         Assert.AreEqual(234, contentType.HistoryCleanup.KeepAllVersionsNewerThanDays);
         Assert.AreEqual(567, contentType.HistoryCleanup.KeepLatestVersionPerDayForDays);
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Cannot_Move_Properties_To_Non_Existing_Containers(bool isElement)
+    {
+        var createModel = CreateCreateModel("Test", "test", isElement: isElement);
+        var container = CreateContainer("One");
+        createModel.Containers = new[] { container };
+
+        var property = CreatePropertyType("Test Property", "testProperty", containerKey: container.Key);
+        createModel.Properties = new[] { property };
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = CreateUpdateModel("Test", "test", isElement: isElement);
+        property.ContainerKey = Guid.NewGuid();
+        updateModel.Containers = new[] { container };
+        updateModel.Properties = new[] { property };
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Cannot_Move_Containers_To_Non_Existing_Containers(bool isElement)
+    {
+        var createModel = CreateCreateModel("Test", "test", isElement: isElement);
+        var container = CreateContainer("One");
+        createModel.Containers = new[] { container };
+
+        var property = CreatePropertyType("Test Property", "testProperty", containerKey: container.Key);
+        createModel.Properties = new[] { property };
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = CreateUpdateModel("Test", "test", isElement: isElement);
+        container.ParentKey = Guid.NewGuid();
+        updateModel.Containers = new[] { container };
+        updateModel.Properties = new[] { property };
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
     }
 }

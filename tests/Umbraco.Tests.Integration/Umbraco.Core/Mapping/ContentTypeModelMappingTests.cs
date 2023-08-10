@@ -81,12 +81,6 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
                 Assert.AreEqual(propTypes.ElementAt(j).IsSensitiveData, result.IsSensitiveProperty(result.PropertyTypes.ElementAt(j).Alias));
             }
         }
-
-        Assert.AreEqual(display.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-        for (var i = 0; i < display.AllowedContentTypes.Count(); i++)
-        {
-            Assert.AreEqual(display.AllowedContentTypes.ElementAt(i), result.AllowedContentTypes.ElementAt(i).Id.Value);
-        }
     }
 
     [Test]
@@ -129,12 +123,6 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
                 Assert.AreEqual(propTypes.ElementAt(j).Id, result.PropertyTypes.ElementAt(j).Id);
                 Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeId);
             }
-        }
-
-        Assert.AreEqual(display.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-        for (var i = 0; i < display.AllowedContentTypes.Count(); i++)
-        {
-            Assert.AreEqual(display.AllowedContentTypes.ElementAt(i), result.AllowedContentTypes.ElementAt(i).Id.Value);
         }
     }
 
@@ -202,12 +190,6 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         for (var i = 0; i < display.AllowedTemplates.Count(); i++)
         {
             Assert.AreEqual(display.AllowedTemplates.ElementAt(i), result.AllowedTemplates.ElementAt(i).Alias);
-        }
-
-        Assert.AreEqual(display.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-        for (var i = 0; i < display.AllowedContentTypes.Count(); i++)
-        {
-            Assert.AreEqual(display.AllowedContentTypes.ElementAt(i), result.AllowedContentTypes.ElementAt(i).Id.Value);
         }
     }
 
@@ -295,10 +277,6 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         }
 
         Assert.AreEqual(memberType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-        for (var i = 0; i < memberType.AllowedContentTypes.Count(); i++)
-        {
-            Assert.AreEqual(memberType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
-        }
     }
 
     [Test]
@@ -340,10 +318,6 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         }
 
         Assert.AreEqual(mediaType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-        for (var i = 0; i < mediaType.AllowedContentTypes.Count(); i++)
-        {
-            Assert.AreEqual(mediaType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
-        }
     }
 
     [Test]
@@ -397,10 +371,6 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         }
 
         Assert.AreEqual(contentType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-        for (var i = 0; i < contentType.AllowedContentTypes.Count(); i++)
-        {
-            Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
-        }
     }
 
     [Test]
@@ -678,10 +648,6 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
             result.Groups.SelectMany(x => x.ParentTabContentTypes).ContainsAll(new[] { ctMain.Id, ctChild1.Id }));
 
         Assert.AreEqual(contentType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-        for (var i = 0; i < contentType.AllowedContentTypes.Count(); i++)
-        {
-            Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
-        }
     }
 
     [Test]
@@ -771,10 +737,6 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         }
 
         Assert.AreEqual(contentType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-        for (var i = 0; i < contentType.AllowedContentTypes.Count(); i++)
-        {
-            Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
-        }
     }
 
     [Test]
