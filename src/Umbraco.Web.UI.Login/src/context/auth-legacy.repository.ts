@@ -101,13 +101,43 @@ export class UmbAuthLegacyRepository {
 		const request = new Request('backoffice/umbracoapi/authentication/PostSetInvitedUserPassword', {
 			method: 'POST',
 			body: JSON.stringify({
-        newPassWord,
+				newPassWord,
 			}),
 			headers: {
 				'Content-Type': 'application/json',
 			},
 		});
 		const response = await fetch(request);
+
+		return {
+			status: response.status,
+			error: response.ok ? undefined : this.#getErrorText(response),
+		};
+	}
+
+	public async getPasswordConfig(userId: string): Promise<any> {
+		const request = new Request('backoffice/umbracoapi/authentication/GetPasswordConfig', {
+			method: 'POST',
+			body: JSON.stringify({
+				userId,
+			}),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		const response = await fetch(request);
+
+		// Check if response contains AngularJS response data
+		if (response.ok) {
+			let text = await response.text();
+			text = this.#removeAngularJSResponseData(text);
+			const data = JSON.parse(text);
+
+			return {
+				status: response.status,
+				data,
+			};
+		}
 
 		return {
 			status: response.status,
