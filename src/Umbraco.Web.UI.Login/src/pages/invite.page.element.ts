@@ -1,6 +1,6 @@
 import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { CSSResultGroup, LitElement, css, html } from 'lit';
+import { CSSResultGroup, LitElement, PropertyValueMap, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbAuthMainContext } from '../context/auth-main.context';
 
@@ -11,6 +11,9 @@ export default class UmbInvitePageElement extends LitElement {
 
 	@state()
 	error = '';
+
+	@state()
+	user: any = undefined;
 
 	async #onSubmit(event: CustomEvent) {
 		event.preventDefault();
@@ -28,6 +31,20 @@ export default class UmbInvitePageElement extends LitElement {
 		} else {
 			this.state = 'failed';
 		}
+	}
+
+	protected async firstUpdated(_changedProperties: any) {
+		super.firstUpdated(_changedProperties);
+
+		const user = await UmbAuthMainContext.Instance.getInvitedUser();
+
+		if (!user) {
+			alert('TODO: SHOW ERROR');
+			return;
+		}
+
+		this.user = user;
+		console.log(user, 'user');
 	}
 
 	render() {
