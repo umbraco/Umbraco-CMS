@@ -167,7 +167,8 @@ public interface IRelationService : IService
     /// <param name="relationTypeId"></param>
     /// <param name="pageIndex"></param>
     /// <param name="pageSize"></param>
-    /// <param name="totalChildren"></param>
+    /// <param name="totalRecords"></param>
+    /// <param name="ordering"></param>
     /// <returns></returns>
     IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null);
 

@@ -112,8 +112,6 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <param name="content">The content.</param>
         /// <param name="settingsUdi">The settings UDI.</param>
         /// <param name="settings">The settings.</param>
-        /// <param name="rowSpan">The number of rows to span</param>
-        /// <param name="columnSpan">The number of columns to span</param>
         public BlockGridItem(Udi contentUdi, T content, Udi settingsUdi, IPublishedElement settings)
             : base(contentUdi, content, settingsUdi, settings)
         {
@@ -145,8 +143,6 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <param name="content">The content.</param>
         /// <param name="settingsUdi">The settings udi.</param>
         /// <param name="settings">The settings.</param>
-        /// <param name="rowSpan">The number of rows to span</param>
-        /// <param name="columnSpan">The number of columns to span</param>
         public BlockGridItem(Udi contentUdi, TContent content, Udi settingsUdi, TSettings settings)
             : base(contentUdi, content, settingsUdi, settings)
         {

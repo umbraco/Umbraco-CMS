@@ -19,7 +19,7 @@ public interface IPublishedContentCache : IPublishedCache
     ///     </para>
     ///     <para>
     ///         If
-    ///         <param name="hideTopLevelNode" />
+    ///         <paramref name="hideTopLevelNode" />
     ///         is <c>null</c> then the settings value is used.
     ///     </para>
     ///     <para>The value of <paramref name="preview" /> overrides defaults.</para>

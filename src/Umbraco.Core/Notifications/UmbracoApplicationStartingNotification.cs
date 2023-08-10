@@ -1,10 +1,10 @@
 namespace Umbraco.Cms.Core.Notifications;
 
 /// <summary>
-///     Notification that occurs at the very end of the Umbraco boot process (after all <see cref="IComponent" />s are
+///     Notification that occurs at the very end of the Umbraco boot process (after all <see cref="Composing.IComponent" />s are
 /// initialized).
     /// </summary>
-    /// <seealso cref="Umbraco.Cms.Core.Notifications.IUmbracoApplicationLifetimeNotification" />
+    /// <seealso cref="IUmbracoApplicationLifetimeNotification" />
     public class UmbracoApplicationStartingNotification : IUmbracoApplicationLifetimeNotification
     {
         /// <summary>

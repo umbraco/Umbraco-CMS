@@ -66,7 +66,7 @@ public class Media : ContentBase, IMedia
     ///     Changes the <see cref="IMediaType" /> for the current Media object and removes PropertyTypes,
     ///     which are not part of the new MediaType.
     /// </summary>
-    /// <param name="contentType">New MediaType for this Media</param>
+    /// <param name="mediaType">New MediaType for this Media</param>
     /// <param name="clearProperties">Boolean indicating whether to clear PropertyTypes upon change</param>
     internal void ChangeContentType(IMediaType mediaType, bool clearProperties)
     {
