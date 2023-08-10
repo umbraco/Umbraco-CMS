@@ -30,7 +30,7 @@ public class ByPathScriptController : ScriptControllerBase
         IScript? script = await _scriptService.GetAsync(path);
 
         return script is null
-            ? NotFound()
+            ? ScriptNotFound()
             : Ok(_mapper.Map<ScriptResponseModel>(script));
     }
 }

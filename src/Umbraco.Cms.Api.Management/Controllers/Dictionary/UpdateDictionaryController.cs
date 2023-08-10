@@ -32,13 +32,13 @@ public class UpdateDictionaryController : DictionaryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, UpdateDictionaryItemRequestModel updateDictionaryItemRequestModel)
     {
         IDictionaryItem? current = await _dictionaryItemService.GetAsync(id);
         if (current == null)
         {
-            return NotFound();
+            return DictionaryNotFound();
         }
 
         IDictionaryItem updated = await _dictionaryPresentationFactory.MapUpdateModelToDictionaryItemAsync(current, updateDictionaryItemRequestModel);

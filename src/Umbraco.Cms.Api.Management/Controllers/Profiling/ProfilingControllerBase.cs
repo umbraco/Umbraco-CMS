@@ -23,6 +23,8 @@ public class ProfilingControllerBase : ManagementApiControllerBase
                 .WithDetail("Executing this action requires a signed in user.")
                 .Build()),
 
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown profiling operation status")
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown profiling operation status.")
+                .Build()),
         };
 }

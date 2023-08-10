@@ -23,13 +23,13 @@ public class ByKeyDictionaryController : DictionaryControllerBase
     [HttpGet($"{{{nameof(id)}:guid}}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DictionaryItemResponseModel), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DictionaryItemResponseModel>> ByKey(Guid id)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ByKey(Guid id)
     {
         IDictionaryItem? dictionary = await _dictionaryItemService.GetAsync(id);
         if (dictionary == null)
         {
-            return NotFound();
+            return DictionaryNotFound();
         }
 
         return Ok(await _dictionaryPresentationFactory.CreateDictionaryItemViewModelAsync(dictionary));

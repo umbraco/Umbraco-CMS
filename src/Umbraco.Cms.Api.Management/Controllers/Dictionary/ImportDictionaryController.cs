@@ -29,7 +29,7 @@ public class ImportDictionaryController : DictionaryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Import(ImportDictionaryRequestModel importDictionaryRequestModel)
     {
         Attempt<IDictionaryItem?, DictionaryImportOperationStatus> result = await _dictionaryItemImportService
@@ -41,8 +41,12 @@ public class ImportDictionaryController : DictionaryControllerBase
         return result.Status switch
         {
             DictionaryImportOperationStatus.Success => CreatedAtAction<ByKeyDictionaryController>(controller => nameof(controller.ByKey), result.Result!.Key),
-            DictionaryImportOperationStatus.ParentNotFound => NotFound("The parent dictionary item could not be found."),
-            DictionaryImportOperationStatus.TemporaryFileNotFound => NotFound("The temporary file with specified id could not be found."),
+            DictionaryImportOperationStatus.ParentNotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("The parent dictionary item could not be found.")
+                    .Build()),
+            DictionaryImportOperationStatus.TemporaryFileNotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("The temporary file with specified id could not be found.")
+                    .Build()),
             DictionaryImportOperationStatus.InvalidFileType => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid file type")
                 .WithDetail("The dictionary import only supports UDT files.")
@@ -51,7 +55,9 @@ public class ImportDictionaryController : DictionaryControllerBase
                 .WithTitle("Invalid file content")
                 .WithDetail("The uploaded file could not be read as a valid UDT file.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown dictionary import operation status")
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown dictionary import operation status.")
+                .Build()),
         };
     }
 }

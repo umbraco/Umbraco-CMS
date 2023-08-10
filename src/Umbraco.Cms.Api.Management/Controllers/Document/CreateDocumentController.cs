@@ -29,8 +29,8 @@ public class CreateDocumentController : DocumentControllerBase
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Create(CreateDocumentRequestModel requestModel)
     {
         ContentCreateModel model = _documentEditingPresentationFactory.MapCreateModel(requestModel);

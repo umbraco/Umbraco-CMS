@@ -21,4 +21,9 @@ public abstract class RelationControllerBase : ManagementApiControllerBase
                 .WithDetail("The relation type could not be found.")
                 .Build()),
         };
+
+    protected IActionResult RelationNotFound() => NotFound(new ProblemDetailsBuilder()
+        .WithTitle("The relation could not be found")
+        .Build());
+
 }

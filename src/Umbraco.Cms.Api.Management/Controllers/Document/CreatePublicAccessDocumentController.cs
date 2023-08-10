@@ -26,8 +26,8 @@ public class CreatePublicAccessDocumentController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [HttpPost("{id:guid}/public-access")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Create(Guid id, PublicAccessRequestModel publicAccessRequestModel)
     {
         PublicAccessEntrySlim publicAccessEntrySlim = _publicAccessPresentationFactory.CreatePublicAccessEntrySlim(publicAccessRequestModel, id);

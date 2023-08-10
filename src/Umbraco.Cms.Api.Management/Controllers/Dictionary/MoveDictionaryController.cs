@@ -26,13 +26,13 @@ public class MoveDictionaryController : DictionaryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Move(Guid id, MoveDictionaryRequestModel moveDictionaryRequestModel)
     {
         IDictionaryItem? source = await _dictionaryItemService.GetAsync(id);
         if (source == null)
         {
-            return NotFound();
+            return DictionaryNotFound();
         }
 
         Attempt<IDictionaryItem, DictionaryItemOperationStatus> result = await _dictionaryItemService.MoveAsync(

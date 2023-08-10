@@ -1,8 +1,9 @@
+@using System.Globalization
 @model Umbraco.Cms.Api.Management.BackOfficeLoginModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@CultureInfo.CurrentCulture.Name">
     <head>
         <meta charset="UTF-8" />
         <link rel="icon" type="image/svg+xml" href="~/umbraco/login/favicon.svg" />

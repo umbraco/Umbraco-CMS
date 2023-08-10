@@ -22,7 +22,7 @@ public class RunMigrationPackageController : PackageControllerBase
     /// <returns>The result of running the package migrations.</returns>
     [HttpPost("{name}/run-migration")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> RunMigrations(string name)

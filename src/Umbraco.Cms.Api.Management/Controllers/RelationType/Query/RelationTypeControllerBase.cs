@@ -29,10 +29,7 @@ public class RelationTypeControllerBase : ManagementApiControllerBase
                 .WithTitle("Key already exists")
                 .WithDetail("An entity with the given key already exists")
                 .Build()),
-            RelationTypeOperationStatus.NotFound => NotFound(new ProblemDetailsBuilder()
-                .WithTitle("Relation type not found")
-                .WithDetail("A relation type with the given key does not exist")
-                .Build()),
+            RelationTypeOperationStatus.NotFound => RelationTypeNotFound(),
             RelationTypeOperationStatus.InvalidChildObjectType => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid child object type")
                 .WithDetail("The child object type is not allowed")
@@ -42,4 +39,10 @@ public class RelationTypeControllerBase : ManagementApiControllerBase
                 .WithDetail("The parent object type is not allowed")
                 .Build()),
         };
+
+        protected IActionResult RelationTypeNotFound() => NotFound(new ProblemDetailsBuilder()
+            .WithTitle("Relation type not found")
+            .WithDetail("A relation type with the given key does not exist")
+            .Build());
+
 }

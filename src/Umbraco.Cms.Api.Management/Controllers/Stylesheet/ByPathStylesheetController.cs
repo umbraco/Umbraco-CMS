@@ -31,7 +31,7 @@ public class ByPathStylesheetController : StylesheetControllerBase
 
         if (stylesheet is null)
         {
-            return NotFound();
+            return StylesheetNotFound();
         }
 
         StylesheetResponseModel? viewModel = _umbracoMapper.Map<StylesheetResponseModel>(stylesheet);

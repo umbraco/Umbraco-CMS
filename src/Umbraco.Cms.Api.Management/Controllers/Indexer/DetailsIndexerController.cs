@@ -49,7 +49,7 @@ public class DetailsIndexerController : IndexerControllerBase
             Type = "Error",
         };
 
-        return await Task.FromResult(BadRequest(invalidModelProblem));
+        return await Task.FromResult(NotFound(invalidModelProblem));
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.PublicAccess;
@@ -24,6 +25,7 @@ public class GetPublicAccessDocumentController : DocumentControllerBase
 
     [MapToApiVersion("1.0")]
     [HttpGet("{id:guid}/public-access")]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetPublicAccess(Guid id)
     {
         Attempt<PublicAccessEntry?, PublicAccessOperationStatus> accessAttempt =

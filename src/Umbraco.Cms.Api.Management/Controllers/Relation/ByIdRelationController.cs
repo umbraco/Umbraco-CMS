@@ -23,13 +23,13 @@ public class ByIdRelationController : RelationControllerBase
     [HttpGet("{id:int}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(RelationResponseModel), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> ById(int id)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ById(int id)
     {
         IRelation? relation = _relationService.GetById(id);
         if (relation is null)
         {
-            return NotFound();
+            return RelationNotFound();
         }
 
         return await Task.FromResult(Ok(_relationPresentationFactory.Create(relation)));

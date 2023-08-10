@@ -56,7 +56,10 @@ public class EFCoreCreateTablesNotificationHandler : INotificationAsyncHandler<D
 
     public async Task HandleAsync(DatabaseSchemaAndDataCreatedNotification notification, CancellationToken cancellationToken)
     {
-        await HandleAsync();
+        if (notification.RequiresUpgrade is false)
+        {
+            await HandleAsync();
+        }
     }
 
     private async Task HandleAsync()

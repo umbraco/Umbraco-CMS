@@ -26,7 +26,7 @@ public class AllowedChildrenOfRootDocumentController : DocumentControllerBase
     [HttpGet("root/allowed-document-types")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentTypeResponseModel>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AllowedChildrenOfRoot(int skip = 0, int take = 100)
     {
         PagedModel<IContentType> allowedChildrenOfRoot = await _contentTypeService.GetAllAllowedAsRootAsync(skip, take);
