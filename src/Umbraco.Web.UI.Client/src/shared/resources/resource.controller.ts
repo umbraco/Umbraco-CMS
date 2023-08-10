@@ -96,8 +96,8 @@ export class UmbResourceController extends UmbBaseController {
 						if (this.#notificationContext) {
 							this.#notificationContext.peek('danger', {
 								data: {
-									headline: error.body.title ?? error.name ?? 'Server Error',
-									message: error.body.detail ?? error.message ?? 'Something went wrong',
+									headline: error.body?.title ?? error.name ?? 'Server Error',
+									message: error.body?.detail ?? error.message ?? 'Something went wrong',
 								},
 								...options,
 							});

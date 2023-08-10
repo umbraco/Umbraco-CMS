@@ -112,7 +112,10 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		);
 
 		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUi'), (propertyEditorUIs) => {
-			this.#propertyEditorUIs = propertyEditorUIs;
+
+			// Only include Property Editor UIs which has Property Editor Schema Alias
+			this.#propertyEditorUIs = propertyEditorUIs.filter((propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias);
+
 			this._performFiltering();
 		});
 	}

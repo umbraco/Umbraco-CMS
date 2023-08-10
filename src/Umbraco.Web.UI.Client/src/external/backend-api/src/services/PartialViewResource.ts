@@ -195,6 +195,9 @@ export class PartialViewResource {
             path: {
                 'name': name,
             },
+            errors: {
+                404: `Not Found`,
+            },
         });
     }
 

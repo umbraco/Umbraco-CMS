@@ -1,14 +1,14 @@
 import type {
 	CreateFolderRequestModel,
 	FolderModelBaseModel,
-	FolderReponseModel,
+	FolderResponseModel,
 	ProblemDetails,
 	UpdateFolderReponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbFolderRepository {
 	createFolderScaffold(parentId: string | null): Promise<{
-		data?: FolderReponseModel;
+		data?: FolderResponseModel;
 		error?: ProblemDetails;
 	}>;
 	createFolder(folderRequest: CreateFolderRequestModel): Promise<{
@@ -17,7 +17,7 @@ export interface UmbFolderRepository {
 	}>;
 
 	requestFolder(unique: string): Promise<{
-		data?: FolderReponseModel;
+		data?: FolderResponseModel;
 		error?: ProblemDetails;
 	}>;
 

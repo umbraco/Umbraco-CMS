@@ -1,7 +1,5 @@
 import type { ManifestWithLoaderIncludingDefaultExport } from '@umbraco-cms/backoffice/extension-api';
-
-export type UmbTranslationEntry = string | ((...args: any[]) => string);
-export type UmbTranslationsDictionary = Record<string, Record<string, UmbTranslationEntry>>;
+import type { UmbTranslationsDictionary } from '@umbraco-cms/backoffice/localization-api';
 
 export interface ManifestTranslations extends ManifestWithLoaderIncludingDefaultExport<UmbTranslationsDictionary> {
 	type: 'translations';

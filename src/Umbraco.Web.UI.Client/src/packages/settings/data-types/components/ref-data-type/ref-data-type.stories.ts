@@ -1,7 +1,8 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import { html } from '@umbraco-cms/backoffice/external/lit';
-import './ref-data-type.element.js';
 import type { UmbRefDataTypeElement } from './ref-data-type.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
+import './ref-data-type.element.js';
 
 const meta: Meta<UmbRefDataTypeElement> = {
 	title: 'Components/Ref Data Type',
@@ -15,7 +16,7 @@ export const Overview: Story = {
 	args: {
 		name: 'Custom Data Type',
 		propertyEditorUiAlias: 'Umb.DataTypeInput.CustomUI',
-		propertyEditorSchemaAlias: 'Umbraco.JSON',
+		propertyEditorSchemaAlias: UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT,
 	},
 };
 
@@ -23,7 +24,7 @@ export const WithDetail: Story = {
 	args: {
 		name: 'Custom Data Type',
 		propertyEditorUiAlias: 'Umb.DataType.CustomUI',
-		propertyEditorSchemaAlias: 'Umbraco.JSON',
+		propertyEditorSchemaAlias: UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT,
 		detail: 'With some custom details',
 	},
 };
@@ -32,7 +33,7 @@ export const WithSlots: Story = {
 	args: {
 		name: 'Custom Data Type',
 		propertyEditorUiAlias: 'Umb.DataTypeInput.CustomUI',
-		propertyEditorSchemaAlias: 'Umbraco.JSON',
+		propertyEditorSchemaAlias: UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT,
 		detail: 'With some custom details',
 	},
 	render: (args) => html`

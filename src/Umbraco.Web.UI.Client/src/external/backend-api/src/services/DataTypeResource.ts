@@ -8,7 +8,7 @@ import type { CreateFolderRequestModel } from '../models/CreateFolderRequestMode
 import type { DataTypeItemResponseModel } from '../models/DataTypeItemResponseModel';
 import type { DataTypeReferenceResponseModel } from '../models/DataTypeReferenceResponseModel';
 import type { DataTypeResponseModel } from '../models/DataTypeResponseModel';
-import type { FolderReponseModel } from '../models/FolderReponseModel';
+import type { FolderResponseModel } from '../models/FolderResponseModel';
 import type { MoveDataTypeRequestModel } from '../models/MoveDataTypeRequestModel';
 import type { PagedDataTypeTreeItemResponseModel } from '../models/PagedDataTypeTreeItemResponseModel';
 import type { UpdateDataTypeRequestModel } from '../models/UpdateDataTypeRequestModel';
@@ -230,7 +230,7 @@ export class DataTypeResource {
         id,
     }: {
         id: string,
-    }): CancelablePromise<FolderReponseModel> {
+    }): CancelablePromise<FolderResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/data-type/folder/{id}',

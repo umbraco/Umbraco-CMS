@@ -4,7 +4,7 @@ import { UmbFolderModalData, UmbFolderModalResult, UmbModalContext } from '@umbr
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionClass, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
-import { FolderReponseModel, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
+import { FolderResponseModel, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -33,7 +33,7 @@ export class UmbFolderModalElement extends UmbLitElement {
 	#repositoryObserver?: UmbObserverController<ManifestBase | undefined>;
 
 	@state()
-	_folder?: FolderReponseModel;
+	_folder?: FolderResponseModel;
 
 	@state()
 	_headline?: string;

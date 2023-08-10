@@ -1,4 +1,4 @@
-import type { UmbTranslationsDictionary } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbTranslationsDictionary } from '@umbraco-cms/backoffice/localization-api';
 
 export default {
 	actions: {

@@ -10,7 +10,6 @@ import { manifest as eyeDropper } from './Umbraco.ColorPicker.EyeDropper.js';
 import { manifest as iconPicker } from './Umbraco.IconPicker.js';
 import { manifest as imageCropper } from './Umbraco.ImageCropper.js';
 import { manifest as integer } from './Umbraco.Integer.js';
-import { manifest as json } from './Umbraco.JSON.js';
 import { manifest as label } from './Umbraco.Label.js';
 import { manifest as listView } from './Umbraco.ListView.js';
 import { manifest as markdownEditor } from './Umbraco.MarkdownEditor.js';
@@ -45,7 +44,6 @@ export const manifests: Array<ManifestPropertyEditorSchema> = [
 	iconPicker,
 	imageCropper,
 	integer,
-	json,
 	label,
 	listView,
 	markdownEditor,

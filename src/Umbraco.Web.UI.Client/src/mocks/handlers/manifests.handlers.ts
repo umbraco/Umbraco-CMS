@@ -34,7 +34,7 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/package/manifes
 							label: 'My Custom Property',
 							icon: 'document',
 							group: 'Common',
-							propertyEditorSchema: 'Umbraco.JSON',
+							propertyEditorSchema: 'Umbraco.TextBox',
 						},
 					},
 				],

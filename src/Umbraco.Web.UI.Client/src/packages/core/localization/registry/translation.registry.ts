@@ -1,16 +1,22 @@
-import { TranslationSet, registerTranslation } from '../manager.js';
-import { hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import {
-	UmbBackofficeExtensionRegistry,
-	UmbTranslationEntry,
 	UmbTranslationsDictionary,
-	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extension-registry';
+	UmbTranslationsFlatDictionary,
+	TranslationSet,
+	registerTranslation,
+	translations,
+} from '@umbraco-cms/backoffice/localization-api';
+import { hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
+import { UmbBackofficeExtensionRegistry, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { Subject, combineLatest, map, distinctUntilChanged, Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
-export type UmbTranslationsFlatDictionary = Record<string, UmbTranslationEntry>;
-
 export class UmbTranslationRegistry {
+	/**
+	 * Get the current registered translations.
+	 */
+	get translations() {
+		return translations;
+	}
+
 	#currentLanguage = new Subject<string>();
 	#currentLanguageUnique: Observable<string> = this.#currentLanguage.pipe(
 		map((x) => x.toLowerCase()),
@@ -49,7 +55,7 @@ export class UmbTranslationRegistry {
 
 							// Notify subscribers that the inner dictionary has changed.
 							return {
-								$code: userCulture,
+								$code: extension.meta.culture.toLowerCase(),
 								$dir: extension.meta.direction ?? 'ltr',
 								...innerDictionary,
 							} satisfies TranslationSet;
@@ -60,7 +66,7 @@ export class UmbTranslationRegistry {
 					registerTranslation(...translations);
 
 					// Set the document language
-					document.documentElement.lang = locale.baseName;
+					document.documentElement.lang = locale.baseName.toLowerCase();
 
 					// Set the document direction to the direction of the primary language
 					document.documentElement.dir = translations[0].$dir ?? 'ltr';

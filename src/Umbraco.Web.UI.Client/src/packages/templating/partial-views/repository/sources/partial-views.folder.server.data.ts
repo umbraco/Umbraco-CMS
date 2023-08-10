@@ -1,7 +1,7 @@
 import {
 	CreateFolderRequestModel,
 	FolderModelBaseModel,
-	FolderReponseModel,
+	FolderResponseModel,
 	PartialViewResource,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -17,7 +17,7 @@ export class UmbPartialViewsFolderServerDataSource implements UmbFolderDataSourc
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
-	createScaffold(parentId: string | null): Promise<DataSourceResponse<FolderReponseModel>> {
+	createScaffold(parentId: string | null): Promise<DataSourceResponse<FolderResponseModel>> {
 		throw new Error('Method not implemented.');
 	}
 	get(unique: string): Promise<DataSourceResponse<PartialViewGetFolderResponse>> {
