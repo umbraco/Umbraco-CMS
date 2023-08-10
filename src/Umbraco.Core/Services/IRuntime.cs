@@ -16,7 +16,4 @@ public interface IRuntime : IHostedService
     ///     Stops and Starts the runtime using the original cancellation token.
     /// </summary>
     Task RestartAsync();
-
-    new Task StartAsync(CancellationToken cancellationToken);
-    new Task StopAsync(CancellationToken cancellationToken);
 }
