@@ -1088,9 +1088,9 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             .From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == entity.VersionId || (x.NodeId == entity.Id && x.Current)));
 
         ContentVersionDto? version = versionAndCurrent.FirstOrDefault(x => x.Id == entity.VersionId);
-        string? currentName = versionAndCurrent.FirstOrDefault(x => x.Current)?.Text;
+        ContentVersionDto? current = versionAndCurrent.FirstOrDefault(x => x.Current);
 
-        if (version == null || (!version.Current && !version.Alternate))
+        if (version == null || current == null || (!version.Current && !version.Alternate))
         {
             throw new InvalidOperationException("Cannot save a non-current or non-alternate version.");
         }
@@ -1152,7 +1152,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         // only update on publishing
         if (version.Alternate && !publishing)
         {
-            nodeDto.Text = currentName;
+            nodeDto.Text = current.Text;
         }
 
         nodeDto.ValidatePathWithException();
@@ -1257,9 +1257,12 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 Database.Execute(deleteContentVariations);
 
                 // replace the document version variations (rather than updating)
-                Sql<ISqlContext> deleteDocumentVariations = Sql().Delete<DocumentCultureVariationDto>()
-                    .Where<DocumentCultureVariationDto>(x => x.NodeId == entity.Id);
-                Database.Execute(deleteDocumentVariations);
+                if (!entity.IsAlternateVersion)
+                {
+                    Sql<ISqlContext> deleteDocumentVariations = Sql().Delete<DocumentCultureVariationDto>()
+                        .Where<DocumentCultureVariationDto>(x => x.NodeId == entity.Id);
+                    Database.Execute(deleteDocumentVariations);
+                }
 
                 // TODO: NPoco InsertBulk issue?
                 // we should use the native NPoco InsertBulk here but it causes problems (not sure exactly all scenarios)
@@ -1271,7 +1274,10 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
                 // insert document variations
-                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures!));
+                if (!entity.IsAlternateVersion)
+                {
+                    Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures!));
+                }
             }
 
             // update the document dto
