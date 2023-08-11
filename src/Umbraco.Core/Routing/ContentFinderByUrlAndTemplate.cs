@@ -69,7 +69,7 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("No template in path '/'");
+                    _logger.LogDebug("No template in path '/'");
             }
 
             return Task.FromResult(false);
