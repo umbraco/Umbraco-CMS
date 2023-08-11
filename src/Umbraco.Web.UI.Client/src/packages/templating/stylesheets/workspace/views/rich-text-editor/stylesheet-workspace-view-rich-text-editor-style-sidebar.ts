@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -20,19 +20,63 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 		this.modalContext?.reject();
 	}
 
+	#submit() {
+		const rule = this.data?.rule ?? {};
+		this.modalContext?.submit({ rule });
+	}
+
 	render() {
 		return html`
-			<umb-body-layout headline="Insert">
+			<umb-body-layout headline="Edit style">
 				<div id="main">
 					<uui-box>
-						<h3>Rule</h3>
-						<p>${this.data?.rule?.name}</p>
-						<p>${this.data?.rule?.selector}</p>
-						<p>${this.data?.rule?.styles}</p>
+						<uui-form>
+							<form id="MyForm" name="myForm">
+								<uui-form-layout-item>
+									<uui-label for="name" slot="label" required>Name</uui-label>
+									<span slot="description">The name displayed in the editor style selector</span>
+									<uui-input id="name" name="name" .value=${this.data?.rule?.name ?? ''} label="Rule name" required>
+									</uui-input>
+								</uui-form-layout-item>
+								<uui-form-layout-item>
+									<uui-label for="selector" slot="label" required>Selector</uui-label>
+									<span slot="description">Uses CSS syntax, e.g. "h1" or ".redHeader"</span>
+									<uui-input
+										id="selector"
+										name="selector"
+										.value=${this.data?.rule?.selector ?? ''}
+										label="Rule selector"
+										required>
+									</uui-input>
+								</uui-form-layout-item>
+								<uui-form-layout-item>
+									<uui-label for="styles" slot="label" required="">Selector</uui-label>
+									<span slot="description"
+										>The CSS that should be applied in the rich text editor, e.g. "color:red;"</span
+									>
+									<uui-textarea id="styles" name="styles" .value=${this.data?.rule?.styles ?? ''} label="Rule styles">
+									</uui-textarea>
+								</uui-form-layout-item>
+								<uui-form-layout-item>
+									<uui-label for="styles" slot="label" required="">Preview</uui-label>
+									<span slot="description">How the text will look like in the rich text editor.</span>
+									<div style="${ifDefined(this.data?.rule?.styles)}">
+										a b c d e f g h i j k l m n o p q r s t u v w x t z
+										<br />
+										A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+										<br />
+										1 2 3 4 5 6 7 8 9 0 € £ $ % &amp; (.,;:'"!?)
+										<br />
+										Just keep examining every bid quoted for zinc etchings.
+									</div>
+								</uui-form-layout-item>
+							</form>
+						</uui-form>
 					</uui-box>
 				</div>
 				<div slot="actions">
 					<uui-button @click=${this._close} look="secondary" label="Close">Close</uui-button>
+					<uui-button @click=${this.#submit} look="primary" color="positive" label="Submit">Submit</uui-button>
 				</div>
 			</umb-body-layout>
 		`;
@@ -59,9 +103,20 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 				margin-bottom: var(--uui-size-space-5);
 			}
 
-			h3,
-			p {
-				text-align: left;
+			uui-input {
+				width: 100%;
+			}
+
+			#styles {
+				font-family:
+					Monaco,
+					Menlo,
+					Consolas,
+					Courier New,
+					monospace;
+				--uui-textarea-min-height: 100px;
+				resize: none;
+				width: 300px;
 			}
 		`,
 	];

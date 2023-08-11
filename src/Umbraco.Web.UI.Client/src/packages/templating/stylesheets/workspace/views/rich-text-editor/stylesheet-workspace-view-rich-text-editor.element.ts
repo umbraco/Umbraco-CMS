@@ -18,7 +18,7 @@ export const UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR_MODAL = new UmbMo
 	UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR,
 	{
 		type: 'sidebar',
-		size: 'small',
+		size: 'medium',
 	},
 );
 @customElement('umb-stylesheet-workspace-view-rich-text-editor')
@@ -96,12 +96,19 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 		});
 	};
 
+	#removeRule = (rule: RichTextRuleModel) => {
+		this._rules = this._rules?.filter((r) => r !== rule);
+		throw new Error('Method not implemented.');
+	};
+
 	renderRule(rule: RichTextRuleModel) {
 		return html`<div class="rule">
 			<div class="rule-name"><uui-icon name="umb:navigation"></uui-icon>${rule.name}</div>
 			<div class="rule-actions">
 				<uui-button label="Edit" look="secondary" @click=${() => this.#openModal(rule)}>Edit</uui-button
-				><uui-button label="Remove" look="secondary" color="danger">Remove</uui-button>
+				><uui-button label="Remove" look="secondary" color="danger" @click=${() => this.#removeRule(rule)}
+					>Remove</uui-button
+				>
 			</div>
 		</div>`;
 	}
