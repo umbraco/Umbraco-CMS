@@ -145,7 +145,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 								label="description"
 								name="description"
 								id="description-input"
-								placeholder="Enter a description..."
+								placeholder=${this.localize.term('placeholders_enterDescription')}
 								.value=${this.property.description}
 								@input=${(e: CustomEvent) => {
 									if (e.target) this._singleValueUpdate('description', (e.target as HTMLInputElement).value);
