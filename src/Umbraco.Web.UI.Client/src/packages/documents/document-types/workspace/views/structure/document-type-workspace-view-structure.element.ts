@@ -46,7 +46,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 		return html`
 			<uui-box headline="Structure">
 				<umb-workspace-property-layout alias="Root" label="Allow as Root">
-					<div slot="description">Allow editors to create content of this type in the root of the content tree.</div>
+					<div slot="description">${this.localize.term('contentTypeEditor_allowAsRootDescription')}</div>
 					<div slot="editor">
 						<uui-toggle
 							label=${this.localize.term('contentTypeEditor_allowAsRootHeading')}
@@ -69,7 +69,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 									(id, index) => ({
 										id: id,
 										sortOrder: index,
-									})
+									}),
 								);
 								this.#workspaceContext?.setAllowedContentTypes(sortedContentTypesList);
 							}}">
