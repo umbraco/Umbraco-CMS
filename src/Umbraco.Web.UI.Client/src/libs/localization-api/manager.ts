@@ -26,17 +26,17 @@ export interface DefaultTranslationSet extends TranslationSet {
 }
 
 export const connectedElements = new Set<HTMLElement>();
-const documentElementObserver = new MutationObserver(update);
+// const documentElementObserver = new MutationObserver(update);
 export const translations: Map<string, TranslationSet> = new Map();
 export let documentDirection = document.documentElement.dir || 'ltr';
 export let documentLanguage = document.documentElement.lang || navigator.language;
 export let fallback: TranslationSet;
 
 // Watch for changes on <html lang>
-documentElementObserver.observe(document.documentElement, {
-	attributes: true,
-	attributeFilter: ['dir', 'lang'],
-});
+// documentElementObserver.observe(document.documentElement, {
+// 	attributes: true,
+// 	attributeFilter: ['lang'],
+// });
 
 /** Registers one or more translations */
 export function registerTranslation(...translation: TranslationSet[]) {
