@@ -131,7 +131,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				<div style="color:var(--uui-color-danger-emphasis)">
 					<umb-localize key="contentTypeEditor_confirmDeleteTabNotice">This will delete all items that doesn't belong to a composition.</umb-localize>
 				</div>`,
-			confirmLabel: 'Delete',
+			confirmLabel: this.localize.term('actions_delete'),
 			color: 'danger',
 		};
 
