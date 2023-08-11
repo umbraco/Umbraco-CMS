@@ -277,7 +277,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				<uui-icon name="umb:merge"></uui-icon>
 				Compositions
 			</uui-button>
-			<uui-button label="Reorder" compact>
+			<uui-button label=${this.localize.term('general_reorder')} compact>
 				<uui-icon name="umb:navigation"></uui-icon>
 				Reorder
 			</uui-button>
