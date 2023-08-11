@@ -1,6 +1,6 @@
 import { LitElement, TemplateResult } from 'lit';
 
-interface AnchorElement extends HTMLElement {
+interface AnchorElement {
 	nodeName: string;
 	target: string;
 	hasAttribute(name: string): boolean;
