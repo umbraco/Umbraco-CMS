@@ -21,6 +21,7 @@ export class UmbTranslationRegistry {
 
 	constructor(extensionRegistry: UmbBackofficeExtensionRegistry) {
 		const currentLanguage$ = this.#currentLanguage.pipe(
+			startWith(document.documentElement.lang || 'en-us'),
 			map((x) => x.toLowerCase()),
 			distinctUntilChanged()
 		);

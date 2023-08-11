@@ -76,8 +76,9 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#setLanguage() {
-		const initialLanguage = this.lang || document.documentElement.lang || 'en-us';
-		umbTranslationRegistry.loadLanguage(initialLanguage);
+		if (this.lang) {
+			umbTranslationRegistry.loadLanguage(this.lang);
+		}
 	}
 
 	#listenForLanguageChange(authContext: UmbAuthContext) {
