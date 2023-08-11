@@ -7,14 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/localization-api';
 import { hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBackofficeExtensionRegistry, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	Subject,
-	combineLatest,
-	map,
-	distinctUntilChanged,
-	Observable,
-	filter,
-} from '@umbraco-cms/backoffice/external/rxjs';
+import { Subject, combineLatest, map, distinctUntilChanged, filter } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbTranslationRegistry {
 	/**
@@ -27,14 +20,14 @@ export class UmbTranslationRegistry {
 	#currentLanguage = new Subject<string>();
 
 	constructor(extensionRegistry: UmbBackofficeExtensionRegistry) {
-		const currentLanguage$: Observable<string> = this.#currentLanguage.pipe(
+		const currentLanguage$ = this.#currentLanguage.pipe(
 			map((x) => x.toLowerCase()),
 			distinctUntilChanged()
 		);
 
 		const currentExtensions$ = extensionRegistry.extensionsOfType('translations').pipe(
 			filter((x) => x.length > 0),
-			distinctUntilChanged((prev, curr) => prev.length !== curr.length)
+			distinctUntilChanged((prev, curr) => prev.length === curr.length && prev.every((x) => curr.includes(x)))
 		);
 
 		combineLatest([currentLanguage$, currentExtensions$]).subscribe(async ([userCulture, extensions]) => {
