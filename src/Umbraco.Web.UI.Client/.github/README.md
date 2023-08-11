@@ -1,4 +1,4 @@
-# Bellissima
+# Umbraco.CMS.Bacoffice (Bellissima)
 
 This is the working repository of the upcoming new Backoffice to Umbraco CMS.
 
