@@ -155,7 +155,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="email">Email of the <see cref="IMembershipUser"/> to create</param>
         /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
         /// <param name="memberTypeAlias">Alias of the Type</param>
-        /// <param name="isApproved">Is the member approved</param>
         /// <returns><see cref="IMember"/></returns>
         IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias)
             => CreateMemberWithIdentity(username, email, username, passwordValue, memberTypeAlias);
@@ -186,15 +185,16 @@ namespace Umbraco.Cms.Core.Services
             => CreateMemberWithIdentity(username, email, name, string.Empty, memberTypeAlias, isApproved);
 
         /// <summary>
-        /// Creates and persists a Member
+        /// Creates and persists a Member.
         /// </summary>
         /// <remarks>Using this method will persist the Member object before its returned
-        /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
-        /// <param name="username">Username of the Member to create</param>
-        /// <param name="email">Email of the Member to create</param>
-        /// <param name="name">Name of the Member to create</param>
-        /// <param name="memberTypeAlias">Alias of the MemberType the Member should be based on</param>
-        /// <param name="isApproved">Optional IsApproved of the Member to create</param>
+        /// meaning that it will have an Id available (unlike the <see cref="CreateMember(string, string, string, string)"/> method).</remarks>
+        /// <param name="username">Username of the Member to create.</param>
+        /// <param name="email">Email of the Member to create.</param>
+        /// <param name="name">Name of the Member to create.</param>
+        /// <param name="passwordValue">Password value of the Member to create.</param>
+        /// <param name="memberTypeAlias">Alias of the MemberType the Member should be based on.</param>
+        /// <param name="isApproved">Optional IsApproved of the Member to create.</param>
         /// <returns><see cref="IMember"/></returns>
         public IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, string memberTypeAlias, bool isApproved = true)
         {
@@ -230,6 +230,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="username">Username of the Member to create</param>
         /// <param name="email">Email of the Member to create</param>
         /// <param name="memberType">MemberType the Member should be based on</param>
+        /// <param name="isApproved">Is the member approved.</param>
         /// <returns><see cref="IMember"/></returns>
         public IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType, bool isApproved)
             => CreateMemberWithIdentity(username, email, username, string.Empty, memberType, isApproved);
@@ -246,6 +247,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="email">Email of the Member to create</param>
         /// <param name="name">Name of the Member to create</param>
         /// <param name="memberType">MemberType the Member should be based on</param>
+        /// <param name="isApproved">Is the member approved</param>
         /// <returns><see cref="IMember"/></returns>
         public IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType, bool isApproved)
             => CreateMemberWithIdentity(username, email, name, string.Empty, memberType, isApproved);
@@ -260,6 +262,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="name">Name of the Member to create</param>
         /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
         /// <param name="memberType">MemberType the Member should be based on</param>
+        /// <param name="isApproved">Is the member approved</param>
         /// <returns><see cref="IMember"/></returns>
         private IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, IMemberType memberType, bool isApproved = true)
         {

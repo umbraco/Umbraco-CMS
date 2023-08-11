@@ -32,6 +32,7 @@ public class ApplicationTreeController : UmbracoAuthorizedApiController
     private readonly IControllerFactory _controllerFactory;
     private readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
 
+    /// <summary>
     /// Initializes a new instance of the <see cref="ApplicationTreeController"/> class.
     /// </summary>
     public ApplicationTreeController(

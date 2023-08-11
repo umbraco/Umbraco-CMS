@@ -515,6 +515,7 @@ public class MemberControllerUnitTests
     /// <param name="backOfficeSecurityAccessor">Back office security accessor</param>
     /// <param name="passwordChanger">Password changer class</param>
     /// <param name="globalSettings">The global settings</param>
+    /// <param name="twoFactorLoginService">The two factor login service</param>
     /// <returns>A member controller for the tests</returns>
     private MemberController CreateSut(
         IMemberService memberService,

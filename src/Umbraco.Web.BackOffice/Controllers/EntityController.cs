@@ -1251,7 +1251,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// </summary>
     /// <param name="type">The type of entity.</param>
     /// <param name="postFilter">
-    ///     Optional filter - Format like: "BoolVariable==true&IntVariable>=6". Invalid filters are
+    ///     Optional filter - Format like: "BoolVariable==true&amp;IntVariable>=6". Invalid filters are
     ///     ignored.
     /// </param>
     /// <returns></returns>

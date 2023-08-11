@@ -72,7 +72,6 @@ public abstract class ContentControllerBase : BackOfficeNotificationsController
     ///     Handles if the content for the specified ID isn't found
     /// </summary>
     /// <param name="id">The content ID to find</param>
-    /// <param name="throwException">Whether to throw an exception</param>
     /// <returns>The error response</returns>
     protected NotFoundObjectResult HandleContentNotFound(object id)
     {

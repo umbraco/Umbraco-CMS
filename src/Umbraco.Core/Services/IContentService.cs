@@ -76,12 +76,10 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </summary>
     IContent? GetById(int id);
 
-    new
-
     /// <summary>
     ///     Gets a document.
     /// </summary>
-    IContent? GetById(Guid key);
+    new IContent? GetById(Guid key);
 
     /// <summary>
     ///     Gets publish/unpublish schedule for a content node.

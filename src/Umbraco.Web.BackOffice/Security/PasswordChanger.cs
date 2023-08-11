@@ -17,7 +17,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
     private readonly ILogger<PasswordChanger<TUser>> _logger;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="PasswordChanger" /> class.
+    ///     Initializes a new instance of the <see cref="PasswordChanger{TUser}"/> class.
     ///     Password changing functionality
     /// </summary>
     /// <param name="logger">Logger for this class</param>
