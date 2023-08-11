@@ -115,9 +115,9 @@ export class UmbAuthLegacyRepository {
 		};
 	}
 
-	public async getPasswordConfig(): Promise<any> {
+	public async getPasswordConfig(userId: string): Promise<any> {
 		//TODO: Add type
-		const request = new Request('backoffice/umbracoapi/authentication/GetPasswordConfig', {
+		const request = new Request(`backoffice/umbracoapi/authentication/GetPasswordConfig?userId=${userId}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',

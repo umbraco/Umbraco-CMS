@@ -15,7 +15,7 @@ export interface IUmbAuthContext {
 	getMfaProviders(): Promise<MfaProvidersResponse>;
 	validateMfaCode(code: string, provider: string): Promise<LoginResponse>;
 	getIcons(): Observable<Record<string, string>>;
-	getPasswordConfig(): Promise<any>; //TODO Figure out the type
+	getPasswordConfig(userId: string): Promise<any>; //TODO Figure out the type
 	getInvitedUser(): Promise<any>; //TODO Figure out the type
 	disableLocalLogin: boolean;
 	supportsPersistLogin: boolean;

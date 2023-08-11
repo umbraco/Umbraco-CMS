@@ -1,6 +1,6 @@
 import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { CSSResultGroup, LitElement, PropertyValueMap, css, html } from 'lit';
+import { CSSResultGroup, LitElement, PropertyValueMap, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbAuthMainContext } from '../context/auth-main.context';
 
@@ -13,7 +13,7 @@ export default class UmbInvitePageElement extends LitElement {
 	error = '';
 
 	@state()
-	user: any = undefined;
+	userId: any = undefined;
 
 	async #onSubmit(event: CustomEvent) {
 		event.preventDefault();
@@ -36,22 +36,23 @@ export default class UmbInvitePageElement extends LitElement {
 	protected async firstUpdated(_changedProperties: any) {
 		super.firstUpdated(_changedProperties);
 
-		const user = await UmbAuthMainContext.Instance.getInvitedUser();
+		const { user } = await UmbAuthMainContext.Instance.getInvitedUser();
+		this.userId = user.id;
 
-		if (!user) {
+		if (!this.userId) {
 			alert('TODO: SHOW ERROR');
 			return;
 		}
-
-		this.user = user;
-		console.log(user, 'user');
 	}
 
 	render() {
-		return html`<umb-new-password-layout
-			@submit=${this.#onSubmit}
-			.state=${this.state}
-			.error=${this.error}></umb-new-password-layout>`;
+		return this.userId
+			? html`<umb-new-password-layout
+					@submit=${this.#onSubmit}
+					.userId=${this.userId}
+					.state=${this.state}
+					.error=${this.error}></umb-new-password-layout>`
+			: nothing;
 	}
 
 	static styles: CSSResultGroup = [UUITextStyles, css``];

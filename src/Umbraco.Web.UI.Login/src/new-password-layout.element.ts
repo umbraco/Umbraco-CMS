@@ -1,11 +1,15 @@
 import type { UUIButtonState, UUIInputPasswordElement } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { CSSResultGroup, LitElement, css, html, nothing } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { UmbAuthMainContext } from './context/auth-main.context';
+import { ifDefined } from 'lit/directives/if-defined.js';
 
 @customElement('umb-new-password-layout')
 export default class UmbNewPasswordLayoutElement extends LitElement {
+	@query('#password')
+	passwordElement!: UUIInputPasswordElement;
+
 	@query('#confirmPassword')
 	confirmPasswordElement!: UUIInputPasswordElement;
 
@@ -15,17 +19,30 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 	@property()
 	error: string = '';
 
+	@property()
+	userId = '';
+
+	@state()
+	passwordConfig?: {
+		allowManuallyChangingPassword: boolean;
+		minNonAlphaNumericChars: number;
+		minPasswordLength: number;
+	};
+
 	protected async firstUpdated(_changedProperties: any) {
 		super.firstUpdated(_changedProperties);
 
-		const response = await UmbAuthMainContext.Instance.getPasswordConfig();
-		console.log(response, 'response');
+		const response = await UmbAuthMainContext.Instance.getPasswordConfig(this.userId);
+		this.passwordConfig = response.data;
+		console.log(this.passwordConfig, 'response');
 	}
 
 	#onSubmit(event: Event) {
 		event.preventDefault();
+		if (!this.passwordConfig) return;
 		const form = event.target as HTMLFormElement;
 
+		this.passwordElement.setCustomValidity('');
 		this.confirmPasswordElement.setCustomValidity('');
 
 		if (!form) return;
@@ -35,11 +52,33 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 		const password = formData.get('password') as string;
 		const passwordConfirm = formData.get('confirmPassword') as string;
 
+		if (this.passwordConfig.minPasswordLength > 0) {
+			if (password.length < this.passwordConfig?.minPasswordLength) {
+				this.passwordElement.setCustomValidity(
+					`Password must be at least ${this.passwordConfig?.minPasswordLength} characters long`
+				);
+				return;
+			}
+		}
+
+		this.passwordConfig.minNonAlphaNumericChars = 2;
+
+		if (this.passwordConfig.minNonAlphaNumericChars > 0) {
+			const nonAlphaNumericChars = password.replace(/[a-zA-Z0-9]/g, '').length;
+			if (nonAlphaNumericChars < this.passwordConfig?.minNonAlphaNumericChars) {
+				this.passwordElement.setCustomValidity(
+					`Password must contain at least ${this.passwordConfig?.minNonAlphaNumericChars} non-alphanumeric characters`
+				);
+				return;
+			}
+		}
+
 		if (password !== passwordConfirm) {
 			this.confirmPasswordElement.setCustomValidity('Passwords do not match');
 			return;
 		}
 
+		return;
 		this.dispatchEvent(new CustomEvent('submit', { detail: { password } }));
 	}
 
@@ -70,9 +109,7 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 							type="password"
 							id="confirmPassword"
 							name="confirmPassword"
-							label="ConfirmPassword"
-							required
-							required-message="ConfirmPassword is required"></uui-input-password>
+							label="ConfirmPassword"></uui-input-password>
 					</uui-form-layout-item>
 
 					${this.#renderErrorMessage()}
