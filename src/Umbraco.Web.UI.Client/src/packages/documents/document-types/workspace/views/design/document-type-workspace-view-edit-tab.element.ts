@@ -122,7 +122,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 						container-name=${group.name || ''}></umb-document-type-workspace-view-edit-properties>
 				</uui-box>`
 			)}
-			<uui-button label="Add Group" id="add" look="placeholder" @click=${this.#onAddGroup}> Add Group </uui-button>
+			<uui-button label=${this.localize.term('contentTypeEditor_addGroup')} id="add" look="placeholder" @click=${this.#onAddGroup}></uui-button>
 		`;
 	}
 
