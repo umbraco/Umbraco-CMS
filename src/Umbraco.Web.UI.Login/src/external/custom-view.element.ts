@@ -16,19 +16,15 @@ export default class UmbCustomViewElement extends LitElement {
 
   attributeChangedCallback(name: string, _old: string | null, value: string | null) {
     super.attributeChangedCallback(name, _old, value);
-    console.log('new attributeChangedCallback', name, _old, value)
     if (name === 'custom-view') {
       this.#loadView();
     }
   }
 
   #loadView() {
-    console.log('what is this?', this.customView);
     if (!this.customView || !this.customView.endsWith('.js') && !this.customView.endsWith('.html')) {
       return;
     }
-
-    debugger;
 
     const customView = loadCustomView(this.customView);
 
