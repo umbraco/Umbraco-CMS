@@ -10,9 +10,6 @@ import {
 import { Observable } from 'rxjs';
 
 export class UmbAuthContext implements IUmbAuthContext {
-	newInvitedUserPassword(_password: string): Promise<NewPasswordResponse> {
-		throw new Error('Method not implemented.');
-	}
 	twoFactorView?: string | undefined;
 	isMfaEnabled?: boolean | undefined;
 	supportsPersistLogin = false;
@@ -44,6 +41,15 @@ export class UmbAuthContext implements IUmbAuthContext {
 	}
 
 	getIcons(): Observable<Record<string, string>> {
+		throw new Error('Method not implemented.');
+	}
+	getPasswordConfig(_userId: string): Promise<any> {
+		throw new Error('Method not implemented.');
+	}
+	getInvitedUser(): Promise<any> {
+		throw new Error('Method not implemented.');
+	}
+	newInvitedUserPassword(_password: string): Promise<NewPasswordResponse> {
 		throw new Error('Method not implemented.');
 	}
 }
