@@ -24,19 +24,6 @@ export class UmbAppElement extends UmbLitElement {
 	serverUrl = window.location.origin;
 
 	/**
-	 * The default culture to use for localization.
-	 *
-	 * When the current user is resolved, the culture will be set to the user's culture.
-	 *
-	 * @attr
-	 * @remarks This is the default culture to use for localization, not the current culture.
-	 * @example "en-us"
-	 * @example "en"
-	 */
-	@property({ type: String, attribute: 'default-culture' })
-	culture: string = 'en-us';
-
-	/**
 	 * The base path of the backoffice.
 	 *
 	 * @attr
@@ -89,7 +76,8 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#setLanguage() {
-		umbTranslationRegistry.loadLanguage(this.culture);
+		const initialLanguage = this.lang || document.documentElement.lang || 'en-us';
+		umbTranslationRegistry.loadLanguage(initialLanguage);
 	}
 
 	#listenForLanguageChange(authContext: UmbAuthContext) {
