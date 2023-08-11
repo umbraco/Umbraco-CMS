@@ -170,6 +170,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
         builder.Services.AddTransient<IIpAddressUtilities, IpAddressUtilities>();
 
+        builder.AddUmbracoEFCoreDbContext();
+
         return builder;
     }
 
