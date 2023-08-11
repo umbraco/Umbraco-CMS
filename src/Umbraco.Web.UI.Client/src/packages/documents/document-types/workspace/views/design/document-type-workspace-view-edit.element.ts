@@ -127,9 +127,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	#requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
 		const Message: UmbConfirmModalData = {
 			headline: 'Delete tab',
-			content: html`Are you sure you want to delete the tab (${tab?.name || tab?.id})?
+			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tab?.name ?? tab?.id]}>Are you sure you want to delete the tab <strong>${tab?.name ?? tab?.id}</strong></umb-localize>
 				<div style="color:var(--uui-color-danger-emphasis)">
-					This will delete all items that doesn't belong to a composition.
+					<umb-localize key="contentTypeEditor_confirmDeleteTabNotice">This will delete all items that doesn't belong to a composition.</umb-localize>
 				</div>`,
 			confirmLabel: 'Delete',
 			color: 'danger',
