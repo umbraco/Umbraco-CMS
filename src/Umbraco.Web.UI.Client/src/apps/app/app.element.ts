@@ -82,13 +82,20 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#listenForLanguageChange(authContext: UmbAuthContext) {
-		this.observe(
-			authContext.languageIsoCode,
-			(currentLanguageIsoCode) => {
-				umbTranslationRegistry.loadLanguage(currentLanguageIsoCode);
-			},
-			'languageIsoCode'
-		);
+		// This will wait for the default language to be loaded before attempting to load the current user language
+		// just in case the user language is not the default language.
+		// We **need** to do this because the default language (typically en-us) holds all the fallback keys for all the other languages.
+		// This way we can ensure that the document language is always loaded first and subsequently registered as the fallback language.
+		umbTranslationRegistry.isDefaultLoaded.subscribe((isDefaultLoaded) => {
+			if (!isDefaultLoaded) return;
+			this.observe(
+				authContext.languageIsoCode,
+				(currentLanguageIsoCode) => {
+					umbTranslationRegistry.loadLanguage(currentLanguageIsoCode);
+				},
+				'languageIsoCode'
+			);
+		});
 	}
 
 	async #setup() {

@@ -7,7 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/localization-api';
 import { hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBackofficeExtensionRegistry, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { Subject, combineLatest, map, distinctUntilChanged, filter } from '@umbraco-cms/backoffice/external/rxjs';
+import { BehaviorSubject, Subject, combineLatest, map, distinctUntilChanged, filter, startWith } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbTranslationRegistry {
 	/**
@@ -15,6 +15,10 @@ export class UmbTranslationRegistry {
 	 */
 	get translations() {
 		return translations;
+	}
+
+	get isDefaultLoaded() {
+		return this.#isDefaultLoaded.asObservable();
 	}
 
 	#currentLanguage = new Subject<string>();
@@ -82,6 +86,11 @@ export class UmbTranslationRegistry {
 				if (document.documentElement.dir !== newDir) {
 					document.documentElement.dir = newDir;
 				}
+			}
+
+			if (!this.#isDefaultLoaded.value) {
+				this.#isDefaultLoaded.next(true);
+				this.#isDefaultLoaded.complete();
 			}
 		});
 	}
