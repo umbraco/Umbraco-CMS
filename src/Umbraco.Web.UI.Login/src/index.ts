@@ -4,18 +4,18 @@ import '@umbraco-ui/uui';
 import './localization/localize.element.js';
 import './auth.element.js';
 
-import './back-to-login-button.element.js';
-import './auth-layout.element.js';
+import './components/back-to-login-button.element.js';
+import './components/layouts/auth-layout.element.js';
 
-import './pages/reset-password.page.element.js';
-import './pages/new-password.page.element.js';
-import './pages/mfa.page.element.js';
-import './pages/login.page.element.js';
-import './pages/invite.page.element.js';
+import './components/pages/reset-password.page.element.js';
+import './components/pages/new-password.page.element.js';
+import './components/pages/mfa.page.element.js';
+import './components/pages/login.page.element.js';
+import './components/pages/invite.page.element.js';
 
-import './external-login-providers-layout.element.js';
-import './login-external.element.js';
+import './components/layouts/external-login-providers-layout.element.js';
+import './components/login-external.element.js';
 
-import './new-password-layout.element.js';
-import './confirmation-layout.element.js';
-import './error-layout.element.js';
+import './components/layouts/new-password-layout.element.js';
+import './components/layouts/confirmation-layout.element.js';
+import './components/layouts/error-layout.element.js';

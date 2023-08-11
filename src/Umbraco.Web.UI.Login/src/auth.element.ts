@@ -4,8 +4,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbAuthMainContext } from './context/auth-main.context.js';
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
-import { UmbIconRegistry } from './icon.registry.js';
-import UmbRouter from './umb-router.js';
+import { UmbIconRegistry } from './utils/icon.registry.js';
+import UmbRouter from './utils/umb-router.js';
 
 @customElement('umb-auth')
 export default class UmbAuthElement extends LitElement {

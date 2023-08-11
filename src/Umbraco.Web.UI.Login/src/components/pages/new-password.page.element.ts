@@ -2,8 +2,8 @@ import type { UUIButtonState, UUIInputPasswordElement } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { CSSResultGroup, LitElement, css, html, nothing } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
-import { UmbAuthMainContext } from '../context/auth-main.context';
-import UmbRouter from '../umb-router';
+import { UmbAuthMainContext } from '../../context/auth-main.context';
+import UmbRouter from '../../utils/umb-router';
 
 @customElement('umb-new-password-page')
 export default class UmbNewPasswordPageElement extends LitElement {

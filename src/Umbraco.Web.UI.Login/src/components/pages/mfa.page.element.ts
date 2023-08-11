@@ -2,9 +2,9 @@ import { UUIButtonState, UUIInputElement, UUITextStyles } from '@umbraco-ui/uui'
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
-import { UmbAuthMainContext } from '../context/auth-main.context';
-import { umbLocalizationContext } from '../localization/localization-context';
-import { loadCustomView, renderCustomView } from '../load-custom-view.function';
+import { UmbAuthMainContext } from '../../context/auth-main.context';
+import { umbLocalizationContext } from '../../localization/localization-context';
+import { loadCustomView, renderCustomView } from '../../utils/load-custom-view.function';
 
 type MfaCustomViewElement = HTMLElement & {
 	providers: string[];

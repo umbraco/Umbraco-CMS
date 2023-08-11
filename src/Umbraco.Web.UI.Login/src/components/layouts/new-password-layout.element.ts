@@ -2,7 +2,7 @@ import type { UUIButtonState, UUIInputPasswordElement } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { CSSResultGroup, LitElement, css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { UmbAuthMainContext } from './context/auth-main.context';
+import { UmbAuthMainContext } from '../../context/auth-main.context';
 
 @customElement('umb-new-password-layout')
 export default class UmbNewPasswordLayoutElement extends LitElement {
