@@ -28,27 +28,27 @@
 			background-image="/login.svg"
 			allow-password-reset
 			allow-user-invite>
-			<umb-login-external
+			<umb-external-login-provider
 				slot="external"
 				display-name="Google"
 				provider-name="Umbraco.Google"
 				icon="info"
 				external-logins-url="https://google.com"
 				button-look="primary"
-				button-color="positive"></umb-login-external>
-			<umb-login-external
+				button-color="positive"></umb-external-login-provider>
+			<umb-external-login-provider
 				slot="external"
 				display-name="Azure ID"
 				provider-name="Umbraco.Azure"
 				icon="lock"
 				external-logins-url="https://microsoft.com"
 				button-look="primary"
-				button-color="warning"></umb-login-external>
-			<umb-login-external
+				button-color="warning"></umb-external-login-provider>
+			<umb-external-login-provider
 				slot="external"
 				display-name="My provider"
 				provider-name="MyCustomScheme"
-				custom-view="/src/mocks/customViews/my-custom-view.js"></umb-login-external>
+				custom-view="/src/mocks/customViews/my-custom-view.js"></umb-external-login-provider>
 		</umb-auth>
 	</body>
 </html>

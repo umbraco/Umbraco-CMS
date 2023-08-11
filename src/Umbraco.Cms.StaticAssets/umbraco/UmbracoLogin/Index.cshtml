@@ -58,7 +58,7 @@
         disable-local-login="@disableLocalLogin">
         @foreach (var provider in externalLoginProviders)
         {
-            <umb-login-external
+            <umb-external-login-provider
                 slot="external"
                 display-name="@provider.AuthenticationScheme.DisplayName"
                 provider-name="@provider.ExternalLoginProvider.AuthenticationType"
@@ -67,7 +67,7 @@
                 button-look="@provider.ExternalLoginProvider.Options.ButtonLook.ToString().ToLowerInvariant()"
                 button-color="@provider.ExternalLoginProvider.Options.ButtonColor.ToString().ToLowerInvariant()"
                 custom-view="@provider.ExternalLoginProvider.Options.CustomBackOfficeView">
-            </umb-login-external>
+            </umb-external-login-provider>
         }
     </umb-auth>
     </body>
