@@ -1125,17 +1125,6 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                     .Where<DocumentVersionDto>(x => x.Id == entity.PublishedVersionId));
             }
 
-            // similarly, if publishing an alternate, there should be only one
-            // current version, which is set later
-            // this sets the current to false, and marks it as an alternate so
-            // that it can be loaded for editing
-            if (publishing && entity.IsAlternateVersion)
-            {
-                Database.Execute(Sql()
-                    .Update<ContentVersionDto>(u => u.Set(x => x.Current, false).Set(x => x.Alternate, true))
-                    .Where<ContentVersionDto>(x => x.NodeId == entity.Id && x.Current == true));
-            }
-
             // sanitize names
             SanitizeNames(entity, publishing);
 
