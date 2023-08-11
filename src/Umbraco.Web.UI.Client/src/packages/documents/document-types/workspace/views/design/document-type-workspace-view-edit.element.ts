@@ -279,7 +279,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			</uui-button>
 			<uui-button label=${this.localize.term('general_reorder')} compact>
 				<uui-icon name="umb:navigation"></uui-icon>
-				Reorder
+			<umb-localize key="general_reorder">Reorder</umb-localize>
 			</uui-button>
 		</div>`;
 	}
