@@ -1,5 +1,5 @@
-import { umbTranslationRegistry } from '@umbraco-cms/backoffice/localization';
 import type { UmbAppErrorElement } from './app-error.element.js';
+import { umbTranslationRegistry } from '@umbraco-cms/backoffice/localization';
 import { UMB_AUTH, UmbAuthFlow, UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { UMB_APP, UmbAppContext } from '@umbraco-cms/backoffice/context';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
