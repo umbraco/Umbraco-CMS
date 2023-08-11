@@ -36,7 +36,7 @@
             <umb-control-group>
               <div ng-repeat="login in vm.externalLoginProviders">
 
-                <div ng-if="login.customView" ng-include="login.customView"></div>
+                <umb-custom-view ng-if="login.customView" custom-view="{{ ::login.customView }}"></umb-custom-view>
 
                 <div ng-if="!login.customView && login.properties.AutoLinkOptions.AllowManualLinking">
                   <form action="{{vm.externalLinkLoginFormAction}}" id="oauthloginform-{{login.authType}}" method="POST"
