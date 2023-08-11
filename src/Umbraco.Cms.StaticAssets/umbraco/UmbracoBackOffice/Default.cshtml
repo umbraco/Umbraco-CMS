@@ -127,6 +127,7 @@
         }
     </script>
 
+    <script async type="module" src="@WebPath.Combine(backOfficePath.TrimStart("~"), "/login/custom-view.element.js")"></script>
     <script src="@WebPath.Combine(backOfficePath.TrimStart("~"), "/lib/lazyload-js/LazyLoad.min.js")"></script>
     <script src="@Url.GetUrlWithCacheBust("Application", "BackOffice", null!, hostingEnvironment, umbracoVersion, runtimeMinifier)"></script>
 
