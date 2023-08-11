@@ -14,7 +14,7 @@ export default class UmbInvitePageElement extends LitElement {
 	error = '';
 
 	@state()
-	userId: any = undefined;
+	userId?: string;
 
 	protected async firstUpdated(_changedProperties: any) {
 		super.firstUpdated(_changedProperties);
