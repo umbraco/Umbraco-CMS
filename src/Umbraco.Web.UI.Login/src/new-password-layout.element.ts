@@ -3,7 +3,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { CSSResultGroup, LitElement, css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { UmbAuthMainContext } from './context/auth-main.context';
-import { ifDefined } from 'lit/directives/if-defined.js';
 
 @customElement('umb-new-password-layout')
 export default class UmbNewPasswordLayoutElement extends LitElement {
@@ -64,7 +63,7 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 		this.passwordConfig.minNonAlphaNumericChars = 2;
 
 		if (this.passwordConfig.minNonAlphaNumericChars > 0) {
-			const nonAlphaNumericChars = password.replace(/[a-zA-Z0-9]/g, '').length;
+			const nonAlphaNumericChars = password.replace(/[a-zA-Z0-9]/g, '').length; //TODO: How should we check for non-alphanumeric chars?
 			if (nonAlphaNumericChars < this.passwordConfig?.minNonAlphaNumericChars) {
 				this.passwordElement.setCustomValidity(
 					`Password must contain at least ${this.passwordConfig?.minNonAlphaNumericChars} non-alphanumeric characters`
@@ -77,9 +76,6 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 			this.confirmPasswordElement.setCustomValidity('Passwords do not match');
 			return;
 		}
-
-		return;
-		this.dispatchEvent(new CustomEvent('submit', { detail: { password } }));
 	}
 
 	render() {
