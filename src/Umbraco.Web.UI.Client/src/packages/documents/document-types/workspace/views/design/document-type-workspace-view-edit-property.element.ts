@@ -128,7 +128,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 							name="alias"
 							id="alias-input"
 							label="alias"
-							placeholder="Alias..."
+							placeholder=${this.localize.term('placeholders_alias')}
 							.value=${this.property.alias}
 							?disabled=${this._aliasLocked}
 							@input=${(e: CustomEvent) => {
