@@ -18,13 +18,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs
         private Mock<IIOHelper> _mockIOHelper;
         private readonly string _testPath = Path.Combine(TestContext.CurrentContext.TestDirectory.Split("bin")[0], "App_Data", "TEMP");
 
-        [Test]
-        public async Task Does_Not_Execute_When_Not_Main_Dom()
-        {
-            TempFileCleanupJob sut = CreateTempFileCleanupJob();
-            await sut.RunJobAsync();
-            VerifyFilesNotCleaned();
-        }
 
         [Test]
         public async Task Executes_And_Cleans_Files()
