@@ -131,15 +131,15 @@ namespace Umbraco.Cms.Infrastructure.WebAssets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to // TODO: This would be nicer as an angular module so it can be injected into stuff... that&apos;d be heaps nicer, but
-        ///// how to do that when this is not a regular JS file, it is a server side JS file and RequireJS seems to only want
-        ///// to force load JS files ?
-        ///
-        /////create the namespace (NOTE: This loads before any dependencies so we don&apos;t have a namespace mgr so we just create it manually)
+        ///   Looks up a localized string similar to  // TODO: This would be nicer as an angular module so it can be injected into stuff... that&apos;d be heaps nicer, but
+        /// // how to do that when this is not a regular JS file, it is a server side JS file and RequireJS seems to only want
+        /// // to force load JS files ?
+        /// 
+        /// //create the namespace (NOTE: This loads before any dependencies so we don&apos;t have a namespace mgr so we just create it manually)
         ///var Umbraco = {};
         ///Umbraco.Sys = {};
-        /////define a global static object
-        ///Umbraco.Sys.ServerVariables = ##Variables## ;.
+        /// //define a global static object
+        ///Umbraco.Sys.ServerVariables = ##Variables##  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ServerVariables {
             get {
@@ -149,16 +149,18 @@ namespace Umbraco.Cms.Infrastructure.WebAssets {
         
         /// <summary>
         ///   Looks up a localized string similar to [
-        ///    &apos;lib/tinymce/tinymce.min.js&apos;,
+        ///  &apos;lib/tinymce/tinymce.min.js&apos;,
         ///
-        ///    &apos;lib/tinymce/plugins/anchor/plugin.min.js&apos;,
-        ///    &apos;lib/tinymce/plugins/charmap/plugin.min.js&apos;,
-        ///    &apos;lib/tinymce/plugins/table/plugin.min.js&apos;,
-        ///    &apos;lib/tinymce/plugins/lists/plugin.min.js&apos;,
-        ///    &apos;lib/tinymce/plugins/advlist/plugin.min.js&apos;,
-        ///    &apos;lib/tinymce/plugins/autolink/plugin.min.js&apos;,
-        ///    &apos;lib/tinymce/plugins/directionality/plugin.min.js&apos;,
-        ///    &apos;lib/tinymce/plugins/t [rest of string was truncated]&quot;;.
+        ///  &apos;lib/tinymce/plugins/anchor/plugin.min.js&apos;,
+        ///  &apos;lib/tinymce/plugins/charmap/plugin.min.js&apos;,
+        ///  &apos;lib/tinymce/plugins/table/plugin.min.js&apos;,
+        ///  &apos;lib/tinymce/plugins/lists/plugin.min.js&apos;,
+        ///  &apos;lib/tinymce/plugins/advlist/plugin.min.js&apos;,
+        ///  &apos;lib/tinymce/plugins/autolink/plugin.min.js&apos;,
+        ///  &apos;lib/tinymce/plugins/directionality/plugin.min.js&apos;,
+        ///  &apos;lib/tinymce/plugins/searchreplace/plugin.min.js&apos;
+        ///]
+        ///.
         /// </summary>
         internal static string TinyMceInitialize {
             get {
