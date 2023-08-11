@@ -86,9 +86,9 @@ namespace Umbraco.Cms.Core.Xml.XPath
         private void DebugReturn()
         {
 #if DEBUG
-// ReSharper disable IntroduceOptionalParameters.Local
+            // ReSharper disable IntroduceOptionalParameters.Local
             DebugReturn("(void)");
-// ReSharper restore IntroduceOptionalParameters.Local
+            // ReSharper restore IntroduceOptionalParameters.Local
 #endif
         }
 
@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
         {
             public MacroRoot(IEnumerable<MacroParameter> parameters)
             {
-                Parameters = parameters == null ? new MacroParameter[] {} : parameters.ToArray();
+                Parameters = parameters == null ? new MacroParameter[] { } : parameters.ToArray();
             }
 
             public MacroParameter[] Parameters { get; private set; }

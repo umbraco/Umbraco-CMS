@@ -58,7 +58,7 @@ internal static class CacheKeys
         {
             if (previewing)
             {
-                return "NuCache.ContentCache.RouteByContent[D:" + id +"]";
+                return "NuCache.ContentCache.RouteByContent[D:" + id + "]";
             }
 
             return "NuCache.ContentCache.RouteByContent[P:" + id + "]";

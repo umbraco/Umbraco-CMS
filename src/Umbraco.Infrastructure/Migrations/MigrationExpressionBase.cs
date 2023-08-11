@@ -89,15 +89,15 @@ public abstract class MigrationExpressionBase : IMigrationExpression
         }
 
         // HACK: We're handling all the constraints higher up the stack for SQLite.
-            if (Context.Database.DatabaseType.IsSqlite())
-            {
-                _expressions = _expressions
-                    .Where(x => x is not CreateConstraintExpression)
-                    .Where(x => x is not CreateForeignKeyExpression)
-                    .ToList();
-            }
+        if (Context.Database.DatabaseType.IsSqlite())
+        {
+            _expressions = _expressions
+                .Where(x => x is not CreateConstraintExpression)
+                .Where(x => x is not CreateForeignKeyExpression)
+                .ToList();
+        }
 
-            foreach (IMigrationExpression expression in _expressions)
+        foreach (IMigrationExpression expression in _expressions)
         {
             expression.Execute();
         }

@@ -29,7 +29,7 @@ public class BasicAuthSettings
 
 public class SharedSecret
 {
-    private const string StaticHeaderName =  "X-Authentication-Shared-Secret";
+    private const string StaticHeaderName = "X-Authentication-Shared-Secret";
 
     [DefaultValue(StaticHeaderName)]
     public string? HeaderName { get; set; } = StaticHeaderName;

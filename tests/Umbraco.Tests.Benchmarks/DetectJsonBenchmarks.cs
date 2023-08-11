@@ -61,11 +61,11 @@ public class DetectJsonBenchmarks
     }
 
 
-//|                      Method |        Mean |     Error |    StdDev | Ratio | Allocated |
-//|---------------------------- |------------:|----------:|----------:|------:|----------:|
-//|            StringDetectJson | 103.7203 ns | 1.5370 ns | 0.0842 ns | 1.000 |         - |
-//|              CharDetectJson |   8.8119 ns | 1.0330 ns | 0.0566 ns | 0.085 |         - |
-//|    CharRangeIndexDetectJson |   7.8054 ns | 1.2396 ns | 0.0679 ns | 0.075 |         - |
-//| CharRangeIndexDetectJsonBad |   0.4597 ns | 0.1882 ns | 0.0103 ns | 0.004 |         - |
-//|    CharDetectJsonTwoLookups |   7.8292 ns | 1.7397 ns | 0.0954 ns | 0.075 |         - |
+    //|                      Method |        Mean |     Error |    StdDev | Ratio | Allocated |
+    //|---------------------------- |------------:|----------:|----------:|------:|----------:|
+    //|            StringDetectJson | 103.7203 ns | 1.5370 ns | 0.0842 ns | 1.000 |         - |
+    //|              CharDetectJson |   8.8119 ns | 1.0330 ns | 0.0566 ns | 0.085 |         - |
+    //|    CharRangeIndexDetectJson |   7.8054 ns | 1.2396 ns | 0.0679 ns | 0.075 |         - |
+    //| CharRangeIndexDetectJsonBad |   0.4597 ns | 0.1882 ns | 0.0103 ns | 0.004 |         - |
+    //|    CharDetectJsonTwoLookups |   7.8292 ns | 1.7397 ns | 0.0954 ns | 0.075 |         - |
 }

@@ -156,9 +156,9 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
         }
 
 
-            role.Name = roleName;
-            return Task.CompletedTask;
-        }
+        role.Name = roleName;
+        return Task.CompletedTask;
+    }
 
     /// <inheritdoc />
     public Task<string?> GetNormalizedRoleNameAsync(
@@ -186,13 +186,13 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
 
         // member group can be found by int or Guid, so try both
         if (!int.TryParse(roleId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
+        {
+            if (!Guid.TryParse(roleId, out Guid guid))
             {
-                if (!Guid.TryParse(roleId, out Guid guid))
-                {
-                    throw new ArgumentOutOfRangeException(nameof(roleId), $"{nameof(roleId)} is not a valid Guid");
-                }
+                throw new ArgumentOutOfRangeException(nameof(roleId), $"{nameof(roleId)} is not a valid Guid");
+            }
 
-                memberGroup = _memberGroupService.GetById(guid);
+            memberGroup = _memberGroupService.GetById(guid);
         }
         else
         {
@@ -208,14 +208,14 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
 
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            IMemberGroup? memberGroup = _memberGroupService.GetByName(name);
-            return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup))!;
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentNullException(nameof(name));
         }
+
+        IMemberGroup? memberGroup = _memberGroupService.GetByName(name);
+        return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup))!;
+    }
 
     /// <summary>
     ///     Dispose the store

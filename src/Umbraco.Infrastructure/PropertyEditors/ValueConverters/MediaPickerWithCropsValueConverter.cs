@@ -152,7 +152,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
         }
         if (isMultiple == false && converted is MediaWithCrops mediaWithCrops)
         {
-            return new [] { ToApiMedia(mediaWithCrops) };
+            return new[] { ToApiMedia(mediaWithCrops) };
         }
 
         return Array.Empty<ApiMediaWithCrops>();

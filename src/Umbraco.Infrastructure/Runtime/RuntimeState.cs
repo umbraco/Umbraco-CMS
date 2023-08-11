@@ -208,48 +208,48 @@ public class RuntimeState : IRuntimeState
         switch (GetUmbracoDatabaseState(_databaseFactory))
         {
             case UmbracoDatabaseState.CannotConnect:
-                {
+            {
                 // cannot connect to configured database, this is bad, fail
-                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-                    {
-                        _logger.LogDebug("Could not connect to database.");
-                    }
-
-                    if (_globalSettings.Value.InstallMissingDatabase || _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory))
-                    {
-                        // ok to install on a configured but missing database
-                        Level = RuntimeLevel.BootFailed;
-                        Reason = RuntimeLevelReason.InstallMissingDatabase;
-                        return;
-                    }
-
-                    // else it is bad enough that we want to throw
-                    Reason = RuntimeLevelReason.BootFailedCannotConnectToDatabase;
-                    BootFailedException = new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
-                    throw BootFailedException;
-                }
-            case UmbracoDatabaseState.NotInstalled:
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
                 {
-                    // ok to install on an empty database
-                    Level = RuntimeLevel.Install;
-                    Reason = RuntimeLevelReason.InstallEmptyDatabase;
+                    _logger.LogDebug("Could not connect to database.");
+                }
+
+                if (_globalSettings.Value.InstallMissingDatabase || _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory))
+                {
+                    // ok to install on a configured but missing database
+                    Level = RuntimeLevel.BootFailed;
+                    Reason = RuntimeLevelReason.InstallMissingDatabase;
                     return;
                 }
+
+                // else it is bad enough that we want to throw
+                Reason = RuntimeLevelReason.BootFailedCannotConnectToDatabase;
+                BootFailedException = new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
+                throw BootFailedException;
+            }
+            case UmbracoDatabaseState.NotInstalled:
+            {
+                // ok to install on an empty database
+                Level = RuntimeLevel.Install;
+                Reason = RuntimeLevelReason.InstallEmptyDatabase;
+                return;
+            }
             case UmbracoDatabaseState.NeedsUpgrade:
-                {
+            {
                 // the db version does not match... but we do have a migration table
                 // so, at least one valid table, so we quite probably are installed & need to upgrade
 
                 // although the files version matches the code version, the database version does not
                 // which means the local files have been upgraded but not the database - need to upgrade
-                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-                    {
-                        _logger.LogDebug("Has not reached the final upgrade step, need to upgrade Umbraco.");
-                    }
-                    Level = _unattendedSettings.Value.UpgradeUnattended ? RuntimeLevel.Run : RuntimeLevel.Upgrade;
-                    Reason = RuntimeLevelReason.UpgradeMigrations;
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Has not reached the final upgrade step, need to upgrade Umbraco.");
                 }
-                break;
+                Level = _unattendedSettings.Value.UpgradeUnattended ? RuntimeLevel.Run : RuntimeLevel.Upgrade;
+                Reason = RuntimeLevelReason.UpgradeMigrations;
+            }
+            break;
             case UmbracoDatabaseState.NeedsPackageMigration:
 
                 // no matter what the level is run for package migrations.
@@ -273,14 +273,14 @@ public class RuntimeState : IRuntimeState
                 break;
             case UmbracoDatabaseState.Ok:
             default:
-                {
+            {
 
 
-                    // the database version matches the code & files version, all clear, can run
-                    Level = RuntimeLevel.Run;
-                    Reason = RuntimeLevelReason.Run;
-                }
-                break;
+                // the database version matches the code & files version, all clear, can run
+                Level = RuntimeLevel.Run;
+                Reason = RuntimeLevelReason.Run;
+            }
+            break;
         }
     }
 

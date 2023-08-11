@@ -293,7 +293,7 @@ public class SqlMainDomLock : IMainDomLock
 
             // the row
             List<KeyValueDto>? mainDomRows = db.Fetch<KeyValueDto>("SELECT * FROM umbracoKeyValue WHERE [key] = @key",
-                new {key = MainDomKey});
+                new { key = MainDomKey });
 
             if (mainDomRows.Count == 0 || mainDomRows[0].Value == updatedTempId)
             {
@@ -375,7 +375,7 @@ public class SqlMainDomLock : IMainDomLock
     ///     Inserts or updates the key/value row
     /// </summary>
     private RecordPersistenceType InsertLockRecord(string id, IUmbracoDatabase db) =>
-        db.InsertOrUpdate(new KeyValueDto {Key = MainDomKey, Value = id, UpdateDate = DateTime.Now});
+        db.InsertOrUpdate(new KeyValueDto { Key = MainDomKey, Value = id, UpdateDate = DateTime.Now });
 
     /// <summary>
     ///     Checks if the DB row value is equals the value
@@ -383,7 +383,7 @@ public class SqlMainDomLock : IMainDomLock
     /// <returns></returns>
     private bool IsMainDomValue(string val, IUmbracoDatabase db) =>
         db.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoKeyValue WHERE [key] = @key AND [value] = @val",
-            new {key = MainDomKey, val}) == 1;
+            new { key = MainDomKey, val }) == 1;
 
     #region IDisposable Support
 
@@ -423,13 +423,13 @@ public class SqlMainDomLock : IMainDomLock
                                 _logger.LogDebug("Releasing MainDom, updating row, new application is booting.");
                                 var count = db.Execute(
                                     $"UPDATE umbracoKeyValue SET [value] = [value] + '{UpdatedSuffix}' WHERE [key] = @key",
-                                    new {key = MainDomKey});
+                                    new { key = MainDomKey });
                             }
                             else
                             {
                                 _logger.LogDebug("Releasing MainDom, deleting row, application is shutting down.");
                                 var count = db.Execute("DELETE FROM umbracoKeyValue WHERE [key] = @key",
-                                    new {key = MainDomKey});
+                                    new { key = MainDomKey });
                             }
                         }
                         catch (Exception ex)

@@ -213,7 +213,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             }
 
             // otherwise use the old magic null & string comparisons
-            return value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
+            return value != null && (!(value is string) || string.IsNullOrWhiteSpace((string)value) == false);
         }
 
         /// <inheritdoc />

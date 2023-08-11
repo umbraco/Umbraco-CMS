@@ -254,7 +254,7 @@ public class UserMapDefinition : IMapDefinition
         }
     }
 
-        // Umbraco.Code.MapAll -ContentStartNode -UserCount -MediaStartNode -Key -Languages -Sections
+    // Umbraco.Code.MapAll -ContentStartNode -UserCount -MediaStartNode -Key -Languages -Sections
     // Umbraco.Code.MapAll -Notifications -Udi -Trashed -AdditionalData -IsSystemUserGroup
     private void Map(IReadOnlyUserGroup source, UserGroupBasic target, MapperContext context)
     {

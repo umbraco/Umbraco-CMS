@@ -171,12 +171,12 @@ WHERE r.tagId IS NULL";
     public void RemoveAll(int contentId, int propertyTypeId) =>
         Database.Execute(
             "DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId AND propertyTypeId = @propertyTypeId",
-            new {nodeId = contentId, propertyTypeId});
+            new { nodeId = contentId, propertyTypeId });
 
     /// <inheritdoc />
     public void RemoveAll(int contentId) =>
         Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId",
-            new {nodeId = contentId});
+            new { nodeId = contentId });
 
     // this is a clever way to produce an SQL statement like this:
     //

@@ -34,7 +34,7 @@ internal static class CompilationExceptionFactory
             failures.Add(compilationFailure);
         }
 
-        return new UmbracoCompilationException{CompilationFailures = failures};
+        return new UmbracoCompilationException { CompilationFailures = failures };
     }
 
     public static UmbracoCompilationException Create(
@@ -71,7 +71,7 @@ internal static class CompilationExceptionFactory
             failures.Add(compilationFailure);
         }
 
-        return new UmbracoCompilationException{ CompilationFailures = failures};
+        return new UmbracoCompilationException { CompilationFailures = failures };
     }
 
     private static string ReadContent(RazorCodeDocument codeDocument, string filePath)

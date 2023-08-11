@@ -109,7 +109,7 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeW
     {
         var culture = queryStrings?["culture"].ToString();
 
-        if(culture.IsNullOrWhiteSpace())
+        if (culture.IsNullOrWhiteSpace())
         {
             culture = _localizationService.GetDefaultLanguageIsoCode();
         }

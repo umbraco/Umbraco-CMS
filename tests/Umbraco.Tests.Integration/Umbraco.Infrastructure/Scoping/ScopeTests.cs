@@ -568,8 +568,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         public void ScopeReference()
         {
             ScopeProvider scopeProvider = ScopeProvider;
-            Scope scope = (Scope) scopeProvider.CreateScope();
-            Scope nested = (Scope) scopeProvider.CreateScope();
+            Scope scope = (Scope)scopeProvider.CreateScope();
+            Scope nested = (Scope)scopeProvider.CreateScope();
 
             Assert.IsNotNull(scopeProvider.AmbientScope);
 

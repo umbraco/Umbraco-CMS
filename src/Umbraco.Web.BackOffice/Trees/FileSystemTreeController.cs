@@ -122,7 +122,7 @@ public abstract class FileSystemTreeController : TreeController
 
         TreeNode? root = rootResult.Value;
 
-            //check if there are any children
+        //check if there are any children
         ActionResult<TreeNodeCollection> treeNodesResult = GetTreeNodes(Constants.System.RootString, queryStrings);
 
         if (!(treeNodesResult.Result is null))
@@ -142,13 +142,13 @@ public abstract class FileSystemTreeController : TreeController
     {
         MenuItemCollection menu = MenuItemCollectionFactory.Create();
 
-            //set the default to create
+        //set the default to create
         menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-            //create action
+        //create action
         menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
-            //refresh action
+        //refresh action
         menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
 
         return menu;
@@ -158,7 +158,7 @@ public abstract class FileSystemTreeController : TreeController
     {
         MenuItemCollection menu = MenuItemCollectionFactory.Create();
 
-            //set the default to create
+        //set the default to create
         menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
         //create action
@@ -167,14 +167,14 @@ public abstract class FileSystemTreeController : TreeController
         var hasChildren = FileSystem is not null &&
                           (FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any());
 
-            //We can only delete folders if it doesn't have any children (folders or files)
+        //We can only delete folders if it doesn't have any children (folders or files)
         if (hasChildren == false)
         {
             //delete action
             menu.Items.Add<ActionDelete>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
         }
 
-            //refresh action
+        //refresh action
         menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
 
         return menu;

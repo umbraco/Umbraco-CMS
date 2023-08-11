@@ -1143,7 +1143,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             foreach (IProperty property in properties)
             {
-                if (propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? editor) is false )
+                if (propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? editor) is false)
                 {
                     continue;
                 }

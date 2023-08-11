@@ -8,7 +8,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Models.Trees;
 
 /// <summary>
-    /// A context menu item
+/// A context menu item
 /// </summary>
 [DataContract(Name = "menuItem", Namespace = "")]
 public class MenuItem
@@ -33,11 +33,11 @@ public class MenuItem
     {
         Alias = alias;
         Name = textService.Localize("actions", Alias);
-            TextDescription =  textService.Localize("visuallyHiddenTexts", alias + "_description", Thread.CurrentThread.CurrentUICulture);
+        TextDescription = textService.Localize("visuallyHiddenTexts", alias + "_description", Thread.CurrentThread.CurrentUICulture);
     }
 
     /// <summary>
-        /// Create a menu item based on an <see cref="IAction"/> definition
+    /// Create a menu item based on an <see cref="IAction"/> definition
     /// </summary>
     /// <param name="action"></param>
     /// <param name="name"></param>
@@ -81,7 +81,7 @@ public class MenuItem
     public string? TextDescription { get; set; }
 
     /// <summary>
-        /// Ensures a menu separator will exist before this menu item
+    /// Ensures a menu separator will exist before this menu item
     /// </summary>
     [DataMember(Name = "separator")]
     public bool SeparatorBefore { get; set; }
@@ -99,8 +99,8 @@ public class MenuItem
     [DataMember(Name = "useLegacyIcon")]
     public bool UseLegacyIcon { get; set; } = true;
 
-        /// <summary>
-        /// Used in the UI to inform the user that the menu item will open a dialog/confirmation
+    /// <summary>
+    /// Used in the UI to inform the user that the menu item will open a dialog/confirmation
     /// </summary>
     [DataMember(Name = "opensDialog")]
     public bool OpensDialog { get; set; }

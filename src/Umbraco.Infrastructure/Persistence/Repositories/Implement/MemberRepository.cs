@@ -379,7 +379,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         var versionId = dto.ContentVersionDto.Id;
         var temp = new TempContent<Member>(dto.ContentDto.NodeId, versionId, 0, memberType);
         IDictionary<int, PropertyCollection> properties =
-            GetPropertyCollections(new List<TempContent<Member>> {temp});
+            GetPropertyCollections(new List<TempContent<Member>> { temp });
         member.Properties = properties[versionId];
 
         // reset dirty initial properties (U4-1946)
@@ -584,8 +584,8 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
     protected override void PerformDeleteVersion(int id, int versionId)
     {
-        Database.Delete<PropertyDataDto>("WHERE versionId = @VersionId", new {versionId});
-        Database.Delete<ContentVersionDto>("WHERE versionId = @VersionId", new {versionId});
+        Database.Delete<PropertyDataDto>("WHERE versionId = @VersionId", new { versionId });
+        Database.Delete<ContentVersionDto>("WHERE versionId = @VersionId", new { versionId });
     }
 
     #endregion

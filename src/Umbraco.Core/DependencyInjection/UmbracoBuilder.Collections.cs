@@ -35,7 +35,7 @@ public static partial class UmbracoBuilderExtensions
     {
         builder.CacheRefreshers().Add(() => builder.TypeLoader.GetCacheRefreshers());
         builder.DataEditors().Add(() => builder.TypeLoader.GetDataEditors());
-        builder.Actions().Add(() => builder .TypeLoader.GetActions());
+        builder.Actions().Add(() => builder.TypeLoader.GetActions());
 
         // register known content apps
         builder.ContentApps()

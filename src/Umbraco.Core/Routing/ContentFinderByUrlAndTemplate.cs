@@ -78,7 +78,7 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
         // look for template in last position
         var pos = path.LastIndexOf('/');
         var templateAlias = path.Substring(pos + 1);
-        path = pos == 0 ? "/" : path.Substring(0, pos);;
+        path = pos == 0 ? "/" : path.Substring(0, pos);
 
         ITemplate? template = _fileService.GetTemplate(templateAlias);
 

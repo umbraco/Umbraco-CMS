@@ -238,7 +238,9 @@ internal class ContentBaseFactory
     {
         var dto = new ContentDto
         {
-            NodeId = entity.Id, ContentTypeId = entity.ContentTypeId, NodeDto = BuildNodeDto(entity, objectType),
+            NodeId = entity.Id,
+            ContentTypeId = entity.ContentTypeId,
+            NodeDto = BuildNodeDto(entity, objectType),
         };
 
         return dto;
@@ -312,7 +314,9 @@ internal class ContentBaseFactory
 
         var dto = new MediaVersionDto
         {
-            Id = entity.VersionId, Path = path, ContentVersionDto = BuildContentVersionDto(entity, contentDto),
+            Id = entity.VersionId,
+            Path = path,
+            ContentVersionDto = BuildContentVersionDto(entity, contentDto),
         };
 
         return dto;

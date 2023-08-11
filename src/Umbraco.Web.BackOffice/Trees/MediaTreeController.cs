@@ -147,7 +147,7 @@ public class MediaTreeController : ContentTreeControllerBase, ISearchableTree, I
             return NotFound();
         }
 
-            //if the user has no path access for this node, all they can do is refresh
+        //if the user has no path access for this node, all they can do is refresh
         if (!_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasMediaPathAccess(item, _entityService,
                 _appCaches) ?? false)
         {
@@ -156,7 +156,7 @@ public class MediaTreeController : ContentTreeControllerBase, ISearchableTree, I
         }
 
 
-            //if the media item is in the recycle bin, we don't have a default menu and we need to show a limited menu
+        //if the media item is in the recycle bin, we don't have a default menu and we need to show a limited menu
         if (item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
             .Contains(RecycleBinId.ToInvariantString()))
         {
@@ -184,7 +184,7 @@ public class MediaTreeController : ContentTreeControllerBase, ISearchableTree, I
     }
 
     /// <summary>
-        /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
+    /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
     ///     access
     /// </summary>
     /// <param name="id"></param>

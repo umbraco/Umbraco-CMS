@@ -58,7 +58,7 @@ internal abstract partial class ApiRichTextParserBase
                 break;
         }
 
-        if(handled is false)
+        if (handled is false)
         {
             handleInvalidLink();
         }

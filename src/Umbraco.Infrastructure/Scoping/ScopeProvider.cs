@@ -415,7 +415,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false) =>
-            (Cms.Core.Scoping.IScope) CreateScope(
+            (Cms.Core.Scoping.IScope)CreateScope(
                 isolationLevel,
                 repositoryCacheMode,
                 eventDispatcher,

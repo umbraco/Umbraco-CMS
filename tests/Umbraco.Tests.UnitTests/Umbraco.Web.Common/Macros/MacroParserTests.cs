@@ -396,7 +396,7 @@ asdfsdf
             @"<?UMBRACO_MACRO macroAlias=""Test"" content=""1089"" textArea=""asdfasdf"" title="""" bool=""0"" number="""" contentType="""" multiContentType="""" multiProperties="""" properties="""" tabs="""" multiTabs="""" />",
             result);
     }
-    
+
     [Test]
     public void Format_RTE_WhenMacroContainsParameter_EnableInlineMacro_WithValue_1_ItShouldBeInASpan()
     {
@@ -406,7 +406,7 @@ asdfsdf
 <p>asdfasdf</p>";
         var result = MacroTagParser.FormatRichTextPersistedDataForEditor(
             content,
-            new Dictionary<string, string> { { "test1", "value1" }, { "enableInlineMacro",  "1"} });
+            new Dictionary<string, string> { { "test1", "value1" }, { "enableInlineMacro", "1" } });
 
         Assert.AreEqual(
             @"<p>asdfasdf</p>

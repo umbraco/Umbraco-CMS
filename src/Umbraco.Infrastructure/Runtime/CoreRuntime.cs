@@ -170,8 +170,8 @@ public class CoreRuntime : IRuntime
         AcquireMainDom();
 
         // Notify for unattended install
-            await _eventAggregator.PublishAsync(new RuntimeUnattendedInstallNotification(), cancellationToken);
-            DetermineRuntimeLevel();
+        await _eventAggregator.PublishAsync(new RuntimeUnattendedInstallNotification(), cancellationToken);
+        DetermineRuntimeLevel();
 
         if (!State.UmbracoCanBoot())
         {
@@ -210,7 +210,7 @@ public class CoreRuntime : IRuntime
         }
 
         // Initialize the components
-            _components.Initialize();
+        _components.Initialize();
 
         await _eventAggregator.PublishAsync(
             new UmbracoApplicationStartingNotification(State.Level, isRestarting),

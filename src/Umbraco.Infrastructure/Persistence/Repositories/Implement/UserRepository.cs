@@ -225,23 +225,23 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
     public bool ValidateLoginSession(int userId, Guid sessionId)
     {
         // HACK: Avoid a deadlock - BackOfficeCookieOptions OnValidatePrincipal
-            // After existing session times out and user logs in again ~ 4 requests come in at once that hit the
-            // "update the validate date" code path, check up the call stack there are a few variables that can make this not occur.
-            // TODO: more generic fix, do something with ForUpdate? wait on a mutex? add a distributed lock? etc.
-            if (Database.DatabaseType.IsSqlite())
+        // After existing session times out and user logs in again ~ 4 requests come in at once that hit the
+        // "update the validate date" code path, check up the call stack there are a few variables that can make this not occur.
+        // TODO: more generic fix, do something with ForUpdate? wait on a mutex? add a distributed lock? etc.
+        if (Database.DatabaseType.IsSqlite())
+        {
+            lock (_sqliteValidateSessionLock)
             {
-                lock (_sqliteValidateSessionLock)
-                {
-                    return ValidateLoginSessionInternal(userId, sessionId);
-                }
+                return ValidateLoginSessionInternal(userId, sessionId);
             }
-
-            return ValidateLoginSessionInternal(userId, sessionId);
         }
 
-        private bool ValidateLoginSessionInternal(int userId, Guid sessionId)
-        {
-            // with RepeatableRead transaction mode, read-then-update operations can
+        return ValidateLoginSessionInternal(userId, sessionId);
+    }
+
+    private bool ValidateLoginSessionInternal(int userId, Guid sessionId)
+    {
+        // with RepeatableRead transaction mode, read-then-update operations can
         // cause deadlocks, and the ForUpdate() hint is required to tell the database
         // to acquire an exclusive lock when reading
 
@@ -370,7 +370,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             return;
         }
 
-        List<int> userIds = dtos.Count == 1 ? new List<int> {dtos[0].Id} : dtos.Select(x => x.Id).ToList();
+        List<int> userIds = dtos.Count == 1 ? new List<int> { dtos[0].Id } : dtos.Select(x => x.Id).ToList();
         Dictionary<int, UserDto>? xUsers = dtos.Count == 1 ? null : dtos.ToDictionary(x => x.Id, x => x);
 
         // get users2groups
@@ -396,12 +396,12 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             groups = Database.Fetch<UserGroupDto>(sql)
                 .ToDictionary(x => x.Id, x => x);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Logger.LogDebug(e, "Couldn't get user groups. This should only happens doing the migration that add new columns to user groups");
 
             sql = SqlContext.Sql()
-                .Select<UserGroupDto>(x=>x.Id, x=>x.Alias, x=>x.StartContentId, x=>x.StartMediaId)
+                .Select<UserGroupDto>(x => x.Id, x => x.Alias, x => x.StartContentId, x => x.StartMediaId)
                 .From<UserGroupDto>()
                 .WhereIn<UserGroupDto>(x => x.Id, groupIds);
 
@@ -587,11 +587,11 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             List<UserGroupDto>? assigned = entity.Groups == null || entity.Groups.Any() == false
                 ? new List<UserGroupDto>()
                 : Database.Fetch<UserGroupDto>("SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)",
-                    new {aliases = entity.Groups.Select(x => x.Alias)});
+                    new { aliases = entity.Groups.Select(x => x.Alias) });
 
             foreach (UserGroupDto? groupDto in assigned)
             {
-                var dto = new User2UserGroupDto {UserGroupId = groupDto.Id, UserId = entity.Id};
+                var dto = new User2UserGroupDto { UserGroupId = groupDto.Id, UserId = entity.Id };
                 Database.Insert(dto);
             }
         }
@@ -690,7 +690,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         {
             List<UserStartNodeDto>? assignedStartNodes =
                 Database.Fetch<UserStartNodeDto>("SELECT * FROM umbracoUserStartNode WHERE userId = @userId",
-                    new {userId = entity.Id});
+                    new { userId = entity.Id });
             if (entity.IsPropertyDirty("StartContentIds"))
             {
                 AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Content,
@@ -710,15 +710,15 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             List<UserGroupDto>? assigned = entity.Groups == null || entity.Groups.Any() == false
                 ? new List<UserGroupDto>()
                 : Database.Fetch<UserGroupDto>("SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)",
-                    new {aliases = entity.Groups.Select(x => x.Alias)});
+                    new { aliases = entity.Groups.Select(x => x.Alias) });
 
             //first delete all
             // TODO: We could do this a nicer way instead of "Nuke and Pave"
-            Database.Delete<User2UserGroupDto>("WHERE UserId = @UserId", new {UserId = entity.Id});
+            Database.Delete<User2UserGroupDto>("WHERE UserId = @UserId", new { UserId = entity.Id });
 
             foreach (UserGroupDto? groupDto in assigned)
             {
-                var dto = new User2UserGroupDto {UserGroupId = groupDto.Id, UserId = entity.Id};
+                var dto = new User2UserGroupDto { UserGroupId = groupDto.Id, UserId = entity.Id };
                 Database.Insert(dto);
             }
         }
@@ -741,14 +741,14 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         if (toDelete.Length > 0)
         {
             Database.Delete<UserStartNodeDto>("WHERE UserId = @UserId AND startNode IN (@startNodes)",
-                new {UserId = entity.Id, startNodes = toDelete});
+                new { UserId = entity.Id, startNodes = toDelete });
         }
 
         //add the ones not currently in the db
         var toAdd = entityStartIds.Except(assignedIds).ToArray();
         foreach (var i in toAdd)
         {
-            var dto = new UserStartNodeDto {StartNode = i, StartNodeType = (int)startNodeType, UserId = entity.Id};
+            var dto = new UserStartNodeDto { StartNode = i, StartNodeType = (int)startNodeType, UserId = entity.Id };
             Database.Insert(dto);
         }
     }
@@ -891,7 +891,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
                     INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
                     INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
                     WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
-            filterSql?.Append(subQuery, new {userGroups = includeUserGroups});
+            filterSql?.Append(subQuery, new { userGroups = includeUserGroups });
         }
 
         if (excludeUserGroups != null && excludeUserGroups.Length > 0)
@@ -901,7 +901,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
                     INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
                     INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
                     WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
-            filterSql?.Append(subQuery, new {userGroups = excludeUserGroups});
+            filterSql?.Append(subQuery, new { userGroups = excludeUserGroups });
         }
 
         if (userState != null && userState.Length > 0)

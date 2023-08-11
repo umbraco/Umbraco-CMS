@@ -478,7 +478,7 @@ namespace Umbraco.Cms.Core.IO
             const int count = 10;
             const int pausems = 100;
 
-            for (var i = 0;; i++)
+            for (var i = 0; ; i++)
             {
                 try
                 {

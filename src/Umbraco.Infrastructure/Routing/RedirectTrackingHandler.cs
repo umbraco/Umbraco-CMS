@@ -33,7 +33,7 @@ public sealed class RedirectTrackingHandler :
     private readonly ILogger<RedirectTrackingHandler> _logger;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IRedirectUrlService _redirectUrlService;
-    private readonly IVariationContextAccessor _variationContextAccessor;private readonly ILocalizationService _localizationService;
+    private readonly IVariationContextAccessor _variationContextAccessor; private readonly ILocalizationService _localizationService;
     private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
 
     public RedirectTrackingHandler(
@@ -42,32 +42,33 @@ public sealed class RedirectTrackingHandler :
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IRedirectUrlService redirectUrlService,
         IVariationContextAccessor variationContextAccessor,
-    ILocalizationService localizationService){
+    ILocalizationService localizationService)
+    {
         _logger = logger;
         _webRoutingSettings = webRoutingSettings;
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _redirectUrlService = redirectUrlService;
         _variationContextAccessor = variationContextAccessor;
-    _localizationService = localizationService;
-        }
+        _localizationService = localizationService;
+    }
 
-        [Obsolete("Use ctor with all params")]
-        public RedirectTrackingHandler(
-            ILogger<RedirectTrackingHandler> logger,
-            IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IRedirectUrlService redirectUrlService,
-            IVariationContextAccessor variationContextAccessor)
-        :this(
-            logger,
-            webRoutingSettings,
-            publishedSnapshotAccessor,
-            redirectUrlService,
-            variationContextAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
-        {
+    [Obsolete("Use ctor with all params")]
+    public RedirectTrackingHandler(
+        ILogger<RedirectTrackingHandler> logger,
+        IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IRedirectUrlService redirectUrlService,
+        IVariationContextAccessor variationContextAccessor)
+    : this(
+        logger,
+        webRoutingSettings,
+        publishedSnapshotAccessor,
+        redirectUrlService,
+        variationContextAccessor,
+        StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
+    {
 
-        }
+    }
 
     public void Handle(ContentMovedNotification notification) => CreateRedirectsForOldRoutes(notification);
 
@@ -153,23 +154,24 @@ public sealed class RedirectTrackingHandler :
                 if (!IsNotRoute(route))
                 {
                     oldRoutes[new ContentIdAndCulture(publishedContent.Id, culture)] = new ContentKeyAndOldRoute(publishedContent.Key, route!);
-                    }
-                    else if (string.IsNullOrEmpty(culture))
+                }
+                else if (string.IsNullOrEmpty(culture))
+                {
+                    // Retry using all languages, if this is invariant but has a variant ancestor
+                    var languages = _localizationService.GetAllLanguages();
+                    foreach (var language in languages)
                     {
-                        // Retry using all languages, if this is invariant but has a variant ancestor
-                        var languages = _localizationService.GetAllLanguages();
-                        foreach (var language in languages)
+                        route = contentCache?.GetRouteById(publishedContent.Id, language.IsoCode);
+                        if (!IsNotRoute(route))
                         {
-                            route = contentCache?.GetRouteById(publishedContent.Id, language.IsoCode);
-                if (!IsNotRoute(route))
-                            {
-                oldRoutes[new ContentIdAndCulture(publishedContent.Id, language.IsoCode)] =
-                    new ContentKeyAndOldRoute(publishedContent.Key, route!);
+                            oldRoutes[new ContentIdAndCulture(publishedContent.Id, language.IsoCode)] =
+                                new ContentKeyAndOldRoute(publishedContent.Key, route!);
+                        }
+                    }
+                }
             }
         }
-    }}
-            }
-        }
+    }
 
     private void CreateRedirects(OldRoutesDictionary oldRoutes)
     {

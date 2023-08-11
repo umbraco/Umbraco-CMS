@@ -75,7 +75,7 @@ internal class DomainRepository : EntityRepositoryBase<int, IDomain>, IDomainRep
         => $"{Constants.DatabaseSchema.Tables.Domain}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
-        => new []
+        => new[]
         {
             $"DELETE FROM {Constants.DatabaseSchema.Tables.Domain} WHERE id = @id",
         };

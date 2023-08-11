@@ -45,7 +45,7 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
     public override bool IsConfiguration(object obj)
         => obj is TConfiguration;
 
-        /// <inheritdoc />
+    /// <inheritdoc />
     public override object FromDatabase(
         string? configuration,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)

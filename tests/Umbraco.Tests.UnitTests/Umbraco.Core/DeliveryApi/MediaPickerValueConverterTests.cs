@@ -27,7 +27,7 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
         var publishedPropertyType = SetupMediaPropertyType(false);
         var valueConverter = CreateMediaPickerValueConverter();
 
-        var inter = new[] {new GuidUdi(Constants.UdiEntityType.MediaType, PublishedMedia.Key)};
+        var inter = new[] { new GuidUdi(Constants.UdiEntityType.MediaType, PublishedMedia.Key) };
 
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMedia>;
 
@@ -84,7 +84,7 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
     private IPublishedPropertyType SetupMediaPropertyType(bool multiSelect)
     {
         var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() =>
-            new MediaPickerConfiguration {Multiple = multiSelect}
+            new MediaPickerConfiguration { Multiple = multiSelect }
         ));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);

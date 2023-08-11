@@ -170,7 +170,7 @@ public class RetryPolicy
 
         ShouldRetry shouldRetry = RetryStrategy.GetShouldRetry();
 
-        for (; ;)
+        for (; ; )
         {
             lastError = null;
 

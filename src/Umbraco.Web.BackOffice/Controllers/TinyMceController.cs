@@ -82,7 +82,7 @@ public class TinyMceController : UmbracoAuthorizedApiController
 
         // Really we should only have one file per request to this endpoint
         //  var file = result.FileData[0];
-        var fileName = formFile.FileName.Trim(new[] {'\"'}).TrimEnd();
+        var fileName = formFile.FileName.Trim(new[] { '\"' }).TrimEnd();
         var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
         string ext;
         var fileExtensionIndex = safeFileName.LastIndexOf('.');

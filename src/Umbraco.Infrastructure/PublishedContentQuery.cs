@@ -296,8 +296,8 @@ public class PublishedContentQuery : IPublishedContentQuery
             ordering = query.ManagedQuery(term, fields);
         }
 
-            // Filter selected fields because results are loaded from the published snapshot based on these
-            IOrdering? queryExecutor = ordering.SelectFields(_returnedQueryFields);
+        // Filter selected fields because results are loaded from the published snapshot based on these
+        IOrdering? queryExecutor = ordering.SelectFields(_returnedQueryFields);
 
 
         ISearchResults? results = skip == 0 && take == 0
@@ -331,8 +331,8 @@ public class PublishedContentQuery : IPublishedContentQuery
 
         if (query is IOrdering ordering)
         {
-                // Filter selected fields because results are loaded from the published snapshot based on these
-                query = ordering.SelectFields(_returnedQueryFields);
+            // Filter selected fields because results are loaded from the published snapshot based on these
+            query = ordering.SelectFields(_returnedQueryFields);
         }
 
         ISearchResults? results = skip == 0 && take == 0

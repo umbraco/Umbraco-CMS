@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                   contentTypeService,
                   contentService,
                   propertyEditors,
-                  (Umbraco.Cms.Infrastructure.Scoping.IScopeProvider) scopeProvider,
+                  (Umbraco.Cms.Infrastructure.Scoping.IScopeProvider)scopeProvider,
                   shortStringHelper,
                   serializer,
                   mediaService,
@@ -113,7 +113,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #region Install/Uninstall
 
-            public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId)
+        public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId)
         {
             using (IScope scope = _scopeProvider.CreateScope())
             {
@@ -352,8 +352,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             var templateId = element.AttributeValue<int?>("template");
 
             IEnumerable<XElement>? properties = from property in element.Elements()
-                where property.Attribute("isDoc") == null
-                select property;
+                                                where property.Attribute("isDoc") == null
+                                                select property;
 
             //TODO: This will almost never work, we can't reference a template by an INT Id within a package manifest, we need to change the
             // packager to package templates by UDI and resolve by the same, in 98% of cases, this isn't going to work, or it will resolve the wrong template.
@@ -423,7 +423,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         // set property value
                         // Skip unsupported language variation, otherwise we'll get a "not supported error"
                         // We allow null, because that's invariant
-                        if ( propertyLang is null || installedLanguages.InvariantContains(propertyLang))
+                        if (propertyLang is null || installedLanguages.InvariantContains(propertyLang))
                         {
                             content.SetValue(propertyTypeAlias, propertyValue, propertyLang);
                         }
@@ -456,14 +456,20 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     {
                         return new Content(name, parentId, c)
                         {
-                            Key = key, Level = level, SortOrder = sortOrder, TemplateId = templateId,
+                            Key = key,
+                            Level = level,
+                            SortOrder = sortOrder,
+                            TemplateId = templateId,
                         } as TContentBase;
                     }
                     else
                     {
                         return new Content(name, (IContent)parent, c)
                         {
-                            Key = key, Level = level, SortOrder = sortOrder, TemplateId = templateId,
+                            Key = key,
+                            Level = level,
+                            SortOrder = sortOrder,
+                            TemplateId = templateId,
                         } as TContentBase;
                     }
 
@@ -472,14 +478,18 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     {
                         return new Core.Models.Media(name, parentId, m)
                         {
-                            Key = key, Level = level, SortOrder = sortOrder,
+                            Key = key,
+                            Level = level,
+                            SortOrder = sortOrder,
                         } as TContentBase;
                     }
                     else
                     {
                         return new Core.Models.Media(name, (IMedia)parent, m)
                         {
-                            Key = key, Level = level, SortOrder = sortOrder,
+                            Key = key,
+                            Level = level,
+                            SortOrder = sortOrder,
                         } as TContentBase;
                     }
 
@@ -493,7 +503,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         #region DocumentTypes
 
         public IReadOnlyList<IContentType> ImportDocumentType(XElement docTypeElement, int userId)
-            => ImportDocumentTypes(new[] {docTypeElement}, userId, out _);
+            => ImportDocumentTypes(new[] { docTypeElement }, userId, out _);
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentType"/>
@@ -791,11 +801,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 if (parent is null)
                 {
-                    return new ContentType(_shortStringHelper, parentId) {Alias = alias, Key = key} as T;
+                    return new ContentType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T;
                 }
                 else
                 {
-                    return new ContentType(_shortStringHelper, (IContentType)parent, alias) {Key = key} as T;
+                    return new ContentType(_shortStringHelper, (IContentType)parent, alias) { Key = key } as T;
                 }
             }
 
@@ -803,11 +813,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 if (parent is null)
                 {
-                    return new MediaType(_shortStringHelper, parentId) {Alias = alias, Key = key} as T;
+                    return new MediaType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T;
                 }
                 else
                 {
-                    return new MediaType(_shortStringHelper, (IMediaType)parent, alias) {Key = key} as T;
+                    return new MediaType(_shortStringHelper, (IMediaType)parent, alias) { Key = key } as T;
                 }
             }
 
@@ -1257,7 +1267,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     var editorAlias = dataTypeElement.Attribute("Id")?.Value?.Trim();
                     if (!_propertyEditors.TryGet(editorAlias, out IDataEditor? editor))
                     {
-                        editor = new VoidEditor(_dataValueEditorFactory) {Alias = editorAlias ?? string.Empty};
+                        editor = new VoidEditor(_dataValueEditorFactory) { Alias = editorAlias ?? string.Empty };
                     }
 
                     var dataType = new DataType(editor, _serializer)
@@ -1581,7 +1591,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 {
                     var content = macroPartialViewXml.Value ?? string.Empty;
 
-                    macroPartialView = new PartialView(PartialViewType.PartialViewMacro, path) {Content = content};
+                    macroPartialView = new PartialView(PartialViewType.PartialViewMacro, path) { Content = content };
                     _fileService.SavePartialViewMacro(macroPartialView, userId);
                     result.Add(macroPartialView);
                 }
@@ -1635,7 +1645,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             var existingMacro = _macroService.GetById(macroKey) as Macro;
             Macro macro = existingMacro ?? new Macro(_shortStringHelper, macroAlias, macroName, macroSource,
-                cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration) {Key = macroKey};
+                cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration)
+            { Key = macroKey };
 
             XElement? properties = macroElement.Element("properties");
             if (properties != null)
@@ -1696,7 +1707,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         continue;
                     }
 
-                    script = new Script(path!) {Content = content};
+                    script = new Script(path!) { Content = content };
                     _fileService.SaveScript(script, userId);
                     result.Add(script);
                 }
@@ -1725,7 +1736,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 {
                     var content = partialViewXml.Value ?? string.Empty;
 
-                    partialView = new PartialView(PartialViewType.PartialView, path) {Content = content};
+                    partialView = new PartialView(PartialViewType.PartialView, path) { Content = content };
                     _fileService.SavePartialView(partialView, userId);
                     result.Add(partialView);
                 }
@@ -1757,7 +1768,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         continue;
                     }
 
-                    s = new Stylesheet(stylesheetPath!) {Content = content};
+                    s = new Stylesheet(stylesheetPath!) { Content = content };
                     _fileService.SaveStylesheet(s, userId);
                 }
 
@@ -1800,7 +1811,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         #region Templates
 
         public IEnumerable<ITemplate> ImportTemplate(XElement templateElement, int userId)
-            => ImportTemplates(new[] {templateElement}, userId);
+            => ImportTemplates(new[] { templateElement }, userId);
 
         /// <summary>
         /// Imports and saves package xml as <see cref="ITemplate"/>

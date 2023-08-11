@@ -68,7 +68,7 @@ namespace Umbraco.Extensions
             umbFileConfiguration = umbracoFileConfiguration;
 
             logConfig.WriteTo.UmbracoFile(
-                path : umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory),
+                path: umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory),
                 fileSizeLimitBytes: umbracoFileConfiguration.FileSizeLimitBytes,
                 restrictedToMinimumLevel: umbracoFileConfiguration.RestrictedToMinimumLevel,
                 rollingInterval: umbracoFileConfiguration.RollingInterval,
@@ -136,7 +136,7 @@ namespace Umbraco.Extensions
             //Main .txt logfile - in similar format to older Log4Net output
             //Ends with ..txt as Date is inserted before file extension substring
             logConfig.WriteTo.File(
-                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles),  $"UmbracoTraceLog.{Environment.MachineName}..txt"),
+                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles), $"UmbracoTraceLog.{Environment.MachineName}..txt"),
                 shared: true,
                 rollingInterval: RollingInterval.Day,
                 restrictedToMinimumLevel: minimumLevel,
@@ -162,7 +162,7 @@ namespace Umbraco.Extensions
             //Main .txt logfile - in similar format to older Log4Net output
             //Ends with ..txt as Date is inserted before file extension substring
             logConfig.WriteTo.File(
-                Path.Combine(loggingSettings.GetAbsoluteLoggingPath(hostEnvironment),  $"UmbracoTraceLog.{Environment.MachineName}..txt"),
+                Path.Combine(loggingSettings.GetAbsoluteLoggingPath(hostEnvironment), $"UmbracoTraceLog.{Environment.MachineName}..txt"),
                 shared: true,
                 rollingInterval: RollingInterval.Day,
                 restrictedToMinimumLevel: minimumLevel,
@@ -234,7 +234,7 @@ namespace Umbraco.Extensions
             // Ends with ..txt as Date is inserted before file extension substring
             logConfig.WriteTo.File(
                 new CompactJsonFormatter(),
-                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles) ,$"UmbracoTraceLog.{Environment.MachineName}..json"),
+                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles), $"UmbracoTraceLog.{Environment.MachineName}..json"),
                 shared: true,
                 rollingInterval: RollingInterval.Day, // Create a new JSON file every day
                 retainedFileCountLimit: retainedFileCount, // Setting to null means we keep all files - default is 31 days
@@ -262,7 +262,7 @@ namespace Umbraco.Extensions
             // Ends with ..txt as Date is inserted before file extension substring
             logConfig.WriteTo.File(
                 new CompactJsonFormatter(),
-                Path.Combine(loggingSettings.GetAbsoluteLoggingPath(hostEnvironment) ,$"UmbracoTraceLog.{Environment.MachineName}..json"),
+                Path.Combine(loggingSettings.GetAbsoluteLoggingPath(hostEnvironment), $"UmbracoTraceLog.{Environment.MachineName}..json"),
                 shared: true,
                 rollingInterval: RollingInterval.Day, // Create a new JSON file every day
                 retainedFileCountLimit: retainedFileCount, // Setting to null means we keep all files - default is 31 days

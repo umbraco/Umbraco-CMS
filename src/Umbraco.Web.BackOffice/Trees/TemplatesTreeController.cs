@@ -125,7 +125,7 @@ public class TemplatesTreeController : TreeController, ISearchableTree
 
         if (id == Constants.System.RootString)
         {
-                //refresh action
+            //refresh action
             menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
 
             return menu;
@@ -139,14 +139,14 @@ public class TemplatesTreeController : TreeController, ISearchableTree
 
         EntitySlim entity = FromTemplate(template);
 
-            //don't allow delete if it has child layouts
+        //don't allow delete if it has child layouts
         if (template.IsMasterTemplate == false)
         {
             //add delete option if it doesn't have children
             menu.Items.Add<ActionDelete>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
         }
 
-            //add refresh
+        //add refresh
         menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
 
         return menu;

@@ -6,5 +6,5 @@ public interface ICultureDictionaryFactory
 {
     ICultureDictionary CreateDictionary();
 
-    ICultureDictionary CreateDictionary(CultureInfo specificCulture)  => throw new NotImplementedException();
+    ICultureDictionary CreateDictionary(CultureInfo specificCulture) => throw new NotImplementedException();
 }

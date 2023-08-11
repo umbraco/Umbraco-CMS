@@ -166,7 +166,9 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
                 {
                     toInsertPermissions.Add(new UserGroup2NodePermissionDto
                     {
-                        NodeId = e, Permission = p.ToString(CultureInfo.InvariantCulture), UserGroupId = groupId,
+                        NodeId = e,
+                        Permission = p.ToString(CultureInfo.InvariantCulture),
+                        UserGroupId = groupId,
                     });
                 }
             }
@@ -196,7 +198,9 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
 
         UserGroup2NodePermissionDto[] actions = entityIds.Select(id => new UserGroup2NodePermissionDto
         {
-            NodeId = id, Permission = permission.ToString(CultureInfo.InvariantCulture), UserGroupId = groupId,
+            NodeId = id,
+            Permission = permission.ToString(CultureInfo.InvariantCulture),
+            UserGroupId = groupId,
         }).ToArray();
 
         db.BulkInsertRecords(actions);
@@ -226,12 +230,15 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
 
         UserGroup2NodePermissionDto[] actionsPermissions = groupIdsA.Select(id => new UserGroup2NodePermissionDto
         {
-            NodeId = entity.Id, Permission = permission.ToString(CultureInfo.InvariantCulture), UserGroupId = id,
+            NodeId = entity.Id,
+            Permission = permission.ToString(CultureInfo.InvariantCulture),
+            UserGroupId = id,
         }).ToArray();
 
         UserGroup2NodeDto[] actions = groupIdsA.Select(id => new UserGroup2NodeDto
         {
-            NodeId = entity.Id, UserGroupId = id,
+            NodeId = entity.Id,
+            UserGroupId = id,
         }).ToArray();
 
         db.BulkInsertRecords(actions);
@@ -259,7 +266,8 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
         {
             toInsert.Add(new UserGroup2NodeDto
             {
-                NodeId = permissionSet.EntityId, UserGroupId = entityPermission.UserGroupId,
+                NodeId = permissionSet.EntityId,
+                UserGroupId = entityPermission.UserGroupId,
             });
             foreach (var permission in entityPermission.AssignedPermissions)
             {

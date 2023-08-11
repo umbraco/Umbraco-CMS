@@ -236,7 +236,7 @@ public static partial class NPocoDatabaseExtensions
         where TConnection : class, IDbConnection
     {
         IDbConnection? c = connection;
-        for (; ;)
+        for (; ; )
         {
             switch (c)
             {
@@ -264,7 +264,7 @@ public static partial class NPocoDatabaseExtensions
         where TTransaction : class, IDbTransaction
     {
         IDbTransaction? t = transaction;
-        for (; ;)
+        for (; ; )
         {
             switch (t)
             {
@@ -289,7 +289,7 @@ public static partial class NPocoDatabaseExtensions
         where TCommand : class, IDbCommand
     {
         IDbCommand? c = command;
-        for (; ;)
+        for (; ; )
         {
             switch (c)
             {

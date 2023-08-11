@@ -115,7 +115,8 @@ public class TagsPropertyEditor : DataEditor
         public IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId)
         {
             var strValue = value?.ToString();
-            if (string.IsNullOrWhiteSpace(strValue)) return Enumerable.Empty<ITag>();
+            if (string.IsNullOrWhiteSpace(strValue))
+                return Enumerable.Empty<ITag>();
 
             var tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(dataTypeConfiguration) ?? new TagConfiguration();
 

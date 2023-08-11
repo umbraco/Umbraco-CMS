@@ -97,7 +97,8 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
                 // Reusing the boolean operation of the "Descendants" selector, as we want to get all the nodes from the given starting point
                 return new SelectorOption
                 {
-                    FieldName = DescendantsSelectorIndexer.FieldName, Values = new[] { startItem.Key.ToString() }
+                    FieldName = DescendantsSelectorIndexer.FieldName,
+                    Values = new[] { startItem.Key.ToString() }
                 };
             }
         }

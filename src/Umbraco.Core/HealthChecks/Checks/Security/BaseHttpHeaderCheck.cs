@@ -108,7 +108,7 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
             }
             else
             {
-                resultType = success ?  StatusResultType.Success : StatusResultType.Error;
+                resultType = success ? StatusResultType.Success : StatusResultType.Error;
             }
         }
         catch (Exception ex)

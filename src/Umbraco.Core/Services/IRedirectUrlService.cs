@@ -62,7 +62,7 @@ public interface IRedirectUrlService : IService
     /// <returns>The most recent redirect URLs corresponding to the route.</returns>
     Task<IRedirectUrl?> GetMostRecentRedirectUrlAsync(string url, string? culture) => Task.FromResult(GetMostRecentRedirectUrl(url, culture));
 
-        /// <summary>
+    /// <summary>
     ///     Gets all redirect URLs for a content item.
     /// </summary>
     /// <param name="contentKey">The content unique key.</param>

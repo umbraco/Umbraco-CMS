@@ -252,7 +252,7 @@ public class GlobalSettings
     /// - https://www.umbraco.com/ar/4/3/2/1
     /// </example>
     [DefaultValue(StaticForceCombineUrlPathLeftToRight)]
-    public bool ForceCombineUrlPathLeftToRight { get; set; }  = StaticForceCombineUrlPathLeftToRight;
+    public bool ForceCombineUrlPathLeftToRight { get; set; } = StaticForceCombineUrlPathLeftToRight;
 
     [DefaultValue(StaticShowMaintenancePageWhenInUpgradeState)]
     public bool ShowMaintenancePageWhenInUpgradeState { get; set; } = StaticShowMaintenancePageWhenInUpgradeState;

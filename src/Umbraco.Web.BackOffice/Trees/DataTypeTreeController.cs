@@ -153,7 +153,7 @@ public class DataTypeTreeController : TreeController, ISearchableTree
             UmbracoObjectTypes.DataTypeContainer);
         if (container != null)
         {
-                //set the default to create
+            //set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
             menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
@@ -181,9 +181,9 @@ public class DataTypeTreeController : TreeController, ISearchableTree
                 menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             }
 
-                menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
-                menu.Items.Add<ActionCopy>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
-            }
+            menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add<ActionCopy>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
+        }
 
         return menu;
     }

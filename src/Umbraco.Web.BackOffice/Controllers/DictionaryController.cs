@@ -260,7 +260,7 @@ public class DictionaryController : BackOfficeNotificationsController
             return ValidationProblem(_localizedTextService.Localize("dictionary", "itemDoesNotExists"));
         }
 
-        if(dictionaryItem.ParentId == null && move.ParentId == Constants.System.Root)
+        if (dictionaryItem.ParentId == null && move.ParentId == Constants.System.Root)
         {
             return ValidationProblem(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"));
         }
@@ -341,7 +341,7 @@ public class DictionaryController : BackOfficeNotificationsController
         }
 
         var allowedLanguageIds = currentUser?.CalculateAllowedLanguageIds(_localizationService);
-        var allowedLanguageIdHashSet =allowedLanguageIds is null ? new HashSet<int>() : new HashSet<int>(allowedLanguageIds);
+        var allowedLanguageIdHashSet = allowedLanguageIds is null ? new HashSet<int>() : new HashSet<int>(allowedLanguageIds);
 
         foreach (DictionaryTranslationSave translation in dictionary.Translations)
         {

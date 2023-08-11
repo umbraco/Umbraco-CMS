@@ -216,7 +216,7 @@ namespace Umbraco.Cms.Core.IO
             //TODO this is fucked, why do PhysicalFileSystem has a root url? Mvc views cannot be accessed by url!
             var macroPartialFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MacroPartials), _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.MacroPartials));
             var partialViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.PartialViews), _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.PartialViews));
-            var scriptsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger,  _hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoScriptsPath), _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoScriptsPath));
+            var scriptsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoScriptsPath), _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoScriptsPath));
             var mvcViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MvcViews), _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.MvcViews));
 
             _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "macro-partials", IsScoped);
@@ -350,7 +350,7 @@ namespace Umbraco.Cms.Core.IO
         {
             lock (_shadowLocker)
             {
-                var wrapper = new ShadowWrapper(filesystem, _ioHelper, _hostingEnvironment, _loggerFactory, shadowPath,() => IsScoped?.Invoke());
+                var wrapper = new ShadowWrapper(filesystem, _ioHelper, _hostingEnvironment, _loggerFactory, shadowPath, () => IsScoped?.Invoke());
                 if (_shadowCurrentId != null)
                 {
                     wrapper.Shadow(_shadowCurrentId);

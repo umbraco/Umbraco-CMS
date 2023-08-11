@@ -187,7 +187,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var link = result.First();
         Assert.AreEqual("Custom link name", link.Title);
         Assert.AreEqual(PublishedContent.Key, link.DestinationId);
-        Assert.AreEqual("/the-page-url",  link.Route!.Path);
+        Assert.AreEqual("/the-page-url", link.Route!.Path);
         Assert.AreEqual(LinkType.Content, link.LinkType);
         Assert.AreEqual("_blank", link.Target);
         Assert.Null(link.Url);

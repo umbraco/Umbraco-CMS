@@ -44,7 +44,7 @@ public interface ITrackedReferencesService
     /// <returns>A paged result of <see cref="RelationItem" /> objects.</returns>
     PagedResult<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency);
 
-        /// <summary>
+    /// <summary>
     ///     Gets a paged result of items which are in relation with the current item.
     ///     Basically, shows the items which depend on the current item.
     /// </summary>

@@ -74,7 +74,8 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
 
     public SelectorOption AllContentSelectorOption() => new()
     {
-        FieldName = UmbracoExamineFieldNames.CategoryFieldName, Values = new[] { "content" }
+        FieldName = UmbracoExamineFieldNames.CategoryFieldName,
+        Values = new[] { "content" }
     };
 
     private IBooleanOperation BuildSelectorOperation(SelectorOption selectorOption, IIndex index, string culture, bool preview)

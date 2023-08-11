@@ -43,7 +43,7 @@ public class ModelsBuilderSettings
     {
         get
         {
-            if (ModelsMode == ModelsMode.Nothing ||ModelsMode.IsAuto())
+            if (ModelsMode == ModelsMode.Nothing || ModelsMode.IsAuto())
             {
                 return false;
 

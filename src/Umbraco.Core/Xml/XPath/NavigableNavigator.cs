@@ -82,7 +82,7 @@ public class NavigableNavigator : XPathNavigator
     /// <remarks>When no root content is supplied then the root of the source is used.</remarks>
     public NavigableNavigator(INavigableSource source, int rootId = 0, int maxDepth = int.MaxValue)
 
-        // : this(source, maxDepth)
+    // : this(source, maxDepth)
     {
         _source = source;
         _lastAttributeIndex = source.LastAttributeIndex;

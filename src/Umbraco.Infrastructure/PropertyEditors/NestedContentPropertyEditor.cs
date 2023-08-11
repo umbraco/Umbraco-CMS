@@ -424,7 +424,8 @@ public class NestedContentPropertyEditor : DataEditor
                         // set values to null
                         row.PropertyValues[elementTypeProp.Alias] = new NestedContentValues.NestedContentPropertyValue
                         {
-                            PropertyType = elementTypeProp, Value = null,
+                            PropertyType = elementTypeProp,
+                            Value = null,
                         };
                         row.RawPropertyValues[elementTypeProp.Alias] = null;
                     }

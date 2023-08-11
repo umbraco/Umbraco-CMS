@@ -83,7 +83,7 @@ public class ExponentialBackoff : RetryStrategy
     /// </summary>
     /// <returns>The ShouldRetry delegate.</returns>
     public override ShouldRetry GetShouldRetry() =>
-        delegate(int currentRetryCount, Exception lastException, out TimeSpan retryInterval)
+        delegate (int currentRetryCount, Exception lastException, out TimeSpan retryInterval)
         {
             if (currentRetryCount < _retryCount)
             {

@@ -172,7 +172,7 @@ public class ContentVariantMapper
     {
         // The default segment (null) is always there,
         // even when there is no property data at all yet
-        var segments = new List<string?> {null};
+        var segments = new List<string?> { null };
 
         // Add actual segments based on the property values
         segments.AddRange(content.Properties.SelectMany(p => p.Values.Select(v => v.Segment)));
@@ -243,7 +243,7 @@ public class ContentVariantMapper
         {
             currentUser = currentIUserBackofficeUser;
         }
-        else if(_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is not null)
+        else if (_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is not null)
         {
             currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
         }

@@ -84,7 +84,7 @@ public class InstallAreaRoutesTests
 
         var endpoint = (RouteEndpoint)route.Endpoints[0];
         Assert.AreEqual("install/api/{action}/{id?}", endpoint.RoutePattern.RawText);
-        
+
         endpoint = (RouteEndpoint)route.Endpoints[1];
         Assert.AreEqual("install/{action}/{id?}", endpoint.RoutePattern.RawText);
     }

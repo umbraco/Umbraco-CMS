@@ -38,16 +38,16 @@ public abstract class PackageMigrationBase : MigrationBase
         _packageMigrationsSettings = packageMigrationsSettings;
     }
 
-        public IImportPackageBuilder ImportPackage => BeginBuild(
-            new ImportPackageBuilder(
-                _packagingService,
-                _mediaService,
-                _mediaFileManager,
-                _mediaUrlGenerators,
-                _shortStringHelper,
-                _contentTypeBaseServiceProvider,
-                Context,
-                _packageMigrationsSettings));
+    public IImportPackageBuilder ImportPackage => BeginBuild(
+        new ImportPackageBuilder(
+            _packagingService,
+            _mediaService,
+            _mediaFileManager,
+            _mediaUrlGenerators,
+            _shortStringHelper,
+            _contentTypeBaseServiceProvider,
+            Context,
+            _packageMigrationsSettings));
 
 
 }

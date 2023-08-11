@@ -18,19 +18,19 @@ public class DatabaseSchemaCreatorFactory
     private readonly ILoggerFactory _loggerFactory;
     private readonly IUmbracoVersion _umbracoVersion;
 
-        public DatabaseSchemaCreatorFactory(
-            ILogger<DatabaseSchemaCreator> logger,
-            ILoggerFactory loggerFactory,
-            IUmbracoVersion umbracoVersion,
-            IEventAggregator eventAggregator,
-            IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
-        {
-            _logger = logger;
-            _loggerFactory = loggerFactory;
-            _umbracoVersion = umbracoVersion;
-            _eventAggregator = eventAggregator;
-            _installDefaultDataSettings = installDefaultDataSettings;
-        }
+    public DatabaseSchemaCreatorFactory(
+        ILogger<DatabaseSchemaCreator> logger,
+        ILoggerFactory loggerFactory,
+        IUmbracoVersion umbracoVersion,
+        IEventAggregator eventAggregator,
+        IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
+    {
+        _logger = logger;
+        _loggerFactory = loggerFactory;
+        _umbracoVersion = umbracoVersion;
+        _eventAggregator = eventAggregator;
+        _installDefaultDataSettings = installDefaultDataSettings;
+    }
 
     public DatabaseSchemaCreator Create(IUmbracoDatabase? database) => new DatabaseSchemaCreator(database, _logger,
         _loggerFactory, _umbracoVersion, _eventAggregator, _installDefaultDataSettings);

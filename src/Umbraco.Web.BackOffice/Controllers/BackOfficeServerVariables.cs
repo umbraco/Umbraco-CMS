@@ -187,27 +187,27 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
         }
 
-         public BackOfficeServerVariables(
-            LinkGenerator linkGenerator,
-            IRuntimeState runtimeState,
-            UmbracoFeatures features,
-            IOptionsMonitor<GlobalSettings> globalSettings,
-            IUmbracoVersion umbracoVersion,
-            IOptionsMonitor<ContentSettings> contentSettings,
-            IHttpContextAccessor httpContextAccessor,
-            TreeCollection treeCollection,
-            IHostingEnvironment hostingEnvironment,
-            IOptionsMonitor<RuntimeSettings> runtimeSettings,
-            IOptionsMonitor<SecuritySettings> securitySettings,
-            IRuntimeMinifier runtimeMinifier,
-            IBackOfficeExternalLoginProviders externalLogins,
-            IImageUrlGenerator imageUrlGenerator,
-            PreviewRoutes previewRoutes,
-            IEmailSender emailSender,
-            IOptionsMonitor<MemberPasswordConfigurationSettings> memberPasswordConfigurationSettings,
-            IOptionsMonitor<DataTypesSettings> dataTypesSettings,
-            ITempDataDictionaryFactory tempDataDictionaryFactory,
-            IOptionsMonitor<MarketplaceSettings> marketplaceSettings)
+        public BackOfficeServerVariables(
+           LinkGenerator linkGenerator,
+           IRuntimeState runtimeState,
+           UmbracoFeatures features,
+           IOptionsMonitor<GlobalSettings> globalSettings,
+           IUmbracoVersion umbracoVersion,
+           IOptionsMonitor<ContentSettings> contentSettings,
+           IHttpContextAccessor httpContextAccessor,
+           TreeCollection treeCollection,
+           IHostingEnvironment hostingEnvironment,
+           IOptionsMonitor<RuntimeSettings> runtimeSettings,
+           IOptionsMonitor<SecuritySettings> securitySettings,
+           IRuntimeMinifier runtimeMinifier,
+           IBackOfficeExternalLoginProviders externalLogins,
+           IImageUrlGenerator imageUrlGenerator,
+           PreviewRoutes previewRoutes,
+           IEmailSender emailSender,
+           IOptionsMonitor<MemberPasswordConfigurationSettings> memberPasswordConfigurationSettings,
+           IOptionsMonitor<DataTypesSettings> dataTypesSettings,
+           ITempDataDictionaryFactory tempDataDictionaryFactory,
+           IOptionsMonitor<MarketplaceSettings> marketplaceSettings)
         {
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;

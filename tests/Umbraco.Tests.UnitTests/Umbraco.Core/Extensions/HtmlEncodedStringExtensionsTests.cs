@@ -12,8 +12,8 @@ public class HtmlEncodedStringExtensionsTests
     [TestCase("", false, true)]
     [TestCase("   ", false, true)]
     [TestCase("This is a non-empty string", false, false)]
-    [TestCase("<p>This is a non-empty string</p>", true,false)]
-    [TestCase("<p>This is a non-empty string</p>", false,false)]
+    [TestCase("<p>This is a non-empty string</p>", true, false)]
+    [TestCase("<p>This is a non-empty string</p>", false, false)]
     [TestCase("<p></p>", true, true)]
     [TestCase("<p></p>", false, false)]
     public void IsNullOrWhiteSpace(string? htmlString, bool stripHtml, bool expectedResult)

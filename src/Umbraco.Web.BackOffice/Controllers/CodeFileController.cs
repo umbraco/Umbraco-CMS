@@ -383,7 +383,7 @@ public class CodeFileController : BackOfficeNotificationsController
                     codeFileDisplay.VirtualPath = Constants.SystemDirectories.PartialViews;
                     if (snippetName.IsNullOrWhiteSpace() == false)
                     {
-                            codeFileDisplay.Content = _partialViewSnippetCollection.GetContentFromName(snippetName!);
+                        codeFileDisplay.Content = _partialViewSnippetCollection.GetContentFromName(snippetName!);
                     }
                 }
 

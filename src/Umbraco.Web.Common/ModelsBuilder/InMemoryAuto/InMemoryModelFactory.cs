@@ -440,7 +440,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
                     var dllPath = File.ReadAllText(dllPathFile);
                     if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
                     {
-                        _logger.LogDebug("Cached models dll at {dllPath}.",dllPath);
+                        _logger.LogDebug("Cached models dll at {dllPath}.", dllPath);
                     }
 
                     if (File.Exists(dllPath) && !File.Exists(dllPath + ".delete"))

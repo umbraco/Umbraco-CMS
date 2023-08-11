@@ -178,97 +178,97 @@ public class EntityController : UmbracoAuthorizedJsonController
         return ExamineSearch(query, type, searchFrom, ignoreUserStartNodes);
     }
 
-        /// <summary>
-        ///     Searches for all content that the user is allowed to see (based on their allowed sections)
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        /// <remarks>
-        ///     Even though a normal entity search will allow any user to search on a entity type that they may not have access to
-        ///     edit, we need
-        ///     to filter these results to the sections they are allowed to edit since this search function is explicitly for the
-        ///     global search
-        ///     so if we showed entities that they weren't allowed to edit they would get errors when clicking on the result.
-        ///     The reason a user is allowed to search individual entity types that they are not allowed to edit is because those
-        ///     search
-        ///     methods might be used in things like pickers in the content editor.
-        /// </remarks>
-        [HttpGet]
-        public async Task<IDictionary<string, TreeSearchResult>> SearchAll(string query)
+    /// <summary>
+    ///     Searches for all content that the user is allowed to see (based on their allowed sections)
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    /// <remarks>
+    ///     Even though a normal entity search will allow any user to search on a entity type that they may not have access to
+    ///     edit, we need
+    ///     to filter these results to the sections they are allowed to edit since this search function is explicitly for the
+    ///     global search
+    ///     so if we showed entities that they weren't allowed to edit they would get errors when clicking on the result.
+    ///     The reason a user is allowed to search individual entity types that they are not allowed to edit is because those
+    ///     search
+    ///     methods might be used in things like pickers in the content editor.
+    /// </remarks>
+    [HttpGet]
+    public async Task<IDictionary<string, TreeSearchResult>> SearchAll(string query)
+    {
+        if (string.IsNullOrEmpty(query))
         {
-            if (string.IsNullOrEmpty(query))
-            {
-                return new Dictionary<string, TreeSearchResult>();
-            }
+            return new Dictionary<string, TreeSearchResult>();
+        }
 
-            var culture = ClientCulture();
-            var allowedSections = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.AllowedSections.ToArray();
+        var culture = ClientCulture();
+        var allowedSections = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.AllowedSections.ToArray();
 
-            var searchTasks = new List<Task<KeyValuePair<string, TreeSearchResult>>>();
-            foreach (KeyValuePair<string, SearchableApplicationTree> searchableTree in _searchableTreeCollection
-                         .SearchableApplicationTrees.OrderBy(t => t.Value.SortOrder))
+        var searchTasks = new List<Task<KeyValuePair<string, TreeSearchResult>>>();
+        foreach (KeyValuePair<string, SearchableApplicationTree> searchableTree in _searchableTreeCollection
+                     .SearchableApplicationTrees.OrderBy(t => t.Value.SortOrder))
+        {
+            if (allowedSections?.Contains(searchableTree.Value.AppAlias) ?? false)
             {
-                if (allowedSections?.Contains(searchableTree.Value.AppAlias) ?? false)
+                Tree? tree = _treeService.GetByAlias(searchableTree.Key);
+                if (tree == null)
                 {
-                    Tree? tree = _treeService.GetByAlias(searchableTree.Key);
-                    if (tree == null)
-                    {
-                        continue; //shouldn't occur
-                    }
+                    continue; //shouldn't occur
+                }
 
-                    var rootNodeDisplayName = Tree.GetRootNodeDisplayName(tree, _localizedTextService);
-                    if (rootNodeDisplayName is not null)
-                    {
-                        searchTasks.Add(ExecuteSearchAsync(query, culture, searchableTree, rootNodeDisplayName));
-                    }
+                var rootNodeDisplayName = Tree.GetRootNodeDisplayName(tree, _localizedTextService);
+                if (rootNodeDisplayName is not null)
+                {
+                    searchTasks.Add(ExecuteSearchAsync(query, culture, searchableTree, rootNodeDisplayName));
                 }
             }
-
-            var taskResults = await Task.WhenAll(searchTasks);
-
-            return new Dictionary<string, TreeSearchResult>(taskResults);
         }
 
-        private static async Task<KeyValuePair<string, TreeSearchResult>> ExecuteSearchAsync(
-            string query,
-            string? culture,
-            KeyValuePair<string, SearchableApplicationTree> searchableTree,
-            string rootNodeDisplayName)
+        var taskResults = await Task.WhenAll(searchTasks);
+
+        return new Dictionary<string, TreeSearchResult>(taskResults);
+    }
+
+    private static async Task<KeyValuePair<string, TreeSearchResult>> ExecuteSearchAsync(
+        string query,
+        string? culture,
+        KeyValuePair<string, SearchableApplicationTree> searchableTree,
+        string rootNodeDisplayName)
+    {
+        ISearchableTree searcher = searchableTree.Value.SearchableTree;
+        const int pageSize = 200;
+        IEnumerable<SearchResultEntity> results = (
+            searcher is ISearchableTreeWithCulture searcherWithCulture
+                ? await searcherWithCulture.SearchAsync(query, pageSize, 0, culture: culture)
+                : await searcher.SearchAsync(query, pageSize, 0))
+        .WhereNotNull();
+
+        var searchResult = new TreeSearchResult
         {
-            ISearchableTree searcher = searchableTree.Value.SearchableTree;
-            const int pageSize = 200;
-            IEnumerable<SearchResultEntity> results = (
-                searcher is ISearchableTreeWithCulture searcherWithCulture
-                    ? await searcherWithCulture.SearchAsync(query, pageSize, 0, culture: culture)
-                    : await searcher.SearchAsync(query, pageSize, 0))
-            .WhereNotNull();
+            Results = results,
+            TreeAlias = searchableTree.Key,
+            AppAlias = searchableTree.Value.AppAlias,
+            JsFormatterService = searchableTree.Value.FormatterService,
+            JsFormatterMethod = searchableTree.Value.FormatterMethod
+        };
 
-            var searchResult = new TreeSearchResult
-            {
-                Results = results,
-                TreeAlias = searchableTree.Key,
-                AppAlias = searchableTree.Value.AppAlias,
-                JsFormatterService = searchableTree.Value.FormatterService,
-                JsFormatterMethod = searchableTree.Value.FormatterMethod
-            };
+        return new KeyValuePair<string, TreeSearchResult>(rootNodeDisplayName, searchResult);
+    }
 
-            return new KeyValuePair<string, TreeSearchResult>(rootNodeDisplayName, searchResult);
+    /// <summary>
+    ///     Gets the path for a given node ID
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public IConvertToActionResult GetPath(int id, UmbracoEntityTypes type)
+    {
+        ActionResult<EntityBasic?> foundContentResult = GetResultForId(id, type);
+        EntityBasic? foundContent = foundContentResult.Value;
+        if (foundContent is null)
+        {
+            return foundContentResult;
         }
-
-        /// <summary>
-        ///     Gets the path for a given node ID
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public IConvertToActionResult GetPath(int id, UmbracoEntityTypes type)
-        {
-            ActionResult<EntityBasic?> foundContentResult = GetResultForId(id, type);
-            EntityBasic? foundContent = foundContentResult.Value;
-            if (foundContent is null)
-            {
-                return foundContentResult;
-            }
 
         return new ActionResult<IEnumerable<int>>(foundContent.Path
             .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(

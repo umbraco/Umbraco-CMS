@@ -143,8 +143,8 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
             packageDataInstallation,
             blockGridSampleHelper,
             StaticServiceProvider.Instance.GetRequiredService<ICoreScopeProvider>())
-        {
-        }
+    {
+    }
 
     [ActivatorUtilitiesConstructor]
     public ContentTypeController(
@@ -176,24 +176,24 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
                memberTypeService,
                umbracoMapper,
                localizedTextService)
-        {
-            _serializer = serializer;
-            _propertyEditors = propertyEditors;
-            _contentTypeService = contentTypeService;
-            _umbracoMapper = umbracoMapper;
-            _backofficeSecurityAccessor = backofficeSecurityAccessor;
-            _dataTypeService = dataTypeService;
-            _shortStringHelper = shortStringHelper;
-            _localizedTextService = localizedTextService;
-            _fileService = fileService;
-            _logger = logger;
-            _contentService = contentService;
-            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
-            _hostingEnvironment = hostingEnvironment;
-            _packageDataInstallation = packageDataInstallation;
-            _blockGridSampleHelper = blockGridSampleHelper;
-            _coreScopeProvider = coreScopeProvider;
-        }
+    {
+        _serializer = serializer;
+        _propertyEditors = propertyEditors;
+        _contentTypeService = contentTypeService;
+        _umbracoMapper = umbracoMapper;
+        _backofficeSecurityAccessor = backofficeSecurityAccessor;
+        _dataTypeService = dataTypeService;
+        _shortStringHelper = shortStringHelper;
+        _localizedTextService = localizedTextService;
+        _fileService = fileService;
+        _logger = logger;
+        _contentService = contentService;
+        _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+        _hostingEnvironment = hostingEnvironment;
+        _packageDataInstallation = packageDataInstallation;
+        _blockGridSampleHelper = blockGridSampleHelper;
+        _coreScopeProvider = coreScopeProvider;
+    }
 
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     public int GetCount() => _contentTypeService.Count();
@@ -729,7 +729,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
                     model.TempFileName = fileName;
 
                     var xd = new XmlDocument { XmlResolver = null };
-                    xd.Load(Path.Combine(root,  fileName));
+                    xd.Load(Path.Combine(root, fileName));
 
                     model.Alias = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Alias")?.FirstChild?.Value;
                     model.Name = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Name")?.FirstChild?.Value;

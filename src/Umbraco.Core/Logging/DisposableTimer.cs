@@ -63,10 +63,10 @@ public class DisposableTimer : DisposableObjectSlim
                         var args = new object[startMessageArgs.Length + 1];
                         startMessageArgs.CopyTo(args, 0);
                         args[^1] = _timingId;
-                        
+
                         if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
                         {
-                          logger.LogDebug(startMessage + " [Timing {TimingId}]", args);
+                            logger.LogDebug(startMessage + " [Timing {TimingId}]", args);
                         }
                     }
 
@@ -163,7 +163,7 @@ public class DisposableTimer : DisposableObjectSlim
                             args[^1] = _timingId;
                             if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
                             {
-                              _logger.LogDebug(_endMessage + " ({Duration}ms) [Timing {TimingId}]", args);
+                                _logger.LogDebug(_endMessage + " ({Duration}ms) [Timing {TimingId}]", args);
                             }
                         }
 

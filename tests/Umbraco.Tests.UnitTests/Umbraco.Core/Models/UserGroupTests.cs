@@ -18,7 +18,7 @@ public class UserGroupTests
 {
     private static int _swedishLanguageId = 1;
     private static int _danishLanguageId = 2;
-    private static int _germanLanguageId = 3 ;
+    private static int _germanLanguageId = 3;
 
     [SetUp]
     public void SetUp() => _builder = new UserGroupBuilder();

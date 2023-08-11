@@ -146,5 +146,5 @@ internal class RedirectUrlService : RepositoryService, IRedirectUrlService
         {
             return await _redirectUrlRepository.GetMostRecentUrlAsync(url, culture);
         }
-    }	
+    }
 }

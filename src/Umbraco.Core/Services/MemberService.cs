@@ -592,16 +592,16 @@ namespace Umbraco.Cms.Core.Services
             switch (matchType)
             {
                 case StringPropertyMatchType.Exact:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue!.SqlEquals(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue!.SqlEquals(value, TextColumnType.NVarchar)));
+                    query = Query<IMember>().Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && (((Member)x).LongStringPropertyValue!.SqlEquals(value, TextColumnType.NText) || ((Member)x).ShortStringPropertyValue!.SqlEquals(value, TextColumnType.NVarchar)));
                     break;
                 case StringPropertyMatchType.Contains:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue!.SqlContains(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue!.SqlContains(value, TextColumnType.NVarchar)));
+                    query = Query<IMember>().Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && (((Member)x).LongStringPropertyValue!.SqlContains(value, TextColumnType.NText) || ((Member)x).ShortStringPropertyValue!.SqlContains(value, TextColumnType.NVarchar)));
                     break;
                 case StringPropertyMatchType.StartsWith:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue.SqlStartsWith(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue.SqlStartsWith(value, TextColumnType.NVarchar)));
+                    query = Query<IMember>().Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && (((Member)x).LongStringPropertyValue.SqlStartsWith(value, TextColumnType.NText) || ((Member)x).ShortStringPropertyValue.SqlStartsWith(value, TextColumnType.NVarchar)));
                     break;
                 case StringPropertyMatchType.EndsWith:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue!.SqlEndsWith(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue!.SqlEndsWith(value, TextColumnType.NVarchar)));
+                    query = Query<IMember>().Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && (((Member)x).LongStringPropertyValue!.SqlEndsWith(value, TextColumnType.NText) || ((Member)x).ShortStringPropertyValue!.SqlEndsWith(value, TextColumnType.NVarchar)));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(matchType));
@@ -626,19 +626,19 @@ namespace Umbraco.Cms.Core.Services
             switch (matchType)
             {
                 case ValuePropertyMatchType.Exact:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue == value);
+                    query = Query<IMember>().Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).IntegerPropertyValue == value);
                     break;
                 case ValuePropertyMatchType.GreaterThan:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue > value);
+                    query = Query<IMember>().Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).IntegerPropertyValue > value);
                     break;
                 case ValuePropertyMatchType.LessThan:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue < value);
+                    query = Query<IMember>().Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).IntegerPropertyValue < value);
                     break;
                 case ValuePropertyMatchType.GreaterThanOrEqualTo:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue >= value);
+                    query = Query<IMember>().Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).IntegerPropertyValue >= value);
                     break;
                 case ValuePropertyMatchType.LessThanOrEqualTo:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue <= value);
+                    query = Query<IMember>().Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).IntegerPropertyValue <= value);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(matchType));
@@ -657,7 +657,7 @@ namespace Umbraco.Cms.Core.Services
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
-            IQuery<IMember> query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).BoolPropertyValue == value);
+            IQuery<IMember> query = Query<IMember>().Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).BoolPropertyValue == value);
 
             return _memberRepository.Get(query);
         }
@@ -678,19 +678,19 @@ namespace Umbraco.Cms.Core.Services
             switch (matchType)
             {
                 case ValuePropertyMatchType.Exact:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue == value);
+                    query = Query<IMember>().Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).DateTimePropertyValue == value);
                     break;
                 case ValuePropertyMatchType.GreaterThan:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue > value);
+                    query = Query<IMember>().Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).DateTimePropertyValue > value);
                     break;
                 case ValuePropertyMatchType.LessThan:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue < value);
+                    query = Query<IMember>().Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).DateTimePropertyValue < value);
                     break;
                 case ValuePropertyMatchType.GreaterThanOrEqualTo:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue >= value);
+                    query = Query<IMember>().Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).DateTimePropertyValue >= value);
                     break;
                 case ValuePropertyMatchType.LessThanOrEqualTo:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue <= value);
+                    query = Query<IMember>().Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).DateTimePropertyValue <= value);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(matchType)); // causes rollback // causes rollback

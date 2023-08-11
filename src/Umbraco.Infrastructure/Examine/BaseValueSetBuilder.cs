@@ -53,7 +53,7 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
                     case null:
                         continue;
                     case string strVal:
-                        {
+                    {
                         if (strVal.IsNullOrWhiteSpace())
                         {
                             continue;
@@ -70,9 +70,9 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
                         }
                     }
 
-                        break;
+                    break;
                     default:
-                        {
+                    {
                         var key = $"{keyVal.Key}{cultureSuffix}";
                         if (values?.TryGetValue(key, out IEnumerable<object?>? v) ?? false)
                         {
@@ -84,7 +84,7 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
                         }
                     }
 
-                        break;
+                    break;
                 }
             }
         }

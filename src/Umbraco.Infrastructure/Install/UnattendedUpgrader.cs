@@ -99,7 +99,7 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
 
                 break;
                 default:
-                throw new InvalidOperationException("Invalid reason " + _runtimeState.Reason);
+                    throw new InvalidOperationException("Invalid reason " + _runtimeState.Reason);
             }
         }
 

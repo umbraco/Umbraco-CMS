@@ -41,7 +41,7 @@ public class ContentVariantAllowedActionTests : UmbracoTestServerTestBase
         var userGroup = UserGroupBuilder.CreateUserGroup();
         var languageId = LocalizationService.GetLanguageIdByIsoCode(DkIso);
         userGroup.AddAllowedLanguage(languageId!.Value);
-        UserService.Save(userGroup, new []{ user.Id});
+        UserService.Save(userGroup, new[] { user.Id });
         var currentUser = UserService.GetUserById(user.Id);
 
         var result = CreateContent(currentUser);
@@ -52,7 +52,7 @@ public class ContentVariantAllowedActionTests : UmbracoTestServerTestBase
         // Right now we duplicate allowedActions if you have access, this should be changed
         // when we implement granular permissions for languages
         Assert.AreEqual(danishVariant!.AllowedActions, result.AllowedActions);
-        Assert.AreEqual(usVariant!.AllowedActions, new [] { ActionBrowse.ActionLetter.ToString() });
+        Assert.AreEqual(usVariant!.AllowedActions, new[] { ActionBrowse.ActionLetter.ToString() });
     }
 
     private ContentItemDisplay CreateContent(IUser user)

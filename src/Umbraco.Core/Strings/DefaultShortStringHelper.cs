@@ -280,7 +280,7 @@ namespace Umbraco.Cms.Core.Strings
                     text = Utf8ToAsciiConverter.ToAsciiString(text);
                     break;
                 case CleanStringType.TryAscii:
-                    const char ESC = (char) 27;
+                    const char ESC = (char)27;
                     var ctext = Utf8ToAsciiConverter.ToAsciiString(text, ESC);
                     if (ctext.Contains(ESC) == false)
                     {

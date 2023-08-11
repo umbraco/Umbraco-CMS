@@ -61,7 +61,7 @@ internal static class TemplateFactory
 
     public static TemplateDto BuildDto(Template entity, Guid? nodeObjectTypeId, int primaryKey)
     {
-        var dto = new TemplateDto {Alias = entity.Alias, NodeDto = BuildNodeDto(entity, nodeObjectTypeId)};
+        var dto = new TemplateDto { Alias = entity.Alias, NodeDto = BuildNodeDto(entity, nodeObjectTypeId) };
 
         if (entity.MasterTemplateId != null && entity.MasterTemplateId.Value > 0)
         {

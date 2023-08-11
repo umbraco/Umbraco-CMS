@@ -45,7 +45,7 @@ public static partial class Constants
             /// </summary>
             public const string BlockGrid = "Umbraco.BlockGrid";
 
-                /// <summary>
+            /// <summary>
             ///     CheckBox List.
             /// </summary>
             public const string CheckBoxList = "Umbraco.CheckBoxList";

@@ -104,7 +104,7 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
     }
 
     // We need this because we call GetCustomGenericProperties from TabsAndPropertiesMapper
-        // and we have no access to MapMembershipProperties from the base class without casting
+    // and we have no access to MapMembershipProperties from the base class without casting
     protected override IEnumerable<ContentPropertyDisplay> GetCustomGenericProperties(IContentBase content)
     {
         var member = (IMember)content;
@@ -176,7 +176,7 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
         var prop = new ContentPropertyDisplay
         {
             Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login",
-            Label = localizedText.Localize(null,"login"),
+            Label = localizedText.Localize(null, "login"),
             Value = member.Username
         };
 

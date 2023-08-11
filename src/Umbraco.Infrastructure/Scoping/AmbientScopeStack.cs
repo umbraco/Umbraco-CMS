@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 {
     internal class AmbientScopeStack : IAmbientScopeStack
     {
-        private static AsyncLocal<ConcurrentStack<IScope>> _stack = new ();
+        private static AsyncLocal<ConcurrentStack<IScope>> _stack = new();
 
         public IScope? AmbientScope
         {

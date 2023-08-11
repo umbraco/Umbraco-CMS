@@ -234,20 +234,20 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         }
     }
 
-        /// <summary>
-        /// Gets a list of children for a <see cref="IDictionaryItem"/>
-        /// </summary>
-        /// <param name="parentId">Id of the parent</param>
-        /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-        public IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId)
+    /// <summary>
+    /// Gets a list of children for a <see cref="IDictionaryItem"/>
+    /// </summary>
+    /// <param name="parentId">Id of the parent</param>
+    /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
+    public IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId)
+    {
+        using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                var query = Query<IDictionaryItem>().Where(x => x.ParentId == parentId);
-                var items = _dictionaryRepository.Get(query).ToArray();
-                //ensure the lazy Language callback is assigned
-                foreach (var item in items)
-                    EnsureDictionaryItemLanguageCallback(item);
+            var query = Query<IDictionaryItem>().Where(x => x.ParentId == parentId);
+            var items = _dictionaryRepository.Get(query).ToArray();
+            //ensure the lazy Language callback is assigned
+            foreach (var item in items)
+                EnsureDictionaryItemLanguageCallback(item);
 
             return items;
         }
@@ -274,22 +274,22 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         }
     }
 
-        /// <summary>
-        /// Gets the root/top <see cref="IDictionaryItem"/> objects
-        /// </summary>
-        /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-        public IEnumerable<IDictionaryItem> GetRootDictionaryItems()
+    /// <summary>
+    /// Gets the root/top <see cref="IDictionaryItem"/> objects
+    /// </summary>
+    /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
+    public IEnumerable<IDictionaryItem> GetRootDictionaryItems()
+    {
+        using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                var query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
-                var items = _dictionaryRepository.Get(query).ToArray();
-                //ensure the lazy Language callback is assigned
-                foreach (var item in items)
-                    EnsureDictionaryItemLanguageCallback(item);
-                return items;
-            }
+            var query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
+            var items = _dictionaryRepository.Get(query).ToArray();
+            //ensure the lazy Language callback is assigned
+            foreach (var item in items)
+                EnsureDictionaryItemLanguageCallback(item);
+            return items;
         }
+    }
 
     /// <summary>
     ///     Checks if a <see cref="IDictionaryItem" /> with given key exists

@@ -36,7 +36,7 @@ public class PackageManifest
             {
                 return _packageName;
             }
-          
+
             if (!PackageId.IsNullOrWhiteSpace())
             {
                 _packageName = PackageId;

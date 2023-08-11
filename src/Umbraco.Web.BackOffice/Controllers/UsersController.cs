@@ -827,7 +827,7 @@ public class UsersController : BackOfficeNotificationsController
             DisabledUserIds = users.Select(x => x.Id),
         };
 
-        var message= users.Count > 1
+        var message = users.Count > 1
             ? _localizedTextService.Localize("speechBubbles", "disableUsersSuccess", new[] { userIds.Length.ToString() })
             : _localizedTextService.Localize("speechBubbles", "disableUserSuccess", new[] { users[0].Name });
 

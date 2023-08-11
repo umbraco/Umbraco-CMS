@@ -445,7 +445,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         Database.Update(userGroupDto);
 
         PersistAllowedSections(entity);
-            PersistAllowedLanguages(entity);
+        PersistAllowedLanguages(entity);
 
         entity.ResetDirtyProperties();
     }
@@ -465,43 +465,43 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         }
     }
 
-        private void PersistAllowedLanguages(IUserGroup entity)
+    private void PersistAllowedLanguages(IUserGroup entity)
+    {
+        var userGroup = entity;
+
+        // First delete all
+        Database.Delete<UserGroup2LanguageDto>("WHERE UserGroupId = @UserGroupId", new { UserGroupId = userGroup.Id });
+
+        // Then re-add any associated with the group
+        foreach (var language in userGroup.AllowedLanguages)
         {
-            var userGroup = entity;
-
-            // First delete all
-            Database.Delete<UserGroup2LanguageDto>("WHERE UserGroupId = @UserGroupId", new { UserGroupId = userGroup.Id });
-
-            // Then re-add any associated with the group
-            foreach (var language in userGroup.AllowedLanguages)
+            var dto = new UserGroup2LanguageDto
             {
-                var dto = new UserGroup2LanguageDto
-                {
-                    UserGroupId = userGroup.Id,
-                    LanguageId = language,
-                };
+                UserGroupId = userGroup.Id,
+                LanguageId = language,
+            };
 
-                Database.Insert(dto);
-            }
+            Database.Insert(dto);
         }
+    }
 
-        private List<UserGroup2LanguageDto> GetUserGroupLanguages(int userGroupId)
-        {
-            Sql<ISqlContext> query = Sql()
-                .Select<UserGroup2LanguageDto>()
-                .From<UserGroup2LanguageDto>()
-                .Where<UserGroup2LanguageDto>(x => x.UserGroupId == userGroupId);
-            return Database.Fetch<UserGroup2LanguageDto>(query);
-        }
+    private List<UserGroup2LanguageDto> GetUserGroupLanguages(int userGroupId)
+    {
+        Sql<ISqlContext> query = Sql()
+            .Select<UserGroup2LanguageDto>()
+            .From<UserGroup2LanguageDto>()
+            .Where<UserGroup2LanguageDto>(x => x.UserGroupId == userGroupId);
+        return Database.Fetch<UserGroup2LanguageDto>(query);
+    }
 
-        private IDictionary<int, List<UserGroup2LanguageDto>> GetAllUserGroupLanguageGrouped()
-        {
-            Sql<ISqlContext> query = Sql()
-                .Select<UserGroup2LanguageDto>()
-                .From<UserGroup2LanguageDto>();
-            List<UserGroup2LanguageDto> userGroupLanguages = Database.Fetch<UserGroup2LanguageDto>(query);
-            return userGroupLanguages.GroupBy(x => x.UserGroupId).ToDictionary(x => x.Key, x => x.ToList());
-        }
+    private IDictionary<int, List<UserGroup2LanguageDto>> GetAllUserGroupLanguageGrouped()
+    {
+        Sql<ISqlContext> query = Sql()
+            .Select<UserGroup2LanguageDto>()
+            .From<UserGroup2LanguageDto>();
+        List<UserGroup2LanguageDto> userGroupLanguages = Database.Fetch<UserGroup2LanguageDto>(query);
+        return userGroupLanguages.GroupBy(x => x.UserGroupId).ToDictionary(x => x.Key, x => x.ToList());
+    }
 
     #endregion
 }

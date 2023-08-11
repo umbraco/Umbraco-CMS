@@ -81,16 +81,16 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
         _userDataService = userDataService;
     }
 
-        /// <summary>
-        /// Returns permissions for all nodes passed in for the current user
-        /// </summary>
-        /// <param name="nodeIds"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
-        {
-            EntityPermissionCollection permissions = _userService
-            .GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, nodeIds);
+    /// <summary>
+    /// Returns permissions for all nodes passed in for the current user
+    /// </summary>
+    /// <param name="nodeIds"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
+    {
+        EntityPermissionCollection permissions = _userService
+        .GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, nodeIds);
 
         var permissionsDictionary = new Dictionary<int, string[]>();
         foreach (var nodeId in nodeIds)
@@ -204,7 +204,8 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
             throw new InvalidOperationException("Could not find user Id");
         }
         var user = await _backOfficeUserManager.FindByIdAsync(userId);
-        if (user == null) throw new InvalidOperationException("Could not find user");
+        if (user == null)
+            throw new InvalidOperationException("Could not find user");
 
         IdentityResult result = await _backOfficeUserManager.AddPasswordAsync(user, newPassword);
 

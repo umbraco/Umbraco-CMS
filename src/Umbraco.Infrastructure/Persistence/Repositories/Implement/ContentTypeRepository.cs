@@ -255,7 +255,9 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
         {
             Database.Insert(new ContentTypeTemplateDto
             {
-                ContentTypeNodeId = entity.Id, TemplateNodeId = defaultTemplateId, IsDefault = true,
+                ContentTypeNodeId = entity.Id,
+                TemplateNodeId = defaultTemplateId,
+                IsDefault = true,
             });
         }
 
@@ -264,7 +266,9 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
         {
             Database.Insert(new ContentTypeTemplateDto
             {
-                ContentTypeNodeId = entity.Id, TemplateNodeId = template.Id, IsDefault = false,
+                ContentTypeNodeId = entity.Id,
+                TemplateNodeId = template.Id,
+                IsDefault = false,
             });
         }
     }

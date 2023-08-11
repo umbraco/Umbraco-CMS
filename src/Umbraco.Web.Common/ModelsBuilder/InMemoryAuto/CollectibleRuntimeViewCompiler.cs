@@ -191,7 +191,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
             Debug.Assert(taskSource != null);
 
             if (item.Descriptor?.Item != null &&
-                ChecksumValidator.IsItemValid(_projectEngine.FileSystem, item.Descriptor.Item) )
+                ChecksumValidator.IsItemValid(_projectEngine.FileSystem, item.Descriptor.Item))
             {
                 // If the item has checksums to validate, we should also have a precompiled view.
                 Debug.Assert(item.Descriptor != null);

@@ -80,7 +80,7 @@ public class ComponentTests
             Options.Create(new ContentSettings()));
         var eventAggregator = Mock.Of<IEventAggregator>();
         var scopeProvider = new ScopeProvider(
-            new AmbientScopeStack(), new AmbientScopeContextStack(),Mock.Of<IDistributedLockingMechanismFactory>(),
+            new AmbientScopeStack(), new AmbientScopeContextStack(), Mock.Of<IDistributedLockingMechanismFactory>(),
             f,
             fs,
             new TestOptionsMonitor<CoreDebugSettings>(coreDebug),

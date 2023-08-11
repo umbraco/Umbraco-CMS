@@ -68,10 +68,10 @@ public class RangeTests
     [TestCase(0, 0, -1, 1, true)]
     public void RangeInt32_IsInsideRange(int minimum1, int maximum1, int minimum2, int maximum2, bool expected) =>
         Assert.AreEqual(expected, new Range<int> { Minimum = minimum1, Maximum = maximum1 }.IsInsideRange(new Range<int>
-            {
-                Minimum = minimum2,
-                Maximum = maximum2,
-            }));
+        {
+            Minimum = minimum2,
+            Maximum = maximum2,
+        }));
 
     [TestCase(0, 0, 0, 0, true)]
     [TestCase(0, 1, 0, 1, true)]

@@ -27,7 +27,7 @@ public class FeatureAuthorizeHandler : AuthorizationHandler<FeatureAuthorizeRequ
 
     [Obsolete("Use ctor that is not obsolete. This will be removed in v13.")]
     public FeatureAuthorizeHandler(UmbracoFeatures umbracoFeatures)
-        :this(umbracoFeatures, StaticServiceProvider.Instance.GetRequiredService<IRuntimeState>())
+        : this(umbracoFeatures, StaticServiceProvider.Instance.GetRequiredService<IRuntimeState>())
     {
 
     }
@@ -51,7 +51,7 @@ public class FeatureAuthorizeHandler : AuthorizationHandler<FeatureAuthorizeRequ
 
     private bool? IsAllowed(AuthorizationHandlerContext context)
     {
-        if(_runtimeState.Level != RuntimeLevel.Run && _runtimeState.Level != RuntimeLevel.Upgrade)
+        if (_runtimeState.Level != RuntimeLevel.Run && _runtimeState.Level != RuntimeLevel.Upgrade)
         {
             return false;
         }

@@ -244,7 +244,7 @@ public class UsersControllerTests : UmbracoTestServerTestBase
         var createdUser = userService.GetByEmail("test@test.com");
 
         // Act
-        var url = PrepareApiControllerUrl<UsersController>(x => x.PostDisableUsers(new []{createdUser.Id}));
+        var url = PrepareApiControllerUrl<UsersController>(x => x.PostDisableUsers(new[] { createdUser.Id }));
         var response = await Client.PostAsync(url, null);
 
         // Assert

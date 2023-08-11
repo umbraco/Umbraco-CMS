@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Core.Models.Trees;
 
 /// <summary>
-    /// Represents the refresh node menu item
+/// Represents the refresh node menu item
 /// </summary>
 public sealed class CreateChildEntity : ActionMenuItem
 {

@@ -92,20 +92,20 @@ public class DatabaseSchemaCreator
     private readonly ILoggerFactory _loggerFactory;
     private readonly IUmbracoVersion _umbracoVersion;
 
-        public DatabaseSchemaCreator(
-            IUmbracoDatabase? database,
-            ILogger<DatabaseSchemaCreator> logger,
-            ILoggerFactory loggerFactory,
-            IUmbracoVersion umbracoVersion,
-            IEventAggregator eventAggregator,
-            IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
-        {
-            _database = database ?? throw new ArgumentNullException(nameof(database));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-            _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
-            _eventAggregator = eventAggregator;
-            _defaultDataCreationSettings = defaultDataCreationSettings;
+    public DatabaseSchemaCreator(
+        IUmbracoDatabase? database,
+        ILogger<DatabaseSchemaCreator> logger,
+        ILoggerFactory loggerFactory,
+        IUmbracoVersion umbracoVersion,
+        IEventAggregator eventAggregator,
+        IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
+    {
+        _database = database ?? throw new ArgumentNullException(nameof(database));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+        _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
+        _eventAggregator = eventAggregator;
+        _defaultDataCreationSettings = defaultDataCreationSettings;
 
         if (_database?.SqlContext?.SqlSyntax == null)
         {

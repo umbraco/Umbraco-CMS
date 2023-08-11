@@ -78,8 +78,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             backOfficeSecurityAccessor,
             serializer,
             StaticServiceProvider.Instance.GetRequiredService<IDataTypeUsageService>())
-         {
-         }
+        {
+        }
 
         [ActivatorUtilitiesConstructor]
         public DataTypeController(
@@ -366,7 +366,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var result = _dataTypeService.Move(toMove, move.ParentId);
             if (result.Success)
             {
-                return Content(toMove.Path,MediaTypeNames.Text.Plain, Encoding.UTF8);
+                return Content(toMove.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
             }
 
             switch (result.Result?.Result)
@@ -430,7 +430,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var result = new DataTypeReferences();
             var usages = _dataTypeService.GetReferences(id);
 
-            foreach(var groupOfEntityType in usages.GroupBy(x => x.Key.EntityType))
+            foreach (var groupOfEntityType in usages.GroupBy(x => x.Key.EntityType))
             {
                 //get all the GUIDs for the content types to find
                 var guidsAndPropertyAliases = groupOfEntityType.ToDictionary(i => ((GuidUdi)i.Key).Guid, i => i.Value);
@@ -512,7 +512,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                      .Select(_umbracoMapper.Map<IDataType, DataTypeBasic>)
                      .ToArray();
 
-            var propertyEditors =_propertyEditorCollection.ToArray();
+            var propertyEditors = _propertyEditorCollection.ToArray();
 
             if (dataTypes is not null)
             {
@@ -546,8 +546,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var datatypes = new List<DataTypeBasic>();
             var showDeprecatedPropertyEditors = _contentSettings.ShowDeprecatedPropertyEditors;
 
-            var propertyEditors =_propertyEditorCollection
-                .Where(x=>x.IsDeprecated == false || showDeprecatedPropertyEditors);
+            var propertyEditors = _propertyEditorCollection
+                .Where(x => x.IsDeprecated == false || showDeprecatedPropertyEditors);
             foreach (var propertyEditor in propertyEditors)
             {
                 var hasPrevalues = propertyEditor.GetConfigurationEditor().Fields.Any();

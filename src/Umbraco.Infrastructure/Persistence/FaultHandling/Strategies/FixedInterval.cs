@@ -73,14 +73,14 @@ public class FixedInterval : RetryStrategy
     {
         if (_retryCount == 0)
         {
-            return delegate(int currentRetryCount, Exception lastException, out TimeSpan interval)
+            return delegate (int currentRetryCount, Exception lastException, out TimeSpan interval)
             {
                 interval = TimeSpan.Zero;
                 return false;
             };
         }
 
-        return delegate(int currentRetryCount, Exception lastException, out TimeSpan interval)
+        return delegate (int currentRetryCount, Exception lastException, out TimeSpan interval)
         {
             if (currentRetryCount < _retryCount)
             {

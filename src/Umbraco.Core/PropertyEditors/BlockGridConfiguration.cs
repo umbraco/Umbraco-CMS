@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class BlockGridConfiguration
 {
     [ConfigurationField("blocks", "Blocks", "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.html", Description = "Define Blocks based on Element Types. Use Groups to help organise their selection. Example Groups: 'Layout' and 'Content'")]
-    public BlockGridBlockConfiguration[] Blocks { get; set; }  = Array.Empty<BlockGridBlockConfiguration>();
+    public BlockGridBlockConfiguration[] Blocks { get; set; } = Array.Empty<BlockGridBlockConfiguration>();
 
     [ConfigurationField("blockGroups", "Block Groups", "views/propertyeditors/blockgrid/prevalue/blockgrid.groupconfiguration.html", HideLabel = true)]
     public BlockGridGroupConfiguration[] BlockGroups { get; set; } = Array.Empty<BlockGridGroupConfiguration>();
@@ -37,68 +37,68 @@ public class BlockGridConfiguration
     [DataContract]
     public class BlockGridBlockConfiguration : IBlockConfiguration
     {
-        [DataMember(Name ="columnSpanOptions")]
-        public BlockGridColumnSpanOption[] ColumnSpanOptions { get; set; }  = Array.Empty<BlockGridColumnSpanOption>();
+        [DataMember(Name = "columnSpanOptions")]
+        public BlockGridColumnSpanOption[] ColumnSpanOptions { get; set; } = Array.Empty<BlockGridColumnSpanOption>();
 
-        [DataMember(Name ="rowMinSpan")]
+        [DataMember(Name = "rowMinSpan")]
         public int? RowMinSpan { get; set; }
 
-        [DataMember(Name ="rowMaxSpan")]
+        [DataMember(Name = "rowMaxSpan")]
         public int? RowMaxSpan { get; set; }
 
-        [DataMember(Name ="allowAtRoot")]
+        [DataMember(Name = "allowAtRoot")]
         public bool AllowAtRoot { get; set; } = true;
 
-        [DataMember(Name ="allowInAreas")]
+        [DataMember(Name = "allowInAreas")]
         public bool AllowInAreas { get; set; } = true;
 
-        [DataMember(Name ="areaGridColumns")]
+        [DataMember(Name = "areaGridColumns")]
         public int? AreaGridColumns { get; set; }
 
         [DataMember(Name = "areas")]
         public BlockGridAreaConfiguration[] Areas { get; set; } = Array.Empty<BlockGridAreaConfiguration>();
 
-        [DataMember(Name ="backgroundColor")]
+        [DataMember(Name = "backgroundColor")]
         public string? BackgroundColor { get; set; }
 
-        [DataMember(Name ="iconColor")]
+        [DataMember(Name = "iconColor")]
         public string? IconColor { get; set; }
 
-        [DataMember(Name ="thumbnail")]
+        [DataMember(Name = "thumbnail")]
         public string? Thumbnail { get; set; }
 
-        [DataMember(Name ="contentElementTypeKey")]
+        [DataMember(Name = "contentElementTypeKey")]
         public Guid ContentElementTypeKey { get; set; }
 
-        [DataMember(Name ="settingsElementTypeKey")]
+        [DataMember(Name = "settingsElementTypeKey")]
         public Guid? SettingsElementTypeKey { get; set; }
 
-        [DataMember(Name ="view")]
+        [DataMember(Name = "view")]
         public string? View { get; set; }
 
-        [DataMember(Name ="stylesheet")]
+        [DataMember(Name = "stylesheet")]
         public string? Stylesheet { get; set; }
 
-        [DataMember(Name ="label")]
+        [DataMember(Name = "label")]
         public string? Label { get; set; }
 
-        [DataMember(Name ="editorSize")]
+        [DataMember(Name = "editorSize")]
         public string? EditorSize { get; set; }
 
-        [DataMember(Name ="inlineEditing")]
+        [DataMember(Name = "inlineEditing")]
         public bool InlineEditing { get; set; }
 
-        [DataMember(Name ="forceHideContentEditorInOverlay")]
+        [DataMember(Name = "forceHideContentEditorInOverlay")]
         public bool ForceHideContentEditorInOverlay { get; set; }
 
-        [DataMember(Name ="groupKey")]
+        [DataMember(Name = "groupKey")]
         public string? GroupKey { get; set; }
     }
 
     [DataContract]
     public class BlockGridColumnSpanOption
     {
-        [DataMember(Name ="columnSpan")]
+        [DataMember(Name = "columnSpan")]
         public int? ColumnSpan { get; set; }
     }
 
@@ -106,64 +106,64 @@ public class BlockGridConfiguration
     public class BlockGridGroupConfiguration
     {
 
-        [DataMember(Name ="key")]
+        [DataMember(Name = "key")]
         public Guid Key { get; set; }
 
-        [DataMember(Name ="name")]
+        [DataMember(Name = "name")]
         public string? Name { get; set; }
     }
 
     [DataContract]
     public class NumberRange
     {
-        [DataMember(Name ="min")]
+        [DataMember(Name = "min")]
         public int? Min { get; set; }
 
-        [DataMember(Name ="max")]
+        [DataMember(Name = "max")]
         public int? Max { get; set; }
     }
 
     [DataContract]
     public class BlockGridAreaConfiguration
     {
-        [DataMember(Name ="key")]
+        [DataMember(Name = "key")]
         public Guid Key { get; set; }
 
-        [DataMember(Name ="alias")]
+        [DataMember(Name = "alias")]
         public string? Alias { get; set; }
 
-        [DataMember(Name ="createLabel")]
+        [DataMember(Name = "createLabel")]
         public string? CreateLabel { get; set; }
 
-        [DataMember(Name ="columnSpan")]
+        [DataMember(Name = "columnSpan")]
         public int? ColumnSpan { get; set; }
 
-        [DataMember(Name ="rowSpan")]
+        [DataMember(Name = "rowSpan")]
         public int? RowSpan { get; set; }
 
-        [DataMember(Name ="minAllowed")]
+        [DataMember(Name = "minAllowed")]
         public int? MinAllowed { get; set; }
 
-        [DataMember(Name ="maxAllowed")]
+        [DataMember(Name = "maxAllowed")]
         public int? MaxAllowed { get; set; }
 
-        [DataMember(Name ="specifiedAllowance")]
+        [DataMember(Name = "specifiedAllowance")]
         public BlockGridAreaConfigurationSpecifiedAllowance[] SpecifiedAllowance { get; set; } = Array.Empty<BlockGridAreaConfigurationSpecifiedAllowance>();
     }
 
     [DataContract]
     public class BlockGridAreaConfigurationSpecifiedAllowance
     {
-        [DataMember(Name ="elementTypeKey")]
+        [DataMember(Name = "elementTypeKey")]
         public Guid? ElementTypeKey { get; set; }
 
-        [DataMember(Name ="groupKey")]
+        [DataMember(Name = "groupKey")]
         public Guid? GroupKey { get; set; }
 
-        [DataMember(Name ="minAllowed")]
+        [DataMember(Name = "minAllowed")]
         public int? MinAllowed { get; set; }
 
-        [DataMember(Name ="maxAllowed")]
+        [DataMember(Name = "maxAllowed")]
         public int? MaxAllowed { get; set; }
     }
 }

@@ -91,7 +91,7 @@ public class ScopedNotificationPublisherTests
 
         return new ScopeProvider(
             new AmbientScopeStack(),
-                new AmbientScopeContextStack(),Mock.Of<IDistributedLockingMechanismFactory>(),
+                new AmbientScopeContextStack(), Mock.Of<IDistributedLockingMechanismFactory>(),
             Mock.Of<IUmbracoDatabaseFactory>(),
             fileSystems,
             new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),

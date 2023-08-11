@@ -33,7 +33,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType,
         long pageIndex, int pageSize, out long totalRecords,
         IQuery<IUmbracoEntity>? filter, Ordering? ordering) =>
-        GetPagedResultsByQuery(query, new[] {objectType}, pageIndex, pageSize, out totalRecords, filter, ordering);
+        GetPagedResultsByQuery(query, new[] { objectType }, pageIndex, pageSize, out totalRecords, filter, ordering);
 
     // get a page of entities
     public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid[] objectTypes,
@@ -227,7 +227,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         var isMedia = objectType == Constants.ObjectTypes.Media;
         var isMember = objectType == Constants.ObjectTypes.Member;
 
-        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, null, new[] {objectType});
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, null, new[] { objectType });
 
         var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
         sql = translator.Translate();
@@ -296,7 +296,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     }
 
     private DocumentEntitySlim BuildVariants(DocumentEntitySlim entity)
-        => BuildVariants(new[] {entity}).First();
+        => BuildVariants(new[] { entity }).First();
 
     private IEnumerable<DocumentEntitySlim> BuildVariants(IEnumerable<DocumentEntitySlim> entities)
     {
@@ -387,7 +387,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType,
         Action<Sql<ISqlContext>>? filter)
     {
-        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] {objectType});
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] { objectType });
         return AddGroupBy(isContent, isMedia, isMember, sql, true);
     }
 

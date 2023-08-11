@@ -111,6 +111,6 @@ public class NestedContentSingleValueConverter : NestedContentValueConverterBase
             return Array.Empty<IApiElement>();
         }
 
-        return new [] { _apiElementBuilder.Build(element) };
+        return new[] { _apiElementBuilder.Build(element) };
     }
 }

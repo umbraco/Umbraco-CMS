@@ -111,7 +111,7 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
                 });
 
         IEnumerable<EntitySlim> childIds = Database.Fetch<AxisDefintionDto>(childIdsSql)
-            .Select(x => new EntitySlim {Id = x.NodeId, ParentId = x.ParentId, Name = x.Alias});
+            .Select(x => new EntitySlim { Id = x.NodeId, ParentId = x.ParentId, Name = x.Alias });
 
         return childIds;
     }
@@ -311,7 +311,7 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
 
         if (ids?.Any() ?? false)
         {
-            sql.Where("umbracoNode.id in (@ids)", new {ids});
+            sql.Where("umbracoNode.id in (@ids)", new { ids });
         }
         else
         {
@@ -329,7 +329,7 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         // later to populate the template item's properties
         IUmbracoEntity[] childIds = (ids?.Any() ?? false
                 ? GetAxisDefinitions(dtos.ToArray())
-                : dtos.Select(x => new EntitySlim {Id = x.NodeId, ParentId = x.NodeDto.ParentId, Name = x.Alias}))
+                : dtos.Select(x => new EntitySlim { Id = x.NodeId, ParentId = x.NodeDto.ParentId, Name = x.Alias }))
             .ToArray();
 
         return dtos.Select(d => MapFromDto(d, childIds));
@@ -479,7 +479,7 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         }
 
         //Get TemplateDto from db to get the Primary key of the entity
-        TemplateDto templateDto = Database.SingleOrDefault<TemplateDto>("WHERE nodeId = @Id", new {entity.Id});
+        TemplateDto templateDto = Database.SingleOrDefault<TemplateDto>("WHERE nodeId = @Id", new { entity.Id });
 
         //Save updated entity to db
         template.UpdateDate = DateTime.Now;
@@ -543,14 +543,14 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         {
             foreach (var delete in deletes)
             {
-                Database.Execute(delete, new {id = GetEntityId(descendant)});
+                Database.Execute(delete, new { id = GetEntityId(descendant) });
             }
         }
 
         //now we can delete this one
         foreach (var delete in deletes)
         {
-            Database.Execute(delete, new {id = GetEntityId(entity)});
+            Database.Execute(delete, new { id = GetEntityId(entity) });
         }
 
         var viewName = string.Concat(entity.Alias, ".cshtml");

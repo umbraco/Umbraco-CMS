@@ -23,7 +23,7 @@ public class CreateTableExpression : MigrationExpressionBase
                 .Select(x => x.ForeignKey)
                 .ToList();
 
-            var table = new TableDefinition { Name = TableName, SchemaName = SchemaName, Columns = Columns, ForeignKeys = foreignKeys };
+        var table = new TableDefinition { Name = TableName, SchemaName = SchemaName, Columns = Columns, ForeignKeys = foreignKeys };
 
         return string.Format(SqlSyntax.Format(table));
     }

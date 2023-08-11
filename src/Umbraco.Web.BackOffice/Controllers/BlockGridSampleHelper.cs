@@ -100,7 +100,7 @@ public sealed class BlockGridSampleHelper
             }
         };
 
-        foreach (var elementDescriptor  in elementDescriptors)
+        foreach (var elementDescriptor in elementDescriptors)
         {
             IContentType? contentType = existingContentTypes.FirstOrDefault(c => c.Alias == elementDescriptor.Alias);
             if (contentType != null)
@@ -158,7 +158,7 @@ public sealed class BlockGridSampleHelper
                 };
             }
 
-            if(errorMessage.IsNullOrWhiteSpace())
+            if (errorMessage.IsNullOrWhiteSpace())
             {
                 errorMessage = $"Could not create element type: {elementDescriptor.Name}";
             }

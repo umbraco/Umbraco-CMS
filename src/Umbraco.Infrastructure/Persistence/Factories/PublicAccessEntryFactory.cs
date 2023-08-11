@@ -13,12 +13,12 @@ internal static class PublicAccessEntryFactory
                 dto.LoginNodeId,
                 dto.NoAccessNodeId,
                 dto.Rules.Select(x => new PublicAccessRule(x.Id, x.AccessId)
-            {
-                RuleValue = x.RuleValue,
-                RuleType = x.RuleType,
-                CreateDate = x.CreateDate,
-                UpdateDate = x.UpdateDate,
-            }))
+                {
+                    RuleValue = x.RuleValue,
+                    RuleType = x.RuleType,
+                    CreateDate = x.CreateDate,
+                    UpdateDate = x.UpdateDate,
+                }))
         { CreateDate = dto.CreateDate, UpdateDate = dto.UpdateDate };
 
         // reset dirty initial properties (U4-1946)

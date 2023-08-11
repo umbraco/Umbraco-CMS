@@ -189,14 +189,14 @@ public class UmbracoHelper
         return dictionaryValue;
     }
 
-        /// <summary>
-        ///     Returns the dictionary value for the key specified, and if empty returns the specified default fall back value
-        /// </summary>
-        /// <param name="key">key of dictionary item</param>
-        /// <param name="specificCulture">the specific culture on which the result well be back upon</param>
-        /// <param name="defaultValue">fall back text if dictionary item is empty - Name altText to match Umbraco.Field</param>
-        /// <returns></returns>
-        public string GetDictionaryValueOrDefault(string key, CultureInfo specificCulture, string defaultValue)
+    /// <summary>
+    ///     Returns the dictionary value for the key specified, and if empty returns the specified default fall back value
+    /// </summary>
+    /// <param name="key">key of dictionary item</param>
+    /// <param name="specificCulture">the specific culture on which the result well be back upon</param>
+    /// <param name="defaultValue">fall back text if dictionary item is empty - Name altText to match Umbraco.Field</param>
+    /// <returns></returns>
+    public string GetDictionaryValueOrDefault(string key, CultureInfo specificCulture, string defaultValue)
     {
         _cultureDictionary = _cultureDictionaryFactory.CreateDictionary(specificCulture);
         var dictionaryValue = GetDictionaryValue(key);

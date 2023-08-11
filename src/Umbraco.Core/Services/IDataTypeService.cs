@@ -16,7 +16,7 @@ public interface IDataTypeService : IService
     IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
 
     Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId);
-    
+
     Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
 
     EntityContainer? GetContainer(int containerId);

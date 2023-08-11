@@ -30,7 +30,7 @@ public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
         _databaseProviderMetadata = databaseProviderMetadata;
     }
 
-    public override object ViewModel => new {databases = _databaseProviderMetadata.GetAvailable().ToList()};
+    public override object ViewModel => new { databases = _databaseProviderMetadata.GetAvailable().ToList() };
 
     public override string View => ShouldDisplayView() ? base.View : string.Empty;
 

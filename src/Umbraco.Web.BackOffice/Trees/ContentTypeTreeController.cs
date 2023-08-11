@@ -133,7 +133,7 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
 
         if (id == Constants.System.RootString)
         {
-                //set the default to create
+            //set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
             // root actions

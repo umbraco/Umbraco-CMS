@@ -34,9 +34,9 @@ public class ImageCropperValueConverterTests : PropertyValueConverterTests
 
         var serializer = new JsonNetSerializer();
         var source = serializer.Serialize(new ImageCropperValue
-            {
-                Src = "/some/file.jpg",
-                Crops = new[]
+        {
+            Src = "/some/file.jpg",
+            Crops = new[]
                 {
                     new ImageCropperValue.ImageCropperCrop
                     {
@@ -44,8 +44,8 @@ public class ImageCropperValueConverterTests : PropertyValueConverterTests
                         Coordinates = new ImageCropperValue.ImageCropperCropCoordinates { X1 = 1m, X2 = 2m, Y1 = 10m, Y2 = 20m }
                     }
                 },
-                FocalPoint = new ImageCropperValue.ImageCropperFocalPoint { Left = .2m, Top = .4m }
-            }
+            FocalPoint = new ImageCropperValue.ImageCropperFocalPoint { Left = .2m, Top = .4m }
+        }
         );
         var inter = valueConverter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, source, false);
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as ApiImageCropperValue;

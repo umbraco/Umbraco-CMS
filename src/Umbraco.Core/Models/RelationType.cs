@@ -22,7 +22,8 @@ public class RelationType : EntityBase, IRelationTypeWithIsDependency
     {
     }
 
-        public RelationType(string? name, string? alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType, bool isDependency){
+    public RelationType(string? name, string? alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType, bool isDependency)
+    {
         if (name == null)
         {
             throw new ArgumentNullException(nameof(name));

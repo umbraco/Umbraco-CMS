@@ -29,11 +29,11 @@ public class TelemetryIdentifierStep : InstallSetupStep<object>
         _siteIdentifierService = siteIdentifierService;
     }
 
-        public override Task<InstallSetupResult?> ExecuteAsync(object model)
-        {
-            _siteIdentifierService.TryCreateSiteIdentifier(out _);
-            return Task.FromResult<InstallSetupResult?>(null);
-        }
+    public override Task<InstallSetupResult?> ExecuteAsync(object model)
+    {
+        _siteIdentifierService.TryCreateSiteIdentifier(out _);
+        return Task.FromResult<InstallSetupResult?>(null);
+    }
 
     public override bool RequiresExecution(object model)
     {

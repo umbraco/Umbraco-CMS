@@ -601,7 +601,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
 
             // Next find all other document types that have a reference to this content type
-            IEnumerable<TItem> referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes?.Any(p=>p.Id.Value==item.Id) ?? false);
+            IEnumerable<TItem> referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes?.Any(p => p.Id.Value == item.Id) ?? false);
             foreach (TItem reference in referenceToAllowedContentTypes)
             {
                 reference.AllowedContentTypes = reference.AllowedContentTypes?.Where(p => p.Id.Value != item.Id);
@@ -737,8 +737,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         // this is illegal
         //var originalb = (ContentTypeCompositionBase)original;
         // but we *know* it has to be a ContentTypeCompositionBase anyways
-        var originalb = (ContentTypeCompositionBase) (object) original;
-        var clone = (TItem) (object) originalb.DeepCloneWithResetIdentities(alias);
+        var originalb = (ContentTypeCompositionBase)(object)original;
+        var clone = (TItem)(object)originalb.DeepCloneWithResetIdentities(alias);
 
         clone.Name = name;
 
@@ -791,8 +791,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 // this is illegal
                 //var copyingb = (ContentTypeCompositionBase) copying;
                 // but we *know* it has to be a ContentTypeCompositionBase anyways
-                var copyingb = (ContentTypeCompositionBase) (object)copying;
-                copy = (TItem) (object) copyingb.DeepCloneWithResetIdentities(alias);
+                var copyingb = (ContentTypeCompositionBase)(object)copying;
+                copy = (TItem)(object)copyingb.DeepCloneWithResetIdentities(alias);
 
                 copy.Name = copy.Name + " (copy)"; // might not be unique
 
@@ -845,7 +845,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     public Attempt<OperationResult<MoveOperationStatusType>?> Move(TItem moving, int containerId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
-        if(moving.ParentId == containerId)
+        if (moving.ParentId == containerId)
         {
             return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, eventMessages);
         }

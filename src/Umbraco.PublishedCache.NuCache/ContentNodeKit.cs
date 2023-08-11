@@ -4,15 +4,15 @@ using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache;
 
-    public struct ContentNodeKit
-    {
-        public ContentNode Node { get; } = null!;
+public struct ContentNodeKit
+{
+    public ContentNode Node { get; } = null!;
 
-        public int ContentTypeId { get; }
+    public int ContentTypeId { get; }
 
-        public ContentData? DraftData { get; }
+    public ContentData? DraftData { get; }
 
-        public ContentData? PublishedData { get; }
+    public ContentData? PublishedData { get; }
 
     public ContentNodeKit(ContentNode node, int contentTypeId, ContentData? draftData, ContentData? publishedData)
     {

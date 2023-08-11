@@ -25,7 +25,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<LastSyncedFileManager>();
         builder.Services.AddSingleton<ISyncBootStateAccessor, SyncBootStateAccessor>();
         builder.SetServerMessenger<BatchedDatabaseServerMessenger>();
-builder.AddNotificationHandler<UmbracoApplicationStartingNotification, DatabaseServerMessengerNotificationHandler>();
+        builder.AddNotificationHandler<UmbracoApplicationStartingNotification, DatabaseServerMessengerNotificationHandler>();
         builder.AddNotificationHandler<UmbracoRequestEndNotification, DatabaseServerMessengerNotificationHandler>();
         return builder;
     }

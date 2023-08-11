@@ -312,7 +312,8 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         // set the standard route values/tokens
         var values = new RouteValueDictionary
         {
-            [ControllerToken] = postedInfo.ControllerName, [ActionToken] = postedInfo.ActionName,
+            [ControllerToken] = postedInfo.ControllerName,
+            [ActionToken] = postedInfo.ActionName,
         };
 
         ControllerActionDescriptor? surfaceControllerDescriptor =

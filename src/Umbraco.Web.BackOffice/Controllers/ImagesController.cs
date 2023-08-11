@@ -122,7 +122,7 @@ public class ImagesController : UmbracoAuthorizedApiController
 
     private bool IsAllowed(string encodedImagePath)
     {
-        if(Uri.IsWellFormedUriString(encodedImagePath, UriKind.Relative))
+        if (Uri.IsWellFormedUriString(encodedImagePath, UriKind.Relative))
         {
             return true;
         }

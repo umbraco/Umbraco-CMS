@@ -190,7 +190,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="current"></param>
         /// <returns></returns>
         public string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null)
-            => GetMediaUrl( GetMedia(id), mode, culture, propertyAlias, current);
+            => GetMediaUrl(GetMedia(id), mode, culture, propertyAlias, current);
 
         /// <summary>
         /// Gets the URL of a media item.

@@ -17,9 +17,9 @@ public class TypeFinderBenchmarks
     {
         _typeFinder1 = new TypeFinder(new NullLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly, NullLoggerFactory.Instance));
         _typeFinder2 = new TypeFinder(new NullLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly, NullLoggerFactory.Instance))
-            {
-                QueryWithReferencingAssemblies = false
-            };
+        {
+            QueryWithReferencingAssemblies = false
+        };
     }
 
     // TODO: This setting seems to make no difference anymore

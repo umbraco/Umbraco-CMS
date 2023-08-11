@@ -150,8 +150,8 @@ public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
                     $"The call to {nameof(IPublishedRouter.UpdateRequestAsync)} cannot return null");
             }
 
-			string? customActionName = GetTemplateName(request);
-			
+            string? customActionName = GetTemplateName(request);
+
             def = new UmbracoRouteValues(
                 request,
                 def.ControllerActionDescriptor,
@@ -166,8 +166,8 @@ public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
 
         return def;
     }
-	
-	private string? GetTemplateName(IPublishedRequest request)
+
+    private string? GetTemplateName(IPublishedRequest request)
     {
         // check that a template is defined), if it doesn't and there is a hijacked route it will just route
         // to the index Action

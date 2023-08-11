@@ -557,11 +557,11 @@ public class MemberController : ContentControllerBase
         }
 
         var needsResync = false;
-            var memberId = contentItem.Id?.ToString();
-            if (memberId is null)
-            {
-                return ValidationProblem("Member was not found");
-            }
+        var memberId = contentItem.Id?.ToString();
+        if (memberId is null)
+        {
+            return ValidationProblem("Member was not found");
+        }
         MemberIdentityUser? identityMember = await _memberManager.FindByIdAsync(memberId);
         if (identityMember == null)
         {

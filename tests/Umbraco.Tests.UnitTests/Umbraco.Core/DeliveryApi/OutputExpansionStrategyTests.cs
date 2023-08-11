@@ -300,7 +300,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     [Test]
     public void OutputExpansionStrategy_CanExpandAllElements()
     {
-        var accessor = CreateOutputExpansionStrategyAccessor(true );
+        var accessor = CreateOutputExpansionStrategyAccessor(true);
         var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
         var apiElementBuilder = new ApiElementBuilder(accessor);
 

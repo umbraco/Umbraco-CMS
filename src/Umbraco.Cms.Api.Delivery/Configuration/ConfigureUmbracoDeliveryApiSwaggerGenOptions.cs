@@ -7,7 +7,7 @@ using Umbraco.Cms.Api.Delivery.Filters;
 
 namespace Umbraco.Cms.Api.Delivery.Configuration;
 
-public class ConfigureUmbracoDeliveryApiSwaggerGenOptions: IConfigureOptions<SwaggerGenOptions>
+public class ConfigureUmbracoDeliveryApiSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
 {
     public void Configure(SwaggerGenOptions swaggerGenOptions)
     {
