@@ -5,6 +5,7 @@ import {
 	FileSystemTreeItemPresentationModel,
 	PagedFileSystemTreeItemPresentationModel,
 	PagedStylesheetOverviewResponseModel,
+	RichTextRuleModel,
 	StylesheetResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
@@ -140,6 +141,26 @@ class UmbStylesheetData extends UmbEntityData<StylesheetDBItem> {
 
 	getFolder(path: string): StylesheetDBItem | undefined {
 		return this.data.find((item) => item.path === path && item.isFolder === true);
+	}
+
+	getRules(path: string): Array<RichTextRuleModel> {
+		return [
+			{
+				"name": "bjjh",
+				"selector": "h1",
+				"styles": "color: blue;"
+			},
+			{
+				"name": "comeone",
+				"selector": "h1",
+				"styles": "color: blue;"
+			},
+			{
+				"name": "lol",
+				"selector": "h1",
+				"styles": "color: blue;"
+			}
+		]
 	}
 
 	insertFolder(item: CreateTextFileViewModelBaseModel) {

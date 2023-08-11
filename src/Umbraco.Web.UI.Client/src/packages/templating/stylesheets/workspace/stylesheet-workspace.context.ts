@@ -4,9 +4,11 @@ import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState, UmbObjectState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
+import { RichTextStylesheetRulesResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStylesheetRepository, StylesheetDetails> {
 	#data = new UmbObjectState<StylesheetDetails | undefined>(undefined);
+	#rules = new UmbObjectState<RichTextStylesheetRulesResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = createObservablePart(this.#data, (data) => data?.name);
 	content = createObservablePart(this.#data, (data) => data?.content);
@@ -50,10 +52,15 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 	}
 
 	async load(path: string) {
-		const { data } = await this.repository.requestById(path);
+		const [ {data}, rules ] = await Promise.all([this.repository.requestById(path), this.repository.getStylesheetRules(path)]);
+
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);
+		}
+
+		if (rules.data) {
+			this.#rules.update(rules.data);
 		}
 	}
 

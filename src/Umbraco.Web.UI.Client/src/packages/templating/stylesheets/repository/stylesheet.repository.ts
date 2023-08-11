@@ -1,6 +1,12 @@
+import { Observable } from 'rxjs';
+import { StylesheetDetails } from '../index.js';
 import { UmbStylesheetTreeStore, UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN } from './stylesheet.tree.store.js';
 import { UmbStylesheetTreeServerDataSource } from './sources/stylesheet.tree.server.data.js';
 import { UmbStylesheetServerDataSource } from './sources/stylesheet.server.data.js';
+import {
+	StylesheetGetFolderResponse,
+	UmbStylesheetFolderServerDataSource,
+} from './sources/stylesheet.folder.server.data.js';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
@@ -18,7 +24,7 @@ import {
 	ExtractRichTextStylesheetRulesResponseModel,
 	FileSystemTreeItemPresentationModel,
 	FolderModelBaseModel,
-	FolderReponseModel,
+	FolderResponseModel,
 	InterpolateRichTextStylesheetRequestModel,
 	InterpolateRichTextStylesheetResponseModel,
 	ProblemDetails,
@@ -28,12 +34,6 @@ import {
 	UpdateTextFileViewModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbTreeRootFileSystemModel } from '@umbraco-cms/backoffice/tree';
-import { StylesheetDetails } from '../index.js';
-import { Observable } from 'rxjs';
-import {
-	StylesheetGetFolderResponse,
-	UmbStylesheetFolderServerDataSource,
-} from './sources/stylesheet.folder.server.data.js';
 
 export class UmbStylesheetRepository
 	implements
@@ -65,8 +65,8 @@ export class UmbStylesheetRepository
 
 	createFolderScaffold(
 		parentId: string | null
-	): Promise<{ data?: FolderReponseModel | undefined; error?: ProblemDetails | undefined }> {
-		const data: FolderReponseModel = {
+	): Promise<{ data?: FolderResponseModel | undefined; error?: ProblemDetails | undefined }> {
+		const data: FolderResponseModel = {
 			name: '',
 			parentId,
 		};
