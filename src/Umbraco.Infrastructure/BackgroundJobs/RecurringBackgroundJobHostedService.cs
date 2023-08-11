@@ -6,6 +6,7 @@ using Serilog.Core;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -60,12 +61,16 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
     /// <inheritdoc />
     public override async Task PerformExecuteAsync(object? state)
     {
+        var executingNotification = new Notifications.RecurringBackgroundJobExecutingNotification(_job, new EventMessages());
+        await _eventAggregator.PublishAsync(executingNotification);
+
         try
         {
 
             if (_runtimeState.Level != RuntimeLevel.Run)
             {
                 _logger.LogDebug("Job not running as runlevel not yet ready");
+                await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobIgnoredNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
                 return;
             }
 
@@ -73,6 +78,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
             if (!_job.ServerRoles.Contains(_serverRoleAccessor.CurrentServerRole))
             {
                 _logger.LogDebug("Job not running on this server role");
+                await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobIgnoredNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
                 return;
             }
 
@@ -80,19 +86,19 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
             if (!_mainDom.IsMainDom)
             {
                 _logger.LogDebug("Job not running as not MainDom");
+                await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobIgnoredNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
                 return;
             }
 
 
-            await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobExecutingNotification(_job, new EventMessages()));
             await _job.RunJobAsync();
-            await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobExecutingNotification(_job, new EventMessages()));
+            await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobExecutedNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
 
 
         }
         catch (Exception ex)
         {
-            await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobFailedNotification(_job, new EventMessages()));
+            await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobFailedNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
             _logger.LogError(ex, "Unhandled exception in recurring background job.");
         }
 
@@ -100,21 +106,22 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
-        await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobStartingNotification(_job, new EventMessages()));
+        var startingNotification = new Notifications.RecurringBackgroundJobStartingNotification(_job, new EventMessages());
+        await _eventAggregator.PublishAsync(startingNotification);
 
         await base.StartAsync(cancellationToken);
 
-        await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobStartedNotification(_job, new EventMessages()));
+        await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobStartedNotification(_job, new EventMessages()).WithStateFrom(startingNotification));
 
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-
-        await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobStoppingNotification(_job, new EventMessages()));
+        var stoppingNotification = new Notifications.RecurringBackgroundJobStoppingNotification(_job, new EventMessages());
+        await _eventAggregator.PublishAsync(stoppingNotification);
 
         await base.StopAsync(cancellationToken);
 
-        await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobStoppedNotification(_job, new EventMessages()));
+        await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobStoppedNotification(_job, new EventMessages()).WithStateFrom(stoppingNotification));
     }
 }
