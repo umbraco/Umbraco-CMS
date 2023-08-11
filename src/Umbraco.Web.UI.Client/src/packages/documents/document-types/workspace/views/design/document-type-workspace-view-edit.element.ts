@@ -212,7 +212,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 					label="Content"
 					.active=${rootTabActive}
 					href=${rootTabPath}>
-					Content
+					<umb-localize key="general_content">Content</umb-localize>
 				</uui-tab>
 				${repeat(
 					this._tabs,
