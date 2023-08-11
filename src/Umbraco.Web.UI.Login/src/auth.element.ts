@@ -84,6 +84,14 @@ export default class UmbAuthElement extends LitElement {
 						</umb-error-layout>`;
 					}
 
+					if (flow === 'invite-user' && status === 'false') {
+						return html` <umb-error-layout
+							header="Invite link expired"
+							message="This invite link has expired or been cancelled. Please reach out to the administrator to request a new invitation">
+							<uui-button type="submit" label="Back to login" look="primary" color="default" href="login"></uui-button>
+						</umb-error-layout>`;
+					}
+
 					// validate
 					if (flow) {
 						if (flow === 'mfa' && !UmbAuthMainContext.Instance.isMfaEnabled) {

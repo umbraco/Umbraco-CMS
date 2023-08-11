@@ -3,6 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { CSSResultGroup, LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbAuthMainContext } from '../context/auth-main.context';
+import UmbRouter from '../umb-router';
 
 @customElement('umb-invite-page')
 export default class UmbInvitePageElement extends LitElement {
@@ -15,6 +16,19 @@ export default class UmbInvitePageElement extends LitElement {
 	@state()
 	userId: any = undefined;
 
+	protected async firstUpdated(_changedProperties: any) {
+		super.firstUpdated(_changedProperties);
+
+		const response = await UmbAuthMainContext.Instance.getInvitedUser();
+		this.userId = response.user?.id;
+
+		if (!this.userId) {
+			// The login page should already have redirected the user to an error page. They should never get here.
+			UmbRouter.redirect('login');
+			return;
+		}
+	}
+
 	async #onSubmit(event: CustomEvent) {
 		event.preventDefault();
 		const password = event.detail.password;
@@ -23,28 +37,15 @@ export default class UmbInvitePageElement extends LitElement {
 
 		this.state = 'waiting';
 		const response = await UmbAuthMainContext.Instance.newInvitedUserPassword(password);
-		this.error = response.error || '';
 
-		if (response.status === 200) {
-			window.location.href = UmbAuthMainContext.Instance.returnPath;
-			this.state = 'success';
+		if (response.error) {
+			this.error = response.error;
+			this.state = 'failed';
 			return;
 		}
 
-		this.state = 'failed';
-		alert('TODO: SHOW ERROR');
-	}
-
-	protected async firstUpdated(_changedProperties: any) {
-		super.firstUpdated(_changedProperties);
-
-		const { user } = await UmbAuthMainContext.Instance.getInvitedUser();
-		this.userId = user.id;
-
-		if (!this.userId) {
-			alert('TODO: SHOW ERROR');
-			return;
-		}
+		this.state = 'success';
+		window.location.href = UmbAuthMainContext.Instance.returnPath;
 	}
 
 	render() {
