@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -21,8 +21,39 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 	}
 
 	#submit() {
-		const rule = this.data?.rule ?? {};
-		this.modalContext?.submit({ rule });
+		this.modalContext?.submit({ rule: this._rule ?? {} });
+	}
+
+	connectedCallback() {
+		super.connectedCallback();
+		this._rule = this.data?.rule ?? null;
+	}
+
+	@state()
+	private _rule?: RichTextRuleModel | null = null;
+
+	#updateName(event: Event) {
+		const name = (event.target as HTMLInputElement).value;
+		this._rule = {
+			...this._rule,
+			name,
+		};
+	}
+
+	#updateSelector(event: Event) {
+		const selector = (event.target as HTMLInputElement).value;
+		this._rule = {
+			...this._rule,
+			selector,
+		};
+	}
+
+	#updateStyles(event: Event) {
+		const styles = (event.target as HTMLInputElement).value;
+		this._rule = {
+			...this._rule,
+			styles,
+		};
 	}
 
 	render() {
@@ -35,7 +66,13 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 								<uui-form-layout-item>
 									<uui-label for="name" slot="label" required>Name</uui-label>
 									<span slot="description">The name displayed in the editor style selector</span>
-									<uui-input id="name" name="name" .value=${this.data?.rule?.name ?? ''} label="Rule name" required>
+									<uui-input
+										id="name"
+										name="name"
+										.value=${this._rule?.name ?? ''}
+										label="Rule name"
+										required
+										@input=${this.#updateName}>
 									</uui-input>
 								</uui-form-layout-item>
 								<uui-form-layout-item>
@@ -44,8 +81,9 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 									<uui-input
 										id="selector"
 										name="selector"
-										.value=${this.data?.rule?.selector ?? ''}
+										.value=${this._rule?.selector ?? ''}
 										label="Rule selector"
+										@input=${this.#updateSelector}
 										required>
 									</uui-input>
 								</uui-form-layout-item>
@@ -54,13 +92,18 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 									<span slot="description"
 										>The CSS that should be applied in the rich text editor, e.g. "color:red;"</span
 									>
-									<uui-textarea id="styles" name="styles" .value=${this.data?.rule?.styles ?? ''} label="Rule styles">
+									<uui-textarea
+										@input=${this.#updateStyles}
+										id="styles"
+										name="styles"
+										.value=${this._rule?.styles ?? ''}
+										label="Rule styles">
 									</uui-textarea>
 								</uui-form-layout-item>
 								<uui-form-layout-item>
 									<uui-label for="styles" slot="label" required="">Preview</uui-label>
 									<span slot="description">How the text will look like in the rich text editor.</span>
-									<div style="${ifDefined(this.data?.rule?.styles)}">
+									<div style="${ifDefined(this._rule?.styles)}">
 										a b c d e f g h i j k l m n o p q r s t u v w x t z
 										<br />
 										A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
