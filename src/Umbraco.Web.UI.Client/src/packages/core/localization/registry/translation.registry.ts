@@ -22,6 +22,7 @@ export class UmbTranslationRegistry {
 	}
 
 	#currentLanguage = new Subject<string>();
+	#isDefaultLoaded = new BehaviorSubject(false);
 
 	constructor(extensionRegistry: UmbBackofficeExtensionRegistry) {
 		const currentLanguage$ = this.#currentLanguage.pipe(
