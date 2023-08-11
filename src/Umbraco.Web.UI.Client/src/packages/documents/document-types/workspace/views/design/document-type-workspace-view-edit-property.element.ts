@@ -119,7 +119,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 						<uui-input
 							name="label"
 							id="label-input"
-							placeholder="Label..."
+							placeholder=${this.localize.term('placeholders_label')}
 							label="label"
 							.value=${this.property.name}
 							@input=${this.#onNameChange}></uui-input>
