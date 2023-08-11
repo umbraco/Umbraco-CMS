@@ -16,6 +16,7 @@ using Umbraco.Cms.Tests.Common;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRegistration;
 
 [TestFixture]
+[Obsolete("Replaced by BackgroundJobs.Jobs.ServerRegistration.TouchServerJobTests")]
 public class TouchServerTaskTests
 {
     private Mock<IServerRegistrationService> _mockServerRegistrationService;
