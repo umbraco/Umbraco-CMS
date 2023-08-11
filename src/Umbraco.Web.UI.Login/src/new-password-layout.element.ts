@@ -60,8 +60,6 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 			}
 		}
 
-		this.passwordConfig.minNonAlphaNumericChars = 2;
-
 		if (this.passwordConfig.minNonAlphaNumericChars > 0) {
 			const nonAlphaNumericChars = password.replace(/[a-zA-Z0-9]/g, '').length; //TODO: How should we check for non-alphanumeric chars?
 			if (nonAlphaNumericChars < this.passwordConfig?.minNonAlphaNumericChars) {
@@ -76,6 +74,8 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 			this.confirmPasswordElement.setCustomValidity('Passwords do not match');
 			return;
 		}
+
+		this.dispatchEvent(new CustomEvent('submit', { detail: { password } }));
 	}
 
 	render() {
