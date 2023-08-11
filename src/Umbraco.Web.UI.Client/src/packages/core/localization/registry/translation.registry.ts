@@ -75,7 +75,6 @@ export class UmbTranslationRegistry {
 			);
 
 			if (translations.length) {
-				console.log('Registering translations for', locale.baseName.toLowerCase(), translations);
 				registerTranslation(...translations);
 
 				// Set the document language
@@ -98,7 +97,6 @@ export class UmbTranslationRegistry {
 	 * @param locale The locale to load.
 	 */
 	loadLanguage(locale: string) {
-		console.log('Loading language', locale);
 		this.#currentLanguage.next(locale);
 	}
 
