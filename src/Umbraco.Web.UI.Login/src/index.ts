@@ -14,7 +14,7 @@ import './components/pages/login.page.element.js';
 import './components/pages/invite.page.element.js';
 
 import './components/layouts/external-login-providers-layout.element.js';
-import './components/login-external.element.js';
+import './components/external-login-provider.element.js';
 
 import './components/layouts/new-password-layout.element.js';
 import './components/layouts/confirmation-layout.element.js';

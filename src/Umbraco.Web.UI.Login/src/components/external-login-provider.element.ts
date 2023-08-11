@@ -13,10 +13,10 @@ type ExternalLoginCustomViewElement = HTMLElement & {
 /**
  * This elements represents a single external login provider and should be slotted into the <umb-auth> element.
  *
- * @element umb-login-external
+ * @element umb-external-login-provider
  */
-@customElement('umb-login-external')
-export class UmbLoginExternalElement extends LitElement {
+@customElement('umb-external-login-provider')
+export class UmbExternalLoginProviderElement extends LitElement {
 	/**
 	 * Gets or sets the path to the module that should be loaded as the custom view.
 	 * The module should export a default class that extends HTMLElement.
@@ -189,6 +189,6 @@ export class UmbLoginExternalElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-login-external': UmbLoginExternalElement;
+		'umb-external-login-provider': UmbExternalLoginProviderElement;
 	}
 }
