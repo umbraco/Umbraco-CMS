@@ -33,7 +33,6 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 
 		const response = await UmbAuthMainContext.Instance.getPasswordConfig(this.userId);
 		this.passwordConfig = response.data;
-		console.log(this.passwordConfig, 'response');
 	}
 
 	#onSubmit(event: Event) {
