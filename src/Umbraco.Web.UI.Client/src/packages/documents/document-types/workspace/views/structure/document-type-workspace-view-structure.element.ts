@@ -49,7 +49,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 					<div slot="description">Allow editors to create content of this type in the root of the content tree.</div>
 					<div slot="editor">
 						<uui-toggle
-							label="Allow as root"
+							label=${this.localize.term('contentTypeEditor_allowAsRootHeading')}
 							?checked=${this._allowedAsRoot}
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setAllowedAsRoot((e.target as UUIToggleElement).checked);
