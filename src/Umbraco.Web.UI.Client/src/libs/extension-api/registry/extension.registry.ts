@@ -111,34 +111,17 @@ export class UmbExtensionRegistry<
 	}
 
 	register(manifest: ManifestTypes | ManifestKind<ManifestTypes>): void {
-		if (!manifest.type) {
-			console.error(`Extension is missing type`, manifest);
+		const isValid = this.checkExtension(manifest);
+		if (!isValid) {
 			return;
 		}
 
-		if (!manifest.alias) {
-			console.error(`Extension is missing alias`, manifest);
-			return;
-		}
-
-		if (manifest.type === 'kind') {
-			this.defineKind(manifest as ManifestKind<ManifestTypes>);
-			return;
-		}
-
-		const extensionsValues = this._extensions.getValue();
-		const extension = extensionsValues.find((extension) => extension.alias === (manifest as ManifestTypes).alias);
-
-		if (extension) {
-			console.error(`Extension with alias ${(manifest as ManifestTypes).alias} is already registered`);
-			return;
-		}
-
-		this._extensions.next([...extensionsValues, manifest as ManifestTypes]);
+		this._extensions.next([...this._extensions.getValue(), manifest as ManifestTypes]);
 	}
 
 	registerMany(manifests: Array<ManifestTypes | ManifestKind<ManifestTypes>>): void {
-		manifests.forEach((manifest) => this.register(manifest));
+		const validManifests = manifests.filter(this.checkExtension.bind(this));
+		this._extensions.next([...this._extensions.getValue(), ...(validManifests as Array<ManifestTypes>)]);
 	}
 
 	unregisterMany(aliases: Array<string>): void {
@@ -171,6 +154,33 @@ export class UmbExtensionRegistry<
 		return this.extensions.pipe(map((extensions) => extensions.find((extension) => extension.alias === alias) || null));
 	}
 	*/
+
+	private checkExtension(manifest: ManifestTypes | ManifestKind<ManifestTypes>): boolean {
+		if (!manifest.type) {
+			console.error(`Extension is missing type`, manifest);
+			return false;
+		}
+
+		if (!manifest.alias) {
+			console.error(`Extension is missing alias`, manifest);
+			return false;
+		}
+
+		if (manifest.type === 'kind') {
+			this.defineKind(manifest as ManifestKind<ManifestTypes>);
+			return false;
+		}
+
+		const extensionsValues = this._extensions.getValue();
+		const extension = extensionsValues.find((extension) => extension.alias === (manifest as ManifestTypes).alias);
+
+		if (extension) {
+			console.error(`Extension with alias ${(manifest as ManifestTypes).alias} is already registered`);
+			return false;
+		}
+
+		return true;
+	}
 
 	private _kindsOfType<Key extends keyof ManifestTypeMap<ManifestTypes> | string>(type: Key) {
 		return this.kinds.pipe(
