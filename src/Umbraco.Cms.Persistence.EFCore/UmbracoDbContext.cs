@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Attributes;
 
 namespace Umbraco.Cms.Persistence.EFCore;
 
@@ -14,6 +15,7 @@ namespace Umbraco.Cms.Persistence.EFCore;
 /// To find documentation about this way of working with the context see
 /// https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/providers?tabs=dotnet-core-cli#using-one-context-type
 /// </remarks>
+[UmbracoInternal]
 public class UmbracoDbContext : DbContext
 {
     public UmbracoDbContext(DbContextOptions<UmbracoDbContext> options)
