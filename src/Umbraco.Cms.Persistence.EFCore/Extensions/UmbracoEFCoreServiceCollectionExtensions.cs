@@ -17,8 +17,6 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     public static IServiceCollection AddUmbracoEFCoreContext<T>(this IServiceCollection services, DefaultEFCoreOptionsAction? defaultEFCoreOptionsAction = null)
         where T : DbContext
     {
-        defaultEFCoreOptionsAction ??= DefaultOptionsAction;
-
         services.AddPooledDbContextFactory<T>((provider, builder) => SetupDbContext(defaultEFCoreOptionsAction, provider, builder));
         services.AddTransient(services => services.GetRequiredService<IDbContextFactory<T>>().CreateDbContext());
 
@@ -31,38 +29,9 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         return services;
     }
 
-    private static void SetupDbContext(DefaultEFCoreOptionsAction defaultEFCoreOptionsAction, IServiceProvider provider, DbContextOptionsBuilder builder)
-    {
-        ConnectionStrings connectionStrings = GetConnectionStringAndProviderName(provider);
-        IEnumerable<IMigrationProviderSetup> migrationProviders = provider.GetServices<IMigrationProviderSetup>();
-        IMigrationProviderSetup? migrationProvider =
-            migrationProviders.FirstOrDefault(x => x.ProviderName == connectionStrings.ProviderName);
-        migrationProvider?.Setup(builder, connectionStrings.ConnectionString);
-        defaultEFCoreOptionsAction(builder, connectionStrings.ConnectionString, connectionStrings.ProviderName);
-    }
-
-    private static ConnectionStrings GetConnectionStringAndProviderName(IServiceProvider serviceProvider)
-    {
-        string? connectionString = null;
-        string? providerName = null;
-
-        ConnectionStrings connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;
-
-        // Replace data directory
-        string? dataDirectory = AppDomain.CurrentDomain.GetData(Constants.System.DataDirectoryName)?.ToString();
-        if (string.IsNullOrEmpty(dataDirectory) is false)
-        {
-            connectionStrings.ConnectionString = connectionStrings.ConnectionString?.Replace(Constants.System.DataDirectoryPlaceholder, dataDirectory);
-        }
-
-        return connectionStrings;
-    }
-
     public static IServiceCollection AddUmbracoEFCoreContext<T>(this IServiceCollection services, string connectionString, string providerName, DefaultEFCoreOptionsAction? defaultEFCoreOptionsAction = null)
         where T : DbContext
     {
-        defaultEFCoreOptionsAction ??= DefaultOptionsAction;
-
         // Replace data directory
         string? dataDirectory = AppDomain.CurrentDomain.GetData(Constants.System.DataDirectoryName)?.ToString();
         if (string.IsNullOrEmpty(dataDirectory) is false)
@@ -70,7 +39,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
             connectionString = connectionString.Replace(Constants.System.DataDirectoryPlaceholder, dataDirectory);
         }
 
-        services.AddPooledDbContextFactory<T>((_, options) => defaultEFCoreOptionsAction(options, providerName, connectionString));
+        services.AddPooledDbContextFactory<T>(options => defaultEFCoreOptionsAction?.Invoke(options, providerName, connectionString));
         services.AddTransient(services => services.GetRequiredService<IDbContextFactory<T>>().CreateDbContext());
 
         services.AddUnique<IAmbientEFCoreScopeStack<T>, AmbientEFCoreScopeStack<T>>();
@@ -82,21 +51,23 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         return services;
     }
 
-    private static void DefaultOptionsAction(DbContextOptionsBuilder options, string? providerName, string? connectionString)
+    private static void SetupDbContext(DefaultEFCoreOptionsAction? defaultEFCoreOptionsAction, IServiceProvider provider, DbContextOptionsBuilder builder)
     {
-        if (connectionString.IsNullOrWhiteSpace())
+        ConnectionStrings connectionStrings = GetConnectionStringAndProviderName(provider);
+        defaultEFCoreOptionsAction?.Invoke(builder, connectionStrings.ConnectionString, connectionStrings.ProviderName);
+    }
+
+    private static ConnectionStrings GetConnectionStringAndProviderName(IServiceProvider serviceProvider)
+    {
+        ConnectionStrings connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;
+
+        // Replace data directory
+        string? dataDirectory = AppDomain.CurrentDomain.GetData(Constants.System.DataDirectoryName)?.ToString();
+        if (string.IsNullOrEmpty(dataDirectory) is false)
         {
-            return;
+            connectionStrings.ConnectionString = connectionStrings.ConnectionString?.Replace(Constants.System.DataDirectoryPlaceholder, dataDirectory);
         }
 
-        switch (providerName)
-        {
-            case "Microsoft.Data.Sqlite":
-                options.UseSqlite(connectionString);
-                break;
-            case "Microsoft.Data.SqlClient":
-                options.UseSqlServer(connectionString);
-                break;
-        }
+        return connectionStrings;
     }
 }
