@@ -13,10 +13,22 @@ public class IndexConfigurationFactory : IIndexConfigurationFactory
     {
         configurationObjects = new Dictionary<string, IUmbracoIndexConfiguration>()
         {
-            { Constants.UmbracoIndexes.InternalIndexName, new UmbracoExamineIndexConfig(publicAccessService, provider)  },
-            { Constants.UmbracoIndexes.ExternalIndexName, new UmbracoExamineIndexConfig(publicAccessService, provider) { PublishedValuesOnly = true}},
-            { Constants.UmbracoIndexes.MembersIndexName, new UmbracoExamineIndexConfig(publicAccessService, provider) },
-            { Constants.UmbracoIndexes.DeliveryApiContentIndexName, new UmbracoExamineIndexConfig(publicAccessService, provider) }
+            {
+                global::Umbraco.Cms.Core.Constants.UmbracoIndexes.InternalIndexName,
+                new UmbracoExamineIndexConfig(publicAccessService, provider)
+            },
+            {
+                global::Umbraco.Cms.Core.Constants.UmbracoIndexes.ExternalIndexName,
+                new UmbracoExamineIndexConfig(publicAccessService, provider) { PublishedValuesOnly = true }
+            },
+            {
+                global::Umbraco.Cms.Core.Constants.UmbracoIndexes.MembersIndexName,
+                new UmbracoExamineIndexConfig(publicAccessService, provider)
+            },
+            {
+                global::Umbraco.Cms.Core.Constants.UmbracoIndexes.DeliveryApiContentIndexName,
+                new UmbracoExamineIndexConfig(publicAccessService, provider)
+            }
         };
     }
 

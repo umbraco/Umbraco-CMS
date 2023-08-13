@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using IndexCreatorSettings = Umbraco.Search.Examine.Configuration.IndexCreatorSettings;
 
 internal class UmbracoCmsSchema
 {

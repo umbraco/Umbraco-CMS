@@ -12,5 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Search.Examine\Umbraco.Search.Examine.csproj" />
   </ItemGroup>
 </Project>

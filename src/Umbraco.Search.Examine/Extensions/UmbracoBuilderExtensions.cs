@@ -1,4 +1,7 @@
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -7,7 +10,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Search;
-using Umbraco.Extensions;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Examine.Configuration;
@@ -17,7 +19,9 @@ using Umbraco.Search.NotificationHandlers;
 using Umbraco.Search.Services;
 using Umbraco.Search.ValueSet.ValueSetBuilders;
 using ContentIndexingNotificationHandler = Umbraco.Search.NotificationHandlers.ContentIndexingNotificationHandler;
-using ContentTypeIndexingNotificationHandler = Umbraco.Search.NotificationHandlers.ContentTypeIndexingNotificationHandler;
+using ContentTypeIndexingNotificationHandler =
+    Umbraco.Search.NotificationHandlers.ContentTypeIndexingNotificationHandler;
+using IndexCreatorSettings = Umbraco.Search.Examine.Configuration.IndexCreatorSettings;
 using IUmbracoIndexingHandler = Umbraco.Search.NotificationHandlers.IUmbracoIndexingHandler;
 using LanguageIndexingNotificationHandler = Umbraco.Search.NotificationHandlers.LanguageIndexingNotificationHandler;
 using MediaIndexingNotificationHandler = Umbraco.Search.NotificationHandlers.MediaIndexingNotificationHandler;
@@ -32,8 +36,18 @@ public static partial class UmbracoBuilderExtensions
 {
     public static IUmbracoBuilder AddExamine(this IUmbracoBuilder builder)
     {
+        UmbracoOptionsAttribute? umbracoOptionsAttribute =
+            typeof(IndexCreatorSettings).GetCustomAttribute<UmbracoOptionsAttribute>();
+        if (umbracoOptionsAttribute is null)
+        {
+            throw new ArgumentException($"{typeof(IndexCreatorSettings)} do not have the UmbracoOptionsAttribute.");
+        }
 
-
+        OptionsBuilder<IndexCreatorSettings>? optionsBuilder = builder.Services.AddOptions<IndexCreatorSettings>()
+            .Bind(
+                builder.Config.GetSection(umbracoOptionsAttribute.ConfigurationKey),
+                o => o.BindNonPublicProperties = umbracoOptionsAttribute.BindNonPublicProperties)
+            .ValidateDataAnnotations();
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, ContentTypeIndexingNotificationHandler>();
         builder.AddNotificationHandler<MediaCacheRefresherNotification, MediaIndexingNotificationHandler>();

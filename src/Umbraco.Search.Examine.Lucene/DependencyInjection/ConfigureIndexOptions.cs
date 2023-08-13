@@ -3,7 +3,6 @@ using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
 using Lucene.Net.Util;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.Examine.Configuration;
 using Umbraco.Search.Examine.Extensions;

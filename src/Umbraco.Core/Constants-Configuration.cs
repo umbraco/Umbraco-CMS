@@ -38,6 +38,7 @@ public static partial class Constants
         public const string ConfigHealthChecks = ConfigPrefix + "HealthChecks";
         public const string ConfigHosting = ConfigPrefix + "Hosting";
         public const string ConfigImaging = ConfigPrefix + "Imaging";
+        [Obsolete("This is no longer used and will be removed in future versions of Umbraco", true)]
         public const string ConfigExamine = ConfigPrefix + "Examine";
         public const string ConfigIndexing = ConfigPrefix + "Indexing";
         public const string ConfigKeepAlive = ConfigPrefix + "KeepAlive";

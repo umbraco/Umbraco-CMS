@@ -1,8 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Cms.Core.Configuration.Models;
-[Obsolete("This class will be removed in v14, please check documentation of specific search provider", true)]
+namespace Umbraco.Search.Examine.Configuration;
 public enum LuceneDirectoryFactory
 {
     /// <summary>

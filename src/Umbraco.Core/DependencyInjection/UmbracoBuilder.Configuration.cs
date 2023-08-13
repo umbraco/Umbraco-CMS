@@ -50,7 +50,6 @@ public static partial class UmbracoBuilderExtensions
         builder
             .AddUmbracoOptions<ModelsBuilderSettings>()
             .AddUmbracoOptions<ActiveDirectorySettings>()
-            .AddUmbracoOptions<IndexCreatorSettings>()
             .AddUmbracoOptions<MarketplaceSettings>()
             .AddUmbracoOptions<ContentSettings>()
             .AddUmbracoOptions<DeliveryApiSettings>()
