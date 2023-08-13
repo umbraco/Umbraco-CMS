@@ -19,7 +19,7 @@ namespace Umbraco.Search.SpecialisedSearchers.Tree;
 /// </summary>
 public class UmbracoTreeSearcher
 {
-    private readonly IBackOfficeExamineSearcher _backOfficeExamineSearcher;
+    private readonly IBackOfficeSearcher _backOfficeSearcher;
     private readonly IEntityService _entityService;
     private readonly ILocalizationService _languageService;
     private readonly IUmbracoMapper _mapper;
@@ -31,14 +31,14 @@ public class UmbracoTreeSearcher
         IEntityService entityService,
         IUmbracoMapper mapper,
         ISqlContext sqlContext,
-        IBackOfficeExamineSearcher backOfficeExamineSearcher,
+        IBackOfficeSearcher backOfficeSearcher,
         IPublishedUrlProvider publishedUrlProvider)
     {
         _languageService = languageService;
         _entityService = entityService;
         _mapper = mapper;
         _sqlContext = sqlContext;
-        _backOfficeExamineSearcher = backOfficeExamineSearcher;
+        _backOfficeSearcher = backOfficeSearcher;
         _publishedUrlProvider = publishedUrlProvider;
     }
 
@@ -60,7 +60,7 @@ public class UmbracoTreeSearcher
         IBackofficeSearchRequest request,
         out long totalFound)
     {
-        IEnumerable<IUmbracoSearchResult> pagedResult = _backOfficeExamineSearcher.Search(request, out totalFound);
+        IEnumerable<IUmbracoSearchResult> pagedResult = _backOfficeSearcher.Search(request, out totalFound);
 
         return request.EntityType switch
         {

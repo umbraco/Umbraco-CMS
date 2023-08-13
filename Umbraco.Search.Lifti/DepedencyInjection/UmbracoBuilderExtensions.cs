@@ -7,9 +7,9 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.Lifti.SpecialisedSearchers;
 using Umbraco.Search.Services;
+using Umbraco.Search.SpecialisedSearchers;
 using Umbraco.Search.ValueSet;
 using Umbraco.Search.ValueSet.ValueSetBuilders;
-using IBackOfficeExamineSearcher = Umbraco.Search.SpecialisedSearchers.IBackOfficeExamineSearcher;
 using IContentValueSetBuilder = Umbraco.Search.ValueSet.ValueSetBuilders.IContentValueSetBuilder;
 
 namespace Umbraco.Search.Lifti.DepedencyInjection;
@@ -101,7 +101,7 @@ public static class UmbracoBuilderExtensions
         services.AddSingleton<ILiftiIndexManager, LiftiIndexManager>();
         services.AddTransient<ISearchMainDomHandler, InMemoryIndexingMainDomHandler>();
 
-        services.AddSingleton<IBackOfficeExamineSearcher, BackOfficeInMemorySearcher>();
+        services.AddSingleton<IBackOfficeSearcher, BackOfficeInMemorySearcher>();
         // Create the indexes
         services
             .RegisterIndexExternal()

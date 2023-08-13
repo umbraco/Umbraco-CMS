@@ -27,7 +27,7 @@ using Umbraco.Search.SpecialisedSearchers;
 
 namespace Umbraco.Search.Examine.Lucene;
 
-public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
+public class BackOfficeSearcher : IBackOfficeSearcher
 {
     private readonly AppCaches _appCaches;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
@@ -38,7 +38,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
     private readonly IUmbracoTreeSearcherFields _treeSearcherFields;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public BackOfficeExamineSearcher(
+    public BackOfficeSearcher(
         IExamineManager examineManager,
         ILocalizationService languageService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -135,7 +135,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                 AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, request.SearchFrom, request.IgnoreUserStartNodes, _entityService);
                 break;
             default:
-                throw new NotSupportedException("The " + typeof(BackOfficeExamineSearcher) +
+                throw new NotSupportedException("The " + typeof(BackOfficeSearcher) +
                                                 " currently does not support searching against object type " +
                                                 request.EntityType);
         }

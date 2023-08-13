@@ -172,7 +172,7 @@ public static class UmbracoBuilderExtensions
                 = services.GetRequiredService<IIndexConfigurationFactory>();
             return configuration.GetConfiguration();
         });
-        services.AddUnique<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
+        services.AddUnique<IBackOfficeSearcher, BackOfficeSearcher>();
         //todo: restore when indexes are working
         services.AddUnique<IIndexDiagnosticsFactory, ExamineLuceneIndexDiagnosticsFactory>();
 

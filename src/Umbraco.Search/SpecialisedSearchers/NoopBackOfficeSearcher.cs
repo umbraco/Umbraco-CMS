@@ -4,7 +4,7 @@ using Umbraco.Search.Models;
 
 namespace Umbraco.Search.SpecialisedSearchers;
 
-public class NoopBackOfficeExamineSearcher : IBackOfficeExamineSearcher
+public class NoopBackOfficeSearcher : IBackOfficeSearcher
 {
     public IEnumerable<IUmbracoSearchResult> Search(
         IBackofficeSearchRequest request,

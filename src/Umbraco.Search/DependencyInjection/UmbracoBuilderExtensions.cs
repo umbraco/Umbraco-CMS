@@ -12,17 +12,16 @@ using Umbraco.Extensions;
 using Umbraco.Search.Indexing.Populators;
 using Umbraco.Search.NotificationHandlers;
 using Umbraco.Search.Services;
+using Umbraco.Search.SpecialisedSearchers;
 using Umbraco.Search.Telemetry;
 using Umbraco.Search.ValueSet.ValueSetBuilders;
 using ContentIndexPopulator = Umbraco.Search.Indexing.Populators.ContentIndexPopulator;
-using IBackOfficeExamineSearcher = Umbraco.Search.SpecialisedSearchers.IBackOfficeExamineSearcher;
 using IIndexDiagnosticsFactory = Umbraco.Search.Diagnostics.IIndexDiagnosticsFactory;
 using IIndexRebuilder = Umbraco.Search.Indexing.IIndexRebuilder;
 using IndexDiagnosticsFactory = Umbraco.Search.Diagnostics.IndexDiagnosticsFactory;
 using IUmbracoTreeSearcherFields = Umbraco.Search.Configuration.IUmbracoTreeSearcherFields;
 using MediaIndexPopulator = Umbraco.Search.Indexing.Populators.MediaIndexPopulator;
 using MemberIndexPopulator = Umbraco.Search.Indexing.Populators.MemberIndexPopulator;
-using NoopBackOfficeExamineSearcher = Umbraco.Search.SpecialisedSearchers.NoopBackOfficeExamineSearcher;
 using PublishedContentIndexPopulator = Umbraco.Search.Indexing.Populators.PublishedContentIndexPopulator;
 
 namespace Umbraco.Search.DependencyInjection;
@@ -54,7 +53,7 @@ public static partial class UmbracoBuilderExtensions
     {
         services.AddSingleton<IUmbracoTreeSearcherFields, Configuration.UmbracoTreeSearcherFields>();
 
-        services.AddUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
+        services.AddUnique<IBackOfficeSearcher, NoopBackOfficeSearcher>();
         services.AddScoped<SpecialisedSearchers.Tree.UmbracoTreeSearcher>();
         services.AddSingleton<IIndexPopulator, MemberIndexPopulator>();
         services.AddSingleton<IIndexPopulator, ContentIndexPopulator>();

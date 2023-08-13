@@ -21,7 +21,7 @@ using Umbraco.Search.SpecialisedSearchers;
 
 namespace Umbraco.Search.Lifti.SpecialisedSearchers;
 
-public class BackOfficeInMemorySearcher : IBackOfficeExamineSearcher
+public class BackOfficeInMemorySearcher : IBackOfficeSearcher
 {
     private readonly ILiftiIndexManager _liftiIndexManager;
     private readonly ILocalizationService _languageService;
