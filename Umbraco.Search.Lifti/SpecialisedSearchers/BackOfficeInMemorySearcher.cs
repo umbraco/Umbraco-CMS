@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Search.Configuration;
+using Umbraco.Search.Lifti.Extensions;
 using Umbraco.Search.Models;
 using Umbraco.Search.SpecialisedSearchers;
 

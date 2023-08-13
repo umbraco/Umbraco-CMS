@@ -4,6 +4,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.Lifti.SpecialisedSearchers;
 using Umbraco.Search.Services;
@@ -42,7 +43,9 @@ public static class UmbracoBuilderExtensions
             new FullTextIndexBuilder<string>()
                 .WithObjectTokenization<UmbracoValueSet>(o => o
                     .WithKey(c => c.Id)
-                    .WithDynamicFields("Fields", c => c.Values?.ToDictionary(x => x.Key, x => x.Value.Select(x=>x.ToString()))!, tokenizationOptions: tokenOptions => tokenOptions.WithStemming()))
+                    .WithDynamicFields("Fields",
+                        c => c.Values?.ToDictionary(x => x.Key, x => x.Value.Select(x => x.ToString()))!,
+                        tokenizationOptions: tokenOptions => tokenOptions.WithStemming()))
                 .Build()));
         serviceCollection.AddSingleton<IUmbracoIndex>(serviceCollection =>
             new UmbracoMemoryIndex<TIndexedModelType>(
@@ -50,6 +53,7 @@ public static class UmbracoBuilderExtensions
                 serviceCollection.GetRequiredService<TValueSetBuilder>()));
         serviceCollection.AddSingleton<IUmbracoSearcher>(serviceCollection =>
             new UmbracoMemorySearcher<TIndexedModelType>(
+                serviceCollection.GetRequiredService<IUmbracoContextFactory>(),
                 serviceCollection.GetRequiredService<ILiftiIndexManager>().GetIndex(name),
                 name));
         return serviceCollection;
@@ -69,7 +73,9 @@ public static class UmbracoBuilderExtensions
                 .DeliveryApiContentIndexName,
             new FullTextIndexBuilder<string>().WithObjectTokenization<UmbracoValueSet>(o => o
                     .WithKey(c => c.Id)
-                    .WithDynamicFields("Fields", c => c.Values?.ToDictionary(x => x.Key, x => x.Value.Select(x=>x.ToString()))!, tokenizationOptions: tokenOptions => tokenOptions.WithStemming()))
+                    .WithDynamicFields("Fields",
+                        c => c.Values?.ToDictionary(x => x.Key, x => x.Value.Select(x => x.ToString()))!,
+                        tokenizationOptions: tokenOptions => tokenOptions.WithStemming()))
                 .Build()));
         // This is the long way to add IOptions but gives us access to the
         // services collection which we need to get the dir factory
@@ -80,12 +86,14 @@ public static class UmbracoBuilderExtensions
                         .DeliveryApiContentIndexName),
                 serviceCollection.GetRequiredService<IContentValueSetBuilder>()));
         services.AddSingleton<IUmbracoSearcher>(serviceCollection =>
-            new UmbracoMemorySearcher<IContent>(serviceCollection.GetRequiredService<ILiftiIndexManager>().GetIndex(
-                Constants
+            new UmbracoMemorySearcher<IContent>(
+                serviceCollection.GetRequiredService<IUmbracoContextFactory>(),
+                serviceCollection.GetRequiredService<ILiftiIndexManager>().GetIndex(
+                    Constants
+                        .UmbracoIndexes
+                        .DeliveryApiContentIndexName), Constants
                     .UmbracoIndexes
-                    .DeliveryApiContentIndexName), Constants
-                .UmbracoIndexes
-                .DeliveryApiContentIndexName));
+                    .DeliveryApiContentIndexName));
         return services;
     }
 
