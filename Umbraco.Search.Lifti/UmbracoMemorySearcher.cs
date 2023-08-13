@@ -26,11 +26,13 @@ public class UmbracoMemorySearcher<T> : IUmbracoSearcher<T>
         var allResult = _liftiIndex?.LiftiIndex.Search(term);
         if (allResult != null)
         {
-            var results =allResult.Skip(pageSize * page).Take(pageSize).ToUmbracoResults();
-            return new UmbracoSearchResults(allResult.Count(), pageSize,results);
+            var results = allResult.Skip(pageSize * page).Take(pageSize).ToUmbracoResults();
+            return new UmbracoSearchResults(allResult.Count(), pageSize, results);
         }
-        return new UmbracoSearchResults(0, pageSize,new List<IUmbracoSearchResult>());
+
+        return new UmbracoSearchResults(0, pageSize, new List<IUmbracoSearchResult>());
     }
+
     public string Name { get; }
 
     public UmbracoSearchResults? NativeQuery(string query, int page, int pageSize)
@@ -38,10 +40,11 @@ public class UmbracoMemorySearcher<T> : IUmbracoSearcher<T>
         var allResult = _liftiIndex?.LiftiIndex.Search(query);
         if (allResult != null)
         {
-            var results =allResult.Skip(pageSize * page).Take(pageSize).ToUmbracoResults();
-            return new UmbracoSearchResults(allResult.Count(), pageSize,results);
+            var results = allResult.Skip(pageSize * page).Take(pageSize).ToUmbracoResults();
+            return new UmbracoSearchResults(allResult.Count(), pageSize, results);
         }
-        return new UmbracoSearchResults(0, pageSize,new List<IUmbracoSearchResult>());
+
+        return new UmbracoSearchResults(0, pageSize, new List<IUmbracoSearchResult>());
     }
 
     public IEnumerable<PublishedSearchResult> SearchDescendants(IPublishedContent content, string term)
@@ -58,6 +61,7 @@ public class UmbracoMemorySearcher<T> : IUmbracoSearcher<T>
                 return allResult.ToPublishedSearchResults(umbracoContext.Content);
             }
         }
+
         return new List<PublishedSearchResult>();
     }
 
@@ -75,15 +79,67 @@ public class UmbracoMemorySearcher<T> : IUmbracoSearcher<T>
                 return allResult.ToPublishedSearchResults(umbracoContext.Content);
             }
         }
+
         return new List<PublishedSearchResult>();
     }
 
-    public IUmbracoSearchResults Search(ISearchRequest searchRequest) => throw new NotImplementedException();
+    public IUmbracoSearchResults Search(ISearchRequest searchRequest)
+    {
+        var term = string.Empty;
+        if (!string.IsNullOrWhiteSpace(searchRequest.Term))
+        {
+            term += searchRequest.Term;
+        }
+
+        // when not fetching for preview, make sure the "published" field is "y"
+        if (searchRequest.Preview is false)
+        {
+            term += $"{UmbracoSearchFieldNames.DeliveryApiContentIndex.Published}=y";
+        }
+
+        PrepareFilters(term, searchRequest.Filters, searchRequest.FiltersLogicOperator);
+        using (var contextReference = _umbracoContextFactory.EnsureUmbracoContext())
+        {
+            IUmbracoContext umbracoContext = contextReference.UmbracoContext;
+            var allResult = _liftiIndex?.LiftiIndex.Search(term);
+            var results = allResult?.Skip(searchRequest.PageSize * searchRequest.Page).Take(searchRequest.PageSize)
+                .ToUmbracoResults();
+            return new UmbracoSearchResults(allResult?.Count() ?? 0, searchRequest.PageSize,
+                results ?? new List<IUmbracoSearchResult>());
+        }
+    }
+
+    private void PrepareFilters(string term, IList<ISearchFilter> searchRequestFilters)
+    {
+        if (searchRequestFilters.Any())
+        {
+            foreach (var filter in searchRequestFilters)
+            {
+                if (filter.Values.Any())
+                {
+                    term += $" {(filter.LogicOperator == LogicOperator.And ? "&" : "|")} (";
+
+                    foreach (var filterValue in filter.Values)
+                    {
+                        term += $"{filter.FieldName}={filterValue}";
+                    }
+
+                    term += ") ";
+                }
+
+                if (filter.SubFilters.Any())
+                {
+                    term += $" {(filter.LogicOperator == LogicOperator.And ? "&" : "|")} (";
+                    PrepareFilters(term, filter.SubFilters);
+                    term += ") ";
+                }
+            }
+        }
+    }
 
     public ISearchRequest CreateSearchRequest()
     {
         return new DefaultSearchRequest(string.Empty, new List<ISearchFilter>(), LogicOperator.OR);
-
     }
 
     public IEnumerable<PublishedSearchResult> GetAll()
@@ -99,6 +155,7 @@ public class UmbracoMemorySearcher<T> : IUmbracoSearcher<T>
                 return allResult.ToPublishedSearchResults(umbracoContext.Content);
             }
         }
+
         return new List<PublishedSearchResult>();
     }
 }
