@@ -5,15 +5,15 @@ using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
+namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Folder;
 
 [ApiVersion("1.0")]
-public class CreateDataTypeFolderController : DataTypeFolderControllerBase
+public class CreateMediaTypeFolderController : MediaTypeFolderControllerBase
 {
-    public CreateDataTypeFolderController(
+    public CreateMediaTypeFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IDataTypeContainerService dataTypeContainerService)
-        : base(backOfficeSecurityAccessor, dataTypeContainerService)
+        IMediaTypeContainerService mediaTypeContainerService)
+        : base(backOfficeSecurityAccessor, mediaTypeContainerService)
     {
     }
 
@@ -21,7 +21,7 @@ public class CreateDataTypeFolderController : DataTypeFolderControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(CreateFolderRequestModel createFolderRequestModel)
-        => await CreateFolderAsync<ByKeyDataTypeFolderController>(
+        => await CreateFolderAsync<ByKeyMediaTypeFolderController>(
             createFolderRequestModel,
-            controller => nameof(controller.ByKey));
+            controller => nameof(controller.ByKey)).ConfigureAwait(false);
 }

@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.Services.OperationStatus;
 
-public enum DataTypeContainerOperationStatus
+public enum EntityContainerOperationStatus
 {
     Success,
     CancelledByNotification,
