@@ -24,8 +24,6 @@
   <ItemGroup>
     <!-- Update implicit dependencies to fix security issues, even though we do not use them explicitly and they are taken from the shared framework instead of NuGet -->
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="8.0.0-preview.6.*" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="8.0.0-preview.6.*" />
     <PackageReference Include="System.Security.Cryptography.Xml" Version="8.0.0-preview.7.*" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
