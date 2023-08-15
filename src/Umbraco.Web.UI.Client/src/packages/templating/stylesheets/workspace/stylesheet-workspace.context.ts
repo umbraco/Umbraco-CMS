@@ -4,7 +4,10 @@ import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState, UmbObjectState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { RichTextStylesheetRulesResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	RichTextStylesheetRulesResponseModel,
+	UpdateStylesheetRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStylesheetRepository, StylesheetDetails> {
 	#data = new UmbObjectState<StylesheetDetails | undefined>(undefined);
@@ -68,31 +71,28 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 	}
 
 	public async save() {
-		throw new Error('Save method not implemented.');
+		const stylesheet = this.getData();
 
-		// const stylesheet = this.getData();
+		if (!stylesheet)
+			return Promise.reject('Something went wrong, there is no data for partial view you want to save...');
+		if (this.getIsNew()) {
+			const createRequestBody = {
+				name: stylesheet.name,
+				content: stylesheet.content,
+				parentPath: stylesheet.path + '/',
+			};
 
-		// if (!stylesheet)
-		// 	return Promise.reject('Something went wrong, there is no data for partial view you want to save...');
-		// if (this.getIsNew()) {
-
-		// 	const createRequestBody = {
-		// 		name: stylesheet.name,
-		// 		content: stylesheet.content,
-		// 		parentPath: stylesheet.path + '/',
-		// 	}
-
-		// 	this.repository.create(createRequestBody);
-		// 	return Promise.resolve();
-		// }
-		// if (!stylesheet.path) return Promise.reject('There is no path');
-		// const updateRequestBody: UpdatePartialViewRequestModel = {
-		// 	name: stylesheet.name,
-		// 	existingPath: stylesheet.path,
-		// 	content: stylesheet.content,
-		// };
-		// this.repository.save(stylesheet.path, updateRequestBody);
-		// return Promise.resolve();
+			this.repository.create(createRequestBody);
+			return Promise.resolve();
+		}
+		if (!stylesheet.path) return Promise.reject('There is no path');
+		const updateRequestBody: UpdateStylesheetRequestModel = {
+			name: stylesheet.name,
+			existingPath: stylesheet.path,
+			content: stylesheet.content,
+		};
+		this.repository.save(stylesheet.path, updateRequestBody);
+		return Promise.resolve();
 	}
 
 	async create(parentKey: string | null) {
