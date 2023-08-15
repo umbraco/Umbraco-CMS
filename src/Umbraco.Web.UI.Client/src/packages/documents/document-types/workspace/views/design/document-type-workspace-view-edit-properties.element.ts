@@ -107,17 +107,19 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 					(property) =>
 						html`<document-type-workspace-view-edit-property
 							class="property"
-							data-umb-property-id=${property.id}
-							data-property-container-is=${property.containerId}
-							data-container-id=${this.containerId}
-							?inherited=${ifDefined(property.containerId !== this.containerId)}
+							data-umb-property-id=${ifDefined(property.id)}
+							data-property-container-is=${ifDefined(property.containerId === null ? undefined : property.containerId)}
+							data-container-id=${ifDefined(this.containerId)}
+							?inherited=${property.containerId !== this.containerId}
 							.property=${property}
 							@partial-property-update=${(event: CustomEvent) => {
 								this._propertyStructureHelper.partialUpdateProperty(property.id, event.detail);
 							}}></document-type-workspace-view-edit-property>`
 				)}
 			</div>
-			<uui-button id="add" look="placeholder" @click=${this.#onAddProperty}> Add property </uui-button> `;
+			<uui-button label="Add property" id="add" look="placeholder" @click=${this.#onAddProperty}>
+				Add property
+			</uui-button> `;
 	}
 
 	static styles = [

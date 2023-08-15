@@ -740,7 +740,7 @@ export class UmbSorterController<T> implements UmbController {
 
 	// TODO: Move auto scroll into its own class?
 	#autoScrollRAF: number | null = null;
-	#autoScrollEl?: Element;
+	#autoScrollEl = document.scrollingElement || document.documentElement;
 	private autoScrollX = 0;
 	private autoScrollY = 0;
 
@@ -788,11 +788,11 @@ export class UmbSorterController<T> implements UmbController {
 			this.#autoScrollRAF = requestAnimationFrame(this._performAutoScroll);
 		}
 	}
-	private _performAutoScroll() {
+	private _performAutoScroll = () => {
 		this.#autoScrollEl!.scrollLeft += this.autoScrollX * autoScrollSpeed;
 		this.#autoScrollEl!.scrollTop += this.autoScrollY * autoScrollSpeed;
 		this.#autoScrollRAF = requestAnimationFrame(this._performAutoScroll);
-	}
+	};
 	private stopAutoScroll() {
 		cancelAnimationFrame(this.#autoScrollRAF!);
 		this.#autoScrollRAF = null;
@@ -833,6 +833,5 @@ export class UmbSorterController<T> implements UmbController {
 
 		// For auto scroller:
 		this.#scrollElement = null;
-		this.#autoScrollEl = undefined;
 	}
 }

@@ -1,6 +1,8 @@
-# Umbraco.CMS.Backoffice
+# Umbraco.CMS.Bacoffice (Bellissima)
 
-[![Storybook](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ambitious-stone-0033b3603.yml/badge.svg)](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ambitious-stone-0033b3603.yml) [![Static Web App](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ashy-bay-09f36a803.yml/badge.svg)](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ashy-bay-09f36a803.yml)
+This is the working repository of the upcoming new Backoffice to Umbraco CMS.
+
+[![Storybook](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ambitious-stone-0033b3603.yml/badge.svg)](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ambitious-stone-0033b3603.yml)
 
 ## Installation instructions
 
@@ -38,10 +40,6 @@ Create a `.env.local` file and set the following variables:
 VITE_UMBRACO_API_URL=https://localhost:44339 # This will be the URL to your Umbraco instance
 VITE_UMBRACO_USE_MSW=off # Indicate that you want all API calls to bypass MSW (mock-service-worker)
 ```
-
-### Static website
-
-See the Main branch in action here as an [Azure Static Web App](https://ashy-bay-09f36a803.1.azurestaticapps.net/). The deploy runs automatically every time the `main` branch is updated. It uses mocked responses from the Umbraco API to simulate the site just like the local development environment.
 
 ### Storybook
 

@@ -1,5 +1,5 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
-import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -87,7 +87,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				? html`
 						<uui-box>
 							<umb-document-type-workspace-view-edit-properties
-								container-id=${this.ownerTabId}
+								container-id=${ifDefined(this.ownerTabId === null ? undefined : this.ownerTabId)}
 								container-type="Tab"
 								container-name=${this.tabName || ''}></umb-document-type-workspace-view-edit-properties>
 						</uui-box>
@@ -117,12 +117,18 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 						}
 					</div>
 					<umb-document-type-workspace-view-edit-properties
-						container-id=${group.id}
+						container-id=${ifDefined(group.id)}
 						container-type="Group"
 						container-name=${group.name || ''}></umb-document-type-workspace-view-edit-properties>
-				</uui-box>`
+				</uui-box>`,
 			)}
-			<uui-button id="add" look="placeholder" @click=${this.#onAddGroup}> Add Group </uui-button>
+			<uui-button
+				label=${this.localize.term('contentTypeEditor_addGroup')}
+				id="add"
+				look="placeholder"
+				@click=${this.#onAddGroup}>
+				${this.localize.term('contentTypeEditor_addGroup')}
+			</uui-button>
 		`;
 	}
 

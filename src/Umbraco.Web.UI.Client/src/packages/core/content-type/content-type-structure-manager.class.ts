@@ -199,11 +199,11 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		containerType: PropertyContainerTypes = 'Tab',
 		parentId: string | null = null
 	) {
-		const ownerRootContainers = this.getOwnerContainers(containerType, parentId);
+		const ownerRootContainers = this.getOwnerContainers(containerType); //getRootContainers() can't differentiates between compositions and locals
 
 		let changedName = newName;
 		if (ownerRootContainers) {
-			while (ownerRootContainers.find((tab) => tab.name === changedName)) {
+			while (ownerRootContainers.find((tab) => tab.name === changedName && tab.id !== parentId)) {
 				changedName = incrementString(changedName);
 			}
 

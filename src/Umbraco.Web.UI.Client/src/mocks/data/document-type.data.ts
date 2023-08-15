@@ -756,11 +756,11 @@ export const data: Array<DocumentTypeResponseModel> = [
 		],
 		compositions: [
 			{
-				id: '5035d7d9-0a63-415c-9e75-ee2cf931db92',
+				id: '8f68ba66-6fb2-4778-83b8-6ab4ca3a7c5d',
 				compositionType: ContentTypeCompositionTypeModel.INHERITANCE,
 			},
 			{
-				id: '8f68ba66-6fb2-4778-83b8-6ab4ca3a7c5d',
+				id: '5035d7d9-0a63-415c-9e75-ee2cf931db92',
 				compositionType: ContentTypeCompositionTypeModel.COMPOSITION,
 			},
 		],

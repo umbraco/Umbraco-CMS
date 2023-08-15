@@ -15,4 +15,6 @@ export {
 	lastValueFrom,
 	firstValueFrom,
 	switchMap,
+	filter,
+	startWith,
 } from 'rxjs';

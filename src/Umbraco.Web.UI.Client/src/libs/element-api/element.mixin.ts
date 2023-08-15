@@ -10,7 +10,6 @@ import {
 	UmbContextProviderController,
 } from '@umbraco-cms/backoffice/context-api';
 import { ObserverCallback, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { property } from '@umbraco-cms/backoffice/external/lit';
 
 export declare class UmbElement extends UmbControllerHostElement {
 	/**
@@ -34,10 +33,6 @@ export declare class UmbElement extends UmbControllerHostElement {
 
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbElementMixinClass extends UmbControllerHostElementMixin(superClass) implements UmbElement {
-		// Make `dir` and `lang` reactive properties so they react to language changes:
-		@property() dir = '';
-		@property() lang = '';
-
 		localize: UmbLocalizeController = new UmbLocalizeController(this);
 
 		/**
