@@ -1,9 +1,6 @@
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Host.ConfigureUmbracoDefaults();
-builder.WebHost.UseStaticWebAssets();
-
-builder.Services.AddUmbraco(builder.Environment, builder.Configuration)
+builder.CreateUmbracoBuilder()
     .AddBackOffice()
     .AddWebsite()
     .AddDeliveryApi()
