@@ -17,6 +17,8 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 
 	private _modalContext?: UmbModalManagerContext;
 
+	#isNew = false;
+
 	constructor() {
 		super();
 
@@ -32,8 +34,15 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 
 	#observeNameAndPath() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeName');
-		this.observe(this.#workspaceContext.path, (path) => (this._path = path), '_observePath');
+		this.observe(this.#workspaceContext.name, (name) => (this._name = name ?? ''), '_observeName');
+		this.observe(this.#workspaceContext.path, (path) => (this._path = path ?? ''), '_observePath');
+		this.observe(
+			this.#workspaceContext.isNew,
+			(isNew) => {
+				this.#isNew = !!isNew;
+			},
+			'_observeIsNew',
+		);
 	}
 
 	#onNameChange(event: UUIInputEvent) {
@@ -50,8 +59,14 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.StyleSheet">
 				<div id="header" slot="header">
-					<uui-input label="stylesheet name" id="name" .value=${this._name} @input="${this.#onNameChange}"> </uui-input>
-					<small>${this._path}</small>
+					<uui-input
+						placeholder="Enter stylesheet name..."
+						label="stylesheet name"
+						id="name"
+						.value=${this._name}
+						@input="${this.#onNameChange}">
+					</uui-input>
+					<small>/css/${this._path}</small>
 				</div>
 
 				<div slot="footer-info">

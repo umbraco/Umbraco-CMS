@@ -18,10 +18,10 @@ export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 			path: 'create/:parentId',
 			component: () => this.#element,
 			setup: async (_component, info) => {
-				const path = info.match.params.path;
+				const path = info.match.params.parentId;
 				const serverPath = serverFilePathFromUrlFriendlyPath(path);
 				this.#workspaceContext.setIsNew(true);
-				await this.#workspaceContext.load(serverPath);
+				await this.#workspaceContext.create(serverPath);
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,
