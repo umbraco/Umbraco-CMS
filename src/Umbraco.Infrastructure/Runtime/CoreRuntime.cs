@@ -163,11 +163,10 @@ public class CoreRuntime : IRuntime
 
             _running = true;
 
-
             // Store token, so we can re-use this during restart
             _cancellationToken = cancellationToken;
 
-            // Just in-case HostBuilder.ConfigureUmbracoDefaults() isn't used (e.g. upgrade from 9 and ignored advice).
+            // Just in-case HostBuilder.ConfigureUmbracoDefaults() isn't used (e.g. upgrade from 9 and ignored advice or using WebApplicationBuilder)
             if (StaticServiceProvider.Instance == null!)
             {
                 StaticServiceProvider.Instance = _serviceProvider!;

@@ -10,7 +10,9 @@ builder.Services.AddUmbraco(builder.Environment, builder.Configuration)
     .AddComposers()
     .Build();
 
-WebApplication app = await builder.BuildForUmbracoAsync();
+WebApplication app = builder.Build();
+
+await app.BootUmbracoAsync();
 
 if (app.Environment.IsDevelopment())
 {
