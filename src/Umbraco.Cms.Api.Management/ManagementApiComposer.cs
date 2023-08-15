@@ -10,7 +10,6 @@ using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Configuration;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management;
 
@@ -80,8 +79,6 @@ public class ManagementApiComposer : IComposer
         builder.AddUmbracoOptions<NewBackOfficeSettings>();
         // FIXME: remove this when NewBackOfficeSettings is moved to core
         services.AddSingleton<IValidateOptions<NewBackOfficeSettings>, NewBackOfficeSettingsValidator>();
-
-        BackOfficeAuthBuilderOpenIddictExtensions.AddUmbracoEFCoreDbContext(builder);
     }
 }
 

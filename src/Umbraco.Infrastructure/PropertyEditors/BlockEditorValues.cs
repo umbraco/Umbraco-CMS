@@ -16,14 +16,14 @@ internal class BlockEditorValues<TValue, TLayout>
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
-    private readonly Lazy<Dictionary<Guid, IContentType>> _contentTypes;
+    private readonly IContentTypeService _contentTypeService;
     private readonly BlockEditorDataConverter<TValue, TLayout> _dataConverter;
     private readonly ILogger _logger;
 
     public BlockEditorValues(BlockEditorDataConverter<TValue, TLayout> dataConverter, IContentTypeService contentTypeService, ILogger logger)
     {
-        _contentTypes = new Lazy<Dictionary<Guid, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Key));
         _dataConverter = dataConverter;
+        _contentTypeService = contentTypeService;
         _logger = logger;
     }
 
@@ -68,11 +68,7 @@ internal class BlockEditorValues<TValue, TLayout>
         return blockEditorData;
     }
 
-    private IContentType? GetElementType(BlockItemData item)
-    {
-        _contentTypes.Value.TryGetValue(item.ContentTypeKey, out IContentType? contentType);
-        return contentType;
-    }
+    private IContentType? GetElementType(BlockItemData item) => _contentTypeService.Get(item.ContentTypeKey);
 
     private bool ResolveBlockItemData(BlockItemData block, Dictionary<string, Dictionary<string, IPropertyType>> contentTypePropertyTypes)
     {

@@ -32,7 +32,6 @@ public static class UmbracoBuilderExtensions
         builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
         builder.AddUmbracoApiOpenApiUI();
 
-        builder.AddUmbracoEFCoreDbContext();
         builder
             .Services
             .AddControllers()
