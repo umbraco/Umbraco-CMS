@@ -93,15 +93,15 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 	}
 
 	async create(parentKey: string | null) {
-		// const { data } = await this.repository.createScaffold(parentKey, name);
-		// const newStylesheet = {
-		// 	...data,
-		// 	name: '',
-		// 	path: parentKey ?? '',
-		// };
-		// if (!data) return;
-		// this.setIsNew(true);
-		// this.#data.next(newStylesheet);
+		const { data } = await this.repository.createScaffold(parentKey);
+		const newStylesheet = {
+			...data,
+			name: '',
+			path: parentKey ?? '',
+		};
+		if (!data) return;
+		this.setIsNew(true);
+		this.#data.next(newStylesheet);
 
 		throw new Error('Create method not implemented.');
 	}
