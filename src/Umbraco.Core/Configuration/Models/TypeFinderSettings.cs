@@ -26,5 +26,5 @@ public class TypeFinderSettings
     /// <summary>
     ///     Gets or sets a value for the assemblies that will be excluded from scanning.
     /// </summary>
-    public string[] AdditionalAssemblyExclusionEntries { get; set; } = null!;
+    public string[] AdditionalAssemblyExclusionEntries { get; set; } = Array.Empty<string>();
 }
