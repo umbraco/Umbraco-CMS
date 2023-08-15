@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.6.*">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.7.*">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
