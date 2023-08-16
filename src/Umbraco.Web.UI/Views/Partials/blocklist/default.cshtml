@@ -1,13 +1,37 @@
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListModel>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockListModel>
+@using Microsoft.AspNetCore.Mvc.ViewComponents;
+@using Umbraco.Cms.Core.Models.Blocks;
 @{
     if (Model?.Any() != true) { return; }
 }
-<div class="umb-block-list">
-    @foreach (var block in Model)
-    {
-        if (block?.ContentUdi == null) { continue; }
-        var data = block.Content;
 
-        @await Html.PartialAsync("blocklist/Components/" + data.ContentType.Alias, block)
+@inject IViewComponentSelector _selector;
+
+<div class="umb-block-list">
+    @foreach (var item in Model)
+    {
+        if (item?.ContentUdi == null) { continue; }
+
+        var partialViewName = "blocklist/Components/" + item.Content.ContentType.Alias;
+
+        try
+        {
+            if (_selector.SelectComponent(item.Content.ContentType.Alias) is not null)
+            {
+                @await Component.InvokeAsync(item.Content.ContentType.Alias, item)
+            }
+            else
+            {
+                @await Html.PartialAsync(partialViewName, item)
+            }
+        }
+        catch (InvalidOperationException)
+        {
+            <p>
+                <strong>Could not render component of type: @(item.Content.ContentType.Alias)</strong>
+                <br/>
+                This likely happened because the partial view <em>@partialViewName</em> could not be found.
+            </p>
+        }
     }
 </div>
