@@ -178,9 +178,9 @@ public class StylesheetService : FileServiceBase<IStylesheetRepository, IStylesh
         return StylesheetOperationStatus.Success;
     }
 
-    private async Task AuditAsync(AuditType type, Guid performingUserKey)
+    private async Task AuditAsync(AuditType type, Guid userKey)
     {
-        var userId = await _userIdKeyResolver.GetAsync(performingUserKey);
+        var userId = await _userIdKeyResolver.GetAsync(userKey);
         _auditRepository.Save(new AuditItem(-1, type, userId, "Stylesheet"));
     }
 }

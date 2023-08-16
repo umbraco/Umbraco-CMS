@@ -216,9 +216,9 @@ public class PartialViewService : FileServiceBase<IPartialViewRepository, IParti
         return PartialViewOperationStatus.Success;
     }
 
-    private async Task AuditAsync(AuditType type, Guid performingUserKey)
+    private async Task AuditAsync(AuditType type, Guid userKey)
     {
-        int userId = await _userIdKeyResolver.GetAsync(performingUserKey);
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
 
         // We're passing -1 here, because we don't have an entity id to pass in, as files on disc are not entities
         _auditRepository.Save(new AuditItem(-1, type, userId, "PartialView"));
