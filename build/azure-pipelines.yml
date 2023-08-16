@@ -335,6 +335,7 @@ stages:
       # E2E Tests
       - job:
         displayName: E2E Tests
+        timeoutInMinutes: 120
         variables:
           Umbraco__CMS__Unattended__UnattendedUserName: Playwright Test
           Umbraco__CMS__Unattended__UnattendedUserPassword: UmbracoAcceptance123!
