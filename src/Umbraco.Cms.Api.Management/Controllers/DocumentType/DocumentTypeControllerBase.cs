@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult OperationStatusResult(ContentTypeOperationStatus status)
-        => ContentTypeOperationStatusResult(status, "content");
+        => ContentTypeOperationStatusResult(status, "document");
 
     internal static IActionResult ContentTypeOperationStatusResult(ContentTypeOperationStatus status, string type) =>
         status switch
