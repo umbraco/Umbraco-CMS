@@ -7,6 +7,8 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 
+// NOTE: this is the implementation for document types. in the code we refer to document types as content types
+//       at core level, so it has to be named ContentTypeEditingService instead of DocumentTypeEditingService.
 internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<IContentType, IContentTypeService, ContentTypePropertyTypeModel, ContentTypePropertyContainerModel>, IContentTypeEditingService
 {
     private readonly ITemplateService _templateService;
@@ -26,13 +28,13 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(ContentTypeCreateModel model, Guid userKey)
     {
-        Attempt<IContentType?, ContentTypeOperationStatus> result = await MapCreateAsync(model, model.Key, model.ContainerKey);
+        Attempt<IContentType?, ContentTypeOperationStatus> result = await ValidateAndMapForCreationAsync(model, model.Key, model.ContainerKey);
         if (result.Success is false)
         {
             return result;
         }
 
-        IContentType contentType = result.Result ?? throw new InvalidOperationException($"{nameof(MapCreateAsync)} succeeded but did not yield any result");
+        IContentType contentType = result.Result ?? throw new InvalidOperationException($"{nameof(ValidateAndMapForCreationAsync)} succeeded but did not yield any result");
 
         UpdateHistoryCleanup(contentType, model);
         UpdateTemplates(contentType, model);
@@ -45,13 +47,13 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> UpdateAsync(IContentType contentType, ContentTypeUpdateModel model, Guid userKey)
     {
-        Attempt<IContentType?, ContentTypeOperationStatus> result = await MapUpdateAsync(contentType, model);
+        Attempt<IContentType?, ContentTypeOperationStatus> result = await ValidateAndMapForUpdateAsync(contentType, model);
         if (result.Success is false)
         {
             return result;
         }
 
-        contentType = result.Result ?? throw new InvalidOperationException($"{nameof(MapUpdateAsync)} succeeded but did not yield any result");
+        contentType = result.Result ?? throw new InvalidOperationException($"{nameof(ValidateAndMapForUpdateAsync)} succeeded but did not yield any result");
 
         UpdateHistoryCleanup(contentType, model);
         UpdateTemplates(contentType, model);

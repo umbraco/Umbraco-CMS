@@ -43,7 +43,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
 
     protected abstract UmbracoObjectTypes ContainerObjectType { get; }
 
-    protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> MapCreateAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? key, Guid? containerKey)
+    protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> ValidateAndMapForCreationAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? key, Guid? containerKey)
     {
         SanitizeModelAliases(model);
 
@@ -85,7 +85,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         return Attempt.SucceedWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
     }
 
-    protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> MapUpdateAsync(TContentType contentType, ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+    protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> ValidateAndMapForUpdateAsync(TContentType contentType, ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
     {
         SanitizeModelAliases(model);
 
@@ -436,7 +436,6 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return;
         }
 
-        // need the content type IDs here - yet, anyway - see FIXME in Umbraco.Cms.Core.Models.ContentTypeSort
         var allContentTypesByKey = allContentTypeCompositions.ToDictionary(c => c.Key);
         contentType.AllowedContentTypes = model
             .AllowedContentTypes
