@@ -19,7 +19,10 @@ public static class WebApplicationBuilderExtensions
     /// </returns>
     public static IUmbracoBuilder CreateUmbracoBuilder(this WebApplicationBuilder builder)
     {
-        builder.Host.ConfigureUmbracoDefaults();
+        // Configure Umbraco defaults, but ignore decorated host builder and
+        // don't add runtime as hosted service (this is replaced by the explicit BootUmbracoAsync)
+        builder.Host.ConfigureUmbracoDefaults(false);
+
         builder.WebHost.UseStaticWebAssets();
 
         return builder.Services.AddUmbraco(builder.Environment, builder.Configuration);
