@@ -37,7 +37,7 @@ public class PartialViewService : FileServiceBase<IPartialViewRepository, IParti
     }
 
     /// <inheritdoc />
-    public async Task<PartialViewOperationStatus> DeleteAsync(string path, Guid performingUserKey)
+    public async Task<PartialViewOperationStatus> DeleteAsync(string path, Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -60,7 +60,7 @@ public class PartialViewService : FileServiceBase<IPartialViewRepository, IParti
         scope.Notifications.Publish(
             new PartialViewDeletedNotification(partialView, eventMessages).WithStateFrom(deletingNotification));
 
-        await AuditAsync(AuditType.Delete, performingUserKey);
+        await AuditAsync(AuditType.Delete, userKey);
         return PartialViewOperationStatus.Success;
     }
 
@@ -99,7 +99,7 @@ public class PartialViewService : FileServiceBase<IPartialViewRepository, IParti
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> CreateAsync(PartialViewCreateModel createModel, Guid performingUserKey)
+    public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> CreateAsync(PartialViewCreateModel createModel, Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -129,7 +129,7 @@ public class PartialViewService : FileServiceBase<IPartialViewRepository, IParti
 
         Repository.Save(partialView);
         scope.Notifications.Publish(new PartialViewSavedNotification(partialView, eventMessages).WithStateFrom(savingNotification));
-        await AuditAsync(AuditType.Save, performingUserKey);
+        await AuditAsync(AuditType.Save, userKey);
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.Success, partialView);
@@ -162,7 +162,7 @@ public class PartialViewService : FileServiceBase<IPartialViewRepository, IParti
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> UpdateAsync(PartialViewUpdateModel updateModel, Guid performingUserKey)
+    public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> UpdateAsync(PartialViewUpdateModel updateModel, Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IPartialView? partialView = Repository.Get(updateModel.ExistingPath);
@@ -195,7 +195,7 @@ public class PartialViewService : FileServiceBase<IPartialViewRepository, IParti
         Repository.Save(partialView);
         scope.Notifications.Publish(new PartialViewSavedNotification(partialView, eventMessages).WithStateFrom(savingNotification));
 
-        await AuditAsync(AuditType.Save, performingUserKey);
+        await AuditAsync(AuditType.Save, userKey);
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.Success, partialView);
