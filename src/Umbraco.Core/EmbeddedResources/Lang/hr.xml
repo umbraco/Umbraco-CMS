@@ -1920,7 +1920,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="mailBody"><![CDATA[
       Zdravo %0%
 
-      Ovo je automatska pošta koja vas obavještava da je za 
+      Ovo je automatska pošta koja vas obavještava da je za
 	  dokument '%1%' zatražen prijevod na '%5%' od %2%.
 
       Idi na http://%3%/translation/details.aspx?id=%4% za uređivanje.
@@ -2078,9 +2078,8 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="usergroup">Grupa korisnika</key>
     <key alias="userInvited">je pozvan</key>
     <key alias="userInvitedSuccessHelp">Novom korisniku je poslana pozivnica s detaljima o tome kako se prijaviti u Umbraco.</key>
-    <key alias="userinviteWelcomeMessage">Pozdrav i dobrodošli u Umbraco! Jedna minuta bit će vam potrebna da postavite svoju lozinku i dodate svoju profilnu sliku.</key>
+    <key alias="userinviteWelcomeMessage">Pozdrav i dobrodošli u Umbraco! Jedna minuta bit će vam potrebna da postavite svoju lozinku.</key>
     <key alias="userinviteExpiredMessage">Dobrodošli u Umbraco! Nažalost pozivnica je istekla. Molimo kontaktirajte svog administratora i od njega tražite da ju ponovno pošalje.</key>
-    <key alias="userinviteAvatarMessage">AAko postavite svoju fotografiju, drugi korisnici će vas lako prepoznati. Kliknite krug iznad da biste prenijeli svoju fotografiju.</key>
     <key alias="writer">Pisac</key>
     <key alias="change">Promjeni</key>
     <key alias="yourProfile" version="7.0">Vaš profil</key>
@@ -2250,7 +2249,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
 		   1: Recommended value
 	  -->
     <key alias="macroErrorModeCheckSuccessMessage">Makro greške su postavljene na '%0%'.</key>
-    <key alias="macroErrorModeCheckErrorMessage">Greške makroa su postavljene na '%0%' što će spriječiti potpuno učitavanje nekih ili svih stranica 
+    <key alias="macroErrorModeCheckErrorMessage">Greške makroa su postavljene na '%0%' što će spriječiti potpuno učitavanje nekih ili svih stranica
 	  na vašem sajtu ako postoje greške u makroima. Ako ovo ispravite, vrijednost će biti postavljena na '%1%'.
     </key>
     <!-- The following keys get these tokens passed in:

@@ -2197,13 +2197,10 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <key alias="userInvitedSuccessHelp">
       <![CDATA[Un invito è stato invitato al nuovo utente con le istruzioni su come effettuare il login in Umbraco.]]></key>
     <key alias="userinviteWelcomeMessage">Ciao e benvenuto su Umbraco! In solo 1 minuto sarai pronto a partire, dovrai
-      solamente impostare una password e aggiungere una foto profilo.
+      solamente impostare una password.
     </key>
     <key alias="userinviteExpiredMessage">
       <![CDATA[Benvenuto su Umbraco! Purtroppo il tuo invito è scaduto. Per favore contatta l'amministratore e chiedigli di rispedirlo.]]></key>
-    <key alias="userinviteAvatarMessage">Caricando una tua foto, gli altri utenti potranno riconoscerti facilmente. Fai
-      clic sul cerchio sopra per caricare la tua foto.
-    </key>
     <key alias="writer">Autore</key>
     <key alias="change">Modifica</key>
     <key alias="yourProfile" version="7.0">Il tuo profilo</key>

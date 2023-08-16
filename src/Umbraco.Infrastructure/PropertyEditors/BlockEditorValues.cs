@@ -14,14 +14,14 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 internal class BlockEditorValues
 {
-    private readonly Lazy<Dictionary<Guid, IContentType>> _contentTypes;
     private readonly BlockEditorDataConverter _dataConverter;
+    private readonly IContentTypeService _contentTypeService;
     private readonly ILogger _logger;
 
     public BlockEditorValues(BlockEditorDataConverter dataConverter, IContentTypeService contentTypeService, ILogger logger)
     {
-        _contentTypes = new Lazy<Dictionary<Guid, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Key));
         _dataConverter = dataConverter;
+        _contentTypeService = contentTypeService;
         _logger = logger;
     }
 
@@ -66,11 +66,7 @@ internal class BlockEditorValues
         return blockEditorData;
     }
 
-    private IContentType? GetElementType(BlockItemData item)
-    {
-        _contentTypes.Value.TryGetValue(item.ContentTypeKey, out IContentType? contentType);
-        return contentType;
-    }
+    private IContentType? GetElementType(BlockItemData item) => _contentTypeService.Get(item.ContentTypeKey);
 
     private bool ResolveBlockItemData(BlockItemData block, Dictionary<string, Dictionary<string, IPropertyType>> contentTypePropertyTypes)
     {
