@@ -66,18 +66,18 @@ public interface IUserGroupService
     /// Persists a new user group.
     /// </summary>
     /// <param name="userGroup">The user group to create.</param>
-    /// <param name="performingUserId">The ID of the user responsible for creating the group.</param>
-    /// <param name="groupMembersUserIds">The IDs of the users that should be part of the group when created.</param>
+    /// <param name="userKey">The key of the user responsible for creating the group.</param>
+    /// <param name="groupMembersKeys">The keys of the users that should be part of the group when created.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
-    Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(IUserGroup userGroup, int performingUserId, int[]? groupMembersUserIds = null);
+    Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(IUserGroup userGroup, Guid userKey, Guid[]? groupMembersKeys = null);
 
     /// <summary>
     /// Updates an existing user group.
     /// </summary>
     /// <param name="userGroup">The user group to update.</param>
-    /// <param name="performingUserId">The ID of the user responsible for updating the group.</param>
+    /// <param name="userKey">The ID of the user responsible for updating the group.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
-    Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(IUserGroup userGroup, int performingUserId);
+    Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(IUserGroup userGroup, Guid userKey);
 
     /// <summary>
     ///     Deletes a UserGroup
