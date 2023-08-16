@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Xml.XPath;
+using Serilog.Events;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -139,12 +141,43 @@ public class UmbracoHelper
     /// <returns></returns>
     public string? GetDictionaryValue(string key) => CultureDictionary[key];
 
+
+    /// <summary>
+    ///     Returns the dictionary value for the key specified, and if empty returns the specified default fall back value
+    /// </summary>
+    /// <param name="key">key of dictionary item</param>
+    /// <param name="specificCulture">the specific culture on which the result well be back upon</param>
+    /// <returns></returns>
+    public string? GetDictionaryValue(string key, CultureInfo specificCulture)
+    {
+        _cultureDictionary = _cultureDictionaryFactory.CreateDictionary(specificCulture);
+        return GetDictionaryValue(key);
+    }
+
+    /// <summary>
+    ///     Returns the dictionary value for the key specified, and if empty returns the specified default fall back value
+    /// </summary>
+    /// <param name="key">key of dictionary item</param>
+    /// <param name="defaultValue">fall back text if dictionary item is empty - Name altText to match Umbraco.Field</param>
+    /// <returns></returns>
+    public string GetDictionaryValueOrDefault(string key, string defaultValue)
+    {
+        var dictionaryValue = GetDictionaryValue(key);
+        if (string.IsNullOrWhiteSpace(dictionaryValue))
+        {
+            dictionaryValue = defaultValue;
+        }
+
+        return dictionaryValue;
+    }
+
     /// <summary>
     ///     Returns the dictionary value for the key specified, and if empty returns the specified default fall back value
     /// </summary>
     /// <param name="key">key of dictionary item</param>
     /// <param name="altText">fall back text if dictionary item is empty - Name altText to match Umbraco.Field</param>
     /// <returns></returns>
+    [Obsolete("Use GetDictionaryValueOrDefault instead, scheduled for removal in v14.")]
     public string GetDictionaryValue(string key, string altText)
     {
         var dictionaryValue = GetDictionaryValue(key);
@@ -155,6 +188,25 @@ public class UmbracoHelper
 
         return dictionaryValue;
     }
+
+        /// <summary>
+        ///     Returns the dictionary value for the key specified, and if empty returns the specified default fall back value
+        /// </summary>
+        /// <param name="key">key of dictionary item</param>
+        /// <param name="specificCulture">the specific culture on which the result well be back upon</param>
+        /// <param name="defaultValue">fall back text if dictionary item is empty - Name altText to match Umbraco.Field</param>
+        /// <returns></returns>
+        public string GetDictionaryValueOrDefault(string key, CultureInfo specificCulture, string defaultValue)
+    {
+        _cultureDictionary = _cultureDictionaryFactory.CreateDictionary(specificCulture);
+        var dictionaryValue = GetDictionaryValue(key);
+        if (string.IsNullOrWhiteSpace(dictionaryValue))
+        {
+            dictionaryValue = defaultValue;
+        }
+        return dictionaryValue;
+    }
+
 
     /// <summary>
     ///     Returns the ICultureDictionary for access to dictionary items
@@ -174,6 +226,7 @@ public class UmbracoHelper
 
     private IPublishedContent? ContentForObject(object id) => _publishedContentQuery.Content(id);
 
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public IPublishedContent? ContentSingleAtXPath(string xpath, params XPathVariable[] vars) =>
         _publishedContentQuery.ContentSingleAtXPath(xpath, vars);
 
@@ -286,9 +339,11 @@ public class UmbracoHelper
     /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
     public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids) => _publishedContentQuery.Content(ids);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars) =>
         _publishedContentQuery.ContentAtXPath(xpath, vars);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars) =>
         _publishedContentQuery.ContentAtXPath(xpath, vars);
 

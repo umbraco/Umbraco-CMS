@@ -69,6 +69,8 @@ public interface IPublishedProperty
     ///     <para>It must be either null, or a string, or an XPathNavigator.</para>
     ///     <para>It has been fully prepared and processed by the appropriate converter.</para>
     /// </remarks>
+
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     object? GetXPathValue(string? culture = null, string? segment = null);
 
     /// <summary>
