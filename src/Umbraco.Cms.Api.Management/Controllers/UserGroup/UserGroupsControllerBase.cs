@@ -17,7 +17,7 @@ public class UserGroupControllerBase : ManagementApiControllerBase
     protected IActionResult UserGroupOperationStatusResult(UserGroupOperationStatus status) =>
         status switch
         {
-            UserGroupOperationStatus.NotFound => NotFound("The user group could not be found"),
+            UserGroupOperationStatus.NotFound => UserGroupNotFound(),
             UserGroupOperationStatus.AlreadyExists => Conflict(new ProblemDetailsBuilder()
                 .WithTitle("User group already exists")
                 .WithDetail("The user group exists already.")
@@ -78,6 +78,13 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .WithTitle("Missing user group name.")
                 .WithDetail("The user group name is required, and cannot be an empty string.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user group operation status."),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown user group operation status.")
+                .Build()),
         };
+
+    protected IActionResult UserGroupNotFound() => NotFound(new ProblemDetailsBuilder()
+        .WithTitle("The user group could not be found")
+        .Build());
+
 }

@@ -19,6 +19,8 @@ public class TourControllerBase : ManagementApiControllerBase
             .WithTitle("User not found")
             .WithDetail("Was not able to find currently logged in user")
             .Build()),
-        _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown tour operation status.")
+        _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+            .WithTitle("Unknown tour operation status.")
+            .Build()),
     };
 }

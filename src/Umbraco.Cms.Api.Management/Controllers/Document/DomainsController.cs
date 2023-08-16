@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Mapping;
@@ -21,6 +22,8 @@ public class DomainsController : DocumentControllerBase
 
     [MapToApiVersion("1.0")]
     [HttpGet("{id:guid}/domains")]
+     [ProducesResponseType(typeof(DomainsResponseModel), StatusCodes.Status200OK)]
+     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DomainsAsync(Guid id)
     {
         IDomain[] assignedDomains = (await _domainService.GetAssignedDomainsAsync(id, true))

@@ -59,6 +59,8 @@ public class StylesheetFolderControllerBase : PathFolderManagementControllerBase
                 .WithTitle("Invalid name")
                 .WithDetail("The name specified is not a valid name.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown stylesheet folder operation status")
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown stylesheet folder operation status.")
+                .Build()),
         };
 }

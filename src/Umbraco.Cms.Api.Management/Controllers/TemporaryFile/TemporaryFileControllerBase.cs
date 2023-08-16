@@ -24,10 +24,16 @@ public abstract class TemporaryFileControllerBase : ManagementApiControllerBase
                 .WithDetail("The specified key is already used.")
                 .Build()),
 
-            TemporaryFileOperationStatus.NotFound => NotFound(),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown temporary file operation status")
+            TemporaryFileOperationStatus.NotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("The temporary file was not found")
+                    .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown temporary file operation status.")
+                .Build()),
         };
 
 
-    protected new IActionResult NotFound() => NotFound("The temporary file could not be found");
+    protected IActionResult TemporaryFileNotFound() => NotFound(new ProblemDetailsBuilder()
+        .WithTitle("The temporary file could not be found")
+        .Build());
 }

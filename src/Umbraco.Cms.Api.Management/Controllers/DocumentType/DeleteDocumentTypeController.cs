@@ -19,14 +19,14 @@ public class DeleteDocumentTypeController : DocumentTypeControllerBase
     [HttpDelete("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DocumentTypeResponseModel), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
         // FIXME: create and use an async get method here.
         IContentType? contentType = _contentTypeService.Get(id);
         if (contentType == null)
         {
-            return NotFound();
+            return DocumentTypeNotFound();
         }
 
         // FIXME: create overload that accepts user key

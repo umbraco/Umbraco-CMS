@@ -21,8 +21,8 @@ public class UpdateDocumentTypeController : CreateUpdateDocumentTypeControllerBa
     [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, UpdateDocumentTypeRequestModel requestModel)
     {
         if (requestModel.Compositions.Any())
@@ -33,7 +33,7 @@ public class UpdateDocumentTypeController : CreateUpdateDocumentTypeControllerBa
         IContentType? contentType = _contentTypeService.Get(id);
         if (contentType is null)
         {
-            return NotFound();
+            return DocumentTypeNotFound();
         }
 
         ContentTypeOperationStatus result = HandleRequest<UpdateDocumentTypeRequestModel, UpdateDocumentTypePropertyTypeRequestModel, UpdateDocumentTypePropertyTypeContainerRequestModel>(contentType, requestModel);

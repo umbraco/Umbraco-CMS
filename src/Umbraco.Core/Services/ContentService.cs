@@ -1542,7 +1542,7 @@ public class ContentService : RepositoryService, IContentService
                 // handling events, business rules, etc
                 // note: StrategyUnpublish flips the PublishedState to Unpublishing!
                 // note: This unpublishes the entire document (not different variants)
-                unpublishResult = StrategyCanUnpublish(scope, content, eventMessages);
+                unpublishResult = StrategyCanUnpublish(scope, content, eventMessages, notificationState);
                 if (unpublishResult.Success)
                 {
                     unpublishResult = StrategyUnpublish(content, eventMessages);
@@ -3300,10 +3300,10 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="content"></param>
     /// <param name="evtMsgs"></param>
     /// <returns></returns>
-    private PublishResult StrategyCanUnpublish(ICoreScope scope, IContent content, EventMessages evtMsgs)
+    private PublishResult StrategyCanUnpublish(ICoreScope scope, IContent content, EventMessages evtMsgs, IDictionary<string, object?>? notificationState)
     {
         // raise Unpublishing notification
-        if (scope.Notifications.PublishCancelable(new ContentUnpublishingNotification(content, evtMsgs)))
+        if (scope.Notifications.PublishCancelable(new ContentUnpublishingNotification(content, evtMsgs).WithState(notificationState)))
         {
             _logger.LogInformation(
                 "Document {ContentName} (id={ContentId}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id);

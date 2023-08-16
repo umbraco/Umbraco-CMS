@@ -4,6 +4,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Persistence.EFCore;
 
+/// <summary>The Umbraco DB Context. Only for internal use. Can't be internal due to DI.</summary>
 /// <remarks>
 /// To autogenerate migrations use the following commands
 /// and insure the 'src/Umbraco.Web.UI/appsettings.json' have a connection string set with the right provider.

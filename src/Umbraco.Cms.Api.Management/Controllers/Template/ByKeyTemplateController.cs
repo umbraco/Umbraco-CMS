@@ -25,12 +25,12 @@ public class ByKeyTemplateController : TemplateControllerBase
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateResponseModel), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<TemplateResponseModel>> ByKey(Guid id)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ByKey(Guid id)
     {
         ITemplate? template = await _templateService.GetAsync(id);
         return template == null
-            ? NotFound()
+            ? TemplateNotFound()
             : Ok(await _templatePresentationFactory.CreateTemplateResponseModelAsync(template));
     }
 }

@@ -39,14 +39,19 @@ public class ScriptControllerBase : ManagementApiControllerBase
                 .WithTitle("Path too long")
                 .WithDetail("The file path is too long.")
                 .Build()),
-            ScriptOperationStatus.NotFound => NotFound(new ProblemDetailsBuilder()
-                .WithTitle("Script not found")
-                .WithDetail("The script was not found.")
-                .Build()),
+            ScriptOperationStatus.NotFound => ScriptNotFound(),
             ScriptOperationStatus.InvalidName => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid name")
                 .WithDetail("The script name is invalid.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown script operation status")
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown script operation status.")
+                .Build()),
         };
+
+    protected IActionResult ScriptNotFound() => NotFound(new ProblemDetailsBuilder()
+        .WithTitle("The script could not be found")
+        .WithDetail("The script was not found.")
+        .Build());
+
 }

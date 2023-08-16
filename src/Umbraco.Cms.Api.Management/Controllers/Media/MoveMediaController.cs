@@ -25,8 +25,8 @@ public class MoveMediaController : MediaControllerBase
     [HttpPut("{id:guid}/move")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Move(Guid id, MoveMediaRequestModel moveDocumentRequestModel)
     {
         Attempt<IMedia?, ContentEditingOperationStatus> result = await _mediaEditingService.MoveAsync(

@@ -134,49 +134,49 @@ stages:
       umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['determineMajorVersion.majorVersion'] ]
     jobs:
       # C# API Reference
-      - job:
-        displayName: Build C# API Reference
-        pool:
-          vmImage: 'windows-latest'
-        steps:
-          - task: PowerShell@2
-            displayName: Install DocFX
-            inputs:
-              targetType: inline
-              script: |
-                choco install docfx --version=2.59.4 -y
-                if ($lastexitcode -ne 0){
-                    throw ("Error installing DocFX")
-                }
-          - task: PowerShell@2
-            displayName: Generate metadata
-            inputs:
-              targetType: inline
-              script: |
-                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-                if ($lastexitcode -ne 0){
-                    throw ("Error generating metadata.")
-                }
-          - task: PowerShell@2
-            displayName: Generate documentation
-            inputs:
-              targetType: inline
-              script: |
-                docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-                if ($lastexitcode -ne 0){
-                      throw ("Error generating documentation.")
-                }
-          - task: ArchiveFiles@2
-            displayName: Archive C# Docs
-            inputs:
-              rootFolderOrFile: $(Build.SourcesDirectory)/build/csharp-docs/_site
-              includeRootFolder: false
-              archiveFile: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
-          - task: PublishPipelineArtifact@1
-            displayName: Publish C# Docs
-            inputs:
-              targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
-              artifact: csharp-docs
+#      - job:
+#        displayName: Build C# API Reference
+#        pool:
+#          vmImage: 'windows-latest'
+#        steps:
+#          - task: PowerShell@2
+#            displayName: Install DocFX
+#            inputs:
+#              targetType: inline
+#              script: |
+#                choco install docfx --version=2.59.4 -y
+#                if ($lastexitcode -ne 0){
+#                    throw ("Error installing DocFX")
+#                }
+#          - task: PowerShell@2
+#            displayName: Generate metadata
+#            inputs:
+#              targetType: inline
+#              script: |
+#                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+#                if ($lastexitcode -ne 0){
+#                    throw ("Error generating metadata.")
+#                }
+#          - task: PowerShell@2
+#            displayName: Generate documentation
+#            inputs:
+#              targetType: inline
+#              script: |
+#                docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+#                if ($lastexitcode -ne 0){
+#                      throw ("Error generating documentation.")
+#                }
+#          - task: ArchiveFiles@2
+#            displayName: Archive C# Docs
+#            inputs:
+#              rootFolderOrFile: $(Build.SourcesDirectory)/build/csharp-docs/_site
+#              includeRootFolder: false
+#              archiveFile: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
+#          - task: PublishPipelineArtifact@1
+#            displayName: Publish C# Docs
+#            inputs:
+#              targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
+#              artifact: csharp-docs
 
       # js API Reference
       - job:
@@ -549,35 +549,34 @@ stages:
       vmImage: 'windows-latest' # Apparently AzureFileCopy is windows only :(
     variables:
       umbracoMajorVersion:  $[ stageDependencies.Build.A.outputs['determineMajorVersion.majorVersion'] ]
-    displayName: Upload API Documention
+    displayName: Upload API Documentation
     dependsOn:
       - Build
-      - Build_Docs
       - Deploy_MyGet # Change to "Deploy_Nuget" after release of v14
     condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.uploadApiDocs}}))
     jobs:
-      - job:
-        displayName: Upload C# Docs
-        steps:
-          - checkout: none
-          - task: DownloadPipelineArtifact@2
-            displayName: Download artifact
-            inputs:
-              artifact: csharp-docs
-              path: $(Build.SourcesDirectory)
-          - task: ExtractFiles@1
-            inputs:
-              archiveFilePatterns: $(Build.SourcesDirectory)/csharp-docs.zip
-              destinationFolder: $(Build.ArtifactStagingDirectory)/csharp-docs
-          - task: AzureFileCopy@4
-            displayName: 'Copy C# Docs to blob storage'
-            inputs:
-              SourcePath: '$(Build.ArtifactStagingDirectory)/csharp-docs/*'
-              azureSubscription: umbraco-storage
-              Destination: AzureBlob
-              storage: umbracoapidocs
-              ContainerName: '$web'
-              BlobPrefix: v$(umbracoMajorVersion)/csharp
+#      - job:
+#        displayName: Upload C# Docs
+#        steps:
+#          - checkout: none
+#          - task: DownloadPipelineArtifact@2
+#            displayName: Download artifact
+#            inputs:
+#              artifact: csharp-docs
+#              path: $(Build.SourcesDirectory)
+#          - task: ExtractFiles@1
+#            inputs:
+#              archiveFilePatterns: $(Build.SourcesDirectory)/csharp-docs.zip
+#              destinationFolder: $(Build.ArtifactStagingDirectory)/csharp-docs
+#          - task: AzureFileCopy@4
+#            displayName: 'Copy C# Docs to blob storage'
+#            inputs:
+#              SourcePath: '$(Build.ArtifactStagingDirectory)/csharp-docs/*'
+#              azureSubscription: umbraco-storage
+#              Destination: AzureBlob
+#              storage: umbracoapidocs
+#              ContainerName: '$web'
+#              BlobPrefix: v$(umbracoMajorVersion)/csharp
       - job:
         displayName: Upload js Docs
         steps:

@@ -18,7 +18,7 @@ public abstract class LanguageControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid fallback language")
                 .WithDetail("The fallback language could not be applied. This may be caused if the fallback language causes cyclic fallbacks.")
                 .Build()),
-            LanguageOperationStatus.NotFound => NotFound("The language could not be found"),
+            LanguageOperationStatus.NotFound => LanguageNotFound(),
             LanguageOperationStatus.MissingDefault => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("No default language")
                 .WithDetail("The attempted operation would result in having no default language defined. This is not allowed.")
@@ -39,6 +39,12 @@ public abstract class LanguageControllerBase : ManagementApiControllerBase
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the language operation.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown language operation status")
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown language operation status.")
+                .Build()),
         };
+
+    protected IActionResult LanguageNotFound() => NotFound(new ProblemDetailsBuilder()
+        .WithTitle("The language could not be found")
+        .Build());
 }
