@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Delivery.Filters;
 using Umbraco.Cms.Api.Delivery.Routing;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -10,6 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
+[DeliveryApiMediaAccess]
 [VersionedDeliveryApiRoute("media")]
 [ApiExplorerSettings(GroupName = "Media")]
 public abstract class MediaApiControllerBase : DeliveryApiControllerBase

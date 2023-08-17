@@ -2,12 +2,12 @@
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Delivery.Filters;
 using Umbraco.Cms.Api.Delivery.Routing;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
+[DeliveryApiAccess]
 [VersionedDeliveryApiRoute("content")]
 [ApiExplorerSettings(GroupName = "Content")]
 [LocalizeFromAcceptLanguageHeader]
