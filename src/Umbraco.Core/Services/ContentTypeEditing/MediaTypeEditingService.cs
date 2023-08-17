@@ -20,10 +20,10 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
 
     public async Task<Attempt<IMediaType?, ContentTypeOperationStatus>> CreateAsync(MediaTypeCreateModel model, Guid userKey)
     {
-        Attempt<IMediaType?, ContentTypeOperationStatus> result = await MapCreateAsync(model, model.Key, model.ParentKey);
+        Attempt<IMediaType?, ContentTypeOperationStatus> result = await ValidateAndMapForCreationAsync(model, model.Key, model.ParentKey);
         if (result.Success)
         {
-            IMediaType mediaType = result.Result ?? throw new InvalidOperationException($"{nameof(MapCreateAsync)} succeeded but did not yield any result");
+            IMediaType mediaType = result.Result ?? throw new InvalidOperationException($"{nameof(ValidateAndMapForCreationAsync)} succeeded but did not yield any result");
             await _mediaTypeService.SaveAsync(mediaType, userKey);
         }
 
@@ -32,10 +32,10 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
 
     public async Task<Attempt<IMediaType?, ContentTypeOperationStatus>> UpdateAsync(IMediaType mediaType, MediaTypeUpdateModel model, Guid userKey)
     {
-        Attempt<IMediaType?, ContentTypeOperationStatus> result = await MapUpdateAsync(mediaType, model);
+        Attempt<IMediaType?, ContentTypeOperationStatus> result = await ValidateAndMapForUpdateAsync(mediaType, model);
         if (result.Success)
         {
-            mediaType = result.Result ?? throw new InvalidOperationException($"{nameof(MapUpdateAsync)} succeeded but did not yield any result");
+            mediaType = result.Result ?? throw new InvalidOperationException($"{nameof(ValidateAndMapForUpdateAsync)} succeeded but did not yield any result");
             await _mediaTypeService.SaveAsync(mediaType, userKey);
         }
 
