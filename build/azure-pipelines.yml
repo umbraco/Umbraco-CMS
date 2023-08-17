@@ -368,7 +368,7 @@ stages:
               Umbraco__CMS__Unattended__InstallUnattended: true
               Umbraco__CMS__Global__InstallMissingDatabase: true
               UmbracoDatabaseServer: (LocalDB)\MSSQLLocalDB
-              UmbracoDatabaseName: Playwright
+              UmbracoDatabaseName: AcceptanceTestDB
               ConnectionStrings__umbracoDbDSN: Server=$(UmbracoDatabaseServer);Database=$(UmbracoDatabaseName);Integrated Security=true;
               # Custom Umbraco settings
               Umbraco__CMS__Global__VersionCheckPeriod: 0
@@ -429,7 +429,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest/misc
           - pwsh: |
               dotnet new --install ./nupkg/Umbraco.Templates.*.nupkg
-              dotnet new umbraco --name Playwright --no-restore --output .
+              dotnet new umbraco --name AcceptanceTestProject --no-restore --output .
               dotnet restore --configfile ./nuget.config
               dotnet build --configuration $(buildConfiguration) --no-restore
               dotnet dev-certs https
