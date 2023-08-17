@@ -27,8 +27,10 @@ internal sealed class SwaggerMediaDocumentationFilter : SwaggerDocumentationFilt
                 AddQueryParameterDocumentation(parameter, FetchQueryParameterExamples(), "Specifies the media items to fetch");
                 break;
             case "filter":
+                AddQueryParameterDocumentation(parameter, FilterQueryParameterExamples(), "Defines how to filter the fetched media items");
+                break;
             case "sort":
-                parameter.Description = "Currently unsupported - intended for future (or custom) extension.";
+                AddQueryParameterDocumentation(parameter, SortQueryParameterExamples(), "Defines how to sort the found media items");
                 break;
             case "skip":
                 parameter.Description = PaginationDescription(true, "media");
@@ -45,12 +47,73 @@ internal sealed class SwaggerMediaDocumentationFilter : SwaggerDocumentationFilt
         new()
         {
             {
+                "Select all children at root level",
+                new OpenApiExample { Value = new OpenApiString("children:/") }
+            },
+            {
                 "Select all children of a media item by id",
                 new OpenApiExample { Value = new OpenApiString("children:id") }
             },
             {
                 "Select all children of a media item by path",
                 new OpenApiExample { Value = new OpenApiString("children:path") }
+            }
+        };
+
+    private Dictionary<string, OpenApiExample> FilterQueryParameterExamples() =>
+        new()
+        {
+            { "Default filter", new OpenApiExample { Value = new OpenApiString(string.Empty) } },
+            {
+                "Filter by media type",
+                new OpenApiExample { Value = new OpenApiArray { new OpenApiString("mediaType:alias1") } }
+            },
+            {
+                "Filter by name",
+                new OpenApiExample { Value = new OpenApiArray { new OpenApiString("name:nodeName") } }
+            }
+        };
+
+    private Dictionary<string, OpenApiExample> SortQueryParameterExamples() =>
+        new()
+        {
+            { "Default sort", new OpenApiExample { Value = new OpenApiString(string.Empty) } },
+            {
+                "Sort by create date",
+                new OpenApiExample
+                {
+                    Value = new OpenApiArray
+                    {
+                        new OpenApiString("createDate:asc"), new OpenApiString("createDate:desc")
+                    }
+                }
+            },
+            {
+                "Sort by name",
+                new OpenApiExample
+                {
+                    Value = new OpenApiArray { new OpenApiString("name:asc"), new OpenApiString("name:desc") }
+                }
+            },
+            {
+                "Sort by sort order",
+                new OpenApiExample
+                {
+                    Value = new OpenApiArray
+                    {
+                        new OpenApiString("sortOrder:asc"), new OpenApiString("sortOrder:desc")
+                    }
+                }
+            },
+            {
+                "Sort by update date",
+                new OpenApiExample
+                {
+                    Value = new OpenApiArray
+                    {
+                        new OpenApiString("updateDate:asc"), new OpenApiString("updateDate:desc")
+                    }
+                }
             }
         };
 }

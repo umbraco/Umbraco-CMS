@@ -30,43 +30,26 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
     public Attempt<PagedModel<Guid>, ApiMediaQueryOperationStatus> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts, int skip, int take)
     {
         var emptyResult = new PagedModel<Guid>();
-        const string childrenOfParameter = "children:";
 
-        var childrenOf = string.Empty;
-        if (fetch?.StartsWith(childrenOfParameter) is true)
+        IEnumerable<IPublishedContent>? source = GetSource(fetch);
+        if (source is null)
         {
-            childrenOf = fetch.TrimStart(childrenOfParameter);
-        }
-        if (childrenOf.IsNullOrWhiteSpace())
-        {
-            _logger.LogInformation($"The current implementation of {nameof(IApiMediaQueryService)} expects \"{childrenOfParameter}[id/path]\" in the \"{nameof(fetch)}\" query option");
             return Attempt.FailWithStatus(ApiMediaQueryOperationStatus.SelectorOptionNotFound, emptyResult);
         }
 
-        if (filters.Any(filter => filter.IsNullOrWhiteSpace() is false))
+        source = ApplyFilters(source, filters);
+        if (source is null)
         {
-            _logger.LogInformation($"The current implementation of {nameof(IApiMediaQueryService)} does not support the \"{nameof(filters)}\" query option");
             return Attempt.FailWithStatus(ApiMediaQueryOperationStatus.FilterOptionNotFound, emptyResult);
         }
 
-        if (sorts.Any(sort => sort.IsNullOrWhiteSpace() is false))
+        source = ApplySorts(source, sorts);
+        if (source is null)
         {
-            _logger.LogInformation($"The current implementation of {nameof(IApiMediaQueryService)} does not support the \"{nameof(sorts)}\" query option");
             return Attempt.FailWithStatus(ApiMediaQueryOperationStatus.SortOptionNotFound, emptyResult);
         }
 
-        IPublishedMediaCache mediaCache = GetRequiredPublishedMediaCache();
-
-        if (childrenOf.Trim(Constants.CharArrays.ForwardSlash).Length == 0)
-        {
-            return PagedResult(mediaCache.GetAtRoot(), skip, take);
-        }
-
-        IPublishedContent? parent = Guid.TryParse(childrenOf, out Guid parentKey)
-            ? mediaCache.GetById(parentKey)
-            : TryGetByPath(childrenOf, mediaCache);
-
-        return PagedResult(parent?.Children ?? Array.Empty<IPublishedContent>(), skip, take);
+        return PagedResult(source, skip, take);
     }
 
     /// <inheritdoc/>
@@ -96,6 +79,107 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
 
         return resolvedMedia;
     }
+
+    private IEnumerable<IPublishedContent>? GetSource(string? fetch)
+    {
+        const string childrenOfParameter = "children:";
+
+        var childrenOf = string.Empty;
+        if (fetch?.StartsWith(childrenOfParameter) is true)
+        {
+            childrenOf = fetch.TrimStart(childrenOfParameter);
+        }
+
+        if (childrenOf.IsNullOrWhiteSpace())
+        {
+            _logger.LogInformation($"The current implementation of {nameof(IApiMediaQueryService)} expects \"{childrenOfParameter}[id/path]\" in the \"{nameof(fetch)}\" query option");
+            return null;
+        }
+
+        IPublishedMediaCache mediaCache = GetRequiredPublishedMediaCache();
+        if (childrenOf.Trim(Constants.CharArrays.ForwardSlash).Length == 0)
+        {
+            return mediaCache.GetAtRoot();
+        }
+
+        IPublishedContent? parent = Guid.TryParse(childrenOf, out Guid parentKey)
+            ? mediaCache.GetById(parentKey)
+            : TryGetByPath(childrenOf, mediaCache);
+
+        return parent?.Children ?? Array.Empty<IPublishedContent>();
+    }
+
+    private IEnumerable<IPublishedContent>? ApplyFilters(IEnumerable<IPublishedContent> source, IEnumerable<string> filters)
+    {
+        foreach (var filter in filters)
+        {
+            var parts = filter.Split(':');
+            if (parts.Length != 2)
+            {
+                // invalid filter
+                _logger.LogInformation($"The \"{nameof(filters)}\" query option \"{filter}\" is not valid");
+                return null;
+            }
+
+            switch (parts[0])
+            {
+                case "mediaType":
+                    source = source.Where(c => c.ContentType.Alias == parts[1]);
+                    break;
+                case "name":
+                    source = source.Where(c => c.Name.InvariantContains(parts[1]));
+                    break;
+                default:
+                    // unknown filter
+                    _logger.LogInformation($"The \"{nameof(filters)}\" query option \"{filter}\" is not supported");
+                    return null;
+            }
+        }
+
+        return source;
+    }
+
+    private IEnumerable<IPublishedContent>? ApplySorts(IEnumerable<IPublishedContent> source, IEnumerable<string> sorts)
+    {
+        foreach (var sort in sorts)
+        {
+            var parts = sort.Split(':');
+            if (parts.Length != 2)
+            {
+                // invalid sort
+                _logger.LogInformation($"The \"{nameof(sorts)}\" query option \"{sort}\" is not valid");
+                return null;
+            }
+
+            Func<IPublishedContent, object> keySelector;
+            switch (parts[0])
+            {
+                case "createDate":
+                    keySelector = content => content.CreateDate;
+                    break;
+                case "updateDate":
+                    keySelector = content => content.UpdateDate;
+                    break;
+                case "name":
+                    keySelector = content => content.Name.ToLowerInvariant();
+                    break;
+                case "sortOrder":
+                    keySelector = content => content.SortOrder;
+                    break;
+                default:
+                    // unknown sort
+                    _logger.LogInformation($"The \"{nameof(sorts)}\" query option \"{sort}\" is not supported");
+                    return null;
+            }
+
+            source = parts[1] is "desc"
+                ? source.OrderByDescending(keySelector)
+                : source.OrderBy(keySelector);
+        }
+
+        return source;
+    }
+
 
     private Attempt<PagedModel<Guid>, ApiMediaQueryOperationStatus> PagedResult(IEnumerable<IPublishedContent> children, int skip, int take)
     {
