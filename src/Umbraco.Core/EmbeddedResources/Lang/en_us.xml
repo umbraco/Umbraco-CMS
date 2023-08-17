@@ -57,7 +57,7 @@
     <key alias="unlock">Unlock</key>
     <key alias="createblueprint">Create Content Template</key>
     <key alias="resendInvite">Resend Invitation</key>
-    <key alias="toggleHideUnavalible">Hide unavailable options</key>
+    <key alias="toggleHideUnavailable">Hide unavailable options</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Content</key>
