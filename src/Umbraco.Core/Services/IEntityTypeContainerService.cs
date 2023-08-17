@@ -4,8 +4,8 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-public interface IEntityTypeContainerService<TEntityType>
-    where TEntityType : ITreeEntity
+public interface IEntityTypeContainerService<TTreeEntity>
+    where TTreeEntity : ITreeEntity
 {
     /// <summary>
     /// Gets a container
@@ -26,7 +26,7 @@ public interface IEntityTypeContainerService<TEntityType>
     /// </summary>
     /// <param name="entity">The entity whose parent container to get.</param>
     /// <returns></returns>
-    Task<EntityContainer?> GetParentAsync(TEntityType entity);
+    Task<EntityContainer?> GetParentAsync(TTreeEntity entity);
 
     /// <summary>
     /// Creates a new container
