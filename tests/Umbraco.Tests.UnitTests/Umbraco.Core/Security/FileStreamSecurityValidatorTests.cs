@@ -30,10 +30,10 @@ public class FileStreamSecurityValidatorTests
     {
         // Arrange
         var analyzerOne = new Mock<IFileStreamSecurityAnalyzer>();
-        analyzerOne.Setup(analyzer => analyzer.FileContentMatchesFileType(It.IsAny<Stream>()))
+        analyzerOne.Setup(analyzer => analyzer.ShouldHandle(It.IsAny<Stream>()))
             .Returns(false);
         var analyzerTwo = new Mock<IFileStreamSecurityAnalyzer>();
-        analyzerTwo.Setup(analyzer => analyzer.FileContentMatchesFileType(It.IsAny<Stream>()))
+        analyzerTwo.Setup(analyzer => analyzer.ShouldHandle(It.IsAny<Stream>()))
             .Returns(false);
 
         var sut = new FileStreamSecurityValidator(new List<IFileStreamSecurityAnalyzer>{analyzerOne.Object,analyzerTwo.Object});
@@ -55,23 +55,23 @@ public class FileStreamSecurityValidatorTests
     public void IsConsideredSafe_True_AllMatchingAnalyzersReturnTrue()
     {
         // Arrange
-        var analyzerOne = new Mock<IFileStreamSecurityAnalyzer>();
-        analyzerOne.Setup(analyzer => analyzer.FileContentMatchesFileType(It.IsAny<Stream>()))
+        var matchingAnalyzerOne = new Mock<IFileStreamSecurityAnalyzer>();
+        matchingAnalyzerOne.Setup(analyzer => analyzer.ShouldHandle(It.IsAny<Stream>()))
             .Returns(true);
-        analyzerOne.Setup(analyzer => analyzer.IsConsideredSafe(It.IsAny<Stream>()))
-            .Returns(true);
-
-        var analyzerTwo = new Mock<IFileStreamSecurityAnalyzer>();
-        analyzerTwo.Setup(analyzer => analyzer.FileContentMatchesFileType(It.IsAny<Stream>()))
-            .Returns(true);
-        analyzerTwo.Setup(analyzer => analyzer.IsConsideredSafe(It.IsAny<Stream>()))
+        matchingAnalyzerOne.Setup(analyzer => analyzer.IsConsideredSafe(It.IsAny<Stream>()))
             .Returns(true);
 
-        var analyzerThree = new Mock<IFileStreamSecurityAnalyzer>();
-        analyzerThree.Setup(analyzer => analyzer.FileContentMatchesFileType(It.IsAny<Stream>()))
+        var matchingAnalyzerTwo = new Mock<IFileStreamSecurityAnalyzer>();
+        matchingAnalyzerTwo.Setup(analyzer => analyzer.ShouldHandle(It.IsAny<Stream>()))
+            .Returns(true);
+        matchingAnalyzerTwo.Setup(analyzer => analyzer.IsConsideredSafe(It.IsAny<Stream>()))
+            .Returns(true);
+
+        var unmatchedAnalyzer = new Mock<IFileStreamSecurityAnalyzer>();
+        unmatchedAnalyzer.Setup(analyzer => analyzer.ShouldHandle(It.IsAny<Stream>()))
             .Returns(false);
 
-        var sut = new FileStreamSecurityValidator(new List<IFileStreamSecurityAnalyzer>{analyzerOne.Object,analyzerTwo.Object});
+        var sut = new FileStreamSecurityValidator(new List<IFileStreamSecurityAnalyzer>{matchingAnalyzerOne.Object,matchingAnalyzerTwo.Object});
 
         using var memoryStream = new MemoryStream();
         using var streamWriter = new StreamWriter(memoryStream);
@@ -90,23 +90,23 @@ public class FileStreamSecurityValidatorTests
     public void IsConsideredSafe_False_AnyMatchingAnalyzersReturnFalse()
     {
         // Arrange
-        var analyzerOne = new Mock<IFileStreamSecurityAnalyzer>();
-        analyzerOne.Setup(analyzer => analyzer.FileContentMatchesFileType(It.IsAny<Stream>()))
+        var saveMatchingAnalyzer = new Mock<IFileStreamSecurityAnalyzer>();
+        saveMatchingAnalyzer.Setup(analyzer => analyzer.ShouldHandle(It.IsAny<Stream>()))
             .Returns(true);
-        analyzerOne.Setup(analyzer => analyzer.IsConsideredSafe(It.IsAny<Stream>()))
+        saveMatchingAnalyzer.Setup(analyzer => analyzer.IsConsideredSafe(It.IsAny<Stream>()))
             .Returns(true);
 
-        var analyzerTwo = new Mock<IFileStreamSecurityAnalyzer>();
-        analyzerTwo.Setup(analyzer => analyzer.FileContentMatchesFileType(It.IsAny<Stream>()))
+        var unsafeMatchingAnalyzer = new Mock<IFileStreamSecurityAnalyzer>();
+        unsafeMatchingAnalyzer.Setup(analyzer => analyzer.ShouldHandle(It.IsAny<Stream>()))
             .Returns(true);
-        analyzerTwo.Setup(analyzer => analyzer.IsConsideredSafe(It.IsAny<Stream>()))
+        unsafeMatchingAnalyzer.Setup(analyzer => analyzer.IsConsideredSafe(It.IsAny<Stream>()))
             .Returns(false);
 
-        var analyzerThree = new Mock<IFileStreamSecurityAnalyzer>();
-        analyzerThree.Setup(analyzer => analyzer.FileContentMatchesFileType(It.IsAny<Stream>()))
+        var unmatchedAnalyzer = new Mock<IFileStreamSecurityAnalyzer>();
+        unmatchedAnalyzer.Setup(analyzer => analyzer.ShouldHandle(It.IsAny<Stream>()))
             .Returns(false);
 
-        var sut = new FileStreamSecurityValidator(new List<IFileStreamSecurityAnalyzer>{analyzerOne.Object,analyzerTwo.Object});
+        var sut = new FileStreamSecurityValidator(new List<IFileStreamSecurityAnalyzer>{saveMatchingAnalyzer.Object,unsafeMatchingAnalyzer.Object});
 
         using var memoryStream = new MemoryStream();
         using var streamWriter = new StreamWriter(memoryStream);

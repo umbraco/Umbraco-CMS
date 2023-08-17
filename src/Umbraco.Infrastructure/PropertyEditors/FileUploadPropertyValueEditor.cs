@@ -152,7 +152,9 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         using (FileStream filestream = File.OpenRead(file.TempFilePath))
         {
             if (_fileStreamSecurityValidator.IsConsideredSafe(filestream) == false)
+            {
                 return null;
+            }
 
             // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
             // since we'd need to be able to return values for other properties from these methods

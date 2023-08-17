@@ -10,26 +10,29 @@ public class FileStreamSecurityValidator : IFileStreamSecurityValidator
     }
 
     /// <summary>
-    /// Analyzes wether the file content is considered safe with registered IFileStreamSecurityAnalyzers
+    /// Analyzes whether the file content is considered safe with registered IFileStreamSecurityAnalyzers
     /// </summary>
-    /// <param name="fileStream">Needs to be a Read/Write seekable stream</param>
+    /// <param name="fileStream">Needs to be a Read seekable stream</param>
     /// <returns>Whether the file is considered safe after running the necessary analyzers</returns>
     public bool IsConsideredSafe(Stream fileStream)
     {
-        foreach (var fileSanitizer in _fileAnalyzers)
+        foreach (var fileAnalyzer in _fileAnalyzers)
         {
             fileStream.Seek(0, SeekOrigin.Begin);
-            if (!fileSanitizer.FileContentMatchesFileType(fileStream))
+            if (!fileAnalyzer.ShouldHandle(fileStream))
             {
                 continue;
             }
 
             fileStream.Seek(0, SeekOrigin.Begin);
-            if (fileSanitizer.IsConsideredSafe(fileStream) == false)
+            if (fileAnalyzer.IsConsideredSafe(fileStream) == false)
+            {
                 return false;
+            }
         }
         fileStream.Seek(0, SeekOrigin.Begin);
-        // No analyzer found, we consider the file to be safe as the implementer has the possibility to add additional sanitizers
+        // If no analyzer we consider the file to be safe as the implementer has the possibility to add additional analyzers
+        // Or all analyzers deem te file to be safe
         return true;
     }
 }

@@ -3,7 +3,13 @@ namespace Umbraco.Cms.Core.Security;
 public interface IFileStreamSecurityAnalyzer
 {
 
-    bool FileContentMatchesFileType(Stream fileStream);
+    /// <summary>
+    /// Indicates whether the analyzer should process the file
+    /// The implementation should be considerably faster than IsConsideredSafe
+    /// </summary>
+    /// <param name="fileStream"></param>
+    /// <returns></returns>
+    bool ShouldHandle(Stream fileStream);
 
     /// <summary>
     /// Analyzes whether the file content is considered safe
