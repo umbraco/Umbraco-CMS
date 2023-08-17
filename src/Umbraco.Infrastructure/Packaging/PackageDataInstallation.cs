@@ -1171,12 +1171,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     continue;
                 }
 
-                if (allowedChildren?.Any(x => x.Id.IsValueCreated && x.Id.Value == allowedChild.Id) ?? false)
+                if (allowedChildren?.Any(x => x.Key == allowedChild.Key) ?? false)
                 {
                     continue;
                 }
 
-                allowedChildren?.Add(new ContentTypeSort(new Lazy<int>(() => allowedChild.Id), allowedChild.Key, sortOrder, allowedChild.Alias));
+                allowedChildren?.Add(new ContentTypeSort(allowedChild.Key, sortOrder, allowedChild.Alias));
                 sortOrder++;
             }
 

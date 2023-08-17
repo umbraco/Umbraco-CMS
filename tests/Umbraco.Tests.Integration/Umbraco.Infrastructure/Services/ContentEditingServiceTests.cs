@@ -185,7 +185,7 @@ public partial class ContentEditingServiceTests : UmbracoIntegrationTestWithCont
 
         contentType.AllowedContentTypes = new List<ContentTypeSort>
         {
-            new (new Lazy<int>(() => contentType.Id), contentType.Key, 1, contentType.Alias)
+            new (contentType.Key, 1, contentType.Alias)
         };
         ContentTypeService.Save(contentType);
 

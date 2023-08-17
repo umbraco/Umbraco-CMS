@@ -79,7 +79,7 @@ public partial class ContentEditingServiceTests
         {
             rootContentType.AllowedContentTypes = new[]
             {
-                new ContentTypeSort(new Lazy<int>(() => childContentType.Id), childContentType.Key, 1, childContentType.Alias)
+                new ContentTypeSort(childContentType.Key, 1, childContentType.Alias)
             };
         }
         ContentTypeService.Save(rootContentType);
@@ -435,7 +435,7 @@ public partial class ContentEditingServiceTests
         contentType.AllowedAsRoot = true;
         contentType.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => contentType.Id), contentType.Key, 1, contentType.Alias)
+            new ContentTypeSort(contentType.Key, 1, contentType.Alias)
         };
         ContentTypeService.Save(contentType);
 

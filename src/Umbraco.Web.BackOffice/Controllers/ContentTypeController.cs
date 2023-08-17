@@ -414,9 +414,9 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     public ActionResult<DocumentTypeDisplay?> PostSave(DocumentTypeSave contentTypeSave)
     {
-        //Before we send this model into this saving/mapping pipeline, we need to do some cleanup on variations.
-        //If the doc type does not allow content variations, we need to update all of it's property types to not allow this either
-        //else we may end up with ysods. I'm unsure if the service level handles this but we'll make sure it is updated here
+        // Before we send this model into this saving/mapping pipeline, we need to do some cleanup on variations.
+        // If the doc type does not allow content variations, we need to update all of it's property types to not allow this either
+        // else we may end up with ysods. I'm unsure if the service level handles this but we'll make sure it is updated here
         if (!contentTypeSave.AllowCultureVariant)
         {
             foreach (PropertyTypeBasic prop in contentTypeSave.Groups.SelectMany(x => x.Properties))
@@ -590,14 +590,14 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
             }
 
             IContentTypeComposition? contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(contentItem);
-            var ids = contentType?.AllowedContentTypes?.OrderBy(c => c.SortOrder).Select(x => x.Id.Value).ToArray();
+            var keys = contentType?.AllowedContentTypes?.OrderBy(c => c.SortOrder).Select(x => x.Key).ToArray();
 
-            if (ids is null || ids.Any() == false)
+            if (keys is null || keys.Any() == false)
             {
                 return Enumerable.Empty<ContentTypeBasic>();
             }
 
-            types = _contentTypeService.GetAll(ids).OrderBy(c => ids.IndexOf(c.Id)).ToList();
+            types = _contentTypeService.GetAll(keys).OrderBy(c => keys.IndexOf(c.Key)).ToList();
         }
 
         var basics = types.Where(type => type.IsElement == false)

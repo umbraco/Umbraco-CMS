@@ -397,14 +397,14 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
             }
 
             IMediaType? contentType = _mediaTypeService.Get(contentItem.ContentTypeId);
-            var ids = contentType?.AllowedContentTypes?.OrderBy(c => c.SortOrder).Select(x => x.Id.Value).ToArray();
+            var keys = contentType?.AllowedContentTypes?.OrderBy(c => c.SortOrder).Select(x => x.Key).ToArray();
 
-            if (ids is null || ids.Any() == false)
+            if (keys is null || keys.Any() == false)
             {
                 return Enumerable.Empty<ContentTypeBasic>();
             }
 
-            types = _mediaTypeService.GetAll(ids).OrderBy(c => ids.IndexOf(c.Id)).ToList();
+            types = _mediaTypeService.GetAll(keys).OrderBy(c => keys.IndexOf(c.Key)).ToList();
         }
 
         var basics = types.Select(_umbracoMapper.Map<IMediaType, ContentTypeBasic>).WhereNotNull().ToList();
