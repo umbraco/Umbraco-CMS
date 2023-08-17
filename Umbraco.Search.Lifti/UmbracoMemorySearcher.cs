@@ -97,7 +97,7 @@ public class UmbracoMemorySearcher<T> : IUmbracoSearcher<T>
             term += $"{UmbracoSearchFieldNames.DeliveryApiContentIndex.Published}=y";
         }
 
-        PrepareFilters(term, searchRequest.Filters, searchRequest.FiltersLogicOperator);
+        PrepareFilters(term, searchRequest.Filters);
         using (var contextReference = _umbracoContextFactory.EnsureUmbracoContext())
         {
             IUmbracoContext umbracoContext = contextReference.UmbracoContext;
