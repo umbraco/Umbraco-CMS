@@ -9,8 +9,8 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-internal abstract class EntityTypeContainerService<TEntityType, TEntityContainerRepository> : RepositoryService, IEntityTypeContainerService<TEntityType>
-    where TEntityType : ITreeEntity
+internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainerRepository> : RepositoryService, IEntityTypeContainerService<TTreeEntity>
+    where TTreeEntity : ITreeEntity
     where TEntityContainerRepository : IEntityContainerRepository
 {
     private readonly TEntityContainerRepository _entityContainerRepository;
@@ -50,7 +50,7 @@ internal abstract class EntityTypeContainerService<TEntityType, TEntityContainer
         => await Task.FromResult(GetParent(container));
 
     /// <inheritdoc />
-    public async Task<EntityContainer?> GetParentAsync(TEntityType entity)
+    public async Task<EntityContainer?> GetParentAsync(TTreeEntity entity)
         => await Task.FromResult(GetParent(entity));
 
     /// <inheritdoc />

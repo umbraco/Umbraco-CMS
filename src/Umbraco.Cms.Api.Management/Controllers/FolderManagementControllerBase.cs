@@ -12,21 +12,21 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
-public abstract class FolderManagementControllerBase<TEntityType> : ManagementApiControllerBase
-    where TEntityType : ITreeEntity
+public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementApiControllerBase
+    where TTreeEntity : ITreeEntity
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IEntityTypeContainerService<TEntityType> _entityTypeContainerService;
+    private readonly IEntityTypeContainerService<TTreeEntity> _treeEntityTypeContainerService;
 
-    protected FolderManagementControllerBase(IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IEntityTypeContainerService<TEntityType> entityTypeContainerService)
+    protected FolderManagementControllerBase(IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IEntityTypeContainerService<TTreeEntity> treeEntityTypeContainerService)
     {
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _entityTypeContainerService = entityTypeContainerService;
+        _treeEntityTypeContainerService = treeEntityTypeContainerService;
     }
 
     protected async Task<IActionResult> GetFolderAsync(Guid key)
     {
-        EntityContainer? container = await _entityTypeContainerService.GetAsync(key);
+        EntityContainer? container = await _treeEntityTypeContainerService.GetAsync(key);
         if (container == null)
         {
             return NotFound(new ProblemDetailsBuilder()
@@ -34,7 +34,7 @@ public abstract class FolderManagementControllerBase<TEntityType> : ManagementAp
                 .Build());
         }
 
-        EntityContainer? parentContainer = await _entityTypeContainerService.GetParentAsync(container);
+        EntityContainer? parentContainer = await _treeEntityTypeContainerService.GetParentAsync(container);
 
         // we could implement a mapper for this but it seems rather overkill at this point
         return Ok(new FolderResponseModel
@@ -49,7 +49,7 @@ public abstract class FolderManagementControllerBase<TEntityType> : ManagementAp
         CreateFolderRequestModel createFolderRequestModel,
         Expression<Func<TCreatedActionController, string>> createdAction)
     {
-        Attempt<EntityContainer?, EntityContainerOperationStatus> result = await _entityTypeContainerService.CreateAsync(
+        Attempt<EntityContainer?, EntityContainerOperationStatus> result = await _treeEntityTypeContainerService.CreateAsync(
             createFolderRequestModel.Id,
             createFolderRequestModel.Name,
             createFolderRequestModel.ParentId,
@@ -62,7 +62,7 @@ public abstract class FolderManagementControllerBase<TEntityType> : ManagementAp
 
     protected async Task<IActionResult> UpdateFolderAsync(Guid key, UpdateFolderResponseModel updateFolderResponseModel)
     {
-        Attempt<EntityContainer?, EntityContainerOperationStatus> result = await _entityTypeContainerService.UpdateAsync(
+        Attempt<EntityContainer?, EntityContainerOperationStatus> result = await _treeEntityTypeContainerService.UpdateAsync(
             key,
             updateFolderResponseModel.Name,
             CurrentUserKey(_backOfficeSecurityAccessor));
@@ -74,7 +74,7 @@ public abstract class FolderManagementControllerBase<TEntityType> : ManagementAp
 
     protected async Task<IActionResult> DeleteFolderAsync(Guid key)
     {
-        Attempt<EntityContainer?, EntityContainerOperationStatus> result = await _entityTypeContainerService.DeleteAsync(key, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<EntityContainer?, EntityContainerOperationStatus> result = await _treeEntityTypeContainerService.DeleteAsync(key, CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success
             ? Ok()
             : OperationStatusResult(result.Status);
