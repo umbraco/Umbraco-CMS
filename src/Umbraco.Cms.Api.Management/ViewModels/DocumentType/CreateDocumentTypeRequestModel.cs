@@ -3,7 +3,7 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 
 public class CreateDocumentTypeRequestModel
-    : CreateContentTypeRequestModelBase<CreateDocumentTypePropertyTypeRequestModel, CreateDocumentTypePropertyTypeContainerRequestModel>, IDocumentTypeRequestModel
+    : CreateContentTypeRequestModelBase<CreateDocumentTypePropertyTypeRequestModel, CreateDocumentTypePropertyTypeContainerRequestModel>
 {
     public IEnumerable<Guid> AllowedTemplateIds { get; set; } = Array.Empty<Guid>();
 

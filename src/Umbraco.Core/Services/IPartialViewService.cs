@@ -11,9 +11,9 @@ public interface IPartialViewService : IBasicFileService<IPartialView>
     /// Deletes a partial view.
     /// </summary>
     /// <param name="path">The path of the partial view to delete.</param>
-    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>An operation status.</returns>
-    Task<PartialViewOperationStatus> DeleteAsync(string path, Guid performingUserKey);
+    Task<PartialViewOperationStatus> DeleteAsync(string path, Guid userKey);
 
     /// <summary>
     /// Gets the name of all the available partial view snippets.
@@ -34,15 +34,15 @@ public interface IPartialViewService : IBasicFileService<IPartialView>
     /// Creates a new partial view.
     /// </summary>
     /// <param name="createModel"><see cref="PartialViewCreateModel"/> containing the information about the partial view being created.</param>
-    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="PartialViewOperationStatus"/>.</returns>
-    Task<Attempt<IPartialView?, PartialViewOperationStatus>> CreateAsync(PartialViewCreateModel createModel, Guid performingUserKey);
+    Task<Attempt<IPartialView?, PartialViewOperationStatus>> CreateAsync(PartialViewCreateModel createModel, Guid userKey);
 
     /// <summary>
     /// Updates an existing partial view.
     /// </summary>
     /// <param name="updateModel">A <see cref="PartialViewUpdateModel"/> with the changes.</param>
-    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="PartialViewOperationStatus"/>.</returns>
-    Task<Attempt<IPartialView?, PartialViewOperationStatus>> UpdateAsync(PartialViewUpdateModel updateModel, Guid performingUserKey);
+    Task<Attempt<IPartialView?, PartialViewOperationStatus>> UpdateAsync(PartialViewUpdateModel updateModel, Guid userKey);
 }

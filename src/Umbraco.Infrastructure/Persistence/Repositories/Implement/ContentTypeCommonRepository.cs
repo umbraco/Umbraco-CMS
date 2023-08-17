@@ -128,7 +128,6 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
                 }
 
                 allowedContentTypes.Add(new ContentTypeSort(
-                    new Lazy<int>(() => allowedDto.AllowedId),
                     key,
                     allowedDto.SortOrder,
                     alias!));

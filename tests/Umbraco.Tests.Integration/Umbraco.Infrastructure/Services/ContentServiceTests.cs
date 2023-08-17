@@ -1844,7 +1844,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage1", "Textpage", defaultTemplateId: template.Id);
         contentType.AllowedContentTypes = new List<ContentTypeSort>
         {
-            new(new Lazy<int>(() => contentType.Id), contentType.Key, 0, contentType.Alias)
+            new(contentType.Key, 0, contentType.Alias)
         };
         ContentTypeService.Save(contentType);
 
@@ -1884,7 +1884,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage1", "Textpage", defaultTemplateId: template.Id);
         contentType.AllowedContentTypes = new List<ContentTypeSort>
         {
-            new(new Lazy<int>(() => contentType.Id), contentType.Key, 0, contentType.Alias)
+            new(contentType.Key, 0, contentType.Alias)
         };
         ContentTypeService.Save(contentType);
 

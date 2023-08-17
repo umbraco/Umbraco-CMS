@@ -700,8 +700,8 @@ public class MediaController : ContentControllerBase
 
             //check if the item is allowed under this one
             IMediaType? parentContentType = _mediaTypeService.Get(parent.ContentTypeId);
-            if (parentContentType?.AllowedContentTypes?.Select(x => x.Id).ToArray()
-                    .Any(x => x.Value == toMove.ContentType.Id) == false)
+            if (parentContentType?.AllowedContentTypes?.Select(x => x.Key).ToArray()
+                    .Any(x => x == toMove.ContentType.Key) == false)
             {
                 var notificationModel = new SimpleNotificationModel();
                 notificationModel.AddErrorNotification(

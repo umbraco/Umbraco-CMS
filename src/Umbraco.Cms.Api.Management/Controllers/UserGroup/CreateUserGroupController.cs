@@ -49,7 +49,7 @@ public class CreateUserGroupController : UserGroupControllerBase
 
         IUserGroup group = userGroupCreationAttempt.Result;
 
-        Attempt<IUserGroup, UserGroupOperationStatus> result = await _userGroupService.CreateAsync(group, /*currentUser.Id*/ -1);
+        Attempt<IUserGroup, UserGroupOperationStatus> result = await _userGroupService.CreateAsync(group, CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success
             ? CreatedAtAction<ByKeyUserGroupController>(controller => nameof(controller.ByKey), group.Key)
             : UserGroupOperationStatusResult(result.Status);

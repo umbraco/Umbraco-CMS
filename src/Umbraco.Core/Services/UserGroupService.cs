@@ -207,12 +207,12 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     /// <inheritdoc />
     public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(
         IUserGroup userGroup,
-        int performingUserId,
-        int[]? groupMembersUserIds = null)
+        Guid userKey,
+        Guid[]? groupMembersKeys = null)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        IUser? performingUser = _userService.GetUserById(performingUserId);
+        IUser? performingUser = await _userService.GetAsync(userKey);
         if (performingUser is null)
         {
             return Attempt.FailWithStatus(UserGroupOperationStatus.MissingUser, userGroup);
@@ -238,12 +238,12 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
         }
 
-        var checkedGroupMembers = EnsureNonAdminUserIsInSavedUserGroup(performingUser, groupMembersUserIds ?? Enumerable.Empty<int>()).ToArray();
-        IEnumerable<IUser> usersToAdd = _userService.GetUsersById(performingUserId);
+        Guid[] checkedGroupMembersKeys = EnsureNonAdminUserIsInSavedUserGroup(performingUser, groupMembersKeys ?? Enumerable.Empty<Guid>()).ToArray();
+        IUser[] usersToAdd = (await _userService.GetAsync(checkedGroupMembersKeys)).ToArray();
 
         // Since this is a brand new creation we don't have to be worried about what users were added and removed
         // simply put all members that are requested to be in the group will be "added"
-        var userGroupWithUsers = new UserGroupWithUsers(userGroup, usersToAdd.ToArray(), Array.Empty<IUser>());
+        var userGroupWithUsers = new UserGroupWithUsers(userGroup, usersToAdd, Array.Empty<IUser>());
         var savingUserGroupWithUsersNotification = new UserGroupWithUsersSavingNotification(userGroupWithUsers, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingUserGroupWithUsersNotification))
         {
@@ -251,7 +251,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
         }
 
-        _userGroupRepository.AddOrUpdateGroupWithUsers(userGroup, checkedGroupMembers);
+        _userGroupRepository.AddOrUpdateGroupWithUsers(userGroup, usersToAdd.Select(x => x.Id).ToArray());
 
         scope.Complete();
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
@@ -281,11 +281,11 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     /// <inheritdoc />
     public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(
         IUserGroup userGroup,
-        int performingUserId)
+        Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        IUser? performingUser = _userService.GetUserById(performingUserId);
+        IUser? performingUser = await _userService.GetAsync(userKey);
         if (performingUser is null)
         {
             return Attempt.FailWithStatus(UserGroupOperationStatus.MissingUser, userGroup);
@@ -402,16 +402,16 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     /// <remarks>
     /// This is to ensure that the user can access the group they themselves created at a later point and modify it.
     /// </remarks>
-    private IEnumerable<int> EnsureNonAdminUserIsInSavedUserGroup(IUser performingUser, IEnumerable<int> groupMembersUserIds)
+    private IEnumerable<Guid> EnsureNonAdminUserIsInSavedUserGroup(IUser performingUser, IEnumerable<Guid> groupMembersUserKeys)
     {
-        var userIds = groupMembersUserIds.ToList();
+        var userKeys = groupMembersUserKeys.ToList();
 
-        // If the performing user is and admin we don't care, they can access the group later regardless
-        if (performingUser.IsAdmin() is false && userIds.Contains(performingUser.Id) is false)
+        // If the performing user is an admin we don't care, they can access the group later regardless
+        if (performingUser.IsAdmin() is false && userKeys.Contains(performingUser.Key) is false)
         {
-            userIds.Add(performingUser.Id);
+            userKeys.Add(performingUser.Key);
         }
 
-        return userIds;
+        return userKeys;
     }
 }

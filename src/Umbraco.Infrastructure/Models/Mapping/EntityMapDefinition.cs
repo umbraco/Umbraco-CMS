@@ -131,7 +131,6 @@ public class EntityMapDefinition : IMapDefinition
     {
         target.Alias = source.Alias;
         target.Key = source.Key;
-        target.Id = new Lazy<int>(() => Convert.ToInt32(source.Id));
     }
 
     // Umbraco.Code.MapAll -Trashed
