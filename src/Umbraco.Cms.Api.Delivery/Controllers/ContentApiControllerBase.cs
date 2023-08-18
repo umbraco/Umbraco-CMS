@@ -39,5 +39,9 @@ public abstract class ContentApiControllerBase : DeliveryApiControllerBase
                 .WithTitle("Sort option not found")
                 .WithDetail("One of the attempted 'sort' options does not exist")
                 .Build()),
+            _ => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Unknown content query status")
+                .WithDetail($"Content query status \"{status}\" was not expected here")
+                .Build()),
         };
 }
