@@ -11,7 +11,7 @@ COPY nupkg .
 
 WORKDIR /build
 RUN dotnet new --install /nupkg/Umbraco.Templates.*.nupkg
-RUN dotnet new umbraco --name Playwright --no-restore --output .
+RUN dotnet new umbraco --name AcceptanceTestProject --no-restore --output .
 RUN dotnet restore --configfile /nuget.config
 RUN dotnet build --configuration Release --no-restore
 RUN dotnet publish --configuration Release --no-build --output /dist
@@ -46,4 +46,4 @@ ENV Umbraco__CMS__KeepAlive__DisableKeepAliveTask="true"
 # Set application URL
 ENV ASPNETCORE_URLS="http://0.0.0.0:5000;https://0.0.0.0:5001"
 
-CMD dotnet Playwright.dll
+CMD dotnet AcceptanceTestProject.dll
