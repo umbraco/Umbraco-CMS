@@ -33,7 +33,7 @@ internal abstract class ApiMediaWithCropsBuilderBase<T>
         // make sure we merge crops and focal point defined at media level with the locally defined ones (local ones take precedence in case of a conflict)
         ImageCropperValue? mediaCrops = media.Content.Value<ImageCropperValue>(_publishedValueFallback, Constants.Conventions.Media.File);
         ImageCropperValue localCrops = media.LocalCrops;
-        if (mediaCrops != null)
+        if (mediaCrops is not null)
         {
             localCrops = localCrops.Merge(mediaCrops);
         }

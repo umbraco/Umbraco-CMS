@@ -4,6 +4,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
+/// <summary>
+///     Service that handles querying of the Media APIs.
+/// </summary>
 public interface IApiMediaQueryService
 {
     /// <summary>
@@ -18,7 +21,7 @@ public interface IApiMediaQueryService
     Attempt<PagedModel<Guid>, ApiMediaQueryOperationStatus> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts, int skip, int take);
 
     /// <summary>
-    ///     Returns the media item that matches the supplied path (if any)
+    ///     Returns the media item that matches the supplied path (if any).
     /// </summary>
     /// <param name="path">The path to look up.</param>
     /// <returns>The media item at <see cref="path"/>, or null if it does not exist.</returns>

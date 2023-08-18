@@ -28,6 +28,7 @@ public class ByIdMediaApiController : MediaApiControllerBase
     public async Task<IActionResult> ById(Guid id)
     {
         IPublishedContent? media = PublishedMediaCache.GetById(id);
+
         if (media is null)
         {
             return await Task.FromResult(NotFound());

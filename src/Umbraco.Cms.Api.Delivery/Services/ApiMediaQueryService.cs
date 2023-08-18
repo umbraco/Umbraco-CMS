@@ -85,7 +85,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
         const string childrenOfParameter = "children:";
 
         var childrenOf = string.Empty;
-        if (fetch?.StartsWith(childrenOfParameter) is true)
+        if (fetch?.StartsWith(childrenOfParameter, StringComparison.OrdinalIgnoreCase) is true)
         {
             childrenOf = fetch.TrimStart(childrenOfParameter);
         }
@@ -172,7 +172,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
                     return null;
             }
 
-            source = parts[1] is "desc"
+            source = parts[1].StartsWith("desc")
                 ? source.OrderByDescending(keySelector)
                 : source.OrderBy(keySelector);
         }

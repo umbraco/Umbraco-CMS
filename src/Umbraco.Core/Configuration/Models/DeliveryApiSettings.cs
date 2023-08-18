@@ -66,7 +66,7 @@ public class DeliveryApiSettings
         /// <summary>
         ///     Gets or sets a value indicating whether the Media APIs of the Delivery API should be enabled.
         /// </summary>
-        /// <value><c>true</c> if the media APIs should be enabled; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if the Media APIs should be enabled; otherwise, <c>false</c>.</value>
         /// <remarks>
         ///     Setting this to <c>true</c> will have no effect if the Delivery API itself is disabled through <see cref="DeliveryApiSettings"/>
         /// </remarks>
@@ -77,7 +77,7 @@ public class DeliveryApiSettings
         ///     Gets or sets a value indicating whether the Media APIs of the Delivery API (if enabled) should be
         ///     publicly available or should require an API key for access.
         /// </summary>
-        /// <value><c>true</c> if the media APIs should be publicly available; <c>false</c> if an API key should be required for access.</value>
+        /// <value><c>true</c> if the Media APIs should be publicly available; <c>false</c> if an API key should be required for access.</value>
         /// <remarks>
         ///     Setting this to <c>true</c> will have no effect if the Delivery API itself has public access disabled through <see cref="DeliveryApiSettings"/>
         /// </remarks>
