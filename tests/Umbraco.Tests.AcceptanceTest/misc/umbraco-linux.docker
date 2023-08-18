@@ -11,7 +11,7 @@ COPY nupkg .
 
 WORKDIR /build
 RUN dotnet new --install /nupkg/Umbraco.Templates.*.nupkg
-RUN dotnet new umbraco --name Playwright --no-restore --output .
+RUN dotnet new umbraco --name AcceptanceTestProject --no-restore --output .
 RUN dotnet restore --configfile /nuget.config
 RUN dotnet build --configuration Release --no-restore
 RUN dotnet publish --configuration Release --no-build --output /dist
