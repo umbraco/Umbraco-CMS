@@ -46,4 +46,4 @@ ENV Umbraco__CMS__KeepAlive__DisableKeepAliveTask="true"
 # Set application URL
 ENV ASPNETCORE_URLS="http://0.0.0.0:5000;https://0.0.0.0:5001"
 
-CMD dotnet Playwright.dll
+CMD dotnet AcceptanceTestProject.dll
