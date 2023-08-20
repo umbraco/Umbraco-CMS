@@ -167,9 +167,9 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
                     return null;
             }
 
-            source = parts[1].StartsWith("desc")
-                ? source.OrderByDescending(keySelector)
-                : source.OrderBy(keySelector);
+            source = parts[1].StartsWith("asc")
+                ? source.OrderBy(keySelector)
+                : source.OrderByDescending(keySelector);
         }
 
         return source;
