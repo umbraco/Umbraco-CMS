@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -60,6 +60,8 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
                         new object[] { indexCulture }, // required for culture variant querying
                     [UmbracoSearchFieldNames.IndexPathFieldName] =
                         new object[] { content.Path }, // required for unpublishing/deletion handling
+                    [UmbracoSearchFieldNames.PublishedFieldName] =
+                        new object[] { content.Published? "y": "n" }, // required for validating value sets
                     [UmbracoSearchFieldNames.NodeNameFieldName] =
                         new object[]
                         {

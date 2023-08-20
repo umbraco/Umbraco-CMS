@@ -117,9 +117,8 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
     private string[] UpdateIndex(IContent content, IUmbracoIndex<IContentBase> index)
     {
 
-
         index.IndexItems(new []{content});
-       throw  new NotImplementedException();
+        return content.PublishedCultures.ToArray();
     }
 
     private void ReindexDescendants(IContent content, IUmbracoIndex<IContentBase>  index)

@@ -15,5 +15,5 @@ public interface ISearchRequest
     int PageSize { get; set; }
     bool Preview { get; set; }
     ISearchRequest CreateFilter(string name, IList<string> values, LogicOperator logicOperator);
-    void SortBy(string sortFieldName, SortType sortType);
+    void SortBy(string sortFieldName, SortType sortType, bool descanding = false);
 }

@@ -46,7 +46,7 @@ internal partial class DeferedReIndexForMember : IDeferredAction
             foreach (string indexName in searchProvider.GetAllIndexes())
             {
                 var configuration = umbracoIndexesConfiguration.Configuration(indexName);
-                if (!configuration.EnableDefaultEventHandler || !configuration.PublishedValuesOnly)
+                if (!configuration.EnableDefaultEventHandler)
                 {
                     continue;
                 }

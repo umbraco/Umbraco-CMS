@@ -82,7 +82,7 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
         }
         else
         {
-            booleanOperation = query.Field("", "");
+            booleanOperation = query.Field("__IndexType", "*");
         }
 
         // when not fetching for preview, make sure the "published" field is "y"

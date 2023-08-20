@@ -36,6 +36,7 @@ internal sealed class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryA
         fieldDefinitions.Add(new(UmbracoSearchFieldNames.DeliveryApiContentIndex.Id, FieldDefinitionTypes.Raw));
         fieldDefinitions.Add(new(UmbracoSearchFieldNames.DeliveryApiContentIndex.ContentTypeId, FieldDefinitionTypes.Raw));
         fieldDefinitions.Add(new(UmbracoSearchFieldNames.DeliveryApiContentIndex.Culture, FieldDefinitionTypes.Raw));
+        fieldDefinitions.Add(new(UmbracoSearchFieldNames.PublishedFieldName, FieldDefinitionTypes.Raw));
         fieldDefinitions.Add(new(UmbracoSearchFieldNames.IndexPathFieldName, FieldDefinitionTypes.Raw));
         fieldDefinitions.Add(new(UmbracoSearchFieldNames.NodeNameFieldName, FieldDefinitionTypes.Raw));
     }

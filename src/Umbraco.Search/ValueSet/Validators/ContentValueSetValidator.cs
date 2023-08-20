@@ -127,7 +127,7 @@ public class ContentValueSetValidator : UmbracoValueSetValidator, IContentValueS
         {
             IReadOnlyList<object>? published = null;
 
-            if (!valueSet.Values?.TryGetValue(UmbracoSearchFieldNames.PublishedFieldName, out published) != true)
+            if (valueSet.Values?.TryGetValue(UmbracoSearchFieldNames.PublishedFieldName, out published) != true)
             {
                 return new UmbracoValueSetValidationResult(UmbracoValueSetValidationStatus.Failed, valueSet);
             }
@@ -164,7 +164,7 @@ public class ContentValueSetValidator : UmbracoValueSetValidator, IContentValueS
         }
 
         //must have a 'path'
-        if (!valueSet.Values!.TryGetValue(PathKey, out IReadOnlyList<object>? pathValues))
+        if (!valueSet.Values!.TryGetValue(UmbracoSearchFieldNames.IndexPathFieldName, out IReadOnlyList<object>? pathValues))
         {
             return new UmbracoValueSetValidationResult(UmbracoValueSetValidationStatus.Failed, valueSet);
         }

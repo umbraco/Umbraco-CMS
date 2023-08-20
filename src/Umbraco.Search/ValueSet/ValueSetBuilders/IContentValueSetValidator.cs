@@ -2,7 +2,9 @@
 using Umbraco.Search.ValueSet.Validators;
 
 namespace Umbraco.Search.ValueSet.ValueSetBuilders;
-
+public interface IDeliveryApiContentIndexValueSetValidator : IContentValueSetValidator
+{
+}
 /// <summary>
 ///     An extended <see cref="IValueSetValidator" /> for content indexes
 /// </summary>
