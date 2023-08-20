@@ -10,11 +10,6 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Delivery.Services;
 
 /// <inheritdoc />
-/// <remarks>
-/// This service has been built to mimic <see cref="ApiContentQueryService"/> with future extension in mind.
-/// At this time, the "fetch=children:" option is the only supported query option, so it's been hardcoded. In the
-/// future we might implement fetch/filters/sorts as seen in the content equivalent.
-/// </remarks>
 internal sealed class ApiMediaQueryService : IApiMediaQueryService
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
