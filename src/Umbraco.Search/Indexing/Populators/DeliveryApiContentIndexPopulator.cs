@@ -46,7 +46,7 @@ public sealed class DeliveryApiContentIndexPopulator : IndexPopulator
                 // ReSharper disable once PossibleMultipleEnumeration
                 foreach (string index in indexes)
                 {
-                    _provider.GetIndex<IContent>(index)?.IndexItems(descendants);
+                    _provider.GetIndex<IContentBase>(index)?.IndexItems(descendants);
                 }
             });
     }

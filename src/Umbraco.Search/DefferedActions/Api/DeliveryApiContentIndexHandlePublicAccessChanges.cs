@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Extensions;
 
-namespace Umbraco.Search.DefferedActions;
+namespace Umbraco.Search.DefferedActions.Api;
 
 internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : DeliveryApiContentIndexDeferredBase, IDeferredAction
 {

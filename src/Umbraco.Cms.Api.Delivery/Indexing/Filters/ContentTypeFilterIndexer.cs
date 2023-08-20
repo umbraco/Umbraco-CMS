@@ -7,7 +7,7 @@ public sealed class ContentTypeFilterIndexer : IContentIndexHandler
 {
     internal const string FieldName = "contentType";
 
-    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content, string? culture)
+    public IEnumerable<IndexFieldValue> GetFieldValues(IContentBase content, string? culture)
         => new[] { new IndexFieldValue { FieldName = FieldName, Values = new object[] { content.ContentType.Alias } } };
 
     public IEnumerable<IndexField> GetFields()

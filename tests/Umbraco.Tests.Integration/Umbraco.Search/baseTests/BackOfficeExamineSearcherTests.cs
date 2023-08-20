@@ -18,7 +18,7 @@ public class BackOfficeExamineSearcherTests : UmbracoSearchBaseTests
     public void Search_For_Document()
     {
         var content = CreateContent();
-        var apiIndex = SearchProvider.GetIndex<IContent>(Constants
+        var apiIndex = SearchProvider.GetIndex<IContentBase>(Constants
             .UmbracoIndexes
             .DeliveryApiContentIndexName);
         apiIndex.IndexItems(content.ToArray());

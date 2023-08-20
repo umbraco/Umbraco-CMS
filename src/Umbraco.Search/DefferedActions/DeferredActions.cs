@@ -2,7 +2,7 @@
 
 namespace Umbraco.Search.DefferedActions;
 
-internal class DeferredActions
+public sealed class DeferredActions
 {
     // the default enlist priority is 100
     // enlist with a lower priority to ensure that anything "default" runs after us

@@ -70,7 +70,7 @@ public class UmbracoExamineIndex<T> : UmbracoExamineIndex, IUmbracoIndex<T> wher
     }
 
     /// <summary>
-    ///
+    /// 
     /// </summary>
     /// <param name="items"></param>
     /// <typeparam name="T"></typeparam>

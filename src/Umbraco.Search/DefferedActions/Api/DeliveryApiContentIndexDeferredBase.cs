@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
-
-namespace Umbraco.Search.DefferedActions;
+﻿namespace Umbraco.Search.DefferedActions.Api;
 
 internal abstract class DeliveryApiContentIndexDeferredBase
 {

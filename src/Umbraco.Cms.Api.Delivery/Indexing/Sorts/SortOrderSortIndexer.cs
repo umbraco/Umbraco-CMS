@@ -7,7 +7,7 @@ public sealed class SortOrderSortIndexer : IContentIndexHandler
 {
     internal const string FieldName = "sortOrder";
 
-    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content, string? culture)
+    public IEnumerable<IndexFieldValue> GetFieldValues(IContentBase content, string? culture)
         => new[] { new IndexFieldValue { FieldName = FieldName, Values = new object[] { content.SortOrder } } };
 
     public IEnumerable<IndexField> GetFields()

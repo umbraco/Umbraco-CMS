@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
 using Umbraco.Extensions;
+using Umbraco.Search.Examine;
 using Umbraco.Search.Indexing.Populators;
 using Umbraco.Search.NotificationHandlers;
 using Umbraco.Search.Services;
@@ -52,6 +53,7 @@ public static partial class UmbracoBuilderExtensions
     public static IServiceCollection AddSearchServices(this IServiceCollection services)
     {
         services.AddSingleton<IUmbracoTreeSearcherFields, Configuration.UmbracoTreeSearcherFields>();
+        services.AddSingleton<IUmbracoIndexingHandler, DefaultUmbracoIndexingHandler>();
 
         services.AddUnique<IBackOfficeSearcher, NoopBackOfficeSearcher>();
         services.AddScoped<SpecialisedSearchers.Tree.UmbracoTreeSearcher>();

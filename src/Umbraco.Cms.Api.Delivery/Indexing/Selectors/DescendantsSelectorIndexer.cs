@@ -15,7 +15,7 @@ public sealed class DescendantsSelectorIndexer : IContentIndexHandler
     public DescendantsSelectorIndexer(IEntityService entityService)
         => _entityService = entityService;
 
-    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content, string? culture)
+    public IEnumerable<IndexFieldValue> GetFieldValues(IContentBase content, string? culture)
     {
         var ancestorKeys = content.GetAncestorIds()?.Select(id =>
         {

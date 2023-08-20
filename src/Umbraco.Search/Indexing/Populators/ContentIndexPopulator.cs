@@ -49,7 +49,7 @@ public class ContentIndexPopulator : IndexPopulator
         }
 
         var indexer = _provider.GetIndex(index);
-        if (!(indexer is IUmbracoIndex<IContent> casted))
+        if (!(indexer is IUmbracoIndex<IContentBase> casted))
         {
             return false;
         }
@@ -125,7 +125,7 @@ public class ContentIndexPopulator : IndexPopulator
             // ReSharper disable once PossibleMultipleEnumeration
             foreach (string index in indexes)
             {
-                _provider.GetIndex<IContent>(index)?.IndexItems(content);
+                _provider.GetIndex<IContentBase>(index)?.IndexItems(content);
             }
 
             pageIndex++;
@@ -167,7 +167,7 @@ public class ContentIndexPopulator : IndexPopulator
 
             foreach (string index in indexes)
             {
-                _provider.GetIndex<IContent>(index)?.IndexItems(content);
+                _provider.GetIndex<IContentBase>(index)?.IndexItems(content);
             }
 
             pageIndex++;

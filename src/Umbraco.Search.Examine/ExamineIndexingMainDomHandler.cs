@@ -31,7 +31,7 @@ internal class ExamineIndexingMainDomHandler : ISearchMainDomHandler
         //let's deal with shutting down Examine with MainDom
         var examineShutdownRegistered = _mainDom.Register(release: () =>
         {
-            using (_profilingLogger.TraceDuration<ExamineUmbracoIndexingHandler>("Examine shutting down"))
+            using (_profilingLogger.TraceDuration<ExamineIndexingMainDomHandler>("Examine shutting down"))
             {
                 _examineManager.Dispose();
             }

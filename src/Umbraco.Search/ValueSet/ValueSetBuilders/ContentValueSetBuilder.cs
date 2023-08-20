@@ -13,7 +13,7 @@ namespace Umbraco.Search.ValueSet.ValueSetBuilders;
 /// <summary>
 ///     Builds <see cref="ValueSet" />s for <see cref="IContent" /> items
 /// </summary>
-public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentValueSetBuilder,
+public class ContentValueSetBuilder : BaseValueSetBuilder<IContentBase>, IContentValueSetBuilder,
     IPublishedContentValueSetBuilder
 {
     private static readonly object[] NoValue = new[] { "n" };
@@ -41,7 +41,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
     }
 
     /// <inheritdoc />
-    public override IEnumerable<UmbracoValueSet> GetValueSets(params IContent[] content)
+    public override IEnumerable<UmbracoValueSet> GetValueSets(params IContentBase[] content)
     {
         Dictionary<int, IProfile> creatorIds;
         Dictionary<int, IProfile> writerIds;
@@ -60,7 +60,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         return GetValueSetsEnumerable(content, creatorIds, writerIds);
     }
 
-    private IEnumerable<UmbracoValueSet> GetValueSetsEnumerable(IContent[] content, Dictionary<int, IProfile> creatorIds, Dictionary<int, IProfile> writerIds)
+    private IEnumerable<UmbracoValueSet> GetValueSetsEnumerable(IContentBase[] content, Dictionary<int, IProfile> creatorIds, Dictionary<int, IProfile> writerIds)
     {
         // TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways
         // but I wonder if there's a way to reduce the boxing that we have to do or if it will matter in the end since

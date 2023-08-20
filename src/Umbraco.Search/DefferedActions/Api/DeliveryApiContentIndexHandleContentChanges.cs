@@ -1,15 +1,12 @@
-﻿using System.Drawing;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Search;
+﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.HostedServices;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using Umbraco.Search.Services;
 
-namespace Umbraco.Search.DefferedActions;
+namespace Umbraco.Search.DefferedActions.Api;
 
 internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiContentIndexDeferredBase, IDeferredAction
 {
@@ -36,7 +33,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
 
     public void Execute() => _backgroundTaskQueue.QueueBackgroundWorkItem(_ =>
     {
-        IUmbracoIndex<IContent> index = _deliveryApiIndexingHandler.GetIndex()
+        IUmbracoIndex<IContentBase> index = _deliveryApiIndexingHandler.GetIndex()
                        ?? throw new InvalidOperationException("Could not obtain the delivery API content index");
         IUmbracoSearcher searcher = _deliveryApiIndexingHandler.GetSearcher()
                               ?? throw new InvalidOperationException("Could not obtain the delivery API content searcher");
@@ -73,7 +70,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         return Task.CompletedTask;
     });
 
-    private void Reindex(IContent content, IUmbracoIndex<IContent> index, IUmbracoSearcher searcher)
+    private void Reindex(IContent content, IUmbracoIndex<IContentBase> index, IUmbracoSearcher searcher)
     {
         var searchRequest = searcher.CreateSearchRequest();
         searchRequest.CreateFilter(UmbracoSearchFieldNames.DeliveryApiContentIndex.Id,new[] { content.Id.ToString() }.ToList(), LogicOperator.OR);
@@ -117,7 +114,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         }
     }
 
-    private string[] UpdateIndex(IContent content, IUmbracoIndex<IContent> index)
+    private string[] UpdateIndex(IContent content, IUmbracoIndex<IContentBase> index)
     {
 
 
@@ -125,7 +122,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
        throw  new NotImplementedException();
     }
 
-    private void ReindexDescendants(IContent content, IUmbracoIndex<IContent>  index)
+    private void ReindexDescendants(IContent content, IUmbracoIndex<IContentBase>  index)
         => _deliveryApiContentIndexHelper.EnumerateApplicableDescendantsForContentIndex(
             content.Id,
             descendants =>

@@ -78,4 +78,9 @@ public class ExamineSearchProvider : ISearchProvider
     {
         return _searchers.Select(x => x.Name);
     }
+
+    public void Dispose()
+    {
+        // TODO release managed resources here
+    }
 }

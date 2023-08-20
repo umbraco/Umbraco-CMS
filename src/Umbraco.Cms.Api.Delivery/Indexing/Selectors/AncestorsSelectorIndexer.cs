@@ -8,7 +8,7 @@ public sealed class AncestorsSelectorIndexer : IContentIndexHandler
     // NOTE: "id" is a reserved field name
     internal const string FieldName = "itemId";
 
-    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content, string? culture)
+    public IEnumerable<IndexFieldValue> GetFieldValues(IContentBase content, string? culture)
         => new[] { new IndexFieldValue { FieldName = FieldName, Values = new object[] { content.Key } } };
 
     public IEnumerable<IndexField> GetFields()

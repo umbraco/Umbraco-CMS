@@ -46,7 +46,7 @@ public class UmbracoSearchBaseTests : UmbracoIntegrationTest
     public void CanIndexSingle()
     {
      var content =CreateContent();
-        var apiIndex = SearchProvider.GetIndex<IContent>(Constants
+        var apiIndex = SearchProvider.GetIndex<IContentBase>(Constants
             .UmbracoIndexes
             .DeliveryApiContentIndexName);
         apiIndex.IndexItems(content.First().AsEnumerableOfOne().ToArray());
@@ -62,7 +62,7 @@ public class UmbracoSearchBaseTests : UmbracoIntegrationTest
     public void CanIndexMultiple()
     {
         var content =CreateContent();
-        var apiIndex = SearchProvider.GetIndex<IContent>(Constants
+        var apiIndex = SearchProvider.GetIndex<IContentBase>(Constants
             .UmbracoIndexes
             .DeliveryApiContentIndexName);
         apiIndex.IndexItems(content.ToArray());

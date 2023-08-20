@@ -66,7 +66,7 @@ public class UmbracoSearchTests : UmbracoSearchBaseTests
     public void IndexContent()
     {
 
-        var internalIndex = SearchProvider.GetIndex<IContent>(Constants
+        var internalIndex = SearchProvider.GetIndex<IContentBase>(Constants
             .UmbracoIndexes
             .DeliveryApiContentIndexName);
        // internalIndex.IndexItems();
@@ -74,7 +74,7 @@ public class UmbracoSearchTests : UmbracoSearchBaseTests
     [Test]
     public void IndexMultipleContent()
     {
-        var internalIndex = SearchProvider.GetIndex<IContent>(Constants
+        var internalIndex = SearchProvider.GetIndex<IContentBase>(Constants
             .UmbracoIndexes
             .DeliveryApiContentIndexName);
        // internalIndex.IndexItems();

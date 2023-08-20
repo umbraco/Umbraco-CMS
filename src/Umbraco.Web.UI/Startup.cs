@@ -36,8 +36,8 @@ namespace Umbraco.Cms.Web.UI
         {
             services.AddUmbraco(_env, _config)
                 .AddSearchServices()
-                //.AddExamineLuceneIndexes()
-                .AddInMemoryIndexes()
+                .AddExamineLuceneIndexes()
+                //.AddInMemoryIndexes()
                 .AddBackOffice()
                 .AddWebsite()
                 .AddDeliveryApi()

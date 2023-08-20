@@ -14,7 +14,7 @@ public sealed class ChildrenSelectorIndexer : IContentIndexHandler
 
     internal const string FieldName = "parentId";
 
-    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content, string? culture)
+    public IEnumerable<IndexFieldValue> GetFieldValues(IContentBase content, string? culture)
     {
         Guid parentKey = Guid.Empty;
         if (content.ParentId > 0)

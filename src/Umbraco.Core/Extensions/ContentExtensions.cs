@@ -269,7 +269,7 @@ public static class ContentExtensions
     /// </summary>
     /// <param name="content"><see cref="IContent" /> to retrieve ancestors for</param>
     /// <returns>An Enumerable list of integer ids</returns>
-    public static IEnumerable<int>? GetAncestorIds(this IContent content)
+    public static IEnumerable<int>? GetAncestorIds(this IContentBase content)
     {
         if (string.IsNullOrWhiteSpace(content.Path))
         {

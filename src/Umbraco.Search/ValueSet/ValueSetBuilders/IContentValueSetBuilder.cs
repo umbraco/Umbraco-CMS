@@ -6,6 +6,6 @@ namespace Umbraco.Search.ValueSet.ValueSetBuilders;
 /// <summary>
 ///     Marker interface for a <see cref="T:Examine.ValueSet" /> builder for supporting unpublished content
 /// </summary>
-public interface IContentValueSetBuilder : IValueSetBuilder<IContent>
+public interface IContentValueSetBuilder : IValueSetBuilder<IContentBase>
 {
 }

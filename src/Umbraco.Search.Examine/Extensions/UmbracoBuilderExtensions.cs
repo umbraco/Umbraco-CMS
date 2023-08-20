@@ -56,7 +56,6 @@ public static partial class UmbracoBuilderExtensions
 
         builder.AddNotificationHandler<UmbracoRequestBeginNotification, RebuildOnStartupHandler>();
         builder.Services.AddTransient<ISearchMainDomHandler, ExamineIndexingMainDomHandler>();
-        builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();
         builder.Services.AddSingleton<IIndexConfigurationFactory, IndexConfigurationFactory>();
         builder.Services.AddSingleton<ISearchProvider, ExamineSearchProvider>();
         return builder;

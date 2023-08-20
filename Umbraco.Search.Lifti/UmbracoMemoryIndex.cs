@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
+﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Search.Diagnostics;
 using Umbraco.Search.ValueSet.ValueSetBuilders;
 

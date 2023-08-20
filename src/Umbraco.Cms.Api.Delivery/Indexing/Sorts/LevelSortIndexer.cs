@@ -7,7 +7,7 @@ public sealed class LevelSortIndexer : IContentIndexHandler
 {
     internal const string FieldName = "level";
 
-    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content, string? culture)
+    public IEnumerable<IndexFieldValue> GetFieldValues(IContentBase content, string? culture)
         => new[] { new IndexFieldValue { FieldName = FieldName, Values = new object[] { content.Level } } };
 
     public IEnumerable<IndexField> GetFields()

@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Search.DefferedActions;
+using Umbraco.Search.DefferedActions.Api;
 using Umbraco.Search.NotificationHandlers;
 using Umbraco.Search.Services;
 
@@ -116,8 +117,8 @@ _searchProvider,
         return true;
     }
 
-    internal IUmbracoIndex<IContent>? GetIndex()
-        => _searchProvider.GetIndex<IContent>(Constants.UmbracoIndexes.DeliveryApiContentIndexName);
+    internal IUmbracoIndex<IContentBase>? GetIndex()
+        => _searchProvider.GetIndex<IContentBase>(Constants.UmbracoIndexes.DeliveryApiContentIndexName);
 
     public IUmbracoSearcher? GetSearcher() =>
         _searchProvider.GetSearcher(Constants.UmbracoIndexes.DeliveryApiContentIndexName);

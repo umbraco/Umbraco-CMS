@@ -29,7 +29,7 @@ public class MediaIndexPopulator : IndexPopulator
         }
 
         var indexer = _provider.GetIndex(index);
-        if (!(indexer is IUmbracoIndex<IContent> casted))
+        if (!(indexer is IUmbracoIndex<IContentBase> casted))
         {
             return false;
         }

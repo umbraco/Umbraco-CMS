@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Extensions;
 
-namespace Umbraco.Search.DefferedActions;
+namespace Umbraco.Search.DefferedActions.Api;
 
 internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : DeliveryApiContentIndexDeferredBase,
     IDeferredAction
@@ -56,7 +56,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
             return Task.CompletedTask;
         }
 
-        IUmbracoIndex<IContent> index = _deliveryApiIndexingHandler.GetIndex() ??
+        IUmbracoIndex<IContentBase> index = _deliveryApiIndexingHandler.GetIndex() ??
                                         throw new InvalidOperationException(
                                             "Could not obtain the delivery API content index");
 
@@ -69,7 +69,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
         return Task.CompletedTask;
     });
 
-    private void HandleUpdatedContentTypes(IEnumerable<int> updatedContentTypesIds, IUmbracoIndex<IContent> index,
+    private void HandleUpdatedContentTypes(IEnumerable<int> updatedContentTypesIds, IUmbracoIndex<IContentBase> index,
         IUmbracoSearcher searcher)
     {
         foreach (var contentTypeId in updatedContentTypesIds)
@@ -114,7 +114,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
     }
 
     private IEnumerable<KeyValuePair<int, string[]>> GetIndexIdsbyContenIds(List<string> indexIds,
-        IUmbracoIndex<IContent> index)
+        IUmbracoIndex<IContentBase> index)
     {
         return indexIds
             .Select(id =>

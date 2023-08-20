@@ -2,6 +2,6 @@
 
 namespace Umbraco.Search.ValueSet.ValueSetBuilders;
 
-public interface IDeliveryApiContentIndexValueSetBuilder : IValueSetBuilder<IContent>
+public interface IDeliveryApiContentIndexValueSetBuilder : IValueSetBuilder<IContentBase>
 {
 }

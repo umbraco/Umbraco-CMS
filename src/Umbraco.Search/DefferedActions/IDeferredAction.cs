@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Search.DefferedActions;
 
-internal interface IDeferredAction
+public interface IDeferredAction
 {
     void Execute();
 }

@@ -33,7 +33,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
     }
 
     /// <inheritdoc />
-    public IEnumerable<UmbracoValueSet> GetValueSets(params IContent[] contents)
+    public IEnumerable<UmbracoValueSet> GetValueSets(params IContentBase[] contents)
     {
         foreach (IContent content in contents.Where(CanIndex))
         {
@@ -46,28 +46,43 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
                 // required index values go here
                 var indexValues = new Dictionary<string, IEnumerable<object>>(StringComparer.InvariantCultureIgnoreCase)
                 {
-                    [UmbracoSearchFieldNames.DeliveryApiContentIndex.Id] = new object[] { content.Id.ToString() }, // required for correct publishing handling and also needed for backoffice index browsing
-                    [UmbracoSearchFieldNames.DeliveryApiContentIndex.ContentTypeId] = new object[] { content.ContentTypeId.ToString() }, // required for correct content type change handling
-                    [UmbracoSearchFieldNames.DeliveryApiContentIndex.Culture] = new object[] { indexCulture }, // required for culture variant querying
-                    [UmbracoSearchFieldNames.IndexPathFieldName] = new object[] { content.Path }, // required for unpublishing/deletion handling
-                    [UmbracoSearchFieldNames.NodeNameFieldName] = new object[] { content.GetPublishName(culture) ?? string.Empty }, // primarily needed for backoffice index browsing
+                    [UmbracoSearchFieldNames.DeliveryApiContentIndex.Id] =
+                        new object[]
+                        {
+                            content.Id.ToString()
+                        }, // required for correct publishing handling and also needed for backoffice index browsing
+                    [UmbracoSearchFieldNames.DeliveryApiContentIndex.ContentTypeId] =
+                        new object[]
+                        {
+                            content.ContentTypeId.ToString()
+                        }, // required for correct content type change handling
+                    [UmbracoSearchFieldNames.DeliveryApiContentIndex.Culture] =
+                        new object[] { indexCulture }, // required for culture variant querying
+                    [UmbracoSearchFieldNames.IndexPathFieldName] =
+                        new object[] { content.Path }, // required for unpublishing/deletion handling
+                    [UmbracoSearchFieldNames.NodeNameFieldName] =
+                        new object[]
+                        {
+                            content.GetPublishName(culture) ?? string.Empty
+                        }, // primarily needed for backoffice index browsing
                 };
 
                 AddContentIndexHandlerFields(content, culture, indexValues);
 
-                yield return new UmbracoValueSet(DeliveryApiContentIndexUtilites.IndexId(content, indexCulture), IndexTypes.Content, content.ContentType.Alias, indexValues);
+                yield return new UmbracoValueSet(DeliveryApiContentIndexUtilites.IndexId(content, indexCulture),
+                    IndexTypes.Content, content.ContentType.Alias, indexValues);
             }
         }
     }
 
-    private string?[] IndexableCultures(IContent content)
+    private string?[] IndexableCultures(IContentBase content)
     {
         var variesByCulture = content.ContentType.VariesByCulture();
 
         // if the content varies by culture, the indexable cultures are the published
         // cultures - otherwise "null" represents "no culture"
-        var cultures = variesByCulture
-            ? content.PublishedCultures.ToArray()
+        var cultures = variesByCulture && content is IContent contentModel
+            ? contentModel.PublishedCultures.ToArray()
             : new string?[] { null };
 
         // now iterate all ancestors and make sure all cultures are published all the way up the tree
@@ -95,7 +110,8 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         return cultures;
     }
 
-    private void AddContentIndexHandlerFields(IContent content, string? culture, Dictionary<string, IEnumerable<object>> indexValues)
+    private void AddContentIndexHandlerFields(IContentBase content, string? culture,
+        Dictionary<string, IEnumerable<object>> indexValues)
     {
         foreach (IContentIndexHandler handler in _contentIndexHandlerCollection)
         {
@@ -104,7 +120,9 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
             {
                 if (indexValues.ContainsKey(fieldValue.FieldName))
                 {
-                    _logger.LogWarning("Duplicate field value found for field name {FieldName} among the index handlers - first one wins.", fieldValue.FieldName);
+                    _logger.LogWarning(
+                        "Duplicate field value found for field name {FieldName} among the index handlers - first one wins.",
+                        fieldValue.FieldName);
                     continue;
                 }
 
@@ -113,10 +131,10 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         }
     }
 
-    private bool CanIndex(IContent content)
+    private bool CanIndex(IContentBase content)
     {
         // is the content in a state that is allowed in the index?
-        if (content.Published is false || content.Trashed)
+        if (content is IContent contentModel && contentModel.Published is false || content.Trashed)
         {
             return false;
         }

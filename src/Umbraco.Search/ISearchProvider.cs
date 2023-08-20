@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Search;
 
-public interface ISearchProvider
+public interface ISearchProvider : IDisposable
 {
     IUmbracoIndex? GetIndex(string index);
 

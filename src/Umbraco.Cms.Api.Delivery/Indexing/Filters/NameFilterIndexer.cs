@@ -7,7 +7,7 @@ public sealed class NameFilterIndexer : IContentIndexHandler
 {
     internal const string FieldName = "name";
 
-    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content, string? culture)
+    public IEnumerable<IndexFieldValue> GetFieldValues(IContentBase content, string? culture)
         => new[] { new IndexFieldValue { FieldName = FieldName, Values = new object[] { content.GetCultureName(culture) ?? string.Empty } } };
 
     public IEnumerable<IndexField> GetFields()
