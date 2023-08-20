@@ -15,7 +15,7 @@ internal class DeferredActions
     {
         IScopeContext? scopeContext = scopeProvider.Context;
 
-        return scopeContext?.Enlist("examineEvents",
+        return scopeContext?.Enlist("searchEngineEvents",
             () => new DeferredActions(), // creator
             (completed, actions) => // action
             {

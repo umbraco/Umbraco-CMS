@@ -19,7 +19,7 @@ using Umbraco.Search.Services;
 using Umbraco.Search.ValueSet;
 using IContentValueSetBuilder = Umbraco.Search.ValueSet.ValueSetBuilders.IContentValueSetBuilder;
 using IPublishedContentValueSetBuilder = Umbraco.Search.ValueSet.ValueSetBuilders.IPublishedContentValueSetBuilder;
-
+using Umbraco.Search.DefferedActions;
 namespace Umbraco.Search.Examine;
 
 /// <summary>
@@ -83,7 +83,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     /// <inheritdoc />
     public void DeleteIndexForEntity(int entityId, bool keepIfUnpublished)
     {
-        var actions = DeferedActions.Get(_scopeProvider);
+        var actions = DeferredActions.Get(_scopeProvider);
         if (actions != null)
         {
             actions.Add(new DeferedDeleteIndex(this, _configuration, entityId, keepIfUnpublished));
@@ -97,7 +97,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     /// <inheritdoc />
     public void DeleteIndexForEntities(IReadOnlyCollection<int> entityIds, bool keepIfUnpublished)
     {
-        var actions = DeferedActions.Get(_scopeProvider);
+        var actions = Umbraco.Search.DefferedActions.DeferredActions.Get(_scopeProvider);
         if (actions != null)
         {
             actions.Add(new DeferedDeleteIndex(this, _configuration, entityIds, keepIfUnpublished));
@@ -111,7 +111,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     /// <inheritdoc />
     public void ReIndexForContent(IContent sender, bool isPublished)
     {
-        var actions = DeferedActions.Get(_scopeProvider);
+        var actions = DeferredActions.Get(_scopeProvider);
         if (actions != null)
         {
             actions.Add(new DeferedReIndexForContent(_backgroundTaskQueue, _configuration, this, sender, isPublished));
@@ -125,7 +125,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     /// <inheritdoc />
     public void ReIndexForMedia(IMedia sender, bool isPublished)
     {
-        var actions = DeferedActions.Get(_scopeProvider);
+        var actions = DeferredActions.Get(_scopeProvider);
         if (actions != null)
         {
             actions.Add(new DeferedReIndexForMedia(_backgroundTaskQueue, _configuration, this, sender, isPublished));
@@ -154,7 +154,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     /// <inheritdoc />
     public void ReIndexForMember(IMember member)
     {
-        var actions = DeferedActions.Get(_scopeProvider);
+        var actions = DeferredActions.Get(_scopeProvider);
         if (actions != null)
         {
             actions.Add(new DeferedReIndexForMember(_backgroundTaskQueue, _configuration, this, member));
@@ -245,46 +245,6 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     }
 
     #region Deferred Actions
-
-    private class DeferedActions
-    {
-        private readonly List<IDeferredAction> _actions = new();
-
-        public static DeferedActions? Get(ICoreScopeProvider scopeProvider)
-        {
-            IScopeContext? scopeContext = scopeProvider.Context;
-
-            return scopeContext?.Enlist("examineEvents",
-                () => new DeferedActions(), // creator
-                (completed, actions) => // action
-                {
-                    if (completed)
-                    {
-                        actions?.Execute();
-                    }
-                }, EnlistPriority);
-        }
-
-        public void Add(IDeferredAction action) => _actions.Add(action);
-
-        private void Execute()
-        {
-            foreach (IDeferredAction action in _actions)
-            {
-                action.Execute();
-            }
-        }
-    }
-
-    /// <summary>
-    ///     An action that will execute at the end of the Scope being completed
-    /// </summary>
-    private abstract class DeferedAction
-    {
-        public virtual void Execute()
-        {
-        }
-    }
 
     /// <summary>
     ///     Re-indexes an <see cref="IContent" /> item on a background thread
