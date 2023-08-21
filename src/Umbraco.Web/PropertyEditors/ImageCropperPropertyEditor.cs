@@ -4,11 +4,13 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Media;
 
@@ -30,20 +32,33 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IContentSection _contentSettings;
         private readonly IDataTypeService _dataTypeService;
+        private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
         private readonly UploadAutoFillProperties _autoFillProperties;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
         /// </summary>
-        public ImageCropperPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSettings, IDataTypeService dataTypeService)
+        public ImageCropperPropertyEditor(
+            ILogger logger,
+            IMediaFileSystem mediaFileSystem,
+            IContentSection contentSettings,
+            IDataTypeService dataTypeService,
+            IFileStreamSecurityValidator fileStreamSecurityValidator)
             : base(logger)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _dataTypeService = dataTypeService;
+            _fileStreamSecurityValidator = fileStreamSecurityValidator;
 
             // TODO: inject?
             _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, _contentSettings);
+        }
+
+        [Obsolete("Use constructor that accepts IFileStreamSecurityValidator.")]
+        public ImageCropperPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSettings, IDataTypeService dataTypeService)
+            : this(logger, mediaFileSystem, contentSettings, dataTypeService, Current.Factory.GetInstance<IFileStreamSecurityValidator>())
+        {
         }
 
         public string GetMediaPath(object value) => GetFileSrcFromPropertyValue(value, out _, false);
@@ -52,7 +67,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding property value editor.
         /// </summary>
         /// <returns>The corresponding property value editor.</returns>
-        protected override IDataValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, Logger, _mediaFileSystem);
+        protected override IDataValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, Logger, _mediaFileSystem, _fileStreamSecurityValidator);
 
         /// <summary>
         /// Creates the corresponding preValue editor.
@@ -131,7 +146,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Returns the "src" property from the json structure if the value is formatted correctly
         /// </summary>
         /// <param name="propVal"></param>
-        /// <param name="deserializedValue">The deserialized <see cref="JObject"/> value</param>
+        /// <param name="deserializedValue">The  deserialized <see cref="JObject"/> value</param>
         /// <param name="relative">Should the path returned be the application relative path</param>
         /// <returns></returns>
         private string GetFileSrcFromPropertyValue(object propVal, out JObject deserializedValue, bool relative = true)
