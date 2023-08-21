@@ -19,13 +19,8 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     {
         defaultEFCoreOptionsAction ??= DefaultOptionsAction;
 
-        services.AddDbContext<T>(
-            (provider, builder) => SetupDbContext(defaultEFCoreOptionsAction, provider, builder),
-            optionsLifetime: ServiceLifetime.Transient);
-
-
-
-        services.AddDbContextFactory<T>((provider, builder) => SetupDbContext(defaultEFCoreOptionsAction, provider, builder));
+        services.AddPooledDbContextFactory<T>((provider, builder) => SetupDbContext(defaultEFCoreOptionsAction, provider, builder));
+        services.AddTransient(services => services.GetRequiredService<IDbContextFactory<T>>().CreateDbContext());
 
         services.AddUnique<IAmbientEFCoreScopeStack<T>, AmbientEFCoreScopeStack<T>>();
         services.AddUnique<IEFCoreScopeAccessor<T>, EFCoreScopeAccessor<T>>();
@@ -75,17 +70,8 @@ public static class UmbracoEFCoreServiceCollectionExtensions
             connectionString = connectionString.Replace(Constants.System.DataDirectoryPlaceholder, dataDirectory);
         }
 
-        services.AddDbContext<T>(
-            options =>
-            {
-                defaultEFCoreOptionsAction(options, providerName, connectionString);
-            },
-            optionsLifetime: ServiceLifetime.Singleton);
-
-        services.AddDbContextFactory<T>(options =>
-        {
-            defaultEFCoreOptionsAction(options, providerName, connectionString);
-        });
+        services.AddPooledDbContextFactory<T>((_, options) => defaultEFCoreOptionsAction(options, providerName, connectionString));
+        services.AddTransient(services => services.GetRequiredService<IDbContextFactory<T>>().CreateDbContext());
 
         services.AddUnique<IAmbientEFCoreScopeStack<T>, AmbientEFCoreScopeStack<T>>();
         services.AddUnique<IEFCoreScopeAccessor<T>, EFCoreScopeAccessor<T>>();
