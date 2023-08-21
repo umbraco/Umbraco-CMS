@@ -129,6 +129,15 @@ namespace Umbraco.Web.Editors
 
                 using (var fs = System.IO.File.OpenRead(file.LocalFileName))
                 {
+                    // This is kinda cursed
+                    // BUT having a static method like this is absolutely insane,
+                    // and I'm not sure injecting the validator is gonna make it any less so.
+                    var validator = Current.Factory.GetInstance<IFileStreamSecurityValidator>();
+                    if (validator.IsConsideredSafe(fs) is false)
+                    {
+                        return request.CreateValidationErrorResponse("The uploaded file is not permitted due to security reasons");
+                    }
+
                     Current.MediaFileSystem.AddFile(user.Avatar, fs, true);
                 }
 
