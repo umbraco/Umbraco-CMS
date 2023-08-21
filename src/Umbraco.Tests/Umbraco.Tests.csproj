@@ -173,6 +173,7 @@
     <Compile Include="Runtimes\StandaloneTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
     <Compile Include="Scheduling\ContentVersionCleanup_Tests_UnitTests.cs" />
+    <Compile Include="Security\FileStreamSecurityValidatorTests.cs" />
     <Compile Include="Serialization\AutoInterningStringConverterTests.cs" />
     <Compile Include="Scoping\ScopeUnitTests.cs" />
     <Compile Include="Services\AmbiguousEventTests.cs" />
