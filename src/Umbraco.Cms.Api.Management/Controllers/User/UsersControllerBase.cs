@@ -104,7 +104,7 @@ public abstract class UserControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid ISO code")
                 .WithDetail("The specified ISO code is invalid.")
                 .Build()),
-            UserOperationStatus.InvalidVerificationToken => BadRequest(new ProblemDetailsBuilder()
+            UserOperationStatus.InvalidInviteToken => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid verification token")
                 .WithDetail("The specified verification token is invalid.")
                 .Build()),

@@ -382,4 +382,20 @@ public interface IUserService : IMembershipUserService
 
     #endregion
 
+    /// <summary>
+    /// Verifies the reset code sent from the reset password mail for a given user.
+    /// </summary>
+    /// <param name="userKey">The unique key of the user</param>
+    /// <param name="token">The reset password token</param>
+    Task<Attempt<UserOperationStatus>> VerifyPasswordResetAsync(Guid userKey, string token);
+
+    /// <summary>
+    /// Verifies the reset code sent from the reset password mail for a given user.
+    /// </summary>
+    /// <param name="userKey">The unique key of the user</param>
+    /// <param name="token">The reset password token</param>
+    /// <param name="password">The new password of the user</param>
+    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ResetPasswordAsync(Guid userKey, string token, string password);
+
+    Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string modelEmail);
 }

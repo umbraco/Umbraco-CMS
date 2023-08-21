@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers;
 [Authorize(Policy = "New" + AuthorizationPolicies.BackOfficeAccess)]
 [MapToApi(ManagementApiConfiguration.ApiName)]
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
-public class ManagementApiControllerBase : Controller
+public abstract class ManagementApiControllerBase : Controller
 {
     protected CreatedAtActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, Guid id)
         => CreatedAtAction(action, new { id = id });
@@ -46,7 +46,6 @@ public class ManagementApiControllerBase : Controller
 
     protected static Guid CurrentUserKey(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
-        //FIXME - Throw if no current user, when we are able to get the current user
         return backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? throw new InvalidOperationException("No backoffice user found");
     }
 }

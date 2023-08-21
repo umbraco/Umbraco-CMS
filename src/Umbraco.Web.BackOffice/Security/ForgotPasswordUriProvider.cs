@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
@@ -12,14 +12,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Security;
 
-public class InviteUriProvider : IInviteUriProvider
+public class ForgotPasswordUriProvider : IForgotPasswordUriProvider
 {
     private readonly LinkGenerator _linkGenerator;
     private readonly ICoreBackOfficeUserManager _userManager;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly WebRoutingSettings _webRoutingSettings;
 
-    public InviteUriProvider(
+    public ForgotPasswordUriProvider(
         LinkGenerator linkGenerator,
         ICoreBackOfficeUserManager userManager,
         IHttpContextAccessor httpContextAccessor,
@@ -31,22 +31,22 @@ public class InviteUriProvider : IInviteUriProvider
         _webRoutingSettings = webRoutingSettings.Value;
     }
 
-    public async Task<Attempt<Uri, UserOperationStatus>> CreateInviteUriAsync(IUser invitee)
+    public async Task<Attempt<Uri, UserOperationStatus>> CreateForgotPasswordUriAsync(IUser user)
     {
-        Attempt<string, UserOperationStatus> tokenAttempt = await _userManager.GenerateEmailConfirmationTokenAsync(invitee);
+        Attempt<string, UserOperationStatus> tokenAttempt = await _userManager.GeneratePasswordResetTokenAsync(user);
 
         if (tokenAttempt.Success is false)
         {
             return Attempt.FailWithStatus(tokenAttempt.Status, new Uri(string.Empty));
         }
 
-        string inviteToken = $"{invitee.Key}{WebUtility.UrlEncode("|")}{tokenAttempt.Result.ToUrlBase64()}";
+        string forgotPasswordToken = $"{user.Key}{WebUtility.UrlEncode("|")}{tokenAttempt.Result.ToUrlBase64()}";
 
         // FIXME: This will need to change.
         string? action = _linkGenerator.GetPathByAction(
-            nameof(BackOfficeController.VerifyInvite),
+            nameof(BackOfficeController.ValidatePasswordResetCode),
             ControllerExtensions.GetControllerName<BackOfficeController>(),
-            new { area = Constants.Web.Mvc.BackOfficeArea, invite = inviteToken });
+            new { area = Constants.Web.Mvc.BackOfficeArea, invite = forgotPasswordToken });
 
         Uri applicationUri = _httpContextAccessor
             .GetRequiredHttpContext()
