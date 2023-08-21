@@ -79,7 +79,7 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 			const createRequestBody = {
 				name: stylesheet.name,
 				content: stylesheet.content,
-				parentPath: stylesheet.path + '/',
+				parentPath: stylesheet.path === 'null' ? '' : stylesheet.path + '/',
 			};
 
 			this.repository.create(createRequestBody);

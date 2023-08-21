@@ -4,13 +4,22 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-stylesheet-workspace-editor')
 export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: UmbStylesheetWorkspaceContext;
 
+	#name: string | undefined = '';
 	@state()
-	private _name?: string;
+	private get _name() {
+		return this.#name;
+	}
+
+	private set _name(value) {
+		this.#name = value?.replace('.css', '');
+		this.requestUpdate();
+	}
 
 	@state()
 	private _path?: string;
@@ -19,12 +28,17 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 
 	#isNew = false;
 
+	private inputQuery$ = new Subject<string>();
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as unknown as UmbStylesheetWorkspaceContext;
 			this.#observeNameAndPath();
+			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue: string) => {
+				this.#workspaceContext?.setName(`${nameInputValue}.css`);
+			});
 		});
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
@@ -46,13 +60,9 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#onNameChange(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
-
-			if (typeof target?.value === 'string') {
-				this.#workspaceContext?.setName(target.value);
-			}
-		}
+		const target = event.target as UUIInputElement;
+		const value = target.value as string;
+		this.inputQuery$.next(value);
 	}
 
 	render() {
