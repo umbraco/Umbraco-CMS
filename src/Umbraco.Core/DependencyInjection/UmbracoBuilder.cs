@@ -327,6 +327,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ICultureImpactFactory>(provider => new CultureImpactFactory(provider.GetRequiredService<IOptionsMonitor<ContentSettings>>()));
             Services.AddUnique<IDictionaryService, DictionaryService>();
             Services.AddUnique<ITemporaryMediaService, TemporaryMediaService>();
+
+            // Register filestream security analyzers
+            Services.AddUnique<IFileStreamSecurityValidator,FileStreamSecurityValidator>();
         }
     }
 }
