@@ -48,6 +48,10 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 		return this.#rules.getValue();
 	}
 
+	setRules(rules: RichTextRuleModel[]) {
+		this.#rules.next(rules);
+	}
+
 	setName(value: string) {
 		this.#data.next({ ...this.#data.value, name: value });
 	}
@@ -70,6 +74,24 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 		if (rules.data) {
 			this.#rules.next(rules.data.rules ?? []);
 		}
+	}
+
+	async sendRulesGetContent() {
+		const requestBody = {
+			content: this.getData()?.content,
+			rules: this.getRules(),
+		};
+
+		const { data } = await this.repository.interpolateStylesheetRules(requestBody);
+		this.setContent(data?.content ?? '');
+	}
+
+	async sendContentGetRules() {
+		const requestBody = {
+			content: this.getData()?.content,
+		};
+
+		const { data } = await this.repository.extractStylesheetRules(requestBody);
 	}
 
 	public async save() {

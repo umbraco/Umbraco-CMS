@@ -64,7 +64,7 @@ export class UmbStylesheetRepository
 	//#region FOLDER:
 
 	createFolderScaffold(
-		parentId: string | null
+		parentId: string | null,
 	): Promise<{ data?: FolderResponseModel | undefined; error?: ProblemDetails | undefined }> {
 		const data: FolderResponseModel = {
 			name: '',
@@ -74,7 +74,7 @@ export class UmbStylesheetRepository
 	}
 
 	async createFolder(
-		folderRequest: CreateFolderRequestModel
+		folderRequest: CreateFolderRequestModel,
 	): Promise<{ data?: string | undefined; error?: ProblemDetails | undefined }> {
 		await this.#init;
 		const req = {
@@ -87,14 +87,14 @@ export class UmbStylesheetRepository
 		return promise;
 	}
 	async requestFolder(
-		unique: string
+		unique: string,
 	): Promise<{ data?: StylesheetGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
 		await this.#init;
 		return this.#folderDataSource.get(unique);
 	}
 	updateFolder(
 		unique: string,
-		folder: FolderModelBaseModel
+		folder: FolderModelBaseModel,
 	): Promise<{ data?: FolderModelBaseModel | undefined; error?: ProblemDetails | undefined }> {
 		throw new Error('Method not implemented.');
 	}
@@ -113,7 +113,7 @@ export class UmbStylesheetRepository
 
 	createScaffold(
 		parentId: string | null,
-		preset?: Partial<CreateTextFileViewModelBaseModel> | undefined
+		preset?: Partial<CreateTextFileViewModelBaseModel> | undefined,
 	): Promise<DataSourceResponse<CreateTextFileViewModelBaseModel>> {
 		throw new Error('Method not implemented.');
 	}
@@ -144,19 +144,31 @@ export class UmbStylesheetRepository
 	}
 
 	getStylesheetRules(
-		path: string
+		path: string,
 	): Promise<DataSourceResponse<RichTextStylesheetRulesResponseModel | ExtractRichTextStylesheetRulesResponseModel>> {
 		return this.#dataSource.getStylesheetRichTextRules(path);
 	}
-
+	/**
+	 * Existing content + array of rules => new content string
+	 *
+	 * @param {InterpolateRichTextStylesheetRequestModel} data
+	 * @return {*}  {Promise<DataSourceResponse<InterpolateRichTextStylesheetResponseModel>>}
+	 * @memberof UmbStylesheetRepository
+	 */
 	interpolateStylesheetRules(
-		data: InterpolateRichTextStylesheetRequestModel
+		data: InterpolateRichTextStylesheetRequestModel,
 	): Promise<DataSourceResponse<InterpolateRichTextStylesheetResponseModel>> {
 		return this.#dataSource.postStylesheetRichTextInterpolateRules(data);
 	}
-
+	/**
+	 * content string => array of rules
+	 *
+	 * @param {ExtractRichTextStylesheetRulesRequestModel} data
+	 * @return {*}  {Promise<DataSourceResponse<ExtractRichTextStylesheetRulesResponseModel>>}
+	 * @memberof UmbStylesheetRepository
+	 */
 	extractStylesheetRules(
-		data: ExtractRichTextStylesheetRulesRequestModel
+		data: ExtractRichTextStylesheetRulesRequestModel,
 	): Promise<DataSourceResponse<ExtractRichTextStylesheetRulesResponseModel>> {
 		return this.#dataSource.postStylesheetRichTextExtractRules(data);
 	}
@@ -204,7 +216,7 @@ export class UmbStylesheetRepository
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(path) };
 	}
 
-	async requestItemsLegacy(paths: Array<string>) {
+	async requestItems(paths: Array<string>) {
 		if (!paths) throw new Error('Paths are missing');
 		await this.#init;
 		const { data, error } = await this.#treeDataSource.getItems(paths);

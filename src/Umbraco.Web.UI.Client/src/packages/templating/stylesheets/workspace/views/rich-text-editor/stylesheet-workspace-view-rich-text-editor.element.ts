@@ -65,7 +65,6 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 			});
 
 			this.observe(this.#stylesheetWorkspaceContext.rules, (rules) => {
-				debugger;
 				this._rules = rules;
 			});
 		});
