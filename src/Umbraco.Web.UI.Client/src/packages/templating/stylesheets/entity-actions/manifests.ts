@@ -44,7 +44,7 @@ const stylesheetFolderActions: Array<ManifestEntityAction> = [
 			label: 'New stylesheet file',
 			api: UmbCreateStylesheetAction,
 			repositoryAlias: STYLESHEET_REPOSITORY_ALIAS,
-			entityTypes: [STYLESHEET_FOLDER_ENTITY_TYPE, STYLESHEET_ROOT_ENTITY_TYPE],
+			entityTypes: [STYLESHEET_FOLDER_ENTITY_TYPE, STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE, STYLESHEET_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -56,7 +56,7 @@ const stylesheetFolderActions: Array<ManifestEntityAction> = [
 			label: 'New Rich Text Editor style sheet file',
 			api: UmbCreateRTFStylesheetAction,
 			repositoryAlias: STYLESHEET_REPOSITORY_ALIAS,
-			entityTypes: [STYLESHEET_FOLDER_ENTITY_TYPE, STYLESHEET_ROOT_ENTITY_TYPE],
+			entityTypes: [STYLESHEET_FOLDER_ENTITY_TYPE, STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE, STYLESHEET_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
