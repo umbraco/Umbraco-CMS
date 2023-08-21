@@ -197,6 +197,9 @@
     <Compile Include="PropertyEditors\PropertyCacheCompression.cs" />
     <Compile Include="PropertyEditors\IPropertyCacheCompression.cs" />
     <Compile Include="PropertyEditors\UnPublishedContentPropertyCacheCompressionOptions.cs" />
+    <Compile Include="Security\FileStreamSecurityValidator.cs" />
+    <Compile Include="Security\IFileStreamSecurityAnalyzer.cs" />
+    <Compile Include="Security\IFileStreamSecurityValidator.cs" />
     <Compile Include="Security\IHtmlSanitizer.cs" />
     <Compile Include="Security\NoopHtmlSanitizer.cs" />
     <Compile Include="Serialization\AutoInterningStringConverter.cs" />

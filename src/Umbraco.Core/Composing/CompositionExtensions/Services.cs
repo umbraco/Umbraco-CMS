@@ -83,6 +83,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
 
             composition.RegisterUnique<ITelemetryService, TelemetryService>();
             composition.RegisterUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
+            composition.RegisterUnique<IFileStreamSecurityValidator, FileStreamSecurityValidator>();
 
             return composition;
         }
