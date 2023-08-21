@@ -2,17 +2,15 @@ import { UmbStylesheetRepository } from '../repository/stylesheet.repository.js'
 import { StylesheetDetails } from '../index.js';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBooleanState, UmbObjectState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState, UmbObjectState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import {
-	RichTextStylesheetRulesResponseModel,
-	UpdateStylesheetRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { RichTextRuleModel, UpdateStylesheetRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStylesheetRepository, StylesheetDetails> {
 	#data = new UmbObjectState<StylesheetDetails | undefined>(undefined);
-	#rules = new UmbObjectState<RichTextStylesheetRulesResponseModel | undefined>(undefined);
+	#rules = new UmbArrayState<RichTextRuleModel>([]);
 	data = this.#data.asObservable();
+	rules = this.#rules.asObservable();
 	name = createObservablePart(this.#data, (data) => data?.name);
 	content = createObservablePart(this.#data, (data) => data?.content);
 	path = createObservablePart(this.#data, (data) => data?.path);
@@ -46,6 +44,10 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 		return this.#data.getValue();
 	}
 
+	getRules() {
+		return this.#rules.getValue();
+	}
+
 	setName(value: string) {
 		this.#data.next({ ...this.#data.value, name: value });
 	}
@@ -66,7 +68,7 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 		}
 
 		if (rules.data) {
-			this.#rules.update(rules.data);
+			this.#rules.next(rules.data.rules ?? []);
 		}
 	}
 

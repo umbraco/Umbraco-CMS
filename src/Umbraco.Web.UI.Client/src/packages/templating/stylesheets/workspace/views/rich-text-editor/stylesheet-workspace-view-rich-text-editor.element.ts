@@ -33,23 +33,7 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 	private _ready?: boolean = false;
 
 	@state()
-	private _rules?: RichTextRuleModel[] = [
-		{
-			name: 'bjjh',
-			selector: 'h1',
-			styles: 'color: blue;',
-		},
-		{
-			name: 'comeone',
-			selector: 'h1',
-			styles: 'color: blue;',
-		},
-		{
-			name: 'lol',
-			selector: 'h1',
-			styles: 'color: blue;',
-		},
-	];
+	private _rules?: RichTextRuleModel[] = [];
 
 	#stylesheetWorkspaceContext?: UmbStylesheetWorkspaceContext;
 	private _modalContext?: UmbModalManagerContext;
@@ -78,6 +62,11 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 
 			this.observe(this.#stylesheetWorkspaceContext.isCodeEditorReady, (isReady) => {
 				this._ready = isReady;
+			});
+
+			this.observe(this.#stylesheetWorkspaceContext.rules, (rules) => {
+				debugger;
+				this._rules = rules;
 			});
 		});
 
