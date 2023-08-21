@@ -79,16 +79,17 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
     {
         const string childrenOfParameter = "children:";
 
-        var childrenOf = string.Empty;
-        if (fetch?.StartsWith(childrenOfParameter, StringComparison.OrdinalIgnoreCase) is true)
-        {
-            childrenOf = fetch.TrimStart(childrenOfParameter);
-        }
-
-        if (childrenOf.IsNullOrWhiteSpace())
+        if (fetch?.StartsWith(childrenOfParameter, StringComparison.OrdinalIgnoreCase) is not true)
         {
             _logger.LogInformation($"The current implementation of {nameof(IApiMediaQueryService)} expects \"{childrenOfParameter}[id/path]\" in the \"{nameof(fetch)}\" query option");
             return null;
+        }
+
+        var childrenOf = fetch.TrimStart(childrenOfParameter);
+        if (childrenOf.IsNullOrWhiteSpace())
+        {
+            // this mirrors the current behavior of the Content Delivery API :-)
+            return Array.Empty<IPublishedContent>();
         }
 
         IPublishedMediaCache mediaCache = GetRequiredPublishedMediaCache();
