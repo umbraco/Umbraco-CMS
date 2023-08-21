@@ -21,10 +21,10 @@ internal class DictionaryOfCultureVariationSerializer : SerializerBase,
         }
 
         // read each variation
-        var dict = new Dictionary<string, CultureVariation>(StringComparer.InvariantCultureIgnoreCase);
+        var dict = new Dictionary<string, CultureVariation>(pcount, StringComparer.InvariantCultureIgnoreCase);
         for (var i = 0; i < pcount; i++)
         {
-            var languageId = string.Intern(PrimitiveSerializer.String.ReadFrom(stream));
+            var languageId = ArrayPoolingLimitedSerializer.StringSerializer.ReadString(stream, true, false);
             var cultureVariation = new CultureVariation
             {
                 Name = ReadStringObject(stream),

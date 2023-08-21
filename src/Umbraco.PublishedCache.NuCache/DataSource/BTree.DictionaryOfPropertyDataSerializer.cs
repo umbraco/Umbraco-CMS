@@ -20,7 +20,7 @@ internal class DictionaryOfPropertyDataSerializer : SerializerBase, ISerializer<
         for (var i = 0; i < pcount; i++)
         {
             // read property alias
-            var key = string.Intern(PrimitiveSerializer.String.ReadFrom(stream));
+            var key = ArrayPoolingLimitedSerializer.StringSerializer.ReadString(stream, true, true);
 
             // read values count
             var vcount = PrimitiveSerializer.Int32.ReadFrom(stream);

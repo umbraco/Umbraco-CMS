@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.1" />
     <PackageReference Include="Umbraco.CSharpTest.Net.Collections" Version="14.906.1403.1085" />
     <PackageReference Include="MessagePack" Version="2.3.85" />
     <PackageReference Include="K4os.Compression.LZ4" Version="1.2.16" />

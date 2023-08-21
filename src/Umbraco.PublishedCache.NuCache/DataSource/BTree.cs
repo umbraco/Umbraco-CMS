@@ -9,6 +9,11 @@ public class BTree
 {
     public static BPlusTree<int, ContentNodeKit> GetTree(string filepath, bool exists, NuCacheSettings settings, ContentDataSerializer? contentDataSerializer = null)
     {
+        if (GetTreeFunc != null)
+        {
+            return GetTreeFunc(filepath, exists, settings, contentDataSerializer);
+        }
+
         var keySerializer = new PrimitiveSerializer();
         var valueSerializer = new ContentNodeKitSerializer(contentDataSerializer);
         var options = new BPlusTree<int, ContentNodeKit>.OptionsV2(keySerializer, valueSerializer)
@@ -31,6 +36,11 @@ public class BTree
         // btree.
         return tree;
     }
+
+    /// <summary>
+    /// Custom Nucache GetTree
+    /// </summary>
+    public static Func<string, bool, NuCacheSettings, ContentDataSerializer?, BPlusTree<int, ContentNodeKit>>? GetTreeFunc { get; set; }
 
     private static int GetBlockSize(NuCacheSettings settings)
     {

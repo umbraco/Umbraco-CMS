@@ -50,9 +50,7 @@ internal abstract class SerializerBase
             throw new NotSupportedException($"Cannot deserialize type '{type}', expected '{PrefixString}'.");
         }
 
-        return intern
-            ? string.Intern(PrimitiveSerializer.String.ReadFrom(stream))
-            : PrimitiveSerializer.String.ReadFrom(stream);
+        return ArrayPoolingLimitedSerializer.StringSerializer.ReadString(stream, intern);
     }
 
     private T? ReadStruct<T>(Stream stream, char t, Func<Stream, T> read)
@@ -102,7 +100,7 @@ internal abstract class SerializerBase
             case PrefixNull:
                 return null;
             case PrefixString:
-                return PrimitiveSerializer.String.ReadFrom(stream);
+                return ArrayPoolingLimitedSerializer.StringSerializer.ReadString(stream);
             case PrefixInt32:
                 return PrimitiveSerializer.Int32.ReadFrom(stream);
             case PrefixUInt16:
