@@ -7,55 +7,77 @@ import {
 } from '../provide/context-provide.event.js';
 import { UmbContextRequestEventImplementation, UmbContextCallback } from './context-request.event.js';
 
+export type UmbContextDiscriminator<T, DiscriminatorResult extends T = T> = (instance: T) => instance is DiscriminatorResult;
+
 /**
  * @export
  * @class UmbContextConsumer
  */
-export class UmbContextConsumer<T = unknown> {
-	#callback?: UmbContextCallback<T>;
-	#promise?: Promise<T>;
-	#promiseResolver?: (instance: T) => void;
+export class UmbContextConsumer<T = unknown, D extends T = T> {
+	#callback?: UmbContextCallback<D>;
+	#promise?: Promise<D>;
+	#promiseResolver?: (instance: D) => void;
 
-	#instance?: T;
+	#instance?: D;
 	get instance() {
 		return this.#instance;
 	}
 
 	#contextAlias: string;
 
+	#discriminator?: UmbContextDiscriminator<T, D>;
+
 	/**
 	 * Creates an instance of UmbContextConsumer.
 	 * @param {EventTarget} hostElement
 	 * @param {string} contextAlias
-	 * @param {UmbContextCallback} _callback
+	 * @param {UmbContextCallback} callback
 	 * @memberof UmbContextConsumer
 	 */
 	constructor(
 		protected hostElement: EventTarget,
 		contextAlias: string | UmbContextToken<T>,
-		callback?: UmbContextCallback<T>
+		callback?: UmbContextCallback<D>,
+		discriminator?: UmbContextDiscriminator<T, D>
 	) {
 		this.#contextAlias = contextAlias.toString();
 		this.#callback = callback;
+		this.#discriminator = discriminator;
 	}
 
-	/* Idea: Niels: If we need to filter for specific contexts, we could make the response method return true/false. If false, the event should then then not be stopped. Alternatively parse the event it self on to the response-callback. This will enable the event to continue to bubble up finding a context that matches. The reason for such would be to have some who are more specific than others. For example, some might just need the current workspace-context, others might need the closest handling a certain entityType. As I'm writting this is not relevant, but I wanted to keep the idea as we have had some circumstance that might be solved with this approach.*/
+
+	/* Idea: Niels: If we need to filter for specific contexts, we could make the response method return true/false. If false, the event should then then not be stopped. Alternatively parse the event it self on to the response-callback.
+	This will enable the event to continue to bubble up finding a context that matches.
+	The reason for such would be to have some who are more specific than others. For example, some might just need the current workspace-context, others might need the closest handling a certain entityType.
+	As I'm writing this is not relevant, but I wanted to keep the idea as we have had some circumstance that might be solved with this approach.
+	*/
 	protected _onResponse = (instance: T) => {
 		if (this.#instance === instance) {
 			return;
 		}
+		if(this.#discriminator) {
+			// Notice if discriminator returns false, we do not want to setInstance.
+			if(this.#discriminator(instance)) {
+				this.setInstance(instance);
+			}
+		} else {
+			this.setInstance(instance as D);
+		}
+	};
+
+	protected setInstance(instance: D) {
 		this.#instance = instance;
 		this.#callback?.(instance);
 		if (instance !== undefined) {
 			this.#promiseResolver?.(instance);
 			this.#promise = undefined;
 		}
-	};
+	}
 
 	public asPromise() {
 		return (
 			this.#promise ??
-			(this.#promise = new Promise<T>((resolve) => {
+			(this.#promise = new Promise<D>((resolve) => {
 				this.#instance ? resolve(this.#instance) : (this.#promiseResolver = resolve);
 			}))
 		);
