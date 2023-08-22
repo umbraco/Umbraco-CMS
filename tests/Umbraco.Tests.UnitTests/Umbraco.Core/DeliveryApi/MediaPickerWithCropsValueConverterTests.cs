@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
@@ -18,16 +19,19 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var serializer = new JsonNetSerializer();
         var publishedValueFallback = Mock.Of<IPublishedValueFallback>();
         var apiUrlProvider = new ApiMediaUrlProvider(PublishedUrlProvider);
+        var apiMediaWithCropsBuilder = new ApiMediaWithCropsBuilder(
+            new ApiMediaBuilder(
+                new ApiContentNameProvider(),
+                apiUrlProvider,
+                publishedValueFallback,
+                CreateOutputExpansionStrategyAccessor()),
+            publishedValueFallback);
         return new MediaPickerWithCropsValueConverter(
             PublishedSnapshotAccessor,
             PublishedUrlProvider,
             publishedValueFallback,
             serializer,
-            new ApiMediaBuilder(
-                new ApiContentNameProvider(),
-                apiUrlProvider,
-                Mock.Of<IPublishedValueFallback>(),
-                CreateOutputExpansionStrategyAccessor()));
+            apiMediaWithCropsBuilder);
     }
 
     [Test]

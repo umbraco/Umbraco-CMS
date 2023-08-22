@@ -19,12 +19,12 @@
                 ng-class="{'--isOpen':vm.openBlock === block}"
                 ng-click="vm.openBlockOverlay(block)"
                 data-content-element-type-key="{{block.contentElementTypeKey}}">
-                <div class="__actions">
-                    <button ng-if="block.areas.length > 0" type="button" class="btn-reset __action umb-outline" ng-click="vm.openBlockOverlay(block, true); $event.stopPropagation();">
+                <div class="__actions" ng-click="$event.stopPropagation()" tabindex="-1">
+                    <button type="button" ng-if="block.areas.length > 0" class="btn-reset __action umb-outline" ng-click="vm.openBlockOverlay(block, true); $event.stopPropagation();">
                         <umb-icon icon="icon-layout" class="icon"></umb-icon>
                         <localize key="blockEditor_tabAreas" class="sr-only">Areas</localize>
                     </button>
-                    <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($index); $event.stopPropagation();">
+                    <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($index, $event)">
                         <umb-icon icon="icon-trash" class="icon"></umb-icon>
                         <localize key="general_delete" class="sr-only">Delete</localize>
                     </button>
@@ -46,11 +46,13 @@
     <div ui-sortable="vm.groupSortableOptions" ng-model="vm.blockGroups">
         <div class="umb-block-card-group" ng-repeat="blockGroup in vm.blockGroups track by blockGroup.key">
 
-
             <div class="__controls">
-                <div class="__handle"><umb-icon icon="icon-navigation"></umb-icon></div>
                 
-                <input class="__title" title="group name" type="text" ng-model="blockGroup.name"/>
+                <div class="__handle">
+                  <umb-icon icon="icon-navigation"></umb-icon>
+                </div>
+                
+                <input type="text" class="__title" title="group name" ng-model="blockGroup.name" />
 
                 <button 
                     type="button" 
@@ -76,12 +78,12 @@
                     ng-class="{'--isOpen':vm.openBlock === block}"
                     ng-click="vm.openBlockOverlay(block)"
                     data-content-element-type-key="{{block.contentElementTypeKey}}">
-                    <div class="__actions">
-                        <button ng-if="block.areas.length > 0" type="button" class="btn-reset __action umb-outline" ng-click="vm.openBlockOverlay(block, true); $event.stopPropagation();">
+                    <div class="__actions" ng-click="$event.stopPropagation()" tabindex="-1">
+                        <button type="button" ng-if="block.areas.length > 0" class="btn-reset __action umb-outline" ng-click="vm.openBlockOverlay(block, true); $event.stopPropagation();">
                             <umb-icon icon="icon-layout" class="icon"></umb-icon>
                             <localize key="blockEditor_tabAreas" class="sr-only">Areas</localize>
                         </button>
-                        <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($index); $event.stopPropagation();">
+                        <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($index, $event)">
                             <umb-icon icon="icon-trash" class="icon"></umb-icon>
                             <localize key="general_delete" class="sr-only">Delete</localize>
                         </button>

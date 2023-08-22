@@ -46,6 +46,7 @@ public abstract class PublishedPropertyBase : IPublishedProperty
     public abstract object? GetValue(string? culture = null, string? segment = null);
 
     /// <inheritdoc />
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public abstract object? GetXPathValue(string? culture = null, string? segment = null);
 
     /// <inheritdoc />
