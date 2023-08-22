@@ -3,7 +3,7 @@ using Umbraco.Cms.Api.Management.ViewModels.ContentType;
 namespace Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 
 public class UpdateDocumentTypeRequestModel
-    : UpdateContentTypeRequestModelBase<UpdateDocumentTypePropertyTypeRequestModel, UpdateDocumentTypePropertyTypeContainerRequestModel>, IDocumentTypeRequestModel
+    : UpdateContentTypeRequestModelBase<UpdateDocumentTypePropertyTypeRequestModel, UpdateDocumentTypePropertyTypeContainerRequestModel>
 {
     public IEnumerable<Guid> AllowedTemplateIds { get; set; } = Array.Empty<Guid>();
 

@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -19,8 +21,44 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
         IAuditRepository auditRepository,
         IMediaTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver)
+        : base(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            mediaTypeRepository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver) => MediaService = mediaService;
+
+    [Obsolete("Use the constructor with all dependencies instead")]
+    public MediaTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMediaService mediaService,
+        IMediaTypeRepository mediaTypeRepository,
+        IAuditRepository auditRepository,
+        IMediaTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
         IEventAggregator eventAggregator)
-        : base(provider, loggerFactory, eventMessagesFactory, mediaTypeRepository, auditRepository, entityContainerRepository, entityRepository, eventAggregator) => MediaService = mediaService;
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            mediaService,
+            mediaTypeRepository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+    {
+    }
+
 
     // beware! order is important to avoid deadlocks
     protected override int[] ReadLockIds { get; } = { Constants.Locks.MediaTypes };

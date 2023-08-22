@@ -32,14 +32,14 @@ public abstract class DataTypeFolderControllerBase : FolderManagementControllerB
     protected override async Task<EntityContainer?> GetParentContainerAsync(EntityContainer container)
         => await _dataTypeContainerService.GetParentAsync(container);
 
-    protected override async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> CreateContainerAsync(EntityContainer container, Guid? parentId, Guid userId)
-        => await _dataTypeContainerService.CreateAsync(container, parentId, userId);
+    protected override async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> CreateContainerAsync(EntityContainer container, Guid? parentId, Guid userKey)
+        => await _dataTypeContainerService.CreateAsync(container, parentId, userKey);
 
-    protected override async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> UpdateContainerAsync(EntityContainer container, Guid userId)
-        => await _dataTypeContainerService.UpdateAsync(container, userId);
+    protected override async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> UpdateContainerAsync(EntityContainer container, Guid userKey)
+        => await _dataTypeContainerService.UpdateAsync(container, userKey);
 
-    protected override async Task<Attempt<EntityContainer?, DataTypeContainerOperationStatus>> DeleteContainerAsync(Guid id, Guid userId)
-        => await _dataTypeContainerService.DeleteAsync(id, userId);
+    protected override async Task<Attempt<EntityContainer?, DataTypeContainerOperationStatus>> DeleteContainerAsync(Guid id, Guid userKey)
+        => await _dataTypeContainerService.DeleteAsync(id, userKey);
 
     protected override IActionResult OperationStatusResult(DataTypeContainerOperationStatus status)
         => status switch

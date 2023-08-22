@@ -1,5 +1,7 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
@@ -9,6 +11,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -21,6 +24,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     private readonly IEntityContainerRepository _containerRepository;
     private readonly IEntityRepository _entityRepository;
     private readonly IEventAggregator _eventAggregator;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
     protected ContentTypeServiceBase(
         ICoreScopeProvider provider,
@@ -30,7 +34,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         IAuditRepository auditRepository,
         IEntityContainerRepository containerRepository,
         IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         Repository = repository;
@@ -38,6 +43,30 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         _containerRepository = containerRepository;
         _entityRepository = entityRepository;
         _eventAggregator = eventAggregator;
+        _userIdKeyResolver = userIdKeyResolver;
+    }
+
+    [Obsolete("Use the ctor specifying all dependencies instead")]
+    protected ContentTypeServiceBase(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        TRepository repository,
+        IAuditRepository auditRepository,
+        IEntityContainerRepository containerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            auditRepository,
+            containerRepository,
+            entityRepository,
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+    {
     }
 
     protected TRepository Repository { get; }
@@ -307,6 +336,9 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return Repository.Get(id);
     }
 
+    /// <inheritdoc />
+    public Task<TItem?> GetAsync(Guid guid) => Task.FromResult(Get(guid));
+
     public IEnumerable<TItem> GetAll(params int[] ids)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -462,6 +494,12 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #region Save
 
+    public async Task SaveAsync(TItem item, Guid performingUserKey)
+    {
+        var userId = await _userIdKeyResolver.GetAsync(performingUserKey);
+        Save(item, userId);
+    }
+
     public void Save(TItem? item, int userId = Constants.Security.SuperUserId)
     {
         if (item is null)
@@ -570,6 +608,25 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #region Delete
 
+    public async Task<ContentTypeOperationStatus> DeleteAsync(Guid key, Guid performingUserKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        int performingUserId = await _userIdKeyResolver.GetAsync(performingUserKey);
+
+        TItem? item = await GetAsync(key);
+
+        if (item is null)
+        {
+            return ContentTypeOperationStatus.NotFound;
+        }
+
+        Delete(item, performingUserId);
+
+        scope.Complete();
+        return ContentTypeOperationStatus.Success;
+    }
+
     public void Delete(TItem item, int userId = Constants.Security.SuperUserId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -601,10 +658,10 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
 
             // Next find all other document types that have a reference to this content type
-            IEnumerable<TItem> referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes?.Any(p=>p.Id.Value==item.Id) ?? false);
+            IEnumerable<TItem> referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes?.Any(p => p.Key == item.Key) ?? false);
             foreach (TItem reference in referenceToAllowedContentTypes)
             {
-                reference.AllowedContentTypes = reference.AllowedContentTypes?.Where(p => p.Id.Value != item.Id);
+                reference.AllowedContentTypes = reference.AllowedContentTypes?.Where(p => p.Key != item.Key);
                 var changedRef = new List<ContentTypeChange<TItem>>() { new ContentTypeChange<TItem>(reference, ContentTypeChangeTypes.RefreshMain) };
                 // Fire change event
                 scope.Notifications.Publish(GetContentTypeChangedNotification(changedRef, eventMessages));
