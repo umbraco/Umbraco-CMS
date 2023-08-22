@@ -9,13 +9,11 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public class RelationPresentationFactory : IRelationPresentationFactory
 {
     private readonly IRelationService _relationService;
-    private readonly IUmbracoMapper _umbracoMapper;
     private readonly IEntityService _entityService;
 
-    public RelationPresentationFactory(IRelationService relationService, IUmbracoMapper umbracoMapper, IEntityService entityService)
+    public RelationPresentationFactory(IRelationService relationService, IEntityService entityService)
     {
         _relationService = relationService;
-        _umbracoMapper = umbracoMapper;
         _entityService = entityService;
     }
 
