@@ -21,7 +21,7 @@ public class TypeFinder : ITypeFinder
     ///     its an exact name match
     ///     NOTE this means that "foo." will NOT exclude "foo.dll" but only "foo.*.dll"
     /// </remarks>
-    internal static readonly string[] KnownAssemblyExclusionFilter =
+    internal static string[] KnownAssemblyExclusionFilter =
     {
         "mscorlib,", "netstandard,", "System,", "Antlr3.", "AutoMapper,", "AutoMapper.", "Autofac,", // DI
         "Autofac.", "AzureDirectory,", "Castle.", // DI, tests
@@ -49,11 +49,20 @@ public class TypeFinder : ITypeFinder
     private string[]? _assembliesAcceptingLoadExceptions;
     private volatile HashSet<Assembly>? _localFilteredAssemblyCache;
 
+    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V14.")]
     public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, ITypeFinderConfig? typeFinderConfig = null)
+        : this(logger, assemblyProvider, null, typeFinderConfig)
+    { }
+
+    public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, string[]? additionalExlusionAssemblies, ITypeFinderConfig? typeFinderConfig = null)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _assemblyProvider = assemblyProvider;
         _typeFinderConfig = typeFinderConfig;
+        if (additionalExlusionAssemblies is not null)
+        {
+            KnownAssemblyExclusionFilter = KnownAssemblyExclusionFilter.Union(additionalExlusionAssemblies).ToArray();
+        }
     }
 
     /// <inheritdoc />
