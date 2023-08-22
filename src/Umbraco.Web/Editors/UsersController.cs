@@ -49,6 +49,7 @@ namespace Umbraco.Web.Editors
     public class UsersController : UmbracoAuthorizedJsonController
     {
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
 
         public UsersController(
             IGlobalSettings globalSettings,
@@ -59,10 +60,27 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
-            IUmbracoSettingsSection umbracoSettingsSection)
+            IUmbracoSettingsSection umbracoSettingsSection,
+            IFileStreamSecurityValidator fileStreamSecurityValidator)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _umbracoSettingsSection = umbracoSettingsSection;
+            _fileStreamSecurityValidator = fileStreamSecurityValidator;
+        }
+
+        [Obsolete("Use the overload specifying all dependencies instead")]
+        public UsersController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IUmbracoSettingsSection umbracoSettingsSection)
+            : this(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoSettingsSection, Current.Factory.GetInstance<IFileStreamSecurityValidator>())
+        {
         }
 
         /// <summary>
@@ -83,10 +101,15 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, id);
+            return await PostSetAvatarInternal(Request, Services.UserService, _fileStreamSecurityValidator, AppCaches.RuntimeCache, id);
         }
 
-        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, int id)
+        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(
+            HttpRequestMessage request,
+            IUserService userService,
+            IFileStreamSecurityValidator fileStreamSecurityValidator,
+            IAppCache cache,
+            int id)
         {
             if (request.Content.IsMimeMultipartContent() == false)
             {
@@ -129,11 +152,7 @@ namespace Umbraco.Web.Editors
 
                 using (var fs = System.IO.File.OpenRead(file.LocalFileName))
                 {
-                    // This is kinda cursed
-                    // BUT having a static method like this is absolutely insane,
-                    // and I'm not sure injecting the validator is gonna make it any less so.
-                    var validator = Current.Factory.GetInstance<IFileStreamSecurityValidator>();
-                    if (validator.IsConsideredSafe(fs) is false)
+                    if (fileStreamSecurityValidator.IsConsideredSafe(fs) is false)
                     {
                         return request.CreateValidationErrorResponse("The uploaded file is not permitted due to security reasons");
                     }

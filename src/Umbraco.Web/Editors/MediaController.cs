@@ -50,6 +50,24 @@ namespace Umbraco.Web.Editors
     [MediaControllerControllerConfiguration]
     public class MediaController : ContentControllerBase
     {
+        [Obsolete("Use the constructor specifying all dependencies instead.")]
+        public MediaController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services,
+            AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : this(propertyEditors,
+                globalSettings,
+                umbracoContextAccessor,
+                sqlContext,
+                services,
+                appCaches,
+                logger,
+                runtimeState,
+                umbracoHelper,
+                Current.Factory.GetInstance<IFileStreamSecurityValidator>())
+        {
+
+        }
+
         public MediaController(
             PropertyEditorCollection propertyEditors,
             IGlobalSettings globalSettings,
