@@ -6,7 +6,7 @@ import { UmbContextRequestEventImplementation, umbContextRequestEventType } from
 const testContextAlias = 'my-test-context';
 
 class UmbTestContextConsumerClass {
-	prop = 'value from provider';
+	public prop: string = 'value from provider';
 }
 
 describe('UmbContextConsumer', () => {
@@ -18,6 +18,11 @@ describe('UmbContextConsumer', () => {
 	});
 
 	describe('Public API', () => {
+		describe('properties', () => {
+			it('has a instance property', () => {
+				expect(consumer).to.have.property('instance').that.is.undefined;
+			});
+		});
 		describe('methods', () => {
 			it('has a request method', () => {
 				expect(consumer).to.have.property('request').that.is.a('function');
@@ -34,6 +39,7 @@ describe('UmbContextConsumer', () => {
 				expect(event).to.exist;
 				expect(event.type).to.eq(umbContextRequestEventType);
 				expect(event.contextAlias).to.eq(testContextAlias);
+				consumer.hostDisconnected();
 			});
 		});
 	});
@@ -89,4 +95,80 @@ describe('UmbContextConsumer', () => {
 		localConsumer.hostConnected();
 	});
 	*/
+});
+
+describe('UmbContextConsumer with discriminator test', () => {
+
+	type A = { prop: string };
+
+	function discriminator(instance: unknown): instance is A {
+		return typeof (instance as any).prop === 'string';
+	}
+
+	function badDiscriminator(instance: unknown): instance is A {
+		return typeof (instance as any).notExistingProp === 'string';
+	}
+
+	describe('discriminator type', () => {
+		it('discriminator determines the instance type', async () => {
+
+			const localConsumer = new UmbContextConsumer(document.body, testContextAlias, (instance: A) => { console.log(instance)}, discriminator);
+			localConsumer.hostConnected();
+
+			// This bit of code is just to make sure the type is correct.
+			type TestType = Exclude<(typeof localConsumer.instance), undefined> extends A ? true : never;
+			const test: TestType = true;
+			expect(test).to.be.true;
+
+			localConsumer.destroy();
+		});
+	});
+
+
+	it('approving discriminator still fires callback', (done) => {
+		const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+		provider.hostConnected();
+
+		const element = document.createElement('div');
+		document.body.appendChild(element);
+
+		const localConsumer = new UmbContextConsumer(
+			element,
+			testContextAlias,
+			(_instance) => {
+				expect(_instance.prop).to.eq('value from provider');
+				done();
+				localConsumer.hostDisconnected();
+				provider.hostDisconnected();
+			},
+			discriminator
+		);
+		localConsumer.hostConnected();
+	});
+
+	it('disapproving discriminator does not fire callback', (done) => {
+		const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+		provider.hostConnected();
+
+		const element = document.createElement('div');
+		document.body.appendChild(element);
+
+		const localConsumer = new UmbContextConsumer(
+			element,
+			testContextAlias,
+			(_instance) => {
+				expect(_instance.prop).to.eq('this must not happen!');
+			},
+			badDiscriminator
+		);
+		localConsumer.hostConnected();
+
+		Promise.resolve().then(() => {
+			done();
+			localConsumer.hostDisconnected();
+			provider.hostDisconnected();
+		});
+	});
+
+
 });
