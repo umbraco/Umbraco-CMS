@@ -6,6 +6,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Relation;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Relation;
@@ -24,31 +26,25 @@ public class ByChildRelationController : RelationControllerBase
         _relationPresentationFactory = relationPresentationFactory;
     }
 
-    [HttpGet("child-relation/{childId:int}")]
+    /// <summary>
+    /// Gets a paged list of relations by the unique relation child keys.
+    /// </summary>
+    /// <remarks>
+    /// Use case: When you wanna restore a deleted item, this is used to find the old location
+    /// </remarks>
+    [HttpGet("child-relation/{childId:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationResponseModel>), StatusCodes.Status200OK)]
-    public async Task<PagedViewModel<RelationResponseModel>> ByChild(int childId, int skip = 0, int take = 100, string? relationTypeAlias = "")
+    public async Task<IActionResult> ByChild(Guid childId, int skip = 0, int take = 100, string? relationTypeAlias = "")
     {
-        IRelation[] relations = _relationService.GetByChildId(childId).ToArray();
-        RelationResponseModel[] result = Array.Empty<RelationResponseModel>();
+        PagedModel<IRelation> relationsAttempt = await _relationService.GetPagedByChildKeyAsync(childId, skip, take, relationTypeAlias);
 
-        if (relations.Any())
-        {
-            if (string.IsNullOrWhiteSpace(relationTypeAlias) == false)
-            {
-                result = _relationPresentationFactory.CreateMultiple(relations.Where(x =>
-                    x.RelationType.Alias.InvariantEquals(relationTypeAlias))).ToArray();
-            }
-            else
-            {
-                result = _relationPresentationFactory.CreateMultiple(relations).ToArray();
-            }
-        }
+        IEnumerable<RelationResponseModel> mappedRelations = relationsAttempt.Items.Select(_relationPresentationFactory.Create);
 
-        return await Task.FromResult(new PagedViewModel<RelationResponseModel>
+        return await Task.FromResult(Ok(new PagedViewModel<RelationResponseModel>
         {
-            Total = result.Length,
-            Items = result.Skip(skip).Take(take),
-        });
+            Total = relationsAttempt.Total,
+            Items = mappedRelations,
+        }));
     }
 }
