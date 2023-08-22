@@ -31,7 +31,7 @@ public class ResetPasswordTokenController : SecurityControllerBase
     [UserPasswordEnsureMinimumResponseTime]
     public async Task<IActionResult> ResetPasswordToken(ResetPasswordTokenRequestModel model)
     {
-        Attempt<PasswordChangedModel, UserOperationStatus> result = await _userService.ResetPasswordAsync(model.UserKey, model.ResetCode, model.Password);
+        Attempt<PasswordChangedModel, UserOperationStatus> result = await _userService.ResetPasswordAsync(model.UserId, model.ResetCode, model.Password);
 
         return result.Success
             ? NoContent()
