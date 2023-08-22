@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
@@ -51,6 +52,7 @@ public class MediaController : ContentControllerBase
 {
     private static readonly Semaphore _postAddFileSemaphore = new(1, 1);
     private readonly AppCaches _appCaches;
+    private readonly IFileStreamSecurityValidator? _fileStreamSecurityValidator; // make non nullable in v14
     private readonly IAuthorizationService _authorizationService;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly ContentSettings _contentSettings;
@@ -67,6 +69,58 @@ public class MediaController : ContentControllerBase
     private readonly ISqlContext _sqlContext;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    [ActivatorUtilitiesConstructor]
+    public MediaController(
+        ICultureDictionary cultureDictionary,
+        ILoggerFactory loggerFactory,
+        IShortStringHelper shortStringHelper,
+        IEventMessagesFactory eventMessages,
+        ILocalizedTextService localizedTextService,
+        IOptionsSnapshot<ContentSettings> contentSettings,
+        IMediaTypeService mediaTypeService,
+        IMediaService mediaService,
+        IEntityService entityService,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IUmbracoMapper umbracoMapper,
+        IDataTypeService dataTypeService,
+        ISqlContext sqlContext,
+        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+        IRelationService relationService,
+        PropertyEditorCollection propertyEditors,
+        MediaFileManager mediaFileManager,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        IHostingEnvironment hostingEnvironment,
+        IImageUrlGenerator imageUrlGenerator,
+        IJsonSerializer serializer,
+        IAuthorizationService authorizationService,
+        AppCaches appCaches,
+        IFileStreamSecurityValidator streamSecurityValidator)
+        : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
+    {
+        _shortStringHelper = shortStringHelper;
+        _contentSettings = contentSettings.Value;
+        _mediaTypeService = mediaTypeService;
+        _mediaService = mediaService;
+        _entityService = entityService;
+        _backofficeSecurityAccessor = backofficeSecurityAccessor;
+        _umbracoMapper = umbracoMapper;
+        _dataTypeService = dataTypeService;
+        _localizedTextService = localizedTextService;
+        _sqlContext = sqlContext;
+        _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+        _relationService = relationService;
+        _propertyEditors = propertyEditors;
+        _mediaFileManager = mediaFileManager;
+        _mediaUrlGenerators = mediaUrlGenerators;
+        _hostingEnvironment = hostingEnvironment;
+        _logger = loggerFactory.CreateLogger<MediaController>();
+        _imageUrlGenerator = imageUrlGenerator;
+        _authorizationService = authorizationService;
+        _appCaches = appCaches;
+        _fileStreamSecurityValidator = streamSecurityValidator;
+    }
+
+    [Obsolete("Use constructor overload that has fileStreamSecurityValidator, scheduled for removal in v14")]
     public MediaController(
         ICultureDictionary cultureDictionary,
         ILoggerFactory loggerFactory,
@@ -731,6 +785,17 @@ public class MediaController : ContentControllerBase
                 continue;
             }
 
+            using var stream = new MemoryStream();
+            await formFile.CopyToAsync(stream);
+            if (_fileStreamSecurityValidator != null && _fileStreamSecurityValidator.IsConsideredSafe(stream) == false)
+            {
+                tempFiles.Notifications.Add(new BackOfficeNotification(
+                    _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
+                    _localizedTextService.Localize("media", "fileSecurityValidationFailure"),
+                    NotificationStyle.Warning));
+                continue;
+            }
+
             if (string.IsNullOrEmpty(mediaTypeAlias))
             {
                 mediaTypeAlias = Constants.Conventions.MediaTypes.File;
@@ -808,11 +873,8 @@ public class MediaController : ContentControllerBase
             IMedia createdMediaItem = _mediaService.CreateMedia(mediaItemName, parentId.Value, mediaTypeAlias,
                 _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
-            await using (Stream stream = formFile.OpenReadStream())
-            {
                 createdMediaItem.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper,
                     _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, fileName, stream);
-            }
 
             Attempt<OperationResult?> saveResult = _mediaService.Save(createdMediaItem,
                 _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
