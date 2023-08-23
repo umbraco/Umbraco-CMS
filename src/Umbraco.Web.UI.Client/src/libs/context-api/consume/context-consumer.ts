@@ -1,4 +1,4 @@
-import { UmbContextToken } from '../token/context-token.js';
+import { UmbContextDiscriminator, UmbContextToken } from '../token/context-token.js';
 import {
 	isUmbContextProvideEventType,
 	//isUmbContextUnprovidedEventType,
@@ -7,25 +7,23 @@ import {
 } from '../provide/context-provide.event.js';
 import { UmbContextRequestEventImplementation, UmbContextCallback } from './context-request.event.js';
 
-export type UmbContextDiscriminator<T, DiscriminatorResult extends T = T> = (instance: T) => instance is DiscriminatorResult;
-
 /**
  * @export
  * @class UmbContextConsumer
  */
-export class UmbContextConsumer<T = unknown, D extends T = T> {
-	#callback?: UmbContextCallback<D>;
-	#promise?: Promise<D>;
-	#promiseResolver?: (instance: D) => void;
+export class UmbContextConsumer<BaseType = unknown, DiscriminatedType extends BaseType = BaseType> {
+	#callback?: UmbContextCallback<DiscriminatedType>;
+	#promise?: Promise<DiscriminatedType>;
+	#promiseResolver?: (instance: DiscriminatedType) => void;
 
-	#instance?: D;
+	#instance?: DiscriminatedType;
 	get instance() {
 		return this.#instance;
 	}
 
 	#contextAlias: string;
 
-	#discriminator?: UmbContextDiscriminator<T, D>;
+	#discriminator?: UmbContextDiscriminator<BaseType, DiscriminatedType>;
 
 	/**
 	 * Creates an instance of UmbContextConsumer.
@@ -36,13 +34,12 @@ export class UmbContextConsumer<T = unknown, D extends T = T> {
 	 */
 	constructor(
 		protected hostElement: EventTarget,
-		contextAlias: string | UmbContextToken<T>,
-		callback?: UmbContextCallback<D>,
-		discriminator?: UmbContextDiscriminator<T, D>
+		contextAlias: string | UmbContextToken<BaseType, DiscriminatedType>,
+		callback?: UmbContextCallback<DiscriminatedType>
 	) {
 		this.#contextAlias = contextAlias.toString();
 		this.#callback = callback;
-		this.#discriminator = discriminator;
+		this.#discriminator = (contextAlias as any).getDiscriminator?.();
 	}
 
 
@@ -51,7 +48,7 @@ export class UmbContextConsumer<T = unknown, D extends T = T> {
 	The reason for such would be to have some who are more specific than others. For example, some might just need the current workspace-context, others might need the closest handling a certain entityType.
 	As I'm writing this is not relevant, but I wanted to keep the idea as we have had some circumstance that might be solved with this approach.
 	*/
-	protected _onResponse = (instance: T) => {
+	protected _onResponse = (instance: BaseType) => {
 		if (this.#instance === instance) {
 			return;
 		}
@@ -61,11 +58,11 @@ export class UmbContextConsumer<T = unknown, D extends T = T> {
 				this.setInstance(instance);
 			}
 		} else {
-			this.setInstance(instance as D);
+			this.setInstance(instance as DiscriminatedType);
 		}
 	};
 
-	protected setInstance(instance: D) {
+	protected setInstance(instance: DiscriminatedType) {
 		this.#instance = instance;
 		this.#callback?.(instance);
 		if (instance !== undefined) {
@@ -77,7 +74,7 @@ export class UmbContextConsumer<T = unknown, D extends T = T> {
 	public asPromise() {
 		return (
 			this.#promise ??
-			(this.#promise = new Promise<D>((resolve) => {
+			(this.#promise = new Promise<DiscriminatedType>((resolve) => {
 				this.#instance ? resolve(this.#instance) : (this.#promiseResolver = resolve);
 			}))
 		);

@@ -1,5 +1,6 @@
 import { expect, oneEvent } from '@open-wc/testing';
 import { UmbContextProvider } from '../provide/context-provider.js';
+import { UmbContextToken } from '../token/context-token.js';
 import { UmbContextConsumer } from './context-consumer.js';
 import { UmbContextRequestEventImplementation, umbContextRequestEventType } from './context-request.event.js';
 
@@ -111,10 +112,14 @@ describe('UmbContextConsumer with discriminator test', () => {
 
 	it('discriminator determines the instance type', async () => {
 
-		const localConsumer = new UmbContextConsumer(document.body, testContextAlias, (instance: A) => { console.log(instance)}, discriminator);
+		const localConsumer = new UmbContextConsumer(
+			document.body,
+			new UmbContextToken(testContextAlias, discriminator),
+			(instance: A) => { console.log(instance)}
+		);
 		localConsumer.hostConnected();
 
-		// This bit of code is just to make sure the type is correct.
+		// This bit of code is not really a test but it serves as a TypeScript type test, making sure the given type is matches the one given from the Discriminator method.
 		type TestType = Exclude<(typeof localConsumer.instance), undefined> extends A ? true : never;
 		const test: TestType = true;
 		expect(test).to.be.true;
@@ -131,14 +136,13 @@ describe('UmbContextConsumer with discriminator test', () => {
 
 		const localConsumer = new UmbContextConsumer(
 			element,
-			testContextAlias,
+			new UmbContextToken(testContextAlias, discriminator),
 			(_instance) => {
 				expect(_instance.prop).to.eq('value from provider');
 				done();
 				localConsumer.hostDisconnected();
 				provider.hostDisconnected();
-			},
-			discriminator
+			}
 		);
 		localConsumer.hostConnected();
 	});
@@ -152,11 +156,10 @@ describe('UmbContextConsumer with discriminator test', () => {
 
 		const localConsumer = new UmbContextConsumer(
 			element,
-			testContextAlias,
+			new UmbContextToken(testContextAlias, badDiscriminator),
 			(_instance) => {
 				expect(_instance.prop).to.eq('this must not happen!');
-			},
-			badDiscriminator
+			}
 		);
 		localConsumer.hostConnected();
 

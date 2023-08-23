@@ -1,4 +1,9 @@
-export class UmbContextToken<T = unknown> {
+
+export type UmbContextDiscriminator<BaseType, DiscriminatorResult extends BaseType = BaseType> = (instance: BaseType) => instance is DiscriminatorResult;
+
+export class UmbContextToken<BaseType = unknown, DiscriminatedType extends BaseType = BaseType> {
+
+	#discriminator: UmbContextDiscriminator<BaseType, DiscriminatedType> | undefined;
 	/**
 	 * Get the type of the token
 	 *
@@ -8,15 +13,18 @@ export class UmbContextToken<T = unknown> {
 	 * @example   `typeof MyToken.TYPE`
 	 * @returns   undefined
 	 */
-	readonly TYPE: T = undefined as never;
+	readonly TYPE: DiscriminatedType = undefined as never;
 
 	/**
-	 * @param alias   Unique identifier for the token,
-	 * @param _desc   Description for the token,
-	 *                used only for debugging purposes,
-	 *                it should but does not need to be unique
+	 * @param alias   Unique identifier for the token
 	 */
-	constructor(protected alias: string, protected _desc?: string) {}
+	constructor(protected alias: string, discriminator?: UmbContextDiscriminator<BaseType, DiscriminatedType>) {
+		this.#discriminator = discriminator;
+	}
+
+	getDiscriminator(): UmbContextDiscriminator<BaseType, DiscriminatedType> | undefined {
+		return this.#discriminator;
+	}
 
 	/**
 	 * This method must always return the unique alias of the token since that
@@ -27,4 +35,6 @@ export class UmbContextToken<T = unknown> {
 	toString(): string {
 		return this.alias;
 	}
+
+
 }
