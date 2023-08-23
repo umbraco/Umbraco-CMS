@@ -19,4 +19,6 @@ public interface IContentEditingService
     Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid id, Guid? parentId, Guid userKey);
 
     Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid id, Guid? parentId, bool relateToOriginal, bool includeDescendants, Guid userKey);
+
+    Task<ContentEditingOperationStatus> SortAsync(Guid? parentId, IEnumerable<SortingModel> sortingModels, Guid userKey);
 }

@@ -23,8 +23,9 @@ internal sealed class ContentEditingService
         ITemplateService templateService,
         ILogger<ContentEditingService> logger,
         ICoreScopeProvider scopeProvider,
-        IUserIdKeyResolver userIdKeyResolver)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider)
+        IUserIdKeyResolver userIdKeyResolver,
+        ITreeEntitySortingService treeEntitySortingService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, treeEntitySortingService)
     {
         _templateService = templateService;
         _logger = logger;
@@ -39,7 +40,7 @@ internal sealed class ContentEditingService
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
     {
-        Attempt<IContent?, ContentEditingOperationStatus> result = await MapCreate(createModel);
+        Attempt<IContent?, ContentEditingOperationStatus> result = await MapCreate(createModel, (name, parentId, contentType) => new Content(name, parentId, contentType));
         if (result.Success == false)
         {
             return result;
@@ -102,7 +103,20 @@ internal sealed class ContentEditingService
         return await HandleCopyAsync(id, parentId, (content, newParentId) => ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, currentUserId));
     }
 
-    protected override IContent Create(string? name, int parentId, IContentType contentType) => new Content(name, parentId, contentType);
+
+    public async Task<ContentEditingOperationStatus> SortAsync(Guid? parentId, IEnumerable<SortingModel> sortingModels, Guid userKey)
+    {
+        var currentUserId = await GetUserIdAsync(userKey);
+        return await HandleSortAsync(
+            parentId,
+            sortingModels,
+            (int id, int pageIndex, int pageSize, out long total) => ContentService.GetPagedChildren(id, pageIndex, pageSize, out total),
+            items =>
+            {
+                OperationResult result = ContentService.Sort(items, currentUserId);
+                return OperationResultToOperationStatus(result);
+            });
+    }
 
     private async Task<ContentEditingOperationStatus> UpdateTemplateAsync(IContent content, Guid? templateKey)
     {

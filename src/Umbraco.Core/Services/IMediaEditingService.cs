@@ -17,4 +17,6 @@ public interface IMediaEditingService
     Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteAsync(Guid id, Guid userKey);
 
     Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveAsync(Guid id, Guid? parentId, Guid userKey);
+
+    Task<ContentEditingOperationStatus> SortAsync(Guid? parentId, IEnumerable<SortingModel> sortingModels, Guid userKey);
 }

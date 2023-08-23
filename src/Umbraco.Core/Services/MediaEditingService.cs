@@ -21,8 +21,9 @@ internal sealed class MediaEditingService
         IDataTypeService dataTypeService,
         ILogger<ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> logger,
         ICoreScopeProvider scopeProvider,
-        IUserIdKeyResolver userIdKeyResolver)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider)
+        IUserIdKeyResolver userIdKeyResolver,
+        ITreeEntitySortingService treeEntitySortingService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, treeEntitySortingService)
     {
         _logger = logger;
         _userIdKeyResolver = userIdKeyResolver;
@@ -36,7 +37,7 @@ internal sealed class MediaEditingService
 
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> CreateAsync(MediaCreateModel createModel, Guid userKey)
     {
-        Attempt<IMedia?, ContentEditingOperationStatus> result = await MapCreate(createModel);
+        Attempt<IMedia?, ContentEditingOperationStatus> result = await MapCreate(createModel, (name, parentId, contentType) => new Models.Media(name, parentId, contentType));
         if (result.Success == false)
         {
             return result;
@@ -84,8 +85,21 @@ internal sealed class MediaEditingService
         return await HandleMoveAsync(id, parentId, (content, newParentId) => ContentService.Move(content, newParentId, currentUserId).Result);
     }
 
-    protected override IMedia Create(string? name, int parentId, IMediaType contentType)
-        => new Models.Media(name, parentId, contentType);
+    public async Task<ContentEditingOperationStatus> SortAsync(Guid? parentId, IEnumerable<SortingModel> sortingModels, Guid userKey)
+    {
+        var currentUserId = await GetUserIdAsync(userKey);
+        return await HandleSortAsync(
+            parentId,
+            sortingModels,
+            (int id, int pageIndex, int pageSize, out long total) => ContentService.GetPagedChildren(id, pageIndex, pageSize, out total),
+            items =>
+            {
+                var result = ContentService.Sort(items, currentUserId);
+                return result
+                    ? ContentEditingOperationStatus.Success
+                    : ContentEditingOperationStatus.CancelledByNotification;
+            });
+    }
 
     private ContentEditingOperationStatus Save(IMedia media, int userId)
     {
