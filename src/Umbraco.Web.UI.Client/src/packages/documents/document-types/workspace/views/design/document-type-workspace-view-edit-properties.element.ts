@@ -12,6 +12,7 @@ import {
 	PropertyTypeModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 const SORTER_CONFIG: UmbSorterConfig<DocumentTypePropertyTypeResponseModel> = {
 	compareElementToModel: (element: HTMLElement, model: DocumentTypePropertyTypeResponseModel) => {
 		return element.getAttribute('data-umb-property-id') === model.id;
@@ -84,6 +85,9 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	@state()
 	_ownerDocumentTypes?: DocumentTypeResponseModel[];
 
+	@state()
+	protected _modalRouteNewProperty?: string;
+
 	constructor() {
 		super();
 
@@ -96,6 +100,19 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 			this._propertyStructure = propertyStructure;
 			this.#propertySorter.setModel(this._propertyStructure);
 		});
+
+		// Note: Route for adding a new property
+		new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
+			.addAdditionalPath('new-property')
+			.onSetup(() => {
+				return {};
+			})
+			.onSubmit((result) => {
+				this.#addProperty(result);
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._modalRouteNewProperty = routeBuilder(null);
+			});
 	}
 
 	connectedCallback(): void {
@@ -107,18 +124,11 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		});
 	}
 
-	async #onAddProperty() {
-		const property = await this._propertyStructureHelper.addProperty(this._containerId);
-		if (!property) return;
+	async #addProperty(propertyData: PropertyTypeModelBaseModel) {
+		const propertyPlaceholder = await this._propertyStructureHelper.addProperty(this._containerId);
+		if (!propertyPlaceholder) return;
 
-		// TODO: Figure out how we from this location can get into the route modal, via URL.
-		// The modal is registered by the document-type-workspace-view-edit-property element, therefor a bit hard to get the URL from here.
-
-		const el = this.shadowRoot?.querySelector(
-			`document-type-workspace-view-edit-property[data-umb-property-id='${property.id}']`,
-		) as UmbDocumentTypeWorkspacePropertyElement;
-
-		window.history.pushState({}, '', el.modalRoute);
+		this._propertyStructureHelper.partialUpdateProperty(propertyPlaceholder.id, propertyData);
 	}
 
 	render() {
@@ -127,8 +137,9 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 					this._propertyStructure,
 					(property) => property.id ?? '' + property.containerId ?? '' + (property as any).sortOrder ?? '',
 					(property) => {
+						// Note: This piece might be moved into the property component
 						const inheritedFromDocument = this._ownerDocumentTypes?.find(
-							(types) => types.containers?.find((containers) => containers.id == property.containerId),
+							(types) => types.containers?.find((containers) => containers.id === property.containerId),
 						);
 
 						return html`<document-type-workspace-view-edit-property
@@ -152,7 +163,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				label=${this.localize.term('contentTypeEditor_addProprety')}
 				id="add"
 				look="placeholder"
-				@click=${this.#onAddProperty}>
+				href=${ifDefined(this._modalRouteNewProperty)}>
 				<umb-localize key="contentTypeEditor_addProprety">Add property</umb-localize>
 			</uui-button> `;
 	}

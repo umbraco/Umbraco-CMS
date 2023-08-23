@@ -5,6 +5,7 @@ import {
 	UMB_CONFIRM_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_PROPERTY_SETTINGS_MODAL,
+	UMB_WORKSPACE_MODAL,
 	UmbConfirmModalData,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
@@ -56,6 +57,9 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	@state()
 	protected _modalRoute?: string;
 
+	@state()
+	protected _editDocumentTypePath?: string;
+
 	@property()
 	public get modalRoute() {
 		return this._modalRoute;
@@ -88,6 +92,15 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRoute = routeBuilder(null);
+			});
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('document-type')
+			.onSetup(() => {
+				return { entityType: 'document-type', preset: {} };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editDocumentTypePath = routeBuilder({});
 			});
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (context) => {
@@ -217,7 +230,9 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 							<uui-icon name="umb:merge"></uui-icon>
 							<span>
 								${this.localize.term('contentTypeEditor_inheritedFrom')}
-								<a href=${ifDefined(this.dataOwnerDocumentTypeId)}> ${this.dataOwnerDocumentTypeName ?? '??'}</a>
+								<a href=${this._editDocumentTypePath + 'edit/' + this.dataOwnerDocumentTypeId}>
+									${this.dataOwnerDocumentTypeName ?? '??'}
+								</a>
 							</span>
 						</uui-tag>
 					</div>
