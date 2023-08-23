@@ -25,7 +25,7 @@ In this following example we define the manifest for a Workspace Action, this ac
 	conditions: [
 		{
 			alias: 'Umb.Condition.SectionAlias',
-			matches: 'My.Example.Workspace'
+			match: 'My.Example.Workspace'
 		}
 	]
 }
@@ -37,7 +37,7 @@ Each condition is an object with the following properties:
 - `alias`- The alias of the condition to utilize.
 - `...` - The rest of the properties of the object are specific to the condition.
 
-In the above example the `Umb.Condition.SectionAlias` condition is used, this condition takes a property `matches` which must be set to the alias of the section to match.
+In the above example the `Umb.Condition.SectionAlias` condition is used, this condition takes a property `match` which must be set to the alias of the section to match.
 
 ### Core conditions types
 
