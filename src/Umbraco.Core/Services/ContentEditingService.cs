@@ -32,9 +32,9 @@ internal sealed class ContentEditingService
         _userIdKeyResolver = userIdKeyResolver;
     }
 
-    public async Task<IContent?> GetAsync(Guid id)
+    public async Task<IContent?> GetAsync(Guid key)
     {
-        IContent? content = ContentService.GetById(id);
+        IContent? content = ContentService.GetById(key);
         return await Task.FromResult(content);
     }
 
@@ -79,36 +79,36 @@ internal sealed class ContentEditingService
             : Attempt.FailWithStatus(operationStatus, content);
     }
 
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid id, Guid userKey)
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
     {
         var currentUserId = await GetUserIdAsync(userKey);
-        return await HandleDeletionAsync(id, content => ContentService.MoveToRecycleBin(content, currentUserId), false);
+        return await HandleDeletionAsync(key, content => ContentService.MoveToRecycleBin(content, currentUserId), false);
     }
 
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid id, Guid userKey)
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
     {
         var currentUserId = await GetUserIdAsync(userKey);
-        return await HandleDeletionAsync(id, content => ContentService.Delete(content, currentUserId), false);
+        return await HandleDeletionAsync(key, content => ContentService.Delete(content, currentUserId), false);
     }
 
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid id, Guid? parentId, Guid userKey)
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
     {
         var currentUserId = await GetUserIdAsync(userKey);
-        return await HandleMoveAsync(id, parentId, (content, newParentId) => ContentService.Move(content, newParentId, currentUserId));
+        return await HandleMoveAsync(key, parentKey, (content, newParentId) => ContentService.Move(content, newParentId, currentUserId));
     }
 
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid id, Guid? parentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
     {
         var currentUserId = await GetUserIdAsync(userKey);
-        return await HandleCopyAsync(id, parentId, (content, newParentId) => ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, currentUserId));
+        return await HandleCopyAsync(key, parentKey, (content, newParentId) => ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, currentUserId));
     }
 
 
-    public async Task<ContentEditingOperationStatus> SortAsync(Guid? parentId, IEnumerable<SortingModel> sortingModels, Guid userKey)
+    public async Task<ContentEditingOperationStatus> SortAsync(Guid? parentKey, IEnumerable<SortingModel> sortingModels, Guid userKey)
     {
         var currentUserId = await GetUserIdAsync(userKey);
         return await HandleSortAsync(
-            parentId,
+            parentKey,
             sortingModels,
             (int id, int pageIndex, int pageSize, out long total) => ContentService.GetPagedChildren(id, pageIndex, pageSize, out total),
             items =>
