@@ -1,27 +1,27 @@
 {
-    "$schema": "../../types/umbraco-package-schema.json",
-    "name": "My Package",
-    "version": "1.0.0",
-    "extensions": [
-        {
-            "name": "My Dashboard",
-            "alias": "myDashboard",
+	"$schema": "../../types/umbraco-package-schema.json",
+	"name": "My Package",
+	"version": "1.0.0",
+	"extensions": [
+		{
+			"name": "My Dashboard",
+			"alias": "myDashboard",
 
-            "weight": -10,
-            "elementName": "my-dashboard",
-            "js": "js/my-dashboard.js",
+			"weight": -10,
+			"elementName": "my-dashboard",
+			"js": "js/my-dashboard.js",
 
-            "type": "dashboard",
-            "meta": {
-                "label": "My Dashboard",
-                "pathname": "my-dashboard"
-            },
-						"conditions": [
-							{
-								"alias": "Umb.Condition.SectionAlias",
-								"match": "Umb.Section.Content"
-							}
-						]
-        }
-    ]
+			"type": "dashboard",
+			"meta": {
+				"label": "My Dashboard",
+				"pathname": "my-dashboard"
+			},
+			"conditions": [
+				{
+					"alias": "Umb.Condition.SectionAlias",
+					"match": "Umb.Section.Content"
+				}
+			]
+		}
+	]
 }
