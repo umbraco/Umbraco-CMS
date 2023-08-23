@@ -6,7 +6,7 @@
         {
             "name": "My Dashboard",
             "alias": "myDashboard",
-            
+
             "weight": -10,
             "elementName": "my-dashboard",
             "js": "js/my-dashboard.js",
@@ -14,9 +14,14 @@
             "type": "dashboard",
             "meta": {
                 "label": "My Dashboard",
-                "pathname": "my-dashboard",
-                "sections": ["Umb.Section.Content"]
-            }
+                "pathname": "my-dashboard"
+            },
+						"conditions": [
+							{
+								"alias": "Umb.Condition.SectionAlias",
+								"match": "Umb.Section.Content"
+							}
+						]
         }
     ]
 }

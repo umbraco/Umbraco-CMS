@@ -29,9 +29,12 @@ Create an umbraco-package.json file in the root of your package.
 				"label": "My Dashboard",
 				"pathname": "my-dashboard"
 			},
-			"conditions": {
-				"sections": ["Umb.Section.Content"]
-			}
+			"conditions": [
+				{
+					"alias": "Umb.Condition.SectionAlias",
+					"match": "Umb.Section.Content"
+				}
+			]
 		}
 	]
 }
@@ -157,9 +160,12 @@ Finally add an umbraco-package.json file in the root of your package folder `my-
 				"label": "My Dashboard",
 				"pathname": "my-dashboard"
 			},
-			"conditions": {
-				"sections": ["Umb.Section.Content"]
-			}
+			"conditions": [
+				{
+					"alias": "Umb.Condition.SectionAlias",
+					"match": "Umb.Section.Content"
+				}
+			]
 		}
 	]
 }
