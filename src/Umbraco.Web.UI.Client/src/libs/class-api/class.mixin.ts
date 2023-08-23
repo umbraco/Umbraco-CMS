@@ -28,10 +28,10 @@ declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 		controllerAlias?: UmbControllerAlias
 	): UmbObserverController<T>;
 	provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R>;
-	consumeContext<R = unknown>(
-		alias: string | UmbContextToken<R>,
-		callback: UmbContextCallback<R>
-	): UmbContextConsumerController<R>;
+	consumeContext<BaseType = unknown, DiscriminatedType extends BaseType = never, ResultType extends BaseType = BaseType>(
+		alias: string | UmbContextToken<BaseType, DiscriminatedType, ResultType>,
+		callback: UmbContextCallback<ResultType>
+	): UmbContextConsumerController<BaseType, DiscriminatedType, ResultType>;
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;
@@ -96,10 +96,10 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 		 * @return {UmbContextConsumerController} Reference to a Context Consumer Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		consumeContext<R = unknown>(
-			contextAlias: string | UmbContextToken<R>,
-			callback: UmbContextCallback<R>
-		): UmbContextConsumerController<R> {
+		consumeContext<BaseType = unknown, DiscriminatedType extends BaseType = never, ResultType extends BaseType = BaseType>(
+			contextAlias: string | UmbContextToken<BaseType, DiscriminatedType, ResultType>,
+			callback: UmbContextCallback<ResultType>
+		): UmbContextConsumerController<BaseType, DiscriminatedType, ResultType>  {
 			return new UmbContextConsumerController(this, contextAlias, callback);
 		}
 	}

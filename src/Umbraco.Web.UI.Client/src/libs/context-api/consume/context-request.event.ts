@@ -9,9 +9,9 @@ export type UmbContextCallback<T> = (instance: T) => void;
  * @export
  * @interface UmbContextRequestEvent
  */
-export interface UmbContextRequestEvent<T = unknown> extends Event {
-	readonly contextAlias: string | UmbContextToken<T>;
-	readonly callback: UmbContextCallback<T>;
+export interface UmbContextRequestEvent<ResultType = unknown> extends Event {
+	readonly contextAlias: string | UmbContextToken<unknown, any, ResultType>;
+	readonly callback: UmbContextCallback<ResultType>;
 }
 
 /**
@@ -20,10 +20,10 @@ export interface UmbContextRequestEvent<T = unknown> extends Event {
  * @extends {Event}
  * @implements {UmbContextRequestEvent}
  */
-export class UmbContextRequestEventImplementation<T = unknown> extends Event implements UmbContextRequestEvent<T> {
+export class UmbContextRequestEventImplementation<ResultType = unknown> extends Event implements UmbContextRequestEvent<ResultType> {
 	public constructor(
-		public readonly contextAlias: string | UmbContextToken<T>,
-		public readonly callback: UmbContextCallback<T>
+		public readonly contextAlias: string | UmbContextToken<any, any, ResultType>,
+		public readonly callback: UmbContextCallback<ResultType>
 	) {
 		super(umbContextRequestEventType, { bubbles: true, composed: true, cancelable: true });
 	}

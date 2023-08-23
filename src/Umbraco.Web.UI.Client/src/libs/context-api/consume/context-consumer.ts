@@ -11,12 +11,15 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  * @export
  * @class UmbContextConsumer
  */
-export class UmbContextConsumer<BaseType = unknown, DiscriminatedType extends BaseType = BaseType> {
-	#callback?: UmbContextCallback<DiscriminatedType>;
-	#promise?: Promise<DiscriminatedType>;
-	#promiseResolver?: (instance: DiscriminatedType) => void;
+export class UmbContextConsumer<
+BaseType = unknown,
+DiscriminatedType extends BaseType = never,
+ResultType extends BaseType = keyof DiscriminatedType extends BaseType ? DiscriminatedType : BaseType> {
+	#callback?: UmbContextCallback<ResultType>;
+	#promise?: Promise<ResultType>;
+	#promiseResolver?: (instance: ResultType) => void;
 
-	#instance?: DiscriminatedType;
+	#instance?: ResultType;
 	get instance() {
 		return this.#instance;
 	}
@@ -34,8 +37,8 @@ export class UmbContextConsumer<BaseType = unknown, DiscriminatedType extends Ba
 	 */
 	constructor(
 		protected hostElement: EventTarget,
-		contextAlias: string | UmbContextToken<BaseType, DiscriminatedType>,
-		callback?: UmbContextCallback<DiscriminatedType>
+		contextAlias: string | UmbContextToken<BaseType, DiscriminatedType, ResultType>,
+		callback?: UmbContextCallback<ResultType>
 	) {
 		this.#contextAlias = contextAlias.toString();
 		this.#callback = callback;
@@ -55,14 +58,14 @@ export class UmbContextConsumer<BaseType = unknown, DiscriminatedType extends Ba
 		if(this.#discriminator) {
 			// Notice if discriminator returns false, we do not want to setInstance.
 			if(this.#discriminator(instance)) {
-				this.setInstance(instance);
+				this.setInstance(instance as unknown as ResultType);
 			}
 		} else {
-			this.setInstance(instance as DiscriminatedType);
+			this.setInstance(instance as ResultType);
 		}
 	};
 
-	protected setInstance(instance: DiscriminatedType) {
+	protected setInstance(instance: ResultType) {
 		this.#instance = instance;
 		this.#callback?.(instance);
 		if (instance !== undefined) {
@@ -74,7 +77,7 @@ export class UmbContextConsumer<BaseType = unknown, DiscriminatedType extends Ba
 	public asPromise() {
 		return (
 			this.#promise ??
-			(this.#promise = new Promise<DiscriminatedType>((resolve) => {
+			(this.#promise = new Promise<ResultType>((resolve) => {
 				this.#instance ? resolve(this.#instance) : (this.#promiseResolver = resolve);
 			}))
 		);

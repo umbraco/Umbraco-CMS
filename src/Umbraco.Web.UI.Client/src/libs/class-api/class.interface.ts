@@ -16,8 +16,8 @@ export interface UmbClassMixinInterface extends UmbControllerHost, UmbController
 		unique?: string
 	): UmbObserverController<T>;
 	provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R>;
-	consumeContext<R = unknown>(
-		alias: string | UmbContextToken<R>,
-		callback: UmbContextCallback<R>
-	): UmbContextConsumerController<R>;
+	consumeContext<BaseType = unknown, DiscriminatedType extends BaseType = never, ResultType extends BaseType = BaseType>(
+		alias: string | UmbContextToken<BaseType, DiscriminatedType, ResultType>,
+		callback: UmbContextCallback<ResultType>
+	): UmbContextConsumerController<BaseType, DiscriminatedType, ResultType>;
 }
