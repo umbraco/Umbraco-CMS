@@ -29,6 +29,10 @@ export class UmbContentTypePropertyStructureHelper {
 		this.#propertyStructure.sortBy((a, b) => ((a as any).sortOrder ?? 0) - ((b as any).sortOrder ?? 0));
 	}
 
+	public getOwnerDocumentTypes() {
+		return this.#structure?.documentTypes;
+	}
+
 	public setStructureManager(structure: UmbContentTypePropertyStructureManager) {
 		this.#structure = structure;
 		this.#initResolver?.(undefined);
@@ -75,7 +79,7 @@ export class UmbContentTypePropertyStructureHelper {
 				(groupContainers) => {
 					groupContainers.forEach((group) => this._observePropertyStructureOf(group.id));
 				},
-				'_observeGroupContainers'
+				'_observeGroupContainers',
 			);
 		}
 	}
@@ -99,7 +103,7 @@ export class UmbContentTypePropertyStructureHelper {
 				// Fire update to subscribers:
 				this.#propertyStructure.next(_propertyStructure);
 			},
-			'_observePropertyStructureOfGroup' + groupId
+			'_observePropertyStructureOfGroup' + groupId,
 		);
 	}
 
