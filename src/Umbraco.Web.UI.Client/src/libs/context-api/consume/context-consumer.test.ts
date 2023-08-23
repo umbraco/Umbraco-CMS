@@ -109,21 +109,18 @@ describe('UmbContextConsumer with discriminator test', () => {
 		return typeof (instance as any).notExistingProp === 'string';
 	}
 
-	describe('discriminator type', () => {
-		it('discriminator determines the instance type', async () => {
+	it('discriminator determines the instance type', async () => {
 
-			const localConsumer = new UmbContextConsumer(document.body, testContextAlias, (instance: A) => { console.log(instance)}, discriminator);
-			localConsumer.hostConnected();
+		const localConsumer = new UmbContextConsumer(document.body, testContextAlias, (instance: A) => { console.log(instance)}, discriminator);
+		localConsumer.hostConnected();
 
-			// This bit of code is just to make sure the type is correct.
-			type TestType = Exclude<(typeof localConsumer.instance), undefined> extends A ? true : never;
-			const test: TestType = true;
-			expect(test).to.be.true;
+		// This bit of code is just to make sure the type is correct.
+		type TestType = Exclude<(typeof localConsumer.instance), undefined> extends A ? true : never;
+		const test: TestType = true;
+		expect(test).to.be.true;
 
-			localConsumer.destroy();
-		});
+		localConsumer.destroy();
 	});
-
 
 	it('approving discriminator still fires callback', (done) => {
 		const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
