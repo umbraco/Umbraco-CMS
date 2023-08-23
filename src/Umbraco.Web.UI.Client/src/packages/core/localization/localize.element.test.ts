@@ -1,6 +1,6 @@
 import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
-import { umbTranslationRegistry } from '@umbraco-cms/backoffice/localization';
 import { UmbLocalizeElement } from './localize.element.js';
+import { umbTranslationRegistry } from '@umbraco-cms/backoffice/localization';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
 
