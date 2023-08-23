@@ -4,12 +4,10 @@ import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
 
 export interface StylesheetRichTextEditorStyleModalData {
-	rule?: RichTextRuleModel;
+	rule: RichTextRuleModel | null;
 }
 
-export interface StylesheetRichTextEditorStyleModalResult {
-	rule: RichTextRuleModel;
-}
+export type StylesheetRichTextEditorStyleModalResult = NonNullable<Required<StylesheetRichTextEditorStyleModalData>>;
 
 @customElement('umb-stylesheet-rich-text-editor-style-modal')
 export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbModalBaseElement<
@@ -21,7 +19,7 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 	}
 
 	#submit() {
-		this.modalContext?.submit({ rule: this._rule ?? {} });
+		this.modalContext?.submit({ rule: this._rule });
 	}
 
 	connectedCallback() {
@@ -30,10 +28,11 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 	}
 
 	@state()
-	private _rule?: RichTextRuleModel | null = null;
+	private _rule: RichTextRuleModel | null = null;
 
 	#updateName(event: Event) {
 		const name = (event.target as HTMLInputElement).value;
+
 		this._rule = {
 			...this._rule,
 			name,
@@ -42,6 +41,7 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 
 	#updateSelector(event: Event) {
 		const selector = (event.target as HTMLInputElement).value;
+
 		this._rule = {
 			...this._rule,
 			selector,
@@ -50,6 +50,7 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 
 	#updateStyles(event: Event) {
 		const styles = (event.target as HTMLInputElement).value;
+
 		this._rule = {
 			...this._rule,
 			styles,

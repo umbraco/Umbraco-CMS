@@ -2,6 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
+import { UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR } from '../../manifests.js';
+import {
+	StylesheetRichTextEditorStyleModalData,
+	StylesheetRichTextEditorStyleModalResult,
+} from './stylesheet-workspace-view-rich-text-editor-style-sidebar.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import {
@@ -11,60 +16,60 @@ import {
 	UmbModalToken,
 } from '@umbraco-cms/backoffice/modal';
 import { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR } from '../../manifests.js';
-import { StylesheetRichTextEditorStyleModalResult } from './stylesheet-workspace-view-rich-text-editor-style-sidebar.js';
 
-export const UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR_MODAL = new UmbModalToken<{ rule: RichTextRuleModel }>(
-	UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR,
-	{
-		type: 'sidebar',
-		size: 'medium',
-	},
-);
+export const UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR_MODAL = new UmbModalToken<
+	StylesheetRichTextEditorStyleModalData,
+	StylesheetRichTextEditorStyleModalResult
+>(UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR, {
+	type: 'sidebar',
+	size: 'medium',
+});
 @customElement('umb-stylesheet-workspace-view-rich-text-editor')
 export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitElement {
 	@state()
-	private _content?: string | null = '';
+	private _content: string = '';
 
 	@state()
-	private _path?: string | null = '';
+	private _path: string = '';
 
 	@state()
-	private _ready?: boolean = false;
+	private _ready: boolean = false;
 
 	@state()
-	private _rules?: RichTextRuleModel[] = [];
+	_rules: RichTextRuleModel[] = [];
 
-	#stylesheetWorkspaceContext?: UmbStylesheetWorkspaceContext;
+	#context?: UmbStylesheetWorkspaceContext;
 	private _modalContext?: UmbModalManagerContext;
 
 	#isNew = false;
 	#modal?: UmbModalContext;
+
+	#currentlyEditing: RichTextRuleModel | null = null;
 
 	constructor() {
 		super();
 
 		//tODO: should this be called something else here?
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#stylesheetWorkspaceContext = workspaceContext as UmbStylesheetWorkspaceContext;
+			this.#context = workspaceContext as UmbStylesheetWorkspaceContext;
 
-			this.observe(this.#stylesheetWorkspaceContext.content, (content) => {
-				this._content = content;
+			this.observe(this.#context.content, (content) => {
+				this._content = content ?? '';
 			});
 
-			this.observe(this.#stylesheetWorkspaceContext.path, (path) => {
-				this._path = path;
+			this.observe(this.#context.path, (path) => {
+				this._path = path ?? '';
 			});
 
-			this.observe(this.#stylesheetWorkspaceContext.isNew, (isNew) => {
+			this.observe(this.#context.isNew, (isNew) => {
 				this.#isNew = !!isNew;
 			});
 
-			this.observe(this.#stylesheetWorkspaceContext.isCodeEditorReady, (isReady) => {
+			this.observe(this.#context.isCodeEditorReady, (isReady) => {
 				this._ready = isReady;
 			});
 
-			this.observe(this.#stylesheetWorkspaceContext.rules, (rules) => {
+			this.observe(this.#context.rules, (rules) => {
 				this._rules = rules;
 			});
 		});
@@ -74,20 +79,32 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 		});
 	}
 
-	#openModal = (rule: RichTextRuleModel = {}) => {
+	#openModal = (rule: RichTextRuleModel | null = null) => {
 		if (!this._modalContext) throw new Error('Modal context not found');
+		this.#currentlyEditing = rule;
 		const modal = this._modalContext.open(UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR_MODAL, {
 			rule,
 		});
-		modal?.onSubmit().then((closedModal) => {
-			console.log(closedModal);
+		modal?.onSubmit().then((result) => {
+			if (this.#currentlyEditing && result.rule) {
+				this.#replaceRule(result.rule);
+				this.#currentlyEditing = null;
+				return;
+			}
+			if (result.rule) {
+				this.#context?.setRules([...this._rules, result.rule]);
+				this.#currentlyEditing = null;
+			}
 		});
 	};
 
 	#removeRule = (rule: RichTextRuleModel) => {
-		this._rules = this._rules?.filter((r) => r !== rule);
-		throw new Error('Method not implemented.');
+		this.#context?.setRules(this._rules?.filter((r) => r !== rule));
 	};
+
+	#replaceRule(rule: RichTextRuleModel) {
+		this.#context?.setRules(this._rules?.map((r) => (r === this.#currentlyEditing ? rule : r)));
+	}
 
 	renderRule(rule: RichTextRuleModel) {
 		return html`<div class="rule">
@@ -106,7 +123,7 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 				<p id="description">Define the styles that should be available in the rich text editor for this stylesheet.</p>
 				<div id="rules">
 					${this._rules?.map((rule) => this.renderRule(rule))}
-					<uui-button label="Add rule" look="primary" @click=${this.#openModal}>Add</uui-button>
+					<uui-button label="Add rule" look="primary" @click=${() => this.#openModal(null)}>Add</uui-button>
 				</div>
 			</div>
 		</uui-box>`;

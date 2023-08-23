@@ -50,6 +50,7 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 
 	setRules(rules: RichTextRuleModel[]) {
 		this.#rules.next(rules);
+		this.sendRulesGetContent();
 	}
 
 	setName(value: string) {
@@ -92,6 +93,7 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 		};
 
 		const { data } = await this.repository.extractStylesheetRules(requestBody);
+		this.setRules(data?.rules ?? []);
 	}
 
 	public async save() {
