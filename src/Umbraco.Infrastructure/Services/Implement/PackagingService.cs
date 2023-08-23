@@ -161,7 +161,12 @@ public class PackagingService : IPackagingService
     }
 
     /// <inheritdoc/>
-    public Task<PackageDefinition?> GetCreatedPackageByKeyAsync(Guid key) => Task.FromResult(_createdPackages.GetByKey(key));
+    public Task<PackageDefinition?> GetCreatedPackageByKeyAsync(Guid key)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+
+        return Task.FromResult(_createdPackages.GetByKey(key));
+    }
 
     [Obsolete("Use CreateCreatedPackageAsync or UpdateCreatedPackageAsync instead. Scheduled for removal in Umbraco 15.")]
     public bool SaveCreatedPackage(PackageDefinition definition)
@@ -197,6 +202,7 @@ public class PackagingService : IPackagingService
     /// <inheritdoc/>
     public async Task<Attempt<PackageDefinition, PackageOperationStatus>> UpdateCreatedPackageAsync(PackageDefinition package, Guid userKey)
     {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         if (_createdPackages.SavePackage(package) == false)
         {
             return Attempt.FailWithStatus(PackageOperationStatus.NotFound, package);
@@ -204,6 +210,7 @@ public class PackagingService : IPackagingService
 
         int currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
         _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' updated. Package key: {package.PackageId}");
+        scope.Complete();
         return await Task.FromResult(Attempt.SucceedWithStatus(PackageOperationStatus.Success, package));
     }
 
