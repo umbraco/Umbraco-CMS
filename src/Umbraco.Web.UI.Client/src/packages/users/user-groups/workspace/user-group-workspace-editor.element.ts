@@ -1,11 +1,10 @@
-import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context.js';
+import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context.js';
 import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 // TODO: import from package when available
 //import { UmbUserInputElement } from '../../users/components/user-input/user-input.element.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	UMB_CONFIRM_MODAL,
@@ -21,14 +20,14 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _userKeys?: Array<string>;
 
-	#workspaceContext?: UmbUserGroupWorkspaceContext;
+	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 	#modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance as UmbUserGroupWorkspaceContext;
+		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance;
 			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup));
 			this.observe(this.#workspaceContext.userIds, (userKeys) => (this._userKeys = userKeys));
 		});
