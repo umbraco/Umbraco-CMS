@@ -1,4 +1,4 @@
-import { UmbWorkspaceMemberGroupContext } from './member-group-workspace.context.js';
+import { UmbMemberGroupWorkspaceContext } from './member-group-workspace.context.js';
 import { UmbMemberGroupWorkspaceEditorElement } from './member-group-workspace-editor.element.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -11,7 +11,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-member-group-workspace')
 export class UmbMemberGroupWorkspaceElement extends UmbLitElement {
-	#workspaceContext = new UmbWorkspaceMemberGroupContext(this);
+	#workspaceContext = new UmbMemberGroupWorkspaceContext(this);
 	#element = new UmbMemberGroupWorkspaceEditorElement();
 
 	@state()
