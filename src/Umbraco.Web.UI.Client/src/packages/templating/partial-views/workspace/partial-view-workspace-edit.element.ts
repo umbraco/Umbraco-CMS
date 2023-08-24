@@ -1,17 +1,16 @@
 import { UmbTemplatingInsertMenuElement } from '../../components/index.js';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../../templates/modals/modal-tokens.js';
 import { getQuerySnippet } from '../../utils.js';
-import { UmbPartialViewsWorkspaceContext } from './partial-views-workspace.context.js';
+import { UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT } from './partial-view-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
-@customElement('umb-partial-views-workspace-edit')
-export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-partial-view-workspace-edit')
+export class UmbPartialViewWorkspaceEditElement extends UmbLitElement {
 	#name: string | undefined = '';
 	@state()
 	private get _name() {
@@ -35,10 +34,8 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 	@query('umb-code-editor')
 	private _codeEditor?: UmbCodeEditorElement;
 
-	#partialViewsWorkspaceContext?: UmbPartialViewsWorkspaceContext;
+	#partialViewWorkspaceContext?: typeof UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT.TYPE;
 	private _modalContext?: UmbModalManagerContext;
-
-	#isNew = false;
 
 	private inputQuery$ = new Subject<string>();
 
@@ -49,31 +46,30 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 			this._modalContext = instance;
 		});
 
-		//tODO: should this be called something else here?
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#partialViewsWorkspaceContext = workspaceContext as UmbPartialViewsWorkspaceContext;
-			this.observe(this.#partialViewsWorkspaceContext.name, (name) => {
+		this.consumeContext(UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#partialViewWorkspaceContext = workspaceContext;
+			this.observe(this.#partialViewWorkspaceContext.name, (name) => {
 				this._name = name;
 			});
 
-			this.observe(this.#partialViewsWorkspaceContext.content, (content) => {
+			this.observe(this.#partialViewWorkspaceContext.content, (content) => {
 				this._content = content;
 			});
 
-			this.observe(this.#partialViewsWorkspaceContext.path, (path) => {
+			this.observe(this.#partialViewWorkspaceContext.path, (path) => {
 				this._path = path;
 			});
 
-			this.observe(this.#partialViewsWorkspaceContext.isNew, (isNew) => {
+			this.observe(this.#partialViewWorkspaceContext.isNew, (isNew) => {
 				this.#isNew = !!isNew;
 			});
 
-			this.observe(this.#partialViewsWorkspaceContext.isCodeEditorReady, (isReady) => {
+			this.observe(this.#partialViewWorkspaceContext.isCodeEditorReady, (isReady) => {
 				this._ready = isReady;
 			});
 
 			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue: string) => {
-				this.#partialViewsWorkspaceContext?.setName(`${nameInputValue}.cshtml`);
+				this.#partialViewWorkspaceContext?.setName(`${nameInputValue}.cshtml`);
 			});
 		});
 	}
@@ -87,7 +83,7 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 	#onCodeEditorInput(event: Event) {
 		const target = event.target as UmbCodeEditorElement;
 		const value = target.code as string;
-		this.#partialViewsWorkspaceContext?.setContent(value);
+		this.#partialViewWorkspaceContext?.setContent(value);
 	}
 
 	#insertSnippet(event: Event) {
@@ -206,10 +202,10 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 	];
 }
 
-export default UmbPartialViewsWorkspaceEditElement;
+export default UmbPartialViewWorkspaceEditElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-partial-views-workspace-edit': UmbPartialViewsWorkspaceEditElement;
+		'umb-partial-view-workspace-edit': UmbPartialViewWorkspaceEditElement;
 	}
 }
