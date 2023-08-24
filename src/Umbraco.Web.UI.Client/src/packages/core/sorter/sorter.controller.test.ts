@@ -1,8 +1,8 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbSorterConfig, UmbSorterController } from './sorter.controller.js';
+import UmbTestSorterControllerElement from './stories/test-sorter-controller.element.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import UmbTestSorterControllerElement from './stories/test-sorter-controller.element.js';
 
 describe('UmbContextConsumer', () => {
 	let hostElement: UmbTestSorterControllerElement;
