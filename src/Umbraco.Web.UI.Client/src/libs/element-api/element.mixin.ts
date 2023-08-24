@@ -26,14 +26,13 @@ export declare class UmbElement extends UmbControllerHostElement {
 	): UmbObserverController<T>;
 	provideContext<
 		BaseType = unknown,
-		DiscriminatedType extends BaseType = never,
 		ResultType extends BaseType = BaseType,
 		InstanceType extends ResultType = ResultType
-	>(alias: string | UmbContextToken<BaseType, DiscriminatedType, ResultType>, instance: InstanceType): UmbContextProviderController<BaseType, DiscriminatedType, ResultType, InstanceType>;
-	consumeContext<BaseType = unknown, DiscriminatedType extends BaseType = never, ResultType extends BaseType = BaseType>(
-		alias: string | UmbContextToken<BaseType, DiscriminatedType, ResultType>,
+	>(alias: string | UmbContextToken<BaseType, ResultType>, instance: InstanceType): UmbContextProviderController<BaseType, ResultType, InstanceType>;
+	consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+		alias: string | UmbContextToken<BaseType, ResultType>,
 		callback: UmbContextCallback<ResultType>
-	): UmbContextConsumerController<BaseType, DiscriminatedType, ResultType>;
+	): UmbContextConsumerController<BaseType, ResultType>;
 }
 
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
@@ -60,11 +59,10 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 */
 		provideContext<
 			BaseType = unknown,
-			DiscriminatedType extends BaseType = never,
 			ResultType extends BaseType = BaseType,
 			InstanceType extends ResultType = ResultType
 		>
-		(alias: string | UmbContextToken<BaseType, DiscriminatedType, ResultType>, instance: InstanceType): UmbContextProviderController<BaseType, DiscriminatedType, ResultType, InstanceType> {
+		(alias: string | UmbContextToken<BaseType, ResultType>, instance: InstanceType): UmbContextProviderController<BaseType, ResultType, InstanceType> {
 			return new UmbContextProviderController(this, alias, instance);
 		}
 
@@ -75,10 +73,10 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @return {UmbContextConsumerController} Reference to a Context Consumer Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		consumeContext<BaseType = unknown, DiscriminatedType extends BaseType = never, ResultType extends BaseType = BaseType>(
-			alias: string | UmbContextToken<BaseType, DiscriminatedType, ResultType>,
+		consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+			alias: string | UmbContextToken<BaseType, ResultType>,
 			callback: UmbContextCallback<ResultType>
-		): UmbContextConsumerController<BaseType, DiscriminatedType, ResultType> {
+		): UmbContextConsumerController<BaseType, ResultType> {
 			return new UmbContextConsumerController(this, alias, callback);
 		}
 	}

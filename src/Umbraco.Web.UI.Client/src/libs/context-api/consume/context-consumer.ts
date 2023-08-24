@@ -13,8 +13,7 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  */
 export class UmbContextConsumer<
 BaseType = unknown,
-DiscriminatedType extends BaseType = never,
-ResultType extends BaseType = keyof DiscriminatedType extends BaseType ? DiscriminatedType : BaseType> {
+ResultType extends BaseType = BaseType> {
 	#callback?: UmbContextCallback<ResultType>;
 	#promise?: Promise<ResultType>;
 	#promiseResolver?: (instance: ResultType) => void;
@@ -26,7 +25,7 @@ ResultType extends BaseType = keyof DiscriminatedType extends BaseType ? Discrim
 
 	#contextAlias: string;
 
-	#discriminator?: UmbContextDiscriminator<BaseType, DiscriminatedType>;
+	#discriminator?: UmbContextDiscriminator<BaseType, ResultType>;
 
 	/**
 	 * Creates an instance of UmbContextConsumer.
@@ -37,7 +36,7 @@ ResultType extends BaseType = keyof DiscriminatedType extends BaseType ? Discrim
 	 */
 	constructor(
 		protected hostElement: EventTarget,
-		contextAlias: string | UmbContextToken<BaseType, DiscriminatedType, ResultType>,
+		contextAlias: string | UmbContextToken<BaseType, ResultType>,
 		callback?: UmbContextCallback<ResultType>
 	) {
 		this.#contextAlias = contextAlias.toString();

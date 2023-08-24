@@ -4,17 +4,16 @@ import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/c
 
 export class UmbContextProviderController<
 	BaseType = unknown,
-	DiscriminatedType extends BaseType = never,
-	ResultType extends BaseType = keyof DiscriminatedType extends BaseType ? DiscriminatedType : BaseType,
+	ResultType extends BaseType = BaseType,
 	InstanceType extends ResultType = ResultType
-> extends UmbContextProvider<BaseType, DiscriminatedType, ResultType> implements UmbController {
+> extends UmbContextProvider<BaseType, ResultType> implements UmbController {
 	#host: UmbControllerHost;
 
 	public get controllerAlias() {
 		return this._contextAlias.toString();
 	}
 
-	constructor(host: UmbControllerHost, contextAlias: string | UmbContextToken<BaseType, DiscriminatedType, ResultType>, instance: InstanceType) {
+	constructor(host: UmbControllerHost, contextAlias: string | UmbContextToken<BaseType, ResultType>, instance: InstanceType) {
 		super(host.getHostElement(), contextAlias, instance);
 		this.#host = host;
 

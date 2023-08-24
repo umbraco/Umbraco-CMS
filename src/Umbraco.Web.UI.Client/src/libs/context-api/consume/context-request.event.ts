@@ -10,7 +10,7 @@ export type UmbContextCallback<T> = (instance: T) => void;
  * @interface UmbContextRequestEvent
  */
 export interface UmbContextRequestEvent<ResultType = unknown> extends Event {
-	readonly contextAlias: string | UmbContextToken<unknown, any, ResultType>;
+	readonly contextAlias: string | UmbContextToken<unknown, ResultType>;
 	readonly callback: UmbContextCallback<ResultType>;
 }
 
@@ -22,7 +22,7 @@ export interface UmbContextRequestEvent<ResultType = unknown> extends Event {
  */
 export class UmbContextRequestEventImplementation<ResultType = unknown> extends Event implements UmbContextRequestEvent<ResultType> {
 	public constructor(
-		public readonly contextAlias: string | UmbContextToken<any, any, ResultType>,
+		public readonly contextAlias: string | UmbContextToken<any, ResultType>,
 		public readonly callback: UmbContextCallback<ResultType>
 	) {
 		super(umbContextRequestEventType, { bubbles: true, composed: true, cancelable: true });

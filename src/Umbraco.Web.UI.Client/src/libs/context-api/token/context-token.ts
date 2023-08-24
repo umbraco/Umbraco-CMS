@@ -3,10 +3,9 @@ export type UmbContextDiscriminator<BaseType, DiscriminatorResult extends BaseTy
 
 export class UmbContextToken<
 BaseType = unknown,
-DiscriminatedType extends BaseType = never,
-ResultType extends BaseType = keyof DiscriminatedType extends BaseType ? DiscriminatedType : BaseType> {
+ResultType extends BaseType = BaseType> {
 
-	#discriminator: UmbContextDiscriminator<BaseType, DiscriminatedType> | undefined;
+	#discriminator: UmbContextDiscriminator<BaseType, ResultType> | undefined;
 	/**
 	 * Get the type of the token
 	 *
@@ -21,11 +20,11 @@ ResultType extends BaseType = keyof DiscriminatedType extends BaseType ? Discrim
 	/**
 	 * @param alias   Unique identifier for the token
 	 */
-	constructor(protected alias: string, discriminator?: UmbContextDiscriminator<BaseType, DiscriminatedType>) {
+	constructor(protected alias: string, discriminator?: UmbContextDiscriminator<BaseType, ResultType>) {
 		this.#discriminator = discriminator;
 	}
 
-	getDiscriminator(): UmbContextDiscriminator<BaseType, DiscriminatedType> | undefined {
+	getDiscriminator(): UmbContextDiscriminator<BaseType, ResultType> | undefined {
 		return this.#discriminator;
 	}
 

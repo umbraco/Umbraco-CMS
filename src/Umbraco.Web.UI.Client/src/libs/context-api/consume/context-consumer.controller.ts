@@ -6,9 +6,8 @@ import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/c
 
 export class UmbContextConsumerController<
 	BaseType = unknown,
-	DiscriminatedType extends BaseType = never,
-	ResultType extends BaseType = keyof DiscriminatedType extends BaseType ? DiscriminatedType : BaseType
-> extends UmbContextConsumer<BaseType, DiscriminatedType, ResultType> implements UmbController {
+	ResultType extends BaseType = BaseType
+> extends UmbContextConsumer<BaseType, ResultType> implements UmbController {
 	#controllerAlias = Symbol();
 	#host: UmbControllerHost;
 
@@ -16,7 +15,7 @@ export class UmbContextConsumerController<
 		return this.#controllerAlias;
 	}
 
-	constructor(host: UmbControllerHost, contextAlias: string | UmbContextToken<BaseType, DiscriminatedType, ResultType>, callback: UmbContextCallback<ResultType>) {
+	constructor(host: UmbControllerHost, contextAlias: string | UmbContextToken<BaseType, ResultType>, callback: UmbContextCallback<ResultType>) {
 		super(host.getHostElement(), contextAlias, callback);
 		this.#host = host;
 		host.addController(this);
