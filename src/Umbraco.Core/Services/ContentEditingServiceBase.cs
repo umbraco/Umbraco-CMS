@@ -97,10 +97,10 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
     }
 
     // helper method to perform move-to-recycle-bin and delete for content as they are very much handled in the same way
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid id, Delete performDelete, bool allowForTrashed)
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid key, Delete performDelete, bool allowForTrashed)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        TContent? content = ContentService.GetById(id);
+        TContent? content = ContentService.GetById(key);
         if (content == null)
         {
             return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
@@ -118,10 +118,10 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
         return OperationResultToAttempt(content, deleteResult);
     }
 
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid id, Guid? parentId, Move performMove)
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Move performMove)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        TContent? content = ContentService.GetById(id);
+        TContent? content = ContentService.GetById(key);
         if (content is null)
         {
             return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
@@ -129,7 +129,7 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
 
         TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
 
-        TContent? parent = TryGetAndValidateParent(parentId, contentType, out ContentEditingOperationStatus operationStatus);
+        TContent? parent = TryGetAndValidateParent(parentKey, contentType, out ContentEditingOperationStatus operationStatus);
         if (operationStatus != ContentEditingOperationStatus.Success)
         {
             return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(operationStatus, content);
@@ -154,10 +154,10 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
         return OperationResultToAttempt(content, moveResult);
     }
 
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleCopyAsync(Guid id, Guid? parentId, Copy performCopy)
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleCopyAsync(Guid key, Guid? parentKey, Copy performCopy)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        TContent? content = ContentService.GetById(id);
+        TContent? content = ContentService.GetById(key);
         if (content is null)
         {
             return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
@@ -165,7 +165,7 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
 
         TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
 
-        TContent? parent = TryGetAndValidateParent(parentId, contentType, out ContentEditingOperationStatus operationStatus);
+        TContent? parent = TryGetAndValidateParent(parentKey, contentType, out ContentEditingOperationStatus operationStatus);
         if (operationStatus != ContentEditingOperationStatus.Success)
         {
             return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(operationStatus, content);
@@ -182,13 +182,13 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
     }
 
     protected async Task<ContentEditingOperationStatus> HandleSortAsync(
-        Guid? parentId,
+        Guid? parentKey,
         IEnumerable<SortingModel> sortingModels,
         GetPagedChildren getPagedChildren,
         Sort performSort)
     {
-        var contentId = parentId.HasValue
-            ? ContentService.GetById(parentId.Value)?.Id
+        var contentId = parentKey.HasValue
+            ? ContentService.GetById(parentKey.Value)?.Id
             : Constants.System.Root;
 
         if (contentId.HasValue is false)
@@ -302,13 +302,13 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
         return contentType;
     }
 
-    private TContent? TryGetAndValidateParent(Guid? parentId, TContentType contentType, out ContentEditingOperationStatus operationStatus)
+    private TContent? TryGetAndValidateParent(Guid? parentKey, TContentType contentType, out ContentEditingOperationStatus operationStatus)
     {
-        TContent? parent = parentId.HasValue
-            ? ContentService.GetById(parentId.Value)
+        TContent? parent = parentKey.HasValue
+            ? ContentService.GetById(parentKey.Value)
             : null;
 
-        if (parentId.HasValue && parent == null)
+        if (parentKey.HasValue && parent == null)
         {
             operationStatus = ContentEditingOperationStatus.ParentNotFound;
             return null;
