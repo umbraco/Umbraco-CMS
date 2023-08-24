@@ -1,4 +1,4 @@
-import { UmbWorkspaceMediaTypeContext } from './media-type-workspace.context.js';
+import { UmbMediaTypeWorkspaceContext } from './media-type-workspace.context.js';
 import { UmbMediaTypeWorkspaceEditorElement } from './media-type-workspace-editor.element.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -7,7 +7,7 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-media-type-workspace')
 export class UmbMediaTypeWorkspaceElement extends UmbLitElement {
-	#workspaceContext = new UmbWorkspaceMediaTypeContext(this);
+	#workspaceContext = new UmbMediaTypeWorkspaceContext(this);
 	#element = new UmbMediaTypeWorkspaceEditorElement();
 
 	@state()
