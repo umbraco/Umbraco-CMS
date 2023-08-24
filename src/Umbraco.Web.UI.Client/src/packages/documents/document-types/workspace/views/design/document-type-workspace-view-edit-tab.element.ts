@@ -19,7 +19,6 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 	public set ownerTabId(value: string | null | undefined) {
 		if (value === this._ownerTabId) return;
-		console.log('ownerTabId', value);
 		const oldValue = this._ownerTabId;
 		this._ownerTabId = value;
 		this._groupStructureHelper.setOwnerId(value);
