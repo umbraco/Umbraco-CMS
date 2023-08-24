@@ -60,10 +60,6 @@ export class UmbPartialViewWorkspaceEditElement extends UmbLitElement {
 				this._path = path;
 			});
 
-			this.observe(this.#partialViewWorkspaceContext.isNew, (isNew) => {
-				this.#isNew = !!isNew;
-			});
-
 			this.observe(this.#partialViewWorkspaceContext.isCodeEditorReady, (isReady) => {
 				this._ready = isReady;
 			});
