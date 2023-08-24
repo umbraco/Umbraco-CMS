@@ -83,7 +83,7 @@ type MyPublishableContext = {
 	publish()
 };
 
-const MY_CONTEXT_TOKEN = new ContextToken<MyContext, MyPublishableContext>('My.Context.Token', (context): context is MyPublishableContext => {
+const MY_PUBLISHABLE_CONTEXT_TOKEN = new ContextToken<MyContext, MyPublishableContext>('My.Context.Token', (context): context is MyPublishableContext => {
 	return 'publish' in context;
 });
 ```
