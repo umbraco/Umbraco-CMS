@@ -67,7 +67,7 @@ Our Document Workspace Context, has features around Publishing. We do not want a
 But since publishing is not part of the generic Workspace Context, we need to identify if the context is a Document Workspace Context and then recast it.
 
 To avoid each implementation taking care of this, Context Tokens can be extended with a type discriminator.
-This will dicard the given api if it does not live up to the needs, and then it is the decired type, it will cast the api to the desired type.
+This will dicard the given api if it does not live up to the needs, and when it is the decired type, it will cast the api to the desired type.
 
 This example, shows how to create a discriminator Context Token, that will discard the api if it is not a Publishable Context:
 
