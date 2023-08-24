@@ -1,4 +1,4 @@
-import { UMB_DATA_TYPE_WORKSPACE_CONTEXT, UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context.js';
+import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import {
@@ -36,7 +36,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 	@state()
 	private _data: Array<any> = [];
 
-	private _workspaceContext?: UmbDataTypeWorkspaceContext;
+	private _workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
