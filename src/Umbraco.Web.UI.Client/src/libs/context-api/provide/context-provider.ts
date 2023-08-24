@@ -13,7 +13,7 @@ import {
  * @export
  * @class UmbContextProvider
  */
-export class UmbContextProvider<BaseType = unknown, DiscriminatorType extends BaseType = never, ResultType extends BaseType = keyof DiscriminatorType extends BaseType ? DiscriminatorType : BaseType> {
+export class UmbContextProvider<BaseType = unknown, DiscriminatedType extends BaseType = BaseType, ResultType extends BaseType = keyof DiscriminatedType extends BaseType ? DiscriminatedType : BaseType> {
 	protected hostElement: EventTarget;
 
 	protected _contextAlias: string;
@@ -35,7 +35,7 @@ export class UmbContextProvider<BaseType = unknown, DiscriminatorType extends Ba
 	 * @param {*} instance
 	 * @memberof UmbContextProvider
 	 */
-	constructor(hostElement: EventTarget, contextAlias: string | UmbContextToken<BaseType, DiscriminatorType, ResultType>, instance: ResultType) {
+	constructor(hostElement: EventTarget, contextAlias: string | UmbContextToken<BaseType, DiscriminatedType, ResultType>, instance: ResultType) {
 		this.hostElement = hostElement;
 		this._contextAlias = contextAlias.toString();
 		this.#instance = instance;

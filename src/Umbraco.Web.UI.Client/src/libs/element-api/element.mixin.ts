@@ -24,7 +24,12 @@ export declare class UmbElement extends UmbControllerHostElement {
 		callback: ObserverCallback<T>,
 		unique?: string
 	): UmbObserverController<T>;
-	provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R>;
+	provideContext<
+		BaseType = unknown,
+		DiscriminatedType extends BaseType = never,
+		ResultType extends BaseType = BaseType,
+		InstanceType extends ResultType = ResultType
+	>(alias: string | UmbContextToken<BaseType, DiscriminatedType, ResultType>, instance: InstanceType): UmbContextProviderController<BaseType, DiscriminatedType, ResultType, InstanceType>;
 	consumeContext<BaseType = unknown, DiscriminatedType extends BaseType = never, ResultType extends BaseType = BaseType>(
 		alias: string | UmbContextToken<BaseType, DiscriminatedType, ResultType>,
 		callback: UmbContextCallback<ResultType>
@@ -53,7 +58,13 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @return {UmbContextProviderController} Reference to a Context Provider Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R> {
+		provideContext<
+			BaseType = unknown,
+			DiscriminatedType extends BaseType = never,
+			ResultType extends BaseType = BaseType,
+			InstanceType extends ResultType = ResultType
+		>
+		(alias: string | UmbContextToken<BaseType, DiscriminatedType, ResultType>, instance: InstanceType): UmbContextProviderController<BaseType, DiscriminatedType, ResultType, InstanceType> {
 			return new UmbContextProviderController(this, alias, instance);
 		}
 

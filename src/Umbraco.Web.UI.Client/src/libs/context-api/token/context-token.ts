@@ -1,7 +1,10 @@
 
 export type UmbContextDiscriminator<BaseType, DiscriminatorResult extends BaseType> = (instance: BaseType) => instance is DiscriminatorResult;
 
-export class UmbContextToken<BaseType = unknown, DiscriminatedType extends BaseType = never, ResultType extends BaseType = keyof DiscriminatedType extends object ? DiscriminatedType : BaseType> {
+export class UmbContextToken<
+BaseType = unknown,
+DiscriminatedType extends BaseType = never,
+ResultType extends BaseType = keyof DiscriminatedType extends BaseType ? DiscriminatedType : BaseType> {
 
 	#discriminator: UmbContextDiscriminator<BaseType, DiscriminatedType> | undefined;
 	/**
