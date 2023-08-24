@@ -5,7 +5,7 @@ import { Meta } from '@storybook/blocks';
 # Context API
 
 The Context API enables connections between Elements and APIs.
-DOM structure defines the context of which an API is exposed for. APIs are provided via an element and can then be consumed by any decending element wthin.
+DOM structure defines the context of which an API is exposed for. APIs are provided via an element and can then be consumed by any decending element.
 
 ### Consume a Context API.
 
@@ -18,7 +18,7 @@ this.consumeContext('requestThisContextAlias', (context) => {
 });
 ```
 
-Or with a Controller using a 'host' reference to Controller Host(Umbraco Element/Controller):
+Or with a Controller using a 'host' reference to Controller Host(Thats either a Umbraco Element or just another Controller):
 
 ```ts
 new UmbContextConsumerController(host, 'requestThisContextAlias', (context) => {
@@ -26,6 +26,74 @@ new UmbContextConsumerController(host, 'requestThisContextAlias', (context) => {
 	console.log("I've got the context", context);
 });
 ```
+
+#### Context Token
+
+Using a Context Token gives you a typed context:
+
+```ts
+import { UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+
+this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (context) => {
+	// Notice this is a subscription, as context might change or a new one appears, but the value is strongly typed
+	console.log("I've got the context of the right type", context);
+});
+```
+
+#### Write your own Context Token
+
+A Context Token is generally just a string matched with a type. In this way users of the token can be sure to get the right type of context.
+
+```ts
+import { ContextToken } from '@umbraco-cms/backoffice/context';
+
+type MyContext = {
+	foo: string;
+	bar: number;
+};
+
+const MY_CONTEXT_TOKEN = new ContextToken<MyContext>('My.Context.Token');
+```
+
+#### Context Token with discriminator.
+
+Notice this is only relevant if you are going to make multiple context API for the same context.
+
+In some cases we need to have different APIs for the same context. Our Workspace Contexts is a good example of this.
+
+If someone wants the workspace name, they might not care about the specific API of the Workspace Context. These implementations can use a standard Context Token with a type of a generic Workspace Context.
+
+Our Document Workspace Context, has features around Publishing. We do not want a new Context for these features, as we want to make sure when we are in a Workspace, we do not accidentally retrieve workspace context of a parent workspace. So we need to provide a workspace context in each workspace, the one we retrieve is the one we will be using.
+But since publishing is not part of the generic Workspace Context, we need to identify if the context is a Document Workspace Context and then recast it.
+
+To avoid each implementation taking care of this, Context Tokens can be extended with a type discriminator.
+This will dicard the given api if it does not live up to the needs, and then it is the decired type, it will cast the api to the desired type.
+
+This example, shows how to create a discriminator Context Token, that will discard the api if it is not a Publishable Context:
+
+```ts
+import { ContextToken } from '@umbraco-cms/backoffice/context';
+
+type MyBaseContext = {
+	foo: string;
+	bar: number;
+};
+
+type MyPublishableContext = {
+	publish()
+};
+
+const MY_CONTEXT_TOKEN = new ContextToken<MyContext, MyPublishableContext>('My.Context.Token', (context): context is MyPublishableContext => {
+	return 'publish' in context;
+});
+```
+
+This enables implementors to request a Document Workspace Context, without the knowledge about how do identify such, nor needing to know about the Type.
+
+In details, the Context API will find the first API matching alias 'My.Context.Token', and never look furhter. If that API does live up to the type discriminator, it will be returned. If not the consumer will never reply.
+
+
+
 
 ### Provide a Context API.
 
