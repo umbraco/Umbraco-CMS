@@ -1,4 +1,4 @@
-import { UMB_MEMBER_TYPE_WORKSPACE_CONTEXT } from '../../member-group-workspace.context.js';
+import { UMB_MEMBER_GROUP_WORKSPACE_CONTEXT } from '../../member-group-workspace.context.js';
 import type { MemberGroupDetails } from '../../../types.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -8,12 +8,12 @@ export class UmbWorkspaceViewMemberGroupInfoElement extends UmbLitElement {
 	@state()
 	private _memberGroup?: MemberGroupDetails;
 
-	#workspaceContext?: typeof UMB_MEMBER_TYPE_WORKSPACE_CONTEXT.TYPE;
+	#workspaceContext?: typeof UMB_MEMBER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MEMBER_TYPE_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_MEMBER_GROUP_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeMemberGroup();
 		});

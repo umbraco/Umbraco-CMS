@@ -1,5 +1,5 @@
 import type { MemberGroupDetails } from '../types.js';
-import { UMB_MEMBER_TYPE_WORKSPACE_CONTEXT } from './member-group-workspace.context.js';
+import { UMB_MEMBER_GROUP_WORKSPACE_CONTEXT } from './member-group-workspace.context.js';
 import { UUITextStyles, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -9,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-member-group-workspace-editor')
 export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
-	#workspaceContext?: typeof UMB_MEMBER_TYPE_WORKSPACE_CONTEXT.TYPE;
+	#workspaceContext?: typeof UMB_MEMBER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _memberGroup?: MemberGroupDetails;
@@ -17,7 +17,7 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MEMBER_TYPE_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_MEMBER_GROUP_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeMemberGroup();
 		});
