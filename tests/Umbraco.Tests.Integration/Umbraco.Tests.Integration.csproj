@@ -66,6 +66,9 @@
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Move.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.MoveToRecycleBin.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Update.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>

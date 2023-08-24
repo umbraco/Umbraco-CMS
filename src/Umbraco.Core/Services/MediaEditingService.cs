@@ -12,7 +12,6 @@ internal sealed class MediaEditingService
     : ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>, IMediaEditingService
 {
     private readonly ILogger<ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> _logger;
-    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
     public MediaEditingService(
         IMediaService contentService,
@@ -23,11 +22,8 @@ internal sealed class MediaEditingService
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
         ITreeEntitySortingService treeEntitySortingService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, treeEntitySortingService)
-    {
-        _logger = logger;
-        _userIdKeyResolver = userIdKeyResolver;
-    }
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, treeEntitySortingService)
+        => _logger = logger;
 
     public async Task<IMedia?> GetAsync(Guid key)
     {
@@ -37,7 +33,7 @@ internal sealed class MediaEditingService
 
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> CreateAsync(MediaCreateModel createModel, Guid userKey)
     {
-        Attempt<IMedia?, ContentEditingOperationStatus> result = await MapCreate(createModel, (name, parentId, contentType) => new Models.Media(name, parentId, contentType));
+        Attempt<IMedia?, ContentEditingOperationStatus> result = await MapCreate(createModel);
         if (result.Success == false)
         {
             return result;
@@ -52,53 +48,57 @@ internal sealed class MediaEditingService
             : Attempt.FailWithStatus<IMedia?, ContentEditingOperationStatus>(operationStatus, media);
     }
 
-    public async Task<Attempt<IMedia, ContentEditingOperationStatus>> UpdateAsync(IMedia content, MediaUpdateModel updateModel, Guid userKey)
+    public async Task<Attempt<IMedia, ContentEditingOperationStatus>> UpdateAsync(IMedia media, MediaUpdateModel updateModel, Guid userKey)
     {
-        Attempt<ContentEditingOperationStatus> result = await MapUpdate(content, updateModel);
+        Attempt<ContentEditingOperationStatus> result = await MapUpdate(media, updateModel);
         if (result.Success == false)
         {
-            return Attempt.FailWithStatus(result.Result, content);
+            return Attempt.FailWithStatus(result.Result, media);
         }
 
         var currentUserId = await GetUserIdAsync(userKey);
-        ContentEditingOperationStatus operationStatus = Save(content, currentUserId);
+        ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
         return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, content)
-            : Attempt.FailWithStatus(operationStatus, content);
+            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, media)
+            : Attempt.FailWithStatus(operationStatus, media);
     }
 
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
-    {
-        var currentUserId = await GetUserIdAsync(userKey);
-        return await HandleDeletionAsync(key, media => ContentService.MoveToRecycleBin(media, currentUserId).Result, false);
-    }
+        => await HandleMoveToRecycleBinAsync(key, userKey);
 
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
-    {
-        var currentUserId = await GetUserIdAsync(userKey);
-        return await HandleDeletionAsync(key, media => ContentService.Delete(media, currentUserId).Result, true);
-    }
+        => await HandleDeleteAsync(key, userKey);
 
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
-    {
-        var currentUserId = await GetUserIdAsync(userKey);
-        return await HandleMoveAsync(key, parentKey, (content, newParentId) => ContentService.Move(content, newParentId, currentUserId).Result);
-    }
+        => await HandleMoveAsync(key, parentKey, userKey);
 
     public async Task<ContentEditingOperationStatus> SortAsync(Guid? parentKey, IEnumerable<SortingModel> sortingModels, Guid userKey)
+        => await HandleSortAsync(parentKey, sortingModels, userKey);
+
+    protected override IMedia New(string? name, int parentId, IMediaType mediaType)
+        => new Models.Media(name, parentId, mediaType);
+
+    protected override OperationResult? Move(IMedia media, int newParentId, int userId)
+        => ContentService.Move(media, newParentId, userId).Result;
+
+    protected override IMedia? Copy(IMedia media, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
+        => null; // copy is not supported for media
+
+    protected override OperationResult? MoveToRecycleBin(IMedia media, int userId)
+        => ContentService.MoveToRecycleBin(media, userId).Result;
+
+    protected override OperationResult? Delete(IMedia media, int userId)
+        => ContentService.Delete(media, userId).Result;
+
+    protected override IEnumerable<IMedia> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total)
+        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total);
+
+    protected override ContentEditingOperationStatus Sort(IEnumerable<IMedia> items, int userId)
     {
-        var currentUserId = await GetUserIdAsync(userKey);
-        return await HandleSortAsync(
-            parentKey,
-            sortingModels,
-            (int id, int pageIndex, int pageSize, out long total) => ContentService.GetPagedChildren(id, pageIndex, pageSize, out total),
-            items =>
-            {
-                var result = ContentService.Sort(items, currentUserId);
-                return result
-                    ? ContentEditingOperationStatus.Success
-                    : ContentEditingOperationStatus.CancelledByNotification;
-            });
+        bool result = ContentService.Sort(items, userId);
+        return result
+            ? ContentEditingOperationStatus.Success
+            : ContentEditingOperationStatus.CancelledByNotification;
     }
 
     private ContentEditingOperationStatus Save(IMedia media, int userId)
@@ -122,6 +122,4 @@ internal sealed class MediaEditingService
             return ContentEditingOperationStatus.Unknown;
         }
     }
-
-    private async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey);
 }

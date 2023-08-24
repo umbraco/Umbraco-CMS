@@ -9,21 +9,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-public abstract class ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>
+internal abstract class ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>
     where TContent : class, IContentBase
     where TContentType : class, IContentTypeComposition
     where TContentService : IContentServiceBase<TContent>
     where TContentTypeService : IContentTypeBaseService<TContentType>
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
-
     private readonly IDataTypeService _dataTypeService;
-
     private readonly ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
-
     private readonly ICoreScopeProvider _scopeProvider;
-
     private readonly ITreeEntitySortingService _treeEntitySortingService;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
     protected ContentEditingServiceBase(
         TContentService contentService,
@@ -32,34 +29,38 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
         IDataTypeService dataTypeService,
         ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> logger,
         ICoreScopeProvider scopeProvider,
+        IUserIdKeyResolver userIdKeyResolver,
         ITreeEntitySortingService treeEntitySortingService)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _dataTypeService = dataTypeService;
         _logger = logger;
         _scopeProvider = scopeProvider;
+        _userIdKeyResolver = userIdKeyResolver;
         _treeEntitySortingService = treeEntitySortingService;
         ContentService = contentService;
         ContentTypeService = contentTypeService;
     }
 
-    protected delegate TContent Create(string? name, int parentId, TContentType contentType);
+    protected abstract TContent New(string? name, int parentId, TContentType contentType);
 
-    protected delegate OperationResult? Move(TContent content, int newParentId);
+    protected abstract OperationResult? Move(TContent content, int newParentId, int userId);
 
-    protected delegate TContent? Copy(TContent content, int newParentId);
+    protected abstract TContent? Copy(TContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId);
 
-    protected delegate OperationResult? Delete(TContent content);
+    protected abstract OperationResult? MoveToRecycleBin(TContent content, int userId);
 
-    protected delegate IEnumerable<TContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total);
+    protected abstract OperationResult? Delete(TContent content, int userId);
 
-    protected delegate ContentEditingOperationStatus Sort(IEnumerable<TContent> items);
+    protected abstract IEnumerable<TContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total);
+
+    protected abstract ContentEditingOperationStatus Sort(IEnumerable<TContent> items, int userId);
 
     protected TContentService ContentService { get; }
 
     protected TContentTypeService ContentTypeService { get; }
 
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> MapCreate(ContentCreationModelBase contentCreationModelBase, Create performCreate)
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> MapCreate(ContentCreationModelBase contentCreationModelBase)
     {
         TContentType? contentType = TryGetAndValidateContentType(contentCreationModelBase.ContentTypeKey, contentCreationModelBase, out ContentEditingOperationStatus operationStatus);
         if (contentType == null)
@@ -73,7 +74,7 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
             return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(operationStatus, null);
         }
 
-        TContent content = performCreate(null, parent?.Id ?? Constants.System.Root, contentType);
+        TContent content = New(null, parent?.Id ?? Constants.System.Root, contentType);
 
         UpdateNames(contentCreationModelBase, content, contentType);
         await UpdateExistingProperties(contentCreationModelBase, content, contentType);
@@ -96,8 +97,14 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
         return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
 
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveToRecycleBinAsync(Guid key, Guid userKey)
+        => await HandleDeletionAsync(key, userKey, false, MoveToRecycleBin);
+
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeleteAsync(Guid key, Guid userKey)
+        => await HandleDeletionAsync(key, userKey, true, Delete);
+
     // helper method to perform move-to-recycle-bin and delete for content as they are very much handled in the same way
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid key, Delete performDelete, bool allowForTrashed)
+    private async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid key, Guid userKey, bool mustBeTrashed, Func<TContent, int, OperationResult?> performDelete)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
@@ -106,19 +113,23 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
             return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
         }
 
-        if (content.Trashed && allowForTrashed is false)
+        if (content.Trashed != mustBeTrashed)
         {
-            return await Task.FromResult(Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.InTrash, content));
+            ContentEditingOperationStatus status = mustBeTrashed
+                ? ContentEditingOperationStatus.NotInTrash
+                : ContentEditingOperationStatus.InTrash;
+            return await Task.FromResult(Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(status, content));
         }
 
-        OperationResult? deleteResult = performDelete(content);
+        var userId = await GetUserIdAsync(userKey);
+        OperationResult? deleteResult = performDelete(content, userId);
 
         scope.Complete();
 
         return OperationResultToAttempt(content, deleteResult);
     }
 
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Move performMove)
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
@@ -147,14 +158,15 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
             return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ParentInvalid, content);
         }
 
-        OperationResult? moveResult = performMove(content, parent?.Id ?? Constants.System.Root);
+        var userId = await GetUserIdAsync(userKey);
+        OperationResult? moveResult = Move(content, parent?.Id ?? Constants.System.Root, userId);
 
         scope.Complete();
 
         return OperationResultToAttempt(content, moveResult);
     }
 
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleCopyAsync(Guid key, Guid? parentKey, Copy performCopy)
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleCopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
@@ -171,7 +183,8 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
             return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(operationStatus, content);
         }
 
-        TContent? copy = performCopy(content, parent?.Id ?? Constants.System.Root);
+        var userId = await GetUserIdAsync(userKey);
+        TContent? copy = Copy(content, parent?.Id ?? Constants.System.Root, relateToOriginal, includeDescendants, userId);
         scope.Complete();
 
         // we'll assume that we have performed all validations for unsuccessful scenarios above, so a null result here
@@ -184,8 +197,7 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
     protected async Task<ContentEditingOperationStatus> HandleSortAsync(
         Guid? parentKey,
         IEnumerable<SortingModel> sortingModels,
-        GetPagedChildren getPagedChildren,
-        Sort performSort)
+        Guid userKey)
     {
         var contentId = parentKey.HasValue
             ? ContentService.GetById(parentKey.Value)?.Id
@@ -198,12 +210,12 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
 
         const int pageSize = 500;
         var pageNumber = 0;
-        IEnumerable<TContent> page = getPagedChildren(contentId.Value, pageNumber++, pageSize, out var total);
+        IEnumerable<TContent> page = GetPagedChildren(contentId.Value, pageNumber++, pageSize, out var total);
         var children = new List<TContent>((int)total);
         children.AddRange(page);
         while (pageNumber * pageSize < total)
         {
-            page = getPagedChildren(contentId.Value, pageNumber++, pageSize, out _);
+            page = GetPagedChildren(contentId.Value, pageNumber++, pageSize, out _);
             children.AddRange(page);
         }
 
@@ -213,7 +225,9 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
                 .SortEntities(children, sortingModels)
                 .ToArray();
 
-            return performSort(sortedChildren);
+            var userId = await GetUserIdAsync(userKey);
+
+            return Sort(sortedChildren, userId);
         }
         catch (ArgumentException argumentException)
         {
@@ -240,6 +254,8 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
             // for any other state we'll return "unknown" so we know that we need to amend this switch statement
             _ => ContentEditingOperationStatus.Unknown
         };
+
+    protected async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey);
 
     private TContentType? TryGetAndValidateContentType(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase, out ContentEditingOperationStatus operationStatus)
     {
