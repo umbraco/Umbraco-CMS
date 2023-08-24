@@ -71,15 +71,17 @@ This will dicard the given api if it does not live up to the needs, and when it 
 
 This example, shows how to create a discriminator Context Token, that will discard the api if it is not a Publishable Context:
 
+Context token example:
+
 ```ts
 import { ContextToken } from '@umbraco-cms/backoffice/context';
 
-type MyBaseContext = {
+interface MyBaseContext {
 	foo: string;
 	bar: number;
 };
 
-type MyPublishableContext = {
+interface MyPublishableContext extends MyBaseContext {
 	publish()
 };
 
@@ -88,11 +90,26 @@ const MY_PUBLISHABLE_CONTEXT_TOKEN = new ContextToken<MyContext, MyPublishableCo
 });
 ```
 
-This enables implementors to request a Document Workspace Context, without the knowledge about how do identify such, nor needing to know about the Type.
+Implementation of context token example:
+
+```ts
+
+const contextElement = new UmbLitElement();
+contextElement.provideContext(MY_PUBLISHABLE_CONTEXT_TOKEN, new MyPublishableContext());
+
+
+const consumerElement = new UmbLitElement();
+contextElement.appendChild(contextElement);
+consumerElement.consumeContext(MY_PUBLISHABLE_CONTEXT_TOKEN, (context) => {
+	// context is of type 'MyPublishableContext'
+	console.log("I've got the context of the right type", context);
+});
+
+```
+
+This enables implementors to request a publishable context, without the knowledge about how do identify such, neither they need to know about the Type.
 
 In details, the Context API will find the first API matching alias 'My.Context.Token', and never look furhter. If that API does live up to the type discriminator, it will be returned. If not the consumer will never reply.
-
-
 
 
 ### Provide a Context API.
