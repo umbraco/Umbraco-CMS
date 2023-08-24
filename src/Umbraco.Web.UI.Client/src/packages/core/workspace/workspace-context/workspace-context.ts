@@ -1,6 +1,5 @@
 import { UmbEntityWorkspaceContextInterface } from './workspace-entity-context.interface.js';
-import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -12,6 +11,7 @@ TODO: We need to figure out if we like to keep using same alias for all workspac
 If so we need to align on a interface that all of these implements. otherwise consumers cant trust the workspace-context.
 */
 export abstract class UmbWorkspaceContext<RepositoryType, EntityType extends UmbEntityBase>
+	extends UmbBaseController
 	implements UmbEntityWorkspaceContextInterface<EntityType>
 {
 	public readonly host: UmbControllerHostElement;
@@ -25,11 +25,12 @@ export abstract class UmbWorkspaceContext<RepositoryType, EntityType extends Umb
 	isNew = this.#isNew.asObservable();
 
 	constructor(host: UmbControllerHostElement, workspaceAlias: string, repository: RepositoryType) {
+		super(host)
 		this.host = host;
 		this.workspaceAlias = workspaceAlias;
 		this.repository = repository;
-		new UmbContextProviderController(host, UMB_WORKSPACE_CONTEXT, this);
-		new UmbContextConsumerController(host, UMB_MODAL_CONTEXT_TOKEN, (context) => {
+		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (context) => {
 			(this.modalContext as UmbModalContext) = context;
 		});
 	}
@@ -59,5 +60,4 @@ export abstract class UmbWorkspaceContext<RepositoryType, EntityType extends Umb
 	abstract getEntityType(): string; // TODO: consider of this should be on the repository because a repo is responsible for one entity type
 	abstract getData(): EntityType | undefined;
 	abstract save(): Promise<void>;
-	abstract destroy(): void;
 }

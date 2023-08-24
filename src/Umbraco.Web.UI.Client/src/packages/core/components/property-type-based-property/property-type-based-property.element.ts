@@ -2,12 +2,11 @@ import { UmbDataTypeConfig } from '../../property-editor/index.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDataTypeRepository } from '@umbraco-cms/backoffice/data-type';
-import { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { DataTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
@@ -57,12 +56,12 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	}
 	private _propertyVariantId?: UmbVariantId | undefined;
 
-	private _workspaceContext?: UmbDocumentWorkspaceContext;
+	private _workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._workspaceContext = workspaceContext as UmbDocumentWorkspaceContext;
+		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this._workspaceContext = workspaceContext;
 			this._observeProperty();
 		});
 	}

@@ -1,4 +1,3 @@
-import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context.js';
 import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
@@ -47,7 +46,7 @@ export class UmbWorkspaceVariantContext {
 		// How do we ensure this connects to a document workspace context? and not just any other context? (We could start providing workspace contexts twice, under the general name and under a specific name)
 		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
 		new UmbContextConsumerController(host, UMB_WORKSPACE_CONTEXT, (context) => {
-			this.#workspaceContext = context as UmbDocumentWorkspaceContext;
+			this.#workspaceContext = context as UmbWorkspaceVariableEntityContextInterface;
 			this._observeVariant();
 		});
 
