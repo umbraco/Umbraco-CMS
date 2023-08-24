@@ -2,6 +2,7 @@ import { UmbMemberTypeRepository } from '../repository/member-type.repository.js
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 // TODO => use correct tpye
 type EntityType = any;
@@ -73,3 +74,8 @@ export class UmbMemberTypeWorkspaceContext
 		this.#data.complete();
 	}
 }
+
+export const UMB_MEMBER_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbMemberTypeWorkspaceContext>(
+	'UmbWorkspaceContext',
+	(context): context is UmbMemberTypeWorkspaceContext => context.getEntityType?.() === 'member-type'
+);
