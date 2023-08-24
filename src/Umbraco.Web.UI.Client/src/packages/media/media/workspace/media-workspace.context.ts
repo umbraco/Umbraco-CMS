@@ -3,6 +3,7 @@ import type { MediaDetails } from '../index.js';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 type EntityType = MediaDetails;
 export class UmbMediaWorkspaceContext
@@ -81,3 +82,8 @@ export class UmbMediaWorkspaceContext
 		this.#data.complete();
 	}
 }
+
+export const UMB_MEDIA_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbMediaWorkspaceContext>(
+	'UmbWorkspaceContext',
+	(context): context is UmbMediaWorkspaceContext => context.getEntityType?.() === 'media'
+);
