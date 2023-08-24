@@ -1,10 +1,11 @@
 import { UmbStylesheetRepository } from '../repository/stylesheet.repository.js';
 import { StylesheetDetails } from '../index.js';
-import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStylesheetRepository, StylesheetDetails> {
+export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStylesheetRepository, StylesheetDetails> implements UmbEntityWorkspaceContextInterface {
 	#data = new UmbObjectState<StylesheetDetails | undefined>(undefined);
 	data = this.#data.asObservable();
 
@@ -40,3 +41,8 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 		this.#data.complete();
 	}
 }
+
+export const UMB_STYLESHEET_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbStylesheetWorkspaceContext>(
+	'UmbWorkspaceContext',
+	(context): context is UmbStylesheetWorkspaceContext => context.getEntityType?.() === 'stylesheet'
+);
