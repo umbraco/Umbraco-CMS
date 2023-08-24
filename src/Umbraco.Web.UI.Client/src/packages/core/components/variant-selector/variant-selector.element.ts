@@ -10,9 +10,6 @@ import { DocumentVariantResponseModel, ContentStateModel } from '@umbraco-cms/ba
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
-	// TODO: not jet used:
-	@property()
-	alias!: string;
 
 	@state()
 	_variants: Array<DocumentVariantResponseModel> = [];
@@ -21,7 +18,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	@state()
 	_activeVariants: Array<ActiveVariant> = [];
 
-	@property()
+	@property({attribute: false})
 	public get _activeVariantsCultures(): string[] {
 		return this._activeVariants.map((el) => el.culture ?? '') ?? [];
 	}
