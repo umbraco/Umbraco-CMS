@@ -49,9 +49,9 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 	constructor() {
 		super();
 
-		//tODO: should this be called something else here?
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#context = workspaceContext as UmbStylesheetWorkspaceContext;
+			this.#context.sendContentGetRules();
 
 			this.observe(this.#context.content, (content) => {
 				this._content = content ?? '';
@@ -78,6 +78,8 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 			this._modalContext = instance;
 		});
 	}
+
+
 
 	#openModal = (rule: RichTextRuleModel | null = null) => {
 		if (!this._modalContext) throw new Error('Modal context not found');

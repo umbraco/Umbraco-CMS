@@ -88,6 +88,9 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 	}
 
 	async sendContentGetRules() {
+
+		if (!this.getData()?.content) return Promise.reject('There is no content to extract rules from...');
+		
 		const requestBody = {
 			content: this.getData()?.content,
 		};
