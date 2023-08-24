@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         #region Containers
 
-        [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V15.")]
         public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -100,23 +100,14 @@ namespace Umbraco.Cms.Core.Services.Implement
                 try
                 {
                     Guid? parentKey = parentId > 0 ? _dataTypeContainerRepository.Get(parentId)?.Key : null;
-
-                    var container = new EntityContainer(Constants.ObjectTypes.DataType)
-                    {
-                        Name = name,
-                        ParentId = parentId,
-                        CreatorId = userId,
-                        Key = key
-                    };
-
                     Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-                    Attempt<EntityContainer, DataTypeContainerOperationStatus> result = _dataTypeContainerService.CreateAsync(container, parentKey, currentUserKey).GetAwaiter().GetResult();
+                    Attempt<EntityContainer?, EntityContainerOperationStatus> result = _dataTypeContainerService.CreateAsync(key, name, parentKey, currentUserKey).GetAwaiter().GetResult();
 
                     // mimic old service behavior
                     return result.Status switch
                     {
-                        DataTypeContainerOperationStatus.CancelledByNotification => OperationResult.Attempt.Cancel(evtMsgs, container),
-                        DataTypeContainerOperationStatus.Success => OperationResult.Attempt.Succeed(evtMsgs, container),
+                        EntityContainerOperationStatus.CancelledByNotification => OperationResult.Attempt.Cancel(evtMsgs, new EntityContainer(Constants.ObjectTypes.DataType)),
+                        EntityContainerOperationStatus.Success => OperationResult.Attempt.Succeed(evtMsgs, result.Result ?? throw new NullReferenceException("Container creation operation succeeded but the result was null")),
                         _ => throw new InvalidOperationException($"Invalid operation status: {result.Status}")
                     };
                 }
@@ -127,25 +118,25 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public EntityContainer? GetContainer(int containerId)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             return _dataTypeContainerRepository.Get(containerId);
         }
 
-        [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public EntityContainer? GetContainer(Guid containerId)
             => _dataTypeContainerService.GetAsync(containerId).GetAwaiter().GetResult();
 
-        [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public IEnumerable<EntityContainer> GetContainers(string name, int level)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             return _dataTypeContainerRepository.Get(name, level);
         }
 
-        [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public IEnumerable<EntityContainer> GetContainers(IDataType dataType)
         {
             var ancestorIds = dataType.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
@@ -160,14 +151,14 @@ namespace Umbraco.Cms.Core.Services.Implement
             return GetContainers(ancestorIds);
         }
 
-        [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             return _dataTypeContainerRepository.GetMany(containerIds);
         }
 
-        [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -177,23 +168,23 @@ namespace Umbraco.Cms.Core.Services.Implement
                 Guid? parentKey = isNew && container.ParentId > 0 ? _dataTypeContainerRepository.Get(container.ParentId)?.Key : null;
                 Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
 
-                Attempt<EntityContainer, DataTypeContainerOperationStatus> result = isNew
-                    ? _dataTypeContainerService.CreateAsync(container, parentKey, currentUserKey).GetAwaiter().GetResult()
-                    : _dataTypeContainerService.UpdateAsync(container, currentUserKey).GetAwaiter().GetResult();
+                Attempt<EntityContainer?, EntityContainerOperationStatus> result = isNew
+                    ? _dataTypeContainerService.CreateAsync(container.Key, container.Name.IfNullOrWhiteSpace(string.Empty), parentKey, currentUserKey).GetAwaiter().GetResult()
+                    : _dataTypeContainerService.UpdateAsync(container.Key, container.Name.IfNullOrWhiteSpace(string.Empty), currentUserKey).GetAwaiter().GetResult();
 
                 // mimic old service behavior
                 return result.Status switch
                 {
-                    DataTypeContainerOperationStatus.Success => OperationResult.Attempt.Succeed(evtMsgs),
-                    DataTypeContainerOperationStatus.CancelledByNotification => OperationResult.Attempt.Cancel(evtMsgs),
-                    DataTypeContainerOperationStatus.ParentNotFound => OperationResult.Attempt.Fail(evtMsgs, new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.")),
-                    DataTypeContainerOperationStatus.InvalidObjectType => OperationResult.Attempt.Fail(evtMsgs, new InvalidOperationException("Not a " + Constants.ObjectTypes.DataType + " container.")),
+                    EntityContainerOperationStatus.Success => OperationResult.Attempt.Succeed(evtMsgs),
+                    EntityContainerOperationStatus.CancelledByNotification => OperationResult.Attempt.Cancel(evtMsgs),
+                    EntityContainerOperationStatus.ParentNotFound => OperationResult.Attempt.Fail(evtMsgs, new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.")),
+                    EntityContainerOperationStatus.InvalidObjectType => OperationResult.Attempt.Fail(evtMsgs, new InvalidOperationException("Not a " + Constants.ObjectTypes.DataType + " container.")),
                     _ => OperationResult.Attempt.Fail(evtMsgs, new InvalidOperationException($"Invalid operation status: {result.Status}"))
                 };
             }
         }
 
-        [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -206,19 +197,19 @@ namespace Umbraco.Cms.Core.Services.Implement
                 }
 
                 Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-                Attempt<EntityContainer?, DataTypeContainerOperationStatus> result = _dataTypeContainerService.DeleteAsync(container.Key, currentUserKey).GetAwaiter().GetResult();
+                Attempt<EntityContainer?, EntityContainerOperationStatus> result = _dataTypeContainerService.DeleteAsync(container.Key, currentUserKey).GetAwaiter().GetResult();
                 // mimic old service behavior
                 return result.Status switch
                 {
-                    DataTypeContainerOperationStatus.Success => OperationResult.Attempt.Succeed(evtMsgs),
-                    DataTypeContainerOperationStatus.NotEmpty => Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, evtMsgs)),
-                    DataTypeContainerOperationStatus.CancelledByNotification => Attempt.Fail(new OperationResult(OperationResultType.FailedCancelledByEvent, evtMsgs)),
+                    EntityContainerOperationStatus.Success => OperationResult.Attempt.Succeed(evtMsgs),
+                    EntityContainerOperationStatus.NotEmpty => Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, evtMsgs)),
+                    EntityContainerOperationStatus.CancelledByNotification => Attempt.Fail(new OperationResult(OperationResultType.FailedCancelledByEvent, evtMsgs)),
                     _ => OperationResult.Attempt.Fail(evtMsgs, new InvalidOperationException($"Invalid operation status: {result.Status}"))
                 };
             }
         }
 
-        [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
+        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V16.")]
         public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -236,12 +227,12 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                     container.Name = name;
                     Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-                    Attempt<EntityContainer, DataTypeContainerOperationStatus> result = _dataTypeContainerService.UpdateAsync(container, currentUserKey).GetAwaiter().GetResult();
+                    Attempt<EntityContainer?, EntityContainerOperationStatus> result = _dataTypeContainerService.UpdateAsync(container.Key, container.Name, currentUserKey).GetAwaiter().GetResult();
                     // mimic old service behavior
                     return result.Status switch
                     {
-                        DataTypeContainerOperationStatus.Success => OperationResult.Attempt.Succeed(OperationResultType.Success, evtMsgs, container),
-                        DataTypeContainerOperationStatus.CancelledByNotification => OperationResult.Attempt.Cancel(evtMsgs, container),
+                        EntityContainerOperationStatus.Success => OperationResult.Attempt.Succeed(OperationResultType.Success, evtMsgs, result.Result ?? throw new NullReferenceException("Container update operation succeeded but the result was null")),
+                        EntityContainerOperationStatus.CancelledByNotification => OperationResult.Attempt.Cancel(evtMsgs, container),
                         _ => OperationResult.Attempt.Fail<EntityContainer>(evtMsgs, new InvalidOperationException($"Invalid operation status: {result.Status}"))
                     };
                 }

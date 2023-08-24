@@ -31,13 +31,11 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Create_Container_At_Root()
     {
-        EntityContainer toCreate = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-
-        var result = await DataTypeContainerService.CreateAsync(toCreate, null, Constants.Security.SuperUserKey);
+        var result = await DataTypeContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
-        Assert.AreEqual(DataTypeContainerOperationStatus.Success, result.Status);
+        Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
 
-        var created = await DataTypeContainerService.GetAsync(toCreate.Key);
+        var created = await DataTypeContainerService.GetAsync(result.Result.Key);
         Assert.NotNull(created);
         Assert.AreEqual("Root Container", created.Name);
         Assert.AreEqual(Constants.System.Root, created.ParentId);
@@ -46,35 +44,43 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Create_Child_Container()
     {
-        EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
+        EntityContainer root = (await DataTypeContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey)).Result;
 
-        EntityContainer child = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Child Container" };
-        var result = await DataTypeContainerService.CreateAsync(child, root.Key, Constants.Security.SuperUserKey);
+        var result = await DataTypeContainerService.CreateAsync(null, "Child Container", root.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
-        Assert.AreEqual(DataTypeContainerOperationStatus.Success, result.Status);
+        Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
 
-        var created = await DataTypeContainerService.GetAsync(child.Key);
+        var created = await DataTypeContainerService.GetAsync(result.Result.Key);
         Assert.NotNull(created);
         Assert.AreEqual("Child Container", created.Name);
-        Assert.AreEqual(root.Id, child.ParentId);
+        Assert.AreEqual(root.Id, created.ParentId);
+    }
+
+    [Test]
+    public async Task Can_Create_Container_With_Explicit_Key()
+    {
+        var key = Guid.NewGuid();
+        var result = await DataTypeContainerService.CreateAsync(key, "Root Container", null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+        Assert.AreEqual(key, result.Result.Key);
+
+        var created = await DataTypeContainerService.GetAsync(key);
+        Assert.NotNull(created);
+        Assert.AreEqual("Root Container", created.Name);
+        Assert.AreEqual(Constants.System.Root, created.ParentId);
     }
 
     [Test]
     public async Task Can_Update_Container_At_Root()
     {
-        EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
+        var key = (await DataTypeContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey)).Result.Key;
 
-        EntityContainer toUpdate = await DataTypeContainerService.GetAsync(root.Key);
-        Assert.NotNull(toUpdate);
-
-        toUpdate.Name += " UPDATED";
-        var result = await DataTypeContainerService.UpdateAsync(toUpdate, Constants.Security.SuperUserKey);
+        var result = await DataTypeContainerService.UpdateAsync(key, "Root Container UPDATED", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
-        Assert.AreEqual(DataTypeContainerOperationStatus.Success, result.Status);
+        Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
 
-        var updated = await DataTypeContainerService.GetAsync(toUpdate.Key);
+        var updated = await DataTypeContainerService.GetAsync(key);
         Assert.NotNull(updated);
         Assert.AreEqual("Root Container UPDATED", updated.Name);
         Assert.AreEqual(Constants.System.Root, updated.ParentId);
@@ -83,21 +89,14 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Update_Child_Container()
     {
-        EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
+        EntityContainer root = (await DataTypeContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey)).Result;
+        EntityContainer child = (await DataTypeContainerService.CreateAsync(null, "Child Container", root.Key, Constants.Security.SuperUserKey)).Result;
 
-        EntityContainer child = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Child Container" };
-        await DataTypeContainerService.CreateAsync(child, root.Key, Constants.Security.SuperUserKey);
-
-        EntityContainer toUpdate = await DataTypeContainerService.GetAsync(child.Key);
-        Assert.NotNull(toUpdate);
-
-        toUpdate.Name += " UPDATED";
-        var result = await DataTypeContainerService.UpdateAsync(toUpdate, Constants.Security.SuperUserKey);
+        var result = await DataTypeContainerService.UpdateAsync(child.Key, "Child Container UPDATED", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
-        Assert.AreEqual(DataTypeContainerOperationStatus.Success, result.Status);
+        Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
 
-        var updated = await DataTypeContainerService.GetAsync(toUpdate.Key);
+        EntityContainer updated = await DataTypeContainerService.GetAsync(child.Key);
         Assert.NotNull(updated);
         Assert.AreEqual("Child Container UPDATED", updated.Name);
         Assert.AreEqual(root.Id, updated.ParentId);
@@ -106,10 +105,9 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Get_Container_At_Root()
     {
-        EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
+        EntityContainer root = (await DataTypeContainerService.CreateAsync(null,"Root Container", null, Constants.Security.SuperUserKey)).Result;
 
-        var created = await DataTypeContainerService.GetAsync(root.Key);
+        EntityContainer created = await DataTypeContainerService.GetAsync(root.Key);
         Assert.NotNull(created);
         Assert.AreEqual("Root Container", created.Name);
         Assert.AreEqual(Constants.System.Root, created.ParentId);
@@ -118,13 +116,10 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Get_Child_Container()
     {
-        EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
+        EntityContainer root = (await DataTypeContainerService.CreateAsync(null,"Root Container", null, Constants.Security.SuperUserKey)).Result;
+        EntityContainer child = (await DataTypeContainerService.CreateAsync(null, "Child Container", root.Key, Constants.Security.SuperUserKey)).Result;
 
-        EntityContainer child = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Child Container" };
-        await DataTypeContainerService.CreateAsync(child, root.Key, Constants.Security.SuperUserKey);
-
-        var created = await DataTypeContainerService.GetAsync(child.Key);
+        EntityContainer created = await DataTypeContainerService.GetAsync(child.Key);
         Assert.IsNotNull(created);
         Assert.AreEqual("Child Container", created.Name);
         Assert.AreEqual(root.Id, child.ParentId);
@@ -133,12 +128,11 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Delete_Container_At_Root()
     {
-        EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
+        EntityContainer root = (await DataTypeContainerService.CreateAsync(null,"Root Container", null, Constants.Security.SuperUserKey)).Result;
 
         var result = await DataTypeContainerService.DeleteAsync(root.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
-        Assert.AreEqual(DataTypeContainerOperationStatus.Success, result.Status);
+        Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
 
         var current = await DataTypeContainerService.GetAsync(root.Key);
         Assert.IsNull(current);
@@ -147,100 +141,41 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Delete_Child_Container()
     {
-        Guid userKey = Constants.Security.SuperUserKey;
-        EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, null, userKey);
+        EntityContainer root = (await DataTypeContainerService.CreateAsync(null,"Root Container", null, Constants.Security.SuperUserKey)).Result;
+        EntityContainer child = (await DataTypeContainerService.CreateAsync(null, "Child Container", root.Key, Constants.Security.SuperUserKey)).Result;
 
-        EntityContainer child = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Child Container" };
-        await DataTypeContainerService.CreateAsync(child, root.Key, userKey);
-
-        var result = await DataTypeContainerService.DeleteAsync(child.Key, userKey);
+        var result = await DataTypeContainerService.DeleteAsync(child.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
-        Assert.AreEqual(DataTypeContainerOperationStatus.Success, result.Status);
+        Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
 
-        var current = await DataTypeContainerService.GetAsync(child.Key);
-        Assert.IsNull(current);
+        child = await DataTypeContainerService.GetAsync(child.Key);
+        Assert.IsNull(child);
 
-        current = await DataTypeContainerService.GetAsync(root.Key);
-        Assert.IsNotNull(current);
+        root = await DataTypeContainerService.GetAsync(root.Key);
+        Assert.IsNotNull(root);
     }
 
     [Test]
     public async Task Cannot_Create_Child_Container_Below_Invalid_Parent()
     {
-        EntityContainer child = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Child Container" };
-        var result = await DataTypeContainerService.CreateAsync(child, Guid.NewGuid(), Constants.Security.SuperUserKey);
+        var key = Guid.NewGuid();
+        var result = await DataTypeContainerService.CreateAsync(key, "Child Container", Guid.NewGuid(), Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(DataTypeContainerOperationStatus.ParentNotFound, result.Status);
+        Assert.AreEqual(EntityContainerOperationStatus.ParentNotFound, result.Status);
 
-        var created = await DataTypeContainerService.GetAsync(child.Key);
+        var created = await DataTypeContainerService.GetAsync(key);
         Assert.IsNull(created);
-    }
-
-    [Test]
-    public async Task Cannot_Create_Child_Container_With_Explicit_Id()
-    {
-        EntityContainer toCreate = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container", Id = 1234 };
-
-        var result = await DataTypeContainerService.CreateAsync(toCreate, null, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DataTypeContainerOperationStatus.InvalidId, result.Status);
-
-        var created = await DataTypeContainerService.GetAsync(toCreate.Key);
-        Assert.IsNull(created);
-    }
-
-    [TestCase(Constants.ObjectTypes.Strings.DocumentType)]
-    [TestCase(Constants.ObjectTypes.Strings.MediaType)]
-    public async Task Cannot_Create_Container_With_Invalid_Contained_Type(string containedObjectType)
-    {
-        EntityContainer toCreate = new EntityContainer(new Guid(containedObjectType)) { Name = "Root Container" };
-
-        var result = await DataTypeContainerService.CreateAsync(toCreate, null, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DataTypeContainerOperationStatus.InvalidObjectType, result.Status);
-
-        var created = await DataTypeContainerService.GetAsync(toCreate.Key);
-        Assert.IsNull(created);
-    }
-
-    [Test]
-    public async Task Cannot_Update_Container_Parent()
-    {
-        EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
-
-        EntityContainer root2 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container 2" };
-        await DataTypeContainerService.CreateAsync(root2, null, Constants.Security.SuperUserKey);
-
-        EntityContainer child = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Child Container" };
-        await DataTypeContainerService.CreateAsync(child, root.Key, Constants.Security.SuperUserKey);
-
-        EntityContainer toUpdate = await DataTypeContainerService.GetAsync(child.Key);
-        Assert.IsNotNull(toUpdate);
-
-        toUpdate.ParentId = root2.Id;
-        var result = await DataTypeContainerService.UpdateAsync(toUpdate, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DataTypeContainerOperationStatus.ParentNotFound, result.Status);
-
-        var current = await DataTypeContainerService.GetAsync(child.Key);
-        Assert.IsNotNull(current);
-        Assert.AreEqual(root.Id, child.ParentId);
     }
 
     [Test]
     public async Task Cannot_Delete_Container_With_Child_Container()
     {
-        EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
-
-        EntityContainer child = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Child Container" };
-        await DataTypeContainerService.CreateAsync(child, root.Key, Constants.Security.SuperUserKey);
+        EntityContainer root = (await DataTypeContainerService.CreateAsync(null,"Root Container", null, Constants.Security.SuperUserKey)).Result;
+        EntityContainer child = (await DataTypeContainerService.CreateAsync(null, "Child Container", root.Key, Constants.Security.SuperUserKey)).Result;
 
         var result = await DataTypeContainerService.DeleteAsync(root.Key, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(DataTypeContainerOperationStatus.NotEmpty, result.Status);
+        Assert.AreEqual(EntityContainerOperationStatus.NotEmpty, result.Status);
 
         var current = await DataTypeContainerService.GetAsync(root.Key);
         Assert.IsNotNull(current);
@@ -249,8 +184,7 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Cannot_Delete_Container_With_Child_DataType()
     {
-        EntityContainer container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(container, null, Constants.Security.SuperUserKey);
+        EntityContainer container = (await DataTypeContainerService.CreateAsync(null,"Root Container", null, Constants.Security.SuperUserKey)).Result;
 
         IDataType dataType =
             new DataType(new TextboxPropertyEditor(DataValueEditorFactory, IOHelper, EditorConfigurationParser), ConfigurationEditorJsonSerializer)
@@ -263,7 +197,7 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
 
         var result = await DataTypeContainerService.DeleteAsync(container.Key, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(DataTypeContainerOperationStatus.NotEmpty, result.Status);
+        Assert.AreEqual(EntityContainerOperationStatus.NotEmpty, result.Status);
 
         var currentContainer = await DataTypeContainerService.GetAsync(container.Key);
         Assert.IsNotNull(currentContainer);
@@ -277,6 +211,6 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     {
         var result = await DataTypeContainerService.DeleteAsync(Guid.NewGuid(), Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(DataTypeContainerOperationStatus.NotFound, result.Status);
+        Assert.AreEqual(EntityContainerOperationStatus.NotFound, result.Status);
     }
 }
