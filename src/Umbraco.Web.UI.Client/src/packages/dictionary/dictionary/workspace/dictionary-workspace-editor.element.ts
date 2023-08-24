@@ -1,20 +1,19 @@
-import { UmbDictionaryWorkspaceContext } from './dictionary-workspace.context.js';
 import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from './dictionary-workspace.context';
 @customElement('umb-dictionary-workspace-editor')
 export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _name?: string | null = '';
 
-	#workspaceContext?: UmbDictionaryWorkspaceContext;
+	#workspaceContext?: typeof UMB_DICTIONARY_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance as UmbDictionaryWorkspaceContext;
+		this.consumeContext(UMB_DICTIONARY_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance;
 			this.#observeName();
 		});
 	}
