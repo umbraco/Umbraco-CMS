@@ -24,8 +24,6 @@ parameters:
 
 variables:
   nodeVersion: 18.16.0
-  dotnetVersion: 7.x
-  dotnetIncludePreviewVersions: true
   solution: umbraco.sln
   buildConfiguration: Release
   UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
@@ -69,10 +67,9 @@ stages:
               targets: coreBuild
               workingDirectory: src/Umbraco.Web.UI.Client
           - task: UseDotNet@2
-            displayName: Use .NET $(dotnetVersion)
+            displayName: Use .NET SDK from global.json
             inputs:
-              version: $(dotnetVersion)
-              includePreviewVersions: $(dotnetIncludePreviewVersions)
+              useGlobalJson: true
           - task: DotNetCoreCLI@2
             displayName: Run dotnet restore
             inputs:
@@ -227,10 +224,9 @@ stages:
               artifact: build_output
               path: $(Build.SourcesDirectory)
           - task: UseDotNet@2
-            displayName: Use .NET $(dotnetVersion)
+            displayName: Use .NET SDK from global.json
             inputs:
-              version: $(dotnetVersion)
-              includePreviewVersions: $(dotnetIncludePreviewVersions)
+              useGlobalJson: true
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test
             inputs:
@@ -263,10 +259,9 @@ stages:
               artifact: build_output
               path: $(Build.SourcesDirectory)
           - task: UseDotNet@2
-            displayName: Use .NET $(dotnetVersion)
+            displayName: Use .NET SDK from global.json
             inputs:
-              version: $(dotnetVersion)
-              includePreviewVersions: $(dotnetIncludePreviewVersions)
+              useGlobalJson: true
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test
             inputs:
@@ -304,10 +299,9 @@ stages:
               artifact: build_output
               path: $(Build.SourcesDirectory)
           - task: UseDotNet@2
-            displayName: Use .NET $(dotnetVersion)
+            displayName: Use .NET SDK from global.json
             inputs:
-              version: $(dotnetVersion)
-              includePreviewVersions: $(dotnetIncludePreviewVersions)
+              useGlobalJson: true
           - powershell: sqllocaldb start mssqllocaldb
             displayName: Start localdb (Windows only)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
@@ -399,10 +393,9 @@ stages:
             displayName: Create database (Windows only)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
           - task: UseDotNet@2
-            displayName: Use .NET $(dotnetVersion)
+            displayName: Use .NET SDK from global.json
             inputs:
-              version: $(dotnetVersion)
-              includePreviewVersions: $(dotnetIncludePreviewVersions)
+              useGlobalJson: true
           - pwsh: |
               $sha = 'g$(Build.SourceVersion)'.substring(0, 8)
               docker build -t $(dockerImageName):$sha -f $(dockerfile) .
