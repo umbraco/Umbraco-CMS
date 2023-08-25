@@ -237,10 +237,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		this.#documentTypes.updateOne(documentTypeKey, { containers });
 	}
 
-	async createProperty(documentTypeId: string | null, containerId: string | null = null, sortOrder?: number) {
-		await this.#init;
-		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
-
+	createPropertyScaffold(containerId: string | null = null, sortOrder?: number) {
 		const property: PropertyTypeModelBaseModel = {
 			id: UmbId.new(),
 			containerId: containerId,
@@ -261,6 +258,15 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 			},
 			sortOrder: sortOrder ?? 0,
 		} as any; // Sort order was not allowed when this was written.
+
+		return property;
+	}
+
+	async createProperty(documentTypeId: string | null, containerId: string | null = null, sortOrder?: number) {
+		await this.#init;
+		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
+
+		const property: PropertyTypeModelBaseModel = this.createPropertyScaffold(containerId, sortOrder);
 
 		const properties = [...(this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.properties ?? [])];
 		properties.push(property);
