@@ -23,8 +23,7 @@ public class EmailUserForgotPasswordSender : IUserForgotPasswordSender
         IEmailSender emailSender,
         ILocalizedTextService localizedTextService,
         IOptionsMonitor<GlobalSettings> globalSettings,
-        IOptionsMonitor<SecuritySettings> securitySettings
-    )
+        IOptionsMonitor<SecuritySettings> securitySettings)
     {
         _emailSender = emailSender;
         _localizedTextService = localizedTextService;
@@ -44,11 +43,14 @@ public class EmailUserForgotPasswordSender : IUserForgotPasswordSender
 
         string? senderEmail = _globalSettings.Smtp?.From;
 
-        var emailSubject = _localizedTextService.Localize("login", "resetPasswordEmailCopySubject", recipientCulture);
+        var emailSubject = _localizedTextService.Localize(
+            "login",
+            "resetPasswordEmailCopySubject",
+            recipientCulture);
 
         string?[] bodyTokes =
         {
-            messageModel.Recipient.Name,
+            messageModel.Recipient.Username,
             messageModel.InviteUri.ToString(),
             senderEmail,
         };
@@ -66,7 +68,7 @@ public class EmailUserForgotPasswordSender : IUserForgotPasswordSender
 
         var message = new EmailMessage(senderEmail, address.ToString(), emailSubject, emailBody, true);
 
-        await _emailSender.SendAsync(message, Constants.Web.EmailTypes.UserInvite, true);
+        await _emailSender.SendAsync(message, Constants.Web.EmailTypes.PasswordReset, true);
     }
 
     public bool CanSend() => _securitySettings.AllowPasswordReset && _emailSender.CanSendRequiredEmail();
