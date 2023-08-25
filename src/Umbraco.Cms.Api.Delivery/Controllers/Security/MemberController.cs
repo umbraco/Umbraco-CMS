@@ -2,7 +2,6 @@ using System.Security.Claims;
 using Asp.Versioning;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -47,7 +46,6 @@ public class MemberController : DeliveryApiControllerBase
         _deliveryApiSettings = deliveryApiSettings.Value;
     }
 
-    [AllowAnonymous]
     [HttpGet("authorize")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Authorize()
@@ -78,9 +76,9 @@ public class MemberController : DeliveryApiControllerBase
             : await AuthorizeExternal(request);
     }
 
-    [HttpGet("logout")]
+    [HttpGet("signout")]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> Logout()
+    public async Task<IActionResult> Signout()
     {
         await _memberSignInManager.SignOutAsync();
         return SignOut(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);

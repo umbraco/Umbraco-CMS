@@ -21,7 +21,9 @@ public static class Paths
 
         public static readonly string TokenEndpoint = EndpointPath($"{EndpointTemplate}/token");
 
-        public static readonly string LogoutEndpoint = EndpointPath($"{EndpointTemplate}/logout");
+        public static readonly string LogoutEndpoint = EndpointPath($"{EndpointTemplate}/signout");
+
+        public static readonly string RevokeEndpoint = EndpointPath($"{EndpointTemplate}/revoke");
 
         private static string EndpointPath(string relativePath) => $"/umbraco/delivery/api/v1.0/{relativePath}";
     }
