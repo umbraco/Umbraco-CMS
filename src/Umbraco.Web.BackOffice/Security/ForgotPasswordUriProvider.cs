@@ -53,7 +53,7 @@ public class ForgotPasswordUriProvider : IForgotPasswordUriProvider
             .Request
             .GetApplicationUri(_webRoutingSettings);
 
-        var inviteUri = new Uri(applicationUri, action);
-        return Attempt.SucceedWithStatus(UserOperationStatus.Success, inviteUri);
+        var forgotPasswordUri = new Uri(applicationUri, action);
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, forgotPasswordUri);
     }
 }
