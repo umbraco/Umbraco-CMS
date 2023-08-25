@@ -32,7 +32,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
-        public override bool? IsValue(object value, PropertyValueLevel level) => value?.ToString() != "[]";
+        public override bool? IsValue(object value, PropertyValueLevel level) => value is not null &&
+            !string.IsNullOrWhiteSpace(value.ToString()) &&
+            value.ToString() != "[]";
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview) => source?.ToString();
 
