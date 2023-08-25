@@ -1,5 +1,4 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
-import { UmbDocumentTypeWorkspacePropertyElement } from './document-type-workspace-view-edit-property.element.js';
 import './document-type-workspace-view-edit-property.element.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
