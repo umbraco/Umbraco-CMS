@@ -1,5 +1,5 @@
 import { UmbLanguageRepository } from '../../repository/language.repository.js';
-import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { ApiError, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -7,7 +7,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbLanguageWorkspaceContext
 	extends UmbWorkspaceContext<UmbLanguageRepository, LanguageResponseModel>
-	implements UmbEntityWorkspaceContextInterface
+	implements UmbSaveableWorkspaceContextInterface
 {
 	#data = new UmbObjectState<LanguageResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
@@ -103,7 +103,7 @@ export class UmbLanguageWorkspaceContext
 }
 
 
-export const UMB_LANGUAGE_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbLanguageWorkspaceContext>(
+export const UMB_LANGUAGE_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbLanguageWorkspaceContext>(
 	'UmbWorkspaceContext',
 	(context): context is UmbLanguageWorkspaceContext => context.getEntityType?.() === 'language'
 );

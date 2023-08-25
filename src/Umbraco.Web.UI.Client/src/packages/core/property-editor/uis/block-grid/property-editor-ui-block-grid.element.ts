@@ -1,4 +1,3 @@
-import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../../../workspace/workspace-variant/workspace-variant.context.js';
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../workspace/workspace-property/workspace-property.context.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
@@ -13,7 +12,6 @@ import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/compon
  */
 @customElement('umb-property-editor-ui-block-grid')
 export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
-	private _variantContext?: typeof UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN.TYPE;
 
 	@property()
 	value = '';

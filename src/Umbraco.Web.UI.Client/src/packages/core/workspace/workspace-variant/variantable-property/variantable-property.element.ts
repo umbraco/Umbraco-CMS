@@ -1,4 +1,4 @@
-import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../workspace-variant.context.js';
+import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT } from '../workspace-split-view.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -17,7 +17,7 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 		this._updatePropertyVariantId();
 	}
 
-	private _variantContext?: typeof UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN.TYPE;
+	private _variantContext?: typeof UMB_WORKSPACE_SPLIT_VIEW_CONTEXT.TYPE;
 
 	@state()
 	private _workspaceVariantId?: UmbVariantId;
@@ -27,7 +27,8 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN, (workspaceContext) => {
+		// TODO: Refactor: this could use the new DataSetContext:
+		this.consumeContext(UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, (workspaceContext) => {
 			this._variantContext = workspaceContext;
 			this._observeVariantContext();
 		});

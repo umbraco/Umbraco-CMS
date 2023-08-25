@@ -1,5 +1,5 @@
 import { UmbDataTypeRepository } from '../repository/data-type.repository.js';
-import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -7,7 +7,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbDataTypeWorkspaceContext
 	extends UmbWorkspaceContext<UmbDataTypeRepository, DataTypeResponseModel>
-	implements UmbEntityWorkspaceContextInterface<DataTypeResponseModel | undefined>
+	implements UmbSaveableWorkspaceContextInterface<DataTypeResponseModel | undefined>
 {
 	// TODO: revisit. temp solution because the create and response models are different.
 	#data = new UmbObjectState<DataTypeResponseModel | undefined>(undefined);
@@ -97,7 +97,7 @@ export class UmbDataTypeWorkspaceContext
 	}
 }
 
-export const UMB_DATA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbDataTypeWorkspaceContext>(
+export const UMB_DATA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbDataTypeWorkspaceContext>(
 	'UmbWorkspaceContext',
 	(context): context is UmbDataTypeWorkspaceContext => context.getEntityType?.() === 'data-type'
 );

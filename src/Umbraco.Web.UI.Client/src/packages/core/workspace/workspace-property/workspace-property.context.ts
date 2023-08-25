@@ -1,7 +1,7 @@
-import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface.js';
+import { UmbVariableWorkspaceContextInterface } from '../workspace-context/workspace-variable-entity-context.interface.js';
 import { UmbPropertyEditorExtensionElement } from '../../extension-registry/interfaces/property-editor-ui-extension-element.interface.js';
 import { type WorkspacePropertyData } from '../types/workspace-property-data.type.js';
-import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN, UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -51,13 +51,13 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 	private _variantDifference = new UmbStringState(undefined);
 	public readonly variantDifference = this._variantDifference.asObservable();
 
-	private _workspaceContext?: UmbWorkspaceVariableEntityContextInterface;
-	private _workspaceVariantConsumer?: UmbContextConsumerController<typeof UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN.TYPE>;
+	private _workspaceContext?: UmbVariableWorkspaceContextInterface;
+	private _workspaceVariantConsumer?: UmbContextConsumerController<typeof UMB_WORKSPACE_SPLIT_VIEW_CONTEXT.TYPE>;
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 		new UmbContextConsumerController(host, UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._workspaceContext = workspaceContext as UmbWorkspaceVariableEntityContextInterface;
+			this._workspaceContext = workspaceContext as UmbVariableWorkspaceContextInterface;
 		});
 
 		this._providerController = new UmbContextProviderController(host, UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, this);
@@ -71,7 +71,7 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 				if (!this._workspaceVariantConsumer) {
 					this._workspaceVariantConsumer = new UmbContextConsumerController(
 						this.#host,
-						UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN,
+						UMB_WORKSPACE_SPLIT_VIEW_CONTEXT,
 						(workspaceVariantContext) => {
 							new UmbObserverController(this.#host, workspaceVariantContext.variantId, (workspaceVariantId) => {
 								this.#workspaceVariantId = workspaceVariantId;

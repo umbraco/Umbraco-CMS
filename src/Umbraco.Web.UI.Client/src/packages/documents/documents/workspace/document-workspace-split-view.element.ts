@@ -5,10 +5,8 @@ import { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-document-workspace-split-view')
 export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
+	// TOOD: Refactor: use the split view context token:
 	private _workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
-
-	@state()
-	_unique?: string;
 
 	@state()
 	_variants?: Array<ActiveVariant>;
@@ -41,10 +39,10 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 							(view) =>
 								view.index + '_' + (view.culture ?? '') + '_' + (view.segment ?? '') + '_' + this._variants!.length,
 							(view) => html`
-								<umb-workspace-variant
+								<umb-workspace-split-view
 									alias="Umb.Workspace.Document"
 									.splitViewIndex=${view.index}
-									.displayNavigation=${view.index === this._variants!.length - 1}></umb-workspace-variant>
+									.displayNavigation=${view.index === this._variants!.length - 1}></umb-workspace-split-view>
 							`
 						)}
 					</div>

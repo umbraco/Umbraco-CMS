@@ -307,6 +307,44 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		this.#documentTypes.updateOne(documentTypeId, { properties });
 	}
 
+	// TODO: Refactor: These property methods, could be named without structure in their name.
+	async propertyStructureById(
+		propertyId: string
+	) {
+		await this.#init;
+		return this.#documentTypes.asObservablePart((docTypes) => {
+			for (const docType of docTypes) {
+				const foundProp = docType.properties?.find((property) => property.id === propertyId);
+				if(foundProp) {
+					return foundProp;
+				}
+			}
+			return undefined;
+		});
+	}
+
+	async getPropertyStructureById(propertyId: string) {
+		await this.#init;
+		for (const docType of this.#documentTypes.getValue()) {
+			const foundProp = docType.properties?.find((property) => property.id === propertyId);
+			if(foundProp) {
+				return foundProp;
+			}
+		}
+		return undefined;
+	}
+	async getPropertyStructureByAlias(propertyAlias: string) {
+		await this.#init;
+		for (const docType of this.#documentTypes.getValue()) {
+			const foundProp = docType.properties?.find((property) => property.alias === propertyAlias);
+			if(foundProp) {
+				return foundProp;
+			}
+		}
+		return undefined;
+	}
+
+
 	/*
 	rootDocumentTypeName() {
 		return this.#documentTypes.asObservablePart((docTypes) => {

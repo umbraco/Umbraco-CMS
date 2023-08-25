@@ -1,6 +1,6 @@
 import { UmbMediaRepository } from '../repository/media.repository.js';
 import type { MediaDetails } from '../index.js';
-import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -8,7 +8,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 type EntityType = MediaDetails;
 export class UmbMediaWorkspaceContext
 	extends UmbWorkspaceContext<UmbMediaRepository, EntityType>
-	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
+	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
@@ -83,7 +83,7 @@ export class UmbMediaWorkspaceContext
 	}
 }
 
-export const UMB_MEDIA_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbMediaWorkspaceContext>(
+export const UMB_MEDIA_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbMediaWorkspaceContext>(
 	'UmbWorkspaceContext',
 	(context): context is UmbMediaWorkspaceContext => context.getEntityType?.() === 'media'
 );

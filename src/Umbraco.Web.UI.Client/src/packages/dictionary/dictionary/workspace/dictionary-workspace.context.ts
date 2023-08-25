@@ -1,5 +1,5 @@
 import { UmbDictionaryRepository } from '../repository/dictionary.repository.js';
-import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -7,7 +7,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbDictionaryWorkspaceContext
 	extends UmbWorkspaceContext<UmbDictionaryRepository, DictionaryItemResponseModel>
-	implements UmbEntityWorkspaceContextInterface<DictionaryItemResponseModel | undefined>
+	implements UmbSaveableWorkspaceContextInterface<DictionaryItemResponseModel | undefined>
 {
 	#data = new UmbObjectState<DictionaryItemResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
@@ -86,7 +86,7 @@ export class UmbDictionaryWorkspaceContext
 }
 
 
-export const UMB_DICTIONARY_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbDictionaryWorkspaceContext>(
+export const UMB_DICTIONARY_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbDictionaryWorkspaceContext>(
 	'UmbWorkspaceContext',
 	(context): context is UmbDictionaryWorkspaceContext => context.getEntityType?.() === 'dictionary-item'
 );

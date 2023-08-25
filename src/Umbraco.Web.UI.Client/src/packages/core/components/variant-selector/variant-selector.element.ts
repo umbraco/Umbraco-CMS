@@ -1,8 +1,10 @@
+import { UmbVariantId } from '../../variant/variant-id.class.js';
 import { UUITextStyles, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import {
-	UmbWorkspaceVariantContext,
-	UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN,
+	UmbWorkspaceSplitViewContext,
+	UMB_WORKSPACE_SPLIT_VIEW_CONTEXT,
+	UMB_VARIANT_DATASET_CONTEXT,
 	ActiveVariant,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -23,7 +25,8 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		return this._activeVariants.map((el) => el.culture ?? '') ?? [];
 	}
 
-	private _variantContext?: UmbWorkspaceVariantContext;
+	#splitViewContext?: UmbWorkspaceSplitViewContext;
+	#datasetContext?: typeof UMB_VARIANT_DATASET_CONTEXT.TYPE;
 
 	@state()
 	private _name?: string;
@@ -43,18 +46,21 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext<UmbWorkspaceVariantContext>(UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN, (instance) => {
-			this._variantContext = instance;
+		this.consumeContext(UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, (instance) => {
+			this.#splitViewContext = instance;
 			this._observeVariants();
 			this._observeActiveVariants();
-			this._observeVariantContext();
+		});
+		this.consumeContext(UMB_VARIANT_DATASET_CONTEXT, (instance) => {
+			this.#datasetContext = instance;
+			this._observeDatasetContext();
 		});
 	}
 
 	private async _observeVariants() {
-		if (!this._variantContext) return;
+		if (!this.#splitViewContext) return;
 
-		const workspaceContext = this._variantContext.getWorkspaceContext();
+		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
 		if (workspaceContext) {
 			this.observe(
 				workspaceContext.variants,
@@ -69,9 +75,9 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	}
 
 	private async _observeActiveVariants() {
-		if (!this._variantContext) return;
+		if (!this.#splitViewContext) return;
 
-		const workspaceContext = this._variantContext.getWorkspaceContext();
+		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
 		if (workspaceContext) {
 			this.observe(
 				workspaceContext.splitView.activeVariantsInfo,
@@ -85,31 +91,20 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		}
 	}
 
-	private async _observeVariantContext() {
-		if (!this._variantContext) return;
+	private async _observeDatasetContext() {
+		if (!this.#datasetContext) return;
+
+		const variantId = this.#datasetContext.getVariantId();
+		this._culture = variantId.culture;
+		this._segment = variantId.segment;
+		this.updateVariantDisplayName();
 
 		this.observe(
-			this._variantContext.name,
+			this.#datasetContext.name,
 			(name) => {
 				this._name = name;
 			},
 			'_name'
-		);
-		this.observe(
-			this._variantContext.culture,
-			(culture) => {
-				this._culture = culture;
-				this.updateVariantDisplayName();
-			},
-			'_culture'
-		);
-		this.observe(
-			this._variantContext.segment,
-			(segment) => {
-				this._segment = segment;
-				this.updateVariantDisplayName();
-			},
-			'_segment'
 		);
 	}
 
@@ -128,8 +123,9 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				// TODO: create a setName method on EntityWorkspace:
-				this._variantContext?.setName(target.value);
+				// TODO: Refactor: find a good way to mix these features... maybe we should request the context multiple times? or find a way to mix the discriminators? or a way to investigate the context for features?
+				alert("cannot set name currently.")
+				//this.#datasetContext?.setName(target.value);
 			}
 		}
 	}
@@ -146,17 +142,17 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	}
 
 	private _switchVariant(variant: DocumentVariantResponseModel) {
-		this._variantContext?.switchVariant(variant);
+		this.#splitViewContext?.switchVariant(UmbVariantId.Create(variant));
 		this._close();
 	}
 
 	private _openSplitView(variant: DocumentVariantResponseModel) {
-		this._variantContext?.openSplitView(variant);
+		this.#splitViewContext?.openSplitView(UmbVariantId.Create(variant));
 		this._close();
 	}
 
 	private _closeSplitView() {
-		this._variantContext?.closeSplitView();
+		this.#splitViewContext?.closeSplitView();
 	}
 
 	private _isVariantActive(culture: string) {
