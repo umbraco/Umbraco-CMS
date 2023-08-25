@@ -104,8 +104,8 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		// Note: Route for adding a new property
 		new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
 			.addAdditionalPath('new-property')
-			.onSetup(() => {
-				return {};
+			.onSetup(async () => {
+				return (await this._propertyStructureHelper.createPropertyScaffold()) ?? false;
 			})
 			.onSubmit((result) => {
 				this.#addProperty(result);

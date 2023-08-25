@@ -110,6 +110,13 @@ export class UmbContentTypePropertyStructureHelper {
 	// TODO: consider moving this to another class, to separate 'viewer' from 'manipulator':
 	/** Manipulate methods: */
 
+	async createPropertyScaffold(ownerId?: string, sortOrder?: number) {
+		await this.#init;
+		if (!this.#structure) return;
+
+		return await this.#structure.createPropertyScaffold(ownerId, sortOrder);
+	}
+
 	async addProperty(ownerId?: string, sortOrder?: number) {
 		await this.#init;
 		if (!this.#structure) return;

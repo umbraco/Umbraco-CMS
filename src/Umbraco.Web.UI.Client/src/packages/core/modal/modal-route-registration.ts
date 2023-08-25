@@ -14,7 +14,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	#modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenResult> | string;
 	#modalConfig?: UmbModalConfig;
 
-	#onSetupCallback?: (routingInfo: Params) => UmbModalTokenData | false;
+	#onSetupCallback?: (routingInfo: Params) => Promise<UmbModalTokenData | false> | UmbModalTokenData | false;
 	#onSubmitCallback?: (data: UmbModalTokenResult) => void;
 	#onRejectCallback?: () => void;
 
@@ -87,7 +87,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		this.#urlBuilderCallback?.(urlBuilder);
 	}
 
-	public onSetup(callback: (routingInfo: Params) => UmbModalTokenData | false) {
+	public onSetup(callback: (routingInfo: Params) => Promise<UmbModalTokenData | false> | UmbModalTokenData | false) {
 		this.#onSetupCallback = callback;
 		return this;
 	}
@@ -109,11 +109,11 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		this.#modalContext = undefined;
 	};
 
-	routeSetup(router: IRouterSlot, modalContext: UmbModalManagerContext, params: Params) {
+	async routeSetup(router: IRouterSlot, modalContext: UmbModalManagerContext, params: Params) {
 		// If already open, don't do anything:
 		if (this.active) return;
 
-		const modalData = this.#onSetupCallback ? this.#onSetupCallback(params) : undefined;
+		const modalData = this.#onSetupCallback ? await this.#onSetupCallback(params) : undefined;
 		if (modalData !== false) {
 			this.#modalContext = modalContext.open(this.#modalAlias, modalData, this.modalConfig, router);
 			this.#modalContext.onSubmit().then(this.#onSubmit, this.#onReject);
