@@ -5,15 +5,15 @@ using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
+namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Folder;
 
 [ApiVersion("1.0")]
-public class UpdateDataTypeFolderController : DataTypeFolderControllerBase
+public class UpdateDocumentTypeFolderController : DocumentTypeFolderControllerBase
 {
-    public UpdateDataTypeFolderController(
+    public UpdateDocumentTypeFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IDataTypeContainerService dataTypeContainerService)
-        : base(backOfficeSecurityAccessor, dataTypeContainerService)
+        IContentTypeContainerService contentTypeContainerService)
+        : base(backOfficeSecurityAccessor, contentTypeContainerService)
     {
     }
 

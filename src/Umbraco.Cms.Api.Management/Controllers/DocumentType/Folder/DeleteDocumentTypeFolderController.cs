@@ -4,15 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
+namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Folder;
 
 [ApiVersion("1.0")]
-public class DeleteDataTypeFolderController : DataTypeFolderControllerBase
+public class DeleteDocumentTypeFolderController : DocumentTypeFolderControllerBase
 {
-    public DeleteDataTypeFolderController(
+    public DeleteDocumentTypeFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IDataTypeContainerService dataTypeContainerService)
-        : base(backOfficeSecurityAccessor, dataTypeContainerService)
+        IContentTypeContainerService contentTypeContainerService)
+        : base(backOfficeSecurityAccessor, contentTypeContainerService)
     {
     }
 
