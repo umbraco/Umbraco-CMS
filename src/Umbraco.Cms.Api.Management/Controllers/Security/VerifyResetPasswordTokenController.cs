@@ -16,15 +16,12 @@ public class VerifyResetPasswordTokenController : SecurityControllerBase
 {
     private readonly IUserService _userService;
 
-    public VerifyResetPasswordTokenController(IUserService userService)
-    {
-        _userService = userService;
-    }
+    public VerifyResetPasswordTokenController(IUserService userService) => _userService = userService;
 
     [HttpPost("forgot-password/verify")]
     [MapToApiVersion("1.0")]
     [AllowAnonymous]
-    [ProducesResponseType( StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetailsBuilder), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetailsBuilder), StatusCodes.Status404NotFound)]
     [UserPasswordEnsureMinimumResponseTime]

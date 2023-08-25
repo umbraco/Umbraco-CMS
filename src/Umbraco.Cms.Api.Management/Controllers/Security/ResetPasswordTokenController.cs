@@ -17,15 +17,12 @@ public class ResetPasswordTokenController : SecurityControllerBase
 {
     private readonly IUserService _userService;
 
-    public ResetPasswordTokenController(IUserService userService)
-    {
-        _userService = userService;
-    }
+    public ResetPasswordTokenController(IUserService userService) => _userService = userService;
 
     [HttpPost("forgot-password/reset")]
     [MapToApiVersion("1.0")]
     [AllowAnonymous]
-    [ProducesResponseType( StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetailsBuilder), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetailsBuilder), StatusCodes.Status404NotFound)]
     [UserPasswordEnsureMinimumResponseTime]

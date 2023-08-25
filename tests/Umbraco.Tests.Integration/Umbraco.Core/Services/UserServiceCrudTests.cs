@@ -82,8 +82,7 @@ public partial class UserServiceCrudTests : UmbracoIntegrationTest
             GetRequiredService<IShortStringHelper>(),
             GetRequiredService<IOptions<ContentSettings>>(),
             GetRequiredService<IIsoCodeValidator>(),
-            GetRequiredService<IUserForgotPasswordSender>()
-            );
+            GetRequiredService<IUserForgotPasswordSender>());
     }
 
 

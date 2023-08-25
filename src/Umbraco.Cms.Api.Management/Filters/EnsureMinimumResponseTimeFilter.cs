@@ -7,10 +7,7 @@ internal abstract class EnsureMinimumResponseTimeFilter : IAsyncActionFilter
 {
     private readonly TimeSpan _minimumResponseTime;
 
-    protected EnsureMinimumResponseTimeFilter(TimeSpan minimumResponseTime)
-    {
-        _minimumResponseTime = minimumResponseTime;
-    }
+    protected EnsureMinimumResponseTimeFilter(TimeSpan minimumResponseTime) => _minimumResponseTime = minimumResponseTime;
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {

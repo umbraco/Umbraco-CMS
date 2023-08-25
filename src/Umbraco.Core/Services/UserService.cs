@@ -1081,7 +1081,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (string.IsNullOrEmpty(model.ResetPasswordToken) is false)
         {
-            Attempt<UserOperationStatus> verifyPasswordResetAsync = await VerifyPasswordResetAsync(userKey, model.ResetPasswordToken!);
+            Attempt<UserOperationStatus> verifyPasswordResetAsync = await VerifyPasswordResetAsync(userKey, model.ResetPasswordToken);
             if (verifyPasswordResetAsync.Result != UserOperationStatus.Success)
             {
                 return Attempt.FailWithStatus(verifyPasswordResetAsync.Result, new PasswordChangedModel());
@@ -2032,7 +2032,13 @@ internal class UserService : RepositoryService, IUserService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        Attempt<PasswordChangedModel, UserOperationStatus> changePasswordAttempt = await ChangePasswordAsync(userKey, new ChangeUserPasswordModel() { NewPassword = password, UserKey = userKey, ResetPasswordToken = token});
+        Attempt<PasswordChangedModel, UserOperationStatus> changePasswordAttempt =
+            await ChangePasswordAsync(userKey, new ChangeUserPasswordModel
+            {
+                NewPassword = password,
+                UserKey = userKey,
+                ResetPasswordToken = token
+            });
 
         scope.Complete();
         return changePasswordAttempt;

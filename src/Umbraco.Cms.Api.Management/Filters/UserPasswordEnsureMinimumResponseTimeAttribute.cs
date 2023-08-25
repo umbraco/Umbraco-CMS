@@ -13,7 +13,8 @@ internal class UserPasswordEnsureMinimumResponseTimeAttribute : TypeFilterAttrib
 
     private class UserPasswordEnsureMinimumResponseTimeFilter : EnsureMinimumResponseTimeFilter
     {
-        public UserPasswordEnsureMinimumResponseTimeFilter(IOptions<UserPasswordConfigurationSettings> options):base(options.Value.MinimumResponseTime)
+        public UserPasswordEnsureMinimumResponseTimeFilter(IOptions<UserPasswordConfigurationSettings> options)
+            : base(options.Value.MinimumResponseTime)
         {
         }
     }
