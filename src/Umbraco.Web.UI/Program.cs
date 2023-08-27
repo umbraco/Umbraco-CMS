@@ -1,6 +1,12 @@
+using Umbraco.Search.DependencyInjection;
+using Umbraco.Search.Examine.Lucene.DependencyInjection;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.CreateUmbracoBuilder()
+    .AddSearchServices()
+    .AddExamineLuceneIndexes()
+    //.AddInMemoryIndexes()
     .AddBackOffice()
     .AddWebsite()
     .AddDeliveryApi()
