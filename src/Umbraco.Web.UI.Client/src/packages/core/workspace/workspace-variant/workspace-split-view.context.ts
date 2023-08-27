@@ -25,8 +25,8 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 	#index = new UmbNumberState(undefined);
 	index = this.#index.asObservable();
 
-	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
-	variantId = this.#variantId.asObservable();
+	//#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
+	//variantId = this.#variantId.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -60,10 +60,13 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 				// TODO: Ask workspace context to create the specific dataset.
 
 				this.#dataSetContext?.destroy();
-				const variantId = this.#variantId.getValue();
-				if(variantId) {
-					this.#dataSetContext = this.#workspaceContext?.createVariableDatasetContext(this, UmbVariantId.Create(activeVariantInfo));
-				}
+				const variantId = UmbVariantId.Create(activeVariantInfo);
+				// We can safely assume in this context that the workspace is variant.
+				//if(variantId.isInvariant()) {
+					this.#dataSetContext = this.#workspaceContext?.createVariableDatasetContext(this, variantId);
+				/*} else {
+					this.#dataSetContext = this.#workspaceContext?.createDatasetContext(this);
+				}*/
 			},
 			'_observeActiveVariant'
 		);

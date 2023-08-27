@@ -67,18 +67,6 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	}
 
 	/**
-	 * Property Value, this is the value stored in the property.
-	 * @public
-	 * @type {unknown}
-	 * @attr
-	 * @default undefined
-	 */
-	@property({ attribute: false })
-	public set value(value: unknown) {
-		this._propertyContext.setValue(value);
-	}
-
-	/**
 	 * Config. Configuration to pass to the Property Editor UI. This is also the configuration data stored on the Data Type.
 	 * @public
 	 * @type {string}
@@ -88,19 +76,6 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	@property({ type: Array, attribute: false })
 	public set config(value: UmbDataTypeConfig | undefined) {
 		this._propertyContext.setConfig(value);
-	}
-
-	/**
-	 * PropertyVariantId. A Variant ID to identify which variant its value is stored on.
-	 * @public
-	 * @type {UmbVariantId}
-	 * @attr
-	 * @default null
-	 */
-	@property({ type: Object, attribute: false })
-	public set propertyVariantId(value: UmbVariantId | undefined) {
-		this._propertyContext.setVariantId(value);
-		//this._variantDisplayName = value?.toString();
 	}
 
 	@state()
@@ -234,8 +209,9 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 			? html`<umb-property-action-menu
 					slot="property-action-menu"
 					id="property-action-menu"
-					.propertyEditorUiAlias="${this._propertyEditorUiAlias}"
-					.value="${this._value}"></umb-property-action-menu>`
+					.propertyAlias=${this._alias}
+					.propertyEditorUiAlias=${this._propertyEditorUiAlias}
+					.value=${this._value}></umb-property-action-menu>`
 			: ''}`;
 	}
 

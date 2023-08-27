@@ -43,6 +43,7 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 	}
 
 	private _updatePropertyVariantId() {
+		console.log("_updatePropertyVariantId", this._workspaceVariantId && this.property)
 		if (this._workspaceVariantId && this.property) {
 			const newVariantId = UmbVariantId.Create({
 				culture: this.property.variesByCulture ? this._workspaceVariantId.culture : null,

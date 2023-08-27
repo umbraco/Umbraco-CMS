@@ -97,6 +97,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 	/**
 	 * Get the stored value for a property. It will render the default value from the configuration if no value is stored in the database.
 	 */
+	// TODO: Refactor: setup a dataset for this, otherwise we cannot ensure features, neither the right reactivity.
 	private _getValue(property: PropertyEditorConfigProperty) {
 		const value = this.data.find((data) => data.alias === property.alias)?.value;
 		if (value) return value;

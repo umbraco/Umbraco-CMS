@@ -1,7 +1,7 @@
 import { UmbDocumentRepository } from '../repository/document.repository.js';
 import { UmbDocumentTypeRepository } from '../../document-types/repository/document-type.repository.js';
 import { UmbDocumentDatasetContext } from '../dataset-context/document-dataset-context.js';
-import { type UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbSaveableWorkspaceContextInterface,
@@ -201,6 +201,10 @@ export class UmbDocumentWorkspaceContext
 
 	public createVariableDatasetContext(host: UmbControllerHost, variantId: UmbVariantId): UmbDatasetContext {
 		return new UmbDocumentDatasetContext(host, this, variantId);
+	}
+
+	public createDatasetContext(host: UmbControllerHost): UmbDatasetContext {
+		return new UmbDocumentDatasetContext(host, this, UmbVariantId.Create({}));
 	}
 
 	public destroy(): void {

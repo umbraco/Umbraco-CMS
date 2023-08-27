@@ -25,6 +25,10 @@ export class UmbVariantId {
 		return (this.culture || 'invariant') + (this.segment ? `_${this.segment}` : '');
 	}
 
+	public isInvariant(): boolean {
+		return this.culture === null && this.segment === null;
+	}
+
 	public toObject(): variantObject {
 		return { culture: this.culture, segment: this.segment };
 	}

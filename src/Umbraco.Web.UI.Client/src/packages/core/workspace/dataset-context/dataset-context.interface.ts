@@ -1,4 +1,5 @@
-import { type Observable } from "@umbraco-cms/backoffice/external/rxjs";
+import type {  Observable } from "@umbraco-cms/backoffice/external/rxjs";
+import type { UmbVariantId } from "../../variant/variant-id.class.js";
 
 /**
  * Represents a set of properties.
@@ -18,6 +19,7 @@ export interface UmbDatasetContext {
 	getType(): string;
 	getUnique(): string | undefined;
 	//getUniqueName(): string;
+	getVariantId: undefined | (() => UmbVariantId | undefined);
 
 	getName(): string | undefined;
 	readonly name: Observable<string | undefined>;
@@ -25,6 +27,7 @@ export interface UmbDatasetContext {
 	destroy(): void;
 
 	// Property methods:
+	propertyVariantId(propertyAlias: string): Promise<Observable<UmbVariantId | undefined> | undefined>;
 	propertyValueByAlias<ReturnType = unknown>(propertyAlias: string): Promise<Observable<ReturnType | undefined> | undefined>;
 	setPropertyValue(propertyAlias: string, value: unknown): Promise<void>;
 

@@ -1,6 +1,7 @@
 import { UmbDocumentWorkspaceContext } from "../workspace/index.js";
 import { DocumentVariantResponseModel, PropertyTypeModelBaseModel } from "@umbraco-cms/backoffice/backend-api";
 import { UmbBaseController, UmbControllerHost } from "@umbraco-cms/backoffice/controller-api";
+import { map } from "@umbraco-cms/backoffice/external/rxjs";
 import { UmbObjectState } from "@umbraco-cms/backoffice/observable-api";
 import { UmbVariantId } from "@umbraco-cms/backoffice/variant";
 import { UMB_DATASET_CONTEXT, UmbVariantDatasetContext } from "@umbraco-cms/backoffice/workspace";
@@ -70,7 +71,16 @@ export class UmbDocumentDatasetContext extends UmbBaseController implements UmbV
 	 * TODO: Write proper JSDocs here.
 	 * Ideally do not use these methods, its better to communicate directly with the workspace, but if you do not know the property variant id, then this will figure it out for you. So good for externals to set or get values of a property.
 	 */
+	async propertyVariantId(propertyAlias: string) {
+		return (await this.#workspace.structure.propertyStructureByAlias(propertyAlias)).pipe(map((property) => property ? this.#createPropertyVariantId(property) : undefined));
+	}
+
+	/**
+	 * TODO: Write proper JSDocs here.
+	 * Ideally do not use these methods, its better to communicate directly with the workspace, but if you do not know the property variant id, then this will figure it out for you. So good for externals to set or get values of a property.
+	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
+
 		// This is not reacting to if the property variant settings changes while running.
 		const property = await this.#workspace.structure.getPropertyStructureByAlias(propertyAlias);
 		if(property) {
@@ -80,6 +90,12 @@ export class UmbDocumentDatasetContext extends UmbBaseController implements UmbV
 			}
 		}
 		return undefined;
+	}
+
+	// TODO: Refactor:
+	// Not used currently:
+	async propertyValueByAliasAndCulture<ReturnType = unknown>(propertyAlias: string, propertyVariantId: UmbVariantId) {
+		return this.#workspace.propertyValueByAlias<ReturnType>(propertyAlias, propertyVariantId);
 	}
 
 	/**
