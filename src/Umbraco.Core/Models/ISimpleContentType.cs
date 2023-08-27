@@ -47,6 +47,11 @@ public interface ISimpleContentType
     bool IsElement { get; }
 
     /// <summary>
+    ///     Gets the aliases of the content types that compose this content type.
+    /// </summary>
+    IEnumerable<string> CompositionAliases => Enumerable.Empty<string>();
+
+    /// <summary>
     ///     Validates that a combination of culture and segment is valid for the content type properties.
     /// </summary>
     /// <param name="culture">The culture.</param>

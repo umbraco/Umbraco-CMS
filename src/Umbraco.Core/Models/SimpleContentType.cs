@@ -11,14 +11,14 @@ public class SimpleContentType : ISimpleContentType
     ///     Initializes a new instance of the <see cref="SimpleContentType" /> class.
     /// </summary>
     public SimpleContentType(IContentType contentType)
-        : this((IContentTypeBase)contentType) =>
+        : this((IContentTypeComposition)contentType) =>
         DefaultTemplate = contentType.DefaultTemplate;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="SimpleContentType" /> class.
     /// </summary>
     public SimpleContentType(IMediaType mediaType)
-        : this((IContentTypeBase)mediaType)
+        : this((IContentTypeComposition)mediaType)
     {
     }
 
@@ -26,11 +26,11 @@ public class SimpleContentType : ISimpleContentType
     ///     Initializes a new instance of the <see cref="SimpleContentType" /> class.
     /// </summary>
     public SimpleContentType(IMemberType memberType)
-        : this((IContentTypeBase)memberType)
+        : this((IContentTypeComposition)memberType)
     {
     }
 
-    private SimpleContentType(IContentTypeBase contentType)
+    private SimpleContentType(IContentTypeComposition contentType)
     {
         if (contentType == null)
         {
@@ -46,6 +46,7 @@ public class SimpleContentType : ISimpleContentType
         Name = contentType.Name;
         AllowedAsRoot = contentType.AllowedAsRoot;
         IsElement = contentType.IsElement;
+        CompositionAliases = contentType.CompositionAliases().ToList();
     }
 
     public string Alias { get; }
@@ -68,6 +69,8 @@ public class SimpleContentType : ISimpleContentType
     public bool AllowedAsRoot { get; }
 
     public bool IsElement { get; }
+
+    public IEnumerable<string> CompositionAliases { get; }
 
     public bool SupportsPropertyVariation(string? culture, string segment, bool wildcards = false) =>
 
