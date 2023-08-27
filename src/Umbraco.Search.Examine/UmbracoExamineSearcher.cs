@@ -75,14 +75,14 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
     public IUmbracoSearchResults Search(ISearchRequest searchRequest)
     {
         var query = _examineIndex.CreateQuery();
-        IBooleanOperation? booleanOperation = null;
+        IBooleanOperation booleanOperation;
         if (!string.IsNullOrWhiteSpace(searchRequest.Term))
         {
             booleanOperation = query.ManagedQuery(searchRequest.Term);
         }
         else
         {
-            booleanOperation = query.Field("__IndexType", "*");
+            booleanOperation = query.NativeQuery("*:*");
         }
 
         // when not fetching for preview, make sure the "published" field is "y"
