@@ -5,15 +5,15 @@ using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
+namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Folder;
 
 [ApiVersion("1.0")]
-public class CreateDataTypeFolderController : DataTypeFolderControllerBase
+public class CreateDocumentTypeFolderController : DocumentTypeFolderControllerBase
 {
-    public CreateDataTypeFolderController(
+    public CreateDocumentTypeFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IDataTypeContainerService dataTypeContainerService)
-        : base(backOfficeSecurityAccessor, dataTypeContainerService)
+        IContentTypeContainerService contentTypeContainerService)
+        : base(backOfficeSecurityAccessor, contentTypeContainerService)
     {
     }
 
@@ -23,7 +23,7 @@ public class CreateDataTypeFolderController : DataTypeFolderControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Create(CreateFolderRequestModel createFolderRequestModel)
-        => await CreateFolderAsync<ByKeyDataTypeFolderController>(
+        => await CreateFolderAsync<ByKeyDocumentTypeFolderController>(
             createFolderRequestModel,
-            controller => nameof(controller.ByKey));
+            controller => nameof(controller.ByKey)).ConfigureAwait(false);
 }

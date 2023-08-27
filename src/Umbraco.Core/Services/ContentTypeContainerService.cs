@@ -6,13 +6,13 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services;
 
-internal sealed class DataTypeContainerService : EntityTypeContainerService<IDataType, IDataTypeContainerRepository>, IDataTypeContainerService
+internal sealed class ContentTypeContainerService : EntityTypeContainerService<IContentType, IDocumentTypeContainerRepository>, IContentTypeContainerService
 {
-    public DataTypeContainerService(
+    public ContentTypeContainerService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
-        IDataTypeContainerRepository entityContainerRepository,
+        IDocumentTypeContainerRepository entityContainerRepository,
         IAuditRepository auditRepository,
         IEntityRepository entityRepository,
         IUserIdKeyResolver userIdKeyResolver)
@@ -20,7 +20,7 @@ internal sealed class DataTypeContainerService : EntityTypeContainerService<IDat
     {
     }
 
-    protected override Guid ContainedObjectType => Constants.ObjectTypes.DataType;
+    protected override Guid ContainedObjectType => Constants.ObjectTypes.DocumentType;
 
-    protected override UmbracoObjectTypes ContainerObjectType => UmbracoObjectTypes.DataTypeContainer;
+    protected override UmbracoObjectTypes ContainerObjectType => UmbracoObjectTypes.DocumentTypeContainer;
 }

@@ -959,6 +959,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     protected Guid ContainerObjectType => EntityContainer.GetContainerObjectType(ContainedObjectType);
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -999,6 +1000,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1040,6 +1042,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return OperationResult.Attempt.Succeed(eventMessages);
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public EntityContainer? GetContainer(int containerId)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1048,6 +1051,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return _containerRepository.Get(containerId);
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public EntityContainer? GetContainer(Guid containerId)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1056,6 +1060,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return _containerRepository.Get(containerId);
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1064,6 +1069,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return _containerRepository.GetMany(containerIds);
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public IEnumerable<EntityContainer> GetContainers(TItem item)
     {
         var ancestorIds = item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
@@ -1074,6 +1080,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return GetContainers(ancestorIds);
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public IEnumerable<EntityContainer> GetContainers(string name, int level)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1082,6 +1089,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return _containerRepository.Get(name, level);
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1121,6 +1129,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         // TODO: Audit trail ?
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
