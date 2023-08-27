@@ -4678,11 +4678,11 @@
       }
     },
     "/umbraco/management/api/v1/document/sort": {
-      "post": {
+      "put": {
         "tags": [
           "Document"
         ],
-        "operationId": "PostDocumentSort",
+        "operationId": "PutDocumentSort",
         "requestBody": {
           "content": {
             "application/json": {
@@ -8316,11 +8316,11 @@
       }
     },
     "/umbraco/management/api/v1/media/sort": {
-      "post": {
+      "put": {
         "tags": [
           "Media"
         ],
-        "operationId": "PostMediaSort",
+        "operationId": "PutMediaSort",
         "requestBody": {
           "content": {
             "application/json": {
