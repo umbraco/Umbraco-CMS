@@ -82,7 +82,7 @@ internal sealed class MediaEditingService
         => ContentService.Move(media, newParentId, userId).Result;
 
     protected override IMedia? Copy(IMedia media, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
-        => throw new NotImplementedException("Copy is not supported for media");
+        => throw new NotSupportedException("Copy is not supported for media");
 
     protected override OperationResult? MoveToRecycleBin(IMedia media, int userId)
         => ContentService.MoveToRecycleBin(media, userId).Result;
