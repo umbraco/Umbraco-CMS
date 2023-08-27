@@ -50,5 +50,7 @@ public class UmbracoSearchFieldNames
         ///     Whether or not the content exists in a published state
         /// </summary>
         public const string Published = "published";
+
+        public const string AncestorIds = "ancestorIds";
     }
 }

@@ -37,7 +37,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
     {
         foreach (IContent content in contents.Where(CanIndex))
         {
-            var cultures = IndexableCultures(content);
+            var cultures = IndexableCultures(content, out var ancestors);
 
             foreach (var culture in cultures)
             {
@@ -51,6 +51,8 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
                         {
                             content.Id.ToString()
                         }, // required for correct publishing handling and also needed for backoffice index browsing
+                    [UmbracoSearchFieldNames.DeliveryApiContentIndex.AncestorIds] =
+                        ancestors.Select(x => x.ToString()).ToArray(), // required for descendant queries
                     [UmbracoSearchFieldNames.DeliveryApiContentIndex.ContentTypeId] =
                         new object[]
                         {
@@ -77,10 +79,10 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         }
     }
 
-    private string?[] IndexableCultures(IContentBase content)
+    private string?[] IndexableCultures(IContentBase content, out IEnumerable<Guid> ancestors)
     {
         var variesByCulture = content.ContentType.VariesByCulture();
-
+        var list = new List<Guid>();
         // if the content varies by culture, the indexable cultures are the published
         // cultures - otherwise "null" represents "no culture"
         var cultures = variesByCulture && content is IContent contentModel
@@ -91,6 +93,10 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         foreach (var ancestorId in content.GetAncestorIds() ?? Array.Empty<int>())
         {
             IContent? ancestor = _contentService.GetById(ancestorId);
+            if (ancestor != null)
+            {
+                list.Add(ancestor.Key);
+            }
             if (ancestor is null || ancestor.Published is false)
             {
                 // no published ancestor => don't index anything
@@ -108,7 +114,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
                 break;
             }
         }
-
+        ancestors = list;
         return cultures;
     }
 

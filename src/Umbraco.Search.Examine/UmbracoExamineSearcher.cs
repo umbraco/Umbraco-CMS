@@ -131,6 +131,28 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
 
                         });
                         break;
+                    case LogicOperator.And:
+                        booleanOperation = booleanOperation.And(x =>
+                        {
+                            if (filter.Values.Any())
+                            {
+                                if (filter.Values.Count == 1)
+                                {
+                                    return x.Field(filter.FieldName, filter.Values.First());
+                                }
+
+                                return x.GroupedOr(new[] { filter.FieldName }, filter.Values.ToArray());
+                            }
+
+                            if (filter.SubFilters.Any())
+                            {
+                                return PrepareSubFilters(searchQuery,x, filter.SubFilters, filter.LogicOperator);
+                            }
+                            //this is not possible
+                            return null;
+
+                        });
+                        break;
                 }
             }
 
