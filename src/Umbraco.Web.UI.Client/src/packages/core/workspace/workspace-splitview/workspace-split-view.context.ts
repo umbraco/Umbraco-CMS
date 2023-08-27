@@ -1,4 +1,3 @@
-import { UmbVariantableWorkspaceContextInterface } from '../workspace-context/workspace-variantable-entity-context.interface.js';
 import { UmbDatasetContext } from '../dataset-context/index.js';
 import { UMB_VARIANT_WORKSPACE_CONTEXT_TOKEN } from '../index.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -23,9 +22,6 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 
 	#index = new UmbNumberState(undefined);
 	index = this.#index.asObservable();
-
-	//#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
-	//variantId = this.#variantId.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -101,18 +97,10 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 	}
 
 
-
-
 	/**
 	 *
 	 * concept this class could have methods to set and get the culture and segment of the active variant? just by using the index.
 	 */
-
-	/*
-	public destroy(): void {
-
-	}
-	*/
 }
 
 export const UMB_WORKSPACE_SPLIT_VIEW_CONTEXT = new UmbContextToken<UmbWorkspaceSplitViewContext>(

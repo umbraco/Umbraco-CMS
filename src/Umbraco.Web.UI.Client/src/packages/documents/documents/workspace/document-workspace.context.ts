@@ -7,7 +7,7 @@ import {
 	UmbSaveableWorkspaceContextInterface,
 	UmbWorkspaceContext,
 	UmbWorkspaceSplitViewManager,
-	UmbVariableWorkspaceContextInterface,
+	UmbVariantableWorkspaceContextInterface,
 	type UmbDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
 import type { CreateDocumentRequestModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -27,7 +27,7 @@ import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbWorkspaceContext<UmbDocumentRepository, EntityType>
-	implements UmbVariableWorkspaceContextInterface<EntityType | undefined>
+	implements UmbVariantableWorkspaceContextInterface<EntityType | undefined>
 {
 	/**
 	 * The document is the current stored version of the document.

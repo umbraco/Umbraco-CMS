@@ -6,7 +6,7 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { ValueModelBaseModel, VariantResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export interface UmbVariableWorkspaceContextInterface<T = unknown> extends UmbSaveableWorkspaceContextInterface<T> {
+export interface UmbVariantableWorkspaceContextInterface<EntityType = unknown> extends UmbSaveableWorkspaceContextInterface<EntityType> {
 	variants: Observable<Array<VariantResponseModelBaseModel>>;
 
 	splitView: UmbWorkspaceSplitViewManager;

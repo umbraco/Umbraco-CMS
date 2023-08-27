@@ -3,5 +3,5 @@ import { UmbVariantId } from "@umbraco-cms/backoffice/variant";
 
 
 export interface UmbVariantDatasetContext extends UmbDatasetContext {
-	getVariantId: () => UmbVariantId | undefined;
+	getVariantId: () => UmbVariantId;
 }
