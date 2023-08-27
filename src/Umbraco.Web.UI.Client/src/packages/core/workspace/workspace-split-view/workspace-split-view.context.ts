@@ -1,4 +1,4 @@
-import { UmbVariantableWorkspaceContextInterface } from '../workspace-context/workspace-variantable-entity-context.interface.js';
+import { UmbVariantableWorkspaceContextInterface } from '../workspace-context/workspace-variantable-context.interface.js';
 import { UmbDatasetContext } from '../dataset-context/index.js';
 import { UMB_VARIANT_WORKSPACE_CONTEXT_TOKEN } from '../index.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';

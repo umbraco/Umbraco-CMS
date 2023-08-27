@@ -1,5 +1,5 @@
 import type { UmbWorkspaceContextInterface } from './workspace-context.interface.js';
-import type { UmbVariantableWorkspaceContextInterface } from './workspace-variantable-entity-context.interface.js';
+import type { UmbVariantableWorkspaceContextInterface } from './workspace-variantable-context.interface.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
 

@@ -6,5 +6,5 @@ export * from './variant-workspace-context.token.js';
 export * from './workspace-context.interface.js';
 export * from './workspace-context.js';
 export * from './workspace-context.token.js';
-export * from './workspace-invariable-entity-context.interface.js';
-export * from './workspace-variantable-entity-context.interface.js';
+export * from './workspace-invariable-context.interface.js';
+export * from './workspace-variantable-context.interface.js';

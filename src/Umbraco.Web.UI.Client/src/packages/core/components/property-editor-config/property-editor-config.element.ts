@@ -1,3 +1,4 @@
+import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../../settings/data-types/workspace/data-type-workspace.context.js';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
@@ -8,6 +9,7 @@ import {
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_DATASET_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 /**
  *  @element umb-property-editor-config
@@ -15,23 +17,8 @@ import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffic
  */
 @customElement('umb-property-editor-config')
 export class UmbPropertyEditorConfigElement extends UmbLitElement {
-	/**
-	 * Property Editor UI Alias. The element will render configuration for a Property Editor UI with this alias.
-	 * @type {string}
-	 * @attr
-	 * @default ''
-	 */
-	private _propertyEditorUiAlias = '';
-	@property({ type: String, attribute: 'property-editor-ui-alias' })
-	public get propertyEditorUiAlias(): string {
-		return this._propertyEditorUiAlias;
-	}
-	public set propertyEditorUiAlias(value: string) {
-		const oldVal = this._propertyEditorUiAlias;
-		this._propertyEditorUiAlias = value;
-		this.requestUpdate('propertyEditorUiAlias', oldVal);
-		this._observePropertyEditorUIConfig();
-	}
+
+	#datasetContext?: typeof UMB_DATASET_CONTEXT.TYPE;
 
 	/**
 	 * Data. The element will render configuration editors with values from this data.
@@ -46,64 +33,27 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 	@state()
 	private _properties: Array<PropertyEditorConfigProperty> = [];
 
-	private _propertyEditorSchemaConfigDefaultData: Array<PropertyEditorConfigDefaultData> = [];
-	private _propertyEditorUISettingsDefaultData: Array<PropertyEditorConfigDefaultData> = [];
 
-	private _configDefaultData?: Array<PropertyEditorConfigDefaultData>;
+	constructor() {
+		super();
 
-	private _propertyEditorSchemaConfigProperties: Array<PropertyEditorConfigProperty> = [];
-	private _propertyEditorUISettingsProperties: Array<PropertyEditorConfigProperty> = [];
+		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (instance) => {
+			this.#datasetContext = instance.createDatasetContext(this);
+			this.observe(this.#datasetContext.properties, (properties) => {
+				this._properties = properties;
+			}, 'observeProperties');
+		});
 
-	private _observePropertyEditorUIConfig() {
-		if (!this._propertyEditorUiAlias) return;
-
-		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', this.propertyEditorUiAlias),
-			(manifest) => {
-				this._observePropertyEditorSchemaConfig(
-					manifest?.meta.propertyEditorSchemaAlias || UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT
-				);
-				this._propertyEditorUISettingsProperties = manifest?.meta.settings?.properties || [];
-				this._propertyEditorUISettingsDefaultData = manifest?.meta.settings?.defaultData || [];
-				this._mergeConfigProperties();
-				this._mergeConfigDefaultData();
-			}
-		);
-	}
-
-	private _observePropertyEditorSchemaConfig(propertyEditorSchemaAlias: string) {
-		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorSchema', propertyEditorSchemaAlias),
-			(manifest) => {
-				this._propertyEditorSchemaConfigProperties = manifest?.meta.settings?.properties || [];
-				this._propertyEditorSchemaConfigDefaultData = manifest?.meta.settings?.defaultData || [];
-				this._mergeConfigProperties();
-				this._mergeConfigDefaultData();
-			}
-		);
-	}
-
-	private _mergeConfigProperties() {
-		this._properties = [...this._propertyEditorSchemaConfigProperties, ...this._propertyEditorUISettingsProperties];
-	}
-
-	private _mergeConfigDefaultData() {
-		this._configDefaultData = [
-			...this._propertyEditorSchemaConfigDefaultData,
-			...this._propertyEditorUISettingsDefaultData,
-		];
 	}
 
 	/**
 	 * Get the stored value for a property. It will render the default value from the configuration if no value is stored in the database.
 	 */
 	// TODO: Refactor: setup a dataset for this, otherwise we cannot ensure features, neither the right reactivity.
-	private _getValue(property: PropertyEditorConfigProperty) {
-		const value = this.data.find((data) => data.alias === property.alias)?.value;
-		if (value) return value;
-		const defaultValue = this._configDefaultData?.find((data) => data.alias === property.alias)?.value;
-		return defaultValue ?? null;
-	}
+	// TODO: Refactor: move the default data and getting the property config etc. to the workspace.
+	/**
+	Create a dataset context for this one. Feed if with fallback/default values.
+	 */
 
 	render() {
 		return html`
@@ -116,7 +66,6 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 									description="${ifDefined(property.description)}"
 									alias="${property.alias}"
 									property-editor-ui-alias="${property.propertyEditorUiAlias}"
-									.value=${this._getValue(property)}
 									.config=${property.config}></umb-workspace-property>
 							`
 						)}

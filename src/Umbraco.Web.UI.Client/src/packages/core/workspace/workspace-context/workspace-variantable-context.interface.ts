@@ -7,22 +7,23 @@ import type { ValueModelBaseModel, VariantResponseModelBaseModel } from '@umbrac
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbVariantableWorkspaceContextInterface<EntityType = unknown> extends UmbSaveableWorkspaceContextInterface<EntityType> {
-	variants: Observable<Array<VariantResponseModelBaseModel>>;
 
-	splitView: UmbWorkspaceSplitViewManager;
-
-	getName(variantId?: UmbVariantId): void;
+	// Name:
+	getName(variantId?: UmbVariantId): string | undefined;
 	setName(name: string, variantId?: UmbVariantId): void;
 
+	// Variant:
+	variants: Observable<Array<VariantResponseModelBaseModel>>;
+	splitView: UmbWorkspaceSplitViewManager;
 	getVariant(variantId: UmbVariantId): VariantResponseModelBaseModel | undefined;
 
-	//propertyDataByAlias(alias: string, variantId?: UmbVariantId): Observable<ValueModelBaseModel | undefined>;
-
+	// Property:
 	// This one is async cause it needs to structure to provide this data:
 	propertyDataById(id: string): Promise<Observable<ValueModelBaseModel | undefined>>;
 	propertyValueByAlias(alias: string, variantId?: UmbVariantId): Observable<any | undefined>;
 	getPropertyValue(alias: string, variantId?: UmbVariantId): void;
 	setPropertyValue(alias: string, value: unknown, variantId?: UmbVariantId): void;
+	//propertyDataByAlias(alias: string, variantId?: UmbVariantId): Observable<ValueModelBaseModel | undefined>;
 
 	// Dataset methods:
 	createVariableDatasetContext(host: UmbControllerHost, variantId: UmbVariantId): UmbDatasetContext;

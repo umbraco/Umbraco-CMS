@@ -21,6 +21,9 @@ export class UmbDocumentDatasetContext extends UmbBaseController implements UmbV
 	culture = this.#currentVariant.asObservablePart((x) => x?.culture);
 	segment = this.#currentVariant.asObservablePart((x) => x?.segment);
 
+	// TODO: Refactor: Make a properties observable. (with such I think i mean a property value object array.. array with object with properties, alias, value, culture and segment)
+
+
 
 	getType(): string {
 		return this.#workspace.getEntityType();
@@ -81,6 +84,9 @@ export class UmbDocumentDatasetContext extends UmbBaseController implements UmbV
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 
+		return (await this.#workspace.structure.propertyStructureByAlias(propertyAlias)).pipe(map((property) => property?.alias ? this.#workspace.getPropertyValue<ReturnType>(property.alias, this.#createPropertyVariantId(property)) : undefined));
+
+		/*
 		// This is not reacting to if the property variant settings changes while running.
 		const property = await this.#workspace.structure.getPropertyStructureByAlias(propertyAlias);
 		if(property) {
@@ -90,6 +96,7 @@ export class UmbDocumentDatasetContext extends UmbBaseController implements UmbV
 			}
 		}
 		return undefined;
+		*/
 	}
 
 	// TODO: Refactor:

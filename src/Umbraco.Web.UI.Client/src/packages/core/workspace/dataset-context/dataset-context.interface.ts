@@ -19,7 +19,7 @@ export interface UmbDatasetContext {
 	getType(): string;
 	getUnique(): string | undefined;
 	//getUniqueName(): string;
-	getVariantId: undefined | (() => UmbVariantId | undefined);
+	getVariantId?: (() => UmbVariantId | undefined);
 
 	getName(): string | undefined;
 	readonly name: Observable<string | undefined>;
@@ -27,8 +27,8 @@ export interface UmbDatasetContext {
 	destroy(): void;
 
 	// Property methods:
-	propertyVariantId(propertyAlias: string): Promise<Observable<UmbVariantId | undefined> | undefined>;
-	propertyValueByAlias<ReturnType = unknown>(propertyAlias: string): Promise<Observable<ReturnType | undefined> | undefined>;
+	propertyVariantId?: ((propertyAlias: string) => Promise<Observable<UmbVariantId | undefined>>);
+	propertyValueByAlias<ReturnType = unknown>(propertyAlias: string): Promise<Observable<ReturnType | undefined>>;
 	setPropertyValue(propertyAlias: string, value: unknown): Promise<void>;
 
 }
