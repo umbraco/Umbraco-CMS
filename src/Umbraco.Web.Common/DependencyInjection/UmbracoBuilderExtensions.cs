@@ -142,8 +142,6 @@ public static partial class UmbracoBuilderExtensions
                 sp,
                 sp.GetRequiredService<IApplicationDiscriminator>()));
 
-        builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
-
         builder.Services.AddSingleton<DatabaseSchemaCreatorFactory>();
         builder.Services.TryAddEnumerable(ServiceDescriptor
             .Singleton<IDatabaseProviderMetadata, CustomConnectionStringDatabaseProviderMetadata>());
