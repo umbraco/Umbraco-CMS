@@ -1,8 +1,9 @@
-import {test, expect} from '@playwright/test';
-
+import {expect } from '@playwright/test';
+import {test} from "@umbraco/playwright-testhelpers";
 test.describe('Login', () => {
 
-  test.beforeEach(async ({page}) => {
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await page.goto(process.env.URL + '/umbraco');
   });
   test('Login with correct username and password', async ({page}) => {

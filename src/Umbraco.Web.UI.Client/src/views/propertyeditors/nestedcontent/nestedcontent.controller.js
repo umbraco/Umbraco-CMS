@@ -79,7 +79,7 @@
         });
 
         _.each(model.config.contentTypes, function (contentType) {
-            contentType.nameExp = !!contentType.nameTemplate
+            contentType.nameExp = contentType.nameTemplate
                 ? $interpolate(contentType.nameTemplate)
                 : undefined;
         });
@@ -103,9 +103,6 @@
 
         vm.minItems = model.config.minItems || 0;
         vm.maxItems = model.config.maxItems || 0;
-
-        if (vm.maxItems === 0)
-            vm.maxItems = 1000;
 
         vm.singleMode = vm.minItems === 1 && vm.maxItems === 1 && model.config.contentTypes.length === 1;
         vm.expandsOnLoad = Object.toBoolean(model.config.expandsOnLoad)
@@ -204,9 +201,17 @@
             validate();
         };
 
+        vm.maxItemsExceeded = function () {
+            return vm.maxItems !== 0 && vm.nodes.length > vm.maxItems;
+        }
+
+        vm.maxItemsReached = function () {
+            return vm.maxItems !== 0 && vm.nodes.length >= vm.maxItems;
+        }
+
         vm.openNodeTypePicker = function ($event) {
 
-            if (vm.nodes.length >= vm.maxItems) {
+            if (vm.maxItemsReached()) {
                 return;
             }
 
@@ -625,7 +630,7 @@
             // Enforce min items if we only have one scaffold type
             var modelWasChanged = false;
             if (vm.nodes.length < vm.minItems && vm.scaffolds.length === 1) {
-                for (var i = vm.nodes.length; i < model.config.minItems; i++) {
+                for (var ii = vm.nodes.length; ii < model.config.minItems; ii++) {
                     addNode(vm.scaffolds[0].contentTypeAlias);
                 }
                 modelWasChanged = true;
@@ -767,7 +772,7 @@
                 $scope.nestedContentForm.minCount.$setValidity("minCount", true);
             }
 
-            if (vm.nodes.length > vm.maxItems) {
+            if (vm.maxItemsExceeded()) {
                 $scope.nestedContentForm.maxCount.$setValidity("maxCount", false);
             }
             else {

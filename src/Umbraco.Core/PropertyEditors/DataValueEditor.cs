@@ -386,6 +386,11 @@ public class DataValueEditor : IDataValueEditor
     /// <exception cref="System.ArgumentOutOfRangeException">ValueType was out of range.</exception>
     internal Attempt<object?> TryConvertValueToCrlType(object? value)
     {
+        if (value is null)
+        {
+            return Attempt.Succeed<object?>(null);
+        }
+
         // Ensure empty string and JSON values are converted to null
         if (value is string stringValue && string.IsNullOrWhiteSpace(stringValue))
         {

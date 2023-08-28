@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -263,7 +262,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         // Arrange
         var contentTypeService = ContentTypeService;
         var hierarchy = CreateContentTypeHierarchy();
-        contentTypeService.Save(hierarchy, 0); // ensure they are saved!
+        contentTypeService.Save(hierarchy, -1); // ensure they are saved!
         var master = hierarchy.First();
 
         // Act
@@ -279,7 +278,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         // Arrange
         var contentTypeService = ContentTypeService;
         var hierarchy = CreateContentTypeHierarchy();
-        contentTypeService.Save(hierarchy, 0); // ensure they are saved!
+        contentTypeService.Save(hierarchy, -1); // ensure they are saved!
         var master = hierarchy.First();
 
         // Act
@@ -297,7 +296,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         var hierarchy = CreateContentTypeHierarchy();
 
         // Act
-        contentTypeService.Save(hierarchy, 0);
+        contentTypeService.Save(hierarchy, -1);
 
         Assert.That(hierarchy.Any(), Is.True);
         Assert.That(hierarchy.Any(x => x.HasIdentity == false), Is.False);

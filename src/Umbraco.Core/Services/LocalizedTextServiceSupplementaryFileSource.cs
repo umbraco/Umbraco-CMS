@@ -14,7 +14,7 @@ public class LocalizedTextServiceSupplementaryFileSource
     public LocalizedTextServiceSupplementaryFileSource(IFileInfo file, bool overwriteCoreKeys)
     {
         FileInfo = file ?? throw new ArgumentNullException(nameof(file));
-        File = file is PhysicalFileInfo ? new FileInfo(file.PhysicalPath) : null!;
+        File = file is PhysicalFileInfo && file.PhysicalPath is not null ? new FileInfo(file.PhysicalPath) : null!;
         OverwriteCoreKeys = overwriteCoreKeys;
     }
 

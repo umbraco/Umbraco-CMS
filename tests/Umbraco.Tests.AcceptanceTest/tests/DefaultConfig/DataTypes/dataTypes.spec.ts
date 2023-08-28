@@ -8,7 +8,8 @@ import {
 
 test.describe('DataTypes', () => {
 
-  test.beforeEach(async ({page, umbracoApi}) => {
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 
@@ -119,7 +120,6 @@ test.describe('DataTypes', () => {
   });
 
   test('Test Url Picker', async ({page, umbracoApi, umbracoUi}) => {
-
     const urlPickerDocTypeName = 'Url Picker Test';
     const pickerDocTypeAlias = AliasHelper.toAlias(urlPickerDocTypeName);
 
@@ -154,18 +154,18 @@ test.describe('DataTypes', () => {
     await page.locator('.umb-tree-root').click({button: "right"});
     await page.locator('[data-element="action-create"]').click();
     await page.locator('[data-element="action-create-' + pickerDocTypeAlias + '"] > .umb-action-link').click();
-
+    
     // Fill out content
     await umbracoUi.setEditorHeaderName('UrlPickerContent');
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
     await page.locator('span:has-text("×")').click();
     await page.locator('.umb-node-preview-add').click();
-
-    // Should really try and find a better way to do this, but umbracoTreeItem tries to click the content pane in the background
-    await page.locator('#treePicker >> [data-element="tree-item-UrlPickerContent"]').click();
-    await page.locator('.umb-editor-footer-content__right-side > [button-style="success"] > .umb-button > .btn > .umb-button__content').click();
-    await expect(await page.locator('.umb-node-preview__name').first()).toBeVisible();
+    
+    await page.locator('[data-element="editor-container"]').locator('[data-element="tree-item-UrlPickerContent"]').click();
+    await expect(page.locator('[alias="urlLinkPicker"]').locator('input[id="urlLinkPicker"]')).toHaveValue('/');
+    await page.locator('.umb-editor-footer-content__right-side').locator('[label-key="' + ConstantHelper.buttons.submit + '"]').click();
+    await expect(page.locator('.umb-node-preview__name').first()).toBeVisible();
 
     // Save and publish
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));

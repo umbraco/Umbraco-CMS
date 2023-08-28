@@ -11,7 +11,11 @@ angular.module('umbraco').controller("Umbraco.LoginController", function (events
       //check if there's a returnPath query string, if so redirect to it
         var locationObj = $location.search();
         if (locationObj.returnPath) {
-            path = decodeURIComponent(locationObj.returnPath);
+            // decodeURIComponent(...) does not play nice with OAuth redirect URLs, so until we have a
+            // dedicated login screen for the new back-office, we need to hardcode this exception
+            path = locationObj.returnPath.indexOf("/security/back-office/authorize") > 0
+              ? locationObj.returnPath
+              : decodeURIComponent(locationObj.returnPath);
         }
 
         // Ensure path is not absolute

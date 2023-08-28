@@ -16,17 +16,13 @@ angular.module("umbraco")
             if (!editorConfig || Utilities.isString(editorConfig)) {
                 editorConfig = tinyMceService.defaultPrevalues();
             }
-            //make sure there's a max image size
-            if (!editorConfig.maxImageSize && editorConfig.maxImageSize !== 0) {
-                editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
-            }
 
             var width = editorConfig.dimensions ? parseInt(editorConfig.dimensions.width, 10) || null : null;
             var height = editorConfig.dimensions ? parseInt(editorConfig.dimensions.height, 10) || null : null;
 
-            $scope.containerWidth = editorConfig.mode === "distraction-free" ? (width ? width : "auto") : "auto";
-            $scope.containerHeight = editorConfig.mode === "distraction-free" ? (height ? height : "auto") : "auto";
-            $scope.containerOverflow = editorConfig.mode === "distraction-free" ? (height ? "auto" : "inherit") : "inherit";
+            $scope.containerWidth = "auto";
+            $scope.containerHeight = "auto";
+            $scope.containerOverflow = "inherit";
 
             var promises = [];
 
@@ -88,6 +84,7 @@ angular.module("umbraco")
                     //initialize the standard editor functionality for Umbraco
                     tinyMceService.initializeEditor({
                         editor: editor,
+                        toolbar: editorConfig.toolbar,
                         model: $scope.model,
                         currentFormInput: $scope.rteForm.modelValue
                     });

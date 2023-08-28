@@ -3,7 +3,8 @@ import {PartialViewMacroBuilder} from "@umbraco/json-models-builders";
 
 test.describe('Macros', () => {
 
-  test.beforeEach(async ({ page, umbracoApi }) => {
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 
@@ -31,7 +32,6 @@ test.describe('Macros', () => {
     
     // Adds partial view to macro
     await page.locator('[data-element="property-label-macroPartialViewPickerProperty"]').click();
-    
     await page.locator('[data-element="tree-item-' + partialViewMacroFileName + '.cshtml"]').click();
     
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));

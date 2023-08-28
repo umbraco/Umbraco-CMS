@@ -1,8 +1,8 @@
 @import "../../../less/variables.less";
 @import "../../../less/mixins.less";
+@import "../../../less/icons.less";
 @import "../../../less/buttons.less";
 @import "../../../less/accessibility/sr-only.less";
-@import "../../../less/components/umb-icon.less";
 
 @umb-block-grid__item_minimum_height: 48px;
 
@@ -20,18 +20,6 @@
 
 .umb-block-grid__layout-item {
     position: relative;
-    &:hover {
-
-        > ng-form > .umb-block-grid__block--context {
-            z-index: 4;
-        }
-
-        > ng-form > .umb-block-grid__block--inline-create-button, 
-        > ng-form > .umb-block-grid__block--validation-border,
-        > ng-form > .umb-block-grid__block--actions {
-            z-index: 3;
-        }
-    }
 }
 
 .umb-block-grid__block--validation-border {
@@ -191,6 +179,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         }
         &:not(.--scale-mode) {
             > .umb-block-grid__block--actions {
+                z-index: 4;
                 opacity: var(--umb-block-grid--block-ui-opacity);
             }
     
@@ -668,6 +657,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
         100% { background-color: rgba(@blueMidLight, 0.22); }
     }
 }
+
 
 .umb-block-grid__area {
     position: relative;

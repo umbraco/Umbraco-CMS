@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -361,7 +360,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         var results = new List<IContent>();
         for (var i = 0; i < 20; i++)
         {
-            results.Add(ContentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage", 0));
+            results.Add(ContentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage", -1));
         }
 
         var sortedGet = ContentService.GetByIds(new[] { results[10].Id, results[5].Id, results[12].Id })
@@ -707,10 +706,10 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var content = ContentService.GetById(Textpage.Id);
-        var published = ContentService.SaveAndPublish(content, userId: 0);
+        var published = ContentService.SaveAndPublish(content, userId: -1);
 
         // Act
-        var unpublished = ContentService.Unpublish(content, userId: 0);
+        var unpublished = ContentService.Unpublish(content, userId: -1);
 
         // Assert
         Assert.That(published.Success, Is.True);
@@ -1083,7 +1082,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         var content = ContentService.GetById(Textpage.Id);
 
         // Act
-        var published = ContentService.SaveAndPublish(content, userId: 0);
+        var published = ContentService.SaveAndPublish(content, userId: -1);
 
         // Assert
         Assert.That(published.Success, Is.True);
@@ -1966,12 +1965,12 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         content1.PropertyValues(obj);
         content1.ResetDirtyProperties(false);
         ContentService.Save(content1);
-        Assert.IsTrue(ContentService.SaveAndPublish(content1, userId: 0).Success);
+        Assert.IsTrue(ContentService.SaveAndPublish(content1, userId: -1).Success);
         var content2 = ContentBuilder.CreateBasicContent(contentType);
         content2.PropertyValues(obj);
         content2.ResetDirtyProperties(false);
         ContentService.Save(content2);
-        Assert.IsTrue(ContentService.SaveAndPublish(content2, userId: 0).Success);
+        Assert.IsTrue(ContentService.SaveAndPublish(content2, userId: -1).Success);
 
         var editorGroup = UserService.GetUserGroupByAlias(Constants.Security.EditorGroupAlias);
         editorGroup.StartContentId = content1.Id;

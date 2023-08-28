@@ -38,20 +38,20 @@
       "datatype": "choice",
       "choices": [
         {
-          "displayName": ".NET 6.0",
-          "description": "Target net6.0",
-          "choice": "net6.0"
+          "displayName": ".NET 7.0",
+          "description": "Target net7.0",
+          "choice": "net7.0"
         }
       ],
-      "defaultValue": "net6.0",
-      "replaces": "net6.0"
+      "defaultValue": "net7.0",
+      "replaces": "net7.0"
     },
     "UmbracoVersion": {
       "displayName": "Umbraco version",
       "description": "The version of Umbraco.Cms to add as PackageReference.",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": "10.0.0-rc1",
+      "defaultValue": "*",
       "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
     },
     "UseHttpsRedirect": {

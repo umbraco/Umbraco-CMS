@@ -83,8 +83,8 @@ public class GlobalSettings
     public string UmbracoPath
     {
         get => Constants.System.DefaultUmbracoPath;
-        [Obsolete($"{nameof(UmbracoPath)}  is no longer configurable, property setter is scheduled for removal in V12")]
-        // NOTE: when removing this, also clean up the hardcoded removal of UmbracoPath in UmbracoJsonSchemaGenerator
+        [Obsolete($"{nameof(UmbracoPath)} is no longer configurable, this property setter is scheduled for removal in V12.")]
+        // NOTE: When removing this, also clean up the hardcoded removal of UmbracoPath in Umbraco.JsonSchema
         set { }
     }
 

@@ -8,38 +8,39 @@
             <select 
                 ng-model="allowance.$chosenValue"
                 localize="title"
-                title="blockEditor_pickSpecificAllowance"
-                required
-            >
+                title="@blockEditor_pickSpecificAllowance"
+                required>
                 <option ng-repeat="blockGroup in vm.allBlockGroups" value="groupKey:{{blockGroup.key}}">{{blockGroup.name}}</option>
                 <option disabled value="">---------</option>
                 <option ng-repeat="blockType in vm.allBlockTypes" ng-init="elementType = vm.getElementTypeByKey(blockType.contentElementTypeKey)" value="elementTypeKey:{{elementType.key}}">{{elementType.name}}</option>
             </select>
             <input 
                 type="number"
+                pattern="[0-9]*"
                 name="label"
                 min="0"
                 ng-max="model.value.max"
                 placeholder="0"
                 ng-model="allowance.minAllowed"
                 localize="title"
-                title="blockEditor_allowanceMinimum"
-                fix-number/>
+                title="@blockEditor_allowanceMinimum"
+                fix-number />
             <span>–</span>
             <input 
                 type="number"
+                pattern="[0-9]*"
                 name="label"
                 ng-model="allowance.maxAllowed"
                 placeholder="∞"
                 ng-min="model.value.min || 0"
                 localize="title"
-                title="blockEditor_allowanceMaximum"
-                fix-number/>
+                title="@blockEditor_allowanceMaximum"
+                fix-number />
             <button 
                 type="button" 
                 class="btn-reset umb-outline"
                 localize="title"
-                title="actions_delete"
+                title="@actions_delete"
                 ng-click="vm.deleteAllowance(allowance);">
                 <umb-icon icon="icon-trash" class="icon"></umb-icon>
                 <span class="sr-only">

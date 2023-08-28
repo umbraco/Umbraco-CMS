@@ -42,13 +42,11 @@ test.describe('Partial Views', () => {
     //Clean up
     await umbracoApi.partialViews.ensureNameNotExists('', fileName);
   });
-
   test('Create partial view from snippet', async ({page, umbracoApi, umbracoUi}) => {
     const name = "TestPartialViewFromSnippet";
     const fileName = name + ".cshtml";
 
     await umbracoApi.partialViews.ensureNameNotExists('', fileName);
-
     await openPartialViewsCreatePanel(page, umbracoUi);
 
     await umbracoUi.clickElement(umbracoUi.getContextMenuAction("action-create"));
@@ -68,7 +66,6 @@ test.describe('Partial Views', () => {
     // Clean up
     await umbracoApi.partialViews.ensureNameNotExists('', fileName);
   });
-
   test('Partial view with no name', async ({page, umbracoApi, umbracoUi}) => {
     await openPartialViewsCreatePanel(page, umbracoUi);
 
@@ -113,7 +110,6 @@ test.describe('Partial Views', () => {
     // Clean
     await umbracoApi.partialViews.ensureNameNotExists('', fileName);
   });
-
   test('Edit partial view', async ({page, umbracoApi, umbracoUi}) => {
     const name = 'EditPartialView';
     const fileName = name + ".cshtml";
@@ -136,7 +132,6 @@ test.describe('Partial Views', () => {
 
     // Assert
     await umbracoUi.isSuccessNotificationVisible({timeout:20000});
-
     // Clean
     await umbracoApi.partialViews.ensureNameNotExists('', fileName);
   });

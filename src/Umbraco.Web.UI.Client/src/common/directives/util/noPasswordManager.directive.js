@@ -1,10 +1,10 @@
-﻿/**
+/**
 * @ngdoc directive
 * @name umbraco.directives.directive:noPasswordManager
 * @attribte
 * @function
 * @description
-* Added attributes to block password manager elements should as LastPass
+* Added attributes to tell password managers to ignore specific input fields and not inject elements via browser extensions.
 
 * @example
 * <example module="umbraco.directives">
@@ -18,7 +18,9 @@ angular.module("umbraco.directives")
         return {
             restrict: 'A',            
             link: function (scope, element, attrs) {                
-                element.attr("data-lpignore", "true");
+              element
+                .attr("data-lpignore", "true") // LastPass
+                .attr("data-1p-ignore", ""); // 1Password
             }
         }
     });

@@ -10,7 +10,7 @@
         const foundValue = map.reduce((a, b) => {
             let aDiff = Math.abs(a - target);
             let bDiff = Math.abs(b - target);
-    
+
             if (aDiff === bDiff) {
                 return a < b ? a : b;
             } else {
@@ -47,7 +47,7 @@
      * @description
      * renders all blocks for a given list for the block grid editor
      */
-    
+
     angular
         .module("umbraco")
         .component("umbBlockGridEntries", {
@@ -72,7 +72,6 @@
 
         const unsubscribe = [];
         const vm = this;
-        
         vm.invalidAmount = false;
         vm.areaConfig = null;
         vm.locallyAvailableBlockTypes = 0;
@@ -88,16 +87,16 @@
             if(vm.parentBlock) {
                 vm.areaConfig = vm.parentBlock.config.areas.find(area => area.key === vm.areaKey);
             }
-            
+
             vm.locallyAvailableBlockTypes = vm.blockEditorApi.internal.getAllowedTypesOf(vm.parentBlock, vm.areaKey);
-            
+
             unsubscribe.push($scope.$watch('vm.entries', onLocalAmountOfBlocksChanged, true));
         };
 
         function onLocalAmountOfBlocksChanged() {
 
             if (vm.entriesForm && vm.areaConfig) {
-                
+
                 var isMinRequirementGood = vm.entries.length >= vm.areaConfig.minAllowed;
                 vm.entriesForm.areaMinCount.$setValidity("areaMinCount", isMinRequirementGood);
 
@@ -126,12 +125,12 @@
                                 'maxRequirement': maxAllowed
                             });
                         }
-                    } else 
+                    } else
                     // For specific elementTypes:
                     if(allowance.elementTypeKey) {
 
                         const amount = vm.entries.filter(entry => entry.$block.data.contentTypeKey === allowance.elementTypeKey).length;
-                        
+
                         if(amount < minAllowed || (maxAllowed > 0 && amount > maxAllowed)) {
                             vm.invalidBlockTypes.push({
                                 'key': allowance.elementTypeKey,
@@ -179,35 +178,32 @@
             const gridColumnGap = Number(approvedContainerComputedStyles.columnGap.split("px")[0]) || 0;
             const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
 
-
-            const foundElColumns = parseInt(data.relatedElement.dataset.colSpan, 10);
-            const currentElementColumns = data.item.columnSpan;
+                    const foundElColumns = parseInt(data.relatedElement.dataset.colSpan, 10);
+                    const currentElementColumns = data.item.columnSpan;
 
             if(currentElementColumns >= gridColumnNumber) {
                 return true;
             }
 
-            // Get grid template:
-            const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0).map((n, i, list) => list.length === i ? n : n + gridColumnGap);
+                    // Get grid template:
+                    const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0).map((n, i, list) => list.length === i ? n : n + gridColumnGap);
 
-            // ensure all columns are there.
-            // This will also ensure handling non-css-grid mode,
-            // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
-            let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
-            const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
-            if(amountOfUnknownColumns > 0) {
-                let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
-                const layoutWidth = data.containerRect.width;
-                const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
-                if(missingColumnWidth > 0) {
-                    while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
-                        approvedContainerGridColumns.push(missingColumnWidth);
-                    }
-                }
-            }
+                    // ensure all columns are there.
+                    // This will also ensure handling non-css-grid mode,
+                    // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
+                    let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
+                    const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
+                    if(amountOfUnknownColumns > 0) {
+                        let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
+                        const layoutWidth = data.containerRect.width;
+                        const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;if(missingColumnWidth > 0) {
+                        while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
+                            approvedContainerGridColumns.push(missingColumnWidth);
+                        }
+                    }}
 
             let offsetPlacement = 0;
-            /* If placeholder is in this same line, we want to assume that it will offset the placement of the found element, 
+            /* If placeholder is in this same line, we want to assume that it will offset the placement of the found element,
             which provides more potential space for the item to drop at.
             This is relevant in this calculation where we look at the space to determine if its a vertical or horizontal drop in relation to the found element.
             */
@@ -215,8 +211,8 @@
                 offsetPlacement = -(data.elementRect.width + gridColumnGap);
             }
 
-            const relatedStartX = Math.max(data.relatedRect.left - data.containerRect.left + offsetPlacement, 0);
-            const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
+                    const relatedStartX = Math.max(data.relatedRect.left - data.containerRect.left + offsetPlacement, 0);
+                    const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
 
             // If the found related element does not have enough room after which for the current element, then we go vertical mode:
             return (relatedStartCol + (data.horizontalPlaceAfter ? foundElColumns : 0) + currentElementColumns > gridColumnNumber);

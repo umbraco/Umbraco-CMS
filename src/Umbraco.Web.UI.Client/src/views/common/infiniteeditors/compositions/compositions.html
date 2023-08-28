@@ -35,6 +35,12 @@
                                          auto-focus="true">
                       </umb-search-filter>
 
+                      
+                      <umb-checkbox model="vm.hideUnavailable"
+                                    label-key="actions_toggleHideUnavailable"
+                                    class="mt2" style="display: block;">
+                      </umb-checkbox>
+
                     </div>
 
                   </div>
@@ -72,7 +78,7 @@
                             </li>
                             <li class="umb-checkbox-list__item"
                                 ng-repeat="compositeContentType in group.compositeContentTypes | orderBy:'contentType.name' | filter:vm.searchTerm"
-                                ng-class="{'-disabled': (compositeContentType.allowed === false && !compositeContentType.selected) || compositeContentType.inherited, '-selected': compositeContentType.selected}">
+                                ng-class="{'-hidden': ((compositeContentType.allowed === false && !compositeContentType.selected) || compositeContentType.inherited) && vm.hideUnavailable, '-disabled': (compositeContentType.allowed === false && !compositeContentType.selected) || compositeContentType.inherited, '-selected': compositeContentType.selected}">
 
                                 <div class="umb-checkbox-list__item-checkbox" ng-class="{'-selected': compositeContentType.selected }">
                                     <umb-checkbox input-id="umb-overlay-comp-{{compositeContentType.contentType.key}}"

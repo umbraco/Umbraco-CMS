@@ -31,12 +31,12 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiColorPickerCo
             showAlpha: false
         };
 
-        function hide(color) {
+        function hide() {
             // show the add button
             $element.find(".btn.add").show();
         }
 
-        function show(color) {
+        function show() {
             // hide the add button
             $element.find(".btn.add").hide();
         }
@@ -67,7 +67,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiColorPickerCo
             var items = [];
             for (var i in $scope.model.value) {
                 var oldValue = $scope.model.value[i];
-                if (oldValue.hasOwnProperty("value")) {
+                if (Object.prototype.hasOwnProperty.call(oldValue, "value")) {
                     items.push({
                         value: oldValue.value,
                         label: oldValue.label,
@@ -78,7 +78,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiColorPickerCo
                     items.push({
                         value: oldValue,
                         label: oldValue,
-                        sortOrder: sortOrder,
+                        sortOrder: oldValue.sortOrder,
                         id: i
                     });
                 }
@@ -92,9 +92,9 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiColorPickerCo
         }
 
         // ensure labels
-        for (var i = 0; i < $scope.model.value.length; i++) {
-            var item = $scope.model.value[i];
-            item.label = item.hasOwnProperty("label") ? item.label : item.value;
+        for (var ii = 0; ii < $scope.model.value.length; ii++) {
+            var item = $scope.model.value[ii];
+            item.label = Object.prototype.hasOwnProperty.call(item, "label") ? item.label : item.value;
         }
 
         function validLabel(label) {
@@ -183,7 +183,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiColorPickerCo
             //handle: ".handle, .thumbnail",
             items: '> div.control-group',
             tolerance: 'pointer',
-            update: function (e, ui) {
+            update: function () {
                 setDirty();
             }
         };

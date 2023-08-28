@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Security;
@@ -79,10 +79,13 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         IDictionary<string, string?>? items = auth.Properties?.Items;
         if (auth.Principal == null || items == null)
         {
-            Logger.LogDebug(
+            if (Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                Logger.LogDebug(
                 auth.Failure ??
                 new NullReferenceException("Context.AuthenticateAsync(ExternalAuthenticationType) is null"),
                 "The external login authentication failed. No user Principal or authentication items was resolved.");
+            }
             return null;
         }
 
@@ -159,8 +162,8 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     }
 
     public override AuthenticationProperties ConfigureExternalAuthenticationProperties(
-        string provider,
-        string redirectUrl,
+        string? provider,
+        string? redirectUrl,
         string? userId = null)
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
@@ -213,7 +216,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         }
 
         // Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
-        MemberIdentityUser? autoLinkUser = await UserManager.FindByEmailAsync(email);
+        MemberIdentityUser? autoLinkUser = await UserManager.FindByEmailAsync(email!);
         if (autoLinkUser != null)
         {
             try
@@ -244,7 +247,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
             throw new InvalidOperationException("The Name value cannot be null");
         }
 
-        autoLinkUser = MemberIdentityUser.CreateNew(email, email, autoLinkOptions.DefaultMemberTypeAlias, autoLinkOptions.DefaultIsApproved, name);
+        autoLinkUser = MemberIdentityUser.CreateNew(email!, email!, autoLinkOptions.DefaultMemberTypeAlias, autoLinkOptions.DefaultIsApproved, name);
 
         foreach (var userGroup in autoLinkOptions.DefaultMemberGroups)
         {

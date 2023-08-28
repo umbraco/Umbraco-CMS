@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
 {
@@ -19,6 +20,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         private volatile bool _initialized;
         private IPropertyValueConverter? _converter;
         private PropertyCacheLevel _cacheLevel;
+        private PropertyCacheLevel _deliveryApiCacheLevel;
 
         private Type? _modelClrType;
         private Type? _clrType;
@@ -190,6 +192,9 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             }
 
             _cacheLevel = _converter?.GetPropertyCacheLevel(this) ?? PropertyCacheLevel.Snapshot;
+            _deliveryApiCacheLevel = _converter is IDeliveryApiPropertyValueConverter deliveryApiPropertyValueConverter
+                ? deliveryApiPropertyValueConverter.GetDeliveryApiPropertyCacheLevel(this)
+                : _cacheLevel;
             _modelClrType = _converter?.GetPropertyValueType(this) ?? typeof(object);
         }
 
@@ -226,6 +231,20 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
+        public PropertyCacheLevel DeliveryApiCacheLevel
+        {
+            get
+            {
+                if (!_initialized)
+                {
+                    Initialize();
+                }
+
+                return _deliveryApiCacheLevel;
+            }
+        }
+
+        /// <inheritdoc />
         public object? ConvertSourceToInter(IPublishedElement owner, object? source, bool preview)
         {
             if (!_initialized)
@@ -254,6 +273,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
+        [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
         public object? ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             if (!_initialized)
@@ -279,6 +299,22 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             }
 
             return inter.ToString()?.Trim();
+        }
+
+        /// <inheritdoc />
+        public object? ConvertInterToDeliveryApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
+        {
+            if (!_initialized)
+            {
+                Initialize();
+            }
+
+            // use the converter if any, else just return the inter value
+            return _converter != null
+                ? _converter is IDeliveryApiPropertyValueConverter deliveryApiPropertyValueConverter
+                    ? deliveryApiPropertyValueConverter.ConvertIntermediateToDeliveryApiObject(owner, this, referenceCacheLevel, inter, preview, expanding)
+                    : _converter.ConvertIntermediateToObject(owner, this, referenceCacheLevel, inter, preview)
+                : inter;
         }
 
         /// <inheritdoc />

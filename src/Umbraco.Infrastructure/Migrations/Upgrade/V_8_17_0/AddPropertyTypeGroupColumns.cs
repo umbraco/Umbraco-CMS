@@ -5,6 +5,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_17_0;
 
+[Obsolete("This is not used anymore and will be removed in Umbraco 13")]
 public class AddPropertyTypeGroupColumns : MigrationBase
 {
     private readonly IShortStringHelper _shortStringHelper;

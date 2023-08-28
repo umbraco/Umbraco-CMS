@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Models;
 /// </summary>
 [Serializable]
 [DataContract(IsReference = true)]
-public class ContentType : ContentTypeCompositionBase, IContentTypeWithHistoryCleanup
+public class ContentType : ContentTypeCompositionBase, IContentType
 {
     public const bool SupportsPublishingConst = true;
 

@@ -45,13 +45,6 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
         _delay = delay;
     }
 
-    // Scheduled for removal in V11
-    [Obsolete("Please use constructor that takes an ILogger instead")]
-    protected RecurringHostedServiceBase(TimeSpan period, TimeSpan delay)
-        : this(null, period, delay)
-    {
-    }
-
     /// <inheritdoc />
     public void Dispose()
     {

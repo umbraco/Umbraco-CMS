@@ -3,8 +3,9 @@ import {expect} from "@playwright/test";
 import {LabelDataTypeBuilder} from "@umbraco/json-models-builders";
 
 test.describe('Data Types', () => {
-  
-  test.beforeEach(async ({page, umbracoApi}) => {
+
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
   

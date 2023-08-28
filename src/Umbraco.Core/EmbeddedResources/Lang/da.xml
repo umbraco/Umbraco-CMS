@@ -56,6 +56,7 @@
     <key alias="createblueprint">Opret indholdsskabelon</key>
     <key alias="resendInvite">Gensend invitation</key>
     <key alias="defaultValue">Standardværdi</key>
+    <key alias="toggleHideUnavailable">Skjul utilgængelige kompositioner</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Indhold</key>
@@ -389,7 +390,7 @@
     </key>
     <key alias="elementType">Element-type</key>
     <key alias="elementTypeDescription">Definerer skabelonen for et sæt at egenskaber, der kan anvendes som skema i
-      avancerede felter som f.eks. 'Block List' eller 'Nested Content'.
+      avancerede felter som f.eks. 'Block List' eller 'Block Grid'.
     </key>
     <key alias="composition">Komposition</key>
     <key alias="compositionDescription">Definerer et sæt genbrugbare egenskaber, der kan inkluderes i definitionen af
@@ -607,6 +608,8 @@
     </key>
     <key alias="indexCannotRebuild">Dette index kan ikke genbygges for det ikke har nogen</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
+    <key alias="noResults">Der blev ikke fundet nogen resultater</key>
+    <key alias="searchResultsFound">Viser %0% - %1% af %2% resultat(er) - Side %3% af %4%</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>
@@ -1587,15 +1590,15 @@ Mange hilsner fra Umbraco robotten
     <key alias="childNodesHeading">Tilladte typer</key>
     <key alias="childNodesDescription">Tillad at oprette indhold af en specifik type under denne.</key>
     <key alias="chooseChildNode">Vælg child node</key>
-    <key alias="compositionsDescription">Nedarv faner og egenskaber fra en anden dokumenttype. Nye faner vil blive
-      tilføjet den nuværende dokumenttype eller sammenflettet hvis fanenavnene er ens.
+    <key alias="compositionsDescription">Nedarv faner og egenskaber fra en anden indholdstype. Nye faner vil blive
+      tilføjet den nuværende indholdstype eller sammenflettet hvis fanenavnene er ens.
     </key>
     <key alias="compositionInUse">Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som
       komposition
     </key>
     <key alias="noAvailableCompositions">Der er ingen indholdstyper tilgængelige at bruge som komposition</key>
     <key alias="compositionRemoveWarning">Når du fjerner en komposition vil alle associerede indholdsdata blive slettet.
-      Når først dokumenttypen er gemt, er der ingen vej tilbage.
+      Når først indholdstypen er gemt, er der ingen vej tilbage.
     </key>
     <key alias="availableEditors">Opret ny indstilling</key>
     <key alias="reuse">Genbrug</key>
@@ -1648,7 +1651,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="allowVaryBySegment">Tillad segmentering</key>
     <key alias="elementType">Element-type</key>
     <key alias="elementHeading">Er en Element-type</key>
-    <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet.
+    <key alias="elementDescription">En Element-type er tiltænkt brug i andre Dokumenttyper, ikke i indholdstræet.
     </key>
     <key alias="elementCannotToggle">En Dokumenttype kan ikke ændres til en Element-type efter den er blevet brugt til
       at oprette en eller flere indholds elementer.

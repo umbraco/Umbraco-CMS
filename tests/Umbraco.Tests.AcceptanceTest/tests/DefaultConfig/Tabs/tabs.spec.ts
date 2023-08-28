@@ -47,11 +47,14 @@ test.describe('Tabs', () => {
   }
 
   test('Click dashboard tabs', async ({umbracoUi, page}) => {
-    await umbracoUi.goToSection('content');
-    await page.locator('[data-element="tab-contentRedirectManager"] > button').click();
-    expect(page.locator('.redirecturlsearch')).not.toBeNull();
-    await page.locator('[data-element="tab-contentIntro"] > button').click();
-    await expect(page.locator('[data-element="tab-contentIntro"]')).toHaveClass(/umb\-tab\-\-active/);
+    await umbracoUi.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.clickDataElementByElementName('tab-contentRedirectManager');
+    await expect(page.locator('[data-element="tab-content-contentRedirectManager"]')).toBeVisible();
+    await umbracoUi.clickDataElementByElementName('tab-contentIntro');
+
+    // Assert
+    await expect(page.locator('[data-element="tab-contentIntro"]')).toHaveClass(/umb-tab--active/);
+    await expect(page.locator('[data-element="tab-content-contentIntro"]')).toBeVisible();
   });
 
   test('Create tab', async ({umbracoUi, umbracoApi, page}) => {

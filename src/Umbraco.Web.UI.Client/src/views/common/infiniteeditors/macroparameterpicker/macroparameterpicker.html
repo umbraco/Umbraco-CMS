@@ -31,7 +31,7 @@
 
                     <div ng-if="!vm.filterResult">
                         <div ng-repeat="(key,value) in vm.parameterEditors">
-                            <h5>{{key}}</h5>
+                            <h5>{{key | umbCmsTitleCase}}</h5>
                             <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">
                                 <li ng-repeat="parameterEditor in value | orderBy:'name'"
                                     data-element="editor-{{parameterEditor.name}}">
@@ -55,7 +55,7 @@
                         <div ng-if="vm.filterResult.totalResults > 0">
                             <div ng-repeat="result in vm.filterResult.parameterEditors">
                                 <div ng-if="result.parameterEditors.length > 0">
-                                    <h5>{{result.group}}</h5>
+                                    <h5>{{result.group | umbCmsTitleCase}}</h5>
                                     <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">
                                         <li ng-repeat="parameterEditor in result.parameterEditors | orderBy:'name'">
                                             <div ng-if="parameterEditor.loading" class="umb-card-grid-item__loading">

@@ -6,7 +6,8 @@ test.describe('Templates', () => {
 
   const name = 'Templatetest';
 
-  test.beforeEach(async ({page, umbracoApi}) => {
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
     await umbracoApi.templates.ensureNameNotExists(name);
   });

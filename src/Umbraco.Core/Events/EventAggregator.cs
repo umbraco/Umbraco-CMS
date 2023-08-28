@@ -2,104 +2,71 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Events;
-
-/// <summary>
-///     A factory method used to resolve all services.
-///     For multiple instances, it will resolve against <see cref="IEnumerable{T}" />.
-/// </summary>
-/// <param name="serviceType">Type of service to resolve.</param>
-/// <returns>An instance of type <paramref name="serviceType" />.</returns>
-public delegate object ServiceFactory(Type serviceType);
-
-/// <summary>
-///     Extensions for <see cref="ServiceFactory" />.
-/// </summary>
-public static class ServiceFactoryExtensions
-{
-    /// <summary>
-    ///     Gets an instance of <typeparamref name="T" />.
-    /// </summary>
-    /// <typeparam name="T">The type to return.</typeparam>
-    /// <param name="factory">The service factory.</param>
-    /// <returns>The new instance.</returns>
-    public static T GetInstance<T>(this ServiceFactory factory)
-        => (T)factory(typeof(T));
-
-    /// <summary>
-    ///     Gets a collection of instances of <typeparamref name="T" />.
-    /// </summary>
-    /// <typeparam name="T">The collection item type to return.</typeparam>
-    /// <param name="factory">The service factory.</param>
-    /// <returns>The new instance collection.</returns>
-    public static IEnumerable<T> GetInstances<T>(this ServiceFactory factory)
-        => (IEnumerable<T>)factory(typeof(IEnumerable<T>));
-}
 
 /// <inheritdoc />
 public partial class EventAggregator : IEventAggregator
 {
-    private readonly ServiceFactory _serviceFactory;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="EventAggregator" /> class.
-    /// </summary>
-    /// <param name="serviceFactory">The service instance factory.</param>
-    public EventAggregator(ServiceFactory serviceFactory)
-        => _serviceFactory = serviceFactory;
-
-    /// <inheritdoc />
-    public async Task PublishAsync<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
-        where TNotification : INotification
-    {
-        // TODO: Introduce codegen efficient Guard classes to reduce noise.
-        if (notification == null)
-        {
-            throw new ArgumentNullException(nameof(notification));
-        }
-
-        PublishNotification(notification);
-        await PublishNotificationAsync(notification, cancellationToken);
-    }
-
     /// <inheritdoc />
     public void Publish<TNotification>(TNotification notification)
         where TNotification : INotification
     {
-        // TODO: Introduce codegen efficient Guard classes to reduce noise.
-        if (notification == null)
-        {
-            throw new ArgumentNullException(nameof(notification));
-        }
+        ArgumentNullException.ThrowIfNull(notification);
 
-        PublishNotification(notification);
-        Task task = PublishNotificationAsync(notification);
+        Publish<TNotification, INotificationHandler>(notification.Yield());
+    }
+
+    /// <inheritdoc />
+    public void Publish<TNotification, TNotificationHandler>(IEnumerable<TNotification> notifications)
+        where TNotification : INotification
+        where TNotificationHandler : INotificationHandler
+    {
+        PublishNotifications<TNotification, TNotificationHandler>(notifications);
+
+        Task task = PublishNotificationsAsync<TNotification, TNotificationHandler>(notifications);
         if (task is not null)
         {
             Task.WaitAll(task);
         }
     }
 
+    /// <inheritdoc />
+    public async Task PublishAsync<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
+        where TNotification : INotification
+    {
+        ArgumentNullException.ThrowIfNull(notification);
+
+        await PublishAsync<TNotification, INotificationHandler>(notification.Yield(), cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task PublishAsync<TNotification, TNotificationHandler>(IEnumerable<TNotification> notifications, CancellationToken cancellationToken = default)
+        where TNotification : INotification
+        where TNotificationHandler : INotificationHandler
+    {
+        PublishNotifications<TNotification, TNotificationHandler>(notifications);
+
+        await PublishNotificationsAsync<TNotification, TNotificationHandler>(notifications, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public bool PublishCancelable<TCancelableNotification>(TCancelableNotification notification)
         where TCancelableNotification : ICancelableNotification
     {
-        if (notification == null)
-        {
-            throw new ArgumentNullException(nameof(notification));
-        }
+        ArgumentNullException.ThrowIfNull(notification);
 
         Publish(notification);
+
         return notification.Cancel;
     }
 
+    /// <inheritdoc />
     public async Task<bool> PublishCancelableAsync<TCancelableNotification>(TCancelableNotification notification)
         where TCancelableNotification : ICancelableNotification
     {
-        if (notification is null)
-        {
-            throw new ArgumentNullException(nameof(notification));
-        }
+        ArgumentNullException.ThrowIfNull(notification);
 
         Task? task = PublishAsync(notification);
         if (task is not null)

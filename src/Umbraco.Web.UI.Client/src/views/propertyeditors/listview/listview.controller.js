@@ -153,7 +153,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
   $scope.options = {
     useInfiniteEditor: $scope.model.config.useInfiniteEditor === true,
     pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
-        pageNumber: (listParamsForCurrent && $routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
+    pageNumber: (listParamsForCurrent && $routeParams.page && !isNaN($routeParams.page) && Number($routeParams.page) > 0) ? $routeParams.page : 1,
     filter: (listParamsForCurrent && $routeParams.filter ? $routeParams.filter : '').trim(),
     orderBy: (listParamsForCurrent && $routeParams.orderBy ? $routeParams.orderBy : $scope.model.config.orderBy ? $scope.model.config.orderBy : 'VersionDate').trim(),
     orderDirection: (listParamsForCurrent && $routeParams.orderDirection ? $routeParams.orderDirection : $scope.model.config.orderDirection ? $scope.model.config.orderDirection : "desc").trim(),
@@ -177,7 +177,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
   };
 
   _.each($scope.options.includeProperties, function (property) {
-        property.nameExp = !!property.nameTemplate
+    property.nameExp = property.nameTemplate
       ? $interpolate(property.nameTemplate)
       : undefined;
   });
@@ -213,7 +213,13 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         e.alias === "email" ||
         e.alias === "updateDate" ||
         e.alias === "createDate" ||
-        e.alias === "contentTypeAlias";
+        e.alias === "contentTypeAlias" ||
+        e.alias === "failedPasswordAttempts" ||
+        e.alias === "approved" ||
+        e.alias === "lockedOut" ||
+        e.alias === "lastLockoutDate" ||
+        e.alias === "lastLoginDate" ||
+        e.alias === "lastPasswordChangeDate";
     }
 
     if (e.isSystem) {
@@ -314,7 +320,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         //reload!
         $scope.reloadView(id, reloadActiveNode);
       }
-      // in the media section, the list view items are by default also shown in the tree, so we need 
+            // in the media section, the list view items are by default also shown in the tree, so we need 
       // to refresh the current tree node when changing the folder contents (adding and removing)
       else if (reloadActiveNode && section === "media") {
         var activeNode = appState.getTreeState("selectedNode");
@@ -474,7 +480,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
       }
     };
 
-    // if any of the selected nodes has variants we want to 
+        // if any of the selected nodes has variants we want to 
     // show a dialog where the languages can be chosen
     if (selectionHasVariants()) {
       languageResource.getAll()
@@ -530,7 +536,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
       }
     };
 
-    // if any of the selected nodes has variants we want to 
+        // if any of the selected nodes has variants we want to 
     // show a dialog where the languages can be chosen
     if (selectionHasVariants()) {
       languageResource.getAll()
@@ -815,6 +821,18 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         return "general_email";
       case "username":
         return "general_username";
+      case "failedPasswordAttempts":
+        return "user_failedPasswordAttempts";
+      case "approved":
+        return "user_stateApproved";
+      case "lockedOut":
+        return "user_stateLockedOut";
+      case "lastLockoutDate":
+        return "user_lastLockoutDate";
+      case "lastLoginDate":
+        return "user_lastLogin";
+      case "lastPasswordChangeDate":
+        return "user_lastPasswordChangeDate";
     }
     return alias;
   }

@@ -47,6 +47,8 @@ public static class UmbracoBuilderExtensions
         DbProviderFactories.UnregisterFactory(Constants.ProviderName);
         DbProviderFactories.RegisterFactory(Constants.ProviderName, SqlClientFactory.Instance);
 
+        NPocoSqlServerDatabaseExtensions.ConfigureNPocoBulkExtensions();
+
         // Support provider name set by the configuration API for connection string environment variables
         builder.Services.ConfigureAll<ConnectionStrings>(options =>
         {

@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Configuration.Models.Validation;
 public class ContentSettingsValidator : ConfigurationValidatorBase, IValidateOptions<ContentSettings>
 {
     /// <inheritdoc />
-    public ValidateOptionsResult Validate(string name, ContentSettings options)
+    public ValidateOptionsResult Validate(string? name, ContentSettings options)
     {
         if (!ValidateError404Collection(options.Error404Collection, out var message))
         {

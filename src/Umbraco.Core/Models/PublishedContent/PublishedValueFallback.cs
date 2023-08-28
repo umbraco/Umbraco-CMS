@@ -47,6 +47,13 @@ public class PublishedValueFallback : IPublishedValueFallback
                     }
 
                     break;
+                case Fallback.DefaultLanguage:
+                    if (TryGetValueWithDefaultLanguageFallback(property, culture, segment, out value))
+                    {
+                        return true;
+                    }
+
+                    break;
                 default:
                     throw NotSupportedFallbackMethod(f, "property");
             }
@@ -83,6 +90,13 @@ public class PublishedValueFallback : IPublishedValueFallback
                     return true;
                 case Fallback.Language:
                     if (TryGetValueWithLanguageFallback(content, alias, culture, segment, out value))
+                    {
+                        return true;
+                    }
+
+                    break;
+                case Fallback.DefaultLanguage:
+                    if (TryGetValueWithDefaultLanguageFallback(content, alias, culture, segment, out value))
                     {
                         return true;
                     }
@@ -139,6 +153,13 @@ public class PublishedValueFallback : IPublishedValueFallback
                     break;
                 case Fallback.Ancestors:
                     if (TryGetValueWithAncestorsFallback(content, alias, culture, segment, out value, ref noValueProperty))
+                    {
+                        return true;
+                    }
+
+                    break;
+                case Fallback.DefaultLanguage:
+                    if (TryGetValueWithDefaultLanguageFallback(content, alias, culture, segment, out value))
                     {
                         return true;
                     }
@@ -348,5 +369,43 @@ public class PublishedValueFallback : IPublishedValueFallback
 
             language = language2;
         }
+    }
+
+    private bool TryGetValueWithDefaultLanguageFallback<T>(IPublishedProperty property, string? culture, string? segment, out T? value)
+    {
+        value = default;
+
+        if (culture.IsNullOrWhiteSpace())
+        {
+            return false;
+        }
+
+        string? defaultCulture = _localizationService?.GetDefaultLanguageIsoCode();
+        if (culture.InvariantEquals(defaultCulture) == false && property.HasValue(defaultCulture, segment))
+        {
+            value = property.Value<T>(this, defaultCulture, segment);
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool TryGetValueWithDefaultLanguageFallback<T>(IPublishedElement element, string alias, string? culture, string? segment, out T? value)
+    {
+        value = default;
+
+        if (culture.IsNullOrWhiteSpace())
+        {
+            return false;
+        }
+
+        string? defaultCulture = _localizationService?.GetDefaultLanguageIsoCode();
+        if (culture.InvariantEquals(defaultCulture) == false && element.HasValue(alias, defaultCulture, segment))
+        {
+            value = element.Value<T>(this, alias, defaultCulture, segment);
+            return true;
+        }
+
+        return false;
     }
 }

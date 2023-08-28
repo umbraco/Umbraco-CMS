@@ -530,7 +530,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
 
                 //we need to ensure that any currently displayed nodes that get selected
                 // from the search get updated to have a check box!
-                function checkChildren(children) {
+                const checkChildren = function(children) {
                     children.forEach(child => {
                         //check if the id is in the selection, if so ensure it's flagged as selected
                         var exists = vm.searchInfo.selectedSearchResults.find(selected => child.id === selected.id);

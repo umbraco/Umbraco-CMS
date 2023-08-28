@@ -1,6 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
@@ -19,11 +21,18 @@ public class UmbracoRequestPaths
     private readonly string _installPath;
     private readonly string _previewMvcPath;
     private readonly string _surfaceMvcPath;
+    private readonly IOptions<UmbracoRequestPathsOptions> _umbracoRequestPathsOptions;
+
+    [Obsolete("Use constructor that takes IOptions<UmbracoRequestPathsOptions> - Will be removed in Umbraco 13")]
+    public UmbracoRequestPaths(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
+        : this(globalSettings, hostingEnvironment, StaticServiceProvider.Instance.GetRequiredService<IOptions<UmbracoRequestPathsOptions>>())
+    {
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoRequestPaths" /> class.
     /// </summary>
-    public UmbracoRequestPaths(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
+    public UmbracoRequestPaths(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IOptions<UmbracoRequestPathsOptions> umbracoRequestPathsOptions)
     {
         _appPath = hostingEnvironment.ApplicationVirtualPath;
 
@@ -39,6 +48,7 @@ public class UmbracoRequestPaths
         _surfaceMvcPath = "/" + mvcArea + "/Surface/";
         _apiMvcPath = "/" + mvcArea + "/Api/";
         _installPath = hostingEnvironment.ToAbsolute(Constants.SystemDirectories.Install);
+        _umbracoRequestPathsOptions = umbracoRequestPathsOptions;
     }
 
     /// <summary>
@@ -52,6 +62,7 @@ public class UmbracoRequestPaths
     ///         These are def back office:
     ///         /Umbraco/BackOffice     = back office
     ///         /Umbraco/Preview        = back office
+    ///         /Umbraco/Management/Api = back office
     ///     </para>
     ///     <para>
     ///         If it's not any of the above then we cannot determine if it's back office or front-end
@@ -92,6 +103,11 @@ public class UmbracoRequestPaths
         if (urlPath.InvariantStartsWith(_surfaceMvcPath) || urlPath.InvariantStartsWith(_apiMvcPath))
         {
             return false;
+        }
+
+        if (_umbracoRequestPathsOptions.Value.IsBackOfficeRequest(urlPath))
+        {
+            return true;
         }
 
         // if its none of the above, we will have to try to detect if it's a PluginController route

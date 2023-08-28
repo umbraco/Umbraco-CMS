@@ -12,6 +12,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Web.BackOffice.PropertyEditors;
 
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+[Obsolete("Nested content is obsolete, will be removed in V13")]
 public class NestedContentController : UmbracoAuthorizedJsonController
 {
     private readonly IContentTypeService _contentTypeService;

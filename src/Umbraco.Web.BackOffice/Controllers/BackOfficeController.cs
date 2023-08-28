@@ -329,7 +329,9 @@ public class BackOfficeController : UmbracoController
     [AllowAnonymous]
     public ActionResult ExternalLogin(string provider, string? redirectUrl = null)
     {
-        if (redirectUrl == null || Uri.TryCreate(redirectUrl, UriKind.Absolute, out _))
+        // Only relative urls are accepted as redirect url
+        // We can't simply use Uri.TryCreate with kind Absolute, as in Linux any relative url would be seen as an absolute file uri
+        if (redirectUrl == null || !Uri.TryCreate(redirectUrl, UriKind.RelativeOrAbsolute, out Uri? redirectUri) || redirectUri.IsAbsoluteUri)
         {
             redirectUrl = Url.Action(nameof(Default), this.GetControllerName());
         }
@@ -397,7 +399,7 @@ public class BackOfficeController : UmbracoController
     [HttpGet]
     public async Task<IActionResult> ExternalLinkLoginCallback()
     {
-        BackOfficeIdentityUser user = await _userManager.GetUserAsync(User);
+        BackOfficeIdentityUser? user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
             // ... this should really not happen
@@ -515,9 +517,8 @@ public class BackOfficeController : UmbracoController
         }
         else if (result == SignInResult.TwoFactorRequired)
         {
-            BackOfficeIdentityUser? attemptedUser =
-                await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
-            if (attemptedUser == null)
+            BackOfficeIdentityUser? attemptedUser = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
+                if (attemptedUser?.UserName is null)
             {
                 return new ValidationErrorResult(
                     $"No local user found for the login provider {loginInfo.LoginProvider} - {loginInfo.ProviderKey}");

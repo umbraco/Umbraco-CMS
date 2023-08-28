@@ -1,7 +1,6 @@
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
-using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -67,8 +66,10 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
             _timeout = timeout;
             LockId = lockId;
             LockType = lockType;
-
-            _parent._logger.LogDebug("Requesting {lockType} for id {id}", LockType, LockId);
+            if (_parent._logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _parent._logger.LogDebug("Requesting {lockType} for id {id}", LockType, LockId);
+            }
 
             try
             {
@@ -84,7 +85,7 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
                         throw new ArgumentOutOfRangeException(nameof(lockType), lockType, @"Unsupported lockType");
                 }
             }
-            catch (SqlException ex) when (ex.Number == 1222)
+            catch (SqliteException ex) when (ex.SqliteErrorCode == SQLitePCL.raw.SQLITE_BUSY)
             {
                 if (LockType == DistributedLockType.ReadLock)
                 {
@@ -93,17 +94,24 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
 
                 throw new DistributedWriteLockTimeoutException(LockId);
             }
-
-            _parent._logger.LogDebug("Acquired {lockType} for id {id}", LockType, LockId);
+            if (_parent._logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _parent._logger.LogDebug("Acquired {lockType} for id {id}", LockType, LockId);
+            }
         }
 
         public int LockId { get; }
 
         public DistributedLockType LockType { get; }
 
-        public void Dispose() =>
-            // Mostly no op, cleaned up by completing transaction in scope.
-            _parent._logger.LogDebug("Dropped {lockType} for id {id}", LockType, LockId);
+        public void Dispose()
+        {
+            if (_parent._logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                // Mostly no op, cleaned up by completing transaction in scope.
+                _parent._logger.LogDebug("Dropped {lockType} for id {id}", LockType, LockId);
+            }
+        }
 
         public override string ToString()
             => $"SqliteDistributedLock({LockId})";

@@ -59,8 +59,11 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         IDictionary<string, string?>? items = auth.Properties?.Items;
         if (auth.Principal == null || items == null)
         {
-            Logger.LogDebug(
+            if (Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                Logger.LogDebug(
                 "The external login authentication failed. No user Principal or authentication items was resolved.");
+            }
             return null;
         }
 
@@ -86,7 +89,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
 
         var providerKey = auth.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
         var provider = items[UmbracoSignInMgrLoginProviderKey];
-        if (providerKey == null || provider == null)
+        if (providerKey is null || provider is null)
         {
             return null;
         }
@@ -102,14 +105,14 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     }
 
     /// <inheritdoc />
-    public override async Task<TUser> GetTwoFactorAuthenticationUserAsync()
+    public override async Task<TUser?> GetTwoFactorAuthenticationUserAsync()
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         // replaced in order to use a custom auth type
         TwoFactorAuthenticationInfo? info = await RetrieveTwoFactorInfoAsync();
-        if (info == null)
+        if (info?.UserId is null)
         {
-            return null!;
+            return null;
         }
 
         return await UserManager.FindByIdAsync(info.UserId);
@@ -142,7 +145,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     }
 
     /// <inheritdoc />
-    public override async Task<SignInResult> TwoFactorSignInAsync(string? provider, string? code, bool isPersistent, bool rememberClient)
+    public override async Task<SignInResult> TwoFactorSignInAsync(string provider, string code, bool isPersistent, bool rememberClient)
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L552
         // replaced in order to use a custom auth type and to implement logging/events
