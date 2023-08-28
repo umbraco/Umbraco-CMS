@@ -26,7 +26,8 @@ public class BackOfficePasswordChanger : IBackOfficePasswordChanger
         {
             Id = model.User.Id,
             OldPassword = model.OldPassword,
-            NewPassword = model.NewPassword
+            NewPassword = model.NewPassword,
+            ResetPasswordToken = model.ResetPasswordToken,
         };
 
         return await _passwordChanger.ChangePasswordWithIdentityAsync(mappedModel, _userManager, performingUser);

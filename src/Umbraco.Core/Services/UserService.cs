@@ -1095,6 +1095,7 @@ internal class UserService : RepositoryService, IUserService
             NewPassword = model.NewPassword,
             OldPassword = model.OldPassword,
             User = user,
+            ResetPasswordToken = model.ResetPasswordToken,
         }, performingUser);
 
         if (result.Success is false)
