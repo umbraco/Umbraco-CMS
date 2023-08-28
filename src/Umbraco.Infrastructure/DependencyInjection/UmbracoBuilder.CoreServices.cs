@@ -189,6 +189,7 @@ public static partial class UmbracoBuilderExtensions
                 services.GetService<INotificationHandler<SendEmailNotification>>(),
                 services.GetService<INotificationAsyncHandler<SendEmailNotification>>()));
         builder.Services.AddTransient<IUserInviteSender, EmailUserInviteSender>();
+        builder.Services.AddTransient<IUserForgotPasswordSender, EmailUserForgotPasswordSender>();
 
         builder.Services.AddSingleton<IExamineManager, ExamineManager>();
 
