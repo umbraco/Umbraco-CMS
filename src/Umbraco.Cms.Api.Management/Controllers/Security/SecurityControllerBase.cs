@@ -24,6 +24,10 @@ public abstract class SecurityControllerBase : ManagementApiControllerBase
                 .WithTitle("The password reset token was invalid")
                 .WithDetail("The specified password reset token was either used already or wrong.")
                 .Build()),
+            UserOperationStatus.UnknownFailure => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Unknown failure")
+                .WithDetail(errorMessageResult?.Error?.ErrorMessage ?? "The error was unknown")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown user operation status.")
                 .Build()),

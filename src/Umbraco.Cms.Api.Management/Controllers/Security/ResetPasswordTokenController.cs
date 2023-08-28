@@ -32,6 +32,6 @@ public class ResetPasswordTokenController : SecurityControllerBase
 
         return result.Success
             ? NoContent()
-            : UserOperationStatusResult(result.Status);
+            : UserOperationStatusResult(result.Status, result.Result);
     }
 }
