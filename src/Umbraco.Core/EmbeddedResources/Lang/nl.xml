@@ -698,7 +698,7 @@
     <key alias="close">Sluiten</key>
     <key alias="closewindow">Sluit venster</key>
     <key alias="closepane">Sluit paneel</key>
-    <key alias="comment">Comment</key>
+    <key alias="comment">Commentaar</key>
     <key alias="confirm">Bevestig</key>
     <key alias="constrain">Beperken</key>
     <key alias="constrainProportions">Verhoudingen behouden</key>
