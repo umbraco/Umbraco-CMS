@@ -17,7 +17,7 @@ export class UmbDataTypeDatasetContext extends UmbBaseController implements UmbD
 	culture = this.#currentVariant.asObservablePart((x) => x?.culture);
 	segment = this.#currentVariant.asObservablePart((x) => x?.segment);
 
-	properties: Observable<Array<PropertyEditorConfigProperty>>;
+	properties: Observable<Array<PropertyEditorConfigProperty> | undefined>;
 
 	// default data:
 
@@ -28,7 +28,7 @@ export class UmbDataTypeDatasetContext extends UmbBaseController implements UmbD
 	getUnique(): string | undefined {
 		return this.#workspace.getEntityId();
 	}
-	getName(): string | undefined {
+	getName() {
 		return this.#workspace.getName();
 	}
 	setName(name: string) {

@@ -83,24 +83,11 @@ export class UmbDocumentDatasetContext extends UmbBaseController implements UmbV
 	 * Ideally do not use these methods, its better to communicate directly with the workspace, but if you do not know the property variant id, then this will figure it out for you. So good for externals to set or get values of a property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-
+		await this.#workspace.isLoaded();
 		return (await this.#workspace.structure.propertyStructureByAlias(propertyAlias)).pipe(map((property) => property?.alias ? this.#workspace.getPropertyValue<ReturnType>(property.alias, this.#createPropertyVariantId(property)) : undefined));
-
-		/*
-		// This is not reacting to if the property variant settings changes while running.
-		const property = await this.#workspace.structure.getPropertyStructureByAlias(propertyAlias);
-		if(property) {
-			const variantId = this.#createPropertyVariantId(property);
-			if(property.alias) {
-				return this.#workspace.propertyValueByAlias<ReturnType>(property.alias, variantId);
-			}
-		}
-		return undefined;
-		*/
 	}
 
-	// TODO: Refactor:
-	// Not used currently:
+	// TODO: Refactor: Not used currently, but should investigate if we can implement this, to spare some energy.
 	async propertyValueByAliasAndCulture<ReturnType = unknown>(propertyAlias: string, propertyVariantId: UmbVariantId) {
 		return this.#workspace.propertyValueByAlias<ReturnType>(propertyAlias, propertyVariantId);
 	}

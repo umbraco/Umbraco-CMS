@@ -19,10 +19,6 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-
-// TODO: should this context be called DocumentDraft instead of workspace? or should the draft be part of this?
-// TODO: Should we have a DocumentStructureContext and maybe even a DocumentDraftContext?
 
 type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
@@ -40,6 +36,11 @@ export class UmbDocumentWorkspaceContext
 	 * The document is the current state/draft version of the document.
 	 */
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
+	#getDataPromise?: Promise<any>;
+	public isLoaded() {
+		return this.#getDataPromise;
+	}
+
 	readonly unique = this.#currentData.asObservablePart((data) => data?.id);
 	readonly documentTypeKey = this.#currentData.asObservablePart((data) => data?.contentTypeId);
 
@@ -64,7 +65,8 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async load(entityId: string) {
-		const { data } = await this.repository.requestById(entityId);
+		this.#getDataPromise = this.repository.requestById(entityId);
+		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
 
 		this.setIsNew(false);
@@ -74,7 +76,8 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async create(documentTypeKey: string, parentId: string | null) {
-		const { data } = await this.repository.createScaffold(documentTypeKey, { parentId });
+		this.#getDataPromise = this.repository.createScaffold(documentTypeKey, { parentId });
+		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
 
 		this.setIsNew(true);
@@ -132,28 +135,34 @@ export class UmbDocumentWorkspaceContext
 		this.#currentData.update({ variants });
 	}
 
-	propertyDataById(propertyId: string) {
+	async propertyDataById(propertyId: string) {
 		return this.structure.propertyStructureById(propertyId);
 	}
 
-	propertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string, variantId?: UmbVariantId): Observable<PropertyValueType> {
+	async propertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string, variantId?: UmbVariantId) {
 		return this.#currentData.asObservablePart(
 			(data) =>
-				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))?.value
+				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))?.value as PropertyValueType
 		);
 	}
 
-	getPropertyValue<PropertyValueType = unknown>(alias: string, variantId?: UmbVariantId): PropertyValueType | undefined {
+	/**
+	 * Get the current value of the property with the given alias and variantId.
+	 * @param alias
+	 * @param variantId
+	 * @returns The value or undefined if not set or found.
+	 */
+	getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
 		const currentData = this.#currentData.value;
 		if (currentData) {
 			const newDataSet = currentData.values?.find(
 				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true)
 			);
-			return newDataSet?.value;
+			return newDataSet?.value as ReturnType;
 		}
 		return undefined;
 	}
-	setPropertyValue<PropertyValueType = unknown>(alias: string, value: PropertyValueType, variantId?: UmbVariantId) {
+	async setPropertyValue<PropertyValueType = unknown>(alias: string, value: PropertyValueType, variantId?: UmbVariantId) {
 		const entry = { ...variantId?.toObject(), alias, value };
 		const currentData = this.#currentData.value;
 		if (currentData) {

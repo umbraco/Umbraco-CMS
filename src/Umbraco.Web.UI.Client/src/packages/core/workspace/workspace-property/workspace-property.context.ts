@@ -58,6 +58,10 @@ export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseControl
 			this._observeProperty();
 		});
 
+		this.observe(this.alias, () => {
+			this._observeProperty();
+		});
+
 		this._providerController = new UmbContextProviderController(host, UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, this);
 
 		this.observe(this.configValues, (configValues) => {

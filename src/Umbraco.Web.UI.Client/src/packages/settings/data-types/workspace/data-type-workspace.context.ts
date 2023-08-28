@@ -1,11 +1,11 @@
 import { UmbDataTypeRepository } from '../repository/data-type.repository.js';
 import { UmbDataTypeDatasetContext } from '../index.js';
-import { UmbDatasetContext, UmbInvariableWorkspaceContextInterface, UmbWorkspaceContext, UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbInvariableWorkspaceContextInterface, UmbWorkspaceContext, UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { appendToFrozenArray, UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { Observable, combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { PropertyEditorConfigDefaultData, PropertyEditorConfigProperty, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 
@@ -16,6 +16,7 @@ export class UmbDataTypeWorkspaceContext
 	// TODO: revisit. temp solution because the create and response models are different.
 	#data = new UmbObjectState<DataTypeResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
+	#getDataPromise?: Promise<any>;
 
 	name = this.#data.asObservablePart((data) => data?.name);
 	id = this.#data.asObservablePart((data) => data?.id);
@@ -34,11 +35,22 @@ export class UmbDataTypeWorkspaceContext
 
 	private _configDefaultData?: Array<PropertyEditorConfigDefaultData>;
 
+	#defaults = new UmbArrayState<PropertyEditorConfigDefaultData>([], (entry) => entry.alias);
+	defaults = this.#defaults.asObservable();
+
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.DataType', new UmbDataTypeRepository(host));
 
 		this.observe(this.propertyEditorUiAlias, (propertyEditorUiAlias) => {
-			if (!propertyEditorUiAlias) return;
+			if (!propertyEditorUiAlias) {
+				// No property editor ui alias, so we clean up and reset the properties.
+				this.removeControllerByAlias('propertyEditorUiAlias');
+				this._propertyEditorUISettingsProperties = [];
+				this._propertyEditorUISettingsDefaultData = [];
+				this._mergeConfigProperties();
+				this._mergeConfigDefaultData();
+				return;
+			}
 
 			this.observe(
 				umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', propertyEditorUiAlias),
@@ -51,6 +63,7 @@ export class UmbDataTypeWorkspaceContext
 					this._mergeConfigProperties();
 					this._mergeConfigDefaultData();
 				}
+				, 'observePropertyEditorUiAlias'
 			);
 		});
 	}
@@ -74,22 +87,26 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	private _mergeConfigDefaultData() {
+		if(!this._propertyEditorSchemaConfigDefaultData || !this._propertyEditorUISettingsDefaultData) return;
+
 		this._configDefaultData = [
 			...this._propertyEditorSchemaConfigDefaultData,
 			...this._propertyEditorUISettingsDefaultData,
 		];
+		this.#defaults.next(this._configDefaultData);
 	}
 
 	public getPropertyDefaultValue(alias: string) {
 		return this._configDefaultData?.find((x) => x.alias === alias)?.value;
 	}
 
-	createDatasetContext(host: UmbControllerHost): UmbDatasetContext {
+	createDatasetContext(host: UmbControllerHost): UmbDataTypeDatasetContext {
 		return new UmbDataTypeDatasetContext(host, this);
 	}
 
 	async load(id: string) {
-		const { data } = await this.repository.requestById(id);
+		this.#getDataPromise = this.repository.requestById(id);
+		const { data } = await this.#getDataPromise;
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);
@@ -97,7 +114,8 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	async create(parentId: string | null) {
-		let { data } = await this.repository.createScaffold(parentId);
+		this.#getDataPromise = this.repository.createScaffold(parentId);
+		let { data } = await this.#getDataPromise;
 		if (this.modalContext) {
 			data = { ...data, ...this.modalContext.data.preset };
 		}
@@ -121,7 +139,7 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	getName() {
-		this.#data.getValue()?.name;
+		return this.#data.getValue()?.name;
 	}
 	setName(name: string) {
 		this.#data.update({ name });
@@ -134,13 +152,29 @@ export class UmbDataTypeWorkspaceContext
 		this.#data.update({ propertyEditorUiAlias: alias });
 	}
 
+	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
+		await this.#getDataPromise;
 
-	propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-		return this.#data.asObservablePart((data) => data?.values?.find((x) => x.alias === propertyAlias)?.value ?? this.getPropertyDefaultValue(propertyAlias) as ReturnType);
+		// TODO: Merge map..
+
+		return combineLatest([
+			this.#data.asObservablePart((data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType),
+			this.#defaults.asObservablePart((defaults) => defaults?.find((x) => x.alias === propertyAlias)?.value as ReturnType),
+		]).pipe(
+			map(([value, defaultValue]) => {
+				return (value ?? defaultValue);
+			})
+		);
+		//return this.#data.asObservablePart((data) => data?.values?.find((x) => x.alias === propertyAlias)?.value ?? this.getPropertyDefaultValue(propertyAlias) as ReturnType);
+	}
+
+	getPropertyValue<ReturnType = unknown>(propertyAlias: string) {
+		return this.#data.getValue()?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType ?? this.getPropertyDefaultValue(propertyAlias) as ReturnType;
 	}
 
 	// TODO: its not called a property in the model, but we do consider this way in our front-end
-	setPropertyValue(alias: string, value: unknown) {
+	async setPropertyValue(alias: string, value: unknown) {
+		await this.#getDataPromise;
 		const entry = { alias: alias, value: value };
 
 		const currentData = this.#data.value;

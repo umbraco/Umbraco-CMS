@@ -1,7 +1,6 @@
 import type { UmbDatasetContext } from '../dataset-context/dataset-context.interface.js';
 import type { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { ValueModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbInvariableWorkspaceContextInterface<T = unknown>
@@ -12,10 +11,9 @@ export interface UmbInvariableWorkspaceContextInterface<T = unknown>
 	setName(name: string): void;
 
 	// Property:
-	propertyDataById(id: string): Observable<ValueModelBaseModel | undefined>;
-	propertyValueByAlias<ReturnType = unknown>(alias: string): Observable<ReturnType | undefined>;
-	getPropertyValue(alias: string): void;
-	setPropertyValue(alias: string, value: unknown): void;
+	propertyValueByAlias<ReturnType = unknown>(alias: string): Promise<Observable<ReturnType | undefined>>;
+	getPropertyValue<ReturnType = unknown>(alias: string): ReturnType;
+	setPropertyValue(alias: string, value: unknown): Promise<void>;
 
 	// Dataset methods:
 	createDatasetContext(host: UmbControllerHost): UmbDatasetContext;

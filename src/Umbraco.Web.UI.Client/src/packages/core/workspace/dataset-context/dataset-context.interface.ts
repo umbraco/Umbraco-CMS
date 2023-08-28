@@ -1,5 +1,5 @@
-import type {  Observable } from "@umbraco-cms/backoffice/external/rxjs";
 import type { UmbVariantId } from "../../variant/variant-id.class.js";
+import type {  Observable } from "@umbraco-cms/backoffice/external/rxjs";
 
 /**
  * Represents a set of properties.

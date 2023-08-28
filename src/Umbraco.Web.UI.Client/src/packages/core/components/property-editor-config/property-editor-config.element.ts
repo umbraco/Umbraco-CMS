@@ -2,14 +2,11 @@ import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../../settings/data-types/wo
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
-	PropertyEditorConfigDefaultData,
 	PropertyEditorConfigProperty,
-	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_DATASET_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UmbDataTypeDatasetContext } from '@umbraco-cms/backoffice/data-type';
 
 /**
  *  @element umb-property-editor-config
@@ -18,7 +15,7 @@ import { UMB_DATASET_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-property-editor-config')
 export class UmbPropertyEditorConfigElement extends UmbLitElement {
 
-	#datasetContext?: typeof UMB_DATASET_CONTEXT.TYPE;
+	#datasetContext?: UmbDataTypeDatasetContext;
 
 	/**
 	 * Data. The element will render configuration editors with values from this data.
@@ -38,9 +35,10 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (instance) => {
+			console.log("config got context, but has already?...", this.#datasetContext)
 			this.#datasetContext = instance.createDatasetContext(this);
 			this.observe(this.#datasetContext.properties, (properties) => {
-				this._properties = properties;
+				this._properties = properties as Array<PropertyEditorConfigProperty>;
 			}, 'observeProperties');
 		});
 
