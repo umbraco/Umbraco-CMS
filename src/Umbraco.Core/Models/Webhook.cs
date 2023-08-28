@@ -8,11 +8,11 @@ namespace Umbraco.Cms.Core.Models;
 public class Webhook : EntityBase
 {
     private string _url;
-    private WebHookEvent _webHookEvent;
+    private WebhookEvent _webHookEvent;
     private string _entityName;
     private Guid _entityKey;
 
-    public Webhook(string url, WebHookEvent webHookEvent, string entityName, Guid entityKey)
+    public Webhook(string url, WebhookEvent webHookEvent, string entityName, Guid entityKey)
     {
         _url = url;
         _webHookEvent = webHookEvent;
@@ -28,7 +28,7 @@ public class Webhook : EntityBase
     }
 
     [DataMember]
-    public WebHookEvent Event
+    public WebhookEvent Event
     {
         get => _webHookEvent;
         set => SetPropertyValueAndDetectChanges(value, ref _webHookEvent!, nameof(Event));
