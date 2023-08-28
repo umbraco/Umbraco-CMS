@@ -1,42 +1,20 @@
-import { Subject } from '@umbraco-cms/backoffice/external/rxjs';
 import { PackageResource, OpenAPI } from '@umbraco-cms/backoffice/backend-api';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { ManifestBase, isManifestJSType } from '@umbraco-cms/backoffice/extension-api';
 
-// TODO: consider if this can be replaced by the new extension controllers.
+// TODO: consider if this can be replaced by the new extension controllers
 // TODO: move local part out of this, and name something with server.
-export class UmbExtensionInitializer extends UmbBaseController {
+export class UmbServerExtensionRegistrator extends UmbBaseController {
 	#extensionRegistry: UmbBackofficeExtensionRegistry;
-	#unobserve = new Subject<void>();
-	#localPackages: Array<Promise<any>> = [];
 	#apiBaseUrl = OpenAPI.BASE;
 
 	constructor(host: UmbControllerHost, extensionRegistry: UmbBackofficeExtensionRegistry) {
-		super(host, UmbExtensionInitializer.name);
+		super(host, UmbServerExtensionRegistrator.name);
 		this.#extensionRegistry = extensionRegistry;
-	}
-
-	setLocalPackages(localPackages: Array<Promise<any>>) {
-		this.#localPackages = localPackages;
-		this.#loadLocalPackages();
-	}
-
-	hostConnected(): void {
+		// TODO: This was before in hostConnected(), but I don't see the reason to wait. lets just do it right away.
 		this.#loadServerPackages();
-	}
-
-	hostDisconnected(): void {
-		this.#unobserve.next();
-		this.#unobserve.complete();
-	}
-
-	async #loadLocalPackages() {
-		this.#localPackages.forEach(async (packageImport) => {
-			const packageModule = await packageImport;
-			this.#extensionRegistry.registerMany(packageModule.extensions);
-		});
 	}
 
 	async #loadServerPackages() {
