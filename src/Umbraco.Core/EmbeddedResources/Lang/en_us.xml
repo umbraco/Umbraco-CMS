@@ -353,6 +353,7 @@
     <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
     <key alias="dragAndDropYourFilesIntoTheArea">Drag and drop your file(s) into the area</key>
     <key alias="uploadNotAllowed">Upload is not allowed in this location.</key>
+    <key alias="fileSecurityValidationFailure">One or more file security validations have failed</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
