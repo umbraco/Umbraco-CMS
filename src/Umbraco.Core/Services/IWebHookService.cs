@@ -6,9 +6,9 @@ public interface IWebHookService
 {
     Task CreateAsync(Webhook webhook);
 
-    Task Delete(Webhook webhook);
+    Task DeleteAsync(Webhook webhook);
 
-    Task<Webhook> GetAsync(Guid key);
+    Task<Webhook?> GetAsync(Guid key);
 
-    Task<Webhook> GetMultipleAsync(IEnumerable<Guid> keys);
+    Task<IEnumerable<Webhook>> GetMultipleAsync(IEnumerable<Guid> keys);
 }
