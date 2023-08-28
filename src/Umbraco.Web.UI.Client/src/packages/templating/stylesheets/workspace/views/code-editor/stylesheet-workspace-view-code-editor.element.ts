@@ -65,10 +65,6 @@ export class UmbStylesheetWorkspaceViewCodeEditorElement extends UmbLitElement {
 			@input=${this.#onCodeEditorInput}></umb-code-editor>`;
 	}
 
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		console.log('disconnected');
-	}
 
 	render() {
 		return html` <uui-box>
