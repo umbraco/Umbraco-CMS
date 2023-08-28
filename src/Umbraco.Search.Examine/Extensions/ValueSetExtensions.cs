@@ -8,12 +8,13 @@ public static class ValueSetExtensions
 {
     public static UmbracoValueSet ToUmbracoValueSet(this global::Examine.ValueSet valueSet)
     {
-        return new UmbracoValueSet(valueSet.Id, valueSet.Category,
-            valueSet.Values.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
+        return new UmbracoValueSet(valueSet.Id, valueSet.Category,valueSet.ItemType,
+            valueSet.Values.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value))
+       ;
     }
     public static global::Examine.ValueSet ToExamineValueSet(this UmbracoValueSet valueSet)
     {
-        return new global::Examine.ValueSet(valueSet.Id, valueSet.Category,
+        return new global::Examine.ValueSet(valueSet.Id, valueSet.Category,valueSet.ItemType,
             valueSet.Values?.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
     }
     public static global::Examine.ValueSetValidationResult ToExamineValidationResult(this UmbracoValueSetValidationResult valueSet)
