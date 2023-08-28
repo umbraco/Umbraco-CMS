@@ -71,7 +71,7 @@ namespace Umbraco.Core.Persistence.Factories
             }
 
             if (entity.HasIdentity)
-                dto.Id = short.Parse(entity.Id.ToString());
+                dto.Id = dto.Id = entity.Id;
 
             return dto;
         }
