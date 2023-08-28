@@ -133,10 +133,10 @@ namespace Umbraco.Web.PropertyEditors
         {
             var absoluteTempImagePath = Path.GetFullPath(IOHelper.MapPath(tmpImgPath));
 
-                if (IsValidPath(absoluteTempImagePath) == false)
-                {
-                    continue;
-                }
+            if (IsValidPath(absoluteTempImagePath) == false)
+            {
+                return;
+            }
 
             var fileName = Path.GetFileName(absoluteTempImagePath);
             var safeFileName = fileName.ToSafeFileName();
