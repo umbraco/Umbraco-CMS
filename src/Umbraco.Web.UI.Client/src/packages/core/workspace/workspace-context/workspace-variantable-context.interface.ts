@@ -1,5 +1,5 @@
 import type { UmbWorkspaceSplitViewManager } from '../workspace-split-view-manager.class.js';
-import type { UmbDatasetContext } from '../dataset-context/dataset-context.interface.js';
+import type { UmbVariantDatasetContext } from '../dataset-context/variant-dataset-context.interface.js';
 import type { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -25,5 +25,5 @@ export interface UmbVariantableWorkspaceContextInterface<EntityType = unknown> e
 	//propertyDataByAlias(alias: string, variantId?: UmbVariantId): Observable<ValueModelBaseModel | undefined>;
 
 	// Dataset methods:
-	createVariableDatasetContext(host: UmbControllerHost, variantId: UmbVariantId): UmbDatasetContext;
+	createVariableDatasetContext(host: UmbControllerHost, variantId: UmbVariantId): UmbVariantDatasetContext;
 }

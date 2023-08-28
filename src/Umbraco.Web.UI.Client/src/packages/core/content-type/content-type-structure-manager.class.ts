@@ -307,7 +307,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		this.#documentTypes.updateOne(documentTypeId, { properties });
 	}
 
-	// TODO: Refactor: These property methods, could be named without structure in their name.
+	// TODO: Refactor: These property methods, should maybe be named without structure in their name.
 	async propertyStructureById(
 		propertyId: string
 	) {

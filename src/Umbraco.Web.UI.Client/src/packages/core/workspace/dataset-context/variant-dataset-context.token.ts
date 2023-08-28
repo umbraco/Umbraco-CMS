@@ -5,5 +5,5 @@ import { UmbContextToken } from "@umbraco-cms/backoffice/context-api";
 export const IsVariantDatasetContext = (context: UmbDatasetContext): context is UmbVariantDatasetContext => 'getVariantId' in context;
 
 export const UMB_VARIANT_DATASET_CONTEXT = new UmbContextToken<UmbDatasetContext, UmbVariantDatasetContext>(
-	"UmbEntityContext",
+	"UmbDatasetContext",
 	IsVariantDatasetContext);

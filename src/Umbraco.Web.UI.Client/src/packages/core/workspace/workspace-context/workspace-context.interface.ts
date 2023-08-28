@@ -16,10 +16,4 @@ export interface UmbWorkspaceContextInterface<DataType = unknown> {
 	getIsNew(): boolean | undefined;
 	setIsNew(value: boolean): void;
 
-	/*
-	// TODO: Refactor: This could maybe go away:
-	repository: any; // TODO: add type
-	getData(): DataType | undefined;
-	*/
-
 }

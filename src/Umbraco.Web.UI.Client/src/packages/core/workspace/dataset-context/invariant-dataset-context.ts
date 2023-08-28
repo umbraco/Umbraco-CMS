@@ -37,7 +37,6 @@ export class UmbInvariantDatasetContext<WorkspaceType extends UmbInvariantableWo
 		super(host, 'dataSetContext');
 		this._workspace = workspace;
 
-		// TODO: Refactor: use the document dataset context token.
 		this.provideContext(UMB_DATASET_CONTEXT, this);
 	}
 

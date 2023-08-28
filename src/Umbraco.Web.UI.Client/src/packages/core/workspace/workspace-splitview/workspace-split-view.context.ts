@@ -1,4 +1,4 @@
-import { UmbDatasetContext } from '../dataset-context/index.js';
+import { UmbVariantDatasetContext } from '../dataset-context/index.js';
 import { UMB_VARIANT_WORKSPACE_CONTEXT_TOKEN } from '../index.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
@@ -17,8 +17,7 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 		return this.#workspaceContext;
 	}
 
-	// TODO: Refactor: use a variable data set context interface here.
-	#dataSetContext?: UmbDatasetContext;
+	#dataSetContext?: UmbVariantDatasetContext;
 
 	#index = new UmbNumberState(undefined);
 	index = this.#index.asObservable();
