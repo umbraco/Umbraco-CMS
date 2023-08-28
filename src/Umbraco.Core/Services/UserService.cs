@@ -1324,24 +1324,49 @@ internal class UserService : RepositoryService, IUserService
         };
     }
 
-    public async Task<UserOperationStatus> DeleteAsync(Guid key)
+    public async Task<UserOperationStatus> DeleteAsync(Guid userKey, ISet<Guid> keys)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IUser? user = await GetAsync(key);
+        if(keys.Any() is false)
+        {
+            return UserOperationStatus.Success;
+        }
 
-        if (user is null)
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IUser? performingUser = await GetAsync(userKey);
+
+        if (performingUser is null)
+        {
+            return UserOperationStatus.MissingUser;
+        }
+
+        if (keys.Contains(performingUser.Key))
+        {
+            return UserOperationStatus.CannotDeleteSelf;
+        }
+
+        IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+        IUser[] usersToDisable = (await userStore.GetUsersAsync(keys.ToArray())).ToArray();
+
+        if (usersToDisable.Length != keys.Count)
         {
             return UserOperationStatus.UserNotFound;
         }
 
-        // Check user hasn't logged in. If they have they may have made content changes which will mean
-        // the Id is associated with audit trails, versions etc. and can't be removed.
-        if (user.LastLoginDate is not null && user.LastLoginDate != default(DateTime))
+        foreach (IUser user in usersToDisable)
         {
-            return UserOperationStatus.CannotDelete;
-        }
+            // Check user hasn't logged in. If they have they may have made content changes which will mean
+            // the Id is associated with audit trails, versions etc. and can't be removed.
+            if (user.LastLoginDate is not null && user.LastLoginDate != default(DateTime))
+            {
+                return UserOperationStatus.CannotDelete;
+            }
 
-        Delete(user, true);
+            user.IsApproved = false;
+            user.InvitedDate = null;
+
+            Delete(user, true);
+        }
 
         scope.Complete();
         return UserOperationStatus.Success;

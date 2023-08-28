@@ -67,7 +67,7 @@ public interface IUserService : IMembershipUserService
 
     Task<UserOperationStatus> SetAvatarAsync(Guid userKey, Guid temporaryFileKey);
 
-    Task<UserOperationStatus> DeleteAsync(Guid key);
+    Task<UserOperationStatus> DeleteAsync(Guid userKey, ISet<Guid> keys);
 
     Task<UserOperationStatus> DisableAsync(Guid userKey, ISet<Guid> keys);
 
