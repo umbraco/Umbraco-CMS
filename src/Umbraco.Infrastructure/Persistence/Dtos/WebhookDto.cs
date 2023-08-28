@@ -27,10 +27,6 @@ internal class WebhookDto
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public WebhookEvent Event { get; set; }
 
-    [Column(Name = "entityName")]
-    [NullSetting(NullSetting = NullSettings.NotNull)]
-    public string EntityName { get; set; } = string.Empty;
-
     [Column(Name = "entityKey")]
     public Guid EntityKey { get; set; }
 }

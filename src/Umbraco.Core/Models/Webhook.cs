@@ -35,13 +35,6 @@ public class Webhook : EntityBase
     }
 
     [DataMember]
-    public string EntityName
-    {
-        get => _entityName;
-        set => SetPropertyValueAndDetectChanges(value, ref _entityName!, nameof(EntityName));
-    }
-
-    [DataMember]
     public Guid EntityKey
     {
         get => _entityKey;
