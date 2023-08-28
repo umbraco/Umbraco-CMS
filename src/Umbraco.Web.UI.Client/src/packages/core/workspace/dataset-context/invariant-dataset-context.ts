@@ -3,9 +3,9 @@ import { UmbBaseController, UmbControllerHost } from "@umbraco-cms/backoffice/co
 import { UmbObjectState } from "@umbraco-cms/backoffice/observable-api";
 import { UMB_DATASET_CONTEXT, UmbDatasetContext, UmbInvariantableWorkspaceContextInterface } from "@umbraco-cms/backoffice/workspace";
 
-export class UmbInvariantDatasetContext extends UmbBaseController implements UmbDatasetContext {
+export class UmbInvariantDatasetContext<WorkspaceType extends UmbInvariantableWorkspaceContextInterface= UmbInvariantableWorkspaceContextInterface> extends UmbBaseController implements UmbDatasetContext {
 
-	#workspace: UmbInvariantableWorkspaceContextInterface;
+	protected _workspace: WorkspaceType;
 
 	#currentVariant = new UmbObjectState<DocumentVariantResponseModel | undefined>(undefined);
 	currentVariant = this.#currentVariant.asObservable();
@@ -18,24 +18,24 @@ export class UmbInvariantDatasetContext extends UmbBaseController implements Umb
 
 
 	getType(): string {
-		return this.#workspace.getEntityType();
+		return this._workspace.getEntityType();
 	}
 	getUnique(): string | undefined {
-		return this.#workspace.getEntityId();
+		return this._workspace.getEntityId();
 	}
 	getName() {
-		return this.#workspace.getName();
+		return this._workspace.getName();
 	}
 	setName(name: string) {
-		this.#workspace.setName(name);
+		this._workspace.setName(name);
 	}
 
 
 
-	constructor(host: UmbControllerHost, workspace: UmbInvariantableWorkspaceContextInterface) {
+	constructor(host: UmbControllerHost, workspace: WorkspaceType) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
 		super(host, 'dataSetContext');
-		this.#workspace = workspace;
+		this._workspace = workspace;
 
 		// TODO: Refactor: use the document dataset context token.
 		this.provideContext(UMB_DATASET_CONTEXT, this);
@@ -48,7 +48,7 @@ export class UmbInvariantDatasetContext extends UmbBaseController implements Umb
 	 * Ideally do not use these methods, its better to communicate directly with the workspace, but if you do not know the property variant id, then this will figure it out for you. So good for externals to set or get values of a property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-		return this.#workspace.propertyValueByAlias<ReturnType>(propertyAlias);
+		return this._workspace.propertyValueByAlias<ReturnType>(propertyAlias);
 	}
 
 	/**
@@ -56,6 +56,6 @@ export class UmbInvariantDatasetContext extends UmbBaseController implements Umb
 	 * Ideally do not use these methods, its better to communicate directly with the workspace, but if you do not know the property variant id, then this will figure it out for you. So good for externals to set or get values of a property.
 	 */
 	async setPropertyValue(propertyAlias: string, value: unknown) {
-		return this.#workspace.setPropertyValue(propertyAlias, value);
+		return this._workspace.setPropertyValue(propertyAlias, value);
 	}
 }

@@ -6,7 +6,7 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbInvariantDatasetContext } from '@umbraco-cms/backoffice/data-type';
+import { UMB_DATA_TYPE_DATASET_CONTEXT } from '@umbraco-cms/backoffice/data-type';
 
 /**
  *  @element umb-property-editor-config
@@ -15,7 +15,7 @@ import { UmbInvariantDatasetContext } from '@umbraco-cms/backoffice/data-type';
 @customElement('umb-property-editor-config')
 export class UmbPropertyEditorConfigElement extends UmbLitElement {
 
-	#datasetContext?: UmbInvariantDatasetContext;
+	#datasetContext?: typeof UMB_DATA_TYPE_DATASET_CONTEXT.TYPE;
 
 	/**
 	 * Data. The element will render configuration editors with values from this data.
