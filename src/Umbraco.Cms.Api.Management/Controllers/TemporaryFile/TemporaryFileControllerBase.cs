@@ -25,8 +25,11 @@ public abstract class TemporaryFileControllerBase : ManagementApiControllerBase
                 .Build()),
 
             TemporaryFileOperationStatus.NotFound => NotFound(new ProblemDetailsBuilder()
-                    .WithTitle("The temporary file was not found")
-                    .Build()),
+                .WithTitle("The temporary file was not found")
+                .Build()),
+            TemporaryFileOperationStatus.UploadBlocked => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("The temporary file was blocked by a validator")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown temporary file operation status.")
                 .Build()),
