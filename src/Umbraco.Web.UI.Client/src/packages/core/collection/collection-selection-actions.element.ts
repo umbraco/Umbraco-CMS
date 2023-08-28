@@ -51,12 +51,12 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		// TODO: Make sure it only updates on length change.
 		this.observe(this._collectionContext.items, (mediaItems) => {
 			this._nodesLength = mediaItems.length;
-		});
+		}, 'observeItem');
 
 		this.observe(this._collectionContext.selection, (selection) => {
 			this._selectionLength = selection.length;
 			this._selection = selection;
-		});
+		}, 'observeSelection');
 	}
 
 	private _renderSelectionCount() {
@@ -74,6 +74,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 			(bulkActions) => {
 				this._entityBulkActions = bulkActions;
 			}
+			, 'observeEntityBulkActions'
 		);
 	}
 
