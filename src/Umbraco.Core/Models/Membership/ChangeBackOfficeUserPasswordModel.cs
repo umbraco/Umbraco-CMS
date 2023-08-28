@@ -15,7 +15,7 @@ public class ChangeBackOfficeUserPasswordModel
     public required IUser User { get; set; }
 
     /// <summary>
-    /// The reset token, that is required if changing your own  password without the old password.
+    ///     The reset token that is required if changing your own password without the old password.
     /// </summary>
     public string? ResetPasswordToken { get; set; }
 }

@@ -67,7 +67,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
             });
         }
 
-        // If old password is not specified we either has to change another users password, or provide a reset password token
+        // If old password is not specified we either have to change another user's password, or provide a reset password token
         if (changingPasswordModel.OldPassword.IsNullOrWhiteSpace())
         {
             if (changingPasswordModel.Id == currentUser?.Id && changingPasswordModel.ResetPasswordToken is null)
@@ -78,8 +78,6 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
                     Error = new ValidationResult("Cannot change the password of current user without the old password or a reset password token", new[] { "value" }),
                 });
             }
-
-
 
             // ok, we should be able to reset it
             IdentityResult resetResult = changingPasswordModel.ResetPasswordToken is not null
