@@ -339,6 +339,7 @@
     <key alias="renameFolderFailed">Omdøbning af mappen med id %0% fejlede</key>
     <key alias="dragAndDropYourFilesIntoTheArea">Træk dine filer ind i dropzonen for, at uploade dem til mediebiblioteket.</key>
     <key alias="uploadNotAllowed">Upload er ikke tiladt på denne lokation</key>
+      <key alias="fileSecurityValidationFailure">En eller flere fil sikkerhedsvalideringer har fejlet</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>

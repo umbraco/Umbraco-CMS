@@ -20,6 +20,7 @@ using Umbraco.Web.Models;
 using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
 using System.Text;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Tests.PropertyEditors
 {
@@ -95,7 +96,16 @@ namespace Umbraco.Tests.PropertyEditors
                     }
                 };
                 var dataTypeService = new TestObjects.TestDataTypeService(
-                    new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSection>(), Mock.Of<IDataTypeService>())) { Id = 1, Configuration = imageCropperConfiguration });
+                    new DataType(new ImageCropperPropertyEditor(
+                        Mock.Of<ILogger>(),
+                        mediaFileSystem,
+                        Mock.Of<IContentSection>(),
+                        Mock.Of<IDataTypeService>(),
+                        Mock.Of<IFileStreamSecurityValidator>()))
+                    {
+                        Id = 1,
+                        Configuration = imageCropperConfiguration
+                    });
 
                 var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
 

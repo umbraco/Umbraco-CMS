@@ -37,6 +37,7 @@ using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Editors
 {
@@ -49,10 +50,39 @@ namespace Umbraco.Web.Editors
     [MediaControllerControllerConfiguration]
     public class MediaController : ContentControllerBase
     {
-        public MediaController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        [Obsolete("Use the constructor specifying all dependencies instead.")]
+        public MediaController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services,
+            AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : this(propertyEditors,
+                globalSettings,
+                umbracoContextAccessor,
+                sqlContext,
+                services,
+                appCaches,
+                logger,
+                runtimeState,
+                umbracoHelper,
+                Current.Factory.GetInstance<IFileStreamSecurityValidator>())
+        {
+
+        }
+
+        public MediaController(
+            PropertyEditorCollection propertyEditors,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IFileStreamSecurityValidator fileStreamSecurityValidator)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
+            _fileStreamSecurityValidator = fileStreamSecurityValidator;
         }
 
         /// <summary>
@@ -236,6 +266,7 @@ namespace Umbraco.Web.Editors
 
         private int[] _userStartNodes;
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
 
         protected int[] UserStartNodes
         {
@@ -812,16 +843,27 @@ namespace Umbraco.Web.Editors
                     continue;
                 }
 
-                var mediaItemName = fileName.ToFriendlyName();
-
-                var createdMediaItem = mediaService.CreateMedia(mediaItemName, parentId, mediaTypeAlias, Security.CurrentUser.Id);
-
                 var fileInfo = new FileInfo(file.LocalFileName);
-                var fs = fileInfo.OpenReadWithRetry();
-                if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
-                using (fs)
+                var mediaFileStream = fileInfo.OpenReadWithRetry();
+                if (mediaFileStream == null)
                 {
-                    createdMediaItem.SetValue(Services.ContentTypeBaseServices, Constants.Conventions.Media.File, fileName, fs);
+                    throw new InvalidOperationException("Could not acquire file stream");
+                }
+
+                if (_fileStreamSecurityValidator != null && _fileStreamSecurityValidator.IsConsideredSafe(mediaFileStream) is false)
+                {
+                    tempFiles.Notifications.Add(new Notification(
+                        localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
+                        localizedTextService.Localize("media", "fileSecurityValidationFailure"),
+                        NotificationStyle.Warning));
+                    continue;
+                }
+
+                var mediaItemName = fileName.ToFriendlyName();
+                var createdMediaItem = mediaService.CreateMedia(mediaItemName, parentId, mediaTypeAlias, Security.CurrentUser.Id);
+                using (mediaFileStream)
+                {
+                    createdMediaItem.SetValue(Services.ContentTypeBaseServices, Constants.Conventions.Media.File, fileName, mediaFileStream);
                 }
 
                 var saveResult = mediaService.Save(createdMediaItem, Security.CurrentUser.Id);

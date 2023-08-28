@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using File = System.IO.File;
 
@@ -20,12 +21,18 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly ILogger _logger;
         private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
 
-        public ImageCropperPropertyValueEditor(DataEditorAttribute attribute, ILogger logger, IMediaFileSystem mediaFileSystem)
+        public ImageCropperPropertyValueEditor(
+            DataEditorAttribute attribute,
+            ILogger logger,
+            IMediaFileSystem mediaFileSystem,
+            IFileStreamSecurityValidator fileStreamSecurityValidator)
             : base(attribute)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+            _fileStreamSecurityValidator = fileStreamSecurityValidator;
         }
 
         /// <summary>
@@ -165,6 +172,11 @@ namespace Umbraco.Web.PropertyEditors
             {
                 // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
                 // since we'd need to be able to return values for other properties from these methods
+
+                if (_fileStreamSecurityValidator.IsConsideredSafe(filestream) is false)
+                {
+                    return null;
+                }
 
                 _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
             }

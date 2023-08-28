@@ -12,6 +12,8 @@ using Umbraco.Web.WebApi;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Security;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 
@@ -155,7 +157,9 @@ namespace Umbraco.Web.Editors
         public async Task<HttpResponseMessage> PostSetAvatar()
         {
             //borrow the logic from the user controller
-            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, Security.GetUserId().ResultOr(0));
+            // This is unbelievable... This controller has no real constructor using DI, instead everything is resolved from the Current service locator.
+            // So I guess we'll just do that again here
+            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, Current.Factory.GetInstance<IFileStreamSecurityValidator>(), AppCaches.RuntimeCache, Security.GetUserId().ResultOr(0));
         }
 
         /// <summary>

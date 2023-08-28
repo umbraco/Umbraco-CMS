@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Media;
 
@@ -22,16 +24,27 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IContentSection _contentSection;
+        private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
         private readonly UploadAutoFillProperties _uploadAutoFillProperties;
 
-        public FileUploadPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSection)
+        public FileUploadPropertyEditor(
+            ILogger logger,
+            IMediaFileSystem mediaFileSystem,
+            IContentSection contentSection,
+            IFileStreamSecurityValidator fileStreamSecurityValidator)
             : base(logger)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSection = contentSection;
+            _fileStreamSecurityValidator = fileStreamSecurityValidator;
             _uploadAutoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, contentSection);
         }
 
+        [Obsolete("Use constructor that accepts IFileStreamSecurityValidator.")]
+        public FileUploadPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSection)
+            : this(logger, mediaFileSystem, contentSection, Current.Factory.GetInstance<IFileStreamSecurityValidator>())
+        {
+        }
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new FileUploadConfigurationEditor();
@@ -42,7 +55,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override IDataValueEditor CreateValueEditor()
         {
-            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem);
+            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem, _fileStreamSecurityValidator);
             editor.Validators.Add(new UploadFileTypeValidator());
             return editor;
         }

@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -16,11 +17,16 @@ namespace Umbraco.Web.PropertyEditors
     internal class FileUploadPropertyValueEditor : DataValueEditor
     {
         private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
 
-        public FileUploadPropertyValueEditor(DataEditorAttribute attribute, IMediaFileSystem mediaFileSystem)
+        public FileUploadPropertyValueEditor(
+            DataEditorAttribute attribute,
+            IMediaFileSystem mediaFileSystem,
+            IFileStreamSecurityValidator fileStreamSecurityValidator)
             : base(attribute)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+            _fileStreamSecurityValidator = fileStreamSecurityValidator;
         }
 
         /// <summary>
@@ -109,6 +115,11 @@ namespace Umbraco.Web.PropertyEditors
 
             using (var filestream = File.OpenRead(file.TempFilePath))
             {
+                if (_fileStreamSecurityValidator.IsConsideredSafe(filestream) is false)
+                {
+                    return null;
+                }
+
                 // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
                 // since we'd need to be able to return values for other properties from these methods
 
