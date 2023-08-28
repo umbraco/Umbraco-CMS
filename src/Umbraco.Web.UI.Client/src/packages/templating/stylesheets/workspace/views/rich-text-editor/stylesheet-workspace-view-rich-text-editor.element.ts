@@ -16,6 +16,8 @@ import {
 	UmbModalToken,
 } from '@umbraco-cms/backoffice/modal';
 import { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 
 export const UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR_MODAL = new UmbModalToken<
 	StylesheetRichTextEditorStyleModalData,
@@ -24,6 +26,20 @@ export const UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR_MODAL = new UmbMo
 	type: 'sidebar',
 	size: 'medium',
 });
+
+const SORTER_CONFIG: UmbSorterConfig<RichTextRuleModel> = {
+	compareElementToModel: (element: HTMLElement, model: RichTextRuleModel) => {
+		return element.getAttribute('data-umb-rule-name') === model.name;
+	},
+	querySelectModelToElement: (container: HTMLElement, modelEntry: RichTextRuleModel) => {
+		return container.querySelector('data-umb-rule-name[' + modelEntry.name + ']');
+	},
+	identifier: 'stylesheet-rules-sorter',
+	itemSelector: '[data-umb-rule-name]',
+	disabledItemSelector: '[inherited]',
+	containerSelector: '#rules-container',
+};
+
 @customElement('umb-stylesheet-workspace-view-rich-text-editor')
 export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitElement {
 	@state()
@@ -45,6 +61,19 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 	#modal?: UmbModalContext;
 
 	#currentlyEditing: RichTextRuleModel | null = null;
+
+	#sorter = new UmbSorterController(this, {
+		...SORTER_CONFIG,
+		performItemInsert: ({ item, newIndex }) => {
+			//return true;
+
+			return this.#context?.findNewSortOrder(item, newIndex) ?? false;
+		},
+		performItemRemove: (args) => {
+			console.log(args, 'remove');
+			return true;
+		},
+	});
 
 	constructor() {
 		super();
@@ -71,6 +100,7 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 
 			this.observe(this.#context.rules, (rules) => {
 				this._rules = rules;
+				this.#sorter.setModel(this._rules);
 			});
 		});
 
@@ -78,8 +108,6 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 			this._modalContext = instance;
 		});
 	}
-
-
 
 	#openModal = (rule: RichTextRuleModel | null = null) => {
 		if (!this._modalContext) throw new Error('Modal context not found');
@@ -109,7 +137,7 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 	}
 
 	renderRule(rule: RichTextRuleModel) {
-		return html`<div class="rule">
+		return html`<div class="rule" data-umb-rule-name="${ifDefined(rule.name)}">
 			<div class="rule-name"><uui-icon name="umb:navigation"></uui-icon>${rule.name}</div>
 			<div class="rule-actions">
 				<uui-button label="Edit" look="secondary" @click=${() => this.#openModal(rule)}>Edit</uui-button
@@ -124,7 +152,7 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 			<div id="box-row">
 				<p id="description">Define the styles that should be available in the rich text editor for this stylesheet.</p>
 				<div id="rules">
-					${this._rules?.map((rule) => this.renderRule(rule))}
+					<div id="rules-container">${repeat(this._rules, (rule) => rule.name, this.renderRule)}</div>
 					<uui-button label="Add rule" look="primary" @click=${() => this.#openModal(null)}>Add</uui-button>
 				</div>
 			</div>

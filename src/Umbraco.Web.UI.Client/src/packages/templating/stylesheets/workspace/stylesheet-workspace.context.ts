@@ -6,9 +6,11 @@ import { UmbArrayState, UmbBooleanState, UmbObjectState, createObservablePart } 
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { RichTextRuleModel, UpdateStylesheetRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
+export type RichTextRuleModelSortable = RichTextRuleModel & { sortOrder?: number };
+
 export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStylesheetRepository, StylesheetDetails> {
 	#data = new UmbObjectState<StylesheetDetails | undefined>(undefined);
-	#rules = new UmbArrayState<RichTextRuleModel>([]);
+	#rules = new UmbArrayState<RichTextRuleModelSortable>([]);
 	data = this.#data.asObservable();
 	rules = this.#rules.asObservable();
 	name = createObservablePart(this.#data, (data) => data?.name);
@@ -20,6 +22,7 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.StyleSheet', new UmbStylesheetRepository(host));
+		this.#rules.sortBy((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 		this.#loadCodeEditor();
 	}
 
@@ -49,7 +52,7 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 	}
 
 	setRules(rules: RichTextRuleModel[]) {
-		this.#rules.next(rules);
+		this.#rules.next(rules.map((r, i) => ({ ...r, sortOrder: i })));
 		this.sendRulesGetContent();
 	}
 
@@ -73,7 +76,7 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 		}
 
 		if (rules.data) {
-			this.#rules.next(rules.data.rules ?? []);
+			this.#rules.next(rules.data.rules?.map((r, i) => ({ ...r, sortOrder: i })) ?? []);
 		}
 	}
 
@@ -88,15 +91,25 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 	}
 
 	async sendContentGetRules() {
+		if (!this.getData()?.content) return;
 
-		if (!this.getData()?.content) return Promise.reject('There is no content to extract rules from...');
-		
 		const requestBody = {
 			content: this.getData()?.content,
 		};
 
 		const { data } = await this.repository.extractStylesheetRules(requestBody);
 		this.setRules(data?.rules ?? []);
+	}
+
+	findNewSortOrder(rule: RichTextRuleModel, newIndex: number) {
+		const rules = [...this.getRules()].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+		const oldIndex = rules.findIndex((r) => r.name === rule.name);
+
+		if (oldIndex === -1) return false;
+		rules.splice(oldIndex, 1);
+		rules.splice(newIndex, 0, rule);
+		this.setRules(rules.map((r, i) => ({ ...r, sortOrder: i })));
+		return true;
 	}
 
 	public async save() {
@@ -130,8 +143,8 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 			path: parentKey ?? '',
 			content: '',
 		};
-		this.setIsNew(true);
 		this.#data.next(newStylesheet);
+		this.setIsNew(true);
 	}
 
 	public destroy(): void {
