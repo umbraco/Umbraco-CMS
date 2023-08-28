@@ -1,14 +1,11 @@
-import { UmbDataTypeWorkspaceContext } from "../workspace/data-type-workspace.context.js";
 import { DocumentVariantResponseModel } from "@umbraco-cms/backoffice/backend-api";
 import { UmbBaseController, UmbControllerHost } from "@umbraco-cms/backoffice/controller-api";
-import { PropertyEditorConfigProperty } from "@umbraco-cms/backoffice/extension-registry";
-import { Observable } from "@umbraco-cms/backoffice/external/rxjs";
 import { UmbObjectState } from "@umbraco-cms/backoffice/observable-api";
-import { UMB_DATASET_CONTEXT, UmbDatasetContext } from "@umbraco-cms/backoffice/workspace";
+import { UMB_DATASET_CONTEXT, UmbDatasetContext, UmbInvariantableWorkspaceContextInterface } from "@umbraco-cms/backoffice/workspace";
 
-export class UmbDataTypeDatasetContext extends UmbBaseController implements UmbDatasetContext {
+export class UmbInvariantDatasetContext extends UmbBaseController implements UmbDatasetContext {
 
-	#workspace: UmbDataTypeWorkspaceContext;
+	#workspace: UmbInvariantableWorkspaceContextInterface;
 
 	#currentVariant = new UmbObjectState<DocumentVariantResponseModel | undefined>(undefined);
 	currentVariant = this.#currentVariant.asObservable();
@@ -16,8 +13,6 @@ export class UmbDataTypeDatasetContext extends UmbBaseController implements UmbD
 	name = this.#currentVariant.asObservablePart((x) => x?.name);
 	culture = this.#currentVariant.asObservablePart((x) => x?.culture);
 	segment = this.#currentVariant.asObservablePart((x) => x?.segment);
-
-	properties: Observable<Array<PropertyEditorConfigProperty> | undefined>;
 
 	// default data:
 
@@ -37,12 +32,10 @@ export class UmbDataTypeDatasetContext extends UmbBaseController implements UmbD
 
 
 
-	constructor(host: UmbControllerHost, workspace: UmbDataTypeWorkspaceContext) {
+	constructor(host: UmbControllerHost, workspace: UmbInvariantableWorkspaceContextInterface) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
 		super(host, 'dataSetContext');
 		this.#workspace = workspace;
-
-		this.properties = this.#workspace.properties;
 
 		// TODO: Refactor: use the document dataset context token.
 		this.provideContext(UMB_DATASET_CONTEXT, this);

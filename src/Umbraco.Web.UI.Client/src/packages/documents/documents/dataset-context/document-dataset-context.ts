@@ -6,6 +6,7 @@ import { UmbObjectState } from "@umbraco-cms/backoffice/observable-api";
 import { UmbVariantId } from "@umbraco-cms/backoffice/variant";
 import { UMB_DATASET_CONTEXT, UmbVariantDatasetContext } from "@umbraco-cms/backoffice/workspace";
 
+// TODO: This code can be split into a UmbContentTypeDatasetContext, leaving just the publishing state and methods to this class.
 export class UmbDocumentDatasetContext extends UmbBaseController implements UmbVariantDatasetContext {
 
 	#workspace: UmbDocumentWorkspaceContext;

@@ -1,6 +1,5 @@
 import { UmbDataTypeRepository } from '../repository/data-type.repository.js';
-import { UmbDataTypeDatasetContext } from '../index.js';
-import { UmbInvariableWorkspaceContextInterface, UmbWorkspaceContext, UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbInvariantDatasetContext, UmbInvariantableWorkspaceContextInterface, UmbWorkspaceContext, UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { appendToFrozenArray, UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -11,7 +10,7 @@ import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffic
 
 export class UmbDataTypeWorkspaceContext
 	extends UmbWorkspaceContext<UmbDataTypeRepository, DataTypeResponseModel>
-	implements UmbInvariableWorkspaceContextInterface<DataTypeResponseModel | undefined>
+	implements UmbInvariantableWorkspaceContextInterface<DataTypeResponseModel | undefined>
 {
 	// TODO: revisit. temp solution because the create and response models are different.
 	#data = new UmbObjectState<DataTypeResponseModel | undefined>(undefined);
@@ -100,8 +99,8 @@ export class UmbDataTypeWorkspaceContext
 		return this._configDefaultData?.find((x) => x.alias === alias)?.value;
 	}
 
-	createDatasetContext(host: UmbControllerHost): UmbDataTypeDatasetContext {
-		return new UmbDataTypeDatasetContext(host, this);
+	createDatasetContext(host: UmbControllerHost): UmbInvariantDatasetContext {
+		return new UmbInvariantDatasetContext(host, this);
 	}
 
 	async load(id: string) {

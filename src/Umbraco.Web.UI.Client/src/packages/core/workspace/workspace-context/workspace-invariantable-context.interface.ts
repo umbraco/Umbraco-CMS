@@ -3,7 +3,7 @@ import type { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export interface UmbInvariableWorkspaceContextInterface<T = unknown>
+export interface UmbInvariantableWorkspaceContextInterface<T = unknown>
 	extends UmbSaveableWorkspaceContextInterface<T> {
 
 	// Name:
