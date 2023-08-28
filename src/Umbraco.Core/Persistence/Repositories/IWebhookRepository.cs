@@ -2,6 +2,6 @@
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
-public interface IWebhookRepository : IReadWriteQueryRepository<int, Webhook>
+public interface IWebhookRepository : IReadWriteQueryRepository<Guid, Webhook>
 {
 }

@@ -7,7 +7,7 @@ internal static class WebhookFactory
 {
     public static Webhook BuildEntity(WebhookDto dto)
     {
-        var entity = new Webhook(dto.Url, dto.Event, dto.EntityKey);
+        var entity = new Webhook(dto.Url, Enum.Parse<WebhookEvent>(dto.Event), dto.EntityKey);
 
         try
         {
@@ -31,7 +31,7 @@ internal static class WebhookFactory
         var dto = new WebhookDto
         {
             Url = webhook.Url,
-            Event = webhook.Event,
+            Event = webhook.Event.ToString(),
             EntityKey = webhook.EntityKey,
             Key = webhook.Key,
         };

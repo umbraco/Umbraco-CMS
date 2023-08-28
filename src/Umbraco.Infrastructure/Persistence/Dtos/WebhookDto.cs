@@ -1,6 +1,5 @@
 ﻿using NPoco;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -25,7 +24,7 @@ internal class WebhookDto
 
     [Column(Name = "event")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    public WebhookEvent Event { get; set; }
+    public string Event { get; set; } = string.Empty;
 
     [Column(Name = "entityKey")]
     public Guid EntityKey { get; set; }

@@ -13,13 +13,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-public class WebhookRepository : EntityRepositoryBase<int, Webhook>, IWebhookRepository
+public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRepository
 {
-    public WebhookRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger<EntityRepositoryBase<int, Webhook>> logger) : base(scopeAccessor, appCaches, logger)
+    public WebhookRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger<EntityRepositoryBase<Guid, Webhook>> logger) : base(scopeAccessor, appCaches, logger)
     {
     }
 
-    protected override Webhook? PerformGet(int id)
+    protected override Webhook? PerformGet(Guid id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
         sql.Where(GetBaseWhereClause(), new { Id = id });
@@ -30,7 +30,7 @@ public class WebhookRepository : EntityRepositoryBase<int, Webhook>, IWebhookRep
             : DtoToEntity(dto);
     }
 
-    protected override IEnumerable<Webhook> PerformGetAll(params int[]? ids)
+    protected override IEnumerable<Webhook> PerformGetAll(params Guid[]? ids)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
 
@@ -86,7 +86,7 @@ public class WebhookRepository : EntityRepositoryBase<int, Webhook>, IWebhookRep
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Webhook}.id = @id";
+    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Webhook}.key = @key";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
