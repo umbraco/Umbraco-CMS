@@ -14,5 +14,8 @@ public enum ContentPublishingOperationStatus
     FailedAwaitingRelease,
     FailedCultureAwaitingRelease,
     FailedIsTrashed,
-    FailedPathNotPublished
+    FailedPathNotPublished,
+    SuccessPublishAlready,
+    FailedPublishCancelledByEvent,
+    FailedPublishContentInvalid
 }

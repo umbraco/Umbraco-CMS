@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -160,10 +161,259 @@ public class ContentPublishingService : IContentPublishingService
         return Attempt.Fail(contentPublishingOperationStatus);
     }
 
+    public async Task<Attempt<ContentPublishingOperationStatus>> PublishBranch(Guid id, bool force, Guid userKey, string culture = "*")
+    {
+        IContent? content = _contentService.GetById(id);
+        if (content is null)
+        {
+            return Attempt.Fail(ContentPublishingOperationStatus.ContentNotFound);
+        }
+
+        // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
+        // and not to == them, else we would be comparing references, and that is a bad thing
+
+        // determines whether the document is edited, and thus needs to be published,
+        // for the specified culture (it may be edited for other cultures and that
+        // should not trigger a publish).
+
+        // determines cultures to be published
+        // can be: null (content is not impacted), an empty set (content is impacted but already published), or cultures
+        HashSet<string>? ShouldPublish(IContent c)
+        {
+            var isRoot = c.Id == content.Id;
+            HashSet<string>? culturesToPublish = null;
+
+            // invariant content type
+            if (!c.ContentType.VariesByCulture())
+            {
+                return SaveAndPublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force);
+            }
+
+            // variant content type, specific culture
+            if (culture != "*")
+            {
+                return SaveAndPublishBranch_ShouldPublish(ref culturesToPublish, culture, c.IsCulturePublished(culture), c.IsCultureEdited(culture), isRoot, force);
+            }
+
+            // variant content type, all cultures
+            if (c.Published)
+            {
+                // then some (and maybe all) cultures will be 'already published' (unless forcing),
+                // others will have to 'republish this culture'
+                foreach (var x in c.AvailableCultures)
+                {
+                    SaveAndPublishBranch_ShouldPublish(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, force);
+                }
+
+                return culturesToPublish;
+            }
+
+            // if not published, publish if force/root else do nothing
+            return force || isRoot
+                ? new HashSet<string> { "*" } // "*" means 'publish all'
+                : null; // null means 'nothing to do'
+        }
+
+        return Attempt.Succeed((await SaveAndPublishBranch(content, force, ShouldPublish, SaveAndPublishBranch_PublishCultures, userKey)).First());
+    }
+
+    public Task<Attempt<ContentPublishingOperationStatus>> PublishBranch(Guid id, bool force, Guid userKey, string[] cultures) => throw new NotImplementedException();
+
+    internal async Task<IEnumerable<ContentPublishingOperationStatus>> SaveAndPublishBranch(
+        IContent document,
+        bool force,
+        Func<IContent, HashSet<string>?> shouldPublish,
+        Func<IContent, HashSet<string>, IReadOnlyCollection<ILanguage>, bool> publishCultures,
+        Guid userKey)
+    {
+        if (shouldPublish == null)
+        {
+            throw new ArgumentNullException(nameof(shouldPublish));
+        }
+
+        if (publishCultures == null)
+        {
+            throw new ArgumentNullException(nameof(publishCultures));
+        }
+
+        EventMessages eventMessages = _eventMessagesFactory.Get();
+        var results = new List<ContentPublishingOperationStatus>();
+        var publishedDocuments = new List<IContent>();
+
+        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
+        {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
+            var allLangs = await _languageService.GetAllAsync();
+
+            if (!document.HasIdentity)
+            {
+                throw new InvalidOperationException("Cannot not branch-publish a new document.");
+            }
+
+            PublishedState publishedState = document.PublishedState;
+            if (publishedState == PublishedState.Publishing)
+            {
+                throw new InvalidOperationException("Cannot mix PublishCulture and SaveAndPublishBranch.");
+            }
+
+            // deal with the branch root - if it fails, abort
+            ContentPublishingOperationStatus result = SaveAndPublishBranchItem(scope, document, shouldPublish, publishCultures, true, publishedDocuments, eventMessages, userKey, allLangs.ToList());
+            results.Add(result);
+            if (result is not ContentPublishingOperationStatus.Success)
+            {
+                return results;
+            }
+
+                // deal with descendants
+            // if one fails, abort its branch
+            var exclude = new HashSet<int>();
+
+            int count;
+            var page = 0;
+            const int pageSize = 100;
+            do
+            {
+                count = 0;
+
+                // important to order by Path ASC so make it explicit in case defaults change
+                // ReSharper disable once RedundantArgumentDefaultValue
+                foreach (IContent d in GetPagedDescendants(document.Id, page, pageSize, out _, ordering: Ordering.By("Path", Direction.Ascending)))
+                {
+                    count++;
+
+                    // if parent is excluded, exclude child too
+                    if (exclude.Contains(d.ParentId))
+                    {
+                        exclude.Add(d.Id);
+                        continue;
+                    }
+
+                    // no need to check path here, parent has to be published here
+                    result = SaveAndPublishBranchItem(scope, d, shouldPublish, publishCultures, false, publishedDocuments, eventMessages, userKey, allLangs.ToList());
+                    results.Add(result);
+                    if (result != ContentPublishingOperationStatus.Success)
+                    {
+                        continue;
+                    }
+
+                    // if we could not publish the document, cut its branch
+                    exclude.Add(d.Id);
+                }
+
+                page++;
+            }
+            while (count > 0);
+
+            // TODO use mapped userkey here
+            Audit(AuditType.Publish, -1, document.Id, "Branch published");
+
+            // trigger events for the entire branch
+            // (SaveAndPublishBranchOne does *not* do it)
+            scope.Notifications.Publish(
+                new ContentTreeChangeNotification(document, TreeChangeTypes.RefreshBranch, eventMessages));
+            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages, true));
+
+            scope.Complete();
+        }
+
+        return results;
+    }
+
+    // shouldPublish: a function determining whether the document has changes that need to be published
+    //  note - 'force' is handled by 'editing'
+    // publishValues: a function publishing values (using the appropriate PublishCulture calls)
+    private ContentPublishingOperationStatus SaveAndPublishBranchItem(
+        ICoreScope scope,
+        IContent document,
+        Func<IContent, HashSet<string>?> shouldPublish,
+        Func<IContent, HashSet<string>, IReadOnlyCollection<ILanguage>, bool> publishCultures,
+        bool isRoot,
+        ICollection<IContent> publishedDocuments,
+        EventMessages evtMsgs,
+        Guid userKey,
+        IReadOnlyCollection<ILanguage> allLangs)
+    {
+        HashSet<string>? culturesToPublish = shouldPublish(document);
+
+        // null = do not include
+        if (culturesToPublish == null)
+        {
+            return ContentPublishingOperationStatus.FailedNothingToPublish;
+        }
+
+        // empty = already published
+        if (culturesToPublish.Count == 0)
+        {
+            return ContentPublishingOperationStatus.SuccessPublishAlready;
+        }
+
+        var savingNotification = new ContentSavingNotification(document, evtMsgs);
+        if (scope.Notifications.PublishCancelable(savingNotification))
+        {
+            return ContentPublishingOperationStatus.FailedPublishCancelledByEvent;
+        }
+
+        // publish & check if values are valid
+        if (!publishCultures(document, culturesToPublish, allLangs))
+        {
+            // TODO: Based on this callback behavior there is no way to know which properties may have been invalid if this failed, see other results of FailedPublishContentInvalid
+            return ContentPublishingOperationStatus.FailedPublishContentInvalid;
+        }
+
+        ContentPublishingOperationStatus result = Publish(document, allLangs, userKey, scope, true, isRoot);
+        if (result == ContentPublishingOperationStatus.Success || result == ContentPublishingOperationStatus.SuccessPublishCulture)
+        {
+            publishedDocuments.Add(document);
+        }
+
+        return result;
+    }
+
+    // utility 'ShouldPublish' func used by SaveAndPublishBranch
+    private HashSet<string>? SaveAndPublishBranch_ShouldPublish(ref HashSet<string>? cultures, string c, bool published, bool edited, bool isRoot, bool force)
+    {
+        // if published, republish
+        if (published)
+        {
+            if (cultures == null)
+            {
+                cultures = new HashSet<string>(); // empty means 'already published'
+            }
+
+            if (edited)
+            {
+                cultures.Add(c); // <culture> means 'republish this culture'
+            }
+
+            return cultures;
+        }
+
+        // if not published, publish if force/root else do nothing
+        if (!force && !isRoot)
+        {
+            return cultures; // null means 'nothing to do'
+        }
+
+        if (cultures == null)
+        {
+            cultures = new HashSet<string>();
+        }
+
+        cultures.Add(c); // <culture> means 'publish this culture'
+        return cultures;
+    }
+
+    // utility 'PublishCultures' func used by SaveAndPublishBranch
+    private bool SaveAndPublishBranch_PublishCultures(IContent content, HashSet<string> culturesToPublish, IReadOnlyCollection<ILanguage> allLangs)
+    {
+        return content.PublishCulture(_cultureImpactFactory.ImpactInvariant());
+    }
+
     private bool IsDefaultCulture(IEnumerable<ILanguage>? langs, string culture) =>
         langs?.Any(x => x.IsDefault && x.IsoCode.InvariantEquals(culture)) ?? false;
 
-        private ContentPublishingOperationStatus Publish(IContent content, IEnumerable<ILanguage> languages, Guid userKey, ICoreScope scope, bool branchOne = false, bool branchRoot = false)
+    private ContentPublishingOperationStatus Publish(IContent content, IEnumerable<ILanguage> languages, Guid userKey, ICoreScope scope, bool branchOne = false, bool branchRoot = false)
     {
         var userId = -1;
         PublishResult? unpublishResult = null;
