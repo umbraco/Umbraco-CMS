@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Models;
 
 public class UserForgotPasswordMessage
 {
-    public required Uri InviteUri { get; set; }
+    public required Uri ForgotPasswordUri { get; set; }
 
     public required IUser Recipient { get; set; }
 }

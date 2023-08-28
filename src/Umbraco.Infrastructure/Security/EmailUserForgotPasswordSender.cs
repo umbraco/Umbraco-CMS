@@ -51,7 +51,7 @@ public class EmailUserForgotPasswordSender : IUserForgotPasswordSender
         string?[] bodyTokes =
         {
             messageModel.Recipient.Username,
-            messageModel.InviteUri.ToString(),
+            messageModel.ForgotPasswordUri.ToString(),
             senderEmail,
         };
 

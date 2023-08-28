@@ -713,7 +713,7 @@ internal class UserService : RepositoryService, IUserService
 
         var message = new UserForgotPasswordMessage
         {
-            InviteUri = uriAttempt.Result,
+            ForgotPasswordUri = uriAttempt.Result,
             Recipient = user,
         };
         await _forgotPasswordSender.SendForgotPassword(message);
