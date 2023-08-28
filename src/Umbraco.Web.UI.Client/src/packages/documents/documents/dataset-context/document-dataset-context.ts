@@ -23,7 +23,9 @@ export class UmbDocumentDatasetContext extends UmbBaseController implements UmbV
 	segment = this.#currentVariant.asObservablePart((x) => x?.segment);
 
 	// TODO: Refactor: Make a properties observable. (with such I think i mean a property value object array.. array with object with properties, alias, value, culture and segment)
-
+	// TO make such happen I think we need to maintain all properties and their value of this object.
+	// This will actually make it simpler if multiple are watching the same property.
+	// But it will also mean that we wil watch all properties and their structure, for variantID, all the time for all of the properties.
 
 
 	getType(): string {
