@@ -397,5 +397,9 @@ public interface IUserService : IMembershipUserService
     /// <param name="password">The new password of the user.</param>
     Task<Attempt<PasswordChangedModel, UserOperationStatus>> ResetPasswordAsync(Guid userKey, string token, string password);
 
-    Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string modelEmail);
+    /// <summary>
+    ///     Sends an email with a link to reset user's password.
+    /// </summary>
+    /// <param name="userEmail">The email address of the user.</param>
+    Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail);
 }

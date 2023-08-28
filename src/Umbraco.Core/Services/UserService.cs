@@ -684,7 +684,7 @@ internal class UserService : RepositoryService, IUserService
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, creationResult);
     }
 
-    public async Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string email)
+    public async Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail)
     {
         if (_forgotPasswordSender.CanSend() is false)
         {
@@ -697,7 +697,7 @@ internal class UserService : RepositoryService, IUserService
         ICoreBackOfficeUserManager userManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
         IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
-        IUser? user = await userStore.GetByEmailAsync(email);
+        IUser? user = await userStore.GetByEmailAsync(userEmail);
 
         if (user is null)
         {
