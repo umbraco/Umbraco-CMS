@@ -50,6 +50,14 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Content is in the recycle bin")
                 .WithDetail("Could not perform the operation because the targeted content was in the recycle bin.")
                 .Build()),
+            ContentEditingOperationStatus.NotInTrash => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Content is not in the recycle bin")
+                .WithDetail("The attempted operation requires the targeted content to be in the recycle bin.")
+                .Build()),
+            ContentEditingOperationStatus.SortingInvalid => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid sorting options")
+                .WithDetail("The supplied sorting operations were invalid. Additional details can be found in the log.")
+                .Build()),
             ContentEditingOperationStatus.Unknown => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown error. Please see the log for more details.")
                 .Build()),
