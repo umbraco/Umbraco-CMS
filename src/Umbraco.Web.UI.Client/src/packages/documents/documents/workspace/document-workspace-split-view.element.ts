@@ -5,7 +5,7 @@ import { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-document-workspace-split-view')
 export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
-	// TOOD: Refactor: use the split view context token:
+	// TODO: Refactor: use the split view context token:
 	private _workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
@@ -14,6 +14,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		// TODO: Refactor: use a split view workspace context token:
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;
 			this._observeActiveVariantInfo();
