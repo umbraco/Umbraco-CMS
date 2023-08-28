@@ -115,7 +115,7 @@ export class UmbDocumentWorkspaceViewEditElement
 		if (!this._routes || !this._tabs) return;
 		return html`
 			<umb-body-layout header-fit-height>
-				${this._routerPath && (this._tabs.length > 0 || this._hasRootGroups)
+				${this._routerPath && (this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups))
 					? html` <uui-tab-group slot="header">
 							${this._hasRootGroups && this._tabs.length > 0
 								? html`
