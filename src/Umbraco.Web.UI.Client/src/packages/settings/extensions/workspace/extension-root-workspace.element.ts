@@ -76,7 +76,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 								<uui-table-row>
 									<uui-table-cell>${extension.type}</uui-table-cell>
 									<uui-table-cell>
-										${isManifestElementNameType(extension) ? extension.name : `[Custom extension] ${extension.name}`}
+										${extension.name}
 									</uui-table-cell>
 									<uui-table-cell>${extension.alias}</uui-table-cell>
 									<uui-table-cell>${extension.weight ? extension.weight : ''} </uui-table-cell>
