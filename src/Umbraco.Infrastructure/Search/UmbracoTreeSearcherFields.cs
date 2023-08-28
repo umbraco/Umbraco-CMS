@@ -74,6 +74,8 @@ public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
             fields.Add(field);
         }
 
+        fields.Add(UmbracoExamineFieldNames.PublishedFieldName);
+
         return fields;
     }
 }
