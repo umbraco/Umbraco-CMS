@@ -93,7 +93,6 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContentBase>, IConten
                 },
                 { "urlName", urlValue?.Yield() ?? Enumerable.Empty<string>() }, // Always add invariant urlName
                 { "path", c.Path.Yield() },
-
                 { UmbracoSearchFieldNames.IndexPathFieldName, c.Path.Yield() },
                 { "searchablePath", c.Path?.Split(',') ?? Enumerable.Empty<string>() },
                 { "nodeType", c.ContentType.Id.ToString().Yield() },
@@ -109,6 +108,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContentBase>, IConten
                         : "??")
                     .Yield()
                 },
+                { UmbracoSearchFieldNames.ItemTypeFieldName, new object[] { c.ContentType.Alias } },
                 { "writerID", new object[] { c.WriterId } },
                 { "templateID", new object[] { c.TemplateId ?? 0 } },
                 { UmbracoSearchFieldNames.VariesByCultureFieldName, NoValue },

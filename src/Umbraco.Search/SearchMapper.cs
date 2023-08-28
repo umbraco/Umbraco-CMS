@@ -97,6 +97,7 @@ public class SearchMapper : IMapDefinition
 
         if (source.Values.ContainsKey(UmbracoSearchFieldNames.ItemTypeFieldName))
         {
+
             target.AdditionalData.Add("contentType", source.Values[UmbracoSearchFieldNames.ItemTypeFieldName]);
         }
     }

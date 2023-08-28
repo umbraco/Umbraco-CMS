@@ -58,6 +58,11 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
                         {
                             content.ContentTypeId.ToString()
                         }, // required for correct content type change handling
+                    [UmbracoSearchFieldNames.ItemTypeFieldName] =
+                        new object[]
+                        {
+                            content.ContentType.Alias
+                        },
                     [UmbracoSearchFieldNames.DeliveryApiContentIndex.Culture] =
                         new object[] { indexCulture }, // required for culture variant querying
                     [UmbracoSearchFieldNames.IndexPathFieldName] =
