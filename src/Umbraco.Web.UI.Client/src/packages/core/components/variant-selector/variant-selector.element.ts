@@ -6,6 +6,7 @@ import {
 	UMB_WORKSPACE_SPLIT_VIEW_CONTEXT,
 	UMB_VARIANT_DATASET_CONTEXT,
 	ActiveVariant,
+	IsNameableDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentVariantResponseModel, ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
@@ -122,10 +123,8 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
-			if (typeof target?.value === 'string') {
-				// TODO: Refactor: find a good way to mix these features... maybe we should request the context multiple times? or find a way to mix the discriminators? or a way to investigate the context for features?
-				alert("cannot set name currently.")
-				//this.#datasetContext?.setName(target.value);
+			if (typeof target?.value === 'string' && this.#datasetContext && IsNameableDatasetContext(this.#datasetContext)) {
+				this.#datasetContext.setName(target.value);
 			}
 		}
 	}

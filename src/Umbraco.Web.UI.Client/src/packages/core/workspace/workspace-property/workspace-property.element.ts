@@ -2,7 +2,6 @@ import { type UmbDataTypeConfig } from '../../property-editor/index.js';
 import { UmbWorkspacePropertyContext } from './workspace-property.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';

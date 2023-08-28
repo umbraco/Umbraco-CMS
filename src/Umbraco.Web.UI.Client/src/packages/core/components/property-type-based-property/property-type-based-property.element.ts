@@ -31,25 +31,6 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	private _dataTypeRepository: UmbDataTypeRepository = new UmbDataTypeRepository(this);
 	private _dataTypeObserver?: UmbObserverController<DataTypeResponseModel | undefined>;
 
-	/**
-	 * propertyVariantId. A VariantID to identify which the variant of this properties value.
-	 * @public
-	 * @type {UmbVariantId}
-	 * @attr
-	 * @default undefined
-	 */
-	// TODO: Refactor: this can be simplified..
-	@property({ type: Object, attribute: false })
-	public get propertyVariantId(): UmbVariantId | undefined {
-		return this._propertyVariantId;
-	}
-	public set propertyVariantId(value: UmbVariantId | undefined) {
-		const oldValue = this._propertyVariantId;
-		if (value && oldValue?.equal(value)) return;
-		this._propertyVariantId = value;
-		this.requestUpdate('propertyVariantId', oldValue);
-	}
-	private _propertyVariantId?: UmbVariantId | undefined;
 
 
 	private async _observeDataType(dataTypeId?: string) {
@@ -87,7 +68,6 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			label=${ifDefined(this._property?.name)}
 			description=${ifDefined(this._property?.description || undefined)}
 			property-editor-ui-alias=${ifDefined(this._propertyEditorUiAlias)}
-			.propertyVariantId=${this.propertyVariantId}
 			.config=${this._dataTypeData}></umb-workspace-property>`;
 	}
 

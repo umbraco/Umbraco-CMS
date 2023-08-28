@@ -9,8 +9,9 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_DATA_TYPE_DATASET_CONTEXT } from '@umbraco-cms/backoffice/data-type';
 
 /**
- *  @element umb-property-editor-config
- *  @description - Element for displaying the configuration for a Property Editor based on a Property Editor UI Alias and a Property Editor Model alias.
+ * @element umb-property-editor-config
+ * @description - Element for displaying the configuration for a Property Editor based on a Property Editor UI Alias and a Property Editor Model alias.
+ * This element requires a UMB_DATA_TYPE_WORKSPACE_CONTEXT to be present.
  */
 @customElement('umb-property-editor-config')
 export class UmbPropertyEditorConfigElement extends UmbLitElement {
@@ -35,7 +36,6 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (instance) => {
-			console.log("config got context, but has already?...", this.#datasetContext)
 			this.#datasetContext = instance.createDatasetContext(this);
 			this.observe(this.#datasetContext.properties, (properties) => {
 				this._properties = properties as Array<PropertyEditorConfigProperty>;
@@ -43,15 +43,6 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 		});
 
 	}
-
-	/**
-	 * Get the stored value for a property. It will render the default value from the configuration if no value is stored in the database.
-	 */
-	// TODO: Refactor: setup a dataset for this, otherwise we cannot ensure features, neither the right reactivity.
-	// TODO: Refactor: move the default data and getting the property config etc. to the workspace.
-	/**
-	Create a dataset context for this one. Feed if with fallback/default values.
-	 */
 
 	render() {
 		return html`
