@@ -789,22 +789,6 @@ namespace Umbraco.Web.Editors
                     continue;
                 }
 
-                var fileInfo = new FileInfo(file.LocalFileName);
-                var mediaFileStream = fileInfo.OpenReadWithRetry();
-                if (mediaFileStream == null)
-                {
-                    throw new InvalidOperationException("Could not acquire file stream");
-                }
-
-                if (_fileStreamSecurityValidator != null && _fileStreamSecurityValidator.IsConsideredSafe(mediaFileStream) is false)
-                {
-                    tempFiles.Notifications.Add(new Notification(
-                        localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
-                        localizedTextService.Localize("media", "fileSecurityValidationFailure"),
-                        NotificationStyle.Warning));
-                    continue;
-                }
-
                 if (string.IsNullOrEmpty(mediaTypeAlias))
                 {
                     mediaTypeAlias = Constants.Conventions.MediaTypes.File;
@@ -859,10 +843,24 @@ namespace Umbraco.Web.Editors
                     continue;
                 }
 
+                var fileInfo = new FileInfo(file.LocalFileName);
+                var mediaFileStream = fileInfo.OpenReadWithRetry();
+                if (mediaFileStream == null)
+                {
+                    throw new InvalidOperationException("Could not acquire file stream");
+                }
+
+                if (_fileStreamSecurityValidator != null && _fileStreamSecurityValidator.IsConsideredSafe(mediaFileStream) is false)
+                {
+                    tempFiles.Notifications.Add(new Notification(
+                        localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
+                        localizedTextService.Localize("media", "fileSecurityValidationFailure"),
+                        NotificationStyle.Warning));
+                    continue;
+                }
+
                 var mediaItemName = fileName.ToFriendlyName();
-
                 var createdMediaItem = mediaService.CreateMedia(mediaItemName, parentId, mediaTypeAlias, Security.CurrentUser.Id);
-
                 using (mediaFileStream)
                 {
                     createdMediaItem.SetValue(Services.ContentTypeBaseServices, Constants.Conventions.Media.File, fileName, mediaFileStream);
