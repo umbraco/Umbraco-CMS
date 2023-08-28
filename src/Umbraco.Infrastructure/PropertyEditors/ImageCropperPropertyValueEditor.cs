@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -24,6 +25,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core vs web?
 {
     private readonly IDataTypeService _dataTypeService;
+    private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
     private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
     private ContentSettings _contentSettings;
@@ -37,13 +39,15 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         IOptionsMonitor<ContentSettings> contentSettings,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
-        IDataTypeService dataTypeService)
+        IDataTypeService dataTypeService,
+        IFileStreamSecurityValidator fileStreamSecurityValidator)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
         _contentSettings = contentSettings.CurrentValue;
         _dataTypeService = dataTypeService;
+        _fileStreamSecurityValidator = fileStreamSecurityValidator;
         contentSettings.OnChange(x => _contentSettings = x);
     }
 
@@ -236,6 +240,11 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
 
         using (FileStream filestream = File.OpenRead(file.TempFilePath))
         {
+            if (_fileStreamSecurityValidator.IsConsideredSafe(filestream) == false)
+            {
+                return null;
+            }
+
             // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
             // since we'd need to be able to return values for other properties from these methods
             _mediaFileManager.FileSystem.AddFile(filepath, filestream, true); // must overwrite!

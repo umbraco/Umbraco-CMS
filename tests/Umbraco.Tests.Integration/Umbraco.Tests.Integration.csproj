@@ -21,6 +21,11 @@
   <Import Project="..\..\src\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Umbraco.Cms\Umbraco.Cms.csproj" />
+    <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Update="Umbraco.Examine.Lucene\UmbracoExamine\TestFiles.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
