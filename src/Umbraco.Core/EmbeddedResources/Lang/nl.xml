@@ -340,6 +340,7 @@
     <key alias="renameFolderFailed">Kan de map met id %0% niet hernoemen</key>
     <key alias="dragAndDropYourFilesIntoTheArea">Sleep en zet je bestand(en) neer in dit gebied</key>
     <key alias="uploadNotAllowed">Upload is niet toegelaten in deze locatie.</key>
+    <key alias="fileSecurityValidationFailure">Een of meerdere veiligheid validaties zijn gefaald voor het bestand</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Maak nieuw lid aan</key>
@@ -698,7 +699,7 @@
     <key alias="close">Sluiten</key>
     <key alias="closewindow">Sluit venster</key>
     <key alias="closepane">Sluit paneel</key>
-    <key alias="comment">Comment</key>
+    <key alias="comment">Commentaar</key>
     <key alias="confirm">Bevestig</key>
     <key alias="constrain">Beperken</key>
     <key alias="constrainProportions">Verhoudingen behouden</key>
