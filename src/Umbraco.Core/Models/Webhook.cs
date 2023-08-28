@@ -9,14 +9,12 @@ public class Webhook : EntityBase
 {
     private string _url;
     private WebhookEvent _webHookEvent;
-    private string _entityName;
     private Guid _entityKey;
 
-    public Webhook(string url, WebhookEvent webHookEvent, string entityName, Guid entityKey)
+    public Webhook(string url, WebhookEvent webHookEvent, Guid entityKey)
     {
         _url = url;
         _webHookEvent = webHookEvent;
-        _entityName = entityName;
         _entityKey = entityKey;
     }
 
