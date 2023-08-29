@@ -19,10 +19,10 @@ public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRe
     {
     }
 
-    protected override Webhook? PerformGet(Guid id)
+    protected override Webhook? PerformGet(Guid key)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
-        sql.Where(GetBaseWhereClause(), new { Id = id });
+        sql.Where(GetBaseWhereClause(), new { key });
 
         WebhookDto? dto = Database.First<WebhookDto>(sql);
         return dto == null
@@ -86,7 +86,7 @@ public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRe
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Webhook}.key = @key";
+    protected override string GetBaseWhereClause() => "key = @key";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {

@@ -15,13 +15,13 @@ public class WebhookService : IWebHookService
         _coreScopeProvider = coreScopeProvider;
     }
 
-    public Task CreateAsync(Webhook webhook)
+    public Task<Webhook> CreateAsync(Webhook webhook)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         _webhookRepository.Save(webhook);
         scope.Complete();
 
-        return Task.CompletedTask;
+        return Task.FromResult(webhook);
     }
 
     public Task DeleteAsync(Webhook webhook)

@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Services;
 
 public interface IWebHookService
 {
-    Task CreateAsync(Webhook webhook);
+    Task<Webhook> CreateAsync(Webhook webhook);
 
     Task DeleteAsync(Webhook webhook);
 
