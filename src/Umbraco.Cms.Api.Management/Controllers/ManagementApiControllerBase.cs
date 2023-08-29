@@ -13,6 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers;
 [Authorize(Policy = "New" + AuthorizationPolicies.BackOfficeAccess)]
 [MapToApi(ManagementApiConfiguration.ApiName)]
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
+[Produces("application/json")]
 public abstract class ManagementApiControllerBase : Controller
 {
     protected CreatedAtActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, Guid id)
