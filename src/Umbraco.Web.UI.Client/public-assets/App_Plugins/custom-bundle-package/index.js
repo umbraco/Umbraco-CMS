@@ -9,5 +9,5 @@ export const manifests = [
 			label: 'My Bundle Section',
 			pathname: 'my-custom-bundle',
 		},
-	},
+	}
 ];
