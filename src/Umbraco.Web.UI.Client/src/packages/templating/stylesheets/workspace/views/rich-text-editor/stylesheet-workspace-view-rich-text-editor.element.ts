@@ -47,11 +47,10 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 	#sorter = new UmbSorterController(this, {
 		...SORTER_CONFIG,
 		performItemInsert: ({ item, newIndex }) => {
-			//return true;
-
 			return this.#context?.findNewSortOrder(item, newIndex) ?? false;
 		},
-		performItemRemove: (args) => {
+		performItemRemove: () => {
+			//defined so the default does not run
 			return true;
 		},
 	});

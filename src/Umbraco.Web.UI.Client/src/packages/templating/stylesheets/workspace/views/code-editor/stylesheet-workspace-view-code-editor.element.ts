@@ -1,10 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
-import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-stylesheet-workspace-view-code-editor')
@@ -13,36 +12,18 @@ export class UmbStylesheetWorkspaceViewCodeEditorElement extends UmbLitElement {
 	private _content?: string | null = '';
 
 	@state()
-	private _path?: string | null = '';
-
-	@state()
 	private _ready?: boolean = false;
 
-	@query('umb-code-editor')
-	private _codeEditor?: UmbCodeEditorElement;
-
 	#stylesheetWorkspaceContext?: UmbStylesheetWorkspaceContext;
-	private _modalContext?: UmbModalManagerContext;
-
-	#isNew = false;
 
 	constructor() {
 		super();
 
-		//tODO: should this be called something else here?
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#stylesheetWorkspaceContext = workspaceContext as UmbStylesheetWorkspaceContext;
 
 			this.observe(this.#stylesheetWorkspaceContext.content, (content) => {
 				this._content = content;
-			});
-
-			this.observe(this.#stylesheetWorkspaceContext.path, (path) => {
-				this._path = path;
-			});
-
-			this.observe(this.#stylesheetWorkspaceContext.isNew, (isNew) => {
-				this.#isNew = !!isNew;
 			});
 
 			this.observe(this.#stylesheetWorkspaceContext.isCodeEditorReady, (isReady) => {
@@ -64,7 +45,6 @@ export class UmbStylesheetWorkspaceViewCodeEditorElement extends UmbLitElement {
 			.code=${this._content ?? ''}
 			@input=${this.#onCodeEditorInput}></umb-code-editor>`;
 	}
-
 
 	render() {
 		return html` <uui-box>

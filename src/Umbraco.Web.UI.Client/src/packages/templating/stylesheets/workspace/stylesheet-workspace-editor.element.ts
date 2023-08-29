@@ -24,10 +24,6 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _path?: string;
 
-	private _modalContext?: UmbModalManagerContext;
-
-	#isNew = false;
-
 	private inputQuery$ = new Subject<string>();
 
 	constructor() {
@@ -40,23 +36,12 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 				this.#workspaceContext?.setName(`${nameInputValue}.css`);
 			});
 		});
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
-			this._modalContext = instance;
-		});
 	}
 
 	#observeNameAndPath() {
 		if (!this.#workspaceContext) return;
 		this.observe(this.#workspaceContext.name, (name) => (this._name = name ?? ''), '_observeName');
 		this.observe(this.#workspaceContext.path, (path) => (this._path = path ?? ''), '_observePath');
-		this.observe(
-			this.#workspaceContext.isNew,
-			(isNew) => {
-				this.#isNew = !!isNew;
-			},
-			'_observeIsNew',
-		);
 	}
 
 	#onNameChange(event: UUIInputEvent) {
