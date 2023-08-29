@@ -86,25 +86,6 @@ export class UmbExtensionRegistry<
 	private _kinds = new UmbBasicState<Array<ManifestKind<ManifestTypes>>>([]);
 	public readonly kinds = this._kinds.asObservable();
 
-	constructor() {
-
-		setTimeout(() => {
-			this.removeOne();
-		}, 18000);
-	}
-
-	removeOne() {
-		const extensions = this._extensions.getValue();
-		const numberToRemove = Math.round(Math.random()*extensions.length);
-		console.log("remove", numberToRemove, extensions.length)
-		const newExtensionsValues = extensions.filter((extension, index) => index !== numberToRemove);
-		this._extensions.next(newExtensionsValues);
-
-		setTimeout(() => {
-			this.removeOne();
-		}, 10);
-	}
-
 	defineKind(kind: ManifestKind<ManifestTypes>) {
 		const extensionsValues = this._extensions.getValue();
 		const extension = extensionsValues.find(
