@@ -24,7 +24,7 @@ public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRe
         Sql<ISqlContext> sql = GetBaseQuery(false);
         sql.Where(GetBaseWhereClause(), new { key });
 
-        WebhookDto? dto = Database.First<WebhookDto>(sql);
+        WebhookDto? dto = Database.FirstOrDefault<WebhookDto>(sql);
         return dto == null
             ? null
             : DtoToEntity(dto);
@@ -92,9 +92,23 @@ public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRe
     {
         var list = new List<string>
         {
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.Webhook} WHERE id = @id",
+            $"DELETE FROM {Constants.DatabaseSchema.Tables.Webhook} WHERE key = @key",
         };
         return list;
+    }
+
+    protected override Guid GetEntityId(Webhook entity)
+        => entity.Key;
+
+    protected override void PersistDeletedItem(Webhook entity)
+    {
+        IEnumerable<string> deletes = GetDeleteClauses();
+        foreach (var delete in deletes)
+        {
+            Database.Execute(delete, new { key = GetEntityId(entity) });
+        }
+
+        entity.DeleteDate = DateTime.Now;
     }
 
     private static Webhook DtoToEntity(WebhookDto dto)

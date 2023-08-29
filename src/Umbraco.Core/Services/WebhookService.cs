@@ -24,10 +24,15 @@ public class WebhookService : IWebHookService
         return Task.FromResult(webhook);
     }
 
-    public Task DeleteAsync(Webhook webhook)
+    public Task DeleteAsync(Guid key)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        _webhookRepository.Delete(webhook);
+        Webhook? webhook = _webhookRepository.Get(key);
+        if (webhook is not null)
+        {
+            _webhookRepository.Delete(webhook);
+        }
+
         scope.Complete();
         return Task.CompletedTask;
     }
