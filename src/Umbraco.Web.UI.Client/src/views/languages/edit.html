@@ -21,22 +21,32 @@
                     <umb-box-content>
 
                         <umb-control-group label="@general_language" required="true">
-                            <select name="newLang"
+                            <select ng-show="!vm.language.culture || vm.language.culture === '' || vm.availableCultures[vm.language.culture]"
+                                    name="newLang"
                                     class="input-block-level"
                                     ng-model="vm.language.culture"
                                     ng-options="key as value for (key, value) in vm.availableCultures"
                                     val-server-field="IsoCode"
-                                    required></select>
+                                    required>
+                                <option value="">-- Select a language --</option>
+                            </select>
+                            <select ng-hide="!vm.language.culture || vm.language.culture === '' || vm.availableCultures[vm.language.culture]"
+                                    name="customLang"
+                                    class="input-block-level"
+                                    disabled>
+                                <option value="">Custom language.</option>
+                            </select>
                             <span ng-messages="editLanguageForm.newLang.$error" show-validation-on-submit>
                                 <span class="help-inline" ng-message="required">Required</span>
                                 <span class="help-inline" ng-message="valServerField">{{editLanguageForm.newLang.errorMsg}}</span>
                             </span>
                         </umb-control-group>
 
-                        <umb-control-group label="@languages_culture">
-                            <span ng-bind="vm.language.culture"></span>
+                        <umb-control-group label="@languages_culture" description="Iso codes are case-sensitive" required="true">
+                            <input type="text" name="language_isocode" id="language_isocode" ng-model="vm.language.culture" class="umb-textstring textstring input-block-level"
+                                required maxlength="50" placeholder="en-US"/>
                         </umb-control-group>
-
+                        
                         <umb-control-group label="@general_settings" class="umb-toggle-group">
 
                             <div class="umb-toggle-group-item" ng-click="vm.toggleDefault()" ng-class="{ 'umb-toggle-group-item--disabled': vm.initIsDefault }">
