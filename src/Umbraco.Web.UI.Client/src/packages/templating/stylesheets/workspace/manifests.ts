@@ -82,7 +82,8 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR,
 		name: 'Rich text editor style modal',
-		loader: () => import('./views/rich-text-editor/stylesheet-workspace-view-rich-text-editor-style-sidebar.js'),
+		loader: () =>
+			import('./views/rich-text-editor/stylesheet-workspace-view-rich-text-editor-style-sidebar.element.js'),
 	},
 ];
 

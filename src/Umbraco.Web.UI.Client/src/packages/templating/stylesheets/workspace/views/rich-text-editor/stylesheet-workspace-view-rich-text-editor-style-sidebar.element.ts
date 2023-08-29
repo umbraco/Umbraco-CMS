@@ -2,9 +2,10 @@ import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
+import { RichTextRuleModelSortable } from '../../stylesheet-workspace.context.js';
 
 export interface StylesheetRichTextEditorStyleModalData {
-	rule: RichTextRuleModel | null;
+	rule: RichTextRuleModelSortable | null;
 }
 
 export type StylesheetRichTextEditorStyleModalResult = NonNullable<Required<StylesheetRichTextEditorStyleModalData>>;

@@ -10,7 +10,7 @@ export type RichTextRuleModelSortable = RichTextRuleModel & { sortOrder?: number
 
 export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStylesheetRepository, StylesheetDetails> {
 	#data = new UmbObjectState<StylesheetDetails | undefined>(undefined);
-	#rules = new UmbArrayState<RichTextRuleModelSortable>([]);
+	#rules = new UmbArrayState<RichTextRuleModelSortable>([], (rule) => rule.name);
 	data = this.#data.asObservable();
 	rules = this.#rules.asObservable();
 	name = createObservablePart(this.#data, (data) => data?.name);
@@ -51,8 +51,13 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 		return this.#rules.getValue();
 	}
 
-	setRules(rules: RichTextRuleModel[]) {
-		this.#rules.next(rules.map((r, i) => ({ ...r, sortOrder: i })));
+	updateRule(unique: string, rule: RichTextRuleModelSortable) {
+		this.#rules.updateOne(unique, rule);
+	}
+
+	setRules(rules: RichTextRuleModelSortable[]) {
+		const newRules = rules.map((r, i) => ({ ...r, sortOrder: i }));
+		this.#rules.next(newRules);
 		this.sendRulesGetContent();
 	}
 
