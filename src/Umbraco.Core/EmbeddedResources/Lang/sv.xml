@@ -291,6 +291,8 @@
     <key alias="addImageCaption">Lägg till bildtext</key>
     <key alias="searchContentTree">Sök i innehållsträdet</key>
     <key alias="maxAmount">Maximalt värde</key>
+    <key alias="expandChildItems">Visa underliggande noder för</key>
+    <key alias="openContextNode">Öppna kontext för</key>
   </area>
   <area alias="prompt">
     <key alias="stay">Stanna</key>

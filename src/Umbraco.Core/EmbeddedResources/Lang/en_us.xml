@@ -2624,6 +2624,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="addImageCaption">Add image caption</key>
     <key alias="searchContentTree">Search content tree</key>
     <key alias="maxAmount">Maximum amount</key>
+    <key alias="expandChildItems">Expand child items for</key>
+    <key alias="openContextNode">Open context node for</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
