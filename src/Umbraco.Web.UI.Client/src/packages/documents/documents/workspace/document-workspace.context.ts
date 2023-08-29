@@ -208,11 +208,11 @@ export class UmbDocumentWorkspaceContext
 	}
 	*/
 
-	public createVariableDatasetContext(host: UmbControllerHost, variantId: UmbVariantId): UmbDatasetContext {
+	public createVariableDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
 		return new UmbDocumentDatasetContext(host, this, variantId);
 	}
 
-	public createDatasetContext(host: UmbControllerHost): UmbDatasetContext {
+	public createDatasetContext(host: UmbControllerHost) {
 		return new UmbDocumentDatasetContext(host, this, UmbVariantId.Create({}));
 	}
 
