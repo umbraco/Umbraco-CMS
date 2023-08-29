@@ -22,7 +22,7 @@ public class DeleteUserController : UserControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteUser(Guid id)
     {
-        UserOperationStatus result = await _userService.DeleteAsync(CurrentUserKey(_backOfficeSecurityAccessor), new HashSet<Guid>(){id});
+        UserOperationStatus result = await _userService.DeleteAsync(CurrentUserKey(_backOfficeSecurityAccessor), id);
 
         return result is UserOperationStatus.Success
             ? Ok()

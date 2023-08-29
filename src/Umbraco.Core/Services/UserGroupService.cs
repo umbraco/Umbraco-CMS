@@ -135,34 +135,47 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<UserGroupOperationStatus>> DeleteAsync(Guid key)
+    public async Task<Attempt<UserGroupOperationStatus>> DeleteAsync(ISet<Guid> keys)
     {
-        IUserGroup? userGroup = await GetAsync(key);
-
-        Attempt<UserGroupOperationStatus> validationResult = ValidateUserGroupDeletion(userGroup);
-        if (validationResult.Success is false)
+        if (keys.Any() is false)
         {
-            return validationResult;
+            return Attempt.Succeed(UserGroupOperationStatus.Success);
         }
 
-        EventMessages eventMessages = EventMessagesFactory.Get();
+        IUserGroup[] userGroupsToDelete = (await GetAsync(keys)).ToArray();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        if (userGroupsToDelete.Length != keys.Count)
         {
-            var deletingNotification = new UserGroupDeletingNotification(userGroup!, eventMessages);
+            return Attempt.Fail(UserGroupOperationStatus.NotFound);
+        }
 
-            if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+        foreach (IUserGroup userGroup in userGroupsToDelete)
+        {
+            Attempt<UserGroupOperationStatus> validationResult = ValidateUserGroupDeletion(userGroup);
+            if (validationResult.Success is false)
             {
-                scope.Complete();
-                return Attempt.Fail(UserGroupOperationStatus.CancelledByNotification);
+                return validationResult;
             }
-
-            _userGroupRepository.Delete(userGroup!);
-
-            scope.Notifications.Publish(new UserGroupDeletedNotification(userGroup!, eventMessages).WithStateFrom(deletingNotification));
-
-            scope.Complete();
         }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var deletingNotification = new UserGroupDeletingNotification(userGroupsToDelete, eventMessages);
+
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+        {
+            scope.Complete();
+            return Attempt.Fail(UserGroupOperationStatus.CancelledByNotification);
+        }
+
+        foreach (IUserGroup userGroup in userGroupsToDelete)
+        {
+            _userGroupRepository.Delete(userGroup);
+        }
+
+        scope.Notifications.Publish(new UserGroupDeletedNotification(userGroupsToDelete, eventMessages).WithStateFrom(deletingNotification));
+
+        scope.Complete();
 
         return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
