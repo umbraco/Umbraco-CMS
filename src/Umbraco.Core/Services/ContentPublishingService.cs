@@ -44,6 +44,18 @@ public class ContentPublishingService : IContentPublishingService
         _logger = logger;
     }
 
+    /*
+    Things that can go wrong when publishing a branch (on any given culture):
+    - cannot be published because it is invalid (any property was configured invalid)
+    - canceled by event
+    - mandatory culture missing
+    - has expired
+    - awaiting release (scheduled publishing)
+    - is trashed
+    - path not published (aka, parent node could not publish, and we're trying to publish the child)
+    */
+
+
     public async Task<Attempt<ContentPublishingOperationStatus>> PublishAsync(Guid id, Guid userKey,
         string culture = "*")
     {
