@@ -28,7 +28,7 @@ public class ByPathMediaApiController : MediaApiControllerBase
     /// <returns>The media item or not found result.</returns>
     [HttpGet("item/{*path}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ApiMediaWithCropsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IApiMediaWithCropsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByPath(string path)
     {

@@ -24,7 +24,7 @@ public class ByIdsMediaApiController : MediaApiControllerBase
     /// <returns>The media items.</returns>
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<ApiMediaWithCropsResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<IApiMediaWithCropsResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IPublishedContent[] mediaItems = ids
@@ -32,7 +32,7 @@ public class ByIdsMediaApiController : MediaApiControllerBase
             .WhereNotNull()
             .ToArray();
 
-        ApiMediaWithCropsResponse[] apiMediaItems = mediaItems
+        IApiMediaWithCropsResponse[] apiMediaItems = mediaItems
             .Select(BuildApiMediaWithCrops)
             .ToArray();
 
