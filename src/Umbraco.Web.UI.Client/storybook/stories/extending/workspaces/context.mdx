@@ -15,6 +15,8 @@ TODO: extend the description of a workspace
 - A workspace context knows about its entity type (e.g. content, media, member, etc.) and holds its unique string (ex: key).
 - Most workspaces contexts holds a draft state of its entities data. It is a copy of the entity data that can be modified at runtime and send to the server to be saved.
 
+If a workspace wants to utilize Property Editor UIs, then it must provide a dataset context for the property editors. The dataset is the generic interface between workspace and property editors. See dataset contexts for more info.
+
 TODO: More points and examples:
 
 ```ts
