@@ -50,6 +50,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 			const packageModule = await packageImport;
 			umbExtensionsRegistry.registerMany(packageModule.extensions);
 		});
+
 	}
 
 	render() {

@@ -37,6 +37,7 @@ export const manifests: Array<ManifestTypes> = [
 			},
 		],
 	},
+	/*
 	{
 		type: 'headerApp',
 		kind: 'button',
@@ -49,6 +50,7 @@ export const manifests: Array<ManifestTypes> = [
 			href: '/section/content/workspace/document/edit/c05da24d-7740-447b-9cdc-bd8ce2172e38',
 		},
 	},
+	*/
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.ExamineFieldsSettings',
