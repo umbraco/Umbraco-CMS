@@ -35,6 +35,25 @@ internal class BackOfficeSecurityRequirementsOperationFilter : IOperationFilter
                     }
                 }
             };
+
+            operation.Responses.Add(StatusCodes.Status401Unauthorized.ToString(), new OpenApiResponse()
+            {
+                Description = "Unauthorized",
+            });
+
+            // Assuming if and endpoint have more then one AuthorizeAttribute, there is a risk the user do not have access while still being authorized.
+            // The one is the simple one on ManagementApiControllerBase that just requires access to backoffice
+            var numberOfAuthorizeAttributes =
+                context.MethodInfo.GetCustomAttributes(true).Count(x => x is AuthorizeAttribute)
+                + context.MethodInfo.DeclaringType?.GetCustomAttributes(true).Count(x => x is AuthorizeAttribute);
+
+            if (numberOfAuthorizeAttributes > 1)
+            {
+                operation.Responses.Add(StatusCodes.Status403Forbidden.ToString(), new OpenApiResponse()
+                {
+                    Description = "Forbidden",
+                });
+            }
         }
     }
 
