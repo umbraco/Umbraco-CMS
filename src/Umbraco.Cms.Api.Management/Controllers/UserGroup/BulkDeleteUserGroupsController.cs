@@ -18,7 +18,7 @@ public class BulkDeleteUserGroupsController : UserGroupControllerBase
         _userGroupService = userGroupService;
     }
 
-    [HttpDelete("")]
+    [HttpDelete]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
