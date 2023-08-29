@@ -64,6 +64,10 @@ public abstract class UserControllerBase : ManagementApiControllerBase
                 .WithTitle("Cannot disable")
                 .WithDetail("A user cannot disable itself.")
                 .Build()),
+            UserOperationStatus.CannotDeleteSelf => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Cannot delete")
+                .WithDetail("A user cannot delete itself.")
+                .Build()),
             UserOperationStatus.OldPasswordRequired => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Old password required")
                 .WithDetail("The old password is required to change the password of the specified user.")

@@ -19,6 +19,7 @@ public enum UserOperationStatus
     CannotInvite,
     CannotDelete,
     CannotDisableSelf,
+    CannotDeleteSelf,
     CannotDisableInvitedUser,
     OldPasswordRequired,
     InvalidAvatar,
