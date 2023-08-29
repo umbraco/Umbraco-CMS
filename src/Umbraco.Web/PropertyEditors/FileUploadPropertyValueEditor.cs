@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
@@ -107,6 +108,13 @@ namespace Umbraco.Web.PropertyEditors
 
                 using (var filestream = File.OpenRead(file.TempFilePath))
                 {
+                    var validator = ApplicationContext.Current.FileStreamSecurityValidatorFactory.CreateValidator();
+                    if (validator.IsConsideredSafe(filestream) == false)
+                    {
+                        // Skip invalid files.
+                        continue;
+                    }
+
                     _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
 
                     var ext = _mediaFileSystem.GetExtension(filepath);

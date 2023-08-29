@@ -151,6 +151,12 @@ namespace Umbraco.Web.PropertyEditors
 
             using (var filestream = File.OpenRead(file.TempFilePath))
             {
+                var validator = ApplicationContext.Current.FileStreamSecurityValidatorFactory.CreateValidator();
+                if (validator.IsConsideredSafe(filestream) == false)
+                {
+                    return null;
+                }
+
                 _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
 
                 var ext = _mediaFileSystem.GetExtension(filepath);
@@ -165,7 +171,7 @@ namespace Umbraco.Web.PropertyEditors
                     }
                     catch (ArgumentException ex)
                     {
-                        // send any argument errors caused by the thumbnail generation to the log instead of failing miserably 
+                        // send any argument errors caused by the thumbnail generation to the log instead of failing miserably
                         LogHelper.WarnWithException<ImageCropperPropertyValueEditor>("Could not extract image thumbnails.", ex);
                     }
                 }
