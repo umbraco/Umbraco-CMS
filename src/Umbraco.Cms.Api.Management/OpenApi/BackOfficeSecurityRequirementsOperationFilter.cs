@@ -47,7 +47,12 @@ internal class BackOfficeSecurityRequirementsOperationFilter : IOperationFilter
                 context.MethodInfo.GetCustomAttributes(true).Count(x => x is AuthorizeAttribute)
                 + context.MethodInfo.DeclaringType?.GetCustomAttributes(true).Count(x => x is AuthorizeAttribute);
 
-            if (numberOfAuthorizeAttributes > 1)
+
+            var hasConstructorInjectingIAuthorizationService = context.MethodInfo.DeclaringType?.GetConstructors()
+                .Any(ctor =>
+                    ctor.GetParameters().Any(parameter => parameter.GetType() == typeof(IAuthorizationService))) ?? false;
+
+            if (numberOfAuthorizeAttributes > 1 || hasConstructorInjectingIAuthorizationService)
             {
                 operation.Responses.Add(StatusCodes.Status403Forbidden.ToString(), new OpenApiResponse()
                 {
