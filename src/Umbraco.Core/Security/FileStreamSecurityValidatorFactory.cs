@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Umbraco.Core.Security
 {
@@ -14,10 +15,12 @@ namespace Umbraco.Core.Security
         public void AddAnalyzer(IFileStreamSecurityAnalyzer analyzer)
         {
             // We don't want duplicates
-            if (_fileAnalyzers.Contains(analyzer) == false)
+            if (_fileAnalyzers.Any(fileAnalyzer => fileAnalyzer.GetType() == analyzer.GetType()))
             {
-                _fileAnalyzers.Add(analyzer);
+                return;
             }
+
+            _fileAnalyzers.Add(analyzer);
         }
 
         public void RemoveAnalyzer(IFileStreamSecurityAnalyzer analyzer)
