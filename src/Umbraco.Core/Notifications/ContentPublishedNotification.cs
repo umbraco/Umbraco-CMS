@@ -19,6 +19,4 @@ public sealed class ContentPublishedNotification : EnumerableObjectNotification<
     }
 
     public IEnumerable<IContent> PublishedEntities => Target;
-
-    public IEnumerable<IContent>? RelatedPublishedEntities;
 }

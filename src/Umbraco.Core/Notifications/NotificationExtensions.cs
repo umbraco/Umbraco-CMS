@@ -15,19 +15,4 @@ public static class NotificationExtensions
         where T : IStatefulNotification
         where TSource : IStatefulNotification
         => notification.WithState(source.State);
-
-    public static ContentPublishedNotification WithRelatedPublishedEntities(
-        this ContentPublishedNotification notification, IList<IContent>? relatedEntities)
-    {
-        if (relatedEntities?.Any() != true)
-        {
-            return notification;
-        }
-
-        notification.RelatedPublishedEntities = relatedEntities.Where(relatedEntity =>
-            notification.PublishedEntities.Any(publishedEntity =>
-                publishedEntity.Id != relatedEntity.Id));
-
-        return notification;
-    }
 }

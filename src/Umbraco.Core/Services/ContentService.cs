@@ -2172,8 +2172,7 @@ public class ContentService : RepositoryService, IContentService
             {
                 scope.Notifications.Publish(
                     new ContentPublishedNotification(rootResult!.Content!, eventMessages)
-                        .WithState(rootPublishNotificationState)
-                        .WithRelatedPublishedEntities(publishedDocuments));
+                        .WithState(rootPublishNotificationState));
             }
 
             scope.Complete();
