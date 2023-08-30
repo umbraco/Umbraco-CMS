@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IImageUrlGenerator _imageUrlGenerator = new ImageProcessorImageUrlGenerator();
 
         // An array to contain a list of URLs that we have already processed to avoid dupes
-        private static readonly Dictionary<string, GuidUdi> UploadedImages = new();
+        private static readonly Dictionary<string, GuidUdi> UploadedImages = new Dictionary<string, GuidUdi>();
 
         const string TemporaryImageDataAttribute = "data-tmpimg";
 

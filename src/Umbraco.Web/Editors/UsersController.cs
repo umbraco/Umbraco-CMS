@@ -131,6 +131,12 @@ namespace Umbraco.Web.Editors
 
                 using (var fs = System.IO.File.OpenRead(file.LocalFileName))
                 {
+                    // Run analyzer before we add the file to the media filesystem
+                    var validator = ApplicationContext.Current.FileStreamSecurityValidatorFactory.CreateValidator();
+                    if (validator.IsConsideredSafe(fs) is false)
+                    {
+                        return request.CreateValidationErrorResponse("The uploaded file was deemed unsafe.");
+                    }
                     FileSystemProviderManager.Current.MediaFileSystem.AddFile(user.Avatar, fs, true);
                 }
 

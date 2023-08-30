@@ -742,8 +742,12 @@
     <Compile Include="Security\BackOfficeUserPasswordCheckerResult.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\BackOfficeUserValidator.cs" />
+    <Compile Include="Security\FileStreamSecurityValidator.cs" />
+    <Compile Include="Security\FileStreamSecurityValidatorFactory.cs" />
+    <Compile Include="Security\IFileStreamSecurityValidator.cs" />
     <Compile Include="Security\IBackOfficeUserManagerMarker.cs" />
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
+    <Compile Include="Security\IFileStreamSecurityAnalyzer.cs" />
     <Compile Include="Security\IMembershipProviderPasswordHasher.cs" />
     <Compile Include="Security\IUserAwarePasswordHasher.cs" />
     <Compile Include="Security\IUserSessionStore.cs" />

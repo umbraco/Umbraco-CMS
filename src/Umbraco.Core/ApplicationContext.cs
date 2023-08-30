@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
@@ -189,6 +190,21 @@ namespace Umbraco.Core
 		readonly ManualResetEventSlim _isReadyEvent = new ManualResetEventSlim(false);
 		private DatabaseContext _databaseContext;
 		private ServiceContext _services;
+
+        private FileStreamSecurityValidatorFactory _fileStreamSecurityValidatorFactory;
+
+        public FileStreamSecurityValidatorFactory FileStreamSecurityValidatorFactory
+        {
+            get
+            {
+                if (_fileStreamSecurityValidatorFactory == null)
+                {
+                    _fileStreamSecurityValidatorFactory = new FileStreamSecurityValidatorFactory();
+                }
+
+                return _fileStreamSecurityValidatorFactory;
+            }
+        }
 
 		public bool IsReady
         {

@@ -795,11 +795,19 @@ namespace Umbraco.Web.Editors
 
                     var mediaItemName = fileName.ToFriendlyName();
 
-                    var f = mediaService.CreateMedia(mediaItemName, parentId, mediaType, Security.CurrentUser.Id);
+                    // Let's do the validation before we actually create the media item.
+                    var validator = ApplicationContext.FileStreamSecurityValidatorFactory.CreateValidator();
 
                     var fileInfo = new FileInfo(file.LocalFileName);
                     var fs = fileInfo.OpenReadWithRetry();
                     if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
+
+                    if (validator.IsConsideredSafe(fs) == false)
+                    {
+                        return Request.CreateValidationErrorResponse("The uploaded file was deemed unsafe.");
+                    }
+
+                    var f = mediaService.CreateMedia(mediaItemName, parentId, mediaType, Security.CurrentUser.Id);
                     using (fs)
                     {
                         f.SetValue(Constants.Conventions.Media.File, fileName, fs);
