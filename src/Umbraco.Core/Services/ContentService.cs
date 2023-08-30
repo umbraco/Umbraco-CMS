@@ -1950,10 +1950,10 @@ public class ContentService : RepositoryService, IContentService
                 cultures = new HashSet<string>(); // empty means 'already published'
             }
 
-            // if (edited)
-            // {
+            if (isRoot || edited)
+            {
                 cultures.Add(c); // <culture> means 'republish this culture'
-            // }
+            }
 
             return cultures;
         }
