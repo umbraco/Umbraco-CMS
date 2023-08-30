@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 
-namespace Umbraco.Cms.Api.Delivery.Controllers;
+namespace Umbraco.Cms.Api.Delivery.Controllers.Media;
 
 [ApiVersion("1.0")]
 public class ByPathMediaApiController : MediaApiControllerBase
