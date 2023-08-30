@@ -154,6 +154,10 @@ public static class FriendlyPublishedContentExtensions
             validateAlternativeTemplates,
             templateAlias);
 
+    public static bool HasTemplate(
+        this IPublishedContent content)
+        => content.HasTemplate(FileService);
+
     /// <summary>
     ///     Gets a value indicating whether the content has a value for a property identified by its alias.
     /// </summary>

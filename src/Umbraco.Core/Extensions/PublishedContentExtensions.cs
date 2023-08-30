@@ -294,6 +294,23 @@ public static class PublishedContentExtensions
         return publishedContentContentType.IsAllowedTemplate(templateId);
     }
 
+    public static bool HasTemplate(this IPublishedContent content, IFileService fileService)
+    {
+        if (!content.TemplateId.HasValue)
+        {
+            return false;
+        }
+
+        if (content.TemplateId <= 0)
+        {
+            return false;
+        }
+
+        ITemplate? template = fileService.GetTemplate(content.TemplateId.Value);
+
+        return template != null;
+    }
+
     public static bool IsAllowedTemplate(this IPublishedContent content, IFileService fileService, IContentTypeService contentTypeService, bool disableAlternativeTemplates, bool validateAlternativeTemplates, string templateAlias)
     {
         ITemplate? template = fileService.GetTemplate(templateAlias);
