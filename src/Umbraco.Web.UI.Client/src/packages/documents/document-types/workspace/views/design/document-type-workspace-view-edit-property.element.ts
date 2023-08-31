@@ -151,6 +151,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 				this.dispatchEvent(new CustomEvent('property-delete'));
 			})
 			.catch(() => {
+				// We do not need to react to cancel, so we will leave an empty method to prevent Uncaught Promise Rejection error.
 				return;
 			});
 	}
