@@ -118,9 +118,13 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		super.connectedCallback();
 		const doctypes = this._propertyStructureHelper.getOwnerDocumentTypes();
 		if (!doctypes) return;
-		this.observe(doctypes, (documents) => {
-			this._ownerDocumentTypes = documents;
-		});
+		this.observe(
+			doctypes,
+			(documents) => {
+				this._ownerDocumentTypes = documents;
+			},
+			'observeOwnerDocumentTypes',
+		);
 	}
 
 	async #addProperty(propertyData: PropertyTypeModelBaseModel) {
