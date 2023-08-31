@@ -20,6 +20,11 @@ internal class PackageDefinitionFactory : IPackageDefinitionFactory
         packageDefinition.PackageId = Guid.Empty;
         packageDefinition.PackagePath = string.Empty;
 
+        if (createPackageRequestModel.Id.HasValue)
+        {
+            packageDefinition.PackageId = createPackageRequestModel.Id.Value;
+        }
+
         return packageDefinition;
     }
 }
