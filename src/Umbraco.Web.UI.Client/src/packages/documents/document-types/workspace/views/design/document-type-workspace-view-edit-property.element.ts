@@ -1,9 +1,17 @@
 import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_CONFIRM_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_PROPERTY_SETTINGS_MODAL,
+	UMB_WORKSPACE_MODAL,
+	UmbConfirmModalData,
+	UmbModalRouteRegistrationController,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
+import { UmbDataTypeRepository } from '@umbraco-cms/backoffice/data-type';
 
 /**
  *  @element document-type-workspace-view-edit-property
@@ -27,6 +35,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 		const oldValue = this._property;
 		this._property = value;
 		this.#modalRegistration.setUniquePathValue('propertyId', value?.id?.toString());
+		this.setDataType(this._property?.dataTypeId);
 		this.requestUpdate('property', oldValue);
 	}
 
@@ -40,10 +49,35 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	@property({ type: Boolean })
 	public inherited?: boolean;
 
+	#dataTypeRepository = new UmbDataTypeRepository(this);
+
 	#modalRegistration;
+	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
 
 	@state()
 	protected _modalRoute?: string;
+
+	@state()
+	protected _editDocumentTypePath?: string;
+
+	@property()
+	public get modalRoute() {
+		return this._modalRoute;
+	}
+
+	@property({ type: String, attribute: 'owner-document-type-id' })
+	public ownerDocumentTypeId?: string;
+
+	@property({ type: String, attribute: 'owner-document-type-name' })
+	public ownerDocumentTypeName?: string;
+
+	@state()
+	private _dataTypeName?: string;
+
+	async setDataType(dataTypeId: string | undefined) {
+		if (!dataTypeId) return;
+		this.#dataTypeRepository.requestById(dataTypeId).then((x) => (this._dataTypeName = x?.data?.name));
+	}
 
 	constructor() {
 		super();
@@ -59,6 +93,19 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRoute = routeBuilder(null);
 			});
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('document-type')
+			.onSetup(() => {
+				return { entityType: 'document-type', preset: {} };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editDocumentTypePath = routeBuilder({});
+			});
+
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (context) => {
+			this._modalManagerContext = context;
+		});
 	}
 
 	_partialUpdate(partialObject: PropertyTypeModelBaseModel) {
@@ -72,24 +119,41 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 		this.dispatchEvent(new CustomEvent('partial-property-update', { detail: partialObject }));
 	}
 
-	renderInheritedProperty() {
-		return this.property
-			? html`
-					<div id="header">
-						<b>${this.property.name}</b>
-						<i>${this.property.alias}</i>
-						<p>${this.property.description}</p>
-					</div>
-					<div id="editor"></div>
-			  `
-			: '';
-	}
-
 	@state()
 	private _aliasLocked = true;
 
 	#onToggleAliasLock() {
 		this._aliasLocked = !this._aliasLocked;
+	}
+
+	#requestRemove(e: Event) {
+		e.preventDefault();
+		e.stopImmediatePropagation();
+		if (!this.property || !this.property.id) return;
+
+		const Message: UmbConfirmModalData = {
+			headline: `${this.localize.term('actions_delete')} property`,
+			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[
+				this.property.name || this.property.id,
+			]}>
+					Are you sure you want to delete the property <strong>${this.property.name || this.property.id}</strong>
+				</umb-localize>
+				</div>`,
+			confirmLabel: this.localize.term('actions_delete'),
+			color: 'danger',
+		};
+
+		const modalHandler = this._modalManagerContext?.open(UMB_CONFIRM_MODAL, Message);
+
+		modalHandler
+			?.onSubmit()
+			.then(() => {
+				this.dispatchEvent(new CustomEvent('property-delete'));
+			})
+			.catch(() => {
+				// We do not need to react to cancel, so we will leave an empty method to prevent Uncaught Promise Rejection error.
+				return;
+			});
 	}
 
 	#onNameChange(event: UUIInputEvent) {
@@ -123,22 +187,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 							label="label"
 							.value=${this.property.name}
 							@input=${this.#onNameChange}></uui-input>
-						<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
-						<uui-input
-							name="alias"
-							id="alias-input"
-							label="alias"
-							placeholder=${this.localize.term('placeholders_alias')}
-							.value=${this.property.alias}
-							?disabled=${this._aliasLocked}
-							@input=${(e: CustomEvent) => {
-								if (e.target) this._singleValueUpdate('alias', (e.target as HTMLInputElement).value);
-							}}>
-							<!-- TODO: validation for bad characters -->
-							<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
-								<uui-icon name=${this._aliasLocked ? 'umb:lock' : 'umb:unlocked'}></uui-icon>
-							</div>
-						</uui-input>
+						${this.renderPropertyAlias()}
 						<slot name="property-action-menu"></slot>
 						<p>
 							<uui-textarea
@@ -152,11 +201,82 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 								}}></uui-textarea>
 						</p>
 					</div>
-					<uui-button id="editor" label="Edit property settings" href=${ifDefined(this._modalRoute)}>
-						<b></b>
+					<uui-button
+						id="editor"
+						label=${this.localize.term('contentTypeEditor_editorSettings')}
+						href=${ifDefined(this._modalRoute)}>
+						${this.renderPropertyTags()}
+						<uui-action-bar>
+							<uui-button label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
+								<uui-icon name="delete"></uui-icon>
+							</uui-button>
+						</uui-action-bar>
 					</uui-button>
 			  `
 			: '';
+	}
+
+	renderInheritedProperty() {
+		return this.property
+			? html`
+					<div id="header">
+						<b>${this.property.name}</b>
+						<i>${this.property.alias}</i>
+						<p>${this.property.description}</p>
+					</div>
+					<div id="editor">
+						${this.renderPropertyTags()}
+						<uui-tag look="default" class="inherited">
+							<uui-icon name="umb:merge"></uui-icon>
+							<span>
+								${this.localize.term('contentTypeEditor_inheritedFrom')}
+								<a href=${this._editDocumentTypePath + 'edit/' + this.ownerDocumentTypeId}>
+									${this.ownerDocumentTypeName ?? '??'}
+								</a>
+							</span>
+						</uui-tag>
+					</div>
+			  `
+			: '';
+	}
+
+	renderPropertyAlias() {
+		return this.property
+			? html`<uui-input
+					name="alias"
+					id="alias-input"
+					label="alias"
+					placeholder=${this.localize.term('placeholders_alias')}
+					.value=${this.property.alias}
+					?disabled=${this._aliasLocked}
+					@input=${(e: CustomEvent) => {
+						if (e.target) this._singleValueUpdate('alias', (e.target as HTMLInputElement).value);
+					}}>
+					<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
+					<!-- TODO: validation for bad characters -->
+					<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
+						<uui-icon name=${this._aliasLocked ? 'umb:lock' : 'umb:unlocked'}></uui-icon>
+					</div>
+			  </uui-input>`
+			: '';
+	}
+
+	renderPropertyTags() {
+		return this.property
+			? html`<div class="types">
+					${this.property.dataTypeId ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
+					${this.property.variesByCulture
+						? html`<uui-tag look="default">
+								<uui-icon name="umb:shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureVariantLabel')}
+						  </uui-tag>`
+						: nothing}
+					${this.property.appearance?.labelOnTop == true
+						? html`<uui-tag look="default">
+								<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>
+						  </uui-tag>`
+						: nothing}
+			  </div>`
+			: nothing;
 	}
 
 	render() {
@@ -201,7 +321,8 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			:host(.--umb-sorter-placeholder) {
 				height: 2px;
 			}
-			:host(.--umb-sorter-placeholder) > div {
+			:host(.--umb-sorter-placeholder) > div,
+			:host(.--umb-sorter-placeholder) > uui-button {
 				display: none;
 			}
 			:host(.--umb-sorter-placeholder)::after {
@@ -225,6 +346,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			}
 
 			#editor {
+				position: relative;
 				background-color: var(--uui-color-background);
 			}
 			#alias-input,
@@ -260,6 +382,40 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			#description-input {
 				--uui-textarea-border-color: transparent;
 				font-weight: 0.5rem; /* TODO: Cant change font size of UUI textarea yet */
+			}
+
+			.types > div uui-icon,
+			.inherited uui-icon {
+				vertical-align: sub;
+			}
+
+			.inherited {
+				position: absolute;
+				top: var(--uui-size-space-2);
+				right: var(--uui-size-space-2);
+			}
+
+			.types {
+				position: absolute;
+				top: var(--uui-size-space-2);
+				left: var(--uui-size-space-2);
+				display: flex;
+				gap: var(--uui-size-space-2);
+			}
+
+			#editor uui-action-bar {
+				position: absolute;
+				top: var(--uui-size-space-2);
+				right: var(--uui-size-space-2);
+				display: none;
+			}
+			#editor:hover uui-action-bar,
+			#editor:focus uui-action-bar {
+				display: block;
+			}
+
+			a {
+				color: inherit;
 			}
 		`,
 	];

@@ -153,7 +153,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		this._customValidationOptions.forEach((option) => {
 			option.selected = option.value === regEx;
 		});
-		console.log(this._customValidationOptions);
 
 		this._returnData.validation!.regEx = regEx ?? null;
 		this.requestUpdate('_returnData');

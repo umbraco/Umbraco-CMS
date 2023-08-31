@@ -33,7 +33,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	#documentTypes = new UmbArrayState<T>([], (x) => x.id);
 	readonly documentTypes = this.#documentTypes.asObservable();
 	private readonly _documentTypeContainers = this.#documentTypes.asObservablePart((x) =>
-		x.flatMap((x) => x.containers ?? [])
+		x.flatMap((x) => x.containers ?? []),
 	);
 
 	#containers: UmbArrayState<PropertyTypeContainerModelBaseModel> =
@@ -137,7 +137,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 					 */
 					this.#documentTypes.appendOne(docType);
 				}
-			})
+			}),
 		);
 	}
 
@@ -173,7 +173,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		contentTypeId: string | null,
 		parentId: string | null = null,
 		type: PropertyContainerTypes = 'Group',
-		sortOrder?: number
+		sortOrder?: number,
 	) {
 		await this.#init;
 		contentTypeId = contentTypeId ?? this.#ownerDocumentTypeId!;
@@ -197,7 +197,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	makeContainerNameUniqueForOwnerDocument(
 		newName: string,
 		containerType: PropertyContainerTypes = 'Tab',
-		parentId: string | null = null
+		parentId: string | null = null,
 	) {
 		const ownerRootContainers = this.getOwnerContainers(containerType); //getRootContainers() can't differentiates between compositions and locals
 
@@ -215,7 +215,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	async updateContainer(
 		documentTypeId: string | null,
 		containerId: string,
-		partialUpdate: Partial<PropertyTypeContainerModelBaseModel>
+		partialUpdate: Partial<PropertyTypeContainerModelBaseModel>,
 	) {
 		await this.#init;
 		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
@@ -237,10 +237,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		this.#documentTypes.updateOne(documentTypeKey, { containers });
 	}
 
-	async createProperty(documentTypeId: string | null, containerId: string | null = null, sortOrder?: number) {
-		await this.#init;
-		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
-
+	createPropertyScaffold(containerId: string | null = null, sortOrder?: number) {
 		const property: PropertyTypeModelBaseModel = {
 			id: UmbId.new(),
 			containerId: containerId,
@@ -261,6 +258,15 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 			},
 			sortOrder: sortOrder ?? 0,
 		} as any; // Sort order was not allowed when this was written.
+
+		return property;
+	}
+
+	async createProperty(documentTypeId: string | null, containerId: string | null = null, sortOrder?: number) {
+		await this.#init;
+		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
+
+		const property: PropertyTypeModelBaseModel = this.createPropertyScaffold(containerId, sortOrder);
 
 		const properties = [...(this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.properties ?? [])];
 		properties.push(property);
@@ -287,7 +293,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 		const frozenProperties = this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.properties ?? [];
 
-		const properties = filterFrozenArray(frozenProperties, (x) => x.id === propertyId);
+		const properties = filterFrozenArray(frozenProperties, (x) => x.id !== propertyId);
 
 		this.#documentTypes.updateOne(documentTypeId, { properties });
 	}
@@ -295,7 +301,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	async updateProperty(
 		documentTypeId: string | null,
 		propertyId: string,
-		partialUpdate: Partial<PropertyTypeModelBaseModel>
+		partialUpdate: Partial<PropertyTypeModelBaseModel>,
 	) {
 		await this.#init;
 		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
@@ -387,7 +393,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 	containersOfParentKey(
 		parentId: PropertyTypeContainerModelBaseModel['parentId'],
-		containerType: PropertyContainerTypes
+		containerType: PropertyContainerTypes,
 	) {
 		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.parentId === parentId && x.type === containerType);

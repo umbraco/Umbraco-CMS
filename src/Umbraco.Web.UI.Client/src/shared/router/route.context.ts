@@ -49,9 +49,9 @@ export class UmbRouteContext extends UmbBaseController {
 			__modalKey: modalRegistration.key,
 			path: '/' + modalRegistration.generateModalPath(),
 			component: EmptyDiv,
-			setup: (component, info) => {
+			setup: async (component, info) => {
 				if (!this.#modalContext) return;
-				const modalContext = modalRegistration.routeSetup(this.#modalRouter, this.#modalContext, info.match.params);
+				const modalContext = await modalRegistration.routeSetup(this.#modalRouter, this.#modalContext, info.match.params);
 				if (modalContext) {
 					modalContext.onSubmit().then(
 						() => {

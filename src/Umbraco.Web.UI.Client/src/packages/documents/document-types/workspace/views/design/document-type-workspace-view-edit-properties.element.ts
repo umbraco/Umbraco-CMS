@@ -1,13 +1,17 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
+import './document-type-workspace-view-edit-property.element.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbSorterController, UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DocumentTypePropertyTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
-import './document-type-workspace-view-edit-property.element.js';
+import {
+	DocumentTypePropertyTypeResponseModel,
+	DocumentTypeResponseModel,
+	PropertyTypeModelBaseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 const SORTER_CONFIG: UmbSorterConfig<DocumentTypePropertyTypeResponseModel> = {
 	compareElementToModel: (element: HTMLElement, model: DocumentTypePropertyTypeResponseModel) => {
 		return element.getAttribute('data-umb-property-id') === model.id;
@@ -77,26 +81,57 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	@state()
 	_propertyStructure: Array<PropertyTypeModelBaseModel> = [];
 
+	@state()
+	_ownerDocumentTypes?: DocumentTypeResponseModel[];
+
+	@state()
+	protected _modalRouteNewProperty?: string;
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._propertyStructureHelper.setStructureManager(
-				(workspaceContext as UmbDocumentTypeWorkspaceContext).structure
+				(workspaceContext as UmbDocumentTypeWorkspaceContext).structure,
 			);
 		});
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._propertyStructure = propertyStructure;
 			this.#propertySorter.setModel(this._propertyStructure);
 		});
+
+		// Note: Route for adding a new property
+		new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
+			.addAdditionalPath('new-property')
+			.onSetup(async () => {
+				return (await this._propertyStructureHelper.createPropertyScaffold(this._containerId)) ?? false;
+			})
+			.onSubmit((result) => {
+				this.#addProperty(result);
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._modalRouteNewProperty = routeBuilder(null);
+			});
 	}
 
-	async #onAddProperty() {
-		const property = await this._propertyStructureHelper.addProperty(this._containerId);
-		if (!property) return;
+	connectedCallback(): void {
+		super.connectedCallback();
+		const doctypes = this._propertyStructureHelper.getOwnerDocumentTypes();
+		if (!doctypes) return;
+		this.observe(
+			doctypes,
+			(documents) => {
+				this._ownerDocumentTypes = documents;
+			},
+			'observeOwnerDocumentTypes',
+		);
+	}
 
-		// TODO: Figure out how we from this location can get into the route modal, via URL.
-		// The modal is registered by the document-type-workspace-view-edit-property element, therefor a bit hard to get the URL from here.
+	async #addProperty(propertyData: PropertyTypeModelBaseModel) {
+		const propertyPlaceholder = await this._propertyStructureHelper.addProperty(this._containerId);
+		if (!propertyPlaceholder) return;
+
+		this._propertyStructureHelper.partialUpdateProperty(propertyPlaceholder.id, propertyData);
 	}
 
 	render() {
@@ -104,21 +139,35 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				${repeat(
 					this._propertyStructure,
 					(property) => property.id ?? '' + property.containerId ?? '' + (property as any).sortOrder ?? '',
-					(property) =>
-						html`<document-type-workspace-view-edit-property
+					(property) => {
+						// Note: This piece might be moved into the property component
+						const inheritedFromDocument = this._ownerDocumentTypes?.find(
+							(types) => types.containers?.find((containers) => containers.id === property.containerId),
+						);
+
+						return html`<document-type-workspace-view-edit-property
 							class="property"
 							data-umb-property-id=${ifDefined(property.id)}
-							data-property-container-is=${ifDefined(property.containerId === null ? undefined : property.containerId)}
-							data-container-id=${ifDefined(this.containerId)}
+							owner-document-type-id=${ifDefined(inheritedFromDocument?.id)}
+							owner-document-type-name=${ifDefined(inheritedFromDocument?.name)}
 							?inherited=${property.containerId !== this.containerId}
 							.property=${property}
 							@partial-property-update=${(event: CustomEvent) => {
 								this._propertyStructureHelper.partialUpdateProperty(property.id, event.detail);
-							}}></document-type-workspace-view-edit-property>`
+							}}
+							@property-delete=${() => {
+								this._propertyStructureHelper.removeProperty(property.id!);
+							}}>
+						</document-type-workspace-view-edit-property>`;
+					},
 				)}
 			</div>
-			<uui-button label="Add property" id="add" look="placeholder" @click=${this.#onAddProperty}>
-				Add property
+			<uui-button
+				label=${this.localize.term('contentTypeEditor_addProprety')}
+				id="add"
+				look="placeholder"
+				href=${ifDefined(this._modalRouteNewProperty)}>
+				<umb-localize key="contentTypeEditor_addProprety">Add property</umb-localize>
 			</uui-button> `;
 	}
 
