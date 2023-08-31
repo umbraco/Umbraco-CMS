@@ -28,13 +28,13 @@
                                     ng-options="key as value for (key, value) in vm.availableCultures"
                                     val-server-field="IsoCode"
                                     required>
-                                <option value="">-- Select a language --</option>
+                                <option value=""><localize key="languages_selectLanguage">-- Select language --</localize></option>
                             </select>
                             <select ng-hide="!vm.language.culture || vm.language.culture === '' || vm.availableCultures[vm.language.culture]"
                                     name="customLang"
                                     class="input-block-level"
                                     disabled>
-                                <option value="">Custom language.</option>
+                                <option value=""><localize key="languages_customLanguage">Custom language</localize></option>
                             </select>
                             <span ng-messages="editLanguageForm.newLang.$error" show-validation-on-submit>
                                 <span class="help-inline" ng-message="required">Required</span>
@@ -42,11 +42,11 @@
                             </span>
                         </umb-control-group>
 
-                        <umb-control-group label="@languages_culture" description="Iso codes are case-sensitive" required="true">
+                        <umb-control-group label="@languages_culture" description="@languages_isoCodeDescription" required="true">
                             <input type="text" name="language_isocode" id="language_isocode" ng-model="vm.language.culture" class="umb-textstring textstring input-block-level"
                                 required maxlength="50" placeholder="en-US"/>
                         </umb-control-group>
-                        
+
                         <umb-control-group label="@general_settings" class="umb-toggle-group">
 
                             <div class="umb-toggle-group-item" ng-click="vm.toggleDefault()" ng-class="{ 'umb-toggle-group-item--disabled': vm.initIsDefault }">

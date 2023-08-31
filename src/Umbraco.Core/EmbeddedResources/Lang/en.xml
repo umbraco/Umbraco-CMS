@@ -1905,6 +1905,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     </key>
     <key alias="fallbackLanguage">Fall back language</key>
     <key alias="none">none</key>
+    <key alias="selectLanguage">-- Select language --</key>
+    <key alias="isoCodeDescription">Iso codes are case-sensitive</key>
+    <key alias="customLanguage">Custom language</key>
   </area>
   <area alias="macro">
     <key alias="addParameter">Add parameter</key>

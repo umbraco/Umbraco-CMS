@@ -1681,6 +1681,10 @@ Mange hilsner fra Umbraco robotten
     </key>
     <key alias="fallbackLanguage">Fallback-sprog</key>
     <key alias="none">ingen</key>
+    <key alias="culture">Iso kode</key>
+    <key alias="selectLanguage">-- Vælg et sprog --</key>
+    <key alias="isoCodeDescription">Iso koder skener mellem store og små bogstaver.</key>
+    <key alias="customLanguage">Brugerdefineret sprog</key>
   </area>
   <area alias="macro">
     <key alias="addParameter">Tilføj parameter</key>

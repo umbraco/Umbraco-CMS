@@ -1988,6 +1988,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="invariantSegmentPropertyUnlockHelp"><![CDATA[<strong>%0%</strong> is shared across all segments.]]></key>
     <key alias="invariantLanguageProperty">Shared: Languages</key>
     <key alias="invariantSegmentProperty">Shared: Segments</key>
+    <key alias="selectLanguage">-- Select language --</key>
+    <key alias="isoCodeDescription">Iso codes are case-sensitive</key>
+    <key alias="customLanguage">Custom language</key>
   </area>
   <area alias="macro">
     <key alias="addParameter">Add parameter</key>
