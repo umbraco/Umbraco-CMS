@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
@@ -9,17 +10,19 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 public class ModelsGenerator : IModelsGenerator
 {
     private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly IUmbracoVersion _umbracoVersion;
     private readonly OutOfDateModelsStatus _outOfDateModels;
     private readonly UmbracoServices _umbracoService;
     private ModelsBuilderSettings _config;
 
     public ModelsGenerator(UmbracoServices umbracoService, IOptionsMonitor<ModelsBuilderSettings> config,
-        OutOfDateModelsStatus outOfDateModels, IHostingEnvironment hostingEnvironment)
+        OutOfDateModelsStatus outOfDateModels, IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion)
     {
         _umbracoService = umbracoService;
         _config = config.CurrentValue;
         _outOfDateModels = outOfDateModels;
         _hostingEnvironment = hostingEnvironment;
+        _umbracoVersion = umbracoVersion;
         config.OnChange(x => _config = x);
     }
 
@@ -38,7 +41,7 @@ public class ModelsGenerator : IModelsGenerator
 
         IList<TypeModel> typeModels = _umbracoService.GetAllTypes();
 
-        var builder = new TextBuilder(_config, typeModels);
+        var builder = new TextBuilder(_config, typeModels, _umbracoVersion);
 
         foreach (TypeModel typeModel in builder.GetModelsToGenerate())
         {

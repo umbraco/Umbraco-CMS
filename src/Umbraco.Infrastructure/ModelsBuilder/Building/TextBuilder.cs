@@ -1,7 +1,9 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Semver;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 
@@ -10,6 +12,8 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 /// </summary>
 public class TextBuilder : Builder
 {
+    private readonly IUmbracoVersion _umbracoVersion;
+
     private static readonly IDictionary<string, string> _typesMap =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -36,21 +40,16 @@ public class TextBuilder : Builder
     ///     and the result of code parsing.
     /// </summary>
     /// <param name="typeModels">The list of models to generate.</param>
-    public TextBuilder(ModelsBuilderSettings config, IList<TypeModel> typeModels)
-        : base(config, typeModels)
-    {
-    }
-
-    // internal for unit tests only
-    public TextBuilder()
-    {
-    }
+    /// <param name="modelsBuilderApiVersion">The api version used by modelsbuilder</param>
+    public TextBuilder(ModelsBuilderSettings config, IList<TypeModel> typeModels, IUmbracoVersion umbracoVersion)
+        : base(config, typeModels) =>
+        _umbracoVersion = umbracoVersion;
 
     /// <summary>
     ///     Outputs an "auto-generated" header to a string builder.
     /// </summary>
     /// <param name="sb">The string builder.</param>
-    public static void WriteHeader(StringBuilder sb) => TextHeaderWriter.WriteHeader(sb);
+    public static void WriteHeader(StringBuilder sb, SemVersion semVersion) => TextHeaderWriter.WriteHeader(sb, semVersion);
 
     /// <summary>
     ///     Outputs a generated model to a string builder.
@@ -59,7 +58,8 @@ public class TextBuilder : Builder
     /// <param name="typeModel">The model to generate.</param>
     public void Generate(StringBuilder sb, TypeModel typeModel)
     {
-        WriteHeader(sb);
+        SemVersion semVersion = _umbracoVersion.SemanticVersion;
+        WriteHeader(sb, semVersion);
 
         foreach (var t in TypesUsing)
         {
@@ -82,7 +82,8 @@ public class TextBuilder : Builder
     /// <param name="typeModels">The models to generate.</param>
     public void Generate(StringBuilder sb, IEnumerable<TypeModel> typeModels)
     {
-        WriteHeader(sb);
+        SemVersion semVersion = _umbracoVersion.SemanticVersion;
+        WriteHeader(sb, semVersion);
 
         foreach (var t in TypesUsing)
         {
@@ -142,9 +143,9 @@ public class TextBuilder : Builder
     //
     // note that the blog post above clearly states that "Nor should it be applied at the type level if the type being generated is a partial class."
     // and since our models are partial classes, we have to apply the attribute against the individual members, not the class itself.
-    private static void WriteGeneratedCodeAttribute(StringBuilder sb, string tabs) => sb.AppendFormat(
+    private static void WriteGeneratedCodeAttribute(StringBuilder sb, string tabs, SemVersion semVersion) => sb.AppendFormat(
         "{0}[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"Umbraco.ModelsBuilder.Embedded\", \"{1}\")]\n",
-        tabs, ApiVersion.Current.Version);
+        tabs, semVersion);
 
     // writes an attribute that specifies that an output may be null.
     // (useful for consuming projects with nullable reference types enabled)
@@ -273,22 +274,24 @@ public class TextBuilder : Builder
         // as 'new' since parent has its own - or maybe not - disable warning
         sb.Append("\t\t// helpers\n");
         sb.Append("#pragma warning disable 0109 // new is redundant\n");
-        WriteGeneratedCodeAttribute(sb, "\t\t");
+
+        SemVersion semVersion = _umbracoVersion.SemanticVersion;
+        WriteGeneratedCodeAttribute(sb, "\t\t", semVersion);
         sb.AppendFormat(
             "\t\tpublic new const string ModelTypeAlias = \"{0}\";\n",
             type.Alias);
         TypeModel.ItemTypes itemType = type.IsElement ? TypeModel.ItemTypes.Content : type.ItemType; // TODO
-        WriteGeneratedCodeAttribute(sb, "\t\t");
+        WriteGeneratedCodeAttribute(sb, "\t\t", semVersion);
         sb.AppendFormat(
             "\t\tpublic new const PublishedItemType ModelItemType = PublishedItemType.{0};\n",
             itemType);
-        WriteGeneratedCodeAttribute(sb, "\t\t");
+        WriteGeneratedCodeAttribute(sb, "\t\t", semVersion);
         WriteMaybeNullAttribute(sb, "\t\t", true);
         sb.Append(
             "\t\tpublic new static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor)\n");
         sb.Append(
             "\t\t\t=> PublishedModelUtility.GetModelContentType(publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);\n");
-        WriteGeneratedCodeAttribute(sb, "\t\t");
+        WriteGeneratedCodeAttribute(sb, "\t\t", semVersion);
         WriteMaybeNullAttribute(sb, "\t\t", true);
         sb.AppendFormat(
             "\t\tpublic static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedSnapshotAccessor publishedSnapshotAccessor, Expression<Func<{0}, TValue>> selector)\n",
@@ -364,8 +367,8 @@ public class TextBuilder : Builder
 
             sb.Append("\t\t///</summary>\n");
         }
-
-        WriteGeneratedCodeAttribute(sb, "\t\t");
+        SemVersion semVersion = _umbracoVersion.SemanticVersion;
+        WriteGeneratedCodeAttribute(sb, "\t\t", semVersion);
 
         if (!property.ModelClrType.IsValueType)
         {
@@ -440,7 +443,8 @@ public class TextBuilder : Builder
             sb.Append("\t\t///</summary>\n");
         }
 
-        WriteGeneratedCodeAttribute(sb, "\t\t");
+        SemVersion semVersion = _umbracoVersion.SemanticVersion;
+        WriteGeneratedCodeAttribute(sb, "\t\t", semVersion);
         if (!property.ModelClrType.IsValueType)
         {
             WriteMaybeNullAttribute(sb, "\t\t");
@@ -497,7 +501,7 @@ public class TextBuilder : Builder
             sb.AppendFormat("\t\t/// <summary>Static getter for {0}</summary>\n", XmlCommentString(property.Name));
         }
 
-        WriteGeneratedCodeAttribute(sb, "\t\t");
+        WriteGeneratedCodeAttribute(sb, "\t\t", semVersion);
         if (!property.ModelClrType.IsValueType)
         {
             WriteMaybeNullAttribute(sb, "\t\t", true);
@@ -556,7 +560,8 @@ public class TextBuilder : Builder
             sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
         }
 
-        WriteGeneratedCodeAttribute(sb, "\t\t");
+        SemVersion semVersion = _umbracoVersion.SemanticVersion;
+        WriteGeneratedCodeAttribute(sb, "\t\t", semVersion);
         if (!property.ModelClrType.IsValueType)
         {
             WriteMaybeNullAttribute(sb, "\t\t");

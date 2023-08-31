@@ -111,15 +111,16 @@ public static class AssemblyExtensions
     /// Gets the assembly informational version for the specified <paramref name="assembly" />.
     /// </summary>
     /// <param name="assembly">The assembly.</param>
+    /// <param name="semVersionFactory">The SemVersionFactory.</param>
     /// <param name="version">The assembly version.</param>
     /// <returns>
     ///   <c>true</c> if the assembly information version is retrieved; otherwise, <c>false</c>.
     /// </returns>
-    public static bool TryGetInformationalVersion(this Assembly assembly, [NotNullWhen(true)] out string? version)
+    public static bool TryGetInformationalVersion(this Assembly assembly, ISemVersionFactory semVersionFactory, [NotNullWhen(true)] out string? version)
     {
         AssemblyInformationalVersionAttribute? assemblyInformationalVersionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
         if (assemblyInformationalVersionAttribute is not null &&
-            SemVersion.TryParse(assemblyInformationalVersionAttribute.InformationalVersion, out SemVersion? semVersion))
+            semVersionFactory.TryParse(assemblyInformationalVersionAttribute.InformationalVersion, out SemVersion? semVersion))
         {
             version = semVersion.ToSemanticStringWithoutBuild();
             return true;

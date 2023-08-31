@@ -10,7 +10,7 @@ public static class VersionExtensions
 {
     public static Version GetVersion(this SemVersion semVersion, int maxParts = 4)
     {
-        int.TryParse(semVersion.Build, NumberStyles.Integer, CultureInfo.InvariantCulture, out int build);
+        int.TryParse(semVersion.Metadata, NumberStyles.Integer, CultureInfo.InvariantCulture, out int build);
 
         if (maxParts >= 4)
         {

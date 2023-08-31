@@ -39,43 +39,17 @@ public class ModelsBuilderDashboardController : UmbracoAuthorizedJsonController
     private readonly IModelsGenerator _modelGenerator;
     private readonly OutOfDateModelsStatus _outOfDateModels;
 
-    // TODO: Remove in v13
-    private readonly ModelsGenerator? _concreteModelGenerator;
-
-    [Obsolete("This constructor is obsolete and will be removed in v13. Use the constructor with IModelsGenerator instead.")]
-    [Browsable(false)]
-    public ModelsBuilderDashboardController(
-        IOptions<ModelsBuilderSettings> config,
-        ModelsGenerator modelsGenerator,
-        OutOfDateModelsStatus outOfDateModels,
-        ModelsGenerationError mbErrors)
-        : this(config, StaticServiceProvider.Instance.GetRequiredService<IModelsGenerator>(), outOfDateModels, mbErrors)
-    {
-    }
-
-    [Obsolete("This constructor is obsolete and will be removed in v13. Use the constructor with only IModelsGenerator instead.")]
-    [Browsable(false)]
-    public ModelsBuilderDashboardController(
-        IOptions<ModelsBuilderSettings> config,
-        ModelsGenerator concreteModelGenerator,
-        IModelsGenerator modelsGenerator,
-        OutOfDateModelsStatus outOfDateModels,
-        ModelsGenerationError mbErrors)
-        : this(config, modelsGenerator, outOfDateModels, mbErrors)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public ModelsBuilderDashboardController(IOptions<ModelsBuilderSettings> config,
         IModelsGenerator modelsGenerator,
         OutOfDateModelsStatus outOfDateModels,
-        ModelsGenerationError mbErrors)
+        ModelsGenerationError mbErrors,
+        IUmbracoVersion umbracoVersion)
     {
         _config = config.Value;
         _modelGenerator = modelsGenerator;
         _outOfDateModels = outOfDateModels;
         _mbErrors = mbErrors;
-        _dashboardReport = new DashboardReport(config, outOfDateModels, mbErrors);
+        _dashboardReport = new DashboardReport(config, outOfDateModels, mbErrors, umbracoVersion);
     }
 
     // invoked by the dashboard

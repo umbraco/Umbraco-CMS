@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -29,6 +30,7 @@ public class LegacyManifestParser : ILegacyManifestParser
     private readonly IAppPolicyCache _cache;
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
     private readonly ILegacyPackageManifestFileProviderFactory _legacyPackageManifestFileProviderFactory;
+    private readonly ISemVersionFactory _semVersionFactory;
     private readonly LegacyManifestFilterCollection _filters;
     private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -55,7 +57,8 @@ public class LegacyManifestParser : ILegacyManifestParser
         ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IDataValueEditorFactory dataValueEditorFactory,
-        ILegacyPackageManifestFileProviderFactory legacyPackageManifestFileProviderFactory)
+        ILegacyPackageManifestFileProviderFactory legacyPackageManifestFileProviderFactory,
+        ISemVersionFactory semVersionFactory)
     {
         if (appCaches == null)
         {
@@ -74,33 +77,7 @@ public class LegacyManifestParser : ILegacyManifestParser
         _shortStringHelper = shortStringHelper;
         _dataValueEditorFactory = dataValueEditorFactory;
         _legacyPackageManifestFileProviderFactory = legacyPackageManifestFileProviderFactory;
-    }
-
-    [Obsolete("Use other ctor - Will be removed in Umbraco 13")]
-    public LegacyManifestParser(
-        AppCaches appCaches,
-        ManifestValueValidatorCollection validators,
-        LegacyManifestFilterCollection filters,
-        ILogger<LegacyManifestParser> logger,
-        IIOHelper ioHelper,
-        IHostingEnvironment hostingEnvironment,
-        IJsonSerializer jsonSerializer,
-        ILocalizedTextService localizedTextService,
-        IShortStringHelper shortStringHelper,
-        IDataValueEditorFactory dataValueEditorFactory)
-        : this(
-              appCaches,
-              validators,
-              filters,
-              logger,
-              ioHelper,
-              hostingEnvironment,
-              jsonSerializer,
-              localizedTextService,
-              shortStringHelper,
-              dataValueEditorFactory,
-              StaticServiceProvider.Instance.GetRequiredService<ILegacyPackageManifestFileProviderFactory>())
-    {
+        _semVersionFactory = semVersionFactory;
     }
 
     public string AppPluginsPath
@@ -189,7 +166,7 @@ public class LegacyManifestParser : ILegacyManifestParser
             }
 
             if (!string.IsNullOrEmpty(assemblyName) &&
-                TryGetAssemblyInformationalVersion(assemblyName, out string? version))
+                TryGetAssemblyInformationalVersion(assemblyName, _semVersionFactory, out string? version))
             {
                 manifest.Version = version;
             }
@@ -233,13 +210,13 @@ public class LegacyManifestParser : ILegacyManifestParser
         return manifest;
     }
 
-    private bool TryGetAssemblyInformationalVersion(string name, [NotNullWhen(true)] out string? version)
+    private bool TryGetAssemblyInformationalVersion(string name, ISemVersionFactory semVersionFactory, [NotNullWhen(true)] out string? version)
     {
         foreach (Assembly assembly in AssemblyLoadContext.Default.Assemblies)
         {
             AssemblyName assemblyName = assembly.GetName();
             if (string.Equals(assemblyName.Name, name, StringComparison.OrdinalIgnoreCase) &&
-                assembly.TryGetInformationalVersion(out version))
+                assembly.TryGetInformationalVersion(semVersionFactory, out version))
             {
                 return true;
             }

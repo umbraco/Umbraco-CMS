@@ -23,11 +23,13 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.SemanticVersioning;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
@@ -60,7 +62,7 @@ public class ComponentTests
             new DatabaseSchemaCreatorFactory(
                 loggerFactory.CreateLogger<DatabaseSchemaCreator>(),
                 loggerFactory,
-                new UmbracoVersion(),
+                new UmbracoVersion(new SemVersionFactory()),
                 Mock.Of<IEventAggregator>(),
                 Mock.Of<IOptionsMonitor<InstallDefaultDataSettings>>()),
             mapperCollection);
@@ -157,7 +159,7 @@ public class ComponentTests
                 {
                     return Mock.Of<ILogger<ComponentCollection>>();
                 }
-                
+
                 if (type == typeof(ILogger<ComponentCollection>))
                 {
                     return Mock.Of<ILogger<ComponentCollection>>();
@@ -324,7 +326,7 @@ public class ComponentTests
                 {
                     return Mock.Of<ILogger<ComponentCollection>>();
                 }
-                
+
                 if (type == typeof(IServiceProviderIsService))
                 {
                     return Mock.Of<IServiceProviderIsService>();

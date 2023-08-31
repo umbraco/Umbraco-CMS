@@ -10,9 +10,11 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.SemanticVersioning;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Cms.Web.BackOffice.Routing;
@@ -47,7 +49,7 @@ internal class UmbracoCustomizations : ICustomization
 
         fixture.Customize<IUmbracoVersion>(
             u => u.FromFactory(
-                () => new UmbracoVersion()));
+                () => new UmbracoVersion(new SemVersionFactory())));
 
         fixture.Customize<HostingSettings>(x =>
             x.With(settings => settings.ApplicationVirtualPath, string.Empty));

@@ -12,14 +12,19 @@ internal class DashboardReport
 {
     private readonly ModelsBuilderSettings _config;
     private readonly ModelsGenerationError _mbErrors;
+    private readonly IUmbracoVersion _umbracoVersion;
     private readonly OutOfDateModelsStatus _outOfDateModels;
 
-    public DashboardReport(IOptions<ModelsBuilderSettings> config, OutOfDateModelsStatus outOfDateModels,
-        ModelsGenerationError mbErrors)
+    public DashboardReport(
+        IOptions<ModelsBuilderSettings> config,
+        OutOfDateModelsStatus outOfDateModels,
+        ModelsGenerationError mbErrors,
+        IUmbracoVersion umbracoVersion)
     {
         _config = config.Value;
         _outOfDateModels = outOfDateModels;
         _mbErrors = mbErrors;
+        _umbracoVersion = umbracoVersion;
     }
 
     public bool CanGenerate() => _config.ModelsMode.SupportsExplicitGeneration();
@@ -33,7 +38,7 @@ internal class DashboardReport
         var sb = new StringBuilder();
 
         sb.Append("<p>Version: ");
-        sb.Append(ApiVersion.Current.Version);
+        sb.Append(_umbracoVersion.Version);
         sb.Append("</p>");
 
         sb.Append("<p>ModelsBuilder is enabled, with the following configuration:</p>");

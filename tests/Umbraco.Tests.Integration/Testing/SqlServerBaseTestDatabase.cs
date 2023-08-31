@@ -7,8 +7,10 @@ using Moq;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.SemanticVersioning;
 using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
@@ -108,7 +110,7 @@ public abstract class SqlServerBaseTestDatabase : BaseTestDatabase
                     database,
                     _loggerFactory.CreateLogger<DatabaseSchemaCreator>(),
                     _loggerFactory,
-                    new UmbracoVersion(),
+                    new UmbracoVersion(new SemVersionFactory()),
                     Mock.Of<IEventAggregator>(),
                     options);
 

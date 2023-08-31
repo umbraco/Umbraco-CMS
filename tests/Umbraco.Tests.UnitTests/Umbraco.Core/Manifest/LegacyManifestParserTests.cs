@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
+using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -47,7 +48,8 @@ public class LegacyManifestParserTests
             Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IDataValueEditorFactory>(),
-            Mock.Of<ILegacyPackageManifestFileProviderFactory>());
+            Mock.Of<ILegacyPackageManifestFileProviderFactory>(),
+            Mock.Of<ISemVersionFactory>());
     }
 
     private LegacyManifestParser _parser;

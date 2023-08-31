@@ -10,9 +10,11 @@ using NPoco;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.SemanticVersioning;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.Sqlite.Mappers;
 using Umbraco.Cms.Tests.Common;
@@ -123,7 +125,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
             database,
             _loggerFactory.CreateLogger<DatabaseSchemaCreator>(),
             _loggerFactory,
-            new UmbracoVersion(),
+            new UmbracoVersion(new SemVersionFactory()),
             Mock.Of<IEventAggregator>(),
             options);
 

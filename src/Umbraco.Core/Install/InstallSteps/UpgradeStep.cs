@@ -15,11 +15,13 @@ namespace Umbraco.Cms.Core.Install.InstallSteps
         public override bool RequiresExecution(object model) => true;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IRuntimeState _runtimeState;
+        private readonly ISemVersionFactory _semVersionFactory;
 
-        public UpgradeStep(IUmbracoVersion umbracoVersion, IRuntimeState runtimeState)
+        public UpgradeStep(IUmbracoVersion umbracoVersion, IRuntimeState runtimeState, ISemVersionFactory semVersionFactory)
         {
             _umbracoVersion = umbracoVersion;
             _runtimeState = runtimeState;
+            _semVersionFactory = semVersionFactory;
         }
 
         public override Task<InstallSetupResult?> ExecuteAsync(object model) => Task.FromResult<InstallSetupResult?>(null);
@@ -45,7 +47,7 @@ namespace Umbraco.Cms.Core.Install.InstallSteps
                 var currentState = FormatGuidState(_runtimeState.CurrentMigrationState);
                 var newState = FormatGuidState(_runtimeState.FinalMigrationState);
                 var newVersion = _umbracoVersion.SemanticVersion?.ToSemanticStringWithoutBuild();
-                var oldVersion = new SemVersion(_umbracoVersion.SemanticVersion?.Major ?? 0).ToString(); //TODO can we find the old version somehow? e.g. from current state
+                var oldVersion = _semVersionFactory.Create(_umbracoVersion.SemanticVersion?.Major ?? 0).ToString(); //TODO can we find the old version somehow? e.g. from current state
 
                 var reportUrl = $"https://our.umbraco.com/contribute/releases/compare?from={oldVersion}&to={newVersion}&notes=1";
 
