@@ -187,7 +187,6 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 							label="label"
 							.value=${this.property.name}
 							@input=${this.#onNameChange}></uui-input>
-						<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
 						${this.renderPropertyAlias()}
 						<slot name="property-action-menu"></slot>
 						<p>
@@ -253,6 +252,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 					@input=${(e: CustomEvent) => {
 						if (e.target) this._singleValueUpdate('alias', (e.target as HTMLInputElement).value);
 					}}>
+					<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
 					<!-- TODO: validation for bad characters -->
 					<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
 						<uui-icon name=${this._aliasLocked ? 'umb:lock' : 'umb:unlocked'}></uui-icon>
