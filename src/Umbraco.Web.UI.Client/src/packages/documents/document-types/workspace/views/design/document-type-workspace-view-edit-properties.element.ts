@@ -144,8 +144,8 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 						return html`<document-type-workspace-view-edit-property
 							class="property"
 							data-umb-property-id=${ifDefined(property.id)}
-							data-owner-document-type-id=${ifDefined(inheritedFromDocument?.id)}
-							data-owner-document-type-name=${ifDefined(inheritedFromDocument?.name)}
+							owner-document-type-id=${ifDefined(inheritedFromDocument?.id)}
+							owner-document-type-name=${ifDefined(inheritedFromDocument?.name)}
 							?inherited=${property.containerId !== this.containerId}
 							.property=${property}
 							@partial-property-update=${(event: CustomEvent) => {

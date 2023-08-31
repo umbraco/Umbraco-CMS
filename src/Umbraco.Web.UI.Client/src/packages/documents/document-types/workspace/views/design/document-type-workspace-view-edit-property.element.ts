@@ -65,11 +65,11 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 		return this._modalRoute;
 	}
 
-	@property({ type: String, attribute: 'data-owner-document-type-id' })
-	public dataOwnerDocumentTypeId?: string;
+	@property({ type: String, attribute: 'owner-document-type-id' })
+	public ownerDocumentTypeId?: string;
 
-	@property({ type: String, attribute: 'data-owner-document-type-name' })
-	public dataOwnerDocumentTypeName?: string;
+	@property({ type: String, attribute: 'owner-document-type-name' })
+	public ownerDocumentTypeName?: string;
 
 	@state()
 	private _dataTypeName?: string;
@@ -230,8 +230,8 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 							<uui-icon name="umb:merge"></uui-icon>
 							<span>
 								${this.localize.term('contentTypeEditor_inheritedFrom')}
-								<a href=${this._editDocumentTypePath + 'edit/' + this.dataOwnerDocumentTypeId}>
-									${this.dataOwnerDocumentTypeName ?? '??'}
+								<a href=${this._editDocumentTypePath + 'edit/' + this.ownerDocumentTypeId}>
+									${this.ownerDocumentTypeName ?? '??'}
 								</a>
 							</span>
 						</uui-tag>
