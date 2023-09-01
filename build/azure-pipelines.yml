@@ -293,9 +293,9 @@ stages:
               command: test
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
-              ${{if startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')}}:
+              ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release/') }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${integrationReleaseTestFilter}'
-              ${{if not startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')}}:
+              ${{ else }}:
                 arguments: '--configuration $(buildConfiguration) ${integrationNonReleaseTestFilter}'
             env:
               Tests__Database__DatabaseType: 'Sqlite'
@@ -338,9 +338,9 @@ stages:
               command: test
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
-              ${{if startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')}}:
+              ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release/') }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${integrationReleaseTestFilter}'
-              ${{if not startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')}}:
+              ${{ else }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${integrationNonReleaseTestFilter}'
             env:
               Tests__Database__DatabaseType: $(testDb)
