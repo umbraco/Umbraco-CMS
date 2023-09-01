@@ -1,5 +1,7 @@
 export type variantObject = { culture?: string | null; segment?: string | null };
 
+export const INVARIANT_CULTURE = 'invariant';
+
 export class UmbVariantId {
 	public static Create(variantData: variantObject): UmbVariantId {
 		return Object.freeze(new UmbVariantId(variantData));
@@ -9,7 +11,7 @@ export class UmbVariantId {
 	public readonly segment: string | null = null;
 
 	constructor(variantData: variantObject) {
-		this.culture = (variantData.culture === 'invariant' ? null : variantData.culture) ?? null;
+		this.culture = (variantData.culture === INVARIANT_CULTURE ? null : variantData.culture) ?? null;
 		this.segment = variantData.segment ?? null;
 	}
 
@@ -22,7 +24,15 @@ export class UmbVariantId {
 	}
 
 	public toString(): string {
-		return (this.culture || 'invariant') + (this.segment ? `_${this.segment}` : '');
+		return (this.culture || INVARIANT_CULTURE) + (this.segment ? `_${this.segment}` : '');
+	}
+
+	public toCultureString(): string {
+		return (this.culture || INVARIANT_CULTURE);
+	}
+
+	public toSegmentString(): string {
+		return (this.segment || '');
 	}
 
 	public isInvariant(): boolean {
@@ -33,6 +43,7 @@ export class UmbVariantId {
 		return { culture: this.culture, segment: this.segment };
 	}
 
+	// TODO: needs localization option:
 	public toDifferencesString(variantId: UmbVariantId): string {
 		let r = '';
 
