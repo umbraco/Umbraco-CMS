@@ -32,7 +32,7 @@ parameters:
   - name: integrationReleaseTestFilter
     displayName: TestFilter used for release type builds
     type: string
-    default: null
+    default: ''
   - name: escapedIntegrationNonReleaseTestFilter
     displayName: Escaped TestFilter used for non-release type builds
     type: string
@@ -40,7 +40,7 @@ parameters:
   - name: escapedIntegrationReleaseTestFilter
     displayName: Escaped TestFilter used for release type builds
     type: string
-    default: null
+    default: ''
 
 variables:
   nodeVersion: 14.18.1
