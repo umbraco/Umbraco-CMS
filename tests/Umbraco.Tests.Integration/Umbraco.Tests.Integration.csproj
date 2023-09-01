@@ -6,8 +6,9 @@
     <IsPackable>true</IsPackable>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Umbraco.Cms.Tests.Integration</RootNamespace>
+    <GenerateCompatibilitySuppressionFile>true</GenerateCompatibilitySuppressionFile>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Bogus" Version="34.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.5" />
