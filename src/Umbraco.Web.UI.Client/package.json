@@ -158,7 +158,7 @@
 		"@types/mocha": "^10.0.1",
 		"@types/uuid": "^9.0.2",
 		"@typescript-eslint/eslint-plugin": "^6.3.0",
-		"@typescript-eslint/parser": "^6.3.0",
+		"@typescript-eslint/parser": "^6.5.0",
 		"@web/dev-server-esbuild": "^0.4.1",
 		"@web/dev-server-import-maps": "^0.1.1",
 		"@web/test-runner": "^0.17.0",
