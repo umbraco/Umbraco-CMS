@@ -59,7 +59,7 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 				const variantId = UmbVariantId.Create(activeVariantInfo);
 				// We can safely assume in this context that the workspace is variant.
 				//if(variantId.isInvariant()) {
-					this.#dataSetContext = this.#workspaceContext?.createVariableDatasetContext(this, variantId);
+					this.#dataSetContext = this.#workspaceContext?.createVariantDatasetContext(this, variantId);
 				/*} else {
 					this.#dataSetContext = this.#workspaceContext?.createDatasetContext(this);
 				}*/
