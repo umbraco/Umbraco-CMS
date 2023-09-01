@@ -24,23 +24,23 @@ parameters:
   - name: forceReleaseTestFilter
     displayName: Force to use the release test filters
     type: boolean
-    default: : false
+    default: false
   - name: integrationNonReleaseTestFilter
     displayName: TestFilter used for non-release type builds
     type: string
-    default: : --filter TestCategory!=LongRunning&TestCategory!=NonCritical
+    default: '--filter TestCategory!=LongRunning&TestCategory!=NonCritical'
   - name: integrationReleaseTestFilter
     displayName: TestFilter used for release type builds
     type: string
-    default: : null
+    default: null
   - name: escapedIntegrationNonReleaseTestFilter
     displayName: Escaped TestFilter used for non-release type builds
     type: string
-    default: : --filter TestCategory\!=LongRunning&TestCategory\!=NonCritical
+    default: '--filter TestCategory\!=LongRunning&TestCategory\!=NonCritical'
   - name: escapedIntegrationReleaseTestFilter
     displayName: Escaped TestFilter used for release type builds
     type: string
-    default: : null
+    default: null
 
 variables:
   nodeVersion: 14.18.1
@@ -312,10 +312,10 @@ stages:
               command: test
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
-              ${{ if or(forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${integrationReleaseTestFilter}'
+              ${{ if or( parameters.forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
               ${{ else }}:
-                arguments: '--configuration $(buildConfiguration) ${integrationNonReleaseTestFilter}'
+                arguments: '--configuration $(buildConfiguration) ${{parameters.integrationNonReleaseTestFilter}}'
             env:
               Tests__Database__DatabaseType: 'Sqlite'
               Umbraco__CMS__Global__MainDomLock: 'FileSystemMainDomLock'
@@ -326,10 +326,10 @@ stages:
               command: test
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
-              ${{ if or(forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${escapedIntegrationReleaseTestFilter}'
+              ${{ if or( parameters.forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.escapedIntegrationReleaseTestFilter}}'
               ${{ else }}:
-                arguments: '--configuration $(buildConfiguration) ${escapedIntegrationNonReleaseTestFilter}'
+                arguments: '--configuration $(buildConfiguration) ${{parameters.escapedIntegrationNonReleaseTestFilter}}'
             env:
               Tests__Database__DatabaseType: 'Sqlite'
               Umbraco__CMS__Global__MainDomLock: 'FileSystemMainDomLock'
@@ -372,10 +372,10 @@ stages:
               command: test
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
-              ${{ or(forceReleaseTestFilter, if startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${integrationReleaseTestFilter}'
+              ${{ if or( parameters.forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
               ${{ else }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${integrationNonReleaseTestFilter}'
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
             env:
               Tests__Database__DatabaseType: $(testDb)
               Tests__Database__SQLServerMasterConnectionString: $(connectionString)
@@ -387,10 +387,10 @@ stages:
               command: test
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
-              ${{ or(forceReleaseTestFilter, if startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${escapedIntegrationReleaseTestFilter}'
+              ${{ if or( parameters.forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.escapedIntegrationReleaseTestFilter}}'
               ${{ else }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${escapedIntegrationNonReleaseTestFilter}'
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.escapedIntegrationNonReleaseTestFilter}}'
             env:
               Tests__Database__DatabaseType: $(testDb)
               Tests__Database__SQLServerMasterConnectionString: $(connectionString)
