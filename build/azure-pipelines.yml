@@ -33,12 +33,12 @@ parameters:
     displayName: TestFilter used for release type builds
     type: string
     default: ' '
-  - name: escapedIntegrationNonReleaseTestFilter
-    displayName: Escaped TestFilter used for non-release type builds
+  - name: nonWindowsIntegrationNonReleaseTestFilter
+    displayName: TestFilter used for non-release type builds on non windows agents
     type: string
-    default: '--filter TestCategory\!=LongRunning&TestCategory\!=NonCritical'
-  - name: escapedIntegrationReleaseTestFilter
-    displayName: Escaped TestFilter used for release type builds
+    default: '--filter TestCategory!=LongRunning&TestCategory!=NonCritical'
+  - name: nonWindowsIntegrationReleaseTestFilter
+    displayName: TestFilter used for release type builds on non windows agents
     type: string
     default: ' '
 
@@ -327,9 +327,9 @@ stages:
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
               ${{ if or( parameters.forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.escapedIntegrationReleaseTestFilter}}'
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
               ${{ else }}:
-                arguments: '--configuration $(buildConfiguration) ${{parameters.escapedIntegrationNonReleaseTestFilter}}'
+                arguments: '--configuration $(buildConfiguration) ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
             env:
               Tests__Database__DatabaseType: 'Sqlite'
               Umbraco__CMS__Global__MainDomLock: 'FileSystemMainDomLock'
@@ -388,9 +388,9 @@ stages:
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
               ${{ if or( parameters.forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.escapedIntegrationReleaseTestFilter}}'
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
               ${{ else }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.escapedIntegrationNonReleaseTestFilter}}'
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
             env:
               Tests__Database__DatabaseType: $(testDb)
               Tests__Database__SQLServerMasterConnectionString: $(connectionString)
