@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -191,6 +192,7 @@ public class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void EntityService_Can_Get_Paged_Content_Descendants_Including_Recycled()
     {
         var contentType = ContentTypeService.Get("umbTextpage");
@@ -232,6 +234,7 @@ public class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void EntityService_Can_Get_Paged_Content_Descendants_Without_Recycled()
     {
         var contentType = ContentTypeService.Get("umbTextpage");
@@ -274,6 +277,7 @@ public class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void EntityService_Can_Get_Paged_Trashed_Content_Children()
     {
         var contentType = ContentTypeService.Get("umbTextpage");
@@ -379,6 +383,7 @@ public class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void EntityService_Can_Get_Paged_Media_Descendants()
     {
         var folderType = MediaTypeService.Get(1031);
@@ -411,6 +416,7 @@ public class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void EntityService_Can_Get_Paged_Media_Descendants_Including_Recycled()
     {
         var folderType = MediaTypeService.Get(1031);
@@ -453,6 +459,7 @@ public class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void EntityService_Can_Get_Paged_Media_Descendants_Without_Recycled()
     {
         var folderType = MediaTypeService.Get(1031);
@@ -496,6 +503,7 @@ public class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void EntityService_Can_Get_Paged_Trashed_Media_Children()
     {
         var folderType = MediaTypeService.Get(1031);
@@ -540,6 +548,7 @@ public class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void EntityService_Can_Get_Paged_Media_Descendants_With_Search()
     {
         var folderType = MediaTypeService.Get(1031);

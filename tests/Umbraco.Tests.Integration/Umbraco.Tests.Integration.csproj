@@ -20,7 +20,7 @@
   <Import Project="..\..\src\Umbraco.Cms\buildTransitive\Umbraco.Cms.targets" />
   <ItemGroup>
     <ProjectReference Include="..\..\src\Umbraco.Cms\Umbraco.Cms.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" PrivateAssets="all"/>
+    <ProjectReference Include="..\..\src\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" PrivateAssets="all" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
   </ItemGroup>
 

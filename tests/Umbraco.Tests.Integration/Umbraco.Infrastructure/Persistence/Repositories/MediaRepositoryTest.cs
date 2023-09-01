@@ -319,36 +319,6 @@ public class MediaRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    [Ignore("Unsupported feature.")]
-    [Test]
-    public void QueryMedia_ContentTypeAliasFilter()
-    {
-        // we could support this, but it would require an extra join on the query,
-        // and we don't absolutely need it now, so leaving it out for now
-
-        // Arrange
-        var folderMediaType = MediaTypeService.Get(1031);
-        var provider = ScopeProvider;
-        using (var scope = provider.CreateScope())
-        {
-            var repository = CreateRepository(provider, out var mediaTypeRepository);
-
-            // Act
-            for (var i = 0; i < 10; i++)
-            {
-                var folder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
-                repository.Save(folder);
-            }
-
-            string[] types = { "Folder" };
-            var query = provider.CreateQuery<IMedia>().Where(x => types.Contains(x.ContentType.Alias));
-            var result = repository.Get(query);
-
-            // Assert
-            Assert.That(result.Count(), Is.GreaterThanOrEqualTo(11));
-        }
-    }
-
     [Test]
     public void GetPagedResultsByQuery_FirstPage()
     {

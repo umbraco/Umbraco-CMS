@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importing;
@@ -81,6 +82,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
     [Test]
+    [LongRunning]
     public void Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()
     {
         // Arrange
@@ -128,6 +130,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_Inherited_ContentTypes_And_Verify_PropertyTypes_UniqueIds()
     {
         // Arrange
@@ -154,6 +157,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_Inherited_ContentTypes_And_Verify_PropertyGroups_And_PropertyTypes()
     {
         // Arrange
@@ -193,6 +197,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_Template_Package_Xml()
     {
         // Arrange
@@ -262,6 +267,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_StandardMvc_ContentTypes_Package_Xml()
     {
         // Arrange
@@ -300,6 +306,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_StandardMvc_ContentTypes_And_Templates_Xml()
     {
         // Arrange
@@ -326,6 +333,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_Fanoe_Starterkit_ContentTypes_And_Templates_Xml()
     {
         // Arrange
@@ -381,6 +389,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_Media_Package_Xml()
     {
         // Arrange
@@ -507,6 +516,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_ReImport_Single_DocType()
     {
         // Arrange
@@ -726,6 +736,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_Package_With_Compositions()
     {
         // Arrange
