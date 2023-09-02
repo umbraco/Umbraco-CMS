@@ -39,6 +39,17 @@ public static partial class UmbracoApplicationBuilderExtensions
         return builder;
     }
 
+    public static IUmbracoBuilder SetMemberSignInManager<TSignInManager>(this IUmbracoBuilder builder)
+        where TSignInManager : SignInManager<MemberIdentityUser>, IMemberSignInManager
+    {
+        Type customType = typeof(TSignInManager);
+        Type signInManagerType = typeof(SignInManager<MemberIdentityUser>);
+        builder.Services.Replace(ServiceDescriptor.Scoped(typeof(IMemberSignInManager), customType));
+        builder.Services.AddScoped(customType, services => services.GetRequiredService(signInManagerType));
+        builder.Services.Replace(ServiceDescriptor.Scoped(signInManagerType, customType));
+        return builder;
+    }
+
     public static IUmbracoBuilder SetMemberUserStore<TUserStore>(this IUmbracoBuilder builder)
         where TUserStore : MemberUserStore
     {
