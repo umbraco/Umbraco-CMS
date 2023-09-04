@@ -1591,7 +1591,7 @@ public class ContentController : ContentControllerBase
             OperationResult saveResult = _contentService.Save(contentItem.PersistedContent!, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             PublishResult[] publishStatus =
             {
-                new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent)
+                new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent!)
             };
             wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
             successfulCultures = Array.Empty<string>();
@@ -1682,7 +1682,7 @@ public class ContentController : ContentControllerBase
             OperationResult saveResult = _contentService.Save(
                 contentItem.PersistedContent!,
                 _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
-            var publishStatus = new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent);
+            var publishStatus = new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent!);
             wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
             successfulCultures = Array.Empty<string>();
             return publishStatus;

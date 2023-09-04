@@ -9,31 +9,36 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
-public class PublishDocumentController : DocumentControllerBase
+public class PublishDocumentWithDescendantsController : DocumentControllerBase
 {
     private readonly IContentPublishingService _contentPublishingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public PublishDocumentController(IContentPublishingService contentPublishingService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public PublishDocumentWithDescendantsController(IContentPublishingService contentPublishingService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _contentPublishingService = contentPublishingService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut("{id:guid}/publish")]
+    [HttpPut("{id:guid}/publish-with-descendants")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     // TODO: ensure we return a ProblemDetails response model for NotFound
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Publish(Guid id, PublishDocumentRequestModel requestModel)
+    public async Task<IActionResult> PublishWithDescendants(Guid id, PublishDocumentWithDescendantsRequestModel requestModel)
     {
-        Attempt<ContentPublishingOperationStatus> attempt = await _contentPublishingService.PublishAsync(
+        Attempt<IDictionary<Guid, ContentPublishingOperationStatus>> attempt = await _contentPublishingService.PublishBranchAsync(
             id,
             requestModel.Cultures,
+            requestModel.IncludeUnpublishedDescendants,
             CurrentUserKey(_backOfficeSecurityAccessor));
+
+        // FIXME: when we get to implement proper validation handling, this should return a collection of status codes by key (based on attempt.Result)
         return attempt.Success
             ? Ok()
-            : ContentPublishingOperationStatusResult(attempt.Result);
+            : ContentPublishingOperationStatusResult(
+                attempt.Result?.Values.FirstOrDefault(r => r is not ContentPublishingOperationStatus.Success)
+                ?? throw new NotSupportedException("The attempt was not successful - at least one result value should be unsuccessful too"));
     }
 }

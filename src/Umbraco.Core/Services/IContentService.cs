@@ -365,64 +365,33 @@ public interface IContentService : IContentServiceBase<IContent>
 
     #region Publish Document
 
-    /// <summary>
-    ///     Saves and publishes a document.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         By default, publishes all variations of the document, but it is possible to specify a culture to be
-    ///         published.
-    ///     </para>
-    ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
-    ///     <para>The document is *always* saved, even when publishing fails.</para>
-    ///     <para>
-    ///         If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
-    ///         'empty'. If the content type is invariant, then culture can be either '*' or null or empty.
-    ///     </para>
-    /// </remarks>
-    /// <param name="content">The document to publish.</param>
-    /// <param name="culture">The culture to publish.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
+    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(Publish)} instead. Will be removed in V16")]
     PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId);
 
-    /// <summary>
-    ///     Saves and publishes a document.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         By default, publishes all variations of the document, but it is possible to specify a culture to be
-    ///         published.
-    ///     </para>
-    ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
-    ///     <para>The document is *always* saved, even when publishing fails.</para>
-    /// </remarks>
-    /// <param name="content">The document to publish.</param>
-    /// <param name="cultures">The cultures to publish.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
+    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(Publish)} instead. Will be removed in V16")]
     PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Saves and publishes a document branch.
+    ///     Publishes a document.
     /// </summary>
-    /// <param name="content">The root document.</param>
-    /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
-    /// <param name="culture">A culture, or "*" for all cultures.</param>
-    /// <param name="userId">The identifier of the user performing the operation.</param>
     /// <remarks>
-    ///     <para>
-    ///         Unless specified, all cultures are re-published. Otherwise, one culture can be specified. To act on more
-    ///         than one culture, see the other overloads of this method.
-    ///     </para>
-    ///     <para>
-    ///         The <paramref name="force" /> parameter determines which documents are published. When <c>false</c>,
-    ///         only those documents that are already published, are republished. When <c>true</c>, all documents are
-    ///         published. The root of the branch is always published, regardless of <paramref name="force" />.
-    ///     </para>
+    ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
+    ///     <para>Wildcards (*) can be used as culture identifier to publish all cultures.</para>
+    ///     <para>An empty array (or a wildcard) can be passed for culture invariant content.</para>
     /// </remarks>
+    /// <param name="content">The document to publish.</param>
+    /// <param name="cultures">The cultures to publish.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    PublishResult Publish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
+
+    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(PublishBranch)} instead. Will be removed in V16")]
     IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = Constants.Security.SuperUserId);
 
+    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(PublishBranch)} instead. Will be removed in V16")]
+    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId);
+
     /// <summary>
-    ///     Saves and publishes a document branch.
+    ///     Publishes a document branch.
     /// </summary>
     /// <param name="content">The root document.</param>
     /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
@@ -435,7 +404,7 @@ public interface IContentService : IContentServiceBase<IContent>
     ///         published. The root of the branch is always published, regardless of <paramref name="force" />.
     ///     </para>
     /// </remarks>
-    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId);
+    IEnumerable<PublishResult> PublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId);
 
     ///// <summary>
     ///// Saves and publishes a document branch.

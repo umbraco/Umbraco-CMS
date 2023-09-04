@@ -3,19 +3,19 @@
 public enum ContentPublishingOperationStatus
 {
     Success,
-    SuccessPublishCulture,
     ContentNotFound,
-    FailedCancelledByEvent,
-    FailedContentInvalid,
-    FailedNothingToPublish,
-    FailedMandatoryCultureMissing,
-    FailedHasExpired,
-    FailedCultureHasExpired,
-    FailedAwaitingRelease,
-    FailedCultureAwaitingRelease,
-    FailedIsTrashed,
-    FailedPathNotPublished,
-    SuccessPublishAlready,
-    FailedPublishCancelledByEvent,
-    FailedPublishContentInvalid
+    CancelledByEvent,
+    ContentInvalid,
+    NothingToPublish,
+    MandatoryCultureMissing,
+    HasExpired,
+    CultureHasExpired,
+    AwaitingRelease,
+    CultureAwaitingRelease,
+    InTrash,
+    PathNotPublished,
+    ConcurrencyViolation,
+    UnsavedChanges,
+    Failed, // unspecified failure (can happen on unpublish at the time of writing)
+    Unknown
 }
