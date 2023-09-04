@@ -1,5 +1,8 @@
-import { ManifestRepository, ManifestStore, ManifestTreeStore } from '@umbraco-cms/backoffice/extension-registry';
 import { SCRIPTS_REPOSITORY_ALIAS } from '../config.js';
+import { UmbScriptsRepository } from './scripts.repository.js';
+import { UmbScriptsStore } from './scripts.store.js';
+import { UmbScriptsTreeStore } from './scripts.tree.store.js';
+import { ManifestRepository, ManifestStore, ManifestTreeStore } from '@umbraco-cms/backoffice/extension-registry';
 
 const repository: ManifestRepository = {
 	type: 'repository',
