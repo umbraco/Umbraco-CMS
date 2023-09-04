@@ -1145,10 +1145,13 @@ public class MediaController : ContentControllerBase
             IQuery<IMedia>? queryFilter = null;
             if (filter.IsNullOrWhiteSpace() == false)
             {
+                int.TryParse(filter, out int filterAsIntId);
+                Guid.TryParse(filter, out Guid filterAsGuid);
                 //add the default text filter
                 queryFilter = _sqlContext.Query<IMedia>()
                     .Where(x => x.Name != null)
-                    .Where(x => x.Name!.Contains(filter));
+                    .Where(x => x.Name!.Contains(filter)
+                      || x.Id == filterAsIntId || x.Key == filterAsGuid);
             }
 
             children = _mediaService
