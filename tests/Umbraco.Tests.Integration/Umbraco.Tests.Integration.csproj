@@ -109,4 +109,8 @@
       <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
+  </ItemGroup>
 </Project>
