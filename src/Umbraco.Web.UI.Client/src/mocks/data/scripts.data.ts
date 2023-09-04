@@ -1,6 +1,7 @@
 import { UmbEntityData } from './entity.data.js';
 import { createFileSystemTreeItem, createTextFileItem } from './utils.js';
 import {
+	CreatePathFolderRequestModel,
 	CreateTextFileViewModelBaseModel,
 	FileSystemTreeItemPresentationModel,
 	PagedFileSystemTreeItemPresentationModel,
@@ -12,7 +13,7 @@ import {
 
 type ScriptsDataItem = ScriptResponseModel & FileSystemTreeItemPresentationModel & { id: string };
 
-export const treeData: Array<ScriptsDataItem> = [
+export const data: Array<ScriptsDataItem> = [
 	{
 		id: 'some-folder',
 		path: 'some-folder',
@@ -124,7 +125,7 @@ export const treeData: Array<ScriptsDataItem> = [
 
 class UmbScriptsTreeData extends UmbEntityData<FileSystemTreeItemPresentationModel> {
 	constructor() {
-		super(treeData);
+		super(data);
 	}
 
 	getTreeRoot(): PagedFileSystemTreeItemPresentationModel {
@@ -147,18 +148,47 @@ class UmbScriptsTreeData extends UmbEntityData<FileSystemTreeItemPresentationMod
 	}
 }
 
+class UmbScriptsFolderData extends UmbEntityData<ScriptResponseModel> {
+	constructor() {
+		super(data);
+	}
+
+	getFolder(path: string): FileSystemTreeItemPresentationModel {
+		const items = data.filter((item) => item.isFolder && item.path === path);
+		const total = items.length;
+		return items as FileSystemTreeItemPresentationModel;
+	}
+
+	postFolder(payload: CreatePathFolderRequestModel) {
+		const newFolder = {
+			id: `${payload.parentPath ?? ''}/${payload.name}`,
+			path: `${payload.parentPath ?? ''}/${payload.name}`,
+			isFolder: true,
+			name: payload.name,
+			type: 'script',
+			hasChildren: false,
+		};
+		return this.insert(newFolder);
+	}
+
+	deleteFolder(path: string) {
+		return this.delete([path]);
+	}
+}
+
 export const umbScriptsTreeData = new UmbScriptsTreeData();
+export const umbScriptsFolderData = new UmbScriptsFolderData();
 
 class UmbScriptsData extends UmbEntityData<ScriptResponseModel> {
 	constructor() {
-		super(treeData);
+		super(data);
 	}
 
-	getPartialView(path: string): PartialViewResponseModel | undefined {
+	getScript(path: string): ScriptResponseModel | undefined {
 		return createTextFileItem(this.data.find((item) => item.path === path));
 	}
 
-	insertPartialView(item: CreateTextFileViewModelBaseModel) {
+	insertScript(item: CreateTextFileViewModelBaseModel) {
 		const newItem: ScriptsDataItem = {
 			...item,
 			path: `${item.parentPath}/${item.name}.js}`,
@@ -173,4 +203,4 @@ class UmbScriptsData extends UmbEntityData<ScriptResponseModel> {
 	}
 }
 
-export const umbPartialViewsData = new UmbScriptsData();
+export const umbScriptsData = new UmbScriptsData();
