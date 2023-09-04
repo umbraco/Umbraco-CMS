@@ -8,6 +8,7 @@ import type {
 	FileSystemTreeItemPresentationModel,
 	DocumentResponseModel,
 	TextFileResponseModelBaseModel,
+	FileItemResponseModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => {
@@ -40,7 +41,7 @@ export const createContentTreeItem = (item: any): ContentTreeItemResponseModel &
 
 // TODO: remove isTrashed type extension when we have found a solution to trashed items
 export const createDocumentTreeItem = (
-	item: DocumentResponseModel
+	item: DocumentResponseModel,
 ): DocumentTreeItemResponseModel & { isTrashed: boolean } => {
 	return {
 		...createContentTreeItem(item),
@@ -81,7 +82,7 @@ export const createTextFileItem = (item: any): TextFileResponseModelBaseModel =>
 	content: item.content,
 });
 
-export const createItem = (item: any): any => ({
+export const createFileItemResponseModelBaseModel = (item: any): FileItemResponseModelBaseModel => ({
 	path: item.path,
 	name: item.name,
 	icon: item.icon,

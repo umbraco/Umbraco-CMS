@@ -1,5 +1,5 @@
 import { UmbEntityData } from './entity.data.js';
-import { createFileSystemTreeItem, createItem, createTextFileItem } from './utils.js';
+import { createFileSystemTreeItem, createFileItemResponseModelBaseModel, createTextFileItem } from './utils.js';
 import {
 	CreateTextFileViewModelBaseModel,
 	FileSystemTreeItemPresentationModel,
@@ -125,7 +125,7 @@ class UmbStylesheetData extends UmbEntityData<StylesheetDBItem> {
 	}
 
 	getStylesheetItem(path: string): StylesheetDBItem | undefined {
-		return createItem(this.data.find((item) => item.path === path));
+		return createFileItemResponseModelBaseModel(this.data.find((item) => item.path === path));
 	}
 
 	getStylesheet(path: string): StylesheetResponseModel | undefined {
@@ -146,21 +146,21 @@ class UmbStylesheetData extends UmbEntityData<StylesheetDBItem> {
 	getRules(path: string): Array<RichTextRuleModel> {
 		return [
 			{
-				"name": "bjjh",
-				"selector": "h1",
-				"styles": "color: blue;"
+				name: 'bjjh',
+				selector: 'h1',
+				styles: 'color: blue;',
 			},
 			{
-				"name": "comeone",
-				"selector": "h1",
-				"styles": "color: blue;"
+				name: 'comeone',
+				selector: 'h1',
+				styles: 'color: blue;',
 			},
 			{
-				"name": "lol",
-				"selector": "h1",
-				"styles": "color: blue;"
-			}
-		]
+				name: 'lol',
+				selector: 'h1',
+				styles: 'color: blue;',
+			},
+		];
 	}
 
 	insertFolder(item: CreateTextFileViewModelBaseModel) {
