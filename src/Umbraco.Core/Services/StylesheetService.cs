@@ -32,7 +32,7 @@ public class StylesheetService : FileServiceBase<IStylesheetRepository, IStylesh
     }
 
     /// <inheritdoc />
-    public async Task<StylesheetOperationStatus> DeleteAsync(string path, Guid performingUserKey)
+    public async Task<StylesheetOperationStatus> DeleteAsync(string path, Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -52,14 +52,14 @@ public class StylesheetService : FileServiceBase<IStylesheetRepository, IStylesh
         Repository.Delete(stylesheet);
 
         scope.Notifications.Publish(new StylesheetDeletedNotification(stylesheet, eventMessages).WithStateFrom(deletingNotification));
-        await AuditAsync(AuditType.Delete, performingUserKey);
+        await AuditAsync(AuditType.Delete, userKey);
 
         scope.Complete();
         return StylesheetOperationStatus.Success;
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IStylesheet?, StylesheetOperationStatus>> CreateAsync(StylesheetCreateModel createModel, Guid performingUserKey)
+    public async Task<Attempt<IStylesheet?, StylesheetOperationStatus>> CreateAsync(StylesheetCreateModel createModel, Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -89,7 +89,7 @@ public class StylesheetService : FileServiceBase<IStylesheetRepository, IStylesh
         Repository.Save(stylesheet);
 
         scope.Notifications.Publish(new StylesheetSavedNotification(stylesheet, eventMessages).WithStateFrom(savingNotification));
-        await AuditAsync(AuditType.Save, performingUserKey);
+        await AuditAsync(AuditType.Save, userKey);
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IStylesheet?, StylesheetOperationStatus>(StylesheetOperationStatus.Success, stylesheet);
@@ -122,7 +122,7 @@ public class StylesheetService : FileServiceBase<IStylesheetRepository, IStylesh
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IStylesheet?, StylesheetOperationStatus>> UpdateAsync(StylesheetUpdateModel updateModel, Guid performingUserKey)
+    public async Task<Attempt<IStylesheet?, StylesheetOperationStatus>> UpdateAsync(StylesheetUpdateModel updateModel, Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -157,7 +157,7 @@ public class StylesheetService : FileServiceBase<IStylesheetRepository, IStylesh
         Repository.Save(stylesheet);
 
         scope.Notifications.Publish(new StylesheetSavedNotification(stylesheet, eventMessages).WithStateFrom(savingNotification));
-        await AuditAsync(AuditType.Save, performingUserKey);
+        await AuditAsync(AuditType.Save, userKey);
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IStylesheet?, StylesheetOperationStatus>(StylesheetOperationStatus.Success, stylesheet);
@@ -178,9 +178,9 @@ public class StylesheetService : FileServiceBase<IStylesheetRepository, IStylesh
         return StylesheetOperationStatus.Success;
     }
 
-    private async Task AuditAsync(AuditType type, Guid performingUserKey)
+    private async Task AuditAsync(AuditType type, Guid userKey)
     {
-        var userId = await _userIdKeyResolver.GetAsync(performingUserKey);
+        var userId = await _userIdKeyResolver.GetAsync(userKey);
         _auditRepository.Save(new AuditItem(-1, type, userId, "Stylesheet"));
     }
 }

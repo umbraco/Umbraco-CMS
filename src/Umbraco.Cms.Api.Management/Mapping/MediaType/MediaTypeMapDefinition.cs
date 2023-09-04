@@ -11,7 +11,8 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
     public void DefineMaps(IUmbracoMapper mapper)
         => mapper.Define<IMediaType, MediaTypeResponseModel>((_, _) => new MediaTypeResponseModel(), Map);
 
-    // Umbraco.Code.MapAll
+    // Todo: ParentId
+    // Umbraco.Code.MapAll -ParentId
     private void Map(IMediaType source, MediaTypeResponseModel target, MapperContext context)
     {
         target.Id = source.Key;

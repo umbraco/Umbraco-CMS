@@ -17,9 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Cms.Persistence.EFCore.Sqlite\Umbraco.Cms.Persistence.EFCore.Sqlite.csproj" />
-    <ProjectReference Include="..\Umbraco.Cms.Persistence.EFCore.SqlServer\Umbraco.Cms.Persistence.EFCore.SqlServer.csproj" />
-    <ProjectReference Include="..\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj" />
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
 

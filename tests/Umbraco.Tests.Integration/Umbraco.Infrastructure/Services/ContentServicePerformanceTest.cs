@@ -69,18 +69,18 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
         ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
         contentType1.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => contentType2.Id), contentType2.Key, 0, contentType2.Alias),
-            new ContentTypeSort(new Lazy<int>(() => contentType3.Id), contentType3.Key, 1, contentType3.Alias)
+            new ContentTypeSort(contentType2.Key, 0, contentType2.Alias),
+            new ContentTypeSort(contentType3.Key, 1, contentType3.Alias)
         };
         contentType2.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => contentType1.Id), contentType1.Key, 0, contentType1.Alias),
-            new ContentTypeSort(new Lazy<int>(() => contentType3.Id), contentType3.Key, 1, contentType3.Alias)
+            new ContentTypeSort(contentType1.Key, 0, contentType1.Alias),
+            new ContentTypeSort(contentType3.Key, 1, contentType3.Alias)
         };
         contentType3.AllowedContentTypes = new[]
         {
-            new ContentTypeSort(new Lazy<int>(() => contentType1.Id), contentType1.Key, 0, contentType1.Alias),
-            new ContentTypeSort(new Lazy<int>(() => contentType2.Id), contentType2.Key, 1, contentType2.Alias)
+            new ContentTypeSort(contentType1.Key, 0, contentType1.Alias),
+            new ContentTypeSort(contentType2.Key, 1, contentType2.Alias)
         };
         ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
 
@@ -120,7 +120,7 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
 
         // Act
         var watch = Stopwatch.StartNew();
-        ContentService.Save(pages, 0);
+        ContentService.Save(pages, -1);
         watch.Stop();
         var elapsed = watch.ElapsedMilliseconds;
 
@@ -139,7 +139,7 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
 
         // Act
         var watch = Stopwatch.StartNew();
-        ContentService.Save(pages, 0);
+        ContentService.Save(pages, -1);
         watch.Stop();
         var elapsed = watch.ElapsedMilliseconds;
 
@@ -155,7 +155,7 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
         // Arrange
         var contentType = ContentTypeService.Get(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
-        ContentService.Save(pages, 0);
+        ContentService.Save(pages, -1);
 
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -182,7 +182,7 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
         // Arrange
         var contentType = ContentTypeService.Get(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
-        ContentService.Save(pages, 0);
+        ContentService.Save(pages, -1);
 
         using (var scope = ScopeProvider.CreateScope())
         {
@@ -208,7 +208,7 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
         // Arrange
         var contentType = ContentTypeService.Get(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
-        ContentService.Save(pages, 0);
+        ContentService.Save(pages, -1);
 
         using (var scope = ScopeProvider.CreateScope())
         {
@@ -237,7 +237,7 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
         // Arrange
         var contentType = ContentTypeService.Get(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
-        ContentService.Save(pages, 0);
+        ContentService.Save(pages, -1);
 
         using (var scope = ScopeProvider.CreateScope())
         {

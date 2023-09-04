@@ -33,22 +33,22 @@ public partial class EventAggregator : IEventAggregator
     }
 
     /// <inheritdoc />
-    public Task PublishAsync<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
+    public async Task PublishAsync<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
         where TNotification : INotification
     {
         ArgumentNullException.ThrowIfNull(notification);
 
-        return PublishAsync<TNotification, INotificationHandler>(notification.Yield(), cancellationToken);
+        await PublishAsync<TNotification, INotificationHandler>(notification.Yield(), cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task PublishAsync<TNotification, TNotificationHandler>(IEnumerable<TNotification> notifications, CancellationToken cancellationToken = default)
+    public async Task PublishAsync<TNotification, TNotificationHandler>(IEnumerable<TNotification> notifications, CancellationToken cancellationToken = default)
         where TNotification : INotification
         where TNotificationHandler : INotificationHandler
     {
         PublishNotifications<TNotification, TNotificationHandler>(notifications);
 
-        return PublishNotificationsAsync<TNotification, TNotificationHandler>(notifications, cancellationToken);
+        await PublishNotificationsAsync<TNotification, TNotificationHandler>(notifications, cancellationToken);
     }
 
     /// <inheritdoc />

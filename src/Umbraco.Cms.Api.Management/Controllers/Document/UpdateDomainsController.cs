@@ -39,7 +39,9 @@ public class UpdateDomainsController : DocumentControllerBase
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the domain update operation.")
                 .Build()),
-            DomainOperationStatus.ContentNotFound => NotFound("The targeted content item was not found."),
+            DomainOperationStatus.ContentNotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("The targeted content item was not found.")
+                    .Build()),
             DomainOperationStatus.LanguageNotFound => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid language specified")
                 .WithDetail("One or more of the specified language ISO codes could not be found.")
@@ -48,7 +50,9 @@ public class UpdateDomainsController : DocumentControllerBase
                 .WithTitle("Duplicate domain name detected")
                 .WithDetail("One or more of the specified domain names were duplicates, possibly of assignments to other content items.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown domain update operation status")
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown domain update operation status.")
+                .Build()),
         };
     }
 }

@@ -23,12 +23,19 @@ public class ByRelationTypeKeyRelationController : RelationControllerBase
         _relationPresentationFactory = relationPresentationFactory;
     }
 
+    /// <summary>
+    /// Gets a paged list of relations by the unique relation key.
+    /// </summary>
+    /// <remarks>
+    /// Use case: On a relation type page you can see all created relations of this type.
+    /// </remarks>
     [HttpGet("type/{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<ProblemDetails>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByRelationTypeKey(Guid id, int skip = 0, int take = 100)
     {
-        Attempt<PagedModel<IRelation>, RelationOperationStatus> relationsAttempt = await _relationService.GetPagedByRelationTypeKey(id, skip, take);
+        Attempt<PagedModel<IRelation>, RelationOperationStatus> relationsAttempt = await _relationService.GetPagedByRelationTypeKeyAsync(id, skip, take);
 
         if (relationsAttempt.Success is false)
         {

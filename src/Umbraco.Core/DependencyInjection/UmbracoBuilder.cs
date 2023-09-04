@@ -35,6 +35,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
@@ -287,6 +288,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ILocalizationService, LocalizationService>();
             Services.AddUnique<IDictionaryItemService, DictionaryItemService>();
             Services.AddUnique<IDataTypeContainerService, DataTypeContainerService>();
+            Services.AddUnique<IContentTypeContainerService, ContentTypeContainerService>();
+            Services.AddUnique<IMediaTypeContainerService, MediaTypeContainerService>();
             Services.AddUnique<IIsoCodeValidator, IsoCodeValidator>();
             Services.AddUnique<ILanguageService, LanguageService>();
             Services.AddUnique<IMacroService, MacroService>();
@@ -307,6 +310,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IContentTypeService, ContentTypeService>();
             Services.AddUnique<IContentTypeBaseServiceProvider, ContentTypeBaseServiceProvider>();
             Services.AddUnique<IMediaTypeService, MediaTypeService>();
+            Services.AddUnique<IContentTypeEditingService, ContentTypeEditingService>();
+            Services.AddUnique<IMediaTypeEditingService, MediaTypeEditingService>();
             Services.AddUnique<IFileService, FileService>();
             Services.AddUnique<ITemplateService, TemplateService>();
             Services.AddUnique<IScriptService, ScriptService>();
@@ -323,6 +328,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IMemberTypeService, MemberTypeService>();
             Services.AddUnique<INotificationService, NotificationService>();
             Services.AddUnique<ITrackedReferencesService, TrackedReferencesService>();
+            Services.AddUnique<ITreeEntitySortingService, TreeEntitySortingService>();
             Services.AddUnique<ExternalLoginService>(factory => new ExternalLoginService(
                 factory.GetRequiredService<ICoreScopeProvider>(),
                 factory.GetRequiredService<ILoggerFactory>(),
@@ -350,6 +356,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDictionaryService, DictionaryService>();
             Services.AddUnique<ITemporaryMediaService, TemporaryMediaService>();
             Services.AddUnique<IMediaImportService, MediaImportService>();
+
+            // Register filestream security analyzers
+            Services.AddUnique<IFileStreamSecurityValidator,FileStreamSecurityValidator>();
         }
     }
 }

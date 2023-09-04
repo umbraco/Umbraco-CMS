@@ -51,31 +51,33 @@ public interface IUserService : IMembershipUserService
     /// <remarks>
     /// This creates both the Umbraco user and the identity user.
     /// </remarks>
-    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <param name="model">Model to create the user from.</param>
     /// <param name="approveUser">Specifies if the user should be enabled be default. Defaults to false.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
-    Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(Guid performingUserKey, UserCreateModel model, bool approveUser = false);
+    Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(Guid userKey, UserCreateModel model, bool approveUser = false);
 
-    Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(Guid performingUserKey, UserInviteModel model);
+    Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(Guid userKey, UserInviteModel model);
 
     Task<Attempt<UserOperationStatus>> VerifyInviteAsync(Guid userKey, string token);
 
     Task<Attempt<PasswordChangedModel, UserOperationStatus>> CreateInitialPasswordAsync(Guid userKey, string token, string password);
-    
-    Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model);
+
+    Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid userKey, UserUpdateModel model);
 
     Task<UserOperationStatus> SetAvatarAsync(Guid userKey, Guid temporaryFileKey);
 
-    Task<UserOperationStatus> DeleteAsync(Guid key);
+    Task<UserOperationStatus> DeleteAsync(Guid userKey, ISet<Guid> keys);
 
-    Task<UserOperationStatus> DisableAsync(Guid performingUserKey, ISet<Guid> keys);
+    Task<UserOperationStatus> DeleteAsync(Guid userKey, Guid key) => DeleteAsync(userKey, new HashSet<Guid> { key });
 
-    Task<UserOperationStatus> EnableAsync(Guid performingUserKey, ISet<Guid> keys);
+    Task<UserOperationStatus> DisableAsync(Guid userKey, ISet<Guid> keys);
 
-    Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(Guid performingUserKey, params Guid[] keys);
+    Task<UserOperationStatus> EnableAsync(Guid userKey, ISet<Guid> keys);
 
-    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeUserPasswordModel model);
+    Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(Guid userKey, params Guid[] keys);
+
+    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid userKey, ChangeUserPasswordModel model);
 
     Task<UserOperationStatus> ClearAvatarAsync(Guid userKey);
 
@@ -84,12 +86,14 @@ public interface IUserService : IMembershipUserService
     /// <summary>
     /// Gets all users that the requesting user is allowed to see.
     /// </summary>
-    /// <param name="requestingUserKey">The Key of the user requesting the users.</param>
-    /// <returns></returns>
-    Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(Guid requestingUserKey, int skip, int take) => throw new NotImplementedException();
+    /// <param name="userKey">The Key of the user requesting the users.</param>
+    /// <param name="skip">Amount to skip.</param>
+    /// <param name="take">Amount to take.</param>
+    /// <returns>All users that the user is allowed to see.</returns>
+    Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(Guid userKey, int skip, int take) => throw new NotImplementedException();
 
     public Task<Attempt<PagedModel<IUser>, UserOperationStatus>> FilterAsync(
-        Guid requestingUserKey,
+        Guid userKey,
         UserFilter filter,
         int skip = 0,
         int take = 100,
@@ -380,4 +384,24 @@ public interface IUserService : IMembershipUserService
 
     #endregion
 
+    /// <summary>
+    ///     Verifies the reset code sent from the reset password mail for a given user.
+    /// </summary>
+    /// <param name="userKey">The unique key of the user.</param>
+    /// <param name="token">The reset password token.</param>
+    Task<Attempt<UserOperationStatus>> VerifyPasswordResetAsync(Guid userKey, string token);
+
+    /// <summary>
+    ///     Changes the user's password.
+    /// </summary>
+    /// <param name="userKey">The unique key of the user.</param>
+    /// <param name="token">The reset password token.</param>
+    /// <param name="password">The new password of the user.</param>
+    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ResetPasswordAsync(Guid userKey, string token, string password);
+
+    /// <summary>
+    ///     Sends an email with a link to reset user's password.
+    /// </summary>
+    /// <param name="userEmail">The email address of the user.</param>
+    Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail);
 }

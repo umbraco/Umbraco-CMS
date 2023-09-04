@@ -14,5 +14,7 @@ public enum ContentEditingOperationStatus
     TemplateNotAllowed,
     PropertyTypeNotFound,
     InTrash,
+    NotInTrash,
+    SortingInvalid,
     Unknown
 }

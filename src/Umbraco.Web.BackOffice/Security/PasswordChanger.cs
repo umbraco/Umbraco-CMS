@@ -67,23 +67,22 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
             });
         }
 
-        // Are we just changing another user/member's password?
+        // If old password is not specified we either have to change another user's password, or provide a reset password token
         if (changingPasswordModel.OldPassword.IsNullOrWhiteSpace())
         {
-            if (changingPasswordModel.Id == currentUser?.Id)
+            if (changingPasswordModel.Id == currentUser?.Id && changingPasswordModel.ResetPasswordToken is null)
             {
                 return Attempt.Fail(new PasswordChangedModel
                 {
 
-                    Error = new ValidationResult("Cannot change the password of current user without the old password", new[] { "value" }),
+                    Error = new ValidationResult("Cannot change the password of current user without the old password or a reset password token", new[] { "value" }),
                 });
             }
 
             // ok, we should be able to reset it
-            var resetToken = await userMgr.GeneratePasswordResetTokenAsync(identityUser);
-
-            IdentityResult resetResult =
-                await userMgr.ChangePasswordWithResetAsync(userId, resetToken, changingPasswordModel.NewPassword);
+            IdentityResult resetResult = changingPasswordModel.ResetPasswordToken is not null
+                ? await userMgr.ResetPasswordAsync(identityUser, changingPasswordModel.ResetPasswordToken.FromUrlBase64()!, changingPasswordModel.NewPassword)
+                : await userMgr.ChangePasswordWithResetAsync(userId, await userMgr.GeneratePasswordResetTokenAsync(identityUser), changingPasswordModel.NewPassword);
 
             if (resetResult.Succeeded == false)
             {

@@ -36,7 +36,7 @@ public class UpdateCreatedPackageController : CreatedPackageControllerBase
     /// <returns>The created package.</returns>
     [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Update(Guid id, UpdatePackageRequestModel updatePackageRequestModel)
     {
@@ -44,7 +44,7 @@ public class UpdateCreatedPackageController : CreatedPackageControllerBase
 
         if (package is null)
         {
-            return NotFound();
+            return CreatedPackageNotFound();
         }
 
         // Macros are not included!

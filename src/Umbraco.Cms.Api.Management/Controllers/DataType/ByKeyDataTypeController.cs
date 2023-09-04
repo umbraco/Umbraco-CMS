@@ -23,13 +23,13 @@ public class ByKeyDataTypeController : DataTypeControllerBase
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DataTypeResponseModel), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DataTypeResponseModel>> ByKey(Guid id)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ByKey(Guid id)
     {
         IDataType? dataType = await _dataTypeService.GetAsync(id);
         if (dataType == null)
         {
-            return NotFound();
+            return DataTypeNotFound();
         }
 
         return Ok(_umbracoMapper.Map<DataTypeResponseModel>(dataType));

@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
@@ -23,17 +24,16 @@ public class ByKeyDocumentTypeController : DocumentTypeControllerBase
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DocumentTypeResponseModel), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid id)
     {
-        // FIXME: create and use an async get method here.
-        IContentType? contentType = _contentTypeService.Get(id);
-        if (contentType == null)
+        IContentType? contentType = await _contentTypeService.GetAsync(id);
+        if (contentType is null)
         {
-            return NotFound();
+            return OperationStatusResult(ContentTypeOperationStatus.NotFound);
         }
 
         DocumentTypeResponseModel model = _umbracoMapper.Map<DocumentTypeResponseModel>(contentType)!;
-        return await Task.FromResult(Ok(model));
+        return Ok(model);
     }
 }

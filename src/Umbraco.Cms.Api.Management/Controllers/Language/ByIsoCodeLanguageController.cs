@@ -22,14 +22,14 @@ public class ByIsoCodeLanguageController : LanguageControllerBase
 
     [HttpGet($"{{{nameof(isoCode)}}}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(LanguageResponseModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<LanguageResponseModel>> ByIsoCode(string isoCode)
+    public async Task<IActionResult> ByIsoCode(string isoCode)
     {
         ILanguage? language = await _languageService.GetAsync(isoCode);
         if (language == null)
         {
-            return NotFound();
+            return LanguageNotFound();
         }
 
         return Ok(_umbracoMapper.Map<LanguageResponseModel>(language)!);

@@ -131,7 +131,6 @@ public class EntityMapDefinition : IMapDefinition
     {
         target.Alias = source.Alias;
         target.Key = source.Key;
-        target.Id = new Lazy<int>(() => Convert.ToInt32(source.Id));
     }
 
     // Umbraco.Code.MapAll -Trashed
@@ -276,6 +275,11 @@ public class EntityMapDefinition : IMapDefinition
         if (source.Values.ContainsKey(ExamineFieldNames.ItemTypeFieldName))
         {
             target.AdditionalData.Add("contentType", source.Values[ExamineFieldNames.ItemTypeFieldName]);
+        }
+
+        if (source.Values.ContainsKey(UmbracoExamineFieldNames.PublishedFieldName))
+        {
+            target.AdditionalData.Add("published", string.Equals(source.Values[UmbracoExamineFieldNames.PublishedFieldName], "y", StringComparison.InvariantCultureIgnoreCase));
         }
     }
 

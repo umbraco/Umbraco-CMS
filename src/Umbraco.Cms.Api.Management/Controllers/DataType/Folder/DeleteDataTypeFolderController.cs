@@ -9,7 +9,9 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
 [ApiVersion("1.0")]
 public class DeleteDataTypeFolderController : DataTypeFolderControllerBase
 {
-    public DeleteDataTypeFolderController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IDataTypeContainerService dataTypeContainerService)
+    public DeleteDataTypeFolderController(
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IDataTypeContainerService dataTypeContainerService)
         : base(backOfficeSecurityAccessor, dataTypeContainerService)
     {
     }
@@ -17,6 +19,7 @@ public class DeleteDataTypeFolderController : DataTypeFolderControllerBase
     [HttpDelete("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id) => await DeleteFolderAsync(id);
 }

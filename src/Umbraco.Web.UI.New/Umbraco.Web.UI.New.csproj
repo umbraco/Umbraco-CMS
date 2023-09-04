@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.5.23280.1">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.7.*">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -37,10 +37,6 @@
     <_ContentIncludedByDefault Remove="umbraco\UmbracoInstall\Index.cshtml" />
     <_ContentIncludedByDefault Remove="umbraco\UmbracoLogin\Index.cshtml" />
     <_ContentIncludedByDefault Remove="umbraco\UmbracoBackOffice\Default.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="umbraco\" />
   </ItemGroup>
 
   <Target Name="CopyAppsettingsTemplate" BeforeTargets="Build" Condition="!Exists('appsettings.json')">

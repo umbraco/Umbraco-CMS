@@ -712,7 +712,6 @@ public class ContentController : ContentControllerBase
     {
         long totalChildren;
         List<IContent> children;
-
         // Sets the culture to the only existing culture if we only have one culture.
         if (string.IsNullOrWhiteSpace(cultureName))
         {
@@ -721,18 +720,19 @@ public class ContentController : ContentControllerBase
                 cultureName = _allLangs.Value.First().Key;
             }
         }
-
         if (pageNumber > 0 && pageSize > 0)
         {
             IQuery<IContent>? queryFilter = null;
             if (filter.IsNullOrWhiteSpace() == false)
             {
+                int.TryParse(filter, out int filterAsIntId);//considering id,key & name as filter param
+                Guid.TryParse(filter, out Guid filterAsGuid);
                 //add the default text filter
                 queryFilter = _sqlContext.Query<IContent>()
                     .Where(x => x.Name != null)
-                    .Where(x => x.Name!.Contains(filter));
+                    .Where(x => x.Name!.Contains(filter)
+                      || x.Id == filterAsIntId || x.Key == filterAsGuid);
             }
-
             children = _contentService
                 .GetPagedChildren(id, pageNumber - 1, pageSize, out totalChildren, queryFilter, Ordering.By(orderBy, orderDirection, cultureName, !orderBySystemField)).ToList();
         }
@@ -2649,8 +2649,8 @@ public class ContentController : ContentControllerBase
 
             IContentType? parentContentType = _contentTypeService.Get(parent.ContentTypeId);
             //check if the item is allowed under this one
-            if (parentContentType?.AllowedContentTypes?.Select(x => x.Id).ToArray()
-                    .Any(x => x.Value == toMove.ContentType.Id) == false)
+            if (parentContentType?.AllowedContentTypes?.Select(x => x.Key).ToArray()
+                    .Any(x => x == toMove.ContentType.Key) == false)
             {
                 return ValidationProblem(
                     _localizedTextService.Localize("moveOrCopy", "notAllowedByContentType"));

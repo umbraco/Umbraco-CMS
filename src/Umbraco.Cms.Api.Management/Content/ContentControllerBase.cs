@@ -15,13 +15,19 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the content operation.")
                 .Build()),
-            ContentEditingOperationStatus.ContentTypeNotFound => NotFound("The content type could not be found"),
+            ContentEditingOperationStatus.ContentTypeNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("Cancelled by notification")
+                .Build()),
             ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Content type culture variance mismatch")
                 .WithDetail("The content type variance did not match that of the passed content data.")
                 .Build()),
-            ContentEditingOperationStatus.NotFound => NotFound("The content could not be found"),
-            ContentEditingOperationStatus.ParentNotFound => NotFound("The targeted content parent could not be found"),
+            ContentEditingOperationStatus.NotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("The content could not be found")
+                    .Build()),
+            ContentEditingOperationStatus.ParentNotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("The targeted content parent could not be found")
+                    .Build()),
             ContentEditingOperationStatus.ParentInvalid => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid parent")
                 .WithDetail("The targeted parent was not valid for the operation.")
@@ -30,18 +36,34 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Operation not permitted")
                 .WithDetail("The attempted operation was not permitted, likely due to a permission/configuration mismatch with the operation.")
                 .Build()),
-            ContentEditingOperationStatus.TemplateNotFound => NotFound("The template could not be found"),
+            ContentEditingOperationStatus.TemplateNotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("The template could not be found")
+                    .Build()),
             ContentEditingOperationStatus.TemplateNotAllowed => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Template not allowed")
                 .WithDetail("The selected template was not allowed for the operation.")
                 .Build()),
-            ContentEditingOperationStatus.PropertyTypeNotFound => NotFound("One or more property types could not be found"),
+            ContentEditingOperationStatus.PropertyTypeNotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("One or more property types could not be found")
+                    .Build()),
             ContentEditingOperationStatus.InTrash => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Content is in the recycle bin")
                 .WithDetail("Could not perform the operation because the targeted content was in the recycle bin.")
                 .Build()),
-            ContentEditingOperationStatus.Unknown => StatusCode(StatusCodes.Status500InternalServerError, "Unknown error. Please see the log for more details."),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status.")
+            ContentEditingOperationStatus.NotInTrash => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Content is not in the recycle bin")
+                .WithDetail("The attempted operation requires the targeted content to be in the recycle bin.")
+                .Build()),
+            ContentEditingOperationStatus.SortingInvalid => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid sorting options")
+                .WithDetail("The supplied sorting operations were invalid. Additional details can be found in the log.")
+                .Build()),
+            ContentEditingOperationStatus.Unknown => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown error. Please see the log for more details.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown content operation status.")
+                .Build()),
         };
 
     protected IActionResult ContentPublishingOperationStatusResult(ContentPublishingOperationStatus status) =>
@@ -106,16 +128,26 @@ public class ContentControllerBase : ManagementApiControllerBase
     protected IActionResult ContentCreatingOperationStatusResult(ContentCreatingOperationStatus status) =>
         status switch
         {
-            ContentCreatingOperationStatus.NotFound => NotFound("The content type could not be found"),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status."),
+            ContentCreatingOperationStatus.NotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("The content type could not be found")
+                    .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown content operation status.")
+                .Build()),
         };
 
     protected IActionResult PublicAccessOperationStatusResult(PublicAccessOperationStatus status) =>
         status switch
         {
-            PublicAccessOperationStatus.ContentNotFound => NotFound("The content could not be found"),
-            PublicAccessOperationStatus.ErrorNodeNotFound => NotFound("The error page could not be found"),
-            PublicAccessOperationStatus.LoginNodeNotFound => NotFound("The login page could not be found"),
+            PublicAccessOperationStatus.ContentNotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("The content could not be found")
+                    .Build()),
+            PublicAccessOperationStatus.ErrorNodeNotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("The error page could not be found")
+                    .Build()),
+            PublicAccessOperationStatus.LoginNodeNotFound => NotFound(new ProblemDetailsBuilder()
+                    .WithTitle("The login page could not be found")
+                    .Build()),
             PublicAccessOperationStatus.NoAllowedEntities => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("No allowed entities given")
                 .WithDetail("Both MemberGroups and Members were empty, thus no entities can be allowed.")
@@ -128,6 +160,8 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Ambiguous Rule")
                 .WithDetail("The specified rule is ambiguous, because both member groups and member names were given.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status."),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown content operation status.")
+                .Build()),
         };
 }

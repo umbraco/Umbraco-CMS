@@ -276,7 +276,7 @@ public class UmbracoTestDataController : SurfaceController
             new PropertyType(_shortStringHelper, GetOrCreateMediaPicker(), "media") { Name = "Media" });
         docType.AddPropertyType(new PropertyType(_shortStringHelper, GetOrCreateText(), "desc") { Name = "Description" });
         Services.ContentTypeService.Save(docType);
-        docType.AllowedContentTypes = new[] { new ContentTypeSort(docType.Id, 0) };
+        docType.AllowedContentTypes = new[] { new ContentTypeSort(docType.Key, 0, docType.Alias) };
         Services.ContentTypeService.Save(docType);
         return docType;
     }

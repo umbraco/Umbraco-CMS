@@ -1097,7 +1097,8 @@ public class ContentService : RepositoryService, IContentService
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
 
-            Audit(AuditType.Save, userId == -1 ? 0 : userId, Constants.System.Root, "Saved multiple content");
+            string contentIds = string.Join(", ", contentsA.Select(x => x.Id));
+            Audit(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items ({contentIds})");
 
             scope.Complete();
         }
@@ -2762,7 +2763,7 @@ public class ContentService : RepositoryService, IContentService
             }
             else
             {
-                Audit(AuditType.SendToPublish, content.WriterId, content.Id);
+                Audit(AuditType.SendToPublish, userId, content.Id);
             }
 
             return saveResult.Success;
@@ -3514,7 +3515,7 @@ public class ContentService : RepositoryService, IContentService
 
             _documentBlueprintRepository.Save(content);
 
-            Audit(AuditType.Save, Constants.Security.SuperUserId, content.Id, $"Saved content template: {content.Name}");
+            Audit(AuditType.Save, userId, content.Id, $"Saved content template: {content.Name}");
 
             scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, evtMsgs));
 

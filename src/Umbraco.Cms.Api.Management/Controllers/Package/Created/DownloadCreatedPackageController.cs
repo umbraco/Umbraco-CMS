@@ -24,7 +24,7 @@ public class DownloadCreatedPackageController : CreatedPackageControllerBase
     /// <returns>The XML or ZIP file of the package or not found result.</returns>
     [HttpGet("{id:guid}/download")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     public async Task<IActionResult> Download(Guid id)
     {
@@ -32,13 +32,13 @@ public class DownloadCreatedPackageController : CreatedPackageControllerBase
 
         if (package is null)
         {
-            return NotFound();
+            return CreatedPackageNotFound();
         }
 
         Stream? fileStream = _packagingService.GetPackageFileStream(package);
         if (fileStream is null)
         {
-            return NotFound();
+            return CreatedPackageFileStreamNotFound();
         }
 
         var fileName = Path.GetFileName(package.PackagePath);

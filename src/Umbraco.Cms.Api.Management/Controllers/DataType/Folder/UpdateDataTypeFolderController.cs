@@ -10,7 +10,9 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
 [ApiVersion("1.0")]
 public class UpdateDataTypeFolderController : DataTypeFolderControllerBase
 {
-    public UpdateDataTypeFolderController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IDataTypeContainerService dataTypeContainerService)
+    public UpdateDataTypeFolderController(
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IDataTypeContainerService dataTypeContainerService)
         : base(backOfficeSecurityAccessor, dataTypeContainerService)
     {
     }
@@ -18,6 +20,8 @@ public class UpdateDataTypeFolderController : DataTypeFolderControllerBase
     [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateFolderReponseModel updateFolderReponseModel) => await UpdateFolderAsync(id, updateFolderReponseModel);
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(Guid id, UpdateFolderResponseModel updateFolderResponseModel)
+        => await UpdateFolderAsync(id, updateFolderResponseModel);
 }

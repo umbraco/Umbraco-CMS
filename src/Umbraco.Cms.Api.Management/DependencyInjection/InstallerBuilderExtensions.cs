@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Services.Installer;
 using Umbraco.Cms.Infrastructure.Factories.Installer;
 using Umbraco.Cms.Infrastructure.Installer.Steps;
-using Umbraco.Cms.Web.Common.Installer;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 
@@ -51,8 +50,7 @@ public static class InstallerBuilderExtensions
             .Append<DatabaseUpgradeStep>()
             .Append<CreateUserStep>()
             .Append<RegisterInstallCompleteStep>()
-            .Append<RestartRuntimeStep>()
-            .Append<SignInUserStep>();
+            .Append<RestartRuntimeStep>();
 
         return builder;
     }
