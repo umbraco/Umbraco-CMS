@@ -1,8 +1,8 @@
 const { rest } = window.MockServiceWorker;
 import { RestHandler, MockedRequest, DefaultBodyType } from 'msw';
+import { umbScriptsTreeData, umbScriptsData, umbScriptsFolderData } from '../data/scripts.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { CreatePathFolderRequestModel, CreateTextFileViewModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { umbScriptsTreeData, umbScriptsData, umbScriptsFolderData } from '../data/scripts.data.js';
 
 const treeHandlers = [
 	rest.get(umbracoPath('/tree/script/root'), (req, res, ctx) => {
@@ -51,7 +51,6 @@ const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 	rest.put(umbracoPath('/script'), (req, res, ctx) => {
 		const requestBody = req.json() as CreateTextFileViewModelBaseModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		const response = umbScriptsData.updateData(requestBody);
 		return res(ctx.status(200));
 	}),
 ];
@@ -66,7 +65,6 @@ const folderHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 	rest.post(umbracoPath('script/folder'), (req, res, ctx) => {
 		const requestBody = req.json() as CreatePathFolderRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		const response = umbScriptsFolderData.postFolder(requestBody);
 		return res(ctx.status(200));
 	}),
 	rest.delete(umbracoPath('script/folder'), (req, res, ctx) => {

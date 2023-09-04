@@ -5,10 +5,7 @@ import {
 	CreateTextFileViewModelBaseModel,
 	FileSystemTreeItemPresentationModel,
 	PagedFileSystemTreeItemPresentationModel,
-	PartialViewResponseModel,
-	PartialViewSnippetResponseModel,
 	ScriptResponseModel,
-	SnippetItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 type ScriptsDataItem = ScriptResponseModel & FileSystemTreeItemPresentationModel & { id: string };
@@ -155,7 +152,6 @@ class UmbScriptsFolderData extends UmbEntityData<ScriptResponseModel> {
 
 	getFolder(path: string): FileSystemTreeItemPresentationModel {
 		const items = data.filter((item) => item.isFolder && item.path === path);
-		const total = items.length;
 		return items as FileSystemTreeItemPresentationModel;
 	}
 
