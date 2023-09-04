@@ -35,7 +35,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 	 * This enables to registerer og unregister extensions via DevTools, or just via querying this element via the DOM.
 	 * @type {UmbExtensionsRegistry}
 	 */
-	public registry = umbExtensionsRegistry;
+	public extensionRegistry = umbExtensionsRegistry;
 
 	constructor() {
 		super();
