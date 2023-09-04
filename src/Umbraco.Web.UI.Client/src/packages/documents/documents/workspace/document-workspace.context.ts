@@ -1,6 +1,6 @@
 import { UmbDocumentRepository } from '../repository/document.repository.js';
 import { UmbDocumentTypeRepository } from '../../document-types/repository/document-type.repository.js';
-import { UmbDocumentDatasetContext } from '../dataset-context/document-dataset-context.js';
+import { UmbDocumentVariantContext } from '../variant-context/document-variant-context.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
@@ -8,7 +8,7 @@ import {
 	UmbWorkspaceContext,
 	UmbWorkspaceSplitViewManager,
 	UmbVariantableWorkspaceContextInterface,
-	type UmbDatasetContext,
+	type UmbVariantContext,
 } from '@umbraco-cms/backoffice/workspace';
 import type { CreateDocumentRequestModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
@@ -208,12 +208,12 @@ export class UmbDocumentWorkspaceContext
 	}
 	*/
 
-	public createVariableDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
-		return new UmbDocumentDatasetContext(host, this, variantId);
+	public createVariantPropertySetContext(host: UmbControllerHost, variantId: UmbVariantId) {
+		return new UmbDocumentVariantContext(host, this, variantId);
 	}
 
 	public createDatasetContext(host: UmbControllerHost) {
-		return new UmbDocumentDatasetContext(host, this, UmbVariantId.Create({}));
+		return new UmbDocumentVariantContext(host, this, UmbVariantId.Create({}));
 	}
 
 	public destroy(): void {

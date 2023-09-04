@@ -1,4 +1,4 @@
-export * from './dataset-context/index.js';
+export * from './variant-context/index.js';
 export * from './workspace-action-menu/index.js';
 export * from './workspace-action/index.js';
 export * from './workspace-alias.condition.js';

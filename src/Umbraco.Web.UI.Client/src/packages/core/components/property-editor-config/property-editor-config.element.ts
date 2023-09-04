@@ -6,7 +6,7 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_DATA_TYPE_DATASET_CONTEXT } from '@umbraco-cms/backoffice/data-type';
+import { UMB_DATA_TYPE_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-config
@@ -16,7 +16,7 @@ import { UMB_DATA_TYPE_DATASET_CONTEXT } from '@umbraco-cms/backoffice/data-type
 @customElement('umb-property-editor-config')
 export class UmbPropertyEditorConfigElement extends UmbLitElement {
 
-	#datasetContext?: typeof UMB_DATA_TYPE_DATASET_CONTEXT.TYPE;
+	#datasetContext?: typeof UMB_DATA_TYPE_VARIANT_CONTEXT.TYPE;
 
 	/**
 	 * Data. The element will render configuration editors with values from this data.
@@ -36,7 +36,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (instance) => {
-			this.#datasetContext = instance.createDatasetContext(this);
+			this.#datasetContext = instance.createPropertySetContext(this);
 			this.observe(this.#datasetContext.properties, (properties) => {
 				this._properties = properties as Array<PropertyEditorConfigProperty>;
 			}, 'observeProperties');
