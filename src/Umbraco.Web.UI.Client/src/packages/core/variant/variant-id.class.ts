@@ -7,6 +7,10 @@ export class UmbVariantId {
 		return Object.freeze(new UmbVariantId(variantData));
 	}
 
+	public static CreateInvariant(): UmbVariantId {
+		return Object.freeze(new UmbVariantId({}));
+	}
+
 	public readonly culture: string | null = null;
 	public readonly segment: string | null = null;
 

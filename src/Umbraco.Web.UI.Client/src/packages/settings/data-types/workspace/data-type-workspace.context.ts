@@ -1,5 +1,5 @@
 import { UmbDataTypeRepository } from '../repository/data-type.repository.js';
-import { UmbDataTypeDatasetContext } from '../dataset-context/data-type-dataset-context.js';
+import { UmbDataTypeVariantContext } from '../variant-context/data-type-variant-context.js';
 import { UmbInvariantableWorkspaceContextInterface, UmbWorkspaceContext, UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { appendToFrozenArray, UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -100,8 +100,8 @@ export class UmbDataTypeWorkspaceContext
 		return this._configDefaultData?.find((x) => x.alias === alias)?.value;
 	}
 
-	createDatasetContext(host: UmbControllerHost): UmbDataTypeDatasetContext {
-		return new UmbDataTypeDatasetContext(host, this);
+	createPropertySetContext(host: UmbControllerHost): UmbDataTypeVariantContext {
+		return new UmbDataTypeVariantContext(host, this);
 	}
 
 	async load(id: string) {

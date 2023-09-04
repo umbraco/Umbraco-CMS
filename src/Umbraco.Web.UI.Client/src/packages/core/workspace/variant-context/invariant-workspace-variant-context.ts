@@ -1,9 +1,10 @@
 import { DocumentVariantResponseModel } from "@umbraco-cms/backoffice/backend-api";
 import { UmbBaseController, UmbControllerHost } from "@umbraco-cms/backoffice/controller-api";
 import { UmbObjectState } from "@umbraco-cms/backoffice/observable-api";
-import { UMB_DATASET_CONTEXT, UmbDatasetContext, UmbInvariantableWorkspaceContextInterface } from "@umbraco-cms/backoffice/workspace";
+import { UmbVariantId } from "@umbraco-cms/backoffice/variant";
+import { UMB_VARIANT_CONTEXT, UmbVariantContext, UmbInvariantableWorkspaceContextInterface } from "@umbraco-cms/backoffice/workspace";
 
-export class UmbInvariantDatasetContext<WorkspaceType extends UmbInvariantableWorkspaceContextInterface= UmbInvariantableWorkspaceContextInterface> extends UmbBaseController implements UmbDatasetContext {
+export class UmbInvariantWorkspaceVariantContext<WorkspaceType extends UmbInvariantableWorkspaceContextInterface= UmbInvariantableWorkspaceContextInterface> extends UmbBaseController implements UmbVariantContext {
 
 	protected _workspace: WorkspaceType;
 
@@ -16,11 +17,13 @@ export class UmbInvariantDatasetContext<WorkspaceType extends UmbInvariantableWo
 
 	// default data:
 
-
-	getType(): string {
+	getVariantId() {
+		return UmbVariantId.CreateInvariant();
+	}
+	getType() {
 		return this._workspace.getEntityType();
 	}
-	getUnique(): string | undefined {
+	getUnique() {
 		return this._workspace.getEntityId();
 	}
 	getName() {
@@ -34,10 +37,10 @@ export class UmbInvariantDatasetContext<WorkspaceType extends UmbInvariantableWo
 
 	constructor(host: UmbControllerHost, workspace: WorkspaceType) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
-		super(host, 'dataSetContext');
+		super(host, 'variantContext');
 		this._workspace = workspace;
 
-		this.provideContext(UMB_DATASET_CONTEXT, this);
+		this.provideContext(UMB_VARIANT_CONTEXT, this);
 	}
 
 

@@ -4,10 +4,10 @@ import { UmbBaseController, UmbControllerHost } from "@umbraco-cms/backoffice/co
 import { map } from "@umbraco-cms/backoffice/external/rxjs";
 import { UmbObjectState } from "@umbraco-cms/backoffice/observable-api";
 import { UmbVariantId } from "@umbraco-cms/backoffice/variant";
-import { UMB_DATASET_CONTEXT, UmbVariantDatasetContext } from "@umbraco-cms/backoffice/workspace";
+import { UMB_VARIANT_CONTEXT, UmbVariantContext } from "@umbraco-cms/backoffice/workspace";
 
-// TODO: This code can be split into a UmbContentTypeDatasetContext, leaving just the publishing state and methods to this class.
-export class UmbDocumentDatasetContext extends UmbBaseController implements UmbVariantDatasetContext {
+// TODO: This code can be split into a UmbContentTypeVariantContext, leaving just the publishing state and methods to this class.
+export class UmbDocumentVariantContext extends UmbBaseController implements UmbVariantContext {
 
 	#workspace: UmbDocumentWorkspaceContext;
 	#variantId: UmbVariantId;
@@ -48,7 +48,7 @@ export class UmbDocumentDatasetContext extends UmbBaseController implements UmbV
 
 	constructor(host: UmbControllerHost, workspace: UmbDocumentWorkspaceContext, variantId: UmbVariantId) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
-		super(host, 'dataSetContext');
+		super(host, 'variantContext');
 		this.#workspace = workspace;
 		this.#variantId = variantId;
 
@@ -62,7 +62,7 @@ export class UmbDocumentDatasetContext extends UmbBaseController implements UmbV
 		);
 
 		// TODO: Refactor: use the document dataset context token.
-		this.provideContext(UMB_DATASET_CONTEXT, this);
+		this.provideContext(UMB_VARIANT_CONTEXT, this);
 	}
 
 

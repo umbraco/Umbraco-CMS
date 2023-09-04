@@ -4,9 +4,9 @@ import { css, html, nothing, customElement, property, state, ifDefined } from '@
 import {
 	UmbWorkspaceSplitViewContext,
 	UMB_WORKSPACE_SPLIT_VIEW_CONTEXT,
-	UMB_VARIANT_DATASET_CONTEXT,
+	UMB_VARIANT_CONTEXT,
 	ActiveVariant,
-	IsNameableDatasetContext,
+	IsNameablePropertySetContext,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentVariantResponseModel, ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
@@ -27,7 +27,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	}
 
 	#splitViewContext?: UmbWorkspaceSplitViewContext;
-	#datasetContext?: typeof UMB_VARIANT_DATASET_CONTEXT.TYPE;
+	#datasetContext?: typeof UMB_VARIANT_CONTEXT.TYPE;
 
 	@state()
 	private _name?: string;
@@ -52,7 +52,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			this._observeVariants();
 			this._observeActiveVariants();
 		});
-		this.consumeContext(UMB_VARIANT_DATASET_CONTEXT, (instance) => {
+		this.consumeContext(UMB_VARIANT_CONTEXT, (instance) => {
 			this.#datasetContext = instance;
 			this._observeDatasetContext();
 		});
@@ -123,7 +123,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
-			if (typeof target?.value === 'string' && this.#datasetContext && IsNameableDatasetContext(this.#datasetContext)) {
+			if (typeof target?.value === 'string' && this.#datasetContext && IsNameablePropertySetContext(this.#datasetContext)) {
 				this.#datasetContext.setName(target.value);
 			}
 		}

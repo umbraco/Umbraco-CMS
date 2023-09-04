@@ -1,4 +1,4 @@
-import type { UmbDatasetContext } from '../dataset-context/dataset-context.interface.js';
+import type { UmbVariantContext } from '../variant-context/variant-context.interface.js';
 import type { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -16,5 +16,5 @@ export interface UmbInvariantableWorkspaceContextInterface<T = unknown>
 	setPropertyValue(alias: string, value: unknown): Promise<void>;
 
 	// Dataset methods:
-	createDatasetContext(host: UmbControllerHost): UmbDatasetContext;
+	createPropertySetContext(host: UmbControllerHost): UmbVariantContext;
 }

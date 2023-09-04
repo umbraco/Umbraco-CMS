@@ -1,8 +1,8 @@
 import { UmbDataTypeWorkspaceContext } from "../workspace/data-type-workspace.context.js";
 import { UmbControllerHost } from "@umbraco-cms/backoffice/controller-api";
-import { UmbInvariantDatasetContext } from "@umbraco-cms/backoffice/workspace";
+import { UmbInvariantWorkspaceVariantContext } from "@umbraco-cms/backoffice/workspace";
 
-export class UmbDataTypeDatasetContext extends UmbInvariantDatasetContext<UmbDataTypeWorkspaceContext> {
+export class UmbDataTypeVariantContext extends UmbInvariantWorkspaceVariantContext<UmbDataTypeWorkspaceContext> {
 
 
 	properties = this._workspace.properties

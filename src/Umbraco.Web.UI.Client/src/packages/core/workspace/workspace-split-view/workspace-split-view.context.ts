@@ -1,4 +1,4 @@
-import { UmbVariantDatasetContext } from '../dataset-context/index.js';
+import { UmbVariantContext } from '../variant-context/index.js';
 import { UMB_VARIANT_WORKSPACE_CONTEXT_TOKEN } from '../index.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
@@ -17,7 +17,7 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 		return this.#workspaceContext;
 	}
 
-	#dataSetContext?: UmbVariantDatasetContext;
+	#variantContext?: UmbVariantContext;
 
 	#index = new UmbNumberState(undefined);
 	index = this.#index.asObservable();
@@ -55,13 +55,13 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 
 				// TODO: Ask workspace context to create the specific dataset.
 
-				this.#dataSetContext?.destroy();
+				this.#variantContext?.destroy();
 				const variantId = UmbVariantId.Create(activeVariantInfo);
 				// We can safely assume in this context that the workspace is variant.
 				//if(variantId.isInvariant()) {
-					this.#dataSetContext = this.#workspaceContext?.createVariantDatasetContext(this, variantId);
+					this.#variantContext = this.#workspaceContext?.createVariantPropertySetContext(this, variantId);
 				/*} else {
-					this.#dataSetContext = this.#workspaceContext?.createDatasetContext(this);
+					this.#variantContext = this.#workspaceContext?.createDatasetContext(this);
 				}*/
 			},
 			'_observeActiveVariant'
