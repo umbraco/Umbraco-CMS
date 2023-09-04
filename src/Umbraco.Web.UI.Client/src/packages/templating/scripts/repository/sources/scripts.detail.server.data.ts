@@ -1,11 +1,9 @@
 import {
-	CreatePartialViewRequestModel,
 	CreateScriptRequestModel,
 	CreateTextFileViewModelBaseModel,
-	PartialViewItemResponseModel,
+	ScriptItemResponseModel,
 	ScriptResource,
 	ScriptResponseModel,
-	UpdatePartialViewRequestModel,
 	UpdateScriptRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -31,7 +29,7 @@ export class UmbScriptsServerDataSource
 	 * Fetches a partial view with the given path from the server
 	 * @param {string} path
 	 * @return {*}
-	 * @memberof UmbStylesheetServerDataSource
+	 * @memberof UmbScriptsDetailServerDataSource
 	 */
 	get(path: string): Promise<DataSourceResponse<ScriptResponseModel>> {
 		if (!path) throw new Error('Path is missing');
@@ -40,11 +38,11 @@ export class UmbScriptsServerDataSource
 	/**
 	 * Creates a new partial view
 	 *
-	 * @param {CreatePartialViewRequestModel} requestBody
+	 * @param {CreateScriptRequestModel} requestBody
 	 * @return {*}  {Promise<DataSourceResponse<string>>}
-	 * @memberof UmbPartialViewDetailServerDataSource
+	 * @memberof UmbScriptsDetailServerDataSource
 	 */
-	insert(requestBody: CreatePartialViewRequestModel): Promise<DataSourceResponse<string>> {
+	insert(requestBody: CreateScriptRequestModel): Promise<DataSourceResponse<string>> {
 		return tryExecuteAndNotify(this.#host, ScriptResource.postScript({ requestBody }));
 	}
 
@@ -53,11 +51,11 @@ export class UmbScriptsServerDataSource
 	 * Updates a partial view
 	 *
 	 * @param {string} [unique='']
-	 * @param {UpdatePartialViewRequestModel} requestBody
+	 * @param {UpdateScriptRequestModel} requestBody
 	 * @return {*}  {Promise<DataSourceResponse<any>>}
-	 * @memberof UmbPartialViewDetailServerDataSource
+	 * @memberof UmbScriptsDetailServerDataSource
 	 */
-	update(unique = '', requestBody: UpdatePartialViewRequestModel): Promise<DataSourceResponse<any>> {
+	update(unique = '', requestBody: UpdateScriptRequestModel): Promise<DataSourceResponse<any>> {
 		return tryExecuteAndNotify(this.#host, ScriptResource.putScript({ requestBody }));
 	}
 	/**
@@ -65,13 +63,13 @@ export class UmbScriptsServerDataSource
 	 *
 	 * @param {string} path
 	 * @return {*}  {Promise<DataSourceResponse>}
-	 * @memberof UmbPartialViewDetailServerDataSource
+	 * @memberof UmbScriptsDetailServerDataSource
 	 */
 	delete(path: string): Promise<DataSourceResponse> {
 		return tryExecuteAndNotify(this.#host, ScriptResource.deleteScript({ path }));
 	}
 
-	getItems(keys: Array<string>): Promise<DataSourceResponse<PartialViewItemResponseModel[]>> {
+	getItems(keys: Array<string>): Promise<DataSourceResponse<ScriptItemResponseModel[]>> {
 		return tryExecuteAndNotify(this.#host, ScriptResource.getScriptItem({ path: keys }));
 	}
 }
