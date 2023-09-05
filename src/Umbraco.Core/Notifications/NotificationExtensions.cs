@@ -1,5 +1,3 @@
-using Umbraco.Cms.Core.Models;
-
 namespace Umbraco.Cms.Core.Notifications;
 
 public static class NotificationExtensions
