@@ -1,4 +1,5 @@
-import { UUIButtonState, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 
 import { HealthCheckActionRequestModel, HealthCheckResource } from '@umbraco-cms/backoffice/backend-api';
@@ -31,7 +32,7 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 	}
 
 	render() {
-		return html` <div class="action">
+		return html` <div class="action uui-text">
 			<p>${this.action.description || html`<span class="no-description">This action has no description</span>`}</p>
 			<uui-form>
 				<form @submit=${(e: SubmitEvent) => this._onActionClick(e)}>
@@ -95,7 +96,7 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				margin: var(--uui-size-space-4) 0;

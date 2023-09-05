@@ -1,5 +1,5 @@
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
@@ -10,7 +10,7 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbImportDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryRepository> {
-	static styles = [UUITextStyles];
+	static styles = [UmbTextStyles];
 
 	#modalContext?: UmbModalManagerContext;
 

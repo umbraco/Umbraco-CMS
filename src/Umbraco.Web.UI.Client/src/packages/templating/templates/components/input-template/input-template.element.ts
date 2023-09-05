@@ -3,7 +3,7 @@ import '../template-card/template-card.element.js';
 
 import { UmbTemplateRepository } from '../../repository/template.repository.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_TEMPLATE_PICKER_MODAL,
 	UMB_TEMPLATE_MODAL,
@@ -171,7 +171,6 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			#add-button {
 				width: 100%;

@@ -4,7 +4,7 @@ import {
 	UmbLogViewerWorkspaceContext,
 	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
 } from '../../../logviewer.context.js';
-import { UUIPopoverElement, UUISymbolExpandElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UUIPopoverElement, UUISymbolExpandElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -86,7 +86,6 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			#polling-interval-menu {
 				margin: 0;

@@ -1,5 +1,5 @@
 import { UmbInputListBaseElement } from '../input-list-base/input-list-base.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_SECTION_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -54,7 +54,7 @@ export class UmbInputPickerSectionElement extends UmbInputListBaseElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: flex;

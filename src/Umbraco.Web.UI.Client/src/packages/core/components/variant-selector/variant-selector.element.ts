@@ -1,4 +1,4 @@
-import { UUITextStyles, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbWorkspaceVariantContext,
@@ -244,7 +244,6 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			#name-input {
 				width: 100%;

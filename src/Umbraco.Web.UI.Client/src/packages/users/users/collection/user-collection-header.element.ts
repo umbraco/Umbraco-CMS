@@ -1,6 +1,5 @@
 import { UmbUserCollectionContext } from './user-collection.context.js';
 import {
-	UUITextStyles,
 	UUIBooleanInputEvent,
 	UUICheckboxElement,
 	UUIRadioGroupElement,
@@ -169,7 +168,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		`;
 	}
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				height: 100%;

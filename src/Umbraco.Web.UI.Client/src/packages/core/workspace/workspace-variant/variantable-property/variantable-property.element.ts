@@ -1,5 +1,5 @@
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../workspace-variant.context.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -60,7 +60,7 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

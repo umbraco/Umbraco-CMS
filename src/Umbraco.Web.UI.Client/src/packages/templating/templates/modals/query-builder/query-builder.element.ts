@@ -1,6 +1,6 @@
 import { UmbTemplateRepository } from '../../repository/template.repository.js';
 import type { UmbQueryBuilderFilterElement } from './query-builder-filter.element.js';
-import { UUIComboboxListElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, query, queryAll } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import {
@@ -265,7 +265,6 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				display: block;

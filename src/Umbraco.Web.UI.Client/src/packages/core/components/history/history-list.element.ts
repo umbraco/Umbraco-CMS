@@ -1,5 +1,5 @@
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-history-list')
@@ -11,7 +11,7 @@ export class UmbHistoryListElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

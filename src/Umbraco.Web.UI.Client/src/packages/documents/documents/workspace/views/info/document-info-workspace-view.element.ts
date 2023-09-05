@@ -1,8 +1,9 @@
 import { css, html, nothing, repeat, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 interface HistoryNode {
 	userId?: number;
 	userAvatars?: [];
@@ -251,7 +252,7 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: grid;

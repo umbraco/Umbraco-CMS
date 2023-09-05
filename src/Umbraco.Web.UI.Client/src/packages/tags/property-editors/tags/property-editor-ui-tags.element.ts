@@ -1,6 +1,6 @@
 import { UmbTagsInputElement } from '../../components/tags-input/tags-input.element.js';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
 import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -58,7 +58,7 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 			@change=${this._onChange}></umb-tags-input>`;
 	}
 
-	static styles = [UUITextStyles];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUITagsElement;

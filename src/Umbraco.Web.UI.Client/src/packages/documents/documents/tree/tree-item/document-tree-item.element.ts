@@ -1,6 +1,6 @@
 import { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTreeItemExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -45,7 +45,7 @@ export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTree
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			#icon-container {
 				position: relative;

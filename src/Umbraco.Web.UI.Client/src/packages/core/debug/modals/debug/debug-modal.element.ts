@@ -1,5 +1,5 @@
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbContextDebuggerModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
@@ -20,7 +20,7 @@ export default class UmbContextDebuggerModalElement extends UmbModalBaseElement<
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			uui-dialog-layout {
 				display: flex;

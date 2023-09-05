@@ -3,7 +3,7 @@ import {
 	UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN,
 } from '../../repository/document-type.tree.store.js';
 import { css, html, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { DocumentTypeResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	UmbModalManagerContext,
@@ -121,7 +121,6 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			#add-button {
 				width: 100%;

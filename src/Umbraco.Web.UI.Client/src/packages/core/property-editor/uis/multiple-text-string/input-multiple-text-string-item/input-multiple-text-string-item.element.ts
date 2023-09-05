@@ -1,5 +1,5 @@
 import { css, html, nothing, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
@@ -121,7 +121,6 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				display: flex;

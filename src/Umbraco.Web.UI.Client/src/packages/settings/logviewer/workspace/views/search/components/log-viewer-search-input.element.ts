@@ -1,10 +1,8 @@
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
 import {
-	UUIButtonElement,
 	UUIInputElement,
 	UUIPopoverElement,
 	UUISymbolExpandElement,
-	UUITextStyles,
 } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { Subject, debounceTime, tap } from '@umbraco-cms/backoffice/external/rxjs';
@@ -212,7 +210,6 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				display: flex;

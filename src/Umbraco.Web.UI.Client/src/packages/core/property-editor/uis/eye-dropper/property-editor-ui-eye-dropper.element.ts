@@ -1,5 +1,5 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
@@ -40,8 +40,6 @@ export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implemen
 			.swatches=${this._swatches}
 			.opacity="${this._opacity}"></umb-input-eye-dropper>`;
 	}
-
-	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIEyeDropperElement;

@@ -1,5 +1,5 @@
 import { css, html, customElement, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
-import { UUIButtonState, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import {
 	TelemetryResponseModel,
 	TelemetryLevelModel,
@@ -8,6 +8,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-dashboard-telemetry')
 export class UmbDashboardTelemetryElement extends UmbLitElement {
@@ -111,7 +112,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-box>
+			<uui-box class="uui-text">
 				<h1>Consent for telemetry data</h1>
 				<div style="max-width:75ch">
 					<p>
@@ -139,7 +140,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

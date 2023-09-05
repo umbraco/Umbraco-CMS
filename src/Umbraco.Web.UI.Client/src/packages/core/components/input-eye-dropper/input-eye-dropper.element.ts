@@ -1,5 +1,5 @@
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin, UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin, UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-eye-dropper')
@@ -29,8 +29,6 @@ export class UmbInputEyeDropperElement extends FormControlMixin(UmbLitElement) {
 			.opacity="${this.opacity}"
 			.swatches="${this.swatches}"></uui-color-picker>`;
 	}
-
-	static styles = [UUITextStyles, css``];
 }
 
 export default UmbInputEyeDropperElement;

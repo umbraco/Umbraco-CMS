@@ -1,5 +1,5 @@
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -9,7 +9,7 @@ export class UmbMediaEditWorkspaceViewElement extends UmbLitElement implements U
 		return html`<div>Render Media Props</div>`;
 	}
 
-	static styles = [UUITextStyles, css``];
+	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbMediaEditWorkspaceViewElement;

@@ -1,5 +1,5 @@
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin, UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin, UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
 
@@ -43,8 +43,6 @@ export class UmbInputColorElement extends FormControlMixin(UmbLitElement) {
 				.showLabel=${this.showLabels}></uui-color-swatch>`;
 		})}`;
 	}
-
-	static styles = [UUITextStyles];
 }
 
 export default UmbInputColorElement;

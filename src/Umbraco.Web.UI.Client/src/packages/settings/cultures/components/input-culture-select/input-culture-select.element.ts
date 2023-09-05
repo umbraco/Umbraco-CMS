@@ -1,7 +1,6 @@
 import { UmbCultureRepository } from '../../repository/culture.repository.js';
 import { css, html, repeat, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import {
-	UUITextStyles,
 	FormControlMixin,
 	UUIComboboxElement,
 	UUIComboboxEvent,
@@ -102,8 +101,6 @@ export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement
 				  `}
 		`;
 	}
-
-	static styles = [UUITextStyles, css``];
 }
 
 export default UmbInputCultureSelectElement;

@@ -2,12 +2,13 @@ import {
 	UmbHealthCheckDashboardContext,
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 } from '../health-check-dashboard.context.js';
-import { UUITextStyles, UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './health-check-group-box-overview.element.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-dashboard-health-check-overview')
 export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
@@ -50,7 +51,7 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;
