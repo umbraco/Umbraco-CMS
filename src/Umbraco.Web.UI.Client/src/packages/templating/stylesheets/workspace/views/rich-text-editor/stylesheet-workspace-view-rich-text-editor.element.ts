@@ -60,7 +60,6 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#context = workspaceContext as UmbStylesheetWorkspaceContext;
-			this.#context.sendContentGetRules();
 
 			this.observe(this.#context.rules, (rules) => {
 				this._rules = rules;

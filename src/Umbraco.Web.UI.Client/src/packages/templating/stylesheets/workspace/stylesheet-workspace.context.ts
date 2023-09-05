@@ -81,7 +81,8 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 		}
 
 		if (rules.data) {
-			this.#rules.next(rules.data.rules?.map((r, i) => ({ ...r, sortOrder: i })) ?? []);
+			const x = rules.data.rules?.map((r, i) => ({ ...r, sortOrder: i })) ?? [];
+			this.#rules.next(x);
 		}
 	}
 
@@ -96,6 +97,7 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 	}
 
 	async sendContentGetRules() {
+
 		if (!this.getData()?.content) return;
 
 		const requestBody = {

@@ -3,6 +3,7 @@ import { createFileSystemTreeItem, createFileItemResponseModelBaseModel, createT
 import {
 	CreateTextFileViewModelBaseModel,
 	ExtractRichTextStylesheetRulesRequestModel,
+	ExtractRichTextStylesheetRulesResponseModel,
 	FileSystemTreeItemPresentationModel,
 	InterpolateRichTextStylesheetRequestModel,
 	PagedFileSystemTreeItemPresentationModel,
@@ -148,7 +149,7 @@ class UmbStylesheetData extends UmbEntityData<StylesheetDBItem> {
 		return this.data.find((item) => item.path === path && item.isFolder === true);
 	}
 
-	getRules(path: string): Array<RichTextRuleModel> {
+	getRules(path: string): ExtractRichTextStylesheetRulesResponseModel {
 		const regex = /\*\*\s*umb_name:\s*(?<name>[^*\r\n]*?)\s*\*\/\s*(?<selector>[^,{]*?)\s*{\s*(?<styles>.*?)\s*}/gis;
 		const item = this.data.find((item) => item.path === path);
 		if (!item) throw Error('item not found');
@@ -157,55 +158,49 @@ class UmbStylesheetData extends UmbEntityData<StylesheetDBItem> {
 		//@ts-ignore
 		// eslint-disable-next-line no-unsafe-optional-chaining
 		const rules = [...item.content?.matchAll(regex)].map((match) => match.groups);
-		return rules;
+		return { rules };
 	}
 
-	extractRules({
-        requestBody,
-    }: {
-        requestBody?: ExtractRichTextStylesheetRulesRequestModel,
-    }) {
+	async extractRules({ requestBody }: { requestBody?: ExtractRichTextStylesheetRulesRequestModel }) {
 		const regex = /\*\*\s*umb_name:\s*(?<name>[^*\r\n]*?)\s*\*\/\s*(?<selector>[^,{]*?)\s*{\s*(?<styles>.*?)\s*}/gis;
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		//@ts-ignore
-		// eslint-disable-next-line no-unsafe-optional-chaining
-		const rules = [...requestBody.content?.matchAll(regex)].map((match) => match.groups);
-		return rules;
 
+		if (!requestBody) {
+			throw Error('No request body');
+		}
+		const { content } = await requestBody;
+		if (!content) return { rules: [] };
+
+		const rules = [...content.matchAll(regex)].map((match) => match.groups);
+		return { rules };
 	}
 
-	interpolateRules({
-        requestBody,
-    }: {
-        requestBody?: InterpolateRichTextStylesheetRequestModel,
-    }) {
-		debugger;
+	interpolateRules({ requestBody }: { requestBody?: InterpolateRichTextStylesheetRequestModel }) {
 		const regex = /\/\*\*\s*umb_name:\s*(?<name>[^*\r\n]*?)\s*\*\/\s*(?<selector>[^,{]*?)\s*{\s*(?<styles>.*?)\s*}/gis;
-		if(!requestBody) {
-			throw Error('No request body')
+		if (!requestBody) {
+			throw Error('No request body');
 		}
-		const {content, rules} = requestBody;
+		const { content, rules } = requestBody;
 
-		if(!content && !rules) return {content: ''};
+		if (!content && !rules) return { content: '' };
 
-		console.log(content)
+		console.log(content);
 
-		
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		//@ts-ignore
 		// eslint-disable-next-line no-unsafe-optional-chaining
-		const cleanedContent = content?.replaceAll(regex, '')
+		const cleanedContent = content?.replaceAll(regex, '');
 
-		const newContent = rules?.map(rule => 
-		`/**umb_name:${rule.name}*/
+		const newContent = rules?.map(
+			(rule) =>
+				`/**umb_name:${rule.name}*/
 		${rule.selector} {
 			${rule.styles}
 		}
 		${cleanedContent}	
-		`)
+		`,
+		);
 
-		return {content: newContent};
-
+		return { content: newContent };
 	}
 
 	insertFolder(item: CreateTextFileViewModelBaseModel) {
