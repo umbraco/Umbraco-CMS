@@ -1,9 +1,9 @@
 import {
 	UmbLocalizationDictionary,
 	UmbLocalizationFlatDictionary,
-	TranslationSet,
-	registerTranslation,
-	translations,
+	LocalizationSet,
+	registerLocalization,
+	localizations,
 } from '@umbraco-cms/backoffice/localization-api';
 import { hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBackofficeExtensionRegistry, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -21,8 +21,8 @@ export class UmbLocalizationRegistry {
 	/**
 	 * Get the current registered translations.
 	 */
-	get translations() {
-		return translations;
+	get localizations() {
+		return localizations;
 	}
 
 	get isDefaultLoaded() {
@@ -57,8 +57,8 @@ export class UmbLocalizationRegistry {
 						const innerDictionary: UmbLocalizationFlatDictionary = {};
 
 						// If extension contains a dictionary, add it to the inner dictionary.
-						if (extension.meta.translations) {
-							for (const [dictionaryName, dictionary] of Object.entries(extension.meta.translations)) {
+						if (extension.meta.localizations) {
+							for (const [dictionaryName, dictionary] of Object.entries(extension.meta.localizations)) {
 								this.#addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
 							}
 						}
@@ -77,12 +77,12 @@ export class UmbLocalizationRegistry {
 							$code: extension.meta.culture.toLowerCase(),
 							$dir: extension.meta.direction ?? 'ltr',
 							...innerDictionary,
-						} satisfies TranslationSet;
+						} satisfies LocalizationSet;
 					}),
 			);
 
 			if (translations.length) {
-				registerTranslation(...translations);
+				registerLocalization(...translations);
 
 				// Set the document language
 				const newLang = locale.baseName.toLowerCase();

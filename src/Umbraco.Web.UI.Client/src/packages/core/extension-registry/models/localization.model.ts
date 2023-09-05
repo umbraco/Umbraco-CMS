@@ -20,7 +20,7 @@ export interface MetaLocalization {
 	culture: string;
 
 	/**
-	 * @summary The direction of the translations (left-to-right or right-to-left).
+	 * @summary The direction of the localizations (left-to-right or right-to-left).
 	 * @description
 	 * The value is used to describe the direction of the translations according to the extension system
 	 * and it will be set as the `dir` attribute on the `<html>` element. It defaults to `ltr`.
@@ -31,7 +31,7 @@ export interface MetaLocalization {
 	direction?: 'ltr' | 'rtl';
 
 	/**
-	 * The translations.
+	 * The localizations.
 	 * @example
 	 * {
 	 *   "general": {
@@ -40,5 +40,5 @@ export interface MetaLocalization {
 	 *   }
 	 * }
 	 */
-	translations?: UmbLocalizationDictionary;
+	localizations?: UmbLocalizationDictionary;
 }

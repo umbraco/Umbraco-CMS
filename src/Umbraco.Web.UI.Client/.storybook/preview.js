@@ -25,7 +25,7 @@ import '../src/libs/controller-api/controller-host-initializer.element.ts';
 import '../src/packages/core/components';
 
 import { manifests as documentManifests } from '../src/packages/documents';
-import { manifests as translationManifests } from '../src/packages/core/localization/manifests';
+import { manifests as localizationManifests } from '../src/packages/core/localization/manifests';
 
 // MSW
 startMockServiceWorker({ serviceWorker: { url: (import.meta.env.VITE_BASE_PATH ?? '/') + 'mockServiceWorker.js' } });
@@ -39,7 +39,7 @@ class UmbStoryBookElement extends UmbLitElement {
 		this._registerExtensions(documentManifests);
 		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalManagerContext(this));
 
-		this._registerExtensions(translationManifests);
+		this._registerExtensions(localizationManifests);
 		umbLocalizationRegistry.loadLanguage('en-us'); // register default language
 	}
 

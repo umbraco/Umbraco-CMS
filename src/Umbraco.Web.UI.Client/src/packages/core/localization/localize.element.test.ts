@@ -10,7 +10,7 @@ const english = {
 	name: 'Test English',
 	meta: {
 		culture: 'en',
-		translations: {
+		localizations: {
 			general: {
 				close: 'Close',
 				logout: 'Log out',
@@ -33,7 +33,7 @@ const danish = {
 	name: 'Test Danish',
 	meta: {
 		culture: 'da',
-		translations: {
+		localizations: {
 			general: {
 				close: 'Luk',
 			},

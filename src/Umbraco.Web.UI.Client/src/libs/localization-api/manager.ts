@@ -16,21 +16,21 @@ import type { LitElement } from '@umbraco-cms/backoffice/external/lit';
 
 export type FunctionParams<T> = T extends (...args: infer U) => string ? U : [];
 
-export interface TranslationSet {
+export interface LocalizationSet {
 	$code: string; // e.g. en, en-GB
 	$dir: 'ltr' | 'rtl';
 }
 
-export interface DefaultTranslationSet extends TranslationSet {
+export interface DefaultLocalizationSet extends LocalizationSet {
 	[key: string]: UmbLocalizationEntry;
 }
 
 export const connectedElements = new Set<HTMLElement>();
 const documentElementObserver = new MutationObserver(update);
-export const translations: Map<string, TranslationSet> = new Map();
+export const localizations: Map<string, LocalizationSet> = new Map();
 export let documentDirection = document.documentElement.dir || 'ltr';
 export let documentLanguage = document.documentElement.lang || navigator.language;
-export let fallback: TranslationSet;
+export let fallback: LocalizationSet;
 
 // Watch for changes on <html lang>
 documentElementObserver.observe(document.documentElement, {
@@ -39,15 +39,15 @@ documentElementObserver.observe(document.documentElement, {
 });
 
 /** Registers one or more translations */
-export function registerTranslation(...translation: TranslationSet[]) {
+export function registerLocalization(...translation: LocalizationSet[]) {
 	translation.map((t) => {
 		const code = t.$code.toLowerCase();
 
-		if (translations.has(code)) {
+		if (localizations.has(code)) {
 			// Merge translations that share the same language code
-			translations.set(code, { ...translations.get(code), ...t });
+			localizations.set(code, { ...localizations.get(code), ...t });
 		} else {
-			translations.set(code, t);
+			localizations.set(code, t);
 		}
 
 		// The first translation that's registered is the fallback
