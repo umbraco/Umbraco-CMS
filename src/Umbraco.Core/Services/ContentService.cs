@@ -2107,7 +2107,7 @@ public class ContentService : RepositoryService, IContentService
             // deal with the branch root - if it fails, abort
             var rootPublishNotificationState = new Dictionary<string, object?>();
             PublishResult? rootResult = SaveAndPublishBranchItem(scope, document, shouldPublish, publishCultures, true,
-                publishedDocuments, eventMessages, userId, allLangs,rootPublishNotificationState);
+                publishedDocuments, eventMessages, userId, allLangs, rootPublishNotificationState);
             if (rootResult != null)
             {
                 results.Add(rootResult);
