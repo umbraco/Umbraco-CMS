@@ -59,9 +59,9 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-box>
+			<uui-box class="uui-text">
 				<div class="headline">
-					<h1>Models Builder</h1>
+					<h1 class="uui-h2">Models Builder</h1>
 					<uui-button
 						.state="${this._buttonStateReload}"
 						look="secondary"

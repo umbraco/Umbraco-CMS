@@ -105,7 +105,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 				min="1"
 				max=${this._telemetryLevels.length}
 				hide-step-values></uui-slider>
-			<h2>${this._selectedTelemetry.telemetryLevel}</h2>
+			<h2 class="uui-h3">${this._selectedTelemetry.telemetryLevel}</h2>
 			<p>${unsafeHTML(this._selectedTelemetryDescription)}</p>
 		`;
 	}
@@ -113,7 +113,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-box class="uui-text">
-				<h1>Consent for telemetry data</h1>
+				<h1 class="uui-h2">Consent for telemetry data</h1>
 				<div style="max-width:75ch">
 					<p>
 						In order to improve Umbraco and add new functionality based on as relevant information as possible, we would

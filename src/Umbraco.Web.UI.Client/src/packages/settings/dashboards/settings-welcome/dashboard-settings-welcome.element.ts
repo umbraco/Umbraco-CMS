@@ -5,9 +5,9 @@ import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/ex
 export class UmbDashboardSettingsWelcomeElement extends LitElement {
 	render() {
 		return html`
-			<section id="settings-dashboard">
+			<section id="settings-dashboard" class="uui-text">
 				<uui-box>
-					<h1>Documentation</h1>
+					<h1 class="uui-h3">Documentation</h1>
 					<p>Read more about working with the items in Settings in our Documentation.</p>
 					<uui-button
 						look="primary"
@@ -20,7 +20,7 @@ export class UmbDashboardSettingsWelcomeElement extends LitElement {
 				</uui-box>
 
 				<uui-box>
-					<h1>Community</h1>
+					<h1 class="uui-h3">Community</h1>
 					<p>Ask a question in the community forum or our Discord community</p>
 					<uui-button
 						look="primary"
@@ -41,7 +41,7 @@ export class UmbDashboardSettingsWelcomeElement extends LitElement {
 				</uui-box>
 
 				<uui-box class="training">
-					<h1>Training</h1>
+					<h1 class="uui-h3">Training</h1>
 
 					<p>Find out about real-life training and certification opportunities</p>
 					<uui-button
@@ -55,7 +55,7 @@ export class UmbDashboardSettingsWelcomeElement extends LitElement {
 				</uui-box>
 
 				<uui-box>
-					<h1>Support</h1>
+					<h1 class="uui-h3">Support</h1>
 					<p>Ask a question in the community forum or our Discord community.</p>
 					<uui-button
 						look="primary"
@@ -68,7 +68,7 @@ export class UmbDashboardSettingsWelcomeElement extends LitElement {
 				</uui-box>
 
 				<uui-box>
-					<h1>Videos</h1>
+					<h1 class="uui-h3">Videos</h1>
 					<p>
 						Watch our free tutorial videos on the Umbraco Learning Base YouTube channel, to get upto speed quickly with
 						Umbraco.
