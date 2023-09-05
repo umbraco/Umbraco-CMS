@@ -4,7 +4,7 @@ import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbrac
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -81,3 +81,8 @@ export class UmbUserWorkspaceContext
 		this.#data.complete();
 	}
 }
+
+export const UMB_USER_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbUserWorkspaceContext>(
+	'UmbWorkspaceContext',
+	(context): context is UmbUserWorkspaceContext => context.getEntityType?.() === 'user'
+);

@@ -1,16 +1,15 @@
-import { UmbRelationTypeWorkspaceContext } from './relation-type-workspace.context.js';
+import { UMB_RELATION_TYPE_WORKSPACE_CONTEXT } from './relation-type-workspace.context.js';
 import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 /**
  * @element umb-relation-type-workspace-editor
  * @description - Element for displaying a Relation Type Workspace
  */
 @customElement('umb-relation-type-workspace-editor')
 export class UmbRelationTypeWorkspaceEditorElement extends UmbLitElement {
-	#workspaceContext?: UmbRelationTypeWorkspaceContext;
+	#workspaceContext?: typeof UMB_RELATION_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _relationType?: RelationTypeResponseModel;
@@ -18,8 +17,8 @@ export class UmbRelationTypeWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance as UmbRelationTypeWorkspaceContext;
+		this.consumeContext(UMB_RELATION_TYPE_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance;
 			this.#observeRelationType();
 		});
 	}

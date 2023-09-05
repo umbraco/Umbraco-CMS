@@ -3,6 +3,7 @@ import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbrac
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbDataTypeWorkspaceContext
 	extends UmbWorkspaceContext<UmbDataTypeRepository, DataTypeResponseModel>
@@ -95,3 +96,8 @@ export class UmbDataTypeWorkspaceContext
 		this.#data.complete();
 	}
 }
+
+export const UMB_DATA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbDataTypeWorkspaceContext>(
+	'UmbWorkspaceContext',
+	(context): context is UmbDataTypeWorkspaceContext => context.getEntityType?.() === 'data-type'
+);

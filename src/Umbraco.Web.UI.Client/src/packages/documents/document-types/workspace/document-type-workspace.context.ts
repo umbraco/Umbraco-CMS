@@ -7,6 +7,7 @@ import type {
 	DocumentTypeResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 type EntityType = DocumentTypeResponseModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -151,5 +152,13 @@ export class UmbDocumentTypeWorkspaceContext
 
 	public destroy(): void {
 		this.structure.destroy();
+		super.destroy();
 	}
 }
+
+
+export const UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbDocumentTypeWorkspaceContext>(
+	'UmbWorkspaceContext',
+	(context): context is UmbDocumentTypeWorkspaceContext => context.getEntityType?.() === 'document-type'
+);
+

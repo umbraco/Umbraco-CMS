@@ -3,9 +3,10 @@ import type { MediaTypeDetails } from '../types.js';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 type EntityType = MediaTypeDetails;
-export class UmbWorkspaceMediaTypeContext
+export class UmbMediaTypeWorkspaceContext
 	extends UmbWorkspaceContext<UmbMediaTypeRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
@@ -61,3 +62,9 @@ export class UmbWorkspaceMediaTypeContext
 		this.#data.complete();
 	}
 }
+
+
+export const UMB_MEDIA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbMediaTypeWorkspaceContext>(
+	'UmbWorkspaceContext',
+	(context): context is UmbMediaTypeWorkspaceContext => context.getEntityType?.() === 'media-type'
+);

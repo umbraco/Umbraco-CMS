@@ -1,4 +1,4 @@
-import { UmbRelationTypeWorkspaceContext } from '../../relation-type-workspace.context.js';
+import { UMB_RELATION_TYPE_WORKSPACE_CONTEXT } from '../../relation-type-workspace.context.js';
 import {
 	UUITextStyles,
 	UUIBooleanInputEvent,
@@ -9,7 +9,6 @@ import {
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-relation-type-workspace-view-relation-type')
@@ -20,13 +19,13 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement
 	@state()
 	private _relationType?: RelationTypeResponseModel;
 
-	#workspaceContext?: UmbRelationTypeWorkspaceContext;
+	#workspaceContext?: typeof UMB_RELATION_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance as UmbRelationTypeWorkspaceContext;
+		this.consumeContext(UMB_RELATION_TYPE_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance;
 			this._observeRelationType();
 		});
 	}

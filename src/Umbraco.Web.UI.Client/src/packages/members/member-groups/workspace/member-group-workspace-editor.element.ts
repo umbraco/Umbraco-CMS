@@ -1,16 +1,15 @@
 import type { MemberGroupDetails } from '../types.js';
-import { UmbWorkspaceMemberGroupContext } from './member-group-workspace.context.js';
+import { UMB_MEMBER_GROUP_WORKSPACE_CONTEXT } from './member-group-workspace.context.js';
 import { UUITextStyles, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 /**
  * @element umb-member-group-edit-workspace
  * @description - Element for displaying a Member Group Workspace
  */
 @customElement('umb-member-group-workspace-editor')
 export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
-	#workspaceContext?: UmbWorkspaceMemberGroupContext;
+	#workspaceContext?: typeof UMB_MEMBER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _memberGroup?: MemberGroupDetails;
@@ -18,8 +17,8 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance as UmbWorkspaceMemberGroupContext;
+		this.consumeContext(UMB_MEMBER_GROUP_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance;
 			this.#observeMemberGroup();
 		});
 	}

@@ -1,21 +1,20 @@
-import { UmbUserWorkspaceContext } from '../../../users/workspace/user-workspace.context.js';
+import { UMB_USER_WORKSPACE_CONTEXT } from '../../../users/workspace/user-workspace.context.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-workspace-action-user-group-save')
 export class UmbWorkspaceActionUserGroupSaveElement extends UmbLitElement {
 	@state()
 	private _saveButtonState?: UUIButtonState;
 
-	private _workspaceContext?: UmbUserWorkspaceContext;
+	private _workspaceContext?: typeof UMB_USER_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			this._workspaceContext = instance as UmbUserWorkspaceContext;
+		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
+			this._workspaceContext = instance;
 		});
 	}
 

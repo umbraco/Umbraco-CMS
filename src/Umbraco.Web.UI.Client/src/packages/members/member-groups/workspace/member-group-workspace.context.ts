@@ -3,9 +3,10 @@ import type { MemberGroupDetails } from '../types.js';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 type EntityType = MemberGroupDetails;
-export class UmbWorkspaceMemberGroupContext
+export class UmbMemberGroupWorkspaceContext
 	extends UmbWorkspaceContext<UmbMemberGroupRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
@@ -63,3 +64,10 @@ export class UmbWorkspaceMemberGroupContext
 		this.#data.complete();
 	}
 }
+
+
+
+export const UMB_MEMBER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbMemberGroupWorkspaceContext>(
+	'UmbWorkspaceContext',
+	(context): context is UmbMemberGroupWorkspaceContext => context.getEntityType?.() === 'member-group'
+);

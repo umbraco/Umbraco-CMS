@@ -3,6 +3,7 @@ import { UmbDocumentTypeRepository } from '../../document-types/repository/docum
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
+	UmbEntityWorkspaceContextInterface,
 	UmbWorkspaceContext,
 	UmbWorkspaceSplitViewManager,
 	UmbWorkspaceVariableEntityContextInterface,
@@ -15,6 +16,7 @@ import {
 	UmbObserverController,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 // TODO: should this context be called DocumentDraft instead of workspace? or should the draft be part of this?
 // TODO: Should we have a DocumentStructureContext and maybe even a DocumentDraftContext?
@@ -200,7 +202,14 @@ export class UmbDocumentWorkspaceContext
 	public destroy(): void {
 		this.#draft.complete();
 		this.structure.destroy();
+		super.destroy();
 	}
 }
 
 export default UmbDocumentWorkspaceContext;
+
+
+export const UMB_DOCUMENT_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbDocumentWorkspaceContext>(
+	'UmbWorkspaceContext',
+	(context): context is UmbDocumentWorkspaceContext => context.getEntityType?.() === 'document'
+);

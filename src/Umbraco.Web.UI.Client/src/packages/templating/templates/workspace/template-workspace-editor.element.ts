@@ -2,7 +2,7 @@ import type { UmbTemplatingInsertMenuElement } from '../../components/insert-men
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element.js';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/modal-tokens.js';
 import { getQuerySnippet } from '../../utils.js';
-import type { UmbTemplateWorkspaceContext } from './template-workspace.context.js';
+import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { camelCase } from '@umbraco-cms/backoffice/external/lodash';
 import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
@@ -14,7 +14,6 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-template-workspace-editor')
 export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
@@ -36,7 +35,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	@query('umb-code-editor')
 	private _codeEditor?: UmbCodeEditorElement;
 
-	#templateWorkspaceContext?: UmbTemplateWorkspaceContext;
+	#templateWorkspaceContext?: typeof UMB_TEMPLATE_WORKSPACE_CONTEXT.TYPE;
 	#isNew = false;
 
 	#masterTemplateId: string | null = null;
@@ -50,8 +49,8 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			this._modalContext = instance;
 		});
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#templateWorkspaceContext = workspaceContext as UmbTemplateWorkspaceContext;
+		this.consumeContext(UMB_TEMPLATE_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#templateWorkspaceContext = workspaceContext;
 			this.observe(this.#templateWorkspaceContext.name, (name) => {
 				this._name = name;
 			});

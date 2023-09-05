@@ -3,6 +3,7 @@ import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbrac
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbDictionaryWorkspaceContext
 	extends UmbWorkspaceContext<UmbDictionaryRepository, DictionaryItemResponseModel>
@@ -83,3 +84,9 @@ export class UmbDictionaryWorkspaceContext
 		this.#data.complete();
 	}
 }
+
+
+export const UMB_DICTIONARY_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbDictionaryWorkspaceContext>(
+	'UmbWorkspaceContext',
+	(context): context is UmbDictionaryWorkspaceContext => context.getEntityType?.() === 'dictionary-item'
+);
