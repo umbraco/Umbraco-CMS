@@ -2,7 +2,6 @@ import { UmbDataTypeConfig } from '../../property-editor/index.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDataTypeRepository } from '@umbraco-cms/backoffice/data-type';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { DataTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -30,8 +29,6 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 
 	private _dataTypeRepository: UmbDataTypeRepository = new UmbDataTypeRepository(this);
 	private _dataTypeObserver?: UmbObserverController<DataTypeResponseModel | undefined>;
-
-
 
 	private async _observeDataType(dataTypeId?: string) {
 		this._dataTypeObserver?.destroy();
