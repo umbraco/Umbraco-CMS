@@ -141,6 +141,11 @@ public static partial class Constants
             public const string Label = "Umbraco.Label";
 
             /// <summary>
+            ///     No configuration String.
+            /// </summary>
+            public const string String = "Umbraco.String";
+
+            /// <summary>
             ///     Picker Relations.
             /// </summary>
             public const string PickerRelations = "Umbraco.PickerRelations";
