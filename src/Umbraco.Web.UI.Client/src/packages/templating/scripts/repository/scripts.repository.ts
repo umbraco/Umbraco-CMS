@@ -1,10 +1,7 @@
-import { PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../../partial-views/config.js';
-import { UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } from '../../partial-views/repository/partial-views.tree.store.js';
-import { PartialViewGetFolderResponse } from '../../partial-views/repository/sources/partial-views.folder.server.data.js';
 import { UmbScriptsTreeServerDataSource } from './sources/scripts.tree.server.data.js';
 import { UmbScriptsServerDataSource } from './sources/scripts.detail.server.data.js';
-import { UmbScriptsFolderServerDataSource } from './sources/scripts.folder.server.data.js';
-import { UmbScriptsTreeStore } from './scripts.tree.store.js';
+import { ScriptsGetFolderResponse, UmbScriptsFolderServerDataSource } from './sources/scripts.folder.server.data.js';
+import { UMB_SCRIPTS_TREE_STORE_CONTEXT_TOKEN, UmbScriptsTreeStore } from './scripts.tree.store.js';
 import {
 	DataSourceResponse,
 	UmbDataSourceErrorResponse,
@@ -27,6 +24,7 @@ import {
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { SCRIPTS_ROOT_ENTITY_TYPE } from '../config.js';
 
 export class UmbScriptsRepository
 	implements
@@ -51,7 +49,7 @@ export class UmbScriptsRepository
 		this.#folderDataSource = new UmbScriptsFolderServerDataSource(this.#host);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			new UmbContextConsumerController(this.#host, UMB_SCRIPTS_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
 			}),
 		]);
@@ -82,7 +80,7 @@ export class UmbScriptsRepository
 	}
 	async requestFolder(
 		unique: string,
-	): Promise<{ data?: PartialViewGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
+	): Promise<{ data?: ScriptsGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
 		await this.#init;
 		return this.#folderDataSource.get(unique);
 	}
@@ -110,7 +108,7 @@ export class UmbScriptsRepository
 		const data = {
 			id: null,
 			path: null,
-			type: PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+			type: SCRIPTS_ROOT_ENTITY_TYPE,
 			name: 'Partial Views',
 			icon: 'umb:folder',
 			hasChildren: true,

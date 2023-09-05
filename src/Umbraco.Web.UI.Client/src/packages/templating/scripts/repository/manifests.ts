@@ -1,4 +1,4 @@
-import { SCRIPTS_REPOSITORY_ALIAS } from '../config.js';
+import { SCRIPTS_REPOSITORY_ALIAS, SCRIPTS_STORE_ALIAS, SCRIPTS_TREE_STORE_ALIAS } from '../config.js';
 import { UmbScriptsRepository } from './scripts.repository.js';
 import { UmbScriptsStore } from './scripts.store.js';
 import { UmbScriptsTreeStore } from './scripts.tree.store.js';
@@ -10,9 +10,6 @@ const repository: ManifestRepository = {
 	name: 'Partial Views Repository',
 	class: UmbScriptsRepository,
 };
-
-export const SCRIPTS_STORE_ALIAS = 'Umb.Store.PartialViews';
-export const SCRIPTS_TREE_STORE_ALIAS = 'Umb.Store.PartialViewsTree';
 
 const store: ManifestStore = {
 	type: 'store',

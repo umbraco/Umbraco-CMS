@@ -8,8 +8,10 @@ export const SCRIPTS_FOLDER_ENTITY_TYPE = 'script-folder';
 export const SCRIPTS_FOLDER_EMPTY_ENTITY_TYPE = 'script-folder-empty';
 
 export const SCRIPTS_REPOSITORY_ALIAS = 'Umb.Repository.Scripts';
-
 export const SCRIPTS_TREE_ALIAS = 'Umb.Tree.Scripts';
 
-export const UMB_SCRIPTS_TREE_STORE_CONTEXT_TOKEN_ALIAS = 'Umb.Store.Scripts.Tree';
-export const UMB_SCRIPTS_STORE_CONTEXT_TOKEN_ALIAS = 'Umb.Store.Scripts';
+export const SCRIPTS_STORE_ALIAS = 'Umb.Store.Scripts';
+export const SCRIPTS_TREE_STORE_ALIAS = 'Umb.Store.Scripts.Tree';
+
+export const UMB_SCRIPTS_TREE_STORE_CONTEXT_TOKEN_ALIAS = 'Umb.Store.Scripts.Tree.Context.Token';
+export const UMB_SCRIPTS_STORE_CONTEXT_TOKEN_ALIAS = 'Umb.Store.Scripts.Context.Token';
