@@ -18,7 +18,6 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IDataTypeService _dataTypeService;
     private readonly ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
-    private readonly ICoreScopeProvider _scopeProvider;
     private readonly ITreeEntitySortingService _treeEntitySortingService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
 
