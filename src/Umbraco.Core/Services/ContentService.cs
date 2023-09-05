@@ -2168,7 +2168,7 @@ public class ContentService : RepositoryService, IContentService
             // (SaveAndPublishBranchOne does *not* do it)
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(document, TreeChangeTypes.RefreshBranch, eventMessages));
-            if (rootResult?.Success == true)
+            if (rootResult?.Success is true)
             {
                 scope.Notifications.Publish(
                     new ContentPublishedNotification(rootResult!.Content!, eventMessages)
