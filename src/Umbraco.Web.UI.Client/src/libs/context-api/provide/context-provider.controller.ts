@@ -2,14 +2,18 @@ import { UmbContextToken } from '../token/context-token.js';
 import { UmbContextProvider } from './context-provider.js';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbContextProviderController<T = unknown> extends UmbContextProvider implements UmbController {
+export class UmbContextProviderController<
+	BaseType = unknown,
+	ResultType extends BaseType = BaseType,
+	InstanceType extends ResultType = ResultType
+> extends UmbContextProvider<BaseType, ResultType> implements UmbController {
 	#host: UmbControllerHost;
 
 	public get controllerAlias() {
 		return this._contextAlias.toString();
 	}
 
-	constructor(host: UmbControllerHost, contextAlias: string | UmbContextToken<T>, instance: T) {
+	constructor(host: UmbControllerHost, contextAlias: string | UmbContextToken<BaseType, ResultType>, instance: InstanceType) {
 		super(host.getHostElement(), contextAlias, instance);
 		this.#host = host;
 

@@ -27,11 +27,15 @@ declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 		callback: (_value: T) => void,
 		controllerAlias?: UmbControllerAlias
 	): UmbObserverController<T>;
-	provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R>;
-	consumeContext<R = unknown>(
-		alias: string | UmbContextToken<R>,
-		callback: UmbContextCallback<R>
-	): UmbContextConsumerController<R>;
+	provideContext<
+		BaseType = unknown,
+		ResultType extends BaseType = BaseType,
+		InstanceType extends ResultType = ResultType
+	>(alias: string | UmbContextToken<BaseType, ResultType>, instance: InstanceType): UmbContextProviderController<BaseType, ResultType, InstanceType>;
+	consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+		alias: string | UmbContextToken<BaseType, ResultType>,
+		callback: UmbContextCallback<ResultType>
+	): UmbContextConsumerController<BaseType, ResultType>;
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;
@@ -82,11 +86,17 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 		 * @return {UmbContextProviderController} Reference to a Context Provider Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		provideContext<R = unknown>(
-			contextAlias: string | UmbContextToken<R>,
-			instance: R
-		): UmbContextProviderController<R> {
-			return new UmbContextProviderController(this, contextAlias, instance);
+		provideContext
+		<
+			BaseType = unknown,
+			ResultType extends BaseType = BaseType,
+			InstanceType extends ResultType = ResultType
+		>
+		(
+			contextAlias: string | UmbContextToken<BaseType, ResultType>,
+			instance: InstanceType
+		): UmbContextProviderController {
+			return new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, contextAlias, instance);
 		}
 
 		/**
@@ -96,10 +106,10 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 		 * @return {UmbContextConsumerController} Reference to a Context Consumer Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		consumeContext<R = unknown>(
-			contextAlias: string | UmbContextToken<R>,
-			callback: UmbContextCallback<R>
-		): UmbContextConsumerController<R> {
+		consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+			contextAlias: string | UmbContextToken<BaseType, ResultType>,
+			callback: UmbContextCallback<ResultType>
+		): UmbContextConsumerController<BaseType, ResultType>  {
 			return new UmbContextConsumerController(this, contextAlias, callback);
 		}
 	}

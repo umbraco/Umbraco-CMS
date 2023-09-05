@@ -4,6 +4,7 @@ import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbrac
 import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbUserGroupWorkspaceContext
 	extends UmbWorkspaceContext<UmbUserGroupRepository, UserGroupResponseModel>
@@ -102,3 +103,9 @@ export class UmbUserGroupWorkspaceContext
 		this.#userIds.next(keys);
 	}
 }
+
+
+export const UMB_USER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbUserGroupWorkspaceContext>(
+	'UmbWorkspaceContext',
+	(context): context is UmbUserGroupWorkspaceContext => context.getEntityType?.() === 'user-group'
+);

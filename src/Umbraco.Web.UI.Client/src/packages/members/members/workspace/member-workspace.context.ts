@@ -2,6 +2,7 @@ import { UmbMemberRepository } from '../repository/member.repository.js';
 import type { MemberDetails } from '../types.js';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbMemberWorkspaceContext
 	extends UmbWorkspaceContext<UmbMemberRepository, MemberDetails>
@@ -35,3 +36,8 @@ export class UmbMemberWorkspaceContext
 		console.log('destroy');
 	}
 }
+
+export const UMB_MEMBER_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbMemberWorkspaceContext>(
+	'UmbWorkspaceContext',
+	(context): context is UmbMemberWorkspaceContext => context.getEntityType?.() === 'member'
+);

@@ -1,19 +1,18 @@
-import { UmbWorkspaceMediaTypeContext } from './media-type-workspace.context.js';
+import { UMB_MEDIA_TYPE_WORKSPACE_CONTEXT } from './media-type-workspace.context.js';
 import { UUITextStyles, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-media-type-workspace-editor')
 export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _mediaTypeName?: string | null = '';
-	#workspaceContext?: UmbWorkspaceMediaTypeContext;
+	#workspaceContext?: typeof UMB_MEDIA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance as UmbWorkspaceMediaTypeContext;
+		this.consumeContext(UMB_MEDIA_TYPE_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance;
 			this.#observeName();
 		});
 	}

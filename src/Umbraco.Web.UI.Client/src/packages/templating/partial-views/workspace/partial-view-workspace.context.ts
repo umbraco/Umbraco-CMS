@@ -2,20 +2,20 @@ import { UmbPartialViewsRepository } from '../repository/partial-views.repositor
 import { PartialViewDetails } from '../config.js';
 import { createObservablePart, UmbBooleanState, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-// TODO: I think this should be named PartialViewWorkspace... not with an 's'
-export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<
+export class UmbPartialViewWorkspaceContext extends UmbWorkspaceContext<
 	UmbPartialViewsRepository,
 	PartialViewDetails
-> {
+> implements UmbEntityWorkspaceContextInterface {
 	getEntityId(): string | undefined {
 		return this.getData()?.path;
 	}
 	getEntityType(): string {
-		return 'partial-views';
+		return 'partial-view';
 	}
 	save(): Promise<void> {
 		const partialView = this.getData();
@@ -41,9 +41,7 @@ export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<
 		this.repository.save(partialView.path, updateRequestBody);
 		return Promise.resolve();
 	}
-	destroy(): void {
-		throw new Error('Method not implemented.');
-	}
+
 	#data = new UmbDeepState<PartialViewDetails | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = createObservablePart(this.#data, (data) => data?.name);
@@ -54,7 +52,7 @@ export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.PartialViews', new UmbPartialViewsRepository(host));
+		super(host, 'Umb.Workspace.PartialView', new UmbPartialViewsRepository(host));
 		this.#loadCodeEditor();
 	}
 
@@ -99,3 +97,10 @@ export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<
 		this.#data.next(newPartial);
 	}
 }
+
+
+
+export const UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbPartialViewWorkspaceContext>(
+	'UmbWorkspaceContext',
+	(context): context is UmbPartialViewWorkspaceContext => context.getEntityType?.() === 'partial-view'
+);

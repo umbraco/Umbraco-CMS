@@ -1,13 +1,11 @@
-import { UmbLanguageWorkspaceContext } from '../../language-workspace.context.js';
+import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from '../../language-workspace.context.js';
 import type { UmbInputCultureSelectElement } from '../../../../../cultures/components/input-culture-select/input-culture-select.element.js';
 import type { UmbInputLanguagePickerElement } from '../../../../components/input-language-picker/input-language-picker.element.js';
 import { UUIBooleanInputEvent, UUIToggleElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-// TODO: set up import alias for these modules
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-language-details-workspace-view')
@@ -27,7 +25,7 @@ export class UmbLanguageDetailsWorkspaceViewElement
 	@state()
 	_validationErrors?: { [key: string]: Array<any> };
 
-	#languageWorkspaceContext?: UmbLanguageWorkspaceContext;
+	#languageWorkspaceContext?: typeof UMB_LANGUAGE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -36,8 +34,8 @@ export class UmbLanguageDetailsWorkspaceViewElement
 		 In the language workspace we want to clear a default language change warning and reset the initial state after a save action has been executed. */
 		let initialStateSet = false;
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			this.#languageWorkspaceContext = instance as UmbLanguageWorkspaceContext;
+		this.consumeContext(UMB_LANGUAGE_WORKSPACE_CONTEXT, (instance) => {
+			this.#languageWorkspaceContext = instance;
 
 			this.observe(this.#languageWorkspaceContext.data, (language) => {
 				this._language = language;

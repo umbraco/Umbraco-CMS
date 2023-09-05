@@ -1,7 +1,6 @@
-import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context.js';
+import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
@@ -37,7 +36,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 	@state()
 	private _data: Array<any> = [];
 
-	private _workspaceContext?: UmbDataTypeWorkspaceContext;
+	private _workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
@@ -47,9 +46,8 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 			this._modalContext = instance;
 		});
 
-		// TODO: Figure out if this is the best way to consume a context or if it could be strongly typed using UmbContextToken
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (_instance) => {
-			this._workspaceContext = _instance as UmbDataTypeWorkspaceContext;
+		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (_instance) => {
+			this._workspaceContext = _instance;
 			this._observeDataType();
 		});
 	}
