@@ -1,6 +1,11 @@
 const { rest } = window.MockServiceWorker;
 import { umbStylesheetData } from '../data/stylesheet.data.js';
-import { CreateTextFileViewModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	CreateTextFileViewModelBaseModel,
+	ExtractRichTextStylesheetRulesRequestModel,
+	ExtractRichTextStylesheetRulesResponseModel,
+	InterpolateRichTextStylesheetRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 const treeHandlers = [
@@ -69,6 +74,35 @@ const detailHandlers = [
 	}),
 ];
 
+type getRulesRequestBody = { path?: string };
+
+const rulesHandlers = [
+	rest.post(umbracoPath('/stylesheet/rich-text/extract-rules'), (req, res, ctx) => {
+		const requestBody = req.json() as ExtractRichTextStylesheetRulesRequestModel;
+		if (!requestBody) return res(ctx.status(400, 'no body found'));
+		const response = umbStylesheetData.extractRules({ requestBody });
+		return res(ctx.status(200), ctx.json(response));
+	}),
+
+	rest.post(umbracoPath('/stylesheet/rich-text/interpolate-rules'), (req, res, ctx) => {
+		const requestBody = req.json() as InterpolateRichTextStylesheetRequestModel;
+		if (!requestBody) return res(ctx.status(400, 'no body found'));
+		const response = umbStylesheetData.interpolateRules({ requestBody });
+		return res(ctx.status(200), ctx.json(response));
+	}),
+
+	rest.get(umbracoPath('/stylesheet/rich-text/rules'), (req, res, ctx) => {
+		const path = req.url.searchParams.get('path');
+		if (!path) return res(ctx.status(400));
+		try {
+			const response = umbStylesheetData.getRules(path);
+			return res(ctx.status(200), ctx.json(response));
+		} catch (e) {
+			return res(ctx.status(404));
+		}
+	}),
+];
+
 const folderHandlers = [
 	rest.get(umbracoPath('/v1/stylesheet/all'), (req, res, ctx) => {
 		const path = req.url.searchParams.get('path');
@@ -91,4 +125,4 @@ const folderHandlers = [
 	}),
 ];
 
-export const handlers = [...treeHandlers, ...detailHandlers, ...folderHandlers];
+export const handlers = [...treeHandlers, ...detailHandlers, ...folderHandlers, ...rulesHandlers];
