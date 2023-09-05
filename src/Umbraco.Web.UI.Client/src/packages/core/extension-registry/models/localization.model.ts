@@ -1,12 +1,12 @@
 import type { ManifestWithLoaderIncludingDefaultExport } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbTranslationsDictionary } from '@umbraco-cms/backoffice/localization-api';
+import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localization-api';
 
-export interface ManifestTranslations extends ManifestWithLoaderIncludingDefaultExport<UmbTranslationsDictionary> {
-	type: 'translations';
-	meta: MetaTranslations;
+export interface ManifestLocalization extends ManifestWithLoaderIncludingDefaultExport<UmbLocalizationDictionary> {
+	type: 'localization';
+	meta: MetaLocalization;
 }
 
-export interface MetaTranslations {
+export interface MetaLocalization {
 	/**
 	 * @summary The culture of the translations.
 	 * @description
@@ -40,5 +40,5 @@ export interface MetaTranslations {
 	 *   }
 	 * }
 	 */
-	translations?: UmbTranslationsDictionary;
+	translations?: UmbLocalizationDictionary;
 }

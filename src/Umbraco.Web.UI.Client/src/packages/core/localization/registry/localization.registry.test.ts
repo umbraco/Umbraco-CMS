@@ -1,10 +1,10 @@
 import { aTimeout, expect } from '@open-wc/testing';
-import { UmbTranslationRegistry } from './translation.registry.js';
-import { ManifestTranslations, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLocalizationRegistry } from './localization.registry.js';
+import { ManifestLocalization, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-//#region Translations
-const english: ManifestTranslations = {
-	type: 'translations',
+//#region Localizations
+const english: ManifestLocalization = {
+	type: 'localization',
 	alias: 'test.en',
 	name: 'Test English',
 	meta: {
@@ -26,8 +26,8 @@ const english: ManifestTranslations = {
 	},
 };
 
-const englishOverride: ManifestTranslations = {
-	type: 'translations',
+const englishOverride: ManifestLocalization = {
+	type: 'localization',
 	alias: 'test.en.override',
 	name: 'Test English',
 	meta: {
@@ -40,8 +40,8 @@ const englishOverride: ManifestTranslations = {
 	},
 };
 
-const danish: ManifestTranslations = {
-	type: 'translations',
+const danish: ManifestLocalization = {
+	type: 'localization',
 	alias: 'test.da',
 	name: 'Test Danish',
 	meta: {
@@ -55,8 +55,8 @@ const danish: ManifestTranslations = {
 	},
 };
 
-const danishRegional: ManifestTranslations = {
-	type: 'translations',
+const danishRegional: ManifestLocalization = {
+	type: 'localization',
 	alias: 'test.da-DK',
 	name: 'Test Danish (Denmark)',
 	meta: {
@@ -75,10 +75,10 @@ describe('UmbLocalizeController', () => {
 	umbExtensionsRegistry.register(danish);
 	umbExtensionsRegistry.register(danishRegional);
 
-	let registry: UmbTranslationRegistry;
+	let registry: UmbLocalizationRegistry;
 
 	beforeEach(async () => {
-		registry = new UmbTranslationRegistry(umbExtensionsRegistry);
+		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
 		registry.loadLanguage(english.meta.culture);
 		await aTimeout(0);
 	});

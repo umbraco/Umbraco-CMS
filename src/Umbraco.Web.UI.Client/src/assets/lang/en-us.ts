@@ -1,4 +1,4 @@
-import type { UmbTranslationsDictionary } from '@umbraco-cms/backoffice/localization-api';
+import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localization-api';
 
 export default {
 	actions: {
@@ -3216,4 +3216,4 @@ export default {
 	formRecordSetActions: {
 		deleteConfirm: 'Are you sure you want to delete these entries?',
 	},
-} as UmbTranslationsDictionary;
+} as UmbLocalizationDictionary;
