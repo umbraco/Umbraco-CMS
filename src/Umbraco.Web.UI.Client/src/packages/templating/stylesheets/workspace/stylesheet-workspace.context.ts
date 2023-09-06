@@ -81,11 +81,15 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);
+		} else {
+			this.#data.update(undefined);
 		}
 
 		if (rules.data) {
 			const x = rules.data.rules?.map((r, i) => ({ ...r, sortOrder: i })) ?? [];
 			this.#rules.next(x);
+		} else {
+			this.#rules.next([]);
 		}
 	}
 
@@ -124,8 +128,9 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 	public async save() {
 		const stylesheet = this.getData();
 
-		if (!stylesheet)
+		if (!stylesheet) {
 			return Promise.reject('Something went wrong, there is no data for partial view you want to save...');
+		}
 		if (this.getIsNew()) {
 			const createRequestBody = {
 				name: stylesheet.name,

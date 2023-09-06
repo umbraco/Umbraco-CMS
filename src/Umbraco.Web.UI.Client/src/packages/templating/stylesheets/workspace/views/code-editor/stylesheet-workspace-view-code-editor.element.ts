@@ -1,10 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
+import { UMB_STYLESHEET_WORKSPACE_CONTEXT, UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-stylesheet-workspace-view-code-editor')
 export class UmbStylesheetWorkspaceViewCodeEditorElement extends UmbLitElement {
@@ -19,8 +18,8 @@ export class UmbStylesheetWorkspaceViewCodeEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#stylesheetWorkspaceContext = workspaceContext as UmbStylesheetWorkspaceContext;
+		this.consumeContext(UMB_STYLESHEET_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#stylesheetWorkspaceContext = workspaceContext;
 
 			this.observe(this.#stylesheetWorkspaceContext.content, (content) => {
 				this._content = content;

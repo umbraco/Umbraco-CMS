@@ -4,6 +4,7 @@ import {
 	CreateTextFileViewModelBaseModel,
 	ExtractRichTextStylesheetRulesRequestModel,
 	InterpolateRichTextStylesheetRequestModel,
+	UpdateStylesheetRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
@@ -51,12 +52,13 @@ const detailHandlers = [
 		const response = umbStylesheetData.delete([path]);
 		return res(ctx.status(200), ctx.json(response));
 	}),
-	rest.put(umbracoPath('/stylesheet'), (req, res, ctx) => {
-		const requestBody = req.json() as CreateTextFileViewModelBaseModel;
+	rest.put(umbracoPath('/stylesheet'), async (req, res, ctx) => {
+		const requestBody = await req.json() as UpdateStylesheetRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		umbStylesheetData.updateData(requestBody);
 		return res(ctx.status(200));
 	}),
+
 	rest.get(umbracoPath('/v1/stylesheet/all'), (req, res, ctx) => {
 		const path = req.url.searchParams.get('path');
 		if (!path) return;

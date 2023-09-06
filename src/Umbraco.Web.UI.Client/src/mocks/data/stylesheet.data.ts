@@ -1,4 +1,4 @@
-import { UmbEntityData } from './entity.data.js';
+import { UmbData } from './data.js';
 import { createFileSystemTreeItem, createFileItemResponseModelBaseModel, createTextFileItem } from './utils.js';
 import {
 	CreateTextFileViewModelBaseModel,
@@ -9,6 +9,7 @@ import {
 	PagedFileSystemTreeItemPresentationModel,
 	PagedStylesheetOverviewResponseModel,
 	StylesheetResponseModel,
+	UpdateStylesheetRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 //prettier-ignore
@@ -24,7 +25,10 @@ export const data: Array<StylesheetDBItem> = [
 		name: 'Stylesheet File 1.css',
 		type: 'stylesheet',
 		hasChildren: false,
-		content: `h1 {
+		content: `
+		/** Stylesheet 1 */
+
+		h1 {
 	color: blue;
 }
 
@@ -50,7 +54,9 @@ h1 {
 		name: 'Stylesheet File 2.css',
 		type: 'stylesheet',
 		hasChildren: false,
-		content: `h1 {
+		content: `
+		/** Stylesheet 2 */
+h1 {
 	color: green;
 }
 
@@ -108,7 +114,7 @@ h1 {
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-class UmbStylesheetData extends UmbEntityData<StylesheetDBItem> {
+class UmbStylesheetData extends UmbData<StylesheetDBItem> {
 	constructor() {
 		super(data);
 	}
@@ -230,6 +236,62 @@ ${rule.selector} {
 
 		this.insert(newItem);
 		return newItem;
+	}
+
+
+	insert(item: StylesheetDBItem) {
+		const exits = this.data.find((i) => i.path === item.path);
+
+		if (exits) {
+			throw new Error(`Item with path ${item.path} already exists`);
+		}
+
+		this.data.push(item);
+
+		return item;
+	}
+
+	updateData(updateItem: UpdateStylesheetRequestModel) {
+		console.log("update data", updateItem)
+		const itemIndex = this.data.findIndex((item) => item.path === updateItem.existingPath);
+		const item = this.data[itemIndex];
+		console.log("existing", item)
+		if (!item) return;
+
+		// TODO: revisit this code, seems like something we can solve smarter/type safer now:
+		const itemKeys = Object.keys(item);
+		const newItem = {...item};
+
+		for (const [key] of Object.entries(updateItem)) {
+			if (itemKeys.indexOf(key) !== -1) {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				newItem[key] = updateItem[key];
+			}
+		}
+
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this.data[itemIndex] = newItem;
+
+
+		console.log("result", this.data[itemIndex])
+	}
+
+	delete(paths: Array<string>) {
+		const deletedPaths = this.data
+			.filter((item) => {
+				if (!item.path) throw new Error('Item has no path');
+				paths.includes(item.path);
+			})
+			.map((item) => item.path);
+
+		this.data = this.data.filter((item) => {
+			if (!item.path) throw new Error('Item has no path');
+			paths.indexOf(item.path) === -1;
+		});
+
+		return deletedPaths;
 	}
 }
 
