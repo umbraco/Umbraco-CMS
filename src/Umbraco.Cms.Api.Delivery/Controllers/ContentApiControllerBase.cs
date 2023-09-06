@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
+[DeliveryApiAccess]
 [VersionedDeliveryApiRoute("content")]
 [ApiExplorerSettings(GroupName = "Content")]
 [LocalizeFromAcceptLanguageHeader]
@@ -39,7 +40,10 @@ public abstract class ContentApiControllerBase : DeliveryApiControllerBase
                 .WithTitle("Sort option not found")
                 .WithDetail("One of the attempted 'sort' options does not exist")
                 .Build()),
-            _ => throw new ArgumentOutOfRangeException(nameof(status), status, $"Invalid {nameof(ApiContentQueryOperationStatus)} value.")
+            _ => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Unknown content query status")
+                .WithDetail($"Content query status \"{status}\" was not expected here")
+                .Build()),
         };
 
     /// <summary>

@@ -23,8 +23,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Security;
 [ApiVersion("1.0")]
 [ApiController]
 [VersionedApiBackOfficeRoute(Common.Security.Paths.BackOfficeApi.EndpointTemplate)]
-[ApiExplorerSettings(GroupName = "Security")]
-public class BackOfficeController : ManagementApiControllerBase
+public class BackOfficeController : SecurityControllerBase
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IBackOfficeSignInManager _backOfficeSignInManager;

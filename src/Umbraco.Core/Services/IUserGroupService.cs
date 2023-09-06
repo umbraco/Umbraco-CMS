@@ -82,9 +82,10 @@ public interface IUserGroupService
     /// <summary>
     ///     Deletes a UserGroup
     /// </summary>
-    /// <param name="key">The key of the user group to delete.</param>
+    /// <param name="userGroupKeys">The keys of the user groups to delete.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
-    Task<Attempt<UserGroupOperationStatus>> DeleteAsync(Guid key);
+    Task<Attempt<UserGroupOperationStatus>> DeleteAsync(ISet<Guid> userGroupKeys);
+    Task<Attempt<UserGroupOperationStatus>> DeleteAsync(Guid userGroupKey) => DeleteAsync(new HashSet<Guid>(){userGroupKey});
 
     /// <summary>
     /// Updates the users to have the groups specified.

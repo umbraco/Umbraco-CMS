@@ -99,14 +99,14 @@ public class NotificationService : INotificationService
         const int pagesz = 400; // load batches of 400 users
         do
         {
-            // users are returned ordered by id, notifications are returned ordered by user id
-            var users = _userService.GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-            var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(), Constants.ObjectTypes.Document)?.ToList();
+            var notifications = GetUsersNotifications(new List<int>(), action, Enumerable.Empty<int>(), Constants.ObjectTypes.Document)?.ToList();
             if (notifications is null || notifications.Count == 0)
             {
                 break;
             }
 
+            // users are returned ordered by id, notifications are returned ordered by user id
+            var users = _userService.GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
             foreach (IUser user in users)
             {
                 Notification[] userNotifications = notifications.Where(n => n.UserId == user.Id).ToArray();

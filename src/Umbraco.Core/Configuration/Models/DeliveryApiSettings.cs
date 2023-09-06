@@ -50,6 +50,11 @@ public class DeliveryApiSettings
     public bool RichTextOutputAsJson { get; set; } = StaticRichTextOutputAsJson;
 
     /// <summary>
+    ///     Gets or sets the settings for the Media APIs of the Delivery API.
+    /// </summary>
+    public MediaSettings Media { get; set; } = new ();
+
+    /// <summary>
     ///     Gets or sets the member authorization settings for the Delivery API.
     /// </summary>
     public MemberAuthorizationSettings? MemberAuthorization { get; set; } = null;
@@ -61,6 +66,37 @@ public class DeliveryApiSettings
     ///     This method is intended for future extension - see remark in <see cref="MemberAuthorizationSettings"/>
     /// </remarks>
     public bool MemberAuthorizationIsEnabled() => MemberAuthorization?.AuthorizationCodeFlow?.Enabled is true;
+
+    /// <summary>
+    ///     Typed configuration options for the Media APIs of the Delivery API.
+    /// </summary>
+    /// <remarks>
+    ///     The Delivery API settings (as configured in <see cref="DeliveryApiSettings"/>) supersede these settings in levels of restriction.
+    ///     I.e. the Media APIs cannot be enabled, if the Delivery API is disabled.
+    /// </remarks>
+    public class MediaSettings
+    {
+        /// <summary>
+        ///     Gets or sets a value indicating whether the Media APIs of the Delivery API should be enabled.
+        /// </summary>
+        /// <value><c>true</c> if the Media APIs should be enabled; otherwise, <c>false</c>.</value>
+        /// <remarks>
+        ///     Setting this to <c>true</c> will have no effect if the Delivery API itself is disabled through <see cref="DeliveryApiSettings"/>
+        /// </remarks>
+        [DefaultValue(StaticEnabled)]
+        public bool Enabled { get; set; } = StaticEnabled;
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether the Media APIs of the Delivery API (if enabled) should be
+        ///     publicly available or should require an API key for access.
+        /// </summary>
+        /// <value><c>true</c> if the Media APIs should be publicly available; <c>false</c> if an API key should be required for access.</value>
+        /// <remarks>
+        ///     Setting this to <c>true</c> will have no effect if the Delivery API itself has public access disabled through <see cref="DeliveryApiSettings"/>
+        /// </remarks>
+        [DefaultValue(StaticPublicAccess)]
+        public bool PublicAccess { get; set; } = StaticPublicAccess;
+    }
 
     /// <summary>
     ///     Typed configuration options for member authorization settings for the Delivery API.

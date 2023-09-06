@@ -181,7 +181,7 @@ public interface IRelationService : IService
     /// <param name="totalRecords"></param>
     /// <param name="ordering"></param>
     /// <returns></returns>
-    Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKey(Guid key, int skip, int take, Ordering? ordering = null);
+    Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKeyAsync(Guid key, int skip, int take, Ordering? ordering = null);
 
     /// <summary>
     ///     Gets the Child object from a Relation as an <see cref="IUmbracoEntity" />
@@ -392,4 +392,6 @@ public interface IRelationService : IService
     /// </summary>
     /// <returns>All of the allowed <see cref="UmbracoObjectTypes"/>.</returns>
     IEnumerable<UmbracoObjectTypes> GetAllowedObjectTypes();
+
+    Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(Guid childKey, int skip, int take, string? relationTypeAlias);
 }

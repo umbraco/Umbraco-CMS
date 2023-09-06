@@ -96,7 +96,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                     ClientId = Constants.OAuthClientIds.Postman,
                     RedirectUris =
                     {
-                        new Uri("https://oauth.pstmn.io/v1/callback")
+                        new Uri("https://oauth.pstmn.io/v1/callback"), new Uri("https://oauth.pstmn.io/v1/browser-callback")
                     },
                     Type = OpenIddictConstants.ClientTypes.Public,
                     Permissions =

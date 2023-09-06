@@ -189,6 +189,7 @@ public static partial class UmbracoBuilderExtensions
                 services.GetService<INotificationHandler<SendEmailNotification>>(),
                 services.GetService<INotificationAsyncHandler<SendEmailNotification>>()));
         builder.Services.AddTransient<IUserInviteSender, EmailUserInviteSender>();
+        builder.Services.AddTransient<IUserForgotPasswordSender, EmailUserForgotPasswordSender>();
 
         builder.Services.AddSingleton<IExamineManager, ExamineManager>();
 
@@ -430,6 +431,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiContentBuilder, ApiContentBuilder>();
         builder.Services.AddSingleton<IApiContentResponseBuilder, ApiContentResponseBuilder>();
         builder.Services.AddSingleton<IApiMediaBuilder, ApiMediaBuilder>();
+        builder.Services.AddSingleton<IApiMediaWithCropsBuilder, ApiMediaWithCropsBuilder>();
+        builder.Services.AddSingleton<IApiMediaWithCropsResponseBuilder, ApiMediaWithCropsResponseBuilder>();
         builder.Services.AddSingleton<IApiContentNameProvider, ApiContentNameProvider>();
         builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, NoopOutputExpansionStrategyAccessor>();
         builder.Services.AddSingleton<IRequestStartItemProviderAccessor, NoopRequestStartItemProviderAccessor>();
@@ -440,6 +443,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IRequestMemberService, NoopRequestMemberService>();
         builder.Services.AddSingleton<IApiAccessService, NoopApiAccessService>();
         builder.Services.AddSingleton<IApiContentQueryService, NoopApiContentQueryService>();
+        builder.Services.AddSingleton<IApiMediaQueryService, NoopApiMediaQueryService>();
         builder.Services.AddSingleton<IApiMediaUrlProvider, ApiMediaUrlProvider>();
         builder.Services.AddSingleton<IApiContentRouteBuilder, ApiContentRouteBuilder>();
         builder.Services.AddSingleton<IApiPublishedContentCache, ApiPublishedContentCache>();

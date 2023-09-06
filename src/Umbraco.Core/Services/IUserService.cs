@@ -67,7 +67,9 @@ public interface IUserService : IMembershipUserService
 
     Task<UserOperationStatus> SetAvatarAsync(Guid userKey, Guid temporaryFileKey);
 
-    Task<UserOperationStatus> DeleteAsync(Guid key);
+    Task<UserOperationStatus> DeleteAsync(Guid userKey, ISet<Guid> keys);
+
+    Task<UserOperationStatus> DeleteAsync(Guid userKey, Guid key) => DeleteAsync(userKey, new HashSet<Guid> { key });
 
     Task<UserOperationStatus> DisableAsync(Guid userKey, ISet<Guid> keys);
 
@@ -382,4 +384,24 @@ public interface IUserService : IMembershipUserService
 
     #endregion
 
+    /// <summary>
+    ///     Verifies the reset code sent from the reset password mail for a given user.
+    /// </summary>
+    /// <param name="userKey">The unique key of the user.</param>
+    /// <param name="token">The reset password token.</param>
+    Task<Attempt<UserOperationStatus>> VerifyPasswordResetAsync(Guid userKey, string token);
+
+    /// <summary>
+    ///     Changes the user's password.
+    /// </summary>
+    /// <param name="userKey">The unique key of the user.</param>
+    /// <param name="token">The reset password token.</param>
+    /// <param name="password">The new password of the user.</param>
+    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ResetPasswordAsync(Guid userKey, string token, string password);
+
+    /// <summary>
+    ///     Sends an email with a link to reset user's password.
+    /// </summary>
+    /// <param name="userEmail">The email address of the user.</param>
+    Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail);
 }

@@ -276,6 +276,11 @@ public class EntityMapDefinition : IMapDefinition
         {
             target.AdditionalData.Add("contentType", source.Values[ExamineFieldNames.ItemTypeFieldName]);
         }
+
+        if (source.Values.ContainsKey(UmbracoExamineFieldNames.PublishedFieldName))
+        {
+            target.AdditionalData.Add("published", string.Equals(source.Values[UmbracoExamineFieldNames.PublishedFieldName], "y", StringComparison.InvariantCultureIgnoreCase));
+        }
     }
 
     private static string? MapContentTypeIcon(IEntitySlim entity)
