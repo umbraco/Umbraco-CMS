@@ -36,22 +36,21 @@ internal sealed class RequestMemberService : IRequestMemberService
         _deliveryApiSettings = deliveryApiSettings.Value;
     }
 
-    public async Task<bool> MemberHasAccessToAsync(IPublishedContent content)
+    public async Task<PublicAccessStatus> MemberHasAccessToAsync(IPublishedContent content)
     {
         PublicAccessEntry? publicAccessEntry = _publicAccessService.GetEntryForContent(content.Path);
         if (publicAccessEntry is null)
         {
-            return true;
+            return PublicAccessStatus.AccessAccepted;
         }
 
         ClaimsPrincipal? requestPrincipal = await GetRequestPrincipal();
         if (requestPrincipal is null)
         {
-            return false;
+            return PublicAccessStatus.NotLoggedIn;
         }
 
-        PublicAccessStatus hasAccess = await _publicAccessChecker.HasMemberAccessToContentAsync(content.Id, requestPrincipal);
-        return hasAccess == PublicAccessStatus.AccessAccepted;
+        return await _publicAccessChecker.HasMemberAccessToContentAsync(content.Id, requestPrincipal);
     }
 
     public async Task<ProtectedAccess> MemberAccessAsync()

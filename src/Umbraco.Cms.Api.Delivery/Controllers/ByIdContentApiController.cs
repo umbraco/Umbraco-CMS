@@ -67,9 +67,10 @@ public class ByIdContentApiController : ContentApiItemControllerBase
             return NotFound();
         }
 
-        if (await _requestMemberService.MemberHasAccessToAsync(contentItem) is false)
+        IActionResult? deniedAccessResult = await HandleMemberAccessAsync(contentItem, _requestMemberService);
+        if (deniedAccessResult is not null)
         {
-            return Unauthorized();
+            return deniedAccessResult;
         }
 
         IApiContentResponse? apiContentResponse = ApiContentResponseBuilder.Build(contentItem);

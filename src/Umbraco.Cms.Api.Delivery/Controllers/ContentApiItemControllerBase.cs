@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
@@ -28,4 +30,14 @@ public abstract class ContentApiItemControllerBase : ContentApiControllerBase
 
     [Obsolete($"Please use {nameof(IPublicAccessService)} to test for content protection. Will be removed in V14.")]
     protected bool IsProtected(IPublishedContent content) => _publicAccessService.IsProtected(content.Path);
+
+    protected async Task<IActionResult?> HandleMemberAccessAsync(IPublishedContent content, IRequestMemberService requestMemberService)
+    {
+        PublicAccessStatus accessStatus = await requestMemberService.MemberHasAccessToAsync(content);
+        return accessStatus is PublicAccessStatus.AccessAccepted
+            ? null
+            : accessStatus is PublicAccessStatus.AccessDenied
+                ? Forbidden()
+                : Unauthorized();
+    }
 }

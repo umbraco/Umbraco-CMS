@@ -106,9 +106,10 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
         IPublishedContent? contentItem = GetContent(path);
         if (contentItem is not null)
         {
-            if (await _requestMemberService.MemberHasAccessToAsync(contentItem) is false)
+            IActionResult? deniedAccessResult = await HandleMemberAccessAsync(contentItem, _requestMemberService);
+            if (deniedAccessResult is not null)
             {
-                return Unauthorized();
+                return deniedAccessResult;
             }
 
             return await Task.FromResult(Ok(ApiContentResponseBuilder.Build(contentItem)));
