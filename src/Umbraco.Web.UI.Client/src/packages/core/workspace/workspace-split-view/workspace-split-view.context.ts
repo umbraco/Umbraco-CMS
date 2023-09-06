@@ -47,13 +47,13 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 		const index = this.#index.getValue();
 		if (index === undefined) return;
 
-		// TODO: Should splitView be put into its own context?... a split view manager context?   one which might have a reference to the workspace context, so we still can ask that about how to create the dataset context.
+		// TODO: Should splitView be put into its own context?... a split view manager context?   one which might have a reference to the workspace context, so we still can ask that about how to create the variant context.
 		this.observe(
 			this.#workspaceContext.splitView.activeVariantByIndex(index),
 			async (activeVariantInfo) => {
 				if (!activeVariantInfo) return;
 
-				// TODO: Ask workspace context to create the specific dataset.
+				// TODO: Ask workspace context to create the specific variant context.
 
 				this.#variantContext?.destroy();
 				const variantId = UmbVariantId.Create(activeVariantInfo);

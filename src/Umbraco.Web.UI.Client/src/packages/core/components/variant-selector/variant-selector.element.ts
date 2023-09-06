@@ -27,7 +27,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	}
 
 	#splitViewContext?: UmbWorkspaceSplitViewContext;
-	#datasetContext?: typeof UMB_VARIANT_CONTEXT.TYPE;
+	#variantContext?: typeof UMB_VARIANT_CONTEXT.TYPE;
 
 	@state()
 	private _name?: string;
@@ -53,7 +53,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			this._observeActiveVariants();
 		});
 		this.consumeContext(UMB_VARIANT_CONTEXT, (instance) => {
-			this.#datasetContext = instance;
+			this.#variantContext = instance;
 			this._observeDatasetContext();
 		});
 	}
@@ -93,15 +93,15 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	}
 
 	private async _observeDatasetContext() {
-		if (!this.#datasetContext) return;
+		if (!this.#variantContext) return;
 
-		const variantId = this.#datasetContext.getVariantId();
+		const variantId = this.#variantContext.getVariantId();
 		this._culture = variantId.culture;
 		this._segment = variantId.segment;
 		this.updateVariantDisplayName();
 
 		this.observe(
-			this.#datasetContext.name,
+			this.#variantContext.name,
 			(name) => {
 				this._name = name;
 			},
@@ -123,8 +123,8 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
-			if (typeof target?.value === 'string' && this.#datasetContext && IsNameablePropertySetContext(this.#datasetContext)) {
-				this.#datasetContext.setName(target.value);
+			if (typeof target?.value === 'string' && this.#variantContext && IsNameablePropertySetContext(this.#variantContext)) {
+				this.#variantContext.setName(target.value);
 			}
 		}
 	}
