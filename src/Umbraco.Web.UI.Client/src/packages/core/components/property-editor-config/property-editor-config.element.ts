@@ -36,7 +36,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (instance) => {
-			this.#variantContext = instance.createPropertySetContext(this);
+			this.#variantContext = instance.createInvariantVariantContext(this);
 			this.observe(this.#variantContext.properties, (properties) => {
 				this._properties = properties as Array<PropertyEditorConfigProperty>;
 			}, 'observeProperties');

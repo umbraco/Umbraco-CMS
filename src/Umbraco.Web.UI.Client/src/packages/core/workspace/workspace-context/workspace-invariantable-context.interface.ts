@@ -16,5 +16,5 @@ export interface UmbInvariantableWorkspaceContextInterface<T = unknown>
 	setPropertyValue(alias: string, value: unknown): Promise<void>;
 
 	// Dataset methods:
-	createPropertySetContext(host: UmbControllerHost): UmbVariantContext;
+	createInvariantVariantContext(host: UmbControllerHost): UmbVariantContext;
 }

@@ -25,5 +25,5 @@ export interface UmbVariantableWorkspaceContextInterface<EntityType = unknown> e
 	//propertyDataByAlias(alias: string, variantId?: UmbVariantId): Observable<ValueModelBaseModel | undefined>;
 
 	// Dataset methods:
-	createVariantPropertySetContext(host: UmbControllerHost, variantId: UmbVariantId): UmbVariantContext;
+	createVariantVariantContext(host: UmbControllerHost, variantId: UmbVariantId): UmbVariantContext;
 }
