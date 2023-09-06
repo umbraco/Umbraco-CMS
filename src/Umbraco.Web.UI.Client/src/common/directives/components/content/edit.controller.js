@@ -5,7 +5,7 @@
         appState, contentResource, entityResource, navigationService, notificationsService, contentAppHelper,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
         editorState, $http, eventsService, overlayService, $location, localStorageService, treeService,
-        $exceptionHandler, uploadTracker) {
+        $exceptionHandler, uploadTracker) {        
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -322,6 +322,22 @@
 
             $scope.defaultButton = buttons.defaultButton;
             $scope.subButtons = buttons.subButtons;
+
+            // Preview buttons
+            const defaultPreviewUrl = `preview/?id=${content.id}${$scope.culture ? `&culture=${$scope.culture}` : ''}`;
+
+            $scope.previewDefaultButton = {
+                handler: () => $scope.preview($scope.content, defaultPreviewUrl),
+                labelKey: "buttons_saveAndPreview"
+            };
+
+            $scope.previewSubButtons = $scope.content.variants?.[0].additionalPreviewUrls?.map((additionalPreviewUrl) => {
+                return {
+                    label: additionalPreviewUrl.name,
+                    handler: () => $scope.preview($scope.content, additionalPreviewUrl.url)
+                }
+            });
+
             $scope.page.showPreviewButton = true;
         }
 
@@ -952,13 +968,13 @@
             }
         };
 
-        $scope.preview = function (content) {
+        $scope.preview = function (content, url) {
 
-            const openPreviewWindow = () => {
+            const openPreviewWindow = (url) => {
                 // Chromes popup blocker will kick in if a window is opened
                 // without the initial scoped request. This trick will fix that.
               
-              const previewWindow = $window.open(`preview/?id=${content.id}${$scope.culture ? `&culture=${$scope.culture}` : ''}`, 'umbpreview');
+              const previewWindow = $window.open(url, 'umbpreview');
 
               previewWindow.addEventListener('load', () => {
                 previewWindow.location.href = previewWindow.document.URL;
@@ -969,7 +985,7 @@
             //The user cannot save if they don't have access to do that, in which case we just want to preview
             //and that's it otherwise they'll get an unauthorized access message
             if (!_.contains(content.allowedActions, "A")) {
-                openPreviewWindow();
+                openPreviewWindow(url);
             }
             else {
                 var selectedVariant = $scope.content.variants[0];
@@ -988,7 +1004,7 @@
                 //ensure the save flag is set for the active variant
                 selectedVariant.save = true;
                 performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function (data) {
-                    openPreviewWindow()
+                    openPreviewWindow(url);
                 }, function (err) {
                     //validation issues ....
                 });
