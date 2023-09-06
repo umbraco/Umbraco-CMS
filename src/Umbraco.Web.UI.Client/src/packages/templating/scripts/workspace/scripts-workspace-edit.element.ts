@@ -69,7 +69,7 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 			});
 
 			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue: string) => {
-				this.#scriptsWorkspaceContext?.setName(`${nameInputValue}.cshtml`);
+				this.#scriptsWorkspaceContext?.setName(`${nameInputValue}.js`);
 			});
 		});
 	}
@@ -88,14 +88,14 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 
 	#renderCodeEditor() {
 		return html`<umb-code-editor
-			language="razor"
+			language="javascript"
 			id="content"
 			.code=${this._content ?? ''}
 			@input=${this.#onCodeEditorInput}></umb-code-editor>`;
 	}
 
 	render() {
-		return html`<umb-workspace-editor alias="Umb.Workspace.Template">
+		return html`<umb-workspace-editor alias="Umb.Workspace.Scripts">
 			<div id="workspace-header" slot="header">
 				<uui-input
 					placeholder="Enter name..."
