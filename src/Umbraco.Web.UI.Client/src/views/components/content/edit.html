@@ -55,16 +55,6 @@
                     </umb-button-group>
 
                     <umb-button
-                        alias="preview"
-                        ng-if="!page.isNew && content.allowPreview && page.showPreviewButton"
-                        type="button"
-                        button-style="link"
-                        action="preview(content)"
-                        label-key="buttons_saveAndPreview"
-                        disabled="page.uploadsInProgress">
-                    </umb-button>
-
-                    <umb-button
                         ng-if="page.showSaveButton"
                         alias="save"
                         type="button"
