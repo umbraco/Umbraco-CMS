@@ -1,13 +1,14 @@
+import { SCRIPTS_ENTITY_TYPE } from '../config.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type { ManifestWorkspace, ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.Scripts',
-	name: 'Partial View Workspace',
+	name: 'Scripts Workspace',
 	loader: () => import('./scripts-workspace.element.js'),
 	meta: {
-		entityType: 'partial-view',
+		entityType: SCRIPTS_ENTITY_TYPE,
 	},
 };
 
@@ -15,7 +16,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	{
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Scripts.Save',
-		name: 'Save Partial View',
+		name: 'Save Scripts Workspace Action',
 		weight: 70,
 		meta: {
 			look: 'primary',
