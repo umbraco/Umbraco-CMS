@@ -74,7 +74,6 @@ const detailHandlers = [
 	}),
 ];
 
-type getRulesRequestBody = { path?: string };
 
 const rulesHandlers = [
 	rest.post(umbracoPath('/stylesheet/rich-text/extract-rules'), async (req, res, ctx) => {

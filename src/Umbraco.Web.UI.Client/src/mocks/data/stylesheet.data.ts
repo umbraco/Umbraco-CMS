@@ -25,26 +25,24 @@ export const data: Array<StylesheetDBItem> = [
 		name: 'Stylesheet File 1.css',
 		type: 'stylesheet',
 		hasChildren: false,
-		content: `
-		h1 {
-			color: blue;
-		}
-		
-		/**umb_name:bjjh*/
-		h1 {
-			color: blue;
-		}
-		
-		/**umb_name:comeone*/
-		h1 {
-			color: blue;
-		}
-		
-		/**umb_name:lol*/
-		h1 {
-			color: blue;
-		}
-		`,
+		content: `h1 {
+	color: blue;
+}
+
+/**umb_name:bjjh*/
+h1 {
+	color: blue;
+}
+
+/**umb_name:comeone*/
+h1 {
+	color: blue;
+}
+
+/**umb_name:lol*/
+h1 {
+	color: blue;
+}`,
 	},
 	{
 		path: 'Stylesheet File 2.css',
@@ -53,24 +51,24 @@ export const data: Array<StylesheetDBItem> = [
 		name: 'Stylesheet File 2.css',
 		type: 'stylesheet',
 		hasChildren: false,
-		content: `		h1 {
-			color: green;
-		}
-		
-		/**umb_name:HELLO*/
-		h1 {
-			color: green;
-		}
-		
-		/**umb_name:SOMETHING*/
-		h1 {
-			color: green;
-		}
-		
-		/**umb_name:NIOCE*/
-		h1 {
-			color: green;
-		}`,
+		content: `h1 {
+	color: green;
+}
+
+/**umb_name:HELLO*/
+h1 {
+	color: green;
+}
+
+/**umb_name:SOMETHING*/
+h1 {
+	color: green;
+}
+
+/**umb_name:NIOCE*/
+h1 {
+	color: green;
+}`,
 	},
 	{
 		path: 'Folder 1',
@@ -86,24 +84,24 @@ export const data: Array<StylesheetDBItem> = [
 		type: 'stylesheet',
 		hasChildren: true,
 		isFolder: false,
-		content: `		h1 {
-			color: pink;
-		}
-		
-		/**umb_name:ONE*/
-		h1 {
-			color: pink;
-		}
-		
-		/**umb_name:TWO*/
-		h1 {
-			color: pink;
-		}
-		
-		/**umb_name:THREE*/
-		h1 {
-			color: pink;
-		}`,
+		content: `h1 {
+	color: pink;
+}
+
+/**umb_name:ONE*/
+h1 {
+	color: pink;
+}
+
+/**umb_name:TWO*/
+h1 {
+	color: pink;
+}
+
+/**umb_name:THREE*/
+h1 {
+	color: pink;
+}`,
 	},
 ];
 
@@ -190,17 +188,19 @@ class UmbStylesheetData extends UmbEntityData<StylesheetDBItem> {
 		//@ts-ignore
 		const cleanedContent = content?.replaceAll(regex, '');
 
-		const newContent = rules
-			?.map(
-				(rule) =>
-					`/**umb_name:${rule.name}*/
-		${rule.selector} {
-			${rule.styles}
-		}
-		${cleanedContent}	
-		`,
-			)
-			.join('');
+		const newContent = `${cleanedContent.replace(/[\r\n]+$/, '')}
+
+${rules
+	?.map(
+		(rule) =>
+			`/**umb_name:${rule.name}*/
+${rule.selector} {
+	${rule.styles}
+}
+
+`,
+	)
+	.join('')}`;
 
 		return { content: newContent };
 	}
