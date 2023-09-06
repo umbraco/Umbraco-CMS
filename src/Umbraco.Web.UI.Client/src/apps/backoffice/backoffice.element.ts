@@ -1,7 +1,6 @@
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context.js';
 import { UmbExtensionInitializer } from './extension-initializer.controller.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbBundleExtensionInitializer,
@@ -48,7 +47,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				display: flex;

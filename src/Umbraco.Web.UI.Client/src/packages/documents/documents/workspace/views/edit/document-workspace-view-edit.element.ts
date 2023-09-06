@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context.js';
 import type { UmbDocumentWorkspaceViewEditTabElement } from './document-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import {
 	encodeFolderName,
@@ -154,7 +154,7 @@ export class UmbDocumentWorkspaceViewEditElement
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

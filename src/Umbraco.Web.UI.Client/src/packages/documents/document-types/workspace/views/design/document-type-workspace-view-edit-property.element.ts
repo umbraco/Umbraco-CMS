@@ -1,4 +1,4 @@
-import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
@@ -12,6 +12,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeRepository } from '@umbraco-cms/backoffice/data-type';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
  *  @element document-type-workspace-view-edit-property
@@ -228,7 +229,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 						${this.renderPropertyTags()}
 						<uui-tag look="default" class="inherited">
 							<uui-icon name="umb:merge"></uui-icon>
-							<span>
+							<span class="uui-text">
 								${this.localize.term('contentTypeEditor_inheritedFrom')}
 								<a href=${this._editDocumentTypePath + 'edit/' + this.ownerDocumentTypeId}>
 									${this.ownerDocumentTypeName ?? '??'}
@@ -285,7 +286,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: grid;

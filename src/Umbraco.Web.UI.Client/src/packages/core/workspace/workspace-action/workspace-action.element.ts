@@ -1,6 +1,6 @@
 import { UmbWorkspaceAction } from './index.js';
 import { css, html, customElement, property, state, query } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import type { UUIButtonElement, UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -59,7 +59,7 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [UUITextStyles, css``];
+	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbWorkspaceActionElement;

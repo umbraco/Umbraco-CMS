@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import {
@@ -169,7 +169,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

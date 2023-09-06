@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -43,7 +43,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

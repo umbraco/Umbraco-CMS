@@ -1,6 +1,6 @@
 import { UmbLanguageRepository } from '../repository/language.repository.js';
 import { UMB_APP_LANGUAGE_CONTEXT_TOKEN, UmbAppLanguageContext } from './app-language.context.js';
-import { UUITextStyles, UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -107,7 +107,6 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				display: block;

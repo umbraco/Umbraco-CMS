@@ -3,7 +3,7 @@ import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils
 import { ChooseInsertTypeModalResult, CodeSnippetType } from '../../modals/insert-choose-type-sidebar.element.js';
 import { UmbDictionaryRepository } from '@umbraco-cms/backoffice/dictionary';
 import { customElement, property, css, html } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import {
 	UMB_DICTIONARY_ITEM_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
@@ -152,7 +152,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	// 		  </li>`}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				--umb-header-layout-height: 70px;

@@ -1,4 +1,3 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_COLLECTION_CONTEXT_TOKEN, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { ManifestDashboardCollection } from '@umbraco-cms/backoffice/extension-registry';
@@ -33,7 +32,6 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				display: flex;

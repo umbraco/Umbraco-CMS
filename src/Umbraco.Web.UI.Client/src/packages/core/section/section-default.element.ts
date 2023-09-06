@@ -1,6 +1,6 @@
 import type { UmbWorkspaceElement } from '../workspace/workspace.element.js';
 import type { UmbSectionMainViewElement } from './section-main-views/section-main-views.element.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import {
 	ManifestSection,
@@ -97,7 +97,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				flex: 1 1 auto;

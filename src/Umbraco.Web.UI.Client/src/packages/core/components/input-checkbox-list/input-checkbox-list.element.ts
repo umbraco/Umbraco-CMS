@@ -1,5 +1,5 @@
 import { css, html, nothing, repeat, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin, UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin, UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-checkbox-list')
@@ -60,7 +60,6 @@ export class UmbInputCheckboxListElement extends FormControlMixin(UmbLitElement)
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			uui-checkbox {
 				width: 100%;

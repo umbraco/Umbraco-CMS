@@ -1,5 +1,5 @@
 import { UMB_MEDIA_TYPE_WORKSPACE_CONTEXT } from './media-type-workspace.context.js';
-import { UUITextStyles, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-media-type-workspace-editor')
@@ -42,7 +42,6 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			#header {
 				display: flex;

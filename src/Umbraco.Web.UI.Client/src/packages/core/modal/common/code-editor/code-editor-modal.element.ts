@@ -1,6 +1,6 @@
 import { css, html, ifDefined, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { loadCodeEditor, type UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
-import { UUITextStyles, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbCodeEditorModalData, UmbCodeEditorModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
@@ -77,7 +77,6 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			#editor-box {
 				padding: var(--uui-box-default-padding, var(--uui-size-space-5, 18px));

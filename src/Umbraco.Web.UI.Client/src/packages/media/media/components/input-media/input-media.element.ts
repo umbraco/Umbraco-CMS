@@ -1,6 +1,6 @@
 import { UmbMediaRepository } from '../../repository/media.repository.js';
 import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
@@ -181,7 +181,6 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				display: grid;

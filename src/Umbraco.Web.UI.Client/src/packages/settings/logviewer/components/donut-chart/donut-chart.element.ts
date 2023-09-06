@@ -1,5 +1,5 @@
 import { UmbDonutSliceElement } from './donut-slice.element.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import {
 	css,
 	html,
@@ -221,8 +221,8 @@ export class UmbDonutChartElement extends LitElement {
 					<feMorphology operator="erode" radius="0.5 0.5" x="0%" y="0%" width="100%" height="100%" in="SourceGraphic" result="morphology"/>
 				</filter>
 				<filter id="filter" x="-20%" y="-20%" width="140%" height="140%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="linearRGB">
-					<feColorMatrix 
-						type="matrix" 
+					<feColorMatrix
+						type="matrix"
 						values="1.8 0 0 0 0
 						0 1.8 0 0 0
 						0 0 1.8 0 0
@@ -249,7 +249,7 @@ export class UmbDonutChartElement extends LitElement {
 									d="${circle.commands}"
 									transform="rotate(${circle.offset} ${this.viewBox / 2} ${this.viewBox / 2})">
 								</path>
-								<path 
+								<path
 								data-index="${i}"
 								@mouseenter=${this.#showDetailsBox}
 								@mouseleave=${this.#hideDetailsBox}
@@ -260,7 +260,7 @@ export class UmbDonutChartElement extends LitElement {
 									transform="rotate(${circle.offset} ${this.viewBox / 2} ${this.viewBox / 2})">
 								</path>`
 					)}
-		
+
         `;
 	}
 
@@ -278,7 +278,7 @@ export class UmbDonutChartElement extends LitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			path {
 				pointer-events: visibleFill;

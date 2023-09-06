@@ -1,5 +1,5 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent, UmbRoute } from '@umbraco-cms/backoffice/router';
 
@@ -70,7 +70,7 @@ export class UmbPropertyEditorUIBlockGridInnerTestElement extends UmbLitElement 
 		</div>`;
 	}
 
-	static styles = [UUITextStyles];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIBlockGridInnerTestElement;

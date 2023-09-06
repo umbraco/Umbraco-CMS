@@ -1,5 +1,5 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import '../../../components/input-radio-button-list/input-radio-button-list.element.js';
 import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
 import type { UmbInputRadioButtonListElement } from '../../../components/input-radio-button-list/input-radio-button-list.element.js';
@@ -61,7 +61,7 @@ export class UmbPropertyEditorUIRadioButtonListElement
 			.list="${this._list}"></umb-input-radio-button-list>`;
 	}
 
-	static styles = [UUITextStyles];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIRadioButtonListElement;

@@ -1,5 +1,5 @@
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	UmbModalRouteRegistrationController,
@@ -98,7 +98,6 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			#empty-state-button {
 				width: 100%;

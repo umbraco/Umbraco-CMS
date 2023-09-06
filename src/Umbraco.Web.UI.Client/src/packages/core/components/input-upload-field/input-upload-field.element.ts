@@ -9,7 +9,7 @@ import {
 	query,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -134,7 +134,6 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			uui-icon {
 				vertical-align: sub;

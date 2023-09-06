@@ -1,5 +1,5 @@
 import { html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbExportDictionaryModalData, UmbExportDictionaryModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
@@ -45,7 +45,7 @@ export class UmbExportDictionaryModalElement extends UmbModalBaseElement<
 		</umb-body-layout>`;
 	}
 
-	static styles = [UUITextStyles];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbExportDictionaryModalElement;

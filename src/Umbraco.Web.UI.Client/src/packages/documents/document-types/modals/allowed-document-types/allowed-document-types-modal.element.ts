@@ -1,5 +1,5 @@
 import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbAllowedDocumentTypesModalData, UmbAllowedDocumentTypesModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -87,7 +87,7 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles = [UUITextStyles];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbAllowedDocumentTypesModalElement;

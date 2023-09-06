@@ -1,6 +1,6 @@
 import { UmbUserPickerContext } from './user-input.context.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -116,7 +116,6 @@ export class UmbUserInputElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			#add-button {
 				width: 100%;

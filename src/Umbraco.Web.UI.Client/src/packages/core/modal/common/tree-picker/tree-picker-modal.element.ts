@@ -1,6 +1,6 @@
 import type { UmbTreeElement } from '../../../tree/tree.element.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbTreePickerModalData, UmbPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
@@ -57,7 +57,7 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 		`;
 	}
 
-	static styles = [UUITextStyles, css``];
+	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbTreePickerModalElement;

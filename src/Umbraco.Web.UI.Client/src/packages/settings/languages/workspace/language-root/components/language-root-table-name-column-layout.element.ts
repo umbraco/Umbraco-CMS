@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, LitElement, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-language-root-table-name-column-layout')
@@ -12,7 +12,7 @@ export class UmbLanguageRootTableNameColumnLayoutElement extends LitElement {
 		return html`<a href=${'section/settings/workspace/language/edit/' + this.value.isoCode}>${this.value.name}</a>`;
 	}
 
-	static styles = [UUITextStyles, css``];
+	static styles = [UmbTextStyles, css``];
 }
 
 declare global {

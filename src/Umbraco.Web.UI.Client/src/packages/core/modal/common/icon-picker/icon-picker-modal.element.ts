@@ -2,7 +2,7 @@ import icons from '../../../../../shared/icon-registry/icons/icons.json' assert 
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import { css, html, styleMap, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 
 import { UmbIconPickerModalData, UmbIconPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
@@ -134,7 +134,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				position: relative;

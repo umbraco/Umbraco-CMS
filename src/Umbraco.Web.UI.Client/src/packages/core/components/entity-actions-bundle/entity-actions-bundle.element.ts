@@ -1,5 +1,5 @@
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -72,7 +72,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [UUITextStyles, css``];
+	static styles = [UmbTextStyles, css``];
 }
 
 declare global {

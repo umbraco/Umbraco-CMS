@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, CSSResultGroup, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalContext, UmbChangePasswordModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -82,7 +82,7 @@ export class UmbChangePasswordModalElement extends UmbLitElement {
 	}
 
 	static styles: CSSResultGroup = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

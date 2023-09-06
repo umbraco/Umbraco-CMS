@@ -47,6 +47,7 @@ export default {
 						'@umbraco-cms/backoffice/repository': './src/shared/repository/index.ts',
 						'@umbraco-cms/backoffice/resources': './src/shared/resources/index.ts',
 						'@umbraco-cms/backoffice/router': './src/shared/router/index.ts',
+						'@umbraco-cms/backoffice/style': './src/shared/style/index.ts',
 						'@umbraco-cms/backoffice/utils': './src/shared/utils/index.ts',
 
 						'@umbraco-cms/internal/lit-element': './src/shared/lit-element/index.ts',

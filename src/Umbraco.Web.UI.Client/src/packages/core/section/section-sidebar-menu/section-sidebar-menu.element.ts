@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import {
 	ManifestMenu,
@@ -42,7 +42,7 @@ export class UmbSectionSidebarMenuElement<
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			h3 {
 				padding: var(--uui-size-4) var(--uui-size-8);

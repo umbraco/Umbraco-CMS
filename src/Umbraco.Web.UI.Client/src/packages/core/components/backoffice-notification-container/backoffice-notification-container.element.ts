@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, CSSResultGroup, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbNotificationHandler,
@@ -46,7 +46,7 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 	}
 
 	static styles: CSSResultGroup = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			#notifications {
 				position: absolute;

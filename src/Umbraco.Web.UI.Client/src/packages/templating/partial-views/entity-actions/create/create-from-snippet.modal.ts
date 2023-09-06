@@ -1,5 +1,5 @@
 import { UmbCreateFromSnippetPartialViewModalData } from './create-from-snippet.action.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { SnippetItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -46,7 +46,7 @@ export default class UmbPartialViewCreateFromSnippetModalElement extends UmbModa
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

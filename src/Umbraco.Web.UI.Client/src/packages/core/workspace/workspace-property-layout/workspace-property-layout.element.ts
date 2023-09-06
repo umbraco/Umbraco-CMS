@@ -1,5 +1,5 @@
 import { css, html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 
 /**
  *  @element umb-workspace-property-layout
@@ -65,7 +65,7 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: grid;

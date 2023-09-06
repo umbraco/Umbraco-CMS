@@ -1,6 +1,6 @@
 import { UmbLanguagePickerContext } from './input-language-picker.context.js';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -131,7 +131,6 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			#add-button {
 				width: 100%;

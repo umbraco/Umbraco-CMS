@@ -1,6 +1,6 @@
 import type { UmbPropertyAction } from './property-action.model.js';
 import { CSSResultGroup, html, LitElement, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
 import type { ManifestPropertyAction } from '@umbraco-cms/backoffice/extension-registry';
@@ -43,5 +43,5 @@ export class UmbPropertyActionElement extends LitElement implements UmbPropertyA
 		return html`${this._element}`;
 	}
 
-	static styles: CSSResultGroup = [UUITextStyles];
+	static styles: CSSResultGroup = [UmbTextStyles];
 }

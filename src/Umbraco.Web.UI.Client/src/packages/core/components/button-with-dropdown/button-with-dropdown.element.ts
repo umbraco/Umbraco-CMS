@@ -1,5 +1,4 @@
 import {
-	UUITextStyles,
 	InterfaceColor,
 	InterfaceLook,
 	PopoverPlacement,
@@ -74,7 +73,6 @@ export class UmbButtonWithDropdownElement extends LitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			uui-symbol-expand {
 				margin-left: var(--uui-size-space-3);

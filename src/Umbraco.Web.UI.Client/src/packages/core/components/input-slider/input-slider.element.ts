@@ -1,5 +1,5 @@
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin, UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin, UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-slider')
@@ -54,8 +54,6 @@ export class UmbInputSliderElement extends FormControlMixin(UmbLitElement) {
 			.valueHigh="${this.initVal2}"
 			@change="${this.#onChange}"></uui-range-slider>`;
 	}
-
-	static styles = [UUITextStyles, css``];
 }
 
 export default UmbInputSliderElement;

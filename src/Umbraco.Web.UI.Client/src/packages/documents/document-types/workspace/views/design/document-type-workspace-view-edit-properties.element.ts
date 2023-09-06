@@ -1,7 +1,7 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import './document-type-workspace-view-edit-property.element.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbSorterController, UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -172,7 +172,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			#add {
 				width: 100%;

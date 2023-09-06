@@ -1,7 +1,7 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat, nothing, query } from '@umbraco-cms/backoffice/external/lit';
-import { UUIInputElement, UUIInputEvent, UUITabElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement, UUIInputEvent, UUITabElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { encodeFolderName, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -10,6 +10,7 @@ import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-document-type-workspace-view-edit')
 export class UmbDocumentTypeWorkspaceViewEditElement
@@ -305,7 +306,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				position: relative;

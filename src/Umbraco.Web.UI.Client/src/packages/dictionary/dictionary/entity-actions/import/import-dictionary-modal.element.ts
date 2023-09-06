@@ -1,6 +1,6 @@
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
 import { css, html, customElement, query, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbImportDictionaryModalData, UmbImportDictionaryModalResult } from '@umbraco-cms/backoffice/modal';
 import { ImportDictionaryRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
@@ -11,7 +11,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	UmbImportDictionaryModalResult
 > {
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			uui-input {
 				width: 100%;

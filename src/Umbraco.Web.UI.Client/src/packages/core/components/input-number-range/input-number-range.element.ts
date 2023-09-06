@@ -1,5 +1,5 @@
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 function getNumberOrUndefined(value: string) {
@@ -80,8 +80,6 @@ export class UmbInputNumberRangeElement extends FormControlMixin(UmbLitElement) 
 			–
 			<uui-input type="number" .value=${this._maxValue} @input=${this._onMaxInput} label=${this.maxLabel}></uui-input>`;
 	}
-
-	static styles = [UUITextStyles, css``];
 }
 
 export default UmbInputNumberRangeElement;

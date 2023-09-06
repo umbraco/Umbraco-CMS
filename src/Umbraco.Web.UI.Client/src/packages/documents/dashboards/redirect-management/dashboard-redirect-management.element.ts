@@ -1,5 +1,4 @@
 import {
-	UUITextStyles,
 	UUIButtonState,
 	UUIPaginationElement,
 	UUIPaginationEvent,
@@ -17,6 +16,7 @@ import {
 	RedirectUrlResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-dashboard-redirect-management')
 export class UmbDashboardRedirectManagementElement extends UmbLitElement {
@@ -157,7 +157,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-body-layout header-transparent>
+			<umb-body-layout header-transparent class="uui-text">
 				<div slot="header" id="header">
 					${this._trackerStatus
 						? html`<div>
@@ -278,7 +278,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

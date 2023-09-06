@@ -1,6 +1,6 @@
 import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from '../../dictionary-workspace.context.js';
 import { UmbDictionaryRepository } from '../../../repository/dictionary.repository.js';
-import { UUITextStyles, UUITextareaElement, UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UUITextareaElement, UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DictionaryItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -74,7 +74,6 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				display: block;

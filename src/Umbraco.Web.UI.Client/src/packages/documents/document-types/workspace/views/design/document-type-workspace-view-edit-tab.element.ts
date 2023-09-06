@@ -1,6 +1,6 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -132,7 +132,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			#add {
 				width: 100%;

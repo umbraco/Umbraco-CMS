@@ -1,5 +1,5 @@
 import { css, html, nothing, repeat, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin, UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin, UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-radio-button-list')
@@ -49,7 +49,6 @@ export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitEleme
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				display: block;
