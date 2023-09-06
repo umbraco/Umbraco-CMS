@@ -90,7 +90,7 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 									</uui-input>
 								</uui-form-layout-item>
 								<uui-form-layout-item>
-									<uui-label for="styles" slot="label" required="">Selector</uui-label>
+									<uui-label for="styles" slot="label" required="">Styles</uui-label>
 									<span slot="description"
 										>The CSS that should be applied in the rich text editor, e.g. "color:red;"</span
 									>
