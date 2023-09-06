@@ -1,16 +1,16 @@
 import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
 import { UmbLocalizeElement } from './localize.element.js';
-import { umbTranslationRegistry } from '@umbraco-cms/backoffice/localization';
+import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
 
 const english = {
-	type: 'translations',
+	type: 'localization',
 	alias: 'test.en',
 	name: 'Test English',
 	meta: {
 		culture: 'en',
-		translations: {
+		localizations: {
 			general: {
 				close: 'Close',
 				logout: 'Log out',
@@ -28,12 +28,12 @@ const english = {
 };
 
 const danish = {
-	type: 'translations',
+	type: 'localization',
 	alias: 'test.da',
 	name: 'Test Danish',
 	meta: {
 		culture: 'da',
-		translations: {
+		localizations: {
 			general: {
 				close: 'Luk',
 			},
@@ -57,7 +57,7 @@ describe('umb-localize', () => {
 		umbExtensionsRegistry.register(danish);
 
 		beforeEach(async () => {
-			umbTranslationRegistry.loadLanguage(english.meta.culture);
+			umbLocalizationRegistry.loadLanguage(english.meta.culture);
 			element = await fixture(html`<umb-localize key="general_close">Fallback value</umb-localize>`);
 		});
 
@@ -115,7 +115,7 @@ describe('umb-localize', () => {
 		it('should change the value if the language is changed', async () => {
 			expect(element.shadowRoot?.innerHTML).to.contain('Close');
 
-			umbTranslationRegistry.loadLanguage(danish.meta.culture);
+			umbLocalizationRegistry.loadLanguage(danish.meta.culture);
 			await aTimeout(0);
 			await elementUpdated(element);
 

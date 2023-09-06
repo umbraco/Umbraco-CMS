@@ -1,3 +1,3 @@
 import './localize.element.js';
 
-export * from './registry/translation.registry.js';
+export * from './registry/localization.registry.js';

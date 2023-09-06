@@ -71,7 +71,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 				} catch (error) {
 					throw new Error('Could not create repository with alias: Umb.Repository.User');
 				}
-			}
+			},
 		);
 	}
 
@@ -90,7 +90,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 			}
 
 			// Find all translations and make a unique list of iso codes
-			const translations = await firstValueFrom(umbExtensionsRegistry.extensionsOfType('translations'));
+			const translations = await firstValueFrom(umbExtensionsRegistry.extensionsOfType('localization'));
 
 			this.languages = translations
 				.filter((isoCode) => isoCode !== undefined)
@@ -280,11 +280,11 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 				${this.#renderInfoItem('Failed login attempts', this._user.failedLoginAttempts)}
 				${this.#renderInfoItem(
 					'Last lockout date',
-					this._user.lastLockoutDate || `${this._user.name} has not been locked out`
+					this._user.lastLockoutDate || `${this._user.name} has not been locked out`,
 				)}
 				${this.#renderInfoItem(
 					'Password last changed',
-					this._user.lastLoginDate || `${this._user.name} has not changed password`
+					this._user.lastLoginDate || `${this._user.name} has not changed password`,
 				)}
 				${this.#renderInfoItem('User created', this._user.createDate)}
 				${this.#renderInfoItem('User last updated', this._user.updateDate)}
@@ -311,19 +311,15 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		const buttons: TemplateResult[] = [];
 
 		if (this._user.state === UserStateModel.DISABLED) {
-			buttons.push(
-				html`
-					<uui-button @click=${this.#onUserStatusChange} look="secondary" color="positive" label="Enable"></uui-button>
-				`
-			);
+			buttons.push(html`
+				<uui-button @click=${this.#onUserStatusChange} look="secondary" color="positive" label="Enable"></uui-button>
+			`);
 		}
 
 		if (this._user.state === UserStateModel.ACTIVE || this._user.state === UserStateModel.INACTIVE) {
-			buttons.push(
-				html`
-					<uui-button @click=${this.#onUserStatusChange} look="secondary" color="warning" label="Disable"></uui-button>
-				`
-			);
+			buttons.push(html`
+				<uui-button @click=${this.#onUserStatusChange} look="secondary" color="warning" label="Disable"></uui-button>
+			`);
 		}
 
 		if (this._currentUser?.id !== this._user?.id) {
@@ -335,7 +331,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		}
 
 		buttons.push(
-			html`<uui-button @click=${this.#onPasswordChange} look="secondary" label="Change password"></uui-button>`
+			html`<uui-button @click=${this.#onPasswordChange} look="secondary" label="Change password"></uui-button>`,
 		);
 
 		return buttons;
@@ -361,7 +357,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 						<uui-icon slot="icon" name="folder"></uui-icon>
 					</uui-ref-node>
 				`;
-			}
+			},
 		);
 	}
 

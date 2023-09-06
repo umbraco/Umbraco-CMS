@@ -11,26 +11,26 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-import type { UmbTranslationEntry } from './types/translation.js';
+import type { UmbLocalizationEntry } from './types/localization.js';
 import type { LitElement } from '@umbraco-cms/backoffice/external/lit';
 
 export type FunctionParams<T> = T extends (...args: infer U) => string ? U : [];
 
-export interface TranslationSet {
+export interface LocalizationSet {
 	$code: string; // e.g. en, en-GB
 	$dir: 'ltr' | 'rtl';
 }
 
-export interface DefaultTranslationSet extends TranslationSet {
-	[key: string]: UmbTranslationEntry;
+export interface DefaultLocalizationSet extends LocalizationSet {
+	[key: string]: UmbLocalizationEntry;
 }
 
 export const connectedElements = new Set<HTMLElement>();
 const documentElementObserver = new MutationObserver(update);
-export const translations: Map<string, TranslationSet> = new Map();
+export const localizations: Map<string, LocalizationSet> = new Map();
 export let documentDirection = document.documentElement.dir || 'ltr';
 export let documentLanguage = document.documentElement.lang || navigator.language;
-export let fallback: TranslationSet;
+export let fallback: LocalizationSet;
 
 // Watch for changes on <html lang>
 documentElementObserver.observe(document.documentElement, {
@@ -39,15 +39,15 @@ documentElementObserver.observe(document.documentElement, {
 });
 
 /** Registers one or more translations */
-export function registerTranslation(...translation: TranslationSet[]) {
+export function registerLocalization(...translation: LocalizationSet[]) {
 	translation.map((t) => {
 		const code = t.$code.toLowerCase();
 
-		if (translations.has(code)) {
+		if (localizations.has(code)) {
 			// Merge translations that share the same language code
-			translations.set(code, { ...translations.get(code), ...t });
+			localizations.set(code, { ...localizations.get(code), ...t });
 		} else {
-			translations.set(code, t);
+			localizations.set(code, t);
 		}
 
 		// The first translation that's registered is the fallback

@@ -3,42 +3,51 @@ import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import css from 'rollup-plugin-import-css';
 import webWorkerLoader from 'rollup-plugin-web-worker-loader';
-import { readdirSync, lstatSync, rmSync, cpSync, copyFileSync } from 'fs';
+import { readdirSync, lstatSync, cpSync, copyFileSync, existsSync, unlinkSync } from 'fs';
+import * as globModule from 'tiny-glob';
 
-/* TODO Temp solution. I can't find a way for rollup to overwrite the external folder that is already created
-by tsc. So I'm deleting it before the build.*/
-console.log('--- Deleting existing external folder ---');
-rmSync('./dist-cms/external', { recursive: true, force: true });
-console.log('--- Deleting existing external done ---');
+const glob = globModule.default;
+
+// TODO: could we rename this to just dist?
+const DIST_DIRECTORY = './dist-cms';
+
+/* TODO: temp solution. Not every external library can run in the browser so we need rollup to bundle them and make them Browser friendly.
+For each external library we want to bundle all its files into one js bundle. First we run the 
+Typescript compiler to create the external folder with d.ts files in the correct places. Then we delete all the js modules that are created, but
+might not work in the browser. Then we run rollup to bundle the external libraries. */
+console.log('--- Deleting temp external JS modules ---');
+const tempJsFiles = await glob(`${DIST_DIRECTORY}/external/**/*.js`);
+tempJsFiles.forEach((path) => existsSync(path) && unlinkSync(path));
+console.log('--- Deleting temp external JS modules done ---');
 
 // Copy assets
 console.log('--- Copying assets ---');
-cpSync('./src/assets', './dist-cms/assets', { recursive: true });
+cpSync('./src/assets', `${DIST_DIRECTORY}/assets`, { recursive: true });
 console.log('--- Copying assets done ---');
 
 // Copy SRC CSS
 console.log('--- Copying src CSS ---');
-cpSync('./src/css', './dist-cms/css', { recursive: true });
+cpSync('./src/css', `${DIST_DIRECTORY}/css`, { recursive: true });
 console.log('--- Copying src CSS done ---');
 
 // Copy UUI CSS
 console.log('--- Copying UUI CSS ---');
-copyFileSync('./node_modules/@umbraco-ui/uui-css/dist/uui-css.css', './dist-cms/css/uui-css.css');
+copyFileSync('./node_modules/@umbraco-ui/uui-css/dist/uui-css.css', `${DIST_DIRECTORY}/css/uui-css.css`);
 console.log('--- Copying src UUI CSS done ---');
 
 // Copy UUI FONTS
 console.log('--- Copying UUI Fonts ---');
-cpSync('./node_modules/@umbraco-ui/uui-css/assets/fonts', './dist-cms/assets/fonts', { recursive: true });
+cpSync('./node_modules/@umbraco-ui/uui-css/assets/fonts', `${DIST_DIRECTORY}/assets/fonts`, { recursive: true });
 console.log('--- Copying src UUI Fonts done ---');
 
 // Copy TinyMCE
 console.log('--- Copying TinyMCE ---');
-cpSync('./node_modules/tinymce', './dist-cms/tinymce', { recursive: true });
+cpSync('./node_modules/tinymce', `${DIST_DIRECTORY}/tinymce`, { recursive: true });
 console.log('--- Copying TinyMCE done ---');
 
 // Copy TinyMCE i18n
 console.log('--- Copying TinyMCE i18n ---');
-cpSync('./node_modules/tinymce-i18n/langs6', './dist-cms/tinymce/langs', { recursive: true });
+cpSync('./node_modules/tinymce-i18n/langs6', `${DIST_DIRECTORY}/tinymce/langs`, { recursive: true });
 console.log('--- Copying TinyMCE i18n done ---');
 
 const readFolders = (path) => readdirSync(path).filter((folder) => lstatSync(`${path}/${folder}`).isDirectory());
@@ -48,7 +57,7 @@ const createModuleDescriptors = (folderName) =>
 			name: moduleName,
 			file: `index.ts`,
 			root: `./src/${folderName}/${moduleName}`,
-			dist: `./dist-cms/${folderName}/${moduleName}`,
+			dist: `${DIST_DIRECTORY}/${folderName}/${moduleName}`,
 		};
 	});
 
@@ -57,21 +66,23 @@ const exclude = [];
 const allowed = externals.filter((module) => !exclude.includes(module.name));
 
 // TODO: Minify code
-const libraries = allowed
-	.map((module) => {
-		/** @type {import('rollup').RollupOptions} */
-		return {
-			input: `./src/external/${module.name}/index.ts`,
-			output: {
-				dir: `./dist-cms/external/${module.name}`,
-				format: 'es',
-			},
-			plugins: [nodeResolve(), webWorkerLoader({ target: 'browser', pattern: /^(.+)\?worker$/ }), commonjs(), css(), esbuild({ minify: true, sourceMap: true })],
-		}
-	});
+const libraries = allowed.map((module) => {
+	/** @type {import('rollup').RollupOptions} */
+	return {
+		input: `./src/external/${module.name}/index.ts`,
+		output: {
+			dir: `${DIST_DIRECTORY}/external/${module.name}`,
+			format: 'es',
+		},
+		plugins: [
+			nodeResolve(),
+			webWorkerLoader({ target: 'browser', pattern: /^(.+)\?worker$/ }),
+			commonjs(),
+			css(),
+			esbuild({ minify: true, sourceMap: true }),
+		],
+	};
+});
 
 /** @type {import('rollup').RollupOptions[]} */
-export default [
-	...libraries,
-]
-
+export default [...libraries];

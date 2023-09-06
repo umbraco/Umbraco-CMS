@@ -1,5 +1,5 @@
 import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
-import { DefaultTranslationSet, TranslationSet, registerTranslation, translations } from './manager.js';
+import { DefaultLocalizationSet, LocalizationSet, registerLocalization, localizations } from './manager.js';
 import { UmbLocalizeController } from './localize.controller.js';
 import { LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
@@ -10,7 +10,7 @@ class UmbLocalizeControllerHostElement extends UmbElementMixin(LitElement) {
 	@property() lang = 'en-us';
 }
 
-interface TestTranslation extends TranslationSet {
+interface TestLocalization extends LocalizationSet {
 	close: string;
 	logout: string;
 	withInlineToken: any;
@@ -19,8 +19,8 @@ interface TestTranslation extends TranslationSet {
 	numUsersSelected: (count: number) => string;
 }
 
-//#region Translations
-const english: TestTranslation = {
+//#region Localizations
+const english: TestLocalization = {
 	$code: 'en-us',
 	$dir: 'ltr',
 	close: 'Close',
@@ -35,20 +35,20 @@ const english: TestTranslation = {
 	},
 };
 
-const englishOverride: DefaultTranslationSet = {
+const englishOverride: DefaultLocalizationSet = {
 	$code: 'en-us',
 	$dir: 'ltr',
 	close: 'Close 2',
 };
 
-const danish: DefaultTranslationSet = {
+const danish: DefaultLocalizationSet = {
 	$code: 'da',
 	$dir: 'ltr',
 	close: 'Luk',
 	notOnRegional: 'Not on regional',
 };
 
-const danishRegional: DefaultTranslationSet = {
+const danishRegional: DefaultLocalizationSet = {
 	$code: 'da-dk',
 	$dir: 'ltr',
 	close: 'Luk',
@@ -56,10 +56,10 @@ const danishRegional: DefaultTranslationSet = {
 //#endregion
 
 describe('UmbLocalizeController', () => {
-	let controller: UmbLocalizeController<TestTranslation>;
+	let controller: UmbLocalizeController<TestLocalization>;
 
 	beforeEach(async () => {
-		registerTranslation(english, danish, danishRegional);
+		registerLocalization(english, danish, danishRegional);
 		document.documentElement.lang = english.$code;
 		document.documentElement.dir = english.$dir;
 		await aTimeout(0);
@@ -76,7 +76,7 @@ describe('UmbLocalizeController', () => {
 
 	afterEach(() => {
 		controller.destroy();
-		translations.clear();
+		localizations.clear();
 	});
 
 	it('should have a default language', () => {
@@ -131,7 +131,7 @@ describe('UmbLocalizeController', () => {
 
 		it('should override a term if new translation is registered', () => {
 			// Let the registry load the new extension
-			registerTranslation(englishOverride);
+			registerLocalization(englishOverride);
 
 			expect(controller.term('close')).to.equal('Close 2');
 		});
@@ -174,7 +174,7 @@ describe('UmbLocalizeController', () => {
 
 		it('should return a date with a custom format', () => {
 			expect(controller.date(new Date(2020, 11, 31), { month: 'long', day: '2-digit', year: 'numeric' })).to.equal(
-				'December 31, 2020'
+				'December 31, 2020',
 			);
 		});
 	});
@@ -198,7 +198,7 @@ describe('UmbLocalizeController', () => {
 
 		it('should return a number with a custom format', () => {
 			expect(controller.number(123456.789, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).to.equal(
-				'123,456.79'
+				'123,456.79',
 			);
 		});
 	});

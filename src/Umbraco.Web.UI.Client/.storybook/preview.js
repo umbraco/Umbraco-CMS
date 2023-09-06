@@ -17,7 +17,7 @@ import { UmbDocumentTypeStore } from '../src/packages/documents/document-types/r
 import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
 import { UmbIconRegistry } from '../src/shared/icon-registry/icon.registry';
 import { UmbLitElement } from '../src/shared/lit-element';
-import { umbTranslationRegistry } from '../src/packages/core/localization';
+import { umbLocalizationRegistry } from '../src/packages/core/localization';
 import customElementManifests from '../dist-cms/custom-elements.json';
 
 import '../src/libs/context-api/provide/context-provider.element';
@@ -25,7 +25,7 @@ import '../src/libs/controller-api/controller-host-initializer.element.ts';
 import '../src/packages/core/components';
 
 import { manifests as documentManifests } from '../src/packages/documents';
-import { manifests as translationManifests } from '../src/packages/core/localization/manifests';
+import { manifests as localizationManifests } from '../src/packages/core/localization/manifests';
 
 // MSW
 startMockServiceWorker({ serviceWorker: { url: (import.meta.env.VITE_BASE_PATH ?? '/') + 'mockServiceWorker.js' } });
@@ -39,8 +39,8 @@ class UmbStoryBookElement extends UmbLitElement {
 		this._registerExtensions(documentManifests);
 		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalManagerContext(this));
 
-		this._registerExtensions(translationManifests);
-		umbTranslationRegistry.loadLanguage('en-us'); // register default language
+		this._registerExtensions(localizationManifests);
+		umbLocalizationRegistry.loadLanguage('en-us'); // register default language
 	}
 
 	_registerExtensions(manifests) {
