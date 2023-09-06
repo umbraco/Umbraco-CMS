@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorExtensionElement } from '../interfaces/index.js';
-import type { UmbDataTypeConfig } from '../../property-editor/index.js';
+import type { UmbPropertyEditorConfig } from '../../property-editor/index.js';
 import type { ManifestElement, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestPropertyEditorUi extends ManifestElement<UmbPropertyEditorExtensionElement> {
@@ -58,7 +58,7 @@ export interface PropertyEditorConfigProperty {
 	description?: string;
 	alias: string;
 	propertyEditorUiAlias: string;
-	config?: UmbDataTypeConfig;
+	config?: UmbPropertyEditorConfig;
 }
 
 export interface PropertyEditorConfigDefaultData {

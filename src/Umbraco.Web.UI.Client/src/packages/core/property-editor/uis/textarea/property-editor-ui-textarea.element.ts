@@ -2,7 +2,7 @@ import { css, html, customElement, property, state, ifDefined, styleMap } from '
 import { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-property-editor-ui-textarea')
 export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
@@ -25,7 +25,7 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 	private _css?: any;
 
 	@property({ attribute: false })
-	public set config(config: UmbDataTypeConfigCollection | undefined) {
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._maxChars = config?.getValueByAlias('maxChars');
 		this._rows = config?.getValueByAlias('rows');
 		this._minHeight = config?.getValueByAlias('minHeight');

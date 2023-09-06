@@ -3,7 +3,7 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-property-editor-ui-checkbox-list
@@ -20,7 +20,7 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 	}
 
 	@property({ attribute: false })
-	public set config(config: UmbDataTypeConfigCollection | undefined) {
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		const listData: Record<number, { value: string; sortOrder: number }> | undefined = config.getValueByAlias('items');
 

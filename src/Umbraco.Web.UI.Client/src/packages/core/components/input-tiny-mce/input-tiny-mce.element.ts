@@ -7,7 +7,6 @@ import { renderEditor, type tinymce } from '@umbraco-cms/backoffice/external/tin
 import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import {
 	TinyMcePluginArguments,
-	UmbDataTypeConfigCollection,
 	UmbTinyMcePluginBase,
 } from '@umbraco-cms/backoffice/components';
 import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
@@ -25,12 +24,13 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 // TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
 @customElement('umb-input-tiny-mce')
 export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	@property({ attribute: false })
-	configuration?: UmbDataTypeConfigCollection;
+	configuration?: UmbPropertyEditorConfigCollection;
 
 	@state()
 	private _tinyConfig: tinymce.RawEditorOptions = {};

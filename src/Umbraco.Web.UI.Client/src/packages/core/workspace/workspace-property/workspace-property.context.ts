@@ -16,7 +16,7 @@ import {
 	UmbContextProviderController,
 	UmbContextToken,
 } from '@umbraco-cms/backoffice/context-api';
-import { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbWorkspacePropertyContext<ValueType = any> {
 	#host: UmbControllerHostElement;
@@ -31,7 +31,7 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 	public readonly value = this.#data.asObservablePart((data) => data.value);
 	public readonly configValues = this.#data.asObservablePart((data) => data.config);
 
-	#configCollection = new UmbClassState<UmbDataTypeConfigCollection | undefined>(undefined);
+	#configCollection = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
 	public readonly config = this.#configCollection.asObservable();
 
 	private _editor = new UmbBasicState<UmbPropertyEditorExtensionElement | undefined>(undefined);
@@ -63,7 +63,7 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 		this._providerController = new UmbContextProviderController(host, UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, this);
 
 		this.configValues.subscribe((configValues) => {
-			this.#configCollection.next(configValues ? new UmbDataTypeConfigCollection(configValues) : undefined);
+			this.#configCollection.next(configValues ? new UmbPropertyEditorConfigCollection(configValues) : undefined);
 		});
 
 		this.variantId.subscribe((propertyVariantId) => {

@@ -1,7 +1,7 @@
 import { UmbInputToggleElement } from '../../../components/input-toggle/input-toggle.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -23,7 +23,7 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 	_showLabels?: boolean;
 
 	@property({ attribute: false })
-	public set config(config: UmbDataTypeConfigCollection | undefined) {
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this.value ??= config?.getValueByAlias('default') ?? false;
 		this._labelOff = config?.getValueByAlias('labelOff');
 		this._labelOn = config?.getValueByAlias('labelOn');

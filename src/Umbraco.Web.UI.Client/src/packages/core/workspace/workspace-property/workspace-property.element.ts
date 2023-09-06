@@ -1,4 +1,4 @@
-import { type UmbDataTypeConfig } from '../../property-editor/index.js';
+import { type UmbPropertyEditorConfig } from '../../property-editor/index.js';
 import { UmbWorkspacePropertyContext } from './workspace-property.context.js';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
@@ -7,7 +7,7 @@ import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  *  @element umb-workspace-property
@@ -86,7 +86,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	 * @default ''
 	 */
 	@property({ type: Array, attribute: false })
-	public set config(value: UmbDataTypeConfig | undefined) {
+	public set config(value: UmbPropertyEditorConfig | undefined) {
 		this._propertyContext.setConfig(value);
 	}
 
@@ -124,7 +124,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	private _propertyContext = new UmbWorkspacePropertyContext(this);
 
 	private _valueObserver?: UmbObserverController<unknown>;
-	private _configObserver?: UmbObserverController<UmbDataTypeConfigCollection | undefined>;
+	private _configObserver?: UmbObserverController<UmbPropertyEditorConfigCollection | undefined>;
 
 	constructor() {
 		super();
