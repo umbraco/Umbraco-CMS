@@ -2,12 +2,12 @@
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Delivery.Filters;
 using Umbraco.Cms.Api.Delivery.Routing;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
+[DeliveryApiAccess]
 [VersionedDeliveryApiRoute("content")]
 [ApiExplorerSettings(GroupName = "Content")]
 [LocalizeFromAcceptLanguageHeader]
@@ -38,6 +38,10 @@ public abstract class ContentApiControllerBase : DeliveryApiControllerBase
             ApiContentQueryOperationStatus.SortOptionNotFound => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Sort option not found")
                 .WithDetail("One of the attempted 'sort' options does not exist")
+                .Build()),
+            _ => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Unknown content query status")
+                .WithDetail($"Content query status \"{status}\" was not expected here")
                 .Build()),
         };
 }

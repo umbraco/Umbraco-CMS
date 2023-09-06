@@ -26,5 +26,5 @@ public sealed class ContentPublishedNotification : EnumerableObjectNotification<
 
     public IEnumerable<IContent> PublishedEntities => Target;
 
-    public bool IncludeDescendants { get; set; }
+    public bool IncludeDescendants { get; }
 }

@@ -1795,9 +1795,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="usergroup">Groupe d'utilisateurs</key>
     <key alias="userInvited">a été invité</key>
     <key alias="userInvitedSuccessHelp">Une invitation a été envoyée au nouvel utilisateur avec les détails concernant la connexion à Umbraco.</key>
-    <key alias="userinviteWelcomeMessage">Bien le bonjour et bienvenue dans Umbraco! Vous serez prêt.e dans moins d'1 minute, vous devez encore simplement configurer votre mot de passe et ajouter une photo pour votre avatar.</key>
+    <key alias="userinviteWelcomeMessage">Bien le bonjour et bienvenue dans Umbraco! Vous serez prêt.e dans moins d'1 minute, vous devez encore simplement configurer votre mot de passe.</key>
     <key alias="userinviteExpiredMessage">Bienvenue dans Umbraco! Malheureusement, votre invitation a expiré. Veuillez contacter votre administrateur et demandez-lui de vous l'envoyer à nouveau.</key>
-    <key alias="userinviteAvatarMessage">Chargez une photo afin que les autres utilisateurs puissent vous reconnaître facilement. Cliquez sur le cercle ci-dessus pour charger votre photo.</key>
     <key alias="writer">Rédacteur</key>
     <key alias="change">Modifier</key>
     <key alias="yourProfile" version="7.0">Votre profil</key>
