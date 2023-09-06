@@ -105,6 +105,8 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 				<small>Scripts/${this._path}</small>
 			</div>
 			<uui-box>
+				<!-- the div below in the header is to make the box display nicely with code editor -->
+				<div slot="header"></div>
 				${this._ready
 					? this.#renderCodeEditor()
 					: html`<div id="loader-container">
@@ -120,13 +122,12 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 			:host {
 				display: block;
 				width: 100%;
-				height: 100%;
 			}
 
 			#loader-container {
 				display: grid;
 				place-items: center;
-				min-height: calc(100dvh - 360px);
+				min-height: calc(100dvh - 300px);
 			}
 
 			umb-code-editor {
@@ -134,7 +135,7 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 			}
 
 			uui-box {
-				min-height: calc(100dvh - 300px);
+				min-height: calc(100dvh - 360px);
 				margin: var(--uui-size-layout-1);
 				--uui-box-default-padding: 0;
 				/* remove header border bottom as code editor looks better in this box */
@@ -147,16 +148,6 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 
 			uui-input {
 				width: 100%;
-			}
-
-			#code-editor-menu-container uui-icon:not([name='umb:delete']) {
-				margin-right: var(--uui-size-space-3);
-			}
-
-			#code-editor-menu-container {
-				display: flex;
-				justify-content: flex-end;
-				gap: var(--uui-size-space-3);
 			}
 		`,
 	];
