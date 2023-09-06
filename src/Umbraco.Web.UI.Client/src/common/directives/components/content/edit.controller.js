@@ -328,7 +328,7 @@
 
             $scope.previewDefaultButton = {
                 alias: 'preview',
-                handler: () => $scope.preview($scope.content, defaultPreviewUrl),
+                handler: () => $scope.preview($scope.content, defaultPreviewUrl, 'umbpreview'),
                 labelKey: "buttons_saveAndPreview"
             };
 
@@ -336,7 +336,8 @@
                 return {
                     alias: 'preview_' + additionalPreviewUrl.name,
                     label: additionalPreviewUrl.name,
-                    handler: () => $scope.preview($scope.content, additionalPreviewUrl.url)
+                    // We use target _blank here. If we open the window in the same tab with a 'umb_preview_name' target, we get a cors js error.
+                    handler: () => $scope.preview($scope.content, additionalPreviewUrl.url, '_blank')
                 }
             });
 
@@ -970,13 +971,13 @@
             }
         };
 
-        $scope.preview = function (content, url) {
+        $scope.preview = function (content, url, urlTarget) {
 
-            const openPreviewWindow = (url) => {
+            const openPreviewWindow = (url, target) => {
                 // Chromes popup blocker will kick in if a window is opened
                 // without the initial scoped request. This trick will fix that.
               
-              const previewWindow = $window.open(url, 'umbpreview');
+              const previewWindow = $window.open(url, target);
 
               previewWindow.addEventListener('load', () => {
                 previewWindow.location.href = previewWindow.document.URL;
@@ -987,7 +988,7 @@
             //The user cannot save if they don't have access to do that, in which case we just want to preview
             //and that's it otherwise they'll get an unauthorized access message
             if (!_.contains(content.allowedActions, "A")) {
-                openPreviewWindow(url);
+                openPreviewWindow(url, urlTarget);
             }
             else {
                 var selectedVariant = $scope.content.variants[0];
@@ -1006,7 +1007,7 @@
                 //ensure the save flag is set for the active variant
                 selectedVariant.save = true;
                 performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function (data) {
-                    openPreviewWindow(url);
+                    openPreviewWindow(url, urlTarget);
                 }, function (err) {
                     //validation issues ....
                 });
