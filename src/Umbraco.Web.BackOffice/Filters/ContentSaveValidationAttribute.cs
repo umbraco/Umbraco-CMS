@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -131,7 +131,6 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
         /// </summary>
         /// <param name="actionContext"></param>
         /// <param name="contentItem"></param>
-        /// <param name="backofficeSecurity"></param>
         private async Task<bool> ValidateUserAccessAsync(
             ContentItemSave? contentItem,
             ActionExecutingContext actionContext)

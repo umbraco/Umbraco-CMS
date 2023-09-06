@@ -22,14 +22,14 @@ public class UniqueMediaPathScheme : IMediaPathScheme
     /// <inheritdoc />
     /// <remarks>
     ///     <para>
-    ///         Returning null so that <see cref="MediaFileSystem.DeleteMediaFiles" /> does *not*
+    ///         Returning null so that <see cref="MediaFileManager.DeleteMediaFiles(IEnumerable{string})" /> does *not*
     ///         delete any directory. This is because the above shortening of the Guid to 8 chars
     ///         means we're increasing the risk of collision, and we don't want to delete files
     ///         belonging to other media items.
     ///     </para>
     ///     <para>
     ///         And, at the moment, we cannot delete directory "only if it is empty" because of
-    ///         race conditions. We'd need to implement locks in <see cref="MediaFileSystem" /> for
+    ///         race conditions. We'd need to implement locks in <see cref="MediaFileManager" /> for
     ///         this.
     ///     </para>
     /// </remarks>

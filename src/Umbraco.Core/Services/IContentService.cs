@@ -76,12 +76,10 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </summary>
     IContent? GetById(int id);
 
-    new
-
     /// <summary>
     ///     Gets a document.
     /// </summary>
-    IContent? GetById(Guid key);
+    new IContent? GetById(Guid key);
 
     /// <summary>
     ///     Gets publish/unpublish schedule for a content node.
@@ -167,9 +165,8 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </summary>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     /// <remarks>
-    ///     The content returned from this method may be culture variant, in which case the resulting
-    ///     <see cref="IContent.ContentSchedule" /> should be queried
-    ///     for which culture(s) have been scheduled.
+    ///     The content returned from this method may be culture variant, in which case you can use 
+    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
     IEnumerable<IContent> GetContentForExpiration(DateTime date);
 
@@ -178,9 +175,8 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </summary>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     /// <remarks>
-    ///     The content returned from this method may be culture variant, in which case the resulting
-    ///     <see cref="IContent.ContentSchedule" /> should be queried
-    ///     for which culture(s) have been scheduled.
+    ///     The content returned from this method may be culture variant, in which case you can use 
+    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
     IEnumerable<IContent> GetContentForRelease(DateTime date);
 

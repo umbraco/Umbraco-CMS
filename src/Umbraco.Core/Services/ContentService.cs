@@ -207,7 +207,7 @@ public class ContentService : RepositoryService, IContentService
 
     /// <summary>
     ///     Used to bulk update the permissions set for a content item. This will replace all permissions
-    ///     assigned to an entity with a list of user id & permission pairs.
+    ///     assigned to an entity with a list of user id &amp; permission pairs.
     /// </summary>
     /// <param name="permissionSet"></param>
     public void SetPermissions(EntityPermissionSet permissionSet)

@@ -14,7 +14,7 @@ public class DeleteExternalLoginsOnMemberDeletedHandler : INotificationHandler<M
     private readonly IExternalLoginWithKeyService _externalLoginWithKeyService;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="DeleteExternalLoginsOnMemberDeletingHandler" /> class.
+    ///     Initializes a new instance of the <see cref="DeleteExternalLoginsOnMemberDeletedHandler"/> class.
     /// </summary>
     public DeleteExternalLoginsOnMemberDeletedHandler(IExternalLoginWithKeyService externalLoginWithKeyService)
         => _externalLoginWithKeyService = externalLoginWithKeyService;

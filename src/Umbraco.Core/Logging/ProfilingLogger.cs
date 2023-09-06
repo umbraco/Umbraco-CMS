@@ -141,7 +141,7 @@ public sealed class ProfilingLogger : IProfilingLogger
     public void LogTrace(string messageTemplate, params object[] propertyValues)
         => Logger.LogTrace(messageTemplate, propertyValues);
 
-    ///<inheritdoc>/>
+    ///<inheritdoc/>
     public bool IsEnabled(LogLevel logLevel)
     {
         switch (logLevel)

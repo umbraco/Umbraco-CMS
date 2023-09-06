@@ -151,8 +151,6 @@ public class ContentPermissions
     /// </summary>
     /// <param name="nodeId"></param>
     /// <param name="user"></param>
-    /// <param name="userService"></param>
-    /// <param name="entityService"></param>
     /// <param name="entity">The <see cref="IUmbracoEntity" /> item resolved if one was found for the id</param>
     /// <param name="permissionsToCheck"></param>
     /// <returns></returns>
@@ -218,9 +216,6 @@ public class ContentPermissions
     /// </summary>
     /// <param name="nodeId"></param>
     /// <param name="user"></param>
-    /// <param name="userService"></param>
-    /// <param name="contentService"></param>
-    /// <param name="entityService"></param>
     /// <param name="contentItem">The <see cref="IContent" /> item resolved if one was found for the id</param>
     /// <param name="permissionsToCheck"></param>
     /// <returns></returns>
