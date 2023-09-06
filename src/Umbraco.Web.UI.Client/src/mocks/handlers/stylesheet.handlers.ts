@@ -77,10 +77,10 @@ const detailHandlers = [
 type getRulesRequestBody = { path?: string };
 
 const rulesHandlers = [
-	rest.post(umbracoPath('/stylesheet/rich-text/extract-rules'), (req, res, ctx) => {
+	rest.post(umbracoPath('/stylesheet/rich-text/extract-rules'), async (req, res, ctx) => {
 		const requestBody = req.json() as ExtractRichTextStylesheetRulesRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		const response = umbStylesheetData.extractRules({ requestBody });
+		const response = await umbStylesheetData.extractRules({ requestBody });
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
