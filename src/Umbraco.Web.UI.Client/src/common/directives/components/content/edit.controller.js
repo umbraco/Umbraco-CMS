@@ -327,12 +327,14 @@
             const defaultPreviewUrl = `preview/?id=${content.id}${$scope.culture ? `&culture=${$scope.culture}` : ''}`;
 
             $scope.previewDefaultButton = {
+                alias: 'preview',
                 handler: () => $scope.preview($scope.content, defaultPreviewUrl),
                 labelKey: "buttons_saveAndPreview"
             };
 
             $scope.previewSubButtons = $scope.content.variants?.[0].additionalPreviewUrls?.map((additionalPreviewUrl) => {
                 return {
+                    alias: 'preview_' + additionalPreviewUrl.name,
                     label: additionalPreviewUrl.name,
                     handler: () => $scope.preview($scope.content, additionalPreviewUrl.url)
                 }
