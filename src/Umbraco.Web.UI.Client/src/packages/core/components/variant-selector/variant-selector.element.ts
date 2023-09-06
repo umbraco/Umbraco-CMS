@@ -6,7 +6,7 @@ import {
 	UMB_WORKSPACE_SPLIT_VIEW_CONTEXT,
 	UMB_VARIANT_CONTEXT,
 	ActiveVariant,
-	IsNameablePropertySetContext,
+	isNameablePropertySetContext,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentVariantResponseModel, ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
@@ -54,7 +54,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		});
 		this.consumeContext(UMB_VARIANT_CONTEXT, (instance) => {
 			this.#variantContext = instance;
-			this._observeDatasetContext();
+			this._observeVariantContext();
 		});
 	}
 
@@ -92,7 +92,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		}
 	}
 
-	private async _observeDatasetContext() {
+	private async _observeVariantContext() {
 		if (!this.#variantContext) return;
 
 		const variantId = this.#variantContext.getVariantId();
@@ -123,7 +123,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
-			if (typeof target?.value === 'string' && this.#variantContext && IsNameablePropertySetContext(this.#variantContext)) {
+			if (typeof target?.value === 'string' && this.#variantContext && isNameablePropertySetContext(this.#variantContext)) {
 				this.#variantContext.setName(target.value);
 			}
 		}

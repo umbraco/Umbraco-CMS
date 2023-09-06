@@ -135,7 +135,7 @@ export class UmbDocumentWorkspaceContext
 		this.#currentData.update({ variants });
 	}
 
-	async propertyDataById(propertyId: string) {
+	async propertyStructureById(propertyId: string) {
 		return this.structure.propertyStructureById(propertyId);
 	}
 

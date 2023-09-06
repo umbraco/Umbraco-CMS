@@ -5,6 +5,6 @@ import type { ValueModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 export interface UmbPropertyStructureWorkspaceContextInterface<EntityType = unknown>
 	extends UmbWorkspaceContextInterface<EntityType> {
 
-		propertyDataById(id: string): Promise<Observable<ValueModelBaseModel | undefined>>;
+		propertyStructureById(id: string): Promise<Observable<ValueModelBaseModel | undefined>>;
 
 }
