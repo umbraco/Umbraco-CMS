@@ -50,7 +50,6 @@ export const data: Array<StylesheetDBItem> = [
 		path: 'Stylesheet File 2.css',
 		isFolder: false,
 		icon: 'style',
-
 		name: 'Stylesheet File 2.css',
 		type: 'stylesheet',
 		hasChildren: false,
@@ -58,44 +57,50 @@ export const data: Array<StylesheetDBItem> = [
 			color: green;
 		}
 		
-		/**umb_name:bjjh*/
+		/**umb_name:HELLO*/
 		h1 {
 			color: green;
 		}
 		
-		/**umb_name:comeone*/
+		/**umb_name:SOMETHING*/
 		h1 {
 			color: green;
 		}
 		
-		/**umb_name:lol*/
+		/**umb_name:NIOCE*/
 		h1 {
 			color: green;
 		}`,
 	},
 	{
 		path: 'Folder 1',
+		name: 'Folder 1',
 		isFolder: true,
 		icon: 'folder',
-
-		name: 'Folder 1',
 		type: 'stylesheet',
 		hasChildren: true,
+	},
+	{
+		path: 'Folder 1/Stylesheet File 3.css',
+		name: 'Stylesheet File 3.css',
+		type: 'stylesheet',
+		hasChildren: true,
+		isFolder: false,
 		content: `		h1 {
 			color: pink;
 		}
 		
-		/**umb_name:bjjh*/
+		/**umb_name:ONE*/
 		h1 {
 			color: pink;
 		}
 		
-		/**umb_name:comeone*/
+		/**umb_name:TWO*/
 		h1 {
 			color: pink;
 		}
 		
-		/**umb_name:lol*/
+		/**umb_name:THREE*/
 		h1 {
 			color: pink;
 		}`,
