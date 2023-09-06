@@ -252,10 +252,8 @@ ${rule.selector} {
 	}
 
 	updateData(updateItem: UpdateStylesheetRequestModel) {
-		console.log("update data", updateItem)
 		const itemIndex = this.data.findIndex((item) => item.path === updateItem.existingPath);
 		const item = this.data[itemIndex];
-		console.log("existing", item)
 		if (!item) return;
 
 		// TODO: revisit this code, seems like something we can solve smarter/type safer now:
@@ -270,12 +268,12 @@ ${rule.selector} {
 			}
 		}
 
+		// Specific to stylesheet, we need to update path based on name:
+		//newItem.path = updateItem.name;
+
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this.data[itemIndex] = newItem;
-
-
-		console.log("result", this.data[itemIndex])
 	}
 
 	delete(paths: Array<string>) {
