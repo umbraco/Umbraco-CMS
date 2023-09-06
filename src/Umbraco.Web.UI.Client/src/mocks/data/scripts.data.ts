@@ -1,3 +1,4 @@
+import { UmbData } from './data.js';
 import { UmbEntityData } from './entity.data.js';
 import { createFileSystemTreeItem, createTextFileItem } from './utils.js';
 import {
@@ -6,13 +7,13 @@ import {
 	FileSystemTreeItemPresentationModel,
 	PagedFileSystemTreeItemPresentationModel,
 	ScriptResponseModel,
+	UpdateScriptRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-type ScriptsDataItem = ScriptResponseModel & FileSystemTreeItemPresentationModel & { id: string };
+type ScriptsDataItem = ScriptResponseModel & FileSystemTreeItemPresentationModel;
 
 export const data: Array<ScriptsDataItem> = [
 	{
-		id: 'some-folder',
 		path: 'some-folder',
 		isFolder: true,
 		name: 'some-folder',
@@ -20,7 +21,6 @@ export const data: Array<ScriptsDataItem> = [
 		hasChildren: true,
 	},
 	{
-		id: 'another-folder',
 		path: 'another-folder',
 		isFolder: true,
 		name: 'another-folder',
@@ -28,7 +28,6 @@ export const data: Array<ScriptsDataItem> = [
 		hasChildren: true,
 	},
 	{
-		id: 'very important folder',
 		path: 'very important folder',
 		isFolder: true,
 		name: 'very important folder',
@@ -36,7 +35,6 @@ export const data: Array<ScriptsDataItem> = [
 		hasChildren: true,
 	},
 	{
-		id: 'some-folder/ugly script.js',
 		path: 'some-folder/ugly script.js',
 		isFolder: false,
 		name: 'ugly script.js',
@@ -55,7 +53,6 @@ export const data: Array<ScriptsDataItem> = [
 		 console.log(makeid(5));`,
 	},
 	{
-		id: 'some-folder/nice script.js',
 		path: 'some-folder/nice script.js',
 		isFolder: false,
 		name: 'nice script.js',
@@ -71,7 +68,6 @@ export const data: Array<ScriptsDataItem> = [
 		}`,
 	},
 	{
-		id: 'another-folder/only bugs.js',
 		path: 'another-folder/only bugs.js',
 		isFolder: false,
 		name: 'only bugs.js',
@@ -84,7 +80,6 @@ export const data: Array<ScriptsDataItem> = [
 		console.log(my_arr);`,
 	},
 	{
-		id: 'very important folder/no bugs at all.js',
 		path: 'very important folder/no bugs at all.js',
 		isFolder: false,
 		name: 'no bugs at all.js',
@@ -100,7 +95,6 @@ export const data: Array<ScriptsDataItem> = [
 		// -> TO get the short day name e.g. Tue`,
 	},
 	{
-		id: 'very important folder/nope.js',
 		path: 'very important folder/nope.js',
 		isFolder: false,
 		name: 'nope.js',
@@ -120,7 +114,7 @@ export const data: Array<ScriptsDataItem> = [
 	},
 ];
 
-class UmbScriptsTreeData extends UmbEntityData<FileSystemTreeItemPresentationModel> {
+class UmbScriptsData extends UmbData<ScriptsDataItem> {
 	constructor() {
 		super(data);
 	}
@@ -143,12 +137,6 @@ class UmbScriptsTreeData extends UmbEntityData<FileSystemTreeItemPresentationMod
 		const items = this.data.filter((item) => paths.includes(item.path ?? ''));
 		return items.map((item) => createFileSystemTreeItem(item));
 	}
-}
-
-class UmbScriptsFolderData extends UmbEntityData<ScriptResponseModel> {
-	constructor() {
-		super(data);
-	}
 
 	getFolder(path: string): FileSystemTreeItemPresentationModel {
 		const items = data.filter((item) => item.isFolder && item.path === path);
@@ -157,7 +145,6 @@ class UmbScriptsFolderData extends UmbEntityData<ScriptResponseModel> {
 
 	postFolder(payload: CreatePathFolderRequestModel) {
 		const newFolder = {
-			id: `${payload.parentPath ?? ''}/${payload.name}`,
 			path: `${payload.parentPath ?? ''}/${payload.name}`,
 			isFolder: true,
 			name: payload.name,
@@ -170,15 +157,6 @@ class UmbScriptsFolderData extends UmbEntityData<ScriptResponseModel> {
 	deleteFolder(path: string) {
 		return this.delete([path]);
 	}
-}
-
-export const umbScriptsTreeData = new UmbScriptsTreeData();
-export const umbScriptsFolderData = new UmbScriptsFolderData();
-
-class UmbScriptsData extends UmbEntityData<ScriptResponseModel> {
-	constructor() {
-		super(data);
-	}
 
 	getScript(path: string): ScriptResponseModel | undefined {
 		return createTextFileItem(this.data.find((item) => item.path === path));
@@ -188,7 +166,6 @@ class UmbScriptsData extends UmbEntityData<ScriptResponseModel> {
 		const newItem: ScriptsDataItem = {
 			...item,
 			path: `${item.parentPath}/${item.name}.js}`,
-			id: `${item.parentPath}/${item.name}.js}`,
 			isFolder: false,
 			hasChildren: false,
 			type: 'script',
@@ -196,6 +173,59 @@ class UmbScriptsData extends UmbEntityData<ScriptResponseModel> {
 
 		this.insert(newItem);
 		return newItem;
+	}
+
+	insert(item: ScriptsDataItem) {
+		const exits = this.data.find((i) => i.path === item.path);
+
+		if (exits) {
+			throw new Error(`Item with path ${item.path} already exists`);
+		}
+
+		this.data.push(item);
+
+		return item;
+	}
+
+	updateData(updateItem: UpdateScriptRequestModel) {
+		const itemIndex = this.data.findIndex((item) => item.path === updateItem.existingPath);
+		const item = this.data[itemIndex];
+		if (!item) return;
+
+		// TODO: revisit this code, seems like something we can solve smarter/type safer now:
+		const itemKeys = Object.keys(item);
+		const newItem = { ...item };
+
+		for (const [key] of Object.entries(updateItem)) {
+			if (itemKeys.indexOf(key) !== -1) {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				newItem[key] = updateItem[key];
+			}
+		}
+		// Specific to fileSystem, we need to update path based on name:
+		const dirName = updateItem.existingPath?.substring(0, updateItem.existingPath.lastIndexOf('/'));
+		newItem.path = `${dirName}${dirName ? '/' : ''}${updateItem.name}`;
+
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this.data[itemIndex] = newItem;
+	}
+
+	delete(paths: Array<string>) {
+		const deletedPaths = this.data
+			.filter((item) => {
+				if (!item.path) throw new Error('Item has no path');
+				paths.includes(item.path);
+			})
+			.map((item) => item.path);
+
+		this.data = this.data.filter((item) => {
+			if (!item.path) throw new Error('Item has no path');
+			paths.indexOf(item.path) === -1;
+		});
+
+		return deletedPaths;
 	}
 }
 

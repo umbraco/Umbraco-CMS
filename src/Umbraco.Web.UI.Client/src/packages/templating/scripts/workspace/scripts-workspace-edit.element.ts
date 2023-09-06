@@ -113,6 +113,19 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 							<uui-loader></uui-loader>
 					  </div>`}
 			</uui-box>
+			<div slot="footer-info">
+				<!-- TODO: Shortcuts Modal? -->
+				<uui-button label="Show keyboard shortcuts">
+					Keyboard Shortcuts
+					<uui-keyboard-shortcut>
+						<uui-key>ALT</uui-key>
+						+
+						<uui-key>shift</uui-key>
+						+
+						<uui-key>k</uui-key>
+					</uui-keyboard-shortcut>
+				</uui-button>
+			</div>
 		</umb-workspace-editor>`;
 	}
 
@@ -127,15 +140,15 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 			#loader-container {
 				display: grid;
 				place-items: center;
-				min-height: calc(100dvh - 230px);
+				min-height: calc(100dvh - 260px);
 			}
 
 			umb-code-editor {
-				--editor-height: calc(100dvh - 230px);
+				--editor-height: calc(100dvh - 260px);
 			}
 
 			uui-box {
-				min-height: calc(100dvh - 230px);
+				min-height: calc(100dvh - 260px);
 				margin: var(--uui-size-layout-1);
 				--uui-box-default-padding: 0;
 				/* remove header border bottom as code editor looks better in this box */

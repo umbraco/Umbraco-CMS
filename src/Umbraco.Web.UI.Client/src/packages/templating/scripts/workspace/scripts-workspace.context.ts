@@ -1,4 +1,4 @@
-import { ScriptDetails } from '../config.js';
+import { ScriptDetails, SCRIPTS_WORKSPACE_ALIAS } from '../config.js';
 import { UmbScriptsRepository } from '../repository/scripts.repository.js';
 import { createObservablePart, UmbBooleanState, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -7,39 +7,6 @@ import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UpdateScriptRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbScriptsWorkspaceContext extends UmbWorkspaceContext<UmbScriptsRepository, ScriptDetails> {
-	getEntityId(): string | undefined {
-		return this.getData()?.path;
-	}
-	getEntityType(): string {
-		throw new Error('Method not implemented.');
-	}
-	save(): Promise<void> {
-		const script = this.getData();
-
-		if (!script) return Promise.reject('Something went wrong, there is no data for script view you want to save...');
-		if (this.getIsNew()) {
-			const createRequestBody = {
-				name: script.name,
-				content: script.content,
-				parentPath: script.path + '/',
-			};
-
-			this.repository.create(createRequestBody);
-			console.log('create');
-			return Promise.resolve();
-		}
-		if (!script.path) return Promise.reject('There is no path');
-		const updateRequestBody: UpdateScriptRequestModel = {
-			name: script.name,
-			existingPath: script.path,
-			content: script.content,
-		};
-		this.repository.save(script.path, updateRequestBody);
-		return Promise.resolve();
-	}
-	destroy(): void {
-		throw new Error('Method not implemented.');
-	}
 	#data = new UmbDeepState<ScriptDetails | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = createObservablePart(this.#data, (data) => data?.name);
@@ -50,7 +17,7 @@ export class UmbScriptsWorkspaceContext extends UmbWorkspaceContext<UmbScriptsRe
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.Script', new UmbScriptsRepository(host));
+		super(host, SCRIPTS_WORKSPACE_ALIAS, new UmbScriptsRepository(host));
 		this.#loadCodeEditor();
 	}
 
@@ -93,5 +60,42 @@ export class UmbScriptsWorkspaceContext extends UmbWorkspaceContext<UmbScriptsRe
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.next(script);
+	}
+
+	getEntityId(): string | undefined {
+		return this.getData()?.path;
+	}
+
+	save(): Promise<void> {
+		const script = this.getData();
+
+		if (!script) return Promise.reject('Something went wrong, there is no data for script view you want to save...');
+		if (this.getIsNew()) {
+			const createRequestBody = {
+				name: script.name,
+				content: script.content,
+				parentPath: script.path + '/',
+			};
+
+			this.repository.create(createRequestBody);
+			console.log('create');
+			return Promise.resolve();
+		}
+		if (!script.path) return Promise.reject('There is no path');
+		const updateRequestBody: UpdateScriptRequestModel = {
+			name: script.name,
+			existingPath: script.path,
+			content: script.content,
+		};
+		this.repository.save(script.path, updateRequestBody);
+		return Promise.resolve();
+	}
+
+	destroy(): void {
+		throw new Error('Method not implemented.');
+	}
+
+	getEntityType(): string {
+		throw new Error('Method not implemented.');
 	}
 }

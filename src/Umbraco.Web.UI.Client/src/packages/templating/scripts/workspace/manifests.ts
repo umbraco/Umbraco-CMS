@@ -12,22 +12,22 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
+//TODO: this does not work for some reason
 const workspaceActions: Array<ManifestWorkspaceAction> = [
 	{
 		type: 'workspaceAction',
-		alias: SCRIPTS_WORKSPACE_ACTION_SAVE_ALIAS,
-		name: 'Save Scripts Workspace Action',
-		weight: 70,
+		alias: 'Umb.WorkspaceAction.Scripts.Save',
+		name: 'Save Script Workspace Action',
 		meta: {
+			label: 'Save',
 			look: 'primary',
 			color: 'positive',
-			label: 'Save',
 			api: UmbSaveWorkspaceAction,
 		},
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: SCRIPTS_WORKSPACE_ALIAS,
+				match: workspace.alias,
 			},
 		],
 	},
