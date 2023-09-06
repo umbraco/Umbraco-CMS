@@ -16,7 +16,7 @@ export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 	_routes: UmbRoute[] = [
 		{
 			path: 'create/:path',
-			component: () => this.#element,
+			component: import('./stylesheet-workspace-editor.element.js'),
 			setup: async (_component, info) => {
 				const path = info.match.params.path === 'null' ? null : info.match.params.path;
 				const serverPath = path === null ? null : serverFilePathFromUrlFriendlyPath(path);
@@ -31,7 +31,7 @@ export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 		},
 		{
 			path: 'edit/:path',
-			component: () => this.#element,
+			component: import('./stylesheet-workspace-editor.element.js'),
 			setup: (_component, info) => {
 				this.removeControllerByAlias('_observeIsNew');
 				const path = info.match.params.path;
