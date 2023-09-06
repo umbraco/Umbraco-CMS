@@ -131,7 +131,7 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 			}
 
 			umb-code-editor {
-				--editor-height: calc(100dvh - 300px);
+				--editor-height: calc(100dvh - 230px);
 			}
 
 			uui-box {

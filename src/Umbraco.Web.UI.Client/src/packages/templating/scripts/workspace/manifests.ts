@@ -27,7 +27,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: SCRIPTS_WORKSPACE_ALIAS,
 			},
 		],
 	},
