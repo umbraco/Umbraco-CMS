@@ -80,12 +80,6 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 		this.#workspaceContext?.splitView.openSplitView(variant);
 	}
 
-	public changeVariant(culture: string | null, segment: string | null) {
-		const index = this.#index.getValue();
-		if (index === undefined) return;
-		this.#workspaceContext?.splitView.setActiveVariant(index, culture, segment);
-	}
-
 	public getSplitViewIndex() {
 		return this.#index.getValue();
 	}
