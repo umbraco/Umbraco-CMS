@@ -8,6 +8,7 @@ import { PropertyValueMap, css, html, nothing, customElement, state } from '@umb
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbPropertySettingsModalResult, UmbPropertySettingsModalData } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
+import { UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/document-type';
 // TODO: Could base take a token to get its types?.
 // TODO: Missing a workspace context... unless this should not be a workspace any way.
 @customElement('umb-property-settings-modal')
@@ -44,11 +45,23 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	@state() private _aliasLocked = true;
 
 	@state()
+	protected _ownerDocumentType?: UmbPropertySettingsModalResult;
+
+	@state()
 	protected _returnData!: UmbPropertySettingsModalResult;
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this._returnData = JSON.parse(JSON.stringify(this.data));
+
+		// TODO: This is actually not good enough, we need to be able to get to the DOCUMENT_WORKSPACE_CONTEXT, so we can have a look at the draft/runtime version of the document. Otherwise 'Vary by culture' is first updated when saved.
+		this.consumeContext(UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.observe(instance.byId(this.data?.documentTypeId), (documentType) => {
+				this._ownerDocumentType = documentType;
+				this.requestUpdate('_ownerDocumentType');
+			}, '_observeDocumentType');
+		});
+
+		this._returnData = JSON.parse(JSON.stringify(this.data?.propertyData ?? {}));
 
 		this._returnData.validation ??= {};
 
@@ -105,7 +118,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		if (!this._aliasLocked) {
 			this._returnData.alias = alias;
 		} else {
-			this._returnData.alias = this.data?.alias;
+			this._returnData.alias = this.data?.propertyData?.alias;
 		}
 		this.requestUpdate('_returnData');
 	}
@@ -177,6 +190,11 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		this.requestUpdate('_returnData');
 	}
 
+	#onVaryByCultureChange(event: UUIBooleanInputEvent) {
+		this._returnData.variesByCulture = event.target.checked;
+		this.requestUpdate('_returnData');
+	}
+
 	// TODO: This would conceptually be a Property Editor Workspace, should be changed at one point in the future.
 	// For now this is hacky made available by giving the element an fixed alias.
 	// This would allow for workspace views and workspace actions.
@@ -226,6 +244,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 									${this.#renderCustomValidation()}
 								</div>
 								<hr />
+								${this.#renderVariationControls()}
 								<div class="container">
 									<b style="margin-bottom: var(--uui-size-space-3)">Appearance</b>
 									<div id="appearances">${this.#renderAlignLeftIcon()} ${this.#renderAlignTopIcon()}</div>
@@ -277,13 +296,13 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 				<uui-toggle
 					@change=${this.#onMandatoryChange}
 					id="mandatory"
-					value=${this._returnData.validation?.mandatory}
+					.checked=${this._returnData.validation?.mandatory ?? false}
 					slot="editor"></uui-toggle>
 			</div>
 			${this._returnData.validation?.mandatory
 				? html`<uui-input
 						name="mandatory-message"
-						value=${this._returnData.validation?.mandatoryMessage}
+						value=${this._returnData.validation?.mandatoryMessage ?? ''}
 						@change=${this.#onMandatoryMessageChange}
 						style="margin-top: var(--uui-size-space-1)"
 						id="mandatory-message"
@@ -310,6 +329,24 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 							.value=${this._returnData.validation?.regExMessage ?? ''}></uui-textarea>
 				  `
 				: nothing} `;
+	}
+
+	#renderVariationControls() {
+		return this._ownerDocumentType?.variesByCulture || this._ownerDocumentType?.variesBySegment ?
+		html`
+			<div class="container">
+				<b>Variation</b>
+				${this._ownerDocumentType?.variesByCulture ? this.#renderVaryByCulture() : ''}
+			</div>
+			<hr />`
+		: '';
+	}
+	#renderVaryByCulture() {
+		return html`<uui-toggle
+				@change=${this.#onVaryByCultureChange}
+				.checked=${this._returnData.variesByCulture ?? false}
+				label="Vary by culture"></uui-toggle>
+			`;
 	}
 
 	static styles = [
