@@ -1,3 +1,4 @@
+import { SCRIPTS_ROOT_ENTITY_TYPE } from '../config.js';
 import { UmbScriptsTreeServerDataSource } from './sources/scripts.tree.server.data.js';
 import { UmbScriptsServerDataSource } from './sources/scripts.detail.server.data.js';
 import { ScriptsGetFolderResponse, UmbScriptsFolderServerDataSource } from './sources/scripts.folder.server.data.js';
@@ -24,7 +25,6 @@ import {
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { SCRIPTS_ROOT_ENTITY_TYPE } from '../config.js';
 
 export class UmbScriptsRepository
 	implements

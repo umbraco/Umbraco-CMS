@@ -4,6 +4,10 @@ import {
 	SCRIPTS_FOLDER_ENTITY_TYPE,
 	SCRIPTS_ROOT_ENTITY_TYPE,
 	SCRIPTS_FOLDER_EMPTY_ENTITY_TYPE,
+	SCRIPTS_ENTITY_ACTION_DELETE_ALIAS,
+	SCRIPTS_ENTITY_ACTION_CREATE_NEW_ALIAS,
+	SCRIPTS_ENTITY_ACTION_DELETE_FOLDER_ALIAS,
+	SCRIPTS_ENTITY_ACTION_CREATE_FOLDER_NEW_ALIAS,
 } from '../config.js';
 import { UmbCreateScriptAction } from './create/create-empty.action.js';
 import {
@@ -16,7 +20,7 @@ import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry
 const scriptsViewActions: Array<ManifestEntityAction> = [
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.Scripts.Delete',
+		alias: SCRIPTS_ENTITY_ACTION_DELETE_ALIAS,
 		name: 'Delete Scripts Entity Action',
 		meta: {
 			icon: 'umb:trash',
@@ -31,7 +35,7 @@ const scriptsViewActions: Array<ManifestEntityAction> = [
 const scriptsFolderActions: Array<ManifestEntityAction> = [
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.ScriptsFolder.Create.New',
+		alias: SCRIPTS_ENTITY_ACTION_CREATE_NEW_ALIAS,
 		name: 'Create Scripts Entity Under Directory Action',
 		meta: {
 			icon: 'umb:article',
@@ -43,7 +47,7 @@ const scriptsFolderActions: Array<ManifestEntityAction> = [
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.ScriptsFolder.DeleteFolder',
+		alias: SCRIPTS_ENTITY_ACTION_DELETE_FOLDER_ALIAS,
 		name: 'Remove empty folder',
 		meta: {
 			icon: 'umb:trash',
@@ -55,7 +59,7 @@ const scriptsFolderActions: Array<ManifestEntityAction> = [
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.ScriptsFolder.CreateFolder',
+		alias: SCRIPTS_ENTITY_ACTION_CREATE_FOLDER_NEW_ALIAS,
 		name: 'Create empty folder',
 		meta: {
 			icon: 'umb:add',

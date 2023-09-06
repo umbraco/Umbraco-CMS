@@ -3,6 +3,7 @@ import {
 	SCRIPTS_REPOSITORY_ALIAS,
 	SCRIPTS_ROOT_ENTITY_TYPE,
 	SCRIPTS_TREE_ALIAS,
+	SCRIPTS_TREE_ITEM_ALIAS,
 } from '../config.js';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -19,7 +20,7 @@ const tree: ManifestTree = {
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
 	kind: 'fileSystem',
-	alias: 'Umb.TreeItem.Scripts',
+	alias: SCRIPTS_TREE_ITEM_ALIAS,
 	name: 'Scripts Tree Item',
 	meta: {
 		entityTypes: [SCRIPTS_ROOT_ENTITY_TYPE, SCRIPTS_ENTITY_TYPE],
