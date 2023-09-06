@@ -127,7 +127,7 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 			#loader-container {
 				display: grid;
 				place-items: center;
-				min-height: calc(100dvh - 300px);
+				min-height: calc(100dvh - 230px);
 			}
 
 			umb-code-editor {
@@ -135,7 +135,7 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 			}
 
 			uui-box {
-				min-height: calc(100dvh - 360px);
+				min-height: calc(100dvh - 230px);
 				margin: var(--uui-size-layout-1);
 				--uui-box-default-padding: 0;
 				/* remove header border bottom as code editor looks better in this box */
