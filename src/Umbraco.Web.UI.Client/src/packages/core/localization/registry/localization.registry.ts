@@ -1,20 +1,28 @@
 import {
-	UmbTranslationsDictionary,
-	UmbTranslationsFlatDictionary,
-	TranslationSet,
-	registerTranslation,
-	translations,
+	UmbLocalizationDictionary,
+	UmbLocalizationFlatDictionary,
+	LocalizationSet,
+	registerLocalization,
+	localizations,
 } from '@umbraco-cms/backoffice/localization-api';
 import { hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBackofficeExtensionRegistry, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { BehaviorSubject, Subject, combineLatest, map, distinctUntilChanged, filter, startWith } from '@umbraco-cms/backoffice/external/rxjs';
+import {
+	BehaviorSubject,
+	Subject,
+	combineLatest,
+	map,
+	distinctUntilChanged,
+	filter,
+	startWith,
+} from '@umbraco-cms/backoffice/external/rxjs';
 
-export class UmbTranslationRegistry {
+export class UmbLocalizationRegistry {
 	/**
 	 * Get the current registered translations.
 	 */
-	get translations() {
-		return translations;
+	get localizations() {
+		return localizations;
 	}
 
 	get isDefaultLoaded() {
@@ -28,12 +36,12 @@ export class UmbTranslationRegistry {
 		const currentLanguage$ = this.#currentLanguage.pipe(
 			startWith(document.documentElement.lang || 'en-us'),
 			map((x) => x.toLowerCase()),
-			distinctUntilChanged()
+			distinctUntilChanged(),
 		);
 
-		const currentExtensions$ = extensionRegistry.extensionsOfType('translations').pipe(
+		const currentExtensions$ = extensionRegistry.extensionsOfType('localization').pipe(
 			filter((x) => x.length > 0),
-			distinctUntilChanged((prev, curr) => prev.length === curr.length && prev.every((x) => curr.includes(x)))
+			distinctUntilChanged((prev, curr) => prev.length === curr.length && prev.every((x) => curr.includes(x))),
 		);
 
 		combineLatest([currentLanguage$, currentExtensions$]).subscribe(async ([userCulture, extensions]) => {
@@ -43,14 +51,14 @@ export class UmbTranslationRegistry {
 					.filter(
 						(x) =>
 							x.meta.culture.toLowerCase() === locale.baseName.toLowerCase() ||
-							x.meta.culture.toLowerCase() === locale.language.toLowerCase()
+							x.meta.culture.toLowerCase() === locale.language.toLowerCase(),
 					)
 					.map(async (extension) => {
-						const innerDictionary: UmbTranslationsFlatDictionary = {};
+						const innerDictionary: UmbLocalizationFlatDictionary = {};
 
 						// If extension contains a dictionary, add it to the inner dictionary.
-						if (extension.meta.translations) {
-							for (const [dictionaryName, dictionary] of Object.entries(extension.meta.translations)) {
+						if (extension.meta.localizations) {
+							for (const [dictionaryName, dictionary] of Object.entries(extension.meta.localizations)) {
 								this.#addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
 							}
 						}
@@ -58,7 +66,7 @@ export class UmbTranslationRegistry {
 						// If extension contains a js file, load it and add the default dictionary to the inner dictionary.
 						const loadedExtension = await loadExtension(extension);
 
-						if (loadedExtension && hasDefaultExport<UmbTranslationsDictionary>(loadedExtension)) {
+						if (loadedExtension && hasDefaultExport<UmbLocalizationDictionary>(loadedExtension)) {
 							for (const [dictionaryName, dictionary] of Object.entries(loadedExtension.default)) {
 								this.#addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
 							}
@@ -69,12 +77,12 @@ export class UmbTranslationRegistry {
 							$code: extension.meta.culture.toLowerCase(),
 							$dir: extension.meta.direction ?? 'ltr',
 							...innerDictionary,
-						} satisfies TranslationSet;
-					})
+						} satisfies LocalizationSet;
+					}),
 			);
 
 			if (translations.length) {
-				registerTranslation(...translations);
+				registerLocalization(...translations);
 
 				// Set the document language
 				const newLang = locale.baseName.toLowerCase();
@@ -105,9 +113,9 @@ export class UmbTranslationRegistry {
 	}
 
 	#addOrUpdateDictionary(
-		innerDictionary: UmbTranslationsFlatDictionary,
+		innerDictionary: UmbLocalizationFlatDictionary,
 		dictionaryName: string,
-		dictionary: UmbTranslationsDictionary['value']
+		dictionary: UmbLocalizationDictionary['value'],
 	) {
 		for (const [key, value] of Object.entries(dictionary)) {
 			innerDictionary[`${dictionaryName}_${key}`] = value;
@@ -115,4 +123,4 @@ export class UmbTranslationRegistry {
 	}
 }
 
-export const umbTranslationRegistry = new UmbTranslationRegistry(umbExtensionsRegistry);
+export const umbLocalizationRegistry = new UmbLocalizationRegistry(umbExtensionsRegistry);

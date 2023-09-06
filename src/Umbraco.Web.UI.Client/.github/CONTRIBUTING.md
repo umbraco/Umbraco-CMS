@@ -34,8 +34,7 @@ The frontend has an API formatter that takes the OpenAPI schema file and convert
 
 ### Caveats
 
-1. There is currently no way to add translations. All texts in the UI are expected to be written in Umbraco’s default language of English.
-2. The backoffice can be run and tested against a real Umbraco instance by cloning down the `v14/dev` branch, but there are no guarantees about how well it works yet.
+1. The backoffice can be run and tested against a real Umbraco instance by cloning down the `v14/dev` branch, but there are no guarantees about how well it works yet.
 
 **Current schema for API:**
 

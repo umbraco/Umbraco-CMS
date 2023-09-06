@@ -1,16 +1,16 @@
 import { aTimeout, expect } from '@open-wc/testing';
-import { UmbTranslationRegistry } from './translation.registry.js';
-import { ManifestTranslations, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLocalizationRegistry } from './localization.registry.js';
+import { ManifestLocalization, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-//#region Translations
-const english: ManifestTranslations = {
-	type: 'translations',
+//#region Localizations
+const english: ManifestLocalization = {
+	type: 'localization',
 	alias: 'test.en',
 	name: 'Test English',
 	meta: {
 		culture: 'en-us',
 		direction: 'ltr',
-		translations: {
+		localizations: {
 			general: {
 				close: 'Close',
 				logout: 'Log out',
@@ -26,13 +26,13 @@ const english: ManifestTranslations = {
 	},
 };
 
-const englishOverride: ManifestTranslations = {
-	type: 'translations',
+const englishOverride: ManifestLocalization = {
+	type: 'localization',
 	alias: 'test.en.override',
 	name: 'Test English',
 	meta: {
 		culture: 'en-us',
-		translations: {
+		localizations: {
 			general: {
 				close: 'Close 2',
 			},
@@ -40,13 +40,13 @@ const englishOverride: ManifestTranslations = {
 	},
 };
 
-const danish: ManifestTranslations = {
-	type: 'translations',
+const danish: ManifestLocalization = {
+	type: 'localization',
 	alias: 'test.da',
 	name: 'Test Danish',
 	meta: {
 		culture: 'da',
-		translations: {
+		localizations: {
 			general: {
 				close: 'Luk',
 				notOnRegional: 'Not on regional',
@@ -55,13 +55,13 @@ const danish: ManifestTranslations = {
 	},
 };
 
-const danishRegional: ManifestTranslations = {
-	type: 'translations',
+const danishRegional: ManifestLocalization = {
+	type: 'localization',
 	alias: 'test.da-DK',
 	name: 'Test Danish (Denmark)',
 	meta: {
 		culture: 'da-dk',
-		translations: {
+		localizations: {
 			general: {
 				close: 'Luk',
 			},
@@ -75,16 +75,16 @@ describe('UmbLocalizeController', () => {
 	umbExtensionsRegistry.register(danish);
 	umbExtensionsRegistry.register(danishRegional);
 
-	let registry: UmbTranslationRegistry;
+	let registry: UmbLocalizationRegistry;
 
 	beforeEach(async () => {
-		registry = new UmbTranslationRegistry(umbExtensionsRegistry);
+		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
 		registry.loadLanguage(english.meta.culture);
 		await aTimeout(0);
 	});
 
 	afterEach(() => {
-		registry.translations.clear();
+		registry.localizations.clear();
 	});
 
 	it('should set the document language and direction', async () => {
@@ -93,9 +93,9 @@ describe('UmbLocalizeController', () => {
 	});
 
 	it('should load translations for the current language', async () => {
-		expect(registry.translations.has(english.meta.culture)).to.be.true;
+		expect(registry.localizations.has(english.meta.culture)).to.be.true;
 
-		const current = registry.translations.get(english.meta.culture);
+		const current = registry.localizations.get(english.meta.culture);
 		expect(current).to.have.property('general_close', 'Close'); // Also tests that the translation is flattened.
 		expect(current).to.have.property('general_logout', 'Log out');
 	});
@@ -105,7 +105,7 @@ describe('UmbLocalizeController', () => {
 
 		await aTimeout(0);
 
-		const current = registry.translations.get(english.meta.culture);
+		const current = registry.localizations.get(english.meta.culture);
 		expect(current).to.have.property('general_close', 'Close 2');
 		expect(current).to.have.property('general_logout', 'Log out');
 	});
@@ -116,10 +116,10 @@ describe('UmbLocalizeController', () => {
 		await aTimeout(0);
 
 		// Check that the new language is loaded.
-		expect(registry.translations.has(danish.meta.culture)).to.be.true;
+		expect(registry.localizations.has(danish.meta.culture)).to.be.true;
 
 		// Check that the new language has the correct translations.
-		const current = registry.translations.get(danish.meta.culture);
+		const current = registry.localizations.get(danish.meta.culture);
 		expect(current).to.have.property('general_close', 'Luk');
 	});
 
@@ -129,7 +129,7 @@ describe('UmbLocalizeController', () => {
 		await aTimeout(0);
 
 		// Check that both the regional and the base language is loaded.
-		expect(registry.translations.has(danishRegional.meta.culture), 'expected "da-dk" to be present').to.be.true;
-		expect(registry.translations.has(danish.meta.culture), 'expected "da" to be present').to.be.true;
+		expect(registry.localizations.has(danishRegional.meta.culture), 'expected "da-dk" to be present').to.be.true;
+		expect(registry.localizations.has(danish.meta.culture), 'expected "da" to be present').to.be.true;
 	});
 });
