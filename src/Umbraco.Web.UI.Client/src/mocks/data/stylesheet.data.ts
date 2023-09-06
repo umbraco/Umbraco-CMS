@@ -258,7 +258,7 @@ ${rule.selector} {
 
 		// TODO: revisit this code, seems like something we can solve smarter/type safer now:
 		const itemKeys = Object.keys(item);
-		const newItem = {...item};
+		const newItem = { ...item };
 
 		for (const [key] of Object.entries(updateItem)) {
 			if (itemKeys.indexOf(key) !== -1) {
@@ -267,7 +267,7 @@ ${rule.selector} {
 				newItem[key] = updateItem[key];
 			}
 		}
-		// Specific to stylesheet, we need to update path based on name:
+		// Specific to fileSystem, we need to update path based on name:
 		const dirName = updateItem.existingPath?.substring(0, updateItem.existingPath.lastIndexOf('/'));
 		newItem.path = `${dirName}${dirName ? '/' : ''}${updateItem.name}`;
 
