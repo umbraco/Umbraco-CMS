@@ -63,7 +63,7 @@ public class DeliveryApiSettings
     ///     Gets a value indicating if any member authorization type is enabled for the Delivery API.
     /// </summary>
     /// <remarks>
-    ///     This method is intended for future extension - see remark in <see cref="MemberAuthorizationSettings"/>
+    ///     This method is intended for future extension - see remark in <see cref="MemberAuthorizationSettings"/>.
     /// </remarks>
     public bool MemberAuthorizationIsEnabled() => MemberAuthorization?.AuthorizationCodeFlow?.Enabled is true;
 
@@ -118,7 +118,6 @@ public class DeliveryApiSettings
     /// </summary>
     public class AuthorizationCodeFlowSettings
     {
-        private const bool StaticEnabled = false;
 
         /// <summary>
         ///     Gets or sets a value indicating whether Authorization Code Flow should be enabled for the Delivery API.

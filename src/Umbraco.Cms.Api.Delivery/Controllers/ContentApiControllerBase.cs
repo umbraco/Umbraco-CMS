@@ -47,12 +47,12 @@ public abstract class ContentApiControllerBase : DeliveryApiControllerBase
         };
 
     /// <summary>
-    /// Creates a 403 Forbidden result
+    ///     Creates a 403 Forbidden result.
     /// </summary>
     /// <remarks>
-    /// Use this method instead of <see cref="ControllerBase.Forbid()"/> on the controller base. The latter will yield
-    /// a redirect to an access denied URL because of the default cookie auth scheme. This method ensures that a proper
-    /// 403 Forbidden status code is returned to the client.
+    ///     Use this method instead of <see cref="ControllerBase.Forbid()"/> on the controller base. The latter will yield
+    ///     a redirect to an access denied URL because of the default cookie auth scheme. This method ensures that a proper
+    ///     403 Forbidden status code is returned to the client.
     /// </remarks>
     protected IActionResult Forbidden() => new StatusCodeResult(StatusCodes.Status403Forbidden);
 }

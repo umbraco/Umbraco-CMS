@@ -51,8 +51,8 @@ public class MemberController : DeliveryApiControllerBase
     public async Task<IActionResult> Authorize()
     {
         // in principle this is not necessary for now, since the member application has been removed, thus making
-        // the member client ID invalid for the authentication code flow. however, if we ever add additional flows
-        // to the API, we should perform this check, so we might as well include it up front.
+        // the member client ID invalid for the authentication code flow. However, if we ever add additional flows
+        // to the API, we should perform this check, so we might as well include it upfront.
         if (_deliveryApiSettings.MemberAuthorizationIsEnabled() is false)
         {
             return BadRequest("Member authorization is not allowed.");
@@ -62,7 +62,7 @@ public class MemberController : DeliveryApiControllerBase
         OpenIddictRequest? request = context.GetOpenIddictServerRequest();
         if (request is null)
         {
-            return BadRequest("Unable to obtain OpenID data from the current request");
+            return BadRequest("Unable to obtain OpenID data from the current request.");
         }
 
         // make sure this endpoint ONLY handles member authentication

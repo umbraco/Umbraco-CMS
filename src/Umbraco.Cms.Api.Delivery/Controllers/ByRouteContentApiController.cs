@@ -87,6 +87,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IApiContentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByRoute(string path = "")
     {
