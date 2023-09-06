@@ -11,7 +11,6 @@ import {
 	repeat,
 } from '@umbraco-cms/backoffice/external/lit';
 import {
-	UUITextStyles,
 	FormControlMixin,
 	UUIInputElement,
 	UUIInputEvent,
@@ -247,7 +246,6 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			#wrapper {
 				box-sizing: border-box;

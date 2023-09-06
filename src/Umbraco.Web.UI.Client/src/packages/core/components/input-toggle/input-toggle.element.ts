@@ -1,5 +1,5 @@
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin, UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin, UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-toggle')
@@ -58,7 +58,6 @@ export class UmbInputToggleElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			uui-toggle {
 				width: 100%;

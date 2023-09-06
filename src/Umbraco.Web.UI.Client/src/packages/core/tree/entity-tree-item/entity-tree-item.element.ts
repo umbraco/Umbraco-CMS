@@ -1,6 +1,6 @@
 import { UmbEntityTreeItemContext } from './entity-tree-item.context.js';
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
@@ -41,7 +41,7 @@ export class UmbEntityTreeItemElement extends UmbLitElement implements UmbTreeIt
 		return html`<umb-tree-item-base></umb-tree-item-base>`;
 	}
 
-	static styles = [UUITextStyles, css``];
+	static styles = [UmbTextStyles, css``];
 }
 
 declare global {

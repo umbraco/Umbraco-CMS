@@ -1,6 +1,6 @@
 import { UmbFileSystemTreeItemContext } from './file-system-tree-item.context.js';
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import {
@@ -49,7 +49,7 @@ export class UmbFileSystemTreeItemElement extends UmbLitElement implements UmbTr
 		return html`<umb-tree-item-base></umb-tree-item-base>`;
 	}
 
-	static styles = [UUITextStyles, css``];
+	static styles = [UmbTextStyles, css``];
 }
 
 declare global {

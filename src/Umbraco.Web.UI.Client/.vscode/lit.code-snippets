@@ -3,7 +3,7 @@
 		"prefix": "lit new",
 		"scope": "typescript",
 		"body": [
-			"import { UUITextStyles } from '@umbraco-ui/uui-css';",
+			"import { UmbTextStyles } from '@umbraco-ui/backoffice/style';",
 			"import { css, html } from 'lit';",
 			"import { customElement } from 'lit/decorators.js';",
 			"import { UmbLitElement } from '@umbraco-cms/internal/lit-element';",
@@ -14,7 +14,7 @@
 			"\t\treturn html`${0:umb-${TM_FILENAME_BASE/(.*)\\..+$/$1/}}`;",
 			"\t}",
 			"",
-			"\tstatic styles = [UUITextStyles, css``];",
+			"\tstatic styles = [UmbTextStyles, css``];",
 			"}",
 			"",
 			"export default Umb${TM_FILENAME_BASE/(.*)\\..+$/${1:/pascalcase}/}Element",

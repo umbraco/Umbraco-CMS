@@ -2,7 +2,7 @@ import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.c
 import type { UmbInputTemplateElement } from '../../../../../templating/templates/components/input-template/input-template.element.js';
 import '../../../../../templating/templates/components/input-template/input-template.element.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -73,7 +73,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

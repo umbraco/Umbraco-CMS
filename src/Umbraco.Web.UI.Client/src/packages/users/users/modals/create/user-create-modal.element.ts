@@ -1,8 +1,9 @@
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserGroupInputElement } from '../../../user-groups/components/input-user-group/user-group-input.element.js';
 import { UmbUserRepository } from '../../repository/user.repository.js';
 import { UmbUserDetail } from '../../types.js';
 import { css, html, nothing, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
 // TODO: we need to import this from the user group module when it is ready
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import {
@@ -124,7 +125,7 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 	private _renderPostCreate() {
 		if (!this._createdUser) return nothing;
 
-		return html`<div>
+		return html`<div class="uui-text">
 			<h1><b style="color: var(--uui-color-interactive-emphasis)">${this._createdUser.name}</b> has been created</h1>
 			<p>The new user has successfully been created. To log in to Umbraco use the password below</p>
 
@@ -133,7 +134,7 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 				id="password"
 				label="password"
 				name="password"
-				value="${this._createdUserInitialPassword}"
+				value="${this._createdUserInitialPassword ?? ''}"
 				readonly>
 				<!-- The button should be placed in the append part of the input, but that doesn't work with password inputs for now. -->
 				<uui-button slot="prepend" compact label="copy" @click=${this.#copyPassword}></uui-button>
@@ -177,7 +178,7 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: flex;

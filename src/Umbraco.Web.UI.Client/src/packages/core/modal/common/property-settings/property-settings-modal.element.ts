@@ -1,8 +1,8 @@
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UUIBooleanInputEvent,
 	UUIInputEvent,
 	UUISelectEvent,
-	UUITextStyles,
 } from '@umbraco-cms/backoffice/external/uui';
 import { PropertyValueMap, css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
@@ -313,7 +313,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				color: var(--uui-color-text);

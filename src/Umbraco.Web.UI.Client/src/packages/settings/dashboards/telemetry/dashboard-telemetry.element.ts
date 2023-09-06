@@ -1,5 +1,5 @@
 import { css, html, customElement, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
-import { UUIButtonState, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import {
 	TelemetryResponseModel,
 	TelemetryLevelModel,
@@ -8,6 +8,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-dashboard-telemetry')
 export class UmbDashboardTelemetryElement extends UmbLitElement {
@@ -104,15 +105,15 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 				min="1"
 				max=${this._telemetryLevels.length}
 				hide-step-values></uui-slider>
-			<h2>${this._selectedTelemetry.telemetryLevel}</h2>
+			<h2 class="uui-h3">${this._selectedTelemetry.telemetryLevel}</h2>
 			<p>${unsafeHTML(this._selectedTelemetryDescription)}</p>
 		`;
 	}
 
 	render() {
 		return html`
-			<uui-box>
-				<h1>Consent for telemetry data</h1>
+			<uui-box class="uui-text">
+				<h1 class="uui-h2">Consent for telemetry data</h1>
 				<div style="max-width:75ch">
 					<p>
 						In order to improve Umbraco and add new functionality based on as relevant information as possible, we would
@@ -139,7 +140,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

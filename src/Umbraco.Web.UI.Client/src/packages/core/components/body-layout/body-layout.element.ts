@@ -1,3 +1,4 @@
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import {
 	css,
 	html,
@@ -8,7 +9,6 @@ import {
 	state,
 	query,
 } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 
 //TODO: Add the following attributes to JSDocs: header-transparent, main-no-padding, header-no-padding, header-fit-height
 
@@ -129,7 +129,7 @@ export class UmbBodyLayoutElement extends LitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: flex;
@@ -175,7 +175,7 @@ export class UmbBodyLayoutElement extends LitElement {
 			}
 
 			:host([header-transparent]:not([main-no-padding])) #main:not(*[style='display: none'] + *) {
-				/* The following styling is only applied if the clear-header IS present, 
+				/* The following styling is only applied if the clear-header IS present,
 				the main-no-padding attribute is NOT present, and the header is NOT hidden */
 				padding-top: var(--uui-size-space-1);
 			}

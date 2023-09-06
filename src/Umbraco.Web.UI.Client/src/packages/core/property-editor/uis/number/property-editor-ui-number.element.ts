@@ -1,5 +1,5 @@
 import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
@@ -41,7 +41,7 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			uui-input {
 				width: 100%;

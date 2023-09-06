@@ -3,7 +3,7 @@ import { UmbUserRepository } from '../repository/user.repository.js';
 import { UmbUserGroupInputElement } from '../../user-groups/components/input-user-group/user-group-input.element.js';
 import { type UmbUserDetail } from '../index.js';
 import { UmbUserWorkspaceContext } from './user-workspace.context.js';
-import { UUIInputElement, UUIInputEvent, UUISelectElement, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement, UUIInputEvent, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
 	html,
@@ -26,6 +26,7 @@ import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-user-workspace-editor')
 export class UmbUserWorkspaceEditorElement extends UmbLitElement {
@@ -170,7 +171,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		if (!this._user) return html`User not found`;
 
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.User">
+			<umb-workspace-editor alias="Umb.Workspace.User" class="uui-text">
 				${this.#renderHeader()}
 				<div id="main">
 					<div id="left-column">${this.#renderLeftColumn()}</div>
@@ -361,7 +362,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

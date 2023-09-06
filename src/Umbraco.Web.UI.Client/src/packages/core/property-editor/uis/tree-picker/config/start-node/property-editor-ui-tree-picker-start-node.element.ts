@@ -1,5 +1,5 @@
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -17,7 +17,7 @@ export class UmbPropertyEditorUITreePickerStartNodeElement extends UmbLitElement
 		return html`<div>umb-property-editor-ui-tree-picker-start-node</div>`;
 	}
 
-	static styles = [UUITextStyles];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUITreePickerStartNodeElement;

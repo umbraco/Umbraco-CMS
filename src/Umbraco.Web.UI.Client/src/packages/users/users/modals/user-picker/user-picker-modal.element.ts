@@ -1,5 +1,5 @@
 import { UmbUserRepository } from '../../repository/user.repository.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbUserPickerModalData, UmbUserPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
@@ -82,7 +82,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			uui-avatar {
 				border: 2px solid var(--uui-color-surface);

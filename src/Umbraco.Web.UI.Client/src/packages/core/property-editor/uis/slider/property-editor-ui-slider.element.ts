@@ -1,6 +1,6 @@
 import { UmbInputSliderElement } from '../../../components/input-slider/input-slider.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
@@ -71,7 +71,7 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 			@change="${this._onChange}"></umb-input-slider>`;
 	}
 
-	static styles = [UUITextStyles];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUISliderElement;

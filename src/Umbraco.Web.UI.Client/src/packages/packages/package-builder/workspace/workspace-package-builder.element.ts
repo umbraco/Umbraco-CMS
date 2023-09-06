@@ -2,7 +2,6 @@ import type { UmbInputDocumentElement } from '../../../documents/documents/compo
 import type { UmbInputMediaElement } from '../../../media/media/components/input-media/input-media.element.js';
 import type { UmbInputLanguagePickerElement } from '../../../settings/languages/components/input-language-picker/input-language-picker.element.js';
 import {
-	UUITextStyles,
 	UUIBooleanInputEvent,
 	UUIInputElement,
 	UUIInputEvent,
@@ -22,6 +21,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-workspace-package-builder')
 export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
@@ -276,7 +276,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

@@ -1,5 +1,5 @@
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 import '../collection/views/table/user-collection-table-view.element.js';
@@ -29,7 +29,7 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				height: 100%;

@@ -1,4 +1,4 @@
-import { UUITextStyles, type UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
+import { type UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	PropertyValueMap,
 	css,
@@ -146,7 +146,6 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				display: flex;

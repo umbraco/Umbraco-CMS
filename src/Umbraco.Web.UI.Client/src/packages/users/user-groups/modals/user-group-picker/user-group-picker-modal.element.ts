@@ -1,5 +1,5 @@
 import type { UmbUserGroupRepository } from '../../repository/user-group.repository.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
@@ -86,7 +86,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 		`;
 	}
 
-	static styles = [UUITextStyles, css``];
+	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbUserGroupPickerModalElement;

@@ -1,5 +1,5 @@
 import { UmbUserGroupCollectionContext } from './user-group-collection.context.js';
-import { UUITextStyles, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -31,7 +31,6 @@ export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
 		`;
 	}
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				height: 100%;

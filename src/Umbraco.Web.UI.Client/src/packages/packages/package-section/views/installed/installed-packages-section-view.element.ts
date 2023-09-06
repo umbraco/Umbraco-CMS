@@ -2,7 +2,7 @@ import { UmbPackageRepository } from '../../../package/repository/package.reposi
 import type { UmbPackageWithMigrationStatus } from '../../../types.js';
 import { html, css, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbSectionViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -108,7 +108,7 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implem
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

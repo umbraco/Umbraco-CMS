@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, CSSResultGroup, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbModalManagerContext,
@@ -50,7 +50,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	}
 
 	static styles: CSSResultGroup = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			uui-button {
 				font-size: 14px;

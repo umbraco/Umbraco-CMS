@@ -1,6 +1,6 @@
 import { UmbTreeElement } from '../../../tree/tree.element.js';
 import { css, html, nothing, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbLinkPickerConfig,
 	UmbLinkPickerLink,
@@ -170,7 +170,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			hr {
 				border: none;

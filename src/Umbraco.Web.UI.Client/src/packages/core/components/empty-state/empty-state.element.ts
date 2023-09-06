@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-empty-state')
@@ -22,7 +22,7 @@ export class UmbEmptyStateElement extends LitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

@@ -1,6 +1,6 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
  */
 @customElement('{{ extensionTagName extensionType name }}')
 export class {{className extensionType name }} extends UmbLitElement {
-	static styles = [UUITextStyles];
+	static styles = [UmbTextStyles];
 
 	@property()
 	value = '';

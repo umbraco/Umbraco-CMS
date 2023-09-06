@@ -1,5 +1,5 @@
 import { css, html, customElement, property, state, ifDefined, styleMap } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
@@ -54,7 +54,6 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			uui-textarea {
 				width: 100%;

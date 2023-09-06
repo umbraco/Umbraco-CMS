@@ -1,6 +1,5 @@
 import { UMB_RELATION_TYPE_WORKSPACE_CONTEXT } from '../../relation-type-workspace.context.js';
 import {
-	UUITextStyles,
 	UUIBooleanInputEvent,
 	UUIRadioGroupElement,
 	UUIRadioGroupEvent,
@@ -91,7 +90,6 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				display: block;
