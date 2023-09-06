@@ -109,7 +109,7 @@ export class UmbScriptsRepository
 			id: null,
 			path: null,
 			type: SCRIPTS_ROOT_ENTITY_TYPE,
-			name: 'Partial Views',
+			name: 'Scripts',
 			icon: 'umb:folder',
 			hasChildren: true,
 		};
