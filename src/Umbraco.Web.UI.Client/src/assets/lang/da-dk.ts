@@ -1,4 +1,4 @@
-import type { UmbTranslationsDictionary } from '@umbraco-cms/backoffice/localization-api';
+import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localization-api';
 
 export default {
 	actions: {
@@ -3243,4 +3243,4 @@ export default {
 			'\n      Sets the cached artifact signatures for all entities within the Umbraco environment.\n      This can be used when signatures have been cleared and you want to ensure they are pre-generated before attempting a potentially long-running restore or transfer operation.\n    ',
 		setSignatures: 'Set Signatures',
 	},
-} as UmbTranslationsDictionary;
+} as UmbLocalizationDictionary;

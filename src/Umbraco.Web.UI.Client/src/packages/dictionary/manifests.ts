@@ -1,4 +1,4 @@
-import { manifests as translationSectionManifests } from './section.manifest.js';
+import { manifests as dictionarySectionManifests } from './section.manifest.js';
 import { manifests as dictionaryManifests } from './dictionary/manifests.js';
 
-export const manifests = [...translationSectionManifests, ...dictionaryManifests];
+export const manifests = [...dictionarySectionManifests, ...dictionaryManifests];

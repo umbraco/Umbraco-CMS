@@ -1,5 +1,5 @@
 import type { UmbAppErrorElement } from './app-error.element.js';
-import { umbTranslationRegistry } from '@umbraco-cms/backoffice/localization';
+import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 import { UMB_AUTH, UmbAuthFlow, UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { UMB_APP, UmbAppContext } from '@umbraco-cms/backoffice/context';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
@@ -77,7 +77,7 @@ export class UmbAppElement extends UmbLitElement {
 
 	#setLanguage() {
 		if (this.lang) {
-			umbTranslationRegistry.loadLanguage(this.lang);
+			umbLocalizationRegistry.loadLanguage(this.lang);
 		}
 	}
 
@@ -86,14 +86,14 @@ export class UmbAppElement extends UmbLitElement {
 		// just in case the user language is not the default language.
 		// We **need** to do this because the default language (typically en-us) holds all the fallback keys for all the other languages.
 		// This way we can ensure that the document language is always loaded first and subsequently registered as the fallback language.
-		umbTranslationRegistry.isDefaultLoaded.subscribe((isDefaultLoaded) => {
+		umbLocalizationRegistry.isDefaultLoaded.subscribe((isDefaultLoaded) => {
 			if (!isDefaultLoaded) return;
 			this.observe(
 				authContext.languageIsoCode,
 				(currentLanguageIsoCode) => {
-					umbTranslationRegistry.loadLanguage(currentLanguageIsoCode);
+					umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
 				},
-				'languageIsoCode'
+				'languageIsoCode',
 			);
 		});
 	}
