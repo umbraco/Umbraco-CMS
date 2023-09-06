@@ -8,7 +8,6 @@ import {
 	InterpolateRichTextStylesheetRequestModel,
 	PagedFileSystemTreeItemPresentationModel,
 	PagedStylesheetOverviewResponseModel,
-	RichTextRuleModel,
 	StylesheetResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 

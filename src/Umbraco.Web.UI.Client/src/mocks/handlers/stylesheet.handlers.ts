@@ -3,7 +3,6 @@ import { umbStylesheetData } from '../data/stylesheet.data.js';
 import {
 	CreateTextFileViewModelBaseModel,
 	ExtractRichTextStylesheetRulesRequestModel,
-	ExtractRichTextStylesheetRulesResponseModel,
 	InterpolateRichTextStylesheetRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -55,7 +54,7 @@ const detailHandlers = [
 	rest.put(umbracoPath('/stylesheet'), (req, res, ctx) => {
 		const requestBody = req.json() as CreateTextFileViewModelBaseModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		const response = umbStylesheetData.updateData(requestBody);
+		umbStylesheetData.updateData(requestBody);
 		return res(ctx.status(200));
 	}),
 	rest.get(umbracoPath('/v1/stylesheet/all'), (req, res, ctx) => {
