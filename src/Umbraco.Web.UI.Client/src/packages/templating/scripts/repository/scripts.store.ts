@@ -7,33 +7,33 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
 
 /**
  * @export
- * @class UmbPartialViewsStore
+ * @class UmbScriptsStore
  * @extends {UmbStoreBase}
- * @description - Data Store for partial views
+ * @description - Data Store for scripts
  */
 export class UmbScriptsStore extends UmbStoreBase {
 	/**
-	 * Creates an instance of UmbPartialViewsStore.
+	 * Creates an instance of UmbScriptsStore.
 	 * @param {UmbControllerHostInterface} host
-	 * @memberof UmbPartialViewsStore
+	 * @memberof UmbScriptsStore
 	 */
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_SCRIPTS_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<TemplateResponseModel>([], (x) => x.id));
 	}
 
 	/**
-	 * Append a partial view to the store
+	 * Append a script to the store
 	 * @param {Template} template
-	 * @memberof UmbPartialViewsStore
+	 * @memberof UmbScriptsStore
 	 */
 	append(template: TemplateResponseModel) {
 		this._data.append([template]);
 	}
 
 	/**
-	 * Removes partial views in the store with the given uniques
+	 * Removes scripts in the store with the given uniques
 	 * @param {string[]} uniques
-	 * @memberof UmbPartialViewsStore
+	 * @memberof UmbScriptsStore
 	 */
 	remove(uniques: string[]) {
 		this._data.remove(uniques);

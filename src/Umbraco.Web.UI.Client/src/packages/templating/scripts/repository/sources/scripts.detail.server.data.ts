@@ -26,7 +26,7 @@ export class UmbScriptsServerDataSource
 	}
 
 	/**
-	 * Fetches a partial view with the given path from the server
+	 * Fetches a script with the given path from the server
 	 * @param {string} path
 	 * @return {*}
 	 * @memberof UmbScriptsDetailServerDataSource
@@ -36,7 +36,7 @@ export class UmbScriptsServerDataSource
 		return tryExecuteAndNotify(this.#host, ScriptResource.getScript({ path }));
 	}
 	/**
-	 * Creates a new partial view
+	 * Creates a new script
 	 *
 	 * @param {CreateScriptRequestModel} requestBody
 	 * @return {*}  {Promise<DataSourceResponse<string>>}
@@ -48,7 +48,7 @@ export class UmbScriptsServerDataSource
 
 	//TODO the parameters here are bit ugly, since unique is already in the request body parameter, but it has to be done to marry the UmbDataSource interface an backend API together... maybe come up with some nicer solution
 	/**
-	 * Updates a partial view
+	 * Updates a script
 	 *
 	 * @param {string} [unique='']
 	 * @param {UpdateScriptRequestModel} requestBody
@@ -59,7 +59,7 @@ export class UmbScriptsServerDataSource
 		return tryExecuteAndNotify(this.#host, ScriptResource.putScript({ requestBody }));
 	}
 	/**
-	 * Deletes a partial view
+	 * Deletes a script
 	 *
 	 * @param {string} path
 	 * @return {*}  {Promise<DataSourceResponse>}

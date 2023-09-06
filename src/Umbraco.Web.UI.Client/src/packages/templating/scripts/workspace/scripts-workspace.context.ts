@@ -4,7 +4,7 @@ import { createObservablePart, UmbBooleanState, UmbDeepState } from '@umbraco-cm
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import { UpdateScriptRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbScriptsWorkspaceContext extends UmbWorkspaceContext<UmbScriptsRepository, ScriptDetails> {
 	getEntityId(): string | undefined {
@@ -16,7 +16,7 @@ export class UmbScriptsWorkspaceContext extends UmbWorkspaceContext<UmbScriptsRe
 	save(): Promise<void> {
 		const script = this.getData();
 
-		if (!script) return Promise.reject('Something went wrong, there is no data for partial view you want to save...');
+		if (!script) return Promise.reject('Something went wrong, there is no data for script view you want to save...');
 		if (this.getIsNew()) {
 			const createRequestBody = {
 				name: script.name,
@@ -29,7 +29,7 @@ export class UmbScriptsWorkspaceContext extends UmbWorkspaceContext<UmbScriptsRe
 			return Promise.resolve();
 		}
 		if (!script.path) return Promise.reject('There is no path');
-		const updateRequestBody: UpdatePartialViewRequestModel = {
+		const updateRequestBody: UpdateScriptRequestModel = {
 			name: script.name,
 			existingPath: script.path,
 			content: script.content,
@@ -50,7 +50,7 @@ export class UmbScriptsWorkspaceContext extends UmbWorkspaceContext<UmbScriptsRe
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.PartialViews', new UmbScriptsRepository(host));
+		super(host, 'Umb.Workspace.Script', new UmbScriptsRepository(host));
 		this.#loadCodeEditor();
 	}
 
@@ -85,13 +85,13 @@ export class UmbScriptsWorkspaceContext extends UmbWorkspaceContext<UmbScriptsRe
 
 	async create(parentKey: string | null, name = 'Empty') {
 		const { data } = await this.repository.createScaffold(parentKey, name);
-		const newPartial = {
+		const script = {
 			...data,
 			name: '',
 			path: parentKey ?? '',
 		};
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next(newPartial);
+		this.#data.next(script);
 	}
 }

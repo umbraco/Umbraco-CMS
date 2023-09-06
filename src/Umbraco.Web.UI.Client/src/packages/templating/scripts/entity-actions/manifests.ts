@@ -16,8 +16,8 @@ import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry
 const scriptsViewActions: Array<ManifestEntityAction> = [
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.PartialView.Delete',
-		name: 'Delete PartialView Entity Action',
+		alias: 'Umb.EntityAction.Scripts.Delete',
+		name: 'Delete Scripts Entity Action',
 		meta: {
 			icon: 'umb:trash',
 			label: 'Delete',
@@ -31,11 +31,11 @@ const scriptsViewActions: Array<ManifestEntityAction> = [
 const scriptsFolderActions: Array<ManifestEntityAction> = [
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.PartialViewFolder.Create.New',
-		name: 'Create PartialView Entity Under Directory Action',
+		alias: 'Umb.EntityAction.ScriptsFolder.Create.New',
+		name: 'Create Scripts Entity Under Directory Action',
 		meta: {
 			icon: 'umb:article',
-			label: 'New empty partial view',
+			label: 'New empty script',
 			api: UmbCreateScriptAction,
 			repositoryAlias: SCRIPTS_REPOSITORY_ALIAS,
 			entityTypes: [SCRIPTS_FOLDER_ENTITY_TYPE, SCRIPTS_ROOT_ENTITY_TYPE],
@@ -43,7 +43,7 @@ const scriptsFolderActions: Array<ManifestEntityAction> = [
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.PartialViewFolder.DeleteFolder',
+		alias: 'Umb.EntityAction.ScriptsFolder.DeleteFolder',
 		name: 'Remove empty folder',
 		meta: {
 			icon: 'umb:trash',
@@ -55,7 +55,7 @@ const scriptsFolderActions: Array<ManifestEntityAction> = [
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.PartialViewFolder.CreateFolder',
+		alias: 'Umb.EntityAction.ScriptsFolder.CreateFolder',
 		name: 'Create empty folder',
 		meta: {
 			icon: 'umb:add',

@@ -8,17 +8,17 @@ export const UMB_SCRIPTS_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbScrip
 );
 
 /**
- * Tree Store for partial views
+ * Tree Store for scripts
  *
  * @export
- * @class UmbPartialViewsTreeStore
+ * @class 
  * @extends {UmbEntityTreeStore}
  */
 export class UmbScriptsTreeStore extends UmbFileSystemTreeStore {
 	/**
-	 * Creates an instance of UmbPartialViewsTreeStore.
+	 * Creates an instance of UmbScriptsTreeStore.
 	 * @param {UmbControllerHostInterface} host
-	 * @memberof UmbPartialViewsTreeStore
+	 * @memberof UmbScriptsTreeStore
 	 */
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_SCRIPTS_TREE_STORE_CONTEXT_TOKEN.toString());

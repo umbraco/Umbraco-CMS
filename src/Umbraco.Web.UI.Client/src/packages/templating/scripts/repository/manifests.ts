@@ -7,21 +7,21 @@ import { ManifestRepository, ManifestStore, ManifestTreeStore } from '@umbraco-c
 const repository: ManifestRepository = {
 	type: 'repository',
 	alias: SCRIPTS_REPOSITORY_ALIAS,
-	name: 'Partial Views Repository',
+	name: 'Scripts Repository',
 	class: UmbScriptsRepository,
 };
 
 const store: ManifestStore = {
 	type: 'store',
 	alias: SCRIPTS_STORE_ALIAS,
-	name: 'Partial Views Store',
+	name: 'Scripts Store',
 	class: UmbScriptsStore,
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: SCRIPTS_TREE_STORE_ALIAS,
-	name: 'Partial Views Tree Store',
+	name: 'Scripts Tree Store',
 	class: UmbScriptsTreeStore,
 };
 
