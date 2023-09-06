@@ -37,6 +37,11 @@
         //initializes any watches
         function startWatches(content) {
 
+            $scope.$watchGroup(['culture', 'segment'],
+            function (value, oldValue) {
+                createPreviewButton($scope.content, value[0], value[1]);
+            });
+
             //watch for changes to isNew, set the page.isNew accordingly and load the breadcrumb if we can
             $scope.$watch('isNew', function (newVal, oldVal) {
 
@@ -322,9 +327,18 @@
 
             $scope.defaultButton = buttons.defaultButton;
             $scope.subButtons = buttons.subButtons;
+        }
 
-            // Preview buttons
-            const defaultPreviewUrl = `preview/?id=${content.id}${$scope.culture ? `&culture=${$scope.culture}` : ''}`;
+        /**
+         * Create the preview buttons for the active variant
+         * @param {any} content the content node
+         * @param {string} culture the active culture
+         * @param {string} segment the active segment
+         */
+        function createPreviewButton (content, culture, segment) {
+
+            const compositeId = culture + '_' + segment;
+            const defaultPreviewUrl = `preview/?id=${content.id}${culture ? `&culture=${culture}` : ''}`;
 
             $scope.previewDefaultButton = {
                 alias: 'preview',
@@ -332,12 +346,14 @@
                 labelKey: "buttons_saveAndPreview"
             };
 
-            $scope.previewSubButtons = $scope.content.variants?.[0].additionalPreviewUrls?.map((additionalPreviewUrl) => {
+            const activeVariant = content.variants?.find((variant) => variant.compositeId === compositeId);
+
+            $scope.previewSubButtons = activeVariant?.additionalPreviewUrls?.map((additionalPreviewUrl) => {
                 return {
                     alias: 'preview_' + additionalPreviewUrl.name,
                     label: additionalPreviewUrl.name,
                     // We use target _blank here. If we open the window in the same tab with a 'umb_preview_name' target, we get a cors js error.
-                    handler: () => $scope.preview($scope.content, additionalPreviewUrl.url, '_blank')
+                    handler: () => $scope.preview(content, additionalPreviewUrl.url, '_blank')
                 }
             });
 
