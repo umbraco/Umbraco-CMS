@@ -267,9 +267,9 @@ ${rule.selector} {
 				newItem[key] = updateItem[key];
 			}
 		}
-
 		// Specific to stylesheet, we need to update path based on name:
-		//newItem.path = updateItem.name;
+		const dirName = updateItem.existingPath?.substring(0, updateItem.existingPath.lastIndexOf('/'));
+		newItem.path = `${dirName}${dirName ? '/' : ''}${updateItem.name}`;
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
