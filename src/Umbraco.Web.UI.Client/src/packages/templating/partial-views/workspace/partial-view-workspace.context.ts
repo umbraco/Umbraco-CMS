@@ -30,7 +30,6 @@ export class UmbPartialViewWorkspaceContext extends UmbWorkspaceContext<
 			};
 
 			this.repository.create(createRequestBody);
-			console.log('create');
 			return Promise.resolve();
 		}
 		if (!partialView.path) return Promise.reject('There is no path');

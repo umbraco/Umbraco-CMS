@@ -94,14 +94,13 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			${repeat(
 				this._languages,
 				(language) => language.isoCode,
-				(language) =>
-					html`
-						<uui-menu-item
-							label=${ifDefined(language.name)}
-							@click-label=${this.#onLabelClick}
-							data-iso-code=${ifDefined(language.isoCode)}
-							?active=${language.isoCode === this._appLanguage?.isoCode}></uui-menu-item>
-					`
+				(language) => html`
+					<uui-menu-item
+						label=${ifDefined(language.name)}
+						@click-label=${this.#onLabelClick}
+						data-iso-code=${ifDefined(language.isoCode)}
+						?active=${language.isoCode === this._appLanguage?.isoCode}></uui-menu-item>
+				`,
 			)}
 		</div>`;
 	}
@@ -127,6 +126,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 				align-items: center;
 				justify-content: space-between;
 				cursor: pointer;
+				font-family: inherit;
 			}
 
 			#toggle:hover {
