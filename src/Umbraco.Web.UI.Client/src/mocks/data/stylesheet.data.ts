@@ -169,7 +169,6 @@ class UmbStylesheetData extends UmbEntityData<StylesheetDBItem> {
 		}
 		const { content } = await requestBody;
 		if (!content) return { rules: [] };
-
 		const rules = [...content.matchAll(regex)].map((match) => match.groups);
 		return { rules };
 	}
@@ -180,25 +179,23 @@ class UmbStylesheetData extends UmbEntityData<StylesheetDBItem> {
 			throw Error('No request body');
 		}
 		const { content, rules } = requestBody;
-
 		if (!content && !rules) return { content: '' };
-
-		console.log(content);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		//@ts-ignore
-		// eslint-disable-next-line no-unsafe-optional-chaining
 		const cleanedContent = content?.replaceAll(regex, '');
 
-		const newContent = rules?.map(
-			(rule) =>
-				`/**umb_name:${rule.name}*/
+		const newContent = rules
+			?.map(
+				(rule) =>
+					`/**umb_name:${rule.name}*/
 		${rule.selector} {
 			${rule.styles}
 		}
 		${cleanedContent}	
 		`,
-		);
+			)
+			.join('');
 
 		return { content: newContent };
 	}

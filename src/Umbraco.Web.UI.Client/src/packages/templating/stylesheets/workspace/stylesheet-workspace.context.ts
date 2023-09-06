@@ -54,6 +54,8 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 
 	updateRule(unique: string, rule: RichTextRuleModelSortable) {
 		this.#rules.updateOne(unique, rule);
+		this.sendRulesGetContent();
+
 	}
 
 	setRules(rules: RichTextRuleModelSortable[]) {
@@ -92,7 +94,6 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 			content: this.getData()?.content,
 			rules: this.getRules(),
 		};
-
 		const { data } = await this.repository.interpolateStylesheetRules(requestBody);
 		this.setContent(data?.content ?? '');
 	}

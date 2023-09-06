@@ -84,8 +84,8 @@ const rulesHandlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.post(umbracoPath('/stylesheet/rich-text/interpolate-rules'), (req, res, ctx) => {
-		const requestBody = req.json() as InterpolateRichTextStylesheetRequestModel;
+	rest.post(umbracoPath('/stylesheet/rich-text/interpolate-rules'), async (req, res, ctx) => {
+		const requestBody = (await req.json()) as InterpolateRichTextStylesheetRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		const response = umbStylesheetData.interpolateRules({ requestBody });
 		return res(ctx.status(200), ctx.json(response));
