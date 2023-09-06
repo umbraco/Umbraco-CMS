@@ -208,7 +208,6 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 			? html`<umb-property-action-menu
 					slot="property-action-menu"
 					id="property-action-menu"
-					.propertyAlias=${this._alias}
 					.propertyEditorUiAlias=${this._propertyEditorUiAlias}
 					.value=${this._value}></umb-property-action-menu>`
 			: ''}`;

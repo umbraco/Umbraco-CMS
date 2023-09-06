@@ -46,11 +46,11 @@ export class UmbDocumentVariantContext extends UmbBaseController implements UmbV
 
 
 
-	constructor(host: UmbControllerHost, workspace: UmbDocumentWorkspaceContext, variantId: UmbVariantId) {
+	constructor(host: UmbControllerHost, workspace: UmbDocumentWorkspaceContext, variantId?: UmbVariantId) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
 		super(host, 'variantContext');
 		this.#workspace = workspace;
-		this.#variantId = variantId;
+		this.#variantId = variantId ?? UmbVariantId.CreateInvariant();
 
 		this.observe(
 			this.#workspace.variantById(this.#variantId),

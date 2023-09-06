@@ -1,4 +1,3 @@
-import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../../settings/data-types/workspace/data-type-workspace.context.js';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
@@ -35,8 +34,8 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (instance) => {
-			this.#variantContext = instance.createInvariantVariantContext(this);
+		this.consumeContext(UMB_DATA_TYPE_VARIANT_CONTEXT, (instance) => {
+			this.#variantContext = instance;
 			this.observe(this.#variantContext.properties, (properties) => {
 				this._properties = properties as Array<PropertyEditorConfigProperty>;
 			}, 'observeProperties');

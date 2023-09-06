@@ -60,4 +60,5 @@ export abstract class UmbWorkspaceContext<RepositoryType, EntityType extends Umb
 	abstract getEntityType(): string; // TODO: consider of this should be on the repository because a repo is responsible for one entity type
 	abstract getData(): EntityType | undefined;
 	abstract save(): Promise<void>;
+
 }

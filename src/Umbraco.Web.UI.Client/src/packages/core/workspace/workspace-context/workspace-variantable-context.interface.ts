@@ -1,10 +1,10 @@
 import type { UmbWorkspaceSplitViewManager } from '../workspace-split-view-manager.class.js';
-import type { UmbVariantContext } from '../variant-context/variant-context.interface.js';
+import { UmbVariantContext } from '../variant-context/variant-context.interface.js';
 import type { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { VariantResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbVariantableWorkspaceContextInterface<EntityType = unknown> extends UmbSaveableWorkspaceContextInterface<EntityType> {
 
@@ -24,6 +24,5 @@ export interface UmbVariantableWorkspaceContextInterface<EntityType = unknown> e
 	setPropertyValue(alias: string, value: unknown, variantId?: UmbVariantId): Promise<void>;
 	//propertyDataByAlias(alias: string, variantId?: UmbVariantId): Observable<ValueModelBaseModel | undefined>;
 
-	// Dataset methods:
-	createVariantVariantContext(host: UmbControllerHost, variantId: UmbVariantId): UmbVariantContext;
+	createVariantContext(host: UmbControllerHost, variantId?: UmbVariantId): UmbVariantContext;
 }
