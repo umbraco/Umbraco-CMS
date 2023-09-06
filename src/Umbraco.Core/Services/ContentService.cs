@@ -1148,10 +1148,6 @@ public class ContentService : RepositoryService, IContentService
         // cannot accept a specific culture for invariant content type (but '*' is ok)
         if (content.ContentType.VariesByCulture())
         {
-            if (cultures.Length == 0)
-            {
-                throw new NotSupportedException("Must supply at least one culture (or wildcard) when publishing variant content types.");
-            }
             if (cultures.Length > 1 && cultures.Contains("*"))
             {
                 throw new NotSupportedException("Cannot combine wildcard and specific cultures when publishing variant content types.");
