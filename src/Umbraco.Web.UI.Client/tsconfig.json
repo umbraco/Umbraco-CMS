@@ -47,6 +47,7 @@
 			"@umbraco-cms/backoffice/repository": ["src/shared/repository"],
 			"@umbraco-cms/backoffice/resources": ["src/shared/resources"],
 			"@umbraco-cms/backoffice/router": ["src/shared/router"],
+			"@umbraco-cms/backoffice/style": ["src/shared/style"],
 			"@umbraco-cms/backoffice/utils": ["src/shared/utils"],
 
 			// CORE

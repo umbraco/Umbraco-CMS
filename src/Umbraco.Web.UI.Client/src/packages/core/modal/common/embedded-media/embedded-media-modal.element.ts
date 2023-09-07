@@ -1,5 +1,5 @@
 import { css, html, unsafeHTML, when, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import {
 	OEmbedResult,
 	OEmbedStatus,
@@ -229,7 +229,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			h3 {
 				margin-left: var(--uui-size-space-5);

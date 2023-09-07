@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -14,7 +14,7 @@ export class UmbPropertyEditorUITinyMceMaxImageSizeConfigurationElement extends 
 		return html`<uui-input type="number" placeholder="Max size" .value=${this.value}></uui-input>`;
 	}
 
-	static styles = [UUITextStyles];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUITinyMceMaxImageSizeConfigurationElement;

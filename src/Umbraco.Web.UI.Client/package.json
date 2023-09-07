@@ -20,6 +20,7 @@
 		"./repository": "./dist-cms/shared/repository/index.js",
 		"./resources": "./dist-cms/shared/resources/index.js",
 		"./router": "./dist-cms/shared/router/index.js",
+		"./style": "./dist-cms/shared/style/index.js",
 		"./utils": "./dist-cms/shared/utils/index.js",
 		"./action": "./dist-cms/packages/core/action/index.js",
 		"./collection": "./dist-cms/packages/core/collection/index.js",

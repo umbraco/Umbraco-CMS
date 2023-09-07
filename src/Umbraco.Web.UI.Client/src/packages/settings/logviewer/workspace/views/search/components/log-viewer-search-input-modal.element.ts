@@ -1,5 +1,5 @@
 import { html, css, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { SavedLogSearchPresenationBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -55,7 +55,6 @@ export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElem
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			uui-input {
 				width: 100%;

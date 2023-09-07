@@ -1,5 +1,5 @@
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -17,7 +17,7 @@ export class UmbPropertyEditorUICollectionViewBulkActionPermissionsElement exten
 		return html`<div>umb-property-editor-ui-collection-view-bulk-action-permissions</div>`;
 	}
 
-	static styles = [UUITextStyles];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUICollectionViewBulkActionPermissionsElement;

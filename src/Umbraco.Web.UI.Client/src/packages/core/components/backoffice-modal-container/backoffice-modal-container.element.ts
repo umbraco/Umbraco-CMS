@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, CSSResultGroup, html, repeat, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbModalContext,
@@ -40,7 +40,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 	}
 
 	static styles: CSSResultGroup = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				position: absolute;

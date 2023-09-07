@@ -1,4 +1,4 @@
-import { UUIButtonState, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbModalManagerContext,
@@ -8,6 +8,7 @@ import {
 import { PublishedCacheResource } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-dashboard-published-status')
 export class UmbDashboardPublishedStatusElement extends UmbLitElement {
@@ -128,6 +129,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	}
 
 	render() {
+		// TODO: Are we supposed to have the debug element here?
 		return html`
 			<umb-debug visible dialog></umb-debug>
 			<uui-box headline="Published Cache Status">
@@ -197,7 +199,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

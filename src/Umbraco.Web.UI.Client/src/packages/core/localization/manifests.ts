@@ -1,10 +1,10 @@
 import { ManifestTypes } from '../extension-registry/index.js';
-import { ManifestTranslations } from '../extension-registry/models/translations.model.js';
+import { ManifestLocalization } from '../extension-registry/models/localization.model.js';
 
-const translationManifests: Array<ManifestTranslations> = [
+const localizationManifests: Array<ManifestLocalization> = [
 	{
-		type: 'translations',
-		alias: 'Umb.Translations.En_US',
+		type: 'localization',
+		alias: 'Umb.Localization.En_US',
 		weight: -100,
 		name: 'English (US)',
 		meta: {
@@ -13,8 +13,8 @@ const translationManifests: Array<ManifestTranslations> = [
 		loader: () => import('../../../assets/lang/en-us.js'),
 	},
 	{
-		type: 'translations',
-		alias: 'Umb.Translations.Da_DK',
+		type: 'localization',
+		alias: 'Umb.Localization.Da_DK',
 		weight: -100,
 		name: 'Dansk (Danmark)',
 		meta: {
@@ -24,4 +24,4 @@ const translationManifests: Array<ManifestTranslations> = [
 	},
 ];
 
-export const manifests: Array<ManifestTypes> = [...translationManifests];
+export const manifests: Array<ManifestTypes> = [...localizationManifests];

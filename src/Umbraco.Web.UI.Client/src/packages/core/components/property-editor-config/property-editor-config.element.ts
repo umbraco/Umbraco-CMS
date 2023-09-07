@@ -1,5 +1,5 @@
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import {
 	PropertyEditorConfigProperty,
 } from '@umbraco-cms/backoffice/extension-registry';
@@ -63,7 +63,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [UUITextStyles];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorConfigElement;

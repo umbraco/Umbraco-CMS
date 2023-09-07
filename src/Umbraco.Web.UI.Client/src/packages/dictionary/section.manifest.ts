@@ -34,10 +34,10 @@ const menuSectionSidebarApp: ManifestTypes = {
 const dashboards: Array<ManifestDashboard> = [
 	{
 		type: 'dashboard',
-		alias: 'Umb.Dashboard.TranslationDictionary',
-		name: 'Dictionary Translation Dashboard',
+		alias: 'Umb.Dashboard.LocalizationDictionary',
+		name: 'Dictionary localization Dashboard',
 		elementName: 'umb-dashboard-translation-dictionary',
-		loader: () => import('./dashboards/dictionary/dashboard-translation-dictionary.element.js'),
+		loader: () => import('./dashboards/dictionary/dashboard-localization-dictionary.element.js'),
 		meta: {
 			label: 'Dictionary overview',
 			pathname: '',

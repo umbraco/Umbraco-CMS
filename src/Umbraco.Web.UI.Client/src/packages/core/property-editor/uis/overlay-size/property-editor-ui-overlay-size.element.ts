@@ -1,5 +1,5 @@
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
@@ -19,7 +19,7 @@ export class UmbPropertyEditorUIOverlaySizeElement extends UmbLitElement impleme
 		return html`<div>umb-property-editor-ui-overlay-size</div>`;
 	}
 
-	static styles = [UUITextStyles];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIOverlaySizeElement;

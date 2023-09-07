@@ -1,6 +1,6 @@
 import { UmbConfigRepository } from '../../repositories/config/config.repository.js';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles, FormControlMixin, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-date')
@@ -142,8 +142,6 @@ export class UmbInputDateElement extends FormControlMixin(UmbLitElement) {
 			.value="${this.displayValue?.replace('Z', '')}">
 		</uui-input>`;
 	}
-
-	static styles = [UUITextStyles, css``];
 }
 
 export default UmbInputDateElement;

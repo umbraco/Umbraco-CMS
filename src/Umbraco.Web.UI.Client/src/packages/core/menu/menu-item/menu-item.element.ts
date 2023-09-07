@@ -1,5 +1,5 @@
 import { html, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { ManifestMenuItem, UmbMenuItemExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -15,7 +15,7 @@ export class UmbMenuItemElement extends UmbLitElement implements UmbMenuItemExte
 			entity-type=${ifDefined(this.manifest.meta.entityType)}></umb-menu-item-base>`;
 	}
 
-	static styles = [UUITextStyles];
+	static styles = [UmbTextStyles];
 }
 
 declare global {

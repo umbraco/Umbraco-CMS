@@ -1,4 +1,4 @@
-import { UUITextStyles, InterfaceColor, InterfaceLook } from '@umbraco-cms/backoffice/external/uui';
+import { InterfaceColor, InterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, LitElement, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { LogLevelModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -36,8 +36,6 @@ export class UmbLogViewerLevelTagElement extends LitElement {
 			>${this.level}<slot></slot
 		></uui-tag>`;
 	}
-
-	static styles = [UUITextStyles, css``];
 }
 
 declare global {

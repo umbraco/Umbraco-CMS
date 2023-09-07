@@ -1,5 +1,5 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from './media-workspace.context.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-media-workspace-editor')
@@ -35,7 +35,7 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

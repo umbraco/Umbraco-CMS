@@ -1,6 +1,6 @@
 import { UmbDataTypeRepository } from '../../repository/data-type.repository.js';
 import { css, html, customElement, property, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import {
 	UmbModalContext,
 	UmbDataTypePickerFlowDataTypePickerModalData,
@@ -128,7 +128,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			uui-box {
 				min-height: 100%;

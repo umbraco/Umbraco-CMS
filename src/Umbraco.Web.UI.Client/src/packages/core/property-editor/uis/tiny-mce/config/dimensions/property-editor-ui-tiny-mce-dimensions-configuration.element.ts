@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -15,7 +15,7 @@ export class UmbPropertyEditorUITinyMceDimensionsConfigurationElement extends Um
 			<uui-input type="number" placeholder="Height" .value=${this.value.height}></uui-input> pixels`;
 	}
 
-	static styles = [UUITextStyles];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUITinyMceDimensionsConfigurationElement;

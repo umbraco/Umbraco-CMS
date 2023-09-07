@@ -1,5 +1,5 @@
 import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 
 /**
  * @element umb-footer-layout
@@ -20,7 +20,7 @@ export class UmbFooterLayoutElement extends LitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: flex;

@@ -5,7 +5,7 @@ import {
 } from '../../../../user-groups/repository/user-group.store.js';
 import type { UmbUserDetail } from '../../../types.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import {
 	UmbTableElement,
 	UmbTableColumn,
@@ -164,7 +164,7 @@ export class UmbUserCollectionTableViewElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: flex;

@@ -1,5 +1,6 @@
-import { UUITextStyles, UUIBooleanInputElement, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUIBooleanInputElement, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-insert-section-checkbox')
 export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
@@ -54,7 +55,7 @@ export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 	render() {
 		return html`
 			${super.render()}
-			<h3 @click=${this.click}>${this.checked ? html`<uui-icon name="umb:check"></uui-icon>` : ''}${this.label}</h3>
+			<h3 class="uui-h3" @click=${this.click}>${this.checked ? html`<uui-icon name="umb:check"></uui-icon>` : ''}${this.label}</h3>
 			<div @click=${this.click}>
 				<slot name="description"><p>here goes some description</p></slot>
 			</div>
@@ -86,7 +87,7 @@ export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 
 	static styles = [
 		...UUIBooleanInputElement.styles,
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

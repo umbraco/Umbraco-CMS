@@ -1,7 +1,7 @@
 import { serverFilePathFromUrlFriendlyPath } from '../../utils.js';
-import { UmbStylesheetWorkspaceEditElement } from './stylesheet-workspace-edit.element.js';
+import { UmbStylesheetWorkspaceEditorElement } from './stylesheet-workspace-editor.element.js';
 import { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -10,23 +10,33 @@ import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/wor
 @customElement('umb-stylesheet-workspace')
 export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbStylesheetWorkspaceContext(this);
-	#element = new UmbStylesheetWorkspaceEditElement();
+	#element = new UmbStylesheetWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: 'edit/:path',
-			component: () => this.#element,
-			setup: (_component, info) => {
-				const path = info.match.params.path;
-				const serverPath = serverFilePathFromUrlFriendlyPath(path);
-				this.#workspaceContext.load(serverPath);
+			path: 'create/:path',
+			component: import('./stylesheet-workspace-editor.element.js'),
+			setup: async (_component, info) => {
+				const path = info.match.params.path === 'null' ? null : info.match.params.path;
+				const serverPath = path === null ? null : serverFilePathFromUrlFriendlyPath(path);
+				await this.#workspaceContext.create(serverPath);
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,
 					this.#workspaceContext,
-					this.shadowRoot!.querySelector('umb-router-slot')!
+					this.shadowRoot!.querySelector('umb-router-slot')!,
 				);
+			},
+		},
+		{
+			path: 'edit/:path',
+			component: import('./stylesheet-workspace-editor.element.js'),
+			setup: (_component, info) => {
+				this.removeControllerByAlias('_observeIsNew');
+				const path = info.match.params.path;
+				const serverPath = serverFilePathFromUrlFriendlyPath(path);
+				this.#workspaceContext.load(serverPath);
 			},
 		},
 	];
@@ -36,7 +46,7 @@ export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

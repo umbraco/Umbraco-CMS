@@ -5,7 +5,7 @@ import { getQuerySnippet } from '../../utils.js';
 import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { camelCase } from '@umbraco-cms/backoffice/external/lodash';
-import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
@@ -216,7 +216,6 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				display: block;

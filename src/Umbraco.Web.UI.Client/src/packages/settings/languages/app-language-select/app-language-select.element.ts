@@ -1,6 +1,6 @@
 import { UmbLanguageRepository } from '../repository/language.repository.js';
 import { UMB_APP_LANGUAGE_CONTEXT_TOKEN, UmbAppLanguageContext } from './app-language.context.js';
-import { UUITextStyles, UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -94,20 +94,18 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			${repeat(
 				this._languages,
 				(language) => language.isoCode,
-				(language) =>
-					html`
-						<uui-menu-item
-							label=${ifDefined(language.name)}
-							@click-label=${this.#onLabelClick}
-							data-iso-code=${ifDefined(language.isoCode)}
-							?active=${language.isoCode === this._appLanguage?.isoCode}></uui-menu-item>
-					`
+				(language) => html`
+					<uui-menu-item
+						label=${ifDefined(language.name)}
+						@click-label=${this.#onLabelClick}
+						data-iso-code=${ifDefined(language.isoCode)}
+						?active=${language.isoCode === this._appLanguage?.isoCode}></uui-menu-item>
+				`,
 			)}
 		</div>`;
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				display: block;
@@ -128,6 +126,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 				align-items: center;
 				justify-content: space-between;
 				cursor: pointer;
+				font-family: inherit;
 			}
 
 			#toggle:hover {

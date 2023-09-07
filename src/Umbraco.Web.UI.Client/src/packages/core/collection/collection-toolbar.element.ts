@@ -1,5 +1,5 @@
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { TooltipMenuItem } from '../components/tooltip-menu/index.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -145,7 +145,7 @@ export class UmbCollectionToolbarElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: flex;

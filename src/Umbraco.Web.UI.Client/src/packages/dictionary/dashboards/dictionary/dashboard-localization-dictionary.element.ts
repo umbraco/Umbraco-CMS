@@ -1,5 +1,5 @@
 import { UmbDictionaryRepository } from '../../dictionary/repository/dictionary.repository.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -177,7 +177,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			#header {
 				display: flex;

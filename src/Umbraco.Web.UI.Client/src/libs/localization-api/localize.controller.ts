@@ -12,14 +12,14 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 import {
-	DefaultTranslationSet,
+	DefaultLocalizationSet,
 	FunctionParams,
-	TranslationSet,
+	LocalizationSet,
 	connectedElements,
 	documentDirection,
 	documentLanguage,
 	fallback,
-	translations,
+	localizations,
 } from './manager.js';
 import { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -42,7 +42,7 @@ const LocalizeControllerAlias = Symbol();
  * }
  * ```
  */
-export class UmbLocalizeController<TranslationType extends TranslationSet = DefaultTranslationSet>
+export class UmbLocalizeController<LocalizationType extends LocalizationSet = DefaultLocalizationSet>
 	implements UmbController
 {
 	#host;
@@ -88,19 +88,19 @@ export class UmbLocalizeController<TranslationType extends TranslationSet = Defa
 		return `${this.#hostEl.lang || documentLanguage}`.toLowerCase();
 	}
 
-	private getTranslationData(lang: string) {
+	private getLocalizationData(lang: string) {
 		const locale = new Intl.Locale(lang);
 		const language = locale?.language.toLowerCase();
 		const region = locale?.region?.toLowerCase() ?? '';
-		const primary = <TranslationType>translations.get(`${language}-${region}`);
-		const secondary = <TranslationType>translations.get(language);
+		const primary = <LocalizationType>localizations.get(`${language}-${region}`);
+		const secondary = <LocalizationType>localizations.get(language);
 
 		return { locale, language, region, primary, secondary };
 	}
 
 	/** Outputs a translated term. */
-	term<K extends keyof TranslationType>(key: K, ...args: FunctionParams<TranslationType[K]>): string {
-		const { primary, secondary } = this.getTranslationData(this.lang());
+	term<K extends keyof LocalizationType>(key: K, ...args: FunctionParams<LocalizationType[K]>): string {
+		const { primary, secondary } = this.getLocalizationData(this.lang());
 		let term: any;
 
 		// Look for a matching term using regionCode, code, then the fallback
@@ -108,8 +108,8 @@ export class UmbLocalizeController<TranslationType extends TranslationSet = Defa
 			term = primary[key];
 		} else if (secondary && secondary[key]) {
 			term = secondary[key];
-		} else if (fallback && fallback[key as keyof TranslationSet]) {
-			term = fallback[key as keyof TranslationSet];
+		} else if (fallback && fallback[key as keyof LocalizationSet]) {
+			term = fallback[key as keyof LocalizationSet];
 		} else {
 			return String(key);
 		}
