@@ -11,7 +11,7 @@ import {
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { ManifestPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestUserPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 
 @customElement('umb-user-group-workspace-editor')
@@ -23,7 +23,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	private _userKeys?: Array<string>;
 
 	@state()
-	private _userPermissions: Array<ManifestPermission> = [];
+	private _userPermissions: Array<ManifestUserPermission> = [];
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 	#modalContext?: UmbModalManagerContext;
@@ -110,7 +110,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
-	#renderPermission(permissionManifest: ManifestPermission) {
+	#renderPermission(permissionManifest: ManifestUserPermission) {
 		return html`<div style="display: flex; align-items:center; border-bottom: 1px solid whitesmoke">
 			<uui-toggle></uui-toggle>
 			<div>

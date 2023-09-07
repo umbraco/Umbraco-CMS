@@ -1,6 +1,6 @@
-import type { ManifestPermission } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 
-const permissions: Array<ManifestPermission> = [
+const permissions: Array<ManifestUserPermission> = [
 	{
 		type: 'userPermission',
 		alias: 'Umb.UserPermission.Document.Browse',
