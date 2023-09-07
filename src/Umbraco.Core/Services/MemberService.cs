@@ -357,7 +357,9 @@ namespace Umbraco.Cms.Core.Services
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
             IQuery<IMember>? query1 = memberTypeAlias == null ? null : Query<IMember>()?.Where(x => x.ContentTypeAlias == memberTypeAlias);
-            IQuery<IMember>? query2 = filter == null ? null : Query<IMember>()?.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter));
+            int.TryParse(filter, out int filterAsIntId);//considering id,key & name as filter param
+            Guid.TryParse(filter, out Guid filterAsGuid);
+            IQuery<IMember>? query2 = filter == null ? null : Query<IMember>()?.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter) || x.Id == filterAsIntId || x.Key ==  filterAsGuid );
             return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, query2, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
         }
 
