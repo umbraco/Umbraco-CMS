@@ -69,7 +69,7 @@ const permissions: Array<ManifestPermission> = [
 		alias: 'Umb.Permission.Document.SendForApproval',
 		name: 'Send Document For Approval Permission',
 		meta: {
-			label: 'Permissions',
+			label: 'Send For Approval',
       description: 'Allow access to send a document for approval before publishing'
 		},
 	},
