@@ -22,10 +22,10 @@ export default class UmbAuthElement extends LitElement {
 	}
 
 	@property({ type: String, attribute: 'background-image' })
-	backgroundImage = '';
+	backgroundImage?: string;
 
 	@property({ type: String, attribute: 'logo-image' })
-	logoImage = '';
+	logoImage?: string;
 
 	@property({ type: Boolean, attribute: 'username-is-email' })
 	usernameIsEmail = false;
