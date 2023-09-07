@@ -11,7 +11,6 @@ import {
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbExtensionElementController } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 
