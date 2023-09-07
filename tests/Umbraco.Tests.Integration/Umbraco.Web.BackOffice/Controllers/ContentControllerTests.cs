@@ -64,7 +64,8 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .WithKeyValue("title", "Cool invariant title")
             .Done()
             .Build();
-        contentService.SaveAndPublish(content);
+        contentService.Save(content);
+        contentService.Publish(content, Array.Empty<string>());
 
         var model = new ContentItemSaveBuilder()
             .WithContent(content)
@@ -122,7 +123,8 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .WithKeyValue("title", "Cool invariant title")
             .Done()
             .Build();
-        contentService.SaveAndPublish(content);
+        contentService.Save(content);
+        contentService.Publish(content, Array.Empty<string>());
 
         var model = new ContentItemSaveBuilder()
             .WithContent(content)
@@ -192,7 +194,8 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .WithKeyValue("title", "Cool invariant title")
             .Done()
             .Build();
-        contentService.SaveAndPublish(content);
+        contentService.Save(content);
+        contentService.Publish(content, Array.Empty<string>());
 
         var model = new ContentItemSaveBuilder()
             .WithId(content.Id)
@@ -257,7 +260,8 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .WithKeyValue("title", "Cool invariant title")
             .Done()
             .Build();
-        contentService.SaveAndPublish(content);
+        contentService.Save(content);
+        contentService.Publish(content, Array.Empty<string>());
         var model = new ContentItemSaveBuilder()
             .WithContent(content)
             .Build();
@@ -318,7 +322,8 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .WithKeyValue("title", "Cool invariant title")
             .Done()
             .Build();
-        contentService.SaveAndPublish(content);
+        contentService.Save(content);
+        contentService.Publish(content, Array.Empty<string>());
 
         content.Name = null; // Removes the name of one of the variants to force an error
         var model = new ContentItemSaveBuilder()
@@ -383,7 +388,8 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .WithKeyValue("title", "Cool invariant title")
             .Done()
             .Build();
-        contentService.SaveAndPublish(content);
+        contentService.Save(content);
+        contentService.Publish(content, content.AvailableCultures.ToArray());
 
         content.CultureInfos[0].Name = null; // Removes the name of one of the variants to force an error
         var model = new ContentItemSaveBuilder()
@@ -487,7 +493,8 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .Build();
 
         var contentService = GetRequiredService<IContentService>();
-        contentService.SaveAndPublish(content);
+        contentService.Save(content);
+        contentService.Publish(content, content.AvailableCultures.ToArray());
 
         var childContent = new ContentBuilder()
             .WithoutIdentity()
@@ -497,7 +504,8 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .WithCultureName(UsIso, "Child")
             .Build();
 
-        contentService.SaveAndPublish(childContent);
+        contentService.Save(childContent);
+        contentService.Publish(childContent, content.AvailableCultures.ToArray());
 
         var grandChildContent = new ContentBuilder()
             .WithoutIdentity()
@@ -643,7 +651,8 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .Build();
 
         var contentService = GetRequiredService<IContentService>();
-        contentService.SaveAndPublish(rootNode);
+        contentService.Save(rootNode);
+        contentService.Publish(rootNode, rootNode.AvailableCultures.ToArray());
 
         var childNode = new ContentBuilder()
             .WithoutIdentity()
@@ -653,7 +662,8 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .WithCultureName(UsIso, "Child")
             .Build();
 
-        contentService.SaveAndPublish(childNode);
+        contentService.Save(childNode);
+        contentService.Publish(childNode, childNode.AvailableCultures.ToArray());
 
         var grandChild = new ContentBuilder()
             .WithoutIdentity()

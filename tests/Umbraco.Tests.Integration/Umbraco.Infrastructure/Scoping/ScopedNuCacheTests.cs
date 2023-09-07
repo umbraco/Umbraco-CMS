@@ -69,7 +69,8 @@ public class ScopedNuCacheTests : UmbracoIntegrationTest
 
         using (var scope = ScopeProvider.CreateScope())
         {
-            ContentService.SaveAndPublish(item);
+            ContentService.Save(item);
+            ContentService.Publish(item, item.AvailableCultures.ToArray());
             scope.Complete();
         }
 
@@ -94,7 +95,8 @@ public class ScopedNuCacheTests : UmbracoIntegrationTest
         using (var scope = ScopeProvider.CreateScope())
         {
             item.Name = "changed";
-            ContentService.SaveAndPublish(item);
+            ContentService.Save(item);
+            ContentService.Publish(item, item.AvailableCultures.ToArray());
 
             if (complete)
             {

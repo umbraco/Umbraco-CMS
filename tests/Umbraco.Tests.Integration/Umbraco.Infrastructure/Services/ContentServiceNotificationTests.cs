@@ -228,7 +228,7 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.SaveAndPublish(document, "fr-FR");
+            ContentService.Publish(document, new[] { "fr-FR" });
             Assert.IsTrue(publishingWasCalled);
             Assert.IsTrue(publishedWasCalled);
         }
@@ -252,6 +252,8 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         var savingWasCalled = false;
         var savedWasCalled = false;
+        var publishingWasCalled = false;
+        var publishedWasCalled = false;
 
         ContentNotificationHandler.SavingContent = notification =>
         {
@@ -274,21 +276,50 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
             var propValue = saved.Properties["title"].Values.First(x => x.Culture == null && x.Segment == null);
 
             Assert.AreEqual("title", propValue.EditedValue);
-            Assert.AreEqual("title", propValue.PublishedValue);
+            Assert.AreEqual(null, propValue.PublishedValue);
 
             savedWasCalled = true;
         };
 
+        ContentNotificationHandler.PublishingContent = notification =>
+        {
+            var publishing = notification.PublishedEntities.First();
+
+            Assert.AreEqual("title", publishing.GetValue<string>("title"));
+
+            publishingWasCalled = true;
+        };
+
+        ContentNotificationHandler.PublishedContent = notification =>
+        {
+            var published = notification.PublishedEntities.First();
+
+            Assert.AreSame("title", document.GetValue<string>("title"));
+
+            // We're only dealing with invariant here.
+            var propValue = published.Properties["title"].Values.First(x => x.Culture == null && x.Segment == null);
+
+            Assert.AreEqual("title", propValue.EditedValue);
+            Assert.AreEqual("title", propValue.PublishedValue);
+
+            publishedWasCalled = true;
+        };
+
         try
         {
-            ContentService.SaveAndPublish(document);
+            ContentService.Save(document);
+            ContentService.Publish(document, document.AvailableCultures.ToArray());
             Assert.IsTrue(savingWasCalled);
             Assert.IsTrue(savedWasCalled);
+            Assert.IsTrue(publishingWasCalled);
+            Assert.IsTrue(publishedWasCalled);
         }
         finally
         {
             ContentNotificationHandler.SavingContent = null;
             ContentNotificationHandler.SavedContent = null;
+            ContentNotificationHandler.PublishingContent = null;
+            ContentNotificationHandler.PublishedContent = null;
         }
     }
 
@@ -301,7 +332,8 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         IContent document = new Content("content", -1, _contentType);
 
-        var result = ContentService.SaveAndPublish(document);
+        ContentService.Save(document);
+        var result = ContentService.Publish(document, document.AvailableCultures.ToArray());
         Assert.IsFalse(result.Success);
         Assert.AreEqual("title", result.InvalidProperties.First().Alias);
 
@@ -324,7 +356,8 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            result = ContentService.SaveAndPublish(document);
+            ContentService.Save(document);
+            result = ContentService.Publish(document, document.AvailableCultures.ToArray());
             Assert.IsTrue(result
                 .Success); // will succeed now because we were able to specify the required value in the Saving event
             Assert.IsTrue(savingWasCalled);
@@ -351,7 +384,8 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
         IContent document = new Content("content", -1, _contentType);
         document.SetCultureName("hello", "en-US");
         document.SetCultureName("bonjour", "fr-FR");
-        ContentService.SaveAndPublish(document);
+        ContentService.Save(document);
+        ContentService.Publish(document, document.AvailableCultures.ToArray());
 
         Assert.IsTrue(document.IsCulturePublished("fr-FR"));
         Assert.IsTrue(document.IsCulturePublished("en-US"));

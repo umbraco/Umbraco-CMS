@@ -69,7 +69,8 @@ public class ContentVariantAllowedActionTests : UmbracoTestServerTestBase
             .Build();
 
         var contentService = GetRequiredService<IContentService>();
-        contentService.SaveAndPublish(rootNode);
+        contentService.Save(rootNode);
+        contentService.Publish(rootNode, new[] { "*" });
 
         ContentItemDisplay? display = UmbracoMapper.Map<ContentItemDisplay>(rootNode, context =>
         {

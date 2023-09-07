@@ -210,15 +210,18 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private IContent CreateBranch()
         {
             Content content1 = ContentBuilder.CreateSimpleContent(_contentType, "Content1");
-            ContentService.SaveAndPublish(content1);
+            ContentService.Save(content1);
+            ContentService.Publish(content1, content1.AvailableCultures.ToArray());
 
             // 2 (published)
             // .1 (published)
             // .2 (not published)
             Content content2 = ContentBuilder.CreateSimpleContent(_contentType, "Content2", content1);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Save(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             Content content21 = ContentBuilder.CreateSimpleContent(_contentType, "Content21", content2);
-            ContentService.SaveAndPublish(content21);
+            ContentService.Save(content21);
+            ContentService.Publish(content21, content21.AvailableCultures.ToArray());
             Content content22 = ContentBuilder.CreateSimpleContent(_contentType, "Content22", content2);
             ContentService.Save(content22);
 
@@ -236,11 +239,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // .1 (published)
             // .2 (not published)
             Content content4 = ContentBuilder.CreateSimpleContent(_contentType, "Content4", content1);
-            ContentService.SaveAndPublish(content4);
+            ContentService.Save(content4);
+            ContentService.Publish(content4, content4.AvailableCultures.ToArray());
             content4.Name = "Content4X";
             ContentService.Save(content4);
             Content content41 = ContentBuilder.CreateSimpleContent(_contentType, "Content41", content4);
-            ContentService.SaveAndPublish(content41);
+            ContentService.Save(content41);
+            ContentService.Publish(content41, content41.AvailableCultures.ToArray());
             Content content42 = ContentBuilder.CreateSimpleContent(_contentType, "Content42", content4);
             ContentService.Save(content42);
 
@@ -248,9 +253,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // .1 (published)
             // .2 (not published)
             Content content5 = ContentBuilder.CreateSimpleContent(_contentType, "Content5", content1);
-            ContentService.SaveAndPublish(content5);
+            ContentService.Save(content5);
+            ContentService.Publish(content5, content5.AvailableCultures.ToArray());
             Content content51 = ContentBuilder.CreateSimpleContent(_contentType, "Content51", content5);
-            ContentService.SaveAndPublish(content51);
+            ContentService.Save(content51);
+            ContentService.Publish(content51, content51.AvailableCultures.ToArray());
             Content content52 = ContentBuilder.CreateSimpleContent(_contentType, "Content52", content5);
             ContentService.Save(content52);
             ContentService.Unpublish(content5);
@@ -405,7 +412,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // - content cache :: refresh newest
             IContent content = ContentService.GetRootContent().FirstOrDefault();
             Assert.IsNotNull(content);
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             content.Name = "changed";
@@ -440,7 +447,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // - content cache :: refresh newest
             IContent content = ContentService.GetRootContent().FirstOrDefault();
             Assert.IsNotNull(content);
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             content.SortOrder = 666;
@@ -475,7 +482,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // - content cache :: refresh newest
             IContent content = ContentService.GetRootContent().FirstOrDefault();
             Assert.IsNotNull(content);
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             content.Properties.First().SetValue("changed");
@@ -513,15 +520,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             ResetEvents();
             content.Name = "changed";
-            ContentService.SaveAndPublish(content);
+            ContentService.Save(content);
+            ContentService.Publish(content, Array.Empty<string>());
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.AreEqual(4, _msgCount);
+            Assert.AreEqual(4, _events.Count);
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.u+p", _events[i++].ToString());
-            m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}", _events[i++].ToString());
+            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content.Id}.u=u", _events[i++].ToString());
+            Assert.AreEqual($"{m++:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i++].ToString());
+            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content.Id}.u+p", _events[i++].ToString());
+            Assert.AreEqual($"{m++:000}: ContentCacheRefresher/RefreshBranch/{content.Id}", _events[i++].ToString());
         }
 
         [Test]
@@ -532,19 +541,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // - content cache :: refresh published, newest
             IContent content = ContentService.GetRootContent().FirstOrDefault();
             Assert.IsNotNull(content);
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             content.Name = "changed";
-            ContentService.SaveAndPublish(content);
+            ContentService.Save(content);
+            ContentService.Publish(content, Array.Empty<string>());
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.AreEqual(4, _msgCount);
+            Assert.AreEqual(4, _events.Count);
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p+p", _events[i++].ToString());
-            m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i++].ToString());
+            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content.Id}.p=p", _events[i++].ToString());
+            Assert.AreEqual($"{m++:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i++].ToString());
+            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content.Id}.p+p", _events[i++].ToString());
+            Assert.AreEqual($"{m++:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i++].ToString());
         }
 
         [Test]
@@ -559,9 +570,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent content = ContentService.GetRootContent().FirstOrDefault();
             Assert.IsNotNull(content);
 
-            ResetEvents();
             content.Name = "changed";
-            ContentService.SaveAndPublish(content);
+            ContentService.Save(content);
+            ResetEvents();
+            ContentService.Publish(content, Array.Empty<string>());
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -580,7 +592,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // - content cache :: refresh newest, remove published
             IContent content = ContentService.GetRootContent().FirstOrDefault();
             Assert.IsNotNull(content);
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Unpublish(content);
@@ -602,7 +614,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // - content cache :: refresh newest, remove published
             IContent content = ContentService.GetRootContent().FirstOrDefault();
             Assert.IsNotNull(content);
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, content.AvailableCultures.ToArray());
             content.Name = "changed";
             ContentService.Save(content);
 
@@ -660,7 +672,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Unpublish(content1);
 
             ResetEvents();
-            ContentService.SaveAndPublish(content1);
+            ContentService.Publish(content1, content1.AvailableCultures.ToArray());
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -692,7 +704,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             // branch is:
             ResetEvents();
-            ContentService.SaveAndPublishBranch(content1, force: false); // force = false, don't publish unpublished items
+            ContentService.PublishBranch(content1, force: false, cultures: content1.AvailableCultures.ToArray()); // force = false, don't publish unpublished items
 
             foreach (EventInstance e in _events)
             {
@@ -728,7 +740,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Unpublish(content1);
 
             ResetEvents();
-            ContentService.SaveAndPublishBranch(content1, force: true); // force = true, also publish unpublished items
+            ContentService.PublishBranch(content1, force: true, cultures: content1.AvailableCultures.ToArray()); // force = true, also publish unpublished items
 
             foreach (EventInstance e in _events)
             {
@@ -889,7 +901,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent content = CreateContent();
             Assert.IsNotNull(content);
 
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.MoveToRecycleBin(content);
@@ -911,7 +923,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent content = CreateContent();
             Assert.IsNotNull(content);
 
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, content.AvailableCultures.ToArray());
             ContentService.MoveToRecycleBin(content);
 
             ResetEvents();
@@ -936,7 +948,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent content = CreateContent();
             Assert.IsNotNull(content);
 
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, content.AvailableCultures.ToArray());
             content.Properties.First().SetValue("changed");
             ContentService.Save(content);
 
@@ -1109,7 +1121,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content = CreateContent();
             Assert.IsNotNull(content);
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Delete(content);
@@ -1128,7 +1140,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content = CreateContent();
             Assert.IsNotNull(content);
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, content.AvailableCultures.ToArray());
             content.Properties.First().SetValue("changed");
             ContentService.Save(content);
 
@@ -1149,10 +1161,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content1 = CreateContent();
             Assert.IsNotNull(content1);
-            ContentService.SaveAndPublish(content1);
+            ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             ContentService.Unpublish(content1);
 
             ResetEvents();
@@ -1235,7 +1247,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content1 = CreateContent();
             Assert.IsNotNull(content1);
-            ContentService.SaveAndPublish(content1);
+            ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent();
             Assert.IsNotNull(content2);
 
@@ -1256,7 +1268,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content1 = CreateContent();
             Assert.IsNotNull(content1);
-            ContentService.SaveAndPublish(content1);
+            ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             content1.Properties.First().SetValue("changed");
             ContentService.Save(content1);
             IContent content2 = CreateContent();
@@ -1281,7 +1293,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsNotNull(content1);
             IContent content2 = CreateContent();
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Move(content1, content2.Id);
@@ -1302,10 +1314,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsNotNull(content1);
             IContent content2 = CreateContent();
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             IContent content3 = CreateContent();
             Assert.IsNotNull(content3);
-            ContentService.SaveAndPublish(content3);
+            ContentService.Publish(content3, content3.AvailableCultures.ToArray());
             ContentService.Unpublish(content2);
 
             ResetEvents();
@@ -1325,10 +1337,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content1 = CreateContent();
             Assert.IsNotNull(content1);
-            ContentService.SaveAndPublish(content1);
+            ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent();
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Move(content1, content2.Id);
@@ -1347,13 +1359,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content1 = CreateContent();
             Assert.IsNotNull(content1);
-            ContentService.SaveAndPublish(content1);
+            ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent();
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             IContent content3 = CreateContent(content2.Id);
             Assert.IsNotNull(content3);
-            ContentService.SaveAndPublish(content3);
+            ContentService.Publish(content3, content3.AvailableCultures.ToArray());
             ContentService.Unpublish(content2);
 
             ResetEvents();
@@ -1373,12 +1385,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content1 = CreateContent();
             Assert.IsNotNull(content1);
-            ContentService.SaveAndPublish(content1);
+            ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             content1.Properties.First().SetValue("changed");
             ContentService.Save(content1);
             IContent content2 = CreateContent();
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Move(content1, content2.Id);
@@ -1397,15 +1409,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content1 = CreateContent();
             Assert.IsNotNull(content1);
-            ContentService.SaveAndPublish(content1);
+            ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             content1.Properties.First().SetValue("changed");
             ContentService.Save(content1);
             IContent content2 = CreateContent();
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             IContent content3 = CreateContent(content2.Id);
             Assert.IsNotNull(content3);
-            ContentService.SaveAndPublish(content3);
+            ContentService.Publish(content3, content3.AvailableCultures.ToArray());
             ContentService.Unpublish(content2);
 
             ResetEvents();
@@ -1425,14 +1437,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content1 = CreateContent();
             Assert.IsNotNull(content1);
-            ContentService.SaveAndPublish(content1);
+            ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             ContentService.Unpublish(content1);
             IContent content3 = CreateContent();
             Assert.IsNotNull(content3);
-            ContentService.SaveAndPublish(content3);
+            ContentService.Publish(content3, content3.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Move(content2, content3.Id);
@@ -1451,17 +1463,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content1 = CreateContent();
             Assert.IsNotNull(content1);
-            ContentService.SaveAndPublish(content1);
+            ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             ContentService.Unpublish(content1);
             IContent content3 = CreateContent();
             Assert.IsNotNull(content3);
-            ContentService.SaveAndPublish(content3);
+            ContentService.Publish(content3, content3.AvailableCultures.ToArray());
             IContent content4 = CreateContent(content3.Id);
             Assert.IsNotNull(content4);
-            ContentService.SaveAndPublish(content4);
+            ContentService.Publish(content4, content4.AvailableCultures.ToArray());
             ContentService.Unpublish(content3);
 
             ResetEvents();
@@ -1481,16 +1493,16 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content1 = CreateContent();
             Assert.IsNotNull(content1);
-            ContentService.SaveAndPublish(content1);
+            ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             content2.Properties.First().SetValue("changed");
             ContentService.Save(content2);
             ContentService.Unpublish(content1);
             IContent content3 = CreateContent();
             Assert.IsNotNull(content3);
-            ContentService.SaveAndPublish(content3);
+            ContentService.Publish(content3, content3.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Move(content2, content3.Id);
@@ -1509,19 +1521,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content1 = CreateContent();
             Assert.IsNotNull(content1);
-            ContentService.SaveAndPublish(content1);
+            ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             content2.Properties.First().SetValue("changed");
             ContentService.Save(content2);
             ContentService.Unpublish(content1);
             IContent content3 = CreateContent();
             Assert.IsNotNull(content3);
-            ContentService.SaveAndPublish(content3);
+            ContentService.Publish(content3, content3.AvailableCultures.ToArray());
             IContent content4 = CreateContent(content3.Id);
             Assert.IsNotNull(content4);
-            ContentService.SaveAndPublish(content4);
+            ContentService.Publish(content4, content4.AvailableCultures.ToArray());
             ContentService.Unpublish(content3);
 
             ResetEvents();
@@ -1541,10 +1553,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content1 = CreateContent();
             Assert.IsNotNull(content1);
-            ContentService.SaveAndPublish(content1);
+            ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             ContentService.Unpublish(content1);
             IContent content3 = CreateContent();
             Assert.IsNotNull(content3);
@@ -1566,10 +1578,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content1 = CreateContent();
             Assert.IsNotNull(content1);
-            ContentService.SaveAndPublish(content1);
+            ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             content2.Properties.First().SetValue("changed");
             ContentService.Save(content2);
             ContentService.Unpublish(content1);
@@ -1636,7 +1648,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             IContent content2 = CreateContent();
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Move(content1, content2.Id);
@@ -1677,10 +1689,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             IContent content2 = CreateContent();
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             IContent content3 = CreateContent(content2.Id);
             Assert.IsNotNull(content3);
-            ContentService.SaveAndPublish(content3);
+            ContentService.Publish(content3, content3.AvailableCultures.ToArray());
             ContentService.Unpublish(content2);
 
             ResetEvents();
@@ -1722,7 +1734,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             IContent content2 = CreateContent();
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
 
             ContentService.Move(content1, content2.Id);
 
@@ -1807,10 +1819,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             IContent content2 = CreateContent();
             Assert.IsNotNull(content2);
-            ContentService.SaveAndPublish(content2);
+            ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             IContent content3 = CreateContent(content2.Id);
             Assert.IsNotNull(content3);
-            ContentService.SaveAndPublish(content3);
+            ContentService.Publish(content3, content3.AvailableCultures.ToArray());
             ContentService.Unpublish(content2);
 
             ContentService.Move(content1, content3.Id);
@@ -1873,7 +1885,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content = CreateContent();
             Assert.IsNotNull(content);
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             IContent copy = ContentService.Copy(content, Constants.System.Root, false);
@@ -1892,7 +1904,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content = CreateContent();
             Assert.IsNotNull(content);
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, content.AvailableCultures.ToArray());
             IContent content2 = CreateContent();
             Assert.IsNotNull(content2);
             ContentService.Move(content, content2.Id);
@@ -1914,7 +1926,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content = CreateBranch();
             Assert.IsNotNull(content);
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             IContent copy = ContentService.Copy(content, Constants.System.Root, false);
@@ -1957,15 +1969,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent content = CreateContent();
             Assert.IsNotNull(content);
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, Array.Empty<string>());
             int v1 = content.VersionId;
 
             content.Properties.First().SetValue("changed");
-            ContentService.SaveAndPublish(content);
+            ContentService.Save(content);
+            ContentService.Publish(content, Array.Empty<string>());
             int v2 = content.VersionId;
 
             content.Properties.First().SetValue("again");
-            ContentService.SaveAndPublish(content);
+            ContentService.Save(content);
+            ContentService.Publish(content, Array.Empty<string>());
             int v3 = content.VersionId;
 
             Console.WriteLine(v1);
@@ -2000,11 +2014,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsFalse(content.IsPropertyDirty("Published"));
             Assert.IsFalse(content.WasPropertyDirty("Published"));
 
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, Array.Empty<string>());
             Assert.IsFalse(content.IsPropertyDirty("Published"));
             Assert.IsTrue(content.WasPropertyDirty("Published")); // has just been published
 
-            ContentService.SaveAndPublish(content);
+            ContentService.Publish(content, Array.Empty<string>());
             Assert.IsFalse(content.IsPropertyDirty("Published"));
             Assert.IsFalse(content.WasPropertyDirty("Published")); // was published already
         }
