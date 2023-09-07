@@ -1,4 +1,3 @@
-using System.Net;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +8,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Delivery.Controllers;
+namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 
 [ApiVersion("1.0")]
 public class ByRouteContentApiController : ContentApiItemControllerBase
@@ -48,15 +47,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByRoute(string path = "")
     {
-        // OpenAPI does not allow reserved chars as "in:path" parameters, so clients based on the Swagger JSON will URL
-        // encode the path. Normally, ASP.NET Core handles that encoding with an automatic decoding - apparently just not
-        // for forward slashes, for whatever reason... so we need to deal with those. Hopefully this will be addressed in
-        // an upcoming version of ASP.NET Core.
-        // See also https://github.com/dotnet/aspnetcore/issues/11544
-        if (path.Contains("%2F", StringComparison.OrdinalIgnoreCase))
-        {
-            path = WebUtility.UrlDecode(path);
-        }
+        path = DecodePath(path);
 
         path = path.TrimStart("/");
         path = path.Length == 0 ? "/" : path;
