@@ -16,7 +16,7 @@ export class UmbScriptsWorkspaceElement extends UmbLitElement {
 			setup: async (component: PageComponent, info: IRoutingInfo) => {
 				const parentKey = info.match.params.parentKey;
 				const decodePath = decodeURIComponent(parentKey);
-				this.#scriptsWorkspaceContext.create(decodePath === 'null' ? null : parentKey);
+				this.#scriptsWorkspaceContext.create(decodePath);
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,

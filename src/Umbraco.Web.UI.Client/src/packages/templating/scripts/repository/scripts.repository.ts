@@ -134,8 +134,8 @@ export class UmbScriptsRepository
 		}
 
 		await this.#init;
-
-		const { data, error } = await this.#treeDataSource.getChildrenOf({ path, skip: 0, take: 100 });
+		const response = await this.#treeDataSource.getChildrenOf({ path, skip: 0, take: 100 });
+		const { data, error } = response;
 		if (data) {
 			this.#treeStore!.appendItems(data.items);
 		}

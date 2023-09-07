@@ -4,7 +4,7 @@ import { createObservablePart, UmbBooleanState, UmbDeepState } from '@umbraco-cm
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { UpdateScriptRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import { TextFileResponseModelBaseModel, UpdateScriptRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbScriptsWorkspaceContext extends UmbWorkspaceContext<UmbScriptsRepository, ScriptDetails> {
 	#data = new UmbDeepState<ScriptDetails | undefined>(undefined);
@@ -50,35 +50,34 @@ export class UmbScriptsWorkspaceContext extends UmbWorkspaceContext<UmbScriptsRe
 		}
 	}
 
-	async create(parentKey: string | null, name = 'Empty') {
-		const { data } = await this.repository.createScaffold(parentKey, name);
-		const script = {
-			...data,
+	async create(parentKey: string) {
+		const newScript: TextFileResponseModelBaseModel = {
 			name: '',
-			path: parentKey ?? '',
+			path: parentKey,
+			content: '',
 		};
-		if (!data) return;
+		this.#data.next(newScript);
 		this.setIsNew(true);
-		this.#data.next(script);
 	}
 
 	getEntityId(): string | undefined {
 		return this.getData()?.path;
 	}
 
-	save(): Promise<void> {
+	public async save() {
 		const script = this.getData();
 
-		if (!script) return Promise.reject('Something went wrong, there is no data for script view you want to save...');
+		if (!script) {
+			return Promise.reject('Something went wrong, there is no data for script you want to save...');
+		}
 		if (this.getIsNew()) {
 			const createRequestBody = {
 				name: script.name,
 				content: script.content,
-				parentPath: script.path + '/',
+				parentPath: script.path === 'null' ? null : script.path + '/',
 			};
 
 			this.repository.create(createRequestBody);
-			console.log('create');
 			return Promise.resolve();
 		}
 		if (!script.path) return Promise.reject('There is no path');

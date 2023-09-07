@@ -1,11 +1,12 @@
 import { UmbScriptsWorkspaceContext } from './scripts-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, query, state, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import _ from 'lodash';
 
 @customElement('umb-scripts-workspace-edit')
 export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
@@ -25,6 +26,9 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 
 	@state()
 	private _path?: string | null = '';
+
+	@state()
+	private _dirName?: string | null = '';
 
 	@state()
 	private _ready?: boolean = false;
@@ -74,6 +78,12 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 		});
 	}
 
+	protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		if (_changedProperties.has('_path')) {
+			this._dirName = this._path?.substring(0, this._path?.lastIndexOf('/'));
+		}
+	}
+
 	#onNameInput(event: Event) {
 		const target = event.target as UUIInputElement;
 		const value = target.value as string;
@@ -102,7 +112,7 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 					.value=${this._name}
 					@input=${this.#onNameInput}
 					label="template name"></uui-input>
-				<small>Scripts/${this._path}</small>
+				<small>Scripts/${this._dirName}${this._name}.js</small>
 			</div>
 			<uui-box>
 				<!-- the div below in the header is to make the box display nicely with code editor -->

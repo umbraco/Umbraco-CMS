@@ -219,19 +219,19 @@ class UmbScriptsData extends UmbData<ScriptsDataItem> {
 	}
 
 	delete(paths: Array<string>) {
-		const deletedPaths = this.data
+		const pathsOfItemsToDelete = this.data
 			.filter((item) => {
 				if (!item.path) throw new Error('Item has no path');
-				paths.includes(item.path);
+				return paths.includes(item.path);
 			})
 			.map((item) => item.path);
 
 		this.data = this.data.filter((item) => {
 			if (!item.path) throw new Error('Item has no path');
-			paths.indexOf(item.path) === -1;
+			return paths.indexOf(item.path) === -1;
 		});
 
-		return deletedPaths;
+		return pathsOfItemsToDelete;
 	}
 }
 
