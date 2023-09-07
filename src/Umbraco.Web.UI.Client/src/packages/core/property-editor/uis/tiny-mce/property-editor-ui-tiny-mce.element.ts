@@ -2,20 +2,20 @@ import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-property-editor-ui-tiny-mce
  */
 @customElement('umb-property-editor-ui-tiny-mce')
 export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
-	#configuration?: UmbDataTypeConfigCollection;
+	#configuration?: UmbPropertyEditorConfigCollection;
 
 	@property({ type: String })
 	value = '';
 
 	@property({ attribute: false })
-	public set config(config: UmbDataTypeConfigCollection | undefined) {
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this.#configuration = config;
 	}
 

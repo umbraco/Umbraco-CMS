@@ -3,7 +3,7 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import type { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-property-editor-ui-upload-field
@@ -14,7 +14,7 @@ export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement impleme
 	value = '';
 
 	@property({ attribute: false })
-	public set config(config: UmbDataTypeConfigCollection | undefined) {
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._fileExtensions = config?.getValueByAlias('fileExtensions');
 		this._multiple = config?.getValueByAlias('multiple');
 	}

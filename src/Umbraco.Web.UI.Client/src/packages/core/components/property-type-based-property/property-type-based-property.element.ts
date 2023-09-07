@@ -1,4 +1,4 @@
-import { UmbDataTypeConfig } from '../../property-editor/index.js';
+import { UmbPropertyEditorConfig } from '../../property-editor/index.js';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDataTypeRepository } from '@umbraco-cms/backoffice/data-type';
@@ -25,7 +25,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	private _propertyEditorUiAlias?: string;
 
 	@state()
-	private _dataTypeData?: UmbDataTypeConfig;
+	private _dataTypeData?: UmbPropertyEditorConfig;
 
 	private _dataTypeRepository: UmbDataTypeRepository = new UmbDataTypeRepository(this);
 	private _dataTypeObserver?: UmbObserverController<DataTypeResponseModel | undefined>;

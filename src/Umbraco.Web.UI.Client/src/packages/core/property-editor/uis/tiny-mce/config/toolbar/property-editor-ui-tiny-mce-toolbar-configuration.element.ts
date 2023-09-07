@@ -3,7 +3,7 @@ import { customElement, css, html, property, map, state, PropertyValueMap } from
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 
 const tinyIconSet = tinymce.default?.IconManager.get('default');
@@ -52,7 +52,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 	}
 
 	@property({ attribute: false })
-	config?: UmbDataTypeConfigCollection;
+	config?: UmbPropertyEditorConfigCollection;
 
 	@state()
 	private _toolbarConfig: ToolbarConfig[] = [];

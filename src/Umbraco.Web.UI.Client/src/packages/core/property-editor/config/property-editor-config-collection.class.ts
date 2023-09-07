@@ -1,12 +1,12 @@
-import { type UmbDataTypeConfigProperty, type UmbDataTypeConfig } from '../../property-editor/index.js';
+import { type UmbPropertyEditorConfigProperty, type UmbPropertyEditorConfig } from '../index.js';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * Extends Array to add utility functions for accessing data type properties
  * by alias, returning either the value or the complete DataTypePropertyPresentationModel object
  */
-export class UmbDataTypeConfigCollection extends Array<UmbDataTypeConfigProperty> {
-	constructor(args: UmbDataTypeConfig) {
+export class UmbPropertyEditorConfigCollection extends Array<UmbPropertyEditorConfigProperty> {
+	constructor(args: UmbPropertyEditorConfig) {
 		super(...args);
 	}
 	static get [Symbol.species](): ArrayConstructor {
@@ -45,7 +45,7 @@ export class UmbDataTypeConfigCollection extends Array<UmbDataTypeConfigProperty
 		return Object.fromEntries(this.map((x) => [x.alias, x.value]));
 	}
 
-	equal(other: UmbDataTypeConfigCollection | undefined): boolean {
+	equal(other: UmbPropertyEditorConfigCollection | undefined): boolean {
 		if (this.length !== other?.length) {
 			return false;
 		}

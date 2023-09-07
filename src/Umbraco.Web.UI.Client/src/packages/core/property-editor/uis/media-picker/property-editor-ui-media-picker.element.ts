@@ -1,6 +1,6 @@
 import { UmbInputMediaElement } from '../../../../media/media/components/input-media/input-media.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -20,7 +20,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	}
 
 	@property({ attribute: false })
-	public set config(config: UmbDataTypeConfigCollection | undefined) {
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		const validationLimit = config?.getByAlias('validationLimit');
 		if (!validationLimit) return;
 

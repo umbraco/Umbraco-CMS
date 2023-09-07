@@ -6,7 +6,7 @@ import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/wo
 import { UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
@@ -20,7 +20,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 	value: UmbLinkPickerLink[] = [];
 
 	@property({ attribute: false })
-	public set config(config: UmbDataTypeConfigCollection | undefined) {
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._overlaySize = config?.getValueByAlias('overlaySize');
 		this._hideAnchor = config?.getValueByAlias('hideAnchor');
 		this._ignoreUserStartNodes = config?.getValueByAlias('ignoreUserStartNodes');
