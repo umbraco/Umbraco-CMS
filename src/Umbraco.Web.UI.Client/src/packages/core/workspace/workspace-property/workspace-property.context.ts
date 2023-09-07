@@ -1,9 +1,8 @@
-import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface.js';
 import { UmbPropertyEditorExtensionElement } from '../../extension-registry/interfaces/property-editor-ui-extension-element.interface.js';
 import { type WorkspacePropertyData } from '../types/workspace-property-data.type.js';
-import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN, UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbClassState,
 	UmbObjectState,
@@ -12,14 +11,12 @@ import {
 	UmbBasicState,
 } from '@umbraco-cms/backoffice/observable-api';
 import {
-	UmbContextConsumerController,
 	UmbContextProviderController,
 	UmbContextToken,
 } from '@umbraco-cms/backoffice/context-api';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-export class UmbWorkspacePropertyContext<ValueType = any> {
-	#host: UmbControllerHostElement;
+export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseController {
 
 	private _providerController: UmbContextProviderController;
 
@@ -43,52 +40,77 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 		return this._editor.getValue();
 	}
 
-	#workspaceVariantId?: UmbVariantId;
-
+	// property variant ID:
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	public readonly variantId = this.#variantId.asObservable();
 
 	private _variantDifference = new UmbStringState(undefined);
 	public readonly variantDifference = this._variantDifference.asObservable();
 
-	private _workspaceContext?: UmbWorkspaceVariableEntityContextInterface;
-	private _workspaceVariantConsumer?: UmbContextConsumerController<typeof UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN.TYPE>;
+	#variantContext?: typeof UMB_VARIANT_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
-		new UmbContextConsumerController(host, UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._workspaceContext = workspaceContext as UmbWorkspaceVariableEntityContextInterface;
+		super(host);
+
+		this.consumeContext(UMB_VARIANT_CONTEXT, (variantContext) => {
+			this.#variantContext = variantContext;
+			this._generateVariantDifferenceString();
+			this._observeProperty();
+		});
+
+		this.observe(this.alias, () => {
+			this._observeProperty();
 		});
 
 		this._providerController = new UmbContextProviderController(host, UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, this);
 
-		this.configValues.subscribe((configValues) => {
+		this.observe(this.configValues, (configValues) => {
 			this.#configCollection.next(configValues ? new UmbPropertyEditorConfigCollection(configValues) : undefined);
 		});
 
-		this.variantId.subscribe((propertyVariantId) => {
-			if (propertyVariantId) {
-				if (!this._workspaceVariantConsumer) {
-					this._workspaceVariantConsumer = new UmbContextConsumerController(
-						this.#host,
-						UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN,
-						(workspaceVariantContext) => {
-							new UmbObserverController(this.#host, workspaceVariantContext.variantId, (workspaceVariantId) => {
-								this.#workspaceVariantId = workspaceVariantId;
-								this._generateVariantDifferenceString();
-							});
-						}
-					);
-				} else {
-					this._generateVariantDifferenceString();
-				}
-			}
+		this.observe(this.variantId, () => {
+			this._generateVariantDifferenceString();
 		});
 	}
 
+
+	private _observePropertyVariant?: UmbObserverController<UmbVariantId | undefined>;
+	private _observePropertyValue?: UmbObserverController<ValueType | undefined>;
+	private async _observeProperty() {
+		const alias = this.#data.getValue().alias;
+		if (!this.#variantContext || !alias) return;
+
+		const variantIdSubject = await this.#variantContext.propertyVariantId?.(alias) ?? undefined;
+		this._observePropertyVariant?.destroy();
+		if(variantIdSubject) {
+			this._observePropertyVariant = this.observe(
+				variantIdSubject,
+				(variantId) => {
+					this.#variantId.next(variantId);
+				}
+			);
+		}
+
+		// TODO: Verify if we need to optimize runtime by parsing the propertyVariantID, cause this method retrieves it again:
+		const subject = await this.#variantContext.propertyValueByAlias<ValueType>(alias)
+
+		this._observePropertyValue?.destroy();
+		if(subject) {
+			this._observePropertyValue = this.observe(
+				subject,
+				(value) => {
+					// Note: Do not try to compare new / old value, as it can of any type. We trust the UmbObjectState in doing such.
+					this.#data.update({ value });
+				}
+			);
+		}
+	}
+
 	private _generateVariantDifferenceString() {
+		if(!this.#variantContext) return;
+		const contextVariantId = this.#variantContext.getVariantId?.() ?? undefined;
 		this._variantDifference.next(
-			this.#workspaceVariantId ? this.#variantId.getValue()?.toDifferencesString(this.#workspaceVariantId) : ''
+			contextVariantId ? this.#variantId.getValue()?.toDifferencesString(contextVariantId) : ''
 		);
 	}
 
@@ -102,16 +124,10 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 		this.#data.update({ description });
 	}
 	public setValue(value: WorkspacePropertyData<ValueType>['value']) {
-		// Note: Do not try to compare new / old value, as it can of any type. We trust the UmbObjectState in doing such.
-		this.#data.update({ value });
-	}
-	public changeValue(value: WorkspacePropertyData<ValueType>['value']) {
-		this.setValue(value);
-
 		const alias = this.#data.getValue().alias;
-		if (alias) {
-			this._workspaceContext?.setPropertyValue(alias, value, this.#variantId.getValue());
-		}
+		if (!this.#variantContext || !alias) return;
+
+		this.#variantContext?.setPropertyValue(alias, value);
 	}
 	public setConfig(config: WorkspacePropertyData<ValueType>['config'] | undefined) {
 		this.#data.update({ config });

@@ -40,13 +40,13 @@ export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'headerApp',
 		kind: 'button',
-		alias: 'Umb.HeaderApp.HackDemo',
-		name: 'Header App Search',
+		alias: 'My.HeaderApp.Wand',
+		name: 'My Header App',
 		weight: 10,
 		meta: {
-			label: 'Hack Demo',
-			icon: 'document',
-			href: '/section/content/workspace/document/edit/c05da24d-7740-447b-9cdc-bd8ce2172e38/en-us/view/content/tab/Local%20blog%20tab',
+			label: 'My Header App',
+			icon: 'wand',
+			href: '/section/content/workspace/document/edit/c05da24d-7740-447b-9cdc-bd8ce2172e38',
 		},
 	},
 	{

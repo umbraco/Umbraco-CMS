@@ -1,6 +1,6 @@
-import { UmbWorkspaceVariantContext } from './workspace-variant.context.js';
+import { UmbWorkspaceSplitViewContext } from './workspace-split-view.context.js';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -9,8 +9,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  * As well breadcrumbs etc.
  *
  */
-@customElement('umb-workspace-variant')
-export class UmbWorkspaceVariantContentElement extends UmbLitElement {
+@customElement('umb-workspace-split-view')
+export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	// TODO: stop prop drilling this alias. Instead use the workspace context.
 	@property()
 	alias!: string;
@@ -20,19 +20,14 @@ export class UmbWorkspaceVariantContentElement extends UmbLitElement {
 
 	@property({ type: Number })
 	public set splitViewIndex(index: number) {
-		this._splitViewIndex = index;
-		this.variantContext.setSplitViewIndex(index);
+		this.splitViewContext.setSplitViewIndex(index);
 	}
 
-	@state()
-	private _splitViewIndex = 0;
-
-	variantContext = new UmbWorkspaceVariantContext(this);
+	splitViewContext = new UmbWorkspaceSplitViewContext(this);
 
 	render() {
 		return html`
 			<umb-workspace-editor
-				.splitViewIndex=${this._splitViewIndex.toString()}
 				alias=${this.alias}
 				.hideNavigation=${!this.displayNavigation}
 				.enforceNoFooter=${true}>
@@ -67,10 +62,10 @@ export class UmbWorkspaceVariantContentElement extends UmbLitElement {
 	];
 }
 
-export default UmbWorkspaceVariantContentElement;
+export default UmbWorkspaceSplitViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-variant': UmbWorkspaceVariantContentElement;
+		'umb-workspace-split-view': UmbWorkspaceSplitViewElement;
 	}
 }

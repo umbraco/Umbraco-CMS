@@ -1,6 +1,6 @@
 import { UmbUserGroupRepository } from '../repository/user-group.repository.js';
 import { UmbUserRepository } from '../../users/repository/user.repository.js';
-import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -8,7 +8,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbUserGroupWorkspaceContext
 	extends UmbWorkspaceContext<UmbUserGroupRepository, UserGroupResponseModel>
-	implements UmbEntityWorkspaceContextInterface<UserGroupResponseModel | undefined>
+	implements UmbSaveableWorkspaceContextInterface<UserGroupResponseModel | undefined>
 {
 	#data = new UmbObjectState<UserGroupResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
@@ -55,9 +55,11 @@ export class UmbUserGroupWorkspaceContext
 	getEntityId(): string | undefined {
 		throw new Error('Method not implemented.');
 	}
+	
 	getEntityType(): string {
-		throw new Error('Method not implemented.');
+		return 'user-group';
 	}
+
 	getData(): UserGroupResponseModel | undefined {
 		throw new Error('Method not implemented.');
 	}
@@ -105,7 +107,7 @@ export class UmbUserGroupWorkspaceContext
 }
 
 
-export const UMB_USER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbUserGroupWorkspaceContext>(
+export const UMB_USER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbUserGroupWorkspaceContext>(
 	'UmbWorkspaceContext',
 	(context): context is UmbUserGroupWorkspaceContext => context.getEntityType?.() === 'user-group'
 );

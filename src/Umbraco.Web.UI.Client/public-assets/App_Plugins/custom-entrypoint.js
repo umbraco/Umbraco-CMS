@@ -1,4 +1,4 @@
 console.log('Hello from the custom entrypoint file!');
-export default function () {
-	console.log('Hello from the custom entrypoint inside the default function!');
+export function onInit() {
+	console.log('Hello from the custom entrypoint inside the onInit function!');
 }

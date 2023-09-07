@@ -12,6 +12,5 @@ type Story = StoryObj<UmbVariantSelectorElement>;
 
 export const Overview: Story = {
 	args: {
-		alias: 'myAlias',
 	},
 };

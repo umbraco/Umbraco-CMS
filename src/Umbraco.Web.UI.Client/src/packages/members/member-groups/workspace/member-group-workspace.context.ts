@@ -1,6 +1,6 @@
 import { UmbMemberGroupRepository } from '../repository/member-group.repository.js';
 import type { MemberGroupDetails } from '../types.js';
-import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -8,7 +8,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 type EntityType = MemberGroupDetails;
 export class UmbMemberGroupWorkspaceContext
 	extends UmbWorkspaceContext<UmbMemberGroupRepository, EntityType>
-	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
+	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
@@ -67,7 +67,7 @@ export class UmbMemberGroupWorkspaceContext
 
 
 
-export const UMB_MEMBER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbMemberGroupWorkspaceContext>(
+export const UMB_MEMBER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbMemberGroupWorkspaceContext>(
 	'UmbWorkspaceContext',
 	(context): context is UmbMemberGroupWorkspaceContext => context.getEntityType?.() === 'member-group'
 );
