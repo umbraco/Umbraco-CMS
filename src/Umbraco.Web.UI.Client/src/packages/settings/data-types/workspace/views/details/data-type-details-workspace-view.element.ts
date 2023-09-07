@@ -73,7 +73,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 							if (!propertyEditorSchema) return;
 							this._setPropertyEditorUiAlias(propertyEditorSchema.meta.defaultPropertyEditorUiAlias ?? undefined);
 						},
-						'_observepropertyEditorSchemaForDefaultUI'
+						'_observePropertyEditorSchemaForDefaultUI'
 					);
 				} else {
 					this._setPropertyEditorUiAlias(undefined);
@@ -103,8 +103,8 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 			return;
 		}
 
-		// remove the '_observepropertyEditorSchemaForDefaultUI' controller, as we do not want to observe for default value anymore:
-		this.removeControllerByAlias('_observepropertyEditorSchemaForDefaultUI');
+		// remove the '_observePropertyEditorSchemaForDefaultUI' controller, as we do not want to observe for default value anymore:
+		this.removeControllerByAlias('_observePropertyEditorSchemaForDefaultUI');
 
 		this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', propertyEditorUiAlias),

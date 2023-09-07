@@ -1,6 +1,6 @@
 import { UmbStylesheetRepository } from '../repository/stylesheet.repository.js';
 import { StylesheetDetails } from '../index.js';
-import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObjectState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
@@ -9,7 +9,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export type RichTextRuleModelSortable = RichTextRuleModel & { sortOrder?: number };
 
-export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStylesheetRepository, StylesheetDetails> implements UmbEntityWorkspaceContextInterface {
+export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStylesheetRepository, StylesheetDetails> implements UmbSaveableWorkspaceContextInterface {
 	#data = new UmbObjectState<StylesheetDetails | undefined>(undefined);
 	#rules = new UmbArrayState<RichTextRuleModelSortable>([], (rule) => rule.name);
 	data = this.#data.asObservable();
@@ -166,7 +166,7 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 	}
 }
 
-export const UMB_STYLESHEET_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbStylesheetWorkspaceContext>(
+export const UMB_STYLESHEET_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbStylesheetWorkspaceContext>(
 	'UmbWorkspaceContext',
 	(context): context is UmbStylesheetWorkspaceContext => context.getEntityType?.() === 'stylesheet'
 );

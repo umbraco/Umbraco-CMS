@@ -1,4 +1,4 @@
-import { UmbEntityWorkspaceContextInterface } from './workspace-entity-context.interface.js';
+import { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
@@ -12,13 +12,13 @@ If so we need to align on a interface that all of these implements. otherwise co
 */
 export abstract class UmbWorkspaceContext<RepositoryType, EntityType extends UmbEntityBase>
 	extends UmbBaseController
-	implements UmbEntityWorkspaceContextInterface<EntityType>
+	implements UmbSaveableWorkspaceContextInterface<EntityType>
 {
 	public readonly host: UmbControllerHostElement;
 	public readonly workspaceAlias: string;
 	public readonly repository: RepositoryType;
 
-	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique.
+	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique (instead of the object type)
 	public readonly modalContext?: UmbModalContext<{ preset: object }>;
 
 	#isNew = new UmbBooleanState(undefined);
@@ -60,4 +60,5 @@ export abstract class UmbWorkspaceContext<RepositoryType, EntityType extends Umb
 	abstract getEntityType(): string; // TODO: consider of this should be on the repository because a repo is responsible for one entity type
 	abstract getData(): EntityType | undefined;
 	abstract save(): Promise<void>;
+
 }

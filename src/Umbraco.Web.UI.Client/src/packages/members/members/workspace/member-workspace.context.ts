@@ -1,12 +1,12 @@
 import { UmbMemberRepository } from '../repository/member.repository.js';
 import type { MemberDetails } from '../types.js';
-import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbMemberWorkspaceContext
 	extends UmbWorkspaceContext<UmbMemberRepository, MemberDetails>
-	implements UmbEntityWorkspaceContextInterface<MemberDetails | undefined>
+	implements UmbSaveableWorkspaceContextInterface<MemberDetails | undefined>
 {
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.Member', new UmbMemberRepository(host));
@@ -37,7 +37,7 @@ export class UmbMemberWorkspaceContext
 	}
 }
 
-export const UMB_MEMBER_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbMemberWorkspaceContext>(
+export const UMB_MEMBER_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbMemberWorkspaceContext>(
 	'UmbWorkspaceContext',
 	(context): context is UmbMemberWorkspaceContext => context.getEntityType?.() === 'member'
 );

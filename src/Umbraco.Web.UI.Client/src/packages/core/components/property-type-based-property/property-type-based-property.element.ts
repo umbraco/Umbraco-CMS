@@ -2,8 +2,6 @@ import { UmbDataTypeConfig } from '../../property-editor/index.js';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDataTypeRepository } from '@umbraco-cms/backoffice/data-type';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { DataTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -19,7 +17,6 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 		this._property = value;
 		if (this._property?.dataTypeId !== oldProperty?.dataTypeId) {
 			this._observeDataType(this._property?.dataTypeId);
-			this._observeProperty();
 		}
 	}
 	private _property?: PropertyTypeModelBaseModel;
@@ -32,53 +29,6 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 
 	private _dataTypeRepository: UmbDataTypeRepository = new UmbDataTypeRepository(this);
 	private _dataTypeObserver?: UmbObserverController<DataTypeResponseModel | undefined>;
-
-	@state()
-	private _value?: unknown;
-
-	/**
-	 * propertyVariantId. A VariantID to identify which the variant of this properties value.
-	 * @public
-	 * @type {UmbVariantId}
-	 * @attr
-	 * @default undefined
-	 */
-	@property({ type: Object, attribute: false })
-	public get propertyVariantId(): UmbVariantId | undefined {
-		return this._propertyVariantId;
-	}
-	public set propertyVariantId(value: UmbVariantId | undefined) {
-		const oldValue = this._propertyVariantId;
-		if (value && oldValue?.equal(value)) return;
-		this._propertyVariantId = value;
-		this._observeProperty();
-		this.requestUpdate('propertyVariantId', oldValue);
-	}
-	private _propertyVariantId?: UmbVariantId | undefined;
-
-	private _workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._workspaceContext = workspaceContext;
-			this._observeProperty();
-		});
-	}
-
-	private _observePropertyValue?: UmbObserverController<unknown>;
-	private _observeProperty() {
-		if (!this._workspaceContext || !this.property || !this._property?.alias) return;
-
-		this._observePropertyValue?.destroy();
-		this._observePropertyValue = this.observe(
-			this._workspaceContext.propertyValueByAlias(this._property.alias, this._propertyVariantId),
-			(value) => {
-				this._value = value;
-			},
-			'_observePropertyValue'
-		);
-	}
 
 	private async _observeDataType(dataTypeId?: string) {
 		this._dataTypeObserver?.destroy();
@@ -115,8 +65,6 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			label=${ifDefined(this._property?.name)}
 			description=${ifDefined(this._property?.description || undefined)}
 			property-editor-ui-alias=${ifDefined(this._propertyEditorUiAlias)}
-			.value=${this._value}
-			.propertyVariantId=${this.propertyVariantId}
 			.config=${this._dataTypeData}></umb-workspace-property>`;
 	}
 

@@ -10,6 +10,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-document-workspace-editor')
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	//private _defaultVariant?: VariantViewModelBaseModel;
+
+	// TODO: Refactor: when having a split view/variants context token, we can rename the split view/variants component to a generic and make this component generic as well.
 	private splitViewElement = new UmbDocumentWorkspaceSplitViewElement();
 
 	@state()

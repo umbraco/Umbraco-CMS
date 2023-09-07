@@ -9,6 +9,18 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/package/manifes
 		ctx.status(200),
 		ctx.json<PackageManifestResponse>([
 			{
+				name: 'My Package Name',
+				version: '1.0.0',
+				extensions: [
+					{
+						type: 'bundle',
+						alias: 'My.Package.Bundle',
+						name: 'My Package Bundle',
+						js: '/App_Plugins/custom-bundle-package/index.js',
+					},
+				],
+			},
+			{
 				name: 'Named Package',
 				version: '1.0.0',
 				extensions: [

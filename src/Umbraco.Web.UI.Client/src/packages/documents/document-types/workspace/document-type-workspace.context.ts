@@ -1,6 +1,6 @@
 import { UmbDocumentTypeRepository } from '../repository/document-type.repository.js';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { UmbWorkspaceContext, UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbWorkspaceContext, UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ContentTypeCompositionModel,
 	ContentTypeSortModel,
@@ -12,7 +12,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 type EntityType = DocumentTypeResponseModel;
 export class UmbDocumentTypeWorkspaceContext
 	extends UmbWorkspaceContext<UmbDocumentTypeRepository, EntityType>
-	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
+	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
 {
 	// Draft is located in structure manager
 
@@ -157,7 +157,7 @@ export class UmbDocumentTypeWorkspaceContext
 }
 
 
-export const UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbDocumentTypeWorkspaceContext>(
+export const UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbDocumentTypeWorkspaceContext>(
 	'UmbWorkspaceContext',
 	(context): context is UmbDocumentTypeWorkspaceContext => context.getEntityType?.() === 'document-type'
 );

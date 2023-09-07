@@ -1,6 +1,6 @@
 import { UmbUserRepository } from '../repository/user.repository.js';
 import { type UmbUserDetail } from '../index.js';
-import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -10,7 +10,7 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbUserWorkspaceContext
 	extends UmbWorkspaceContext<UmbUserRepository, UmbUserDetail>
-	implements UmbEntityWorkspaceContextInterface<UmbUserDetail | undefined>
+	implements UmbSaveableWorkspaceContextInterface<UmbUserDetail | undefined>
 {
 	#authContext?: typeof UMB_AUTH.TYPE;
 
@@ -82,7 +82,7 @@ export class UmbUserWorkspaceContext
 	}
 }
 
-export const UMB_USER_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbUserWorkspaceContext>(
+export const UMB_USER_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbUserWorkspaceContext>(
 	'UmbWorkspaceContext',
 	(context): context is UmbUserWorkspaceContext => context.getEntityType?.() === 'user'
 );

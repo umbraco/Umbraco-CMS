@@ -1,6 +1,6 @@
 import { UmbTemplateRepository } from '../repository/template.repository.js';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
 	createObservablePart,
 	UmbBooleanState,
@@ -11,7 +11,7 @@ import type { TemplateItemResponseModel, TemplateResponseModel } from '@umbraco-
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository, TemplateResponseModel> implements UmbEntityWorkspaceContextInterface {
+export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository, TemplateResponseModel> implements UmbSaveableWorkspaceContextInterface {
 	#data = new UmbDeepState<TemplateResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	#masterTemplate = new UmbObjectState<TemplateItemResponseModel | null>(null);
@@ -170,7 +170,7 @@ ${currentContent}`;
 
 
 
-export const UMB_TEMPLATE_WORKSPACE_CONTEXT = new UmbContextToken<UmbEntityWorkspaceContextInterface, UmbTemplateWorkspaceContext>(
+export const UMB_TEMPLATE_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbTemplateWorkspaceContext>(
 	'UmbWorkspaceContext',
 	(context): context is UmbTemplateWorkspaceContext => context.getEntityType?.() === 'template'
 );
