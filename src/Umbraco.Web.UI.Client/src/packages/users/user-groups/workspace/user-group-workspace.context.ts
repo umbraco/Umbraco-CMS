@@ -55,9 +55,11 @@ export class UmbUserGroupWorkspaceContext
 	getEntityId(): string | undefined {
 		throw new Error('Method not implemented.');
 	}
+	
 	getEntityType(): string {
-		throw new Error('Method not implemented.');
+		return 'user-group';
 	}
+
 	getData(): UserGroupResponseModel | undefined {
 		throw new Error('Method not implemented.');
 	}
