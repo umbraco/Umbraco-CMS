@@ -16,11 +16,10 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.PartialView.Save',
 		name: 'Save Partial View',
-		weight: 70,
 		meta: {
+			label: 'Save',
 			look: 'primary',
 			color: 'positive',
-			label: 'Save',
 			api: UmbSaveWorkspaceAction,
 		},
 		conditions: [

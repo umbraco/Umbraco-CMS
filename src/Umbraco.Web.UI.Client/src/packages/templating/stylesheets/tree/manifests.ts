@@ -1,5 +1,4 @@
-import { STYLESHEET_ENTITY_TYPE } from '../index.js';
-import { STYLESHEET_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { STYLESHEET_ENTITY_TYPE, STYLESHEET_REPOSITORY_ALIAS } from '../config.js';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 
 export const STYLESHEET_TREE_ALIAS = 'Umb.Tree.Stylesheet';
