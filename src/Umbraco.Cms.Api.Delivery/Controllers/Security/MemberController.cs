@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Api.Delivery.Controllers.Security;
 [ApiVersion("1.0")]
 [ApiController]
 [VersionedDeliveryApiRoute(Common.Security.Paths.MemberApi.EndpointTemplate)]
-[ApiExplorerSettings(GroupName = "Security")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class MemberController : DeliveryApiControllerBase
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
