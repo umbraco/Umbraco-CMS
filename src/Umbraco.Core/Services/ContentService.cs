@@ -1127,9 +1127,9 @@ public class ContentService : RepositoryService, IContentService
         }
 
         // we need to guard against unsaved changes before proceeding; the content will be saved, but we're not firing any saved notifications
-        if (content.IsDirty())
+        if (HasUnsavedChanges(content))
         {
-            throw new ArgumentNullException(nameof(content), "The content has unsaved changes. Please save all changes before attempting a publish.");
+            return new PublishResult(PublishResultType.FailedPublishUnsavedChanges, EventMessagesFactory.Get(), content);
         }
 
         if (content.Name != null && content.Name.Length > 255)
@@ -1828,7 +1828,7 @@ public class ContentService : RepositoryService, IContentService
                     else
                     {
                         _documentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = SaveAndPublish(d, userId: d.WriterId);
+                        result = Publish(d, d.AvailableCultures.ToArray(), userId: d.WriterId);
                     }
 
                     if (result.Success == false)
@@ -2125,7 +2125,7 @@ public class ContentService : RepositoryService, IContentService
         HashSet<string>? culturesToPublish = shouldPublish(document);
 
         // we need to guard against unsaved changes before proceeding; the document will be saved, but we're not firing any saved notifications
-        if (document.IsDirty())
+        if (HasUnsavedChanges(document))
         {
             return new PublishResult(PublishResultType.FailedPublishUnsavedChanges, evtMsgs, document);
         }
@@ -2893,6 +2893,8 @@ public class ContentService : RepositoryService, IContentService
 
         return OperationResult.Succeed(eventMessages);
     }
+
+    private bool HasUnsavedChanges(IContent content) => content.HasIdentity is false || content.IsDirty();
 
     public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
     {
