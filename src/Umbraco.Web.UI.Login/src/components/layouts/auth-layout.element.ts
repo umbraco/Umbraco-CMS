@@ -10,15 +10,6 @@ export class UmbAuthLayoutElement extends LitElement {
 	@property({ attribute: 'logo-image' })
 	logoImage?: string;
 
-  constructor() {
-    super();
-
-    if ((window as any).Umbraco) {
-      this.backgroundImage = this.backgroundImage || (window as any).Umbraco.Sys.ServerVariables.umbracoSettings.loginBackgroundImage;
-      this.logoImage = this.logoImage || (window as any).Umbraco.Sys.ServerVariables.umbracoSettings.loginLogoImage;
-    }
-  }
-
 	render() {
 		return html`
 			<div id="background" style=${styleMap({ backgroundImage: `url('${this.backgroundImage}')` })}></div>
