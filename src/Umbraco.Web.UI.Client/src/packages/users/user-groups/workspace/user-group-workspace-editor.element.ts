@@ -4,7 +4,6 @@ import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffic
 // TODO: import from package when available
 //import { UmbUserInputElement } from '../../users/components/user-input/user-input.element.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	UMB_CONFIRM_MODAL,
@@ -12,6 +11,9 @@ import {
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbExtensionElementController } from '@umbraco-cms/backoffice/extension-api';
+import { ManifestPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+
 
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
@@ -20,6 +22,9 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 	@state()
 	private _userKeys?: Array<string>;
+
+	@state()
+	private _userPermissions: Array<ManifestPermission> = [];
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 	#modalContext?: UmbModalManagerContext;
@@ -31,6 +36,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 			this.#workspaceContext = instance;
 			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup));
 			this.observe(this.#workspaceContext.userIds, (userKeys) => (this._userKeys = userKeys));
+			this.observe(umbExtensionsRegistry.extensionsOfType('permission'), (permissionManifests) => this._userPermissions = permissionManifests);
 		});
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
@@ -105,6 +111,16 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
+	#renderPermission(permissionManifest: ManifestPermission) {
+		return html`<div style="display: flex; align-items:center; border-bottom: 1px solid whitesmoke">
+			<uui-toggle></uui-toggle>
+			<div>
+				<h5>${ permissionManifest.meta.label }</h5>
+				<small>${ permissionManifest.meta.description }</small>
+			</div>
+		</div>`;
+	}
+
 	#renderLeftColumn() {
 		if (!this._userGroup) return nothing;
 
@@ -130,7 +146,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 			<uui-box>
 				<div slot="headline">Default Permissions</div>
-				<b>PERMISSIONS NOT IMPLEMENTED YET</b>
+				${ this._userPermissions.map((permission) => this.#renderPermission(permission)) }
 			</uui-box>
 
 			<uui-box>
