@@ -1,4 +1,4 @@
-import {LitElement, nothing} from "lit";
+import {LitElement} from "lit";
 import {customElement, property, state} from "lit/decorators.js";
 import {loadCustomView, renderCustomView} from "../utils/load-custom-view.function.ts";
 import {until} from "lit/directives/until.js";
@@ -12,7 +12,7 @@ export default class UmbCustomViewElement extends LitElement {
   args?: any;
 
   @state()
-  protected component: any = nothing;
+  protected component: any = null;
 
   attributeChangedCallback(name: string, _old: string | null, value: string | null) {
     super.attributeChangedCallback(name, _old, value);
@@ -21,16 +21,16 @@ export default class UmbCustomViewElement extends LitElement {
     }
   }
 
-  #loadView() {
+  async #loadView() {
     if (!this.customView || !this.customView.endsWith('.js') && !this.customView.endsWith('.html')) {
       return;
     }
 
-    const customView = loadCustomView(this.customView);
+    const customView = await loadCustomView(this.customView);
 
     if (this.args) {
       Object.entries(this.args).forEach(([key, value]) => {
-        customView[key] = value;
+        (customView as any)[key] = value;
       });
     }
 
