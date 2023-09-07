@@ -6,6 +6,7 @@ import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
 import { manifests as entityBulkActionManifests } from './entity-bulk-actions/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editors/manifests.js';
+import { manifests as userPermissionManifests } from './user-permissions/manifests.js';
 
 export const manifests = [
 	...collectionManifests,
@@ -16,4 +17,5 @@ export const manifests = [
 	...entityActionManifests,
 	...entityBulkActionManifests,
 	...propertyEditorManifests,
+	...userPermissionManifests,
 ];

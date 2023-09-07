@@ -4,7 +4,6 @@ import { manifests as contentMenuManifest } from './menu.manifests.js';
 import { manifests as documentBlueprintManifests } from './document-blueprints/manifests.js';
 import { manifests as documentTypeManifests } from './document-types/manifests.js';
 import { manifests as documentManifests } from './documents/manifests.js';
-import { manifests as permissionManifests } from './user-permissions/manifests.js';
 
 export const manifests = [
 	...dashboardManifests,
@@ -13,5 +12,4 @@ export const manifests = [
 	...documentBlueprintManifests,
 	...documentTypeManifests,
 	...documentManifests,
-	...permissionManifests,
 ];

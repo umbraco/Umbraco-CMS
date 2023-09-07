@@ -35,7 +35,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 			this.#workspaceContext = instance;
 			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup));
 			this.observe(this.#workspaceContext.userIds, (userKeys) => (this._userKeys = userKeys));
-			this.observe(umbExtensionsRegistry.extensionsOfType('permission'), (permissionManifests) => this._userPermissions = permissionManifests);
+			this.observe(umbExtensionsRegistry.extensionsOfType('userPermission'), (userPermissionManifests) => this._userPermissions = userPermissionManifests);
 		});
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
@@ -110,12 +110,12 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
-	#renderPermission(permissionManifest: ManifestUserPermission) {
+	#renderPermission(userPermissionManifest: ManifestUserPermission) {
 		return html`<div style="display: flex; align-items:center; border-bottom: 1px solid whitesmoke">
 			<uui-toggle></uui-toggle>
 			<div>
-				<h5>${ permissionManifest.meta.label }</h5>
-				<small>${ permissionManifest.meta.description }</small>
+				<h5>${ userPermissionManifest.meta.label }</h5>
+				<small>${ userPermissionManifest.meta.description }</small>
 			</div>
 		</div>`;
 	}
