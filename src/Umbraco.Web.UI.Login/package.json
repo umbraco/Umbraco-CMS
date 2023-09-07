@@ -13,8 +13,7 @@
     "npm": ">=9.5"
   },
 	"dependencies": {
-		"@umbraco-ui/uui": "^1.3.0",
-		"@vaadin/router": "^1.7.5",
+    "@umbraco-ui/uui": "^1.3.0",
 		"lit": "^2.8.0",
 		"msw": "^1.2.3",
 		"rxjs": "^7.8.1"
