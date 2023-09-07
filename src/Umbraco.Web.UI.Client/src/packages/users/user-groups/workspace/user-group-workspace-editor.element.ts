@@ -1,6 +1,6 @@
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context.js';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 // TODO: import from package when available
 //import { UmbUserInputElement } from '../../users/components/user-input/user-input.element.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -13,7 +13,6 @@ import {
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { ManifestUserPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	@state()
@@ -23,7 +22,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	private _userKeys?: Array<string>;
 
 	@state()
-	private _userPermissions: Array<ManifestUserPermission> = [];
+	private _userPermissionManifests: Array<ManifestUserPermission> = [];
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 	#modalContext?: UmbModalManagerContext;
@@ -35,7 +34,10 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 			this.#workspaceContext = instance;
 			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup));
 			this.observe(this.#workspaceContext.userIds, (userKeys) => (this._userKeys = userKeys));
-			this.observe(umbExtensionsRegistry.extensionsOfType('userPermission'), (userPermissionManifests) => this._userPermissions = userPermissionManifests);
+			this.observe(
+				umbExtensionsRegistry.extensionsOfType('userPermission'),
+				(userPermissionManifests) => (this._userPermissionManifests = userPermissionManifests),
+			);
 		});
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
@@ -112,12 +114,22 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 	#renderPermission(userPermissionManifest: ManifestUserPermission) {
 		return html`<div style="display: flex; align-items:center; border-bottom: 1px solid whitesmoke">
-			<uui-toggle></uui-toggle>
+			<uui-toggle
+				label=${userPermissionManifest.meta.label}
+				value=${ifDefined(this._userGroup?.permissions?.includes(userPermissionManifest.alias))}
+				@change=${(event: UUIBooleanInputEvent) =>
+					this.#changeUserPermission(event, userPermissionManifest)}></uui-toggle>
 			<div>
-				<h5>${ userPermissionManifest.meta.label }</h5>
-				<small>${ userPermissionManifest.meta.description }</small>
+				<h5>${userPermissionManifest.meta.label}</h5>
+				<small>${userPermissionManifest.meta.description}</small>
 			</div>
 		</div>`;
+	}
+
+	#changeUserPermission(event: UUIBooleanInputEvent, userPermissionManifest: ManifestUserPermission) {
+		event.target.checked
+			? this.#workspaceContext?.addPermission(userPermissionManifest.alias)
+			: this.#workspaceContext?.removePermission(userPermissionManifest.alias);
 	}
 
 	#renderLeftColumn() {
@@ -145,7 +157,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 			<uui-box>
 				<div slot="headline">Default Permissions</div>
-				${ this._userPermissions.map((permission) => this.#renderPermission(permission)) }
+				${this._userPermissionManifests.map((permission) => this.#renderPermission(permission))}
 			</uui-box>
 
 			<uui-box>

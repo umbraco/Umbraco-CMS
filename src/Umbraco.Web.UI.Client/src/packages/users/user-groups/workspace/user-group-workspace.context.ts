@@ -55,7 +55,7 @@ export class UmbUserGroupWorkspaceContext
 	getEntityId(): string | undefined {
 		throw new Error('Method not implemented.');
 	}
-	
+
 	getEntityType(): string {
 		return 'user-group';
 	}
@@ -63,6 +63,7 @@ export class UmbUserGroupWorkspaceContext
 	getData(): UserGroupResponseModel | undefined {
 		throw new Error('Method not implemented.');
 	}
+
 	async save() {
 		if (!this.#data.value) return;
 
@@ -104,10 +105,34 @@ export class UmbUserGroupWorkspaceContext
 	updateUserKeys(keys: Array<string>) {
 		this.#userIds.next(keys);
 	}
+
+	/**
+	 * Adds a permission to the user group permission array.
+	 * @param {string} permissionAlias
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	addPermission(permissionAlias: string) {
+		const permissions = this.#data.getValue()?.permissions ?? [];
+		const newValue = [...permissions, permissionAlias];
+		this.#data.update({ permissions: newValue });
+	}
+
+	/**
+	 * Removes a permission from the user group permission array.
+	 * @param {string} permissionAlias
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	removePermission(permissionAlias: string) {
+		const permissions = this.#data.getValue()?.permissions ?? [];
+		const newValue = permissions.filter((alias) => alias !== permissionAlias);
+		this.#data.update({ permissions: newValue });
+	}
 }
 
-
-export const UMB_USER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbUserGroupWorkspaceContext>(
+export const UMB_USER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<
+	UmbSaveableWorkspaceContextInterface,
+	UmbUserGroupWorkspaceContext
+>(
 	'UmbWorkspaceContext',
-	(context): context is UmbUserGroupWorkspaceContext => context.getEntityType?.() === 'user-group'
+	(context): context is UmbUserGroupWorkspaceContext => context.getEntityType?.() === 'user-group',
 );
