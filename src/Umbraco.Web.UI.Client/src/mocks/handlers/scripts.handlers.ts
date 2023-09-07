@@ -35,6 +35,13 @@ const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
+	rest.get(umbracoPath('/script/item'), (req, res, ctx) => {
+		const path = decodeURIComponent(req.url.searchParams.get('path') ?? '').replace('-js', '.js');
+		if (!path) return res(ctx.status(400, 'no body found'));
+		const response = umbScriptsData.getItem([path]);
+		return res(ctx.status(200), ctx.json(response));
+	}),
+
 	rest.post(umbracoPath('/script'), (req, res, ctx) => {
 		const requestBody = req.json() as CreateTextFileViewModelBaseModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));

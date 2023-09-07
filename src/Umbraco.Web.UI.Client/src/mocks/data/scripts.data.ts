@@ -1,11 +1,12 @@
 import { UmbData } from './data.js';
 import { UmbEntityData } from './entity.data.js';
-import { createFileSystemTreeItem, createTextFileItem } from './utils.js';
+import { createFileItemResponseModelBaseModel, createFileSystemTreeItem, createTextFileItem } from './utils.js';
 import {
 	CreatePathFolderRequestModel,
 	CreateTextFileViewModelBaseModel,
 	FileSystemTreeItemPresentationModel,
 	PagedFileSystemTreeItemPresentationModel,
+	ScriptItemResponseModel,
 	ScriptResponseModel,
 	UpdateScriptRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -136,6 +137,11 @@ class UmbScriptsData extends UmbData<ScriptsDataItem> {
 	getTreeItem(paths: Array<string>): Array<FileSystemTreeItemPresentationModel> {
 		const items = this.data.filter((item) => paths.includes(item.path ?? ''));
 		return items.map((item) => createFileSystemTreeItem(item));
+	}
+
+	getItem(paths: Array<string>): Array<ScriptItemResponseModel> {
+		const items = this.data.filter((item) => paths.includes(item.path ?? ''));
+		return items.map((item) => createFileItemResponseModelBaseModel(item));
 	}
 
 	getFolder(path: string): FileSystemTreeItemPresentationModel {
