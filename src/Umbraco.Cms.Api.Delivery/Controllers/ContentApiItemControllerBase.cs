@@ -10,10 +10,10 @@ namespace Umbraco.Cms.Api.Delivery.Controllers;
 
 public abstract class ContentApiItemControllerBase : ContentApiControllerBase
 {
-    // please remove this in V14 when the obsolete constructors have been removed
+    // TODO: Remove this in V14 when the obsolete constructors have been removed
     private readonly IPublicAccessService _publicAccessService;
 
-    [Obsolete($"Please use the parameterless constructor does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
+    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
     protected ContentApiItemControllerBase(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,

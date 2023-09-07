@@ -118,13 +118,12 @@ public class DeliveryApiSettings
     /// </summary>
     public class AuthorizationCodeFlowSettings
     {
-
         /// <summary>
         ///     Gets or sets a value indicating whether Authorization Code Flow should be enabled for the Delivery API.
         /// </summary>
         /// <value><c>true</c> if Authorization Code Flow should be enabled; otherwise, <c>false</c>.</value>
         [DefaultValue(StaticEnabled)]
-        public bool Enabled { get; set; }
+        public bool Enabled { get; set; } = StaticEnabled;
 
         /// <summary>
         ///     Gets or sets the URLs allowed to use as redirect targets after a successful login (session authorization).
