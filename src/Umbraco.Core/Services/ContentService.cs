@@ -1121,9 +1121,14 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(content));
         }
 
-        if (cultures == null || cultures.Any(c => c.IsNullOrWhiteSpace()) || cultures.Distinct().Count() != cultures.Length)
+        if (cultures is null)
         {
             throw new ArgumentNullException(nameof(cultures));
+        }
+
+        if (cultures.Any(c => c.IsNullOrWhiteSpace()) || cultures.Distinct().Count() != cultures.Length)
+        {
+            throw new ArgumentException("Cultures cannot be null or whitespace", nameof(cultures));
         }
 
         // we need to guard against unsaved changes before proceeding; the content will be saved, but we're not firing any saved notifications
@@ -1150,7 +1155,7 @@ public class ContentService : RepositoryService, IContentService
         {
             if (cultures.Length > 1 && cultures.Contains("*"))
             {
-                throw new NotSupportedException("Cannot combine wildcard and specific cultures when publishing variant content types.");
+                throw new ArgumentException("Cannot combine wildcard and specific cultures when publishing variant content types.", nameof(cultures));
             }
         }
         else
@@ -1162,7 +1167,7 @@ public class ContentService : RepositoryService, IContentService
 
             if (cultures[0] != "*" || cultures.Length > 1)
             {
-                throw new NotSupportedException($"Only wildcard culture is supported when publishing invariant content types.");
+                throw new ArgumentException($"Only wildcard culture is supported when publishing invariant content types.", nameof(cultures));
             }
         }
 

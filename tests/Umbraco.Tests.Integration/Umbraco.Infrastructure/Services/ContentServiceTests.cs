@@ -1184,23 +1184,38 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    [Ignore("TODO: fix this test")]
-    public void Can_Not_Publish_Invalid_Cultures()
+    public void Can_Not_Publish_Invalid_Cultures_For_Variant_Content()
     {
-        // TODO: fix this, it's all wrong - can't create content without culture names!
-        var content = new ContentBuilder()
-            .AddContentType()
-            .WithContentVariation(ContentVariation.Culture)
-            .Done()
-            .Build();
+        var contentType = ContentTypeBuilder.CreateBasicContentType();
+        contentType.Variations = ContentVariation.Culture;
+        ContentTypeService.Save(contentType);
+
+        var content = ContentBuilder.CreateBasicContent(contentType);
+        content.SetCultureName("Name for en-US", "en-US");
         ContentService.Save(content);
 
-        Assert.Throws<InvalidOperationException>(() => ContentService.Publish(content, new[] { "*" }));
-        Assert.Throws<InvalidOperationException>(
-            () => ContentService.Publish(content, new string[] { null }));
-        Assert.Throws<InvalidOperationException>(() => ContentService.Publish(content, new[] { "*", null }));
-        Assert.Throws<InvalidOperationException>(() =>
-            ContentService.Publish(content, new[] { "en-US", "*", "es-ES" }));
+        Assert.Throws<ArgumentNullException>(() => ContentService.Publish(content, null!));
+        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new string[] { null }));
+        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new [] { string.Empty }));
+        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new[] { "*", null }));
+        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new[] { "en-US", "*" }));
+    }
+
+    [Test]
+    public void Can_Not_Publish_Invalid_Cultures_For_Invariant_Content()
+    {
+        var contentType = ContentTypeBuilder.CreateBasicContentType();
+        ContentTypeService.Save(contentType);
+
+        var content = ContentBuilder.CreateBasicContent(contentType);
+        content.Name = "Content name";
+        ContentService.Save(content);
+
+        Assert.Throws<ArgumentNullException>(() => ContentService.Publish(content, null!));
+        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new string[] { null }));
+        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new[] { "*", null }));
+        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new[] { "en-US" }));
+        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new[] { "en-US", "*" }));
     }
 
     [Test]
