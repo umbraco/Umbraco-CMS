@@ -1,13 +1,12 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import type { UUIButtonState } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { until } from 'lit/directives/until.js';
 
-import type { UUIButtonState } from '@umbraco-ui/uui';
 import { UmbAuthMainContext } from '../../context/auth-main.context.js';
-import { umbLocalizationContext } from '../../localization/localization-context.js';
 import UmbRouter from '../../utils/umb-router.js';
+import { umbLocalizationContext } from '../../external/localization/localization-context.ts';
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends LitElement {
@@ -172,7 +171,6 @@ export default class UmbLoginPageElement extends LitElement {
 	}
 
 	static styles: CSSResultGroup = [
-		UUITextStyles,
 		css`
 			:host {
 				display: flex;

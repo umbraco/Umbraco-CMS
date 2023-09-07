@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-
 export type LoginRequestModel = {
 	username: string;
 	password: string;
@@ -14,7 +12,6 @@ export interface IUmbAuthContext {
 	newInvitedUserPassword(password: string): Promise<NewPasswordResponse>;
 	getMfaProviders(): Promise<MfaProvidersResponse>;
 	validateMfaCode(code: string, provider: string): Promise<LoginResponse>;
-	getIcons(): Observable<Record<string, string>>;
 	getPasswordConfig(userId: string): Promise<any>; //TODO Figure out the type
 	getInvitedUser(): Promise<any>; //TODO Figure out the type
 	disableLocalLogin: boolean;

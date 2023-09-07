@@ -3,7 +3,7 @@ import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
 import { UmbAuthMainContext } from '../../context/auth-main.context';
-import { umbLocalizationContext } from '../../localization/localization-context';
+import { umbLocalizationContext } from '../../external/localization/localization-context.ts';
 import { loadCustomView, renderCustomView } from '../../utils/load-custom-view.function';
 
 type MfaCustomViewElement = HTMLElement & {

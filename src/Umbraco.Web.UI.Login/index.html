@@ -10,9 +10,10 @@
 			import { startMockServiceWorker } from './src/mocks/index.ts';
 
 			if (import.meta.env.DEV) {
-				startMockServiceWorker();
+				await startMockServiceWorker();
 			}
 		</script>
+    <script type="module" src="/src/external.ts"></script>
 		<script type="module" src="/src/index.ts"></script>
 		<style>
 			body {
@@ -22,33 +23,35 @@
 		</style>
 	</head>
 	<body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
-		<umb-auth
-			is-legacy
-			logo-image="/umbraco_logo_white.svg"
-			background-image="/login.svg"
-			allow-password-reset
-			allow-user-invite>
-			<umb-external-login-provider
-				slot="external"
-				display-name="Google"
-				provider-name="Umbraco.Google"
-				icon="info"
-				external-logins-url="https://google.com"
-				button-look="primary"
-				button-color="positive"></umb-external-login-provider>
-			<umb-external-login-provider
-				slot="external"
-				display-name="Azure ID"
-				provider-name="Umbraco.Azure"
-				icon="lock"
-				external-logins-url="https://microsoft.com"
-				button-look="primary"
-				button-color="warning"></umb-external-login-provider>
-			<umb-external-login-provider
-				slot="external"
-				display-name="My provider"
-				provider-name="MyCustomScheme"
-				custom-view="/src/mocks/customViews/my-custom-view.js"></umb-external-login-provider>
-		</umb-auth>
+    <umb-backoffice-icon-registry>
+      <umb-auth
+        is-legacy
+        logo-image="/umbraco_logo_white.svg"
+        background-image="/login.svg"
+        allow-password-reset
+        allow-user-invite>
+        <umb-external-login-provider
+          slot="external"
+          display-name="Google"
+          provider-name="Umbraco.Google"
+          icon="info"
+          external-logins-url="https://google.com"
+          button-look="primary"
+          button-color="positive"></umb-external-login-provider>
+        <umb-external-login-provider
+          slot="external"
+          display-name="Azure ID"
+          provider-name="Umbraco.Azure"
+          icon="lock"
+          external-logins-url="https://microsoft.com"
+          button-look="primary"
+          button-color="warning"></umb-external-login-provider>
+        <umb-external-login-provider
+          slot="external"
+          display-name="My provider"
+          provider-name="MyCustomScheme"
+          custom-view="/src/mocks/customViews/my-custom-view.js"></umb-external-login-provider>
+      </umb-auth>
+    </umb-backoffice-icon-registry>
 	</body>
 </html>

@@ -4,9 +4,17 @@ import { defineConfig } from 'vite';
 export default defineConfig({
 	build: {
 		lib: {
-			entry: ['src/index.ts', 'src/external/custom-view.element.ts'],
+			entry: ['src/index.ts', 'src/external.ts'],
 			formats: ['es'],
 		},
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'uui': ['@umbraco-ui/uui'],
+          'vendor': ['lit', 'rxjs'],
+        },
+      }
+    },
 		target: 'esnext',
 		sourcemap: true,
 		outDir: '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/login',

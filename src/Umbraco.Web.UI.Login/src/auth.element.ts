@@ -1,10 +1,7 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbAuthMainContext } from './context/auth-main.context.js';
-import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
-import { UmbIconRegistry } from './utils/icon.registry.js';
 import UmbRouter from './utils/umb-router.js';
 
 @customElement('umb-auth')
@@ -47,13 +44,6 @@ export default class UmbAuthElement extends LitElement {
 	get returnPath() {
 		// Check if there is a ?redir querystring or else return the returnUrl attribute
 		return new URLSearchParams(window.location.search).get('returnPath') || this.#returnPath;
-	}
-
-	constructor() {
-		super();
-
-		new UUIIconRegistryEssential().attach(this);
-		new UmbIconRegistry().attach(this);
 	}
 
 	@state()
@@ -139,8 +129,6 @@ export default class UmbAuthElement extends LitElement {
 			</umb-auth-layout>
 		`;
 	}
-
-	static styles: CSSResultGroup = [UUITextStyles, css``];
 }
 
 declare global {

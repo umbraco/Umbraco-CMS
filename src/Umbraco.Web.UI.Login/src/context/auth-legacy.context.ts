@@ -8,7 +8,6 @@ import {
 	MfaProvidersResponse,
 } from '../types.js';
 import { UmbAuthLegacyRepository } from './auth-legacy.repository.js';
-import { Observable, ReplaySubject } from 'rxjs';
 
 export class UmbAuthLegacyContext implements IUmbAuthContext {
 	readonly supportsPersistLogin = true;
@@ -53,27 +52,5 @@ export class UmbAuthLegacyContext implements IUmbAuthContext {
 
 	validateMfaCode(code: string, provider: string): Promise<LoginResponse> {
 		return this.#authRepository.validateMfaCode(code, provider);
-	}
-
-	#iconsLoaded = false;
-	#icons = new ReplaySubject<Record<string, string>>(1);
-	getIcons(): Observable<Record<string, string>> {
-		if (!this.#iconsLoaded) {
-			this.#iconsLoaded = true;
-			fetch('backoffice/umbracoapi/icon/geticons')
-				.then((response) => {
-					if (!response.ok) {
-						throw new Error('Could not fetch icons');
-					}
-
-					return response.json();
-				})
-				.then((icons) => {
-					this.#icons.next(icons);
-					this.#icons.complete();
-				});
-		}
-
-		return this.#icons.asObservable();
 	}
 }
