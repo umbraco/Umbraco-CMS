@@ -1,12 +1,10 @@
 @using Microsoft.Extensions.Options;
 @using System.Globalization
-@using Umbraco.Cms.Core
 @using Umbraco.Cms.Core.Configuration
 @using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Hosting
 @using Umbraco.Cms.Core.Logging
 @using Umbraco.Cms.Core.Routing
-@using Umbraco.Cms.Core.Services
 @using Umbraco.Cms.Core.WebAssets
 @using Umbraco.Cms.Infrastructure.WebAssets
 @using Umbraco.Cms.Web.BackOffice.Controllers
@@ -18,7 +16,6 @@
 @inject IOptions<GlobalSettings> globalSettings
 @inject IRuntimeMinifier runtimeMinifier
 @inject IProfilerHtml profilerHtml
-@inject IIconService IconService
 @inject IBackOfficeExternalLoginProviders externalLogins
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out bool isDebug);
@@ -41,9 +38,11 @@
 
     @Html.Raw(await runtimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoInitCssBundleName))
 
+    <link rel="stylesheet" href="~/umbraco/login/style.css" asp-append-version="true" />
+    <script type="module" src="~/umbraco/login/external.js" asp-append-version="true"></script>
+    <script type="module" src="~/umbraco/login/index.js" asp-append-version="true"></script>
 </head>
 <body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show, 'umb-tour-is-visible': tour.show, 'tabbing-active':tabbingActive}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
-
     <noscript>
         <div class="flex flex-wrap flex-column items-center justify-center" style="height: 100%">
             <h1 class="h3">
@@ -59,62 +58,64 @@
         </div>
     </noscript>
 
-    <div ng-hide="!authenticated" ng-cloak>
+    <umb-backoffice-icon-registry>
+        <div ng-hide="!authenticated" ng-cloak>
 
-        <div style="display: none;" id="mainwrapper" class="clearfix">
+            <div style="display: none;" id="mainwrapper" class="clearfix">
 
-            <umb-app-header></umb-app-header>
+                <umb-app-header></umb-app-header>
 
-            <div class="umb-app-content">
+                <div class="umb-app-content">
 
-                <umb-navigation></umb-navigation>
+                    <umb-navigation></umb-navigation>
 
-                <section id="contentwrapper">
+                    <section id="contentwrapper">
 
-                    <div id="contentcolumn">
-                        <div class="umb-editor" ng-view></div>
-                    </div>
+                        <div id="contentcolumn">
+                            <div class="umb-editor" ng-view></div>
+                        </div>
 
-                </section>
+                    </section>
+
+                </div>
 
             </div>
 
+            <umb-tour ng-if="tour.show"
+                      model="tour">
+            </umb-tour>
+
+            <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
+            <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
+
+            <umb-search ng-attr-umb-focus-lock="true" ng-if="search.show" on-close="closeSearch()"></umb-search>
+
         </div>
 
-        <umb-tour ng-if="tour.show"
-                  model="tour">
-        </umb-tour>
+        <umb-notifications></umb-notifications>
 
-        <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
-        <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
+        <umb-backdrop ng-if="backdrop.show || infiniteMode"
+                      backdrop-opacity="backdrop.opacity"
+                      highlight-element="backdrop.element"
+                      highlight-prevent-click="backdrop.elementPreventClick"
+                      disable-events-on-click="backdrop.disableEventsOnClick">
+        </umb-backdrop>
 
-        <umb-search ng-attr-umb-focus-lock="true" ng-if="search.show" on-close="closeSearch()"></umb-search>
+        <umb-overlay ng-if="overlay.show"
+                     model="overlay"
+                     position="{{overlay.position}}"
+                     size="overlay.size"
+                     view="overlay.view"
+                     name="overlay.name"
+                     parent-scope="overlay.parentScope">
+        </umb-overlay>
 
-    </div>
+        <umb-editors ng-show="infiniteMode"></umb-editors>
 
-    <umb-notifications></umb-notifications>
-
-    <umb-backdrop ng-if="backdrop.show || infiniteMode"
-                  backdrop-opacity="backdrop.opacity"
-                  highlight-element="backdrop.element"
-                  highlight-prevent-click="backdrop.elementPreventClick"
-                  disable-events-on-click="backdrop.disableEventsOnClick">
-    </umb-backdrop>
-
-    <umb-overlay ng-if="overlay.show"
-                 model="overlay"
-                 position="{{overlay.position}}"
-                 size="overlay.size"
-                 view="overlay.view"
-                 name="overlay.name"
-                 parent-scope="overlay.parentScope">
-    </umb-overlay>
-
-    <umb-editors ng-show="infiniteMode"></umb-editors>
-
-    <umb-login ng-if="login.show"
-               on-login="hideLoginScreen()">
-    </umb-login>
+        <umb-login ng-if="login.show"
+                   on-login="hideLoginScreen()">
+        </umb-login>
+    </umb-backoffice-icon-registry>
 
     @await Html.BareMinimumServerVariablesScriptAsync(backOfficeServerVariables)
 
@@ -127,7 +128,6 @@
         }
     </script>
 
-    <script async type="module" src="@WebPath.Combine(backOfficePath.TrimStart("~"), "/login/custom-view.element.js")"></script>
     <script src="@WebPath.Combine(backOfficePath.TrimStart("~"), "/lib/lazyload-js/LazyLoad.min.js")"></script>
     <script src="@Url.GetUrlWithCacheBust("Application", "BackOffice", null!, hostingEnvironment, umbracoVersion, runtimeMinifier)"></script>
 

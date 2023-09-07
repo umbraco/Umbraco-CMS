@@ -36,8 +36,9 @@
         <link rel="icon" type="image/svg+xml" href="~/umbraco/login/favicon.svg"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <title>Umbraco</title>
+        <link rel="stylesheet" href="~/umbraco/login/style.css" asp-append-version="true" />
+        <script type="module" src="~/umbraco/login/external.js" asp-append-version="true"></script>
         <script type="module" src="~/umbraco/login/index.js" asp-append-version="true"></script>
-        <link rel="stylesheet" href="~/umbraco/login/style.css" asp-append-version="true"/>
         <style>
           body {
             margin: 0;
@@ -47,28 +48,30 @@
     </head>
 
     <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
-    <umb-auth
-        is-legacy
-        return-url="@backOfficePath"
-        logo-image="@loginLogoImage"
-        background-image="@loginBackgroundImage"
-        username-is-email="@usernameIsEmail"
-        allow-user-invite="@allowUserInvite"
-        allow-password-reset="@allowPasswordReset"
-        disable-local-login="@disableLocalLogin">
-        @foreach (var provider in externalLoginProviders)
-        {
-            <umb-external-login-provider
-                slot="external"
-                display-name="@provider.AuthenticationScheme.DisplayName"
-                provider-name="@provider.ExternalLoginProvider.AuthenticationType"
-                icon="@provider.ExternalLoginProvider.Options.Icon"
-                external-login-url="@externalLoginsUrl"
-                button-look="@provider.ExternalLoginProvider.Options.ButtonLook.ToString().ToLowerInvariant()"
-                button-color="@provider.ExternalLoginProvider.Options.ButtonColor.ToString().ToLowerInvariant()"
-                custom-view="@provider.ExternalLoginProvider.Options.CustomBackOfficeView">
-            </umb-external-login-provider>
-        }
-    </umb-auth>
+        <umb-backoffice-icon-registry>
+            <umb-auth
+                is-legacy
+                return-url="@backOfficePath"
+                logo-image="@loginLogoImage"
+                background-image="@loginBackgroundImage"
+                username-is-email="@usernameIsEmail"
+                allow-user-invite="@allowUserInvite"
+                allow-password-reset="@allowPasswordReset"
+                disable-local-login="@disableLocalLogin">
+                @foreach (var provider in externalLoginProviders)
+                {
+                    <umb-external-login-provider
+                        slot="external"
+                        display-name="@provider.AuthenticationScheme.DisplayName"
+                        provider-name="@provider.ExternalLoginProvider.AuthenticationType"
+                        icon="@provider.ExternalLoginProvider.Options.Icon"
+                        external-login-url="@externalLoginsUrl"
+                        button-look="@provider.ExternalLoginProvider.Options.ButtonLook.ToString().ToLowerInvariant()"
+                        button-color="@provider.ExternalLoginProvider.Options.ButtonColor.ToString().ToLowerInvariant()"
+                        custom-view="@provider.ExternalLoginProvider.Options.CustomBackOfficeView">
+                    </umb-external-login-provider>
+                }
+            </umb-auth>
+        </umb-backoffice-icon-registry>
     </body>
 </html>
