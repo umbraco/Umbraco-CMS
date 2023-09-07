@@ -58,4 +58,8 @@ export class UmbBackofficeIconRegistryElement extends UUIIconRegistryElement {
     new UUIIconRegistryEssential().attach(this);
     this.registry = new UmbIconRegistry();
   }
+
+  protected createRenderRoot() {
+    return this;
+  }
 }
