@@ -1,4 +1,3 @@
-using System.Net;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +18,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     private readonly IRequestRoutingService _requestRoutingService;
     private readonly IRequestRedirectService _requestRedirectService;
     private readonly IRequestPreviewService _requestPreviewService;
-    private readonly IRequestMemberService _requestMemberService;
+    private readonly IRequestMemberAccessService _requestMemberAccessService;
 
     [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
     public ByRouteContentApiController(
@@ -35,7 +34,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
             requestRoutingService,
             requestRedirectService,
             requestPreviewService,
-            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberService>())
+            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberAccessService>())
     {
     }
 
@@ -47,14 +46,14 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
         IRequestRoutingService requestRoutingService,
         IRequestRedirectService requestRedirectService,
         IRequestPreviewService requestPreviewService,
-        IRequestMemberService requestMemberService)
+        IRequestMemberAccessService requestMemberAccessService)
         : this(
             apiPublishedContentCache,
             apiContentResponseBuilder,
             requestRoutingService,
             requestRedirectService,
             requestPreviewService,
-            requestMemberService)
+            requestMemberAccessService)
     {
     }
 
@@ -65,13 +64,13 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
         IRequestRoutingService requestRoutingService,
         IRequestRedirectService requestRedirectService,
         IRequestPreviewService requestPreviewService,
-        IRequestMemberService requestMemberService)
+        IRequestMemberAccessService requestMemberAccessService)
         : base(apiPublishedContentCache, apiContentResponseBuilder)
     {
         _requestRoutingService = requestRoutingService;
         _requestRedirectService = requestRedirectService;
         _requestPreviewService = requestPreviewService;
-        _requestMemberService = requestMemberService;
+        _requestMemberAccessService = requestMemberAccessService;
     }
 
     /// <summary>
@@ -99,7 +98,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
         IPublishedContent? contentItem = GetContent(path);
         if (contentItem is not null)
         {
-            IActionResult? deniedAccessResult = await HandleMemberAccessAsync(contentItem, _requestMemberService);
+            IActionResult? deniedAccessResult = await HandleMemberAccessAsync(contentItem, _requestMemberAccessService);
             if (deniedAccessResult is not null)
             {
                 return deniedAccessResult;

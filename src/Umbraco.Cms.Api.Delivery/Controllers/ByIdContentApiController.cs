@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Delivery.Controllers;
 [ApiVersion("1.0")]
 public class ByIdContentApiController : ContentApiItemControllerBase
 {
-    private readonly IRequestMemberService _requestMemberService;
+    private readonly IRequestMemberAccessService _requestMemberAccessService;
 
     [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
     public ByIdContentApiController(
@@ -23,7 +23,7 @@ public class ByIdContentApiController : ContentApiItemControllerBase
         : this(
             apiPublishedContentCache,
             apiContentResponseBuilder,
-            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberService>())
+            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberAccessService>())
     {
     }
 
@@ -32,11 +32,11 @@ public class ByIdContentApiController : ContentApiItemControllerBase
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,
         IPublicAccessService publicAccessService,
-        IRequestMemberService requestMemberService)
+        IRequestMemberAccessService requestMemberAccessService)
         : this(
             apiPublishedContentCache,
             apiContentResponseBuilder,
-            requestMemberService)
+            requestMemberAccessService)
     {
     }
 
@@ -44,9 +44,9 @@ public class ByIdContentApiController : ContentApiItemControllerBase
     public ByIdContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,
-        IRequestMemberService requestMemberService)
+        IRequestMemberAccessService requestMemberAccessService)
         : base(apiPublishedContentCache, apiContentResponseBuilder)
-        => _requestMemberService = requestMemberService;
+        => _requestMemberAccessService = requestMemberAccessService;
 
     /// <summary>
     ///     Gets a content item by id.
@@ -68,7 +68,7 @@ public class ByIdContentApiController : ContentApiItemControllerBase
             return NotFound();
         }
 
-        IActionResult? deniedAccessResult = await HandleMemberAccessAsync(contentItem, _requestMemberService);
+        IActionResult? deniedAccessResult = await HandleMemberAccessAsync(contentItem, _requestMemberAccessService);
         if (deniedAccessResult is not null)
         {
             return deniedAccessResult;

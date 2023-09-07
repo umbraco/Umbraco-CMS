@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public interface IRequestMemberService
+public interface IRequestMemberAccessService
 {
     Task<PublicAccessStatus> MemberHasAccessToAsync(IPublishedContent content);
 

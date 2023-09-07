@@ -17,10 +17,10 @@ namespace Umbraco.Cms.Api.Delivery.Controllers;
 [ApiVersion("1.0")]
 public class QueryContentApiController : ContentApiControllerBase
 {
-    private readonly IRequestMemberService _requestMemberService;
+    private readonly IRequestMemberAccessService _requestMemberAccessService;
     private readonly IApiContentQueryService _apiContentQueryService;
 
-    [Obsolete($"Please use the constructor that accepts {nameof(IRequestMemberService)}. Will be removed in V14.")]
+    [Obsolete($"Please use the constructor that accepts {nameof(IRequestMemberAccessService)}. Will be removed in V14.")]
     public QueryContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilderBuilder,
@@ -29,7 +29,7 @@ public class QueryContentApiController : ContentApiControllerBase
             apiPublishedContentCache,
             apiContentResponseBuilderBuilder,
             apiContentQueryService,
-            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberService>())
+            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberAccessService>())
     {
     }
 
@@ -38,11 +38,11 @@ public class QueryContentApiController : ContentApiControllerBase
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilderBuilder,
         IApiContentQueryService apiContentQueryService,
-        IRequestMemberService requestMemberService)
+        IRequestMemberAccessService requestMemberAccessService)
         : base(apiPublishedContentCache, apiContentResponseBuilderBuilder)
     {
         _apiContentQueryService = apiContentQueryService;
-        _requestMemberService = requestMemberService;
+        _requestMemberAccessService = requestMemberAccessService;
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public class QueryContentApiController : ContentApiControllerBase
         int skip = 0,
         int take = 10)
     {
-        ProtectedAccess protectedAccess = await _requestMemberService.MemberAccessAsync();
+        ProtectedAccess protectedAccess = await _requestMemberAccessService.MemberAccessAsync();
         Attempt<PagedModel<Guid>, ApiContentQueryOperationStatus> queryAttempt = _apiContentQueryService.ExecuteQuery(fetch, filter, sort, protectedAccess, skip, take);
 
         if (queryAttempt.Success is false)

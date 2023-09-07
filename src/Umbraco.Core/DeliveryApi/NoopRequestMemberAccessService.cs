@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public class NoopRequestMemberService : IRequestMemberService
+public class NoopRequestMemberAccessService : IRequestMemberAccessService
 {
     public Task<PublicAccessStatus> MemberHasAccessToAsync(IPublishedContent content) => Task.FromResult(PublicAccessStatus.AccessAccepted);
 

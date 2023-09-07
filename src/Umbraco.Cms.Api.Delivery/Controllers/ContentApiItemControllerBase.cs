@@ -31,9 +31,9 @@ public abstract class ContentApiItemControllerBase : ContentApiControllerBase
     [Obsolete($"Please use {nameof(IPublicAccessService)} to test for content protection. Will be removed in V14.")]
     protected bool IsProtected(IPublishedContent content) => _publicAccessService.IsProtected(content.Path);
 
-    protected async Task<IActionResult?> HandleMemberAccessAsync(IPublishedContent content, IRequestMemberService requestMemberService)
+    protected async Task<IActionResult?> HandleMemberAccessAsync(IPublishedContent content, IRequestMemberAccessService requestMemberAccessService)
     {
-        PublicAccessStatus accessStatus = await requestMemberService.MemberHasAccessToAsync(content);
+        PublicAccessStatus accessStatus = await requestMemberAccessService.MemberHasAccessToAsync(content);
         return accessStatus is PublicAccessStatus.AccessAccepted
             ? null
             : accessStatus is PublicAccessStatus.AccessDenied

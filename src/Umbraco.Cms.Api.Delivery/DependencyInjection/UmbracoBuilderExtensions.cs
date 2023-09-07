@@ -34,7 +34,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiContentQueryProvider, ApiContentQueryProvider>();
         builder.Services.AddSingleton<IApiMediaQueryService, ApiMediaQueryService>();
         builder.Services.AddTransient<IMemberApplicationManager, MemberApplicationManager>();
-        builder.Services.AddTransient<IRequestMemberService, RequestMemberService>();
+        builder.Services.AddTransient<IRequestMemberAccessService, RequestMemberAccessService>();
 
         builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
         builder.AddUmbracoApiOpenApiUI();

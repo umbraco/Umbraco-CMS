@@ -16,14 +16,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
 
-internal sealed class RequestMemberService : IRequestMemberService
+internal sealed class RequestMemberAccessService : IRequestMemberAccessService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IPublicAccessService _publicAccessService;
     private readonly IPublicAccessChecker _publicAccessChecker;
     private readonly DeliveryApiSettings _deliveryApiSettings;
 
-    public RequestMemberService(
+    public RequestMemberAccessService(
         IHttpContextAccessor httpContextAccessor,
         IPublicAccessService publicAccessService,
         IPublicAccessChecker publicAccessChecker,
