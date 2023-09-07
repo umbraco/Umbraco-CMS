@@ -161,7 +161,7 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             selectorOperation.And(
                 inner => inner
                     .Field(UmbracoExamineFieldNames.DeliveryApiContentIndex.Protected, "n")
-                    .Or(i2 => i2
+                    .Or(protectedAccessInner => protectedAccessInner
                         .GroupedOr(
                             new[] { UmbracoExamineFieldNames.DeliveryApiContentIndex.ProtectedAccess },
                             protectedAccessValues.ToArray())),
