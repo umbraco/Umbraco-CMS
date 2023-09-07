@@ -42,7 +42,7 @@ const scriptsFolderActions: Array<ManifestEntityAction> = [
 			label: 'New empty script',
 			api: UmbCreateScriptAction,
 			repositoryAlias: SCRIPTS_REPOSITORY_ALIAS,
-			entityTypes: [SCRIPTS_FOLDER_ENTITY_TYPE, SCRIPTS_ROOT_ENTITY_TYPE],
+			entityTypes: [SCRIPTS_FOLDER_ENTITY_TYPE, SCRIPTS_FOLDER_EMPTY_ENTITY_TYPE, SCRIPTS_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
