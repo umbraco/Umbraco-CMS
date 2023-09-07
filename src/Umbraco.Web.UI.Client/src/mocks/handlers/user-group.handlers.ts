@@ -1,12 +1,12 @@
 const { rest } = window.MockServiceWorker;
-import { umbUserGroupsData } from '../data/user-groups.data.js';
+import { umbUserGroupData } from '../data/user-group.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 const slug = '/user-group';
 
 export const handlers = [
 	rest.get(umbracoPath(`${slug}`), (req, res, ctx) => {
-		const response = umbUserGroupsData.getAll();
+		const response = umbUserGroupData.getAll();
 
 		return res(ctx.status(200), ctx.json(response));
 	}),
@@ -14,8 +14,19 @@ export const handlers = [
 	rest.get(umbracoPath(`${slug}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return;
-		const userGroup = umbUserGroupsData.getById(id);
+		const userGroup = umbUserGroupData.getById(id);
 
 		return res(ctx.status(200), ctx.json(userGroup));
+	}),
+
+	rest.put(umbracoPath(`${slug}/:id`), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
+		const data = await req.json();
+		if (!data) return;
+
+		umbUserGroupData.save(id, data);
+
+		return res(ctx.status(200));
 	}),
 ];
