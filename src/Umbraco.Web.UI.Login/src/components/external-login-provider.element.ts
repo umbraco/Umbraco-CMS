@@ -1,5 +1,5 @@
-import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui';
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import type { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui';
+import {css, CSSResultGroup, html, LitElement, nothing} from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
 import { loadCustomView, renderCustomView } from '../utils/load-custom-view.function';
@@ -116,7 +116,8 @@ export class UmbExternalLoginProviderElement extends LitElement {
 					label="Continue with ${this.displayName}"
 					.look=${this.buttonLook}
 					.color=${this.buttonColor}>
-					<div><uui-icon name=${this.icon}></uui-icon> Continue with ${this.displayName}</div>
+          ${this.displayName ? html`<div><uui-icon name=${this.icon}></uui-icon> Continue with ${this.displayName}</div>` : nothing}
+          <slot></slot>
 				</uui-button>
 			</form>
 		`;

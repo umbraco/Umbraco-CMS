@@ -66,7 +66,17 @@ public static class HtmlHelperBackOfficeExtensions
             {
                 authType = p.ExternalLoginProvider.AuthenticationType,
                 caption = p.AuthenticationScheme.DisplayName,
-                properties = p.ExternalLoginProvider.Options
+                options = new
+                {
+                    allowManualLinking = p.ExternalLoginProvider.Options.AutoLinkOptions.AllowManualLinking,
+                    buttonStyle = p.ExternalLoginProvider.Options.ButtonStyle,
+                    buttonLook = p.ExternalLoginProvider.Options.ButtonLook.ToString().ToLowerInvariant(),
+                    buttonColor = p.ExternalLoginProvider.Options.ButtonColor.ToString().ToLowerInvariant(),
+                    customBackOfficeView = p.ExternalLoginProvider.Options.CustomBackOfficeView,
+                    denyLocalLogin = p.ExternalLoginProvider.Options.DenyLocalLogin,
+                    icon = p.ExternalLoginProvider.Options.Icon,
+                },
+                properties = p.ExternalLoginProvider.Options,
             })
             .ToArray();
 
