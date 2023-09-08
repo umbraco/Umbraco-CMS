@@ -74,7 +74,7 @@ export class UmbScriptsWorkspaceContext extends UmbWorkspaceContext<UmbScriptsRe
 			const createRequestBody = {
 				name: script.name,
 				content: script.content,
-				parentPath: script.path === 'null' ? null : script.path + '/',
+				parentPath: script.path + '/',
 			};
 
 			this.repository.create(createRequestBody);
