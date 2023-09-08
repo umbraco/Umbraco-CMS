@@ -101,14 +101,14 @@ export default class UmbLoginPageElement extends LitElement {
 						<uui-form>
 							<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
 								<uui-form-layout-item>
-									<uui-label id="emailLabel" for="email" slot="label" required>
+									<uui-label id="emailLabel" for="umb-username" slot="label" required>
 										${this.usernameIsEmail
 											? html`<umb-localize key="general_email">Email</umb-localize>`
 											: html`<umb-localize key="user_username">Name</umb-localize>`}
 									</uui-label>
 									<uui-input
 										type=${this.usernameIsEmail ? 'email' : 'text'}
-										id="email"
+										id="umb-username"
 										name="email"
 										label=${this.usernameIsEmail
 											? until(umbLocalizationContext.localize('general_email', 'Email'))
@@ -118,11 +118,11 @@ export default class UmbLoginPageElement extends LitElement {
 								</uui-form-layout-item>
 
 								<uui-form-layout-item>
-									<uui-label id="passwordLabel" for="password" slot="label" required>
+									<uui-label id="passwordLabel" for="umb-password" slot="label" required>
 										<umb-localize key="user_password">Password</umb-localize>
 									</uui-label>
 									<uui-input-password
-										id="password"
+										id="umb-password"
 										name="password"
 										label=${until(umbLocalizationContext.localize('user_password'), 'Password')}
 										required
@@ -151,7 +151,7 @@ export default class UmbLoginPageElement extends LitElement {
 
 								<uui-button
 									type="submit"
-									id="login-button"
+									id="umb-login-button"
 									look="primary"
 									label="Login"
 									color="default"
@@ -170,7 +170,7 @@ export default class UmbLoginPageElement extends LitElement {
 	#renderErrorMessage() {
 		if (!this._loginError || this._loginState !== 'failed') return nothing;
 
-		return html`<span class="text-danger">${this._loginError}</span>`;
+		return html`<span class="text-error text-danger">${this._loginError}</span>`;
 	}
 
 	static styles: CSSResultGroup = [
@@ -199,7 +199,7 @@ export default class UmbLoginPageElement extends LitElement {
 				width: 100%;
 				border-radius: var(--uui-border-radius);
 			}
-			#login-button {
+			#umb-login-button {
 				width: 100%;
 				--uui-button-padding-top-factor: 1.5;
 				--uui-button-padding-bottom-factor: 1.5;
