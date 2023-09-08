@@ -1,0 +1,31 @@
+schedules:
+- cron: '0 0 * * *'
+  displayName: Daily midnight build
+  branches:
+    include:
+    - v9/dev
+    - v10/dev
+    - v12/dev
+    - v13/dev
+    - v14/dev
+
+steps:
+- task: TriggerBuild@4
+  inputs:
+    definitionIsInCurrentTeamProject: true
+    buildDefinition: '301'
+    queueBuildForUserThatTriggeredBuild: true
+    ignoreSslCertificateErrors: false
+    useSameSourceVersion: false
+    useCustomSourceVersion: false
+    useSameBranch: true
+    waitForQueuedBuildsToFinish: false
+    storeInEnvironmentVariable: false
+    buildParameters: 'sqlServerIntegrationTests: true, forceReleaseTestFilter: true'
+    authenticationMethod: 'Personal Access Token'
+    password: 'ddf'
+    enableBuildInQueueCondition: false
+    dependentOnSuccessfulBuildCondition: false
+    dependentOnFailedBuildCondition: false
+    checkbuildsoncurrentbranch: false
+    failTaskIfConditionsAreNotFulfilled: false
