@@ -21,7 +21,7 @@ steps:
     useSameBranch: true
     waitForQueuedBuildsToFinish: false
     storeInEnvironmentVariable: false
-    buildParameters: 'sqlServerIntegrationTests: true, forceReleaseTestFilter: true'
+    templateParameters: 'sqlServerIntegrationTests: true, forceReleaseTestFilter: true'
     authenticationMethod: 'OAuth Token'
     enableBuildInQueueCondition: false
     dependentOnSuccessfulBuildCondition: false
