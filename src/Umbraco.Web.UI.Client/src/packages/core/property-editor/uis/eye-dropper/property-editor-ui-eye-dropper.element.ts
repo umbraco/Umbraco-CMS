@@ -2,7 +2,7 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import { UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-property-editor-ui-eye-dropper
@@ -21,7 +21,7 @@ export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implemen
 	private _swatches: string[] = [];
 
 	@property({ attribute: false })
-	public set config(config: UmbDataTypeConfigCollection | undefined) {
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (config) {
 			this._opacity = config.getValueByAlias('showAlpha') ?? this.#defaultOpacity;
 			this._swatches = config.getValueByAlias('palette') ?? [];

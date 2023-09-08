@@ -2,7 +2,7 @@ import { html, customElement, property } from '@umbraco-cms/backoffice/external/
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-property-editor-ui-member-picker
@@ -13,7 +13,7 @@ export class UmbPropertyEditorUIMemberPickerElement extends UmbLitElement implem
 	value = '';
 
 	@property({ attribute: false })
-	public config?: UmbDataTypeConfigCollection;
+	public config?: UmbPropertyEditorConfigCollection;
 
 	render() {
 		return html`<div>umb-property-editor-ui-member-picker</div>`;

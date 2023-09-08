@@ -14,7 +14,7 @@ import {
 	UmbContextProviderController,
 	UmbContextToken,
 } from '@umbraco-cms/backoffice/context-api';
-import { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseController {
 
@@ -28,7 +28,7 @@ export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseControl
 	public readonly value = this.#data.asObservablePart((data) => data.value);
 	public readonly configValues = this.#data.asObservablePart((data) => data.config);
 
-	#configCollection = new UmbClassState<UmbDataTypeConfigCollection | undefined>(undefined);
+	#configCollection = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
 	public readonly config = this.#configCollection.asObservable();
 
 	private _editor = new UmbBasicState<UmbPropertyEditorExtensionElement | undefined>(undefined);
@@ -65,7 +65,7 @@ export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseControl
 		this._providerController = new UmbContextProviderController(host, UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, this);
 
 		this.observe(this.configValues, (configValues) => {
-			this.#configCollection.next(configValues ? new UmbDataTypeConfigCollection(configValues) : undefined);
+			this.#configCollection.next(configValues ? new UmbPropertyEditorConfigCollection(configValues) : undefined);
 		});
 
 		this.observe(this.variantId, () => {
@@ -123,8 +123,7 @@ export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseControl
 	public setDescription(description: WorkspacePropertyData<ValueType>['description']) {
 		this.#data.update({ description });
 	}
-	// TODO: Refactor: consider rename to setValue:
-	public changeValue(value: WorkspacePropertyData<ValueType>['value']) {
+	public setValue(value: WorkspacePropertyData<ValueType>['value']) {
 		const alias = this.#data.getValue().alias;
 		if (!this.#variantContext || !alias) return;
 
@@ -141,7 +140,7 @@ export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseControl
 	}
 
 	public resetValue() {
-		this.changeValue(null); // TODO: We should get the default value from Property Editor maybe even later the DocumentType, as that would hold the default value for the property.
+		this.setValue(null); // TODO: We should get the default value from Property Editor maybe even later the DocumentType, as that would hold the default value for the property.
 	}
 
 	public destroy(): void {

@@ -1,6 +1,6 @@
-import type { UmbDataTypeConfigCollection } from '@umbraco-cms/backoffice/components';
+import type { UmbPropertyEditorConfigCollection } from "@umbraco-cms/backoffice/property-editor";
 
 export interface UmbPropertyEditorExtensionElement extends HTMLElement {
 	value: unknown;
-	config?: UmbDataTypeConfigCollection;
+	config?: UmbPropertyEditorConfigCollection;
 }
