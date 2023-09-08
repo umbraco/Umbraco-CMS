@@ -141,13 +141,23 @@ public class BackOfficeController : UmbracoController
             return RedirectToLogin(null);
         }
 
-        var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
-            .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
+        ViewResult defaultView = DefaultView();
 
         return await RenderDefaultOrProcessExternalLoginAsync(
             result,
-            () => View(viewPath),
-            () => View(viewPath));
+            () => defaultView,
+            () => defaultView);
+    }
+
+    /// <summary>
+    ///     Returns the default view for the BackOffice
+    /// </summary>
+    /// <returns>The default view currently /umbraco/UmbracoBackOffice/Default.cshtml</returns>
+    public ViewResult DefaultView()
+    {
+        var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
+            .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
+        return View(viewPath);
     }
 
     [HttpGet]
@@ -453,15 +463,8 @@ public class BackOfficeController : UmbracoController
         Func<IActionResult> defaultResponse,
         Func<IActionResult> externalSignInResponse)
     {
-        if (defaultResponse is null)
-        {
-            throw new ArgumentNullException(nameof(defaultResponse));
-        }
-
-        if (externalSignInResponse is null)
-        {
-            throw new ArgumentNullException(nameof(externalSignInResponse));
-        }
+        ArgumentNullException.ThrowIfNull(defaultResponse);
+        ArgumentNullException.ThrowIfNull(externalSignInResponse);
 
         ViewData.SetUmbracoPath(_globalSettings.GetUmbracoMvcArea(_hostingEnvironment));
 

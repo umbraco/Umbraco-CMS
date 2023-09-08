@@ -72,19 +72,9 @@ internal class FileNameTests
 
     [Test]
     [AutoMoqData]
-    public async Task BackOfficeDefaultExists(
-        [Frozen] IHostingEnvironment hostingEnvironment,
-        [Frozen] ITempDataDictionary tempDataDictionary,
-        [Frozen] IRuntimeState runtimeState,
-        BackOfficeController sut)
+    public void BackOfficeDefaultExists(BackOfficeController sut)
     {
-        Mock.Get(hostingEnvironment).Setup(x => x.ToAbsolute("/")).Returns("http://localhost/");
-        Mock.Get(hostingEnvironment).SetupGet(x => x.ApplicationVirtualPath).Returns("/");
-        Mock.Get(runtimeState).Setup(x => x.Level).Returns(RuntimeLevel.Run);
-
-        sut.TempData = tempDataDictionary;
-
-        var viewResult = await sut.Default() as ViewResult;
+        var viewResult = sut.DefaultView();
         var fileName = GetViewName(viewResult);
         var views = GetUiFiles(new[] { "umbraco", "UmbracoBackOffice" });
 
