@@ -42,6 +42,12 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbTrashEntityAction,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission',
+				match: 'Umb.UserPermission.Document.Trash',
+			},
+		],
 	},
 	{
 		type: 'entityAction',
