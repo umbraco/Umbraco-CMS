@@ -60,6 +60,11 @@ public class SecuritySettings
     public bool UsernameIsEmail { get; set; } = true;
 
     /// <summary>
+    ///     Gets or sets a value indicating whether the member's email address must be unique.
+    /// </summary>
+    public bool RequireUniqueEmailForMembers { get; set; } = true;
+
+    /// <summary>
     ///     Gets or sets the set of allowed characters for a username
     /// </summary>
     [DefaultValue(StaticAllowedUserNameCharacters)]

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
@@ -23,6 +25,7 @@ internal class
     private readonly IMemberService _memberService;
     private readonly IMemberTypeService _memberTypeService;
     private readonly IShortStringHelper _shortStringHelper;
+    private readonly SecuritySettings _securitySettings;
 
     public MemberSaveModelValidator(
         ILogger<MemberSaveModelValidator> logger,
@@ -30,13 +33,15 @@ internal class
         IMemberTypeService memberTypeService,
         IMemberService memberService,
         IShortStringHelper shortStringHelper,
-        IPropertyValidationService propertyValidationService)
+        IPropertyValidationService propertyValidationService,
+        SecuritySettings securitySettings)
         : base(logger, propertyValidationService)
     {
         _backofficeSecurity = backofficeSecurity;
         _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
         _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
         _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+        _securitySettings = securitySettings;
     }
 
     public override bool ValidatePropertiesData(
@@ -179,6 +184,11 @@ internal class
 
     internal bool ValidateUniqueEmail(MemberSave model)
     {
+        if(_securitySettings.RequireUniqueEmailForMembers == false)
+        {
+            return true;
+        }
+
         if (model == null)
         {
             throw new ArgumentNullException(nameof(model));
