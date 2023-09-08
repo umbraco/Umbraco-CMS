@@ -22,8 +22,7 @@ steps:
     waitForQueuedBuildsToFinish: false
     storeInEnvironmentVariable: false
     buildParameters: 'sqlServerIntegrationTests: true, forceReleaseTestFilter: true'
-    authenticationMethod: 'Personal Access Token'
-    password: 'ddf'
+    authenticationMethod: 'OAuth Token'
     enableBuildInQueueCondition: false
     dependentOnSuccessfulBuildCondition: false
     dependentOnFailedBuildCondition: false
