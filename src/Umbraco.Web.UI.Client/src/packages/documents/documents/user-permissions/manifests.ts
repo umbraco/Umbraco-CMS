@@ -7,25 +7,25 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Read Document User Permission',
 		meta: {
 			label: 'Read',
-      description: 'Allow access to browse documents',
+			description: 'Allow access to browse documents',
 		},
 	},
-  {
+	{
 		type: 'userPermission',
 		alias: 'Umb.UserPermission.Document.CreateBlueprint',
 		name: 'Create Document Blueprint User Permission',
 		meta: {
 			label: 'Create Content Template',
-      description: 'Allow access to create a Content Template'
+			description: 'Allow access to create a Content Template',
 		},
 	},
-  {
+	{
 		type: 'userPermission',
 		alias: 'Umb.UserPermission.Document.Delete',
 		name: 'Delete Document User Permission',
 		meta: {
 			label: 'Delete',
-      description: 'Allow access to delete a document'
+			description: 'Allow access to delete a document',
 		},
 	},
 	{
@@ -34,7 +34,7 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Create Document User Permission',
 		meta: {
 			label: 'Create',
-      description: 'Allow access to create a document'
+			description: 'Allow access to create a document',
 		},
 	},
 	{
@@ -43,7 +43,7 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Document Notifications User Permission',
 		meta: {
 			label: 'Notifications',
-      description: 'Allow access to setup notifications for documents'
+			description: 'Allow access to setup notifications for documents',
 		},
 	},
 	{
@@ -52,7 +52,7 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Publish Document User Permission',
 		meta: {
 			label: 'Publish',
-      description: 'Allow access to publish a document'
+			description: 'Allow access to publish a document',
 		},
 	},
 	{
@@ -61,7 +61,7 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Document Permissions User Permission',
 		meta: {
 			label: 'Permissions',
-      description: 'Allow access to change permissions for a document'
+			description: 'Allow access to change permissions for a document',
 		},
 	},
 	{
@@ -70,7 +70,7 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Send Document For Approval User Permission',
 		meta: {
 			label: 'Send For Approval',
-      description: 'Allow access to send a document for approval before publishing'
+			description: 'Allow access to send a document for approval before publishing',
 		},
 	},
 	{
@@ -79,7 +79,7 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Unpublish Document User Permission',
 		meta: {
 			label: 'Unpublish',
-      description: 'Allow access to unpublish a document'
+			description: 'Allow access to unpublish a document',
 		},
 	},
 	{
@@ -88,7 +88,7 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Update Document User Permission',
 		meta: {
 			label: 'Update',
-      description: 'Allow access to save a document'
+			description: 'Allow access to save a document',
 		},
 	},
 ];
