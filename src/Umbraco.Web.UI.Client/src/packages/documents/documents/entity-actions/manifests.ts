@@ -29,6 +29,12 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbCreateDocumentEntityAction,
 			entityTypes: [DOCUMENT_ROOT_ENTITY_TYPE, DOCUMENT_ENTITY_TYPE],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission',
+				match: 'Umb.UserPermission.Document.Create',
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -45,7 +51,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.UserPermission',
-				match: 'Umb.UserPermission.Document.Trash',
+				match: 'Umb.UserPermission.Document.Delete',
 			},
 		],
 	},
