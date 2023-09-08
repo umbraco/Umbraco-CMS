@@ -49,13 +49,19 @@ export default class UmbAuthElement extends LitElement {
 	@state()
 	router?: UmbRouter;
 
+	/**
+	 * Override the default flow.
+	 * @private
+	 */
+  	#flow?: 'mfa' | 'reset-password' | 'invite-user';
+
 	async firstUpdated(): Promise<void> {
 		this.router = new UmbRouter(this, [
 			{
 				path: 'login',
 				component: () => {
 					const searchParams = new URLSearchParams(window.location.search);
-					let flow = searchParams.get('flow')?.toLowerCase();
+					let flow = this.#flow || searchParams.get('flow')?.toLowerCase();
 					const status = searchParams.get('status');
 
 					if (status === 'resetCodeExpired') {
@@ -99,8 +105,10 @@ export default class UmbAuthElement extends LitElement {
 
 						default:
 							return html`<umb-login-page
+                      			@umb-login-mfa=${this.onMfaRequired}
 								?allow-password-reset=${this.allowPasswordReset}
 								?username-is-email=${this.usernameIsEmail}>
+								<slot name="subheadline" slot="subheadline"></slot>
 								<slot name="external" slot="external"></slot>
 							</umb-login-page>`;
 					}
@@ -129,6 +137,11 @@ export default class UmbAuthElement extends LitElement {
 			</umb-auth-layout>
 		`;
 	}
+
+  private onMfaRequired() {
+    this.#flow = 'mfa';
+	this.requestUpdate();
+  }
 }
 
 declare global {

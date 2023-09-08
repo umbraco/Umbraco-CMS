@@ -5,8 +5,7 @@ import { when } from 'lit/directives/when.js';
 import { until } from 'lit/directives/until.js';
 
 import { UmbAuthMainContext } from '../../context/auth-main.context.js';
-import UmbRouter from '../../utils/umb-router.js';
-import { umbLocalizationContext } from '../../external/localization/localization-context.ts';
+import { umbLocalizationContext } from '../../external/localization/localization-context.js';
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends LitElement {
@@ -60,11 +59,14 @@ export default class UmbLoginPageElement extends LitElement {
 			if (response.twoFactorView) {
 				UmbAuthMainContext.Instance.twoFactorView = response.twoFactorView;
 			}
-			UmbRouter.redirect('login?flow=mfa');
+      		this.dispatchEvent(new CustomEvent('umb-login-mfa'));
 			return;
 		}
 
-		if (response.error) return;
+		if (response.error) {
+			this.dispatchEvent(new CustomEvent('umb-login-failed', { bubbles: true, composed: true, detail: response }));
+			return;
+		};
 
 		const returnPath = this.#authContext.returnPath;
 
@@ -72,7 +74,7 @@ export default class UmbLoginPageElement extends LitElement {
 			location.href = returnPath;
 		}
 
-		this.dispatchEvent(new CustomEvent('login-success', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('umb-login-success', { bubbles: true, composed: true }));
 	};
 
 	get #greetingLocalizationKey() {
@@ -92,6 +94,7 @@ export default class UmbLoginPageElement extends LitElement {
 			<h1 id="greeting" class="uui-h3">
 				<umb-localize .key=${this.#greetingLocalizationKey}>Welcome to Umbraco</umb-localize>
 			</h1>
+			<slot name="subheadline"></slot>
 			${this.disableLocalLogin
 				? nothing
 				: html`

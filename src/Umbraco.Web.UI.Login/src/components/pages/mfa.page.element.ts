@@ -107,7 +107,7 @@ export default class UmbMfaPageElement extends LitElement {
 				location.href = returnPath;
 			}
 
-			this.dispatchEvent(new CustomEvent('login-success', { bubbles: true, composed: true }));
+			this.dispatchEvent(new CustomEvent('umb-login-success', { bubbles: true, composed: true }));
 		} catch (e) {
 			if (e instanceof Error) {
 				this.error = e.message ?? 'Unknown error';
@@ -115,6 +115,7 @@ export default class UmbMfaPageElement extends LitElement {
 				this.error = 'Unknown error';
 			}
 			this.buttonState = 'failed';
+			this.dispatchEvent(new CustomEvent('umb-login-failed', { bubbles: true, composed: true, detail: e }));
 		}
 	}
 
