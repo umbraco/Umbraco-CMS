@@ -1,3 +1,4 @@
+import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
 import { UmbBaseController } from '@umbraco-cms/backoffice/controller-api';
 import {
 	ManifestCondition,
@@ -16,18 +17,12 @@ export class UmbUserPermissionCondition extends UmbBaseController implements Umb
 		this.config = args.config;
 		this.#onChange = args.onChange;
 
-		console.log('HELLO FROM MY CONDITION');
-		console.log('GET CURRENT USER CONTEXT');
-		this.permitted = true;
-
-		/*
-		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (context) => {
-			this.observe(context.alias, (sectionAlias) => {
-				this.permitted = sectionAlias === this.config.match;
+		this.consumeContext(UMB_AUTH, (context) => {
+			this.observe(context.currentUser, (currentUser) => {
+				this.permitted = currentUser?.permissions?.includes(this.config.match) || false;
 				this.#onChange();
 			});
 		});
-    */
 	}
 }
 
