@@ -220,6 +220,15 @@ public interface IMemberService : IMembershipMemberService
     IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias);
 
     /// <summary>
+    ///     Get an list of <see cref="IMember"/> for all members with the specified email.
+    /// </summary>
+    //// <param name="email">Email to use for retrieval</param>
+    /// <returns>
+    ///     <see cref="IEnumerable{IMember}" />
+    /// </returns>
+    IEnumerable<IMember> GetMembersByEmail(string email);
+
+    /// <summary>
     ///     Gets all Members for the MemberType id
     /// </summary>
     /// <param name="memberTypeId">Id of the MemberType</param>
