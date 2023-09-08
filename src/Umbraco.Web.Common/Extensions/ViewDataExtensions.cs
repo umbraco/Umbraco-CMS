@@ -21,7 +21,7 @@ public static class ViewDataExtensions
 
     public static bool FromTempData(this ViewDataDictionary viewData, ITempDataDictionary tempData, string token)
     {
-        if (tempData[token] == null)
+        if (tempData?[token] is null)
         {
             return false;
         }
