@@ -72,6 +72,18 @@ internal class FileNameTests
 
     [Test]
     [AutoMoqData]
+    public async Task LoginViewExists(BackOfficeController sut)
+    {
+        var viewResult = await sut.Login() as ViewResult;
+        var fileName = GetViewName(viewResult);
+
+        var views = GetUiFiles(new[] { "umbraco", "UmbracoLogin" });
+
+        Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
+    }
+
+    [Test]
+    [AutoMoqData]
     public void BackOfficeDefaultExists(BackOfficeController sut)
     {
         var viewResult = sut.DefaultView();
