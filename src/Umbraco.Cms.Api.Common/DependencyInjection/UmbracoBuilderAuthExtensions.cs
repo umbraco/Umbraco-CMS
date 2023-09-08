@@ -9,24 +9,15 @@ namespace Umbraco.Cms.Api.Common.DependencyInjection;
 public static class UmbracoBuilderAuthExtensions
 {
     private static bool _initialized;
-    private static SemaphoreSlim _initializedLocker = new(1);
 
     public static IUmbracoBuilder AddUmbracoOpenIddict(this IUmbracoBuilder builder)
     {
-        if (_initialized)
-        {
-            return builder;
-        }
-
-        _initializedLocker.Wait();
-
         if (_initialized is false)
         {
             ConfigureOpenIddict(builder);
             _initialized = true;
         }
 
-        _initializedLocker.Release();
         return builder;
     }
 
