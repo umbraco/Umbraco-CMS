@@ -1,5 +1,5 @@
-import { UUITextStyles } from "@umbraco-ui/uui-css";
-import { css } from "lit";
+import { UUITextStyles } from "@umbraco-cms/backoffice/external/uui";
+import { css } from "@umbraco-cms/backoffice/external/lit";
 
 
 export const UmbTextStyles = css`
