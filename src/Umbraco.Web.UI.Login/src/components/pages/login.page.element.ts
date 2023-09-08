@@ -4,12 +4,11 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { until } from 'lit/directives/until.js';
 
-import { UmbAuthMainContext } from '../../context/auth-main.context.js';
+import { umbAuthContext } from '../../context/auth.context.js';
 import { umbLocalizationContext } from '../../external/localization/localization-context.js';
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends LitElement {
-	#authContext = UmbAuthMainContext.Instance;
 
 	@property({ type: Boolean, attribute: 'username-is-email' })
 	usernameIsEmail = false;
@@ -25,7 +24,7 @@ export default class UmbLoginPageElement extends LitElement {
 
 	@state()
 	private get disableLocalLogin() {
-		return UmbAuthMainContext.Instance.disableLocalLogin;
+		return umbAuthContext.disableLocalLogin;
 	}
 
 	#handleSubmit = async (e: SubmitEvent) => {
@@ -44,7 +43,7 @@ export default class UmbLoginPageElement extends LitElement {
 
 		this._loginState = 'waiting';
 
-		const response = await this.#authContext.login({
+		const response = await umbAuthContext.login({
 			username,
 			password,
 			persist,
@@ -55,11 +54,11 @@ export default class UmbLoginPageElement extends LitElement {
 
 		// Check for 402 status code indicating that MFA is required
 		if (response.status === 402) {
-			UmbAuthMainContext.Instance.isMfaEnabled = true;
+			umbAuthContext.isMfaEnabled = true;
 			if (response.twoFactorView) {
-				UmbAuthMainContext.Instance.twoFactorView = response.twoFactorView;
+				umbAuthContext.twoFactorView = response.twoFactorView;
 			}
-      		this.dispatchEvent(new CustomEvent('umb-login-mfa'));
+      		this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'mfa' }}));
 			return;
 		}
 
@@ -68,7 +67,7 @@ export default class UmbLoginPageElement extends LitElement {
 			return;
 		};
 
-		const returnPath = this.#authContext.returnPath;
+		const returnPath = umbAuthContext.returnPath;
 
 		if (returnPath) {
 			location.href = returnPath;
@@ -131,7 +130,7 @@ export default class UmbLoginPageElement extends LitElement {
 
 								<div id="secondary-actions">
 									${when(
-										this.#authContext.supportsPersistLogin,
+										umbAuthContext.supportsPersistLogin,
 										() => html`<uui-form-layout-item>
 											<uui-checkbox name="persist" label="Remember me">
 												<umb-localize key="user_rememberMe">Remember me</umb-localize>

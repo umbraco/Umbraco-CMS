@@ -6,7 +6,7 @@ import type {
 	ValidatePasswordResetCodeResponse,
 } from '../types.js';
 
-export class UmbAuthLegacyRepository {
+export class UmbAuthRepository {
 	readonly #authURL = 'backoffice/umbracoapi/authentication/postlogin';
 
 	public async login(data: LoginRequestModel): Promise<LoginResponse> {

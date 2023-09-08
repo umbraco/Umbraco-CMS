@@ -1,4 +1,3 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { CSSResultGroup, LitElement, css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
@@ -24,7 +23,6 @@ export default class UmbConfirmationLayoutElement extends LitElement {
 	}
 
 	static styles: CSSResultGroup = [
-		UUITextStyles,
 		css`
 			:host {
 				display: flex;

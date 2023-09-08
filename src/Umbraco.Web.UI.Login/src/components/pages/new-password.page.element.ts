@@ -1,9 +1,8 @@
 import type { UUIButtonState, UUIInputPasswordElement } from '@umbraco-ui/uui';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { CSSResultGroup, LitElement, css, html, nothing } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
-import { UmbAuthMainContext } from '../../context/auth-main.context';
-import UmbRouter from '../../utils/umb-router';
+import { umbAuthContext } from '../../context/auth.context.js';
+import UmbRouter from '../../utils/umb-router.js';
 
 @customElement('umb-new-password-page')
 export default class UmbNewPasswordPageElement extends LitElement {
@@ -49,7 +48,7 @@ export default class UmbNewPasswordPageElement extends LitElement {
 		if (!resetCode || !userId) return;
 
 		this.state = 'waiting';
-		const response = await UmbAuthMainContext.Instance.newPassword(password, resetCode, userId);
+		const response = await umbAuthContext.newPassword(password, resetCode, userId);
 		this.state = response.status === 200 ? 'success' : 'failed';
 		this.page = response.status === 200 ? 'done' : 'new';
 		this.error = response.error || '';
@@ -73,8 +72,6 @@ export default class UmbNewPasswordPageElement extends LitElement {
 	render() {
 		return this.userId && this.resetCode ? this.#renderRoutes() : nothing;
 	}
-
-	static styles: CSSResultGroup = [UUITextStyles, css``];
 }
 
 declare global {

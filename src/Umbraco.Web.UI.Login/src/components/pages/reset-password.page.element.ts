@@ -1,8 +1,7 @@
 import type { UUIButtonState } from '@umbraco-ui/uui';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { CSSResultGroup, LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbAuthMainContext } from '../../context/auth-main.context';
+import { umbAuthContext } from '../../context/auth.context.js';
 
 @customElement('umb-reset-password-page')
 export default class UmbResetPasswordPageElement extends LitElement {
@@ -23,7 +22,7 @@ export default class UmbResetPasswordPageElement extends LitElement {
 		const username = formData.get('email') as string;
 
 		this.resetCallState = 'waiting';
-		const response = await UmbAuthMainContext.Instance.resetPassword(username);
+		const response = await umbAuthContext.resetPassword(username);
 		this.resetCallState = response.status === 200 ? 'success' : 'failed';
 		this.error = response.error || '';
 	};
@@ -89,7 +88,6 @@ export default class UmbResetPasswordPageElement extends LitElement {
 	}
 
 	static styles: CSSResultGroup = [
-		UUITextStyles,
 		css`
 			#header {
 				text-align: center;

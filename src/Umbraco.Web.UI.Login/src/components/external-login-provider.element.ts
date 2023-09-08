@@ -1,8 +1,8 @@
 import type { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui';
-import {css, CSSResultGroup, html, LitElement, nothing} from 'lit';
+import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
-import { loadCustomView, renderCustomView } from '../utils/load-custom-view.function';
+import { loadCustomView, renderCustomView } from '../utils/load-custom-view.function.js';
 
 type ExternalLoginCustomViewElement = HTMLElement & {
 	displayName: string;

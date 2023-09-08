@@ -1,9 +1,8 @@
-import { UUIButtonState } from '@umbraco-ui/uui';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { CSSResultGroup, LitElement, css, html, nothing } from 'lit';
+import type { UUIButtonState } from '@umbraco-ui/uui';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbAuthMainContext } from '../../context/auth-main.context';
-import UmbRouter from '../../utils/umb-router';
+import { umbAuthContext } from '../../context/auth.context.js';
+import UmbRouter from '../../utils/umb-router.js';
 
 @customElement('umb-invite-page')
 export default class UmbInvitePageElement extends LitElement {
@@ -19,7 +18,7 @@ export default class UmbInvitePageElement extends LitElement {
 	protected async firstUpdated(_changedProperties: any) {
 		super.firstUpdated(_changedProperties);
 
-		const response = await UmbAuthMainContext.Instance.getInvitedUser();
+		const response = await umbAuthContext.getInvitedUser();
 		this.userId = response.user?.id;
 
 		if (!this.userId) {
@@ -36,7 +35,7 @@ export default class UmbInvitePageElement extends LitElement {
 		if (!password) return;
 
 		this.state = 'waiting';
-		const response = await UmbAuthMainContext.Instance.newInvitedUserPassword(password);
+		const response = await umbAuthContext.newInvitedUserPassword(password);
 
 		if (response.error) {
 			this.error = response.error;
@@ -45,7 +44,7 @@ export default class UmbInvitePageElement extends LitElement {
 		}
 
 		this.state = 'success';
-		window.location.href = UmbAuthMainContext.Instance.returnPath;
+		window.location.href = umbAuthContext.returnPath;
 	}
 
 	render() {
@@ -57,8 +56,6 @@ export default class UmbInvitePageElement extends LitElement {
 					.error=${this.error}></umb-new-password-layout>`
 			: nothing;
 	}
-
-	static styles: CSSResultGroup = [UUITextStyles, css``];
 }
 
 declare global {

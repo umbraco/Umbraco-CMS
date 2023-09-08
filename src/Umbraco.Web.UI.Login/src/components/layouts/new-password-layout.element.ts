@@ -1,8 +1,7 @@
 import type { UUIButtonState, UUIInputPasswordElement } from '@umbraco-ui/uui';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { CSSResultGroup, LitElement, css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { UmbAuthMainContext } from '../../context/auth-main.context';
+import { umbAuthContext } from '../../context/auth.context';
 
 @customElement('umb-new-password-layout')
 export default class UmbNewPasswordLayoutElement extends LitElement {
@@ -31,7 +30,7 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 	protected async firstUpdated(_changedProperties: any) {
 		super.firstUpdated(_changedProperties);
 
-		const response = await UmbAuthMainContext.Instance.getPasswordConfig(this.userId);
+		const response = await umbAuthContext.getPasswordConfig(this.userId);
 		this.passwordConfig = response.data;
 	}
 
@@ -124,7 +123,6 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 	}
 
 	static styles: CSSResultGroup = [
-		UUITextStyles,
 		css`
 			#header {
 				text-align: center;

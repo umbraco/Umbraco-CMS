@@ -1,4 +1,4 @@
-import {css, CSSResultGroup, html, LitElement, nothing} from 'lit';
+import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 

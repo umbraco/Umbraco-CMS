@@ -1,7 +1,7 @@
 import {LitElement} from "lit";
 import {customElement, property, state} from "lit/decorators.js";
-import {loadCustomView, renderCustomView} from "../utils/load-custom-view.function.ts";
 import {until} from "lit/directives/until.js";
+import {loadCustomView, renderCustomView} from "../utils/load-custom-view.function.js";
 
 @customElement('umb-custom-view')
 export default class UmbCustomViewElement extends LitElement {

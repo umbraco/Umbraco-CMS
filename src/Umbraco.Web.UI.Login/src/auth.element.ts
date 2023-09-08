@@ -1,15 +1,12 @@
 import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbAuthMainContext } from './context/auth-main.context.js';
+import { umbAuthContext } from './context/auth.context.js';
 import UmbRouter from './utils/umb-router.js';
 
 @customElement('umb-auth')
 export default class UmbAuthElement extends LitElement {
 	#returnPath = '';
-
-	@property({ type: Boolean, attribute: 'is-legacy' })
-	isLegacy = false;
 
 	/**
 	 * Disables the local login form and only allows external login providers.
@@ -18,7 +15,7 @@ export default class UmbAuthElement extends LitElement {
 	 */
 	@property({ type: Boolean, attribute: 'disable-local-login' })
 	set disableLocalLogin(value: boolean) {
-		UmbAuthMainContext.Instance.disableLocalLogin = value;
+		umbAuthContext.disableLocalLogin = value;
 	}
 
 	@property({ type: String, attribute: 'background-image' })
@@ -39,7 +36,7 @@ export default class UmbAuthElement extends LitElement {
 	@property({ type: String, attribute: 'return-url' })
 	set returnPath(value: string) {
 		this.#returnPath = value;
-		UmbAuthMainContext.Instance.returnPath = this.returnPath;
+		umbAuthContext.returnPath = this.returnPath;
 	}
 	get returnPath() {
 		// Check if there is a ?redir querystring or else return the returnUrl attribute
@@ -47,13 +44,22 @@ export default class UmbAuthElement extends LitElement {
 	}
 
 	@state()
-	router?: UmbRouter;
+	protected router?: UmbRouter;
 
 	/**
 	 * Override the default flow.
-	 * @private
 	 */
-  	#flow?: 'mfa' | 'reset-password' | 'invite-user';
+	protected flow?: 'mfa' | 'reset-password' | 'invite-user';
+
+	constructor() {
+		super();
+		(this as unknown as EventTarget).addEventListener('umb-login-flow', (e) => {
+			if (e instanceof CustomEvent) {
+				this.flow = e.detail.flow || undefined
+			}
+			this.requestUpdate();
+		});
+	}
 
 	async firstUpdated(): Promise<void> {
 		this.router = new UmbRouter(this, [
@@ -61,7 +67,7 @@ export default class UmbAuthElement extends LitElement {
 				path: 'login',
 				component: () => {
 					const searchParams = new URLSearchParams(window.location.search);
-					let flow = this.#flow || searchParams.get('flow')?.toLowerCase();
+					let flow = this.flow || searchParams.get('flow')?.toLowerCase();
 					const status = searchParams.get('status');
 
 					if (status === 'resetCodeExpired') {
@@ -90,7 +96,7 @@ export default class UmbAuthElement extends LitElement {
 
 					// validate
 					if (flow) {
-						if (flow === 'mfa' && !UmbAuthMainContext.Instance.isMfaEnabled) {
+						if (flow === 'mfa' && !umbAuthContext.isMfaEnabled) {
 							flow = undefined;
 						}
 					}
@@ -105,7 +111,6 @@ export default class UmbAuthElement extends LitElement {
 
 						default:
 							return html`<umb-login-page
-                      			@umb-login-mfa=${this.onMfaRequired}
 								?allow-password-reset=${this.allowPasswordReset}
 								?username-is-email=${this.usernameIsEmail}>
 								<slot name="subheadline" slot="subheadline"></slot>
@@ -137,11 +142,6 @@ export default class UmbAuthElement extends LitElement {
 			</umb-auth-layout>
 		`;
 	}
-
-  private onMfaRequired() {
-    this.#flow = 'mfa';
-	this.requestUpdate();
-  }
 }
 
 declare global {

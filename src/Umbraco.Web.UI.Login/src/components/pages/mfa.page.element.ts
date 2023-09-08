@@ -1,10 +1,10 @@
-import { UUIButtonState, UUIInputElement, UUITextStyles } from '@umbraco-ui/uui';
+import type { UUIButtonState, UUIInputElement } from '@umbraco-ui/uui';
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
-import { UmbAuthMainContext } from '../../context/auth-main.context';
-import { umbLocalizationContext } from '../../external/localization/localization-context.ts';
-import { loadCustomView, renderCustomView } from '../../utils/load-custom-view.function';
+import { umbAuthContext } from '../../context/auth.context.js';
+import { umbLocalizationContext } from '../../external/localization/localization-context.js';
+import { loadCustomView, renderCustomView } from '../../utils/load-custom-view.function.js';
 
 type MfaCustomViewElement = HTMLElement & {
 	providers: string[];
@@ -31,7 +31,7 @@ export default class UmbMfaPageElement extends LitElement {
 
 	async #loadProviders() {
 		try {
-			const response = await UmbAuthMainContext.Instance.getMfaProviders();
+			const response = await umbAuthContext.getMfaProviders();
 			this.providers = response.providers.map((provider) => ({ name: provider, value: provider, selected: false }));
 
 			if (this.providers.length) {
@@ -88,7 +88,7 @@ export default class UmbMfaPageElement extends LitElement {
 		this.buttonState = 'waiting';
 
 		try {
-			const response = await UmbAuthMainContext.Instance.validateMfaCode(code, provider);
+			const response = await umbAuthContext.validateMfaCode(code, provider);
 			if (response.error) {
 				if (codeInput) {
 					codeInput.error = true;
@@ -102,7 +102,7 @@ export default class UmbMfaPageElement extends LitElement {
 
 			this.buttonState = 'success';
 
-			const returnPath = UmbAuthMainContext.Instance.returnPath;
+			const returnPath = umbAuthContext.returnPath;
 			if (returnPath) {
 				location.href = returnPath;
 			}
@@ -182,7 +182,7 @@ export default class UmbMfaPageElement extends LitElement {
 							type="submit"></uui-button>
 						<uui-button
 							label=${until(umbLocalizationContext.localize('general_back', 'Back'))}
-							href="login"></uui-button>
+							@click="${this.onGoBack}"></uui-button>
 					</div>
 					${this.error ? html` <span class="text-danger">${this.error}</span> ` : nothing}
 				</form>
@@ -191,7 +191,7 @@ export default class UmbMfaPageElement extends LitElement {
 	}
 
 	protected async renderCustomView() {
-		const view = UmbAuthMainContext.Instance.twoFactorView;
+		const view = umbAuthContext.twoFactorView;
 		if (!view) return nothing;
 
 		try {
@@ -214,13 +214,16 @@ export default class UmbMfaPageElement extends LitElement {
 	protected render() {
 		return this.loading
 			? html`<uui-loader-bar></uui-loader-bar>`
-			: UmbAuthMainContext.Instance.twoFactorView
+			: umbAuthContext.twoFactorView
 			? until(this.renderCustomView(), html`<uui-loader-bar></uui-loader-bar>`)
 			: this.renderDefaultView();
 	}
 
+	private onGoBack() {
+		this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: undefined } }));
+	}
+
 	static styles = [
-		UUITextStyles,
 		css`
 			.text-danger {
 				color: var(--uui-color-danger-standalone);
