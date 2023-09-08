@@ -42,8 +42,8 @@ const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.post(umbracoPath('/script'), (req, res, ctx) => {
-		const requestBody = req.json() as CreateTextFileViewModelBaseModel;
+	rest.post(umbracoPath('/script'), async (req, res, ctx) => {
+		const requestBody = (await req.json()) as CreateTextFileViewModelBaseModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		const response = umbScriptsData.insertScript(requestBody);
 		return res(ctx.status(200), ctx.json(response));
@@ -55,9 +55,10 @@ const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 		const response = umbScriptsData.delete([path]);
 		return res(ctx.status(200), ctx.json(response));
 	}),
-	rest.put(umbracoPath('/script'), (req, res, ctx) => {
-		const requestBody = req.json() as CreateTextFileViewModelBaseModel;
+	rest.put(umbracoPath('/script'), async (req, res, ctx) => {
+		const requestBody = (await req.json()) as CreateTextFileViewModelBaseModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
+		const response = umbScriptsData.updateData(requestBody);
 		return res(ctx.status(200));
 	}),
 ];

@@ -128,7 +128,7 @@ class UmbScriptsData extends UmbData<ScriptsDataItem> {
 	}
 
 	getTreeItemChildren(parentPath: string): PagedFileSystemTreeItemPresentationModel {
-		const items = this.data.filter((item) => item.path?.startsWith(parentPath + '/'));
+		const items = this.data.filter((item) => item.path?.startsWith(parentPath));
 		const treeItems = items.map((item) => createFileSystemTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };

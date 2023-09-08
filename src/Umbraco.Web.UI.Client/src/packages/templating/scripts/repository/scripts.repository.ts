@@ -129,7 +129,7 @@ export class UmbScriptsRepository
 	}
 
 	async requestTreeItemsOf(path: string | null) {
-		if (path === null) {
+		if (path === null || path === '/' || path === '') {
 			return this.requestRootTreeItems();
 		}
 
