@@ -184,11 +184,6 @@ internal class
 
     internal bool ValidateUniqueEmail(MemberSave model)
     {
-        if(_securitySettings.RequireUniqueEmailForMembers == false)
-        {
-            return true;
-        }
-
         if (model == null)
         {
             throw new ArgumentNullException(nameof(model));
@@ -199,7 +194,7 @@ internal class
         {
             case ContentSaveAction.Save:
                 //ok, we're updating the member, we need to check if they are changing their email and if so, does it exist already ?
-                if (model.PersistedContent?.Email.InvariantEquals(model.Email.Trim()) == false)
+                if (_securitySettings.RequireUniqueEmailForMembers && model.PersistedContent?.Email.InvariantEquals(model.Email.Trim()) == false)
                 {
                     //they are changing their email
                     if (existingByEmail != null && existingByEmail.Email.InvariantEquals(model.Email.Trim()))
@@ -212,7 +207,7 @@ internal class
                 break;
             case ContentSaveAction.SaveNew:
                 //check if the user's email already exists
-                if (existingByEmail != null && existingByEmail.Email.InvariantEquals(model.Email.Trim()))
+                if (_securitySettings.RequireUniqueEmailForMembers && existingByEmail != null && existingByEmail.Email.InvariantEquals(model.Email.Trim()))
                 {
                     //the user cannot use this email
                     return false;
