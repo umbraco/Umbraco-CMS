@@ -210,6 +210,10 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
             editorService.close();
 
+            if ($scope.currentNode) {
+              $scope.currentNode.selected = false;
+            }
+
             // make sure the content tree has nothing highlighted 
             $scope.dialogTreeApi.syncTree({
               path: "-1",
