@@ -539,7 +539,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             genericProperties,
             tabs);
 
-        if (contentType is IContentTypeWithHistoryCleanup withCleanup && withCleanup.HistoryCleanup is not null)
+        if (contentType is IContentType withCleanup && withCleanup.HistoryCleanup is not null)
         {
             xml.Add(SerializeCleanupPolicy(withCleanup.HistoryCleanup));
         }

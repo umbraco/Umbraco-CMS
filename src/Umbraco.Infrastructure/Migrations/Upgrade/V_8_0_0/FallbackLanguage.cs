@@ -9,6 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
 ///     Adds a new, self-joined field to umbracoLanguages to hold the fall-back language for
 ///     a given language.
 /// </summary>
+[Obsolete("This is not used anymore and will be removed in Umbraco 13")]
 public class FallbackLanguage : MigrationBase
 {
     public FallbackLanguage(IMigrationContext context)

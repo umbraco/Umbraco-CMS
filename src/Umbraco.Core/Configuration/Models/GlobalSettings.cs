@@ -21,7 +21,6 @@ public class GlobalSettings
     internal const bool StaticHideTopLevelNodeFromPath = true;
     internal const bool StaticUseHttps = false;
     internal const int StaticVersionCheckPeriod = 7;
-    internal const string StaticUmbracoPath = Constants.System.DefaultUmbracoPath;
     internal const string StaticIconsPath = "umbraco/assets/icons";
     internal const string StaticUmbracoCssPath = "~/css";
     internal const string StaticUmbracoScriptsPath = "~/scripts";
@@ -34,6 +33,7 @@ public class GlobalSettings
     internal const bool StaticSanitizeTinyMce = false;
     internal const int StaticMainDomReleaseSignalPollingInterval = 2000;
     private const bool StaticForceCombineUrlPathLeftToRight = true;
+    private const bool StaticShowMaintenancePageWhenInUpgradeState = true;
 
     /// <summary>
     ///     Gets or sets a value for the reserved URLs (must end with a comma).
@@ -80,8 +80,13 @@ public class GlobalSettings
     /// <summary>
     ///     Gets or sets a value for the Umbraco back-office path.
     /// </summary>
-    [DefaultValue(StaticUmbracoPath)]
-    public string UmbracoPath { get; set; } = StaticUmbracoPath;
+    public string UmbracoPath
+    {
+        get => Constants.System.DefaultUmbracoPath;
+        [Obsolete($"{nameof(UmbracoPath)} is no longer configurable, this property setter is scheduled for removal in V12.")]
+        // NOTE: When removing this, also clean up the hardcoded removal of UmbracoPath in Umbraco.JsonSchema
+        set { }
+    }
 
     /// <summary>
     ///     Gets or sets a value for the Umbraco icons path.
@@ -248,4 +253,7 @@ public class GlobalSettings
     /// </example>
     [DefaultValue(StaticForceCombineUrlPathLeftToRight)]
     public bool ForceCombineUrlPathLeftToRight { get; set; }  = StaticForceCombineUrlPathLeftToRight;
+
+    [DefaultValue(StaticShowMaintenancePageWhenInUpgradeState)]
+    public bool ShowMaintenancePageWhenInUpgradeState { get; set; } = StaticShowMaintenancePageWhenInUpgradeState;
 }

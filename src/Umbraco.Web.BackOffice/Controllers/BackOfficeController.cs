@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -120,6 +121,13 @@ public class BackOfficeController : UmbracoController
         // Check if we not are in an run state, if so we need to redirect
         if (_runtimeState.Level != RuntimeLevel.Run)
         {
+            if (_runtimeState.Level == RuntimeLevel.Upgrade)
+            {
+                return RedirectToAction(nameof(AuthorizeUpgrade), routeValues: new RouteValueDictionary()
+                {
+                    ["redir"] = _globalSettings.GetBackOfficePath(_hostingEnvironment),
+                });
+            }
             return Redirect("/");
         }
 
@@ -255,7 +263,7 @@ public class BackOfficeController : UmbracoController
     [AllowAnonymous]
     public async Task<Dictionary<string, Dictionary<string, string>>> LocalizedText(string? culture = null)
     {
-        CultureInfo? cultureInfo;
+        CultureInfo? cultureInfo = null;
         if (string.IsNullOrWhiteSpace(culture))
         {
             // Force authentication to occur since this is not an authorized endpoint, we need this to get a user.
@@ -264,9 +272,12 @@ public class BackOfficeController : UmbracoController
             // It's entirely likely for a user to have a different culture in the backoffice, than their system.
             IIdentity? user = authenticationResult.Principal?.Identity;
 
-            cultureInfo = authenticationResult.Succeeded && user is not null
-                ? user.GetCulture()
-                : CultureInfo.GetCultureInfo(_globalSettings.DefaultUILanguage);
+            if (authenticationResult.Succeeded && user is not null)
+            {
+                cultureInfo = user.GetCulture();
+            }
+
+            cultureInfo ??= CultureInfo.GetCultureInfo(_globalSettings.DefaultUILanguage);
         }
         else
         {
@@ -318,7 +329,9 @@ public class BackOfficeController : UmbracoController
     [AllowAnonymous]
     public ActionResult ExternalLogin(string provider, string? redirectUrl = null)
     {
-        if (redirectUrl == null || Uri.TryCreate(redirectUrl, UriKind.Absolute, out _))
+        // Only relative urls are accepted as redirect url
+        // We can't simply use Uri.TryCreate with kind Absolute, as in Linux any relative url would be seen as an absolute file uri
+        if (redirectUrl == null || !Uri.TryCreate(redirectUrl, UriKind.RelativeOrAbsolute, out Uri? redirectUri) || redirectUri.IsAbsoluteUri)
         {
             redirectUrl = Url.Action(nameof(Default), this.GetControllerName());
         }
@@ -386,7 +399,7 @@ public class BackOfficeController : UmbracoController
     [HttpGet]
     public async Task<IActionResult> ExternalLinkLoginCallback()
     {
-        BackOfficeIdentityUser user = await _userManager.GetUserAsync(User);
+        BackOfficeIdentityUser? user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
             // ... this should really not happen
@@ -504,9 +517,8 @@ public class BackOfficeController : UmbracoController
         }
         else if (result == SignInResult.TwoFactorRequired)
         {
-            BackOfficeIdentityUser? attemptedUser =
-                await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
-            if (attemptedUser == null)
+            BackOfficeIdentityUser? attemptedUser = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
+                if (attemptedUser?.UserName is null)
             {
                 return new ValidationErrorResult(
                     $"No local user found for the login provider {loginInfo.LoginProvider} - {loginInfo.ProviderKey}");

@@ -190,8 +190,8 @@
                 }
 
                 var contentLanguage = $scope.content.language;
-
-                var otherCreatedVariants = $scope.contentNodeModel.variants.filter(x => x.compositeId !== $scope.content.compositeId && (x.state !== "NotCreated" || x.name !== null)).length === 0;
+                var variants = $scope.contentNodeModel && $scope.contentNodeModel.variants || [];
+                var otherCreatedVariants = variants.filter(x => x.compositeId !== $scope.content.compositeId && (x.state !== "NotCreated" || x.name !== null)).length === 0;
 
                 var canEditCulture = !contentLanguage ||
                     // If the property culture equals the content culture it can be edited

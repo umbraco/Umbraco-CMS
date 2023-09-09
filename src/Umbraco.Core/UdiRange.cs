@@ -34,6 +34,7 @@ public class UdiRange
             case Constants.DeploySelector.DescendantsOfThis:
             case Constants.DeploySelector.ThisAndChildren:
             case Constants.DeploySelector.ThisAndDescendants:
+            case Constants.DeploySelector.EntitiesOfType:
                 Selector = selector;
                 _uriValue = new Uri(Udi + "?" + selector);
                 break;

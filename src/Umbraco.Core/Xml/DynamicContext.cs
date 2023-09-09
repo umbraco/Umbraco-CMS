@@ -118,6 +118,7 @@ namespace Umbraco.Cms.Core.Xml
         /// <summary>
         /// Same as <see cref="XsltContext"/>.
         /// </summary>
+        [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
         public override bool PreserveWhitespace(XPathNavigator node)
         {
             return true;
@@ -140,6 +141,7 @@ namespace Umbraco.Cms.Core.Xml
         /// </summary>
         /// <param name="xpath">The expression to compile</param>
         /// <returns>A compiled <see cref="XPathExpression"/>.</returns>
+        [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
         public static XPathExpression? Compile(string xpath)
         {
             return new XmlDocument().CreateNavigator()?.Compile(xpath);
@@ -203,6 +205,7 @@ namespace Umbraco.Cms.Core.Xml
         /// <summary>
         /// See <see cref="XsltContext"/>. Not used in our implementation.
         /// </summary>
+        [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
         public override IXsltContextFunction ResolveFunction(string prefix, string name, XPathResultType[] argTypes) => throw new NotImplementedException();
 
         /// <summary>

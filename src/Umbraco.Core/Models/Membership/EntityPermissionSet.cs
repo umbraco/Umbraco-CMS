@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Core.Models.Membership;
 
 /// <summary>
-///     Represents an entity -&gt; user group & permission key value pair collection
+///     Represents an entity -&gt; user group &amp; permission key value pair collection
 /// </summary>
 public class EntityPermissionSet
 {
@@ -20,7 +20,7 @@ public class EntityPermissionSet
     public virtual int EntityId { get; }
 
     /// <summary>
-    ///     The key/value pairs of user group id & single permission
+    ///     The key/value pairs of user group id &amp; single permission
     /// </summary>
     public EntityPermissionCollection PermissionsSet { get; }
 

@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Umbraco.Cms.Web.Common.DependencyInjection;
+namespace Umbraco.Cms.Core.DependencyInjection;
 
 /// <summary>
 ///     Service locator for internal (umbraco cms) only purposes. Should only be used if no other ways exist.
@@ -20,6 +20,5 @@ public static class StaticServiceProvider
     ///     The service locator.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static IServiceProvider Instance { get; set; } =
-        null!; // This is set doing startup and will always exists after that
+    public static IServiceProvider Instance { get; set; } = null!; // This is set doing startup and will always exists after that
 }

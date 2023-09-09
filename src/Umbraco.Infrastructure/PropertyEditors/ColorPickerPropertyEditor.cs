@@ -2,10 +2,10 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -44,6 +44,9 @@ public class ColorPickerPropertyEditor : DataEditor
         _editorConfigurationParser = editorConfigurationParser;
         SupportsReadOnly = true;
     }
+
+    public override IPropertyIndexValueFactory PropertyIndexValueFactory { get; } = new NoopPropertyIndexValueFactory();
+
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>

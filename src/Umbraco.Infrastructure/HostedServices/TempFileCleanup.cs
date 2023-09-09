@@ -44,7 +44,10 @@ public class TempFileCleanup : RecurringHostedServiceBase
         // Ensure we do not run if not main domain
         if (_mainDom.IsMainDom == false)
         {
-            _logger.LogDebug("Does not run if not MainDom.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Does not run if not MainDom.");
+            }
             return Task.CompletedTask;
         }
 
@@ -62,7 +65,10 @@ public class TempFileCleanup : RecurringHostedServiceBase
         switch (result.Status)
         {
             case CleanFolderResultStatus.FailedAsDoesNotExist:
-                _logger.LogDebug("The cleanup folder doesn't exist {Folder}", folder.FullName);
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("The cleanup folder doesn't exist {Folder}", folder.FullName);
+                }
                 break;
             case CleanFolderResultStatus.FailedWithException:
                 foreach (CleanFolderResult.Error error in result.Errors!)
@@ -77,7 +83,10 @@ public class TempFileCleanup : RecurringHostedServiceBase
         folder.Refresh(); // In case it's changed during runtime
         if (!folder.Exists)
         {
-            _logger.LogDebug("The cleanup folder doesn't exist {Folder}", folder.FullName);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("The cleanup folder doesn't exist {Folder}", folder.FullName);
+            }
             return;
         }
 

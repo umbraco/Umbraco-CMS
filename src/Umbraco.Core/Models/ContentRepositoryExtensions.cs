@@ -59,6 +59,7 @@ public static class ContentRepositoryExtensions
     /// </summary>
     /// <param name="content"></param>
     /// <param name="date"></param>
+    /// <param name="publishing"></param>
     /// <remarks>
     ///     This is so that in an operation where (for example) 2 languages are updates like french and english, it is possible
     ///     that

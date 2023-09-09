@@ -1,6 +1,9 @@
+using System.Data.Common;
 using System.Runtime.Serialization;
+using Microsoft.Data.SqlClient;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.SqlServer.Services;
 
@@ -47,11 +50,60 @@ public class SqlServerDatabaseProviderMetadata : IDatabaseProviderMetadata
     public bool RequiresConnectionTest => true;
 
     /// <inheritdoc />
-    public bool ForceCreateDatabase => false;
+    public bool ForceCreateDatabase => true;
 
     /// <inheritdoc />
-    public string GenerateConnectionString(DatabaseModel databaseModel) =>
-        databaseModel.IntegratedAuth
-            ? $"Server={databaseModel.Server};Database={databaseModel.DatabaseName};Integrated Security=true"
-            : $"Server={databaseModel.Server};Database={databaseModel.DatabaseName};User Id={databaseModel.Login};Password={databaseModel.Password}";
+    public bool CanRecognizeConnectionString(string? connectionString)
+    {
+        if (connectionString is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            var builder = new SqlConnectionStringBuilder(connectionString);
+
+            return string.IsNullOrEmpty(builder.AttachDBFilename);
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
+    }
+
+    /// <inheritdoc />
+    public string GenerateConnectionString(DatabaseModel databaseModel)
+    {
+        string connectionString = $"Server={databaseModel.Server};Database={databaseModel.DatabaseName};";
+        connectionString = HandleIntegratedAuthentication(connectionString, databaseModel);
+        connectionString = HandleTrustServerCertificate(connectionString, databaseModel);
+
+        return connectionString;
+    }
+
+    private string HandleIntegratedAuthentication(string connectionString, DatabaseModel databaseModel)
+    {
+        if (databaseModel.IntegratedAuth)
+        {
+            connectionString += "Integrated Security=true";
+        }
+        else
+        {
+            connectionString += $"User Id={databaseModel.Login};Password={databaseModel.Password}";
+        }
+
+        return connectionString;
+    }
+
+    private string HandleTrustServerCertificate(string connectionString, DatabaseModel databaseModel)
+    {
+        if (databaseModel.TrustServerCertificate)
+        {
+            connectionString += ";TrustServerCertificate=true;";
+        }
+
+        return connectionString;
+    }
+
 }

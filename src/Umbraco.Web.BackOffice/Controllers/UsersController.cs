@@ -35,6 +35,7 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Models;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
@@ -54,6 +55,7 @@ public class UsersController : BackOfficeNotificationsController
     private readonly GlobalSettings _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IFileStreamSecurityValidator? _fileStreamSecurityValidator; // make non nullable in v14
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly LinkGenerator _linkGenerator;
     private readonly ILocalizedTextService _localizedTextService;
@@ -71,6 +73,58 @@ public class UsersController : BackOfficeNotificationsController
     private readonly WebRoutingSettings _webRoutingSettings;
 
     [ActivatorUtilitiesConstructor]
+    public UsersController(
+        MediaFileManager mediaFileManager,
+        IOptionsSnapshot<ContentSettings> contentSettings,
+        IHostingEnvironment hostingEnvironment,
+        ISqlContext sqlContext,
+        IImageUrlGenerator imageUrlGenerator,
+        IOptionsSnapshot<SecuritySettings> securitySettings,
+        IEmailSender emailSender,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        AppCaches appCaches,
+        IShortStringHelper shortStringHelper,
+        IUserService userService,
+        ILocalizedTextService localizedTextService,
+        IUmbracoMapper umbracoMapper,
+        IOptionsSnapshot<GlobalSettings> globalSettings,
+        IBackOfficeUserManager backOfficeUserManager,
+        ILoggerFactory loggerFactory,
+        LinkGenerator linkGenerator,
+        IBackOfficeExternalLoginProviders externalLogins,
+        UserEditorAuthorizationHelper userEditorAuthorizationHelper,
+        IPasswordChanger<BackOfficeIdentityUser> passwordChanger,
+        IHttpContextAccessor httpContextAccessor,
+        IOptions<WebRoutingSettings> webRoutingSettings,
+        IFileStreamSecurityValidator fileStreamSecurityValidator)
+    {
+        _mediaFileManager = mediaFileManager;
+        _contentSettings = contentSettings.Value;
+        _hostingEnvironment = hostingEnvironment;
+        _sqlContext = sqlContext;
+        _imageUrlGenerator = imageUrlGenerator;
+        _securitySettings = securitySettings.Value;
+        _emailSender = emailSender;
+        _backofficeSecurityAccessor = backofficeSecurityAccessor;
+        _appCaches = appCaches;
+        _shortStringHelper = shortStringHelper;
+        _userService = userService;
+        _localizedTextService = localizedTextService;
+        _umbracoMapper = umbracoMapper;
+        _globalSettings = globalSettings.Value;
+        _userManager = backOfficeUserManager;
+        _loggerFactory = loggerFactory;
+        _linkGenerator = linkGenerator;
+        _externalLogins = externalLogins;
+        _userEditorAuthorizationHelper = userEditorAuthorizationHelper;
+        _passwordChanger = passwordChanger;
+        _logger = _loggerFactory.CreateLogger<UsersController>();
+        _httpContextAccessor = httpContextAccessor;
+        _fileStreamSecurityValidator = fileStreamSecurityValidator;
+        _webRoutingSettings = webRoutingSettings.Value;
+    }
+
+    [Obsolete("Use constructor overload that has fileStreamSecurityValidator, scheduled for removal in v14")]
     public UsersController(
         MediaFileManager mediaFileManager,
         IOptionsSnapshot<ContentSettings> contentSettings,
@@ -138,13 +192,15 @@ public class UsersController : BackOfficeNotificationsController
 
     [AppendUserModifiedHeader("id")]
     [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
-    public IActionResult PostSetAvatar(int id, IList<IFormFile> file) => PostSetAvatarInternal(file, _userService,
+    public IActionResult PostSetAvatar(int id, IList<IFormFile> file)
+        => PostSetAvatarInternal(file, _userService,
         _appCaches.RuntimeCache, _mediaFileManager, _shortStringHelper, _contentSettings, _hostingEnvironment,
-        _imageUrlGenerator, id);
+        _imageUrlGenerator,_fileStreamSecurityValidator, id);
 
     internal static IActionResult PostSetAvatarInternal(IList<IFormFile> files, IUserService userService,
         IAppCache cache, MediaFileManager mediaFileManager, IShortStringHelper shortStringHelper,
         ContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator,
+        IFileStreamSecurityValidator? fileStreamSecurityValidator,
         int id)
     {
         if (files is null)
@@ -186,9 +242,14 @@ public class UsersController : BackOfficeNotificationsController
             //generate a path of known data, we don't want this path to be guessable
             user.Avatar = "UserAvatars/" + (user.Id + safeFileName).GenerateHash<SHA1>() + "." + ext;
 
-            using (Stream fs = file.OpenReadStream())
+            //todo implement Filestreamsecurity
+            using (var ms = new MemoryStream())
             {
-                mediaFileManager.FileSystem.AddFile(user.Avatar, fs, true);
+                file.CopyTo(ms);
+                if(fileStreamSecurityValidator != null && fileStreamSecurityValidator.IsConsideredSafe(ms) == false)
+                    return new ValidationErrorResult("One or more file security analyzers deemed the contents of the file to be unsafe");
+
+                mediaFileManager.FileSystem.AddFile(user.Avatar, ms, true);
             }
 
             userService.Save(user);
@@ -565,10 +626,20 @@ public class UsersController : BackOfficeNotificationsController
         return new ActionResult<IUser?>(user);
     }
 
-    private async Task SendUserInviteEmailAsync(UserBasic? userDisplay, string? from, string? fromEmail, IUser? to,
-        string? message)
+    private async Task SendUserInviteEmailAsync(UserBasic? userDisplay, string? from, string? fromEmail, IUser? to, string? message)
     {
-        BackOfficeIdentityUser user = await _userManager.FindByIdAsync(((int?)userDisplay?.Id).ToString());
+        var userId = userDisplay?.Id?.ToString();
+        if (userId is null)
+        {
+            throw new InvalidOperationException("Could not find user Id");
+        }
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user is null)
+        {
+            throw new InvalidOperationException("Could not find user");
+        }
+
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
         // Use info from SMTP Settings if configured, otherwise set fromEmail as fallback
@@ -596,7 +667,7 @@ public class UsersController : BackOfficeNotificationsController
         var emailBody = _localizedTextService.Localize("user", "inviteEmailCopyFormat",
             // Ensure the culture of the found user is used for the email!
             UmbracoUserExtensions.GetUserCulture(to?.Language, _localizedTextService, _globalSettings),
-            new[] { userDisplay?.Name, from, message, inviteUri.ToString(), senderEmail });
+            new[] { userDisplay?.Name, from, WebUtility.HtmlEncode(message)!.ReplaceLineEndings("<br/>"), inviteUri.ToString(), senderEmail });
 
         // This needs to be in the correct mailto format including the name, else
         // the name cannot be captured in the email sending notification.
@@ -748,7 +819,7 @@ public class UsersController : BackOfficeNotificationsController
         }
 
         Attempt<PasswordChangedModel?> passwordChangeResult =
-            await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager);
+            await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager, currentUser);
 
         if (passwordChangeResult.Success)
         {
@@ -785,22 +856,44 @@ public class UsersController : BackOfficeNotificationsController
             return ValidationProblem("The current user cannot disable itself");
         }
 
-        IUser[] users = _userService.GetUsersById(userIds).ToArray();
+        var users = _userService.GetUsersById(userIds).ToList();
+        List<IUser> skippedUsers = new();
         foreach (IUser u in users)
         {
+            if (u.UserState is UserState.Invited)
+            {
+                _logger.LogWarning("Could not disable invited user {Username}", u.Name);
+                skippedUsers.Add(u);
+                continue;
+            }
+
             u.IsApproved = false;
             u.InvitedDate = null;
         }
 
-        _userService.Save(users);
+        users = users.Except(skippedUsers).ToList();
 
-        if (users.Length > 1)
+        if (users.Any())
         {
-            return Ok(_localizedTextService.Localize("speechBubbles", "disableUsersSuccess",
-                new[] { userIds.Length.ToString() }));
+            _userService.Save(users);
+        }
+        else
+        {
+            return Ok(new DisabledUsersModel());
         }
 
-        return Ok(_localizedTextService.Localize("speechBubbles", "disableUserSuccess", new[] { users[0].Name }));
+        var disabledUsersModel = new DisabledUsersModel
+        {
+            DisabledUserIds = users.Select(x => x.Id),
+        };
+
+        var message= users.Count > 1
+            ? _localizedTextService.Localize("speechBubbles", "disableUsersSuccess", new[] { userIds.Length.ToString() })
+            : _localizedTextService.Localize("speechBubbles", "disableUserSuccess", new[] { users[0].Name });
+
+        var header = _localizedTextService.Localize("general", "success");
+        disabledUsersModel.Notifications.Add(new BackOfficeNotification(header, message, NotificationStyle.Success));
+        return Ok(disabledUsersModel);
     }
 
     /// <summary>

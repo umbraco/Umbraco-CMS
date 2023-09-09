@@ -1,3 +1,5 @@
+﻿using System.Collections.Generic;
+using System.Xml;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -47,8 +49,31 @@ public abstract class PropertyValueConverterBase : IPropertyValueConverter
         => inter;
 
     /// <inheritdoc />
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public virtual object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
-        => inter?.ToString() ?? string.Empty;
+    {
+        var d = new XmlDocument();
+        XmlElement e = d.CreateElement("values");
+        d.AppendChild(e);
+
+        if (inter is IEnumerable<string> collection)
+        {
+            foreach (var value in collection)
+            {
+                XmlElement ee = d.CreateElement("value");
+                ee.InnerText = value;
+                e.AppendChild(ee);
+            }
+        }
+        else
+        {
+            XmlElement ee = d.CreateElement("value");
+            ee.InnerText = inter?.ToString() ?? string.Empty;
+            e.AppendChild(ee);
+        }
+
+        return d.CreateNavigator();
+    }
 
     [Obsolete(
         "This method is not part of the IPropertyValueConverter contract, therefore not used and will be removed in future versions; use IsValue instead.")]

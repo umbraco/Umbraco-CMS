@@ -48,7 +48,7 @@ public interface IMembershipMemberService<T> : IService
     ///     but that is how MS have made theirs so we'll follow that principal.
     /// </remarks>
     /// <param name="countType"><see cref="MemberCountType" /> to count by</param>
-    /// <returns><see cref="System.int" /> with number of Members or Users for passed in type</returns>
+    /// <returns><see cref="int" /> with number of Members or Users for passed in type</returns>
     int GetCount(MemberCountType countType);
 
     /// <summary>
@@ -127,20 +127,6 @@ public interface IMembershipMemberService<T> : IService
     /// <remarks>An <see cref="IMembershipUser" /> can be of type <see cref="IMember" /> or <see cref="IUser" /></remarks>
     /// <param name="membershipUser"><see cref="IMember" /> or <see cref="IUser" /> to Delete</param>
     void Delete(T membershipUser);
-
-    /// <summary>
-    ///     Sets the last login date for the member if they are found by username
-    /// </summary>
-    /// <param name="username"></param>
-    /// <param name="date"></param>
-    /// <remarks>
-    ///     This is a specialized method because whenever a member logs in, the membership provider requires us to set the
-    ///     'online' which requires
-    ///     updating their login date. This operation must be fast and cannot use database locks which is fine if we are only
-    ///     executing a single query
-    ///     for this data since there won't be any other data contention issues.
-    /// </remarks>
-    void SetLastLogin(string username, DateTime date);
 
     /// <summary>
     ///     Saves an <see cref="IMembershipUser" />

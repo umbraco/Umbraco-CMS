@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.Models;
 /// <summary>
 ///     A model representing the value saved for the grid
 /// </summary>
+[Obsolete("The grid is obsolete, will be removed in V13")]
 public class GridValue
 {
     [JsonProperty("name")]
@@ -43,6 +44,7 @@ public class GridValue
         public JToken? Config { get; set; }
     }
 
+    [Obsolete("The grid is obsolete, will be removed in V13")]
     public class GridArea
     {
         [JsonProperty("grid")]
@@ -58,6 +60,7 @@ public class GridValue
         public JToken? Config { get; set; }
     }
 
+    [Obsolete("The grid is obsolete, will be removed in V13")]
     public class GridControl
     {
         [JsonProperty("value")]
@@ -73,6 +76,7 @@ public class GridValue
         public JToken? Config { get; set; }
     }
 
+    [Obsolete("The grid is obsolete, will be removed in V13")]
     public class GridEditor
     {
         [JsonProperty("alias")]

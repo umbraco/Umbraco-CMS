@@ -1,18 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Title>Umbraco CMS - Infrastructure</Title>
+    <Description>Contains the infrastructure assembly needed to run Umbraco CMS.</Description>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+  </PropertyGroup>
 
-    <PropertyGroup>
-      <TargetFramework>net6.0</TargetFramework>
-      <ImplicitUsings>enable</ImplicitUsings>
-      <Nullable>enable</Nullable>
-      <RootNamespace>Umbraco.New.Cms.Infrastructure</RootNamespace>
-      <IsPackable>false</IsPackable>
-      <WarningsAsErrors>nullable</WarningsAsErrors>
-      <EnablePackageValidation>false</EnablePackageValidation>
-    </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.New.Cms.Core\Umbraco.New.Cms.Core.csproj" />
+    <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
-      <ProjectReference Include="..\Umbraco.New.Cms.Core\Umbraco.New.Cms.Core.csproj" />
-    </ItemGroup>
-
+  <ItemGroup>
+    <PackageReference Include="OpenIddict.Abstractions" Version="4.3.0" />
+  </ItemGroup>
 </Project>

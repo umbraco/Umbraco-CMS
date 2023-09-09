@@ -140,7 +140,7 @@ internal class UserService : RepositoryService, IUserService
     /// <summary>
     ///     Gets a User by its integer id
     /// </summary>
-    /// <param name="id"><see cref="System.int" /> Id</param>
+    /// <param name="id"><see cref="int" /> Id</param>
     /// <returns>
     ///     <see cref="IUser" />
     /// </returns>
@@ -333,13 +333,8 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
-    // explicit implementation because we don't need it now but due to the way that the members membership provider is put together
-    // this method must exist in this service as an implementation (legacy)
-    void IMembershipMemberService<IUser>.SetLastLogin(string username, DateTime date) => _logger.LogWarning(
-        "This method is not implemented. Using membership providers users is not advised, use ASP.NET Identity instead. See issue #9224 for more information.");
-
     /// <summary>
-    ///     Saves an <see cref="IUser" />
+    /// Saves an <see cref="IUser" />
     /// </summary>
     /// <param name="entity"><see cref="IUser" /> to Save</param>
     public void Save(IUser entity)
@@ -540,7 +535,7 @@ internal class UserService : RepositoryService, IUserService
     ///     but that is how MS have made theirs so we'll follow that principal.
     /// </remarks>
     /// <param name="countType"><see cref="MemberCountType" /> to count by</param>
-    /// <returns><see cref="System.int" /> with number of Users for passed in type</returns>
+    /// <returns><see cref="int" /> with number of Users for passed in type</returns>
     public int GetCount(MemberCountType countType)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -950,19 +945,12 @@ internal class UserService : RepositoryService, IUserService
     }
 
     /// <summary>
-    ///     Saves a UserGroup
+    ///     Saves a UserGroup.
     /// </summary>
-    /// <param name="userGroup">UserGroup to save</param>
+    /// <param name="userGroup">UserGroup to save.</param>
     /// <param name="userIds">
     ///     If null than no changes are made to the users who are assigned to this group, however if a value is passed in
-    ///     than all users will be removed from this group and only these users will be added
-    /// </param>
-    /// Default is
-    /// <c>True</c>
-    /// otherwise set to
-    /// <c>False</c>
-    /// to not raise events
-    /// </param>
+    ///     than all users will be removed from this group and only these users will be added.</param>
     public void Save(IUserGroup userGroup, int[]? userIds = null)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();

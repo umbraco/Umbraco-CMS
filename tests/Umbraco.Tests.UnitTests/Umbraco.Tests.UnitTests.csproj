@@ -1,47 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>Umbraco.Cms.Tests.UnitTests</RootNamespace>
-    <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <RootNamespace>Umbraco.Cms.Tests.UnitTests</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
-    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
-    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2" />
+  <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="1.0.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="System.Data.Odbc" Version="7.0.0" />
+    <PackageReference Include="System.Data.OleDb" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.17.1" />
-    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
-    <PackageReference Include="System.Data.Odbc" Version="6.0.0" />
-    <PackageReference Include="System.Data.OleDb" Version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="TestHelpers\Assets\UmbracoTraceLog.UNITTEST.20181112.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Umbraco.Core\Persistence\Repositories" />
-    <Folder Include="umbraco\Data\TEMP\TypesCache" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="umbraco\Data\TEMP\TypesCache\umbraco-types.DESKTOP-EU212M2.hash" />
-  </ItemGroup>
-
 </Project>

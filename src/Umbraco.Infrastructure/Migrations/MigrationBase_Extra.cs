@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Execute.Expressions;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 
@@ -108,6 +109,30 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         {
             IEnumerable<Tuple<string, string, string, bool>>? indexes = SqlSyntax.GetDefinedIndexes(Context.Database);
             return indexes.Any(x => x.Item2.InvariantEquals(indexName));
+        }
+
+        protected void CreateIndex<T>(string toCreate)
+        {
+            TableDefinition tableDef = DefinitionFactory.GetTableDefinition(typeof(T), Context.SqlContext.SqlSyntax);
+            IndexDefinition index = tableDef.Indexes.First(x => x.Name == toCreate);
+            new ExecuteSqlStatementExpression(Context) { SqlStatement = Context.SqlContext.SqlSyntax.Format(index) }
+                .Execute();
+        }
+
+        protected void DeleteIndex<T>(string toDelete)
+        {
+            if (!IndexExists(toDelete))
+            {
+                return;
+            }
+
+            TableDefinition tableDef = DefinitionFactory.GetTableDefinition(typeof(T), Context.SqlContext.SqlSyntax);
+            Delete.Index(toDelete).OnTable(tableDef.Name).Do();
+        }
+
+        protected bool PrimaryKeyExists(string tableName, string primaryKeyName)
+        {
+            return SqlSyntax.DoesPrimaryKeyExist(Context.Database, tableName, primaryKeyName);
         }
 
         protected bool ColumnExists(string tableName, string columnName)

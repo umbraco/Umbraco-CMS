@@ -361,6 +361,7 @@
     vm.close = close;
 
     function openInsertOverlay() {
+      var code;
       var insertOverlay = {
         allowedTypes: {
           macro: true,
@@ -375,11 +376,11 @@
               insert(macroObject.syntax);
               break;
             case "dictionary":
-              var code = templateHelper.getInsertDictionarySnippet(model.insert.node.name);
+              code = templateHelper.getInsertDictionarySnippet(model.insert.node.name);
               insert(code);
               break;
             case "partial":
-              var code = templateHelper.getInsertPartialSnippet(model.insert.node.parentId, model.insert.node.name);
+              code = templateHelper.getInsertPartialSnippet(model.insert.node.parentId, model.insert.node.name);
               insert(code);
               break;
             case "umbracoField":
@@ -388,7 +389,7 @@
           }
           editorService.close();
         },
-        close: function (oldModel) {
+        close: function () {
           // close the dialog
           editorService.close();
           // focus editor
@@ -452,7 +453,7 @@
             insert(code);
             editorService.close();
           },
-          close: function (model) {
+          close: function () {
             // close dialog
             editorService.close();
             // focus editor
@@ -488,7 +489,7 @@
             insert(code);
             editorService.close();
           },
-          close: function (model) {
+          close: function () {
             // close dialog
             editorService.close();
             // focus editor
@@ -518,29 +519,30 @@
 
 
     function openSectionsOverlay() {
+      var code;
       var templateSections = {
         isMaster: vm.template.isMasterTemplate,
         submit: function (model) {
 
           if (model.insertType === 'renderBody') {
-            var code = templateHelper.getRenderBodySnippet();
+            code = templateHelper.getRenderBodySnippet();
             insert(code);
           }
 
           if (model.insertType === 'renderSection') {
-            var code = templateHelper.getRenderSectionSnippet(model.renderSectionName, model.mandatoryRenderSection);
+            code = templateHelper.getRenderSectionSnippet(model.renderSectionName, model.mandatoryRenderSection);
             insert(code);
           }
 
           if (model.insertType === 'addSection') {
-            var code = templateHelper.getAddSectionSnippet(model.sectionName);
+            code = templateHelper.getAddSectionSnippet(model.sectionName);
             wrap(code);
           }
 
           editorService.close();
 
         },
-        close: function (model) {
+        close: function () {
           editorService.close();
           vm.editor.focus();
         }

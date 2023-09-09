@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -586,16 +585,16 @@ public class MediaRepositoryTest : UmbracoIntegrationTest
         // Create and Save folder-Media -> (1051)
         var folderMediaType = MediaTypeService.Get(1031);
         _testFolder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
-        MediaService.Save(_testFolder, 0);
+        MediaService.Save(_testFolder, -1);
 
         // Create and Save image-Media -> (1052)
         var imageMediaType = MediaTypeService.Get(1032);
         _testImage = MediaBuilder.CreateMediaImage(imageMediaType, _testFolder.Id);
-        MediaService.Save(_testImage, 0);
+        MediaService.Save(_testImage, -1);
 
         // Create and Save file-Media -> (1053)
         var fileMediaType = MediaTypeService.Get(1033);
         _testFile = MediaBuilder.CreateMediaFile(fileMediaType, _testFolder.Id);
-        MediaService.Save(_testFile, 0);
+        MediaService.Save(_testFile, -1);
     }
 }

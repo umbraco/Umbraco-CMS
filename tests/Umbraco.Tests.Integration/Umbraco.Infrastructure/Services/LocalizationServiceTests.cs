@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -83,6 +82,15 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Can_Get_Dictionary_Items_By_Guid_Ids()
+    {
+        var items = LocalizationService.GetDictionaryItemsByIds(_parentItemGuidId, _childItemGuidId);
+        Assert.AreEqual(2, items.Count());
+        Assert.NotNull(items.FirstOrDefault(i => i.Key == _parentItemGuidId));
+        Assert.NotNull(items.FirstOrDefault(i => i.Key == _childItemGuidId));
+    }
+
+    [Test]
     public void Can_Get_Dictionary_Item_By_Key()
     {
         var parentItem = LocalizationService.GetDictionaryItemByKey("Parent");
@@ -90,6 +98,15 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
 
         var childItem = LocalizationService.GetDictionaryItemByKey("Child");
         Assert.NotNull(childItem);
+    }
+
+    [Test]
+    public void Can_Get_Dictionary_Items_By_Keys()
+    {
+        var items = LocalizationService.GetDictionaryItemsByKeys("Parent", "Child");
+        Assert.AreEqual(2, items.Count());
+        Assert.NotNull(items.FirstOrDefault(i => i.ItemKey == "Parent"));
+        Assert.NotNull(items.FirstOrDefault(i => i.ItemKey == "Child"));
     }
 
     [Test]
@@ -192,7 +209,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         var languageNbNo = new LanguageBuilder()
             .WithCultureInfo("nb-NO")
             .Build();
-        LocalizationService.Save(languageNbNo, 0);
+        LocalizationService.Save(languageNbNo, -1);
         Assert.That(languageNbNo.HasIdentity, Is.True);
         var languageId = languageNbNo.Id;
 
@@ -210,7 +227,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("nb-NO")
             .WithFallbackLanguageId(languageDaDk.Id)
             .Build();
-        LocalizationService.Save(languageNbNo, 0);
+        LocalizationService.Save(languageNbNo, -1);
         var languageId = languageDaDk.Id;
 
         LocalizationService.Delete(languageDaDk);
@@ -428,8 +445,8 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("en-GB")
             .Build();
 
-        LocalizationService.Save(languageDaDk, 0);
-        LocalizationService.Save(languageEnGb, 0);
+        LocalizationService.Save(languageDaDk, -1);
+        LocalizationService.Save(languageEnGb, -1);
         _danishLangId = languageDaDk.Id;
         _englishLangId = languageEnGb.Id;
 

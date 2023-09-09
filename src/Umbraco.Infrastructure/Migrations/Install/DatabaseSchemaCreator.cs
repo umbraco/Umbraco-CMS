@@ -12,7 +12,6 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using ColumnInfo = Umbraco.Cms.Infrastructure.Persistence.SqlSyntax.ColumnInfo;
 
@@ -87,38 +86,26 @@ public class DatabaseSchemaCreator
     };
 
     private readonly IUmbracoDatabase _database;
-    private readonly IOptionsMonitor<InstallDefaultDataSettings> _defaultDataCreationSettings;
+    private readonly IOptionsMonitor<InstallDefaultDataSettings> _installDefaultDataSettings;
     private readonly IEventAggregator _eventAggregator;
     private readonly ILogger<DatabaseSchemaCreator> _logger;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IUmbracoVersion _umbracoVersion;
 
-    [Obsolete("Please use constructor taking all parameters. Scheduled for removal in V11.")]
-    public DatabaseSchemaCreator(
-        IUmbracoDatabase? database,
-        ILogger<DatabaseSchemaCreator> logger,
-        ILoggerFactory loggerFactory,
-        IUmbracoVersion umbracoVersion,
-        IEventAggregator eventAggregator)
-        : this(database, logger, loggerFactory, umbracoVersion, eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<InstallDefaultDataSettings>>())
-    {
-    }
-
-    public DatabaseSchemaCreator(
-        IUmbracoDatabase? database,
-        ILogger<DatabaseSchemaCreator> logger,
-        ILoggerFactory loggerFactory,
-        IUmbracoVersion umbracoVersion,
-        IEventAggregator eventAggregator,
-        IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
-    {
-        _database = database ?? throw new ArgumentNullException(nameof(database));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-        _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
-        _eventAggregator = eventAggregator;
-        _defaultDataCreationSettings = defaultDataCreationSettings;
+        public DatabaseSchemaCreator(
+            IUmbracoDatabase? database,
+            ILogger<DatabaseSchemaCreator> logger,
+            ILoggerFactory loggerFactory,
+            IUmbracoVersion umbracoVersion,
+            IEventAggregator eventAggregator,
+            IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
+        {
+            _database = database ?? throw new ArgumentNullException(nameof(database));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+            _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
+            _eventAggregator = eventAggregator;
+            _installDefaultDataSettings = defaultDataCreationSettings;  // TODO (V13): Rename this parameter to installDefaultDataSettings.
 
         if (_database?.SqlContext?.SqlSyntax == null)
         {
@@ -178,7 +165,7 @@ public class DatabaseSchemaCreator
             var dataCreation = new DatabaseDataCreator(
                 _database, _loggerFactory.CreateLogger<DatabaseDataCreator>(),
                 _umbracoVersion,
-                _defaultDataCreationSettings);
+                _installDefaultDataSettings);
             foreach (Type table in _orderedTables)
             {
                 CreateTable(false, table, dataCreation);
@@ -455,7 +442,7 @@ public class DatabaseSchemaCreator
                 _database,
                 _loggerFactory.CreateLogger<DatabaseDataCreator>(),
                 _umbracoVersion,
-                _defaultDataCreationSettings));
+                _installDefaultDataSettings));
     }
 
     /// <summary>
@@ -533,19 +520,8 @@ public class DatabaseSchemaCreator
     }
 
     /// <summary>
-    ///     Drops the table for the specified <typeparamref name="T" />.
+    ///     Drops the table for the specified <paramref name="tableName"/>
     /// </summary>
-    /// <typeparam name="T">The type representing the DTO/table.</typeparam>
-    /// <example>
-    ///     <code>
-    /// schemaHelper.DropTable&lt;MyDto&gt;);
-    /// </code>
-    /// </example>
-    /// <remarks>
-    ///     If <typeparamref name="T" /> has been decorated with an <see cref="TableNameAttribute" />, the name from that
-    ///     attribute will be used for the table name. If the attribute is not present, the name
-    ///     <typeparamref name="T" /> will be used instead.
-    /// </remarks>
     public void DropTable(string? tableName)
     {
         var sql = new Sql(string.Format(SqlSyntax.DropTable, SqlSyntax.GetQuotedTableName(tableName)));

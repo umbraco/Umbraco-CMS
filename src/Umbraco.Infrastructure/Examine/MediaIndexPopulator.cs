@@ -38,8 +38,11 @@ public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     {
         if (indexes.Count == 0)
         {
-            _logger.LogDebug(
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(
                 $"{nameof(PopulateIndexes)} called with no indexes to populate. Typically means no index is registered with this populator.");
+            }
             return;
         }
 
@@ -59,13 +62,10 @@ public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         {
             media = _mediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out _).ToArray();
 
-            if (media.Length > 0)
+            // ReSharper disable once PossibleMultipleEnumeration
+            foreach (IIndex index in indexes)
             {
-                // ReSharper disable once PossibleMultipleEnumeration
-                foreach (IIndex index in indexes)
-                {
-                    index.IndexItems(_mediaValueSetBuilder.GetValueSets(media));
-                }
+                index.IndexItems(_mediaValueSetBuilder.GetValueSets(media));
             }
 
             pageIndex++;

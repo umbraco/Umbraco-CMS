@@ -26,7 +26,7 @@ internal class DropDownFlexibleConfigurationEditor : ConfigurationEditor<DropDow
     {
         var output = new DropDownFlexibleConfiguration();
 
-        if (editorValues is null || !editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
+        if (editorValues is null || !editorValues.TryGetValue("items", out var jjj) || jjj is not JArray jItems)
         {
             return output; // oops
         }

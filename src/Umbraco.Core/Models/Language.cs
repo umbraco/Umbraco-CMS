@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Runtime.Serialization;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
@@ -14,6 +13,7 @@ public class Language : EntityBase, ILanguage
 {
     private string _cultureName;
     private int? _fallbackLanguageId;
+    private string? _fallbackLanguageIsoCode;
     private bool _isDefaultVariantLanguage;
     private string _isoCode;
     private bool _mandatory;
@@ -29,22 +29,14 @@ public class Language : EntityBase, ILanguage
         _cultureName = cultureName ?? throw new ArgumentNullException(nameof(cultureName));
     }
 
-    [Obsolete(
-        "Use the constructor not requiring global settings and accepting an explicit name instead, scheduled for removal in V11.")]
-    public Language(GlobalSettings globalSettings, string isoCode)
-    {
-        _isoCode = isoCode ?? throw new ArgumentNullException(nameof(isoCode));
-        _cultureName = CultureInfo.GetCultureInfo(isoCode).EnglishName;
-    }
-
-    /// <inheritdoc />
-    [DataMember]
-    public string IsoCode
-    {
-        get => _isoCode;
-        set
+        /// <inheritdoc />
+        [DataMember]
+        public string IsoCode
         {
-            ArgumentNullException.ThrowIfNull(value);
+            get => _isoCode;
+            set
+            {
+                ArgumentNullException.ThrowIfNull(value);
 
             SetPropertyValueAndDetectChanges(value, ref _isoCode!, nameof(IsoCode));
         }
@@ -82,9 +74,17 @@ public class Language : EntityBase, ILanguage
     }
 
     /// <inheritdoc />
+    [Obsolete("This will be replaced by fallback language ISO code in V14.")]
     public int? FallbackLanguageId
     {
         get => _fallbackLanguageId;
         set => SetPropertyValueAndDetectChanges(value, ref _fallbackLanguageId, nameof(FallbackLanguageId));
+    }
+
+    /// <inheritdoc />
+    public string? FallbackIsoCode
+    {
+        get => _fallbackLanguageIsoCode;
+        set => SetPropertyValueAndDetectChanges(value, ref _fallbackLanguageIsoCode, nameof(FallbackIsoCode));
     }
 }

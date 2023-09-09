@@ -2,16 +2,19 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO.Compression;
 using System.Xml.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using File = System.IO.File;
 
@@ -22,6 +25,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
 {
     private readonly IContentService _contentService;
     private readonly IContentTypeService _contentTypeService;
+    private readonly IScopeAccessor _scopeAccessor;
     private readonly string _createdPackagesFolderPath;
     private readonly IDataTypeService _dataTypeService;
     private readonly IFileService _fileService;
@@ -34,7 +38,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IEntityXmlSerializer _serializer;
     private readonly string _tempFolderPath;
-    private readonly IUmbracoDatabase? _umbracoDatabase;
     private readonly PackageDefinitionXmlParser _xmlParser;
 
     /// <summary>
@@ -55,10 +58,10 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         MediaFileManager mediaFileManager,
         IMacroService macroService,
         IContentTypeService contentTypeService,
+        IScopeAccessor scopeAccessor,
         string? mediaFolderPath = null,
         string? tempFolderPath = null)
     {
-        _umbracoDatabase = umbracoDatabaseFactory.CreateDatabase();
         _hostingEnvironment = hostingEnvironment;
         _fileSystems = fileSystems;
         _serializer = serializer;
@@ -71,21 +74,63 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         _mediaFileManager = mediaFileManager;
         _macroService = macroService;
         _contentTypeService = contentTypeService;
+        _scopeAccessor = scopeAccessor;
         _xmlParser = new PackageDefinitionXmlParser();
         _createdPackagesFolderPath = mediaFolderPath ?? Constants.SystemDirectories.CreatedPackages;
         _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData + "/PackageFiles";
     }
 
+    [Obsolete("use ctor with all dependencies instead")]
+    public CreatedPackageSchemaRepository(
+        IUmbracoDatabaseFactory umbracoDatabaseFactory,
+        IHostingEnvironment hostingEnvironment,
+        IOptions<GlobalSettings> globalSettings,
+        FileSystems fileSystems,
+        IEntityXmlSerializer serializer,
+        IDataTypeService dataTypeService,
+        ILocalizationService localizationService,
+        IFileService fileService,
+        IMediaService mediaService,
+        IMediaTypeService mediaTypeService,
+        IContentService contentService,
+        MediaFileManager mediaFileManager,
+        IMacroService macroService,
+        IContentTypeService contentTypeService,
+        string? mediaFolderPath = null,
+        string? tempFolderPath = null)
+    : this(
+        umbracoDatabaseFactory,
+        hostingEnvironment,
+        globalSettings,
+        fileSystems,
+        serializer,
+        dataTypeService,
+        localizationService,
+        fileService,
+        mediaService,
+        mediaTypeService,
+        contentService,
+        mediaFileManager,
+        macroService,
+        contentTypeService,
+        StaticServiceProvider.Instance.GetRequiredService<IScopeAccessor>(),
+        mediaFolderPath,
+        tempFolderPath)
+    {
+    }
+
+    private IUmbracoDatabase Database => _scopeAccessor.AmbientScope?.Database ?? throw new InvalidOperationException("A scope is required to query the database");
+
     public IEnumerable<PackageDefinition> GetAll()
     {
-        Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase!.SqlContext)
+        Sql<ISqlContext> query = new Sql<ISqlContext>(Database.SqlContext)
             .Select<CreatedPackageSchemaDto>()
             .From<CreatedPackageSchemaDto>()
             .OrderBy<CreatedPackageSchemaDto>(x => x.Id);
 
         var packageDefinitions = new List<PackageDefinition>();
 
-        List<CreatedPackageSchemaDto> xmlSchemas = _umbracoDatabase.Fetch<CreatedPackageSchemaDto>(query);
+        List<CreatedPackageSchemaDto> xmlSchemas = Database.Fetch<CreatedPackageSchemaDto>(query);
         foreach (CreatedPackageSchemaDto packageSchema in xmlSchemas)
         {
             var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
@@ -103,11 +148,11 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
 
     public PackageDefinition? GetById(int id)
     {
-        Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase!.SqlContext)
+        Sql<ISqlContext> query = new Sql<ISqlContext>(Database.SqlContext)
             .Select<CreatedPackageSchemaDto>()
             .From<CreatedPackageSchemaDto>()
             .Where<CreatedPackageSchemaDto>(x => x.Id == id);
-        List<CreatedPackageSchemaDto> schemaDtos = _umbracoDatabase.Fetch<CreatedPackageSchemaDto>(query);
+        List<CreatedPackageSchemaDto> schemaDtos = Database.Fetch<CreatedPackageSchemaDto>(query);
 
         if (schemaDtos.IsCollectionEmpty())
         {
@@ -135,11 +180,11 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             File.Delete(packageDef.PackagePath);
         }
 
-        Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase!.SqlContext)
+        Sql<ISqlContext> query = new Sql<ISqlContext>(Database.SqlContext)
             .Delete<CreatedPackageSchemaDto>()
             .Where<CreatedPackageSchemaDto>(x => x.Id == id);
 
-        _umbracoDatabase.Execute(query);
+        Database.Execute(query);
     }
 
     public bool SavePackage(PackageDefinition? definition)
@@ -169,7 +214,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             };
 
             // Set the ids, we have to save in database first to get the Id
-            _umbracoDatabase!.Insert(dto);
+            Database!.Insert(dto);
             definition.Id = dto.Id;
         }
 
@@ -185,7 +230,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             PackageId = definition.PackageId,
             UpdateDate = DateTime.Now,
         };
-        _umbracoDatabase?.Update(updatedDto);
+        Database?.Update(updatedDto);
 
         return true;
     }

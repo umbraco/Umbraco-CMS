@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// <summary>
 ///     Embed Provider for Hulu the the popular online subscription streaming service.
 /// </summary>
-public class Hulu : EmbedProviderBase
+public class Hulu : OEmbedProviderBase
 {
     public Hulu(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)

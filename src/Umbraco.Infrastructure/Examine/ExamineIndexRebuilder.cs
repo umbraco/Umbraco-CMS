@@ -88,7 +88,10 @@ public class ExamineIndexRebuilder : IIndexRebuilder
 
         if (useBackgroundThread)
         {
-            _logger.LogDebug($"Queuing background job for {nameof(RebuildIndexes)}.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug($"Queuing background job for {nameof(RebuildIndexes)}.");
+            }
 
             _backgroundTaskQueue.QueueBackgroundWorkItem(
                 cancellationToken =>

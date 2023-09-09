@@ -206,7 +206,6 @@
          * Used to highlight unsupported properties for the user, changes unsupported properties into a unsupported-property.
          */
         var notSupportedProperties = [
-            "Umbraco.Tags",
             "Umbraco.UploadField",
             "Umbraco.ImageCropper",
             "Umbraco.NestedContent"
@@ -433,6 +432,24 @@
 
             /**
              * @ngdoc method
+             * @name getAvailableAliasesOfElementTypeKeys
+             * @methodOf umbraco.services.blockEditorModelObject
+             * @description Retrieve a list of aliases that are available for content of blocks in this property editor, does not contain aliases of block settings.
+             * @return {Array} array of strings representing alias.
+             */
+             getAvailableAliasesOfElementTypeKeys: function (elementTypeKeys) {
+                return elementTypeKeys.map(
+                    (key) => {
+                        var scaffold = this.getScaffoldFromKey(key);
+                        if (scaffold) {
+                            return scaffold.contentTypeAlias;
+                        }
+                    }
+                );
+            },
+
+            /**
+             * @ngdoc method
              * @name getAvailableBlocksForBlockPicker
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Retrieve a list of available blocks, the list containing object with the configuration model(blockConfigModel) and the element type model(elementTypeModel).
@@ -502,11 +519,15 @@
              */
             getBlockObject: function (layoutEntry) {
                 var contentUdi = layoutEntry.contentUdi;
+                if(!contentUdi) {
+                    console.error("layoutEntry skipped cause it did not have contentUdi:", layoutEntry);
+                    return null;
+                }
 
                 var dataModel = getDataByUdi(contentUdi, this.value.contentData);
 
                 if (dataModel === null) {
-                    console.error("Couldn't find content data of " + contentUdi)
+                    console.error("Couldn't find content data of UDI:", contentUdi, "layoutEntry:", layoutEntry)
                     return null;
                 }
 
@@ -526,6 +547,7 @@
 
                     blockConfiguration = {
                         label: "Unsupported",
+                        labelInterpolator: "Unsupported",
                         unsupported: true
                     };
                 }
@@ -617,12 +639,17 @@
                         mapToPropertyModel(this.settings, this.settingsData);
                     }
                 };
-
                 // first time instant update of label.
-                blockObject.label = blockObject.content.contentTypeName;
-                blockObject.index = 0;
+              blockObject.label = blockObject.content?.contentTypeName || "";
+                blockObject.index = 0; 
 
-                if (blockObject.config.label && blockObject.config.label !== "") {
+                if (blockObject.config.label && blockObject.config.label !== "" && blockObject.config.unsupported !== true) {
+
+                    // If the label does not contain any AngularJS template, then the MutationObserver wont give us any updates. To ensure labels without angular JS template code, we will just set the label directly for ones without '{{':
+                    if(blockObject.config.label.indexOf("{{") === -1) {
+                        blockObject.label = blockObject.config.label;
+                    }
+
                     var labelElement = $('<div></div>', { text: blockObject.config.label});
 
                     var observer = new MutationObserver(function(mutations) {
@@ -631,7 +658,7 @@
                             blockObject.__scope.$evalAsync();
                         });
                     });
-    
+
                     observer.observe(labelElement[0], {characterData: true, subtree:true});
 
                     blockObject.__watchers.push(() => {
@@ -642,16 +669,17 @@
                     blockObject.__renderLabel = function() {
 
                         var labelVars = {
-                            $contentTypeName: this.content.contentTypeName,
+                            $contentTypeName: this.content?.contentTypeName || "",
                             $settings: this.settingsData || {},
                             $layout: this.layout || {},
                             $index: this.index + 1,
                             ... this.data
                         };
-    
+
                         this.__labelScope = Object.assign(this.__labelScope, labelVars);
-    
+
                         $compile(labelElement.contents())(this.__labelScope);
+
                     }.bind(blockObject)
                 } else {
                     blockObject.__renderLabel = function() {};

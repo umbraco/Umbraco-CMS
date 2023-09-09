@@ -65,7 +65,6 @@ public sealed class HtmlLocalLinkParser
     ///     Parses the string looking for the {localLink} syntax and updates them to their correct links.
     /// </summary>
     /// <param name="text"></param>
-    /// <param name="urlProvider"></param>
     /// <returns></returns>
     public string EnsureInternalLinks(string text)
     {

@@ -1,4 +1,4 @@
-<div class="umb-block-editor" ng-controller="Umbraco.Editors.BlockPickerController as vm">
+<div ng-controller="Umbraco.Editors.BlockPickerController as vm">
 
     <umb-editor-view ng-if="!page.loading">
 
@@ -27,19 +27,36 @@
                     </umb-search-filter>
                 </div>
 
-                <div class="umb-block-card-grid" ng-show="filteredBlocks.length > 0">
+                <div class="umb-block-card-grid" ng-if="vm.filterByGroup(null).length > 0">
 
                     <umb-block-card
                         class="umb-outline"
-                        ng-repeat="block in filteredBlocks = (vm.model.availableItems | umbCmsBlockCard: vm.filter.searchTerm)"
+                        ng-repeat="block in vm.filterByGroup(null)"
                         block-config-model="block.blockConfigModel"
                         element-type-model="block.elementTypeModel"
                         ng-click="vm.selectItem(block, $event)">
                     </umb-block-card>
 
                 </div>
+                
+                <div ng-repeat="blockGroup in model.blockGroups" ng-if="vm.filterByGroup(blockGroup).length > 0">
+                    <h5>{{blockGroup.name}}</h5>
 
-                <umb-empty-state ng-if="filteredBlocks.length === 0"
+                    <div class="umb-block-card-grid">
+
+                        <umb-block-card
+                            class="umb-outline"
+                            ng-repeat="block in vm.filterByGroup(blockGroup)"
+                            block-config-model="block.blockConfigModel"
+                            element-type-model="block.elementTypeModel"
+                            ng-click="vm.selectItem(block, $event)">
+                        </umb-block-card>
+
+                    </div>
+
+                </div>
+
+                <umb-empty-state ng-if="vm.filteredItems.length === 0"
                                  position="center">
                   <localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize>
                 </umb-empty-state>

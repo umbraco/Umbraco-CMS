@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -274,6 +273,49 @@ public class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void EntityService_Can_Get_Paged_Trashed_Content_Children()
+    {
+        var contentType = ContentTypeService.Get("umbTextpage");
+
+        var root = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(root);
+        var toDelete = new List<IContent>();
+        for (var i = 0; i < 10; i++)
+        {
+            var c1 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
+            ContentService.Save(c1);
+
+            if (i % 2 == 0)
+            {
+                toDelete.Add(c1);
+            }
+
+            for (var j = 0; j < 5; j++)
+            {
+                var c2 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
+                ContentService.Save(c2);
+            }
+        }
+
+        foreach (var content in toDelete)
+        {
+            ContentService.MoveToRecycleBin(content);
+        }
+
+        // get paged entities at recycle bin root
+        var entities = EntityService
+            .GetPagedTrashedChildren(Constants.System.RecycleBinContent, UmbracoObjectTypes.Document, 0, 1000, out var total)
+            .Select(x => x.Id)
+            .ToArray();
+
+        Assert.True(total > 0);
+        foreach (var c in toDelete)
+        {
+            Assert.IsTrue(entities.Contains(c.Id));
+        }
+    }
+
+    [Test]
     public void EntityService_Can_Get_Paged_Content_Descendants_With_Search()
     {
         var contentType = ContentTypeService.Get("umbTextpage");
@@ -449,6 +491,50 @@ public class EntityServiceTests : UmbracoIntegrationTest
         foreach (var media in toDelete)
         {
             Assert.IsFalse(entities.Contains(media.Id));
+        }
+    }
+
+    [Test]
+    public void EntityService_Can_Get_Paged_Trashed_Media_Children()
+    {
+        var folderType = MediaTypeService.Get(1031);
+        var imageMediaType = MediaTypeService.Get(1032);
+
+        var root = MediaBuilder.CreateMediaFolder(folderType, -1);
+        MediaService.Save(root);
+        var toDelete = new List<IMedia>();
+        for (var i = 0; i < 10; i++)
+        {
+            var c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
+            MediaService.Save(c1);
+
+            if (i % 2 == 0)
+            {
+                toDelete.Add(c1);
+            }
+
+            for (var j = 0; j < 5; j++)
+            {
+                var c2 = MediaBuilder.CreateMediaImage(imageMediaType, c1.Id);
+                MediaService.Save(c2);
+            }
+        }
+
+        foreach (var content in toDelete)
+        {
+            MediaService.MoveToRecycleBin(content);
+        }
+
+        // get paged entities at recycle bin root
+        var entities = EntityService
+            .GetPagedTrashedChildren(Constants.System.RecycleBinMedia, UmbracoObjectTypes.Media, 0, 1000, out var total)
+            .Select(x => x.Id)
+            .ToArray();
+
+        Assert.True(total > 0);
+        foreach (var media in toDelete)
+        {
+            Assert.IsTrue(entities.Contains(media.Id));
         }
     }
 
@@ -812,45 +898,45 @@ public class EntityServiceTests : UmbracoIntegrationTest
             // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
             _textpage = ContentBuilder.CreateSimpleContent(_contentType);
             _textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
-            ContentService.Save(_textpage, 0);
+            ContentService.Save(_textpage, -1);
 
             // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
             _subpage = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 1", _textpage.Id);
             var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
-            ContentService.Save(_subpage, 0, contentSchedule);
+            ContentService.Save(_subpage, -1, contentSchedule);
 
             // Create and Save Content "Text Page 2" based on "umbTextpage" -> 1055
             _subpage2 = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 2", _textpage.Id);
-            ContentService.Save(_subpage2, 0);
+            ContentService.Save(_subpage2, -1);
 
             // Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1056
             _trashed = ContentBuilder.CreateSimpleContent(_contentType, "Text Page Deleted", -20);
             _trashed.Trashed = true;
-            ContentService.Save(_trashed, 0);
+            ContentService.Save(_trashed, -1);
 
             // Create and Save folder-Media -> 1057
             _folderMediaType = MediaTypeService.Get(1031);
             _folder = MediaBuilder.CreateMediaFolder(_folderMediaType, -1);
-            MediaService.Save(_folder, 0);
+            MediaService.Save(_folder, -1);
             _folderId = _folder.Id;
 
             // Create and Save image-Media -> 1058
             _imageMediaType = MediaTypeService.Get(1032);
             _image = MediaBuilder.CreateMediaImage(_imageMediaType, _folder.Id);
-            MediaService.Save(_image, 0);
+            MediaService.Save(_image, -1);
 
             // Create and Save file-Media -> 1059
             var fileMediaType = MediaTypeService.Get(1033);
             var file = MediaBuilder.CreateMediaFile(fileMediaType, _folder.Id);
-            MediaService.Save(file, 0);
+            MediaService.Save(file, -1);
 
             // Create and save sub folder -> 1060
             _subfolder = MediaBuilder.CreateMediaFolder(_folderMediaType, _folder.Id);
-            MediaService.Save(_subfolder, 0);
+            MediaService.Save(_subfolder, -1);
 
             // Create and save sub folder -> 1061
             _subfolder2 = MediaBuilder.CreateMediaFolder(_folderMediaType, _subfolder.Id);
-            MediaService.Save(_subfolder2, 0);
+            MediaService.Save(_subfolder2, -1);
         }
     }
 }

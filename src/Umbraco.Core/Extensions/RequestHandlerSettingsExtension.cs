@@ -7,13 +7,13 @@ namespace Umbraco.Extensions;
 
 /// <summary>
 ///     Get concatenated user and default character replacements
-///     taking into account <see cref="RequestHandlerSettings.EnableDefaultCharReplacements" />
+///     taking into account <see cref="RequestHandlerSettings.EnableDefaultCharReplacements" />.
 /// </summary>
 public static class RequestHandlerSettingsExtension
 {
     /// <summary>
     ///     Get concatenated user and default character replacements
-    ///     taking into account <see cref="RequestHandlerSettings.EnableDefaultCharReplacements" />
+    ///     taking into account <see cref="RequestHandlerSettings.EnableDefaultCharReplacements" />.
     /// </summary>
     public static IEnumerable<CharItem> GetCharReplacements(this RequestHandlerSettings requestHandlerSettings)
     {
@@ -28,31 +28,8 @@ public static class RequestHandlerSettingsExtension
             return RequestHandlerSettings.DefaultCharCollection;
         }
 
-        return MergeUnique(
-            requestHandlerSettings.UserDefinedCharCollection,
-            RequestHandlerSettings.DefaultCharCollection);
-    }
-
-    /// <summary>
-    ///     Merges CharCollection and UserDefinedCharCollection, prioritizing UserDefinedCharCollection
-    /// </summary>
-    internal static void MergeReplacements(
-        this RequestHandlerSettings requestHandlerSettings,
-        IConfiguration configuration)
-    {
-        var sectionKey = $"{Constants.Configuration.ConfigRequestHandler}:";
-
-        IEnumerable<CharItem> charCollection = GetReplacements(
-            configuration,
-            $"{sectionKey}{nameof(RequestHandlerSettings.CharCollection)}");
-
-        IEnumerable<CharItem> userDefinedCharCollection = GetReplacements(
-            configuration,
-            $"{sectionKey}{nameof(requestHandlerSettings.UserDefinedCharCollection)}");
-
-        IEnumerable<CharItem> mergedCollection = MergeUnique(userDefinedCharCollection, charCollection);
-
-        requestHandlerSettings.UserDefinedCharCollection = mergedCollection;
+        // Merges CharCollection and UserDefinedCharCollection, prioritizing UserDefinedCharCollection.
+        return MergeUnique(requestHandlerSettings.UserDefinedCharCollection, RequestHandlerSettings.DefaultCharCollection);
     }
 
     private static IEnumerable<CharItem> GetReplacements(IConfiguration configuration, string key)
@@ -64,6 +41,12 @@ public static class RequestHandlerSettingsExtension
         {
             var @char = section.GetValue<string>(nameof(CharItem.Char));
             var replacement = section.GetValue<string>(nameof(CharItem.Replacement));
+
+            if (@char is null || replacement is null)
+            {
+                continue;
+            }
+
             replacements.Add(new CharItem { Char = @char, Replacement = replacement });
         }
 
@@ -71,8 +54,7 @@ public static class RequestHandlerSettingsExtension
     }
 
     /// <summary>
-    ///     Merges two IEnumerable of CharItem without any duplicates, items in priorityReplacements will override those in
-    ///     alternativeReplacements
+    ///     Merges two IEnumerable of CharItem without any duplicates, items in priorityReplacements will override those in alternativeReplacements.
     /// </summary>
     private static IEnumerable<CharItem> MergeUnique(
         IEnumerable<CharItem> priorityReplacements,

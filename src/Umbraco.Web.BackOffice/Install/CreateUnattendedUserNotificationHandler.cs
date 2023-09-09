@@ -30,6 +30,7 @@ public class CreateUnattendedUserNotificationHandler : INotificationAsyncHandler
     ///     Listening for when the UnattendedInstallNotification fired after a sucessfulk
     /// </summary>
     /// <param name="notification"></param>
+    /// <param name="cancellationToken"></param>
     public async Task HandleAsync(UnattendedInstallNotification notification, CancellationToken cancellationToken)
     {
         UnattendedSettings? unattendedSettings = _unattendedSettings.Value;
@@ -75,7 +76,7 @@ public class CreateUnattendedUserNotificationHandler : INotificationAsyncHandler
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
         IBackOfficeUserManager backOfficeUserManager =
             scope.ServiceProvider.GetRequiredService<IBackOfficeUserManager>();
-        BackOfficeIdentityUser membershipUser =
+        BackOfficeIdentityUser? membershipUser =
             await backOfficeUserManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
         if (membershipUser == null)
         {

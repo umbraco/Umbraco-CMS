@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -213,7 +212,7 @@ public class PublishedSnapshotServiceTestBase
     }
 
     /// <summary>
-    ///     Initializes the <see cref="IPublishedSnapshotService'" /> with a source of data
+    ///     Initializes the <see cref="IPublishedSnapshotService" /> with a source of data.
     /// </summary>
     protected void InitializedCache(
         IEnumerable<ContentNodeKit> contentNodeKits,

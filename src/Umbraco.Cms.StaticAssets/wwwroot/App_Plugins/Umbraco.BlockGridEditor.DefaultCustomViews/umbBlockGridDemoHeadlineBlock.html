@@ -1,0 +1,29 @@
+<style>
+    
+    button {
+        position: relative;
+        display: block;
+        cursor: pointer;
+        background-color: transparent;
+        text-align: left;
+        color: inherit;
+        user-select: none;
+        border: none;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        transition: border-color 120ms, background-color 120ms;
+    }
+
+    h1 {
+        font-family: 'Lato';
+        font-weight: 300;
+        font-size: 34px;
+        margin-top: 0.5em;
+    }
+
+</style>
+
+<button type="button" ng-click="block.edit()" ng-focus="block.focus">
+    <h1 style="margin: 0 20px;">{{block.data.headline}}</h1>
+</button>

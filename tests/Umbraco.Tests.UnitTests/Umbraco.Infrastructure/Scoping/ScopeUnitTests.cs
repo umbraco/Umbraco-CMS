@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -25,7 +24,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
         /// <summary>
         /// Creates a ScopeProvider with mocked internals.
         /// </summary>
-        /// <param name="syntaxProviderMock">The mock of the ISqlSyntaxProvider2, used to count method calls.</param>
+        /// <param name="lockingMechanism"></param>
         /// <returns></returns>
         private ScopeProvider GetScopeProvider(out Mock<IDistributedLockingMechanism> lockingMechanism)
         {

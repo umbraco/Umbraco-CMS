@@ -28,6 +28,9 @@ public class DatabaseModel
     [DataMember(Name = "integratedAuth")]
     public bool IntegratedAuth { get; set; }
 
+    [DataMember(Name = "trustServerCertificate")]
+    public bool TrustServerCertificate { get; set; }
+
     [DataMember(Name = "connectionString")]
     public string? ConnectionString { get; set; }
 }

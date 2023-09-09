@@ -1,11 +1,11 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
@@ -44,7 +44,7 @@ public class MappingTests
     public void SimpleMap()
     {
         var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition1() });
-        var mapper = new UmbracoMapper(definitions, _scopeProvider);
+        var mapper = new UmbracoMapper(definitions, _scopeProvider, NullLogger<UmbracoMapper>.Instance);
 
         var thing1 = new Thing1 { Value = "value" };
         var thing2 = mapper.Map<Thing1, Thing2>(thing1);
@@ -66,7 +66,7 @@ public class MappingTests
     public void EnumerableMap()
     {
         var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition1() });
-        var mapper = new UmbracoMapper(definitions, _scopeProvider);
+        var mapper = new UmbracoMapper(definitions, _scopeProvider, NullLogger<UmbracoMapper>.Instance);
 
         var thing1A = new Thing1 { Value = "valueA" };
         var thing1B = new Thing1 { Value = "valueB" };
@@ -97,7 +97,7 @@ public class MappingTests
     public void InheritedMap()
     {
         var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition1() });
-        var mapper = new UmbracoMapper(definitions, _scopeProvider);
+        var mapper = new UmbracoMapper(definitions, _scopeProvider, NullLogger<UmbracoMapper>.Instance);
 
         var thing3 = new Thing3 { Value = "value" };
         var thing2 = mapper.Map<Thing3, Thing2>(thing3);
@@ -119,7 +119,7 @@ public class MappingTests
     public void CollectionsMap()
     {
         var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition2() });
-        var mapper = new UmbracoMapper(definitions, _scopeProvider);
+        var mapper = new UmbracoMapper(definitions, _scopeProvider, NullLogger<UmbracoMapper>.Instance);
 
         // can map a PropertyCollection
         var source = new PropertyCollection();
@@ -135,7 +135,7 @@ public class MappingTests
             new MapperDefinition1(),
             new MapperDefinition3(),
         });
-        var mapper = new UmbracoMapper(definitions, _scopeProvider);
+        var mapper = new UmbracoMapper(definitions, _scopeProvider, NullLogger<UmbracoMapper>.Instance);
 
         // the mapper currently has a map from Thing1 to Thing2
         // because Thing3 inherits from Thing1, it will map a Thing3 instance,
@@ -191,7 +191,7 @@ public class MappingTests
     public void EnumMap()
     {
         var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition4() });
-        var mapper = new UmbracoMapper(definitions, _scopeProvider);
+        var mapper = new UmbracoMapper(definitions, _scopeProvider, NullLogger<UmbracoMapper>.Instance);
 
         var thing5 = new Thing5 { Fruit1 = Thing5Enum.Apple, Fruit2 = Thing5Enum.Banana, Fruit3 = Thing5Enum.Cherry };
 
@@ -207,7 +207,7 @@ public class MappingTests
     public void NullPropertyMap()
     {
         var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition5() });
-        var mapper = new UmbracoMapper(definitions, _scopeProvider);
+        var mapper = new UmbracoMapper(definitions, _scopeProvider, NullLogger<UmbracoMapper>.Instance);
 
         var thing7 = new Thing7();
 
