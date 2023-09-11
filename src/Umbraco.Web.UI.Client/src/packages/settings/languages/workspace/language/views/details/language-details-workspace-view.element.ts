@@ -1,5 +1,4 @@
 import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from '../../language-workspace.context.js';
-import type { UmbInputCultureSelectElement } from '../../../../../cultures/components/input-culture-select/input-culture-select.element.js';
 import type { UmbInputLanguagePickerElement } from '../../../../components/input-language-picker/input-language-picker.element.js';
 import { UUIBooleanInputEvent, UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
@@ -63,7 +62,8 @@ export class UmbLanguageDetailsWorkspaceViewElement
 
 	#handleCultureChange(event: Event) {
 		if (event instanceof UmbChangeEvent) {
-			const target = event.target as UmbInputCultureSelectElement;
+			// TODO: add correct type for event target
+			const target = event.target as any;
 			const isoCode = target.value.toString();
 			const cultureName = target.selectedCultureName;
 
@@ -129,7 +129,7 @@ export class UmbLanguageDetailsWorkspaceViewElement
 
 						<!-- TEMP VALIDATION ERROR -->
 						${this._validationErrors?.isoCode.map(
-							(isoCodeError) => html`<div class="validation-message">${isoCodeError}</div>`
+							(isoCodeError) => html`<div class="validation-message">${isoCodeError}</div>`,
 						)}
 					</div>
 				</umb-workspace-property-layout>
