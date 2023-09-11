@@ -69,13 +69,7 @@ internal class
                 $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
         }
 
-        var validEmail = true;
-        if (_securitySettings.MemberRequireUniqueEmail)
-        {
-            validEmail = ValidateUniqueEmail(model);
-        }
-
-        if (validEmail == false)
+        if (_securitySettings.MemberRequireUniqueEmail && ValidateUniqueEmail(model) == false)
         {
             modelState.AddPropertyError(
                 new ValidationResult("Email address is already in use", new[] { "value" }),
