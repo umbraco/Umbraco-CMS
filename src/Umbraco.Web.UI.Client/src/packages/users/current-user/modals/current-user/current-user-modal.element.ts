@@ -1,6 +1,6 @@
+import { UMB_APP } from '@umbraco-cms/backoffice/app';
 import { UMB_AUTH, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
-import { UMB_APP } from '@umbraco-cms/backoffice/context';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, CSSResultGroup, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
