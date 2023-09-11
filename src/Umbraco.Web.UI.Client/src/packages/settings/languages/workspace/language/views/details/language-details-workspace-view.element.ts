@@ -1,3 +1,4 @@
+import type { UmbInputCultureSelectElement } from '@umbraco-cms/backoffice/culture';
 import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from '../../language-workspace.context.js';
 import type { UmbInputLanguagePickerElement } from '../../../../components/input-language-picker/input-language-picker.element.js';
 import { UUIBooleanInputEvent, UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
@@ -62,8 +63,7 @@ export class UmbLanguageDetailsWorkspaceViewElement
 
 	#handleCultureChange(event: Event) {
 		if (event instanceof UmbChangeEvent) {
-			// TODO: add correct type for event target
-			const target = event.target as any;
+			const target = event.target as UmbInputCultureSelectElement;
 			const isoCode = target.value.toString();
 			const cultureName = target.selectedCultureName;
 
