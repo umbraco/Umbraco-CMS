@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@umbraco/json-models-builders": "^1.0.6",
-    "@umbraco/playwright-testhelpers": "^1.0.24",
+    "@umbraco/playwright-testhelpers": "^1.0.25",
     "camelize": "^1.0.0",
     "faker": "^4.1.0",
     "form-data": "^4.0.0",
