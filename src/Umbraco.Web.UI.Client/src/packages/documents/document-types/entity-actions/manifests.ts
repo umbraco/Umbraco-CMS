@@ -18,7 +18,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 900,
 		meta: {
 			icon: 'umb:trash',
-			label: 'Delete (TBD)',
+			label: 'Delete',
 			repositoryAlias: DOCUMENT_TYPE_REPOSITORY_ALIAS,
 			api: UmbDeleteEntityAction,
 			entityTypes: [entityType],
