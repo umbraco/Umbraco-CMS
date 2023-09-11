@@ -5,6 +5,7 @@
 	"type": "module",
 	"exports": {
 		".": null,
+		"./app": "./dist-cms/apps/app/index.js",
 		"./class-api": "./dist-cms/libs/class-api/index.js",
 		"./context-api": "./dist-cms/libs/context-api/index.js",
 		"./controller-api": "./dist-cms/libs/controller-api/index.js",
@@ -13,7 +14,6 @@
 		"./localization-api": "./dist-cms/libs/localization-api/index.js",
 		"./observable-api": "./dist-cms/libs/observable-api/index.js",
 		"./auth": "./dist-cms/shared/auth/index.js",
-		"./context": "./dist-cms/shared/context/index.js",
 		"./events": "./dist-cms/shared/umb-events/index.js",
 		"./icon": "./dist-cms/shared/icon/index.js",
 		"./models": "./dist-cms/shared/models/index.js",
