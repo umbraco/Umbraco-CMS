@@ -1,5 +1,5 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { css, html, customElement, state, query, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ProfilingResource } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -7,11 +7,19 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 @customElement('umb-dashboard-performance-profiling')
 export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 	@state()
-	private _profilingStatus?: boolean;
+	private _profilingStatus = true;
 
 	// TODO: Get this from the management api configuration when available
 	@state()
 	private _isDebugMode = true;
+
+	@query('#toggle')
+	private _toggle!: HTMLInputElement;
+
+	#setToggle(value: boolean) {
+		this._toggle.checked = value;
+		this._profilingStatus = value;
+	}
 
 	firstUpdated() {
 		this._getProfilingStatus();
@@ -20,69 +28,41 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 	private async _getProfilingStatus() {
 		const { data } = await tryExecuteAndNotify(this, ProfilingResource.getProfilingStatus());
 
-		if (data) {
-			this._profilingStatus = data.enabled;
-		}
+		if (!data || !data.enabled) return;
+		this._profilingStatus = data.enabled;
 	}
 
 	private async _changeProfilingStatus() {
 		const { error } = await tryExecuteAndNotify(
 			this,
-			ProfilingResource.putProfilingStatus({ requestBody: { enabled: !this._profilingStatus } })
+			ProfilingResource.putProfilingStatus({ requestBody: { enabled: !this._profilingStatus } }),
 		);
 
-		if (!error) {
-			this._profilingStatus = !this._profilingStatus;
-		}
+		error ? this.#setToggle(this._profilingStatus) : this.#setToggle(!this._profilingStatus);
 	}
 
 	private renderProfilingStatus() {
 		return this._isDebugMode
 			? html`
-					<p>
-						Umbraco is running in debug mode. This means you can use the built-in performance profiler to assess
-						performance when rendering pages.
-					</p>
-					<p>
-						If you want to activate the profiler for a specific page rendering, simply add
-						<strong>umbDebug=true</strong> to the querystring when requesting the page.
-					</p>
-
-					<p>
-						If you want the profiler to be activated by default for all page renderings, you can use the toggle below.
-						It will set a cookie in your browser, which then activates the profiler automatically. In other words, the
-						profiler will only be active by default in your browser - not everyone else's.
-					</p>
+					${unsafeHTML(this.localize.term('profiling_performanceProfilingDescription'))}
 
 					<uui-toggle
+						id="toggle"
 						label="Activate the profiler by default"
 						label-position="left"
-						.checked="${this._profilingStatus}"
+						?checked="${this._profilingStatus}"
 						@change="${this._changeProfilingStatus}"></uui-toggle>
 
-					<h4>Friendly reminder</h4>
-					<p>
-						You should never let a production site run in debug mode. Debug mode is turned off by setting
-						<strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>false</strong> in appsettings.json,
-						appsettings.{Environment}.json or via an environment variable.
-					</p>
+					<h4>${this.localize.term('profiling_reminder')}</h4>
+
+					${unsafeHTML(this.localize.term('profiling_reminderDescription'))}
 			  `
-			: html`
-					<p>
-						Umbraco is not running in debug mode, so you can't use the built-in profiler. This is how it should be for a
-						production site.
-					</p>
-					<p>
-						Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in
-						appsettings.json, appsettings.{Environment}.json or via an environment variable.
-					</p>
-			  `;
+			: html` ${unsafeHTML(this.localize.term('profiling_profilerEnabledDescription'))} `;
 	}
 
 	render() {
 		return html`
-			<uui-box>
-				<h1>Performance Profiling</h1>
+			<uui-box headline=${this.localize.term('profiling_performanceProfiling')}>
 				${typeof this._profilingStatus === 'undefined' ? html`<uui-loader></uui-loader>` : this.renderProfilingStatus()}
 			</uui-box>
 		`;
