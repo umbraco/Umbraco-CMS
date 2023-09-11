@@ -156,9 +156,10 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 }
 
-
-export const UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbDocumentTypeWorkspaceContext>(
+export const UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
+	UmbSaveableWorkspaceContextInterface,
+	UmbDocumentTypeWorkspaceContext
+>(
 	'UmbWorkspaceContext',
-	(context): context is UmbDocumentTypeWorkspaceContext => context.getEntityType?.() === 'document-type'
+	(context): context is UmbDocumentTypeWorkspaceContext => context.getEntityType?.() === 'document-type',
 );
-
