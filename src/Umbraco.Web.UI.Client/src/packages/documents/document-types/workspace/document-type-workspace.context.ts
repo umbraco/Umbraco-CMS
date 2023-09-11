@@ -43,26 +43,26 @@ export class UmbDocumentTypeWorkspaceContext
 		this.structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
 
 		// General for content types:
-		this.data = this.structure.ownerDocumentType;
-		this.name = this.structure.ownerDocumentTypeObservablePart((data) => data?.name);
-		this.alias = this.structure.ownerDocumentTypeObservablePart((data) => data?.alias);
-		this.description = this.structure.ownerDocumentTypeObservablePart((data) => data?.description);
-		this.icon = this.structure.ownerDocumentTypeObservablePart((data) => data?.icon);
-		this.allowedAsRoot = this.structure.ownerDocumentTypeObservablePart((data) => data?.allowedAsRoot);
-		this.variesByCulture = this.structure.ownerDocumentTypeObservablePart((data) => data?.variesByCulture);
-		this.variesBySegment = this.structure.ownerDocumentTypeObservablePart((data) => data?.variesBySegment);
-		this.isElement = this.structure.ownerDocumentTypeObservablePart((data) => data?.isElement);
-		this.allowedContentTypes = this.structure.ownerDocumentTypeObservablePart((data) => data?.allowedContentTypes);
-		this.compositions = this.structure.ownerDocumentTypeObservablePart((data) => data?.compositions);
+		this.data = this.structure.ownerContentType;
+		this.name = this.structure.ownerContentTypeObservablePart((data) => data?.name);
+		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);
+		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);
+		this.icon = this.structure.ownerContentTypeObservablePart((data) => data?.icon);
+		this.allowedAsRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAsRoot);
+		this.variesByCulture = this.structure.ownerContentTypeObservablePart((data) => data?.variesByCulture);
+		this.variesBySegment = this.structure.ownerContentTypeObservablePart((data) => data?.variesBySegment);
+		this.isElement = this.structure.ownerContentTypeObservablePart((data) => data?.isElement);
+		this.allowedContentTypes = this.structure.ownerContentTypeObservablePart((data) => data?.allowedContentTypes);
+		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
 
 		// Document type specific:
-		this.allowedTemplateIds = this.structure.ownerDocumentTypeObservablePart((data) => data?.allowedTemplateIds);
-		this.defaultTemplateId = this.structure.ownerDocumentTypeObservablePart((data) => data?.defaultTemplateId);
-		this.cleanup = this.structure.ownerDocumentTypeObservablePart((data) => data?.defaultTemplateId);
+		this.allowedTemplateIds = this.structure.ownerContentTypeObservablePart((data) => data?.allowedTemplateIds);
+		this.defaultTemplateId = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplateId);
+		this.cleanup = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplateId);
 	}
 
 	getData() {
-		return this.structure.getOwnerDocumentType() || {};
+		return this.structure.getOwnerContentType() || {};
 	}
 
 	getEntityId() {
@@ -74,45 +74,45 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	setName(name: string) {
-		this.structure.updateOwnerDocumentType({ name });
+		this.structure.updateOwnerContentType({ name });
 	}
 	setAlias(alias: string) {
-		this.structure.updateOwnerDocumentType({ alias });
+		this.structure.updateOwnerContentType({ alias });
 	}
 	setDescription(description: string) {
-		this.structure.updateOwnerDocumentType({ description });
+		this.structure.updateOwnerContentType({ description });
 	}
 
 	// TODO: manage setting icon color alias?
 	setIcon(icon: string) {
-		this.structure.updateOwnerDocumentType({ icon });
+		this.structure.updateOwnerContentType({ icon });
 	}
 
 	setAllowedAsRoot(allowedAsRoot: boolean) {
-		this.structure.updateOwnerDocumentType({ allowedAsRoot });
+		this.structure.updateOwnerContentType({ allowedAsRoot });
 	}
 	setVariesByCulture(variesByCulture: boolean) {
-		this.structure.updateOwnerDocumentType({ variesByCulture });
+		this.structure.updateOwnerContentType({ variesByCulture });
 	}
 	setVariesBySegment(variesBySegment: boolean) {
-		this.structure.updateOwnerDocumentType({ variesBySegment });
+		this.structure.updateOwnerContentType({ variesBySegment });
 	}
 	setIsElement(isElement: boolean) {
-		this.structure.updateOwnerDocumentType({ isElement });
+		this.structure.updateOwnerContentType({ isElement });
 	}
 	setAllowedContentTypes(allowedContentTypes: Array<ContentTypeSortModel>) {
-		this.structure.updateOwnerDocumentType({ allowedContentTypes });
+		this.structure.updateOwnerContentType({ allowedContentTypes });
 	}
 	setCompositions(compositions: Array<ContentTypeCompositionModel>) {
-		this.structure.updateOwnerDocumentType({ compositions });
+		this.structure.updateOwnerContentType({ compositions });
 	}
 
 	// Document type specific:
 	setAllowedTemplateIds(allowedTemplateIds: Array<string>) {
-		this.structure.updateOwnerDocumentType({ allowedTemplateIds });
+		this.structure.updateOwnerContentType({ allowedTemplateIds });
 	}
 	setDefaultTemplateId(defaultTemplateId: string) {
-		this.structure.updateOwnerDocumentType({ defaultTemplateId });
+		this.structure.updateOwnerContentType({ defaultTemplateId });
 	}
 
 	async create(parentId: string | null) {
