@@ -314,28 +314,24 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	}
 
 	// TODO: Refactor: These property methods, should maybe be named without structure in their name.
-	async propertyStructureById(
-		propertyId: string
-	) {
+	async propertyStructureById(propertyId: string) {
 		await this.#init;
 		return this.#documentTypes.asObservablePart((docTypes) => {
 			for (const docType of docTypes) {
 				const foundProp = docType.properties?.find((property) => property.id === propertyId);
-				if(foundProp) {
+				if (foundProp) {
 					return foundProp;
 				}
 			}
 			return undefined;
 		});
 	}
-	async propertyStructureByAlias(
-		propertyAlias: string
-	) {
+	async propertyStructureByAlias(propertyAlias: string) {
 		await this.#init;
 		return this.#documentTypes.asObservablePart((docTypes) => {
 			for (const docType of docTypes) {
 				const foundProp = docType.properties?.find((property) => property.alias === propertyAlias);
-				if(foundProp) {
+				if (foundProp) {
 					return foundProp;
 				}
 			}
@@ -347,7 +343,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		await this.#init;
 		for (const docType of this.#documentTypes.getValue()) {
 			const foundProp = docType.properties?.find((property) => property.id === propertyId);
-			if(foundProp) {
+			if (foundProp) {
 				return foundProp;
 			}
 		}
@@ -357,13 +353,12 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		await this.#init;
 		for (const docType of this.#documentTypes.getValue()) {
 			const foundProp = docType.properties?.find((property) => property.alias === propertyAlias);
-			if(foundProp) {
+			if (foundProp) {
 				return foundProp;
 			}
 		}
 		return undefined;
 	}
-
 
 	/*
 	rootDocumentTypeName() {
