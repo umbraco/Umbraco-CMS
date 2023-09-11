@@ -62,7 +62,7 @@ public class SecuritySettings
     /// <summary>
     ///     Gets or sets a value indicating whether the member's email address must be unique.
     /// </summary>
-    public bool RequireUniqueEmailForMembers { get; set; } = true;
+    public bool MemberRequireUniqueEmail { get; set; } = true;
 
     /// <summary>
     ///     Gets or sets the set of allowed characters for a username

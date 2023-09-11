@@ -97,7 +97,7 @@ public class MemberController : ContentControllerBase
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         ICoreScopeProvider scopeProvider,
         ITwoFactorLoginService twoFactorLoginService,
-        IOptionsSnapshot<SecuritySettings>? securitySettings)
+        IOptions<SecuritySettings>? securitySettings)
         : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, jsonSerializer)
     {
         _propertyEditors = propertyEditors;
@@ -150,7 +150,7 @@ public class MemberController : ContentControllerBase
               passwordChanger,
               scopeProvider,
               StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>(),
-              null)
+              StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
     {
     }
 

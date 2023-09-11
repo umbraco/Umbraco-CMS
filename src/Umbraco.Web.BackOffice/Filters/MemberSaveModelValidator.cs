@@ -69,7 +69,12 @@ internal class
                 $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
         }
 
-        var validEmail = ValidateUniqueEmail(model);
+        var validEmail = true;
+        if (_securitySettings.MemberRequireUniqueEmail)
+        {
+            validEmail = ValidateUniqueEmail(model);
+        }
+
         if (validEmail == false)
         {
             modelState.AddPropertyError(
@@ -184,11 +189,6 @@ internal class
 
     internal bool ValidateUniqueEmail(MemberSave model)
     {
-        if(_securitySettings.RequireUniqueEmailForMembers == false)
-        {
-            return true;
-        }
-
         if (model == null)
         {
             throw new ArgumentNullException(nameof(model));

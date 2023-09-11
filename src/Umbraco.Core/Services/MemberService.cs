@@ -393,10 +393,8 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IMember"/></returns>
         public IMember? GetByEmail(string email)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            scope.ReadLock(Constants.Locks.MemberTree);
-            IQuery<IMember> query = Query<IMember>().Where(x => x.Email.Equals(email));
-            return _memberRepository.Get(query)?.FirstOrDefault();
+            var members = this.GetMembersByEmail(email);
+            return members?.FirstOrDefault();
         }
 
         /// <summary>
