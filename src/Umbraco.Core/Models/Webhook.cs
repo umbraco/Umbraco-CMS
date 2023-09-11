@@ -1,5 +1,6 @@
 ﻿using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -10,6 +11,12 @@ public class Webhook : EntityBase
     private string _url;
     private WebhookEvent _webHookEvent;
     private Guid[] _entityKeys;
+
+    // Custom comparer for enumerable
+    private static readonly DelegateEqualityComparer<IEnumerable<Guid>> _guidEnumerableComparer =
+        new(
+            (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
+            enum1 => enum1.GetHashCode());
 
     public Webhook(string url, WebhookEvent webHookEvent, Guid[]? entityKeys = null)
     {
@@ -36,6 +43,6 @@ public class Webhook : EntityBase
     public Guid[] EntityKeys
     {
         get => _entityKeys;
-        set => SetPropertyValueAndDetectChanges(value, ref _entityKeys!, nameof(EntityKeys));
+        set => SetPropertyValueAndDetectChanges(value, ref _entityKeys!, nameof(EntityKeys), _guidEnumerableComparer);
     }
 }
