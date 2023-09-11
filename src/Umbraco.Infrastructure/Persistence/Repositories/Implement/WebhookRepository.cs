@@ -38,7 +38,7 @@ public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRe
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
 
-        List<WebhookDto>? dtos = Database.Fetch<WebhookDto>(sql);
+        List<WebhookDto> dtos = Database.Fetch<WebhookDto>(sql);
 
         return dtos.Select(DtoToEntity);
     }

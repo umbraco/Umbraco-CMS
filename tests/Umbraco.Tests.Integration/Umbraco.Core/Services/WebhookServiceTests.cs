@@ -49,6 +49,23 @@ public class WebhookServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Get_All()
+    {
+        var createdWebhookOne = await WebhookService.CreateAsync(new Webhook("https://example.com", WebhookEvent.ContentPublish, new[] { Guid.NewGuid() }));
+        var createdWebhookTwo = await WebhookService.CreateAsync(new Webhook("https://example.com", WebhookEvent.ContentDelete, new[] { Guid.NewGuid() }));
+        var createdWebhookThree = await WebhookService.CreateAsync(new Webhook("https://example.com", WebhookEvent.ContentUnpublish, new[] { Guid.NewGuid() }));
+        var webhooks = await WebhookService.GetAllAsync();
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotEmpty(webhooks);
+            Assert.IsNotNull(webhooks.FirstOrDefault(x => x.Key == createdWebhookOne.Key));
+            Assert.IsNotNull(webhooks.FirstOrDefault(x => x.Key == createdWebhookTwo.Key));
+            Assert.IsNotNull(webhooks.FirstOrDefault(x => x.Key == createdWebhookThree.Key));
+        });
+    }
+
+    [Test]
     [TestCase("https://example.com", WebhookEvent.ContentPublish, "00000000-0000-0000-0000-010000000000")]
     [TestCase("https://example.com", WebhookEvent.ContentDelete, "00000000-0000-0000-0000-000200000000")]
     [TestCase("https://example.com", WebhookEvent.ContentUnpublish, "00000000-0000-0000-0000-300000000000")]

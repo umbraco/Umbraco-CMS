@@ -52,4 +52,12 @@ public class WebhookService : IWebHookService
         scope.Complete();
         return Task.FromResult(webhooks);
     }
+
+    public Task<IEnumerable<Webhook>> GetAllAsync()
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        IEnumerable<Webhook> webhooks = _webhookRepository.GetMany();
+        scope.Complete();
+        return Task.FromResult(webhooks);
+    }
 }
