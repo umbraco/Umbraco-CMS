@@ -19,6 +19,7 @@
 
 <!DOCTYPE html>
 <html lang="@CultureInfo.CurrentCulture.Name">
+
 <head>
     <base href="@backOfficePath.EnsureEndsWith('/')" />
     <meta charset="UTF-8" />
@@ -87,6 +88,7 @@
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/workspace", backofficeAssetsPath + "/packages/core/workspace/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/property-editor", backofficeAssetsPath + "/packages/core/property-editor/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/property-action", backofficeAssetsPath + "/packages/core/property-action/index.js")),
+                    @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/culture", backofficeAssetsPath + "/packages/core/culture/index.js")),
 
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/dictionary", backofficeAssetsPath + "/packages/dictionary/dictionary/index.js")),
 
@@ -119,7 +121,9 @@
         </script>
     <script type="module" src="@backofficeAssetsPath/apps/app/app.element.js"></script>
 </head>
+
 <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
     <umb-app></umb-app>
 </body>
+
 </html>
