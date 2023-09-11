@@ -28,5 +28,8 @@ internal class WebhookDto
 
     [Column(Name = "entityKey")]
     public Guid EntityKey { get; set; }
+
+    [Column(Name = "enabled")]
+    public bool Enabled { get; set; }
 }
 

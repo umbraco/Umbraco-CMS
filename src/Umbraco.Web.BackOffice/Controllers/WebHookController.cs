@@ -23,7 +23,9 @@ public class WebHookController : UmbracoApiController
     {
         IEnumerable<Webhook> webhooks = await _webHookService.GetAllAsync();
 
-        return Ok(webhooks);
+        List<WebhookViewModel> webhookViewModels = _umbracoMapper.MapEnumerable<Webhook, WebhookViewModel>(webhooks);
+
+        return Ok(webhookViewModels);
     }
 
     [HttpPost]
@@ -53,5 +55,6 @@ public class WebHookController : UmbracoApiController
 
     // TODO: This should probably be handled by the NewtonsoftJsonOutputFormatter instead
     [HttpGet]
-    public async Task<IActionResult> GetEvents() => Ok(Enum.GetValues(typeof(WebhookEvent)).Cast<WebhookEvent>().Select(x => x.ToString()));
+    public async Task<IActionResult> GetEvents() =>
+        Ok(Enum.GetValues(typeof(WebhookEvent)).Cast<WebhookEvent>().Select(x => x.ToString()));
 }

@@ -17,4 +17,7 @@ public class WebhookViewModel
 
     [DataMember(Name = "entityKeys")]
     public Guid[] EntityKeys { get; set; } = Array.Empty<Guid>();
+
+    [DataMember(Name = "enabled")]
+    public bool Enabled { get; set; }
 }

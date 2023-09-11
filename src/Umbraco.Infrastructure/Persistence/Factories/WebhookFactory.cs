@@ -7,7 +7,7 @@ internal static class WebhookFactory
 {
     public static Webhook BuildEntity(WebhookDto dto, IEnumerable<WebhookEntityKeyDto>? entityKey2WebhookDtos = null)
     {
-        var entity = new Webhook(dto.Url, Enum.Parse<WebhookEvent>(dto.Event), entityKey2WebhookDtos?.Select(x => x.EntityKey).ToArray());
+        var entity = new Webhook(dto.Url, Enum.Parse<WebhookEvent>(dto.Event), dto.Enabled, entityKey2WebhookDtos?.Select(x => x.EntityKey).ToArray());
         try
         {
             entity.DisableChangeTracking();
@@ -32,6 +32,7 @@ internal static class WebhookFactory
             Url = webhook.Url,
             Event = webhook.Event.ToString(),
             Key = webhook.Key,
+            Enabled = webhook.Enabled
         };
         if (webhook.HasIdentity)
         {

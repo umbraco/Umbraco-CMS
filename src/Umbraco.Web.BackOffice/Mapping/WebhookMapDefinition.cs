@@ -18,6 +18,7 @@ public class WebhookMapDefinition : IMapDefinition
         target.EntityKeys = source.EntityKeys;
         target.Event = source.Event;
         target.Url = source.Url;
+        target.Enabled = source.Enabled;
     }
 
     // Umbraco.Code.MapAll
@@ -26,5 +27,6 @@ public class WebhookMapDefinition : IMapDefinition
         target.EntityKeys = source.EntityKeys;
         target.Event = source.Event;
         target.Url = source.Url;
+        target.Enabled = source.Enabled;
     }
 }
