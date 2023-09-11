@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using AngleSharp.Common;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Http;
@@ -75,7 +72,8 @@ public class MemberControllerUnitTests
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
         IUser user,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IOptions<SecuritySettings> securitySettings)
     {
         // arrange
         SetupMemberTestData(out var fakeMemberData, out _, ContentSaveAction.SaveNew);
@@ -88,7 +86,8 @@ public class MemberControllerUnitTests
             backOfficeSecurityAccessor,
             passwordChanger,
             globalSettings,
-            twoFactorLoginService);
+            twoFactorLoginService,
+            securitySettings);
         sut.ModelState.AddModelError("key", "Invalid model state");
 
         Mock.Get(umbracoMembersUserManager)
@@ -121,7 +120,8 @@ public class MemberControllerUnitTests
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
         IUser user,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IOptions<SecuritySettings> securitySettings)
     {
         // arrange
         var member = SetupMemberTestData(out var fakeMemberData, out var memberDisplay, ContentSaveAction.SaveNew);
@@ -151,7 +151,8 @@ public class MemberControllerUnitTests
             backOfficeSecurityAccessor,
             passwordChanger,
             globalSettings,
-            twoFactorLoginService);
+            twoFactorLoginService,
+            securitySettings);
 
         // act
         var result = await sut.PostSave(fakeMemberData);
@@ -175,7 +176,8 @@ public class MemberControllerUnitTests
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
         IUser user,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IOptions<SecuritySettings> securitySettings)
     {
         // arrange
         var member = SetupMemberTestData(out var fakeMemberData, out var memberDisplay, ContentSaveAction.SaveNew);
@@ -205,7 +207,8 @@ public class MemberControllerUnitTests
             backOfficeSecurityAccessor,
             passwordChanger,
             globalSettings,
-            twoFactorLoginService);
+            twoFactorLoginService,
+            securitySettings);
 
         // act
         var result = await sut.PostSave(fakeMemberData);
@@ -229,7 +232,8 @@ public class MemberControllerUnitTests
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
         IUser user,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IOptions<SecuritySettings> securitySettings)
     {
         // arrange
         var member = SetupMemberTestData(out var fakeMemberData, out var memberDisplay, ContentSaveAction.Save);
@@ -269,7 +273,8 @@ public class MemberControllerUnitTests
             backOfficeSecurityAccessor,
             passwordChanger,
             globalSettings,
-            twoFactorLoginService);
+            twoFactorLoginService,
+            securitySettings);
 
         // act
         var result = await sut.PostSave(fakeMemberData);
@@ -293,7 +298,8 @@ public class MemberControllerUnitTests
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
         IUser user,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IOptions<SecuritySettings> securitySettings)
     {
         // arrange
         var member = SetupMemberTestData(out var fakeMemberData, out _, ContentSaveAction.Save);
@@ -329,7 +335,8 @@ public class MemberControllerUnitTests
             backOfficeSecurityAccessor,
             passwordChanger,
             globalSettings,
-            twoFactorLoginService);
+            twoFactorLoginService,
+            securitySettings);
 
         // act
         var result = await sut.PostSave(fakeMemberData);
@@ -387,7 +394,8 @@ public class MemberControllerUnitTests
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
         IUser user,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IOptions<SecuritySettings> securitySettings)
     {
         // arrange
         var member = SetupMemberTestData(out var fakeMemberData, out _, ContentSaveAction.SaveNew);
@@ -416,7 +424,8 @@ public class MemberControllerUnitTests
             backOfficeSecurityAccessor,
             passwordChanger,
             globalSettings,
-            twoFactorLoginService);
+            twoFactorLoginService,
+            securitySettings);
 
         // act
         var result = sut.PostSave(fakeMemberData).Result;
@@ -441,7 +450,8 @@ public class MemberControllerUnitTests
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
         IUser user,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IOptions<SecuritySettings> securitySettings)
     {
         // arrange
         var roleName = "anyrole";
@@ -485,7 +495,8 @@ public class MemberControllerUnitTests
             backOfficeSecurityAccessor,
             passwordChanger,
             globalSettings,
-            twoFactorLoginService);
+            twoFactorLoginService,
+            securitySettings);
 
         // act
         var result = await sut.PostSave(fakeMemberData);
@@ -526,7 +537,8 @@ public class MemberControllerUnitTests
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IOptions<SecuritySettings>? securitySettings)
     {
         var httpContextAccessor = new HttpContextAccessor();
 
@@ -627,7 +639,8 @@ public class MemberControllerUnitTests
             new ConfigurationEditorJsonSerializer(),
             passwordChanger,
             scopeProvider,
-            twoFactorLoginService);
+            twoFactorLoginService,
+            securitySettings);
     }
 
     /// <summary>

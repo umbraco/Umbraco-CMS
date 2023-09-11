@@ -97,7 +97,7 @@ public class MemberController : ContentControllerBase
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         ICoreScopeProvider scopeProvider,
         ITwoFactorLoginService twoFactorLoginService,
-        IOptions<SecuritySettings>? securitySettings)
+        IOptions<SecuritySettings> securitySettings)
         : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, jsonSerializer)
     {
         _propertyEditors = propertyEditors;
@@ -697,7 +697,7 @@ public class MemberController : ContentControllerBase
         }
 
         IMember? byEmail = _memberService.GetByEmail(contentItem.Email);
-        if (_securitySettings != null && _securitySettings.RequireUniqueEmailForMembers && byEmail != null && byEmail.Key != contentItem.Key)
+        if (_securitySettings != null && _securitySettings.MemberRequireUniqueEmail && byEmail != null && byEmail.Key != contentItem.Key)
         {
             ModelState.AddPropertyError(
                 new ValidationResult("Email address is already in use", new[] { "value" }),
