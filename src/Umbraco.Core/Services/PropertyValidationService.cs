@@ -179,14 +179,20 @@ public class PropertyValidationService : IPropertyValidationService
         }
 
         // else validate vvalues (but don't revalidate pvalue)
-        var pvalues = property.Values.Where(x =>
+        var vvalues = property.Values.Where(x =>
                 x != pvalue && // don't revalidate pvalue
                 property.PropertyType.SupportsVariation(x.Culture, x.Segment, true) && // the value variation is ok
                     (culture == "*" || x.Culture.InvariantEquals(culture)) && // the culture matches
                     (segment == "*" || x.Segment.InvariantEquals(segment))) // the segment matches
             .ToList();
 
-        return pvalues.Count == 0 || pvalues.All(x => IsValidPropertyValue(property, x.EditedValue));
+        // if we do not have any vvalues at this point, validate null (no variant values present)
+        if (vvalues.Any() is false)
+        {
+            return IsValidPropertyValue(property, null);
+        }
+
+        return vvalues.All(x => IsValidPropertyValue(property, x.EditedValue));
     }
 
     /// <summary>

@@ -3531,6 +3531,59 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual(PublishResultType.FailedPublishUnsavedChanges, publishResult.Result);
     }
 
+    [Test]
+    public async Task Cannot_Publish_Invalid_Variant_Content()
+    {
+        var (langEn, langDa, contentType) = await SetupVariantTest();
+
+        IContent content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName(langEn.IsoCode, "EN root")
+            .WithCultureName(langDa.IsoCode, "DA root")
+            .Build();
+        content.SetValue("title", "EN title", culture: langEn.IsoCode);
+        content.SetValue("title", null, culture: langDa.IsoCode);
+        ContentService.Save(content);
+
+        // reset any state and attempt a publish
+        content = ContentService.GetById(content.Key)!;
+        var result = ContentService.Publish(content, new[] { "*" });
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(PublishResultType.FailedPublishContentInvalid, result.Result);
+
+        // verify saved state
+        content = ContentService.GetById(content.Key)!;
+        Assert.IsEmpty(content.PublishedCultures);
+    }
+
+    [Test]
+    public async Task Can_Publish_Culture_With_Other_Culture_Invalid()
+    {
+        var (langEn, langDa, contentType) = await SetupVariantTest();
+
+        IContent content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName(langEn.IsoCode, "EN root")
+            .WithCultureName(langDa.IsoCode, "DA root")
+            .Build();
+        content.SetValue("title", "EN title", culture: langEn.IsoCode);
+        content.SetValue("title", null, culture: langDa.IsoCode);
+        ContentService.Save(content);
+
+        // reset any state and attempt a publish
+        content = ContentService.GetById(content.Key)!;
+        var result = ContentService.Publish(content, new[] { langEn.IsoCode });
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(PublishResultType.SuccessPublishCulture, result.Result);
+
+        // verify saved state
+        content = ContentService.GetById(content.Key)!;
+        Assert.AreEqual(1, content.PublishedCultures.Count());
+        Assert.AreEqual(langEn.IsoCode.ToLowerInvariant(), content.PublishedCultures.First());
+    }
+
     private void AssertPerCulture<T>(IContent item, Func<IContent, string, T> getter,
         params (ILanguage Language, bool Result)[] testCases)
     {
@@ -3628,5 +3681,39 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         public void Handle(ContentPublishingNotification notification) => PublishingContent?.Invoke(notification);
 
         public void Handle(ContentSavingNotification notification) => SavingContent?.Invoke(notification);
+    }
+
+    private async Task<(ILanguage LangEn, ILanguage LangDa, IContentType contentType)> SetupVariantTest()
+    {
+        var langEn = (await LanguageService.GetAsync("en-US"))!;
+        var langDa = new LanguageBuilder()
+            .WithCultureInfo("da-DK")
+            .Build();
+        await LanguageService.CreateAsync(langDa, Constants.Security.SuperUserKey);
+
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        FileService.SaveTemplate(template);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("variantContent")
+            .WithName("Variant Content")
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyGroup()
+            .WithAlias("content")
+            .WithName("Content")
+            .WithSupportsPublishing(true)
+            .AddPropertyType()
+            .WithAlias("title")
+            .WithName("Title")
+            .WithVariations(ContentVariation.Culture)
+            .WithMandatory(true)
+            .Done()
+            .Done()
+            .Build();
+
+        contentType.AllowedAsRoot = true;
+        ContentTypeService.Save(contentType);
+
+        return (langEn, langDa, contentType);
     }
 }

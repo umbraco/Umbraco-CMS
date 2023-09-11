@@ -62,6 +62,26 @@ public class ContentPublishingService : IContentPublishingService
             : Attempt<IDictionary<Guid, ContentPublishingOperationStatus>>.Fail(payloads);
     }
 
+    /// <inheritdoc />
+    public async Task<Attempt<ContentPublishingOperationStatus>> UnpublishAsync(Guid key, string? culture, Guid userKey)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        IContent? content = _contentService.GetById(key);
+        if (content is null)
+        {
+            return Attempt.Fail(ContentPublishingOperationStatus.ContentNotFound);
+        }
+
+        var userId = await _userIdKeyResolver.GetAsync(userKey);
+        PublishResult result = _contentService.Unpublish(content, culture ?? "*", userId);
+        scope.Complete();
+
+        ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
+        return contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
+            ? Attempt.Succeed(ToContentPublishingOperationStatus(result))
+            : Attempt.Fail(ToContentPublishingOperationStatus(result));
+    }
+
     private static ContentPublishingOperationStatus ToContentPublishingOperationStatus(PublishResult publishResult)
         => publishResult.Result switch
         {

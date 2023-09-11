@@ -571,6 +571,44 @@ public class VariationTests
         prop.PublishValues();
     }
 
+    [TestCase(true, true)]
+    [TestCase(true, false)]
+    [TestCase(false, true)]
+    [TestCase(false, false)]
+    public void NoValueTests(bool variesByCulture, bool variesBySegment)
+    {
+        var variation = variesByCulture && variesBySegment
+            ? ContentVariation.CultureAndSegment
+            : variesByCulture
+                ? ContentVariation.Culture
+                : variesBySegment
+                    ? ContentVariation.Segment
+                    : ContentVariation.Nothing;
+
+        var culture = variesByCulture ? "en-US" : null;
+        var segment = variesBySegment ? "my-segment" : null;
+
+        var propertyType = new PropertyTypeBuilder()
+            .WithAlias("prop")
+            .WithSupportsPublishing(true)
+            .WithVariations(variation)
+            .Build();
+
+        var prop = new Property(propertyType);
+        var propertyValidationService = GetPropertyValidationService();
+
+        // "no value" is valid for non-mandatory properties
+        Assert.IsTrue(propertyValidationService.IsPropertyValid(prop, culture, segment));
+
+        propertyType.Mandatory = true;
+
+        // "no value" is NOT valid for mandatory properties
+        Assert.IsFalse(propertyValidationService.IsPropertyValid(prop, culture, segment));
+
+        // can publish, even though invalid
+        prop.PublishValues();
+    }
+
     private static Content CreateContent(IContentType contentType, int id = 1, string name = "content") =>
         new ContentBuilder()
             .WithId(id)

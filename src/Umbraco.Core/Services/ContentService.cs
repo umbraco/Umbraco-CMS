@@ -1506,6 +1506,7 @@ public class ContentService : RepositoryService, IContentService
                     // PublishState to anything other than Publishing or Unpublishing - which is precisely
                     // what we want to do here - throws
                     content.Published = content.Published;
+                    return unpublishResult;
                 }
             }
             else
