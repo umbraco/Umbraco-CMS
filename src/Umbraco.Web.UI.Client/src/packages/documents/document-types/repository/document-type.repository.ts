@@ -168,35 +168,15 @@ export class UmbDocumentTypeRepository
 	// Could potentially be general methods:
 
 	async create(documentType: ItemType) {
-		if (!documentType || !documentType.id) throw new Error('Template is missing');
+		if (!documentType || !documentType.id) throw new Error('Document Type is missing');
 		await this.#init;
 
-		const { error, data } = await this.#detailDataSource.insert(documentType);
+		const { error } = await this.#detailDataSource.insert(documentType);
 
-		if (!error && data) {
-			// TODO: The parts here is a hack, when we can trust the IDs we send, then this should be removed/changed:
-
-			const splitResultUrl = data.split('/');
-			const newId = splitResultUrl[splitResultUrl.length - 1];
-
-			// Temporary hack while we are not in control of IDs:
-
-			const newDocument = { ...(await this.requestById(newId)).data };
-
-			if (newDocument) {
-				const notification = { data: { message: `Document Type created` } };
-				this.#notificationContext?.peek('positive', notification);
-
-				await this.requestRootTreeItems();
-
-				// TODO: currently we cannot put this data into our store, cause we don't have the right ID, as the server currently changes it (and other ids of it, container-id and property-id)
-				//this.#detailStore?.append(newDocument);
-
-				//const treeItem = createTreeItem(newDocument);
-				//this.#treeStore?.appendItems([treeItem]);
-
-				return { data: newDocument };
-			}
+		if (!error) {
+			this.#detailStore?.append(documentType);
+			const treeItem = createTreeItem(documentType);
+			this.#treeStore?.appendItems([treeItem]);
 		}
 
 		return { error };
