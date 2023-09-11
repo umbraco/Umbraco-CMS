@@ -312,7 +312,7 @@ test.describe('BlockListEditorContent', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
 
     // Assert
-    await umbracoUi.getSuccessNotification();
+    await umbracoUi.isSuccessNotificationVisible();
   });
 
   test('can set a maximum of required blocks in content with a block list editor', async ({page, umbracoApi, umbracoUi}) => {
@@ -375,7 +375,7 @@ test.describe('BlockListEditorContent', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey('actions_delete'));
 
     // Assert
-    await umbracoUi.getSuccessNotification();
+    await umbracoUi.isSuccessNotificationVisible();
   });
 
   test('can use inline editing mode in content with a block list editor', async ({page, umbracoApi, umbracoUi}) => {
