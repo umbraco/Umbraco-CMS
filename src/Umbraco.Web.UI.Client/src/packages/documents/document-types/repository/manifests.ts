@@ -1,7 +1,13 @@
+import { UmbDocumentTypeItemStore } from './document-type-item.store.js';
 import { UmbDocumentTypeRepository } from './document-type.repository.js';
 import { UmbDocumentTypeStore } from './document-type.store.js';
 import { UmbDocumentTypeTreeStore } from './document-type.tree.store.js';
-import { ManifestRepository, ManifestStore, ManifestTreeStore } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	ManifestItemStore,
+	ManifestRepository,
+	ManifestStore,
+	ManifestTreeStore,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 export const DOCUMENT_TYPE_REPOSITORY_ALIAS = 'Umb.Repository.DocumentType';
 
@@ -14,6 +20,7 @@ const repository: ManifestRepository = {
 
 export const DOCUMENT_TYPE_STORE_ALIAS = 'Umb.Store.DocumentType';
 export const DOCUMENT_TYPE_TREE_STORE_ALIAS = 'Umb.Store.DocumentTypeTree';
+export const DOCUMENT_TYPE_ITEM_STORE_ALIAS = 'Umb.Store.DocumentTypeItem';
 
 const store: ManifestStore = {
 	type: 'store',
@@ -29,4 +36,11 @@ const treeStore: ManifestTreeStore = {
 	class: UmbDocumentTypeTreeStore,
 };
 
-export const manifests = [repository, store, treeStore];
+const itemStore: ManifestItemStore = {
+	type: 'itemStore',
+	alias: DOCUMENT_TYPE_ITEM_STORE_ALIAS,
+	name: 'Document Type Item Store',
+	class: UmbDocumentTypeItemStore,
+};
+
+export const manifests = [repository, store, treeStore, itemStore];
