@@ -68,7 +68,7 @@ function umbTreeDirective($q, treeService, notificationsService, localizationSer
       vm.hasTree = hasTree;
 
       $scope.labels = {
-        openContextNode: "Open context node for",
+        openContextNode: "Open context node for"
       };
 
       //wire up the exposed api object for hosting controllers
