@@ -87,6 +87,7 @@ public static partial class Constants
 
             public const string CreatedPackageSchema = TableNamePrefix + "CreatedPackageSchema";
             public const string Webhook = TableNamePrefix + "Webhook";
+            public const string WebhookEntityKey = TableNamePrefix + "WebhookEntityKey";
         }
     }
 }

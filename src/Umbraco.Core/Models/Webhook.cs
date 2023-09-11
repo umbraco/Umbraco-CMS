@@ -9,13 +9,13 @@ public class Webhook : EntityBase
 {
     private string _url;
     private WebhookEvent _webHookEvent;
-    private Guid _entityKey;
+    private Guid[] _entityKeys;
 
-    public Webhook(string url, WebhookEvent webHookEvent, Guid entityKey)
+    public Webhook(string url, WebhookEvent webHookEvent, Guid[]? entityKeys = null)
     {
         _url = url;
         _webHookEvent = webHookEvent;
-        _entityKey = entityKey;
+        _entityKeys = entityKeys ?? Array.Empty<Guid>();
     }
 
     [DataMember]
@@ -33,9 +33,9 @@ public class Webhook : EntityBase
     }
 
     [DataMember]
-    public Guid EntityKey
+    public Guid[] EntityKeys
     {
-        get => _entityKey;
-        set => SetPropertyValueAndDetectChanges(value, ref _entityKey, nameof(EntityKey));
+        get => _entityKeys;
+        set => SetPropertyValueAndDetectChanges(value, ref _entityKeys!, nameof(EntityKeys));
     }
 }

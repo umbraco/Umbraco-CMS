@@ -25,9 +25,13 @@ public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRe
         sql.Where(GetBaseWhereClause(), new { key });
 
         WebhookDto? dto = Database.FirstOrDefault<WebhookDto>(sql);
-        return dto == null
-            ? null
-            : DtoToEntity(dto);
+
+        if (dto is not null)
+        {
+            return DtoToEntity(dto);
+        }
+
+        return null;
     }
 
     protected override IEnumerable<Webhook> PerformGetAll(params Guid[]? ids)
@@ -54,10 +58,12 @@ public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRe
     {
         entity.AddingEntity();
 
-        WebhookDto dto = WebhookFactory.BuildDto(entity);
+        WebhookDto webhookDto = WebhookFactory.BuildDto(entity);
 
-        var id = Convert.ToInt32(Database.Insert(dto));
+        var id = Convert.ToInt32(Database.Insert(webhookDto));
         entity.Id = id;
+        IEnumerable<WebhookEntityKeyDto> buildEntityKey2WebhookDtos = WebhookFactory.BuildEntityKey2WebhookDtos(entity, id);
+        Database.InsertBulk(buildEntityKey2WebhookDtos);
 
         entity.ResetDirtyProperties();
     }
@@ -111,9 +117,10 @@ public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRe
         entity.DeleteDate = DateTime.Now;
     }
 
-    private static Webhook DtoToEntity(WebhookDto dto)
+    private Webhook DtoToEntity(WebhookDto dto)
     {
-        Webhook entity = WebhookFactory.BuildEntity(dto);
+        List<WebhookEntityKeyDto> webhookEntityKeyDtos = Database.Fetch<WebhookEntityKeyDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id });
+        Webhook entity = WebhookFactory.BuildEntity(dto, webhookEntityKeyDtos);
 
         // reset dirty initial properties (U4-1946)
         entity.ResetDirtyProperties(false);
