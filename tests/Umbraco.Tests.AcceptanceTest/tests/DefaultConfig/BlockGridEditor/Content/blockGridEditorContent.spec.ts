@@ -390,7 +390,7 @@ test.describe('BlockGridEditorContent', () => {
       await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
 
       // Assert
-      await umbracoUi.getSuccessNotification();
+      await umbracoUi.isSuccessNotificationVisible();
       // Checks if there are two blocks in the area
       await expect(page.locator('[data-element="property-' + blockGridAlias + '"]').locator('umb-block-grid-entry')).toHaveCount(2);
 
@@ -461,7 +461,7 @@ test.describe('BlockGridEditorContent', () => {
       await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
 
       // Assert
-      await umbracoUi.getSuccessNotification();
+      await umbracoUi.isSuccessNotificationVisible();
       // Checks if there are two blocks in the area
       await expect(page.locator('[data-element="property-' + blockGridAlias + '"]').locator('umb-block-grid-entry')).toHaveCount(2);
     });
