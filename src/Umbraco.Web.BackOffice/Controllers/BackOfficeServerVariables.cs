@@ -585,6 +585,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                             "mediaPickerThreeBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaPickerThreeController>(
                                 controller => controller.UploadMedia(null!))
                         },
+                        {
+                            "webhooksApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<WebHookController>(
+                                controller => controller.GetAll())
+                        },
                     }
                 },
                 {

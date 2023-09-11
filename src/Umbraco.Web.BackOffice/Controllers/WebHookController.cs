@@ -7,7 +7,6 @@ using Umbraco.Cms.Web.Common.Models;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
-
 public class WebHookController : UmbracoApiController
 {
     private readonly IWebHookService _webHookService;
@@ -17,6 +16,14 @@ public class WebHookController : UmbracoApiController
     {
         _webHookService = webHookService;
         _umbracoMapper = umbracoMapper;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        IEnumerable<Webhook> webhooks = await _webHookService.GetAllAsync();
+
+        return Ok(webhooks);
     }
 
     [HttpPost]
@@ -36,14 +43,6 @@ public class WebHookController : UmbracoApiController
         return webhook is null ? NotFound() : Ok(webhook);
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Get()
-    {
-        IEnumerable<Webhook> webhooks = await _webHookService.GetAllAsync();
-
-        return Ok(webhooks);
-    }
-
     [HttpDelete]
     public async Task<IActionResult> Delete(Guid key)
     {
@@ -51,4 +50,8 @@ public class WebHookController : UmbracoApiController
 
         return Ok();
     }
+
+    // TODO: This should probably be handled by the NewtonsoftJsonOutputFormatter instead
+    [HttpGet]
+    public async Task<IActionResult> GetEvents() => Ok(Enum.GetValues(typeof(WebhookEvent)).Cast<WebhookEvent>().Select(x => x.ToString()));
 }
