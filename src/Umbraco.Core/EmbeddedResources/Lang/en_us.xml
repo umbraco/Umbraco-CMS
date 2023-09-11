@@ -1965,6 +1965,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="historyCleanupGloballyDisabled"><![CDATA[<strong>NOTE!</strong> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
     <key alias="changeDataTypeHelpText">Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.</key>
   </area>
+  <area alias="webhooks">
+    <key alias="addWebhook">Create webhook</key>
+  </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
     <key alias="culture">ISO code</key>
@@ -2105,10 +2108,12 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Templates</key>
     <key alias="logViewer">Log Viewer</key>
+    <key alias="webhooks">Webhooks</key>
     <key alias="users">Users</key>
     <key alias="settingsGroup">Settings</key>
     <key alias="templatingGroup">Templating</key>
     <key alias="thirdPartyGroup">Third Party</key>
+    <key alias="webhooks">Webhooks</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">New update ready</key>

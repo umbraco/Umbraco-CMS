@@ -9,6 +9,9 @@ namespace Umbraco.Cms.Web.Common.Models;
 public class WebhookViewModel
 {
     [DataMember(Name = "url")]
+    public Guid? Key { get; set; }
+
+    [DataMember(Name = "url")]
     public string Url { get; set; } = string.Empty;
 
     [DataMember(Name = "event")]
