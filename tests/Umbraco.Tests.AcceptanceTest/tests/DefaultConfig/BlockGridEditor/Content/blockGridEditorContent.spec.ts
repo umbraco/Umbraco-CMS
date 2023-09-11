@@ -458,7 +458,8 @@ test.describe('BlockGridEditorContent', () => {
       await page.locator('[title="Delete"]').nth(2).click();
       await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey('actions_delete'));
 
-      await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
+      await page.waitForTimeout(2000);
+      await page.getByRole('button', { name: 'Save and publish' }).click();
 
       // Assert
       await umbracoUi.isSuccessNotificationVisible();
