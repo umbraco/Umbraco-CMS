@@ -7,6 +7,7 @@ import {
 	DocumentTreeItemResponseModel,
 	PagedDocumentTreeItemResponseModel,
 	PagedDocumentTypeResponseModel,
+	PagedRecycleBinItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<DocumentResponseModel> = [
@@ -547,6 +548,20 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		isEdited: false,
 		isTrashed: false,
 	},
+	{
+		name: 'Trashed',
+		type: 'document',
+		icon: 'document',
+		hasChildren: false,
+		id: 'trashed-document-id',
+		isContainer: false,
+		parentId: null,
+		noAccess: false,
+		isProtected: false,
+		isPublished: false,
+		isEdited: false,
+		isTrashed: true,
+	},
 ];
 
 // Temp mocked database
@@ -616,6 +631,20 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 
 		const total = items?.length;
 		return { items, total };
+	}
+
+	getRecycleBinRoot(): PagedRecycleBinItemResponseModel {
+		const items = this.treeData.filter((item) => item.parentId === null && item.isTrashed);
+		const treeItems = items.map((item) => item);
+		const total = items.length;
+		return { items: treeItems, total };
+	}
+
+	getRecycleBinChildren(parentId: string): PagedRecycleBinItemResponseModel {
+		const items = this.treeData.filter((item) => item.parentId === parentId && item.isTrashed);
+		const treeItems = items.map((item) => item);
+		const total = items.length;
+		return { items: treeItems, total };
 	}
 }
 
