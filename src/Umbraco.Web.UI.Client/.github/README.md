@@ -48,3 +48,7 @@ Storybook is also being built and deployed automatically on the Main branch, inc
 ## Contributing
 
 We accept contributions to this project. However be aware that we are mainly working on a private backlog, so not everyone will be immediately obvious. If you want to get started on contributing, please read the [contribute space](https://github.com/umbraco/Umbraco.CMS.Backoffice/contribute) where you will be able to find the guidelines on how to contribute as well as a list of good first issues.
+
+## Documentation
+
+The documentation can be found on [Umbraco Docs](https://docs.umbraco.com/umbraco-backoffice/). The documentation is a work in progress.
