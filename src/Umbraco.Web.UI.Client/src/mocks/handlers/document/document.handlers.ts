@@ -21,26 +21,6 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(items));
 	}),
 
-	rest.post(umbracoPath(`/document`), async (req, res, ctx) => {
-		const data = await req.json();
-		if (!data) return;
-
-		umbDocumentData.insert(data);
-
-		return res(ctx.status(200));
-	}),
-
-	rest.put(umbracoPath(`/document/:id`), async (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return;
-		const data = await req.json();
-		if (!data) return;
-
-		const saved = umbDocumentData.save(id, data);
-
-		return res(ctx.status(200), ctx.json(saved));
-	}),
-
 	rest.get(umbracoPath('/document/root/allowed-document-types'), (req, res, ctx) => {
 		const response = umbDocumentData.getAllowedDocumentTypesAtRoot();
 
@@ -56,6 +36,17 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
+	rest.put(umbracoPath(`/document/:id`), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
+		const data = await req.json();
+		if (!data) return;
+
+		const saved = umbDocumentData.save(id, data);
+
+		return res(ctx.status(200), ctx.json(saved));
+	}),
+
 	rest.get(umbracoPath('/document/:id'), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return;
@@ -63,5 +54,14 @@ export const handlers = [
 		const document = umbDocumentData.getById(id);
 
 		return res(ctx.status(200), ctx.json(document));
+	}),
+
+	rest.post(umbracoPath(`/document`), async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		umbDocumentData.insert(data);
+
+		return res(ctx.status(200));
 	}),
 ];
