@@ -13,18 +13,6 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(trashed));
 	}),
 
-	rest.get(umbracoPath('/tree/document/root'), (req, res, ctx) => {
-		const response = umbDocumentData.getTreeRoot();
-		return res(ctx.status(200), ctx.json(response));
-	}),
-
-	rest.get(umbracoPath('/tree/document/children'), (req, res, ctx) => {
-		const parentId = req.url.searchParams.get('parentId');
-		if (!parentId) return;
-		const response = umbDocumentData.getTreeItemChildren(parentId);
-		return res(ctx.status(200), ctx.json(response));
-	}),
-
 	rest.get(umbracoPath('/tree/document/item'), (req, res, ctx) => {
 		const ids = req.url.searchParams.getAll('id');
 		if (!ids) return;
