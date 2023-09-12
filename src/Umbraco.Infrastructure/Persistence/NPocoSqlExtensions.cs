@@ -169,7 +169,7 @@ namespace Umbraco.Extensions
         private static Sql<ISqlContext> WhereIn<T>(this Sql<ISqlContext> sql, Expression<Func<T, object?>> fieldSelector, Sql? valuesSql, bool not, string? tableAlias)
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector, tableAlias);
-            sql.Where(fieldName + (not ? " NOT" : "") +" IN (" + valuesSql?.SQL + ")", valuesSql?.Arguments);
+            sql.Where(fieldName + (not ? " NOT" : string.Empty) +" IN (" + valuesSql?.SQL + ")", valuesSql?.Arguments);
             return sql;
         }
 
