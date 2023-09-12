@@ -8,15 +8,6 @@
     vm.deleteWebhook = deleteWebhook;
     vm.handleSubmissionError = handleSubmissionError;
 
-    vm.goToPage = goToPage;
-    vm.nextPage = nextPage;
-    vm.previousPage = previousPage;
-
-    vm.pagination = {
-      pageNumber: 1,
-      pageSize: 25
-    };
-
     vm.page = {};
     vm.webhooks = [];
     vm.events = [];
@@ -68,8 +59,7 @@
           if(isCreating){
             webhooksResource.create(model.webhook)
               .then(() => {
-                this.goToPage(1);
-
+                loadWebhooks()
                 notificationsService.success('Webhook saved.');
                 editorService.close();
               }, x => {
@@ -83,8 +73,7 @@
           else{
             webhooksResource.update(model.webhook)
               .then(() => {
-                this.goToPage(1);
-
+                loadWebhooks()
                 notificationsService.success('Webhook saved.');
                 editorService.close();
               }, x => {
@@ -104,18 +93,11 @@
     }
 
     function loadWebhooks(){
-      console.log("Loading webhooks!")
-      const webhooks = webhooksResource
-        .getAll(vm.pagination.pageNumber, vm.pagination.pageSize)
+      webhooksResource
+        .getAll()
         .then((result) => {
           vm.webhooks = result;
-
-          vm.pagination.pageNumber = result.pageNumber;
-          vm.pagination.totalItems = result.totalItems;
-          vm.pagination.totalPages = result.totalPages;
         });
-      console.log(webhooks)
-      return webhooks;
     }
 
     function deleteWebhook (webhook) {
@@ -141,18 +123,6 @@
           overlayService.close();
         }
       });
-    }
-
-    function previousPage (){
-      return goToPage(vm.pagination.pageNumber - 1);
-    }
-    function nextPage (){
-      return goToPage(vm.pagination.pageNumber + 1);
-    }
-
-    function goToPage (pageNumber) {
-      vm.pagination.pageNumber = pageNumber;
-      loadWebhooks()
     }
 
     loadWebhooks()
