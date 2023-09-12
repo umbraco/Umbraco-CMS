@@ -5,5 +5,5 @@ export interface UmbTreeDataSource<ItemType = any, PagedItemType = UmbPagedData<
 	getRootItems(): Promise<DataSourceResponse<PagedItemType>>;
 	getChildrenOf(parentUnique: string | null): Promise<DataSourceResponse<PagedItemType>>;
 	// TODO: remove this when all repositories are migrated to the new items interface
-	getItems(unique: Array<string>): Promise<DataSourceResponse<Array<any>>>;
+	getItems?(unique: Array<string>): Promise<DataSourceResponse<Array<any>>>;
 }
