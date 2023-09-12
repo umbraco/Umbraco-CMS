@@ -50,4 +50,9 @@ export class UmbDocumentRecycleBinTreeServerDataSource implements UmbTreeDataSou
 			);
 		}
 	}
+
+	// TODO: remove when interface is cleaned up
+	async getItems(unique: Array<string>): Promise<any> {
+		throw new Error('Dot not use this method. Use the item source instead');
+	}
 }
