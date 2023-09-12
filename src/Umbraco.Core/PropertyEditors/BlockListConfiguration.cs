@@ -16,6 +16,13 @@ public class BlockListConfiguration
     [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of blocks")]
     public NumberRange ValidationLimit { get; set; } = new();
 
+    [ConfigurationField("useSingleBlockMode", "Single block mode", "boolean",
+        Description = @"When in Single block mode, the output will be BlockListItem<>, instead of BlockListModel.
+
+**NOTE:**
+Single block mode requires a maximum of one available block, and an amount set to minimum 1 and maximum 1 blocks.")]
+    public bool UseSingleBlockMode { get; set; }
+
     [ConfigurationField("useLiveEditing", "Live editing mode", "boolean", Description = "Live editing in editor overlays for live updated custom views or labels using custom expression.")]
     public bool UseLiveEditing { get; set; }
 

@@ -28,12 +28,13 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>
     ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
     /// </remarks>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public static XmlNodeList? SelectNodes(this XmlNode source, string expression, IEnumerable<XPathVariable>? variables)
     {
         XPathVariable[]? av = variables?.ToArray();
@@ -50,12 +51,13 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>
     ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
     /// </remarks>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public static XmlNodeList? SelectNodes(this XmlNode source, XPathExpression expression, IEnumerable<XPathVariable>? variables)
     {
         XPathVariable[]? av = variables?.ToArray();
@@ -72,12 +74,13 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>
     ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
     /// </remarks>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public static XmlNodeList? SelectNodes(this XmlNode source, string? expression, params XPathVariable[]? variables)
     {
         if (variables == null || variables.Length == 0 || variables[0] == null)
@@ -99,12 +102,13 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>
     ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
     /// </remarks>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public static XmlNodeList SelectNodes(this XmlNode source, XPathExpression expression, params XPathVariable[]? variables)
     {
         if (variables == null || variables.Length == 0 || variables[0] == null)
@@ -126,12 +130,13 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>
     ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
     /// </remarks>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public static XmlNode? SelectSingleNode(this XmlNode source, string expression, IEnumerable<XPathVariable>? variables)
     {
         XPathVariable[]? av = variables?.ToArray();
@@ -148,12 +153,13 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>
     ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
     /// </remarks>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public static XmlNode? SelectSingleNode(this XmlNode source, XPathExpression expression, IEnumerable<XPathVariable>? variables)
     {
         XPathVariable[]? av = variables?.ToArray();
@@ -170,12 +176,13 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>
     ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
     /// </remarks>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public static XmlNode? SelectSingleNode(this XmlNode source, string expression, params XPathVariable[]? variables)
     {
         if (variables == null || variables.Length == 0 || variables[0] == null)
@@ -196,12 +203,13 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>
     ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
     /// </remarks>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public static XmlNode? SelectSingleNode(this XmlNode source, XPathExpression expression, params XPathVariable[]? variables)
     {
         if (variables == null || variables.Length == 0 || variables[0] == null)

@@ -347,6 +347,18 @@
     <key alias="selectEditor">Selecciona editor</key>
     <key alias="selectSnippet">Selecciona snippet</key>
   </area>
+  <area alias="dictionary">
+    <key alias="importDictionaryItemHelp">
+      Para importar un elemento del diccionario, busque el archivo ".udt" en su computadora haciendo clic en el
+      Botón "Importar" (se le pedirá confirmación en la siguiente pantalla)
+    </key>
+    <key alias="itemDoesNotExists">El elemento del diccionario no existe.</key>
+    <key alias="parentDoesNotExists">El elemento principal no existe.</key>
+    <key alias="noItems">No hay elementos del diccionario.</key>
+    <key alias="noItemsInFile">No hay elementos de diccionario en este archivo.</key>
+    <key alias="noItemsFound">No se encontraron elementos del diccionario.</key>
+    <key alias="createNew">Crear elemento de diccionario</key>
+  </area>
   <area alias="dictionaryItem">
     <key alias="description">Editar las diferentes versiones lingüísticas para la entrada en el diccionario '% 0%' debajo</key>
     <key alias="displayName"><![CDATA[nombre de la cultura
@@ -898,7 +910,6 @@
     <key alias="reset">Reiniciar</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">Versión actual</key>
     <key alias="diffHelp"><![CDATA[Esto muestra las diferencias entre la versión actual y la versión seleccionada<br /><del>Red</del> el texto de la versión seleccionada no se mostrará. , <ins>el verde significa añadido</ins>]]></key>
     <key alias="documentRolledBack">Se ha recuperado la última versión del documento.</key>
     <key alias="htmlHelp">Esto muestra la versión seleccionada como html, si deseas ver la diferencia entre 2 versiones al mismo tiempo, por favor usa la vista diff</key>
@@ -1383,8 +1394,7 @@
     <key alias="usergroup">Grupo de usuario</key>
     <key alias="userInvited">ha sido invitado</key>
     <key alias="userInvitedSuccessHelp">Se ha enviado una invitación al nuevo usuario con detalles sobre cómo acceder a Umbraco.</key>
-    <key alias="userinviteWelcomeMessage">¡Hola y bienvenido a Umbraco!. En un minuto todo estará listo para empezar, sólo necesitamos que configures tu contraseña y una imagen para tu avatar.</key>
-    <key alias="userinviteAvatarMessage">Sube una foto para que otros usuarios te reconozcan más fácilmente.</key>
+    <key alias="userinviteWelcomeMessage">¡Hola y bienvenido a Umbraco!. En un minuto todo estará listo para empezar, sólo necesitamos que configures tu contraseña.</key>
     <key alias="writer">Redactor</key>
     <key alias="change">Cambiar</key>
     <key alias="yourProfile" version="7.0">Tu perfil</key>

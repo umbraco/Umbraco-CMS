@@ -10,6 +10,7 @@ public static partial class Constants
             public const string GetVersion = "Umbraco.Core.VersionableRepository.GetVersion";
             public const string GetVersions = "Umbraco.Core.VersionableRepository.GetVersions";
             public const string EnsureUniqueNodeName = "Umbraco.Core.VersionableRepository.EnsureUniqueNodeName";
+            public const string SortOrderExists = "Umbraco.Core.VersionableRepository.SortOrderExists";
             public const string GetSortOrder = "Umbraco.Core.VersionableRepository.GetSortOrder";
             public const string GetParentNode = "Umbraco.Core.VersionableRepository.GetParentNode";
             public const string GetReservedId = "Umbraco.Core.VersionableRepository.GetReservedId";

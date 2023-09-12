@@ -80,7 +80,7 @@ public class MacroRenderingController : UmbracoAuthorizedJsonController
     /// <param name="pageId"></param>
     /// <param name="macroParams">
     ///     To send a dictionary as a GET parameter the query should be structured like:
-    ///     ?macroAlias=Test&pageId=3634&macroParams[0].key=myKey&macroParams[0].value=myVal&macroParams[1].key=anotherKey
+    ///     ?macroAlias=Test&amp;pageId=3634&amp;macroParams[0].key=myKey&amp;macroParams[0].value=myVal&amp;macroParams[1].key=anotherKey
     ///     &macroParams[1].value=anotherVal
     /// </param>
     /// <returns></returns>
@@ -125,13 +125,8 @@ public class MacroRenderingController : UmbracoAuthorizedJsonController
 
         // When rendering the macro in the backoffice the default setting would be to use the Culture of the logged in user.
         // Since a Macro might contain thing thats related to the culture of the "IPublishedContent" (ie Dictionary keys) we want
-        // to set the current culture to the culture related to the content item. This is hacky but it works.
-
-        // fixme
-        // in a 1:1 situation we do not handle the language being edited
-        // so the macro renders in the wrong language
-
-        var culture = DomainUtilities.GetCultureFromDomains(publishedContent.Id, publishedContent.Path, null,
+        // to set the current culture to the currently edited culture with fallback to the culture related to the content item.
+        var culture = Request.ClientCulture() ?? DomainUtilities.GetCultureFromDomains(publishedContent.Id, publishedContent.Path, null,
             umbracoContext, _siteDomainHelper);
 
         if (culture != null)

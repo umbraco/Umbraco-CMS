@@ -20,6 +20,8 @@ internal class UmbracoCmsSchema
     {
         public ContentSettings Content { get; set; } = null!;
 
+        public DeliveryApiSettings DeliveryApi { get; set; } = null!;
+
         public CoreDebugSettings Debug { get; set; } = null!;
 
         public ExceptionFilterSettings ExceptionFilter { get; set; } = null!;
@@ -35,6 +37,7 @@ internal class UmbracoCmsSchema
         public ImagingSettings Imaging { get; set; } = null!;
 
         public IndexCreatorSettings Examine { get; set; } = null!;
+        public IndexingSettings Indexing { get; set; } = null!;
 
         public KeepAliveSettings KeepAlive { get; set; } = null!;
 

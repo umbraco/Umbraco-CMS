@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -305,7 +304,7 @@ public class UdiTests
     }
 
     [UdiDefinition("foo", UdiType.GuidUdi)]
-    public class FooConnector : IServiceConnector
+    public class FooConnector : IServiceConnector2
     {
         public IArtifact GetArtifact(Udi udi, IContextCache contextCache) => throw new NotImplementedException();
 

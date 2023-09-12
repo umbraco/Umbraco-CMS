@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 ///     Matches MailKit.Security.SecureSocketOptions and defined locally to avoid having to take
 ///     a dependency on this external library into Umbraco.Core.
 /// </summary>
-/// <seealso cref="http://www.mimekit.net/docs/html/T_MailKit_Security_SecureSocketOptions.htm" />
+/// <seealso href="http://www.mimekit.net/docs/html/T_MailKit_Security_SecureSocketOptions.htm" />
 public enum SecureSocketOptions
 {
     /// <summary>
@@ -74,8 +74,7 @@ public class SmtpSettings : ValidatableEntryBase
     ///     Gets or sets a value for the secure socket options.
     /// </summary>
     [DefaultValue(StaticSecureSocketOptions)]
-    public SecureSocketOptions SecureSocketOptions { get; set; } =
-        Enum<SecureSocketOptions>.Parse(StaticSecureSocketOptions);
+    public SecureSocketOptions SecureSocketOptions { get; set; } = Enum.Parse<SecureSocketOptions>(StaticSecureSocketOptions);
 
     /// <summary>
     ///     Gets or sets a value for the SMTP pick-up directory.
@@ -86,7 +85,7 @@ public class SmtpSettings : ValidatableEntryBase
     ///     Gets or sets a value for the SMTP delivery method.
     /// </summary>
     [DefaultValue(StaticDeliveryMethod)]
-    public SmtpDeliveryMethod DeliveryMethod { get; set; } = Enum<SmtpDeliveryMethod>.Parse(StaticDeliveryMethod);
+    public SmtpDeliveryMethod DeliveryMethod { get; set; } = Enum.Parse<SmtpDeliveryMethod>(StaticDeliveryMethod);
 
     /// <summary>
     ///     Gets or sets a value for the SMTP user name.

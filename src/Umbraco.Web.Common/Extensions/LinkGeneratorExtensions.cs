@@ -13,32 +13,35 @@ namespace Umbraco.Extensions;
 public static class LinkGeneratorExtensions
 {
     /// <summary>
+    /// Gets the Umbraco backoffice URL (if Umbraco is installed).
+    /// </summary>
+    /// <param name="linkGenerator">The link generator.</param>
+    /// <returns>
+    /// The Umbraco backoffice URL.
+    /// </returns>
+    public static string? GetUmbracoBackOfficeUrl(this LinkGenerator linkGenerator)
+        => linkGenerator.GetPathByAction("Default", "BackOffice", new { area = Constants.Web.Mvc.BackOfficeArea });
+
+    /// <summary>
+    /// Gets the Umbraco backoffice URL (if Umbraco is installed) or application virtual path (in most cases just <c>"/"</c>).
+    /// </summary>
+    /// <param name="linkGenerator">The link generator.</param>
+    /// <param name="hostingEnvironment">The hosting environment.</param>
+    /// <returns>
+    /// The Umbraco backoffice URL.
+    /// </returns>
+    public static string GetUmbracoBackOfficeUrl(this LinkGenerator linkGenerator, IHostingEnvironment hostingEnvironment)
+         => GetUmbracoBackOfficeUrl(linkGenerator) ?? hostingEnvironment.ApplicationVirtualPath;
+
+    /// <summary>
     ///     Return the back office url if the back office is installed
     /// </summary>
+    /// <remarks>
+    /// This method contained a bug that would result in always returning "/".
+    /// </remarks>
+    [Obsolete("Use the GetUmbracoBackOfficeUrl extension method instead. This method will be removed in Umbraco 13.")]
     public static string? GetBackOfficeUrl(this LinkGenerator linkGenerator, IHostingEnvironment hostingEnvironment)
-    {
-        Type? backOfficeControllerType;
-        try
-        {
-            backOfficeControllerType = Assembly.Load("Umbraco.Web.BackOffice")
-                .GetType("Umbraco.Web.BackOffice.Controllers.BackOfficeController");
-            if (backOfficeControllerType == null)
-            {
-                return "/"; // this would indicate that the installer is installed without the back office
-            }
-        }
-        catch
-        {
-            return
-                hostingEnvironment
-                    .ApplicationVirtualPath; // this would indicate that the installer is installed without the back office
-        }
-
-        return linkGenerator.GetPathByAction(
-            "Default",
-            ControllerExtensions.GetControllerName(backOfficeControllerType),
-            new { area = Constants.Web.Mvc.BackOfficeApiArea });
-    }
+        => "/";
 
     /// <summary>
     ///     Return the Url for a Web Api service

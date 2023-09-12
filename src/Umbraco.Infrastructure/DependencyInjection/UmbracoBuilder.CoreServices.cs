@@ -7,6 +7,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DeliveryApi.Accessors;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
@@ -36,6 +38,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HealthChecks;
@@ -218,6 +221,20 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
+
+        builder.AddPropertyIndexValueFactories();
+
+        builder.AddDeliveryApiCoreServices();
+
+        return builder;
+    }
+
+    public static IUmbracoBuilder AddPropertyIndexValueFactories(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
+        builder.Services.AddSingleton<INestedContentPropertyIndexValueFactory, NestedContentPropertyIndexValueFactory>();
+        builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
+
         return builder;
     }
 
@@ -354,35 +371,35 @@ public static partial class UmbracoBuilderExtensions
 
         // Add notification handlers for DistributedCache
         builder
-            .AddNotificationHandler<DictionaryItemDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<DictionaryItemSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<LanguageSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<LanguageDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MemberSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MemberDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<PublicAccessEntrySavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<PublicAccessEntryDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<UserSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<UserDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<UserGroupWithUsersSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<UserGroupDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MemberGroupDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MemberGroupSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<DataTypeDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<DataTypeSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<TemplateDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<TemplateSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<RelationTypeDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<RelationTypeSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<DomainDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<DomainSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MacroSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MacroDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MediaTreeChangeNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<ContentTypeChangedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MediaTypeChangedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MemberTypeChangedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<ContentTreeChangeNotification, DistributedCacheBinder>()
+            .AddNotificationHandler<DictionaryItemDeletedNotification, DictionaryItemDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<DictionaryItemSavedNotification, DictionaryItemSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<LanguageSavedNotification, LanguageSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<LanguageDeletedNotification, LanguageDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MemberSavedNotification, MemberSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MemberDeletedNotification, MemberDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<PublicAccessEntrySavedNotification, PublicAccessEntrySavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<PublicAccessEntryDeletedNotification, PublicAccessEntryDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<UserSavedNotification, UserSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<UserDeletedNotification, UserDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<UserGroupWithUsersSavedNotification, UserGroupWithUsersSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<UserGroupDeletedNotification, UserGroupDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MemberGroupDeletedNotification, MemberGroupDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MemberGroupSavedNotification, MemberGroupSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<DataTypeDeletedNotification, DataTypeDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<DataTypeSavedNotification, DataTypeSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<TemplateDeletedNotification, TemplateDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<TemplateSavedNotification, TemplateSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<RelationTypeDeletedNotification, RelationTypeDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<RelationTypeSavedNotification, RelationTypeSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<DomainDeletedNotification, DomainDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<DomainSavedNotification, DomainSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MacroSavedNotification, MacroSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MacroDeletedNotification, MacroDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MediaTreeChangeNotification, MediaTreeChangeDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<ContentTypeChangedNotification, ContentTypeChangedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MediaTypeChangedNotification, MediaTypeChangedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MemberTypeChangedNotification, MemberTypeChangedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>()
             ;
 
         // add notification handlers for auditing
@@ -396,6 +413,34 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<UserDeletedNotification, AuditNotificationsHandler>()
             .AddNotificationHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
             .AddNotificationHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
+
+        return builder;
+    }
+
+    private static IUmbracoBuilder AddDeliveryApiCoreServices(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<IApiElementBuilder, ApiElementBuilder>();
+        builder.Services.AddSingleton<IApiContentBuilder, ApiContentBuilder>();
+        builder.Services.AddSingleton<IApiContentResponseBuilder, ApiContentResponseBuilder>();
+        builder.Services.AddSingleton<IApiMediaBuilder, ApiMediaBuilder>();
+        builder.Services.AddSingleton<IApiMediaWithCropsBuilder, ApiMediaWithCropsBuilder>();
+        builder.Services.AddSingleton<IApiMediaWithCropsResponseBuilder, ApiMediaWithCropsResponseBuilder>();
+        builder.Services.AddSingleton<IApiContentNameProvider, ApiContentNameProvider>();
+        builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, NoopOutputExpansionStrategyAccessor>();
+        builder.Services.AddSingleton<IRequestStartItemProviderAccessor, NoopRequestStartItemProviderAccessor>();
+        builder.Services.AddSingleton<IRequestCultureService, NoopRequestCultureService>();
+        builder.Services.AddSingleton<IRequestRoutingService, NoopRequestRoutingService>();
+        builder.Services.AddSingleton<IRequestRedirectService, NoopRequestRedirectService>();
+        builder.Services.AddSingleton<IRequestPreviewService, NoopRequestPreviewService>();
+        builder.Services.AddSingleton<IApiAccessService, NoopApiAccessService>();
+        builder.Services.AddSingleton<IApiContentQueryService, NoopApiContentQueryService>();
+        builder.Services.AddSingleton<IApiMediaQueryService, NoopApiMediaQueryService>();
+        builder.Services.AddSingleton<IApiMediaUrlProvider, ApiMediaUrlProvider>();
+        builder.Services.AddSingleton<IApiContentRouteBuilder, ApiContentRouteBuilder>();
+        builder.Services.AddSingleton<IApiPublishedContentCache, ApiPublishedContentCache>();
+        builder.Services.AddSingleton<IApiRichTextElementParser, ApiRichTextElementParser>();
+        builder.Services.AddSingleton<IApiRichTextMarkupParser, ApiRichTextMarkupParser>();
+        builder.Services.AddSingleton<IApiPropertyRenderer, ApiPropertyRenderer>();
 
         return builder;
     }

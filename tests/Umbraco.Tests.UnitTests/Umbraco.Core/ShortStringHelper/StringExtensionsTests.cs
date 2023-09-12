@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -323,6 +322,14 @@ public class StringExtensionsTests
     public void ReplaceManyByOneChar(string input, string toReplace, char replacement, string expected)
     {
         var output = input.ReplaceMany(toReplace.ToArray(), replacement);
+        Assert.AreEqual(expected, output);
+    }
+
+    [TestCase("test to test", "test", "release", "release to test")]
+    [TestCase("nothing to do", "test", "release", "nothing to do")]
+    public void ReplaceFirst(string input, string search, string replacement, string expected)
+    {
+        var output = input.ReplaceFirst(search, replacement);
         Assert.AreEqual(expected, output);
     }
 

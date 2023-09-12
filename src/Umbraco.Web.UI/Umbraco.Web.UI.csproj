@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
+    <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
@@ -8,13 +9,18 @@
   <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />
-    <ProjectReference Include="..\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.7">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <PropertyGroup>

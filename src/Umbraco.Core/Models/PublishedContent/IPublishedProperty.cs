@@ -69,5 +69,17 @@ public interface IPublishedProperty
     ///     <para>It must be either null, or a string, or an XPathNavigator.</para>
     ///     <para>It has been fully prepared and processed by the appropriate converter.</para>
     /// </remarks>
+
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     object? GetXPathValue(string? culture = null, string? segment = null);
+
+    /// <summary>
+    ///     Gets the object value of the property for Delivery API representation.
+    /// </summary>
+    /// <remarks>
+    ///     <para>The value is what you want to use when rendering content through the Delivery API.</para>
+    ///     <para>It can be null, or any type of CLR object.</para>
+    ///     <para>It has been fully prepared and processed by the appropriate converter.</para>
+    /// </remarks>
+    object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null);
 }

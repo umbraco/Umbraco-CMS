@@ -14,7 +14,7 @@ public static class UserGroupExtensions
         }
 
         // otherwise create one
-        return new ReadOnlyUserGroup(group.Id, group.Name, group.Icon, group.StartContentId, group.StartMediaId, group.Alias, group.AllowedLanguages, group.AllowedSections, group.Permissions, group.HasAccessToAllLanguages);
+        return new ReadOnlyUserGroup(group.Id, group.Key, group.Name, group.Icon, group.StartContentId, group.StartMediaId, group.Alias, group.AllowedLanguages, group.AllowedSections, group.Permissions, group.HasAccessToAllLanguages);
     }
 
     public static bool IsSystemUserGroup(this IUserGroup group) =>

@@ -1319,8 +1319,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
   </area>
   <area alias="rollback">
     <key alias="changes">Değişiklikler</key>
-    <key alias="created">Oluşturuldu</key>
-    <key alias="currentVersion">Mevcut sürüm</key>
     <key alias="diffHelp"><![CDATA[Bu, mevcut sürüm ile seçili sürüm arasındaki farkları gösterir <br /> <del> Kırmızı </del> metin seçili sürümde gösterilmeyecektir. , <ins> yeşil eklendi demektir </ins>]]></key>
     <key alias="documentRolledBack">Belge geri alındı ​​</key>
     <key alias="headline">Mevcut sürümle karşılaştırmak için bir sürüm seçin</key>
@@ -1881,9 +1879,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="usergroup">Kullanıcı grubu</key>
     <key alias="userInvited">davet edildi</key>
     <key alias="userInvitedSuccessHelp">Yeni kullanıcıya, Umbraco'da nasıl oturum açılacağına ilişkin ayrıntıları içeren bir davetiye gönderildi.</key>
-    <key alias="userinviteWelcomeMessage">Merhabalar, Umbraco'ya hoş geldiniz! Sadece 1 dakika içinde hazır olacaksınız, sadece bir şifre belirlemeniz ve avatarınız için bir resim eklemeniz gerekiyor.</key>
+    <key alias="userinviteWelcomeMessage">Merhabalar, Umbraco'ya hoş geldiniz! Sadece 1 dakika içinde hazır olacaksınız, sadece bir şifre belirlemeniz.</key>
     <key alias="userinviteExpiredMessage">Umbraco'ya hoş geldiniz! Maalesef davetinizin süresi doldu. Lütfen yöneticinizle iletişime geçin ve yeniden göndermesini isteyin.</key>
-    <key alias="userinviteAvatarMessage">Kendi fotoğrafınızı yüklemek, diğer kullanıcıların sizi tanımasını kolaylaştıracaktır. Fotoğrafınızı yüklemek için yukarıdaki daireyi tıklayın.</key>
     <key alias="writer">Yazar</key>
     <key alias="change">Değiştir</key>
     <key alias="yourProfile" version="7.0">Profiliniz</key>
@@ -1998,8 +1995,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="stateInactive">Etkin Değil</key>
     <key alias="sortNameAscending">Ad (AZ)</key>
     <key alias="sortNameDescending">Ad (ZA)</key>
-    <key alias="sortCreateDateAscending">En yeni</key>
-    <key alias="sortCreateDateDescending">En eski</key>
+    <key alias="sortCreateDateAscending">En eski</key>
+    <key alias="sortCreateDateDescending">En yeni</key>
     <key alias="sortLastLoginDateDescending">Son giriş</key>
     <key alias="noUserGroupsAdded">Hiçbir kullanıcı grubu eklenmedi</key>
   </area>

@@ -152,12 +152,13 @@ public class ContentSettings
     internal const string StaticMacroErrors = "Inline";
     internal const string StaticDisallowedUploadFiles = "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd,xamlx";
     internal const bool StaticShowDeprecatedPropertyEditors = false;
-    internal const string StaticLoginBackgroundImage = "assets/img/login.jpg";
+    internal const string StaticLoginBackgroundImage = "assets/img/login.svg";
     internal const string StaticLoginLogoImage = "assets/img/application/umbraco_logo_white.svg";
     internal const bool StaticHideBackOfficeLogo = false;
     internal const bool StaticDisableDeleteWhenReferenced = false;
     internal const bool StaticDisableUnpublishWhenReferenced = false;
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
+    internal const bool StaticShowDomainWarnings = true;
 
     /// <summary>
     ///     Gets or sets a value for the content notification settings.
@@ -190,7 +191,7 @@ public class ContentSettings
     ///     Gets or sets a value for the macro error behaviour.
     /// </summary>
     [DefaultValue(StaticMacroErrors)]
-    public MacroErrorBehaviour MacroErrors { get; set; } = Enum<MacroErrorBehaviour>.Parse(StaticMacroErrors);
+    public MacroErrorBehaviour MacroErrors { get; set; } = Enum.Parse<MacroErrorBehaviour>(StaticMacroErrors);
 
     /// <summary>
     ///     Gets or sets a value for the collection of file extensions that are disallowed for upload.
@@ -242,7 +243,7 @@ public class ContentSettings
     public bool DisableUnpublishWhenReferenced { get; set; } = StaticDisableUnpublishWhenReferenced;
 
     /// <summary>
-    ///     Get or sets the model representing the global content version cleanup policy
+    ///     Gets or sets the model representing the global content version cleanup policy
     /// </summary>
     public ContentVersionCleanupPolicySettings ContentVersionCleanupPolicy { get; set; } = new();
 
@@ -262,4 +263,15 @@ public class ContentSettings
     /// </summary>
     [DefaultValue(StaticDisallowedUploadFiles)]
     public string[] DisallowedUploadedFileExtensions { get; set; } = StaticDisallowedUploadFiles.Split(',');
+
+    /// <summary>
+    /// Gets or sets the allowed external host for media. If empty only relative paths are allowed.
+    /// </summary>
+    public string[] AllowedMediaHosts { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to show domain warnings.
+    /// </summary>
+    [DefaultValue(StaticShowDomainWarnings)]
+    public bool ShowDomainWarnings { get; set; } = StaticShowDomainWarnings;
 }

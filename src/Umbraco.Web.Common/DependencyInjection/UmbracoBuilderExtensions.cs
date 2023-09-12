@@ -46,6 +46,7 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Web.Common;
 using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.Configuration;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.FileProviders;
@@ -149,7 +150,7 @@ public static partial class UmbracoBuilderExtensions
 
         // WebRootFileProviderFactory is just a wrapper around the IWebHostEnvironment.WebRootFileProvider,
         // therefore no need to register it as singleton
-        builder.Services.AddSingleton<IManifestFileProviderFactory, WebRootFileProviderFactory>();
+        builder.Services.AddSingleton<IManifestFileProviderFactory, ContentAndWebRootFileProviderFactory>();
         builder.Services.AddSingleton<IGridEditorsConfigFileProviderFactory, WebRootFileProviderFactory>();
 
         // Must be added here because DbProviderFactories is netstandard 2.1 so cannot exist in Infra for now
@@ -291,6 +292,9 @@ public static partial class UmbracoBuilderExtensions
             options.Cookie.HttpOnly = true;
         });
 
+        builder.Services.ConfigureOptions<ConfigureApiVersioningOptions>();
+        builder.Services.ConfigureOptions<ConfigureApiExplorerOptions>();
+        builder.Services.AddApiVersioning().AddApiExplorer();
         builder.Services.ConfigureOptions<UmbracoMvcConfigureOptions>();
         builder.Services.ConfigureOptions<UmbracoRequestLocalizationOptions>();
         builder.Services.TryAddEnumerable(ServiceDescriptor

@@ -274,29 +274,59 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             foreach (IProperty property in entity.Properties)
             {
-                TagConfiguration? tagConfiguration = property.GetTagConfiguration(PropertyEditors, DataTypeService);
-                if (tagConfiguration == null)
+                if (PropertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out var editor) is false)
                 {
-                    continue; // not a tags property
+                    continue;
                 }
+
+                if (editor.GetValueEditor() is not IDataValueTags tagsProvider)
+                {
+                    // support for legacy tag editors, everything from here down to the last continue can be removed when TagsPropertyEditorAttribute is removed
+                    TagConfiguration? tagConfiguration = property.GetTagConfiguration(PropertyEditors, DataTypeService);
+                    if (tagConfiguration == null)
+                    {
+                        continue;
+                    }
+
+                    if (property.PropertyType.VariesByCulture())
+                    {
+                        var tags = new List<ITag>();
+                        foreach (IPropertyValue pvalue in property.Values)
+                        {
+                            IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, serializer, pvalue.Culture);
+                            var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
+                            IEnumerable<Tag> cultureTags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x, LanguageId = languageId });
+                            tags.AddRange(cultureTags);
+                        }
+
+                        tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
+                    }
+                    else
+                    {
+                        IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, serializer); // strings
+                        IEnumerable<Tag> tags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x });
+                        tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
+                    }
+
+                    continue; // not implementing IDataValueTags, continue
+                }
+
+                object? configuration = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.Configuration;
 
                 if (property.PropertyType.VariesByCulture())
                 {
                     var tags = new List<ITag>();
                     foreach (IPropertyValue pvalue in property.Values)
                     {
-                        IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, serializer, pvalue.Culture);
                         var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
-                        IEnumerable<Tag> cultureTags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x, LanguageId = languageId });
-                        tags.AddRange(cultureTags);
+                        tags.AddRange(tagsProvider.GetTags(pvalue.EditedValue, configuration, languageId));
                     }
 
                     tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
                 }
                 else
                 {
-                    IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, serializer); // strings
-                    IEnumerable<Tag> tags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x });
+                    IEnumerable<ITag> tags = tagsProvider.GetTags(property.GetValue(), configuration, null);
                     tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
                 }
             }
@@ -981,6 +1011,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             List<SimilarNodeName>? names = Database.Fetch<SimilarNodeName>(sql);
 
             return SimilarNodeName.GetUniqueName(names, id, nodeName);
+        }
+
+        protected virtual bool SortorderExists(int parentId, int sortOrder)
+        {
+            SqlTemplate? template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.SortOrderExists, tsql => tsql
+                .Select("sortOrder")
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") &&
+                x.ParentId == SqlTemplate.Arg<int>("parentId") &&
+                x.SortOrder == SqlTemplate.Arg<int>("sortOrder")));
+
+            Sql<ISqlContext> sql = template.Sql(NodeObjectTypeId, parentId, sortOrder);
+            var result = Database.ExecuteScalar<int?>(sql);
+
+            return result != null;
         }
 
         protected virtual int GetNewChildSortOrder(int parentId, int first)

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
@@ -12,7 +13,6 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -36,20 +36,20 @@ public class ContentService : RepositoryService, IContentService
 
     #region Constructors
 
-        public ContentService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IDocumentRepository documentRepository,
-        IEntityRepository entityRepository,
-        IAuditRepository auditRepository,
-        IContentTypeRepository contentTypeRepository,
-        IDocumentBlueprintRepository documentBlueprintRepository,
-        ILanguageRepository languageRepository,
-        Lazy<IPropertyValidationService> propertyValidationService,
-        IShortStringHelper shortStringHelper,
-        ICultureImpactFactory cultureImpactFactory)
-        : base(provider, loggerFactory, eventMessagesFactory)
+    public ContentService(
+    ICoreScopeProvider provider,
+    ILoggerFactory loggerFactory,
+    IEventMessagesFactory eventMessagesFactory,
+    IDocumentRepository documentRepository,
+    IEntityRepository entityRepository,
+    IAuditRepository auditRepository,
+    IContentTypeRepository contentTypeRepository,
+    IDocumentBlueprintRepository documentBlueprintRepository,
+    ILanguageRepository languageRepository,
+    Lazy<IPropertyValidationService> propertyValidationService,
+    IShortStringHelper shortStringHelper,
+    ICultureImpactFactory cultureImpactFactory)
+    : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
         _entityRepository = entityRepository;
@@ -59,7 +59,7 @@ public class ContentService : RepositoryService, IContentService
         _languageRepository = languageRepository;
         _propertyValidationService = propertyValidationService;
         _shortStringHelper = shortStringHelper;
-            _cultureImpactFactory = cultureImpactFactory;
+        _cultureImpactFactory = cultureImpactFactory;
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
@@ -207,7 +207,7 @@ public class ContentService : RepositoryService, IContentService
 
     /// <summary>
     ///     Used to bulk update the permissions set for a content item. This will replace all permissions
-    ///     assigned to an entity with a list of user id & permission pairs.
+    ///     assigned to an entity with a list of user id &amp; permission pairs.
     /// </summary>
     /// <param name="permissionSet"></param>
     public void SetPermissions(EntityPermissionSet permissionSet)
@@ -1097,7 +1097,8 @@ public class ContentService : RepositoryService, IContentService
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
 
-            Audit(AuditType.Save, userId == -1 ? 0 : userId, Constants.System.Root, "Saved multiple content");
+            string contentIds = string.Join(", ", contentsA.Select(x => x.Id));
+            Audit(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items ({contentIds})");
 
             scope.Complete();
         }
@@ -1146,6 +1147,8 @@ public class ContentService : RepositoryService, IContentService
 
             var allLangs = _languageRepository.GetMany().ToList();
 
+            // Change state to publishing
+            content.PublishedState = PublishedState.Publishing;
             var savingNotification = new ContentSavingNotification(content, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
@@ -1156,7 +1159,7 @@ public class ContentService : RepositoryService, IContentService
             // if culture is '*', then publish them all (including variants)
 
             // this will create the correct culture impact even if culture is * or null
-                var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+            var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
 
             // publish the culture(s)
             // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -1540,7 +1543,7 @@ public class ContentService : RepositoryService, IContentService
                 // handling events, business rules, etc
                 // note: StrategyUnpublish flips the PublishedState to Unpublishing!
                 // note: This unpublishes the entire document (not different variants)
-                unpublishResult = StrategyCanUnpublish(scope, content, eventMessages);
+                unpublishResult = StrategyCanUnpublish(scope, content, eventMessages, notificationState);
                 if (unpublishResult.Success)
                 {
                     unpublishResult = StrategyUnpublish(content, eventMessages);
@@ -1843,7 +1846,7 @@ public class ContentService : RepositoryService, IContentService
 
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
-                            var impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
+                        var impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
                         var tryPublish = d.PublishCulture(impact) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                         if (invalidProperties != null && invalidProperties.Length > 0)
@@ -1927,14 +1930,14 @@ public class ContentService : RepositoryService, IContentService
         {
             return culturesToPublish.All(culture =>
             {
-                    var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+                var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
                 return content.PublishCulture(impact) &&
                        _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
             });
         }
 
-            return content.PublishCulture(_cultureImpactFactory.ImpactInvariant())
-                   && _propertyValidationService.Value.IsPropertyDataValid(content, out _, _cultureImpactFactory.ImpactInvariant());
+        return content.PublishCulture(_cultureImpactFactory.ImpactInvariant())
+               && _propertyValidationService.Value.IsPropertyDataValid(content, out _, _cultureImpactFactory.ImpactInvariant());
     }
 
     // utility 'ShouldPublish' func used by SaveAndPublishBranch
@@ -2162,7 +2165,7 @@ public class ContentService : RepositoryService, IContentService
             // (SaveAndPublishBranchOne does *not* do it)
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(document, TreeChangeTypes.RefreshBranch, eventMessages));
-            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages));
+            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages, true));
 
             scope.Complete();
         }
@@ -2432,7 +2435,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId">Optional Id of the User moving the Content</param>
     public void Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
     {
-        if(content.ParentId == parentId)
+        if (content.ParentId == parentId)
         {
             return;
         }
@@ -2583,7 +2586,8 @@ public class ContentService : RepositoryService, IContentService
             IContent[] contents = _documentRepository.Get(query).ToArray();
 
             var emptyingRecycleBinNotification = new ContentEmptyingRecycleBinNotification(contents, eventMessages);
-            if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification))
+            var deletingContentNotification = new ContentDeletingNotification(contents, eventMessages);
+            if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification) || scope.Notifications.PublishCancelable(deletingContentNotification))
             {
                 scope.Complete();
                 return OperationResult.Cancel(eventMessages);
@@ -2817,7 +2821,7 @@ public class ContentService : RepositoryService, IContentService
             }
             else
             {
-                Audit(AuditType.SendToPublish, content.WriterId, content.Id);
+                Audit(AuditType.SendToPublish, userId, content.Id);
             }
 
             return saveResult.Success;
@@ -2932,6 +2936,7 @@ public class ContentService : RepositoryService, IContentService
             // save
             saved.Add(content);
             _documentRepository.Save(content);
+            Audit(AuditType.Sort, userId, content.Id, "Sorting content performed by user");
         }
 
         // first saved, then sorted
@@ -2948,7 +2953,6 @@ public class ContentService : RepositoryService, IContentService
             scope.Notifications.Publish(new ContentPublishedNotification(published, eventMessages));
         }
 
-        Audit(AuditType.Sort, userId, 0, "Sorting content performed by user");
         return OperationResult.Succeed(eventMessages);
     }
 
@@ -3293,10 +3297,10 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="content"></param>
     /// <param name="evtMsgs"></param>
     /// <returns></returns>
-    private PublishResult StrategyCanUnpublish(ICoreScope scope, IContent content, EventMessages evtMsgs)
+    private PublishResult StrategyCanUnpublish(ICoreScope scope, IContent content, EventMessages evtMsgs, IDictionary<string, object?>? notificationState)
     {
         // raise Unpublishing notification
-        if (scope.Notifications.PublishCancelable(new ContentUnpublishingNotification(content, evtMsgs)))
+        if (scope.Notifications.PublishCancelable(new ContentUnpublishingNotification(content, evtMsgs).WithState(notificationState)))
         {
             _logger.LogInformation(
                 "Document {ContentName} (id={ContentId}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id);
@@ -3559,7 +3563,7 @@ public class ContentService : RepositoryService, IContentService
 
             _documentBlueprintRepository.Save(content);
 
-            Audit(AuditType.Save, Constants.Security.SuperUserId, content.Id, $"Saved content template: {content.Name}");
+            Audit(AuditType.Save, userId, content.Id, $"Saved content template: {content.Name}");
 
             scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, evtMsgs));
 

@@ -63,7 +63,7 @@ public class MediaWithCrops<T> : MediaWithCrops
     public new T Content { get; }
 
     /// <summary>
-    ///     Performs an implicit conversion from <see cref="MediaWithCrops{T}" /> to <see cref="T" />.
+    ///     Performs an implicit conversion from <see cref="MediaWithCrops{T}" /> to <typeparamref name="T"/>.
     /// </summary>
     /// <param name="mediaWithCrops">The media with crops.</param>
     /// <returns>

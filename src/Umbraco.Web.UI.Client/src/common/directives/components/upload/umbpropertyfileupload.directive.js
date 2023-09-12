@@ -7,8 +7,10 @@
      * @param {any} fileManager
      * @param {any} mediaHelper
      * @param {any} angularHelper
+     * @param {any} $attrs
+     * @param {any} notificationsService
      */
-    function umbPropertyFileUploadController($scope, $q, fileManager, mediaHelper, angularHelper, $attrs) {
+    function umbPropertyFileUploadController($scope, $q, fileManager, mediaHelper, angularHelper, $attrs, notificationsService) {
 
         //NOTE: this component supports multiple files, though currently the uploader does not but perhaps sometime in the future
         // we'd want it to, so i'll leave the multiple file support in place
@@ -271,15 +273,25 @@
 
             if (args.files && args.files.length > 0) {
 
+                const filesAllowed = [];
+
+                for (let i = 0; i < args.files.length; i++) {
+                  if (fileManager.maxFileSize && args.files[i].size > fileManager.maxFileSize) {
+                    notificationsService.error(`File upload "${args.files[i].name}"`, `File size of ${args.files[i].size / 1000} KB exceeds the maximum allowed size of ${fileManager.maxFileSize / 1000} KB`);
+                  } else {
+                    filesAllowed.push(args.files[i]);
+                  }
+                }
+
                 //set the files collection
                 fileManager.setFiles({
                     propertyAlias: vm.propertyAlias,
-                    files: args.files,
+                    files: filesAllowed,
                     culture: vm.culture,
                     segment: vm.segment
                 });
 
-                updateModelFromSelectedFiles(args.files).then(function(newVal) {
+                updateModelFromSelectedFiles(filesAllowed).then(function(newVal) {
                     angularHelper.safeApply($scope,
                         function() {
                             //pass in the file names and the model files

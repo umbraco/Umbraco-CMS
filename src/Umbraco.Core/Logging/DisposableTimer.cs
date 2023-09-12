@@ -53,14 +53,21 @@ public class DisposableTimer : DisposableObjectSlim
                 case LogLevel.Debug:
                     if (startMessageArgs == null)
                     {
-                        logger.LogDebug("{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            logger.LogDebug("{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
+                        }
                     }
                     else
                     {
                         var args = new object[startMessageArgs.Length + 1];
                         startMessageArgs.CopyTo(args, 0);
-                        args[startMessageArgs.Length] = _timingId;
-                        logger.LogDebug(startMessage + " [Timing {TimingId}]", args);
+                        args[^1] = _timingId;
+                        
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                          logger.LogDebug(startMessage + " [Timing {TimingId}]", args);
+                        }
                     }
 
                     break;
@@ -73,7 +80,7 @@ public class DisposableTimer : DisposableObjectSlim
                     {
                         var args = new object[startMessageArgs.Length + 1];
                         startMessageArgs.CopyTo(args, 0);
-                        args[startMessageArgs.Length] = _timingId;
+                        args[^1] = _timingId;
                         logger.LogInformation(startMessage + " [Timing {TimingId}]", args);
                     }
 
@@ -106,7 +113,7 @@ public class DisposableTimer : DisposableObjectSlim
     /// <summary>
     ///     Disposes resources.
     /// </summary>
-    /// <remarks>Overrides abstract class <see cref="DisposableObject" /> which handles required locking.</remarks>
+    /// <remarks>Overrides abstract class <see cref="DisposableObjectSlim" /> which handles required locking.</remarks>
     protected override void DisposeResources()
     {
         Stopwatch.Stop();
@@ -127,8 +134,8 @@ public class DisposableTimer : DisposableObjectSlim
                 {
                     var args = new object[_failMessageArgs.Length + 2];
                     _failMessageArgs.CopyTo(args, 0);
-                    args[_failMessageArgs.Length - 1] = Stopwatch.ElapsedMilliseconds;
-                    args[_failMessageArgs.Length] = _timingId;
+                    args[^2] = Stopwatch.ElapsedMilliseconds;
+                    args[^1] = _timingId;
                     _logger.LogError(_failException, _failMessage + " ({Duration}ms) [Timing {TimingId}]", args);
                 }
             }
@@ -139,19 +146,25 @@ public class DisposableTimer : DisposableObjectSlim
                     case LogLevel.Debug:
                         if (_endMessageArgs == null)
                         {
-                            _logger.LogDebug(
+                            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                            {
+                                _logger.LogDebug(
                                 "{EndMessage} ({Duration}ms) [Timing {TimingId}]",
                                 _endMessage,
                                 Stopwatch.ElapsedMilliseconds,
                                 _timingId);
+                            }
                         }
                         else
                         {
                             var args = new object[_endMessageArgs.Length + 2];
                             _endMessageArgs.CopyTo(args, 0);
-                            args[^1] = Stopwatch.ElapsedMilliseconds;
-                            args[args.Length] = _timingId;
-                            _logger.LogDebug(_endMessage + " ({Duration}ms) [Timing {TimingId}]", args);
+                            args[^2] = Stopwatch.ElapsedMilliseconds;
+                            args[^1] = _timingId;
+                            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                            {
+                              _logger.LogDebug(_endMessage + " ({Duration}ms) [Timing {TimingId}]", args);
+                            }
                         }
 
                         break;
@@ -168,8 +181,8 @@ public class DisposableTimer : DisposableObjectSlim
                         {
                             var args = new object[_endMessageArgs.Length + 2];
                             _endMessageArgs.CopyTo(args, 0);
-                            args[_endMessageArgs.Length - 1] = Stopwatch.ElapsedMilliseconds;
-                            args[_endMessageArgs.Length] = _timingId;
+                            args[^2] = Stopwatch.ElapsedMilliseconds;
+                            args[^1] = _timingId;
                             _logger.LogInformation(_endMessage + " ({Duration}ms) [Timing {TimingId}]", args);
                         }
 

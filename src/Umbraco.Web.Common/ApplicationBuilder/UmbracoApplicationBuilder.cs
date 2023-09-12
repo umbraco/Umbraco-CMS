@@ -1,14 +1,8 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.Media;
 using Umbraco.Extensions;
-using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder;
 
@@ -77,24 +71,7 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
     {
         UseUmbracoCoreMiddleware();
 
-        // Get media file provider and request path/URL
-        MediaFileManager mediaFileManager = AppBuilder.ApplicationServices.GetRequiredService<MediaFileManager>();
-        if (mediaFileManager.FileSystem.TryCreateFileProvider(out IFileProvider? mediaFileProvider))
-        {
-            GlobalSettings globalSettings =
-                AppBuilder.ApplicationServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
-            IHostingEnvironment? hostingEnvironment = AppBuilder.ApplicationServices.GetService<IHostingEnvironment>();
-            var mediaRequestPath = hostingEnvironment?.ToAbsolute(globalSettings.UmbracoMediaPath);
-
-            // Configure custom file provider for media
-            IWebHostEnvironment? webHostEnvironment = AppBuilder.ApplicationServices.GetService<IWebHostEnvironment>();
-            if (webHostEnvironment is not null)
-            {
-                webHostEnvironment.WebRootFileProvider =
-                    webHostEnvironment.WebRootFileProvider.ConcatComposite(
-                        new MediaPrependBasePathFileProvider(mediaRequestPath, mediaFileProvider));
-            }
-        }
+        AppBuilder.UseUmbracoMediaFileProvider();
 
         AppBuilder.UseStaticFiles();
 
@@ -105,7 +82,10 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
         // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing?view=aspnetcore-5.0
         // where we need to have UseAuthentication and UseAuthorization proceeding this call but before
         // endpoints are defined.
+        RunPreRouting();
         AppBuilder.UseRouting();
+        RunPostRouting();
+
         AppBuilder.UseAuthentication();
         AppBuilder.UseAuthorization();
 
@@ -134,6 +114,22 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
         foreach (IUmbracoPipelineFilter filter in _umbracoPipelineStartupOptions.Value.PipelineFilters)
         {
             filter.OnPrePipeline(AppBuilder);
+        }
+    }
+
+    public void RunPreRouting()
+    {
+        foreach (IUmbracoPipelineFilter filter in _umbracoPipelineStartupOptions.Value.PipelineFilters)
+        {
+            filter.OnPreRouting(AppBuilder);
+        }
+    }
+
+    public void RunPostRouting()
+    {
+        foreach (IUmbracoPipelineFilter filter in _umbracoPipelineStartupOptions.Value.PipelineFilters)
+        {
+            filter.OnPostRouting(AppBuilder);
         }
     }
 

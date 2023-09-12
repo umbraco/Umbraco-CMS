@@ -9,6 +9,7 @@ using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Configuration.Grid;
 
+[Obsolete("The grid is obsolete, will be removed in V13")]
 public class GridConfig : IGridConfig
 {
     public GridConfig(

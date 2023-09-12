@@ -167,7 +167,7 @@ public static class ExpressionHelper
     }
 
     /// <summary>
-    ///     Gets a <see cref="MethodInfo" /> from an <see cref="Expression{Action{T}}" /> provided it refers to a method call.
+    ///     Gets a <see cref="MethodInfo" /> from an <see cref="Expression{TDelegate}"/> of <see cref="Action{T}"/> provided it refers to a method call.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="fromExpression">From expression.</param>
@@ -254,7 +254,7 @@ public static class ExpressionHelper
     }
 
     /// <summary>
-    ///     Gets a <see cref="MemberInfo" /> from an <see cref="Expression{Func{T, TReturn}}" /> provided it refers to member
+    ///     Gets a <see cref="MemberInfo" /> from an <see cref="Expression{TDelegate}" /> of <see cref="Func{T, TReturn}"/> provided it refers to member
     ///     access.
     /// </summary>
     /// <typeparam name="T"></typeparam>

@@ -3,10 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
@@ -47,7 +47,6 @@ public class DefaultUrlProvider : IUrlProvider
     /// <summary>
     ///     Gets the other URLs of a published content.
     /// </summary>
-    /// <param name="umbracoContextAccessor">The Umbraco context.</param>
     /// <param name="id">The published content id.</param>
     /// <param name="current">The current absolute URL.</param>
     /// <returns>The other URLs for the published content.</returns>
@@ -137,9 +136,12 @@ public class DefaultUrlProvider : IUrlProvider
     {
         if (string.IsNullOrWhiteSpace(route))
         {
-            _logger.LogDebug(
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(
                 "Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.",
                 id);
+            }
             return null;
         }
 

@@ -13,7 +13,7 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
+internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference, IDataValueTags
 {
     private BlockEditorValues? _blockEditorValues;
     private readonly IDataTypeService _dataTypeService;
@@ -77,6 +77,40 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
         return result;
     }
 
+    /// <inheritdoc />
+    public IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId)
+    {
+        var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
+
+        BlockEditorData? blockEditorData = BlockEditorValues.DeserializeAndClean(rawJson);
+        if (blockEditorData == null)
+        {
+            return Enumerable.Empty<ITag>();
+        }
+
+        var result = new List<ITag>();
+        // loop through all content and settings data
+        foreach (BlockItemData row in blockEditorData.BlockValue.ContentData.Concat(blockEditorData.BlockValue.SettingsData))
+        {
+            foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
+            {
+                IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
+
+                IDataValueEditor? valueEditor = propEditor?.GetValueEditor();
+                if (valueEditor is not IDataValueTags tagsProvider)
+                {
+                    continue;
+                }
+
+                object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.Configuration;
+
+                result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
+            }
+        }
+
+        return result;
+    }
+
     #region Convert database // editor
 
     // note: there is NO variant support here
@@ -85,7 +119,6 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
     ///     Ensure that sub-editor values are translated through their ToEditor methods
     /// </summary>
     /// <param name="property"></param>
-    /// <param name="dataTypeService"></param>
     /// <param name="culture"></param>
     /// <param name="segment"></param>
     /// <returns></returns>

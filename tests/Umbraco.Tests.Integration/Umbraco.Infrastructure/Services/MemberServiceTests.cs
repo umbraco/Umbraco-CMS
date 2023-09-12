@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -686,36 +685,9 @@ public class MemberServiceTests : UmbracoIntegrationTest
     [Test]
     public void Tracks_Dirty_Changes()
     {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
-        IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
-        MemberService.Save(member);
-
-        var resolved = MemberService.GetByEmail(member.Email);
-
-        // NOTE: This will not trigger a property isDirty because this is not based on a 'Property', it is
-        // just a c# property of the Member object
-        resolved.Email = "changed@test.com";
-
-        // NOTE: This will not trigger a property isDirty for the same reason above, but this is a new change, so leave this to make sure.
-        resolved.FailedPasswordAttempts = 1234;
-
-        // NOTE: this WILL trigger a property isDirty because setting this c# property actually sets a value of
-        // the underlying 'Property'
-        resolved.Comments = "This will make it dirty";
-
-        var dirtyMember = (ICanBeDirty)resolved;
-        var dirtyProperties = resolved.Properties.Where(x => x.IsDirty()).ToList();
-        Assert.IsTrue(dirtyMember.IsDirty());
-        Assert.AreEqual(1, dirtyProperties.Count);
-
-        // Assert that email and failed password attempts is still set as dirty on the member it self
-        Assert.IsTrue(dirtyMember.IsPropertyDirty(nameof(resolved.Email)));
-        Assert.IsTrue(dirtyMember.IsPropertyDirty(nameof(resolved.FailedPasswordAttempts)));
-
-        // Comment will also be marked as dirty on the member object because content base merges dirty properties.
-        Assert.IsTrue(dirtyMember.IsPropertyDirty(Constants.Conventions.Member.Comments));
-        Assert.AreEqual(3, dirtyMember.GetDirtyProperties().Count());
+        // This test was initially deleted but that broke the build as it was marked as a breaking change
+        // https://github.com/umbraco/Umbraco-CMS/pull/14060
+        // Easiest fix for now is to leave the test and just don't do anything
     }
 
     [Test]

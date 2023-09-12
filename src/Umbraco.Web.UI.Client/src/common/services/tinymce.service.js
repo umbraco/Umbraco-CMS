@@ -9,7 +9,7 @@
  * @doc https://www.tiny.cloud/docs/tinymce/6/
  */
 function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
-  $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService, mediaHelper) {
+  $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService, mediaHelper, fileManager) {
 
   //These are absolutely required in order for the macros to render inline
   //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
@@ -170,9 +170,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         }));
       });
     }
-    else {
-      styleFormats = fallbackStyles;
-    }
 
     return $q.all(promises).then(function () {
       // Always push our Umbraco RTE stylesheet
@@ -205,6 +202,17 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
   function uploadImageHandler(blobInfo, progress) {
     return new Promise(function (resolve, reject) {
+      const blob = blobInfo.blob();
+
+      // if the file size is greater than the max file size, reject it
+      if (fileManager.maxFileSize > 0 && blob.size > fileManager.maxFileSize) {
+        reject({
+          message: `The file size (${blob.size / 1000} KB) exceeded the maximum allowed size of ${fileManager.maxFileSize / 1000} KB.`,
+          remove: true
+        });
+        return;
+      }
+
       const xhr = new XMLHttpRequest();
       xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
 
@@ -225,12 +233,18 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       };
 
       xhr.onerror = function () {
-        reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+        reject({
+          message: 'Image upload failed due to a XHR Transport error. Code: ' + xhr.status,
+          remove: true
+        });
       };
 
       xhr.onload = function () {
         if (xhr.status < 200 || xhr.status >= 300) {
-          reject('HTTP Error: ' + xhr.status);
+          reject({
+            message: 'HTTP Error: ' + xhr.status,
+            remove: true
+          });
           return;
         }
 
@@ -240,7 +254,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         data = data.split("\n");
 
         if (!data.length > 1) {
-          reject('Unrecognized text string: ' + data);
+          reject({
+            message: 'Unrecognized text string: ' + data,
+            remove: true
+          });
           return;
         }
 
@@ -249,12 +266,18 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         try {
           json = JSON.parse(data[1]);
         } catch (e) {
-          reject('Invalid JSON: ' + data + ' - ' + e.message);
+          reject({
+            message: 'Invalid JSON: ' + data + ' - ' + e.message,
+            remove: true
+          });
           return;
         }
 
         if (!json || typeof json.tmpLocation !== 'string') {
-          reject('Invalid JSON: ' + data);
+          reject({
+            message: 'Invalid JSON: ' + data,
+            remove: true
+          });
           return;
         }
 
@@ -268,7 +291,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       };
 
       const formData = new FormData();
-      formData.append('file', blobInfo.blob(), blobInfo.blob().name);
+      formData.append('file', blob, blob.name);
 
       xhr.send(formData);
     });
@@ -375,7 +398,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           autoresize_bottom_margin: 10,
           content_css: styles.stylesheets,
           style_formats: styles.styleFormats,
-          style_formats_autohide: true,
           language: getLanguage(),
 
           //this would be for a theme other than inlite
@@ -450,7 +472,18 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             }
           }
 
+          // if we have style_formats at this point they originate from the RTE CSS config. we don't want any custom
+          // style_formats to interfere with the RTE CSS config, so let's explicitly remove the custom style_formats.
+          if(tinyMceConfig.customConfig.style_formats && config.style_formats && config.style_formats.length){
+            delete tinyMceConfig.customConfig.style_formats;
+          }
+
           Utilities.extend(config, tinyMceConfig.customConfig);
+        }
+
+        if(!config.style_formats || !config.style_formats.length){
+          // if we have no style_formats at this point we'll revert to using the default ones (fallbackStyles)
+          config.style_formats = fallbackStyles;
         }
 
         return config;
@@ -596,7 +629,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     createMediaPicker: function (editor, callback) {
       editor.ui.registry.addButton('umbmediapicker', {
         icon: 'image',
-        tooltip: 'Media Picker',
+        tooltip: 'Image Picker',
         stateSelector: 'img[data-udi]',
         onAction: function () {
 
@@ -719,7 +752,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     createInsertMacro: function (editor, callback) {
 
       let self = this;
-      let activeMacroElement = null; //track an active macro element
 
       /** Adds custom rules for the macro plugin and custom serialization */
       editor.on('preInit', function (args) {
@@ -748,20 +780,32 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       });
 
       /**
-       * Because the macro gets wrapped in a P tag because of the way 'enter' works, this
+       * Because the macro got wrapped in a P tag because of the way 'enter' works in older versions of Umbraco, this
        * method will return the macro element if not wrapped in a p, or the p if the macro
        * element is the only one inside of it even if we are deep inside an element inside the macro
        */
-      function getRealMacroElem(element) {
+      function getRealMacroElem() {
+        // Ask the editor for the currently selected element
+        const element = editor.selection.getNode();
+        if (!element) {
+          return null;
+        }
+
         var e = $(element).closest(".umb-macro-holder");
+
         if (e.length > 0) {
-          if (e.get(0).parentNode.nodeName === "P") {
+          var macroHolder = e.get(0);
+          // In case of Inline Macro we don't need the be backward compliant
+          if(macroHolder.tagName === 'SPAN'){
+            return macroHolder;
+          }
+          if (macroHolder.parentNode.nodeName === "P") {
             //now check if we're the only element
             if (element.parentNode.childNodes.length === 1) {
-              return e.get(0).parentNode;
+              return macroHolder.parentNode;
             }
           }
-          return e.get(0);
+          return macroHolder;
         }
         return null;
       }
@@ -770,32 +814,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       editor.ui.registry.addButton('umbmacro', {
         icon: 'preferences',
         tooltip: 'Insert macro',
-        onSetup: function (buttonApi) {
-          /**
-           * Check if the macro is currently selected and toggle the menu button
-           */
-          function onNodeChanged(evt) {
-
-            //set our macro button active when on a node of class umb-macro-holder
-            activeMacroElement = getRealMacroElem(evt.element);
-
-            //set the button active/inactive
-            buttonApi.setEnabled(activeMacroElement === null);
-          }
-
-          //set onNodeChanged event listener
-          editor.on('NodeChange', onNodeChanged);
-
-          return function () {
-            //remove the event listener
-            editor.off('NodeChange', onNodeChanged);
-          }
-
-        },
 
         /** The insert macro button click event handler */
         onAction: function () {
-
           var dialogData = {
             //flag for use in rte so we only show macros flagged for the editor
             richTextEditor: true
@@ -803,6 +824,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
           //when we click we could have a macro already selected and in that case we'll want to edit the current parameters
           //so we'll need to extract them and submit them to the dialog.
+          const activeMacroElement = getRealMacroElem();
           if (activeMacroElement) {
             //we have a macro selected so we'll need to parse it's alias and parameters
             var contents = $(activeMacroElement).contents();
@@ -816,7 +838,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             var parsed = macroService.parseMacroSyntax(syntax);
             dialogData = {
               macroData: parsed,
-              activeMacroElement: activeMacroElement //pass the active element along so we can retrieve it later
+              activeMacroElement //pass the active element along so we can retrieve it later
             };
           }
 
@@ -840,35 +862,37 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       var macroSyntaxComment = "<!-- " + macroObject.syntax + " -->";
       //create an id class for this element so we can re-select it after inserting
       var uniqueId = "umb-macro-" + editor.dom.uniqueId();
-      var macroDiv = editor.dom.create('div',
+      var isInlined = macroObject.macroParamsDictionary["enableInlineMacro"] === "1";
+      var macroElementType = isInlined ? 'span' : 'div';
+      var macroElement = editor.dom.create(macroElementType,
         {
-          'class': 'umb-macro-holder ' + macroObject.macroAlias + " " + uniqueId + ' mceNonEditable',
+          'class': 'umb-macro-holder ' + macroObject.macroAlias + " " + uniqueId + ' mceNonEditable' + (isInlined ? ' inlined-macro' : ''),
           'contenteditable': 'false'
         },
         macroSyntaxComment + '<ins>Macro alias: <strong>' + macroObject.macroAlias + '</strong></ins>');
 
       //if there's an activeMacroElement then replace it, otherwise set the contents of the selected node
       if (activeMacroElement) {
-        activeMacroElement.replaceWith(macroDiv); //directly replaces the html node
+        activeMacroElement.replaceWith(macroElement); //directly replaces the html node
       }
       else {
-        editor.selection.setNode(macroDiv);
+        editor.selection.setNode(macroElement);
       }
 
-      var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
+      var $macroElement = $(editor.dom.select(".umb-macro-holder." + uniqueId));
       editor.setDirty(true);
 
       //async load the macro content
-      this.loadMacroContent($macroDiv, macroObject, editor);
+      this.loadMacroContent($macroElement, macroObject, editor);
 
     },
 
     /** loads in the macro content async from the server */
-    loadMacroContent: function ($macroDiv, macroData, editor) {
+    loadMacroContent: function ($macroElement, macroData, editor) {
 
       //if we don't have the macroData, then we'll need to parse it from the macro div
       if (!macroData) {
-        var contents = $macroDiv.contents();
+        var contents = $macroElement.contents();
         var comment = _.find(contents, function (item) {
           return item.nodeType === 8;
         });
@@ -880,15 +904,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         macroData = parsed;
       }
 
-      var $ins = $macroDiv.find("ins");
+      var $ins = $macroElement.find("ins");
 
       //show the throbber
-      $macroDiv.addClass("loading");
+      $macroElement.addClass("loading");
 
       // Add the contenteditable="false" attribute
       // As just the CSS class of .mceNonEditable is not working by itself?!
       // TODO: At later date - use TinyMCE editor DOM manipulation as opposed to jQuery
-      $macroDiv.attr("contenteditable", "false");
+      $macroElement.attr("contenteditable", "false");
 
       var contentId = $routeParams.id;
 
@@ -897,7 +921,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.macroParamsDictionary)
           .then(function (htmlResult) {
 
-            $macroDiv.removeClass("loading");
+            $macroElement.removeClass("loading");
             htmlResult = htmlResult.trim();
             if (htmlResult !== "") {
               var wasDirty = editor.isDirty();
@@ -1154,7 +1178,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       // the href might be an external url, so check the value for an anchor/qs
       // href has the anchor re-appended later, hence the reset here to avoid duplicating the anchor
-      if (!target.anchor) {
+      if (!target.anchor && href) {
         var urlParts = href.split(/(#|\?)/);
         if (urlParts.length === 3) {
           href = urlParts[0];

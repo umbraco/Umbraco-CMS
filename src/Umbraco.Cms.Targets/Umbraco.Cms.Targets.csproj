@@ -4,14 +4,11 @@
     <Description>Installs Umbraco CMS with minimal dependencies in your ASP.NET Core project.</Description>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
-    <!-- TODO: Enable when final version is shipped (because there's currently no previous version) -->
-    <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms.Api.Delivery\Umbraco.Cms.Api.Delivery.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.StaticAssets\Umbraco.Cms.StaticAssets.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,7 +21,7 @@
     <NoWarn>NU5100;NU5128</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Umbraco.JsonSchema.Extensions" Version="0.2.0" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Umbraco.JsonSchema.Extensions" Version="0.3.0" PrivateAssets="all" GeneratePathProperty="true" />
     <None Include="$(PkgUmbraco_JsonSchema_Extensions)\tasks\netstandard2.0\**" Pack="true" PackagePath="tasks\netstandard2.0" Visible="false" />
     <Content Include="$(_UmbracoCmsJsonSchemaReference)" PackagePath="" Visible="false" />
   </ItemGroup>
@@ -49,5 +46,13 @@
   <!-- Remove generated JSON schema on clean -->
   <Target Name="RemoveAppsettingsSchema" AfterTargets="Clean" Condition="Exists('$(_UmbracoCmsJsonSchemaReference)')">
     <Delete Files="$(_UmbracoCmsJsonSchemaReference)" />
+  </Target>
+
+  <!-- Create and pack empty file to add TFM dependency -->
+  <Target Name="GetTargetFrameworkPackageFiles" BeforeTargets="GenerateNuspec">
+    <WriteLinesToFile File="$(IntermediateOutputPath)_._" />
+    <ItemGroup>
+      <_PackageFiles Include="$(IntermediateOutputPath)_._" PackagePath="lib\$(TargetFramework)" />
+    </ItemGroup>
   </Target>
 </Project>

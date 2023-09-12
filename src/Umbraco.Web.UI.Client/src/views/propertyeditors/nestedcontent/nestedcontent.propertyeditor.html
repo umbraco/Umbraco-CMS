@@ -1,4 +1,4 @@
-﻿<div id="umb-nested-content--{{model.id}}" class="umb-nested-content" ng-class="{'umb-nested-content--narrow':!vm.wideMode, 'umb-nested-content--wide':vm.wideMode}">
+<div id="umb-nested-content--{{model.id}}" class="umb-nested-content" ng-class="{'umb-nested-content--narrow':!vm.wideMode, 'umb-nested-content--wide':vm.wideMode}">
 
     <umb-load-indicator class="mt2" ng-if="!vm.inited"></umb-load-indicator>
 
@@ -60,9 +60,9 @@
             <button
                 type="button"
                 class="btn-reset umb-nested-content__add-content umb-focus"
-                ng-class="{ '--disabled': (!vm.scaffolds.length || vm.nodes.length >= vm.maxItems) }"
+                ng-class="{ '--disabled': (!vm.scaffolds.length || vm.maxItemsReached()) }"
                 ng-click="vm.openNodeTypePicker($event)"
-                aria-disabled="{{!vm.scaffolds.length || vm.nodes.length >= vm.maxItems}}"
+                aria-disabled="{{!vm.scaffolds.length || vm.maxItemsReached()}}"
                 ng-disabled="!vm.allowAdd">
                 <localize key="grid_addElement">Add element</localize>
             </button>
@@ -78,7 +78,7 @@
                 <localize key="validation_entriesShort" tokens="[vm.minItems, vm.minItems - vm.nodes.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
             </div>
         </div>
-        <div ng-if="nestedContentForm.minCount.$error === true || vm.nodes.length > vm.maxItems">
+        <div ng-if="nestedContentForm.minCount.$error === true || vm.maxItemsExceeded()">
             <div class="help text-error">
                 <localize key="validation_entriesExceed" tokens="[vm.maxItems, vm.nodes.length - vm.maxItems]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
             </div>

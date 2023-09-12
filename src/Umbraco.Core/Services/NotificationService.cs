@@ -76,7 +76,8 @@ public class NotificationService : INotificationService
         Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
         Func<(IUser user, NotificationEmailBodyParams body, bool isHtml), string> createBody)
     {
-        var entitiesL = entities.ToList();
+        // sort the entities explicitly by path to handle notification inheritance (see comment below)
+        var entitiesL = entities.OrderBy(entity => entity.Path).ToList();
 
         // exit if there are no entities
         if (entitiesL.Count == 0)
@@ -84,11 +85,11 @@ public class NotificationService : INotificationService
             return;
         }
 
-        // put all entity's paths into a list with the same indices
-        var paths = entitiesL.Select(x =>
-                x.Path.Split(Constants.CharArrays.Comma).Select(s => int.Parse(s, CultureInfo.InvariantCulture))
-                    .ToArray())
-            .ToArray();
+        // create a dictionary of entity paths by entity ID
+        var pathsByEntityId = entitiesL.ToDictionary(
+            entity => entity.Id,
+            entity => entity.Path.Split(Constants.CharArrays.Comma)
+                .Select(s => int.Parse(s, CultureInfo.InvariantCulture)).ToArray());
 
         // lazily get versions
         var prevVersionDictionary = new Dictionary<int, IContentBase?>();
@@ -98,55 +99,40 @@ public class NotificationService : INotificationService
         const int pagesz = 400; // load batches of 400 users
         do
         {
-            // users are returned ordered by id, notifications are returned ordered by user id
-            var users = _userService.GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-            var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(), Constants.ObjectTypes.Document)?.ToList();
+            var notifications = GetUsersNotifications(new List<int>(), action, Enumerable.Empty<int>(), Constants.ObjectTypes.Document)?.ToList();
             if (notifications is null || notifications.Count == 0)
             {
                 break;
             }
 
-            var i = 0;
+            // users are returned ordered by id, notifications are returned ordered by user id
+            var users = _userService.GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
             foreach (IUser user in users)
             {
-                // continue if there's no notification for this user
-                if (notifications[i].UserId != user.Id)
+                Notification[] userNotifications = notifications.Where(n => n.UserId == user.Id).ToArray();
+                foreach (Notification notification in userNotifications)
                 {
-                    continue; // next user
-                }
+                    // notifications are inherited down the tree - find the topmost entity
+                    // relevant to this notification (entity list is sorted by path)
+                    IContent? entityForNotification = entitiesL
+                        .FirstOrDefault(entity =>
+                            pathsByEntityId.TryGetValue(entity.Id, out var path) &&
+                            path.Contains(notification.EntityId));
 
-                for (var j = 0; j < entitiesL.Count; j++)
-                {
-                    IContent content = entitiesL[j];
-                    var path = paths[j];
-
-                    // test if the notification applies to the path ie to this entity
-                    if (path.Contains(notifications[i].EntityId) == false)
+                    if (entityForNotification == null)
                     {
-                        continue; // next entity
+                        continue;
                     }
 
-                    if (prevVersionDictionary.ContainsKey(content.Id) == false)
+                    if (prevVersionDictionary.ContainsKey(entityForNotification.Id) == false)
                     {
-                        prevVersionDictionary[content.Id] = GetPreviousVersion(content.Id);
+                        prevVersionDictionary[entityForNotification.Id] = GetPreviousVersion(entityForNotification.Id);
                     }
 
                     // queue notification
-                    NotificationRequest req = CreateNotificationRequest(operatingUser, user, content, prevVersionDictionary[content.Id], actionName, siteUri, createSubject, createBody);
+                    NotificationRequest req = CreateNotificationRequest(operatingUser, user, entityForNotification, prevVersionDictionary[entityForNotification.Id], actionName, siteUri, createSubject, createBody);
                     Enqueue(req);
-                }
-
-                // skip other notifications for this user, essentially this means moving i to the next index of notifications
-                // for the next user.
-                do
-                {
-                    i++;
-                }
-                while (i < notifications.Count && notifications[i].UserId == user.Id);
-
-                if (i >= notifications.Count)
-                {
-                    break; // break if no more notifications
+                    break;
                 }
             }
 
@@ -579,41 +565,58 @@ public class NotificationService : INotificationService
         }
     }
 
-    private void Process(BlockingCollection<NotificationRequest> notificationRequests) =>
-        ThreadPool.QueueUserWorkItem(state =>
+    private void Process(BlockingCollection<NotificationRequest> notificationRequests)
+    {
+        // We need to suppress the flow of the ExecutionContext when starting a new thread.
+        // Otherwise our scope stack will leak into the context of the new thread, leading to disposing race conditions.
+        using (ExecutionContext.SuppressFlow())
         {
-            _logger.LogDebug("Begin processing notifications.");
-            while (true)
+            ThreadPool.QueueUserWorkItem(state =>
             {
-                // stay on for 8s
-                while (notificationRequests.TryTake(out NotificationRequest? request, 8 * 1000))
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
                 {
-                    try
+                    _logger.LogDebug("Begin processing notifications.");
+                }
+
+                while (true)
+                {
+                    // stay on for 8s
+                    while (notificationRequests.TryTake(out NotificationRequest? request, 8 * 1000))
                     {
-                        _emailSender.SendAsync(request.Mail, Constants.Web.EmailTypes.Notification).GetAwaiter()
-                            .GetResult();
-                        _logger.LogDebug("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
+                        try
+                        {
+                            _emailSender.SendAsync(request.Mail, Constants.Web.EmailTypes.Notification).GetAwaiter()
+                                .GetResult();
+                            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                            {
+                                _logger.LogDebug("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "An error occurred sending notification");
+                        }
                     }
-                    catch (Exception ex)
+
+                    lock (Locker)
                     {
-                        _logger.LogError(ex, "An error occurred sending notification");
+                        if (notificationRequests.Count > 0)
+                        {
+                            continue; // last chance
+                        }
+
+                        _running = false; // going down
+                        break;
                     }
                 }
 
-                lock (Locker)
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
                 {
-                    if (notificationRequests.Count > 0)
-                    {
-                        continue; // last chance
-                    }
-
-                    _running = false; // going down
-                    break;
+                    _logger.LogDebug("Done processing notifications.");
                 }
-            }
-
-            _logger.LogDebug("Done processing notifications.");
-        });
+            });
+        }
+    }
 
     private class NotificationRequest
     {

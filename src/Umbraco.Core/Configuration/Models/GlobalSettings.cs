@@ -33,6 +33,7 @@ public class GlobalSettings
     internal const bool StaticSanitizeTinyMce = false;
     internal const int StaticMainDomReleaseSignalPollingInterval = 2000;
     private const bool StaticForceCombineUrlPathLeftToRight = true;
+    private const bool StaticShowMaintenancePageWhenInUpgradeState = true;
 
     /// <summary>
     ///     Gets or sets a value for the reserved URLs (must end with a comma).
@@ -252,4 +253,7 @@ public class GlobalSettings
     /// </example>
     [DefaultValue(StaticForceCombineUrlPathLeftToRight)]
     public bool ForceCombineUrlPathLeftToRight { get; set; }  = StaticForceCombineUrlPathLeftToRight;
+
+    [DefaultValue(StaticShowMaintenancePageWhenInUpgradeState)]
+    public bool ShowMaintenancePageWhenInUpgradeState { get; set; } = StaticShowMaintenancePageWhenInUpgradeState;
 }

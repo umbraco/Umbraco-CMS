@@ -78,7 +78,7 @@ internal static class UserGroupFactory
 
         if (entity.HasIdentity)
         {
-            dto.Id = short.Parse(entity.Id.ToString());
+            dto.Id = entity.Id;
         }
 
         return dto;

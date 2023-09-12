@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core.Services
         /// but that is how MS have made theirs so we'll follow that principal.
         /// </remarks>
         /// <param name="countType"><see cref="MemberCountType"/> to count by</param>
-        /// <returns><see cref="System.int"/> with number of Members for passed in type</returns>
+        /// <returns><see cref="int"/> with number of Members for passed in type</returns>
         public int GetCount(MemberCountType countType)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <remarks>If no alias is supplied then the count for all Member will be returned</remarks>
         /// <param name="memberTypeAlias">Optional alias for the MemberType when counting number of Members</param>
-        /// <returns><see cref="System.int"/> with number of Members</returns>
+        /// <returns><see cref="int"/> with number of Members</returns>
         public int Count(string? memberTypeAlias = null)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -155,7 +155,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="email">Email of the <see cref="IMembershipUser"/> to create</param>
         /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
         /// <param name="memberTypeAlias">Alias of the Type</param>
-        /// <param name="isApproved">Is the member approved</param>
         /// <returns><see cref="IMember"/></returns>
         IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias)
             => CreateMemberWithIdentity(username, email, username, passwordValue, memberTypeAlias);
@@ -186,15 +185,16 @@ namespace Umbraco.Cms.Core.Services
             => CreateMemberWithIdentity(username, email, name, string.Empty, memberTypeAlias, isApproved);
 
         /// <summary>
-        /// Creates and persists a Member
+        /// Creates and persists a Member.
         /// </summary>
         /// <remarks>Using this method will persist the Member object before its returned
-        /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
-        /// <param name="username">Username of the Member to create</param>
-        /// <param name="email">Email of the Member to create</param>
-        /// <param name="name">Name of the Member to create</param>
-        /// <param name="memberTypeAlias">Alias of the MemberType the Member should be based on</param>
-        /// <param name="isApproved">Optional IsApproved of the Member to create</param>
+        /// meaning that it will have an Id available (unlike the <see cref="CreateMember(string, string, string, string)"/> method).</remarks>
+        /// <param name="username">Username of the Member to create.</param>
+        /// <param name="email">Email of the Member to create.</param>
+        /// <param name="name">Name of the Member to create.</param>
+        /// <param name="passwordValue">Password value of the Member to create.</param>
+        /// <param name="memberTypeAlias">Alias of the MemberType the Member should be based on.</param>
+        /// <param name="isApproved">Optional IsApproved of the Member to create.</param>
         /// <returns><see cref="IMember"/></returns>
         public IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, string memberTypeAlias, bool isApproved = true)
         {
@@ -230,6 +230,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="username">Username of the Member to create</param>
         /// <param name="email">Email of the Member to create</param>
         /// <param name="memberType">MemberType the Member should be based on</param>
+        /// <param name="isApproved">Is the member approved.</param>
         /// <returns><see cref="IMember"/></returns>
         public IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType, bool isApproved)
             => CreateMemberWithIdentity(username, email, username, string.Empty, memberType, isApproved);
@@ -246,6 +247,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="email">Email of the Member to create</param>
         /// <param name="name">Name of the Member to create</param>
         /// <param name="memberType">MemberType the Member should be based on</param>
+        /// <param name="isApproved">Is the member approved</param>
         /// <returns><see cref="IMember"/></returns>
         public IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType, bool isApproved)
             => CreateMemberWithIdentity(username, email, name, string.Empty, memberType, isApproved);
@@ -260,6 +262,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="name">Name of the Member to create</param>
         /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
         /// <param name="memberType">MemberType the Member should be based on</param>
+        /// <param name="isApproved">Is the member approved</param>
         /// <returns><see cref="IMember"/></returns>
         private IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, IMemberType memberType, bool isApproved = true)
         {
@@ -296,7 +299,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets a Member by its integer id
         /// </summary>
-        /// <param name="id"><see cref="System.int"/> Id</param>
+        /// <param name="id"><see cref="int"/> Id</param>
         /// <returns><see cref="IMember"/></returns>
         public IMember? GetById(int id)
         {
@@ -580,7 +583,7 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a list of Members based on a property search
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-        /// <param name="value"><see cref="System.string"/> Value to match</param>
+        /// <param name="value"><see cref="string"/> Value to match</param>
         /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
@@ -614,7 +617,7 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a list of Members based on a property search
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-        /// <param name="value"><see cref="System.int"/> Value to match</param>
+        /// <param name="value"><see cref="int"/> Value to match</param>
         /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
@@ -651,7 +654,7 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a list of Members based on a property search
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-        /// <param name="value"><see cref="System.bool"/> Value to match</param>
+        /// <param name="value"><see cref="bool"/> Value to match</param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, bool value)
         {

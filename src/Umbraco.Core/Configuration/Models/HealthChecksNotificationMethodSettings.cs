@@ -25,8 +25,7 @@ public class HealthChecksNotificationMethodSettings
     ///     Gets or sets a value for the health check notifications reporting verbosity.
     /// </summary>
     [DefaultValue(StaticVerbosity)]
-    public HealthCheckNotificationVerbosity Verbosity { get; set; } =
-        Enum<HealthCheckNotificationVerbosity>.Parse(StaticVerbosity);
+    public HealthCheckNotificationVerbosity Verbosity { get; set; } = Enum.Parse<HealthCheckNotificationVerbosity>(StaticVerbosity);
 
     /// <summary>
     ///     Gets or sets a value indicating whether the health check notifications should occur on failures only.

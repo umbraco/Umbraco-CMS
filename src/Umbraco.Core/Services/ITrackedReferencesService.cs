@@ -1,5 +1,4 @@
 using Umbraco.Cms.Core.Models;
-using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -56,7 +55,6 @@ public interface ITrackedReferencesService
     ///     A boolean indicating whether to filter only the RelationTypes which are
     ///     dependencies (isDependency field is set to true).
     /// </param>
-    /// <param name="totalItems">The total amount of items.</param>
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
     PagedModel<RelationItemModel> GetPagedRelationsForItem(int id, long skip, long take, bool filterMustBeIsDependency) => throw new NotImplementedException();
 
@@ -70,7 +68,6 @@ public interface ITrackedReferencesService
     ///     A boolean indicating whether to filter only the RelationTypes which are
     ///     dependencies (isDependency field is set to true).
     /// </param>
-    /// <param name="totalItems">The total amount of items.</param>
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
     PagedModel<RelationItemModel> GetPagedDescendantsInReferences(int parentId, long skip, long take, bool filterMustBeIsDependency) => throw new NotImplementedException();
 
@@ -84,7 +81,6 @@ public interface ITrackedReferencesService
     ///     A boolean indicating whether to filter only the RelationTypes which are
     ///     dependencies (isDependency field is set to true).
     /// </param>
-    /// <param name="totalItems">The total amount of items.</param>
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
     PagedModel<RelationItemModel> GetPagedItemsWithRelations(int[] ids, long skip, long take, bool filterMustBeIsDependency) => throw new NotImplementedException();
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
@@ -21,6 +20,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Cms.Web.Website.Routing;
@@ -53,20 +53,22 @@ public class UmbracoRouteValueTransformerTests
                 x.RewriteForPublishedContentAccessAsync(It.IsAny<HttpContext>(), It.IsAny<UmbracoRouteValues>()))
             .Returns((HttpContext ctx, UmbracoRouteValues routeVals) => Task.FromResult(routeVals));
 
+        var umbracoVirtualPageRoute = new Mock<IUmbracoVirtualPageRoute>();
+        umbracoVirtualPageRoute.Setup(x => x.SetupVirtualPageRoute(It.IsAny<HttpContext>()));
+
         var transformer = new UmbracoRouteValueTransformer(
             new NullLogger<UmbracoRouteValueTransformer>(),
             ctx,
             router ?? Mock.Of<IPublishedRouter>(),
-            GetGlobalSettings(),
-            TestHelper.GetHostingEnvironment(),
             state,
             routeValuesFactory ?? Mock.Of<IUmbracoRouteValuesFactory>(),
             filter ?? Mock.Of<IRoutableDocumentFilter>(x => x.IsDocumentRequest(It.IsAny<string>()) == true),
             Mock.Of<IDataProtectionProvider>(),
             Mock.Of<IControllerActionSearcher>(),
-            Mock.Of<IEventAggregator>(),
-            publicAccessRequestHandler.Object);
-
+            publicAccessRequestHandler.Object,
+            Mock.Of<IUmbracoVirtualPageRoute>(),
+            Mock.Of<IOptionsMonitor<GlobalSettings>>()
+            );
         return transformer;
     }
 

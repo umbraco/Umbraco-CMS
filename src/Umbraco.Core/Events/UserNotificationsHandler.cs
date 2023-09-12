@@ -107,6 +107,7 @@ public sealed class UserNotificationsHandler :
         _notifier.Notify(_actions.GetAction<ActionUpdate>(), updatedEntities.ToArray());
     }
 
+    [Obsolete("Scheduled for removal in v13")]
     public void Handle(ContentSentToPublishNotification notification) =>
         _notifier.Notify(_actions.GetAction<ActionToPublish>(), notification.Entity);
 
@@ -191,8 +192,11 @@ public sealed class UserNotificationsHandler :
             // if there is no current user, then use the admin
             if (user == null)
             {
-                _logger.LogDebug(
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug(
                     "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
+                }
                 user = _userService.GetUserById(Constants.Security.SuperUserId);
                 if (user == null)
                 {

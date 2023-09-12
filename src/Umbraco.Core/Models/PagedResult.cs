@@ -5,7 +5,6 @@ namespace Umbraco.Cms.Core.Models;
 /// <summary>
 ///     Represents a paged result for a model collection
 /// </summary>
-/// <typeparam name="T"></typeparam>
 [DataContract(Name = "pagedCollection", Namespace = "")]
 public abstract class PagedResult
 {

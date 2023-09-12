@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Extensions;
 

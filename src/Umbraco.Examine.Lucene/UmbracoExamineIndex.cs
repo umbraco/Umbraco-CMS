@@ -47,6 +47,8 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
 
     public bool PublishedValuesOnly { get; protected set; } = false;
 
+    public bool SupportProtectedContent { get; protected set; } = true;
+
     /// <summary>
     ///     override to check if we can actually initialize.
     /// </summary>
@@ -95,7 +97,7 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
         Document? d = docArgs.Document;
 
         foreach (KeyValuePair<string, IReadOnlyList<object>> f in docArgs.ValueSet.Values
-                     .Where(x => x.Key.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)).ToList())
+                     .Where(x => x.Key.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)).ToArray())
         {
             if (f.Value.Count > 0)
             {

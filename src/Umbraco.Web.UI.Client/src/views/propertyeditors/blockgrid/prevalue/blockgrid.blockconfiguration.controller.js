@@ -41,8 +41,9 @@
     function BlockConfigurationController($scope, $element, $http, elementTypeResource, overlayService, localizationService, editorService, eventsService, udiService, dataTypeResource, umbRequestHelper) {
 
         var unsubscribe = [];
-        
+
         const vm = this;
+
         vm.openBlock = null;
         vm.showSampleDataCTA = false;
 
@@ -56,6 +57,7 @@
             if (blockGroupModel.value == null) {
                 blockGroupModel.value = [];
             }
+
             vm.blockGroups = blockGroupModel.value;
 
             if (!$scope.model.value) {
@@ -87,6 +89,7 @@
                 }
             }
         }
+
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
         function removeReferencesToElementTypeKey(contentElementTypeKey) {
@@ -111,22 +114,29 @@
             });
         }
 
-        vm.requestRemoveBlockByIndex = function (index) {
-            localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockTypeMessage", "blockEditor_confirmDeleteBlockTypeNotice"]).then(function (data) {
+        vm.requestRemoveBlockByIndex = function (index, event) {
+
+            const labelKeys = [
+              "general_delete",
+              "blockEditor_confirmDeleteBlockTypeMessage",
+              "blockEditor_confirmDeleteBlockTypeNotice"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(data => {
                 var contentElementType = vm.getElementTypeByKey($scope.model.value[index].contentElementTypeKey);
                 overlayService.confirmDelete({
                     title: data[0],
                     content: localizationService.tokenReplace(data[1], [contentElementType ? contentElementType.name : "(Unavailable ElementType)"]),
                     confirmMessage: data[2],
-                    close: function () {
-                        overlayService.close();
-                    },
-                    submit: function () {
+                    submit: () => {
                         vm.removeBlockByIndex(index);
                         overlayService.close();
-                    }
+                    },
+                    close: overlayService.close()
                 });
             });
+
+            event.stopPropagation();
         }
 
         vm.removeBlockByIndex = function (index) {
@@ -161,7 +171,7 @@
             placeholder: '--sortable-placeholder',
             forcePlaceHolderSize: true,
             stop: function(e, ui) {
-                if(ui.item.sortable.droptarget && ui.item.sortable.droptarget.length > 0) {
+                if (ui.item.sortable.droptarget && ui.item.sortable.droptarget.length > 0) {
                     // We do not want sortable to actually move the data, as we are using the same ng-model. Instead we just change the groupKey and cancel the transfering.
                     ui.item.sortable.model.groupKey = ui.item.sortable.droptarget[0].dataset.groupKey || null;
                     ui.item.sortable.cancel();
@@ -264,7 +274,7 @@
         vm.openBlockOverlay = function (block, openAreas) {
 
             var elementType = vm.getElementTypeByKey(block.contentElementTypeKey);
-            
+
             if (elementType) {
                 localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [elementType.name]).then(function (data) {
 
@@ -343,7 +353,7 @@
 
                             // Then remove group:
                             const groupIndex = vm.blockGroups.indexOf(blockGroup);
-                            if(groupIndex !== -1) {
+                            if (groupIndex !== -1) {
                                 vm.blockGroups.splice(groupIndex, 1);
                                 removeReferencesToGroupKey(blockGroup.key);
                             }
@@ -356,6 +366,7 @@
                 });
             }
         }
+
         dataTypeResource.getAll().then(function(dataTypes) {
             if (dataTypes.filter(x => x.alias === "Umbraco.BlockGrid").length === 0) {
                 vm.showSampleDataCTA = true;
@@ -371,7 +382,7 @@
 
                         const groupName = "Demo Blocks";
                         var sampleGroup =  vm.blockGroups.find(x => x.name === groupName);
-                        if(!sampleGroup) {
+                        if (!sampleGroup) {
                             sampleGroup = {
                                 key: String.CreateGuid(),
                                 name: groupName
@@ -390,6 +401,7 @@
                         initSampleBlock(data.umbBlockGridDemoHeadlineBlock, sampleGroup.key, {"label": "Headline ({{headline | truncate:true:36}})", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoHeadlineBlock.html"});
                         initSampleBlock(data.umbBlockGridDemoImageBlock, sampleGroup.key, {"label": "Image", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoImageBlock.html"});
                         initSampleBlock(data.umbBlockGridDemoRichTextBlock, sampleGroup.key, { "label": "Rich Text  ({{richText | ncRichText | truncate:true:36}})", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoRichTextBlock.html"});
+
                         const twoColumnLayoutAreas = [
                             {
                                 'key': String.CreateGuid(),
@@ -410,6 +422,7 @@
                                 'specifiedAllowance': []
                             }
                         ];
+                        
                         initSampleBlock(data.umbBlockGridDemoTwoColumnLayoutBlock, sampleGroup.key, {"label": "Two Column Layout", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoTwoColumnLayoutBlock.html", "allowInAreas": false, "areas": twoColumnLayoutAreas});
 
                         vm.showSampleDataCTA = false;

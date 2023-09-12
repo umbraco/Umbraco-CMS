@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
@@ -14,7 +15,6 @@ using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Macros;
 using Umbraco.Cms.Infrastructure.Templates;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -293,8 +293,10 @@ public class RichTextPropertyEditor : DataEditor
                 return null;
             }
 
+            var parseAndSaveBase64Images = _pastedImages.FindAndPersistEmbeddedImages(
+                editorValue.Value.ToString()!, mediaParentId, userId);
             var parseAndSavedTempImages =
-                _pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString()!, mediaParentId, userId, _imageUrlGenerator);
+                _pastedImages.FindAndPersistPastedTempImages(parseAndSaveBase64Images, mediaParentId, userId);
             var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
             var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
             var sanitized = _htmlSanitizer.Sanitize(parsed);
@@ -305,7 +307,7 @@ public class RichTextPropertyEditor : DataEditor
 
     internal class RichTextPropertyIndexValueFactory : IPropertyIndexValueFactory
     {
-        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
+        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published, IEnumerable<string> availableCultures)
         {
             var val = property.GetValue(culture, segment, published);
 
@@ -323,5 +325,9 @@ public class RichTextPropertyEditor : DataEditor
             yield return new KeyValuePair<string, IEnumerable<object?>>(
                 $"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new object[] { strVal });
         }
+
+        [Obsolete("Use the overload with the 'availableCultures' parameter instead, scheduled for removal in v14")]
+        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
+            => GetIndexValues(property, culture, segment, published, Enumerable.Empty<string>());
     }
 }

@@ -3,11 +3,14 @@ angular.module("umbraco")
     function ($scope, localizationService, $filter) {
 
         var unsubscribe = [];
-        var vm = this;
+        const vm = this;
 
         vm.navigation = [];
 
-        vm.filterSearchTerm = '';
+        vm.filter = {
+            searchTerm: ""
+        };
+
         vm.filteredItems = [];
 
         // Ensure groupKey value, as we need it to be present for the filtering logic.
@@ -15,11 +18,18 @@ angular.module("umbraco")
             item.blockConfigModel.groupKey = item.blockConfigModel.groupKey || null;
         });
 
-        unsubscribe.push($scope.$watch('vm.filterSearchTerm', updateFiltering));
+        unsubscribe.push($scope.$watch('vm.filter.searchTerm', updateFiltering));
 
         function updateFiltering() {
-            vm.filteredItems = $filter('umbCmsBlockCard')($scope.model.availableItems, vm.filterSearchTerm);
+            vm.filteredItems = $filter('umbCmsBlockCard')($scope.model.availableItems, vm.filter.searchTerm);
         }
+
+        vm.filterByGroup = function (group) {
+
+            const items = $filter('filter')(vm.filteredItems, { blockConfigModel: { groupKey: group?.key || null } });
+
+            return items;
+        };
 
         localizationService.localizeMany(["blockEditor_tabCreateEmpty", "blockEditor_tabClipboard"]).then(
             function (data) {
@@ -38,12 +48,16 @@ angular.module("umbraco")
                     "disabled": vm.model.clipboardItems.length === 0
                 }];
 
-                if (vm.model.openClipboard === true) {
+                if (vm.model.singleBlockMode === true && vm.model.openClipboard === true) {
+                    vm.navigation.splice(0,1);
+                    vm.activeTab = vm.navigation[0];
+                }
+                else if (vm.model.openClipboard === true) {
                     vm.activeTab = vm.navigation[1];
                 } else {
                     vm.activeTab = vm.navigation[0];
                 }
-
+                
                 vm.activeTab.active = true;
             }
         );
@@ -55,10 +69,17 @@ angular.module("umbraco")
         };
 
         vm.clickClearClipboard = function () {
-            vm.onNavigationChanged(vm.navigation[0]);
-            vm.navigation[1].disabled = true;// disabled ws determined when creating the navigation, so we need to update it here.
-            vm.model.clipboardItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
+            vm.model.clipboardItems = []; // This dialog is not connected via the clipboardService events, so we need to update manually.
             vm.model.clickClearClipboard();
+            
+            if (vm.model.singleBlockMode !== true && vm.model.openClipboard !== true)
+            {
+                vm.onNavigationChanged(vm.navigation[0]);
+                vm.navigation[1].disabled = true; // disabled ws determined when creating the navigation, so we need to update it here.
+            }
+            else {
+                vm.close();
+            }
         };
 
         vm.model = $scope.model;

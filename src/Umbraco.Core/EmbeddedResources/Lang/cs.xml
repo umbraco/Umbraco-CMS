@@ -1194,7 +1194,6 @@
   </area>
   <area alias="rollback">
     <key alias="headline">Vyberte verzi, kterou chcete porovnat s aktuální verzí</key>
-    <key alias="currentVersion">Současná verze</key>
     <key alias="diffHelp"><![CDATA[Tohle ukazuje rozdíly mezi současnou verzi a vybranou verzi<br /><del>Červený</del> text nebude ve vybrané verzi zobrazen, <ins>zelený znamená přidaný</ins>].]]></key>
     <key alias="documentRolledBack">Dokument byl vrácen na starší verzi</key>
     <key alias="htmlHelp">Tohle zobrazuje vybranou verzi jako html, jestliže chcete vidět rozdíly mezi 2 verzemi najednou, použijte rozdílové zobrazení</key>
@@ -1755,9 +1754,8 @@
     <key alias="usergroup">Uživatelská skupina</key>
     <key alias="userInvited">byl pozván</key>
     <key alias="userInvitedSuccessHelp">Novému uživateli byla zaslána pozvánka s informacemi, jak se přihlásit do Umbraco.</key>
-    <key alias="userinviteWelcomeMessage">Dobrý den, vítejte v Umbraco! Za pouhou 1 minutu budete moci používat Umbraco. Jenom od vás potřebujeme, abyste si nastavili heslo a přidali obrázek pro svůj avatar.</key>
+    <key alias="userinviteWelcomeMessage">Dobrý den, vítejte v Umbraco! Za pouhou 1 minutu budete moci používat Umbraco. Jenom od vás potřebujeme, abyste si nastavili heslo.</key>
     <key alias="userinviteExpiredMessage">Vítejte v Umbraco! Vaše pozvánka bohužel vypršela. Obraťte se na svého správce a požádejte jej, aby jí znovu odeslal.</key>
-    <key alias="userinviteAvatarMessage">Nahrání vaší fotografie usnadní ostatním uživatelům, aby vás poznali. Kliknutím na kruh výše nahrajte svou fotku.</key>
     <key alias="writer">Spisovatel</key>
     <key alias="change">Změnit</key>
     <key alias="yourProfile" version="7.0">Váš profil</key>
@@ -1870,8 +1868,8 @@
     <key alias="stateInactive">Neaktivní</key>
     <key alias="sortNameAscending">Jméno (A-Z)</key>
     <key alias="sortNameDescending">Jméno (Z-A)</key>
-    <key alias="sortCreateDateAscending">Nejnovější</key>
-    <key alias="sortCreateDateDescending">Nejstarší</key>
+    <key alias="sortCreateDateAscending">Nejstarší</key>
+    <key alias="sortCreateDateDescending">Nejnovější</key>
     <key alias="sortLastLoginDateDescending">Poslední přihlášení</key>
     <key alias="noUserGroupsAdded">Nebyly přidány žádné skupiny uživatelů</key>
   </area>

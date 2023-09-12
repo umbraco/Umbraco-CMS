@@ -1,5 +1,7 @@
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Dashboards;
+using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Routing;
@@ -61,6 +63,18 @@ public static partial class UmbracoBuilderExtensions
     }
 
     /// <summary>
+    /// Register a manifest filter
+    /// </summary>
+    /// <typeparam name="T">The type of the manifest filter.</typeparam>
+    /// <param name="builder">The Builder.</param>
+    public static IUmbracoBuilder AddManifestFilter<T>(this IUmbracoBuilder builder)
+        where T : class, IManifestFilter
+    {
+        builder.ManifestFilters().Append<T>();
+        return builder;
+    }
+
+    /// <summary>
     ///     Register a media url provider.
     /// </summary>
     /// <typeparam name="T">The type of the media url provider.</typeparam>
@@ -105,6 +119,18 @@ public static partial class UmbracoBuilderExtensions
         where T : class, IUrlProvider
     {
         builder.UrlProviders().Append<T>();
+        return builder;
+    }
+
+    /// <summary>
+    /// Add an IMapDefinition to the MapDefinitionCollectionBuilder
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="builder"></param>
+    /// <returns></returns>
+    public static IUmbracoBuilder AddMapDefinition<T>(this IUmbracoBuilder builder) where T : IMapDefinition
+    {
+        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<T>();
         return builder;
     }
 }

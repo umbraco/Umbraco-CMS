@@ -7,7 +7,7 @@ public class ExamineDashboard : IDashboard
 {
     public string Alias => "settingsExamine";
 
-    public string[] Sections => new[] { "settings" };
+    public string[] Sections => new[] { Constants.Applications.Settings };
 
     public string View => "views/dashboard/settings/examinemanagement.html";
 

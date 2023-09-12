@@ -1,4 +1,11 @@
-# [Umbraco CMS](https://umbraco.com) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE.md) [![Build status](https://umbraco.visualstudio.com/Umbraco%20Cms/_apis/build/status/Cms%208%20Continuous?branchName=v8/contrib)](https://umbraco.visualstudio.com/Umbraco%20Cms/_build?definitionId=75) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) [![Twitter](https://img.shields.io/twitter/follow/umbraco.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=umbraco) [![Discord](https://img.shields.io/discord/869656431308189746)](https://discord.gg/umbraco) [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=v11%2Fcontrib&repo=10601208&machine=basicLinux32gb&devcontainer_path=.devcontainer%2Fdevcontainer.json&location=WestEurope)
+# [Umbraco CMS](https://umbraco.com)
+
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE.md) 
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) 
+[![Follow Umbraco on Twitter](https://img.shields.io/badge/Follow-blue?logo=twitter&logoColor=fff)](https://twitter.com/intent/follow?screen_name=umbraco) 
+[![Chat about Umbraco on Discord](https://img.shields.io/discord/869656431308189746?logo=discord&logoColor=fff)](https://discord.gg/umbraco) 
+[![Build status](https://img.shields.io/azure-devops/build/umbraco/Umbraco%2520Cms/301?logo=azurepipelines&label=Azure%20Pipelines)](https://umbraco.visualstudio.com/Umbraco%20Cms/_build?definitionId=301) 
+[![Open in GitHub Codespaces](https://img.shields.io/badge/Open%20in%20GitHub%20Codespaces-525252?logo=github)](https://github.com/codespaces/new?hide_repo_select=true&ref=contrib&repo=10601208&machine=basicLinux32gb&devcontainer_path=.devcontainer%2Fdevcontainer.json&location=WestEurope)
 
 Umbraco is the friendliest, most flexible and fastest growing ASP.NET CMS, and used by more than 500,000 websites worldwide. Our mission is to help you deliver delightful digital experiences by making Umbraco friendly, simpler and social.
 

@@ -180,6 +180,7 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var l = (List<string>)base.GetDeleteClauses(); // we know it's a list
+        l.Add("DELETE FROM umbracoContentVersionCleanupPolicy WHERE contentTypeId = @id");
         l.Add("DELETE FROM cmsDocumentType WHERE contentTypeNodeId = @id");
         l.Add("DELETE FROM cmsContentType WHERE nodeId = @id");
         l.Add("DELETE FROM umbracoNode WHERE id = @id");

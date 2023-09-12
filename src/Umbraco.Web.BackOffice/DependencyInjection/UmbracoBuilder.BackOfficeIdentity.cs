@@ -11,7 +11,9 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
+using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
 using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.BackOffice.Telemetry;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.Security;
 
@@ -65,6 +67,7 @@ public static partial class UmbracoBuilderExtensions
         services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
         services.TryAddSingleton<IBackOfficeExternalLoginProviders, BackOfficeExternalLoginProviders>();
         services.TryAddSingleton<IBackOfficeTwoFactorOptions, DefaultBackOfficeTwoFactorOptions>();
+        services.AddTransient<IDetailedTelemetryProvider, ExternalLoginTelemetryProvider>();
 
         return new BackOfficeIdentityBuilder(services);
     }

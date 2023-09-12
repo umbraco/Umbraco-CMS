@@ -32,16 +32,16 @@ angular.module("umbraco.directives")
             tree: '=',
             isDialog: '='
         },
-        
+
         link: function (scope, element, attrs, umbTreeCtrl) {
             localizationService.localizeMany(["general_search", "visuallyHiddenTexts_openContextMenu"]).then(function (value) {
                 scope.searchAltText = value[0];
                 scope.optionsText = value[1];
             });
-            
+
             // updates the node's DOM/styles
             function setupNodeDom(node, tree) {
-                
+
                 //get the first div element
                 element.children(":first")
                     //set the padding
@@ -61,14 +61,14 @@ angular.module("umbraco.directives")
                 if (!node) {
                     return '';
                 }
-                
+
                 // TODO: This is called constantly because as a method in a template it's re-evaluated pretty much all the time
                 // it would be better if we could cache the processing. The problem is that some of these things are dynamic.
 
                 //is this the current action node (this is not the same as the current selected node!)
                 var actionNode = appState.getMenuState("currentNode");
-                
-                var css = [];                
+
+                var css = [];
                 if (node.cssClasses) {
                     node.cssClasses.forEach(c => css.push(c));
                 }
@@ -94,8 +94,8 @@ angular.module("umbraco.directives")
                     if (actionNode.id === node.id && String(node.id) !== "-1") {
                         css.push("active");
                     }
-                    
-                    // special handling of root nodes with id -1 
+
+                    // special handling of root nodes with id -1
                     // as there can be many nodes with id -1 in a tree we need to check the treeAlias instead
                     if (String(node.id) === "-1" && actionNode.metaData.treeAlias === node.metaData.treeAlias) {
                         css.push("active");
@@ -125,7 +125,7 @@ angular.module("umbraco.directives")
             };
 
             /**
-              Method called when an item is clicked in the tree, this passes the 
+              Method called when an item is clicked in the tree, this passes the
               DOM element, the tree node object and the original click
               and emits it as a treeNodeSelect element if there is a callback object
               defined on the tree
@@ -149,7 +149,7 @@ angular.module("umbraco.directives")
             };
 
             /**
-              Method called when an item is right-clicked in the tree, this passes the 
+              Method called when an item is right-clicked in the tree, this passes the
               DOM element, the tree node object and the original click
               and emits it as a treeNodeSelect element if there is a callback object
               defined on the tree
@@ -158,13 +158,17 @@ angular.module("umbraco.directives")
                 if(ev.altKey) return false;
                 umbTreeCtrl.emitEvent("treeNodeAltSelect", { element: element, tree: scope.tree, node: n, event: ev });
             };
-            
+
             /**
               Method called when a node in the tree is expanded, when clicking the arrow
               takes the arrow DOM element and node data as parameters
               emits treeNodeCollapsing event if already expanded and treeNodeExpanding if collapsed
             */
-            scope.load = function (node) {
+            scope.load = function (node, ev) {
+                if(ev){
+                          ev.stopPropagation();
+                }
+
                 if (node.expanded && !node.metaData.isContainer) {
                     umbTreeCtrl.emitEvent("treeNodeCollapsing", { tree: scope.tree, node: node, element: element });
                     node.expanded = false;
@@ -199,7 +203,7 @@ angular.module("umbraco.directives")
             }));
 
             // Update tree icon if changed
-            evts.push(eventsService.on("editors.tree.icon.changed", function (e, args) {          
+            evts.push(eventsService.on("editors.tree.icon.changed", function (e, args) {
                 if (args.icon !== scope.node.icon && args.id === scope.node.id) {
                     scope.node.icon = args.icon;
                 }

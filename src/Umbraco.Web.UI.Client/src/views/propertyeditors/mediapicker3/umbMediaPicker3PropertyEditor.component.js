@@ -29,7 +29,7 @@
             }
         });
 
-    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs, umbRequestHelper, $injector, uploadTracker) {
+    function MediaPicker3Controller($scope, $element, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs, umbRequestHelper, $injector, uploadTracker, editorState) {
 
         const mediaUploader = $injector.instantiate(Utilities.MediaUploader);
         let uploadInProgress = false;
@@ -50,6 +50,7 @@
         vm.allowAddMedia = true;
         vm.allowRemoveMedia = true;
         vm.allowEditMedia = true;
+        vm.allowDropMedia = true;
 
         vm.handleFiles = handleFiles;
 
@@ -74,14 +75,23 @@
             vm.allowAddMedia = !vm.readonly;
             vm.allowRemoveMedia = !vm.readonly;
             vm.allowEditMedia = !vm.readonly;
+            vm.allowDropMedia = !vm.readonly;
 
-            vm.sortableOptions.disabled = vm.readonly;
+            vm.sortableOptions.disabled = vm.readonly || vm.singleMode;
         });
 
         vm.$onInit = function() {
+            vm.node = vm.node || editorState.getCurrent();
+
+            // If we do not have a node on the scope, then disallow drop media
+            if (!vm.node?.key) {
+              console.warn('An Umbraco.MediaPicker3 did not detect a valid content node and disabled drag & drop.', $element[0]);
+              vm.allowDropMedia = false;
+            }
+
             vm.validationLimit = vm.model.config.validationLimit || {};
             // If single-mode we only allow 1 item as the maximum:
-            if(vm.model.config.multiple === false) {
+            if (vm.model.config.multiple === false) {
                 vm.validationLimit.max = 1;
             }
             vm.model.config.crops = vm.model.config.crops || [];
@@ -98,6 +108,20 @@
             unsubscribe.push(mediaUploader.on('queueStarted', _handleMediaQueueStarted));
             unsubscribe.push(mediaUploader.on('uploadSuccess', _handleMediaUploadSuccess));
             unsubscribe.push(mediaUploader.on('queueCompleted', _handleMediaQueueCompleted));
+
+            vm.sortableOptions = {
+                cursor: "grabbing",
+                handle: "umb-media-card, .umb-media-card",
+                cancel: "input,textarea,select,option",
+                classes: ".umb-media-card--dragging",
+                distance: 5,
+                tolerance: "pointer",
+                scroll: true,
+                disabled: vm.readonly || vm.singleMode,
+                update: function (ev, ui) {
+                  setDirty();
+                }
+            };
 
             copyAllMediasAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
@@ -127,7 +151,7 @@
                 vm.umbProperty.setPropertyActions(propertyActions);
             }
 
-            if(vm.model.value === null || !Array.isArray(vm.model.value)) {
+            if (vm.model.value === null || !Array.isArray(vm.model.value)) {
                 vm.model.value = [];
             }
 
@@ -221,7 +245,7 @@
         function addMediaAt(createIndex, $event) {
             if (!vm.allowAddMedia) return;
 
-            var mediaPicker = {
+            const mediaPicker = {
                 startNodeId: vm.model.config.startNodeId,
                 startNodeIsVirtual: vm.model.config.startNodeIsVirtual,
                 dataTypeKey: vm.model.dataTypeKey,
@@ -238,7 +262,7 @@
                     } else {
                         requestPasteFromClipboard(createIndex, item.data, item.type);
                     }
-                    if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
+                    if (!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         mediaPicker.close();
                     }
                 },
@@ -271,7 +295,7 @@
             };
 
             mediaPicker.clipboardItems = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.MEDIA, vm.allowedTypes || null);
-            mediaPicker.clipboardItems.sort( (a, b) => {
+            mediaPicker.clipboardItems.sort((a, b) => {
                 return b.date - a.date
             });
 
@@ -382,7 +406,7 @@
             // make a clone to avoid editing model directly.
             var mediaEntryClone = Utilities.copy(mediaEntry);
 
-            var mediaEditorModel = {
+            const mediaEditorModel = {
                 $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
                 $parentForm: vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 createFlow: options.createFlow === true,
@@ -491,20 +515,6 @@
                 });
             });
         }
-
-        vm.sortableOptions = {
-            cursor: "grabbing",
-            handle: "umb-media-card, .umb-media-card",
-            cancel: "input,textarea,select,option",
-            classes: ".umb-media-card--dragging",
-            distance: 5,
-            tolerance: "pointer",
-            scroll: true,
-            disabled: vm.readonly,
-            update: function (ev, ui) {
-                setDirty();
-            }
-        };
 
         function onAmountOfMediaChanged() {
 

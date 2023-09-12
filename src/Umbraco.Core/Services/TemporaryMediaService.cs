@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Strings;
@@ -20,6 +22,8 @@ public class TemporaryMediaService : ITemporaryMediaService
     private readonly IHostEnvironment _hostingEnvironment;
     private readonly ILogger<TemporaryMediaService> _logger;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IEntityService _entityService;
+    private readonly AppCaches _appCaches;
 
     public TemporaryMediaService(
         IShortStringHelper shortStringHelper,
@@ -29,7 +33,9 @@ public class TemporaryMediaService : ITemporaryMediaService
         IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
         IHostEnvironment hostingEnvironment,
         ILogger<TemporaryMediaService> logger,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IEntityService entityService,
+        AppCaches appCaches)
     {
         _shortStringHelper = shortStringHelper;
         _mediaFileManager = mediaFileManager;
@@ -39,21 +45,26 @@ public class TemporaryMediaService : ITemporaryMediaService
         _hostingEnvironment = hostingEnvironment;
         _logger = logger;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _entityService = entityService;
+        _appCaches = appCaches;
     }
 
     public IMedia Save(string temporaryLocation, Guid? startNode, string? mediaTypeAlias)
     {
-        var userId = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
+        IUser? user = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
+        int userId = user?.Id ?? Constants.Security.SuperUserId;
         var absoluteTempImagePath = _hostingEnvironment.MapPathContentRoot(temporaryLocation);
         var fileName = Path.GetFileName(absoluteTempImagePath);
         var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
-
         var mediaItemName = safeFileName.ToFriendlyName();
 
         IMedia mediaFile;
+
         if (startNode is null)
         {
-            mediaFile = _mediaService.CreateMedia(mediaItemName, Constants.System.Root, mediaTypeAlias ?? Constants.Conventions.MediaTypes.File, userId);
+            int[]? userStartNodes = user?.CalculateMediaStartNodeIds(_entityService, _appCaches);
+
+            mediaFile = _mediaService.CreateMedia(mediaItemName, userStartNodes != null && userStartNodes.Any() ? userStartNodes[0] : Constants.System.Root, mediaTypeAlias ?? Constants.Conventions.MediaTypes.File, userId);
         }
         else
         {

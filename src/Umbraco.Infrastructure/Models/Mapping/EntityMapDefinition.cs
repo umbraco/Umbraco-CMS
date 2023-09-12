@@ -14,6 +14,7 @@ public class EntityMapDefinition : IMapDefinition
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IEntitySlim, EntityBasic>((source, context) => new EntityBasic(), Map);
+        mapper.Define<IPropertyType, EntityBasic>((source, context) => new EntityBasic(), Map);
         mapper.Define<PropertyType, EntityBasic>((source, context) => new EntityBasic(), Map);
         mapper.Define<PropertyGroup, EntityBasic>((source, context) => new EntityBasic(), Map);
         mapper.Define<IUser, EntityBasic>((source, context) => new EntityBasic(), Map);
@@ -77,7 +78,7 @@ public class EntityMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll -Udi -Trashed
-    private static void Map(PropertyType source, EntityBasic target, MapperContext context)
+    private static void Map(IPropertyType source, EntityBasic target, MapperContext context)
     {
         target.Alias = source.Alias;
         target.Icon = "icon-box";
@@ -274,6 +275,11 @@ public class EntityMapDefinition : IMapDefinition
         if (source.Values.ContainsKey(ExamineFieldNames.ItemTypeFieldName))
         {
             target.AdditionalData.Add("contentType", source.Values[ExamineFieldNames.ItemTypeFieldName]);
+        }
+
+        if (source.Values.ContainsKey(UmbracoExamineFieldNames.PublishedFieldName))
+        {
+            target.AdditionalData.Add("published", string.Equals(source.Values[UmbracoExamineFieldNames.PublishedFieldName], "y", StringComparison.InvariantCultureIgnoreCase));
         }
     }
 

@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
@@ -106,7 +105,9 @@ public class UmbracoContentValueSetValidatorTests
             "test-content",
             new { hello = "world", path = "-1,555", world = "your oyster" });
         var result = validator.Validate(valueSet);
-        Assert.AreEqual(ValueSetValidationStatus.Filtered, result.Status);
+
+        // Note - Result is still valid, excluded is not the same as filtered.
+        Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
 
         Assert.IsFalse(result.ValueSet.Values.ContainsKey("path"));
         Assert.IsTrue(result.ValueSet.Values.ContainsKey("hello"));
@@ -128,7 +129,9 @@ public class UmbracoContentValueSetValidatorTests
             "test-content",
             new { hello = "world", path = "-1,555", world = "your oyster" });
         var result = validator.Validate(valueSet);
-        Assert.AreEqual(ValueSetValidationStatus.Filtered, result.Status);
+
+        // Note - Result is still valid, excluded is not the same as filtered.
+        Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
 
         Assert.IsTrue(result.ValueSet.Values.ContainsKey("path"));
         Assert.IsFalse(result.ValueSet.Values.ContainsKey("hello"));
@@ -150,7 +153,9 @@ public class UmbracoContentValueSetValidatorTests
             "test-content",
             new { hello = "world", path = "-1,555", world = "your oyster" });
         var result = validator.Validate(valueSet);
-        Assert.AreEqual(ValueSetValidationStatus.Filtered, result.Status);
+
+        // Note - Result is still valid, excluded is not the same as filtered.
+        Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
 
         Assert.IsFalse(result.ValueSet.Values.ContainsKey("path"));
         Assert.IsTrue(result.ValueSet.Values.ContainsKey("hello"));
@@ -416,7 +421,9 @@ public class UmbracoContentValueSetValidatorTests
         Assert.IsTrue(valueSet.Values.ContainsKey("title_es-ES"));
 
         result = validator.Validate(valueSet);
-        Assert.AreEqual(ValueSetValidationStatus.Filtered, result.Status);
+
+        // Note - Result is still valid, excluded is not the same as filtered.
+        Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
 
         Assert.AreEqual(7, result.ValueSet.Values.Count()); // filtered to 7 values (removes es-es values)
         Assert.IsFalse(result.ValueSet.Values.ContainsKey($"{UmbracoExamineFieldNames.PublishedFieldName}_es-es"));
