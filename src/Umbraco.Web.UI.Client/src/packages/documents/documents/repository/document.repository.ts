@@ -115,18 +115,6 @@ export class UmbDocumentRepository
 		return this.#detailDataSource.getAllowedDocumentTypesOf(id);
 	}
 
-	async requestItemsLegacy(ids: Array<string>) {
-		await this.#init;
-
-		if (!ids) {
-			throw new Error('Ids are missing');
-		}
-
-		const { data, error } = await this.#treeSource.getItems(ids);
-
-		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
-	}
-
 	async rootTreeItems() {
 		await this.#init;
 		return this.#treeStore!.rootItems;
@@ -135,11 +123,6 @@ export class UmbDocumentRepository
 	async treeItemsOf(parentId: string | null) {
 		await this.#init;
 		return this.#treeStore!.childrenOf(parentId);
-	}
-
-	async itemsLegacy(ids: Array<string>) {
-		await this.#init;
-		return this.#treeStore!.items(ids);
 	}
 
 	// ITEMS:
