@@ -23,6 +23,8 @@ public static partial class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddDistributedCache(this IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<LastSyncedFileManager>();
+        builder.Services.AddSingleton<ILastSyncedManager, LastSyncedDatabaseManager>();
+        builder.Services.AddSingleton<ILastSyncedDatabaseRepository, LastSyncedDatabaseRepository>();
         builder.Services.AddSingleton<ISyncBootStateAccessor, SyncBootStateAccessor>();
         builder.SetServerMessenger<BatchedDatabaseServerMessenger>();
 builder.AddNotificationHandler<UmbracoApplicationStartingNotification, DatabaseServerMessengerNotificationHandler>();

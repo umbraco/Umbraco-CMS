@@ -21,7 +21,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly Lazy<SyncBootState?> _initialized;
-    private readonly LastSyncedFileManager _lastSyncedFileManager;
+    private readonly ILastSyncedManager _lastSyncedManager;
 
     private readonly object _locko = new();
     /*
@@ -39,6 +39,25 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     private DateTime _lastSync;
     private bool _syncing;
 
+    [Obsolete("Use non-obsolete ctor. This will be removed in Umbraco 13.")]
+    protected DatabaseServerMessenger(
+        IMainDom mainDom,
+        CacheRefresherCollection cacheRefreshers,
+        IServerRoleAccessor serverRoleAccessor,
+        ILogger<DatabaseServerMessenger> logger,
+        bool distributedEnabled,
+        ISyncBootStateAccessor syncBootStateAccessor,
+        IHostingEnvironment hostingEnvironment,
+        ICacheInstructionService cacheInstructionService,
+        IJsonSerializer jsonSerializer,
+        LastSyncedFileManager lastSyncedFileManager,
+        IOptionsMonitor<GlobalSettings> globalSettings)
+    : this(mainDom, cacheRefreshers, serverRoleAccessor, logger, distributedEnabled, syncBootStateAccessor, hostingEnvironment, cacheInstructionService, jsonSerializer, (ILastSyncedManager)lastSyncedFileManager, globalSettings)
+    {
+
+    }
+
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="DatabaseServerMessenger" /> class.
     /// </summary>
@@ -52,7 +71,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         IHostingEnvironment hostingEnvironment,
         ICacheInstructionService cacheInstructionService,
         IJsonSerializer jsonSerializer,
-        LastSyncedFileManager lastSyncedFileManager,
+        ILastSyncedManager lastSyncedManager,
         IOptionsMonitor<GlobalSettings> globalSettings)
         : base(distributedEnabled)
     {
@@ -65,7 +84,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         _syncBootStateAccessor = syncBootStateAccessor;
         CacheInstructionService = cacheInstructionService;
         JsonSerializer = jsonSerializer;
-        _lastSyncedFileManager = lastSyncedFileManager;
+        _lastSyncedManager = lastSyncedManager;
         GlobalSettings = globalSettings.CurrentValue;
         _lastPruned = _lastSync = DateTime.UtcNow;
         _syncIdle = new ManualResetEvent(true);
@@ -150,7 +169,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
                 _cancellationToken,
                 LocalIdentity,
                 _lastPruned,
-                _lastSyncedFileManager.LastSyncedId);
+                _lastSyncedManager.LastSyncedId);
 
             if (result.InstructionsWerePruned)
             {
@@ -159,7 +178,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
 
             if (result.LastId > 0)
             {
-                _lastSyncedFileManager.SaveLastSyncedId(result.LastId);
+                _lastSyncedManager.SaveLastSyncedId(result.LastId);
             }
         }
         finally
@@ -284,9 +303,9 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
                 var maxId = CacheInstructionService.GetMaxInstructionId();
 
                 // if there is a max currently, or if we've never synced
-                if (maxId > 0 || _lastSyncedFileManager.LastSyncedId < 0)
+                if (maxId > 0 || _lastSyncedManager.LastSyncedId < 0)
                 {
-                    _lastSyncedFileManager.SaveLastSyncedId(maxId);
+                    _lastSyncedManager.SaveLastSyncedId(maxId);
                 }
             }
 

@@ -640,7 +640,12 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
 
     private string GetLocalFilesPath()
     {
-        var path = Path.Combine(_hostingEnvironment.LocalTempPath, "NuCache");
+
+        var path = string.IsNullOrEmpty(_config.FolderPath)
+            ? Path.Combine(_hostingEnvironment.LocalTempPath, "NuCache")
+            : _config.FolderPath.IsFullPath()
+                ? _config.FolderPath
+                : _hostingEnvironment.MapPathContentRoot(_config.FolderPath);
 
         if (!Directory.Exists(path))
         {

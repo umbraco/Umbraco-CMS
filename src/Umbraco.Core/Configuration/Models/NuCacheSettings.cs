@@ -40,4 +40,9 @@ public class NuCacheSettings
     public int KitBatchSize { get; set; } = StaticKitBatchSize;
 
     public bool UnPublishedContentCompression { get; set; } = false;
+
+    /// <summary>
+    ///     The folder to save the NuCache Files in. If not set, it will be saved in the configured (_hostingEnvironment.LocalTempPath) temp folder.
+    /// </summary>
+    public string? FolderPath { get; set; } = null;
 }
