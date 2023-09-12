@@ -11,7 +11,7 @@
         submit(model) {
           // sets $scope.model.contentType to model.selection[0]
           [$scope.model.contentType] = model.selection;
-          $scope.model.webhook.contentType = $scope.model.contentType.id;
+          $scope.model.webhook.entityKeys = [$scope.model.contentType.key];
           editorService.close();
         },
         close() {
@@ -21,7 +21,7 @@
     };
 
     this.clearContentType = () => {
-      delete $scope.model.webhook.contentType;
+      delete $scope.model.webhook.entityKeys;
       delete $scope.model.contentType;
     };
 

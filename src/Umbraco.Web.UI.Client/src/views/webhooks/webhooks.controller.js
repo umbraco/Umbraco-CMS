@@ -1,7 +1,7 @@
 ﻿(function () {
   "use strict";
 
-  function WebhookController($q, webhooksResource, notificationsService, editorService, overlayService) {
+  function WebhookController($q, webhooksResource, notificationsService, editorService, overlayService, contentTypeResource) {
     var vm = this;
 
     vm.openWebhookOverlay = openWebhookOverlay;
