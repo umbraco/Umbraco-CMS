@@ -1,5 +1,6 @@
 export * from './repository/index.js';
 export * from './workspace/index.js';
+export * from './recycle-bin/index.js';
 
 import './components/index.js';
 
