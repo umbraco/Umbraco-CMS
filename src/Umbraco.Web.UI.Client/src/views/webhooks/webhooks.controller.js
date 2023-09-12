@@ -126,7 +126,7 @@
         submitButtonStyle: 'danger',
         closeButtonLabel: 'Cancel',
         submit: () => {
-          webhooksResource.deleteById(webhook.id)
+          webhooksResource.delete(webhook.key)
             .then(() => {
               const index = this.webhooks.indexOf(webhook);
               this.webhooks.splice(index, 1);
