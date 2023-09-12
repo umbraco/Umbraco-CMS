@@ -1098,7 +1098,7 @@ public class ContentService : RepositoryService, IContentService
                 new ContentTreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
 
             string contentIds = string.Join(", ", contentsA.Select(x => x.Id));
-            Audit(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items ({contentIds})");
+            Audit(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items (#{contentIds.Length})");
 
             scope.Complete();
         }
