@@ -1967,6 +1967,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   </area>
   <area alias="webhooks">
     <key alias="addWebhook">Create webhook</key>
+    <key alias="logs">Logs</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>

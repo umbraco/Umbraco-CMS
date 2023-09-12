@@ -1,0 +1,156 @@
+﻿(function () {
+  "use strict";
+
+  function WebhookController($q, webhooksResource, notificationsService, editorService, overlayService) {
+    var vm = this;
+
+    vm.openWebhookOverlay = openWebhookOverlay;
+    vm.deleteWebhook = deleteWebhook;
+    vm.handleSubmissionError = handleSubmissionError;
+
+    vm.pagination = {
+      pageNumber: 1,
+      pageSize: 25
+    };
+
+    vm.page = {};
+    vm.webhooks = [];
+    vm.events = [];
+
+
+
+    function loadEvents (){
+      return webhooksResource.getAllEvents()
+        .then((data) => {
+          vm.events = data;
+        });
+    }
+
+    function handleSubmissionError (model, errorMessage) {
+      notificationsService.error(errorMessage);
+      model.disableSubmitButton = false;
+      model.submitButtonState = 'error';
+    }
+
+    function openWebhookOverlay (webhook) {
+      let isCreating = !webhook;
+      editorService.open({
+        title: webhook ? 'Edit webhook' : 'Add webhook',
+        position: 'right',
+        size: 'small',
+        submitButtonLabel: webhook ? 'Save' : 'Create',
+        view: "./overlays/edit.html",
+        events: vm.events,
+        contentType: webhook ? webhook.contentType : null,
+        webhook: webhook ? {
+          contentType: webhook.contentType ? webhook.contentType.id : null,
+          enabled: webhook.enabled,
+          event: webhook.event.id,
+          id: webhook.id,
+          url: webhook.url
+        } : {enabled: true},
+        submit: (model) => {
+          model.disableSubmitButton = true;
+          model.submitButtonState = 'busy';
+          if (!model.webhook.url) {
+            //Due to validation url will only be populated if it's valid, hence we can make do with checking url is there
+            handleSubmissionError(model, 'Please provide a valid URL. Did you include https:// ?');
+            return;
+          }
+          if (!model.webhook.event) {
+            handleSubmissionError(model, 'Please provide the event for which the webhook should trigger');
+            return;
+          }
+          if(isCreating){
+            webhooksResource.create(model.webhook)
+              .then(() => {
+                this.goToPage(1);
+
+                notificationsService.success('Webhook saved.');
+                editorService.close();
+              }, x => {
+                let errorMessage = undefined;
+                if (x.data.ModelState) {
+                  errorMessage = `Message: ${Object.values(x.data.ModelState).flat().join(' ')}`;
+                }
+                handleSubmissionError(model, `Error saving webhook. ${errorMessage ?? ''}`);
+              });
+          }
+          else{
+            webhooksResource.update(model.webhook)
+              .then(() => {
+                this.goToPage(1);
+
+                notificationsService.success('Webhook saved.');
+                editorService.close();
+              }, x => {
+                let errorMessage = undefined;
+                if (x.data.ModelState) {
+                  errorMessage = `Message: ${Object.values(x.data.ModelState).flat().join(' ')}`;
+                }
+                handleSubmissionError(model, `Error saving webhook. ${errorMessage ?? ''}`);
+              });
+          }
+
+        },
+        close: () => {
+          editorService.close();
+        }
+      });
+    }
+
+    function loadWebhooks(){
+      console.log("Loading webhooks!")
+      const webhooks = webhooksResource
+        .getAll(vm.pagination.pageNumber, vm.pagination.pageSize)
+        .then((result) => {
+          vm.webhooks = result;
+
+          vm.pagination.pageNumber = result.pageNumber;
+          vm.pagination.totalItems = result.totalItems;
+          vm.pagination.totalPages = result.totalPages;
+        });
+      console.log(webhooks)
+      return webhooks;
+    }
+
+    function deleteWebhook (webhook) {
+      overlayService.open({
+        title: 'Confirm delete webhook',
+        content: 'Are you sure you want to delete the webhook?',
+        submitButtonLabel: 'Yes, delete',
+        submitButtonStyle: 'danger',
+        closeButtonLabel: 'Cancel',
+        submit: () => {
+          webhooksResource.deleteById(webhook.id)
+            .then(() => {
+              const index = this.webhooks.indexOf(webhook);
+              this.webhooks.splice(index, 1);
+
+              notificationsService.success('Webhook deleted.');
+              overlayService.close();
+            }, () => {
+              notificationsService.error('Error deleting webhook.');
+            });
+        },
+        close: () => {
+          overlayService.close();
+        }
+      });
+    }
+
+    vm.previousPage = () => goToPage(vm.pagination.pageNumber - 1);
+    vm.nextPage = () => goToPage(vm.pagination.pageNumber + 1);
+
+    vm.goToPage = (pageNumber) => {
+      vm.pagination.pageNumber = pageNumber;
+      loadWebhooks()
+    };
+
+    loadWebhooks()
+    loadEvents()
+  }
+
+  angular.module("umbraco").controller("Umbraco.Editors.Webhooks.WebhookController", WebhookController);
+
+})();
