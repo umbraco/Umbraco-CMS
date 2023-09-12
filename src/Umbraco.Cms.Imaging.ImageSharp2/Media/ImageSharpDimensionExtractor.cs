@@ -1,4 +1,5 @@
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using Umbraco.Cms.Core.Media;
 using Size = System.Drawing.Size;
@@ -7,7 +8,7 @@ namespace Umbraco.Cms.Imaging.ImageSharp.Media;
 
 public sealed class ImageSharpDimensionExtractor : IImageDimensionExtractor
 {
-    private readonly Configuration _configuration;
+    private readonly DecoderOptions _decoderOptions;
 
     /// <inheritdoc />
     public IEnumerable<string> SupportedImageFileTypes { get; }
@@ -15,12 +16,12 @@ public sealed class ImageSharpDimensionExtractor : IImageDimensionExtractor
     /// <summary>
     /// Initializes a new instance of the <see cref="ImageSharpDimensionExtractor" /> class.
     /// </summary>
-    /// <param name="configuration">The configuration.</param>
-    public ImageSharpDimensionExtractor(Configuration configuration)
+    /// <param name="decoderOptions">The configuration.</param>
+    public ImageSharpDimensionExtractor(DecoderOptions decoderOptions)
     {
-        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        _decoderOptions = decoderOptions ?? throw new ArgumentNullException(nameof(decoderOptions));
 
-        SupportedImageFileTypes = configuration.ImageFormats.SelectMany(f => f.FileExtensions).ToArray();
+        SupportedImageFileTypes = decoderOptions.Configuration.ImageFormats.SelectMany(f => f.FileExtensions).ToArray();
     }
 
     /// <inheritdoc />
@@ -28,7 +29,12 @@ public sealed class ImageSharpDimensionExtractor : IImageDimensionExtractor
     {
         Size? size = null;
 
-        IImageInfo imageInfo = Image.Identify(_configuration, stream);
+        if (stream == null)
+        {
+            return size;
+        }
+
+        ImageInfo imageInfo = Image.Identify(_decoderOptions, stream);
         if (imageInfo != null)
         {
             size = IsExifOrientationRotated(imageInfo)
@@ -39,7 +45,7 @@ public sealed class ImageSharpDimensionExtractor : IImageDimensionExtractor
         return size;
     }
 
-    private static bool IsExifOrientationRotated(IImageInfo imageInfo)
+    private static bool IsExifOrientationRotated(ImageInfo imageInfo)
         => GetExifOrientation(imageInfo) switch
         {
             ExifOrientationMode.LeftTop
@@ -49,10 +55,10 @@ public sealed class ImageSharpDimensionExtractor : IImageDimensionExtractor
             _ => false,
         };
 
-    private static ushort GetExifOrientation(IImageInfo imageInfo)
+    private static ushort GetExifOrientation(ImageInfo imageInfo)
     {
-        IExifValue<ushort>? orientation = imageInfo.Metadata.ExifProfile?.GetValue(ExifTag.Orientation);
-        if (orientation is not null)
+
+        if(imageInfo.Metadata.ExifProfile != null && imageInfo.Metadata.ExifProfile.TryGetValue(ExifTag.Orientation, out IExifValue<ushort>? orientation))
         {
             if (orientation.DataType == ExifDataType.Short)
             {
