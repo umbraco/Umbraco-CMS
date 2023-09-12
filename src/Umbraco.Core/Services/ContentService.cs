@@ -2172,7 +2172,7 @@ public class ContentService : RepositoryService, IContentService
             if (rootResult?.Success is true)
             {
                 scope.Notifications.Publish(
-                    new ContentPublishedNotification(rootResult!.Content!, eventMessages, true)
+                    new ContentPublishedNotification(rootResult!.Content!.Yield(), eventMessages, true)
                         .WithState(rootPublishNotificationState));
             }
 
