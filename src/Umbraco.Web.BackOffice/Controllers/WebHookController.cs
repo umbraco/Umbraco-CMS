@@ -2,12 +2,11 @@
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Models;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
-public class WebHookController : UmbracoApiController
+public class WebHookController : UmbracoAuthorizedJsonController
 {
     private readonly IWebHookService _webHookService;
     private readonly IUmbracoMapper _umbracoMapper;
