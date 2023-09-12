@@ -13,14 +13,6 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(trashed));
 	}),
 
-	rest.get(umbracoPath('/tree/document/item'), (req, res, ctx) => {
-		const ids = req.url.searchParams.getAll('id');
-		if (!ids) return;
-		const items = umbDocumentData.getTreeItem(ids);
-
-		return res(ctx.status(200), ctx.json(items));
-	}),
-
 	rest.get(umbracoPath('/document/root/allowed-document-types'), (req, res, ctx) => {
 		const response = umbDocumentData.getAllowedDocumentTypesAtRoot();
 
