@@ -16,7 +16,7 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithDetail("A notification handler prevented the content operation.")
                 .Build()),
             ContentEditingOperationStatus.ContentTypeNotFound => NotFound(new ProblemDetailsBuilder()
-                .WithTitle("Cancelled by notification")
+                .WithTitle("The requested content could not be found")
                 .Build()),
             ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Content type culture variance mismatch")
@@ -69,7 +69,9 @@ public class ContentControllerBase : ManagementApiControllerBase
     protected IActionResult ContentPublishingOperationStatusResult(ContentPublishingOperationStatus status) =>
         status switch
         {
-            ContentPublishingOperationStatus.ContentNotFound => NotFound("The content type could not be found"),
+            ContentPublishingOperationStatus.ContentNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("The requested content could not be found")
+                .Build()),
             ContentPublishingOperationStatus.CancelledByEvent => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Publish cancelled by event")
                 .WithDetail("The publish operation was cancelled by an event.")

@@ -24,7 +24,6 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    // TODO: ensure we return a ProblemDetails response model for NotFound
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PublishWithDescendants(Guid id, PublishDocumentWithDescendantsRequestModel requestModel)
     {
