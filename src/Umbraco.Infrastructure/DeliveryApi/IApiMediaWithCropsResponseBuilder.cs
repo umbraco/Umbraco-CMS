@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Infrastructure.DeliveryApi;
 
 public interface IApiMediaWithCropsResponseBuilder
 {
-    ApiMediaWithCropsResponse Build(IPublishedContent media);
+    IApiMediaWithCropsResponse Build(IPublishedContent media);
 }
