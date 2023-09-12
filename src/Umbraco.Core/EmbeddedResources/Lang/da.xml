@@ -157,6 +157,12 @@
     <key alias="morePublishingOptions">Flere publiseringsmuligheder</key>
     <key alias="submitChanges">Indsæt</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Brugeren har slettet medie</key>
+    <key alias="move">Brugeren har flyttet medie</key>
+    <key alias="copy">Brugeren har kopieret medie</key>
+    <key alias="save">Brugeren har gemt medie</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">For</key>
     <key alias="delete">Brugeren har slettet indholdet</key>

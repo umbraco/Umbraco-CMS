@@ -159,6 +159,12 @@
     <key alias="morePublishingOptions">Mehr Veröffentlichungs Optionen</key>
     <key alias="submitChanges">Senden</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Medie gelöscht</key>
+    <key alias="move">Medie verschoben</key>
+    <key alias="copy">Medie kopiert</key>
+    <key alias="save">Medie gesichert</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Anzeigen als</key>
     <key alias="delete">Inhalt gelöscht</key>

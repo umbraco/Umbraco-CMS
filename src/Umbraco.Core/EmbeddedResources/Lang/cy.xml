@@ -166,6 +166,12 @@
     <key alias="submitChanges">Submit</key>
     <key alias="submitChangesAndClose">Submit and close</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Cyfrwng wedi'i dileu</key>
+    <key alias="move">Cyfrwng wedi'i symud</key>
+    <key alias="copy">Cyfrwng wedi'i copïo</key>
+    <key alias="save">Cyfrwng wedi'i achub</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Dangos am</key>
     <key alias="delete">Cynnwys wedi'i dileu</key>

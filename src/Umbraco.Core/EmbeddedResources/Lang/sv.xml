@@ -67,6 +67,12 @@
     <key alias="setLanguageHelp"><![CDATA[Sätt kulturen för noder under aktuell nod,<br /> eller ärv kulturen från föregående noder. Appliceras även<br />
      på befintlig nod.]]></key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media raderat</key>
+    <key alias="move">Media flyttat</key>
+    <key alias="copy">Media kopierat</key>
+    <key alias="save">Media sparat</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Visar för</key>
     <key alias="delete">Innehållet raderat</key>
