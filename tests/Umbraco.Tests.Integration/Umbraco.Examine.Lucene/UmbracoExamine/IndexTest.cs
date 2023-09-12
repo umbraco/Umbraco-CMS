@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -19,6 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 public class IndexTest : ExamineBaseTest
 {
     [Test]
+    [LongRunning]
     public void GivenValidationParentNode_WhenContentIndexedUnderDifferentParent_DocumentIsNotIndexed()
     {
         using (GetSynchronousContentIndex(false, out var index, out _, out _, 999))
@@ -48,6 +50,7 @@ public class IndexTest : ExamineBaseTest
     }
 
     [Test]
+    [LongRunning]
     public void GivenIndexingDocument_WhenRichTextPropertyData_CanStoreImmenseFields()
     {
         using (GetSynchronousContentIndex(false, out var index, out _, out var contentValueSetBuilder))
@@ -85,6 +88,7 @@ public class IndexTest : ExamineBaseTest
     }
 
     [Test]
+    [LongRunning]
     public void GivenIndexingDocument_WhenGridPropertyData_ThenDataIndexedInSegregatedFields()
     {
         using (GetSynchronousContentIndex(false, out var index, out _, out var contentValueSetBuilder))
@@ -170,6 +174,7 @@ public class IndexTest : ExamineBaseTest
     }
 
     [Test]
+    [LongRunning]
     public void GivenEmptyIndex_WhenUsingWithContentAndMediaPopulators_ThenIndexPopulated()
     {
         var mediaRebuilder = IndexInitializer.GetMediaIndexRebuilder(IndexInitializer.GetMockMediaService());
@@ -190,6 +195,7 @@ public class IndexTest : ExamineBaseTest
     ///     Check that the node signalled as protected in the content service is not present in the index.
     /// </summary>
     [Test]
+    [LongRunning]
     public void GivenPublishedContentIndex_WhenProtectedContentIndexed_ThenItIsIgnored()
     {
         using (GetSynchronousContentIndex(true, out var index, out var contentRebuilder, out _))
@@ -209,6 +215,7 @@ public class IndexTest : ExamineBaseTest
     }
 
     [Test]
+    [LongRunning]
     public void GivenMediaUnderNonIndexableParent_WhenMediaMovedUnderIndexableParent_ThenItIsIncludedInTheIndex()
     {
         // create a validator with
@@ -245,6 +252,7 @@ public class IndexTest : ExamineBaseTest
     }
 
     [Test]
+    [LongRunning]
     public void GivenMediaUnderIndexableParent_WhenMediaMovedUnderNonIndexableParent_ThenItIsRemovedFromTheIndex()
     {
         // create a validator with
@@ -288,6 +296,7 @@ public class IndexTest : ExamineBaseTest
     ///     We then call the Examine method to re-index Content and do some comparisons to ensure that it worked correctly.
     /// </summary>
     [Test]
+    [LongRunning]
     public void GivenEmptyIndex_WhenIndexedWithContentPopulator_ThenTheIndexIsPopulated()
     {
         using (GetSynchronousContentIndex(false, out var index, out var contentRebuilder, out _))
@@ -325,6 +334,7 @@ public class IndexTest : ExamineBaseTest
     ///     This will delete an item from the index and ensure that all children of the node are deleted too!
     /// </summary>
     [Test]
+    [LongRunning]
     public void GivenPopulatedIndex_WhenDocumentDeleted_ThenItsHierarchyIsAlsoDeleted()
     {
         using (GetSynchronousContentIndex(false, out var index, out var contentRebuilder, out _))

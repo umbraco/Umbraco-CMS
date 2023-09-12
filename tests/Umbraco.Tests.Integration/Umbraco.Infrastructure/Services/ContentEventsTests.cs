@@ -18,6 +18,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Sync;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -268,6 +269,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         #region Validate Setup
 
         [Test]
+        [LongRunning]
         public void CreatedBranchIsOk()
         {
             IContent content1 = CreateBranch();
@@ -381,6 +383,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         #region Save, Publish & Unpublish single content
 
         [Test]
+        [LongRunning]
         public void SaveUnpublishedContent()
         {
             // rule: when a content is saved,
@@ -403,6 +406,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void SavePublishedContent_ContentProperty1()
         {
             // rule: when a content is saved,
@@ -438,6 +442,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void SavePublishedContent_ContentProperty2()
         {
             // rule: when a content is saved,
@@ -473,6 +478,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void SavePublishedContent_UserProperty()
         {
             // rule: when a content is saved,
@@ -508,6 +514,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void SaveAndPublishUnpublishedContent()
         {
             // rule: when a content is saved&published,
@@ -530,6 +537,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void SaveAndPublishPublishedContent()
         {
             // rule: when a content is saved&published,
@@ -553,6 +561,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void PublishUnpublishedContent()
         {
             // rule: when a content is published,
@@ -578,6 +587,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void UnpublishContent()
         {
             // rule: when a content is unpublished,
@@ -600,6 +610,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void UnpublishContentWithChanges()
         {
             // rule: when a content is unpublished,
@@ -630,6 +641,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         #region Publish & Unpublish branch
 
         [Test]
+        [LongRunning]
         public void UnpublishContentBranch()
         {
             // rule: when a content branch is unpublished,
@@ -656,6 +668,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void PublishContentBranch()
         {
             // rule: when a content branch is published,
@@ -689,6 +702,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void PublishContentBranchWithPublishedChildren()
         {
             // rule?
@@ -726,6 +740,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void PublishContentBranchWithAllChildren()
         {
             // rule?
@@ -775,6 +790,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         #region Sort
 
         [Test]
+        [LongRunning]
         public void SortAll()
         {
             // rule: ?
@@ -811,6 +827,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void SortSome()
         {
             // rule: ?
@@ -850,6 +867,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         // incl. trashing a branch, untrashing a single masked content
         // including emptying the recycle bin
         [Test]
+        [LongRunning]
         public void TrashUnpublishedContent()
         {
             IContent content = CreateContent();
@@ -868,6 +886,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void UntrashUnpublishedContent()
         {
             IContent content = CreateContent();
@@ -888,6 +907,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void TrashPublishedContent()
         {
             // does 1) unpublish and 2) trash
@@ -910,6 +930,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void UntrashPublishedContent()
         {
             // same as unpublished as it's been unpublished
@@ -936,6 +957,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void TrashPublishedContentWithChanges()
         {
             IContent content = CreateContent();
@@ -959,6 +981,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void TrashContentBranch()
         {
             IContent content1 = CreateBranch();
@@ -997,6 +1020,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void EmptyRecycleBinContent()
         {
             ContentService.EmptyRecycleBin();
@@ -1019,6 +1043,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void EmptyRecycleBinContents()
         {
             ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
@@ -1046,6 +1071,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void EmptyRecycleBinBranch()
         {
             ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
@@ -1092,6 +1118,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         #region Delete
 
         [Test]
+        [LongRunning]
         public void DeleteUnpublishedContent()
         {
             IContent content = CreateContent();
@@ -1110,6 +1137,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void DeletePublishedContent()
         {
             IContent content = CreateContent();
@@ -1129,6 +1157,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void DeletePublishedContentWithChanges()
         {
             IContent content = CreateContent();
@@ -1150,6 +1179,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void DeleteMaskedPublishedContent()
         {
             IContent content1 = CreateContent();
@@ -1173,6 +1203,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void DeleteBranch()
         {
             IContent content1 = CreateBranch();
@@ -1216,6 +1247,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         #region Move
 
         [Test]
+        [LongRunning]
         public void MoveUnpublishedContentUnderUnpublished()
         {
             IContent content1 = CreateContent();
@@ -1257,6 +1289,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void MovePublishedContentWithChangesUnderUnpublished()
         {
             IContent content1 = CreateContent();
@@ -1280,6 +1313,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void MoveUnpublishedContentUnderPublished()
         {
             IContent content1 = CreateContent();
@@ -1301,6 +1335,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void MoveUnpublishedContentUnderMasked()
         {
             IContent content1 = CreateContent();
@@ -1374,6 +1409,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void MovePublishedContentWithChangesUnderPublished()
         {
             IContent content1 = CreateContent();
@@ -1426,6 +1462,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void MoveMaskedPublishedContentUnderPublished()
         {
             IContent content1 = CreateContent();
@@ -1452,6 +1489,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void MoveMaskedPublishedContentUnderMasked()
         {
             IContent content1 = CreateContent();
@@ -1510,6 +1548,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void MoveMaskedPublishedContentWithChangesUnderMasked()
         {
             IContent content1 = CreateContent();
@@ -1542,6 +1581,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void MoveMaskedPublishedContentUnderUnpublished()
         {
             IContent content1 = CreateContent();
@@ -1594,6 +1634,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void MoveContentBranchUnderUnpublished()
         {
             IContent content1 = CreateBranch();
@@ -1634,6 +1675,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void MoveContentBranchUnderPublished()
         {
             IContent content1 = CreateBranch();
@@ -1675,6 +1717,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void MoveContentBranchUnderMasked()
         {
             IContent content1 = CreateBranch();
@@ -1720,6 +1763,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void MoveContentBranchBackFromPublished()
         {
             IContent content1 = CreateBranch();
@@ -1763,6 +1807,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void MoveContentBranchBackFromUnpublished()
         {
             IContent content1 = CreateBranch();
@@ -1805,6 +1850,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void MoveContentBranchBackFromMasked()
         {
             IContent content1 = CreateBranch();
@@ -1856,6 +1902,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         #region Copy
 
         [Test]
+        [LongRunning]
         public void CopyUnpublishedContent()
         {
             IContent content = CreateContent();
@@ -1874,6 +1921,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void CopyPublishedContent()
         {
             IContent content = CreateContent();
@@ -1893,6 +1941,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void CopyMaskedContent()
         {
             IContent content = CreateContent();
@@ -1915,6 +1964,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void CopyBranch()
         {
             IContent content = CreateBranch();
@@ -1958,6 +2008,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         #region Rollback
 
         [Test]
+        [LongRunning]
         public void Rollback()
         {
             IContent content = CreateContent();
@@ -1996,6 +2047,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         #region Misc
 
         [Test]
+        [LongRunning]
         public void ContentRemembers()
         {
             IContent content = ContentService.GetRootContent().FirstOrDefault();

@@ -21,6 +21,26 @@ parameters:
     displayName: Upload API docs
     type: boolean
     default: false
+  - name: forceReleaseTestFilter
+    displayName: Force to use the release test filters
+    type: boolean
+    default: false
+  - name: integrationNonReleaseTestFilter
+    displayName: TestFilter used for non-release type builds
+    type: string
+    default: '--filter TestCategory!=LongRunning&TestCategory!=NonCritical'
+  - name: integrationReleaseTestFilter
+    displayName: TestFilter used for release type builds
+    type: string
+    default: ' '
+  - name: nonWindowsIntegrationNonReleaseTestFilter
+    displayName: TestFilter used for non-release type builds on non windows agents
+    type: string
+    default: '--filter TestCategory!=LongRunning&TestCategory!=NonCritical'
+  - name: nonWindowsIntegrationReleaseTestFilter
+    displayName: TestFilter used for release type builds on non windows agents
+    type: string
+    default: ' '
 
 variables:
   nodeVersion: 14.18.1
@@ -286,12 +306,30 @@ stages:
               performMultiLevelLookup: true
               includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: DotNetCoreCLI@2
-            displayName: Run dotnet test
+            displayName: Run dotnet test Windows
+            condition: eq(variables['Agent.OS'],'Windows_NT')
             inputs:
               command: test
               projects: '**/*.Tests.Integration.csproj'
-              arguments: '--configuration $(buildConfiguration) --no-build'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
+              ${{ if or( parameters.forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
+              ${{ else }}:
+                arguments: '--configuration $(buildConfiguration) ${{parameters.integrationNonReleaseTestFilter}}'
+            env:
+              Tests__Database__DatabaseType: 'Sqlite'
+              Umbraco__CMS__Global__MainDomLock: 'FileSystemMainDomLock'
+          - task: DotNetCoreCLI@2
+            displayName: Run dotnet test Non Windows
+            condition: ne(variables['Agent.OS'],'Windows_NT')
+            inputs:
+              command: test
+              projects: '**/*.Tests.Integration.csproj'
+              testRunTitle: Integration Tests SQLite - $(Agent.OS)
+              ${{ if or( parameters.forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
+              ${{ else }}:
+                arguments: '--configuration $(buildConfiguration) ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
             env:
               Tests__Database__DatabaseType: 'Sqlite'
               Umbraco__CMS__Global__MainDomLock: 'FileSystemMainDomLock'
@@ -328,12 +366,31 @@ stages:
             displayName: Start SQL Server (Linux only)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
           - task: DotNetCoreCLI@2
-            displayName: Run dotnet test
+            displayName: Run dotnet test Windows
+            condition: eq(variables['Agent.OS'],'Windows_NT')
             inputs:
               command: test
               projects: '**/*.Tests.Integration.csproj'
-              arguments: '--configuration $(buildConfiguration) --no-build'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
+              ${{ if or( parameters.forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
+              ${{ else }}:
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
+            env:
+              Tests__Database__DatabaseType: $(testDb)
+              Tests__Database__SQLServerMasterConnectionString: $(connectionString)
+              Umbraco__CMS__Global__MainDomLock: 'SqlMainDomLock'
+          - task: DotNetCoreCLI@2
+            displayName: Run dotnet test NonWindows
+            condition: ne(variables['Agent.OS'],'Windows_NT')
+            inputs:
+              command: test
+              projects: '**/*.Tests.Integration.csproj'
+              testRunTitle: Integration Tests SQL Server - $(Agent.OS)
+              ${{ if or( parameters.forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
+              ${{ else }}:
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
             env:
               Tests__Database__DatabaseType: $(testDb)
               Tests__Database__SQLServerMasterConnectionString: $(connectionString)
