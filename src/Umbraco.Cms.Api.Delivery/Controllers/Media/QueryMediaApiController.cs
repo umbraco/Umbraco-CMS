@@ -12,7 +12,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Delivery.Controllers;
+namespace Umbraco.Cms.Api.Delivery.Controllers.Media;
 
 [ApiVersion("1.0")]
 public class QueryMediaApiController : MediaApiControllerBase
@@ -37,7 +37,7 @@ public class QueryMediaApiController : MediaApiControllerBase
     /// <returns>The paged result of the media item(s).</returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<ApiMediaWithCropsResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<IApiMediaWithCropsResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Query(
         string? fetch,
@@ -56,7 +56,7 @@ public class QueryMediaApiController : MediaApiControllerBase
         PagedModel<Guid> pagedResult = queryAttempt.Result;
         IPublishedContent[] mediaItems = pagedResult.Items.Select(PublishedMediaCache.GetById).WhereNotNull().ToArray();
 
-        var model = new PagedViewModel<ApiMediaWithCropsResponse>
+        var model = new PagedViewModel<IApiMediaWithCropsResponse>
         {
             Total = pagedResult.Total,
             Items = mediaItems.Select(BuildApiMediaWithCrops)
