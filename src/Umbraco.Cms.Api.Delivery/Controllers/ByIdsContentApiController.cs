@@ -28,7 +28,7 @@ public class ByIdsContentApiController : ContentApiItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<IApiContentResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
+    public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IEnumerable<IPublishedContent> contentItems = ApiPublishedContentCache.GetByIds(ids);
 

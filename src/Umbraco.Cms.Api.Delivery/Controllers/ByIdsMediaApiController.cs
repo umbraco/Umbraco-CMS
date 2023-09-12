@@ -25,7 +25,7 @@ public class ByIdsMediaApiController : MediaApiControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<ApiMediaWithCropsResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
+    public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IPublishedContent[] mediaItems = ids
             .Select(PublishedMediaCache.GetById)
