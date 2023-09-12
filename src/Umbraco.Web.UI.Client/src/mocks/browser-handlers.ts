@@ -13,7 +13,7 @@ import { handlers as examineManagementHandlers } from './handlers/examine-manage
 import { handlers as modelsBuilderHandlers } from './handlers/modelsbuilder.handlers.js';
 import { handlers as healthCheckHandlers } from './handlers/health-check.handlers.js';
 import { handlers as profilingHandlers } from './handlers/performance-profiling.handlers.js';
-import { handlers as documentHandlers } from './handlers/document.handlers.js';
+import { handlers as documentHandlers } from './handlers/document/document.handlers.js';
 import { handlers as mediaHandlers } from './handlers/media.handlers.js';
 import { handlers as dictionaryHandlers } from './handlers/dictionary.handlers.js';
 import { handlers as mediaTypeHandlers } from './handlers/media-type.handlers.js';
