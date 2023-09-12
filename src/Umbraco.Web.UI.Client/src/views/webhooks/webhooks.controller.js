@@ -22,6 +22,8 @@
     function loadEvents (){
       return webhooksResource.getAllEvents()
         .then((data) => {
+          console.log("logging events:")
+          console.log(data)
           vm.events = data;
         });
     }
@@ -39,13 +41,13 @@
         position: 'right',
         size: 'small',
         submitButtonLabel: webhook ? 'Save' : 'Create',
-        view: "./overlays/edit.html",
+        view: "views/webhooks/overlays/edit.html",
         events: vm.events,
         contentType: webhook ? webhook.contentType : null,
         webhook: webhook ? {
-          contentType: webhook.contentType ? webhook.contentType.id : null,
+          entityKey: webhook.contentType ? webhook.contentType.key : null,
           enabled: webhook.enabled,
-          event: webhook.event.id,
+          event: webhook.event,
           id: webhook.id,
           url: webhook.url
         } : {enabled: true},

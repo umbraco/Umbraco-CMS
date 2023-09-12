@@ -27,7 +27,7 @@
 
     this.eventChanged = (newValue, oldValue) => {
       if (oldValue && newValue) {
-        if (oldValue.split('.')[0] !== newValue.split('.')[0]) {
+        if (oldValue.split !== newValue) {
           this.clearContentType();
         }
       }
@@ -50,4 +50,4 @@
   }
 
   angular.module("umbraco").controller("Umbraco.Editors.Webhooks.EditController", EditController);
-});
+})();

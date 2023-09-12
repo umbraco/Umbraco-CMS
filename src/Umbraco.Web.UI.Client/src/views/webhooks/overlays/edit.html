@@ -27,7 +27,7 @@
               </umb-control-group>
 
               <umb-control-group label="Event" description="The event for which the webhook should be triggered." alias="webhookEvent" required="true">
-                <select ng-options="event.id as event.name for event in model.events"
+                <select ng-options="event for event in model.events"
                         data-element="webhook-event"
                         class="umb-property-editor umb-dropdown"
                         name="webhookEvent"
