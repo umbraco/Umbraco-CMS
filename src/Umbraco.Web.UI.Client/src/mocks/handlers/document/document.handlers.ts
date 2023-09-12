@@ -28,6 +28,24 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
+	rest.get(umbracoPath('/document/:id'), (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
+
+		const document = umbDocumentData.getById(id);
+
+		return res(ctx.status(200), ctx.json(document));
+	}),
+
+	rest.delete(umbracoPath('/document/:id'), (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
+
+		const document = umbDocumentData.getById(id);
+
+		return res(ctx.status(200), ctx.json(document));
+	}),
+
 	rest.put(umbracoPath(`/document/:id`), async (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return;
@@ -37,15 +55,6 @@ export const handlers = [
 		const saved = umbDocumentData.save(id, data);
 
 		return res(ctx.status(200), ctx.json(saved));
-	}),
-
-	rest.get(umbracoPath('/document/:id'), (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return;
-
-		const document = umbDocumentData.getById(id);
-
-		return res(ctx.status(200), ctx.json(document));
 	}),
 
 	rest.post(umbracoPath(`/document`), async (req, res, ctx) => {
