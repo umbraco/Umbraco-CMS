@@ -20,8 +20,7 @@
                         node="contentNodeModel"
                         preview="((property.readonly || !allowUpdate) && !property.supportsReadOnly) || (propertyEditorDisabled(property) && allowUpdate)"
                         allow-unlock="!property.readonly && allowUpdate && allowEditInvariantFromNonDefault"
-                        on-unlock="unlockInvariantValue(property)"
-                        ng-attr-readonly="{{property.readonly || !allowUpdate || undefined}}">
+                        on-unlock="unlockInvariantValue(property)">
                     </umb-property-editor>
 
                 </umb-property>
@@ -54,8 +53,7 @@
                         node="contentNodeModel"
                         preview="((property.readonly || !allowUpdate) && !property.supportsReadOnly) || (propertyEditorDisabled(property) && allowUpdate)"
                         allow-unlock="!property.readonly && allowUpdate && allowEditInvariantFromNonDefault"
-                        on-unlock="unlockInvariantValue(property)"
-                        ng-attr-readonly="{{property.readonly || !allowUpdate || undefined}}">
+                        on-unlock="unlockInvariantValue(property)">
                     </umb-property-editor>
 
                 </umb-property>
