@@ -77,6 +77,7 @@
 			"@umbraco-cms/backoffice/tree": ["src/packages/core/tree"],
 			"@umbraco-cms/backoffice/variant": ["src/packages/core/variant"],
 			"@umbraco-cms/backoffice/workspace": ["src/packages/core/workspace"],
+			"@umbraco-cms/backoffice/culture": ["src/packages/core/culture"],
 
 			"@umbraco-cms/backoffice/dictionary": ["./src/packages/dictionary/dictionary/index.ts"],
 

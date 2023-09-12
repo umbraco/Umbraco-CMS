@@ -31,6 +31,7 @@ import { handlers as stylesheetHandlers } from './handlers/stylesheet.handlers.j
 import { handlers as partialViewsHandlers } from './handlers/partial-views.handlers.js';
 import { handlers as tagHandlers } from './handlers/tag-handlers.js';
 import { handlers as configHandlers } from './handlers/config.handlers.js';
+import { handlers as scriptHandlers } from './handlers/scripts.handlers.js';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
@@ -65,6 +66,7 @@ const handlers = [
 	...partialViewsHandlers,
 	...tagHandlers,
 	...configHandlers,
+	...scriptHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {
