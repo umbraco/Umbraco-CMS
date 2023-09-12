@@ -139,8 +139,6 @@ public partial class ContentPublishingServiceTests
         VerifyIsNotPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
-        // TODO: can this really be correct? considering that unpublishing one of two cultures yields only one left in the collection, shouldn't unpublishing all cultures then clear the collection?
-        // - updated in Content.SetPublishInfo() by DocumentRepository.SetVariations() (L407)
         Assert.AreEqual(2, content.PublishedCultures.Count());
     }
 
@@ -166,8 +164,6 @@ public partial class ContentPublishingServiceTests
         VerifyIsNotPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
-        // TODO: can this really be correct? considering that unpublishing one of two cultures yields only one left in the collection, shouldn't unpublishing all cultures then clear the collection?
-        // - updated in Content.SetPublishInfo() by DocumentRepository.SetVariations() (L407)
         Assert.AreEqual(2, content.PublishedCultures.Count());
     }
 
