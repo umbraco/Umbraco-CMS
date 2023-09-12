@@ -8,6 +8,10 @@
     vm.deleteWebhook = deleteWebhook;
     vm.handleSubmissionError = handleSubmissionError;
 
+    vm.goToPage = goToPage;
+    vm.nextPage = nextPage;
+    vm.previousPage = previousPage;
+
     vm.pagination = {
       pageNumber: 1,
       pageSize: 25
@@ -22,8 +26,6 @@
     function loadEvents (){
       return webhooksResource.getAllEvents()
         .then((data) => {
-          console.log("logging events:")
-          console.log(data)
           vm.events = data;
         });
     }
@@ -141,13 +143,17 @@
       });
     }
 
-    vm.previousPage = () => goToPage(vm.pagination.pageNumber - 1);
-    vm.nextPage = () => goToPage(vm.pagination.pageNumber + 1);
+    function previousPage (){
+      return goToPage(vm.pagination.pageNumber - 1);
+    }
+    function nextPage (){
+      return goToPage(vm.pagination.pageNumber + 1);
+    }
 
-    vm.goToPage = (pageNumber) => {
+    function goToPage (pageNumber) {
       vm.pagination.pageNumber = pageNumber;
       loadWebhooks()
-    };
+    }
 
     loadWebhooks()
     loadEvents()
