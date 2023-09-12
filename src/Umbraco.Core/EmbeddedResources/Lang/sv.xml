@@ -103,6 +103,12 @@
     <key alias="blockHasChanges">Du har gjort ändringar i detta innehåll. Är du säker på att du vill ta bort dem?</key>
     <key alias="confirmCancelBlockCreationHeadline">Ignorera skapandet</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Är du säker på att du vill avbryta skapandet?]]></key>
+    <key alias="areaValidationEntriesShort"><![CDATA[<strong>%0%</strong> måste vara närvarande åtminstone <strong>%2%</strong> time(s).]]></key>
+    <key alias="areaValidationEntriesExceed"><![CDATA[<strong>%0%</strong> måste maximalt finnas <strong>%3%</strong> time(s).]]></key>
+  </area>
+  <area alias="validation">
+    <key alias="entriesShort"><![CDATA[Minsta %0% poster, kräver <strong>%1%</strong> mer.]]></key>
+    <key alias="entriesExceed"><![CDATA[Max %0% poster, <strong>%1%</strong> för många.]]></key>  
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Skapa en ny innehållsmall för <em>%0%</em>]]></key>
