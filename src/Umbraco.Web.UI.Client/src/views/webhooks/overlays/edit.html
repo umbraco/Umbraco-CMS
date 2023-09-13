@@ -42,18 +42,19 @@
               </umb-control-group>
 
               <umb-control-group label="Content Type" description="Only trigger the webhook for a specific content type." alias="webhookContentType">
-                <umb-node-preview
-                  ng-show="model.contentType"
-                  icon="model.contentType.icon"
-                  name="model.contentType.name"
-                  alias="model.contentType.alias"
-                  description="vm.contentType.description"
+                 <umb-node-preview
+                   ng-repeat="contentType in model.contentTypes"
+                  ng-show="contentType"
+                  icon="contentType.icon"
+                  name="contentType.name"
+                  alias="contentType.alias"
+                  description="contentType.description"
                   allow-remove="true"
                   allow-open="false"
-                  on-remove="vm.clearContentType()">
+                  on-remove="vm.clearContentType(contentType.key)">
                 </umb-node-preview>
                 <a href
-                   ng-show="!model.contentType && model.webhook.event"
+                   ng-show="(!model.contentTypes || model.contentTypes.length === 0) && model.webhook.event"
                    class="umb-node-preview-add"
                    ng-click="vm.openContentTypePicker()"
                    prevent-default>

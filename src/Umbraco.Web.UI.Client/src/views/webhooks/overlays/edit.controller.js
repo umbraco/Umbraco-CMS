@@ -2,16 +2,15 @@
   "use strict";
   function EditController($scope, editorService) {
     this.openContentTypePicker = () => {
-      const isContent = $scope.model.webhook ? $scope.model.webhook.event.split('.')[0] === 'content' : null;
+      const isContent = $scope.model.webhook ? $scope.model.webhook.event.toLowerCase().includes("content") : null;
       editorService.treePicker({
         section: 'settings',
         treeAlias: isContent ? 'documentTypes' : 'mediaTypes',
         entityType: isContent ? 'DocumentType' : 'MediaType',
-        multiPicker: false,
+        multiPicker: true,
         submit(model) {
-          // sets $scope.model.contentType to model.selection[0]
-          [$scope.model.contentType] = model.selection;
-          $scope.model.webhook.entityKeys = [$scope.model.contentType.key];
+          $scope.model.contentTypes = model.selection;
+          $scope.model.webhook.entityKeys =  model.selection.map((item) => item.key);
           editorService.close();
         },
         close() {
@@ -20,9 +19,10 @@
       });
     };
 
-    this.clearContentType = () => {
-      delete $scope.model.webhook.entityKeys;
-      delete $scope.model.contentType;
+    this.clearContentType = (contentTypeKey) => {
+      $scope.model.webhook.entityKeys = $scope.model.webhook.entityKeys.filter(x => x !== contentTypeKey)
+      $scope.model.contentTypes = $scope.model.contentTypes.filter(x => x.key !== contentTypeKey);
+
     };
 
     this.eventChanged = (newValue, oldValue) => {
