@@ -88,8 +88,7 @@ export class UmbAuthFlow {
 	readonly #storageBackend: LocalStorageBackend;
 
 	// state
-	#configuration: AuthorizationServiceConfiguration;
-	readonly #openIdConnectUrl: string;
+	readonly #configuration: AuthorizationServiceConfiguration;
 	readonly #redirectUri: string;
 	readonly #clientId: string;
 	readonly #scope: string;
@@ -104,7 +103,6 @@ export class UmbAuthFlow {
 		clientId = 'umbraco-back-office',
 		scope = 'offline_access',
 	) {
-		this.#openIdConnectUrl = openIdConnectUrl;
 		this.#redirectUri = redirectUri;
 		this.#clientId = clientId;
 		this.#scope = scope;
