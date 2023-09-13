@@ -27,6 +27,16 @@ public class WebHookController : UmbracoAuthorizedJsonController
         return Ok(webhookViewModels);
     }
 
+    [HttpPut]
+    public async Task<IActionResult> Update(WebhookViewModel webhookViewModel)
+    {
+        Webhook updateModel = _umbracoMapper.Map<Webhook>(webhookViewModel)!;
+
+        await _webHookService.UpdateAsync(updateModel);
+
+        return Ok();
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create(WebhookViewModel webhookViewModel)
     {

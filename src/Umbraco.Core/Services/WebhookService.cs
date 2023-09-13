@@ -24,6 +24,30 @@ public class WebhookService : IWebHookService
         return Task.FromResult(webhook);
     }
 
+    public Task UpdateAsync(Webhook updateModel)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
+        // TODO: Validation if we need it
+
+        Webhook? currentWebhook = _webhookRepository.Get(updateModel.Key);
+
+        if (currentWebhook is null)
+        {
+            throw new ArgumentException("Webhook does not exist");
+        }
+
+        currentWebhook.Enabled = updateModel.Enabled;
+        currentWebhook.EntityKeys = updateModel.EntityKeys;
+        currentWebhook.Event = updateModel.Event;
+        currentWebhook.Url = updateModel.Url;
+
+        _webhookRepository.Save(currentWebhook);
+        scope.Complete();
+
+        return Task.FromResult(updateModel);
+    }
+
     public Task DeleteAsync(Guid key)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();

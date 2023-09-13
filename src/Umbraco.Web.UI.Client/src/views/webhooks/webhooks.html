@@ -25,7 +25,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="webhook in vm.webhooks track by webhook.key" style="cursor: pointer;">
+    <tr ng-repeat="webhook in vm.webhooks track by webhook.key" ng-click="vm.openWebhookOverlay(webhook)" style="cursor: pointer;">
       <td style="width: 60px;">
         <umb-checkmark ng-if="webhook.enabled"
                        checked="webhook.enabled"

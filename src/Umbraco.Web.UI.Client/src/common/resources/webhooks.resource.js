@@ -20,7 +20,7 @@
     },
     update(webhook) {
       return umbRequestHelper.resourcePromise(
-        $http.post(umbRequestHelper.getApiUrl('webhooksApiBaseUrl', 'Create'), webhook),
+        $http.put(umbRequestHelper.getApiUrl('webhooksApiBaseUrl', 'Update'), webhook),
         `Failed to save webhook id ${webhook.id}`
       );
     },

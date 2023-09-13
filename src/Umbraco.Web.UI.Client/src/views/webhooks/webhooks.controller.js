@@ -25,7 +25,12 @@
       const isContent = webhook.event.toLowerCase().includes("content");
       const resource = isContent ? contentTypeResource : mediaTypeResource;
 
+
+
       webhook.entityKeys.forEach((key) => {
+        if (vm.webHooksContentTypes[webhook.key]){
+          delete vm.webHooksContentTypes[webhook.key];
+        }
         resource.getById(key)
           .then((data) => {
             if (!vm.webHooksContentTypes[webhook.key]) {
@@ -57,7 +62,7 @@
           entityKey: webhook.contentType ? webhook.contentType.key : null,
           enabled: webhook.enabled,
           event: webhook.event,
-          id: webhook.id,
+          key: webhook.key,
           url: webhook.url
         } : {enabled: true},
         submit: (model) => {

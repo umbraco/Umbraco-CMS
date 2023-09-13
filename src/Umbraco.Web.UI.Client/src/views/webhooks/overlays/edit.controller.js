@@ -1,6 +1,8 @@
 ﻿(function () {
   "use strict";
   function EditController($scope, editorService) {
+    var vm = this;
+    vm.clearContentType = clearContentType;
     this.openContentTypePicker = () => {
       const isContent = $scope.model.webhook ? $scope.model.webhook.event.toLowerCase().includes("content") : null;
       editorService.treePicker({
@@ -19,11 +21,15 @@
       });
     };
 
-    this.clearContentType = (contentTypeKey) => {
-      $scope.model.webhook.entityKeys = $scope.model.webhook.entityKeys.filter(x => x !== contentTypeKey)
-      $scope.model.contentTypes = $scope.model.contentTypes.filter(x => x.key !== contentTypeKey);
-
-    };
+    function clearContentType (contentTypeKey)
+    {
+      if (Array.isArray($scope.model.webhook.entityKeys)) {
+        $scope.model.webhook.entityKeys = $scope.model.webhook.entityKeys.filter(x => x !== contentTypeKey);
+      }
+      if (Array.isArray($scope.model.contentTypes)) {
+        $scope.model.contentTypes = $scope.model.contentTypes.filter(x => x.key !== contentTypeKey);
+      }
+    }
 
     this.eventChanged = (newValue, oldValue) => {
       if (oldValue && newValue) {
