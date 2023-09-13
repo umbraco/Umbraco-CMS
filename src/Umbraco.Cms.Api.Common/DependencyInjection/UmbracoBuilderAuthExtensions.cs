@@ -29,16 +29,19 @@ public static class UmbracoBuilderAuthExtensions
             {
                 // Enable the authorization and token endpoints.
                 // - important: member endpoints MUST be added before backoffice endpoints to ensure that auto-discovery works for members
+                // FIXME: swap paths here so member API is first (see comment above)
                 options
                     .SetAuthorizationEndpointUris(
-                        Paths.MemberApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
-                        Paths.BackOfficeApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
+                        Paths.BackOfficeApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.MemberApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
                     .SetTokenEndpointUris(
-                        Paths.MemberApi.TokenEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
-                        Paths.BackOfficeApi.TokenEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
+                        Paths.BackOfficeApi.TokenEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.MemberApi.TokenEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
                     .SetLogoutEndpointUris(
+                        Paths.BackOfficeApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
                         Paths.MemberApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
                     .SetRevocationEndpointUris(
+                        Paths.BackOfficeApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
                         Paths.MemberApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash));
 
                 // Enable authorization code flow with PKCE
