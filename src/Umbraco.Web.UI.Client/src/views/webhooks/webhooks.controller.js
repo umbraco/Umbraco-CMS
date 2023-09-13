@@ -1,24 +1,50 @@
 ﻿(function () {
   "use strict";
 
-  function WebhookController($q, webhooksResource, notificationsService, editorService, overlayService, contentTypeResource) {
+  function WebhookController($q,$scope, webhooksResource, notificationsService, editorService, overlayService, contentTypeResource) {
     var vm = this;
 
     vm.openWebhookOverlay = openWebhookOverlay;
     vm.deleteWebhook = deleteWebhook;
     vm.handleSubmissionError = handleSubmissionError;
+    vm.resolveTypeNames = resolveTypeNames;
 
     vm.page = {};
     vm.webhooks = [];
     vm.events = [];
-
-
+    vm.webHooksContentTypes = {};
 
     function loadEvents (){
       return webhooksResource.getAllEvents()
         .then((data) => {
           vm.events = data;
         });
+    }
+
+    function resolveTypeNames(webhook){
+      const isContent = webhook.event.toLowerCase().includes("content");
+
+      let result = "";
+      if(isContent) {
+        webhook.entityKeys.forEach((key) => {
+          contentTypeResource.getById(key)
+            .then((data) => {
+              if(result === ""){
+                result = data.name;
+              }
+              else{
+                result += ", " + data.name;
+              }
+
+              // Because this whole thing is async, we have to set this every time it updates.
+              vm.webHooksContentTypes[webhook.key] = result;
+            });
+        });
+      }
+
+      else{
+
+      }
     }
 
     function handleSubmissionError (model, errorMessage) {
@@ -97,6 +123,10 @@
         .getAll()
         .then((result) => {
           vm.webhooks = result;
+
+          vm.webhooks.forEach((webhook) => {
+            resolveTypeNames(webhook);
+          })
         });
     }
 
