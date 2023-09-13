@@ -172,7 +172,6 @@ export class UmbDocumentServerDataSource
 	/**
 	 * Get the allowed document types for root
 	 * @param {string} id
-	 * @return {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async getAllowedDocumentTypesAtRoot() {
@@ -183,7 +182,6 @@ export class UmbDocumentServerDataSource
 	/**
 	 * Get the allowed document types for a given parent id
 	 * @param {string} id
-	 * @return {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async getAllowedDocumentTypesOf(id: string) {

@@ -21,11 +21,14 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 	async firstUpdated() {
 		const documentId = this.data?.id || null;
 
-		this.#retrieveAllowedChildrenOf(documentId);
-		this.#retrieveHeadline(documentId);
+		this.#retrieveAllowedDocumentTypesOf(documentId);
+
+		if (documentId) {
+			this.#retrieveHeadline(documentId);
+		}
 	}
 
-	async #retrieveAllowedChildrenOf(id: string | null) {
+	async #retrieveAllowedDocumentTypesOf(id: string | null) {
 		const { data } = await this.#documentRepository.requestAllowedDocumentTypesOf(id);
 
 		if (data) {
