@@ -5,7 +5,6 @@ namespace Umbraco.Cms.Core.Services;
 
 public interface IUserGroupAuthorizationService
 {
-
     /// <summary>
     /// Authorizes a user to create a new user group.
     /// </summary>
@@ -21,4 +20,12 @@ public interface IUserGroupAuthorizationService
     /// <param name="userGroup">The user group to be created.</param>
     /// <returns>An attempt with an operation.</returns>
     Attempt<UserGroupOperationStatus> AuthorizeUserGroupUpdate(IUser performingUser, IUserGroup userGroup);
+
+    /// <summary>
+    ///     Authorize that the current user belongs to these groups.
+    /// </summary>
+    /// <param name="performingUser">The user performing the operation.</param>
+    /// <param name="userGroups">The user groups to check for access.</param>
+    /// <returns>An attempt indicating if the operation was a success, as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
+    Attempt<UserGroupOperationStatus> AuthorizeGroupAccess(IUser performingUser, IEnumerable<IUserGroup> userGroups);
 }

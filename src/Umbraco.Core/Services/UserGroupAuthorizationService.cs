@@ -61,7 +61,7 @@ internal sealed class UserGroupAuthorizationService : IUserGroupAuthorizationSer
             return Attempt.Fail(authorizeSectionAccess.Result);
         }
 
-        Attempt<UserGroupOperationStatus> authorizeGroupAccess = AuthorizeGroupAccess(performingUser, userGroup);
+        Attempt<UserGroupOperationStatus> authorizeGroupAccess = AuthorizeGroupAccess(performingUser, new[] { userGroup });
         if (authorizeGroupAccess.Success is false)
         {
             return Attempt.Fail(authorizeGroupAccess.Result);
@@ -75,6 +75,23 @@ internal sealed class UserGroupAuthorizationService : IUserGroupAuthorizationSer
 
 
         return Attempt.Succeed(UserGroupOperationStatus.Success);
+    }
+
+    /// <inheritdoc/>
+    public Attempt<UserGroupOperationStatus> AuthorizeGroupAccess(IUser performingUser, IEnumerable<IUserGroup> userGroups)
+    {
+        if (performingUser.IsAdmin())
+        {
+            return Attempt.Succeed(UserGroupOperationStatus.Success);
+        }
+
+        var userGroupsKeys = performingUser.Groups.Select(x => x.Key).ToArray();
+        var requiredUserGroupsKeys = userGroups.Select(x => x.Key).ToArray();
+        var missingAccess = requiredUserGroupsKeys.Except(userGroupsKeys).ToArray();
+
+        return missingAccess.Length == 0
+            ? Attempt.Succeed(UserGroupOperationStatus.Success)
+            : Attempt.Fail(UserGroupOperationStatus.UnauthorizedMissingUserGroup);
     }
 
     /// <summary>
@@ -125,14 +142,6 @@ internal sealed class UserGroupAuthorizationService : IUserGroupAuthorizationSer
 
         return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
-
-    /// <summary>
-    /// Ensures that the performing user is part of the user group.
-    /// </summary>
-    private Attempt<UserGroupOperationStatus> AuthorizeGroupAccess(IUser performingUser, IUserGroup userGroup) =>
-        performingUser.Groups.Any(x => x.Key == userGroup.Key) || performingUser.IsAdmin()
-            ? Attempt.Succeed(UserGroupOperationStatus.Success)
-            : Attempt.Fail(UserGroupOperationStatus.UnauthorizedMissingUserGroup);
 
     // We explicitly take an IUser here which is non-nullable, since nullability should be handled in caller.
     private Attempt<UserGroupOperationStatus> AuthorizeContentStartNode(IUser user, IUserGroup userGroup)

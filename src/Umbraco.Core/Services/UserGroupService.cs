@@ -1,5 +1,4 @@
-﻿using System.Formats.Asn1;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -329,6 +328,19 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         scope.Complete();
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
+    }
+
+    /// <inheritdoc/>
+    public async Task<Attempt<UserGroupOperationStatus>> AuthorizeGroupAccessAsync(IUser? performingUser, IEnumerable<Guid> userGroupKeys)
+    {
+        if (performingUser is null)
+        {
+            return Attempt.Fail(UserGroupOperationStatus.MissingUser);
+        }
+
+        IEnumerable<IUserGroup> userGroups = await GetAsync(userGroupKeys);
+
+        return _userGroupAuthorizationService.AuthorizeGroupAccess(performingUser, userGroups);
     }
 
     private async Task<UserGroupOperationStatus> ValidateUserGroupUpdateAsync(IUserGroup userGroup)
