@@ -29,8 +29,8 @@ export class UmbContentTypePropertyStructureHelper {
 		this.#propertyStructure.sortBy((a, b) => ((a as any).sortOrder ?? 0) - ((b as any).sortOrder ?? 0));
 	}
 
-	public getOwnerDocumentTypes() {
-		return this.#structure?.documentTypes;
+	get ownerDocumentTypes() {
+		return this.#structure?.contentTypes;
 	}
 
 	public setStructureManager(structure: UmbContentTypePropertyStructureManager) {

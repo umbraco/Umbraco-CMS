@@ -102,7 +102,7 @@ export class UmbAuthFlow {
 		openIdConnectUrl: string,
 		redirectUri: string,
 		clientId = 'umbraco-back-office',
-		scope = 'offline_access'
+		scope = 'offline_access',
 	) {
 		this.#openIdConnectUrl = openIdConnectUrl;
 		this.#redirectUri = redirectUri;
@@ -115,7 +115,7 @@ export class UmbAuthFlow {
 		this.#authorizationHandler = new RedirectRequestHandler(
 			this.#storageBackend,
 			new UmbNoHashQueryStringUtils(),
-			window.location
+			window.location,
 		);
 
 		// set notifier to deliver responses
@@ -156,7 +156,10 @@ export class UmbAuthFlow {
 	 */
 	async setInitialState() {
 		// Ensure there is a connection to the server
-		await this.fetchServiceConfiguration();
+		if (!this.#configuration) {
+			await this.fetchServiceConfiguration();
+		}
+
 		const tokenResponseJson = await this.#storageBackend.getItem(TOKEN_RESPONSE_NAME);
 		if (tokenResponseJson) {
 			const response = new TokenResponse(JSON.parse(tokenResponseJson));
@@ -216,7 +219,7 @@ export class UmbAuthFlow {
 				extras: extras,
 			},
 			undefined,
-			true
+			true,
 		);
 
 		this.#authorizationHandler.performAuthorizationRequest(this.#configuration, request);

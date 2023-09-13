@@ -86,7 +86,11 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 		this.#modalRegistration = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
 			.addUniquePaths(['propertyId'])
 			.onSetup(() => {
-				return this.property ?? false;
+				const documentTypeId = this.ownerDocumentTypeId;
+				if(documentTypeId === undefined) return false;
+				const propertyData = this.property;
+				if(propertyData === undefined) return false;
+				return {propertyData, documentTypeId};
 			})
 			.onSubmit((result) => {
 				this._partialUpdate(result);

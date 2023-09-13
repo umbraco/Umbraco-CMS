@@ -104,7 +104,14 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
 			.addAdditionalPath('new-property')
 			.onSetup(async () => {
-				return (await this._propertyStructureHelper.createPropertyScaffold(this._containerId)) ?? false;
+
+				const documentTypeId = this._ownerDocumentTypes?.find(
+					(types) => types.containers?.find((containers) => containers.id === this.containerId),
+				)?.id;
+				if(documentTypeId === undefined) return false;
+				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
+				if(propertyData === undefined) return false;
+				return {propertyData, documentTypeId};
 			})
 			.onSubmit((result) => {
 				this.#addProperty(result);
@@ -116,7 +123,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		const doctypes = this._propertyStructureHelper.getOwnerDocumentTypes();
+		const doctypes = this._propertyStructureHelper.ownerDocumentTypes;
 		if (!doctypes) return;
 		this.observe(
 			doctypes,

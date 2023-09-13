@@ -1,10 +1,6 @@
 import { UmbCultureRepository } from '../../repository/culture.repository.js';
-import { css, html, repeat, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import {
-	FormControlMixin,
-	UUIComboboxElement,
-	UUIComboboxEvent,
-} from '@umbraco-cms/backoffice/external/uui';
+import { html, repeat, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { FormControlMixin, UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { CultureReponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -89,12 +85,11 @@ export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement
 								${repeat(
 									this.#filteredCultures,
 									(culture) => culture.name,
-									(culture) =>
-										html`
-											<uui-combobox-list-option value=${ifDefined(culture.name)}
-												>${culture.englishName}</uui-combobox-list-option
-											>
-										`
+									(culture) => html`
+										<uui-combobox-list-option value=${ifDefined(culture.name)}
+											>${culture.englishName}</uui-combobox-list-option
+										>
+									`,
 								)}
 							</uui-combobox-list>
 						</uui-combobox>

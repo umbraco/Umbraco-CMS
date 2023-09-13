@@ -22,7 +22,7 @@ export class UmbContentTypeContainerStructureHelper {
 	// Containers defined in data might be more than actual containers to display as we merge them by name.
 	// Direct containers are the containers defining the total of this container(Multiple containers with the same name and type)
 	private _ownerAlikeContainers: PropertyTypeContainerModelBaseModel[] = [];
-	// Owner containers are containers owned by the owner Document Type (The specific one up for editing)
+	// Owner containers are containers owned by the owner Content Type (The specific one up for editing)
 	private _ownerContainers: PropertyTypeContainerModelBaseModel[] = [];
 
 	// State containing the merged containers (only one pr. name):
@@ -106,7 +106,7 @@ export class UmbContentTypeContainerStructureHelper {
 				(ownerContainers) => {
 					this._ownerContainers = ownerContainers || [];
 				},
-				'_observeOwnerContainers'
+				'_observeOwnerContainers',
 			);
 		} else if (this._ownerName) {
 			new UmbObserverController(
@@ -121,7 +121,7 @@ export class UmbContentTypeContainerStructureHelper {
 						this._observeChildContainers();
 					}
 				},
-				'_observeOwnerContainers'
+				'_observeOwnerContainers',
 			);
 		}
 	}
@@ -136,7 +136,7 @@ export class UmbContentTypeContainerStructureHelper {
 				(hasProperties) => {
 					this.#hasProperties.next(hasProperties);
 				},
-				'_observeOwnerHasProperties_' + container.id
+				'_observeOwnerHasProperties_' + container.id,
 			);
 		});
 	}
@@ -149,7 +149,7 @@ export class UmbContentTypeContainerStructureHelper {
 				this.#host,
 				this.#structure!.containersOfParentKey(container.id, this._childType!),
 				this._insertGroupContainers,
-				'_observeGroupsOf_' + container.id
+				'_observeGroupsOf_' + container.id,
 			);
 		});
 	}
@@ -164,7 +164,7 @@ export class UmbContentTypeContainerStructureHelper {
 				this.#containers.next([]);
 				this._insertGroupContainers(rootContainers);
 			},
-			'_observeRootContainers'
+			'_observeRootContainers',
 		);
 	}
 
@@ -223,7 +223,7 @@ export class UmbContentTypeContainerStructureHelper {
 		if (!this.#structure) return;
 
 		const newName =
-			this.#structure.makeContainerNameUniqueForOwnerDocument(name, this._childType, containerParentId) ?? name;
+			this.#structure.makeContainerNameUniqueForOwnerContentType(name, this._childType, containerParentId) ?? name;
 
 		return await this.partialUpdateContainer(containerId, { name: newName });
 	}

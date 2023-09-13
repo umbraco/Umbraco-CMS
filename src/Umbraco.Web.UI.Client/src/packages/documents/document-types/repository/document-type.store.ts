@@ -10,7 +10,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
  * @extends {UmbStoreBase}
  * @description - Data Store for Document Types
  */
-export class UmbDocumentTypeStore extends UmbStoreBase {
+export class UmbDocumentTypeStore extends UmbStoreBase<DocumentTypeResponseModel> {
 	/**
 	 * Creates an instance of UmbDocumentTypeStore.
 	 * @param {UmbControllerHostElement} host

@@ -20,6 +20,8 @@ export default {
 					imports: {
 						'src/': './src/',
 
+						'@umbraco-cms/backoffice/app': './src/apps/app/index.ts',
+
 						'@umbraco-cms/backoffice/external/lit': './src/external/lit/index.ts',
 						'@umbraco-cms/backoffice/external/lodash': './src/external/lodash/index.ts',
 						'@umbraco-cms/backoffice/external/monaco-editor': './src/external/monaco-editor/index.ts',
@@ -40,7 +42,6 @@ export default {
 						'@umbraco-cms/backoffice/observable-api': './src/libs/observable-api/index.ts',
 
 						'@umbraco-cms/backoffice/auth': './src/shared/auth/index.ts',
-						'@umbraco-cms/backoffice/context': './src/shared/context/index.ts',
 						'@umbraco-cms/backoffice/events': './src/shared/umb-events/index.ts',
 						'@umbraco-cms/backoffice/icon': './src/shared/icon-registry/index.ts',
 						'@umbraco-cms/backoffice/models': './src/shared/models/index.ts',
@@ -77,6 +78,7 @@ export default {
 						'@umbraco-cms/backoffice/tree': './src/packages/core/tree/index.ts',
 						'@umbraco-cms/backoffice/variant': './src/packages/core/variant/index.ts',
 						'@umbraco-cms/backoffice/workspace': './src/packages/core/workspace/index.ts',
+						'@umbraco-cms/backoffice/culture': './src/packages/core/culture/index.ts',
 
 						'@umbraco-cms/backoffice/dictionary': './src/packages/dictionary/dictionary/index.ts',
 
