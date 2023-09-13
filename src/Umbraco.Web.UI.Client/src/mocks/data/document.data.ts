@@ -3,8 +3,10 @@ import { UmbEntityData } from './entity.data.js';
 import { createDocumentTreeItem } from './utils.js';
 import {
 	ContentStateModel,
+	DocumentItemResponseModel,
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
+	FolderTreeItemResponseModel,
 	PagedDocumentTreeItemResponseModel,
 	PagedDocumentTypeResponseModel,
 	PagedRecycleBinItemResponseModel,
@@ -564,6 +566,15 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 	},
 ];
 
+const createDocumentItem = (item: DocumentResponseModel | FolderTreeItemResponseModel): DocumentItemResponseModel => {
+	return {
+		id: item.id,
+		name: item.name,
+		icon: item.icon,
+		contentTypeId: item.contentTypeId,
+	};
+};
+
 // Temp mocked database
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -595,7 +606,7 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 	}
 
 	getTreeRoot(): PagedDocumentTreeItemResponseModel {
-		const items = this.treeData.filter((item) => item.parentId === null);
+		const items = this.treeData.filter((item) => item.parentId === null && item.isTrashed === false);
 		const treeItems = items.map((item) => item);
 		const total = items.length;
 		return { items: treeItems, total };
@@ -611,6 +622,11 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 	getTreeItem(ids: Array<string>): Array<DocumentTreeItemResponseModel> {
 		const items = this.treeData.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => item);
+	}
+
+	getItems(ids: Array<string>): Array<DocumentItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
+		return items.map((item) => createDocumentItem(item));
 	}
 
 	getDocumentByIdAllowedDocumentTypes(id: string): PagedDocumentTypeResponseModel {
