@@ -13,7 +13,7 @@ export const handlers = [
 		const parentId = req.url.searchParams.get('parentId');
 		if (!parentId) return;
 
-		const response = umbDocumentData.getRecycleBinChildren(parentId);
+		const response = umbDocumentData.getRecycleBinChildrenOf(parentId);
 
 		return res(ctx.status(200), ctx.json(response));
 	}),

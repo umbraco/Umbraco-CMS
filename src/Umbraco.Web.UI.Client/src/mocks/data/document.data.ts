@@ -612,7 +612,7 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(id: string): PagedDocumentTreeItemResponseModel {
+	getTreeItemChildrenOf(id: string): PagedDocumentTreeItemResponseModel {
 		const items = this.treeData.filter((item) => item.parentId === id && item.isTrashed === false);
 		const treeItems = items.map((item) => item);
 		const total = items.length;
@@ -656,7 +656,7 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 		return { items: treeItems, total };
 	}
 
-	getRecycleBinChildren(parentId: string): PagedRecycleBinItemResponseModel {
+	getRecycleBinChildrenOf(parentId: string): PagedRecycleBinItemResponseModel {
 		const items = this.treeData.filter((item) => item.parentId === parentId && item.isTrashed);
 		const treeItems = items.map((item) => item);
 		const total = items.length;

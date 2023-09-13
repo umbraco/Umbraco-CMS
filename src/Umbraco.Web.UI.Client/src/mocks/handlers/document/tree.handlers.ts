@@ -11,7 +11,7 @@ export const handlers = [
 	rest.get(umbracoPath('/tree/document/children'), (req, res, ctx) => {
 		const parentId = req.url.searchParams.get('parentId');
 		if (!parentId) return;
-		const response = umbDocumentData.getTreeItemChildren(parentId);
+		const response = umbDocumentData.getTreeItemChildrenOf(parentId);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 ];
