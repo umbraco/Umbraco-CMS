@@ -7,10 +7,12 @@ using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
 [ApiVersion("1.0")]
+[Authorize(Policy = "New" + AuthorizationPolicies.DenyLocalLoginIfConfigured)]
 public class ResetPasswordController : SecurityControllerBase
 {
     private readonly IUserService _userService;
