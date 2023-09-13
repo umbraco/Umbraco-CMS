@@ -98,13 +98,12 @@ export class UmbDocumentRepository
 
 	// Structure permissions;
 
-	async requestAllowedDocumentTypesAtRoot() {
-		return this.#detailDataSource.getAllowedDocumentTypesAtRoot();
-	}
-	async requestAllowedDocumentTypesOf(id: string) {
-		if (!id) throw new Error('Id is missing');
+	async requestAllowedDocumentTypesOf(id: string | null) {
+		if (id === undefined) throw new Error('Id is missing');
 		await this.#init;
-		return this.#detailDataSource.getAllowedDocumentTypesOf(id);
+		return id
+			? this.#detailDataSource.getAllowedDocumentTypesOf(id)
+			: this.#detailDataSource.getAllowedDocumentTypesAtRoot();
 	}
 
 	async requestItemsLegacy(ids: Array<string>) {

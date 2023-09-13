@@ -4,7 +4,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
 import {
 	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_ALLOWED_DOCUMENT_TYPES_MODAL,
+	UMB_CREATE_DOCUMENT_MODAL as UMB_CREATE_DOCUMENT_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
@@ -20,43 +20,24 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 	}
 
 	async execute() {
-		if (this.unique) {
-			await this._executeWithParent();
-		} else {
-			await this._executeAtRoot();
-		}
-	}
-
-	private async _executeWithParent() {
-		// TODO: what to do if modal service is not available?
 		if (!this.repository) return;
-
-		const { data } = await this.repository.requestById(this.unique);
-
-		if (data && data.contentTypeId) {
-			// TODO: We need to get the APP language context, use its VariantId to retrieve the right variant. The variant of which we get the name from.
-			this._openModal(data.contentTypeId, data.variants?.[0]?.name);
-		}
+		this._openModal(this.unique || null);
 	}
 
-	private async _executeAtRoot() {
-		this._openModal(null);
-	}
-
-	private async _openModal(parentId: string | null, parentName?: string) {
+	private async _openModal(id: string | null) {
+		// TODO: what to do if modal service is not available?
 		if (!this.#modalContext) return;
-		const modalContext = this.#modalContext.open(UMB_ALLOWED_DOCUMENT_TYPES_MODAL, {
-			parentId: parentId,
-			parentName: parentName,
+		const modalContext = this.#modalContext.open(UMB_CREATE_DOCUMENT_MODAL, {
+			id,
 		});
 
-		const { documentTypeKey } = await modalContext.onSubmit();
+		const { documentTypeId: documentTypeKey } = await modalContext.onSubmit();
 
 		// TODO: how do we want to generate these urls?
 		history.pushState(
 			null,
 			'',
-			`section/content/workspace/document/create/${this.unique ?? 'null'}/${documentTypeKey}`
+			`section/content/workspace/document/create/${this.unique ?? 'null'}/${documentTypeKey}`,
 		);
 	}
 }

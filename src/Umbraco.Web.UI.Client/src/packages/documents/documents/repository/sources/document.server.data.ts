@@ -45,7 +45,7 @@ export class UmbDocumentServerDataSource
 			this.#host,
 			DocumentResource.getDocumentById({
 				id,
-			})
+			}),
 		);
 	}
 
@@ -142,7 +142,7 @@ export class UmbDocumentServerDataSource
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			}) as any
+			}) as any,
 		);
 	}
 
@@ -165,8 +165,19 @@ export class UmbDocumentServerDataSource
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			}).then((res) => res.json())
+			}).then((res) => res.json()),
 		);
+	}
+
+	/**
+	 * Get the allowed document types for root
+	 * @param {string} id
+	 * @return {*}
+	 * @memberof UmbDocumentTypeServerDataSource
+	 */
+	async getAllowedDocumentTypesAtRoot() {
+		// TODO: Notice, here we need to implement pagination.
+		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentRootAllowedDocumentTypes({}));
 	}
 
 	/**
@@ -180,17 +191,5 @@ export class UmbDocumentServerDataSource
 
 		// TODO: Notice, here we need to implement pagination.
 		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdAllowedDocumentTypes({ id }));
-	}
-
-	/**
-	 * Get the allowed document types for root
-	 * @param {string} id
-	 * @return {*}
-	 * @memberof UmbDocumentTypeServerDataSource
-	 */
-	async getAllowedDocumentTypesAtRoot() {
-		console.log('source requestAllowedDocumentTypesAtRoot');
-		// TODO: Notice, here we need to implement pagination.
-		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentRootAllowedDocumentTypes({}));
 	}
 }
