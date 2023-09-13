@@ -16,10 +16,13 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 	private _allowedDocumentTypes: DocumentTypeTreeItemResponseModel[] = [];
 
 	@state()
-	private _headline?: string;
+	private _headline: string = 'Create';
 
 	async firstUpdated() {
-		await this.#retrieveAllowedChildrenOf(this.data?.id || null);
+		const documentId = this.data?.id || null;
+
+		this.#retrieveAllowedChildrenOf(documentId);
+		this.#retrieveHeadline(documentId);
 	}
 
 	async #retrieveAllowedChildrenOf(id: string | null) {
@@ -28,6 +31,15 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 		if (data) {
 			// TODO: implement pagination, or get 1000?
 			this._allowedDocumentTypes = data.items;
+		}
+	}
+
+	async #retrieveHeadline(id: string) {
+		if (!id) return;
+		const { data } = await this.#documentRepository.requestById(id);
+		if (data) {
+			// TODO: we need to get the correct variant context here
+			this._headline = `Create at ${data.variants?.[0].name}`;
 		}
 	}
 
