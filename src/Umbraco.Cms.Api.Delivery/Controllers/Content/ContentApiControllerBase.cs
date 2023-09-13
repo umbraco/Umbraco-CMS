@@ -6,7 +6,7 @@ using Umbraco.Cms.Api.Delivery.Routing;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Delivery.Controllers;
+namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 
 [DeliveryApiAccess]
 [VersionedDeliveryApiRoute("content")]

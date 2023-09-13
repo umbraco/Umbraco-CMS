@@ -19,6 +19,7 @@
 
 <!DOCTYPE html>
 <html lang="@CultureInfo.CurrentCulture.Name">
+
 <head>
     <base href="@backOfficePath.EnsureEndsWith('/')" />
     <meta charset="UTF-8" />
@@ -30,6 +31,8 @@
     <script type="importmap">
             {
                 "imports": {
+                    @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/app", backofficeAssetsPath + "/apps/app/index.js")),
+
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/uui", backofficeAssetsPath + "/external/uui/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/lit", backofficeAssetsPath + "/external/lit/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/openid", backofficeAssetsPath + "/external/openid/index.js")),
@@ -50,13 +53,13 @@
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/observable-api", backofficeAssetsPath + "/libs/observable-api/index.js")),
 
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/auth", backofficeAssetsPath + "/shared/auth/index.js")),
-                    @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/context", backofficeAssetsPath + "/shared/context/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/events", backofficeAssetsPath + "/shared/umb-events/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/icon", backofficeAssetsPath + "/shared/icon-registry/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/models", backofficeAssetsPath + "/shared/models/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/repository", backofficeAssetsPath + "/shared/repository/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/resources", backofficeAssetsPath + "/shared/resources/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/router", backofficeAssetsPath + "/shared/router/index.js")),
+                    @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/style", backofficeAssetsPath + "/shared/style/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/utils", backofficeAssetsPath + "/shared/utils/index.js")),
 
                     @Html.Raw(ImportMapValue("@umbraco-cms/internal/lit-element", backofficeAssetsPath + "/shared/lit-element/index.js")),
@@ -85,6 +88,8 @@
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/variant", backofficeAssetsPath + "/packages/core/variant/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/workspace", backofficeAssetsPath + "/packages/core/workspace/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/property-editor", backofficeAssetsPath + "/packages/core/property-editor/index.js")),
+                    @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/property-action", backofficeAssetsPath + "/packages/core/property-action/index.js")),
+                    @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/culture", backofficeAssetsPath + "/packages/core/culture/index.js")),
 
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/dictionary", backofficeAssetsPath + "/packages/dictionary/dictionary/index.js")),
 
@@ -100,6 +105,7 @@
 
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/data-type", backofficeAssetsPath + "/packages/settings/data-types/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/language", backofficeAssetsPath + "/packages/settings/languages/index.js")),
+                    @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/logviewer", backofficeAssetsPath + "/packages/settings/logviewer/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/relation-type", backofficeAssetsPath + "/packages/settings/relation-types/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/tags", backofficeAssetsPath + "/packages/tags/index.js")),
                     @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/partial-view", backofficeAssetsPath + "/packages/templating/partial-views/index.js")),
@@ -116,7 +122,9 @@
         </script>
     <script type="module" src="@backofficeAssetsPath/apps/app/app.element.js"></script>
 </head>
+
 <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
     <umb-app></umb-app>
 </body>
+
 </html>

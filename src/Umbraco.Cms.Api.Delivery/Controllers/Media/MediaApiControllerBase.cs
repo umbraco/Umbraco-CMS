@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Delivery.Controllers;
+namespace Umbraco.Cms.Api.Delivery.Controllers.Media;
 
 [DeliveryApiMediaAccess]
 [VersionedDeliveryApiRoute("media")]
@@ -30,7 +30,7 @@ public abstract class MediaApiControllerBase : DeliveryApiControllerBase
         ??= _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Media
             ?? throw new InvalidOperationException("Could not obtain the published media cache");
 
-    protected ApiMediaWithCropsResponse BuildApiMediaWithCrops(IPublishedContent media)
+    protected IApiMediaWithCropsResponse BuildApiMediaWithCrops(IPublishedContent media)
         => _apiMediaWithCropsResponseBuilder.Build(media);
 
     protected IActionResult ApiMediaQueryOperationStatusResult(ApiMediaQueryOperationStatus status) =>

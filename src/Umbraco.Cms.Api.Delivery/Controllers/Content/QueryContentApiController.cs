@@ -12,7 +12,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Delivery.Controllers;
+namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 
 [ApiVersion("1.0")]
 public class QueryContentApiController : ContentApiControllerBase
