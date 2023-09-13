@@ -1,6 +1,6 @@
 using System.Security.Principal;
 
-namespace Umbraco.Cms.Api.Management.Security.Authorization;
+namespace Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
 
 /// <summary>
 ///     Authorizes user group access.

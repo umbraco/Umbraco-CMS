@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Management.Security.Authorization;
+namespace Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
 
 /// <inheritdoc />
 public class UserGroupAuthorizer : IUserGroupAuthorizer

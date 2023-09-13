@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 
-namespace Umbraco.Cms.Api.Management.Security.Authorization;
+namespace Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
 
 /// <summary>
 ///     Authorizes that the current user has access to the user group specified in the request.
