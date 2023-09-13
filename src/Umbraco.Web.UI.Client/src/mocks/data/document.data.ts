@@ -566,11 +566,10 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 	},
 ];
 
-const createDocumentItem = (item: DocumentResponseModel | FolderTreeItemResponseModel): DocumentItemResponseModel => {
+const createDocumentItem = (item: DocumentResponseModel): DocumentItemResponseModel => {
 	return {
 		id: item.id,
-		name: item.name,
-		icon: item.icon,
+		name: item.variants?.[0].name, // Hack: TODO: we need to get all variants as part of the document item model
 		contentTypeId: item.contentTypeId,
 	};
 };
