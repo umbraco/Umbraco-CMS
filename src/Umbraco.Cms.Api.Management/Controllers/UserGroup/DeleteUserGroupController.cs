@@ -24,6 +24,7 @@ public class DeleteUserGroupController : UserGroupControllerBase
     [HttpDelete("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
@@ -32,7 +33,7 @@ public class DeleteUserGroupController : UserGroupControllerBase
 
         if (!authorizationResult.Succeeded)
         {
-            return Forbid();
+            return new StatusCodeResult(StatusCodes.Status403Forbidden);
         }
 
         Attempt<UserGroupOperationStatus> result = await _userGroupService.DeleteAsync(id);
