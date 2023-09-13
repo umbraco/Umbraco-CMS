@@ -42,7 +42,7 @@ test.describe('Partial View Macro Files', () => {
 
         // Assert
         // It can take quite a long time for a Partial View Macro to be created
-        await umbracoUi.isSuccessNotificationVisible({timeout: 20000});
+        await umbracoUi.isSuccessNotificationVisible();
 
         //Clean up
         await cleanup(umbracoApi, name);
@@ -65,7 +65,7 @@ test.describe('Partial View Macro Files', () => {
 
         // Assert
         // It can take quite a long time for a Partial View Macro to be created
-        await umbracoUi.isSuccessNotificationVisible({timeout: 20000});
+        await umbracoUi.isSuccessNotificationVisible();
 
         // Clean
         await cleanup(umbracoApi, name);
@@ -91,7 +91,7 @@ test.describe('Partial View Macro Files', () => {
 
         // Assert
         // It can take quite a long time for a Partial View Macro to be created
-        await umbracoUi.isSuccessNotificationVisible({timeout: 20000});
+        await umbracoUi.isSuccessNotificationVisible();
 
         // Clean
         await cleanup(umbracoApi, name);
@@ -152,7 +152,7 @@ test.describe('Partial View Macro Files', () => {
 
         // Assert
         // It can take quite a long time for a Partial View Macro to be edited
-        await umbracoUi.isSuccessNotificationVisible({timeout: 20000});
+        await umbracoUi.isSuccessNotificationVisible();
 
         await cleanup(umbracoApi, name);
     });

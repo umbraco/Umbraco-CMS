@@ -266,7 +266,7 @@ test.describe('Modelsbuilder tests', () => {
     // We only have to type out the opening tag, the editor adds the closing tag automatically.
     await editor.type("<p>@Model.Bod");
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
-    await umbracoUi.isSuccessNotificationVisible({timeout: 20000});
+    await umbracoUi.isSuccessNotificationVisible();
     await page.locator('span:has-text("×")').click();
 
     // Navigate to the content section and update the content
