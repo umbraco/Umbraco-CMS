@@ -128,9 +128,13 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	#requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
 		const Message: UmbConfirmModalData = {
 			headline: 'Delete tab',
-			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tab?.name ?? tab?.id]}>Are you sure you want to delete the tab <strong>${tab?.name ?? tab?.id}</strong></umb-localize>
+			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tab?.name ?? tab?.id]}
+					>Are you sure you want to delete the tab <strong>${tab?.name ?? tab?.id}</strong></umb-localize
+				>
 				<div style="color:var(--uui-color-danger-emphasis)">
-					<umb-localize key="contentTypeEditor_confirmDeleteTabNotice">This will delete all items that doesn't belong to a composition.</umb-localize>
+					<umb-localize key="contentTypeEditor_confirmDeleteTabNotice"
+						>This will delete all items that doesn't belong to a composition.</umb-localize
+					>
 				</div>`,
 			confirmLabel: this.localize.term('actions_delete'),
 			color: 'danger',
@@ -183,7 +187,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			(event.target as HTMLInputElement).value = 'Unnamed';
 		}
 
-		const changedName = this._workspaceContext?.structure.makeContainerNameUniqueForOwnerDocument(
+		const changedName = this._workspaceContext?.structure.makeContainerNameUniqueForOwnerContentType(
 			newName,
 			'Tab',
 			tab.id,
@@ -280,7 +284,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			</uui-button>
 			<uui-button label=${this.localize.term('general_reorder')} compact>
 				<uui-icon name="umb:navigation"></uui-icon>
-			<umb-localize key="general_reorder">Reorder</umb-localize>
+				<umb-localize key="general_reorder">Reorder</umb-localize>
 			</uui-button>
 		</div>`;
 	}

@@ -45,7 +45,7 @@ export class UmbDocumentTypeServerDataSource
 			this.#host,
 			DocumentTypeResource.getDocumentTypeById({
 				id: id,
-			})
+			}),
 		);
 	}
 
@@ -91,27 +91,12 @@ export class UmbDocumentTypeServerDataSource
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async insert(documentType: CreateDocumentTypeRequestModel) {
-		if (!documentType) throw new Error('Document is missing');
-		//if (!document.id) throw new Error('ID is missing');
-
-		documentType = { ...documentType };
-
-		// TODO: Hack to remove some props that ruins the document-type post end-point.
-		(documentType as any).id = undefined;
-
-		// TODO: Investigate if this matters (should go away anyway when we have the end-point accepts us defining the ids.)
-		documentType.properties = documentType.properties?.map((prop) => {
-			return {
-				...prop,
-				id: undefined,
-			};
-		});
-
+		if (!documentType) throw new Error('Document Type is missing');
 		return tryExecuteAndNotify(
 			this.#host,
 			DocumentTypeResource.postDocumentType({
 				requestBody: documentType,
-			})
+			}),
 		);
 	}
 
@@ -164,7 +149,7 @@ export class UmbDocumentTypeServerDataSource
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			}).then((res) => res.json())
+			}).then((res) => res.json()),
 		);
 	}
 }

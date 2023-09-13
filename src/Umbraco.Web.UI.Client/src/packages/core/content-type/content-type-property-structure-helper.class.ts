@@ -30,7 +30,7 @@ export class UmbContentTypePropertyStructureHelper {
 	}
 
 	get ownerDocumentTypes() {
-		return this.#structure?.documentTypes;
+		return this.#structure?.contentTypes;
 	}
 
 	public setStructureManager(structure: UmbContentTypePropertyStructureManager) {
