@@ -254,14 +254,11 @@ export class UmbDocumentRepository
 		return { error };
 	}
 
-	// Listing all currently known methods we need to implement:
-	// these currently only covers posting data
-	// TODO: find a good way to split these
 	async trash(id: string) {
 		if (!id) throw new Error('Id is missing');
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.delete(id);
+		const { error } = await this.#detailDataSource.trash(id);
 
 		if (!error) {
 			// TODO: we currently don't use the detail store for anything.
@@ -273,6 +270,8 @@ export class UmbDocumentRepository
 			this.#treeStore?.removeItem(id);
 			this.#itemStore?.removeItem(id);
 
+			// TODO: append to recycle bin store
+
 			const notification = { data: { message: `Document moved to recycle bin` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
@@ -280,6 +279,9 @@ export class UmbDocumentRepository
 		return { error };
 	}
 
+	// Listing all currently known methods we need to implement:
+	// these currently only covers posting data
+	// TODO: find a good way to split these
 	async saveAndPublish() {
 		alert('save and publish');
 	}
