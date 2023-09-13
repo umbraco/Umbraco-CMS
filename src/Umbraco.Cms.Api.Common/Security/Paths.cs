@@ -10,8 +10,11 @@ public static class Paths
 
         public static readonly string TokenEndpoint = EndpointPath($"{EndpointTemplate}/token");
 
-        // TODO: talk to Jacob about what is the preferred versioning scheme for the new backoffice client - /v1.0/ or /v1/
-        private static string EndpointPath(string relativePath) => $"/umbraco/management/api/v1.0/{relativePath}";
+        public static readonly string LogoutEndpoint = EndpointPath($"{EndpointTemplate}/signout");
+
+        public static readonly string RevokeEndpoint = EndpointPath($"{EndpointTemplate}/revoke");
+
+        private static string EndpointPath(string relativePath) => $"/umbraco/management/api/v1/{relativePath}";
     }
 
     public static class MemberApi
