@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Validation.AspNetCore;
+using Umbraco.Cms.Api.Management.Security.Authorization;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -12,6 +13,12 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
 {
     internal static IUmbracoBuilder AddAuthorizationPolicies(this IUmbracoBuilder builder)
     {
+        // NOTE: Even though we are registering these handlers globally they will only actually execute their logic for
+        // any auth defining a matching requirement and scheme.
+        builder.Services.AddSingleton<IAuthorizationHandler, UserGroupHandler>();
+
+        builder.Services.AddSingleton<IUserGroupAuthorizer, UserGroupAuthorizer>();
+
         builder.Services.AddAuthorization(CreatePolicies);
         return builder;
     }
@@ -66,5 +73,12 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         AddPolicy(AuthorizationPolicies.TreeAccessTemplates, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
 
         AddPolicy(AuthorizationPolicies.RequireAdminAccess, ClaimsIdentity.DefaultRoleClaimType, Constants.Security.AdminGroupAlias);
+
+        // Contextual permissions
+        options.AddPolicy($"New{AuthorizationPolicies.UserBelongsToUserGroupInRequest}", policy =>
+        {
+            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            policy.Requirements.Add(new UserGroupRequirement());
+        });
     }
 }
