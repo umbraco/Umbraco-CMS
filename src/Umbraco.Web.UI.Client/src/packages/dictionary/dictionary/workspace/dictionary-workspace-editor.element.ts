@@ -1,6 +1,6 @@
 import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from './dictionary-workspace.context.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-dictionary-workspace-editor')
 export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
@@ -41,7 +41,7 @@ export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
 					<uui-button href="/section/dictionary/dashboard" label="Back to list" compact>
 						<uui-icon name="umb:arrow-left"></uui-icon>
 					</uui-button>
-					<uui-input .value=${this._name} @input="${this.#handleInput}" label="Dictionary name"></uui-input>
+					<uui-input .value=${this._name ?? ''} @input="${this.#handleInput}" label="Dictionary name"></uui-input>
 				</div>
 			</umb-workspace-editor>
 		`;

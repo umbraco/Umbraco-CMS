@@ -4,13 +4,6 @@ import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/e
 import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DictionaryOverviewResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import {
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_CREATE_DICTIONARY_MODAL,
-	UmbModalRouteRegistrationController,
-} from '@umbraco-cms/backoffice/modal';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-dashboard-translation-dictionary')
 export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
@@ -26,8 +19,6 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#repo!: UmbDictionaryRepository;
 
-	#modalContext!: UmbModalManagerContext;
-
 	#tableItems: Array<UmbTableItem> = [];
 
 	#tableColumns: Array<UmbTableColumn> = [];
@@ -39,10 +30,6 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	constructor() {
 		super();
-
-		new UmbContextConsumerController(this, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
-			this.#modalContext = instance;
-		});
 	}
 
 	async connectedCallback() {
@@ -132,29 +119,15 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 			: this.#tableItems;
 	}
 
-	async #create() {
-		// TODO: what to do if modal service is not available?
-		if (!this.#modalContext) return;
-		if (!this.#repo) return;
-
-		const modalContext = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, { parentId: null });
-
-		const { name, parentId } = await modalContext.onSubmit();
-
-		if (!name || parentId === undefined) return;
-
-		const { data } = await this.#repo.createScaffold(null, { name });
-		const { error } = await this.#repo.create(data);
-
-		if (error) return;
-		history.pushState({}, '', `/section/dictionary/workspace/dictionary-item/edit/${data.id}`);
-	}
-
 	render() {
 		return html`
 			<umb-body-layout header-transparent>
 				<div id="header" slot="header">
-					<uui-button type="button" look="outline" label="Create dictionary item" @click=${this.#create}>
+					<uui-button
+						type="button"
+						look="outline"
+						label="Create dictionary item"
+						href="/section/dictionary/workspace/dictionary-item/create/null">
 						Create dictionary item
 					</uui-button>
 					<uui-input

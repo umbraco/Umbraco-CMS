@@ -20,6 +20,14 @@ export class UmbWorkspaceDictionaryElement extends UmbLitElement {
 				this.#workspaceContext.load(id);
 			},
 		},
+		{
+			path: 'create/:parentId',
+			component: () => this.#element,
+			setup: (_component, info) => {
+				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
+				this.#workspaceContext.create(parentId);
+			},
+		},
 	];
 
 	render() {
