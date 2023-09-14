@@ -77,9 +77,7 @@ export class UmbDictionaryWorkspaceContext
 		if (!this.#data.value) return;
 		if (!this.#data.value.id) return;
 
-		const model = { name: this.#data.value.name, translations: this.#data.value.translations };
-
-		await this.repository.save(this.#data.value.id, model);
+		await this.repository.save(this.#data.value.id, this.#data.value);
 		this.setIsNew(false);
 	}
 
