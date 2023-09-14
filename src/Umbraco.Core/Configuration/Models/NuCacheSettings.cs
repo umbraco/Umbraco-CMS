@@ -44,7 +44,4 @@ public class NuCacheSettings
 
     [DefaultValue(StaticUsePagedSqlQuery)]
     public bool UsePagedSqlQuery { get; set; } = true;
-
-
-
 }
