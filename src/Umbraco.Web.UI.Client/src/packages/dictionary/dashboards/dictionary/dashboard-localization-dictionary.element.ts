@@ -25,9 +25,6 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#languages: Array<LanguageResponseModel> = [];
 
-	@state()
-	protected _modalRouteNewDictionary?: string;
-
 	constructor() {
 		super();
 	}
