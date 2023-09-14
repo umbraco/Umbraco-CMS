@@ -5,10 +5,10 @@
 
 import type { ContentTypeCompositionModel } from './ContentTypeCompositionModel';
 import type { ContentTypeSortModel } from './ContentTypeSortModel';
-import type { CreateDocumentTypePropertyTypeContainerRequestModel } from './CreateDocumentTypePropertyTypeContainerRequestModel';
-import type { CreateDocumentTypePropertyTypeRequestModel } from './CreateDocumentTypePropertyTypeRequestModel';
+import type { CreateMediaTypePropertyTypeContainerRequestModel } from './CreateMediaTypePropertyTypeContainerRequestModel';
+import type { CreateMediaTypePropertyTypeRequestModel } from './CreateMediaTypePropertyTypeRequestModel';
 
-export type CreateContentTypeRequestModelBaseCreateDocumentTypePropertyTypeRequestModelCreateDocumentTypePropertyTypeContainerRequestModel = {
+export type CreateContentTypeRequestModelBaseCreateMediaTypePropertyTypeRequestModelCreateMediaTypePropertyTypeContainerRequestModel = {
     alias?: string;
     name?: string;
     description?: string | null;
@@ -17,8 +17,8 @@ export type CreateContentTypeRequestModelBaseCreateDocumentTypePropertyTypeReque
     variesByCulture?: boolean;
     variesBySegment?: boolean;
     isElement?: boolean;
-    properties?: Array<CreateDocumentTypePropertyTypeRequestModel>;
-    containers?: Array<CreateDocumentTypePropertyTypeContainerRequestModel>;
+    properties?: Array<CreateMediaTypePropertyTypeRequestModel>;
+    containers?: Array<CreateMediaTypePropertyTypeContainerRequestModel>;
     allowedContentTypes?: Array<ContentTypeSortModel>;
     compositions?: Array<ContentTypeCompositionModel>;
     id?: string | null;

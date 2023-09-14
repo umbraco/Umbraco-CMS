@@ -9,6 +9,7 @@ import type { MediaVariantRequestModel } from './MediaVariantRequestModel';
 export type CreateContentRequestModelBaseMediaValueModelMediaVariantRequestModel = {
     values?: Array<MediaValueModel>;
     variants?: Array<MediaVariantRequestModel>;
+    id?: string | null;
     parentId?: string | null;
 };
 
