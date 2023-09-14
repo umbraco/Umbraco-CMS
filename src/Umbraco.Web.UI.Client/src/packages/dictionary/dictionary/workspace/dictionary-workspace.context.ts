@@ -77,8 +77,15 @@ export class UmbDictionaryWorkspaceContext
 		if (!this.#data.value) return;
 		if (!this.#data.value.id) return;
 
-		await this.repository.save(this.#data.value.id, this.#data.value);
-		this.setIsNew(false);
+		if (this.getIsNew()) {
+			await this.repository.create(this.#data.value);
+			this.setIsNew(false);
+		} else {
+			await this.repository.save(this.#data.value.id, this.#data.value);
+		}
+
+		const data = this.getData();
+		if (data) this.saveComplete(data);
 	}
 
 	public destroy(): void {

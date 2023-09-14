@@ -76,23 +76,14 @@ export const handlers = [
 
 	rest.post('/umbraco/management/api/v1/dictionary', async (req, res, ctx) => {
 		const data = await req.json();
+
 		if (!data) return;
 
 		data.icon = 'umb:book-alt';
 		data.hasChildren = false;
 		data.type = 'dictionary-item';
-		data.translations = [
-			{
-				isoCode: 'en-US',
-				translation: '',
-			},
-			{
-				isoCode: 'fr',
-				translation: '',
-			},
-		];
 
-		const value = umbDictionaryData.save(data.id, data);
+		const value = umbDictionaryData.insert(data);
 
 		const createdResult = {
 			value,
