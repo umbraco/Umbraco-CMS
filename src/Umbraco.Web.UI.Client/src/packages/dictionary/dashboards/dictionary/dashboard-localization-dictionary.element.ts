@@ -54,7 +54,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 	#setTableColumns() {
 		this.#tableColumns = [
 			{
-				name: 'Name',
+				name: this.localize.term('general_name'),
 				alias: 'name',
 			},
 		];
@@ -95,11 +95,11 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 					value: dictionary.translatedIsoCodes?.includes(l.isoCode)
 						? html`<uui-icon
 								name="check"
-								title="Translation exists for ${l.name}"
+								title="${this.localize.term('visuallyHiddenTexts_hasTranslation')} (${l.name})"
 								style="color:var(--uui-color-positive-standalone);display:inline-block"></uui-icon>`
 						: html`<uui-icon
 								name="alert"
-								title="Translation does not exist for ${l.name}"
+								title="${this.localize.term('visuallyHiddenTexts_noTranslation')} (${l.name})"
 								style="color:var(--uui-color-danger-standalone);display:inline-block"></uui-icon>`,
 				});
 			});
@@ -123,14 +123,14 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 					<uui-button
 						type="button"
 						look="outline"
-						label="Create dictionary item"
+						label=${this.localize.term('dictionary_createNew')}
 						href="/section/dictionary/workspace/dictionary-item/create/null">
-						Create dictionary item
+						${this.localize.term('dictionary_createNew')}
 					</uui-button>
 					<uui-input
 						@keyup="${this.#filter}"
-						placeholder="Type to filter..."
-						label="Type to filter dictionary"
+						placeholder=${this.localize.term('placeholders_filter')}
+						label=${this.localize.term('placeholders_filter')}
 						id="searchbar">
 						<div slot="prepend">
 							<uui-icon name="search" id="searchbar_icon"></uui-icon>
@@ -144,7 +144,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 							.config=${this._tableConfig}
 							.columns=${this.#tableColumns}
 							.items=${this._tableItemsFiltered}></umb-table>`,
-					() => html`<umb-empty-state>There were no dictionary items found.</umb-empty-state>`,
+					() => html`<umb-empty-state>${this.localize.term('emptyStates_emptyDictionaryTree')}</umb-empty-state>`,
 				)}
 			</umb-body-layout>
 		`;

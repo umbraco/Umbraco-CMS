@@ -1,7 +1,7 @@
 import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from '../../dictionary-workspace.context.js';
 import { UmbDictionaryRepository } from '../../../repository/dictionary.repository.js';
 import { UUITextareaElement, UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, ifDefined, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DictionaryItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 @customElement('umb-workspace-view-dictionary-editor')
@@ -62,12 +62,11 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-box>
-				<p>Edit the different language versions for the dictionary item '<em>${this._dictionary?.name}</em>' below.</p>
-
+				${unsafeHTML(this.localize.term('dictionaryItem_description', this._dictionary?.name))}
 				${repeat(
 					this._languages,
 					(item) => item.isoCode,
-					(item) => this.#renderTranslation(item)
+					(item) => this.#renderTranslation(item),
 				)}
 			</uui-box>
 		`;

@@ -38,10 +38,16 @@ export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.Dictionary">
 				<div id="header" slot="header">
-					<uui-button href="/section/dictionary/dashboard" label="Back to list" compact>
+					<uui-button
+						href="/section/dictionary/dashboard"
+						label=${this.localize.term('general_backToOverview')}
+						compact>
 						<uui-icon name="umb:arrow-left"></uui-icon>
 					</uui-button>
-					<uui-input .value=${this._name ?? ''} @input="${this.#handleInput}" label="Dictionary name"></uui-input>
+					<uui-input
+						.value=${this._name ?? ''}
+						@input="${this.#handleInput}"
+						label="${this.localize.term('general_dictionary')} ${this.localize.term('general_name')}"></uui-input>
 				</div>
 			</umb-workspace-editor>
 		`;
