@@ -56,11 +56,14 @@ export class UmbDocumentServerDataSource
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async createScaffold(documentTypeId: string, preset?: Partial<CreateDocumentRequestModel>) {
+		const id = UmbId.new();
+		const hackID = id === null ? undefined : id;
+
 		const data: DocumentResponseModel = {
 			urls: [],
 			templateId: null,
 			parentId: null,
-			id: UmbId.new(),
+			id: hackID,
 			contentTypeId: documentTypeId,
 			values: [],
 			variants: [
@@ -177,7 +180,9 @@ export class UmbDocumentServerDataSource
 	 */
 	async getAllowedDocumentTypesOf(id: string | null) {
 		if (id === undefined) throw new Error('Id is missing');
+		// TODO: remove when null is allowed as id.
+		const hackId = id === null ? undefined : id;
 		// TODO: Notice, here we need to implement pagination.
-		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentAllowedDocumentTypes({ parentId: id }));
+		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentAllowedDocumentTypes({ parentId: hackId }));
 	}
 }
