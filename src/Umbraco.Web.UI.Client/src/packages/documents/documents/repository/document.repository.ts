@@ -178,11 +178,11 @@ export class UmbDocumentRepository
 			this.#store?.append(item);
 			// TODO: Update tree store with the new item? or ask tree to request the new item?
 
-			// TODO: Revisit this call, as we should be able to update tree on client.
-			await this.requestRootTreeItems();
-
 			const notification = { data: { message: `Document created` } };
 			this.#notificationContext?.peek('positive', notification);
+
+			// TODO: Revisit this call, as we should be able to update tree on client.
+			await this.requestRootTreeItems();
 
 			return { data: item };
 		}
@@ -206,11 +206,11 @@ export class UmbDocumentRepository
 			//this.#treeStore?.updateItem(item.id, { name: item.name });// Port data to tree store.
 			// TODO: would be nice to align the stores on methods/methodNames.
 
-			// TODO: Revisit this call, as we should be able to update tree on client.
-			await this.requestRootTreeItems();
-
 			const notification = { data: { message: `Document saved` } };
 			this.#notificationContext?.peek('positive', notification);
+
+			// TODO: Revisit this call, as we should be able to update tree on client.
+			await this.requestRootTreeItems();
 		}
 
 		return { error };
