@@ -38,7 +38,11 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 			ProfilingResource.putProfilingStatus({ requestBody: { enabled: !this._profilingStatus } }),
 		);
 
-		error ? this.#setToggle(this._profilingStatus) : this.#setToggle(!this._profilingStatus);
+		if (error) {
+			this.#setToggle(this._profilingStatus);
+		} else {
+			this.#setToggle(!this._profilingStatus);
+		}
 	}
 
 	private renderProfilingStatus() {
