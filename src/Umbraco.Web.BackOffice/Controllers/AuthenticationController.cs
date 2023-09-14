@@ -373,7 +373,7 @@ public class AuthenticationController : UmbracoApiControllerBase
 
         IdentityResult result = await _userManager.AddPasswordAsync(user, invitePasswordModel.NewPassword);
 
-        if (result.Succeeded == false)
+        if (result.Succeeded is false)
         {
             // it wasn't successful, so add the change error to the model state, we've name the property alias _umb_password on the form
             // so that is why it is being used here.

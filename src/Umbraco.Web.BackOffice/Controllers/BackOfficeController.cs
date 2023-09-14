@@ -395,7 +395,7 @@ public class BackOfficeController : UmbracoController
     public async Task<IActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")] int userId, [Bind(Prefix = "r")] string resetCode)
     {
         BackOfficeIdentityUser? user = await _userManager.FindByIdAsync(userId.ToString(CultureInfo.InvariantCulture));
-        if (user == null)
+        if (user is null)
         {
             return RedirectToLogin(new { flow = "reset-password", status = "userNotFound" });
         }

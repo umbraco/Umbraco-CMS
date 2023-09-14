@@ -32,7 +32,7 @@ public class BackOfficeExternalLoginProviderOptions
     /// <summary>
     ///     Gets or sets the icon to use for the login button.
     /// </summary>
-    [Obsolete("This is no longer used and will be removed in V14. Please set the ButtonLook and ButtonColor properties instead.")]
+    [Obsolete("This is no longer used and will be removed in V15. Please set the ButtonLook and ButtonColor properties instead.")]
     public string ButtonStyle
     {
         get => _buttonStyle;
