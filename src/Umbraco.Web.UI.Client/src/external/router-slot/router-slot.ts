@@ -82,6 +82,7 @@ export class RouterSlot<D = any, P = any>
 
 	private _lockParent = false;
 	private _setParent(router: IRouterSlot<P> | null | undefined) {
+		if (this._parent === router) return;
 		this.detachListeners();
 		this._parent = router;
 		this.attachListeners();
@@ -130,6 +131,11 @@ export class RouterSlot<D = any, P = any>
 	constructor() {
 		super();
 
+		this.addEventListener("router-slot:capture-parent", (e: any) => {
+			e.stopPropagation();
+			e.detail.parent = this;
+		});
+
 		this.render = this.render.bind(this);
 
 		// Attach the template
@@ -143,7 +149,17 @@ export class RouterSlot<D = any, P = any>
 	connectedCallback() {
 		// Do not query a parent if the parent has been set from the outside.
 		if (!this._lockParent) {
-			this._setParent(this.queryParentRouterSlot());
+			const captureParentEvent = new CustomEvent("router-slot:capture-parent", {
+				composed: true,
+				bubbles: true,
+				detail: { parent: null },
+			});
+			if (this.parentNode) {
+				this.parentNode.dispatchEvent(captureParentEvent);
+				this._setParent(captureParentEvent.detail.parent ?? null);
+			} else {
+				this._setParent(null);
+			}
 		}
 		if (this.parent && this.parent.match !== null && this.match === null) {
 			requestAnimationFrame(() => {
