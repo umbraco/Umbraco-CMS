@@ -1,14 +1,14 @@
 import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbAllowedDocumentTypesModalData, UmbAllowedDocumentTypesModalResult } from '@umbraco-cms/backoffice/modal';
+import { UmbCreateDocumentModalData, UmbCreateDocumentModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
 
-@customElement('umb-allowed-document-types-modal')
-export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
-	UmbAllowedDocumentTypesModalData,
-	UmbAllowedDocumentTypesModalResult
+@customElement('umb-create-document-modal')
+export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
+	UmbCreateDocumentModalData,
+	UmbCreateDocumentModalResult
 > {
 	#documentRepository = new UmbDocumentRepository(this);
 
@@ -16,29 +16,19 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	private _allowedDocumentTypes: DocumentTypeTreeItemResponseModel[] = [];
 
 	@state()
-	private _headline?: string;
+	private _headline: string = 'Create';
 
-	public connectedCallback() {
-		super.connectedCallback();
+	async firstUpdated() {
+		const documentId = this.data?.id || null;
 
-		const parentId = this.data?.parentId;
-		const parentName = this.data?.parentName;
-		if (parentName) {
-			this._headline = `Create at '${parentName}'`;
-		} else {
-			this._headline = `Create`;
-		}
-		if (parentId) {
-			// TODO: Support root aka. id of null? or maybe its an active prop, like 'atRoot'.
-			// TODO: show error
+		this.#retrieveAllowedDocumentTypesOf(documentId);
 
-			this._retrieveAllowedChildrenOf(parentId);
-		} else {
-			this._retrieveAllowedChildrenOfRoot();
+		if (documentId) {
+			this.#retrieveHeadline(documentId);
 		}
 	}
 
-	private async _retrieveAllowedChildrenOf(id: string) {
+	async #retrieveAllowedDocumentTypesOf(id: string | null) {
 		const { data } = await this.#documentRepository.requestAllowedDocumentTypesOf(id);
 
 		if (data) {
@@ -47,12 +37,12 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	private async _retrieveAllowedChildrenOfRoot() {
-		const { data } = await this.#documentRepository.requestAllowedDocumentTypesOf(null);
-
+	async #retrieveHeadline(id: string) {
+		if (!id) return;
+		const { data } = await this.#documentRepository.requestById(id);
 		if (data) {
-			// TODO: implement pagination, or get 1000?
-			this._allowedDocumentTypes = data.items;
+			// TODO: we need to get the correct variant context here
+			this._headline = `Create at ${data.variants?.[0].name}`;
 		}
 	}
 
@@ -63,9 +53,9 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
 		const target = event.target as HTMLButtonElement;
-		const documentTypeKey = target.dataset.id;
-		if (!documentTypeKey) throw new Error('No document type id found');
-		this.modalContext?.submit({ documentTypeKey });
+		const documentTypeId = target.dataset.id;
+		if (!documentTypeId) throw new Error('No document type id found');
+		this.modalContext?.submit({ documentTypeId });
 	}
 
 	render() {
@@ -89,10 +79,10 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	static styles = [UmbTextStyles];
 }
 
-export default UmbAllowedDocumentTypesModalElement;
+export default UmbCreateDocumentModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-allowed-document-types-modal': UmbAllowedDocumentTypesModalElement;
+		'umb-create-document-modal': UmbCreateDocumentModalElement;
 	}
 }

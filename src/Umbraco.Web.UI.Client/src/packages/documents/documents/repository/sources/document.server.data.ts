@@ -83,40 +83,21 @@ export class UmbDocumentServerDataSource
 	 * @param {Document} document
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async insert(document: CreateDocumentRequestModel & { id: string }) {
+	async insert(document: CreateDocumentRequestModel) {
 		if (!document.id) throw new Error('Id is missing');
-
-		// TODO: Hack to remove some props that ruins the document-type post end-point.
-		const unFroozenDocument = { ...document };
-		(unFroozenDocument as any).id = undefined;
-
-		(unFroozenDocument.variants as any) =
-			unFroozenDocument.variants?.map((variant) => {
-				return { ...variant };
-			}) ?? [];
-
-		return tryExecuteAndNotify(this.#host, DocumentResource.postDocument({ requestBody: unFroozenDocument }));
+		return tryExecuteAndNotify(this.#host, DocumentResource.postDocument({ requestBody: document }));
 	}
 
 	/**
 	 * Updates a Document on the server
-	 * @param {Document} Document
+	 * @param {string} id
+	 * @param {UpdateDocumentRequestModel} document
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async update(id: string, document: UpdateDocumentRequestModel) {
 		if (!id) throw new Error('Id is missing');
-
-		// TODO: Hack to remove some props that ruins the document-type post end-point.
-		const unFroozenDocument = { ...document };
-		(unFroozenDocument as any).id = undefined;
-
-		(unFroozenDocument.variants as any) =
-			unFroozenDocument.variants?.map((variant) => {
-				return { ...variant };
-			}) ?? [];
-
-		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentById({ id, requestBody: unFroozenDocument }));
+		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentById({ id, requestBody: document }));
 	}
 
 	/**

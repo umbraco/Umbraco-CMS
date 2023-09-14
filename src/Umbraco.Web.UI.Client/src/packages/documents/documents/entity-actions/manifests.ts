@@ -1,6 +1,5 @@
 import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { DOCUMENT_ENTITY_TYPE, DOCUMENT_ROOT_ENTITY_TYPE } from '../index.js';
-import { UmbCreateDocumentEntityAction } from './create/create.action.js';
 import { UmbPublishDocumentEntityAction } from './publish.action.js';
 import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action.js';
 import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action.js';
@@ -8,28 +7,17 @@ import { UmbDocumentPublicAccessEntityAction } from './public-access.action.js';
 import { UmbDocumentPermissionsEntityAction } from './permissions.action.js';
 import { UmbUnpublishDocumentEntityAction } from './unpublish.action.js';
 import { UmbRollbackDocumentEntityAction } from './rollback.action.js';
+import { manifests as createManifests } from './create/manifests.js';
 import {
 	UmbCopyEntityAction,
 	UmbMoveEntityAction,
 	UmbTrashEntityAction,
 	UmbSortChildrenOfEntityAction,
 } from '@umbraco-cms/backoffice/entity-action';
-import { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestEntityAction> = [
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.Create',
-		name: 'Create Document Entity Action',
-		weight: 1000,
-		meta: {
-			icon: 'umb:add',
-			label: 'Create',
-			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
-			api: UmbCreateDocumentEntityAction,
-			entityTypes: [DOCUMENT_ROOT_ENTITY_TYPE, DOCUMENT_ENTITY_TYPE],
-		},
-	},
+const entityActions: Array<ManifestTypes> = [
+	...createManifests,
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.Trash',
@@ -170,13 +158,4 @@ const entityActions: Array<ManifestEntityAction> = [
 	},
 ];
 
-const modals: Array<ManifestModal> = [
-	{
-		type: 'modal',
-		alias: 'Umb.Modal.CreateDocument',
-		name: 'Create Document Modal',
-		loader: () => import('../../document-types/modals/allowed-document-types/allowed-document-types-modal.element.js'),
-	},
-];
-
-export const manifests = [...entityActions, ...modals];
+export const manifests = [...entityActions];
