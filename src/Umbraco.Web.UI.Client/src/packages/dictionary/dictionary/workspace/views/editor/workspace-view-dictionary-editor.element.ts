@@ -62,7 +62,7 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-box>
-				${unsafeHTML(this.localize.term('dictionaryItem_description', this._dictionary?.name))}
+				${unsafeHTML(this.localize.term('dictionaryItem_description', this._dictionary?.name || 'unnamed'))}
 				${repeat(
 					this._languages,
 					(item) => item.isoCode,
