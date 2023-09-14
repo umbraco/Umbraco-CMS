@@ -56,14 +56,10 @@ export class UmbDocumentServerDataSource
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async createScaffold(documentTypeId: string, preset?: Partial<CreateDocumentRequestModel>) {
-		const id = UmbId.new();
-		const hackID = id === null ? undefined : id;
-
 		const data: DocumentResponseModel = {
 			urls: [],
 			templateId: null,
 			parentId: null,
-			id: hackID,
 			contentTypeId: documentTypeId,
 			values: [],
 			variants: [
@@ -78,6 +74,7 @@ export class UmbDocumentServerDataSource
 				},
 			],
 			...preset,
+			id: UmbId.new(),
 		};
 
 		return { data };
