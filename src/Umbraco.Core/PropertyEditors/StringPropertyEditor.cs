@@ -36,14 +36,6 @@ public class StringPropertyEditor : DataEditor
         SupportsReadOnly = true;
     }
 
-    /// <inheritdoc />
-    protected override IDataValueEditor CreateValueEditor() =>
-        DataValueEditorFactory.Create<StringPropertyValueEditor>(Attribute!);
-
-    /// <inheritdoc />
-    protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new NoopStringConfigurationEditor(_ioHelper, _editorConfigurationParser);
-
     // provides the property value editor
     internal class StringPropertyValueEditor : DataValueEditor
     {
