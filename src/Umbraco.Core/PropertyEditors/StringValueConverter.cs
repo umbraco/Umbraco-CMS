@@ -9,7 +9,7 @@ public class StringValueConverter : PropertyValueConverterBase, IDeliveryApiProp
 {
     private static readonly string[] PropertyTypeAliases =
     {
-        Constants.PropertyEditors.Aliases.String, Constants.PropertyEditors.Aliases.TextArea,
+        Constants.PropertyEditors.Aliases.String
     };
 
     public override bool IsConverter(IPublishedPropertyType propertyType)
