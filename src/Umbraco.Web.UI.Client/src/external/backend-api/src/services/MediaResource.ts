@@ -9,6 +9,7 @@ import type { MediaTreeItemResponseModel } from '../models/MediaTreeItemResponse
 import type { MoveMediaRequestModel } from '../models/MoveMediaRequestModel';
 import type { PagedMediaTreeItemResponseModel } from '../models/PagedMediaTreeItemResponseModel';
 import type { PagedRecycleBinItemResponseModel } from '../models/PagedRecycleBinItemResponseModel';
+import type { SortingRequestModel } from '../models/SortingRequestModel';
 import type { UpdateMediaRequestModel } from '../models/UpdateMediaRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -49,27 +50,6 @@ export class MediaResource {
     }): CancelablePromise<DocumentResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/media/{id}',
-            path: {
-                'id': id,
-            },
-            errors: {
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static deleteMediaById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
             url: '/umbraco/management/api/v1/media/{id}',
             path: {
                 'id': id,
@@ -134,6 +114,28 @@ export class MediaResource {
      * @returns any Success
      * @throws ApiError
      */
+    public static putMediaByIdMoveToRecycleBin({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/media/{id}/move-to-recycle-bin',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Bad Request`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
     public static getMediaItem({
         id,
         dataTypeId,
@@ -147,6 +149,27 @@ export class MediaResource {
             query: {
                 'id': id,
                 'dataTypeId': dataTypeId,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putMediaSort({
+        requestBody,
+    }: {
+        requestBody?: SortingRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/media/sort',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                404: `Not Found`,
             },
         });
     }

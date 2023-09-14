@@ -1,5 +1,5 @@
 import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbAllowedDocumentTypesModalData, UmbAllowedDocumentTypesModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -48,7 +48,7 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	}
 
 	private async _retrieveAllowedChildrenOfRoot() {
-		const { data } = await this.#documentRepository.requestAllowedDocumentTypesAtRoot();
+		const { data } = await this.#documentRepository.requestAllowedDocumentTypesOf(null);
 
 		if (data) {
 			// TODO: implement pagination, or get 1000?
@@ -74,12 +74,11 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 				<uui-box>
 					${this._allowedDocumentTypes.length === 0 ? html`<p>No allowed types</p>` : nothing}
 					${this._allowedDocumentTypes.map(
-						(item) =>
-							html`
-								<uui-menu-item data-id=${ifDefined(item.id)} @click=${this.#onClick} label="${ifDefined(item.name)}">
-									${item.icon ? html`<uui-icon slot="icon" name=${item.icon}></uui-icon>` : nothing}
-								</uui-menu-item>
-							`
+						(item) => html`
+							<uui-menu-item data-id=${ifDefined(item.id)} @click=${this.#onClick} label="${ifDefined(item.name)}">
+								${item.icon ? html`<uui-icon slot="icon" name=${item.icon}></uui-icon>` : nothing}
+							</uui-menu-item>
+						`,
 					)}
 				</uui-box>
 				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._handleCancel}">Cancel</uui-button>

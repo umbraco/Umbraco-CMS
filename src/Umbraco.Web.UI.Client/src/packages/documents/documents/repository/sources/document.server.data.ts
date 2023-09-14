@@ -58,7 +58,6 @@ export class UmbDocumentServerDataSource
 			urls: [],
 			templateId: null,
 			parentId: null,
-			id: UmbId.new(),
 			contentTypeId: documentTypeId,
 			values: [],
 			variants: [
@@ -73,6 +72,7 @@ export class UmbDocumentServerDataSource
 				},
 			],
 			...preset,
+			id: UmbId.new(),
 		};
 
 		return { data };
@@ -127,7 +127,7 @@ export class UmbDocumentServerDataSource
 	async trash(id: string) {
 		if (!id) throw new Error('Document ID is missing');
 		// TODO: if we get a trash endpoint, we should use that instead.
-		return this.delete(id);
+		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdMoveToRecycleBin({ id }));
 	}
 
 	/**
@@ -137,8 +137,7 @@ export class UmbDocumentServerDataSource
 	 */
 	async delete(id: string) {
 		if (!id) throw new Error('Document ID is missing');
-
-		return tryExecuteAndNotify(this.#host, DocumentResource.deleteDocumentById({ id }));
+		return this.trash(id);
 	}
 
 	/**
@@ -146,21 +145,11 @@ export class UmbDocumentServerDataSource
 	 * @param {string} id
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async getAllowedDocumentTypesOf(id: string) {
-		if (!id) throw new Error('Id is missing');
-
+	async getAllowedDocumentTypesOf(id: string | null) {
+		if (id === undefined) throw new Error('Id is missing');
+		// TODO: remove when null is allowed as id.
+		const hackId = id === null ? undefined : id;
 		// TODO: Notice, here we need to implement pagination.
-		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdAllowedDocumentTypes({ id }));
-	}
-
-	/**
-	 * Get the allowed document types for root
-	 * @param {string} id
-	 * @memberof UmbDocumentTypeServerDataSource
-	 */
-	async getAllowedDocumentTypesAtRoot() {
-		console.log('source requestAllowedDocumentTypesAtRoot');
-		// TODO: Notice, here we need to implement pagination.
-		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentRootAllowedDocumentTypes({}));
+		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentAllowedDocumentTypes({ parentId: hackId }));
 	}
 }

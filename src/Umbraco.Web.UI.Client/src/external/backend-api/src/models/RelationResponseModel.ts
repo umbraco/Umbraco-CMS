@@ -4,9 +4,9 @@
 /* eslint-disable */
 
 export type RelationResponseModel = {
-    parentId?: number;
+    parentId?: string;
     parentName?: string | null;
-    childId?: number;
+    childId?: string;
     childName?: string | null;
     createDate?: string;
     comment?: string | null;
