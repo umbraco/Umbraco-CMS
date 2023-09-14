@@ -19,9 +19,18 @@ export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType
 	}
 
 	/**
-	 * Appends items to the store
+	 * Append an item to the store
+	 * @param {StoreItemType} item
+	 * @memberof UmbStoreBase
+	 */
+	append(item: StoreItemType) {
+		this._data.append([item]);
+	}
+
+	/**
+	 * Appends multiple items to the store
 	 * @param {Array<StoreItemType>} items
-	 * @memberof UmbEntityTreeStore
+	 * @memberof UmbStoreBase
 	 */
 	appendItems(items: Array<StoreItemType>) {
 		this._data.append(items);
@@ -29,9 +38,9 @@ export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType
 
 	/**
 	 * Updates an item in the store
-	 * @param {string} id
+	 * @param {string} unique
 	 * @param {Partial<StoreItemType>} data
-	 * @memberof UmbEntityTreeStore
+	 * @memberof UmbStoreBase
 	 */
 	updateItem(unique: string, data: Partial<StoreItemType>) {
 		this._data.updateOne(unique, data);
@@ -39,10 +48,19 @@ export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType
 
 	/**
 	 * Removes an item from the store
-	 * @param {string} id
-	 * @memberof UmbEntityTreeStore
+	 * @param {string} unique
+	 * @memberof UmbStoreBase
 	 */
 	removeItem(unique: string) {
 		this._data.removeOne(unique);
+	}
+
+	/**
+	 * Removes multiple items in the store with the given uniques
+	 * @param {string[]} uniques
+	 * @memberof UmbStoreBase
+	 */
+	removeItems(uniques: Array<string>) {
+		this._data.remove(uniques);
 	}
 }
