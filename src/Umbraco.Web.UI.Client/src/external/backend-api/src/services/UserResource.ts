@@ -7,6 +7,7 @@ import type { CreateInitialPasswordUserRequestModel } from '../models/CreateInit
 import type { CreateUserRequestModel } from '../models/CreateUserRequestModel';
 import type { CreateUserResponseModel } from '../models/CreateUserResponseModel';
 import type { CurrentUserResponseModel } from '../models/CurrentUserResponseModel';
+import type { DeleteUsersRequestModel } from '../models/DeleteUsersRequestModel';
 import type { DirectionModel } from '../models/DirectionModel';
 import type { DisableUserRequestModel } from '../models/DisableUserRequestModel';
 import type { EnableUserRequestModel } from '../models/EnableUserRequestModel';
@@ -42,6 +43,26 @@ export class UserResource {
     }): CancelablePromise<CreateUserResponseModel> {
         return __request(OpenAPI, {
             method: 'POST',
+            url: '/umbraco/management/api/v1/user',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteUser({
+        requestBody,
+    }: {
+        requestBody?: DeleteUsersRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
             url: '/umbraco/management/api/v1/user',
             body: requestBody,
             mediaType: 'application/json',

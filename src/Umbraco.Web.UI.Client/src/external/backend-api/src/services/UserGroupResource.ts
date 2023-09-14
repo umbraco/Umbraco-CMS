@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateUserGroupRequestModel } from '../models/CreateUserGroupRequestModel';
+import type { DeleteUserGroupsRequestModel } from '../models/DeleteUserGroupsRequestModel';
 import type { PagedUserGroupResponseModel } from '../models/PagedUserGroupResponseModel';
 import type { UpdateUserGroupRequestModel } from '../models/UpdateUserGroupRequestModel';
 import type { UserGroupItemResponseModel } from '../models/UserGroupItemResponseModel';
@@ -13,6 +14,26 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class UserGroupResource {
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteUserGroup({
+        requestBody,
+    }: {
+        requestBody?: DeleteUserGroupsRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/user-group',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
 
     /**
      * @returns string Created
