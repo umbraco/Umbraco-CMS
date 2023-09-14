@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
@@ -19,6 +20,7 @@ public class DataTypeControllerTests : UmbracoTestServerTestBase
     [Test]
     [TestCase(true)]
     [TestCase(false)]
+    [LongRunning]
     public async Task Has_Values_Returns_Correct_Values(bool expectHasValues)
     {
         var dataTypeService = GetRequiredService<IDataTypeService>();
