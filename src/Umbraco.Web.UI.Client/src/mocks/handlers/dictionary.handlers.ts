@@ -115,6 +115,18 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
+	rest.put('/umbraco/management/api/v1/dictionary/:id', async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		const id = req.params.id as string;
+		if (!id) return;
+
+		const saved = umbDictionaryData.save(id, data);
+
+		return res(ctx.status(200), ctx.json(saved));
+	}),
+
 	rest.get('/umbraco/management/api/v1/tree/dictionary/root', (req, res, ctx) => {
 		const items = umbDictionaryData.getTreeRoot();
 		const response = {
@@ -165,7 +177,7 @@ export const handlers = [
 		const item = umbDictionaryData.getById(id);
 
 		alert(
-			`Downloads file for dictionary "${item?.name}", ${includeChildren === 'true' ? 'with' : 'without'} children.`
+			`Downloads file for dictionary "${item?.name}", ${includeChildren === 'true' ? 'with' : 'without'} children.`,
 		);
 		return res(ctx.status(200));
 	}),
