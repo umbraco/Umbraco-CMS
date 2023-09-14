@@ -3,34 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { PagedRelationResponseModel } from '../models/PagedRelationResponseModel';
-import type { RelationResponseModel } from '../models/RelationResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class RelationResource {
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getRelationById({
-        id,
-    }: {
-        id: number,
-    }): CancelablePromise<RelationResponseModel> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/relation/{id}',
-            path: {
-                'id': id,
-            },
-            errors: {
-                404: `Not Found`,
-            },
-        });
-    }
 
     /**
      * @returns PagedRelationResponseModel Success
@@ -42,7 +20,7 @@ export class RelationResource {
         take = 100,
         relationTypeAlias = '',
     }: {
-        childId: number,
+        childId: string,
         skip?: number,
         take?: number,
         relationTypeAlias?: string,

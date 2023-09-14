@@ -97,13 +97,10 @@ export class UmbDocumentRepository
 	}
 
 	// Structure permissions;
-
 	async requestAllowedDocumentTypesOf(id: string | null) {
 		if (id === undefined) throw new Error('Id is missing');
 		await this.#init;
-		return id
-			? this.#detailDataSource.getAllowedDocumentTypesOf(id)
-			: this.#detailDataSource.getAllowedDocumentTypesAtRoot();
+		return this.#detailDataSource.getAllowedDocumentTypesOf(id);
 	}
 
 	async requestItemsLegacy(ids: Array<string>) {

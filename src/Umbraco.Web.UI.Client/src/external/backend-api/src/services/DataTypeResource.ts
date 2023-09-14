@@ -12,7 +12,7 @@ import type { FolderResponseModel } from '../models/FolderResponseModel';
 import type { MoveDataTypeRequestModel } from '../models/MoveDataTypeRequestModel';
 import type { PagedDataTypeTreeItemResponseModel } from '../models/PagedDataTypeTreeItemResponseModel';
 import type { UpdateDataTypeRequestModel } from '../models/UpdateDataTypeRequestModel';
-import type { UpdateFolderReponseModel } from '../models/UpdateFolderReponseModel';
+import type { UpdateFolderResponseModel } from '../models/UpdateFolderResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -219,6 +219,10 @@ export class DataTypeResource {
             body: requestBody,
             mediaType: 'application/json',
             responseHeader: 'Location',
+            errors: {
+                400: `Bad Request`,
+                404: `Not Found`,
+            },
         });
     }
 
@@ -259,6 +263,7 @@ export class DataTypeResource {
                 'id': id,
             },
             errors: {
+                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
@@ -273,7 +278,7 @@ export class DataTypeResource {
         requestBody,
     }: {
         id: string,
-        requestBody?: UpdateFolderReponseModel,
+        requestBody?: UpdateFolderResponseModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
@@ -284,6 +289,7 @@ export class DataTypeResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
