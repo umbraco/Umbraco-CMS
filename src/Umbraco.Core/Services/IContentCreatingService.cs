@@ -6,4 +6,6 @@ namespace Umbraco.Cms.Core.Services;
 public interface IContentCreatingService
 {
     Task<Attempt<PagedModel<IContentType>?, ContentCreatingOperationStatus>> GetAllowedChildrenContentTypesAsync(Guid key, int skip, int take);
+
+    Task<PagedModel<IContentType>> GetAllowedChildrenContentTypesAtRootAsync(int skip, int take);
 }
