@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Strings;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
-///     Represents a property editor for label properties.
+///     Represents a property editor for no configuration string properties.
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.String,
@@ -23,7 +23,7 @@ public class StringPropertyEditor : DataEditor
     private readonly IIOHelper _ioHelper;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="LabelPropertyEditor" /> class.
+    ///     Initializes a new instance of the <see cref="StringPropertyEditor" /> class.
     /// </summary>
     public StringPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
@@ -34,19 +34,5 @@ public class StringPropertyEditor : DataEditor
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
         SupportsReadOnly = true;
-    }
-
-    // provides the property value editor
-    internal class StringPropertyValueEditor : DataValueEditor
-    {
-        public StringPropertyValueEditor(
-            ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer,
-            IIOHelper ioHelper,
-            DataEditorAttribute attribute)
-            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
-        {
-        }
     }
 }
