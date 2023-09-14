@@ -1,7 +1,7 @@
 /**
 * @ngdoc directive
 * @function
-* @name umbraco.directives.directive:umbPropertyEditor
+* @name umbraco.directives.directive:umbPropertyEditor 
 * @requires formController
 * @restrict E
 **/
@@ -18,13 +18,14 @@ function umbPropEditor(umbPropEditorHelper, localizationService) {
                 allowUnlock: "<?",
                 onUnlock: "&?"
             },
-
+            
             require: ["^^form", "?^umbProperty"],
             restrict: 'E',
-            replace: true,
+            replace: true,      
             templateUrl: 'views/components/property/umb-property-editor.html',
             link: function (scope, element, attrs, ctrl) {
 
+                scope.readonly = false;
                 scope.labels = {};
 
                 //we need to copy the form controller val to our isolated scope so that
@@ -48,7 +49,7 @@ function umbPropEditor(umbPropEditorHelper, localizationService) {
                     .then(function(value) {
                         scope.labels.invariantCulturePropertyUnlockHelp = value;
                     });
-
+                
                 localizationService.localize('languages_invariantSegmentPropertyUnlockHelp',  [scope.model.label])
                     .then(function(value) {
                         scope.labels.invariantSegmentPropertyUnlockHelp = value;
@@ -65,6 +66,10 @@ function umbPropEditor(umbPropEditorHelper, localizationService) {
                         scope.onUnlock();
                     }
                 };
+
+                attrs.$observe('readonly', (value) => {
+                    scope.readonly = value !== undefined;
+                });
 
                 scope.$on("$destroy", function () {
                     unbindWatcher();
