@@ -1,5 +1,7 @@
 name: Nightly_$(TeamProject)_$(Build.DefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 
+trigger: none
+
 schedules:
 - cron: '0 0 * * *'
   displayName: Daily midnight build
