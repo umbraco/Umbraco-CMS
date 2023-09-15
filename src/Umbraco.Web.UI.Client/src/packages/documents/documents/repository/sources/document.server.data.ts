@@ -97,7 +97,21 @@ export class UmbDocumentServerDataSource
 	 */
 	async update(id: string, document: UpdateDocumentRequestModel) {
 		if (!id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentById({ id, requestBody: document }));
+
+		/* TODO: look into why typescript doesn't complain about getting another model than UpdateDocumentRequestModel
+		Maybe we should simplify the sources, and always send the biggest model.
+		Then it is up to the data source to format the data correctly before passing it to wherever */
+		const requestBody: UpdateDocumentRequestModel = {
+			templateId: document.templateId,
+			values: document.values,
+			variants: document.variants?.map((variant) => ({
+				culture: variant.culture,
+				segment: variant.segment,
+				name: variant.name,
+			})),
+		};
+
+		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentById({ id, requestBody }));
 	}
 
 	/**
