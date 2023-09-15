@@ -6,7 +6,6 @@ import {
 	DocumentItemResponseModel,
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
-	FolderTreeItemResponseModel,
 	PagedDocumentTreeItemResponseModel,
 	PagedDocumentTypeResponseModel,
 	PagedRecycleBinItemResponseModel,
@@ -471,7 +470,7 @@ export const data: Array<DocumentResponseModel> = [
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-us',
 				segment: null,
-				name: 'Blog post B',
+				name: 'Simple Document',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
 			},
@@ -574,6 +573,7 @@ const createDocumentItem = (item: DocumentResponseModel): DocumentItemResponseMo
 	};
 };
 
+// TODO: look into making a combined document model so we don't need to maintain two+ data sets.
 // Temp mocked database
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -597,6 +597,18 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 		this.treeData = this.treeData.map((x) => {
 			if (x.id === result.id) {
 				return createDocumentTreeItem(result);
+			} else {
+				return x;
+			}
+		});
+		return result;
+	}
+
+	trash(ids: string[]): DocumentResponseModel[] {
+		const result = super.trash(ids);
+		this.treeData = this.treeData.map((x) => {
+			if (x.id && ids.includes(x.id)) {
+				return { ...x, isTrashed: true };
 			} else {
 				return x;
 			}
