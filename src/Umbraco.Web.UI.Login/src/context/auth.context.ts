@@ -10,7 +10,7 @@ import {
 import { UmbAuthRepository } from './auth.repository.js';
 
 export class UmbAuthContext implements IUmbAuthContext {
-	readonly supportsPersistLogin = true;
+	readonly supportsPersistLogin = false;
 	disableLocalLogin = false;
 
 	#authRepository = new UmbAuthRepository();
