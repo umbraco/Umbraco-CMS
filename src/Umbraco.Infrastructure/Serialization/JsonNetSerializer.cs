@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Serialization;
 
 public class JsonNetSerializer : IJsonSerializer
 {
-    protected static readonly JsonSerializerSettings JsonSerializerSettings = new()
+    protected JsonSerializerSettings JsonSerializerSettings { get; } = new()
     {
         Converters = new List<JsonConverter> { new StringEnumConverter() },
         Formatting = Formatting.None,
