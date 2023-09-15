@@ -46,7 +46,8 @@ export class UmbObserver<T> {
 	}
 
 	hostConnected() {
-		if (this.#subscription.closed) {
+		// Notice: This will not re-subscribe if this controller was destroyed. Only if the subscription was closed.
+		if (this.#subscription?.closed) {
 			this.#subscription = this.#source.subscribe(this.#callback);
 		}
 	}

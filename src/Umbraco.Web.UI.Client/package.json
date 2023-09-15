@@ -73,8 +73,7 @@
 	},
 	"files": [
 		"dist-cms",
-		"README.md",
-		"router-slot-*.*.*.tgz"
+		"README.md"
 	],
 	"repository": {
 		"url": "https://github.com/umbraco/Umbraco.CMS.Backoffice",
@@ -133,7 +132,6 @@
 		"lit": "^2.8.0",
 		"lodash-es": "4.17.21",
 		"monaco-editor": "^0.41.0",
-		"router-slot": "file:router-slot-2.3.0.tgz",
 		"rxjs": "^7.8.1",
 		"tinymce": "^6.6.1",
 		"tinymce-i18n": "^23.8.7",
