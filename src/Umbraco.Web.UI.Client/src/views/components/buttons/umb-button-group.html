@@ -48,7 +48,8 @@
             hotkey="{{subButton.hotKey}}"
             hotkey-when-hidden="{{subButton.hotKeyWhenHidden}}"
             ng-disabled="disabled">
-               <localize key="{{subButton.labelKey}}">{{subButton.labelKey}}</localize>
+               <localize ng-if="subButton.labelKey" key="{{subButton.labelKey}}">{{subButton.labelKey}}</localize>
+               <span ng-if="subButton.label">{{subButton.label}}</span>
                <span ng-if="subButton.addEllipsis === 'true'">...</span>
          </button>
       </umb-dropdown-item>
