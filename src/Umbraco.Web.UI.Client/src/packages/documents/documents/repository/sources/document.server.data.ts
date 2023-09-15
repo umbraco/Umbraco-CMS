@@ -33,13 +33,10 @@ export class UmbDocumentServerDataSource
 	/**
 	 * Fetches a Document with the given id from the server
 	 * @param {string} id
-	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async get(id: string) {
-		if (!id) {
-			throw new Error('Id is missing');
-		}
+		if (!id) throw new Error('Id is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
@@ -51,7 +48,8 @@ export class UmbDocumentServerDataSource
 
 	/**
 	 * Creates a new Document scaffold
-	 * @param {(string | null)} parentId
+	 * @param {string} documentTypeId
+	 * @param {Partial<CreateDocumentRequestModel>} [preset]
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
@@ -83,7 +81,6 @@ export class UmbDocumentServerDataSource
 	/**
 	 * Inserts a new Document on the server
 	 * @param {Document} document
-	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async insert(document: CreateDocumentRequestModel) {
@@ -104,50 +101,24 @@ export class UmbDocumentServerDataSource
 	}
 
 	/**
-	 * Trash a Document on the server
-	 * @param {Document} Document
-	 * @return {*}
+	 * Moves a Document to the recycle bin on the server
+	 * @param {string} id
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async trash(id: string) {
-		if (!id) {
-			throw new Error('Id is missing');
-		}
-
-		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DocumentResponseModel>(
-			this.#host,
-			fetch('/umbraco/management/api/v1/document/trash', {
-				method: 'POST',
-				body: JSON.stringify([id]),
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}) as any,
-		);
+		if (!id) throw new Error('Document ID is missing');
+		// TODO: if we get a trash endpoint, we should use that instead.
+		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdMoveToRecycleBin({ id }));
 	}
 
 	/**
 	 * Deletes a Document on the server
 	 * @param {string} id
-	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async delete(id: string) {
-		if (!id) {
-			throw new Error('Id is missing');
-		}
-
-		return tryExecuteAndNotify(
-			this.#host,
-			fetch('/umbraco/management/api/v1/document/trash', {
-				method: 'POST',
-				body: JSON.stringify([id]),
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}).then((res) => res.json()),
-		);
+		if (!id) throw new Error('Document ID is missing');
+		return this.trash(id);
 	}
 
 	/**

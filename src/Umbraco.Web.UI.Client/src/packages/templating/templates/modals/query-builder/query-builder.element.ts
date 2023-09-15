@@ -57,7 +57,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	private _queryBuilderSettings?: TemplateQuerySettingsResponseModel;
 
 	@state()
-	private _selectedRootContentName = 'all pages';
+	private _selectedRootContentName? = 'all pages';
 
 	@state()
 	private _defaultSortDirection: SortOrder = SortOrder.Descending;
@@ -129,7 +129,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	};
 
 	async #getDocumentItem(ids: string[]) {
-		const { data, error } = await this.#documentRepository.requestItemsLegacy(ids);
+		const { data, error } = await this.#documentRepository.requestItems(ids);
 		if (data) {
 			this._selectedRootContentName = data[0].name;
 		}
@@ -208,7 +208,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 										(alias) =>
 											html`<uui-combobox-list-option .value=${alias}
 												>content of type "${alias}"</uui-combobox-list-option
-											>`
+											>`,
 									)}
 								</uui-combobox-list></umb-button-with-dropdown
 							>
@@ -235,7 +235,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 										(property) =>
 											html`<uui-combobox-list-option .value=${property.alias ?? ''}
 												>${property.alias}</uui-combobox-list-option
-											>`
+											>`,
 									)}
 								</uui-combobox-list></umb-button-with-dropdown
 							>

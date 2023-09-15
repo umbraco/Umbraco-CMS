@@ -11,7 +11,6 @@ import { manifests as createManifests } from './create/manifests.js';
 import {
 	UmbCopyEntityAction,
 	UmbMoveEntityAction,
-	UmbTrashEntityAction,
 	UmbSortChildrenOfEntityAction,
 } from '@umbraco-cms/backoffice/entity-action';
 import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
@@ -20,25 +19,12 @@ const entityActions: Array<ManifestTypes> = [
 	...createManifests,
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.Trash',
-		name: 'Trash Document Entity Action',
-		weight: 900,
-		meta: {
-			icon: 'umb:trash',
-			label: 'Trash',
-			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
-			api: UmbTrashEntityAction,
-			entityTypes: [DOCUMENT_ENTITY_TYPE],
-		},
-	},
-	{
-		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.CreateBlueprint',
 		name: 'Create Document Blueprint Entity Action',
 		weight: 800,
 		meta: {
 			icon: 'umb:blueprint',
-			label: 'Create Content Template',
+			label: 'Create Content Template (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbCreateDocumentBlueprintEntityAction,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
@@ -47,11 +33,11 @@ const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.Move',
-		name: 'Move Document Entity Action',
+		name: 'Move Document Entity Action ',
 		weight: 700,
 		meta: {
 			icon: 'umb:enter',
-			label: 'Move',
+			label: 'Move (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbMoveEntityAction,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
@@ -64,7 +50,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 600,
 		meta: {
 			icon: 'umb:documents',
-			label: 'Copy',
+			label: 'Copy (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbCopyEntityAction,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
@@ -77,7 +63,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 500,
 		meta: {
 			icon: 'umb:navigation-vertical',
-			label: 'Sort',
+			label: 'Sort (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbSortChildrenOfEntityAction,
 			entityTypes: [DOCUMENT_ROOT_ENTITY_TYPE, DOCUMENT_ENTITY_TYPE],
@@ -90,7 +76,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 400,
 		meta: {
 			icon: 'umb:home',
-			label: 'Culture And Hostnames',
+			label: 'Culture And Hostnames (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbDocumentCultureAndHostnamesEntityAction,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
@@ -102,7 +88,7 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Document Permissions Entity Action',
 		meta: {
 			icon: 'umb:vcard',
-			label: 'Permissions',
+			label: 'Permissions (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbDocumentPermissionsEntityAction,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
@@ -114,7 +100,7 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Document Permissions Entity Action',
 		meta: {
 			icon: 'umb:lock',
-			label: 'Public Access',
+			label: 'Public Access (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbDocumentPublicAccessEntityAction,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
@@ -126,7 +112,7 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Publish Document Entity Action',
 		meta: {
 			icon: 'umb:globe',
-			label: 'Publish',
+			label: 'Publish (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbPublishDocumentEntityAction,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
@@ -138,7 +124,7 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Unpublish Document Entity Action',
 		meta: {
 			icon: 'umb:globe',
-			label: 'Unpublish',
+			label: 'Unpublish (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbUnpublishDocumentEntityAction,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
@@ -150,7 +136,7 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Rollback Document Entity Action',
 		meta: {
 			icon: 'umb:undo',
-			label: 'Rollback',
+			label: 'Rollback (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbRollbackDocumentEntityAction,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],

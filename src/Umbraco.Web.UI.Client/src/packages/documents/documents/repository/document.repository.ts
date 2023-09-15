@@ -2,6 +2,8 @@ import { UmbDocumentServerDataSource } from './sources/document.server.data.js';
 import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from './document.store.js';
 import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from './document.tree.store.js';
 import { UmbDocumentTreeServerDataSource } from './sources/document.tree.server.data.js';
+import { UMB_DOCUMENT_ITEM_STORE_CONTEXT_TOKEN, type UmbDocumentItemStore } from './document-item.store.js';
+import { UmbDocumentItemServerDataSource } from './sources/document-item.server.data.js';
 import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
@@ -28,6 +30,9 @@ export class UmbDocumentRepository
 	#detailDataSource: UmbDocumentServerDataSource;
 	#store?: UmbDocumentStore;
 
+	#itemSource: UmbDocumentItemServerDataSource;
+	#itemStore?: UmbDocumentItemStore;
+
 	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostElement) {
@@ -36,6 +41,7 @@ export class UmbDocumentRepository
 		// TODO: figure out how spin up get the correct data source
 		this.#treeSource = new UmbDocumentTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbDocumentServerDataSource(this.#host);
+		this.#itemSource = new UmbDocumentItemServerDataSource(this.#host);
 
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN, (instance) => {
@@ -46,17 +52,19 @@ export class UmbDocumentRepository
 				this.#store = instance;
 			}),
 
+			new UmbContextConsumerController(this.#host, UMB_DOCUMENT_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#itemStore = instance;
+			}),
+
 			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
 			}),
 		]);
 	}
 
-	// TODO: Trash
 	// TODO: Move
 
 	// TREE:
-
 	async requestTreeRoot() {
 		await this.#init;
 
@@ -103,18 +111,6 @@ export class UmbDocumentRepository
 		return this.#detailDataSource.getAllowedDocumentTypesOf(id);
 	}
 
-	async requestItemsLegacy(ids: Array<string>) {
-		await this.#init;
-
-		if (!ids) {
-			throw new Error('Ids are missing');
-		}
-
-		const { data, error } = await this.#treeSource.getItems(ids);
-
-		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
-	}
-
 	async rootTreeItems() {
 		await this.#init;
 		return this.#treeStore!.rootItems;
@@ -125,9 +121,23 @@ export class UmbDocumentRepository
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async itemsLegacy(ids: Array<string>) {
+	// ITEMS:
+	async requestItems(ids: Array<string>) {
+		if (!ids) throw new Error('Keys are missing');
 		await this.#init;
-		return this.#treeStore!.items(ids);
+
+		const { data, error } = await this.#itemSource.getItems(ids);
+
+		if (data) {
+			this.#itemStore?.appendItems(data);
+		}
+
+		return { data, error, asObservable: () => this.#itemStore!.items(ids) };
+	}
+
+	async items(ids: Array<string>) {
+		await this.#init;
+		return this.#itemStore!.items(ids);
 	}
 
 	// DETAILS:
@@ -228,11 +238,35 @@ export class UmbDocumentRepository
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server.
 			// Consider notify a workspace if a document is deleted from the store while someone is editing it.
-			// TODO: would be nice to align the stores on methods/methodNames.
-			this.#store?.remove([id]);
+			this.#store?.removeItem(id);
 			this.#treeStore?.removeItem(id);
+			this.#itemStore?.removeItem(id);
 
 			const notification = { data: { message: `Document deleted` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
+
+		return { error };
+	}
+
+	async trash(id: string) {
+		if (!id) throw new Error('Id is missing');
+		await this.#init;
+
+		const { error } = await this.#detailDataSource.trash(id);
+
+		if (!error) {
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server.
+			// Consider notify a workspace if a document is deleted from the store while someone is editing it.
+			// TODO: Temp hack: would should update a property isTrashed (maybe) on the item instead of removing them.
+			this.#store?.removeItem(id);
+			this.#treeStore?.removeItem(id);
+			this.#itemStore?.removeItem(id);
+
+			// TODO: append to recycle bin store
+
+			const notification = { data: { message: `Document moved to recycle bin` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 
@@ -242,11 +276,6 @@ export class UmbDocumentRepository
 	// Listing all currently known methods we need to implement:
 	// these currently only covers posting data
 	// TODO: find a good way to split these
-	async trash(ids: Array<string>) {
-		console.log('document trash: ' + ids);
-		alert('implement trash');
-	}
-
 	async saveAndPublish() {
 		alert('save and publish');
 	}
