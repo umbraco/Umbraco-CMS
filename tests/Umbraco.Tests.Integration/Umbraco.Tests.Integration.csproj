@@ -62,4 +62,6 @@
     <Folder Include="Umbraco.Search\Umbraco.Search.Lifti\" />
   </ItemGroup>
 
+    <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
+  </ItemGroup>
 </Project>
