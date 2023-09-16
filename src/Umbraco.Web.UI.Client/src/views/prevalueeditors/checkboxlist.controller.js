@@ -1,7 +1,7 @@
-﻿angular.module("umbraco").controller("Umbraco.PrevalueEditors.CheckboxListController",
+angular.module("umbraco").controller("Umbraco.PrevalueEditors.CheckboxListController",
     function ($scope) {
         
-        var vm = this;
+        const vm = this;
 
         vm.configItems = [];
         vm.viewItems = [];
@@ -9,16 +9,16 @@
 
         function init() {
 
-            var prevalues = ($scope.model.config ? $scope.model.config.prevalues : $scope.model.prevalues) || [];
+            const prevalues = ($scope.model.config ? $scope.model.config.prevalues : $scope.model.prevalues) || [];
 
-            var items = [];
+            let items = [];
 
-            for (var i = 0; i < prevalues.length; i++) {
-                var item = {};
+            for (let i = 0; i < prevalues.length; i++) {
+                const item = {};
 
                 if (Utilities.isObject(prevalues[i])) {
                     item.value = prevalues[i].value;
-                    item.label = prevalues[i].label;
+                    item.label = prevalues[i].label || prevalues[i].value;
                 }
                 else {
                     item.value = prevalues[i];
@@ -42,10 +42,10 @@
 
             vm.viewItems = [];
 
-            var iConfigItem;
-            for (var i = 0; i < vm.configItems.length; i++) {
+            let iConfigItem;
+            for (let i = 0; i < vm.configItems.length; i++) {
                 iConfigItem = vm.configItems[i];
-                var isChecked = _.contains(newVal, iConfigItem.value);
+                const isChecked = _.contains(newVal, iConfigItem.value);
                 vm.viewItems.push({
                     checked: isChecked,
                     value: iConfigItem.value,
@@ -57,7 +57,7 @@
 
         function change(model, value) {
 
-            var index = $scope.model.value.indexOf(value);
+            const index = $scope.model.value.indexOf(value);
 
             if (model === true) {
                 //if it doesn't exist in the model, then add it

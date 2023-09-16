@@ -1,0 +1,11 @@
+<div class="umb-dropdown-preval" ng-controller="Umbraco.PrevalueEditors.DropDownListController as vm">
+
+    <select name="dropDownList"
+            class="umb-dropdown"
+            ng-if="vm.viewItems.length"
+            ng-model="model.value"
+            ng-options="item.value as item.label for item in vm.viewItems">
+        <option></option>
+    </select>
+
+</div>

@@ -353,7 +353,8 @@ public static class EnumerableExtensions
     /// <summary>
     ///     Transforms an enumerable.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TSource"></typeparam>
+    /// <typeparam name="TTarget"></typeparam>
     /// <param name="source"></param>
     /// <param name="transform"></param>
     /// <returns></returns>

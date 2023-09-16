@@ -1,5 +1,5 @@
 window.app.config(function ($routeProvider) {
-
+    
     /**
      * This determines if the route can continue depending on authentication and initialization requirements
      * @param {boolean} authRequired If true, it checks if the user is authenticated and will resolve successfully
@@ -117,9 +117,9 @@ window.app.config(function ($routeProvider) {
             template: "<div ng-include='templateUrl'></div>",
             //This controller will execute for this route, then we can execute some code in order to set the template Url
             controller: function ($scope, $route, $routeParams, $location, sectionService) {
-
+                
                 //We are going to check the currently loaded sections for the user and if the section we are navigating
-                //to has a custom route path we'll use that
+                //to has a custom route path we'll use that 
                 sectionService.getSectionsForUser().then(function(sections) {
                     //find the one we're requesting
                     var found = _.find(sections, function(s) {
@@ -175,9 +175,8 @@ window.app.config(function ($routeProvider) {
                 if ($routeParams.section.toLowerCase() === "users" && $routeParams.tree.toLowerCase() === "users" && usersPages.indexOf($routeParams.method.toLowerCase()) === -1) {
                     $scope.templateUrl = "views/users/overview.html";
                     return;
-              }
-
-              $scope.templateUrl = navigationService.getTreeTemplateUrl($routeParams.tree, $routeParams.method, $routeParams.section);
+                }
+                $scope.templateUrl = navigationService.getTreeTemplateUrl($routeParams.tree, $routeParams.method);
             },
             reloadOnSearch: false,
             resolve: canRoute(true)
@@ -191,9 +190,8 @@ window.app.config(function ($routeProvider) {
                 if (!$routeParams.tree || !$routeParams.method) {
                     $scope.templateUrl = "views/common/dashboard.html";
                     return;
-              }
-
-              $scope.templateUrl = navigationService.getTreeTemplateUrl($routeParams.tree, $routeParams.method, $routeParams.section);
+                }
+                $scope.templateUrl = navigationService.getTreeTemplateUrl($routeParams.tree, $routeParams.method);
             },
             reloadOnSearch: false,
             reloadOnUrl: false,
@@ -201,7 +199,7 @@ window.app.config(function ($routeProvider) {
         })
         .otherwise({ redirectTo: '/login' });
     }).config(function ($locationProvider) {
-
+        
         $locationProvider.html5Mode(false); //turn html5 mode off
         $locationProvider.hashPrefix('');
     });

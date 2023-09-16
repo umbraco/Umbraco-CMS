@@ -760,7 +760,6 @@ public class ContentController : ContentControllerBase
     {
         long totalChildren;
         List<IContent> children;
-
         // Sets the culture to the only existing culture if we only have one culture.
         if (string.IsNullOrWhiteSpace(cultureName))
         {
@@ -769,18 +768,19 @@ public class ContentController : ContentControllerBase
                 cultureName = _allLangs.Value.First().Key;
             }
         }
-
         if (pageNumber > 0 && pageSize > 0)
         {
             IQuery<IContent>? queryFilter = null;
             if (filter.IsNullOrWhiteSpace() == false)
             {
+                int.TryParse(filter, out int filterAsIntId);//considering id,key & name as filter param
+                Guid.TryParse(filter, out Guid filterAsGuid);
                 //add the default text filter
                 queryFilter = _sqlContext.Query<IContent>()
                     .Where(x => x.Name != null)
-                    .Where(x => x.Name!.Contains(filter));
+                    .Where(x => x.Name!.Contains(filter)
+                      || x.Id == filterAsIntId || x.Key == filterAsGuid);
             }
-
             children = _contentService
                 .GetPagedChildren(id, pageNumber - 1, pageSize, out totalChildren, queryFilter, Ordering.By(orderBy, orderDirection, cultureName, !orderBySystemField)).ToList();
         }
@@ -1962,7 +1962,7 @@ public class ContentController : ContentControllerBase
     /// <param name="localizationArea"></param>
     /// <param name="localizationAlias"></param>
     /// <param name="cultureToken">
-    ///     The culture used in the localization message, null by default which means <see cref="culture" /> will be used.
+    ///     The culture used in the localization message, null by default which means <paramref name="culture"/> will be used.
     /// </param>
     private void AddVariantValidationError(string? culture, string? segment, string localizationArea, string localizationAlias, string? cultureToken = null)
     {

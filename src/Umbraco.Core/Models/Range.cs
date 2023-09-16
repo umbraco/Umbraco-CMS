@@ -6,7 +6,9 @@ namespace Umbraco.Cms.Core.Models;
 ///     Represents a range with a minimum and maximum value.
 /// </summary>
 /// <typeparam name="T">The type of the minimum and maximum values.</typeparam>
-/// <seealso cref="IEquatable{Range{T}}" />
+/// <remarks>
+/// See also <see cref="IEquatable{T}"/> of <see cref="Range{T}"/>
+/// </remarks>
 public class Range<T> : IEquatable<Range<T>>
     where T : IComparable<T>
 {

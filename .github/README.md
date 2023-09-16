@@ -4,6 +4,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) 
 [![Follow Umbraco on Twitter](https://img.shields.io/badge/Follow-blue?logo=twitter&logoColor=fff)](https://twitter.com/intent/follow?screen_name=umbraco) 
 [![Chat about Umbraco on Discord](https://img.shields.io/discord/869656431308189746?logo=discord&logoColor=fff)](https://discord.gg/umbraco) 
+[![Read what's going on in the Umbraco Discord chat now](https://img.shields.io/badge/read-discord-blue)](https://discord-chats.umbraco.com) 
 [![Build status](https://img.shields.io/azure-devops/build/umbraco/Umbraco%2520Cms/301?logo=azurepipelines&label=Azure%20Pipelines)](https://umbraco.visualstudio.com/Umbraco%20Cms/_build?definitionId=301) 
 [![Open in GitHub Codespaces](https://img.shields.io/badge/Open%20in%20GitHub%20Codespaces-525252?logo=github)](https://github.com/codespaces/new?hide_repo_select=true&ref=contrib&repo=10601208&machine=basicLinux32gb&devcontainer_path=.devcontainer%2Fdevcontainer.json&location=WestEurope)
 

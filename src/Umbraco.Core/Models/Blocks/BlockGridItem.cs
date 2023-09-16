@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <param name="content">The content.</param>
         /// <param name="settingsUdi">The settings UDI.</param>
         /// <param name="settings">The settings.</param>
-        /// <exception cref="System.ArgumentNullException">contentUdi
+        /// <exception cref="ArgumentNullException">contentUdi
         /// or
         /// content</exception>
         public BlockGridItem(Udi contentUdi, IPublishedElement content, Udi settingsUdi, IPublishedElement settings)
@@ -68,31 +68,31 @@ namespace Umbraco.Cms.Core.Models.Blocks
         public IPublishedElement Settings { get; }
 
         /// <summary>
-        /// The number of rows this item should span.
+        /// The number of rows this item should span
         /// </summary>
         [DataMember(Name = "rowSpan")]
         public int RowSpan { get; set; }
 
         /// <summary>
-        /// The number of columns this item should span.
+        /// The number of columns this item should span
         /// </summary>
         [DataMember(Name = "columnSpan")]
         public int ColumnSpan { get; set; }
 
         /// <summary>
-        /// The grid areas within this item.
+        /// The grid areas within this item
         /// </summary>
         [DataMember(Name = "areas")]
         public IEnumerable<BlockGridArea> Areas { get; set; } = Array.Empty<BlockGridArea>();
 
         /// <summary>
-        /// The number of columns available for the areas to span.
+        /// The number of columns available for the areas to span
         /// </summary>
         [DataMember(Name = "areaGridColumns")]
         public int? AreaGridColumns { get; set; }
 
         /// <summary>
-        /// The number of columns in the root grid.
+        /// The number of columns in the root grid
         /// </summary>
         [DataMember(Name = "gridColumns")]
         public int? GridColumns { get; set; }

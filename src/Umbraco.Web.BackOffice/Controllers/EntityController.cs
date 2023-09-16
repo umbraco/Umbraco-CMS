@@ -533,6 +533,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// <param name="type"></param>
     /// <param name="parentId"></param>
     /// <returns></returns>
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public ActionResult<EntityBasic?>? GetByXPath(string query, int nodeContextId, int? parentId, UmbracoEntityTypes type)
     {
         if (type != UmbracoEntityTypes.Document)
@@ -1250,7 +1251,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// </summary>
     /// <param name="type">The type of entity.</param>
     /// <param name="postFilter">
-    ///     Optional filter - Format like: "BoolVariable==true&IntVariable>=6". Invalid filters are
+    ///     Optional filter - Format like: "BoolVariable==true&amp;IntVariable>=6". Invalid filters are
     ///     ignored.
     /// </param>
     /// <returns></returns>

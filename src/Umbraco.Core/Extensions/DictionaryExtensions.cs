@@ -11,7 +11,7 @@ using Umbraco.Cms.Core;
 namespace Umbraco.Extensions;
 
 /// <summary>
-///     Extension methods for Dictionary & ConcurrentDictionary
+///     Extension methods for Dictionary &amp; ConcurrentDictionary.
 /// </summary>
 public static class DictionaryExtensions
 {
@@ -254,7 +254,7 @@ public static class DictionaryExtensions
 
     /// <summary>
     ///     Converts a dictionary object to a query string representation such as:
-    ///     firstname=shannon&lastname=deminick
+    ///     firstname=shannon&amp;lastname=deminick.
     /// </summary>
     /// <param name="d"></param>
     /// <returns></returns>
