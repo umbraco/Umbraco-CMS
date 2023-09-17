@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Lifti.Extensions;
 using Umbraco.Search.Models;
 
@@ -158,4 +159,6 @@ public class UmbracoMemorySearcher<T> : IUmbracoSearcher<T>
 
         return new List<PublishedSearchResult>();
     }
+
+    public ISearchEngine? SearchEngine { get; } = new LiftiSearchEngine();
 }

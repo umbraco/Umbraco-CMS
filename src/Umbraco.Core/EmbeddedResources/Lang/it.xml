@@ -2587,7 +2587,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <key alias="contentRedirectManager">Gestione Redirect URL</key>
     <key alias="mediaFolderBrowser">Contenuto</key>
     <key alias="settingsWelcome">Benvenuto</key>
-    <key alias="settingsExamine">Gestione Examine</key>
+    <key alias="settingSearchManagment">Gestione Examine</key>
     <key alias="settingsPublishedStatus">Stato di pubblicazione</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>

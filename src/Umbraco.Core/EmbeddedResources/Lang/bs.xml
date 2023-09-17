@@ -2441,7 +2441,7 @@ Da upravljate svojom web lokacijom, jednostavno otvorite Umbraco backoffice i po
     <key alias="contentRedirectManager">Preusmjeravanje URL-ova</key>
     <key alias="mediaFolderBrowser">Sadržaj</key>
     <key alias="settingsWelcome">Dobrodošli</key>
-    <key alias="settingsExamine">Examine menadžment</key>
+    <key alias="settingSearchManagment">Examine menadžment</key>
     <key alias="settingsPublishedStatus">Status stranice</key>
     <key alias="settingsModelsBuilder">Generator modela</key>
     <key alias="settingsHealthCheck">Provjera zdravlja</key>

@@ -2012,7 +2012,7 @@
     <key alias="contentRedirectManager">Správa přesměrování</key>
     <key alias="mediaFolderBrowser">Obsah</key>
     <key alias="settingsWelcome">Vítejte</key>
-    <key alias="settingsExamine">Správa Examine</key>
+    <key alias="settingSearchManagment">Správa Examine</key>
     <key alias="settingsPublishedStatus">Stav publikování</key>
     <key alias="settingsModelsBuilder">Tvůrce modelů</key>
     <key alias="settingsHealthCheck">Health Check</key>

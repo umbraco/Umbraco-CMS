@@ -16,6 +16,8 @@ public class SearchIndexModel
 
     [DataMember(Name = "providerProperties")]
     public IReadOnlyDictionary<string, object?>? ProviderProperties { get; set; }
+    [DataMember(Name = "searchProviderDetails")]
+    public  IReadOnlyDictionary<string, object?>? SearchProviderDetails { get; set; }
 
     [DataMember(Name = "canRebuild")]
     public bool CanRebuild { get; set; }

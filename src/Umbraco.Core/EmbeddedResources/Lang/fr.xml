@@ -2056,7 +2056,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="contentRedirectManager">Gestion des redirections d'URL</key>
     <key alias="mediaFolderBrowser">Contenu</key>
     <key alias="settingsWelcome">Bienvenue</key>
-    <key alias="settingsExamine">Gestion d'Examine</key>
+    <key alias="settingSearchManagment">Gestion d'Examine</key>
     <key alias="settingsPublishedStatus">Statut Publié</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>

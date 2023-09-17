@@ -6,9 +6,10 @@ using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
+using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Models;
 
-namespace Umbraco.Search.Examine;
+namespace Umbraco.Search.Examine.Lucene;
 
 public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
 {
@@ -222,4 +223,6 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
             return query.Execute().ToPublishedSearchResults(contextReference.UmbracoContext.Content);
         }
     }
+
+    public ISearchEngine? SearchEngine { get; } = new ExamineLuceneSearchEngine();
 }

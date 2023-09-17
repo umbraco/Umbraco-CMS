@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Dashboards;
 [Weight(20)]
 public class ExamineDashboard : IDashboard
 {
-    public string Alias => "settingsExamine";
+    public string Alias => "settingSearchManagment";
 
     public string[] Sections => new[] { Constants.Applications.Settings };
 

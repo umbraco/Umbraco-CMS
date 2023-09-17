@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Search.Diagnostics;
 
 namespace Umbraco.Search;
 
@@ -26,4 +27,5 @@ public interface IUmbracoSearcher
     public ISearchRequest CreateSearchRequest();
 
     IEnumerable<PublishedSearchResult> GetAll();
+    ISearchEngine? SearchEngine { get; }
 }

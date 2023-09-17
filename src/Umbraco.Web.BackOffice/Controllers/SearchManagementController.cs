@@ -52,7 +52,7 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
     public IEnumerable<SearcherModel> GetSearcherDetails()
     {
         var model = new List<SearcherModel>(
-            _provider.GetAllSearchers().Select(searcher => new SearcherModel { Name = searcher })
+            _provider.GetAllSearchers().Select(searcher => new SearcherModel { Name = searcher, SearchProviderDetails = _provider.GetSearcher(searcher)?.SearchEngine?.ToDictionary()})
                 .OrderBy(x =>
                     x.Name?.TrimEnd("Searcher"))); //order by name , but strip the "Searcher" from the end if it exists
         return model;
@@ -196,6 +196,7 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
             Name = indexName,
             HealthStatus = isHealth.Success ? Enum.GetName(typeof(HealthStatus),isHealth.Result ?? HealthStatus.Healthy) : Enum.GetName(typeof(HealthStatus),isHealth.Result ?? HealthStatus.Unhealthy),
             ProviderProperties = properties,
+            SearchProviderDetails = indexDiag.SearchEngine?.ToDictionary(),
             CanRebuild = _indexRebuilder.CanRebuild(indexName)
         };
 

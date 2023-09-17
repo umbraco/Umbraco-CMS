@@ -2669,7 +2669,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="contentRedirectManager">Rheolaeth Ailgyfeirio URL</key>
     <key alias="mediaFolderBrowser">Cynnwys</key>
     <key alias="settingsWelcome">Croeso</key>
-    <key alias="settingsExamine">Rheolaeth Examine</key>
+    <key alias="settingSearchManagment">Rheolaeth Examine</key>
     <key alias="settingsPublishedStatus">Statws Cyhoeddedig</key>
     <key alias="settingsModelsBuilder">Adeiladwr Modelau</key>
     <key alias="settingsHealthCheck">Gwiriad Iechyd</key>

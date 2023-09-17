@@ -2028,7 +2028,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="contentRedirectManager">Redirects håndtering</key>
     <key alias="mediaFolderBrowser">Indhold</key>
     <key alias="settingsWelcome">Velkommen</key>
-    <key alias="settingsExamine">Examine Management</key>
+    <key alias="settingSearchManagment">Search Managment</key>
     <key alias="settingsPublishedStatus">Published Cache</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>

@@ -624,7 +624,7 @@
     <key alias="indexInfo">Index info</key>
     <key alias="contentInIndex">Content in index</key>
     <key alias="indexInfoDescription">Lists the properties of the index</key>
-    <key alias="manageIndexes">Manage Examine's indexes</key>
+    <key alias="manageIndexes">Manage Search's indexes</key>
     <key alias="manageIndexesDescription">Allows you to view the details of each index and provides some tools for
       managing the indexes
     </key>
@@ -2563,7 +2563,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="contentRedirectManager">Redirect URL Management</key>
     <key alias="mediaFolderBrowser">Content</key>
     <key alias="settingsWelcome">Welcome</key>
-    <key alias="settingsExamine">Examine Management</key>
+    <key alias="settingSearchManagment">Search Managment</key>
     <key alias="settingsPublishedStatus">Published Status</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>

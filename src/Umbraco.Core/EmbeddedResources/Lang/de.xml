@@ -2303,7 +2303,7 @@
     <key alias="contentRedirectManager">URL-Weiterleitungen verwalten</key>
     <key alias="mediaFolderBrowser">Inhalt</key>
     <key alias="settingsWelcome">Begrüßung</key>
-    <key alias="settingsExamine">Examine Management</key>
+    <key alias="settingSearchManagment">Search Managment</key>
     <key alias="settingsPublishedStatus">Status der Veröffentlichungen</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Systemzustand prüfen</key>

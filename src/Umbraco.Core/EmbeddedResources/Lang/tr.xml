@@ -2140,7 +2140,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="contentRedirectManager">Yeniden Yönlendirme URL Yönetimi</key>
     <key alias="mediaFolderBrowser">İçerik</key>
     <key alias="settingsWelcome">Hoş Geldiniz</key>
-    <key alias="settingsExamine">Yönetimi İnceleyin</key>
+    <key alias="settingSearchManagment">Yönetimi İnceleyin</key>
     <key alias="settingsPublishedStatus">Yayınlanma Durumu</key>
     <key alias="settingsModelsBuilder">Model Oluşturucu</key>
     <key alias="settingsHealthCheck">Durum Kontrolü</key>

@@ -2246,7 +2246,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="contentRedirectManager">Redirect URL Beheer</key>
     <key alias="mediaFolderBrowser">Inhoud</key>
     <key alias="settingsWelcome">Welkom</key>
-    <key alias="settingsExamine">Examine Beheer</key>
+    <key alias="settingSearchManagment">Examine Beheer</key>
     <key alias="settingsPublishedStatus">Publicatiestatus</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Gezondheidscontrole</key>

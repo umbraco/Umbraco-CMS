@@ -97,7 +97,30 @@
                     <div class="umb-panel-group__details-checks">
 
                         <!-- Search Tool -->
+                      <div class="umb-panel-group__details-check">
 
+                        <div class="umb-panel-group__details-check-title">
+                          <div class="umb-panel-group__details-check-name"><localize key="examineManagement_searchEngineInfo">Search Engine info</localize></div>
+                          <div class="umb-panel-group__details-check-description"><localize key="examineManagement_searchEngineInfoDescription">Lists the properties of the search Engine</localize></div>
+                        </div>
+
+                        <div class="umb-panel-group__details-status">
+
+                          <div class="umb-panel-group__details-status-content">
+
+                            <table class="table table-bordered table-condensed">
+                              <tr ng-repeat="(key, val) in vm.selectedSearcher.searchProviderDetails track by $index">
+                                <th>{{key}}</th>
+                                <td>{{val}}</td>
+                              </tr>
+
+                            </table>
+
+                          </div>
+
+                        </div>
+
+                      </div>
                         <div class="umb-panel-group__details-check">
 
                             <div class="umb-panel-group__details-check-title">
@@ -213,6 +236,31 @@
 
                     <div class="umb-panel-group__details-checks">
 
+                      <!-- Search Engine Status -->
+                      <div class="umb-panel-group__details-check">
+
+                        <div class="umb-panel-group__details-check-title">
+                          <div class="umb-panel-group__details-check-name"><localize key="examineManagement_searchEngineInfo">Search Engine info</localize></div>
+                          <div class="umb-panel-group__details-check-description"><localize key="examineManagement_searchEngineInfoDescription">Lists the properties of the search Engine</localize></div>
+                        </div>
+
+                        <div class="umb-panel-group__details-status">
+
+                          <div class="umb-panel-group__details-status-content">
+
+                            <table class="table table-bordered table-condensed">
+                              <tr ng-repeat="(key, val) in vm.selectedIndex.searchProviderDetails track by $index">
+                                <th>{{key}}</th>
+                                <td>{{val}}</td>
+                              </tr>
+
+                            </table>
+
+                          </div>
+
+                        </div>
+
+                      </div>
                         <!-- Health Status -->
 
                         <div class="umb-panel-group__details-check">
@@ -250,7 +298,8 @@
 
                             <div class="umb-panel-group__details-check-title">
                                 <div class="umb-panel-group__details-check-name"><localize key="general_search">Search</localize></div>
-                                <div class="umb-panel-group__details-check-description"><localize key="examineManagement_searchDescription">Search the index and view the results</localize></div>
+                                <div class="umb-panel-group__details-check-description"><localize key="examineManagement_searchDescription">Search the index and view the results</localize>
+                              </div>
                             </div>
 
                             <div class="umb-panel-group__details-status">
