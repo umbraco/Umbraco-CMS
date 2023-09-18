@@ -30,7 +30,7 @@ The development environment is the default environment and is used when running 
 ### Run against a local Umbraco instance
 
 > **Note**
-> Make sure you have followed the [Authentication guide](../docs/authentication.md) before continuing.
+> Make sure you have followed the [Authentication guide](https://github.com/umbraco/Umbraco.CMS.Backoffice/blob/main/docs/authentication.md) before continuing.
 
 If you have a local Umbraco instance running, you can use the development environment to run against it by overriding the API URL and bypassing the mock-service-worker in the frontend client.
 

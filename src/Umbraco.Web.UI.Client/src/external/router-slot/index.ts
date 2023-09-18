@@ -1,4 +1,7 @@
-export * from 'router-slot';
+export * from './router-slot.js';
+export * from './config.js';
+export * from './util/index.js';
+
 export type {
 	Guard,
 	IRoute,
@@ -10,5 +13,4 @@ export type {
 	PageComponent,
 	Component,
 	Params,
-} from 'router-slot/model';
-export * from 'router-slot/util';
+} from './model.js';

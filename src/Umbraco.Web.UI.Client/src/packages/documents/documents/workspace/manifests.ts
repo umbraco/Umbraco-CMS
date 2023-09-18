@@ -78,6 +78,7 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 ];
 
 const workspaceActions: Array<ManifestWorkspaceAction> = [
+	/*
 	{
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Document.SaveAndPublish',
@@ -96,6 +97,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			},
 		],
 	},
+	*/
 	{
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Document.Save',
@@ -103,7 +105,8 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		weight: 80,
 		meta: {
 			label: 'Save',
-			look: 'secondary',
+			look: 'primary',
+			color: 'positive',
 			api: UmbSaveWorkspaceAction,
 		},
 		conditions: [
@@ -113,6 +116,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			},
 		],
 	},
+	/*
 	{
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Document.SaveAndPreview',
@@ -145,6 +149,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			},
 		],
 	},
+	*/
 ];
 
 export const manifests = [workspace, ...workspaceEditorViews, ...workspaceViewCollections, ...workspaceActions];

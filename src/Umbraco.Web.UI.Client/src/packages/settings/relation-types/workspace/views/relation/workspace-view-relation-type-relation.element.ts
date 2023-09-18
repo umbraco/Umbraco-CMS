@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTableColumn, UmbTableConfig } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -83,65 +83,65 @@ export class UmbWorkspaceViewRelationTypeRelationElement
 
 const MockData: Array<RelationResponseModel> = [
 	{
-		parentId: 1,
+		parentId: '1',
 		parentName: 'Parent 1',
-		childId: 2,
+		childId: '2',
 		childName: 'Child 1',
 		createDate: '2021-01-01',
 		comment: 'Comment 1',
 	},
 	{
-		parentId: 1,
+		parentId: '1',
 		parentName: 'Parent 1',
-		childId: 3,
+		childId: '3',
 		childName: 'Child 2',
 		createDate: '2021-01-01',
 		comment: 'Comment 2',
 	},
 	{
-		parentId: 1,
+		parentId: '1',
 		parentName: 'Parent 1',
-		childId: 4,
+		childId: '4',
 		childName: 'Child 3',
 		createDate: '2021-01-01',
 		comment: 'Comment 3',
 	},
 	{
-		parentId: 1,
+		parentId: '1',
 		parentName: 'Parent 1',
-		childId: 5,
+		childId: '5',
 		childName: 'Child 4',
 		createDate: '2021-01-01',
 		comment: 'Comment 4',
 	},
 	{
-		parentId: 1,
+		parentId: '1',
 		parentName: 'Parent 1',
-		childId: 6,
+		childId: '6',
 		childName: 'Child 5',
 		createDate: '2021-01-01',
 		comment: 'Comment 5',
 	},
 	{
-		parentId: 1,
+		parentId: '1',
 		parentName: 'Parent 1',
-		childId: 7,
+		childId: '7',
 		childName: 'Child 6',
 		createDate: '2021-01-01',
 		comment: 'Comment 6',
 	},
 	{
-		parentId: 1,
+		parentId: '1',
 		parentName: 'Parent 1',
-		childId: 8,
+		childId: '8',
 		childName: 'Child 7',
 		createDate: '2021-01-01',
 		comment: 'Comment 7',
 	},
 	{
-		parentId: 1,
+		parentId: '1',
 		parentName: 'Parent 1',
-		childId: 9,
+		childId: '9',
 		childName: 'Child 8',
 		createDate: '2021-01-01',
 		comment: 'Comment 8',

@@ -21,5 +21,7 @@ export type CreateContentTypeRequestModelBaseCreateDocumentTypePropertyTypeReque
     containers?: Array<CreateDocumentTypePropertyTypeContainerRequestModel>;
     allowedContentTypes?: Array<ContentTypeSortModel>;
     compositions?: Array<ContentTypeCompositionModel>;
+    id?: string | null;
+    containerId?: string | null;
 };
 

@@ -13,6 +13,7 @@ import type { PagedDocumentTreeItemResponseModel } from '../models/PagedDocument
 import type { PagedDocumentTypeResponseModel } from '../models/PagedDocumentTypeResponseModel';
 import type { PagedRecycleBinItemResponseModel } from '../models/PagedRecycleBinItemResponseModel';
 import type { PublicAccessRequestModel } from '../models/PublicAccessRequestModel';
+import type { SortingRequestModel } from '../models/SortingRequestModel';
 import type { UpdateDocumentNotificationsRequestModel } from '../models/UpdateDocumentNotificationsRequestModel';
 import type { UpdateDocumentRequestModel } from '../models/UpdateDocumentRequestModel';
 import type { UpdateDomainsRequestModel } from '../models/UpdateDomainsRequestModel';
@@ -69,27 +70,6 @@ export class DocumentResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static deleteDocumentById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/umbraco/management/api/v1/document/{id}',
-            path: {
-                'id': id,
-            },
-            errors: {
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
     public static putDocumentById({
         id,
         requestBody,
@@ -105,35 +85,6 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
-            errors: {
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns PagedDocumentTypeResponseModel Success
-     * @throws ApiError
-     */
-    public static getDocumentByIdAllowedDocumentTypes({
-        id,
-        skip,
-        take = 100,
-    }: {
-        id: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedDocumentTypeResponseModel> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/document/{id}/allowed-document-types',
-            path: {
-                'id': id,
-            },
-            query: {
-                'skip': skip,
-                'take': take,
-            },
             errors: {
                 404: `Not Found`,
             },
@@ -229,6 +180,28 @@ export class DocumentResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putDocumentByIdMoveToRecycleBin({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/document/{id}/move-to-recycle-bin',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
@@ -374,6 +347,33 @@ export class DocumentResource {
     }
 
     /**
+     * @returns PagedDocumentTypeResponseModel Success
+     * @throws ApiError
+     */
+    public static getDocumentAllowedDocumentTypes({
+        parentId,
+        skip,
+        take = 100,
+    }: {
+        parentId?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedDocumentTypeResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document/allowed-document-types',
+            query: {
+                'parentId': parentId,
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
      * @returns any Success
      * @throws ApiError
      */
@@ -398,24 +398,21 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedDocumentTypeResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
-    public static getDocumentRootAllowedDocumentTypes({
-        skip,
-        take = 100,
+    public static putDocumentSort({
+        requestBody,
     }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedDocumentTypeResponseModel> {
+        requestBody?: SortingRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/document/root/allowed-document-types',
-            query: {
-                'skip': skip,
-                'take': take,
-            },
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/document/sort',
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
+                400: `Bad Request`,
                 404: `Not Found`,
             },
         });

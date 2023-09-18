@@ -3,7 +3,7 @@ import type {
 	FolderModelBaseModel,
 	FolderResponseModel,
 	ProblemDetails,
-	UpdateFolderReponseModel,
+	UpdateFolderResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbFolderRepository {
@@ -23,9 +23,9 @@ export interface UmbFolderRepository {
 
 	updateFolder(
 		unique: string,
-		folder: FolderModelBaseModel
+		folder: FolderModelBaseModel,
 	): Promise<{
-		data?: UpdateFolderReponseModel;
+		data?: UpdateFolderResponseModel;
 		error?: ProblemDetails;
 	}>;
 

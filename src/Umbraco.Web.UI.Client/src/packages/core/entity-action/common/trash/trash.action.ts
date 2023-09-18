@@ -9,7 +9,7 @@ import {
 import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbTrashEntityAction<
-	T extends UmbItemRepository<any> & { trash(unique: Array<string>): Promise<void> }
+	T extends UmbItemRepository<any> & { trash(unique: string): Promise<void> },
 > extends UmbEntityActionBase<T> {
 	#modalContext?: UmbModalManagerContext;
 
@@ -37,7 +37,7 @@ export class UmbTrashEntityAction<
 			});
 
 			modalContext?.onSubmit().then(() => {
-				this.repository?.trash([this.unique]);
+				this.repository?.trash(this.unique);
 			});
 		}
 	}

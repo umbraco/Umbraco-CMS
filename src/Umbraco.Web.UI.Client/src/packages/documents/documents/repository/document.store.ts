@@ -21,30 +21,12 @@ export class UmbDocumentStore extends UmbStoreBase {
 	}
 
 	/**
-	 * Append a document to the store
-	 * @param {DocumentDetails} document
-	 * @memberof UmbDocumentDetailStore
-	 */
-	append(document: DocumentResponseModel) {
-		this._data.append([document]);
-	}
-
-	/**
 	 * Retrieve a document from the store
 	 * @param {string} id
 	 * @memberof UmbDocumentStore
 	 */
 	byId(id: DocumentResponseModel['id']) {
 		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
-	}
-
-	/**
-	 * Removes documents in the store with the given uniques
-	 * @param {string[]} uniques
-	 * @memberof UmbDocumentDetailStore
-	 */
-	remove(uniques: Array<DocumentResponseModel['id']>) {
-		this._data.remove(uniques);
 	}
 }
 
