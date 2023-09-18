@@ -118,4 +118,4 @@ export const granularPermissions: Array<ManifestUserGranularPermission> = [
 	},
 ];
 
-export const manifests = [...permissions];
+export const manifests = [...permissions, ...granularPermissions];
