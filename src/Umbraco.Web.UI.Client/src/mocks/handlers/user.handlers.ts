@@ -1,6 +1,6 @@
 const { rest } = window.MockServiceWorker;
 
-import { umbUsersData } from '../data/users.data.js';
+import { umbUsersData } from '../data/user.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 const slug = '/user';
@@ -23,7 +23,7 @@ export const handlers = [
 			ctx.status(200),
 			ctx.json({
 				sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Settings', 'My.Section.Custom'],
-			})
+			}),
 		);
 	}),
 
