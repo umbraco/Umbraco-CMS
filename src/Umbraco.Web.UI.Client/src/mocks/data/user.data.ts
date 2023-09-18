@@ -1,9 +1,10 @@
-import { UmbData } from './data.js';
+import { UmbEntityData } from './entity.data.js';
+import { umbUserGroupData } from './user-group.data.js';
 import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { PagedUserResponseModel, UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 // Temp mocked database
-class UmbUserData extends UmbData<UserResponseModel> {
+class UmbUserData extends UmbEntityData<UserResponseModel> {
 	constructor(data: UserResponseModel[]) {
 		super(data);
 	}
@@ -15,12 +16,9 @@ class UmbUserData extends UmbData<UserResponseModel> {
 		};
 	}
 
-	getById(id: string): UserResponseModel | undefined {
-		return this.data.find((user) => user.id === id);
-	}
-
 	getCurrentUser(): UmbLoggedInUser {
 		const firstUser = this.data[0];
+		const permissions = firstUser.userGroupIds?.length ? umbUserGroupData.getPermissions(firstUser.userGroupIds) : [];
 
 		return {
 			id: firstUser.id,
@@ -33,79 +31,9 @@ class UmbUserData extends UmbData<UserResponseModel> {
 			languages: [],
 			contentStartNodeIds: firstUser.contentStartNodeIds,
 			mediaStartNodeIds: firstUser.mediaStartNodeIds,
-			permissions: [],
+			permissions,
 		};
 	}
-
-	save(id: string, saveItem: UserResponseModel) {
-		const foundIndex = this.data.findIndex((item) => item.id === id);
-		if (foundIndex !== -1) {
-			// update
-			this.data[foundIndex] = saveItem;
-			this.updateData(saveItem);
-		} else {
-			// new
-			this.data.push(saveItem);
-		}
-
-		return saveItem;
-	}
-
-	protected updateData(updateItem: UserResponseModel) {
-		const itemIndex = this.data.findIndex((item) => item.id === updateItem.id);
-		const item = this.data[itemIndex];
-
-		console.log('updateData', updateItem, itemIndex, item);
-
-		if (!item) return;
-
-		const itemKeys = Object.keys(item);
-		const newItem = {};
-
-		for (const [key] of Object.entries(updateItem)) {
-			if (itemKeys.indexOf(key) !== -1) {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				newItem[key] = updateItem[key];
-			}
-		}
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this.data[itemIndex] = newItem;
-
-		console.log('updateData', this.data[itemIndex]);
-	}
-
-	// updateUserGroup(ids: string[], userGroup: string) {
-	// 	this.data.forEach((user) => {
-	// 		if (ids.includes(user.id)) {
-	// 		} else {
-	// 		}
-
-	// 		this.updateData(user);
-	// 	});
-
-	// 	return this.data.map((user) => user.id);
-	// }
-
-	// enable(ids: string[]) {
-	// 	const users = this.data.filter((user) => ids.includes(user.id));
-	// 	users.forEach((user) => {
-	// 		user.status = 'enabled';
-	// 		this.updateData(user);
-	// 	});
-	// 	return users.map((user) => user.id);
-	// }
-
-	// disable(ids: string[]) {
-	// 	const users = this.data.filter((user) => ids.includes(user.id));
-	// 	users.forEach((user) => {
-	// 		user.status = 'disabled';
-	// 		this.updateData(user);
-	// 	});
-	// 	return users.map((user) => user.id);
-	// }
 }
 
 export const data: Array<UserResponseModel & { type: string }> = [
@@ -124,7 +52,11 @@ export const data: Array<UserResponseModel & { type: string }> = [
 		updateDate: '2/10/2022',
 		createDate: '3/13/2022',
 		failedLoginAttempts: 946,
-		userGroupIds: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1'],
+		userGroupIds: [
+			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
+			'9d24dc47-a4bf-427f-8a4a-b900f03b8a12',
+			'f4626511-b0d7-4ab1-aebc-a87871a5dcfa',
+		],
 	},
 	{
 		id: '82e11d3d-b91d-43c9-9071-34d28e62e81d',
