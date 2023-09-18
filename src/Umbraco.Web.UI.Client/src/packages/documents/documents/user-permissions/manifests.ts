@@ -1,4 +1,7 @@
-import type { ManifestUserPermission } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	ManifestUserGranularPermission,
+	ManifestUserPermission,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_USER_PERMISSION_DOCUMENT_CREATE = 'Umb.UserPermission.Document.Create';
 export const UMB_USER_PERMISSION_DOCUMENT_READ = 'Umb.UserPermission.Document.Read';
@@ -100,6 +103,17 @@ const permissions: Array<ManifestUserPermission> = [
 		meta: {
 			label: 'Update',
 			description: 'Allow access to save a document',
+		},
+	},
+];
+
+export const granularPermissions: Array<ManifestUserGranularPermission> = [
+	{
+		type: 'userGranularPermission',
+		alias: 'Umb.UserGranularPermission.Document',
+		name: 'Document Granular User Permission',
+		meta: {
+			entityType: ['document'],
 		},
 	},
 ];
