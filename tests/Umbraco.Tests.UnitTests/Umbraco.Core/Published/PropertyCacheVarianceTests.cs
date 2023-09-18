@@ -28,9 +28,9 @@ public class PropertyCacheVarianceTests
     //    The effective property variation is a product of both variations, meaning the property type and the content type
     //    variations are combined in an OR.
     //    The rules are as follows:
-    //    - ContentVariation.Nothing            => the intermediate value is calculated once and reused across all variants.
+    //    - ContentVariation.Nothing            => the intermediate value is calculated once and reused across all variants (cultures and segments).
     //    - ContentVariation.Culture            => the intermediate value is calculated per culture and reused across all segments.
-    //    - ContentVariation.Segment            => the intermediate value is calculated per culture and reused across all cultures.
+    //    - ContentVariation.Segment            => the intermediate value is calculated per segment and reused across all cultures.
     //    - ContentVariation.CultureAndSegment  => the intermediate value is calculated for all invoked culture and segment combinations.
     // 2. The property type cache level (which is usually derived from the property value converter).
     //   - PropertyCacheLevel.Element   => the final values are cached until the parent content item is updated.
