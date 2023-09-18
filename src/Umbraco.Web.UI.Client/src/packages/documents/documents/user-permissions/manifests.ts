@@ -1,9 +1,20 @@
 import type { ManifestUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 
+export const UMB_USER_PERMISSION_DOCUMENT_CREATE = 'Umb.UserPermission.Document.Create';
+export const UMB_USER_PERMISSION_DOCUMENT_READ = 'Umb.UserPermission.Document.Read';
+export const UMB_USER_PERMISSION_DOCUMENT_UPDATE = 'Umb.UserPermission.Document.Update';
+export const UMB_USER_PERMISSION_DOCUMENT_DELETE = 'Umb.UserPermission.Document.Delete';
+export const UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT = 'Umb.UserPermission.Document.CreateBlueprint';
+export const UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS = 'Umb.UserPermission.Document.Notifications';
+export const UMB_USER_PERMISSION_DOCUMENT_PUBLISH = 'Umb.UserPermission.Document.Publish';
+export const UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS = 'Umb.UserPermission.Document.Permissions';
+export const UMB_USER_PERMISSION_DOCUMENT_SEND_FOR_APPROVAL = 'Umb.UserPermission.Document.SendForApproval';
+export const UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH = 'Umb.UserPermission.Document.Unpublish';
+
 const permissions: Array<ManifestUserPermission> = [
 	{
 		type: 'userPermission',
-		alias: 'Umb.UserPermission.Document.Browse',
+		alias: UMB_USER_PERMISSION_DOCUMENT_READ,
 		name: 'Read Document User Permission',
 		meta: {
 			label: 'Read',
@@ -12,7 +23,7 @@ const permissions: Array<ManifestUserPermission> = [
 	},
 	{
 		type: 'userPermission',
-		alias: 'Umb.UserPermission.Document.CreateBlueprint',
+		alias: UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT,
 		name: 'Create Document Blueprint User Permission',
 		meta: {
 			label: 'Create Content Template',
@@ -21,7 +32,7 @@ const permissions: Array<ManifestUserPermission> = [
 	},
 	{
 		type: 'userPermission',
-		alias: 'Umb.UserPermission.Document.Delete',
+		alias: UMB_USER_PERMISSION_DOCUMENT_DELETE,
 		name: 'Delete Document User Permission',
 		meta: {
 			label: 'Delete',
@@ -30,7 +41,7 @@ const permissions: Array<ManifestUserPermission> = [
 	},
 	{
 		type: 'userPermission',
-		alias: 'Umb.UserPermission.Document.Create',
+		alias: UMB_USER_PERMISSION_DOCUMENT_CREATE,
 		name: 'Create Document User Permission',
 		meta: {
 			label: 'Create',
@@ -39,7 +50,7 @@ const permissions: Array<ManifestUserPermission> = [
 	},
 	{
 		type: 'userPermission',
-		alias: 'Umb.UserPermission.Document.Notifications',
+		alias: UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS,
 		name: 'Document Notifications User Permission',
 		meta: {
 			label: 'Notifications',
@@ -48,7 +59,7 @@ const permissions: Array<ManifestUserPermission> = [
 	},
 	{
 		type: 'userPermission',
-		alias: 'Umb.UserPermission.Document.Publish',
+		alias: UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 		name: 'Publish Document User Permission',
 		meta: {
 			label: 'Publish',
@@ -57,7 +68,7 @@ const permissions: Array<ManifestUserPermission> = [
 	},
 	{
 		type: 'userPermission',
-		alias: 'Umb.UserPermission.Document.Permissions',
+		alias: UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
 		name: 'Document Permissions User Permission',
 		meta: {
 			label: 'Permissions',
@@ -66,7 +77,7 @@ const permissions: Array<ManifestUserPermission> = [
 	},
 	{
 		type: 'userPermission',
-		alias: 'Umb.UserPermission.Document.SendForApproval',
+		alias: UMB_USER_PERMISSION_DOCUMENT_SEND_FOR_APPROVAL,
 		name: 'Send Document For Approval User Permission',
 		meta: {
 			label: 'Send For Approval',
@@ -75,7 +86,7 @@ const permissions: Array<ManifestUserPermission> = [
 	},
 	{
 		type: 'userPermission',
-		alias: 'Umb.UserPermission.Document.Unpublish',
+		alias: UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
 		name: 'Unpublish Document User Permission',
 		meta: {
 			label: 'Unpublish',
@@ -84,7 +95,7 @@ const permissions: Array<ManifestUserPermission> = [
 	},
 	{
 		type: 'userPermission',
-		alias: 'Umb.UserPermission.Document.Update',
+		alias: UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 		name: 'Update Document User Permission',
 		meta: {
 			label: 'Update',
