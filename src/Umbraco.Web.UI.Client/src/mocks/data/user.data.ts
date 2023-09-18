@@ -3,7 +3,7 @@ import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { PagedUserResponseModel, UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 // Temp mocked database
-class UmbUsersData extends UmbData<UserResponseModel> {
+class UmbUserData extends UmbData<UserResponseModel> {
 	constructor(data: UserResponseModel[]) {
 		super(data);
 	}
@@ -196,4 +196,4 @@ export const data: Array<UserResponseModel & { type: string }> = [
 	},
 ];
 
-export const umbUsersData = new UmbUsersData(data);
+export const umbUsersData = new UmbUserData(data);
