@@ -29,6 +29,7 @@ import type { ManifestWorkspaceAction } from './workspace-action.model.js';
 import type { ManifestWorkspaceEditorView } from './workspace-editor-view.model.js';
 import type { ManifestWorkspaceViewCollection } from './workspace-view-collection.model.js';
 import type { ManifestUserPermission } from './user-permission.model.js';
+import type { ManifestUserGranularPermission } from './user-granular-permission.model.js';
 import type {
 	ManifestBase,
 	ManifestBundle,
@@ -67,6 +68,7 @@ export * from './workspace-view-collection.model.js';
 export * from './workspace-editor-view.model.js';
 export * from './workspace.model.js';
 export * from './user-permission.model.js';
+export * from './user-granular-permission.model.js';
 
 export type ManifestTypes =
 	| ManifestBundle<ManifestTypes>
@@ -109,4 +111,5 @@ export type ManifestTypes =
 	| ManifestWorkspaceEditorView
 	| ManifestWorkspaceViewCollection
 	| ManifestUserPermission
+	| ManifestUserGranularPermission
 	| ManifestBase;
