@@ -45,20 +45,40 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 	}
 
 	#renderPermission(userPermissionManifest: ManifestUserPermission) {
-		return html`<div style="display: flex; align-items:center; border-bottom: 1px solid whitesmoke">
+		return html`<div
+			style="display: flex; align-items:center; border-bottom: 1px solid var(--uui-color-divider); padding: 9px 0 12px 0;">
 			<uui-toggle
 				label=${userPermissionManifest.meta.label}
 				?checked=${this.#isAllowed(userPermissionManifest)}
-				@change=${(event: UUIBooleanInputEvent) =>
-					this.#onChangeUserPermission(event, userPermissionManifest)}></uui-toggle>
-			<div>
-				<h5>${userPermissionManifest.meta.label}</h5>
-				<small>${userPermissionManifest.meta.description}</small>
-			</div>
+				@change=${(event: UUIBooleanInputEvent) => this.#onChangeUserPermission(event, userPermissionManifest)}>
+				<div class="permission-meta">
+					<div class="permission-name">${userPermissionManifest.meta.label}</div>
+					<small>${userPermissionManifest.meta.description}</small>
+				</div>
+			</uui-toggle>
 		</div>`;
 	}
 
-	static styles = [UmbTextStyles, css``];
+	static styles = [
+		UmbTextStyles,
+		css`
+			.permission-toggle {
+				display: flex;
+				align-items: center;
+				border-bottom: 1px solid var(--uui-color-divider);
+				padding: var(--uui-size-space-3) 0 var(--uui-size-space-4) 0;
+			}
+
+			.permission-meta {
+				margin-left: var(--uui-size-space-4);
+				line-height: 1.2em;
+			}
+
+			.permission-name {
+				font-weight: bold;
+			}
+		`,
+	];
 }
 
 export default UmbUserGroupDefaultPermissionListElement;
