@@ -11,6 +11,7 @@ import {
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import './components/user-group-default-permission-list.element.js';
+import './components/user-group-granular-permission-list.element.js';
 
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
@@ -134,7 +135,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 			<uui-box>
 				<div slot="headline">Granular permissions</div>
-				<b>PERMISSIONS NOT IMPLEMENTED YET</b>
+				<umb-user-group-granular-permission-list></umb-user-group-granular-permission-list>
 			</uui-box>`;
 	}
 
