@@ -62,10 +62,7 @@ public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRe
 
         var id = Convert.ToInt32(Database.Insert(webhookDto));
         entity.Id = id;
-        IEnumerable<EntityKey2WebhookDto> buildEntityKey2WebhookDtos = WebhookFactory.BuildEntityKey2WebhookDto(entity, id);
-        IEnumerable<Event2WebhookDto> buildEvent2WebhookDtos = WebhookFactory.BuildEvent2WebhookDto(entity, id);
-        Database.InsertBulk(buildEntityKey2WebhookDtos);
-        Database.InsertBulk(buildEvent2WebhookDtos);
+        InsertManyToOneReferences(entity);
 
         entity.ResetDirtyProperties();
     }
@@ -76,6 +73,10 @@ public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRe
 
         WebhookDto dto = WebhookFactory.BuildDto(entity);
         Database.Update(dto);
+
+        // Delete and re-insert the many to one references (event & entity keys)
+        DeleteUpdateManyToOneReferences(dto.Id);
+        InsertManyToOneReferences(entity);
 
         entity.ResetDirtyProperties();
     }
@@ -129,5 +130,20 @@ public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRe
         entity.ResetDirtyProperties(false);
 
         return entity;
+    }
+
+    private void DeleteUpdateManyToOneReferences(int webhookId)
+    {
+        Database.Delete<EntityKey2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId });
+        Database.Delete<Event2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId });
+    }
+
+    private void InsertManyToOneReferences(Webhook webhook)
+    {
+        IEnumerable<EntityKey2WebhookDto> buildEntityKey2WebhookDtos = WebhookFactory.BuildEntityKey2WebhookDto(webhook, webhook.Id);
+        IEnumerable<Event2WebhookDto> buildEvent2WebhookDtos = WebhookFactory.BuildEvent2WebhookDto(webhook, webhook.Id);
+
+        Database.InsertBulk(buildEntityKey2WebhookDtos);
+        Database.InsertBulk(buildEvent2WebhookDtos);
     }
 }
