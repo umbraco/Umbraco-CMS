@@ -19,7 +19,7 @@
     <tr>
       <!--          <th><localize key="general_language"></localize></th>-->
       <th>Enabled</th>
-      <th>Event</th>
+      <th>Events</th>
       <th>Url</th>
       <th>Types</th>
     </tr>
@@ -33,8 +33,8 @@
         </umb-checkmark>
       </td>
       <td>
-        <umb-icon icon="icon-globe" class="language-icon"></umb-icon>
-        <span>{{ webhook.event }}</span>
+        <umb-icon icon="icon-globe" class="event-icon"></umb-icon>
+        <span>{{ vm.webhookEvents[webhook.key] }}</span>
       </td>
       <td>
         {{ webhook.url }}

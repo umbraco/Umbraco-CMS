@@ -26,19 +26,24 @@
                        required />
               </umb-control-group>
 
-              <umb-control-group label="Event" description="The event for which the webhook should be triggered." alias="webhookEvent" required="true">
-                <select ng-options="event for event in model.events"
-                        data-element="webhook-event"
-                        class="umb-property-editor umb-dropdown"
-                        name="webhookEvent"
-                        ng-focus="oldValue=model.webhook.event"
-                        ng-model="model.webhook.event"
-                        ng-change="vm.eventChanged(model.webhook.event, oldValue)"
-                        class="umb-editor"
-                        no-dirty-check
-                        required>
-                  <option></option>
-                </select>
+              <umb-control-group label="Event" description="The events for which the webhook should be triggered." alias="webhookEvents" required="true">
+                <umb-node-preview
+                  ng-repeat="event in model.webhook.events"
+                  ng-show="event"
+                  icon="icon-navigation"
+                  name="event"
+                  alias="event"
+                  description=""
+                  allow-remove="true"
+                  allow-open="false"
+                  on-remove="vm.clearEvent(event)">
+                </umb-node-preview>
+                <a href
+                   class="umb-node-preview-add"
+                   ng-click="vm.openEventPicker()"
+                   prevent-default>
+                  <localize key="general_add">Add</localize>
+                </a>
               </umb-control-group>
 
               <umb-control-group label="Content Type" description="Only trigger the webhook for a specific content type." alias="webhookContentType">
@@ -54,13 +59,13 @@
                   on-remove="vm.clearContentType(contentType.key)">
                 </umb-node-preview>
                 <a href
-                   ng-show="(!model.contentTypes || model.contentTypes.length === 0) && model.webhook.event"
+                   ng-show="model.webhook.events && model.webhook.events.length !== 0"
                    class="umb-node-preview-add"
                    ng-click="vm.openContentTypePicker()"
                    prevent-default>
                   <localize key="general_add">Add</localize>
                 </a>
-                <span class="umb-node-preview-add" ng-show="!model.webhook.event">Please select an event first.</span>
+                <span class="umb-node-preview-add" ng-show="!model.webhook.events || model.webhook.events.length === 0">Please select an event first.</span>
               </umb-control-group>
 
               <umb-control-group label="Enabled" description="Is the webhook enabled?" alias="webhookEnabled">

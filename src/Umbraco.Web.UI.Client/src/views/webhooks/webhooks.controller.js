@@ -8,11 +8,13 @@
     vm.deleteWebhook = deleteWebhook;
     vm.handleSubmissionError = handleSubmissionError;
     vm.resolveTypeNames = resolveTypeNames;
+    vm.resolveEventNames = resolveEventNames;
 
     vm.page = {};
     vm.webhooks = [];
     vm.events = [];
     vm.webHooksContentTypes = {};
+    vm.webhookEvents = {};
 
     function loadEvents (){
       return webhooksResource.getAllEvents()
@@ -21,11 +23,19 @@
         });
     }
 
+    function resolveEventNames(webhook) {
+      webhook.events.forEach((event) => {
+        if (!vm.webhookEvents[webhook.key]) {
+          vm.webhookEvents[webhook.key] = event;
+        } else {
+          vm.webhookEvents[webhook.key] += ", " + event;
+        }
+      });
+    }
+
     function resolveTypeNames(webhook) {
-      const isContent = webhook.event.toLowerCase().includes("content");
+      const isContent = webhook.events[0].toLowerCase().includes("content");
       const resource = isContent ? contentTypeResource : mediaTypeResource;
-
-
 
       webhook.entityKeys.forEach((key) => {
         if (vm.webHooksContentTypes[webhook.key]){
@@ -61,7 +71,7 @@
         webhook: webhook ? {
           entityKey: webhook.contentType ? webhook.contentType.key : null,
           enabled: webhook.enabled,
-          event: webhook.event,
+          events: webhook.events,
           key: webhook.key,
           url: webhook.url
         } : {enabled: true},
@@ -73,7 +83,7 @@
             handleSubmissionError(model, 'Please provide a valid URL. Did you include https:// ?');
             return;
           }
-          if (!model.webhook.event) {
+          if (!model.webhook.events || model.webhook.events.length === 0) {
             handleSubmissionError(model, 'Please provide the event for which the webhook should trigger');
             return;
           }
@@ -121,6 +131,7 @@
 
           vm.webhooks.forEach((webhook) => {
             resolveTypeNames(webhook);
+            resolveEventNames(webhook);
           })
         });
     }

@@ -28,24 +28,31 @@
         $scope.model.selection = [];
       }
 
-      // get languages
+      getAllEvents();
+      vm.loading = false;
+    }
+
+    function getAllEvents(){
+      // get all events
       webhooksResource.getAllEvents()
         .then((data) => {
           data.forEach(function (event) {
             let eventObject = { name: event, selected: false}
             vm.events.push(eventObject);
           });
-
-          vm.loading = false;
         });
-
     }
 
     function selectEvent(event) {
       if (!event.selected) {
-
         event.selected = true;
         $scope.model.selection.push(event);
+        if(event.name.toLowerCase().includes("content")){
+          vm.events = vm.events.filter(event => event.name.toLowerCase().includes("content"));
+        }
+        else{
+          vm.events = vm.events.filter(event => event.name.toLowerCase().includes("media"));
+        }
 
       } else {
 
@@ -56,6 +63,10 @@
           }
         });
 
+        if($scope.model.selection.length === 0){
+          vm.events = [];
+          getAllEvents();
+        }
       }
     }
 

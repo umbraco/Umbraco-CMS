@@ -3,8 +3,21 @@
   function EditController($scope, editorService) {
     var vm = this;
     vm.clearContentType = clearContentType;
+    this.openEventPicker = () => {
+      editorService.eventPicker({
+        title: "Select event",
+        submit(model) {
+
+          $scope.model.webhook.events =  model.selection;
+          editorService.close();
+        },
+        close() {
+          editorService.close();
+        }
+      });
+    }
     this.openContentTypePicker = () => {
-      const isContent = $scope.model.webhook ? $scope.model.webhook.event.toLowerCase().includes("content") : null;
+      const isContent = $scope.model.webhook ? $scope.model.webhook.events[0].toLowerCase().includes("content") : null;
       editorService.treePicker({
         section: 'settings',
         treeAlias: isContent ? 'documentTypes' : 'mediaTypes',

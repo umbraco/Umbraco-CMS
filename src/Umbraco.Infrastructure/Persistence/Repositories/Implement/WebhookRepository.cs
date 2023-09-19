@@ -122,7 +122,8 @@ public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRe
     private Webhook DtoToEntity(WebhookDto dto)
     {
         List<EntityKey2WebhookDto> webhookEntityKeyDtos = Database.Fetch<EntityKey2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id });
-        Webhook entity = WebhookFactory.BuildEntity(dto, webhookEntityKeyDtos);
+        List<Event2WebhookDto> event2WebhookDtos = Database.Fetch<Event2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id });
+        Webhook entity = WebhookFactory.BuildEntity(dto, webhookEntityKeyDtos, event2WebhookDtos);
 
         // reset dirty initial properties (U4-1946)
         entity.ResetDirtyProperties(false);
