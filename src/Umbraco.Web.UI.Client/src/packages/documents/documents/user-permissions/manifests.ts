@@ -20,6 +20,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_READ,
 		name: 'Read Document User Permission',
 		meta: {
+			entityType: ['document'],
 			label: 'Read',
 			description: 'Allow access to browse documents',
 		},
@@ -29,6 +30,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT,
 		name: 'Create Document Blueprint User Permission',
 		meta: {
+			entityType: ['document'],
 			label: 'Create Content Template',
 			description: 'Allow access to create a Content Template',
 		},
@@ -38,6 +40,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_DELETE,
 		name: 'Delete Document User Permission',
 		meta: {
+			entityType: ['document'],
 			label: 'Delete',
 			description: 'Allow access to delete a document',
 		},
@@ -47,6 +50,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_CREATE,
 		name: 'Create Document User Permission',
 		meta: {
+			entityType: ['document'],
 			label: 'Create',
 			description: 'Allow access to create a document',
 		},
@@ -56,6 +60,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS,
 		name: 'Document Notifications User Permission',
 		meta: {
+			entityType: ['document'],
 			label: 'Notifications',
 			description: 'Allow access to setup notifications for documents',
 		},
@@ -65,6 +70,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 		name: 'Publish Document User Permission',
 		meta: {
+			entityType: ['document'],
 			label: 'Publish',
 			description: 'Allow access to publish a document',
 		},
@@ -74,6 +80,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
 		name: 'Document Permissions User Permission',
 		meta: {
+			entityType: ['document'],
 			label: 'Permissions',
 			description: 'Allow access to change permissions for a document',
 		},
@@ -83,6 +90,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_SEND_FOR_APPROVAL,
 		name: 'Send Document For Approval User Permission',
 		meta: {
+			entityType: ['document'],
 			label: 'Send For Approval',
 			description: 'Allow access to send a document for approval before publishing',
 		},
@@ -92,6 +100,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
 		name: 'Unpublish Document User Permission',
 		meta: {
+			entityType: ['document'],
 			label: 'Unpublish',
 			description: 'Allow access to unpublish a document',
 		},
@@ -101,6 +110,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 		name: 'Update Document User Permission',
 		meta: {
+			entityType: ['document'],
 			label: 'Update',
 			description: 'Allow access to save a document',
 		},
@@ -112,6 +122,8 @@ export const granularPermissions: Array<ManifestUserGranularPermission> = [
 		type: 'userGranularPermission',
 		alias: 'Umb.UserGranularPermission.Document',
 		name: 'Document Granular User Permission',
+		loader: () =>
+			import('../components/input-document-granular-permission/input-document-granular-permission.element.js'),
 		meta: {
 			entityType: ['document'],
 		},
