@@ -32,7 +32,7 @@ test.describe('Modelsbuilder tests', () => {
       .done()
       .build();
     await umbracoApi.documentTypes.save(docType);
-    
+
     await umbracoApi.templates.edit(docTypeName, `@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Testdocument>
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
@@ -48,7 +48,7 @@ test.describe('Modelsbuilder tests', () => {
     // Fortunately for us the input field of a text box has the alias of the property as an id :)
     await page.locator("#title").type("Hello world!");
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
-    await umbracoUi.isSuccessNotificationVisible({timeout:10000});
+    await umbracoUi.isSuccessNotificationVisible();
     // Ensure that we can render it on the frontend = we can compile the models and views
     await umbracoApi.content.verifyRenderedContent("/", "<h1>Hello world!</h1>", true);
 
@@ -80,7 +80,7 @@ test.describe('Modelsbuilder tests', () => {
       .done()
       .build();
     const savedDocType = await umbracoApi.documentTypes.save(docType);
-    
+
     await umbracoApi.templates.edit(docTypeName, `@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Testdocument>
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
@@ -116,7 +116,7 @@ test.describe('Modelsbuilder tests', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.submit));
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
     // Has a long timeout because it can sometimes take longer than 5 sec to save on the pipeline
-    await umbracoUi.isSuccessNotificationVisible({timeout:10000});
+    await umbracoUi.isSuccessNotificationVisible();
 
     // Now that the content is updated and the models are rebuilt, ensure that we can still render the frontend.
     await umbracoApi.content.verifyRenderedContent("/", "<h1>" + propertyValue + "</h1>", true)
@@ -149,7 +149,7 @@ test.describe('Modelsbuilder tests', () => {
       .done()
       .build();
     const savedDocType = await umbracoApi.documentTypes.save(docType);
-    
+
     await umbracoApi.templates.edit(docTypeName, `@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Testdocument>
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
@@ -182,8 +182,8 @@ test.describe('Modelsbuilder tests', () => {
     // We only have to type out the opening tag, the editor adds the closing tag automatically.
     await editor.type("<p>Edited");
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
-    
-    await umbracoUi.isSuccessNotificationVisible({timeout:10000});
+
+    await umbracoUi.isSuccessNotificationVisible();
 
     await umbracoApi.content.verifyRenderedContent("/", "<h1>" + propertyValue + "</h1><p>Edited</p>", true);
 
@@ -194,7 +194,7 @@ test.describe('Modelsbuilder tests', () => {
 
   test('Can update view and document type', async ({page, umbracoApi, umbracoUi}, testInfo) => {
     await testInfo.slow();
-    
+
     const docTypeName = "TestDocument";
     const docTypeAlias = AliasHelper.toAlias(docTypeName);
     const propertyAlias = "title";
@@ -218,7 +218,7 @@ test.describe('Modelsbuilder tests', () => {
       .done()
       .build();
     const savedDocType = await umbracoApi.documentTypes.save(docType);
-    
+
     await umbracoApi.templates.edit(docTypeName, `@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Testdocument>
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
@@ -264,7 +264,7 @@ test.describe('Modelsbuilder tests', () => {
     // We only have to type out the opening tag, the editor adds the closing tag automatically.
     await editor.type("<p>@Model.Bod");
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
-    await umbracoUi.isSuccessNotificationVisible({timeout: 10000});
+    await umbracoUi.isSuccessNotificationVisible();
     await page.locator('span:has-text("×")').click();
 
     // Navigate to the content section and update the content
@@ -273,6 +273,8 @@ test.describe('Modelsbuilder tests', () => {
     await umbracoUi.clickElement(umbracoUi.getTreeItem("content", [contentName]));
     await page.locator("#bod").type("Fancy body text");
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
+
+    await page.waitForTimeout(2000);
 
     await umbracoApi.content.verifyRenderedContent("/", "<h1>" + propertyValue + "</h1><p>Fancy body text</p>", true);
 
