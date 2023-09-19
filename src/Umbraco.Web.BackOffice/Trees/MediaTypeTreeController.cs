@@ -136,7 +136,7 @@ public class MediaTypeTreeController : TreeController, ISearchableTree
             if (container.HasChildren == false)
             {
                 // can delete media type
-                    menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+                menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             }
 
             menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
