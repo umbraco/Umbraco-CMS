@@ -9,8 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Asp.Versioning.Mvc" Version="7.0.0" />
-    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.0.0" />
+    <PackageReference Include="Asp.Versioning.Mvc" Version="7.0.1" />
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="OpenIddict.Abstractions" Version="4.7.0" />
     <PackageReference Include="OpenIddict.AspNetCore" Version="4.7.0" />

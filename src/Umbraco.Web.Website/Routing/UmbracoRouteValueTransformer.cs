@@ -139,7 +139,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         HttpContext httpContext, RouteValueDictionary values)
     {
         // If we aren't running, then we have nothing to route. We allow the frontend to continue while in upgrade mode.
-        if (_runtime.Level != RuntimeLevel.Run && _runtime.Level != RuntimeLevel.Upgrade)
+        if (_runtime.Level != RuntimeLevel.Run && _runtime.Level != RuntimeLevel.Upgrade && !httpContext.Request.IsClientSideRequest())
         {
             if (_runtime.Level == RuntimeLevel.Install)
             {
