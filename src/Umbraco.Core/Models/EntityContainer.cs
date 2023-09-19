@@ -12,6 +12,7 @@ public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
         { Constants.ObjectTypes.DataType, Constants.ObjectTypes.DataTypeContainer },
         { Constants.ObjectTypes.DocumentType, Constants.ObjectTypes.DocumentTypeContainer },
         { Constants.ObjectTypes.MediaType, Constants.ObjectTypes.MediaTypeContainer },
+        { Constants.ObjectTypes.MemberType, Constants.ObjectTypes.MemberTypeContainer },
     };
 
     /// <summary>
