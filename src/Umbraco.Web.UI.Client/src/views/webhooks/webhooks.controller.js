@@ -33,14 +33,30 @@
       });
     }
 
+    function getEntities(webhook) {
+      const isContent = webhook.events[0].toLowerCase().includes("content");
+      const resource = isContent ? contentTypeResource : mediaTypeResource;
+      let entities = [];
+
+      webhook.entityKeys.forEach((key) => {
+        resource.getById(key)
+          .then((data) => {
+            entities.push(data);
+          });
+      });
+
+      return entities;
+    }
+
     function resolveTypeNames(webhook) {
       const isContent = webhook.events[0].toLowerCase().includes("content");
       const resource = isContent ? contentTypeResource : mediaTypeResource;
 
+      if (vm.webHooksContentTypes[webhook.key]){
+        delete vm.webHooksContentTypes[webhook.key];
+      }
+
       webhook.entityKeys.forEach((key) => {
-        if (vm.webHooksContentTypes[webhook.key]){
-          delete vm.webHooksContentTypes[webhook.key];
-        }
         resource.getById(key)
           .then((data) => {
             if (!vm.webHooksContentTypes[webhook.key]) {
@@ -67,9 +83,9 @@
         submitButtonLabel: webhook ? 'Save' : 'Create',
         view: "views/webhooks/overlays/edit.html",
         events: vm.events,
-        contentType: webhook ? webhook.contentType : null,
+        contentTypes : webhook ? getEntities(webhook) : null,
         webhook: webhook ? {
-          entityKey: webhook.contentType ? webhook.contentType.key : null,
+          entityKeys: webhook.entityKeys,
           enabled: webhook.enabled,
           events: webhook.events,
           key: webhook.key,
@@ -90,6 +106,7 @@
           if(isCreating){
             webhooksResource.create(model.webhook)
               .then(() => {
+                console.log("Loading freaking webhooks")
                 loadWebhooks()
                 notificationsService.success('Webhook saved.');
                 editorService.close();
@@ -128,6 +145,8 @@
         .getAll()
         .then((result) => {
           vm.webhooks = result;
+          vm.webhookEvents = {};
+          vm.webHooksContentTypes = {};
 
           vm.webhooks.forEach((webhook) => {
             resolveTypeNames(webhook);

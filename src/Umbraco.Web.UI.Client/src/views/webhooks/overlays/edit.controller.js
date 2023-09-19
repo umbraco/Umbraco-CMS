@@ -1,8 +1,9 @@
 ﻿(function () {
   "use strict";
-  function EditController($scope, editorService) {
+  function EditController($scope, editorService, contentTypeResource, mediaTypeResource) {
     var vm = this;
     vm.clearContentType = clearContentType;
+    vm.clearEvent = clearEvent;
     this.openEventPicker = () => {
       editorService.eventPicker({
         title: "Select event",
@@ -24,7 +25,7 @@
         entityType: isContent ? 'DocumentType' : 'MediaType',
         multiPicker: true,
         submit(model) {
-          $scope.model.contentTypes = model.selection;
+          getEntities(model.selection, isContent);
           $scope.model.webhook.entityKeys =  model.selection.map((item) => item.key);
           editorService.close();
         },
@@ -33,6 +34,18 @@
         }
       });
     };
+
+    function getEntities(selection, isContent) {
+      const resource = isContent ? contentTypeResource : mediaTypeResource;
+      $scope.model.contentTypes = [];
+
+      selection.forEach((entity) => {
+        resource.getById(entity.key)
+          .then((data) => {
+            $scope.model.contentTypes.push(data);
+          });
+      });
+    }
 
     function clearContentType (contentTypeKey)
     {
@@ -44,16 +57,15 @@
       }
     }
 
-    this.eventChanged = (newValue, oldValue) => {
-      if (oldValue && newValue) {
-        if (oldValue.split !== newValue) {
-          this.clearContentType();
-        }
+    function clearEvent(event) {
+      if (Array.isArray($scope.model.webhook.events)) {
+        $scope.model.webhook.events = $scope.model.webhook.events.filter(x => x !== event);
       }
-      if (!newValue) {
-        this.clearContentType();
+
+      if (Array.isArray($scope.model.contentTypes)) {
+        $scope.model.events = $scope.model.events.filter(x => x.key !== event);
       }
-    };
+    }
 
     this.close = () => {
       if ($scope.model.close) {
