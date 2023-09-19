@@ -22,11 +22,96 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class MemberTypeRepositoryTest : UmbracoIntegrationTest
 {
-    private MemberTypeRepository CreateRepository(IScopeProvider provider)
+    private IContentTypeCommonRepository CommonRepository => GetRequiredService<IContentTypeCommonRepository>();
+
+    private ILanguageRepository LanguageRepository => GetRequiredService<ILanguageRepository>();
+
+    [Test]
+    public void Can_Create_Container()
     {
-        var commonRepository = GetRequiredService<IContentTypeCommonRepository>();
-        var languageRepository = GetRequiredService<ILanguageRepository>();
-        return new MemberTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, Mock.Of<ILogger<MemberTypeRepository>>(), commonRepository, languageRepository, ShortStringHelper);
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var containerRepository = CreateContainerRepository(provider);
+
+            var container = new EntityContainer(Constants.ObjectTypes.MemberType) { Name = "blah" };
+            containerRepository.Save(container);
+
+            Assert.That(container.Id, Is.GreaterThan(0));
+
+            var found = containerRepository.Get(container.Id);
+            Assert.IsNotNull(found);
+        }
+    }
+
+    [Test]
+    public void Can_Delete_Container()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var containerRepository = CreateContainerRepository(provider);
+
+            var container = new EntityContainer(Constants.ObjectTypes.MemberType) { Name = "blah" };
+            containerRepository.Save(container);
+
+            Assert.That(container.Id, Is.GreaterThan(0));
+
+            // Act
+            containerRepository.Delete(container);
+
+            var found = containerRepository.Get(container.Id);
+            Assert.IsNull(found);
+        }
+    }
+
+    [Test]
+    public void Can_Create_Container_Containing_Member_Types()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var containerRepository = CreateContainerRepository(provider);
+            var repository = CreateRepository(provider);
+
+            var container = new EntityContainer(Constants.ObjectTypes.MemberType) { Name = "blah" };
+            containerRepository.Save(container);
+
+            var contentType = MemberTypeBuilder.CreateSimpleMemberType();
+
+            contentType.ParentId = container.Id;
+            repository.Save(contentType);
+
+            Assert.AreEqual(container.Id, contentType.ParentId);
+        }
+    }
+
+    [Test]
+    public void Can_Delete_Container_Containing_Member_Types()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var containerRepository = CreateContainerRepository(provider);
+            var repository = CreateRepository(provider);
+
+            var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
+            containerRepository.Save(container);
+
+            IMemberType contentType = MemberTypeBuilder.CreateSimpleMemberType();
+            contentType.ParentId = container.Id;
+            repository.Save(contentType);
+
+            // Act
+            containerRepository.Delete(container);
+
+            var found = containerRepository.Get(container.Id);
+            Assert.IsNull(found);
+
+            contentType = repository.Get(contentType.Id);
+            Assert.IsNotNull(contentType);
+            Assert.AreEqual(-1, contentType.ParentId);
+        }
     }
 
     [Test]
@@ -295,4 +380,10 @@ public class MemberTypeRepositoryTest : UmbracoIntegrationTest
             Assert.That(exists, Is.False);
         }
     }
+
+    private MemberTypeRepository CreateRepository(IScopeProvider provider) =>
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<MemberTypeRepository>(), CommonRepository, LanguageRepository, ShortStringHelper);
+
+    private EntityContainerRepository CreateContainerRepository(IScopeProvider provider) =>
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<EntityContainerRepository>(), Constants.ObjectTypes.MemberTypeContainer);
 }
