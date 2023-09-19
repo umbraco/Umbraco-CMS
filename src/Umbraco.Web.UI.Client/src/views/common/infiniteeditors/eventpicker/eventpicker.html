@@ -1,0 +1,43 @@
+﻿<div ng-controller="Umbraco.Editors.EventPickerController as vm">
+
+  <umb-editor-view>
+
+    <umb-editor-header name="model.title" name-locked="true" hide-alias="true" hide-icon="true" hide-description="true">
+    </umb-editor-header>
+
+    <umb-editor-container>
+
+      <umb-load-indicator ng-if="vm.loading">
+      </umb-load-indicator>
+
+      <umb-box ng-if="!vm.loading">
+        <umb-box-content>
+          <ul class="umb-tree">
+            <li class="umb-tree-item" ng-repeat="event in vm.events">
+              <div class="umb-tree-item__inner" style="padding: 5px 10px;">
+                <button type="button" class="btn-reset text-left flex-auto"
+                        ng-class="{ 'umb-tree-node-checked': event.selected }" ng-click="vm.selectEvent(event)">
+                  <umb-icon icon="{{event.selected ? 'icon-check' : 'icon-globe'}}" class="icon umb-tree-icon"
+                            ng-class="{ 'color-green': event.selected }">
+                  </umb-icon>
+                  <span>{{ event.name }}</span>
+                </button>
+              </div>
+            </li>
+          </ul>
+        </umb-box-content>
+      </umb-box>
+    </umb-editor-container>
+
+    <umb-editor-footer>
+      <umb-editor-footer-content-right>
+        <umb-button type="button" button-style="link" label-key="general_close" shortcut="esc" action="vm.close()">
+        </umb-button>
+        <umb-button type="button" button-style="success" label-key="general_submit" action="vm.submit(model)">
+        </umb-button>
+      </umb-editor-footer-content-right>
+    </umb-editor-footer>
+
+  </umb-editor-view>
+
+</div>
