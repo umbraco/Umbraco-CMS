@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class WebhookFactory
 {
-    public static Webhook BuildEntity(WebhookDto dto, IEnumerable<WebhookEntityKeyDto>? entityKey2WebhookDtos = null)
+    public static Webhook BuildEntity(WebhookDto dto, IEnumerable<EntityKey2Webhook>? entityKey2WebhookDtos = null)
     {
         var entity = new Webhook(dto.Url, Enum.Parse<WebhookEvent>(dto.Event), dto.Enabled, entityKey2WebhookDtos?.Select(x => x.EntityKey).ToArray());
         try
@@ -42,8 +42,8 @@ internal static class WebhookFactory
         return dto;
     }
 
-    public static IEnumerable<WebhookEntityKeyDto> BuildEntityKey2WebhookDtos(Webhook webhook, int webhookId) =>
-        webhook.EntityKeys.Select(x => new WebhookEntityKeyDto
+    public static IEnumerable<EntityKey2Webhook> BuildEntityKey2WebhookDtos(Webhook webhook, int webhookId) =>
+        webhook.EntityKeys.Select(x => new EntityKey2Webhook
         {
             EntityKey = x,
             WebhookId = webhookId

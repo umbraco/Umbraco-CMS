@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Models;
 public class Webhook : EntityBase
 {
     private string _url;
-    private WebhookEvent _event;
+    private WebhookEvent[] _events;
     private Guid[] _entityKeys;
     private bool _enabled;
 
@@ -17,10 +17,10 @@ public class Webhook : EntityBase
             (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
             enum1 => enum1.GetHashCode());
 
-    public Webhook(string url, WebhookEvent webhookEvent, bool? enabled = null, Guid[]? entityKeys = null)
+    public Webhook(string url, WebhookEvent webhookEvent, bool? enabled = null, Guid[]? entityKeys = null, WebhookEvent[]? events = null)
     {
         _url = url;
-        _event = webhookEvent;
+        _events = events ?? Array.Empty<WebhookEvent>();
         _entityKeys = entityKeys ?? Array.Empty<Guid>();
         _enabled = enabled ?? false;
     }
@@ -31,10 +31,10 @@ public class Webhook : EntityBase
         set => SetPropertyValueAndDetectChanges(value, ref _url!, nameof(Url));
     }
 
-    public WebhookEvent Event
+    public WebhookEvent[] Events
     {
-        get => _event;
-        set => SetPropertyValueAndDetectChanges(value, ref _event!, nameof(Event));
+        get => _events;
+        set => SetPropertyValueAndDetectChanges(value, ref _events!, nameof(Events));
     }
 
     public Guid[] EntityKeys
@@ -46,6 +46,6 @@ public class Webhook : EntityBase
     public bool Enabled
     {
         get => _enabled;
-        set => SetPropertyValueAndDetectChanges(value, ref _enabled, nameof(Event));
+        set => SetPropertyValueAndDetectChanges(value, ref _enabled, nameof(Enabled));
     }
 }

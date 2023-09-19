@@ -62,7 +62,7 @@ public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRe
 
         var id = Convert.ToInt32(Database.Insert(webhookDto));
         entity.Id = id;
-        IEnumerable<WebhookEntityKeyDto> buildEntityKey2WebhookDtos = WebhookFactory.BuildEntityKey2WebhookDtos(entity, id);
+        IEnumerable<EntityKey2WebhookDto> buildEntityKey2WebhookDtos = WebhookFactory.BuildEntityKey2WebhookDto(entity, id);
         Database.InsertBulk(buildEntityKey2WebhookDtos);
 
         entity.ResetDirtyProperties();
@@ -119,7 +119,7 @@ public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRe
 
     private Webhook DtoToEntity(WebhookDto dto)
     {
-        List<WebhookEntityKeyDto> webhookEntityKeyDtos = Database.Fetch<WebhookEntityKeyDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id });
+        List<EntityKey2WebhookDto> webhookEntityKeyDtos = Database.Fetch<EntityKey2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id });
         Webhook entity = WebhookFactory.BuildEntity(dto, webhookEntityKeyDtos);
 
         // reset dirty initial properties (U4-1946)

@@ -6,12 +6,12 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 
-[TableName(Constants.DatabaseSchema.Tables.WebhookEntityKey)]
+[TableName(Constants.DatabaseSchema.Tables.EntityKey2Webhook)]
 [ExplicitColumns]
-public class WebhookEntityKeyDto
+public class EntityKey2WebhookDto
 {
     [Column("webhookId")]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_webhookEntityKey2webhook", OnColumns = "webhookId, entityKey")]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_webhookEntityKey2Webhook", OnColumns = "webhookId, entityKey")]
     [ForeignKey(typeof(WebhookDto), OnDelete = Rule.Cascade)]
     public int WebhookId { get; set; }
 
