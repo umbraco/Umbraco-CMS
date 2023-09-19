@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.Filters;
@@ -48,4 +49,13 @@ public abstract class ManagementApiControllerBase : Controller
     {
         return backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? throw new InvalidOperationException("No backoffice user found");
     }
+
+    /// <summary>
+    ///     Creates a 403 Forbidden result.
+    /// </summary>
+    /// <remarks>
+    ///     Use this method instead of <see cref="ManagementApiControllerBase.Forbid()"/> on the controller base.
+    ///     This method ensures that a proper 403 Forbidden status code is returned to the client.
+    /// </remarks>
+    protected IActionResult Forbidden() => new StatusCodeResult(StatusCodes.Status403Forbidden);
 }

@@ -30,7 +30,6 @@ public class ByKeyUserGroupController : UserGroupControllerBase
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UserGroupResponseModel), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid id)
     {
@@ -39,7 +38,7 @@ public class ByKeyUserGroupController : UserGroupControllerBase
 
         if (!authorizationResult.Succeeded)
         {
-            return new StatusCodeResult(StatusCodes.Status403Forbidden);
+            return Forbidden();
         }
 
         IUserGroup? userGroup = await _userGroupService.GetAsync(id);
