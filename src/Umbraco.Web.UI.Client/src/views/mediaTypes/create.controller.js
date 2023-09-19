@@ -9,8 +9,9 @@
 function MediaTypesCreateController($scope, $location, navigationService, mediaTypeResource, formHelper, appState, localizationService) {
 
     $scope.model = {
-        folderName: "",
-        creatingFolder: false
+      allowCreateFolder: $scope.currentNode.parentId === null || $scope.currentNode.nodeType === 'container',
+      folderName: "",
+      creatingFolder: false
     };
 
     var node = $scope.currentNode;
