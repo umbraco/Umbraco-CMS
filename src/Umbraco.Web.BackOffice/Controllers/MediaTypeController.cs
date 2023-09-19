@@ -322,13 +322,12 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
             i => _mediaTypeService.Get(i),
             type => _mediaTypeService.Save(type));
 
-        if (!(savedCt.Result is null))
+        if (savedCt.Result is not null)
         {
             return savedCt.Result;
         }
 
         MediaTypeDisplay? display = _umbracoMapper.Map<MediaTypeDisplay>(savedCt.Value);
-
 
         display?.AddSuccessNotification(
             _localizedTextService.Localize("speechBubbles", "mediaTypeSavedHeader"),

@@ -458,7 +458,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
                 }
             });
 
-        if (!(savedCt.Result is null))
+        if (savedCt.Result is not null)
         {
             return savedCt.Result;
         }
