@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using NPoco;
@@ -230,7 +231,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
 
-            foreach (var row in GetContentNodeDtos(sql))
+            foreach (var row in GetContentNodeDtos(sql, scope))
             {
                 yield return CreateContentNodeKit(row, serializer);
             }
@@ -248,7 +249,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in GetContentNodeDtos(sql))
+            foreach (var row in GetContentNodeDtos(sql, scope))
             {
                 yield return CreateContentNodeKit(row, serializer);
             }
@@ -268,7 +269,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in GetContentNodeDtos(sql))
+            foreach (var row in GetContentNodeDtos(sql, scope))
             {
                 yield return CreateContentNodeKit(row, serializer);
             }
@@ -300,7 +301,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in GetContentNodeDtos(sql))
+            foreach (var row in GetContentNodeDtos(sql, scope))
             {
                 yield return CreateMediaNodeKit(row, serializer);
             }
@@ -318,7 +319,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in GetContentNodeDtos(sql))
+            foreach (var row in GetContentNodeDtos(sql, scope))
             {
                 yield return CreateMediaNodeKit(row, serializer);
             }
@@ -338,7 +339,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in GetContentNodeDtos(sql))
+            foreach (var row in GetContentNodeDtos(sql, scope))
             {
                 yield return CreateMediaNodeKit(row, serializer);
             }
@@ -452,7 +453,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return s;
         }
 
-        private IEnumerable<ContentSourceDto> GetContentNodeDtos(Sql<ISqlContext> sql)
+        private IEnumerable<ContentSourceDto> GetContentNodeDtos(Sql<ISqlContext> sql, IScope scope)
         {
             var usePagedSqlQuery = ConfigurationManager.AppSettings[NuCacheSerializerComponent.Nucache_UsePagedSqlQuery_Key];
 
@@ -460,25 +461,22 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
             // QueryPaged is very slow on large sites however, so use fetch if UsePagedSqlQuery is disabled.
             IEnumerable<ContentSourceDto> dtos;
-            if (usePagedSqlQuery == "true")
+            if (usePagedSqlQuery == "false")
             {
-                // Use a more efficient COUNT query
-                Sql<ISqlContext>? sqlCountQuery = SqlContentSourcesCount()
-                    .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document));
-
-                Sql<ISqlContext>? sqlCount =
-                    SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
-
-                dtos = Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount);
+                dtos = scope.Database.Fetch<ContentSourceDto>(sql);
             }
             else
             {
-                dtos = Database.Fetch<ContentSourceDto>(sql);
+                // Use a more efficient COUNT query
+                var sqlCountQuery = SqlContentSourcesCount(scope)
+                    .Append(SqlObjectTypeNotTrashed(scope.SqlContext, Constants.ObjectTypes.Document));
+
+                var sqlCount = scope.SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
+                dtos = scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql, sqlCount);
             }
 
             return dtos;
         }
-
-
     }
 }
