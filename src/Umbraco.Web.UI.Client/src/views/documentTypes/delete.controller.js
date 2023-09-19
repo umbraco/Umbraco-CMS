@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function DocumentTypesDeleteController($scope, dataTypeResource, contentTypeResource, treeService, navigationService, localizationService) {
+function DocumentTypesDeleteController($scope, contentTypeResource, treeService, navigationService, localizationService) {
 
     $scope.performDelete = function() {
 
@@ -51,7 +51,7 @@ function DocumentTypesDeleteController($scope, dataTypeResource, contentTypeReso
     $scope.labels = {};
     localizationService
         .format(["contentTypeEditor_yesDelete", "contentTypeEditor_andAllDocuments"], "%0% " + $scope.currentNode.name + " %1%")
-        .then(function (data) {
+        .then(data => {
             $scope.labels.deleteConfirm = data;
         });
 }

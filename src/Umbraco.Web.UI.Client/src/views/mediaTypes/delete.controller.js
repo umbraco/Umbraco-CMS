@@ -49,7 +49,7 @@ function MediaTypesDeleteController($scope, mediaTypeResource, treeService, navi
     $scope.labels = {};
     localizationService
         .format(["contentTypeEditor_yesDelete", "contentTypeEditor_andAllMediaItems"], "%0% " + $scope.currentNode.name + " %1%")
-        .then(function (data) {
+        .then(data => {
             $scope.labels.deleteConfirm = data;
         });
 
