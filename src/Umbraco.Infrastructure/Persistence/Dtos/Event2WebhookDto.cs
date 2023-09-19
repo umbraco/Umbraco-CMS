@@ -1,9 +1,11 @@
 ﻿using System.Data;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
+[TableName(Constants.DatabaseSchema.Tables.Event2Webhook)]
 public class Event2WebhookDto
 {
     [Column("webhookId")]

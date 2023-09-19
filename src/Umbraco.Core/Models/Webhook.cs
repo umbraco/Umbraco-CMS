@@ -11,8 +11,14 @@ public class Webhook : EntityBase
     private Guid[] _entityKeys;
     private bool _enabled;
 
-    // Custom comparer for enumerable
+    // Custom comparer for enumerable guids
     private static readonly DelegateEqualityComparer<IEnumerable<Guid>> _guidEnumerableComparer =
+        new(
+            (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
+            enum1 => enum1.GetHashCode());
+
+    // Custom comparer for enumerable webhook events
+    private static readonly DelegateEqualityComparer<IEnumerable<WebhookEvent>> _webhookEventEnumerableComparer =
         new(
             (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
             enum1 => enum1.GetHashCode());
@@ -34,7 +40,7 @@ public class Webhook : EntityBase
     public WebhookEvent[] Events
     {
         get => _events;
-        set => SetPropertyValueAndDetectChanges(value, ref _events!, nameof(Events));
+        set => SetPropertyValueAndDetectChanges(value, ref _events!, nameof(Events), _webhookEventEnumerableComparer);
     }
 
     public Guid[] EntityKeys
