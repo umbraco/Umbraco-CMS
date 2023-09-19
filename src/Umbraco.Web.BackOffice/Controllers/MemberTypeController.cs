@@ -313,7 +313,19 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     }
 
     /// <summary>
-    ///     Copy the member type
+    ///     Move the member type.
+    /// </summary>
+    /// <param name="move"></param>
+    /// <returns></returns>
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
+    public IActionResult PostMove(MoveOrCopy move) =>
+        PerformMove(
+            move,
+            i => _memberTypeService.Get(i),
+            (type, i) => _memberTypeService.Move(type, i));
+
+    /// <summary>
+    ///     Copy the member type.
     /// </summary>
     /// <param name="copy"></param>
     /// <returns></returns>

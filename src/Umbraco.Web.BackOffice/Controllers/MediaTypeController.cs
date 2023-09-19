@@ -338,7 +338,7 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     }
 
     /// <summary>
-    ///     Move the media type
+    ///     Move the media type.
     /// </summary>
     /// <param name="move"></param>
     /// <returns></returns>
@@ -350,7 +350,7 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
             (type, i) => _mediaTypeService.Move(type, i));
 
     /// <summary>
-    ///     Copy the media type
+    ///     Copy the media type.
     /// </summary>
     /// <param name="copy"></param>
     /// <returns></returns>

@@ -114,11 +114,10 @@ public abstract class MemberTypeAndGroupTreeControllerBase : TreeController
             return menu;
         }
 
-        IMemberType? memberType = _memberTypeService.Get(int.Parse(id));
-        if (memberType != null)
+        if (queryStrings["tree"].ToString() == Constants.Trees.MemberTypes)
         {
             IEntitySlim? container = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture),
-            UmbracoObjectTypes.MemberTypeContainer);
+                UmbracoObjectTypes.MemberTypeContainer);
 
             if (container != null)
             {
@@ -143,7 +142,13 @@ public abstract class MemberTypeAndGroupTreeControllerBase : TreeController
             }
             else
             {
-                menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+                IMemberType? ct = _memberTypeService.Get(int.Parse(id));
+
+                if (ct != null)
+                {
+                    menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
+                    menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+                }
             }
         }
 

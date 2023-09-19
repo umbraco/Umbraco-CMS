@@ -1,6 +1,6 @@
 angular.module("umbraco")
 .controller("Umbraco.Editors.MediaTypes.MoveController",
-    function ($scope, mediaTypeResource, treeService, navigationService, notificationsService, appState, eventsService) {
+    function ($scope, mediaTypeResource, treeService, navigationService, appState, eventsService) {
 
         $scope.dialogTreeApi = {};
         $scope.source = _.clone($scope.currentNode);

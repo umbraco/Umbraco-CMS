@@ -119,6 +119,7 @@ public class MediaTypeTreeController : TreeController, ISearchableTree
 
         IEntitySlim? container = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture),
             UmbracoObjectTypes.MediaTypeContainer);
+
         if (container != null)
         {
             // set the default to create
@@ -147,7 +148,7 @@ public class MediaTypeTreeController : TreeController, ISearchableTree
 
             menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
-            // no move action if this is a child doc type
+            // no move action if this is a child media type
             if (parent == null)
             {
                 menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);

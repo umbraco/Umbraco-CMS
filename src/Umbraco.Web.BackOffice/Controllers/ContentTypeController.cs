@@ -628,7 +628,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
     }
 
     /// <summary>
-    ///     Move the content type
+    ///     Move the content type.
     /// </summary>
     /// <param name="move"></param>
     /// <returns></returns>
@@ -640,7 +640,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
             (type, i) => _contentTypeService.Move(type, i));
 
     /// <summary>
-    ///     Copy the content type
+    ///     Copy the content type.
     /// </summary>
     /// <param name="copy"></param>
     /// <returns></returns>
