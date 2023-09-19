@@ -154,7 +154,7 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
         IEntitySlim? container = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture), UmbracoObjectTypes.DocumentTypeContainer);
         if (container != null)
         {
-            //set the default to create
+            // set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
             menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
@@ -167,7 +167,7 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
 
             if (container.HasChildren == false)
             {
-                //can delete doc type
+                // can delete doc type
                 menu.Items.Add<ActionDelete>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
             }
 
