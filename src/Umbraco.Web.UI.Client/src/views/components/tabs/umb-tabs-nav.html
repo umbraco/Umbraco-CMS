@@ -16,7 +16,7 @@
         </umb-button-ellipsis>
 
         <umb-dropdown class="umb-tabs-tray" ng-if="vm.showTray" on-close="vm.hideTray()">
-            <umb-dropdown-item ng-repeat="tab in vm.tabs | limitTo: vm.overflowingTabs" ng-class="{'umb-tab--error': valTab_tabHasError}" val-tab>
+            <umb-dropdown-item ng-repeat="tab in vm.tabs | limitTo: vm.overflowingTabs" data-element="tab-{{tab.alias}}" ng-class="{'umb-tab--error': valTab_tabHasError}" val-tab>
                 <button
                     type="button"
                     class="btn-reset umb-tray-button"
