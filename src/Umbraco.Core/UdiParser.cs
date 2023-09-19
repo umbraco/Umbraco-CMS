@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
@@ -217,6 +217,7 @@ public sealed class UdiParser
             { Constants.UdiEntityType.DataType, UdiType.GuidUdi },
             { Constants.UdiEntityType.DataTypeContainer, UdiType.GuidUdi },
             { Constants.UdiEntityType.MemberType, UdiType.GuidUdi },
+            { Constants.UdiEntityType.MemberTypeContainer, UdiType.GuidUdi },
             { Constants.UdiEntityType.MemberGroup, UdiType.GuidUdi },
             { Constants.UdiEntityType.RelationType, UdiType.GuidUdi },
             { Constants.UdiEntityType.FormsForm, UdiType.GuidUdi },

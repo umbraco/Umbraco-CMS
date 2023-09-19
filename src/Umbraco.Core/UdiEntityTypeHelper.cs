@@ -32,6 +32,8 @@ public static class UdiEntityTypeHelper
                 return Constants.UdiEntityType.DataTypeContainer;
             case UmbracoObjectTypes.MemberType:
                 return Constants.UdiEntityType.MemberType;
+            case UmbracoObjectTypes.MemberTypeContainer:
+                return Constants.UdiEntityType.MemberTypeContainer;
             case UmbracoObjectTypes.MemberGroup:
                 return Constants.UdiEntityType.MemberGroup;
             case UmbracoObjectTypes.RelationType:
@@ -78,6 +80,8 @@ public static class UdiEntityTypeHelper
                 return UmbracoObjectTypes.DataTypeContainer;
             case Constants.UdiEntityType.MemberType:
                 return UmbracoObjectTypes.MemberType;
+            case Constants.UdiEntityType.MemberTypeContainer:
+                return UmbracoObjectTypes.MemberTypeContainer;
             case Constants.UdiEntityType.MemberGroup:
                 return UmbracoObjectTypes.MemberGroup;
             case Constants.UdiEntityType.RelationType:

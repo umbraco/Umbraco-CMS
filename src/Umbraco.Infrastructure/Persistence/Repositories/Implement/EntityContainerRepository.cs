@@ -22,10 +22,14 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
     {
         Guid[] allowedContainers =
         {
-            Constants.ObjectTypes.DocumentTypeContainer, Constants.ObjectTypes.MediaTypeContainer,
+            Constants.ObjectTypes.DocumentTypeContainer,
+            Constants.ObjectTypes.MediaTypeContainer,
+            Constants.ObjectTypes.MemberTypeContainer,
             Constants.ObjectTypes.DataTypeContainer,
         };
+
         NodeObjectTypeId = containerObjectType;
+
         if (allowedContainers.Contains(NodeObjectTypeId) == false)
         {
             throw new InvalidOperationException("No container type exists with ID: " + NodeObjectTypeId);

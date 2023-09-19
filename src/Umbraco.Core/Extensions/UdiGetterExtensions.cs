@@ -162,6 +162,10 @@ public static class UdiGetterExtensions
         {
             entityType = Constants.UdiEntityType.MediaTypeContainer;
         }
+        else if (entity.ContainedObjectType == Constants.ObjectTypes.MemberType)
+        {
+            entityType = Constants.UdiEntityType.MemberTypeContainer;
+        }
         else
         {
             throw new NotSupportedException(string.Format(
