@@ -19,6 +19,8 @@ public static partial class Constants
 
         public static readonly Guid MediaTypeContainer = new(Strings.MediaTypeContainer);
 
+        public static readonly Guid MemberTypeContainer = new(Strings.MemberTypeContainer);
+
         public static readonly Guid DataType = new(Strings.DataType);
 
         public static readonly Guid Document = new(Strings.Document);
