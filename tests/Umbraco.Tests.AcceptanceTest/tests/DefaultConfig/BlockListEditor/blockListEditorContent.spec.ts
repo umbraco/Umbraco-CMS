@@ -312,7 +312,7 @@ test.describe('BlockListEditorContent', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
 
     // Assert
-    await umbracoUi.getSuccessNotification();
+    await umbracoUi.isSuccessNotificationVisible();
   });
 
   test('can set a maximum of required blocks in content with a block list editor', async ({page, umbracoApi, umbracoUi}) => {
@@ -374,8 +374,11 @@ test.describe('BlockListEditorContent', () => {
     // Can't use our constant helper because the action for delete does not contain an s. The correct way is 'action-delete'
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey('actions_delete'));
 
+    // Now that we deleted the block, we should be able to save our content
+    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
+
     // Assert
-    await umbracoUi.getSuccessNotification();
+    await umbracoUi.isSuccessNotificationVisible();
   });
 
   test('can use inline editing mode in content with a block list editor', async ({page, umbracoApi, umbracoUi}) => {
