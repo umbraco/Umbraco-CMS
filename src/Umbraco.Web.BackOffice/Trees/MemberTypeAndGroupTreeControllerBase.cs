@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -5,7 +6,9 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Trees;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
@@ -18,19 +21,33 @@ namespace Umbraco.Cms.Web.BackOffice.Trees;
 [CoreTree]
 public abstract class MemberTypeAndGroupTreeControllerBase : TreeController
 {
+    private readonly IEntityService _entityService;
     private readonly IMemberTypeService _memberTypeService;
 
+    [Obsolete("Use the constructor with IEntityService instead")]
     protected MemberTypeAndGroupTreeControllerBase(
         ILocalizedTextService localizedTextService,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
         IMenuItemCollectionFactory menuItemCollectionFactory,
         IEventAggregator eventAggregator,
         IMemberTypeService memberTypeService)
+        : this(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, eventAggregator, memberTypeService, StaticServiceProvider.Instance.GetRequiredService<IEntityService>())
+    {
+    }
+
+    protected MemberTypeAndGroupTreeControllerBase(
+        ILocalizedTextService localizedTextService,
+        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+        IMenuItemCollectionFactory menuItemCollectionFactory,
+        IEventAggregator eventAggregator,
+        IMemberTypeService memberTypeService,
+        IEntityService entityService)
         : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
     {
         MenuItemCollectionFactory = menuItemCollectionFactory;
 
         _memberTypeService = memberTypeService;
+        _entityService = entityService;
     }
 
     public IMenuItemCollectionFactory MenuItemCollectionFactory { get; }
@@ -56,16 +73,56 @@ public abstract class MemberTypeAndGroupTreeControllerBase : TreeController
 
         if (id == Constants.System.RootString)
         {
+            // set the default to create
+            menu.DefaultMenuAlias = ActionNew.ActionAlias;
+
             // root actions
-            menu.Items.Add(new CreateChildEntity(LocalizedTextService));
+
+            if (queryStrings["tree"].ToString() == Constants.Trees.MemberGroups)
+            {
+                menu.Items.Add(new CreateChildEntity(LocalizedTextService));
+            }
+            else
+            {
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+            }
+
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+
             return menu;
         }
 
         IMemberType? memberType = _memberTypeService.Get(int.Parse(id));
         if (memberType != null)
         {
-            menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+            IEntitySlim? container = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture),
+            UmbracoObjectTypes.MemberTypeContainer);
+
+            if (container != null)
+            {
+                // set the default to create
+                menu.DefaultMenuAlias = ActionNew.ActionAlias;
+
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+
+                menu.Items.Add(new MenuItem("rename", LocalizedTextService.Localize("actions", "rename"))
+                {
+                    Icon = "icon-edit",
+                    UseLegacyIcon = false,
+                });
+
+                if (container.HasChildren == false)
+                {
+                    // can delete member type
+                    menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+                }
+
+                menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
+            }
+            else
+            {
+                menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+            }
         }
 
         // delete member type/group

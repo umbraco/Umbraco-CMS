@@ -6,7 +6,7 @@
  * @description
  * The controller for the media type creation dialog
  */
-function MediaTypesCreateController($scope, $location, navigationService, mediaTypeResource, formHelper, appState, localizationService) {
+function MediaTypesCreateController($scope, $location, navigationService, mediaTypeResource, formHelper, appState) {
 
     $scope.model = {
         folderName: "",
@@ -14,6 +14,7 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
     };
 
     var node = $scope.currentNode;
+    var section = appState.getSectionState("currentSection");
 
     $scope.showCreateFolder = function() {
         $scope.model.creatingFolder = true;
@@ -32,9 +33,7 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
 
                 formHelper.resetForm({ scope: $scope, formCtrl: $scope.createFolderForm });
 
-                var section = appState.getSectionState("currentSection");
-
-            }, function (err) {
+            }, function(err) {
                 formHelper.resetForm({ scope: $scope, formCtrl: $scope.createFolderForm, hasErrors: true });
                 $scope.error = err;
             });
@@ -43,7 +42,7 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
 
     $scope.createMediaType = function() {
         $location.search('create', null);
-        $location.path("/settings/mediaTypes/edit/" + node.id).search("create", "true");
+        $location.path("/" + section + "/mediaTypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
     };
 

@@ -8,19 +8,19 @@ namespace Umbraco.Cms.Core.Models;
 public enum UmbracoObjectTypes
 {
     /// <summary>
-    ///     Default value
+    ///     Default value.
     /// </summary>
     Unknown,
 
     /// <summary>
-    ///     Root
+    ///     Root.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.SystemRoot)]
     [FriendlyName("Root")]
     ROOT,
 
     /// <summary>
-    ///     Document
+    ///     Document.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.Document, typeof(IContent))]
     [FriendlyName("Document")]
@@ -28,7 +28,7 @@ public enum UmbracoObjectTypes
     Document,
 
     /// <summary>
-    ///     Media
+    ///     Media.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.Media, typeof(IMedia))]
     [FriendlyName("Media")]
@@ -36,7 +36,7 @@ public enum UmbracoObjectTypes
     Media,
 
     /// <summary>
-    ///     Member Type
+    ///     Member Type.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.MemberType, typeof(IMemberType))]
     [FriendlyName("Member Type")]
@@ -44,7 +44,7 @@ public enum UmbracoObjectTypes
     MemberType,
 
     /// <summary>
-    ///     Template
+    ///     Template.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.Template, typeof(ITemplate))]
     [FriendlyName("Template")]
@@ -52,7 +52,7 @@ public enum UmbracoObjectTypes
     Template,
 
     /// <summary>
-    ///     Member Group
+    ///     Member Group.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.MemberGroup, typeof(IMemberGroup))]
     [FriendlyName("Member Group")]
@@ -60,7 +60,7 @@ public enum UmbracoObjectTypes
     MemberGroup,
 
     /// <summary>
-    ///     "Media Type
+    ///     "Media Type.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.MediaType, typeof(IMediaType))]
     [FriendlyName("Media Type")]
@@ -68,7 +68,7 @@ public enum UmbracoObjectTypes
     MediaType,
 
     /// <summary>
-    ///     Document Type
+    ///     Document Type.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.DocumentType, typeof(IContentType))]
     [FriendlyName("Document Type")]
@@ -76,14 +76,14 @@ public enum UmbracoObjectTypes
     DocumentType,
 
     /// <summary>
-    ///     Recycle Bin
+    ///     Recycle Bin.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.ContentRecycleBin)]
     [FriendlyName("Recycle Bin")]
     RecycleBin,
 
     /// <summary>
-    ///     Member
+    ///     Member.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.Member, typeof(IMember))]
     [FriendlyName("Member")]
@@ -91,7 +91,7 @@ public enum UmbracoObjectTypes
     Member,
 
     /// <summary>
-    ///     Data Type
+    ///     Data Type.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.DataType, typeof(IDataType))]
     [FriendlyName("Data Type")]
@@ -99,7 +99,7 @@ public enum UmbracoObjectTypes
     DataType,
 
     /// <summary>
-    ///     Document type container
+    ///     Document type container.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.DocumentTypeContainer)]
     [FriendlyName("Document Type Container")]
@@ -107,7 +107,7 @@ public enum UmbracoObjectTypes
     DocumentTypeContainer,
 
     /// <summary>
-    ///     Media type container
+    ///     Media type container.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.MediaTypeContainer)]
     [FriendlyName("Media Type Container")]
@@ -115,7 +115,15 @@ public enum UmbracoObjectTypes
     MediaTypeContainer,
 
     /// <summary>
-    ///     Media type container
+    ///     Member type container.
+    /// </summary>
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.MemberTypeContainer)]
+    [FriendlyName("Member Type Container")]
+    [UmbracoUdiType(Constants.UdiEntityType.MemberTypeContainer)]
+    MemberTypeContainer,
+
+    /// <summary>
+    ///     Media type container.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.DataTypeContainer)]
     [FriendlyName("Data Type Container")]
@@ -123,7 +131,7 @@ public enum UmbracoObjectTypes
     DataTypeContainer,
 
     /// <summary>
-    ///     Relation type
+    ///     Relation type.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.RelationType)]
     [FriendlyName("Relation Type")]
@@ -131,35 +139,35 @@ public enum UmbracoObjectTypes
     RelationType,
 
     /// <summary>
-    ///     Forms Form
+    ///     Forms Form.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.FormsForm)]
     [FriendlyName("Form")]
     FormsForm,
 
     /// <summary>
-    ///     Forms PreValue
+    ///     Forms PreValue.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.FormsPreValue)]
     [FriendlyName("PreValue")]
     FormsPreValue,
 
     /// <summary>
-    ///     Forms DataSource
+    ///     Forms DataSource.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.FormsDataSource)]
     [FriendlyName("DataSource")]
     FormsDataSource,
 
     /// <summary>
-    ///     Language
+    ///     Language.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.Language)]
     [FriendlyName("Language")]
     Language,
 
     /// <summary>
-    ///     Document Blueprint
+    ///     Document Blueprint.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.DocumentBlueprint, typeof(IContent))]
     [FriendlyName("DocumentBlueprint")]
@@ -167,7 +175,7 @@ public enum UmbracoObjectTypes
     DocumentBlueprint,
 
     /// <summary>
-    ///     Reserved Identifier
+    ///     Reserved Identifier.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.IdReservation)]
     [FriendlyName("Identifier Reservation")]

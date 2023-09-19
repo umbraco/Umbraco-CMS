@@ -37,11 +37,15 @@ public static partial class Constants
 
         // TODO: What is this? This alias is only used for the blue print tree to render the blueprint's document type, it's not a real udi type
         public const string DocumentTypeBluePrints = "document-type-blueprints";
+
         public const string MediaType = "media-type";
         public const string MediaTypeContainer = "media-type-container";
+
         public const string DataType = "data-type";
         public const string DataTypeContainer = "data-type-container";
+
         public const string MemberType = "member-type";
+        public const string MemberTypeContainer = "member-type-container";
         public const string MemberGroup = "member-group";
 
         public const string RelationType = "relation-type";

@@ -113,6 +113,7 @@ public class MediaTypeTreeController : TreeController, ISearchableTree
             // root actions
             menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+
             return menu;
         }
 
@@ -133,7 +134,7 @@ public class MediaTypeTreeController : TreeController, ISearchableTree
 
             if (container.HasChildren == false)
             {
-                // can delete doc type
+                // can delete media type
                     menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             }
 

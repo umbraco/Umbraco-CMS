@@ -6,7 +6,7 @@
  * @description
  * The controller for the member type creation dialog
  */
-function MemberTypesCreateController($scope, $location, navigationService, memberTypeResource, formHelper, appState, localizationService) {
+function MemberTypesCreateController($scope, $location, navigationService, memberTypeResource, formHelper, appState) {
 
     $scope.model = {
         folderName: "",
@@ -23,7 +23,7 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
     $scope.createContainer = function () {
         if (formHelper.submitForm({
             scope: $scope,
-            formCtrl: this.createFolderForm
+            formCtrl: $scope.createFolderForm
         })) {
             memberTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
@@ -31,11 +31,11 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
                 var currPath = node.path ? node.path : "-1";
                 navigationService.syncTree({ tree: "memberTypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
-                formHelper.resetForm({ scope: $scope, formCtrl: this.createFolderForm });
+                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createFolderForm });
 
             }, function(err) {
-                formHelper.resetForm({ scope: $scope, formCtrl: this.createFolderForm, hasErrors: true });
-               // TODO: Handle errors
+                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createFolderForm, hasErrors: true });
+                $scope.error = err;
             });
         };
     }
@@ -45,6 +45,10 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
         $location.path("/" + section + "/memberTypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
     }
+    $scope.close = function() {
+        const showMenu = true;
+        navigationService.hideDialog(showMenu);
+    };
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.MemberTypes.CreateController", MemberTypesCreateController);

@@ -73,6 +73,8 @@ public static partial class Constants
 
             public const string MediaTypeContainer = "42AEF799-B288-4744-9B10-BE144B73CDC4";
 
+            public const string MemberTypeContainer = "59EF5767-7223-4ABC-B229-72821DC711B9";
+
             public const string ContentItem = "10E2B09F-C28B-476D-B77A-AA686435E44A";
 
             public const string ContentItemType = "7A333C54-6F43-40A4-86A2-18688DC7E532";
