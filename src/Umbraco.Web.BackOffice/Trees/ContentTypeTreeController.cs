@@ -54,7 +54,8 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
     protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
     {
         ActionResult<TreeNode?> rootResult = base.CreateRootNode(queryStrings);
-        if (!(rootResult.Result is null))
+
+        if (rootResult.Result is not null)
         {
             return rootResult;
         }
@@ -133,7 +134,7 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
 
         if (id == Constants.System.RootString)
         {
-                //set the default to create
+            // set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
             // root actions
@@ -167,7 +168,7 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
 
             if (container.HasChildren == false)
             {
-                // can delete doc type
+                // can delete document type
                 menu.Items.Add<ActionDelete>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
             }
 

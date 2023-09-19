@@ -57,7 +57,8 @@ public class MemberGroupTreeController : MemberTypeAndGroupTreeControllerBase
     protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
     {
         ActionResult<TreeNode?> rootResult = base.CreateRootNode(queryStrings);
-        if (!(rootResult.Result is null))
+
+        if (rootResult.Result is not null)
         {
             return rootResult.Result;
         }

@@ -67,6 +67,5 @@ public class MemberTypeTreeController : MemberTypeAndGroupTreeControllerBase, IS
     protected override IEnumerable<TreeNode> GetTreeNodesFromService(string id, FormCollection queryStrings) =>
         _memberTypeService.GetAll()
             .OrderBy(x => x.Name)
-            .Select(dt => CreateTreeNode(dt, Constants.ObjectTypes.MemberType, id, queryStrings,
-                dt?.Icon ?? Constants.Icons.MemberType, false));
+            .Select(dt => CreateTreeNode(dt, Constants.ObjectTypes.MemberType, id, queryStrings, dt?.Icon ?? Constants.Icons.MemberType, false));
 }

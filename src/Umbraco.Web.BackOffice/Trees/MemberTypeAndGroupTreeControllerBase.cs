@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Extensions;
+using static Umbraco.Cms.Core.Constants.Conventions;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees;
 
@@ -85,7 +86,30 @@ public abstract class MemberTypeAndGroupTreeControllerBase : TreeController
             return nodes;
         }
 
-        nodes.AddRange(GetTreeNodesFromService(id, queryStrings));
+        if (queryStrings["tree"].ToString() == Constants.Trees.MemberTypes)
+        {
+            IEnumerable<IMemberType> memberTypes = _memberTypeService.GetAll();
+
+            nodes.AddRange(
+                _entityService.GetChildren(intId, UmbracoObjectTypes.MemberType)
+                    .OrderBy(entity => entity.Name)
+                    .Select(dt =>
+                    {
+                        var hasChildren = dt.HasChildren;
+                        IMemberType? mt = memberTypes.FirstOrDefault(x => x.Id == dt.Id);
+                        TreeNode node = CreateTreeNode(dt, Constants.ObjectTypes.MemberType, id, queryStrings, mt?.Icon ?? Constants.Icons.MemberType, hasChildren);
+
+                        node.Path = dt.Path;
+                        return node;
+                    }));
+
+            //nodes.AddRange(GetTreeNodesFromService(id, queryStrings));
+        }
+        else
+        {
+            nodes.AddRange(GetTreeNodesFromService(id, queryStrings));
+        }
+
         return nodes;
     }
 

@@ -66,10 +66,10 @@ public class DataTypeTreeController : TreeController, ISearchableTree
                 .OrderBy(entity => entity.Name)
                 .Select(dt =>
                 {
-                    TreeNode node = CreateTreeNode(dt, Constants.ObjectTypes.DataType, id, queryStrings,
-                        Constants.Icons.Folder, dt.HasChildren);
+                    TreeNode node = CreateTreeNode(dt, Constants.ObjectTypes.DataType, id, queryStrings, Constants.Icons.Folder, dt.HasChildren);
                     node.Path = dt.Path;
                     node.NodeType = "container";
+
                     // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
                     node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
                     return node;
@@ -93,8 +93,7 @@ public class DataTypeTreeController : TreeController, ISearchableTree
                 .Select(dt =>
                 {
                     IDataType dataType = dataTypes[dt.Id];
-                    TreeNode node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name,
-                        dataType.Editor?.Icon, false);
+                    TreeNode node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, dataType.Editor?.Icon, false);
                     node.Path = dt.Path;
                     return node;
                 })
@@ -140,7 +139,7 @@ public class DataTypeTreeController : TreeController, ISearchableTree
 
         if (id == Constants.System.RootString)
         {
-            //set the default to create
+            // set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
             // root actions
@@ -153,7 +152,7 @@ public class DataTypeTreeController : TreeController, ISearchableTree
             UmbracoObjectTypes.DataTypeContainer);
         if (container != null)
         {
-                //set the default to create
+            // set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
             menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);

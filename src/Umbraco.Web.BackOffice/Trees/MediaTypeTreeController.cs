@@ -91,8 +91,7 @@ public class MediaTypeTreeController : TreeController, ISearchableTree
                     // need this check to keep supporting sites where children have already been created.
                     var hasChildren = dt.HasChildren;
                     IMediaType? mt = mediaTypes.FirstOrDefault(x => x.Id == dt.Id);
-                    TreeNode node = CreateTreeNode(dt, Constants.ObjectTypes.MediaType, id, queryStrings,
-                        mt?.Icon ?? Constants.Icons.MediaType, hasChildren);
+                    TreeNode node = CreateTreeNode(dt, Constants.ObjectTypes.MediaType, id, queryStrings, mt?.Icon ?? Constants.Icons.MediaType, hasChildren);
 
                     node.Path = dt.Path;
                     return node;
