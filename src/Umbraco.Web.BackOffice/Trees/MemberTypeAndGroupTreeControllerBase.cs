@@ -68,10 +68,10 @@ public abstract class MemberTypeAndGroupTreeControllerBase : TreeController
                 .OrderBy(entity => entity.Name)
                 .Select(dt =>
                 {
-                    TreeNode node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, Constants.Icons.Folder,
-                        dt.HasChildren, "");
+                    TreeNode node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, Constants.Icons.Folder, dt.HasChildren, string.Empty);
                     node.Path = dt.Path;
                     node.NodeType = "container";
+
                     // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
                     node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
                     return node;
