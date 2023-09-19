@@ -1186,7 +1186,7 @@ When building a custom infinite editor view you can use the same components as a
       memberPicker: memberPicker,
       memberEditor: memberEditor,
       mediaCropDetails,
-      eventPicker : eventPicker,
+      eventPicker : eventPicker
     };
 
     return service;
