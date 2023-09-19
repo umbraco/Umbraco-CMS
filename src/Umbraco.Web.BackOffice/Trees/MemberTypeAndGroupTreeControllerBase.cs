@@ -61,7 +61,9 @@ public abstract class MemberTypeAndGroupTreeControllerBase : TreeController
 
         var nodes = new TreeNodeCollection();
 
-        nodes.AddRange(
+        if (queryStrings["tree"].ToString() == Constants.Trees.MemberTypes)
+        {
+            nodes.AddRange(
             _entityService.GetChildren(intId, UmbracoObjectTypes.MemberTypeContainer)
                 .OrderBy(entity => entity.Name)
                 .Select(dt =>
@@ -74,6 +76,7 @@ public abstract class MemberTypeAndGroupTreeControllerBase : TreeController
                     node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
                     return node;
                 }));
+        }
 
         // if the request is for folders only then just return
         if (queryStrings["foldersonly"].ToString().IsNullOrWhiteSpace() == false &&
