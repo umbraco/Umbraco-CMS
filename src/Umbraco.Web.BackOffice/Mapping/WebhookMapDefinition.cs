@@ -8,7 +8,7 @@ public class WebhookMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<WebhookViewModel, Webhook>((_, _) => new Webhook(string.Empty, WebhookEvent.ContentDelete), Map);
+        mapper.Define<WebhookViewModel, Webhook>((_, _) => new Webhook(string.Empty), Map);
         mapper.Define<Webhook, WebhookViewModel>((_, _) => new WebhookViewModel(), Map);
     }
 
@@ -16,7 +16,7 @@ public class WebhookMapDefinition : IMapDefinition
     private void Map(WebhookViewModel source, Webhook target, MapperContext context)
     {
         target.EntityKeys = source.EntityKeys;
-        target.Event = source.Event;
+        target.Events = source.Events;
         target.Url = source.Url;
         target.Enabled = source.Enabled;
         target.Key = source.Key ?? Guid.NewGuid();
@@ -26,7 +26,7 @@ public class WebhookMapDefinition : IMapDefinition
     private void Map(Webhook source, WebhookViewModel target, MapperContext context)
     {
         target.EntityKeys = source.EntityKeys;
-        target.Event = source.Event;
+        target.Events = source.Events;
         target.Url = source.Url;
         target.Enabled = source.Enabled;
         target.Key = source.Key;

@@ -17,7 +17,7 @@ public class Webhook : EntityBase
             (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
             enum1 => enum1.GetHashCode());
 
-    public Webhook(string url, WebhookEvent webhookEvent, bool? enabled = null, Guid[]? entityKeys = null, WebhookEvent[]? events = null)
+    public Webhook(string url, bool? enabled = null, Guid[]? entityKeys = null, WebhookEvent[]? events = null)
     {
         _url = url;
         _events = events ?? Array.Empty<WebhookEvent>();

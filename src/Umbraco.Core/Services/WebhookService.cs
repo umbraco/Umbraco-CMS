@@ -39,7 +39,7 @@ public class WebhookService : IWebHookService
 
         currentWebhook.Enabled = updateModel.Enabled;
         currentWebhook.EntityKeys = updateModel.EntityKeys;
-        currentWebhook.Event = updateModel.Event;
+        currentWebhook.Events = updateModel.Events;
         currentWebhook.Url = updateModel.Url;
 
         _webhookRepository.Save(currentWebhook);
