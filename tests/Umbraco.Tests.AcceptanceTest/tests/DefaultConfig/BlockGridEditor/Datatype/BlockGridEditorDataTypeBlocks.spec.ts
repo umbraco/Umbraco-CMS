@@ -590,6 +590,8 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
     const dragTo = await page.locator('[key="blockEditor_addBlockType"]').nth(1);
     await umbracoUi.dragAndDrop(dragFrom, dragTo, 0, 0, 15);
 
+    // We need a wait to make sure the element is moved
+    await page.waitForTimeout(2000);
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
     // Assert
