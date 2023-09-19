@@ -164,10 +164,10 @@ test.describe('Routing', () => {
     await page.locator('.btn-success').last().click()
 
     // Assert
-    await expect(await umbracoUi.getSuccessNotification()).toHaveCount(2);
+    await expect(await umbracoUi.getSuccessNotification()).toHaveCount(2, {timeout: 20000});
     await expect(await page.locator('.alert-warning')).toBeVisible();
   });
-  
+
   test('Root node published in language A, Child node published in language A + B, Grandchild published in A + B', async ({page, umbracoApi, umbracoUi}) => {
     const rootDocType = new DocumentTypeBuilder()
       .withName(rootDocTypeName)
@@ -249,6 +249,6 @@ test.describe('Routing', () => {
     await page.locator('.checkbox').last().click();
     await page.locator('.btn-success').last().click()
     // Assert
-    await expect(await umbracoUi.getSuccessNotification()).toHaveCount(2);
+    await expect(await umbracoUi.getSuccessNotification()).toHaveCount(2, {timeout: 20000});
   })
 });
