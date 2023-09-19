@@ -272,7 +272,7 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
             .Select(_umbracoMapper.Map<IMediaType, ContentTypeBasic>).WhereNotNull();
 
     /// <summary>
-    ///     Deletes a media type container with a given ID
+    ///     Deletes a media type container with a given ID.
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>

@@ -365,6 +365,8 @@
     <key alias="memberLockoutNotEnabled">Lockout is not enabled for this member</key>
     <key alias="memberNotInGroup">The member is not in group '%0%'</key>
     <key alias="2fa">Two-Factor Authentication</key>
+    <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
+    <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
   </area>
   <area alias="contentType">
     <key alias="copyFailed">Failed to copy content type</key>

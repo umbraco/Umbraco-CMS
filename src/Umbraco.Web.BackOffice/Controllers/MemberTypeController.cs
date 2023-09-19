@@ -200,6 +200,50 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
         return dto;
     }
 
+    /// <summary>
+    ///     Deletes a member type container with a given ID.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpDelete]
+    [HttpPost]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
+    public IActionResult DeleteContainer(int id)
+    {
+        _memberTypeService.DeleteContainer(id, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+
+        return Ok();
+    }
+
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
+    public IActionResult PostCreateContainer(int parentId, string name)
+    {
+        Attempt<OperationResult<OperationResultType, EntityContainer>?> result =
+            _memberTypeService.CreateContainer(parentId, Guid.NewGuid(), name, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+
+        if (result.Success)
+        {
+            return Ok(result.Result); //return the id
+        }
+
+        return ValidationProblem(result.Exception?.Message);
+    }
+
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
+    public IActionResult PostRenameContainer(int id, string name)
+    {
+        Attempt<OperationResult<OperationResultType, EntityContainer>?> result =
+            _memberTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+
+        if (result.Success)
+        {
+            return Ok(result.Result); //return the id
+        }
+
+        return ValidationProblem(result.Exception?.Message);
+    }
+
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
     public ActionResult<MemberTypeDisplay?> PostSave(MemberTypeSave contentTypeSave)
     {
         //get the persisted member type

@@ -349,6 +349,8 @@
     <key alias="allMembers">All Members</key>
     <key alias="memberGroupNoProperties">Member groups have no additional properties for editing.</key>
     <key alias="2fa">Two-Factor Authentication</key>
+    <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
+    <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
   </area>
   <area alias="contentType">
     <key alias="copyFailed">Failed to copy content type</key>

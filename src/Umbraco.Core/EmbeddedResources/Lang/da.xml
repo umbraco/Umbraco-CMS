@@ -344,6 +344,8 @@
     <key alias="allMembers">Alle medlemmer</key>
     <key alias="memberGroupNoProperties">Medlemgrupper har ingen yderligere egenskaber til redigering.</key>
     <key alias="2fa">Totrinsbekræftelse</key>
+    <key alias="createFolderFailed">Oprettelse af mappen under parent med id %0% fejlede</key>
+    <key alias="renameFolderFailed">Omdøbning af mappen med id %0% fejlede</key>
   </area>
   <area alias="contentType">
     <key alias="copyFailed">Kopiering af indholdstypen fejlede</key>

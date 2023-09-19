@@ -90,6 +90,17 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter, local
                'Failed to delete member type');
         },
 
+        deleteContainerById: function (id) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "memberTypeApiBaseUrl",
+                       "DeleteContainer",
+                       [{ id: id }])),
+               'Failed to delete member type container');
+        },
+
         getScaffold: function () {
 
             return umbRequestHelper.resourcePromise(
@@ -141,6 +152,32 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter, local
                         id: args.id
                     }, { responseType: 'text' }),
                 promise);
+        },
+
+        createContainer: function (parentId, name) {
+
+          var promise = localizationService.localize("member_createFolderFailed", [parentId]);
+
+          return umbRequestHelper.resourcePromise(
+            $http.post(
+              umbRequestHelper.getApiUrl(
+                "memberTypeApiBaseUrl",
+                "PostCreateContainer",
+                { parentId: parentId, name: encodeURIComponent(name) })),
+            promise);
+        },
+
+        renameContainer: function (id, name) {
+
+          var promise = localizationService.localize("member_renameFolderFailed", [id]);
+
+          return umbRequestHelper.resourcePromise(
+            $http.post(umbRequestHelper.getApiUrl("memberTypeApiBaseUrl",
+              "PostRenameContainer",
+              { id: id, name: name })),
+            promise
+          );
+
         }
     };
 }

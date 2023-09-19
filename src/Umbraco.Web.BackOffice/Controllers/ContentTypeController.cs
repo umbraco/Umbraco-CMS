@@ -369,7 +369,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
     }
 
     /// <summary>
-    ///     Deletes a document type container with a given ID
+    ///     Deletes a document type container with a given ID.
     /// </summary>
     [HttpDelete]
     [HttpPost]
