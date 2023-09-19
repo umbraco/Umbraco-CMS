@@ -64,7 +64,7 @@ public class CropWebProcessor : IImageWebProcessor
         Vector2 xy2 = ExifOrientationUtilities.Transform(new Vector2(right, bottom), Vector2.Zero, Vector2.One, orientation);
 
         // Scale points to a pixel based rectangle
-        Size size = image.Image.Size();
+        Size size = image.Image.Size;
 
         return Rectangle.Round(RectangleF.FromLTRB(
             MathF.Min(xy1.X, xy2.X) * size.Width,
