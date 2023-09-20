@@ -103,6 +103,9 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter, local
 
         getScaffold: function (parentId) {
 
+            // For backwards compatibility.
+            parentId = parentId ?? -1;
+
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
