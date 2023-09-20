@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Directory = Lucene.Net.Store.Directory;
 
@@ -96,6 +97,7 @@ public class PublishedContentQueryTests : ExamineBaseTest
     [TestCase("en-us", ExpectedResult = "1, 2", Description = "Search Culture: en-us. Must return both en-us and invariant results")]
     [TestCase("*", ExpectedResult = "1, 2, 3", Description = "Search Culture: *. Must return all cultures and all invariant results")]
     [TestCase(null, ExpectedResult = "1", Description = "Search Culture: null. Must return only invariant results")]
+    [LongRunning]
     public string Search(string culture)
     {
         using (var luceneDir = new RandomIdRAMDirectory())
