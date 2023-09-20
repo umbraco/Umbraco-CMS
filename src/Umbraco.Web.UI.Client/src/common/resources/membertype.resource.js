@@ -153,7 +153,7 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter, local
          *    });
          * </pre>
          * @param {Object} args arguments object
-         * @param {Int} args.idd the ID of the node to move
+         * @param {Int} args.id the ID of the node to move
          * @param {Int} args.parentId the ID of the parent node to move to
          * @returns {Promise} resourcePromise object.
          *
