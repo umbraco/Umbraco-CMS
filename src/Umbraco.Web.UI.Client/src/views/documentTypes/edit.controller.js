@@ -364,10 +364,9 @@
                         editorState.set($scope.content);
                     }
                     else {
-                        localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
-                            localizationService.localize("speechBubbles_validationFailedMessage").then(function (msgValue) {
-                                notificationsService.error(headerValue, msgValue);
-                            });
+                      localizationService.localizeMany(["speechBubbles_validationFailedHeader", "speechBubbles_validationFailedMessage"])
+                        .then(values => {
+                            notificationsService.error(values[0], values[1]);
                         });
                     }
                     vm.page.saveButtonState = "error";

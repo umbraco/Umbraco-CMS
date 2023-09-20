@@ -204,7 +204,7 @@
         function save() {
 
             // only save if there is no overlays open
-            if(overlayHelper.getNumberOfOverlays() === 0) {
+            if (overlayHelper.getNumberOfOverlays() === 0) {
 
                 var deferred = $q.defer();
 
@@ -221,7 +221,7 @@
                 }).then(function (data) {
                     //success
 
-                    if(!infiniteMode) {
+                    if (!infiniteMode) {
                         syncTreeNode(vm.contentType, data.path);
                     }
 
@@ -235,7 +235,7 @@
 
                     vm.page.saveButtonState = "success";
 
-                    if(infiniteMode && $scope.model.submit) {
+                    if (infiniteMode && $scope.model.submit) {
                         $scope.model.submit();
                     }
 
@@ -247,10 +247,9 @@
                         editorState.set($scope.content);
                     }
                     else {
-                        localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
-                            localizationService.localize("speechBubbles_validationFailedMessage").then(function (msgValue) {
-                                notificationsService.error(headerValue, msgValue);
-                            });
+                      localizationService.localizeMany(["speechBubbles_validationFailedHeader", "speechBubbles_validationFailedMessage"])
+                        .then(values => {
+                          notificationsService.error(values[0], values[1]);
                         });
                     }
 
