@@ -262,9 +262,8 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
         return dto;
     }
 
-
     /// <summary>
-    ///     Returns all media types
+    ///     Returns all media types.
     /// </summary>
     [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
     public IEnumerable<ContentTypeBasic> GetAll() =>

@@ -268,7 +268,7 @@
             // convert legacy icons
             convertLegacyIcons(contentType);
 
-            //set a shared state
+            // set a shared state
             editorState.set(contentType);
 
             vm.contentType = contentType;

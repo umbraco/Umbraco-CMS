@@ -101,13 +101,13 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter, local
                'Failed to delete member type container');
         },
 
-        getScaffold: function () {
+        getScaffold: function (parentId) {
 
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "memberTypeApiBaseUrl",
-                       "GetEmpty")),
+                       "GetEmpty", { parentId: parentId })),
                'Failed to retrieve content type scaffold');
         },
 

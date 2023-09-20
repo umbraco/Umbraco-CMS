@@ -189,14 +189,36 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
         return Ok(result);
     }
 
-    public MemberTypeDisplay? GetEmpty()
-    {
-        var ct = new MemberType(_shortStringHelper, -1)
-        {
-            Icon = Constants.Icons.Member
-        };
+    //public MemberTypeDisplay? GetEmpty()
+    //{
+    //    var ct = new MemberType(_shortStringHelper, -1)
+    //    {
+    //        Icon = Constants.Icons.Member
+    //    };
 
-        MemberTypeDisplay? dto = _umbracoMapper.Map<IMemberType, MemberTypeDisplay>(ct);
+    //    MemberTypeDisplay? dto = _umbracoMapper.Map<IMemberType, MemberTypeDisplay>(ct);
+    //    return dto;
+    //}
+
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
+    public MemberTypeDisplay? GetEmpty(int parentId)
+    {
+        IMemberType mt;
+        if (parentId != Constants.System.Root)
+        {
+            IMemberType? parent = _memberTypeService.Get(parentId);
+            mt = parent != null
+                ? new MemberType(_shortStringHelper, parent, string.Empty)
+                : new MemberType(_shortStringHelper, parentId);
+        }
+        else
+        {
+            mt = new MemberType(_shortStringHelper, parentId);
+        }
+
+        mt.Icon = Constants.Icons.Member;
+
+        MemberTypeDisplay? dto = _umbracoMapper.Map<IMemberType, MemberTypeDisplay>(mt);
         return dto;
     }
 
