@@ -346,7 +346,7 @@ test.describe('BlockGridEditorContent', () => {
 
     // Selects the created image for the block
     await page.locator('[data-content-element-type-key="' + element['key'] + '"]').click();
-    await page.locator('[data-element="property-image"]').locator('[key="' + ConstantHelper.buttons.add + '"]').click();
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
     await page.locator('[data-element="media-grid"] >> [title="' + imageName + '"]').click();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.select));
     await page.locator('[label="Submit"]').click();
