@@ -162,6 +162,6 @@ public static partial class Constants
         /// <summary>
         ///     Webhooks icon
         /// </summary>
-        public const string Webhooks = "icon-webhook";
+        public const string Webhooks = "icon-directions-alt";
     }
 }
