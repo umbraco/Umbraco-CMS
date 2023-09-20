@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Umbraco.Extensions;
 
@@ -32,6 +33,7 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task Validate_OpenApi_Contract_is_implemented()
     {
         string[] keysToIgnore = { "servers", "x-generator" };

@@ -4,6 +4,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 
@@ -13,6 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers;
 public class BackOfficeAssetsControllerTests : UmbracoTestServerTestBase
 {
     [Test]
+    [LongRunning]
     public async Task EnsureSuccessStatusCode()
     {
         // Arrange

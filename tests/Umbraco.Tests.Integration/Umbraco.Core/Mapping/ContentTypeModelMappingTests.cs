@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -140,6 +141,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void ContentTypeSave_To_IContentType()
     {
         // Arrange

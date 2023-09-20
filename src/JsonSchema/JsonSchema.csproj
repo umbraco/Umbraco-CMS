@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
-    <PackageReference Include="Umbraco.Deploy.Core" Version="10.2.2" />
-    <PackageReference Include="Umbraco.Forms.Core" Version="10.5.0" />
+    <PackageReference Include="Umbraco.Deploy.Core" Version="10.2.4" />
+    <PackageReference Include="Umbraco.Forms.Core" Version="10.5.1" />
   </ItemGroup>
 </Project>

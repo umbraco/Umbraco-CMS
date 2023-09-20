@@ -38,6 +38,8 @@ public sealed class ConfigureBackOfficeIdentityOptions : IConfigureOptions<BackO
         options.SignIn.RequireConfirmedPhoneNumber = false; // not implemented
 
         options.User.RequireUniqueEmail = true;
+        // Support validation of users names using Down-Level Logon Name format
+        options.User.AllowedUserNameCharacters = _securitySettings.AllowedUserNameCharacters;
 
         options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
         options.ClaimsIdentity.UserNameClaimType = ClaimTypes.Name;
