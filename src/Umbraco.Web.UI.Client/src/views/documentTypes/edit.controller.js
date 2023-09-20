@@ -200,11 +200,10 @@
 
                             vm.page.saveButtonState = "busy";
 
-                            localizationService.localize("modelsBuilder_buildingModels").then(function (headerValue) {
-                                localizationService.localize("modelsBuilder_waitingMessage").then(function (msgValue) {
-                                    notificationsService.info(headerValue, msgValue);
-                                });
-                            });
+                            localizationService.localizeMany(["modelsBuilder_buildingModels", "modelsBuilder_waitingMessage"])
+                              .then(values => {
+                                notificationsService.info(values[0], values[1]);
+                              });
 
                             contentTypeHelper.generateModels().then(function (result) {
 
