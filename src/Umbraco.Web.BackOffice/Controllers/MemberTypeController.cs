@@ -291,11 +291,10 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
             }
         }
 
-        ActionResult<IMemberType?> savedCt =
-            PerformPostSave<MemberTypeDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
-                contentTypeSave,
-                i => ct,
-                type => _memberTypeService.Save(type));
+        ActionResult<IMemberType?> savedCt = PerformPostSave<MemberTypeDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
+            contentTypeSave,
+            i => _memberTypeService.Get(i),
+            type => _memberTypeService.Save(type));
 
         if (savedCt.Result is not null)
         {
