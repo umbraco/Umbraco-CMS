@@ -222,7 +222,7 @@ export class UmbCodeEditorController {
 		if (selections?.length > 0) {
 			this.#editor.executeEdits(
 				null,
-				selections.map((selection) => ({ range: selection, text }))
+				selections.map((selection) => ({ range: selection, text })),
 			);
 		}
 	}
@@ -236,7 +236,7 @@ export class UmbCodeEditorController {
 	 */
 	find(
 		searchString: string,
-		searchOptions: CodeEditorSearchOptions = <CodeEditorSearchOptions>{}
+		searchOptions: CodeEditorSearchOptions = <CodeEditorSearchOptions>{},
 	): UmbCodeEditorRange[] {
 		if (!this.#editor) throw new Error('Editor object not found');
 		const defaultOptions = {

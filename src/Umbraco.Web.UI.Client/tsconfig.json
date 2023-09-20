@@ -43,7 +43,7 @@
 
 			// SHARED
 			"@umbraco-cms/backoffice/auth": ["src/shared/auth"],
-			"@umbraco-cms/backoffice/events": ["src/shared/umb-events"],
+			"@umbraco-cms/backoffice/events": ["src/packages/core/umb-events"],
 			"@umbraco-cms/backoffice/icon": ["src/shared/icon-registry"],
 			"@umbraco-cms/backoffice/models": ["src/shared/models"],
 			"@umbraco-cms/backoffice/repository": ["src/shared/repository"],
