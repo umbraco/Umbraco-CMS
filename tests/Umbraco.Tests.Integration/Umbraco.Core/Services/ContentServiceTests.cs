@@ -3,13 +3,10 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -20,6 +17,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Extensions;
@@ -28,7 +26,7 @@ using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
 using Language = Umbraco.Cms.Core.Models.Language;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 /// <summary>
 ///     Tests covering all methods in the ContentService class.
@@ -161,6 +159,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Get_All_Blueprints()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
@@ -191,6 +190,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public async Task Perform_Scheduled_Publishing()
     {
         var langUk = new LanguageBuilder()
@@ -335,6 +335,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Get_Top_Version_Ids()
     {
         // Arrange
@@ -355,6 +356,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Get_By_Ids_Sorted()
     {
         // Arrange
@@ -571,6 +573,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Get_All_Versions_Of_Content()
     {
         var parent = ContentService.GetById(Textpage.Id);
@@ -656,6 +659,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Get_Content_For_Expiration()
     {
         // Arrange
@@ -754,6 +758,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Publish_Culture_After_Last_Culture_Unpublished()
     {
         var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr,
@@ -1388,6 +1393,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Failed_Publish_Should_Not_Update_Edited_State_When_Edited_True()
     {
         // Arrange
@@ -1440,6 +1446,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     // V9 - Tests.Integration
     [Test]
+    [LongRunning]
     public void Failed_Publish_Should_Not_Update_Edited_State_When_Edited_False()
     {
         // Arrange
@@ -1590,6 +1597,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Get_Published_Descendant_Versions()
     {
         // Arrange
@@ -1775,6 +1783,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Move_Content_Structure_To_RecycleBin_And_Empty_RecycleBin()
     {
         var contentType = ContentTypeService.Get("umbTextpage");
@@ -1831,6 +1840,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Ensures_Permissions_Are_Retained_For_Copied_Descendants_With_Explicit_Permissions()
     {
         // Arrange
@@ -1871,6 +1881,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Ensures_Permissions_Are_Inherited_For_Copied_Descendants()
     {
         // Arrange
@@ -1946,6 +1957,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public async Task Can_Empty_RecycleBin_With_Content_That_Has_All_Related_Data()
     {
         // Arrange
@@ -2322,6 +2334,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public async Task Can_Rollback_Version_On_Multilingual()
     {
         var langFr = new LanguageBuilder()
@@ -2629,6 +2642,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Delete_Previous_Versions_Not_Latest()
     {
         // Arrange
@@ -2644,6 +2658,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Get_Paged_Children()
     {
         // Start by cleaning the "db"
@@ -2670,6 +2685,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Get_Paged_Children_Dont_Get_Descendants()
     {
         // Start by cleaning the "db"
@@ -2843,6 +2859,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public async Task Ensure_Invariant_Name()
     {
         var languageService = LanguageService;
@@ -2926,6 +2943,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public async Task Can_Get_Paged_Children_WithFilterAndOrder()
     {
         var languageService = LanguageService;
@@ -3059,6 +3077,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public async Task Can_SaveRead_Variations()
     {
         var languageService = LanguageService;
