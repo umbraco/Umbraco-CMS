@@ -14,15 +14,17 @@
             <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="createMediaType()" umb-auto-focus>
               <umb-icon class="icon large" icon="icon-item-arrangement"></umb-icon>
               <span class="menu-label">
-                                <localize key="general_new">New</localize>
-                                <localize key="content_mediatype">Media type</localize>
-                            </span>
+                  <localize key="general_new">New</localize>
+                  <localize key="content_mediatype">Media type</localize>
+              </span>
             </button>
           </li>
           <li data-element="action-folder" class="umb-action" ng-if="model.allowCreateFolder">
             <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="showCreateFolder()">
               <umb-icon class="icon large" icon="icon-folder"></umb-icon>
-              <span class="menu-label"><localize key="general_folder">Folder</localize>...</span>
+              <span class="menu-label">
+                <localize key="general_folder">Folder</localize>
+              </span>
             </button>
           </li>
         </ul>
@@ -34,6 +36,7 @@
         <localize key="buttons_somethingElse">Do something else</localize>
       </button>
     </div>
+
   </div>
 
   <div ng-cloak ng-show="model.creatingFolder">
