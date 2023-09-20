@@ -3,10 +3,12 @@ import { UmbEntityData } from './entity.data.js';
 import { createDocumentTreeItem } from './utils.js';
 import {
 	ContentStateModel,
+	DocumentItemResponseModel,
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
 	PagedDocumentTreeItemResponseModel,
 	PagedDocumentTypeResponseModel,
+	PagedRecycleBinItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<DocumentResponseModel> = [
@@ -468,7 +470,7 @@ export const data: Array<DocumentResponseModel> = [
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-us',
 				segment: null,
-				name: 'Blog post B',
+				name: 'Simple Document',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
 			},
@@ -547,8 +549,31 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		isEdited: false,
 		isTrashed: false,
 	},
+	{
+		name: 'Trashed',
+		type: 'document',
+		icon: 'document',
+		hasChildren: false,
+		id: 'trashed-document-id',
+		isContainer: false,
+		parentId: null,
+		noAccess: false,
+		isProtected: false,
+		isPublished: false,
+		isEdited: false,
+		isTrashed: true,
+	},
 ];
 
+const createDocumentItem = (item: DocumentResponseModel): DocumentItemResponseModel => {
+	return {
+		id: item.id,
+		name: item.variants?.[0].name, // Hack: TODO: we need to get all variants as part of the document item model
+		contentTypeId: item.contentTypeId,
+	};
+};
+
+// TODO: look into making a combined document model so we don't need to maintain two+ data sets.
 // Temp mocked database
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -579,15 +604,27 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 		return result;
 	}
 
+	trash(ids: string[]): DocumentResponseModel[] {
+		const result = super.trash(ids);
+		this.treeData = this.treeData.map((x) => {
+			if (x.id && ids.includes(x.id)) {
+				return { ...x, isTrashed: true };
+			} else {
+				return x;
+			}
+		});
+		return result;
+	}
+
 	getTreeRoot(): PagedDocumentTreeItemResponseModel {
-		const items = this.treeData.filter((item) => item.parentId === null);
+		const items = this.treeData.filter((item) => item.parentId === null && item.isTrashed === false);
 		const treeItems = items.map((item) => item);
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(id: string): PagedDocumentTreeItemResponseModel {
-		const items = this.treeData.filter((item) => item.parentId === id);
+	getTreeItemChildrenOf(id: string): PagedDocumentTreeItemResponseModel {
+		const items = this.treeData.filter((item) => item.parentId === id && item.isTrashed === false);
 		const treeItems = items.map((item) => item);
 		const total = items.length;
 		return { items: treeItems, total };
@@ -596,6 +633,11 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 	getTreeItem(ids: Array<string>): Array<DocumentTreeItemResponseModel> {
 		const items = this.treeData.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => item);
+	}
+
+	getItems(ids: Array<string>): Array<DocumentItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
+		return items.map((item) => createDocumentItem(item));
 	}
 
 	getDocumentByIdAllowedDocumentTypes(id: string): PagedDocumentTypeResponseModel {
@@ -616,6 +658,20 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 
 		const total = items?.length;
 		return { items, total };
+	}
+
+	getRecycleBinRoot(): PagedRecycleBinItemResponseModel {
+		const items = this.treeData.filter((item) => item.parentId === null && item.isTrashed === true);
+		const treeItems = items.map((item) => item);
+		const total = items.length;
+		return { items: treeItems, total };
+	}
+
+	getRecycleBinChildrenOf(parentId: string): PagedRecycleBinItemResponseModel {
+		const items = this.treeData.filter((item) => item.parentId === parentId && item.isTrashed === true);
+		const treeItems = items.map((item) => item);
+		const total = items.length;
+		return { items: treeItems, total };
 	}
 }
 

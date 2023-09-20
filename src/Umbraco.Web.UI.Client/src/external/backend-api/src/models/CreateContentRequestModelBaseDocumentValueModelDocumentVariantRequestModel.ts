@@ -9,6 +9,7 @@ import type { DocumentVariantRequestModel } from './DocumentVariantRequestModel'
 export type CreateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel = {
     values?: Array<DocumentValueModel>;
     variants?: Array<DocumentVariantRequestModel>;
+    id?: string | null;
     parentId?: string | null;
 };
 

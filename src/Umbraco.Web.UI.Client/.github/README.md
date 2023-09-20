@@ -1,4 +1,4 @@
-# Umbraco.CMS.Bacoffice (Bellissima)
+# Umbraco.CMS.Backoffice (Bellissima)
 
 This is the working repository of the upcoming new Backoffice to Umbraco CMS.
 
@@ -30,7 +30,7 @@ The development environment is the default environment and is used when running 
 ### Run against a local Umbraco instance
 
 > **Note**
-> Make sure you have followed the [Authentication guide](../docs/authentication.md) before continuing.
+> Make sure you have followed the [Authentication guide](https://github.com/umbraco/Umbraco.CMS.Backoffice/blob/main/docs/authentication.md) before continuing.
 
 If you have a local Umbraco instance running, you can use the development environment to run against it by overriding the API URL and bypassing the mock-service-worker in the frontend client.
 
@@ -48,3 +48,7 @@ Storybook is also being built and deployed automatically on the Main branch, inc
 ## Contributing
 
 We accept contributions to this project. However be aware that we are mainly working on a private backlog, so not everyone will be immediately obvious. If you want to get started on contributing, please read the [contribute space](https://github.com/umbraco/Umbraco.CMS.Backoffice/contribute) where you will be able to find the guidelines on how to contribute as well as a list of good first issues.
+
+## Documentation
+
+The documentation can be found on [Umbraco Docs](https://docs.umbraco.com/umbraco-backoffice/). The documentation is a work in progress.

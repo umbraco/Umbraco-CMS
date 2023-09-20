@@ -64,8 +64,6 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 			const item = this.getById(id);
 			if (!item) return;
 
-			// TODO: how do we handle trashed items?
-			// TODO: remove ignore when we know how to handle trashed items.
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			item.isTrashed = true;

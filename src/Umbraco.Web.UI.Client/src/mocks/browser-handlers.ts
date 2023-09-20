@@ -13,7 +13,7 @@ import { handlers as examineManagementHandlers } from './handlers/examine-manage
 import { handlers as modelsBuilderHandlers } from './handlers/modelsbuilder.handlers.js';
 import { handlers as healthCheckHandlers } from './handlers/health-check.handlers.js';
 import { handlers as profilingHandlers } from './handlers/performance-profiling.handlers.js';
-import { handlers as documentHandlers } from './handlers/document.handlers.js';
+import { handlers as documentHandlers } from './handlers/document/index.js';
 import { handlers as mediaHandlers } from './handlers/media.handlers.js';
 import { handlers as dictionaryHandlers } from './handlers/dictionary.handlers.js';
 import { handlers as mediaTypeHandlers } from './handlers/media-type.handlers.js';
@@ -31,6 +31,7 @@ import { handlers as stylesheetHandlers } from './handlers/stylesheet.handlers.j
 import { handlers as partialViewsHandlers } from './handlers/partial-views.handlers.js';
 import { handlers as tagHandlers } from './handlers/tag-handlers.js';
 import { handlers as configHandlers } from './handlers/config.handlers.js';
+import { handlers as scriptHandlers } from './handlers/scripts.handlers.js';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
@@ -65,6 +66,7 @@ const handlers = [
 	...partialViewsHandlers,
 	...tagHandlers,
 	...configHandlers,
+	...scriptHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {

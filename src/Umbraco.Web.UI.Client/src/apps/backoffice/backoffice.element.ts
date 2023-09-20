@@ -25,6 +25,7 @@ const CORE_PACKAGES = [
 	import('../../packages/umbraco-news/umbraco-package.js'),
 	import('../../packages/tags/umbraco-package.js'),
 	import('../../packages/log-viewer/umbraco-package.js'),
+	import('../../packages/health-check/umbraco-package.js'),
 ];
 
 @customElement('umb-backoffice')
