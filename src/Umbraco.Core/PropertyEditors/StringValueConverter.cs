@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Templates;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 [DefaultPropertyValueConverter]
-public class StringValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
+public class StringValueConverter : PropertyValueConverterBase
 {
     private static readonly string[] PropertyTypeAliases =
     {
@@ -19,29 +19,9 @@ public class StringValueConverter : PropertyValueConverterBase, IDeliveryApiProp
         => typeof(string);
 
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
-        => PropertyCacheLevel.Snapshot;
-
-    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
-    {
-        if (source == null)
-        {
-            return null;
-        }
-
-        return source.ToString();
-    }
-
-    public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview) =>
-
-        // source should come from ConvertSource and be a string (or null) already
-        inter ?? string.Empty;
-
-    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
-    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
-        => GetPropertyValueType(propertyType);
-
-    public object ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
-        => ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
+        object? source, bool preview)
+        => source as string;
 }
