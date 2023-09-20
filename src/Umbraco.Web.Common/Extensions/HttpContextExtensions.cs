@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core;
 
@@ -41,7 +42,7 @@ public static class HttpContextExtensions
     }
 
     /// <summary>
-    ///     Runs the authentication process
+    ///     Runs the authentication process.
     /// </summary>
     public static async Task<AuthenticateResult> AuthenticateBackOfficeAsync(this HttpContext? httpContext)
     {
@@ -63,7 +64,7 @@ public static class HttpContextExtensions
     }
 
     /// <summary>
-    ///     Runs the authentication process
+    ///     Runs the authentication process.
     /// </summary>
     public static async Task<AuthenticateResult> AuthenticateMemberAsync(this HttpContext? httpContext)
     {
@@ -73,19 +74,19 @@ public static class HttpContextExtensions
         }
 
         AuthenticateResult result =
-            await httpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType); // which to use for member?
+            await httpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme);
 
         if (!result.Succeeded)
         {
             result =
-                await httpContext.AuthenticateAsync(Constants.Security.BackOfficeExternalAuthenticationType); // which to use for member?
+                await httpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme);
         }
 
         return result;
     }
 
     /// <summary>
-    ///     Get the value in the request form or query string for the key
+    ///     Get the value in the request form or query string for the key.
     /// </summary>
     public static string? GetRequestValue(this HttpContext context, string key)
     {
