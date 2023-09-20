@@ -16,17 +16,7 @@ public static class HtmlHelperBackOfficeExtensions
     ///     Outputs a script tag containing the bare minimum (non secure) server vars for use with the angular app
     /// </summary>
     /// <param name="html"></param>
-    /// <param name="linkGenerator"></param>
-    /// <param name="features"></param>
-    /// <param name="globalSettings"></param>
-    /// <param name="umbracoVersion"></param>
-    /// <param name="contentSettings"></param>
-    /// <param name="treeCollection"></param>
-    /// <param name="httpContextAccessor"></param>
-    /// <param name="hostingEnvironment"></param>
-    /// <param name="settings"></param>
-    /// <param name="securitySettings"></param>
-    /// <param name="runtimeMinifier"></param>
+    /// <param name="backOfficeServerVariables"></param>
     /// <returns></returns>
     /// <remarks>
     ///     These are the bare minimal server variables that are required for the application to start without being
@@ -52,6 +42,7 @@ public static class HtmlHelperBackOfficeExtensions
     /// </summary>
     /// <param name="html"></param>
     /// <param name="externalLogins"></param>
+    /// <param name="externalLoginErrors"></param>
     /// <returns></returns>
     public static async Task<IHtmlContent> AngularValueExternalLoginInfoScriptAsync(this IHtmlHelper html,
         IBackOfficeExternalLoginProviders externalLogins,

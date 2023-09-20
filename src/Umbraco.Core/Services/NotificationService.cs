@@ -99,14 +99,14 @@ public class NotificationService : INotificationService
         const int pagesz = 400; // load batches of 400 users
         do
         {
-            // users are returned ordered by id, notifications are returned ordered by user id
-            var users = _userService.GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-            var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(), Constants.ObjectTypes.Document)?.ToList();
+            var notifications = GetUsersNotifications(new List<int>(), action, Enumerable.Empty<int>(), Constants.ObjectTypes.Document)?.ToList();
             if (notifications is null || notifications.Count == 0)
             {
                 break;
             }
 
+            // users are returned ordered by id, notifications are returned ordered by user id
+            var users = _userService.GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
             foreach (IUser user in users)
             {
                 Notification[] userNotifications = notifications.Where(n => n.UserId == user.Id).ToArray();
@@ -565,49 +565,58 @@ public class NotificationService : INotificationService
         }
     }
 
-    private void Process(BlockingCollection<NotificationRequest> notificationRequests) =>
-        ThreadPool.QueueUserWorkItem(state =>
+    private void Process(BlockingCollection<NotificationRequest> notificationRequests)
+    {
+        // We need to suppress the flow of the ExecutionContext when starting a new thread.
+        // Otherwise our scope stack will leak into the context of the new thread, leading to disposing race conditions.
+        using (ExecutionContext.SuppressFlow())
         {
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            ThreadPool.QueueUserWorkItem(state =>
             {
-                _logger.LogDebug("Begin processing notifications.");
-            }
-            while (true)
-            {
-                // stay on for 8s
-                while (notificationRequests.TryTake(out NotificationRequest? request, 8 * 1000))
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
                 {
-                    try
+                    _logger.LogDebug("Begin processing notifications.");
+                }
+
+                while (true)
+                {
+                    // stay on for 8s
+                    while (notificationRequests.TryTake(out NotificationRequest? request, 8 * 1000))
                     {
-                        _emailSender.SendAsync(request.Mail, Constants.Web.EmailTypes.Notification).GetAwaiter()
-                            .GetResult();
-                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        try
                         {
-                            _logger.LogDebug("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
+                            _emailSender.SendAsync(request.Mail, Constants.Web.EmailTypes.Notification).GetAwaiter()
+                                .GetResult();
+                            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                            {
+                                _logger.LogDebug("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "An error occurred sending notification");
                         }
                     }
-                    catch (Exception ex)
+
+                    lock (Locker)
                     {
-                        _logger.LogError(ex, "An error occurred sending notification");
+                        if (notificationRequests.Count > 0)
+                        {
+                            continue; // last chance
+                        }
+
+                        _running = false; // going down
+                        break;
                     }
                 }
 
-                lock (Locker)
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
                 {
-                    if (notificationRequests.Count > 0)
-                    {
-                        continue; // last chance
-                    }
-
-                    _running = false; // going down
-                    break;
+                    _logger.LogDebug("Done processing notifications.");
                 }
-            }
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-            {
-                _logger.LogDebug("Done processing notifications.");
-            }
-        });
+            });
+        }
+    }
 
     private class NotificationRequest
     {

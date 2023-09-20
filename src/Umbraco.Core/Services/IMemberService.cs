@@ -178,7 +178,7 @@ public interface IMemberService : IMembershipMemberService
     /// </summary>
     /// <remarks>If no alias is supplied then the count for all Member will be returned</remarks>
     /// <param name="memberTypeAlias">Optional alias for the MemberType when counting number of Members</param>
-    /// <returns><see cref="System.int" /> with number of Members</returns>
+    /// <returns><see cref="int" /> with number of Members</returns>
     int Count(string? memberTypeAlias = null);
 
     /// <summary>
@@ -204,7 +204,7 @@ public interface IMemberService : IMembershipMemberService
     /// <summary>
     ///     Gets a Member by its integer id
     /// </summary>
-    /// <param name="id"><see cref="System.int" /> Id</param>
+    /// <param name="id"><see cref="int" /> Id</param>
     /// <returns>
     ///     <see cref="IMember" />
     /// </returns>
@@ -278,7 +278,7 @@ public interface IMemberService : IMembershipMemberService
     ///     Gets a list of Members based on a property search
     /// </summary>
     /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-    /// <param name="value"><see cref="System.string" /> Value to match</param>
+    /// <param name="value"><see cref="string" /> Value to match</param>
     /// <param name="matchType">
     ///     The type of match to make as <see cref="StringPropertyMatchType" />. Default is
     ///     <see cref="StringPropertyMatchType.Exact" />
@@ -295,7 +295,7 @@ public interface IMemberService : IMembershipMemberService
     ///     Gets a list of Members based on a property search
     /// </summary>
     /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-    /// <param name="value"><see cref="System.int" /> Value to match</param>
+    /// <param name="value"><see cref="int" /> Value to match</param>
     /// <param name="matchType">
     ///     The type of match to make as <see cref="StringPropertyMatchType" />. Default is
     ///     <see cref="StringPropertyMatchType.Exact" />
@@ -309,7 +309,7 @@ public interface IMemberService : IMembershipMemberService
     ///     Gets a list of Members based on a property search
     /// </summary>
     /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-    /// <param name="value"><see cref="System.bool" /> Value to match</param>
+    /// <param name="value"><see cref="bool" /> Value to match</param>
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
