@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Validation.AspNetCore;
 using Umbraco.Cms.Api.Management.Security.Authorization;
+using Umbraco.Cms.Api.Management.Security.Authorization.DenyLocalLogin;
+using Umbraco.Cms.Api.Management.Security.Authorization.Media;
+using Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -15,8 +18,12 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
     {
         // NOTE: Even though we are registering these handlers globally they will only actually execute their logic for
         // any auth defining a matching requirement and scheme.
+        builder.Services.AddSingleton<IAuthorizationHandler, DenyLocalLoginHandler>();
+        builder.Services.AddSingleton<IAuthorizationHandler, MediaHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, UserGroupHandler>();
 
+        builder.Services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
+        builder.Services.AddSingleton<IMediaAuthorizer, MediaAuthorizer>();
         builder.Services.AddSingleton<IUserGroupAuthorizer, UserGroupAuthorizer>();
 
         builder.Services.AddAuthorization(CreatePolicies);
@@ -75,6 +82,24 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         AddPolicy(AuthorizationPolicies.RequireAdminAccess, ClaimsIdentity.DefaultRoleClaimType, Constants.Security.AdminGroupAlias);
 
         // Contextual permissions
+        options.AddPolicy($"New{AuthorizationPolicies.ContentPermissionByResource}", policy =>
+        {
+            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            policy.Requirements.Add(new ContentPermissionsResourceRequirement());
+        });
+
+        options.AddPolicy($"New{AuthorizationPolicies.DenyLocalLoginIfConfigured}", policy =>
+        {
+            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            policy.Requirements.Add(new DenyLocalLoginRequirement());
+        });
+
+        options.AddPolicy($"New{AuthorizationPolicies.MediaPermissionByResource}", policy =>
+        {
+            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            policy.Requirements.Add(new MediaRequirement());
+        });
+
         options.AddPolicy($"New{AuthorizationPolicies.UserBelongsToUserGroupInRequest}", policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
