@@ -15,5 +15,5 @@ public interface IAuthorizationHelper
     /// <returns>
     ///     <see cref="IUser" />.
     /// </returns>
-    IUser? GetCurrentUser(IPrincipal? currentUser);
+    IUser GetCurrentUser(IPrincipal currentUser);
 }

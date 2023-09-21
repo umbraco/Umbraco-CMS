@@ -19,10 +19,10 @@ internal sealed class AuthorizationHelper : IAuthorizationHelper
         => _userService = userService;
 
     /// <inheritdoc/>
-    public IUser? GetCurrentUser(IPrincipal? currentUser)
+    public IUser GetCurrentUser(IPrincipal currentUser)
     {
         IUser? user = null;
-        ClaimsIdentity? umbIdentity = currentUser?.GetUmbracoIdentity();
+        ClaimsIdentity? umbIdentity = currentUser.GetUmbracoIdentity();
         Guid? currentUserKey = umbIdentity?.GetUserKey();
 
         if (currentUserKey is null)
@@ -36,6 +36,11 @@ internal sealed class AuthorizationHelper : IAuthorizationHelper
         else
         {
             user = _userService.GetAsync(currentUserKey.Value).GetAwaiter().GetResult();
+        }
+
+        if (user is null)
+        {
+            throw new InvalidOperationException($"Could not obtain an {nameof(IUser)} instance from {nameof(IPrincipal)}");
         }
 
         return user;
