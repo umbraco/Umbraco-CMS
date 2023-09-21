@@ -61,10 +61,10 @@ internal sealed class UserGroupAuthorizationService : IUserGroupAuthorizationSer
             return Attempt.Fail(authorizeSectionAccess.Result);
         }
 
-        Attempt<UserGroupOperationStatus> authorizeGroupAccess = AuthorizeGroupAccess(performingUser, new[] { userGroup });
-        if (authorizeGroupAccess.Success is false)
+        UserGroupOperationStatus authorizeGroupAccess = AuthorizeGroupAccess(performingUser, new[] { userGroup });
+        if (authorizeGroupAccess != UserGroupOperationStatus.Success)
         {
-            return Attempt.Fail(authorizeGroupAccess.Result);
+            return Attempt.Fail(authorizeGroupAccess);
         }
 
         Attempt<UserGroupOperationStatus> authorizeStartNodeChanges = AuthorizeStartNodeChanges(performingUser, userGroup);
@@ -78,11 +78,11 @@ internal sealed class UserGroupAuthorizationService : IUserGroupAuthorizationSer
     }
 
     /// <inheritdoc/>
-    public Attempt<UserGroupOperationStatus> AuthorizeGroupAccess(IUser performingUser, IEnumerable<IUserGroup> userGroups)
+    public UserGroupOperationStatus AuthorizeGroupAccess(IUser performingUser, IEnumerable<IUserGroup> userGroups)
     {
         if (performingUser.IsAdmin())
         {
-            return Attempt.Succeed(UserGroupOperationStatus.Success);
+            return UserGroupOperationStatus.Success;
         }
 
         var userGroupsKeys = performingUser.Groups.Select(x => x.Key).ToArray();
@@ -90,8 +90,8 @@ internal sealed class UserGroupAuthorizationService : IUserGroupAuthorizationSer
         var missingAccess = requiredUserGroupsKeys.Except(userGroupsKeys).ToArray();
 
         return missingAccess.Length == 0
-            ? Attempt.Succeed(UserGroupOperationStatus.Success)
-            : Attempt.Fail(UserGroupOperationStatus.UnauthorizedMissingUserGroup);
+            ? UserGroupOperationStatus.Success
+            : UserGroupOperationStatus.UnauthorizedMissingUserGroup;
     }
 
     /// <summary>

@@ -3,6 +3,8 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+// FIXME: Start using <see cref="UserGroupAuthorizationStatus"/> for all authorization things
+// + refactor to return only <see cref="UserGroupAuthorizationStatus"/>, without the Attempt
 public interface IUserGroupAuthorizationService
 {
     /// <summary>
@@ -26,6 +28,6 @@ public interface IUserGroupAuthorizationService
     /// </summary>
     /// <param name="performingUser">The user performing the operation.</param>
     /// <param name="userGroups">The user groups to check for access.</param>
-    /// <returns>An attempt indicating if the operation was a success, as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
-    Attempt<UserGroupOperationStatus> AuthorizeGroupAccess(IUser performingUser, IEnumerable<IUserGroup> userGroups);
+    /// <returns><see cref="UserGroupOperationStatus"/>.</returns>
+    UserGroupOperationStatus AuthorizeGroupAccess(IUser performingUser, IEnumerable<IUserGroup> userGroups);
 }

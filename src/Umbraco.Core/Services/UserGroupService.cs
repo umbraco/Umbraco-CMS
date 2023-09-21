@@ -331,13 +331,8 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<UserGroupOperationStatus>> AuthorizeGroupAccessAsync(IUser? performingUser, IEnumerable<Guid> userGroupKeys)
+    public async Task<UserGroupOperationStatus> AuthorizeGroupAccessAsync(IUser performingUser, IEnumerable<Guid> userGroupKeys)
     {
-        if (performingUser is null)
-        {
-            return Attempt.Fail(UserGroupOperationStatus.MissingUser);
-        }
-
         IEnumerable<IUserGroup> userGroups = await GetAsync(userGroupKeys);
 
         return _userGroupAuthorizationService.AuthorizeGroupAccess(performingUser, userGroups);

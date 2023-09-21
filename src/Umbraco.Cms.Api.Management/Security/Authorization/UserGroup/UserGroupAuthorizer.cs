@@ -1,6 +1,7 @@
 using System.Security.Principal;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
 
@@ -25,10 +26,10 @@ internal sealed class UserGroupAuthorizer : IUserGroupAuthorizer
             return true;
         }
 
-        IUser? user = _authorizationHelper.GetCurrentUser(currentUser);
+        IUser user = _authorizationHelper.GetCurrentUser(currentUser);
 
         var result = await _userGroupService.AuthorizeGroupAccessAsync(user, userGroupKeys);
 
-        return result.Success;
+        return result == UserGroupOperationStatus.Success;
     }
 }
