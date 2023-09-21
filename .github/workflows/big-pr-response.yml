@@ -1,0 +1,73 @@
+name: big-pr-resonse
+
+on:
+  pull_request:
+    types: [opened]
+    branches:
+      - contrib
+
+env:
+  is_hq: false
+  is_sweeping_pr: false
+  sweeping_pr_filecount: 10
+
+jobs:
+  check-is-hq:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR is from HQ
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const response = await fetch('https://collaboratorsv2.euwest01.umbraco.io/umbraco/api/users/GetIgnoredUsers', {
+              method: 'POST',
+              headers: {
+                'Authorization': 'Bearer ${{ secrets.OUR_BOT_API_TOKEN }}',
+                'Content-Type': 'application/json'
+              }
+            });
+            const hqUsers = await response.json();
+            if(hqUsers.includes(pr.head.user.login)) {
+              core.exportVariable('is_hq', 'true');
+            }
+
+  check-pr-size:
+    runs-on: ubuntu-latest
+    needs: check-is-hq
+    if: github.env.is_hq == 'false'
+    permissions:
+      issues: write
+    steps:
+      - name: Check PR size
+        uses: actions/github-script@v6
+        with:
+          script : |
+            const pr = context.payload.pull_request;
+            const fileCount = pr.changed_files;
+            console.log(`PR #${pr.number} has ${fileCount} files`);
+            if (fileCount > ${{ env.sweeping_pr_filecount }}) {
+              core.exportVariable('is_sweeping_pr', 'true');
+              core.exportVariable('sweeping_pr_filecount', fileCount);
+            }
+
+  comment-on-large-pr:
+    runs-on: ubuntu-latest
+    needs: check-pr-size
+    if: github.env.is_sweeping_pr == 'true'
+    permissions:
+      issues: write
+    steps:
+      - name: Comment on PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const fileCount = parseInt(process.env.sweeping_pr_filecount);
+            const comment = `:warning: This PR has ${fileCount} files. Please consider splitting it into smaller PRs.`;
+            github.issues.createComment({
+              issue_number: pr.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment,
+            });
