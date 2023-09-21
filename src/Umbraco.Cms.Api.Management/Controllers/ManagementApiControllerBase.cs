@@ -57,5 +57,6 @@ public abstract class ManagementApiControllerBase : Controller
     ///     Use this method instead of <see cref="ManagementApiControllerBase.Forbid()"/> on the controller base.
     ///     This method ensures that a proper 403 Forbidden status code is returned to the client.
     /// </remarks>
+    // Duplicate code copied between Management API and Delivery API.
     protected IActionResult Forbidden() => new StatusCodeResult(StatusCodes.Status403Forbidden);
 }
