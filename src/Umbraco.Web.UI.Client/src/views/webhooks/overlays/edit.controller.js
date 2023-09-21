@@ -8,7 +8,6 @@
       editorService.eventPicker({
         title: "Select event",
         submit(model) {
-
           $scope.model.webhook.events =  model.selection;
           editorService.close();
         },

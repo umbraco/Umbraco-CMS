@@ -1,7 +1,7 @@
 ﻿(function () {
   "use strict";
 
-  function OverviewController($q, $location, $routeParams, webhooksResource, notificationsService, editorService, overlayService, localizationService) {
+  function OverviewController($q, $location, $routeParams, notificationsService, editorService, overlayService, localizationService) {
     var vm = this;
     vm.page = {};
     vm.page.labels = {};

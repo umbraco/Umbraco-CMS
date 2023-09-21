@@ -19,7 +19,9 @@
     function loadEvents (){
       return webhooksResource.getAllEvents()
         .then((data) => {
-          vm.events = data;
+          vm.events = data.map(item => item.eventName);
+          console.log("logging vm.events")
+          console.log(vm.events)
         });
     }
 

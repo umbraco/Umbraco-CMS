@@ -37,7 +37,7 @@
       webhooksResource.getAllEvents()
         .then((data) => {
           data.forEach(function (event) {
-            let eventObject = { name: event, selected: false}
+            let eventObject = { name: event.eventName, selected: false}
             vm.events.push(eventObject);
           });
         });
