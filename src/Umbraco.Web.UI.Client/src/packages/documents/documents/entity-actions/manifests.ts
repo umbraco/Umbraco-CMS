@@ -24,7 +24,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 800,
 		meta: {
 			icon: 'umb:blueprint',
-			label: 'Create Content Blueprint (TBD)',
+			label: 'Create Document Blueprint (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbCreateDocumentBlueprintEntityAction,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
