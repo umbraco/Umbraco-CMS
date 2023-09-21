@@ -1,5 +1,4 @@
-﻿using System.Runtime.Serialization;
-using Umbraco.Cms.Core.Models.Entities;
+﻿using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models;
@@ -7,7 +6,7 @@ namespace Umbraco.Cms.Core.Models;
 public class Webhook : EntityBase
 {
     private string _url;
-    private WebhookEvent[] _events;
+    private string[] _events;
     private Guid[] _entityKeys;
     private bool _enabled;
 
@@ -18,15 +17,15 @@ public class Webhook : EntityBase
             enum1 => enum1.GetHashCode());
 
     // Custom comparer for enumerable webhook events
-    private static readonly DelegateEqualityComparer<IEnumerable<WebhookEvent>> _webhookEventEnumerableComparer =
+    private static readonly DelegateEqualityComparer<IEnumerable<string>> _webhookEventEnumerableComparer =
         new(
             (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
             enum1 => enum1.GetHashCode());
 
-    public Webhook(string url, bool? enabled = null, Guid[]? entityKeys = null, WebhookEvent[]? events = null)
+    public Webhook(string url, bool? enabled = null, Guid[]? entityKeys = null, string[]? events = null)
     {
         _url = url;
-        _events = events ?? Array.Empty<WebhookEvent>();
+        _events = events ?? Array.Empty<string>();
         _entityKeys = entityKeys ?? Array.Empty<Guid>();
         _enabled = enabled ?? false;
     }
@@ -37,7 +36,7 @@ public class Webhook : EntityBase
         set => SetPropertyValueAndDetectChanges(value, ref _url!, nameof(Url));
     }
 
-    public WebhookEvent[] Events
+    public string[] Events
     {
         get => _events;
         set => SetPropertyValueAndDetectChanges(value, ref _events!, nameof(Events), _webhookEventEnumerableComparer);

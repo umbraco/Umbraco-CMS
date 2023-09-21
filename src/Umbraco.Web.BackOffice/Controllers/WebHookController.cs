@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Web.Common.Models;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
@@ -62,8 +64,31 @@ public class WebHookController : UmbracoAuthorizedJsonController
         return Ok();
     }
 
-    // TODO: This should probably be handled by the NewtonsoftJsonOutputFormatter instead
     [HttpGet]
-    public async Task<IActionResult> GetEvents() =>
-        Ok(Enum.GetValues(typeof(WebhookEvent)).Cast<WebhookEvent>().Select(x => x.ToString()));
+    public IActionResult GetEvents()
+    {
+        // Load the assembly containing your webhook event classes
+        Assembly assembly = typeof(IWebhookEvent).Assembly;
+
+        // Get all types in the assembly that implement IWebhookEvent
+        var webhookEventTypes = assembly
+            .GetTypes()
+            .Where(type => typeof(IWebhookEvent).IsAssignableFrom(type) && !type.IsAbstract);
+
+        // Create instances of each type and select the EventName property value for each instance
+        var eventNames = webhookEventTypes
+            .Select(type =>
+            {
+                if (Activator.CreateInstance(type) is IWebhookEvent webhookEvent)
+                {
+                    return webhookEvent.EventName;
+                }
+
+                return null;
+            })
+            .Where(eventName => !string.IsNullOrEmpty(eventName))
+            .ToArray();
+
+        return Ok(eventNames);
+    }
 }

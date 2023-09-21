@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
@@ -11,7 +12,7 @@ internal static class WebhookFactory
             dto.Url,
             dto.Enabled,
             entityKey2WebhookDtos?.Select(x => x.EntityKey).ToArray(),
-            event2WebhookDtos?.Select(x => Enum.Parse<WebhookEvent>(x.Event)).ToArray());
+            event2WebhookDtos?.Select(x => x.Event).ToArray());
 
         try
         {
@@ -56,7 +57,7 @@ internal static class WebhookFactory
     public static IEnumerable<Event2WebhookDto> BuildEvent2WebhookDto(Webhook webhook, int webhookId) =>
         webhook.Events.Select(x => new Event2WebhookDto
         {
-            Event = x.ToString(),
+            Event = x,
             WebhookId = webhookId,
         });
 }
