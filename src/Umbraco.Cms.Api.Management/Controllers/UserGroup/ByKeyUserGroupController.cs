@@ -13,18 +13,18 @@ namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 [ApiVersion("1.0")]
 public class ByKeyUserGroupController : UserGroupControllerBase
 {
+    private readonly IAuthorizationService _authorizationService;
     private readonly IUserGroupService _userGroupService;
     private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
-    private readonly IAuthorizationService _authorizationService;
 
     public ByKeyUserGroupController(
+        IAuthorizationService authorizationService,
         IUserGroupService userGroupService,
-        IUserGroupPresentationFactory userGroupPresentationFactory,
-        IAuthorizationService authorizationService)
+        IUserGroupPresentationFactory userGroupPresentationFactory)
     {
+        _authorizationService = authorizationService;
         _userGroupService = userGroupService;
         _userGroupPresentationFactory = userGroupPresentationFactory;
-        _authorizationService = authorizationService;
     }
 
     [HttpGet("{id:guid}")]

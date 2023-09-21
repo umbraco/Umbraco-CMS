@@ -12,13 +12,13 @@ namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 [ApiVersion("1.0")]
 public class DeleteUserGroupController : UserGroupControllerBase
 {
-    private readonly IUserGroupService _userGroupService;
     private readonly IAuthorizationService _authorizationService;
+    private readonly IUserGroupService _userGroupService;
 
-    public DeleteUserGroupController(IUserGroupService userGroupService, IAuthorizationService authorizationService)
+    public DeleteUserGroupController(IAuthorizationService authorizationService, IUserGroupService userGroupService)
     {
-        _userGroupService = userGroupService;
         _authorizationService = authorizationService;
+        _userGroupService = userGroupService;
     }
 
     [HttpDelete("{id:guid}")]

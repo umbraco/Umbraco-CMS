@@ -13,13 +13,13 @@ namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 [ApiVersion("1.0")]
 public class BulkDeleteUserGroupsController : UserGroupControllerBase
 {
-    private readonly IUserGroupService _userGroupService;
     private readonly IAuthorizationService _authorizationService;
+    private readonly IUserGroupService _userGroupService;
 
-    public BulkDeleteUserGroupsController(IUserGroupService userGroupService, IAuthorizationService authorizationService)
+    public BulkDeleteUserGroupsController(IAuthorizationService authorizationService, IUserGroupService userGroupService)
     {
-        _userGroupService = userGroupService;
         _authorizationService = authorizationService;
+        _userGroupService = userGroupService;
     }
 
     [HttpDelete]
