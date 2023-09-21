@@ -52,7 +52,7 @@ export default {
 		update: 'Update',
 		setPermissions: 'Set permissions',
 		unlock: 'Unlock',
-		createblueprint: 'Create Content Template',
+		createblueprint: 'Create Content Blueprint',
 		resendInvite: 'Resend Invitation',
 		deployQueueForTransfer: 'Queue for transfer',
 		deployRestore: 'Workspace restore',
@@ -86,7 +86,7 @@ export default {
 		sort: 'Allow access to change the sort order for nodes',
 		translate: 'Allow access to translate a node',
 		update: 'Allow access to save a node',
-		createblueprint: 'Allow access to create a Content Template',
+		createblueprint: 'Allow access to create a Content Blueprint',
 		notify: 'Allow access to setup notifications for content nodes',
 		deployQueueForTransfer: 'Allow the user to queue item(s)',
 		deployRestore: 'Allow the user to restore items for the whole workspace',
@@ -329,14 +329,14 @@ export default {
 		variantUnpublishNotAllowed: 'Unpublish is not allowed',
 	},
 	blueprints: {
-		createBlueprintFrom: 'Create a new Content Template from <em>%0%</em>',
+		createBlueprintFrom: 'Create a new Content Blueprint from <em>%0%</em>',
 		blankBlueprint: 'Blank',
-		selectBlueprint: 'Select a Content Template',
-		createdBlueprintHeading: 'Content Template created',
-		createdBlueprintMessage: "A Content Template was created from '%0%'",
-		duplicateBlueprintMessage: 'Another Content Template with the same name already exists',
+		selectBlueprint: 'Select a Content Blueprint',
+		createdBlueprintHeading: 'Content Blueprint created',
+		createdBlueprintMessage: "A Content Blueprint was created from '%0%'",
+		duplicateBlueprintMessage: 'Another Content Blueprint with the same name already exists',
 		blueprintDescription:
-			'A Content Template is predefined content that an editor can select to use as the\n      basis for creating new content\n    ',
+			'A Content Blueprint is predefined content that an editor can select to use as the\n      basis for creating new content\n    ',
 	},
 	media: {
 		clickToUpload: 'Click to upload',
@@ -378,7 +378,7 @@ export default {
 	create: {
 		chooseNode: 'Where do you want to create the new %0%',
 		createUnder: 'Create an item under',
-		createContentBlueprint: 'Select the Document Type you want to make a content template for',
+		createContentBlueprint: 'Select the Document Type you want to make a content blueprint for',
 		enterFolderName: 'Enter a folder name',
 		updateData: 'Choose a type and a title',
 		noDocumentTypes:
@@ -1294,7 +1294,7 @@ export default {
 		editMultiContentPublishedText: '%0% documents published and visible on the website',
 		editVariantPublishedText: '%0% published and visible on the website',
 		editMultiVariantPublishedText: '%0% documents published for languages %1% and visible on the website',
-		editBlueprintSavedHeader: 'Content Template saved',
+		editBlueprintSavedHeader: 'Content Blueprint saved',
 		editBlueprintSavedText: 'Changes have been successfully saved',
 		editContentSavedHeader: 'Content saved',
 		editContentSavedText: 'Remember to publish to make changes visible',
@@ -1705,7 +1705,7 @@ export default {
 	},
 	treeHeaders: {
 		content: 'Content',
-		contentBlueprints: 'Content Templates',
+		contentBlueprints: 'Content Blueprints',
 		media: 'Media',
 		cacheBrowser: 'Cache Browser',
 		contentRecycleBin: 'Recycle Bin',
@@ -2073,7 +2073,7 @@ export default {
 		protectDescription: 'Setup access restrictions on %0%',
 		rightsDescription: 'Setup Permissions on %0%',
 		sortDescription: 'Change sort order for %0%',
-		createblueprintDescription: 'Create Content Template based on %0%',
+		createblueprintDescription: 'Create Content Blueprint based on %0%',
 		openContextMenu: 'Open context menu for',
 		currentLanguage: 'Current language',
 		switchLanguage: 'Switch language to',
@@ -2417,15 +2417,15 @@ export default {
 		addColumnSpanOption: 'Add spanning %0% columns option',
 	},
 	contentTemplatesDashboard: {
-		whatHeadline: 'What are Content Templates?',
+		whatHeadline: 'What are Content Blueprints?',
 		whatDescription:
-			'Content Templates are pre-defined content that can be selected when creating a new\n      content node.\n    ',
-		createHeadline: 'How do I create a Content Template?',
+			'Content Blueprinta are pre-defined content that can be selected when creating a new\n      content node.\n    ',
+		createHeadline: 'How do I create a Content Blueprint?',
 		createDescription:
-			'\n            <p>There are two ways to create a Content Template:</p>\n            <ul>\n                <li>Right-click a content node and select "Create Content Template" to create a new Content Template.</li>\n                <li>Right-click the Content Templates tree in the Settings section and select the Document Type you want to create a Content Template for.</li>\n            </ul>\n            <p>Once given a name, editors can start using the Content Template as a foundation for their new page.</p>\n        ',
-		manageHeadline: 'How do I manage Content Templates?',
+			'\n            <p>There are two ways to create a Content Blueprint:</p>\n            <ul>\n                <li>Right-click a content node and select "Create Content Blueprint" to create a new Content Blueprint.</li>\n                <li>Right-click the Content Blueprints tree in the Settings section and select the Document Type you want to create a Content Blueprint for.</li>\n            </ul>\n            <p>Once given a name, editors can start using the Content Blueprint as a foundation for their new page.</p>\n        ',
+		manageHeadline: 'How do I manage Content Blueprints?',
 		manageDescription:
-			'You can edit and delete Content Templates from the "Content Templates" tree in the\n      Settings section. Expand the Document Type which the Content Template is based on and click it to edit or delete\n      it.\n    ',
+			'You can edit and delete Content Blueprints from the "Content Blueprints" tree in the\n      Settings section. Expand the Document Type which the Content Blueprint is based on and click it to edit or delete\n      it.\n    ',
 	},
 	preview: {
 		endLabel: 'End',
