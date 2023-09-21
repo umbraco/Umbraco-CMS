@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.Security;
 /// <summary>
 ///     Checks user access to media
 /// </summary>
+// FIXME: Consider deleting this for v14 - some of the logic is migrated into <see cref="MediaPermissionsService"/>
 public class MediaPermissions
 {
     private readonly AppCaches _appCaches;
