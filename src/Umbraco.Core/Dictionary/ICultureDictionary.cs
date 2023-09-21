@@ -25,4 +25,6 @@ public interface ICultureDictionary
     /// <param name="key"></param>
     /// <returns></returns>
     IDictionary<string, string> GetChildren(string key);
+
+    bool TestBreaking { get; }
 }

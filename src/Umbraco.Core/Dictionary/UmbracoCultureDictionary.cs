@@ -76,6 +76,8 @@ internal class DefaultCultureDictionary : ICultureDictionary
                 return null;
             });
 
+    public bool TestBreaking => throw new NotImplementedException();
+
     /// <summary>
     ///     Returns the dictionary value based on the key supplied
     /// </summary>
