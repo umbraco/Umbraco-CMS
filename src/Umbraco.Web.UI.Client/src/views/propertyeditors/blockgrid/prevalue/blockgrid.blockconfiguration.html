@@ -20,8 +20,8 @@
                 ng-click="vm.openBlockOverlay(block)"
                 data-content-element-type-key="{{block.contentElementTypeKey}}">
                 <div class="__actions" ng-click="$event.stopPropagation()" tabindex="-1">
-                    <div>
-                      <button type="button" ng-if="block.areas.length > 0" class="btn-reset __action umb-outline" ng-click="vm.openBlockOverlay(block, true); $event.stopPropagation();">
+                    <div ng-if="block.areas.length > 0">
+                      <button type="button" class="btn-reset __action umb-outline" ng-click="vm.openBlockOverlay(block, true); $event.stopPropagation();">
                           <umb-icon icon="icon-layout" class="icon"></umb-icon>
                           <localize key="blockEditor_tabAreas" class="sr-only">Areas</localize>
                       </button>
