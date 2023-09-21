@@ -1,4 +1,4 @@
-import type { DataSourceResponse } from 'src/packages/core/repository';
+import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbDataSource<
 	CreateRequestType,

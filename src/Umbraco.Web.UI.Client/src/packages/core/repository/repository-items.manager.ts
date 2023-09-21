@@ -1,4 +1,4 @@
-import { UmbItemRepository } from 'src/packages/core/repository';
+import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbExtensionClassInitializer } from '@umbraco-cms/backoffice/extension-registry';
