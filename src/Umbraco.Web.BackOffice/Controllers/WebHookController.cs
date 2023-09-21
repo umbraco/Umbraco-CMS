@@ -12,11 +12,13 @@ public class WebHookController : UmbracoAuthorizedJsonController
 {
     private readonly IWebHookService _webHookService;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly WebhookEventCollection _webhookEventCollection;
 
-    public WebHookController(IWebHookService webHookService, IUmbracoMapper umbracoMapper)
+    public WebHookController(IWebHookService webHookService, IUmbracoMapper umbracoMapper, WebhookEventCollection webhookEventCollection)
     {
         _webHookService = webHookService;
         _umbracoMapper = umbracoMapper;
+        _webhookEventCollection = webhookEventCollection;
     }
 
     [HttpGet]
@@ -67,28 +69,7 @@ public class WebHookController : UmbracoAuthorizedJsonController
     [HttpGet]
     public IActionResult GetEvents()
     {
-        // Load the assembly containing your webhook event classes
-        Assembly assembly = typeof(IWebhookEvent).Assembly;
-
-        // Get all types in the assembly that implement IWebhookEvent
-        var webhookEventTypes = assembly
-            .GetTypes()
-            .Where(type => typeof(IWebhookEvent).IsAssignableFrom(type) && !type.IsAbstract);
-
-        // Create instances of each type and select the EventName property value for each instance
-        var eventNames = webhookEventTypes
-            .Select(type =>
-            {
-                if (Activator.CreateInstance(type) is IWebhookEvent webhookEvent)
-                {
-                    return webhookEvent.EventName;
-                }
-
-                return null;
-            })
-            .Where(eventName => !string.IsNullOrEmpty(eventName))
-            .ToArray();
-
-        return Ok(eventNames);
+        List<WebhookEventViewModel> viewModels = _umbracoMapper.MapEnumerable<IWebhookEvent, WebhookEventViewModel>(_webhookEventCollection.AsEnumerable());
+        return Ok(viewModels);
     }
 }

@@ -7,7 +7,7 @@ public abstract class WebhookEventBase<T> : IWebhookEvent, INotificationAsyncHan
     where T : INotification
 {
 
-    public abstract string EventName { get; }
+    public string EventName { get; set; } = string.Empty;
 
     public abstract Task HandleAsync(T notification, CancellationToken cancellationToken);
 }

@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Webhooks;
 
 public class ContentPublishWebhookEvent : WebhookEventBase<ContentPublishedNotification>
 {
-    public override string EventName => "ContentPublish";
+    public ContentPublishWebhookEvent() => EventName = "ContentPublish";
 
     public override async Task HandleAsync(ContentPublishedNotification notification, CancellationToken cancellationToken)
     {

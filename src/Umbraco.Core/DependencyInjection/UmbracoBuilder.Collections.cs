@@ -19,6 +19,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Tour;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection;
@@ -128,6 +129,12 @@ public static partial class UmbracoBuilderExtensions
         builder.FilterHandlers().Add(() => builder.TypeLoader.GetTypes<IFilterHandler>());
         builder.SortHandlers().Add(() => builder.TypeLoader.GetTypes<ISortHandler>());
         builder.ContentIndexHandlers().Add(() => builder.TypeLoader.GetTypes<IContentIndexHandler>());
+        builder.WebhookEvents()
+            .Append<ContentDeleteWebhookEvent>()
+            .Append<ContentPublishWebhookEvent>()
+            .Append<ContentUnpublishWebhookEvent>()
+            .Append<MediaDeleteWebhookEvent>()
+            .Append<MediaSaveWebhookEvent>();
     }
 
     /// <summary>
@@ -194,6 +201,12 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="builder">The builder.</param>
     public static SectionCollectionBuilder Sections(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<SectionCollectionBuilder>();
+
+    /// <summary>
+    /// Gets the backoffice sections/applications collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    public static WebhookEventCollectionBuilder WebhookEvents(this IUmbracoBuilder builder) => builder.WithCollectionBuilder<WebhookEventCollectionBuilder>();
 
     /// <summary>
     /// Gets the components collection builder.
