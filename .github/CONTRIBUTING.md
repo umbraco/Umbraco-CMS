@@ -46,3 +46,5 @@ Follow these steps to get started on your first PR
 
 [build - debugging with vs]: BUILD.md#debugging-with-visual-studio	"Details on building and debugging Umbraco with Visual Studio"
 [build - debugging with code]: BUILD.md#debugging-with-vs-code	"Details on building and debugging Umbraco with Visual Studio Code"
+
+[questions]: contributing-first-issue.md#questions

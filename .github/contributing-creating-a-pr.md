@@ -44,3 +44,8 @@ There will be times that we really like your proposed changes and we’ll finish
 
 [ Umbrabot ]: https://github.com/umbrabot
 [git flow]: https://jeffkreeftmeijer.com/git-flow/	"An explanation of git flow"
+
+
+[making larger changes]: contributing-before-you-start.md#making-large-changes
+[pr or package]: contributing-before-you-start.md#pull-request-or-package
+[Core collabs]: contributing-core-collabs-team.md
