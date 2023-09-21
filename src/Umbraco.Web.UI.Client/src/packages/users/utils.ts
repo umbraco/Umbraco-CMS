@@ -12,7 +12,7 @@ const userStates: DisplayStatus[] = [
 	{ "key": "Disabled", "color": "danger", look: "primary" },
 	{ "key": "LockedOut", "color": "danger", look: "secondary" },
 	{ "key": "Invited", "color": "warning", look: "primary" },
-	{ "key": "Inactive", "color": "warning", look: "secondary" }
+	{ "key": "Inactive", "color": "warning", look: "primary" }
 ];
 
 export const getDisplayStateFromUserStatus = (status?: UserStateModel): DisplayStatus => 
