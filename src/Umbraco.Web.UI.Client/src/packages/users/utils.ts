@@ -6,7 +6,7 @@ interface DisplayStatus {
 	color: InterfaceColor;
 	key: string;
 }
-var userStates: DisplayStatus[] = [
+const userStates: DisplayStatus[] = [
 	{ "key": "All", color:"positive", look: "secondary" } ,
 	{ "key": "Active", "color": "positive", look: "primary" },
 	{ "key": "Disabled", "color": "danger", look: "primary" },
