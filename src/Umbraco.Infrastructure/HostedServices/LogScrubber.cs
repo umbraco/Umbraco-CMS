@@ -18,6 +18,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices;
 /// <remarks>
 ///     Will only run on non-replica servers.
 /// </remarks>
+[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.LogScrubberJob instead")]
 public class LogScrubber : RecurringHostedServiceBase
 {
     private readonly IAuditService _auditService;

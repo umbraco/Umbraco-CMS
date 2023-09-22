@@ -13,6 +13,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
 /// <summary>
 ///     Implements periodic database instruction processing as a hosted service.
 /// </summary>
+[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.ServerRegistration.InstructionProcessJob instead")]
 public class InstructionProcessTask : RecurringHostedServiceBase
 {
     private readonly ILogger<InstructionProcessTask> _logger;
