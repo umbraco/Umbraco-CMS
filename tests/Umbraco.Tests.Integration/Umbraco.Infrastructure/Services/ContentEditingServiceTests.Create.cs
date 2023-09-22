@@ -407,6 +407,40 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
+    public async Task Can_Create_With_Explicit_Key()
+    {
+        var contentType = ContentTypeBuilder.CreateContentMetaContentType();
+        contentType.AllowedTemplates = null;
+        contentType.AllowedAsRoot = true;
+        ContentTypeService.Save(contentType);
+
+        var key = Guid.NewGuid();
+        var createModel = new ContentCreateModel
+        {
+            Key = key,
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantName = "Test Create",
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "title", Value = "The title value" }
+            }
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsTrue(result.Result.HasIdentity);
+        Assert.AreEqual(key, result.Result.Key);
+        Assert.AreEqual("The title value", result.Result.GetValue<string>("title"));
+
+        var content = await ContentEditingService.GetAsync(key);
+        Assert.IsNotNull(content);
+        Assert.AreEqual(result.Result.Id, content.Id);
+    }
+
+    [Test]
     public async Task Cannot_Create_With_Invariant_Property_Value_For_Variant_Content()
     {
         var contentType = await CreateVariantContentType();
