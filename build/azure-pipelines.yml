@@ -96,6 +96,9 @@ stages:
             name: determineMajorVersion
           - script: dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
             displayName: Run dotnet pack
+          - script: echo "Running dotnet pack failed"
+            displayName: Running dotnet pack failed
+            condition: failed()
           - script: |
               sha="$(Build.SourceVersion)"
               sha=${sha:0:7}
