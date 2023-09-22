@@ -94,11 +94,11 @@ stages:
               echo "##vso[task.setvariable variable=majorVersion;isOutput=true]$major"
             displayName: Set major version
             name: determineMajorVersion
-          - script: dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg > "$(Build.SourcesDirectory)\dotnetpack.txt"
+          - script: dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg > "$(Build.SourcesDirectory)/dotnetpack.txt"
             displayName: Run dotnet pack
           - script: |
               echo "Running dotnet pack failed"
-              $log = Get-Content -Path "$(Build.SourcesDirectory)\dotnetpack.txt
+              $log = Get-Content -Path "$(Build.SourcesDirectory)\dotnetpack.txt"
               Write-Host $log
             displayName: Handling dotnet pack failure
             condition: failed()
