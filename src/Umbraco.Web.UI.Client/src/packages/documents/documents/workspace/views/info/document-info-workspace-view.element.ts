@@ -177,7 +177,7 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="content_createDate"></umb-localize></strong>
-				<span><umb-localize key="${new Date}" type="date"></umb-localize></span>
+				<span><umb-localize-date date="${new Date}"></umb-localize-date></span>
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="content_documentType"></umb-localize></strong>

@@ -9,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-localize')
 export class UmbLocalizeElement extends UmbLitElement {
 	/**
-	 * The key to localize. The key is case sensitive. For non-term localizations, this is the input
+	 * The key to localize. The key is case sensitive. 
 	 * @attr
 	 * @example key="general_ok"
 	 */
@@ -33,37 +33,11 @@ export class UmbLocalizeElement extends UmbLitElement {
 	 */
 	@property()
 	debug = false;
-
-	@property()
-	type: 'term' | 'date' | 'number' | 'relativeTime' = 'term';
-
-	@property()
-	unit: Intl.RelativeTimeFormatUnit = 'seconds';
-
-	@property() 
-	options?: Intl.DateTimeFormatOptions | Intl.NumberFormatOptions | Intl.RelativeTimeFormatOptions;
 	
 	@state()
 	protected get text(): string {
-		let localizedValue = '';
+		const localizedValue = this.localize.term(this.key, ...(this.args ?? []));
 
-		switch (this.type) {
-			case 'term':
-				localizedValue = this.localize.term(this.key, ...(this.args ?? []));
-				break;
-			case 'date':
-				localizedValue = this.localize.date(this.key, this.options as Intl.DateTimeFormatOptions);
-				break;
-			case 'number':
-				localizedValue = this.localize.number(this.key, this.options as Intl.NumberFormatOptions);
-				break;				
-			case 'relativeTime':
-				localizedValue = this.localize.relativeTime(+this.key, this.unit, this.options as Intl.RelativeTimeFormatOptions);
-				break;		
-			default:
-				throw('unsupported type')
-				break;
-		}
 		// If the value is the same as the key, it means the key was not found.
 		if (localizedValue === this.key) {
 			(this.getHostElement() as HTMLElement).setAttribute('data-localize-missing', this.key);
