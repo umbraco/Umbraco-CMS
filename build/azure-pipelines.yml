@@ -94,22 +94,21 @@ stages:
               echo "##vso[task.setvariable variable=majorVersion;isOutput=true]$major"
             displayName: Set major version
             name: determineMajorVersion
-           - task: PowerShell@2
-              displayName: Run dotnet pack
-              inputs:
-                targetType: 'inline'
-                script: |
-                  echo "Running dotnet pack"
-                  $outputFile = "$(Build.ArtifactStagingDirectory)/dotnetpack.txt"
-                  dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg *> $outputFile
-                  $log = Get-Content -Path $outputFile
-                  echo "donet pack log: $log"
-                  if ($log.contains('breaking')) {
-                    Write-Host "There are breaking changes"
-                  }
-                  else {
-                    Write-Host "Error not due to breaking change"
-                  }
+          - task: PowerShell@2
+            displayName: Run dotnet pack
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo "Running dotnet pack failed"
+                dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg *> "$(Build.SourcesDirectory)/dotnetpack.txt"
+                $log = Get-Content -Path "$(Build.SourcesDirectory)/dotnetpack.txt"
+                echo "donet pack log: $log"
+                if ($log.contains('breaking')) {
+                  Write-Host "There are breaking changes"
+                }
+                else {
+                  Write-Host "Error not due to breaking change"
+                }
           - script: |
               sha="$(Build.SourceVersion)"
               sha=${sha:0:7}
