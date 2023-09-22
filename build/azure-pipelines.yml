@@ -99,9 +99,9 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                echo "Running dotnet pack failed"
-                dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg *> "$(Build.SourcesDirectory)/dotnetpack.txt"
-                $log = Get-Content -Path "$(Build.SourcesDirectory)/dotnetpack.txt"
+                echo "Running dotnet pack"
+                dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg *> ./dotnetpack.txt
+                $log = Get-Content -Path ./dotnetpack.txt
                 echo "donet pack log: $log"
                 if ($log.contains('breaking')) {
                   Write-Host "There are breaking changes"
