@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Configuration;
 /// </summary>
 public class UmbracoVersion : IUmbracoVersion
 {
-    public UmbracoVersion()
+    public UmbracoVersion(ISemVersionFactory semVersionFactory)
     {
         Assembly umbracoCoreAssembly = typeof(SemVersion).Assembly;
 
@@ -24,7 +24,7 @@ public class UmbracoVersion : IUmbracoVersion
         // gets the value indicated by the AssemblyInformationalVersion attribute
         // this is the true semantic version of the Umbraco Cms
         SemanticVersion =
-            SemVersion.Parse(umbracoCoreAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            semVersionFactory.Parse(umbracoCoreAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                 ?.InformationalVersion ?? string.Empty);
 
         // gets the non-semantic version

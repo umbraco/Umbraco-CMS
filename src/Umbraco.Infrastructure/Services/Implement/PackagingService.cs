@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 using File = System.IO.File;
@@ -34,6 +35,7 @@ public class PackagingService : IPackagingService
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IHostEnvironment _hostEnvironment;
     private readonly IUserService _userService;
+    private readonly ISemVersionFactory _semVersionFactory;
 
     public PackagingService(
         IAuditService auditService,
@@ -45,7 +47,8 @@ public class PackagingService : IPackagingService
         ICoreScopeProvider coreScopeProvider,
         PackageMigrationPlanCollection packageMigrationPlans,
         IHostEnvironment hostEnvironment,
-        IUserService userService)
+        IUserService userService,
+        ISemVersionFactory semVersionFactory)
     {
         _auditService = auditService;
         _createdPackages = createdPackages;
@@ -57,6 +60,7 @@ public class PackagingService : IPackagingService
         _coreScopeProvider = coreScopeProvider;
         _hostEnvironment = hostEnvironment;
         _userService = userService;
+        _semVersionFactory = semVersionFactory;
     }
 
     #region Installation
@@ -258,7 +262,7 @@ public class PackagingService : IPackagingService
             }
 
             if (installedPackage.Version is null &&
-                plan.GetType().Assembly.TryGetInformationalVersion(out string? version))
+                plan.GetType().Assembly.TryGetInformationalVersion(_semVersionFactory, out string? version))
             {
                 installedPackage.Version = version;
             }

@@ -37,6 +37,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         private readonly IPublishedValueFallback _publishedValueFallback;
         private readonly InMemoryAssemblyLoadContextManager _loadContextManager;
         private readonly RuntimeCompilationCacheBuster _runtimeCompilationCacheBuster;
+        private readonly IUmbracoVersion _umbracoVersion;
         private readonly Lazy<string> _pureLiveDirectory = null!;
         private readonly int _debugLevel;
         private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
@@ -57,7 +58,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             IApplicationShutdownRegistry hostingLifetime,
             IPublishedValueFallback publishedValueFallback,
             InMemoryAssemblyLoadContextManager loadContextManager,
-            RuntimeCompilationCacheBuster runtimeCompilationCacheBuster)
+            RuntimeCompilationCacheBuster runtimeCompilationCacheBuster,
+            IUmbracoVersion umbracoVersion)
         {
             _umbracoServices = umbracoServices;
             _profilingLogger = profilingLogger;
@@ -68,6 +70,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             _publishedValueFallback = publishedValueFallback;
             _loadContextManager = loadContextManager;
             _runtimeCompilationCacheBuster = runtimeCompilationCacheBuster;
+            _umbracoVersion = umbracoVersion;
             _errors = new ModelsGenerationError(config, _hostingEnvironment);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
@@ -392,7 +395,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             }
 
             IList<TypeModel> typeModels = UmbracoServices.GetAllTypes();
-            var currentHash = TypeModelHasher.Hash(typeModels);
+            var currentHash = TypeModelHasher.Hash(typeModels, _umbracoVersion.SemanticVersion);
             var modelsHashFile = Path.Combine(_pureLiveDirectory.Value, "models.hash");
             var modelsSrcFile = Path.Combine(_pureLiveDirectory.Value, "models.generated.cs");
             var projFile = Path.Combine(_pureLiveDirectory.Value, "all.generated.cs");
@@ -712,7 +715,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
                 File.Delete(file);
             }
 
-            var builder = new TextBuilder(_config, typeModels);
+            var builder = new TextBuilder(_config, typeModels, _umbracoVersion);
 
             var codeBuilder = new StringBuilder();
             builder.Generate(codeBuilder, builder.GetModelsToGenerate());

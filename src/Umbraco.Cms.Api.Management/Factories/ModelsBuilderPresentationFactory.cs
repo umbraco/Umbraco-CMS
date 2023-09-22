@@ -14,11 +14,13 @@ public class ModelsBuilderPresentationFactory : IModelsBuilderPresentationFactor
     private ModelsBuilderSettings _modelsBuilderSettings;
     private readonly ModelsGenerationError _mbErrors;
     private readonly OutOfDateModelsStatus _outOfDateModels;
+    private readonly IUmbracoVersion _umbracoVersion;
 
-    public ModelsBuilderPresentationFactory(IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings, ModelsGenerationError mbErrors, OutOfDateModelsStatus outOfDateModels)
+    public ModelsBuilderPresentationFactory(IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings, ModelsGenerationError mbErrors, OutOfDateModelsStatus outOfDateModels, IUmbracoVersion umbracoVersion)
     {
         _mbErrors = mbErrors;
         _outOfDateModels = outOfDateModels;
+        _umbracoVersion = umbracoVersion;
         _modelsBuilderSettings = modelsBuilderSettings.CurrentValue;
 
         modelsBuilderSettings.OnChange(x => _modelsBuilderSettings = x);
@@ -32,7 +34,7 @@ public class ModelsBuilderPresentationFactory : IModelsBuilderPresentationFactor
             CanGenerate = _modelsBuilderSettings.ModelsMode.SupportsExplicitGeneration(),
             OutOfDateModels = _outOfDateModels.IsOutOfDate,
             LastError = _mbErrors.GetLastError(),
-            Version = ApiVersion.Current.Version.ToString(),
+            Version = _umbracoVersion.Version.ToString(),
             ModelsNamespace = _modelsBuilderSettings.ModelsNamespace,
             TrackingOutOfDateModels = _modelsBuilderSettings.FlagOutOfDateModels,
         };

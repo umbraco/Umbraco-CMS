@@ -19,6 +19,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 public class UpdateCheckController : UmbracoAuthorizedJsonController
 {
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+    private readonly ISemVersionFactory _semVersionFactory;
     private readonly ICookieManager _cookieManager;
     private readonly GlobalSettings _globalSettings;
     private readonly IUmbracoVersion _umbracoVersion;
@@ -29,13 +30,15 @@ public class UpdateCheckController : UmbracoAuthorizedJsonController
         IUmbracoVersion umbracoVersion,
         ICookieManager cookieManager,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IOptionsSnapshot<GlobalSettings> globalSettings)
+        IOptionsSnapshot<GlobalSettings> globalSettings,
+        ISemVersionFactory semVersionFactory)
     {
         _upgradeService = upgradeService ?? throw new ArgumentNullException(nameof(upgradeService));
         _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
         _cookieManager = cookieManager ?? throw new ArgumentNullException(nameof(cookieManager));
         _backofficeSecurityAccessor = backofficeSecurityAccessor ??
                                       throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
+        _semVersionFactory = semVersionFactory;
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
     }
 
@@ -49,7 +52,7 @@ public class UpdateCheckController : UmbracoAuthorizedJsonController
         {
             try
             {
-                var version = new SemVersion(_umbracoVersion.Version.Major, _umbracoVersion.Version.Minor,
+                var version = _semVersionFactory.Create(_umbracoVersion.Version.Major, _umbracoVersion.Version.Minor,
                     _umbracoVersion.Version.Build, _umbracoVersion.Comment);
                 UpgradeResult result = await _upgradeService.CheckUpgrade(version);
 

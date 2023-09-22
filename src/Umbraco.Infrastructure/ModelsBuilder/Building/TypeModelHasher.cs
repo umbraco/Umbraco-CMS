@@ -1,11 +1,12 @@
 using System.Text;
+using Umbraco.Cms.Core.Semver;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 
 public class TypeModelHasher
 {
-    public static string Hash(IEnumerable<TypeModel> typeModels)
+    public static string Hash(IEnumerable<TypeModel> typeModels, SemVersion semVersion)
     {
         var builder = new StringBuilder();
 
@@ -35,7 +36,7 @@ public class TypeModelHasher
         }
 
         // Include the MB version in the hash so that if the MB version changes, models are rebuilt
-        builder.AppendLine(ApiVersion.Current.Version.ToString());
+        builder.AppendLine(semVersion.ToString());
 
         return builder.ToString().GenerateHash();
     }

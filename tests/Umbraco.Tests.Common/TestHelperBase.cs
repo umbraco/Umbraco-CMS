@@ -21,9 +21,11 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.SemanticVersioning;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Extensions;
@@ -163,7 +165,8 @@ public abstract class TestHelperBase
         return relativePath.Replace("~/", bin + "/");
     }
 
-    public IUmbracoVersion GetUmbracoVersion() => new UmbracoVersion();
+    public IUmbracoVersion GetUmbracoVersion() => new UmbracoVersion(GetSemVersionFactory());
+    public ISemVersionFactory GetSemVersionFactory() => new SemVersionFactory();
 
     public IServiceCollection GetRegister() => new ServiceCollection();
 
