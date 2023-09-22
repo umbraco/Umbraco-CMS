@@ -113,6 +113,13 @@ stages:
               targetPath: $(Build.SourcesDirectory)
               artifactName: build_output
 
+      - job: B
+        displayName: Checking on breaking changes
+        dependsOn: A
+        condition: failed()
+        steps:
+          - script: echo "The main build failed"
+
   - stage: Build_Docs
     condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.buildApiDocs}}))
     displayName: Prepare API Documentation
