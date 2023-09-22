@@ -94,7 +94,9 @@ stages:
               echo "##vso[task.setvariable variable=majorVersion;isOutput=true]$major"
             displayName: Set major version
             name: determineMajorVersion
-          - script: dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg > "$(Build.SourcesDirectory)/dotnetpack.txt"
+          - script: |
+              dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg > "$(Build.ArtifactStagingDirectory)/dotnetpack.txt"
+
             displayName: Run dotnet pack
           - task: PowerShell@2
             displayName: Handling dotnet pack failure
@@ -103,7 +105,7 @@ stages:
               targetType: 'inline'
               script: |
                 echo "Running dotnet pack failed"
-                $log = Get-Content -Path "$(Build.SourcesDirectory)/dotnetpack.txt"
+                $log = Get-Content -Path "$(Build.ArtifactStagingDirectory)/dotnetpack.txt"
                 echo "donet pack log: $log"
                 if ($log.contains('breaking')) {
                   Write-Host "There are breaking changes"
