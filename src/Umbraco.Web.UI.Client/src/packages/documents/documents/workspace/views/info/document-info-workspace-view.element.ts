@@ -138,8 +138,8 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 
 	render() {
 		return html`<div class="container">
-				<uui-box headline="Links" style="--uui-box-default-padding: 0;"> ${this.#renderLinksSection()} </uui-box>
-				<uui-box headline="History">
+				<uui-box headline=${this.localize.term('general_links')} style="--uui-box-default-padding: 0;"> ${this.#renderLinksSection()} </uui-box>
+				<uui-box headline=${this.localize.term('general_history')}>
 					<umb-history-list>
 						${repeat(
 							this._historyList,
@@ -164,7 +164,7 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 			</a>
 			<div class="link-item">
 				<span class="link-language">en-EN</span>
-				<span class="link-content italic"> This document is published but is not in the cache</span>
+				<span class="link-content italic"><umb-localize key="content_parentNotPublishedAnomaly"></umb-localize></span>
 			</div>
 		</div>`;
 	}
@@ -172,35 +172,36 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 	#renderGeneralSection() {
 		return html`
 			<div class="general-item">
-				<strong>Status</strong>
-				<span><uui-tag color="positive" look="primary" label="Published">Published</uui-tag></span>
+				<strong>${this.localize.term('content_publishStatus')}</strong>
+				<span><uui-tag color="positive" look="primary" label=${this.localize.term('content_published')}><umb-localize key="content_published"></umb-localize></uui-tag></span>
 			</div>
 			<div class="general-item">
-				<strong>Created Date</strong>
-				<span>...</span>
+				<strong><umb-localize key="content_createDate"></umb-localize></strong>
+				<span><umb-localize key="${new Date}" type="date"></umb-localize></span>
 			</div>
 			<div class="general-item">
-				<strong>Document Type</strong>
+				<strong><umb-localize key="content_documentType"></umb-localize></strong>
 				<uui-button
 					href=${this._editDocumentTypePath + 'edit/' + this._documentTypeId}
-					label="Edit Document Type"></uui-button>
+					label=${this.localize.term('general_edit')}></uui-button>
 			</div>
 			<div class="general-item">
-				<strong>Template</strong>
-				<span>template picker?</span>
+				<strong><umb-localize key="template_template"></umb-localize></strong>
+				<span>IMPLEMENT template picker?</span>
 			</div>
 			<div class="general-item">
-				<strong>Id</strong>
+				<strong><umb-localize key="template_id"></umb-localize></strong>
 				<span>...</span>
 			</div>
 		`;
 	}
 
 	#renderHistory(history: HistoryNode) {
-		return html` <umb-history-item .name="${history.userName}" .detail="${history.timestamp}">
-			<span class="log-type">${this.#renderTag(history.logType)} ${this.#renderTagDescription(history.logType)}</span>
-			<uui-button label="Rollback" look="secondary" slot="actions">
-				<uui-icon name="umb:undo"></uui-icon> Rollback
+		return html` <umb-history-item .name="${history.userName}" .detail="${this.localize.date(history.timestamp!)}">
+			<span class="log-type">${this.#renderTag(history.logType)} ${this.#renderTagDescription(history.logType, history)}</span>
+			<uui-button label=${this.localize.term('actions_rollback')} look="secondary" slot="actions">
+				<uui-icon name="umb:undo"></uui-icon> 
+				<umb-localize key="actions_rollback"></umb-localize>
 			</uui-button>
 		</umb-history-item>`;
 	}
@@ -220,34 +221,34 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 	#renderTag(type?: HistoryLogType) {
 		switch (type) {
 			case 'Publish':
-				return html`<uui-tag look="primary" color="positive" label="Publish">Publish</uui-tag>`;
+				return html`<uui-tag look="primary" color="positive" label=${this.localize.term('content_publish')}><umb-localize key="content_publish"></umb-localize></uui-tag>`;
 			case 'Unpublish':
-				return html`<uui-tag look="primary" color="warning" label="Unpublish">Unpublish</uui-tag>`;
+				return html`<uui-tag look="primary" color="warning" label=${this.localize.term('content_unpublish')}><umb-localize key="content_unpublish"></umb-localize></uui-tag>`;
 			case 'Save':
-				return html`<uui-tag look="primary" label="Save">Save</uui-tag>`;
+				return html`<uui-tag look="primary" label=${this.localize.term('auditTrails_smallSave')}><umb-localize key="auditTrails_smallSave"></umb-localize></uui-tag>`;
 			case 'ContentVersionEnableCleanup':
-				return html`<uui-tag look="secondary" label="Content Version Enable Cleanup">Save</uui-tag>`;
+				return html`<uui-tag look="secondary" label=${this.localize.term('contentTypeEditor_historyCleanupEnableCleanup')}><umb-localize key="contentTypeEditor_historyCleanupEnableCleanup"></umb-localize></uui-tag>`;
 			case 'ContentVersionPreventCleanup':
-				return html`<uui-tag look="secondary" label="Content Version Prevent Cleanup">Save</uui-tag>`;
+				return html`<uui-tag look="secondary" label=${this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}><umb-localize key="contentTypeEditor_historyCleanupPreventCleanup"></umb-localize></uui-tag>`;
 			default:
-				return 'Could not detech log type';
+				return 'Could not detect log type';
 		}
 	}
 
-	#renderTagDescription(type?: HistoryLogType, params?: string) {
+	#renderTagDescription(type?: HistoryLogType, params?: HistoryNode) {
 		switch (type) {
 			case 'Publish':
-				return html`Content published`;
+				return this.localize.term('auditTrails_publish');
 			case 'Unpublish':
-				return html`Content unpublished`;
+				return this.localize.term('auditTrails_unpublish');
 			case 'Save':
-				return html`Content saved`;
+				return this.localize.term('auditTrails_save');
 			case 'ContentVersionEnableCleanup':
-				return html`Cleanup enabled for version: ${params}`;
+				return this.localize.term('auditTrails_contentversionenablecleanup', [params?.nodeId]);
 			case 'ContentVersionPreventCleanup':
-				return html`Cleanup disabled for version: ${params}`;
+				return this.localize.term('auditTrails_contentversionpreventcleanup', [params?.nodeId]);
 			default:
-				return 'Could not detech log type';
+				return 'Could not detect log type';
 		}
 	}
 

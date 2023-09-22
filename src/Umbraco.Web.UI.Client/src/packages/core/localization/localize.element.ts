@@ -9,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-localize')
 export class UmbLocalizeElement extends UmbLitElement {
 	/**
-	 * The key to localize. The key is case sensitive.
+	 * The key to localize. The key is case sensitive. For non-term localizations, this is the input
 	 * @attr
 	 * @example key="general_ok"
 	 */
@@ -34,10 +34,36 @@ export class UmbLocalizeElement extends UmbLitElement {
 	@property()
 	debug = false;
 
+	@property()
+	type: 'term' | 'date' | 'number' | 'relativeTime' = 'term';
+
+	@property()
+	unit: Intl.RelativeTimeFormatUnit = 'seconds';
+
+	@property() 
+	options?: Intl.DateTimeFormatOptions | Intl.NumberFormatOptions | Intl.RelativeTimeFormatOptions;
+	
 	@state()
 	protected get text(): string {
-		const localizedValue = this.localize.term(this.key, ...(this.args ?? []));
+		let localizedValue = '';
 
+		switch (this.type) {
+			case 'term':
+				localizedValue = this.localize.term(this.key, ...(this.args ?? []));
+				break;
+			case 'date':
+				localizedValue = this.localize.date(this.key, this.options as Intl.DateTimeFormatOptions);
+				break;
+			case 'number':
+				localizedValue = this.localize.number(this.key, this.options as Intl.NumberFormatOptions);
+				break;				
+			case 'relativeTime':
+				localizedValue = this.localize.relativeTime(+this.key, this.unit, this.options as Intl.RelativeTimeFormatOptions);
+				break;		
+			default:
+				throw('unsupported type')
+				break;
+		}
 		// If the value is the same as the key, it means the key was not found.
 		if (localizedValue === this.key) {
 			(this.getHostElement() as HTMLElement).setAttribute('data-localize-missing', this.key);
@@ -50,11 +76,11 @@ export class UmbLocalizeElement extends UmbLitElement {
 	}
 
 	protected render() {
-		return this.text
+		return this.text.trim()
 			? html`${unsafeHTML(this.text)}`
 			: this.debug
-			? html`<span style="color:red">${this.key}</span>`
-			: html`<slot></slot>`;
+				? html`<span style="color:red">${this.key}</span>`
+				: html`<slot></slot>`;
 	}
 
 	static styles = [
