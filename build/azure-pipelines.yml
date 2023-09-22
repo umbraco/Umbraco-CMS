@@ -96,12 +96,15 @@ stages:
             name: determineMajorVersion
           - script: dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg > "$(Build.SourcesDirectory)/dotnetpack.txt"
             displayName: Run dotnet pack
-          - script: |
-              echo "Running dotnet pack failed"
-              $log = Get-Content -Path "$(Build.SourcesDirectory)\dotnetpack.txt"
-              Write-Host $log
+          - task: PowerShell@2
             displayName: Handling dotnet pack failure
             condition: failed()
+            inpputs:
+              targetType: 'inline'
+              script: |
+                echo "Running dotnet pack failed"
+                $log = Get-Content -Path "$(Build.SourcesDirectory)/dotnetpack.txt"
+                Write-Host $log
           - script: |
               sha="$(Build.SourceVersion)"
               sha=${sha:0:7}
