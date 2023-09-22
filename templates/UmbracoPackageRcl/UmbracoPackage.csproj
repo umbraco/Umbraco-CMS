@@ -24,4 +24,21 @@
     <PackageReference Include="Umbraco.Cms.Web.Website" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
     <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="package.json" Pack="False" />
+    <Content Update="package-lock.json" Pack="False" />
+    <Content Update="tsconfig.json" Pack="False" />
+  </ItemGroup>
+
+  <Target Name="NpmInstall" AfterTargets="Restore;Build" Inputs="package-lock.json" Outputs="node_modules\.package-lock.json">
+    <Message Text="Installing NPM packages" Importance="High" />
+    <Exec Command="npm ci --no-fund --no-audit --prefer-offline" />
+  </Target>
+
+  <Target Name="NpmBuild" AfterTargets="Build;NpmInstall">
+    <Message Text="Executing NPM build script" Importance="High" />
+    <Exec Command="npm run build" />
+  </Target>
+
 </Project>

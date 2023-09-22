@@ -1,0 +1,19 @@
+{
+  "name": "UmbracoPackage",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsc && vite build --watch",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lit": "^2.8.0"
+  },
+  "devDependencies": {
+    "@umbraco-cms/backoffice": "^14.0.0--preview003",
+    "typescript": "^5.2.2",
+    "vite": "^4.4.9"
+  }
+}
