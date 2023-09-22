@@ -104,7 +104,13 @@ stages:
               script: |
                 echo "Running dotnet pack failed"
                 $log = Get-Content -Path "$(Build.SourcesDirectory)/dotnetpack.txt"
-                Write-Host $log
+                echo "donet pack log: $log"
+                if ($log.contains('breaking')) {
+                  Write-Host "There are breaking changes"
+                }
+                else {
+                  Write-Host "Error not due to breaking change"
+                }
           - script: |
               sha="$(Build.SourceVersion)"
               sha=${sha:0:7}
