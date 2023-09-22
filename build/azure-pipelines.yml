@@ -99,7 +99,7 @@ stages:
           - task: PowerShell@2
             displayName: Handling dotnet pack failure
             condition: failed()
-            inpputs:
+            inputs:
               targetType: 'inline'
               script: |
                 echo "Running dotnet pack failed"
