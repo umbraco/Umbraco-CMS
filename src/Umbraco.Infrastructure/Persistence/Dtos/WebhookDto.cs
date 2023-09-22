@@ -22,9 +22,6 @@ internal class WebhookDto
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string Url { get; set; } = string.Empty;
 
-    [Column(Name = "entityKey")]
-    public Guid EntityKey { get; set; }
-
     [Column(Name = "enabled")]
     public bool Enabled { get; set; }
 }
