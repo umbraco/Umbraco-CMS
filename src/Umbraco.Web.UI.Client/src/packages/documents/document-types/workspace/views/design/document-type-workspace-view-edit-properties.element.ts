@@ -1,7 +1,7 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import './document-type-workspace-view-edit-property.element.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbSorterController, UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -12,6 +12,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+
 const SORTER_CONFIG: UmbSorterConfig<DocumentTypePropertyTypeResponseModel> = {
 	compareElementToModel: (element: HTMLElement, model: DocumentTypePropertyTypeResponseModel) => {
 		return element.getAttribute('data-umb-property-id') === model.id;
@@ -19,11 +20,14 @@ const SORTER_CONFIG: UmbSorterConfig<DocumentTypePropertyTypeResponseModel> = {
 	querySelectModelToElement: (container: HTMLElement, modelEntry: DocumentTypePropertyTypeResponseModel) => {
 		return container.querySelector('data-umb-property-id[' + modelEntry.id + ']');
 	},
+	placeholderClass: 'select',
 	identifier: 'content-type-property-sorter',
 	itemSelector: '[data-umb-property-id]',
 	disabledItemSelector: '[inherited]',
 	containerSelector: '#property-list',
+	resolveVerticalDirection: () => false,
 };
+
 @customElement('umb-document-type-workspace-view-edit-properties')
 export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	#propertySorter = new UmbSorterController(this, {
@@ -40,9 +44,11 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 							0) + 1;
 				}
 			}
+			console.log('perform insert', sortOrder, args.item.id);
 			return this._propertyStructureHelper.insertProperty(args.item, sortOrder);
 		},
 		performItemRemove: (args) => {
+			console.log('perform remove');
 			return this._propertyStructureHelper.removeProperty(args.item.id!);
 		},
 	});
@@ -104,14 +110,13 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
 			.addAdditionalPath('new-property')
 			.onSetup(async () => {
-
 				const documentTypeId = this._ownerDocumentTypes?.find(
 					(types) => types.containers?.find((containers) => containers.id === this.containerId),
 				)?.id;
-				if(documentTypeId === undefined) return false;
+				if (documentTypeId === undefined) return false;
 				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
-				if(propertyData === undefined) return false;
-				return {propertyData, documentTypeId};
+				if (propertyData === undefined) return false;
+				return { propertyData, documentTypeId };
 			})
 			.onSubmit((result) => {
 				this.#addProperty(result);

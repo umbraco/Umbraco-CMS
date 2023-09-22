@@ -87,10 +87,10 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			.addUniquePaths(['propertyId'])
 			.onSetup(() => {
 				const documentTypeId = this.ownerDocumentTypeId;
-				if(documentTypeId === undefined) return false;
+				if (documentTypeId === undefined) return false;
 				const propertyData = this.property;
-				if(propertyData === undefined) return false;
-				return {propertyData, documentTypeId};
+				if (propertyData === undefined) return false;
+				return { propertyData, documentTypeId };
 			})
 			.onSubmit((result) => {
 				this._partialUpdate(result);
@@ -233,8 +233,8 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 						${this.renderPropertyTags()}
 						<uui-tag look="default" class="inherited">
 							<uui-icon name="umb:merge"></uui-icon>
-							<span class="uui-text">
-								${this.localize.term('contentTypeEditor_inheritedFrom')}
+							<span
+								>${this.localize.term('contentTypeEditor_inheritedFrom')}
 								<a href=${this._editDocumentTypePath + 'edit/' + this.ownerDocumentTypeId}>
 									${this.ownerDocumentTypeName ?? '??'}
 								</a>
