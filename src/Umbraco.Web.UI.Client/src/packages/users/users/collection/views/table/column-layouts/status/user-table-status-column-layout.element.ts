@@ -1,4 +1,4 @@
-import { getLookAndColorFromUserStatus } from '../../../../../../utils.js';
+import { getDisplayStateFromUserStatus } from '../../../../../../utils.js';
 import { html, LitElement, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-user-table-status-column-layout')
@@ -10,8 +10,8 @@ export class UmbUserTableStatusColumnLayoutElement extends LitElement {
 		return html`${this.value.status && this.value.status !== 'enabled'
 			? html`<uui-tag
 					size="s"
-					look="${getLookAndColorFromUserStatus(this.value.status).look}"
-					color="${getLookAndColorFromUserStatus(this.value.status).color}">
+					look="${getDisplayStateFromUserStatus(this.value.status).look}"
+					color="${getDisplayStateFromUserStatus(this.value.status).color}">
 					${this.value.status}
 			  </uui-tag>`
 			: nothing}`;

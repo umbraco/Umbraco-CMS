@@ -1,4 +1,4 @@
-import { getLookAndColorFromUserStatus } from '../../../../utils.js';
+import { getDisplayStateFromUserStatus } from '../../../../utils.js';
 import { UmbUserCollectionContext } from '../../user-collection.context.js';
 import { type UmbUserDetail } from '../../../types.js';
 import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
@@ -63,24 +63,24 @@ export class UmbUserCollectionGridViewElement extends UmbLitElement {
 			return nothing;
 		}
 
-		const statusLook = getLookAndColorFromUserStatus(user.state);
+		const statusLook = getDisplayStateFromUserStatus(user.state);
 		return html`<uui-tag
 			slot="tag"
 			size="s"
 			look="${ifDefined(statusLook?.look)}"
 			color="${ifDefined(statusLook?.color)}">
-			${user.state}
+			<umb-localize key=${'user_'+statusLook.key}></umb-localize>
 		</uui-tag>`;
 	}
 
 	#renderUserLoginDate(user: UmbUserDetail) {
 		if (!user.lastLoginDate) {
-			return html`<div class="user-login-time">${`${user.name} has not logged in yet`}</div>`;
+			return html`<div class="user-login-time">${`${user.name} ${this.localize.term('user_noLogin')}`}</div>`;
 		}
 
 		return html`<div class="user-login-time">
-			<div>Last login</div>
-			${user.lastLoginDate}
+			<umb-localize key="user_lastLogin"></umb-localize><br/>
+			${this.localize.date(user.lastLoginDate)}
 		</div>`;
 	}
 
