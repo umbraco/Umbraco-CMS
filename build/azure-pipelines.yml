@@ -102,7 +102,7 @@ stages:
                 echo "Running dotnet pack"
                 $outputFile = "$(Build.SourcesDirectory)/dotnetpack.txt"
                 echo "$outputFile"
-                dir . °> $outputFile
+                dir . *> $outputFile
                 dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
                 $log = Get-Content -Path $outputFile
                 echo "dotnet pack log: $log"
