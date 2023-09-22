@@ -165,9 +165,23 @@
         function configureViewModel(isInitLoad) {
             if (vm.value) {
                 if (Utilities.isString(vm.value) && vm.value.length > 0) {
-                    if (vm.config.storageType === "Json") {
+
+                    let parsedJson = undefined;
+                    let isValidJson = true;
+                    if (vm.config.storageType === "Json"){
+                        try{
+                            parsedJson = JSON.parse(vm.value);
+                        }
+                        catch(e){
+                            // This can happen if you switch a tag editor from csv to json, and the value is still returned as a csv string.
+                            // The value will be saved as a json string on the next save or publish.
+                            isValidJson = false;
+                        }
+                    }
+
+                    if (vm.config.storageType === "Json" && isValidJson) {
                         //json storage
-                        vm.viewModel = JSON.parse(vm.value);
+                        vm.viewModel = parsedJson;
 
                         //if this is the first load, we are just re-formatting the underlying model to be consistent
                         //we don't want to notify the component parent of any changes, that will occur if the user actually
@@ -177,7 +191,7 @@
                         }
                     }
                     else {
-                        //csv storage
+                        //csv storage / fallback if not valid json
 
                         // split the csv string, and remove any duplicate values
                         let tempArray = vm.value.split(',').map(function (v) {
