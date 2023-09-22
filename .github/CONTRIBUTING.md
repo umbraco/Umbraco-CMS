@@ -19,6 +19,7 @@ We also encourage community members to feel free to comment on others' pull requ
   * [What can I contribute?](#what-can-i-contribute)
     + [Making larger changes](#making-larger-changes)
     + [Pull request or package?](#pull-request-or-package)
+    + [Unwanted changes](#unwanted-changes)
     + [Ownership and copyright](#ownership-and-copyright)
 - [Finding your first issue: Up for grabs](#finding-your-first-issue-up-for-grabs)
 - [Making your changes](#making-your-changes)
