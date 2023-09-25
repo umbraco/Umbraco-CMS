@@ -86,7 +86,9 @@ internal class Property : PublishedPropertyBase
         _isPreviewing = content.IsPreviewing;
         _isMember = content.ContentType.ItemType == PublishedItemType.Member;
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
-        _variations = propertyType.Variations;
+        // this variable is used for contextualizing the variation level when calculating property values.
+        // it must be set to the union of variance (the combination of content type and property type variance).
+        _variations = propertyType.Variations | content.ContentType.Variations;
     }
 
     // clone for previewing as draft a published content that is published and has no draft
