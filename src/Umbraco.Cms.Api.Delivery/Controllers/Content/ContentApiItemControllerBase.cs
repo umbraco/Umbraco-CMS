@@ -31,13 +31,28 @@ public abstract class ContentApiItemControllerBase : ContentApiControllerBase
     [Obsolete($"Please use {nameof(IPublicAccessService)} to test for content protection. Will be removed in V14.")]
     protected bool IsProtected(IPublishedContent content) => _publicAccessService.IsProtected(content.Path);
 
-    protected async Task<IActionResult?> HandleMemberAccessAsync(IPublishedContent content, IRequestMemberAccessService requestMemberAccessService)
+    protected async Task<IActionResult?> HandleMemberAccessAsync(IPublishedContent contentItem, IRequestMemberAccessService requestMemberAccessService)
     {
-        PublicAccessStatus accessStatus = await requestMemberAccessService.MemberHasAccessToAsync(content);
+        PublicAccessStatus accessStatus = await requestMemberAccessService.MemberHasAccessToAsync(contentItem);
         return accessStatus is PublicAccessStatus.AccessAccepted
             ? null
             : accessStatus is PublicAccessStatus.AccessDenied
                 ? Forbidden()
                 : Unauthorized();
+    }
+
+    protected async Task<IActionResult?> HandleMemberAccessAsync(IEnumerable<IPublishedContent> contentItems, IRequestMemberAccessService requestMemberAccessService)
+    {
+        foreach (IPublishedContent content in contentItems)
+        {
+            IActionResult? result = await HandleMemberAccessAsync(content, requestMemberAccessService);
+            // if any of the content items yield an error based on the current member access, return that error
+            if (result is not null)
+            {
+                return result;
+            }
+        }
+
+        return null;
     }
 }

@@ -1,7 +1,9 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
@@ -12,13 +14,40 @@ namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 [ApiVersion("1.0")]
 public class ByIdsContentApiController : ContentApiItemControllerBase
 {
+    private readonly IRequestMemberAccessService _requestMemberAccessService;
+
+    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
     public ByIdsContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,
         IPublicAccessService publicAccessService)
-        : base(apiPublishedContentCache, apiContentResponseBuilder, publicAccessService)
+        : this(
+            apiPublishedContentCache,
+            apiContentResponseBuilder,
+            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberAccessService>())
     {
     }
+
+    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
+    public ByIdsContentApiController(
+        IApiPublishedContentCache apiPublishedContentCache,
+        IApiContentResponseBuilder apiContentResponseBuilder,
+        IPublicAccessService publicAccessService,
+        IRequestMemberAccessService requestMemberAccessService)
+        : this(
+            apiPublishedContentCache,
+            apiContentResponseBuilder,
+            requestMemberAccessService)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public ByIdsContentApiController(
+        IApiPublishedContentCache apiPublishedContentCache,
+        IApiContentResponseBuilder apiContentResponseBuilder,
+        IRequestMemberAccessService requestMemberAccessService)
+        : base(apiPublishedContentCache, apiContentResponseBuilder)
+        => _requestMemberAccessService = requestMemberAccessService;
 
     /// <summary>
     ///     Gets content items by ids.
@@ -28,12 +57,17 @@ public class ByIdsContentApiController : ContentApiItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<IApiContentResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
+    public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
-        IEnumerable<IPublishedContent> contentItems = ApiPublishedContentCache.GetByIds(ids);
+        IPublishedContent[] contentItems = ApiPublishedContentCache.GetByIds(ids).ToArray();
+
+        IActionResult? deniedAccessResult = await HandleMemberAccessAsync(contentItems, _requestMemberAccessService);
+        if (deniedAccessResult is not null)
+        {
+            return deniedAccessResult;
+        }
 
         IApiContentResponse[] apiContentItems = contentItems
-            .Where(contentItem => !IsProtected(contentItem))
             .Select(ApiContentResponseBuilder.Build)
             .WhereNotNull()
             .ToArray();
