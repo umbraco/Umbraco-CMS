@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Security;
 /// <summary>
 ///     Checks user access to media
 /// </summary>
-// FIXME: Consider deleting this for v14 - some of the logic is migrated into <see cref="MediaPermissionsService"/>
+// FIXME: Consider deleting this for v14 - the logic is migrated into <see cref="MediaPermissionsService"/>
 public class MediaPermissions
 {
     private readonly AppCaches _appCaches;
@@ -38,6 +38,7 @@ public class MediaPermissions
     /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
     /// <param name="media"></param>
     /// <returns></returns>
+    // Migrated as IMediaPermissionsService.AuthorizeRootAccessAsync and IMediaPermissionsService.AuthorizeBinAccessAsync
     public MediaAccess CheckPermissions(IUser? user, int nodeId, out IMedia? media)
     {
         if (user == null)
@@ -66,6 +67,7 @@ public class MediaPermissions
         return hasPathAccess ? MediaAccess.Granted : MediaAccess.Denied;
     }
 
+    // Migrated as IMediaPermissionsService.AuthorizeAccessAsync
     public MediaAccess CheckPermissions(IMedia? media, IUser? user)
     {
         if (user == null)

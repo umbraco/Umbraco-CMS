@@ -34,4 +34,16 @@ internal sealed class MediaPermissionsService : IMediaPermissionsService
             ? MediaAuthorizationStatus.Success
             : MediaAuthorizationStatus.UnauthorizedMissingPathAccess;
     }
+
+    /// <inheritdoc/>
+    public async Task<MediaAuthorizationStatus> AuthorizeRootAccessAsync(IUser performingUser)
+        => performingUser.HasMediaRootAccess(_entityService, _appCaches)
+            ? MediaAuthorizationStatus.Success
+            : MediaAuthorizationStatus.UnauthorizedMissingRootAccess;
+
+    /// <inheritdoc/>
+    public async Task<MediaAuthorizationStatus> AuthorizeBinAccessAsync(IUser performingUser)
+        => performingUser.HasMediaBinAccess(_entityService, _appCaches)
+            ? MediaAuthorizationStatus.Success
+            : MediaAuthorizationStatus.UnauthorizedMissingBinAccess;
 }
