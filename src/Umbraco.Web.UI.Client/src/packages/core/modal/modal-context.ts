@@ -41,14 +41,14 @@ type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
 	  };
 
 // TODO: consider splitting this into two separate handlers
-export class UmbModalContextClass<ModalData extends object = object, ModalResult = unknown>
+export class UmbModalContextClass<ModalPreset extends object = object, ModalValue = unknown>
 	extends EventTarget
 	implements UmbController
 {
 	#host: UmbControllerHostElement;
 
-	#submitPromise: Promise<ModalResult>;
-	#submitResolver?: (value: ModalResult) => void;
+	#submitPromise: Promise<ModalValue>;
+	#submitResolver?: (value: ModalValue) => void;
 	#submitRejecter?: () => void;
 
 	private _modalExtensionObserver?: UmbObserverController<ManifestModal | undefined>;
@@ -60,7 +60,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	public readonly innerElement = this.#innerElement.asObservable();
 
 	public readonly key: string;
-	public readonly data: ModalData;
+	public readonly data: ModalPreset;
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
 
@@ -71,8 +71,8 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	constructor(
 		host: UmbControllerHostElement,
 		router: IRouterSlot | null,
-		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
-		data?: ModalData,
+		modalAlias: string | UmbModalToken<ModalPreset, ModalValue>,
+		data?: ModalPreset,
 		config?: UmbModalConfig,
 	) {
 		super();
@@ -88,7 +88,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 		this.size = config?.size || this.size;
 
 		const defaultData = modalAlias instanceof UmbModalToken ? modalAlias.getDefaultData() : undefined;
-		this.data = Object.freeze({ ...defaultData, ...data } as ModalData);
+		this.data = Object.freeze({ ...defaultData, ...data } as ModalPreset);
 
 		// TODO: Consider if its right to use Promises, or use another event based system? Would we need to be able to cancel an event, to then prevent the closing..?
 		this.#submitPromise = new Promise((resolve, reject) => {
@@ -124,7 +124,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 			UMB_MODAL_CONTEXT_TOKEN,
 
 			// Note, We are doing the Typing dance here because of the way we are correcting the submit method attribute type.
-			this as unknown as UmbModalContext<ModalData, ModalResult>,
+			this as unknown as UmbModalContext<ModalPreset, ModalValue>,
 		);
 
 		this.#host.addController(this);
@@ -209,8 +209,8 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	 * @public
 	 * @memberof UmbModalContext
 	 */
-	private submit(result?: ModalResult) {
-		this.#submitResolver?.(result as ModalResult);
+	private submit(result?: ModalValue) {
+		this.#submitResolver?.(result as ModalValue);
 		this.modalElement.close();
 	}
 
@@ -228,7 +228,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	 * @public
 	 * @memberof UmbModalContext
 	 */
-	public onSubmit(): Promise<ModalResult> {
+	public onSubmit(): Promise<ModalValue> {
 		return this.#submitPromise;
 	}
 
