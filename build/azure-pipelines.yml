@@ -301,6 +301,8 @@ stages:
         pool:
           vmImage: $(vmImage)
         steps:
+          - checkout: self
+            submodules: true
           - task: DownloadPipelineArtifact@2
             displayName: Download build artifacts
             inputs:
