@@ -6,7 +6,7 @@ import type { ManifestModal, UmbModalExtensionElement } from '@umbraco-cms/backo
 export abstract class UmbModalBaseElement<
 		ModalDataType extends object = object,
 		ModalResultType = unknown,
-		ModalManifestType extends ManifestModal = ManifestModal
+		ModalManifestType extends ManifestModal = ManifestModal,
 	>
 	extends UmbLitElement
 	implements UmbModalExtensionElement<ModalDataType, ModalResultType, ModalManifestType>
