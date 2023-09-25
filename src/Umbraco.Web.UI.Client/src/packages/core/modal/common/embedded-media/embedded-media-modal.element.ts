@@ -1,10 +1,10 @@
 import { css, html, unsafeHTML, when, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	OEmbedResult,
 	OEmbedStatus,
 	UmbEmbeddedMediaModalData,
-	UmbEmbeddedMediaModalResult,
+	UmbEmbeddedMediaModalValue,
 } from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
@@ -23,7 +23,7 @@ interface UmbEmbeddedMediaModalModel {
 @customElement('umb-embedded-media-modal')
 export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	UmbEmbeddedMediaModalData,
-	UmbEmbeddedMediaModalResult
+	UmbEmbeddedMediaModalValue
 > {
 	#loading = false;
 	#embedResult!: OEmbedResult;
@@ -77,7 +77,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 						url: this._model.url,
 						width: this._model.width?.toString(),
 						height: this._model.height?.toString(),
-					} as { [key: string]: string })
+					} as { [key: string]: string }),
 			);
 
 			this.#embedResult = await result.json();
@@ -179,14 +179,18 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 
 					${when(
 						this.#embedResult?.oEmbedStatus === OEmbedStatus.Success || this._model.a11yInfo,
-						() => html` <umb-workspace-property-layout label="Preview" orientation="vertical">
-							<div slot="editor">
-								${when(this.#loading, () => html`<uui-loader-circle></uui-loader-circle>`)}
-								${when(this.#embedResult?.markup, () => html`${unsafeHTML(this.#embedResult.markup)}`)}
-								${when(this._model.info, () => html` <p aria-hidden="true">${this._model.info}</p>`)}
-								${when(this._model.a11yInfo, () => html` <p class="sr-only" role="alert">${this._model.a11yInfo}</p>`)}
-							</div>
-						</umb-workspace-property-layout>`
+						() =>
+							html` <umb-workspace-property-layout label="Preview" orientation="vertical">
+								<div slot="editor">
+									${when(this.#loading, () => html`<uui-loader-circle></uui-loader-circle>`)}
+									${when(this.#embedResult?.markup, () => html`${unsafeHTML(this.#embedResult.markup)}`)}
+									${when(this._model.info, () => html` <p aria-hidden="true">${this._model.info}</p>`)}
+									${when(
+										this._model.a11yInfo,
+										() => html` <p class="sr-only" role="alert">${this._model.a11yInfo}</p>`,
+									)}
+								</div>
+							</umb-workspace-property-layout>`,
 					)}
 
 					<umb-workspace-property-layout label="Width" orientation="vertical">

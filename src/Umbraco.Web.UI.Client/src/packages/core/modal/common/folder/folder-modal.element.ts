@@ -1,6 +1,6 @@
 import { css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { UmbFolderModalData, UmbFolderModalResult, UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbFolderModalData, UmbFolderModalValue, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionClass, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
@@ -11,7 +11,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 @customElement('umb-folder-modal')
 export class UmbFolderModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbFolderModalData, UmbFolderModalResult>;
+	modalContext?: UmbModalContext<UmbFolderModalData, UmbFolderModalValue>;
 
 	private _data?: UmbFolderModalData;
 	@property({ type: Object, attribute: false })
@@ -56,7 +56,7 @@ export class UmbFolderModalElement extends UmbLitElement {
 				} catch (error) {
 					throw new Error('Could not create repository with alias: ' + this.#repositoryAlias + '');
 				}
-			}
+			},
 		);
 	}
 

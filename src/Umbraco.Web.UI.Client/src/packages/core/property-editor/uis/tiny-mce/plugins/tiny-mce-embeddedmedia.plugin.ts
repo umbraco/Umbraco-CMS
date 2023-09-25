@@ -1,7 +1,7 @@
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import {
 	UmbEmbeddedMediaModalData,
-	UmbEmbeddedMediaModalResult,
+	UmbEmbeddedMediaModalValue,
 	UMB_EMBEDDED_MEDIA_MODAL,
 	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
@@ -52,7 +52,7 @@ export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase 
 		this.#showModal(selectedElm, modify);
 	}
 
-	#insertInEditor(embed: UmbEmbeddedMediaModalResult, activeElement: HTMLElement) {
+	#insertInEditor(embed: UmbEmbeddedMediaModalValue, activeElement: HTMLElement) {
 		// Wrap HTML preview content here in a DIV with non-editable class of .mceNonEditable
 		// This turns it into a selectable/cutable block to move about
 		const wrapper = this.editor.dom.create(
@@ -65,7 +65,7 @@ export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase 
 				'data-embed-constrain': embed.constrain ?? false,
 				contenteditable: false,
 			},
-			embed.preview
+			embed.preview,
 		);
 
 		// Only replace if activeElement is an Embed element.

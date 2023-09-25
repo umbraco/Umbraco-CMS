@@ -4,11 +4,11 @@ export interface UmbCreateDocumentModalData {
 	id: string | null;
 }
 
-export interface UmbCreateDocumentModalResult {
+export interface UmbCreateDocumentModalValue {
 	documentTypeId: string;
 }
 
-export const UMB_CREATE_DOCUMENT_MODAL = new UmbModalToken<UmbCreateDocumentModalData, UmbCreateDocumentModalResult>(
+export const UMB_CREATE_DOCUMENT_MODAL = new UmbModalToken<UmbCreateDocumentModalData, UmbCreateDocumentModalValue>(
 	'Umb.Modal.CreateDocument',
 	{
 		type: 'sidebar',

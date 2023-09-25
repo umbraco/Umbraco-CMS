@@ -8,12 +8,12 @@ export interface StylesheetRichTextEditorStyleModalData {
 	rule: RichTextRuleModelSortable | null;
 }
 
-export type StylesheetRichTextEditorStyleModalResult = NonNullable<Required<StylesheetRichTextEditorStyleModalData>>;
+export type UmbStylesheetRichTextEditorStyleModalValue = NonNullable<Required<StylesheetRichTextEditorStyleModalData>>;
 
 @customElement('umb-stylesheet-rich-text-editor-style-modal')
 export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbModalBaseElement<
 	StylesheetRichTextEditorStyleModalData,
-	StylesheetRichTextEditorStyleModalResult
+	UmbStylesheetRichTextEditorStyleModalValue
 > {
 	private _close() {
 		this.modalContext?.reject();

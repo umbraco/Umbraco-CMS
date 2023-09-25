@@ -2,15 +2,15 @@ import icons from '../../../../../shared/icon-registry/icons/icons.json' assert 
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import { css, html, styleMap, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-import { UmbIconPickerModalData, UmbIconPickerModalResult } from '@umbraco-cms/backoffice/modal';
+import { UmbIconPickerModalData, UmbIconPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 // TODO: Make use of UmbPickerLayoutBase
 // TODO: to prevent element extension we need to move the Picker logic into a separate class we can reuse across all pickers
 @customElement('umb-icon-picker-modal')
-export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPickerModalData, UmbIconPickerModalResult> {
+export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPickerModalData, UmbIconPickerModalValue> {
 	private _iconList = icons.map((icon) => icon.name);
 
 	@state()
@@ -90,8 +90,9 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 						label="Color switcher for icons"
 						@change="${this._onColorChange}">
 						${this._colorList.map(
-							(color) =>
-								html` <uui-color-swatch label="${color}" title="${color}" value="${color}"></uui-color-swatch> `
+							(color) => html`
+								<uui-color-swatch label="${color}" title="${color}" value="${color}"></uui-color-swatch>
+							`,
 						)}
 					</uui-color-swatches>
 

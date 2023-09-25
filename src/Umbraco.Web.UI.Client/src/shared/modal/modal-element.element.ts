@@ -5,17 +5,17 @@ import type { ManifestModal, UmbModalExtensionElement } from '@umbraco-cms/backo
 
 export abstract class UmbModalBaseElement<
 		ModalDataType extends object = object,
-		ModalResultType = unknown,
-		ModalManifestType extends ManifestModal = ManifestModal
+		ModalValueType = unknown,
+		ModalManifestType extends ManifestModal = ManifestModal,
 	>
 	extends UmbLitElement
-	implements UmbModalExtensionElement<ModalDataType, ModalResultType, ModalManifestType>
+	implements UmbModalExtensionElement<ModalDataType, ModalValueType, ModalManifestType>
 {
 	@property({ type: Array, attribute: false })
 	public manifest?: ModalManifestType;
 
 	@property({ attribute: false })
-	public modalContext?: UmbModalContext<ModalDataType, ModalResultType>;
+	public modalContext?: UmbModalContext<ModalDataType, ModalValueType>;
 
 	@property({ type: Object, attribute: false })
 	public data?: ModalDataType;

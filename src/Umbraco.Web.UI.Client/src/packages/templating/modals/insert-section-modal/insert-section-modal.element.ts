@@ -1,6 +1,6 @@
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS } from '../manifests.js';
 import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
@@ -9,22 +9,22 @@ import './insert-section-input.element.js';
 // eslint-disable-next-line local-rules/ensure-relative-import-use-js-extension
 import type { UmbInsertSectionCheckboxElement } from './insert-section-input.element';
 
-export const UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL = new UmbModalToken<object, InsertSectionModalModalResult>(
+export const UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL = new UmbModalToken<object, UmbInsertSectionModalModalValue>(
 	UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS,
 	{
 		type: 'sidebar',
 		size: 'small',
-	}
+	},
 );
 
-export interface InsertSectionModalModalResult {
+export interface UmbInsertSectionModalModalValue {
 	value?: string;
 }
 
 @customElement('umb-templating-insert-section-modal')
 export default class UmbTemplatingInsertSectionModalElement extends UmbModalBaseElement<
 	object,
-	InsertSectionModalModalResult
+	UmbInsertSectionModalModalValue
 > {
 	@queryAll('umb-insert-section-checkbox')
 	checkboxes!: NodeListOf<UmbInsertSectionCheckboxElement>;

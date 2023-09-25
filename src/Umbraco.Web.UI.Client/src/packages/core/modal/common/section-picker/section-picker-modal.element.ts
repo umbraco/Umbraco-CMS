@@ -1,14 +1,14 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbSectionPickerModalData, UmbSectionPickerModalResult } from '@umbraco-cms/backoffice/modal';
+import { UmbSectionPickerModalData, UmbSectionPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-section-picker-modal')
 export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 	UmbSectionPickerModalData,
-	UmbSectionPickerModalResult
+	UmbSectionPickerModalValue
 > {
 	@state()
 	private _sections: Array<ManifestSection> = [];
@@ -34,7 +34,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 
 		this.observe(
 			umbExtensionsRegistry.extensionsOfType('section'),
-			(sections: Array<ManifestSection>) => (this._sections = sections)
+			(sections: Array<ManifestSection>) => (this._sections = sections),
 		);
 	}
 
@@ -50,7 +50,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 								?selected=${this.#selectionManager.isSelected(item.alias)}
 								@selected=${() => this.#selectionManager.select(item.alias)}
 								@deselected=${() => this.#selectionManager.deselect(item.alias)}></uui-menu-item>
-						`
+						`,
 					)}
 				</uui-box>
 				<div slot="actions">

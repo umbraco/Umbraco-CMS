@@ -22,16 +22,16 @@ export interface OEmbedResult extends UmbEmbeddedMediaDimensions {
 	markup?: string;
 }
 
-export interface UmbEmbeddedMediaModalResult extends UmbEmbeddedMediaModalData {
+export interface UmbEmbeddedMediaModalValue extends UmbEmbeddedMediaModalData {
 	preview?: string;
 	originalWidth: number;
 	originalHeight: number;
 }
 
-export const UMB_EMBEDDED_MEDIA_MODAL = new UmbModalToken<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>(
+export const UMB_EMBEDDED_MEDIA_MODAL = new UmbModalToken<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalValue>(
 	'Umb.Modal.EmbeddedMedia',
 	{
 		type: 'sidebar',
 		size: 'medium',
-	}
+	},
 );

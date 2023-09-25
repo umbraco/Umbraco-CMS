@@ -1,7 +1,7 @@
 import { UmbUserRepository } from '../../repository/user.repository.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbUserPickerModalData, UmbUserPickerModalResult } from '@umbraco-cms/backoffice/modal';
+import { UmbUserPickerModalData, UmbUserPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -10,7 +10,7 @@ import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 import { type UmbUserDetail } from '@umbraco-cms/backoffice/users';
 
 @customElement('umb-user-picker-modal')
-export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPickerModalData, UmbUserPickerModalResult> {
+export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPickerModalData, UmbUserPickerModalValue> {
 	@state()
 	private _users: Array<UmbUserDetail> = [];
 
@@ -34,7 +34,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 				} catch (error) {
 					throw new Error('Could not create repository with alias: Umb.Repository.User');
 				}
-			}
+			},
 		);
 	}
 
@@ -70,7 +70,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 								?selected=${this.#selectionManager.isSelected(user.id!)}>
 								<uui-avatar slot="icon" name=${user.name}></uui-avatar>
 							</uui-menu-item>
-						`
+						`,
 					)}
 				</uui-box>
 				<div slot="actions">
