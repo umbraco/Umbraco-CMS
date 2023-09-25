@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Webhooks;
 
 public class ContentDeleteWebhookEvent : WebhookEventBase<ContentDeletedNotification>
 {
-    public ContentDeleteWebhookEvent() => EventName = "ContentPublish";
+    public ContentDeleteWebhookEvent() => EventName = Constants.WebhookEvents.ContentDelete;
 
     public override async Task HandleAsync(ContentDeletedNotification notification, CancellationToken cancellationToken)
     {

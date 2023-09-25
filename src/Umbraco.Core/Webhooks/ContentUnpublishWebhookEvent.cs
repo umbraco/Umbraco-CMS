@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Webhooks;
 
 public class ContentUnpublishWebhookEvent : WebhookEventBase<ContentUnpublishedNotification>
 {
-    public ContentUnpublishWebhookEvent() => EventName = "ContentUnpublish";
+    public ContentUnpublishWebhookEvent() => EventName = Constants.WebhookEvents.ContentUnpublish;
 
     public override async Task HandleAsync(ContentUnpublishedNotification notification, CancellationToken cancellationToken)
     {
