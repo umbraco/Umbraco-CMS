@@ -64,6 +64,8 @@ export class UmbModalContextClass<ModalPreset extends object = object, ModalValu
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
 
+	#value?: ModalValue;
+
 	public get controllerAlias() {
 		return 'umbModalContext:' + this.key;
 	}
@@ -133,6 +135,7 @@ export class UmbModalContextClass<ModalPreset extends object = object, ModalValu
 	hostConnected(): void {
 		this.#modalContextProvider.hostConnected();
 	}
+
 	hostDisconnected(): void {
 		this.#modalContextProvider.hostDisconnected();
 	}
@@ -230,6 +233,24 @@ export class UmbModalContextClass<ModalPreset extends object = object, ModalValu
 	 */
 	public onSubmit(): Promise<ModalValue> {
 		return this.#submitPromise;
+	}
+
+	/**
+	 * Gives the current value of this modal.
+	 * @public
+	 * @memberof UmbModalContext
+	 */
+	public getValue() {
+		return this.#value;
+	}
+
+	/**
+	 * Sets the current value of this modal.
+	 * @public
+	 * @memberof UmbModalContext
+	 */
+	public setValue(value: ModalValue) {
+		this.#value = value;
 	}
 
 	destroy(): void {
