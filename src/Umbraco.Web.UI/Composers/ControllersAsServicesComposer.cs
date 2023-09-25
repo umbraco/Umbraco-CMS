@@ -32,6 +32,8 @@ namespace Umbraco.Cms.Web.UI.Composers
     /// </remarks>
     public class ControllersAsServicesComposer : IComposer
     {
+        private const bool DO_NOT_DELETE_ME = true;
+
         /// <inheritdoc />
         public void Compose(IUmbracoBuilder builder) => builder.Services
             .AddMvc()
