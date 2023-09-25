@@ -98,7 +98,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 				</a>
 				<uui-input
 					id="name"
-					label="name"
+					label=${this.localize.term('general_name')}
 					.value=${this._userGroup?.name ?? ''}
 					@input="${this.#onNameChange}"></uui-input>
 			</div>
@@ -109,52 +109,57 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		if (!this._userGroup) return nothing;
 
 		return html` <uui-box>
-				<div slot="headline">Assign access</div>
-				<umb-workspace-property-layout label="Sections" description="Add sections to give users access">
+				<div slot="headline"><umb-localize key="user_assignAccess"></umb-localize></div>
+				<umb-workspace-property-layout
+					label=${this.localize.term('main_sections')}
+					description=${this.localize.term('user_sectionsHelp')}>
 					<umb-input-section
 						slot="editor"
 						.value=${this._userGroup.sections ?? []}
 						@change=${(e: any) => this.#onSectionsChange(e.target.value)}></umb-input-section>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout
-					label="Content start node"
-					description="Limit the content tree to a specific start node">
+					label=${this.localize.term('defaultdialogs_selectContentStartNode')}
+					description=${this.localize.term('user_startnodehelp')}>
 					<b slot="editor">CONTENT START NODE PICKER NOT IMPLEMENTED YET</b>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout
-					label="Media start node"
-					description="Limit the media library to a specific start node">
+					label=${this.localize.term('defaultdialogs_selectMediaStartNode')}
+					description=${this.localize.term('user_mediastartnodehelp')}>
 					<b slot="editor">MEDIA START NODE PICKER NOT IMPLEMENTED YET</b>
 				</umb-workspace-property-layout>
 			</uui-box>
 
 			<uui-box>
-				<div slot="headline">Default Permissions</div>
+				<div slot="headline"><umb-localize key="user_permissionsDefault"></umb-localize></div>
 				<umb-user-group-default-permission-list></umb-user-group-default-permission-list>
 			</uui-box>
 
 			<uui-box>
-				<div slot="headline">Granular permissions</div>
+				<div slot="headline"><umb-localize key="user_permissionsGranular"></umb-localize></div>
 				<umb-user-group-granular-permission-list></umb-user-group-granular-permission-list>
 			</uui-box>`;
 	}
 
 	#renderRightColumn() {
 		return html`<uui-box>
-				<div slot="headline">Users</div>
+				<div slot="headline"><umb-localize key="sections_users"></umb-localize></div>
 				<!-- change any to UmbUserInputElement when package is available -->
 				<umb-user-input
 					@change=${(e: Event) => this.#onUsersChange((e.target as any).selectedIds)}
 					.selectedIds=${this._userKeys ?? []}></umb-user-input>
 			</uui-box>
 			<uui-box>
-				<div slot="headline">Delete user group</div>
+				<div slot="headline">
+					<umb-localize key="actions_delete"></umb-localize>
+					<umb-localize key="user_usergroup"></umb-localize>
+				</div>
 				<uui-button
 					@click=${this.#onDelete}
 					style="width: 100%"
 					color="danger"
 					look="secondary"
-					label="Delete"></uui-button>
+					label=${this.localize.term('actions_delete')}></uui-button>
 			</uui-box>`;
 	}
 
