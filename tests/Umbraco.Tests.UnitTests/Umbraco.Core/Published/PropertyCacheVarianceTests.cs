@@ -244,24 +244,24 @@ public class PropertyCacheVarianceTests
         string expectedValue3EnUsSegment2,
         string expectedValue4DaDkSegment2)
     {
-        var culture = "da-DK";
-        var segment = "segment1";
+        var variationContextCulture = "da-DK";
+        var variationContextSegment = "segment1";
         var property = CreateProperty(
             contentTypeVariation,
             propertyTypeVariation,
             propertyCacheLevel,
-            () => culture,
-            () => segment);
+            () => variationContextCulture,
+            () => variationContextSegment);
 
         Assert.AreEqual(expectedValue1DaDkSegment1, property.GetValue());
 
-        culture = "en-US";
+        variationContextCulture = "en-US";
         Assert.AreEqual(expectedValue2EnUsSegment1, property.GetValue());
 
-        segment = "segment2";
+        variationContextSegment = "segment2";
         Assert.AreEqual(expectedValue3EnUsSegment2, property.GetValue());
 
-        culture = "da-DK";
+        variationContextCulture = "da-DK";
         Assert.AreEqual(expectedValue4DaDkSegment2, property.GetValue());
     }
 
@@ -309,28 +309,31 @@ public class PropertyCacheVarianceTests
 
         foreach (var scenario in scenarios)
         {
-            var culture = "da-DK";
-            var segment = "segment1";
+            var variationContextCulture = "da-DK";
+            var variationContextSegment = "segment1";
             var property = CreateProperty(
                 scenario.ContentTypeVariation,
                 scenario.PropertyTypeVariation,
                 PropertyCacheLevel.Element,
-                () => culture,
-                () => segment);
+                () => variationContextCulture,
+                () => variationContextSegment);
 
             Assert.AreEqual(expectedValue1DaDkSegment1, property.GetValue());
 
-            culture = "en-US";
+            variationContextCulture = "en-US";
             Assert.AreEqual(expectedValue2EnUsSegment1, property.GetValue());
 
-            segment = "segment2";
+            variationContextSegment = "segment2";
             Assert.AreEqual(expectedValue3EnUsSegment2, property.GetValue());
 
-            culture = "da-DK";
+            variationContextCulture = "da-DK";
             Assert.AreEqual(expectedValue4DaDkSegment2, property.GetValue());
         }
     }
 
+    /// <summary>
+    /// Creates a new property with a mocked publishedSnapshotAccessor that uses a VariationContext that reads culture and segment information from the passed in functions.
+    /// </summary>
     private Property CreateProperty(ContentVariation contentTypeVariation, ContentVariation propertyTypeVariation, PropertyCacheLevel propertyTypeCacheLevel, Func<string> getCulture, Func<string> getSegment)
     {
         var contentType = new Mock<IPublishedContentType>();
