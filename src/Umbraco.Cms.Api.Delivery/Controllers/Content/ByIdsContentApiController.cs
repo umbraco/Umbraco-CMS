@@ -57,6 +57,8 @@ public class ByIdsContentApiController : ContentApiItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<IApiContentResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IPublishedContent[] contentItems = ApiPublishedContentCache.GetByIds(ids).ToArray();
