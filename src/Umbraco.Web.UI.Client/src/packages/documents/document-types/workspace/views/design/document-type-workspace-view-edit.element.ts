@@ -21,7 +21,7 @@ const SORTER_CONFIG: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
 		return element.getAttribute('data-umb-tabs-id') === model.id;
 	},
 	querySelectModelToElement: (container: HTMLElement, modelEntry: PropertyTypeContainerModelBaseModel) => {
-		return container.querySelector('data-umb-tabs-id[' + modelEntry.id + ']');
+		return container.querySelector(`[data-umb-tabs-id='` + modelEntry.id + `']`);
 	},
 	identifier: 'content-type-tabs-sorter',
 	itemSelector: '[data-umb-tabs-id]',
@@ -41,16 +41,28 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 
 	config: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
 		...SORTER_CONFIG,
-		performItemInsert: (args) => {
+		performItemInsert: async (args) => {
+			if (!this._tabs) return false;
+			const oldIndex = this._tabs.findIndex((tab) => tab.id! === args.item.id);
+			if (args.newIndex === oldIndex) return true;
+
 			let sortOrder = 0;
-			if (this._tabs && this._tabs.length > 0) {
+			//TODO the sortOrder set is not correct
+			if (this._tabs.length > 0) {
 				if (args.newIndex === 0) {
 					sortOrder = (this._tabs[0].sortOrder ?? 0) - 1;
 				} else {
-					sortOrder = ((this._tabs[Math.min(args.newIndex, this._tabs.length - 1)] as any).sortOrder ?? 0) + 1;
+					sortOrder = (this._tabs[Math.min(args.newIndex, this._tabs.length - 1)].sortOrder ?? 0) + 1;
+				}
+
+				if (sortOrder !== args.item.sortOrder) {
+					await this._tabsStructureHelper.partialUpdateContainer(args.item.id!, { sortOrder });
 				}
 			}
-			this._tabsStructureHelper.partialUpdateContainer(args.item.id!, { sortOrder });
+
+			return true;
+		},
+		performItemRemove: () => {
 			return true;
 		},
 	};
@@ -256,7 +268,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		return html`
 			<umb-body-layout header-fit-height>
 				<div id="header" slot="header">
-					<div id="tabs-wrapper">${this._routerPath ? this.renderTabsNavigation() : ''} ${this.renderAddButton()}</div>
+					<div id="tabs-wrapper" class="flex">
+						${this._routerPath ? this.renderTabsNavigation() : ''} ${this.renderAddButton()}
+					</div>
 					${this.renderActions()}
 				</div>
 				<umb-router-slot
@@ -310,41 +324,48 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 
 	renderTabsNavigation() {
 		if (!this._tabs) return;
-		const rootTabPath = this._routerPath + '/root';
-		const rootTabActive = rootTabPath === this._activePath;
 
-		return html`<div id="tabs-group">
-			<uui-tab-group>
-				<uui-tab
-					class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
-					label=${this.localize.term('general_content')}
-					.active=${rootTabActive}
-					href=${rootTabPath}>
-					${this.localize.term('general_content')}
-				</uui-tab>
-				${repeat(
-					this._tabs,
-					(tab) => tab.id! + tab.name,
-					(tab) => this.renderTab(tab),
-				)}
-			</uui-tab-group>
-		</div>`;
+		if (this.sortModeActive) {
+			return html`<div id="tabs-group" class="flex">
+				<uui-tab-group>
+					${this.renderRootTab()}
+					${repeat(
+						this._tabs,
+						(tab) => tab.id! + tab.name,
+						(tab) => this.renderTabInSortMode(tab),
+					)}
+				</uui-tab-group>
+			</div>`;
+		} else {
+			return html`<div class="flex">
+				<uui-tab-group>
+					${this.renderRootTab()}
+					${repeat(
+						this._tabs,
+						(tab) => tab.id! + tab.name,
+						(tab) => this.renderTabInDefaultMode(tab),
+					)}
+				</uui-tab-group>
+			</div>`;
+		}
 	}
 
-	renderTab(tab: PropertyTypeContainerModelBaseModel) {
-		if (this.sortModeActive) {
-			return this.renderTabInSortMode(tab);
-		} else {
-			return this.renderTabInDefaultMode(tab);
-		}
+	renderRootTab() {
+		const rootTabPath = this._routerPath + '/root';
+		const rootTabActive = rootTabPath === this._activePath;
+		return html`<uui-tab
+			class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
+			label=${this.localize.term('general_content')}
+			.active=${rootTabActive}
+			href=${rootTabPath}>
+			${this.localize.term('general_content')}
+		</uui-tab>`;
 	}
 
 	renderTabInDefaultMode(tab: PropertyTypeContainerModelBaseModel) {
 		const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
 		const tabActive = path === this._activePath;
 		const tabInherited = !this._tabsStructureHelper.isOwnerContainer(tab.id!);
-
-		console.log(tabInherited, tab.name);
 
 		return html`<uui-tab
 			label=${tab.name ?? 'unnamed'}
@@ -395,10 +416,11 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 					? html`<uui-icon class="external" name="umb:merge"></uui-icon>${tab.name!}`
 					: html`${tab.name!}
 							<uui-input
+								label="sort order"
 								type="number"
 								value=${ifDefined(tab.sortOrder)}
 								style="width:50px"
-								@change=${(e: UUIInputEvent) => this.#changeOrder(tab, e)}></uui-input>`}
+								@keypress=${(e: UUIInputEvent) => this.#changeOrder(tab, e)}></uui-input>`}
 			</div>
 		</uui-tab>`;
 	}
@@ -458,14 +480,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				flex-wrap: nowrap;
 			}
 
-			#tabs-wrapper {
+			.flex {
 				display: flex;
 			}
-
-			#tabs-group {
-				display: flex;
-			}
-
 			uui-tab-group {
 				flex-wrap: nowrap;
 			}
