@@ -167,9 +167,15 @@
                 if (Utilities.isString(vm.value) && vm.value.length > 0) {
 
                     if (vm.config.storageType === "Json" && vm.value.detectIsJson()) {
-                        //json storage
-                        vm.viewModel = JSON.parse(vm.value);
-
+                        try {
+                            //json storage
+                            vm.viewModel = JSON.parse(vm.value);
+                        }
+                        catch (e) {
+                            // Invaild JSON we'll just leave it
+                            console.error("Invalid JSON in tag editor value", vm.value);
+                        }
+                        
                         //if this is the first load, we are just re-formatting the underlying model to be consistent
                         //we don't want to notify the component parent of any changes, that will occur if the user actually
                         //changes a value. If we notify at this point it will signal a form dirty change which we don't want.
