@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 
@@ -80,6 +81,18 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown user group operation status.")
+                .Build()),
+        };
+
+    protected IActionResult UserGroupAuthorizationStatusResult(UserGroupAuthorizationStatus status) =>
+        status switch
+        {
+            UserGroupAuthorizationStatus.UnauthorizedMissingUserGroup => Unauthorized(new ProblemDetailsBuilder()
+                .WithTitle("Unauthorized")
+                .WithDetail("The performing user does not have access to all specified user groups.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown user group authorization status.")
                 .Build()),
         };
 
