@@ -41,7 +41,10 @@ type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
 	  };
 
 // TODO: consider splitting this into two separate handlers
-export class UmbModalContextClass<ModalData extends object = object, ModalResult = unknown> implements UmbController {
+export class UmbModalContextClass<ModalData extends object = object, ModalResult = unknown>
+	extends EventTarget
+	implements UmbController
+{
 	#host: UmbControllerHostElement;
 
 	#submitPromise: Promise<ModalResult>;
@@ -70,8 +73,9 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 		router: IRouterSlot | null,
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
 		data?: ModalData,
-		config?: UmbModalConfig
+		config?: UmbModalConfig,
 	) {
+		super();
 		this.#host = host;
 		this.key = config?.key || UmbId.new();
 
@@ -120,7 +124,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 			UMB_MODAL_CONTEXT_TOKEN,
 
 			// Note, We are doing the Typing dance here because of the way we are correcting the submit method attribute type.
-			this as unknown as UmbModalContext<ModalData, ModalResult>
+			this as unknown as UmbModalContext<ModalData, ModalResult>,
 		);
 
 		this.#host.addController(this);
@@ -168,7 +172,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 							this.#appendInnerElement(innerElement);
 						}
 					}
-				}
+				},
 			);
 		}
 	}
