@@ -19,11 +19,11 @@ import { UmbContextProvider, UmbContextToken } from '@umbraco-cms/backoffice/con
 /**
  * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.
  */
-export type UmbModalContext<ModalData extends object = object, ModalResult = any> = Omit<
-	UmbModalContextClass<ModalData, ModalResult>,
+export type UmbModalContext<ModalData extends object = object, ModalValue = any> = Omit<
+	UmbModalContextClass<ModalData, ModalValue>,
 	'submit'
 > &
-	OptionalSubmitArgumentIfUndefined<ModalResult>;
+	OptionalSubmitArgumentIfUndefined<ModalValue>;
 
 // If Type is undefined we don't accept an argument,
 // If type is unknown, we accept an option argument.
@@ -208,12 +208,12 @@ export class UmbModalContextClass<ModalPreset extends object = object, ModalValu
 
 	// note, this methods is private  argument is not defined correctly here, but requires to be fix by appending the OptionalSubmitArgumentIfUndefined type when newing up this class.
 	/**
-	 * Submits this modal, returning with a result to the initiator of the modal.
+	 * Submits this modal, returning with a value to the initiator of the modal.
 	 * @public
 	 * @memberof UmbModalContext
 	 */
-	private submit(result?: ModalValue) {
-		this.#submitResolver?.(result as ModalValue);
+	private submit(value?: ModalValue) {
+		this.#submitResolver?.(value as ModalValue);
 		this.modalElement.close();
 	}
 
