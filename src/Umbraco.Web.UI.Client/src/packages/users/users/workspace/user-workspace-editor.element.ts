@@ -1,8 +1,7 @@
-import { UmbUserRepository } from '@umbraco-cms/backoffice/user';
 import { getDisplayStateFromUserStatus } from '../../utils.js';
-import { UmbUserRepository } from '../repository/user.repository.js';
 import { type UmbUserDetail } from '../index.js';
 import { UmbUserWorkspaceContext } from './user-workspace.context.js';
+import { UmbUserRepository } from '@umbraco-cms/backoffice/users';
 import { UUIInputElement, UUIInputEvent, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
@@ -18,10 +17,8 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_CHANGE_PASSWORD_MODAL, type UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { type UserStateModel } from '@umbraco-cms/backoffice/backend-api';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_AUTH, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
