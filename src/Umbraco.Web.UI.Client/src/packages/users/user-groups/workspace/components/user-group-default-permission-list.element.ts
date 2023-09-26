@@ -49,7 +49,7 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 
 		for (const [key, value] of Object.entries(this._groupedUserPermissionManifests)) {
 			entityGroups.push(
-				html`<h3><umb-localize .key=${`user_permissionsEntityGroup_${key}`}>${key}</umb-localize></h3>
+				html`<h5><umb-localize .key=${`user_permissionsEntityGroup_${key}`}>${key}</umb-localize></h5>
 					${value.map((permission) => this.#renderPermission(permission))}`,
 			);
 		}
