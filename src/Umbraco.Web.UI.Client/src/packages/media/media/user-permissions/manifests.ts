@@ -12,6 +12,7 @@ const permissions: Array<ManifestUserPermission> = [
 			entityType: 'media',
 			label: 'Move',
 			description: 'Allow access to move media items',
+			group: 'structure',
 		},
 	},
 	{
@@ -22,6 +23,7 @@ const permissions: Array<ManifestUserPermission> = [
 			entityType: 'media',
 			label: 'Copy',
 			description: 'Allow access to copy a media item',
+			group: 'structure',
 		},
 	},
 ];
