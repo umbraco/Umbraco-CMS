@@ -37,7 +37,7 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 		host: UmbControllerHostElement,
 		repositoryAlias: string,
 		modalAlias: string | UmbModalToken,
-		getUniqueMethod?: (entry: ItemType) => string | undefined
+		getUniqueMethod?: (entry: ItemType) => string | undefined,
 	) {
 		this.host = host;
 		this.modalAlias = modalAlias;

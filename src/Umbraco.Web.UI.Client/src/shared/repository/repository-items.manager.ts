@@ -29,7 +29,7 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 	constructor(
 		host: UmbControllerHostElement,
 		repositoryAlias: string,
-		getUniqueMethod?: (entry: ItemType) => string | undefined
+		getUniqueMethod?: (entry: ItemType) => string | undefined,
 	) {
 		this.host = host;
 		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
