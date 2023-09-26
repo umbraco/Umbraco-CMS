@@ -5,6 +5,14 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 const slug = '/user-group';
 
 export const handlers = [
+	rest.get(umbracoPath(`${slug}/item`), (req, res, ctx) => {
+		const ids = req.url.searchParams.getAll('id');
+		if (!ids) return;
+		const items = umbUserGroupData.getItems(ids);
+
+		return res(ctx.status(200), ctx.json(items));
+	}),
+
 	rest.get(umbracoPath(`${slug}`), (req, res, ctx) => {
 		const response = umbUserGroupData.getAll();
 
