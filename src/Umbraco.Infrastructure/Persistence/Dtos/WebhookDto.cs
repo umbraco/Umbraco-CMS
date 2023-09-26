@@ -24,5 +24,13 @@ internal class WebhookDto
 
     [Column(Name = "enabled")]
     public bool Enabled { get; set; }
+
+    [ResultColumn]
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(Event2WebhookDto.WebhookId))]
+    public List<Event2WebhookDto> Event2WebhookDtos { get; set; } = null!;
+
+    [ResultColumn]
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(EntityKey2WebhookDto.WebhookId))]
+    public List<EntityKey2WebhookDto> EntityKey2WebhookDtos { get; set; } = null!;
 }
 
