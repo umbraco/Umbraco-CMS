@@ -6,5 +6,5 @@ export interface ManifestUserGranularPermission extends ManifestElement {
 }
 
 export interface MetaUserGranularPermission {
-	entityType: Array<string>;
+	entityType: string;
 }

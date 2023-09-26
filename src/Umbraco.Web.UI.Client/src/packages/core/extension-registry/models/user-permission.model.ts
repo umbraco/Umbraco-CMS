@@ -7,7 +7,7 @@ export interface ManifestUserPermission extends ManifestBase {
 
 export interface MetaUserPermission {
 	label: string;
-	entityType: Array<string>;
+	entityType: string;
 	description?: string;
 	group?: string;
 }
