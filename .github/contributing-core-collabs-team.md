@@ -8,6 +8,7 @@ The Core Contributors team consists of one member of Umbraco HQ, [Sebastiaan][Se
 - [George Bidder][George Bidder]
 - [Jason Elkin][Jason Elkin]
 - [Laura Neto][Laura Neto]
+- [Kyle Eck][Kyle Eck]
 - [Michael Latouche][Michael Latouche]
 - [Sebastiaan][Sebastiaan]
 
