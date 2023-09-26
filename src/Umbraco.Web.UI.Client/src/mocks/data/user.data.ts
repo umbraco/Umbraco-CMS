@@ -3,6 +3,7 @@ import { umbUserGroupData } from './user-group.data.js';
 import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import {
 	PagedUserResponseModel,
+	UpdateUserGroupsOnUserRequestModel,
 	UserItemResponseModel,
 	UserResponseModel,
 	UserStateModel,
@@ -31,6 +32,13 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 	getItems(ids: Array<string>): Array<UserItemResponseModel> {
 		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => createUserItem(item));
+	}
+
+	setUserGroups(data: UpdateUserGroupsOnUserRequestModel): void {
+		const users = this.data.filter((user) => data.userIds?.includes(user.id ?? ''));
+		users.forEach((user) => {
+			user.userGroupIds = data.userGroupIds;
+		});
 	}
 
 	getCurrentUser(): UmbLoggedInUser {

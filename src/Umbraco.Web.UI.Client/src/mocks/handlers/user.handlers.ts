@@ -14,6 +14,15 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(items));
 	}),
 
+	rest.post(umbracoPath(`${slug}/set-user-groups`), async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		umbUsersData.setUserGroups(data);
+
+		return res(ctx.status(200));
+	}),
+
 	rest.get(umbracoPath(`${slug}/filter`), (req, res, ctx) => {
 		//TODO: Implementer filter
 		const response = umbUsersData.getAll();
