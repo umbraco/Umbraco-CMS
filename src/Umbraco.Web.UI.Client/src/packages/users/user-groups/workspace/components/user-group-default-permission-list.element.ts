@@ -5,6 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { ManifestUserPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 
 @customElement('umb-user-group-default-permission-list')
 export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
@@ -12,20 +13,24 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 	private _userGroup?: UserGroupResponseModel;
 
 	@state()
-	private _userPermissionManifests: Array<ManifestUserPermission> = [];
+	private _groupedUserPermissionManifests: Record<string, Array<ManifestUserPermission>> = {};
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
+		this.#observeUserPermissions();
+
 		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup));
-			this.observe(
-				umbExtensionsRegistry.extensionsOfType('userPermission'),
-				(userPermissionManifests) => (this._userPermissionManifests = userPermissionManifests),
-			);
+		});
+	}
+
+	#observeUserPermissions() {
+		this.observe(umbExtensionsRegistry.extensionsOfType('userPermission'), (userPermissionManifests) => {
+			this._groupedUserPermissionManifests = groupBy(userPermissionManifests, (manifest) => manifest.meta.entityType);
 		});
 	}
 
@@ -36,12 +41,20 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 	}
 
 	#isAllowed(userPermissionManifest: ManifestUserPermission) {
-		console.log(this._userGroup?.permissions?.includes(userPermissionManifest.alias));
 		return this._userGroup?.permissions?.includes(userPermissionManifest.alias);
 	}
 
 	render() {
-		return html` ${this._userPermissionManifests.map((permission) => this.#renderPermission(permission))} `;
+		const entityGroups = [];
+
+		for (const [key, value] of Object.entries(this._groupedUserPermissionManifests)) {
+			entityGroups.push(
+				html`<h3>${key}</h3>
+					${value.map((permission) => this.#renderPermission(permission))}`,
+			);
+		}
+
+		return html`${entityGroups}`;
 	}
 
 	#renderPermission(userPermissionManifest: ManifestUserPermission) {
