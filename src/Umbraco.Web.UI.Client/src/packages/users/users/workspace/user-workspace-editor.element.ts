@@ -1,6 +1,6 @@
+import { UmbUserRepository } from '@umbraco-cms/backoffice/user';
 import { getDisplayStateFromUserStatus } from '../../utils.js';
 import { UmbUserRepository } from '../repository/user.repository.js';
-import { UmbUserGroupInputElement } from '../../user-groups/components/input-user-group/user-group-input.element.js';
 import { type UmbUserDetail } from '../index.js';
 import { UmbUserWorkspaceContext } from './user-workspace.context.js';
 import { UUIInputElement, UUIInputEvent, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
@@ -15,17 +15,14 @@ import {
 	repeat,
 } from '@umbraco-cms/backoffice/external/lit';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-
-import { UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/modal';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_CHANGE_PASSWORD_MODAL, type UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { type UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-user-workspace-editor')
@@ -43,7 +40,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	#modalContext?: UmbModalManagerContext;
 	#workspaceContext?: UmbUserWorkspaceContext;
 
-	#userRepository?: UmbUserRepository;
+	#userRepository = new UmbUserRepository(this);
 
 	constructor() {
 		super();
@@ -54,25 +51,9 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#workspaceContext = workspaceContext as UmbUserWorkspaceContext;
+			this.#workspaceContext = workspaceContext;
 			this.#observeUser();
 		});
-
-		// TODO: this code is reused in multiple places, so it should be extracted to a function
-		new UmbObserverController(
-			this,
-			umbExtensionsRegistry.getByTypeAndAlias('repository', 'Umb.Repository.User'),
-			async (repositoryManifest) => {
-				if (!repositoryManifest) return;
-
-				try {
-					const result = await createExtensionClass<UmbUserRepository>(repositoryManifest, [this]);
-					this.#userRepository = result;
-				} catch (error) {
-					throw new Error('Could not create repository with alias: Umb.Repository.User');
-				}
-			},
-		);
 	}
 
 	#observeUser() {
@@ -198,9 +179,16 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		return html` <uui-box>
 				<div slot="headline"><umb-localize key="user_profile">Profile</umb-localize></div>
 				<umb-workspace-property-layout label="${this.localize.term('general_email')}">
-					<uui-input slot="editor" name="email" label="${this.localize.term('general_email')}" readonly value=${ifDefined(this._user.email)}></uui-input>
+					<uui-input
+						slot="editor"
+						name="email"
+						label="${this.localize.term('general_email')}"
+						readonly
+						value=${ifDefined(this._user.email)}></uui-input>
 				</umb-workspace-property-layout>
-				<umb-workspace-property-layout label="${this.localize.term('user_language')}" description=${this.localize.term('user_languageHelp')}>
+				<umb-workspace-property-layout
+					label="${this.localize.term('user_language')}"
+					description=${this.localize.term('user_languageHelp')}>
 					<uui-select
 						slot="editor"
 						name="language"
@@ -213,7 +201,9 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 			<uui-box>
 				<div slot="headline"><umb-localize key="user_assignAccess">Assign Access</umb-localize></div>
 				<div id="assign-access">
-					<umb-workspace-property-layout label="${this.localize.term('general_groups')}" description="${this.localize.term('user_groupsHelp')}">
+					<umb-workspace-property-layout
+						label="${this.localize.term('general_groups')}"
+						description="${this.localize.term('user_groupsHelp')}">
 						<umb-user-group-input
 							slot="editor"
 							.selectedIds=${this._user.userGroupIds ?? []}
@@ -238,8 +228,9 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 			</uui-box>
 			<uui-box headline=${this.localize.term('user_access')}>
 				<div slot="header" class="faded-text">
-					<umb-localize key="user_accessHelp">Based on the assigned groups and start nodes, the user has access to the following nodes</umb-localize>
-					
+					<umb-localize key="user_accessHelp"
+						>Based on the assigned groups and start nodes, the user has access to the following nodes</umb-localize
+					>
 				</div>
 
 				<b><umb-localize key="sections_content">Content</umb-localize></b>
@@ -267,7 +258,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 				<div>
 					<b><umb-localize key="general_status">Status</umb-localize>:</b>
 					<uui-tag look="${ifDefined(displayState?.look)}" color="${ifDefined(displayState?.color)}">
-						${this.localize.term('user_'+displayState.key)}
+						${this.localize.term('user_' + displayState.key)}
 					</uui-tag>
 				</div>
 
@@ -277,7 +268,11 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 							<uui-button look="primary" label=${this.localize.term('actions_resendInvite')}></uui-button>
 					  `
 					: nothing}
-				${this.#renderInfoItem('user_lastLogin', this.localize.date(this._user.lastLoginDate!) || `${this._user.name + ' ' + this.localize.term('user_noLogin') } `)}
+				${this.#renderInfoItem(
+					'user_lastLogin',
+					this.localize.date(this._user.lastLoginDate!) ||
+						`${this._user.name + ' ' + this.localize.term('user_noLogin')} `,
+				)}
 				${this.#renderInfoItem('user_failedPasswordAttempts', this._user.failedLoginAttempts)}
 				${this.#renderInfoItem(
 					'user_lastLockoutDate',
@@ -313,26 +308,41 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 
 		if (this._user.state === UserStateModel.DISABLED) {
 			buttons.push(html`
-				<uui-button @click=${this.#onUserStatusChange} look="secondary" color="positive" label=${this.localize.term('actions_enable')}></uui-button>
+				<uui-button
+					@click=${this.#onUserStatusChange}
+					look="secondary"
+					color="positive"
+					label=${this.localize.term('actions_enable')}></uui-button>
 			`);
 		}
 
 		if (this._user.state === UserStateModel.ACTIVE || this._user.state === UserStateModel.INACTIVE) {
 			buttons.push(html`
-				<uui-button @click=${this.#onUserStatusChange} look="secondary" color="warning" label=${this.localize.term('actions_disable')}></uui-button>
+				<uui-button
+					@click=${this.#onUserStatusChange}
+					look="secondary"
+					color="warning"
+					label=${this.localize.term('actions_disable')}></uui-button>
 			`);
 		}
 
 		if (this._currentUser?.id !== this._user?.id) {
 			const button = html`
-				<uui-button @click=${this.#onUserDelete} look="secondary" color="danger" label=${this.localize.term('user_deleteUser')}></uui-button>
+				<uui-button
+					@click=${this.#onUserDelete}
+					look="secondary"
+					color="danger"
+					label=${this.localize.term('user_deleteUser')}></uui-button>
 			`;
 
 			buttons.push(button);
 		}
 
 		buttons.push(
-			html`<uui-button @click=${this.#onPasswordChange} look="secondary" label=${this.localize.term('general_changePassword')}></uui-button>`,
+			html`<uui-button
+				@click=${this.#onPasswordChange}
+				look="secondary"
+				label=${this.localize.term('general_changePassword')}></uui-button>`,
 		);
 
 		return buttons;
