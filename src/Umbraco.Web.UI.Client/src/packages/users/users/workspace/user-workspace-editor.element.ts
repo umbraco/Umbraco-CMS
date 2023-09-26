@@ -21,6 +21,7 @@ import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_AUTH, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { type UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 
 @customElement('umb-user-workspace-editor')
 export class UmbUserWorkspaceEditorElement extends UmbLitElement {
@@ -48,7 +49,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#workspaceContext = workspaceContext;
+			this.#workspaceContext = workspaceContext as UmbUserWorkspaceContext;
 			this.#observeUser();
 		});
 	}
