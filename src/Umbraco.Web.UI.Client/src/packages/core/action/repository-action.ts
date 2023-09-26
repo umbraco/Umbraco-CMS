@@ -1,5 +1,5 @@
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
@@ -18,7 +18,7 @@ export class UmbActionBase<RepositoryType> {
 				if (!repositoryManifest) return;
 
 				try {
-					const result = await createExtensionClass<RepositoryType>(repositoryManifest, [this.host]);
+					const result = await createExtensionApi<RepositoryType>(repositoryManifest, [this.host]);
 					this.repository = result;
 				} catch (error) {
 					throw new Error('Could not create repository with alias: ' + repositoryAlias + '');

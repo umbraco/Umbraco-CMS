@@ -17,7 +17,7 @@ import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api'
 import {
 	ManifestTypes,
 	UmbBackofficeManifestKind,
-	UmbMultiExtensionsClassInitializer,
+	UmbMultiExtensionsApiInitializer,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 export * from './localization/index.js';
@@ -59,7 +59,7 @@ const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 ];
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
-	new UmbMultiExtensionsClassInitializer(host, ['globalContext', 'store', 'treeStore', 'itemStore']);
+	new UmbMultiExtensionsApiInitializer(host, ['globalContext', 'store', 'treeStore', 'itemStore']);
 
 	extensionRegistry.registerMany(manifests);
 

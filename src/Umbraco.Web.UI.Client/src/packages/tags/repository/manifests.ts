@@ -8,7 +8,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: TAG_REPOSITORY_ALIAS,
 	name: 'Tags Repository',
-	class: UmbTagRepository,
+	api: UmbTagRepository,
 };
 
 export const TAG_STORE_ALIAS = 'Umb.Store.Tags';
@@ -17,7 +17,7 @@ const store: ManifestStore = {
 	type: 'store',
 	alias: TAG_STORE_ALIAS,
 	name: 'Tags Store',
-	class: UmbTagStore,
+	api: UmbTagStore,
 };
 
 export const manifests = [repository, store];

@@ -1,4 +1,4 @@
-import { ManifestClass } from '@umbraco-cms/backoffice/extension-api';
+import { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
 export interface MetaTinyMcePlugin {
 	/**
@@ -36,7 +36,7 @@ export interface MetaTinyMcePlugin {
  *
  * @see [TinyMCE Plugin](https://www.tiny.cloud/docs/tinymce/6/apis/tinymce.plugin/) for more information.
  */
-export interface ManifestTinyMcePlugin extends ManifestClass {
+export interface ManifestTinyMcePlugin extends ManifestApi {
 	type: 'tinyMcePlugin';
 	meta?: MetaTinyMcePlugin;
 }

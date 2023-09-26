@@ -37,5 +37,5 @@ export const manifest: ManifestCondition = {
 	type: 'condition',
 	name: 'Workspace Alias Condition',
 	alias: 'Umb.Condition.WorkspaceAlias',
-	class: UmbWorkspaceAliasCondition,
+	api: UmbWorkspaceAliasCondition,
 };

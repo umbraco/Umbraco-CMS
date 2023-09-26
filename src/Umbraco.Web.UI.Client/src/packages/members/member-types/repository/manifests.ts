@@ -9,7 +9,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: MEMBER_TYPES_REPOSITORY_ALIAS,
 	name: 'Member Types Repository',
-	class: UmbMemberTypeRepository,
+	api: UmbMemberTypeRepository,
 };
 
 export const MEMBER_TYPE_STORE_ALIAS = 'Umb.Store.MemberType';
@@ -19,14 +19,14 @@ const store: ManifestStore = {
 	type: 'store',
 	alias: MEMBER_TYPE_STORE_ALIAS,
 	name: 'Member Type Store',
-	class: UmbMemberTypeStore,
+	api: UmbMemberTypeStore,
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: MEMBER_TYPE_TREE_STORE_ALIAS,
 	name: 'Member Type Tree Store',
-	class: UmbMemberTypeTreeStore,
+	api: UmbMemberTypeTreeStore,
 };
 
 export const manifests = [store, treeStore, repository];

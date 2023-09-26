@@ -9,7 +9,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: LANGUAGE_REPOSITORY_ALIAS,
 	name: 'Languages Repository',
-	class: UmbLanguageRepository,
+	api: UmbLanguageRepository,
 };
 
 export const LANGUAGE_STORE_ALIAS = 'Umb.Store.Language';
@@ -19,14 +19,14 @@ const store: ManifestStore = {
 	type: 'store',
 	alias: LANGUAGE_STORE_ALIAS,
 	name: 'Language Store',
-	class: UmbLanguageStore,
+	api: UmbLanguageStore,
 };
 
 const itemStore = {
 	type: 'itemStore',
 	alias: LANGUAGE_ITEM_STORE_ALIAS,
 	name: 'Language Item Store',
-	class: UmbLanguageItemStore,
+	api: UmbLanguageItemStore,
 };
 
 export const manifests = [repository, store, itemStore];

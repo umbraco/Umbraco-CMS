@@ -1,27 +1,36 @@
 import type { ManifestTypes } from './models/index.js';
 import { umbExtensionsRegistry } from './registry.js';
 import {
-	createExtensionClass,
+	createExtensionApi,
 	ManifestBase,
-	ManifestClass,
+	ManifestApi,
 	SpecificManifestTypeOrManifestBase,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbExtensionClassInitializer<
+/**
+ * Initializes a extensions APIs for a host element.
+ * The Extension API will be given one argument, the host element.
+ *
+ * @param host The host element to initialize extension classes for.
+ * @param extensionType The extension type(strings) to initialize.
+ * @param extensionAlias The extension alias to target.
+ *
+ */
+export class UmbExtensionApiInitializer<
 	ExtensionType extends string = string,
 	ExtensionManifest extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ExtensionType>,
-	ExtensionClassInterface = ExtensionManifest extends ManifestClass ? ExtensionManifest['CLASS_TYPE'] : unknown
+	ExtensionApiInterface = ExtensionManifest extends ManifestApi ? ExtensionManifest['API_TYPE'] : unknown
 > extends UmbBaseController {
-	#currentPromise?: Promise<ExtensionClassInterface | undefined>;
-	#currentPromiseResolver?: (value: ExtensionClassInterface | undefined) => void;
-	#currentClass?: ExtensionClassInterface;
+	#currentPromise?: Promise<ExtensionApiInterface | undefined>;
+	#currentPromiseResolver?: (value: ExtensionApiInterface | undefined) => void;
+	#currentApi?: ExtensionApiInterface;
 
 	constructor(
 		host: UmbControllerHostElement,
 		extensionType: ExtensionType,
 		extensionAlias: string,
-		callback: (extensionClass: ExtensionClassInterface | undefined) => void
+		callback: (extensionApi: ExtensionApiInterface | undefined) => void
 	) {
 		super(host);
 		const source = umbExtensionsRegistry.getByTypeAndAlias(extensionType, extensionAlias);
@@ -31,12 +40,12 @@ export class UmbExtensionClassInitializer<
 
 			try {
 				// Destroy the previous class if it exists, and if destroy method is an method on the class.
-				(this.#currentClass as any)?.destroy?.();
+				(this.#currentApi as any)?.destroy?.();
 
-				this.#currentClass = await createExtensionClass<ExtensionClassInterface>(manifest, [host]);
-				callback(this.#currentClass);
+				this.#currentApi = await createExtensionApi<ExtensionApiInterface>(manifest, [host]);
+				callback(this.#currentApi);
 				if (this.#currentPromiseResolver) {
-					this.#currentPromiseResolver(this.#currentClass);
+					this.#currentPromiseResolver(this.#currentApi);
 					this.#currentPromise = undefined;
 					this.#currentPromiseResolver = undefined;
 				}
@@ -56,6 +65,6 @@ export class UmbExtensionClassInitializer<
 	public destroy(): void {
 		super.destroy();
 		// Destroy the current class if it exists, and if destroy method is an method on the class.
-		(this.#currentClass as any)?.destroy?.();
+		(this.#currentApi as any)?.destroy?.();
 	}
 }

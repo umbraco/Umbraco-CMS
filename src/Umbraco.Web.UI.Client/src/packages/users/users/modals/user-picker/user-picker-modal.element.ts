@@ -2,7 +2,7 @@ import { UmbUserRepository } from '../../repository/user.repository.js';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbUserPickerModalData, UmbUserPickerModalResult } from '@umbraco-cms/backoffice/modal';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
@@ -28,7 +28,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 				if (!repositoryManifest) return;
 
 				try {
-					const result = await createExtensionClass<UmbUserRepository>(repositoryManifest, [this]);
+					const result = await createExtensionApi<UmbUserRepository>(repositoryManifest, [this]);
 					this.#userRepository = result;
 					this.#observeUsers();
 				} catch (error) {

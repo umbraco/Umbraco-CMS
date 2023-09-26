@@ -8,7 +8,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 	name: 'Document Recycle Bin Repository',
-	class: UmbDocumentRecycleBinRepository,
+	api: UmbDocumentRecycleBinRepository,
 };
 
 export const DOCUMENT_RECYCLE_BIN_TREE_STORE_ALIAS = 'Umb.Store.DocumentRecycleBinTree';
@@ -17,7 +17,7 @@ const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: DOCUMENT_RECYCLE_BIN_TREE_STORE_ALIAS,
 	name: 'Document Recycle Bin Tree Store',
-	class: UmbDocumentRecycleBinTreeStore,
+	api: UmbDocumentRecycleBinTreeStore,
 };
 
 export const manifests = [repository, treeStore];

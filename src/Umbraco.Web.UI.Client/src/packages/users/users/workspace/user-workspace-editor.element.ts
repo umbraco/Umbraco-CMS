@@ -22,7 +22,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
@@ -66,7 +66,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 				if (!repositoryManifest) return;
 
 				try {
-					const result = await createExtensionClass<UmbUserRepository>(repositoryManifest, [this]);
+					const result = await createExtensionApi<UmbUserRepository>(repositoryManifest, [this]);
 					this.#userRepository = result;
 				} catch (error) {
 					throw new Error('Could not create repository with alias: Umb.Repository.User');

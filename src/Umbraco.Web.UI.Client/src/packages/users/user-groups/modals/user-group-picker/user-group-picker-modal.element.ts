@@ -6,7 +6,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-user-group-picker-modal')
 export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any> {
@@ -31,7 +31,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 				if (!repositoryManifest) return;
 
 				try {
-					const result = await createExtensionClass<UmbUserGroupRepository>(repositoryManifest, [this]);
+					const result = await createExtensionApi<UmbUserGroupRepository>(repositoryManifest, [this]);
 					this.#userGroupRepository = result;
 					this.#observeUserGroups();
 				} catch (error) {

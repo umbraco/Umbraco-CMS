@@ -100,12 +100,12 @@ export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
 /**
  * The type of extension such as dashboard etc...
  */
-export interface ManifestClass<ClassType = unknown>
-	extends ManifestWithLoader<{ default: ClassConstructor<ClassType> }> {
+export interface ManifestApi<ApiType = unknown>
+	extends ManifestWithLoader<{ default: ClassConstructor<ApiType> }> {
 	/**
 	 * @TJS-ignore
 	 */
-	readonly CLASS_TYPE?: ClassType;
+	readonly API_TYPE?: ApiType;
 
 	/**
 	 * The file location of the javascript file to load
@@ -116,16 +116,12 @@ export interface ManifestClass<ClassType = unknown>
 	/**
 	 * @TJS-ignore
 	 */
-	className?: string;
+	apiName?: string;
 
 	/**
 	 * @TJS-ignore
 	 */
-	class?: ClassConstructor<ClassType>;
-}
-
-export interface ManifestClassWithClassConstructor<T = unknown> extends ManifestClass<T> {
-	class: ClassConstructor<T>;
+	api?: ClassConstructor<ApiType>;
 }
 
 export interface ManifestWithLoaderIncludingDefaultExport<T = unknown>
@@ -216,7 +212,7 @@ export interface ManifestBundle<UmbManifestTypes extends ManifestBase = Manifest
 /**
  * This type of extension takes a JS module and registers all exported manifests from the pointed JS file.
  */
-export interface ManifestCondition extends ManifestClass<UmbExtensionCondition> {
+export interface ManifestCondition extends ManifestApi<UmbExtensionCondition> {
 	type: 'condition';
 
 	/**

@@ -3,7 +3,7 @@ import { UmbPagedData, UmbTreeRepository } from '@umbraco-cms/backoffice/reposit
 import { ManifestTree, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { ProblemDetails, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
@@ -159,7 +159,7 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 				if (!repositoryManifest) return;
 
 				try {
-					const result = await createExtensionClass<UmbTreeRepository<TreeItemType>>(repositoryManifest, [this._host]);
+					const result = await createExtensionApi<UmbTreeRepository<TreeItemType>>(repositoryManifest, [this._host]);
 					this.repository = result;
 					this.#checkIfInitialized();
 				} catch (error) {

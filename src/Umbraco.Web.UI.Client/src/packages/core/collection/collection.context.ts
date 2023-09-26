@@ -6,7 +6,7 @@ import {
 	UmbObjectState,
 	UmbObserverController,
 } from '@umbraco-cms/backoffice/observable-api';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
@@ -47,7 +47,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 			umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
 			async (repositoryManifest) => {
 				if (repositoryManifest) {
-					const result = await createExtensionClass<UmbCollectionRepository>(repositoryManifest, [this._host]);
+					const result = await createExtensionApi<UmbCollectionRepository>(repositoryManifest, [this._host]);
 					this.repository = result;
 					this._onRepositoryReady();
 				}

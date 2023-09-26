@@ -15,7 +15,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: TEMPLATE_REPOSITORY_ALIAS,
 	name: 'Template Repository',
-	class: UmbTemplateRepository,
+	api: UmbTemplateRepository,
 };
 
 export const TEMPLATE_STORE_ALIAS = 'Umb.Store.Template';
@@ -26,21 +26,21 @@ const store: ManifestStore = {
 	type: 'store',
 	alias: TEMPLATE_STORE_ALIAS,
 	name: 'Template Store',
-	class: UmbTemplateStore,
+	api: UmbTemplateStore,
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: TEMPLATE_TREE_STORE_ALIAS,
 	name: 'Template Tree Store',
-	class: UmbTemplateTreeStore,
+	api: UmbTemplateTreeStore,
 };
 
 const itemStore: ManifestItemStore = {
 	type: 'itemStore',
 	alias: TEMPLATE_ITEM_STORE_ALIAS,
 	name: 'Template Item Store',
-	class: UmbTemplateItemStore,
+	api: UmbTemplateItemStore,
 };
 
 export const manifests = [repository, store, treeStore, itemStore];

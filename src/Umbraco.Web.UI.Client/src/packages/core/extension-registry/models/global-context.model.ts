@@ -1,5 +1,5 @@
-import type { ManifestClass } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestGlobalContext extends ManifestClass {
+export interface ManifestGlobalContext extends ManifestApi {
 	type: 'globalContext';
 }

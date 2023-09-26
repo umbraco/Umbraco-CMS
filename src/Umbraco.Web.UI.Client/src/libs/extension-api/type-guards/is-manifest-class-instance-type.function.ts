@@ -1,5 +1,9 @@
-import type { ManifestClass, ManifestClassWithClassConstructor } from '../types.js';
+import type { ClassConstructor, ManifestApi } from '../types.js';
 
-export function isManifestClassConstructorType(manifest: unknown): manifest is ManifestClassWithClassConstructor {
-	return typeof manifest === 'object' && manifest !== null && (manifest as ManifestClass).class !== undefined;
+export function isManifestClassConstructorType<ApiType>(manifest: unknown): manifest is ManifestApiWithClassConstructor<ApiType> {
+	return typeof manifest === 'object' && manifest !== null && (manifest as ManifestApi).api !== undefined;
+}
+
+export interface ManifestApiWithClassConstructor<T = unknown> extends ManifestApi<T> {
+	api: ClassConstructor<T>;
 }

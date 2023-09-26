@@ -9,7 +9,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: DOCUMENT_REPOSITORY_ALIAS,
 	name: 'Documents Repository',
-	class: UmbDocumentRepository,
+	api: UmbDocumentRepository,
 };
 
 export const DOCUMENT_STORE_ALIAS = 'Umb.Store.Document';
@@ -19,14 +19,14 @@ const store: ManifestStore = {
 	type: 'store',
 	alias: DOCUMENT_STORE_ALIAS,
 	name: 'Document Store',
-	class: UmbDocumentStore,
+	api: UmbDocumentStore,
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: DOCUMENT_TREE_STORE_ALIAS,
 	name: 'Document Tree Store',
-	class: UmbDocumentTreeStore,
+	api: UmbDocumentTreeStore,
 };
 
 export const manifests = [repository, store, treeStore];

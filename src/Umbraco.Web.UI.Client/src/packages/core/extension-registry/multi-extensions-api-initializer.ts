@@ -1,16 +1,16 @@
-import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 /**
- * Initializes multiple extensions classes for a host element.
- * Extension class will be given one argument, the host element.
+ * Initializes multiple extensions APIs for a host element.
+ * Extension API will be given one argument, the host element.
  *
  * @param host The host element to initialize extension classes for.
  * @param extensionTypes The extension types(strings) to initialize.
  *
  */
-export class UmbMultiExtensionsClassInitializer extends UmbBaseController {
+export class UmbMultiExtensionsApiInitializer extends UmbBaseController {
 	#extensionMap = new Map();
 
 	constructor(host: UmbControllerHostElement, extensionTypes: Array<string>) {
@@ -33,7 +33,7 @@ export class UmbMultiExtensionsClassInitializer extends UmbBaseController {
 				// Notice, currently no way to re-initialize an extension class if it changes. But that does not seem necessary currently. (Otherwise look at implementing the UmbExtensionClassInitializer)
 
 				// Instantiate and provide extension JS class. For Context API the classes provide them selfs when the class instantiates.
-				this.#extensionMap.set(extension.alias, createExtensionClass(extension, [this._host]));
+				this.#extensionMap.set(extension.alias, createExtensionApi(extension, [this._host]));
 			});
 		});
 	}

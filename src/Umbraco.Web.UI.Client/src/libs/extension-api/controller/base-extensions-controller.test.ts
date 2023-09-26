@@ -248,7 +248,7 @@ describe('UmbBaseExtensionsController', () => {
 				type: 'condition',
 				name: 'test-condition-valid',
 				alias: 'Umb.Test.Condition.Valid',
-				class: UmbTestConditionAlwaysValid,
+				api: UmbTestConditionAlwaysValid,
 			});
 		});
 
@@ -320,7 +320,7 @@ describe('UmbBaseExtensionsController', () => {
 				type: 'condition',
 				name: 'test-condition-invalid',
 				alias: 'Umb.Test.Condition.Invalid',
-				class: UmbTestConditionAlwaysInvalid,
+				api: UmbTestConditionAlwaysInvalid,
 			});
 		});
 
