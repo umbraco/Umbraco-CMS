@@ -6,6 +6,14 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 const slug = '/user';
 
 export const handlers = [
+	rest.get(umbracoPath(`${slug}/item`), (req, res, ctx) => {
+		const ids = req.url.searchParams.getAll('id');
+		if (!ids) return;
+		const items = umbUsersData.getItems(ids);
+
+		return res(ctx.status(200), ctx.json(items));
+	}),
+
 	rest.get(umbracoPath(`${slug}/filter`), (req, res, ctx) => {
 		//TODO: Implementer filter
 		const response = umbUsersData.getAll();

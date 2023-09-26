@@ -1,7 +1,19 @@
 import { UmbEntityData } from './entity.data.js';
 import { umbUserGroupData } from './user-group.data.js';
 import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
-import { PagedUserResponseModel, UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	PagedUserResponseModel,
+	UserItemResponseModel,
+	UserResponseModel,
+	UserStateModel,
+} from '@umbraco-cms/backoffice/backend-api';
+
+const createUserItem = (item: UserResponseModel): UserItemResponseModel => {
+	return {
+		name: item.name,
+		id: item.id,
+	};
+};
 
 // Temp mocked database
 class UmbUserData extends UmbEntityData<UserResponseModel> {
@@ -14,6 +26,11 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 			total: this.data.length,
 			items: this.data,
 		};
+	}
+
+	getItems(ids: Array<string>): Array<UserItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
+		return items.map((item) => createUserItem(item));
 	}
 
 	getCurrentUser(): UmbLoggedInUser {
