@@ -1,5 +1,4 @@
-import { hasDefaultExport } from './has-default-export.function.js';
-import { isManifestElementNameType } from './type-guards/index.js';
+import { hasDefaultExport, hasElementExport, isManifestElementNameType } from './type-guards/index.js';
 import { loadExtension } from './load-extension.function.js';
 import type { HTMLElementConstructor, ManifestElement } from './types.js';
 
@@ -16,6 +15,10 @@ export async function createExtensionElement<ElementType extends HTMLElement>(
 
 	// TODO: Do we need this except for the default() loader?
 	if (js) {
+		if (hasElementExport<HTMLElementConstructor<ElementType>>(js)) {
+			// Element will be created by default class
+			return new js.element();
+		}
 		if (hasDefaultExport<HTMLElementConstructor<ElementType>>(js)) {
 			// Element will be created by default class
 			return new js.default();

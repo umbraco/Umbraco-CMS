@@ -1,5 +1,4 @@
-import { hasDefaultExport } from './has-default-export.function.js';
-import { isManifestClassConstructorType } from './type-guards/index.js';
+import { hasApiExport, hasDefaultExport, isManifestClassConstructorType } from './type-guards/index.js';
 import { loadExtension } from './load-extension.function.js';
 import type { ManifestApi, ClassConstructor } from './types.js';
 
@@ -15,6 +14,9 @@ export async function createExtensionApi<ApiType = unknown>(
 	}
 
 	if (js) {
+		if (hasApiExport<ClassConstructor<ApiType>>(js)) {
+			return new js.api(...constructorArguments);
+		}
 		if (hasDefaultExport<ClassConstructor<ApiType>>(js)) {
 			return new js.default(...constructorArguments);
 		}

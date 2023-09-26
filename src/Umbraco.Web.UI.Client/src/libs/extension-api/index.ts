@@ -6,7 +6,6 @@ export * from './create-extension-element-or-fallback.function.js';
 export * from './create-extension-element.function.js';
 export * from './entry-point-extension-initializer.js';
 export * from './entry-point.interface.js';
-export * from './has-default-export.function.js';
 export * from './has-init-export.function.js';
 export * from './load-extension.function.js';
 export * from './registry/extension.registry.js';
