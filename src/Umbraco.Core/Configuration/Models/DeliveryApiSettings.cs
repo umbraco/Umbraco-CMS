@@ -55,6 +55,19 @@ public class DeliveryApiSettings
     public MediaSettings Media { get; set; } = new ();
 
     /// <summary>
+    ///     Gets or sets the member authorization settings for the Delivery API.
+    /// </summary>
+    public MemberAuthorizationSettings? MemberAuthorization { get; set; } = null;
+
+    /// <summary>
+    ///     Gets a value indicating if any member authorization type is enabled for the Delivery API.
+    /// </summary>
+    /// <remarks>
+    ///     This method is intended for future extension - see remark in <see cref="MemberAuthorizationSettings"/>.
+    /// </remarks>
+    public bool MemberAuthorizationIsEnabled() => MemberAuthorization?.AuthorizationCodeFlow?.Enabled is true;
+
+    /// <summary>
     ///     Typed configuration options for the Media APIs of the Delivery API.
     /// </summary>
     /// <remarks>
@@ -83,5 +96,46 @@ public class DeliveryApiSettings
         /// </remarks>
         [DefaultValue(StaticPublicAccess)]
         public bool PublicAccess { get; set; } = StaticPublicAccess;
+    }
+
+    /// <summary>
+    ///     Typed configuration options for member authorization settings for the Delivery API.
+    /// </summary>
+    /// <remarks>
+    ///     This class is intended for future extension, if/when adding support for additional
+    ///     authorization flows (i.e. non-interactive authorization flows).
+    /// </remarks>
+    public class MemberAuthorizationSettings
+    {
+        /// <summary>
+        ///     Gets or sets the Authorization Code Flow configuration for the Delivery API.
+        /// </summary>
+        public AuthorizationCodeFlowSettings? AuthorizationCodeFlow { get; set; } = null;
+    }
+
+    /// <summary>
+    ///     Typed configuration options for the Authorization Code Flow settings for the Delivery API.
+    /// </summary>
+    public class AuthorizationCodeFlowSettings
+    {
+        /// <summary>
+        ///     Gets or sets a value indicating whether Authorization Code Flow should be enabled for the Delivery API.
+        /// </summary>
+        /// <value><c>true</c> if Authorization Code Flow should be enabled; otherwise, <c>false</c>.</value>
+        [DefaultValue(StaticEnabled)]
+        public bool Enabled { get; set; } = StaticEnabled;
+
+        /// <summary>
+        ///     Gets or sets the URLs allowed to use as redirect targets after a successful login (session authorization).
+        /// </summary>
+        /// <value>The URLs allowed as redirect targets.</value>
+        public Uri[] LoginRedirectUrls { get; set; } = Array.Empty<Uri>();
+
+        /// <summary>
+        ///     Gets or sets the URLs allowed to use as redirect targets after a successful logout (session termination).
+        /// </summary>
+        /// <value>The URLs allowed as redirect targets.</value>
+        /// <remarks>These are only required if logout is to be used.</remarks>
+        public Uri[] LogoutRedirectUrls { get; set; } = Array.Empty<Uri>();
     }
 }
