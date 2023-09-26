@@ -7,4 +7,10 @@ export const extensions = [
 		type: 'bundle',
 		loader: () => import('./manifests.js'),
 	},
+	{
+		name: 'User Management Entry Point',
+		alias: 'Umb.EntryPoint.UserManagement',
+		type: 'entryPoint',
+		loader: () => import('./index.js'),
+	},
 ];
