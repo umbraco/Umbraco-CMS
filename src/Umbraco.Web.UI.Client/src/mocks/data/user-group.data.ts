@@ -4,7 +4,19 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_DELETE,
 	UMB_USER_PERMISSION_DOCUMENT_READ,
 } from '@umbraco-cms/backoffice/document';
-import { PagedUserGroupResponseModel, UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	PagedUserGroupResponseModel,
+	UserGroupItemResponseModel,
+	UserGroupResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
+
+const createUserGroupItem = (item: UserGroupResponseModel): UserGroupItemResponseModel => {
+	return {
+		name: item.name,
+		id: item.id,
+		icon: item.icon,
+	};
+};
 
 // Temp mocked database
 class UmbUserGroupData extends UmbEntityData<UserGroupResponseModel> {
@@ -17,6 +29,11 @@ class UmbUserGroupData extends UmbEntityData<UserGroupResponseModel> {
 			total: this.data.length,
 			items: this.data,
 		};
+	}
+
+	getItems(ids: Array<string>): Array<UserGroupItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
+		return items.map((item) => createUserGroupItem(item));
 	}
 
 	/**
