@@ -14,4 +14,6 @@ public interface IWebHookService
     Task<IEnumerable<Webhook>> GetMultipleAsync(IEnumerable<Guid> keys);
 
     Task<IEnumerable<Webhook>> GetAllAsync();
+
+    Task<IEnumerable<Webhook>> GetByEventName(string eventName);
 }
