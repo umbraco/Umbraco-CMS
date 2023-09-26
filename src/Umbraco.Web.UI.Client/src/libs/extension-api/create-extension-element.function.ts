@@ -1,12 +1,12 @@
 import { hasDefaultExport, hasElementExport, isManifestElementNameType } from './type-guards/index.js';
-import { loadExtension } from './load-extension.function.js';
 import type { HTMLElementConstructor, ManifestElement } from './types.js';
+import { loadExtensionElement } from './load-extension-element.function.js';
 
 export async function createExtensionElement<ElementType extends HTMLElement>(
 	manifest: ManifestElement<ElementType>
 ): Promise<ElementType | undefined> {
 	//TODO: Write tests for these extension options:
-	const js = await loadExtension(manifest);
+	const js = await loadExtensionElement(manifest);
 
 	if (isManifestElementNameType(manifest)) {
 		// created by manifest method providing HTMLElement

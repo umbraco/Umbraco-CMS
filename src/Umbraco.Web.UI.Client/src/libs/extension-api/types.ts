@@ -132,6 +132,49 @@ export interface ManifestWithLoaderIncludingDefaultExport<T = unknown>
 	js?: string;
 }
 
+export interface ManifestWithLoaderIncludingApiExport<ApiType = unknown>
+	extends ManifestWithLoader<{ api: ApiType } | Omit<object, 'api'>> {
+	/**
+	 * The file location of the javascript file to load
+	 */
+	js?: string;
+	/**
+	* The file location of the API javascript file to load
+	*/
+	apiJs?: string;
+}
+
+export interface ManifestWithLoaderIncludingElementExport<ElementType extends HTMLElement = HTMLElement>
+	extends ManifestWithLoader<{ element: ElementType } | Omit<object, 'element'>> {
+	/**
+	 * The file location of the javascript file to load
+	 */
+	js?: string;
+	/**
+	* The file location of the element javascript file to load
+	*/
+ elementJs?: string;
+}
+export interface ManifestWithLoaderOptionalApiOrElementExport<
+	ElementType extends HTMLElement = HTMLElement, 
+	ApiType = unknown,
+	ClassType = { element: ElementType } | { api: ApiType } | { element: ElementType, api: ApiType } | Omit<Omit<object, 'element'>, 'api'>
+>
+extends ManifestWithLoader<ClassType> {
+	/**
+	 * The file location of the javascript file to load
+	 */
+	js?: string;
+	/**
+	* The file location of the element javascript file to load
+	*/
+	elementJs?: string;
+	/**
+	 * The file location of the API javascript file to load
+	 */
+	apiJs?: string;
+}
+
 export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
 	extends ManifestWithLoader<{ default: ClassConstructor<ElementType> } | Omit<object, 'default'>> {
 	/**
@@ -148,7 +191,7 @@ export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
 
 	/**
 	 * The HTML web component name to use such as 'my-dashboard'
-	 * Note it is NOT <my-dashboard></my-dashboard> but just the name
+	 * Note it is NOT <my-dashboard></my-dashboard>, just the element name.
 	 */
 	elementName?: string;
 
@@ -156,6 +199,35 @@ export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
 	 * This contains properties specific to the type of extension
 	 */
 	meta?: unknown;
+}
+
+export interface ManifestElementAndApi<ElementType extends HTMLElement = HTMLElement, ApiType = unknown>
+	extends ManifestWithLoaderOptionalApiOrElementExport<ElementType, ApiType> {
+	/**
+	 * @TJS-ignore
+	 */
+	readonly API_TYPE?: ApiType;
+	/**
+	 * @TJS-ignore
+	 */
+	readonly ELEMENT_TYPE?: ElementType;
+
+
+	/**
+	 * @TJS-ignore
+	 */
+	apiName?: string;
+
+	/**
+	 * @TJS-ignore
+	 */
+	api?: ClassConstructor<ApiType>;
+
+	/**
+	 * The HTML web component name to use such as 'my-dashboard'
+	 * Note it is NOT <my-dashboard></my-dashboard>, just the element name.
+	 */
+	elementName?: string;
 }
 
 export interface ManifestWithView<ElementType extends HTMLElement = HTMLElement> extends ManifestElement<ElementType> {

@@ -1,13 +1,13 @@
 import { hasApiExport, hasDefaultExport, isManifestClassConstructorType } from './type-guards/index.js';
-import { loadExtension } from './load-extension.function.js';
 import type { ManifestApi, ClassConstructor } from './types.js';
+import { loadExtensionApi } from './load-extension-api.function.js';
 
 //TODO: Write tests for this method:
 export async function createExtensionApi<ApiType = unknown>(
 	manifest: ManifestApi,
 	constructorArguments: unknown[]
 ): Promise<ApiType | undefined> {
-	const js = await loadExtension(manifest);
+	const js = await loadExtensionApi(manifest);
 
 	if (isManifestClassConstructorType<ApiType>(manifest)) {
 		return new manifest.api(...constructorArguments);
