@@ -2,6 +2,7 @@ export * from './repository/index.js';
 export * from './workspace/index.js';
 export * from './recycle-bin/index.js';
 export * from './user-permissions/index.js';
+export * from './components/index.js';
 
 import './components/index.js';
 
