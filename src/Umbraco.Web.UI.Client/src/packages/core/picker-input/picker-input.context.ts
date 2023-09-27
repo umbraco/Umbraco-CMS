@@ -101,5 +101,6 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 	#removeItem(unique: string) {
 		const newSelection = this.getSelection().filter((value) => value !== unique);
 		this.setSelection(newSelection);
+		this.host.dispatchEvent(new UmbChangeEvent());
 	}
 }
