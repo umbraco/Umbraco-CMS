@@ -13,11 +13,10 @@ import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import { UmbInputSectionElement } from '@umbraco-cms/backoffice/components';
 import { UmbUserInputElement } from '@umbraco-cms/backoffice/users';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
+import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 
 import './components/user-group-default-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
-
-import { UmbInputMediaElement } from 'src/packages/media/media/components/index.js';
 
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {

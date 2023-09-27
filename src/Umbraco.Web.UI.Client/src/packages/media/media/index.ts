@@ -1,5 +1,7 @@
 import { ContentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
+export * from './components/index.js';
+
 // Content
 export interface ContentProperty {
 	alias: string;
