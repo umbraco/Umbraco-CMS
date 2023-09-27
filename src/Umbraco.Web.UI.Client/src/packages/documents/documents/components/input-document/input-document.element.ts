@@ -81,12 +81,12 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this._selectedIds.length < this.min
+			() => !!this.min && this._selectedIds.length < this.min,
 		);
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this._selectedIds.length > this.max
+			() => !!this.max && this._selectedIds.length > this.max,
 		);
 
 		this.consumeContext(UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN, (instance) => {

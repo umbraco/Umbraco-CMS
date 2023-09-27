@@ -58,6 +58,7 @@ export const data: Array<UserGroupResponseModel> = [
 		id: 'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		name: 'Administrators',
 		icon: 'umb:medal',
+		documentStartNodeId: 'all-property-editors-document-id',
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
 	},
 	{
