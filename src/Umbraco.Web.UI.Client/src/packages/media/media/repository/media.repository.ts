@@ -3,6 +3,8 @@ import { UmbMediaTreeServerDataSource } from './sources/media.tree.server.data.j
 import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from './media.tree.store.js';
 import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_TOKEN } from './media.store.js';
 import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.data.js';
+import { UmbMediaItemServerDataSource } from './sources/media-item.server.data.js';
+import { UmbMediaItemStore } from './media-item.store.js';
 import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
@@ -28,6 +30,9 @@ export class UmbMediaRepository
 	#detailDataSource: UmbMediaDetailServerDataSource;
 	#store?: UmbMediaStore;
 
+	#itemSource: UmbMediaItemServerDataSource;
+	#itemStore?: UmbMediaItemStore;
+
 	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostElement) {
@@ -36,6 +41,7 @@ export class UmbMediaRepository
 		// TODO: figure out how spin up get the correct data source
 		this.#treeSource = new UmbMediaTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbMediaDetailServerDataSource(this.#host);
+		this.#itemSource = new UmbMediaItemServerDataSource(this.#host);
 
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
@@ -44,6 +50,10 @@ export class UmbMediaRepository
 
 			new UmbContextConsumerController(this.#host, UMB_MEDIA_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#store = instance;
+			}).asPromise(),
+
+			new UmbContextConsumerController(this.#host, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#itemStore = instance;
 			}).asPromise(),
 
 			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
@@ -117,6 +127,25 @@ export class UmbMediaRepository
 	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
+	}
+
+	// ITEMS:
+	async requestItems(ids: Array<string>) {
+		if (!ids) throw new Error('Keys are missing');
+		await this.#init;
+
+		const { data, error } = await this.#itemSource.getItems(ids);
+
+		if (data) {
+			this.#itemStore?.appendItems(data);
+		}
+
+		return { data, error, asObservable: () => this.#itemStore!.items(ids) };
+	}
+
+	async items(ids: Array<string>) {
+		await this.#init;
+		return this.#itemStore!.items(ids);
 	}
 
 	// DETAILS:

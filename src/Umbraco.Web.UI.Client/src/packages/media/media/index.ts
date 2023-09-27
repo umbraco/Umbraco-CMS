@@ -21,4 +21,5 @@ export interface MediaDetails extends ContentTreeItemResponseModel {
 	data: Array<ContentPropertyData>;
 	variants: Array<any>; // TODO: define variant data
 	//layout?: any; // TODO: define layout type - make it non-optional
+	icon?: string;
 }
