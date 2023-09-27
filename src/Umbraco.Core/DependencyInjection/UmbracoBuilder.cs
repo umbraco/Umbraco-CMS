@@ -36,6 +36,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Snippets;
+using Umbraco.Cms.Core.StartNodeFinder;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
@@ -329,6 +330,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Register filestream security analyzers
             Services.AddUnique<IFileStreamSecurityValidator,FileStreamSecurityValidator>();
+            Services.AddUnique<IStartNodeFinder,StartNodeFinder.StartNodeFinder>();
         }
     }
 }

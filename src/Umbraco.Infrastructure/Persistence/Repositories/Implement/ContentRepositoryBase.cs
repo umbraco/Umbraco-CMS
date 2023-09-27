@@ -760,7 +760,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // in the table?
 
             // get all PropertyDataDto for all definitions / versions
-            var allPropertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, Constants.Sql.MaxParameterCount, batch =>
+            List<PropertyDataDto> allPropertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, Constants.Sql.MaxParameterCount, batch =>
                 SqlContext.Sql()
                     .Select<PropertyDataDto>()
                     .From<PropertyDataDto>()

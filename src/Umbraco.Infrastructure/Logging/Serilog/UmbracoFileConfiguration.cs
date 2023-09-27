@@ -41,6 +41,7 @@ public class UmbracoFileConfiguration
     public bool RollOnFileSizeLimit { get; set; }
 
     public int RetainedFileCountLimit { get; set; } = 31;
+    public TimeSpan? RetainedFileTimeLimit { get; set; } = TimeSpan.FromDays(31);
 
     public string GetPath(string logDirectory) =>
         Path.Combine(logDirectory, $"UmbracoTraceLog.{Environment.MachineName}..json");

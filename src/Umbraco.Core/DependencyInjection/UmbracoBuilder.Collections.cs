@@ -14,7 +14,10 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Sections;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Snippets;
+using Umbraco.Cms.Core.StartNodeFinder.Filters;
+using Umbraco.Cms.Core.StartNodeFinder.Origin;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Tour;
 using Umbraco.Cms.Core.Trees;
@@ -77,6 +80,16 @@ public static partial class UmbracoBuilderExtensions
             .Append<MembersSection>()
             .Append<FormsSection>()
             .Append<TranslationSection>();
+
+        builder.StartNodeOriginFinders()
+            .Append<ByKeyStartNodeOriginFinder>()
+            .Append<CurrentStartNodeOriginFinder>()
+            .Append<SiteStartNodeOriginFinder>()
+            .Append<RootStartNodeOriginFinder>();
+
+        builder.StartNodeSelectorFilters()
+            .Append<NearestAncestorOrSelfStartNodeSelectorFilter>();
+
         builder.Components();
         // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
         builder.Dashboards()
@@ -194,6 +207,12 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="builder">The builder.</param>
     public static SectionCollectionBuilder Sections(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<SectionCollectionBuilder>();
+
+    public static StartNodeOriginFinderCollectionBuilder StartNodeOriginFinders(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<StartNodeOriginFinderCollectionBuilder>();
+
+    public static StartNodeSelectorFilterCollectionBuilder StartNodeSelectorFilters(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<StartNodeSelectorFilterCollectionBuilder>();
 
     /// <summary>
     /// Gets the components collection builder.

@@ -20,6 +20,7 @@ public class ConfigureUmbracoDeliveryApiSwaggerGenOptions: IConfigureOptions<Swa
                 Description = $"You can find out more about the {DeliveryApiConfiguration.ApiTitle} in [the documentation]({DeliveryApiConfiguration.ApiDocumentationContentArticleLink})."
             });
 
+        swaggerGenOptions.SupportNonNullableReferenceTypes();
         swaggerGenOptions.DocumentFilter<MimeTypeDocumentFilter>(DeliveryApiConfiguration.ApiName);
 
         swaggerGenOptions.OperationFilter<SwaggerContentDocumentationFilter>();

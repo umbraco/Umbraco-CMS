@@ -74,7 +74,8 @@ namespace Umbraco.Extensions
                 rollingInterval: umbracoFileConfiguration.RollingInterval,
                 flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
                 rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
-                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit);
+                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit,
+                retainedFileTimeLimit: umbracoFileConfiguration.RetainedFileTimeLimit);
 
             return logConfig;
         }
@@ -115,7 +116,8 @@ namespace Umbraco.Extensions
                 rollingInterval: umbracoFileConfiguration.RollingInterval,
                 flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
                 rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
-                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit);
+                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit,
+                retainedFileTimeLimit: umbracoFileConfiguration.RetainedFileTimeLimit);
 
             return logConfig;
         }
@@ -186,6 +188,7 @@ namespace Umbraco.Extensions
             RollingInterval rollingInterval = RollingInterval.Day,
             bool rollOnFileSizeLimit = false,
             int? retainedFileCountLimit = 31,
+            TimeSpan? retainedFileTimeLimit = null,
             Encoding? encoding = null)
         {
             formatter ??= new CompactJsonFormatter();
@@ -210,7 +213,8 @@ namespace Umbraco.Extensions
                         rollOnFileSizeLimit,
                         retainedFileCountLimit,
                         encoding,
-                        null));
+                        null,
+                        retainedFileTimeLimit));
         }
 
 
