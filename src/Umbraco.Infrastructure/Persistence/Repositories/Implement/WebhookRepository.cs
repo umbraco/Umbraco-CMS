@@ -63,6 +63,26 @@ public class WebhookRepository : IWebhookRepository
         return DtoToEntity(webhookDto);
     }
 
+    public async Task<PagedModel<Webhook>> GetByEventNameAsync(string eventName)
+    {
+        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+            .Select<WebhookDto>()
+            .From<WebhookDto>()
+            .InnerJoin<Event2WebhookDto>()
+            .On<WebhookDto, Event2WebhookDto>(left => left.Id, right => right.WebhookId)
+            .Where<Event2WebhookDto>(x => x.Event == eventName);
+
+        var webhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<WebhookDto>(sql)!;
+
+        IEnumerable<Webhook>? webhooks = webhookDtos?.Select(DtoToEntity).WhereNotNull();
+
+        return new PagedModel<Webhook>
+        {
+            Items = webhooks ?? Enumerable.Empty<Webhook>(),
+            Total = webhookDtos?.Count ?? 0,
+        };
+    }
+
     public async Task DeleteAsync(Webhook webhook)
     {
         Sql<ISqlContext> sql = _scopeAccessor.AmbientScope!.Database.SqlContext.Sql()

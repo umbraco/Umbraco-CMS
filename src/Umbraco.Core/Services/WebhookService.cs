@@ -75,14 +75,12 @@ public class WebhookService : IWebHookService
         return webhooks;
     }
 
-    public Task<IEnumerable<Webhook>> GetByEventName(string eventName)
+    public async Task<IEnumerable<Webhook>> GetByEventNameAsync(string eventName)
     {
-        // using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        // IQuery<Webhook> query = Query<Webhook>().Where(x => x.Events.Contains(eventName));
-        // IEnumerable<Webhook> webhooks = _webhookRepository.Get(query);
-        // scope.Complete();
-        // return Task.FromResult(webhooks);
-        return Task.FromResult(Enumerable.Empty<Webhook>());
+        using ICoreScope scope = _provider.CreateCoreScope();
+        PagedModel<Webhook> webhooks = await _webhookRepository.GetByEventNameAsync(eventName);
+        scope.Complete();
 
+        return webhooks.Items;
     }
 }

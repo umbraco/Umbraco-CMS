@@ -14,5 +14,5 @@ public interface IWebHookService
 
     Task<PagedModel<Webhook>> GetAllAsync(int skip, int take);
 
-    Task<IEnumerable<Webhook>> GetByEventName(string eventName);
+    Task<IEnumerable<Webhook>> GetByEventNameAsync(string eventName);
 }

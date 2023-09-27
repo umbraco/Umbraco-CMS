@@ -98,7 +98,7 @@ public class WebhookServiceTests : UmbracoIntegrationTest
         var webhook2 = await WebhookService.CreateAsync(new Webhook("https://example.com", events: new[] { Constants.WebhookEvents.ContentUnpublish }));
         var webhook3 = await WebhookService.CreateAsync(new Webhook("https://example.com", events: new[] { Constants.WebhookEvents.ContentUnpublish }));
 
-        var result = await WebhookService.GetByEventName(Constants.WebhookEvents.ContentUnpublish);
+        var result = await WebhookService.GetByEventNameAsync(Constants.WebhookEvents.ContentUnpublish);
 
         Assert.IsNotEmpty(result);
         Assert.AreEqual(2, result.Count());

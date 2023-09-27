@@ -29,6 +29,13 @@ public interface IWebhookRepository
     /// <summary>
     ///     Gets a webhook by key
     /// </summary>
+    /// <param name="eventName">The key of the webhook which will be retrieved.</param>
+    /// <returns>The <see cref="Webhook" /> webhook with the given key.</returns>
+    Task<PagedModel<Webhook>> GetByEventNameAsync(string eventName);
+
+    /// <summary>
+    ///     Gets a webhook by key
+    /// </summary>
     /// <param name="webhook">The webhook to be deleted.</param>
     /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous operation.</placeholder></returns>
     Task DeleteAsync(Webhook webhook);
