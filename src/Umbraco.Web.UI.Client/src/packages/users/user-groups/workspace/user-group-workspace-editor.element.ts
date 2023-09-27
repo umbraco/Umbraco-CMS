@@ -9,6 +9,8 @@ import {
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
+import { UmbInputSectionElement } from '@umbraco-cms/backoffice/components';
 
 import './components/user-group-default-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
@@ -42,8 +44,14 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.updateUserKeys(userIds);
 	}
 
-	#onSectionsChange(value: string[]) {
-		this.#workspaceContext?.updateProperty('sections', value);
+	#onSectionsChange(event: CustomEvent) {
+		const target = event.target as UmbInputSectionElement;
+		this.#workspaceContext?.updateProperty('sections', target.value);
+	}
+
+	#onDocumentStartNodeChange(event: CustomEvent) {
+		const target = event.target as UmbInputDocumentElement;
+		this.#workspaceContext?.updateProperty('documentStartNodeId', target.selectedIds[0]);
 	}
 
 	async #onDelete() {
@@ -116,7 +124,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					<umb-input-section
 						slot="editor"
 						.value=${this._userGroup.sections ?? []}
-						@change=${(e: any) => this.#onSectionsChange(e.target.value)}></umb-input-section>
+						@change=${this.#onSectionsChange}></umb-input-section>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout
 					label=${this.localize.term('defaultdialogs_selectContentStartNode')}
@@ -125,7 +133,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 						slot="editor"
 						max="1"
 						.selectedIds=${this._userGroup.documentStartNodeId ? [this._userGroup.documentStartNodeId] : []}
-						@change=${(e: any) => this.#onSectionsChange(e.target.value)}
+						@change=${this.#onDocumentStartNodeChange}
 						multiple></umb-input-document>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout
