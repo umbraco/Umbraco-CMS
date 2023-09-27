@@ -17,6 +17,8 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import './components/user-group-default-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
 
+import { UmbInputMediaElement } from 'src/packages/media/media/components/index.js';
+
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	@state()
@@ -50,6 +52,11 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#onDocumentStartNodeChange(event: CustomEvent) {
 		const target = event.target as UmbInputDocumentElement;
 		this.#workspaceContext?.updateProperty('documentStartNodeId', target.selectedIds[0]);
+	}
+
+	#onMediaStartNodeChange(event: CustomEvent) {
+		const target = event.target as UmbInputMediaElement;
+		this.#workspaceContext?.updateProperty('mediaStartNodeId', target.selectedIds[0]);
 	}
 
 	#onUsersChange(event: UmbChangeEvent) {
@@ -145,7 +152,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 						slot="editor"
 						max="1"
 						.selectedIds=${this._userGroup.mediaStartNodeId ? [this._userGroup.mediaStartNodeId] : []}
-						@change=${this.#onDocumentStartNodeChange}></umb-input-media>
+						@change=${this.#onMediaStartNodeChange}></umb-input-media>
 				</umb-workspace-property-layout>
 			</uui-box>
 
