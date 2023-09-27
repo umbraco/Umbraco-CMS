@@ -100,7 +100,8 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#renderLeftColumn() {
 		if (!this._userGroup) return nothing;
 
-		return html` <uui-box>
+		return html`
+			<uui-box>
 				<div slot="headline"><umb-localize key="user_assignAccess"></umb-localize></div>
 				<umb-workspace-property-layout
 					label=${this.localize.term('main_sections')}
@@ -135,10 +136,13 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 				<umb-user-group-default-permission-list></umb-user-group-default-permission-list>
 			</uui-box>
 
+			<!-- Temp disabled because it is work in progress
 			<uui-box>
 				<div slot="headline"><umb-localize key="user_permissionsGranular"></umb-localize></div>
 				<umb-user-group-granular-permission-list></umb-user-group-granular-permission-list>
-			</uui-box>`;
+			</uui-box>
+	-->
+		`;
 	}
 
 	#renderRightColumn() {
