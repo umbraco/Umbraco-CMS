@@ -1,13 +1,9 @@
+import { UMB_USER_GROUP_ENTITY_TYPE } from '../index.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import {
-	UMB_CONFIRM_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UmbModalManagerContext,
-} from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import { UmbInputSectionElement } from '@umbraco-cms/backoffice/components';
@@ -27,7 +23,6 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	private _userKeys?: Array<string>;
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
-	#modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
@@ -36,10 +31,6 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 			this.#workspaceContext = instance;
 			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup));
 			this.observe(this.#workspaceContext.userIds, (userKeys) => (this._userKeys = userKeys));
-		});
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
-			this.#modalContext = instance;
 		});
 	}
 
@@ -65,26 +56,6 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		event.stopPropagation();
 		const target = event.target as UmbUserInputElement;
 		this.#workspaceContext?.updateUserKeys(target.selectedIds);
-	}
-
-	async #onDelete() {
-		if (!this.#modalContext || !this.#workspaceContext) return;
-
-		const modalContext = this.#modalContext.open(UMB_CONFIRM_MODAL, {
-			color: 'danger',
-			headline: `Delete user group ${this._userGroup?.name}?`,
-			content: html`Are you sure you want to delete <b>${this._userGroup?.name}</b> user group?`,
-			confirmLabel: 'Delete',
-		});
-
-		await modalContext.onSubmit();
-
-		if (!this._userGroup || !this._userGroup.id) return;
-
-		await this.#workspaceContext.delete(this._userGroup?.id);
-		//TODO: should we check if it actually succeeded in deleting the user group?
-
-		history.pushState(null, '', 'section/users/view/user-groups');
 	}
 
 	#onNameChange(event: UUIInputEvent) {
@@ -175,18 +146,11 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 				<div slot="headline"><umb-localize key="sections_users"></umb-localize></div>
 				<umb-user-input @change=${this.#onUsersChange} .selectedIds=${this._userKeys ?? []}></umb-user-input>
 			</uui-box>
-			<uui-box>
-				<div slot="headline">
-					<umb-localize key="actions_delete"></umb-localize>
-					<umb-localize key="user_usergroup"></umb-localize>
-				</div>
-				<uui-button
-					@click=${this.#onDelete}
-					style="width: 100%"
-					color="danger"
-					look="secondary"
-					label=${this.localize.term('actions_delete')}></uui-button>
-			</uui-box>`;
+			<uui-box headline="Actions">
+				<umb-entity-action-list
+					.entityType=${UMB_USER_GROUP_ENTITY_TYPE}
+					.unique=${this._userGroup?.id}></umb-entity-action-list
+			></uui-box>`;
 	}
 
 	static styles = [
