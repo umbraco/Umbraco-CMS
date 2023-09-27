@@ -121,7 +121,11 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 				<umb-workspace-property-layout
 					label=${this.localize.term('defaultdialogs_selectContentStartNode')}
 					description=${this.localize.term('user_startnodehelp')}>
-					<b slot="editor">CONTENT START NODE PICKER NOT IMPLEMENTED YET</b>
+					<umb-input-document
+						slot="editor"
+						.selectedIds=${this._userGroup.documentStartNodeId ? [this._userGroup.documentStartNodeId] : []}
+						@change=${(e: any) => this.#onSectionsChange(e.target.value)}
+						multiple></umb-input-document>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout
 					label=${this.localize.term('defaultdialogs_selectMediaStartNode')}
