@@ -218,13 +218,4 @@ public class PropertyEditorValueTypeConverterTests
     }
 
     private static IPublishedPropertyType PropertyType() => Mock.Of<IPublishedPropertyType>(x => x.EditorAlias == "My.Custom.Alias");
-
-    // private static PropertyEditorCollection DefaultPropertyEditorCollection()
-    //     => new PropertyEditorCollection(new DataEditorCollection(Array.Empty<IDataEditor>));
-    //
-    // private static IPublishedPropertyType DefaultPublishedPropertyType(string editorAlias)
-    // {
-    //     var propertyType = Mock.Of<IPublishedPropertyType>(x => x.EditorAlias == editorAlias);
-    //     return propertyType;
-    // }
 }
