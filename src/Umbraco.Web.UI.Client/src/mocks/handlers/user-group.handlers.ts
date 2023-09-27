@@ -37,4 +37,13 @@ export const handlers = [
 
 		return res(ctx.status(200));
 	}),
+
+	rest.delete<string>(umbracoPath(`${slug}/:id`), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
+
+		umbUserGroupData.delete([id]);
+
+		return res(ctx.status(200));
+	}),
 ];
