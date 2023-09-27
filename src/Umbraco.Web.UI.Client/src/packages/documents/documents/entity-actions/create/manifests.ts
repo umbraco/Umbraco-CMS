@@ -19,6 +19,9 @@ const entityActions: Array<ManifestEntityAction> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.UserPermission',
+				// TODO: investigate why the match property is not typed
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				//@ts-ignore
 				match: 'Umb.UserPermission.Document.Create',
 			},
 		],
