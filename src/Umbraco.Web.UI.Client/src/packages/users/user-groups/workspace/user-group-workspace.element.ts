@@ -1,6 +1,6 @@
 import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context.js';
 import { UmbUserGroupWorkspaceEditorElement } from './user-group-workspace-editor.element.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
@@ -22,7 +22,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 				new UmbWorkspaceIsNewRedirectController(
 					this,
 					this.#workspaceContext,
-					this.shadowRoot!.querySelector('umb-router-slot')!
+					this.shadowRoot!.querySelector('umb-router-slot')!,
 				);
 			},
 		},
