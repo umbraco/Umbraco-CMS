@@ -57,8 +57,8 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 	}
 
 	async #requestItems() {
-		if (!this.repository) throw new Error('Repository is not initialized');
 		await this.#init;
+		if (!this.repository) throw new Error('Repository is not initialized');
 		if (this.itemsObserver) this.itemsObserver.destroy();
 
 		// TODO: Test if its just some items that is gone now, if so then just filter them out. (maybe use code from #removeItem)
