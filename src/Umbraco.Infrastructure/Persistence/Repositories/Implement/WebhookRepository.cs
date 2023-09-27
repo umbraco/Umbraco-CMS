@@ -1,149 +1,122 @@
-﻿using Microsoft.Extensions.Logging;
-using NPoco;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
+﻿using NPoco;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
-using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-public class WebhookRepository : EntityRepositoryBase<Guid, Webhook>, IWebhookRepository
+public class WebhookRepository : IWebhookRepository
 {
-    public WebhookRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger<EntityRepositoryBase<Guid, Webhook>> logger) : base(scopeAccessor, appCaches, logger)
+    private readonly IScopeAccessor _scopeAccessor;
+
+    public WebhookRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
+
+    public async Task<PagedModel<Webhook>> GetAllAsync(int skip, int take)
     {
-    }
-
-    protected override Webhook? PerformGet(Guid key)
-    {
-        Sql<ISqlContext> sql = GetBaseQuery(false);
-        sql.Where(GetBaseWhereClause(), new { key });
-
-        WebhookDto? dto = Database.FirstOrDefault<WebhookDto>(sql);
-
-        if (dto is not null)
-        {
-            return DtoToEntity(dto);
-        }
-
-        return null;
-    }
-
-    protected override IEnumerable<Webhook> PerformGetAll(params Guid[]? ids)
-    {
-        Sql<ISqlContext> sql = GetBaseQuery(false);
-
-        List<WebhookDto> dtos = Database.Fetch<WebhookDto>(sql);
-
-        return dtos.Select(DtoToEntity);
-    }
-
-    protected override IEnumerable<Webhook> PerformGetByQuery(IQuery<Webhook> query)
-    {
-        Sql<ISqlContext> sqlClause = GetBaseQuery(false);
-        var translator = new SqlTranslator<Webhook>(sqlClause, query);
-        Sql<ISqlContext> sql = translator.Translate();
-
-        List<WebhookDto>? dtos = Database.Fetch<WebhookDto>(sql);
-
-        return dtos.Select(DtoToEntity);
-    }
-
-    protected override void PersistNewItem(Webhook entity)
-    {
-        entity.AddingEntity();
-
-        WebhookDto webhookDto = WebhookFactory.BuildDto(entity);
-
-        var id = Convert.ToInt32(Database.Insert(webhookDto));
-        entity.Id = id;
-        InsertManyToOneReferences(entity);
-
-        entity.ResetDirtyProperties();
-    }
-
-    protected override void PersistUpdatedItem(Webhook entity)
-    {
-        entity.UpdatingEntity();
-
-        WebhookDto dto = WebhookFactory.BuildDto(entity);
-        Database.Update(dto);
-
-        // Delete and re-insert the many to one references (event & entity keys)
-        DeleteUpdateManyToOneReferences(dto.Id);
-        InsertManyToOneReferences(entity);
-
-        entity.ResetDirtyProperties();
-    }
-
-    protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
-    {
-        Sql<ISqlContext> sql = Sql();
-
-        sql = isCount
-            ? sql.SelectCount()
-            : sql.Select<WebhookDto>();
-
-        sql
+        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+            .Select<WebhookDto>()
             .From<WebhookDto>();
 
-        return sql;
-    }
+        List<WebhookDto>? webhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<WebhookDto>(sql)!;
 
-    protected override string GetBaseWhereClause() => "key = @key";
+        IEnumerable<Webhook>? webhooks = webhookDtos?.Skip(skip).Take(take).Select(DtoToEntity).WhereNotNull();
 
-    protected override IEnumerable<string> GetDeleteClauses()
-    {
-        var list = new List<string>
+        return new PagedModel<Webhook>
         {
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.Webhook} WHERE key = @key",
+            Items = webhooks ?? Enumerable.Empty<Webhook>(),
+            Total = webhookDtos?.Count ?? 0,
         };
-        return list;
     }
 
-    protected override Guid GetEntityId(Webhook entity)
-        => entity.Key;
-
-    protected override void PersistDeletedItem(Webhook entity)
+    public async Task<Webhook> CreateAsync(Webhook webhook)
     {
-        IEnumerable<string> deletes = GetDeleteClauses();
-        foreach (var delete in deletes)
+        webhook.AddingEntity();
+
+        WebhookDto webhookDto = WebhookFactory.BuildDto(webhook);
+
+        var result = await _scopeAccessor.AmbientScope?.Database.InsertAsync(webhookDto)!;
+
+        var id = Convert.ToInt32(result);
+        webhook.Id = id;
+
+        IEnumerable<Event2WebhookDto> entityKeys = WebhookFactory.BuildEvent2WebhookDto(webhook);
+        await _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(entityKeys)!;
+        await _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(WebhookFactory.BuildEntityKey2WebhookDto(webhook))!;
+
+        webhook.ResetDirtyProperties();
+
+        return webhook;
+    }
+
+    public async Task<Webhook?> GetAsync(Guid key)
+    {
+        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+            .Select<WebhookDto>()
+            .From<WebhookDto>()
+            .Where<WebhookDto>(x => x.Key == key);
+
+        WebhookDto? webhookDto = await _scopeAccessor.AmbientScope?.Database.FirstOrDefaultAsync<WebhookDto>(sql)!;
+
+        return DtoToEntity(webhookDto);
+    }
+
+    public async Task DeleteAsync(Webhook webhook)
+    {
+        Sql<ISqlContext> sql = _scopeAccessor.AmbientScope!.Database.SqlContext.Sql()
+            .Delete<WebhookDto>()
+            .Where<WebhookDto>(x => x.Key == webhook.Key);
+
+        await _scopeAccessor.AmbientScope?.Database.ExecuteAsync(sql)!;
+
+        webhook.DeleteDate = DateTime.Now;
+    }
+
+    public async Task UpdateAsync(Webhook webhook)
+    {
+        webhook.UpdatingEntity();
+
+        WebhookDto dto = WebhookFactory.BuildDto(webhook);
+        await _scopeAccessor.AmbientScope?.Database.UpdateAsync(dto)!;
+
+        // Delete and re-insert the many to one references (event & entity keys)
+        DeleteManyToOneReferences(dto.Id);
+        InsertManyToOneReferences(webhook);
+
+        webhook.ResetDirtyProperties();
+    }
+
+    private void DeleteManyToOneReferences(int webhookId)
+    {
+        _scopeAccessor.AmbientScope?.Database.Delete<EntityKey2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId });
+        _scopeAccessor.AmbientScope?.Database.Delete<Event2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId });
+    }
+
+    private void InsertManyToOneReferences(Webhook webhook)
+    {
+        IEnumerable<EntityKey2WebhookDto> buildEntityKey2WebhookDtos = WebhookFactory.BuildEntityKey2WebhookDto(webhook);
+        IEnumerable<Event2WebhookDto> buildEvent2WebhookDtos = WebhookFactory.BuildEvent2WebhookDto(webhook);
+
+        _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(buildEntityKey2WebhookDtos);
+        _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(buildEvent2WebhookDtos);
+    }
+
+    private Webhook? DtoToEntity(WebhookDto? dto)
+    {
+        if (dto is null)
         {
-            Database.Execute(delete, new { key = GetEntityId(entity) });
+            return null;
         }
 
-        entity.DeleteDate = DateTime.Now;
-    }
-
-    private Webhook DtoToEntity(WebhookDto dto)
-    {
-        List<EntityKey2WebhookDto> webhookEntityKeyDtos = Database.Fetch<EntityKey2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id });
-        List<Event2WebhookDto> event2WebhookDtos = Database.Fetch<Event2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id });
+        List<EntityKey2WebhookDto>? webhookEntityKeyDtos = _scopeAccessor.AmbientScope?.Database.Fetch<EntityKey2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id });
+        List<Event2WebhookDto>? event2WebhookDtos = _scopeAccessor.AmbientScope?.Database.Fetch<Event2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id });
         Webhook entity = WebhookFactory.BuildEntity(dto, webhookEntityKeyDtos, event2WebhookDtos);
 
         // reset dirty initial properties (U4-1946)
         entity.ResetDirtyProperties(false);
 
         return entity;
-    }
-
-    private void DeleteUpdateManyToOneReferences(int webhookId)
-    {
-        Database.Delete<EntityKey2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId });
-        Database.Delete<Event2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId });
-    }
-
-    private void InsertManyToOneReferences(Webhook webhook)
-    {
-        IEnumerable<EntityKey2WebhookDto> buildEntityKey2WebhookDtos = WebhookFactory.BuildEntityKey2WebhookDto(webhook, webhook.Id);
-        IEnumerable<Event2WebhookDto> buildEvent2WebhookDtos = WebhookFactory.BuildEvent2WebhookDto(webhook, webhook.Id);
-
-        Database.InsertBulk(buildEntityKey2WebhookDtos);
-        Database.InsertBulk(buildEvent2WebhookDtos);
     }
 }

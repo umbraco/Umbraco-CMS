@@ -22,11 +22,11 @@ public class WebHookController : UmbracoAuthorizedJsonController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(int skip = 0, int take = int.MaxValue)
     {
-        IEnumerable<Webhook> webhooks = await _webHookService.GetAllAsync();
+        PagedModel<Webhook> webhooks = await _webHookService.GetAllAsync(skip, take);
 
-        List<WebhookViewModel> webhookViewModels = _umbracoMapper.MapEnumerable<Webhook, WebhookViewModel>(webhooks);
+        List<WebhookViewModel> webhookViewModels = _umbracoMapper.MapEnumerable<Webhook, WebhookViewModel>(webhooks.Items);
 
         return Ok(webhookViewModels);
     }

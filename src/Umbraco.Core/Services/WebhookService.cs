@@ -1,37 +1,36 @@
-﻿using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
+﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class WebhookService : RepositoryService, IWebHookService
+public class WebhookService : IWebHookService
 {
+    private readonly ICoreScopeProvider _provider;
     private readonly IWebhookRepository _webhookRepository;
 
-    public WebhookService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IWebhookRepository webhookRepository) : base(provider, loggerFactory, eventMessagesFactory)
+    public WebhookService(ICoreScopeProvider provider, IWebhookRepository webhookRepository)
     {
+        _provider = provider;
         _webhookRepository = webhookRepository;
     }
 
-    public Task<Webhook> CreateAsync(Webhook webhook)
+    public async Task<Webhook> CreateAsync(Webhook webhook)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        _webhookRepository.Save(webhook);
+        using ICoreScope scope = _provider.CreateCoreScope();
+        Webhook created = await _webhookRepository.CreateAsync(webhook);
         scope.Complete();
 
-        return Task.FromResult(webhook);
+        return created;
     }
 
-    public Task UpdateAsync(Webhook updateModel)
+    public async Task UpdateAsync(Webhook updateModel)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        using ICoreScope scope = _provider.CreateCoreScope();
 
         // TODO: Validation if we need it
 
-        Webhook? currentWebhook = _webhookRepository.Get(updateModel.Key);
+        Webhook? currentWebhook = await _webhookRepository.GetAsync(updateModel.Key);
 
         if (currentWebhook is null)
         {
@@ -43,55 +42,47 @@ public class WebhookService : RepositoryService, IWebHookService
         currentWebhook.Events = updateModel.Events;
         currentWebhook.Url = updateModel.Url;
 
-        _webhookRepository.Save(currentWebhook);
+        await _webhookRepository.UpdateAsync(currentWebhook);
         scope.Complete();
-
-        return Task.FromResult(updateModel);
     }
 
-    public Task DeleteAsync(Guid key)
+    public async Task DeleteAsync(Guid key)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        Webhook? webhook = _webhookRepository.Get(key);
+        using ICoreScope scope = _provider.CreateCoreScope();
+        Webhook? webhook = await _webhookRepository.GetAsync(key);
         if (webhook is not null)
         {
-            _webhookRepository.Delete(webhook);
+            await _webhookRepository.DeleteAsync(webhook);
         }
 
         scope.Complete();
-        return Task.CompletedTask;
     }
 
-    public Task<Webhook?> GetAsync(Guid key)
+    public async Task<Webhook?> GetAsync(Guid key)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        Webhook? webhook = _webhookRepository.Get(key);
+        using ICoreScope scope = _provider.CreateCoreScope();
+        Webhook? webhook = await _webhookRepository.GetAsync(key);
         scope.Complete();
-        return Task.FromResult(webhook);
+        return webhook;
     }
 
-    public Task<IEnumerable<Webhook>> GetMultipleAsync(IEnumerable<Guid> keys)
+    public async Task<PagedModel<Webhook>> GetAllAsync(int skip, int take)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IEnumerable<Webhook> webhooks = _webhookRepository.GetMany(keys.ToArray());
+        using ICoreScope scope = _provider.CreateCoreScope();
+        PagedModel<Webhook> webhooks = await _webhookRepository.GetAllAsync(skip, take);
         scope.Complete();
-        return Task.FromResult(webhooks);
-    }
 
-    public Task<IEnumerable<Webhook>> GetAllAsync()
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IEnumerable<Webhook> webhooks = _webhookRepository.GetMany();
-        scope.Complete();
-        return Task.FromResult(webhooks);
+        return webhooks;
     }
 
     public Task<IEnumerable<Webhook>> GetByEventName(string eventName)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IQuery<Webhook> query = Query<Webhook>().Where(x => x.Events.Contains(eventName));
-        IEnumerable<Webhook> webhooks = _webhookRepository.Get(query);
-        scope.Complete();
-        return Task.FromResult(webhooks);
+        // using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        // IQuery<Webhook> query = Query<Webhook>().Where(x => x.Events.Contains(eventName));
+        // IEnumerable<Webhook> webhooks = _webhookRepository.Get(query);
+        // scope.Complete();
+        // return Task.FromResult(webhooks);
+        return Task.FromResult(Enumerable.Empty<Webhook>());
+
     }
 }

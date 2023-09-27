@@ -587,7 +587,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "webhooksApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<WebHookController>(
-                                controller => controller.GetAll())
+                                controller => controller.GetAll(0, 0))
                         },
                     }
                 },

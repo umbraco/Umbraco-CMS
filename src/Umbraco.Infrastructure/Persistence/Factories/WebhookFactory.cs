@@ -47,17 +47,17 @@ internal static class WebhookFactory
         return dto;
     }
 
-    public static IEnumerable<EntityKey2WebhookDto> BuildEntityKey2WebhookDto(Webhook webhook, int webhookId) =>
+    public static IEnumerable<EntityKey2WebhookDto> BuildEntityKey2WebhookDto(Webhook webhook) =>
         webhook.EntityKeys.Select(x => new EntityKey2WebhookDto
         {
             EntityKey = x,
-            WebhookId = webhookId,
+            WebhookId = webhook.Id,
         });
 
-    public static IEnumerable<Event2WebhookDto> BuildEvent2WebhookDto(Webhook webhook, int webhookId) =>
+    public static IEnumerable<Event2WebhookDto> BuildEvent2WebhookDto(Webhook webhook) =>
         webhook.Events.Select(x => new Event2WebhookDto
         {
             Event = x,
-            WebhookId = webhookId,
+            WebhookId = webhook.Id,
         });
 }

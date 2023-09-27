@@ -35,35 +35,19 @@ public class WebhookServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_Multiple()
-    {
-        var createdWebhookOne = await WebhookService.CreateAsync(new Webhook("https://example.com", true, new[] { Guid.NewGuid() }, new[] { Constants.WebhookEvents.ContentPublish }));
-        var createdWebhookTwo = await WebhookService.CreateAsync(new Webhook("https://example.com", true, new[] { Guid.NewGuid() }, new[] { Constants.WebhookEvents.ContentDelete }));
-        var keys = new List<Guid> { createdWebhookOne.Key, createdWebhookTwo.Key };
-        var webhooks = await WebhookService.GetMultipleAsync(keys);
-
-        Assert.Multiple(() =>
-        {
-            Assert.IsNotEmpty(webhooks);
-            Assert.IsNotNull(webhooks.FirstOrDefault(x => x.Key == createdWebhookOne.Key));
-            Assert.IsNotNull(webhooks.FirstOrDefault(x => x.Key == createdWebhookTwo.Key));
-        });
-    }
-
-    [Test]
     public async Task Can_Get_All()
     {
         var createdWebhookOne = await WebhookService.CreateAsync(new Webhook("https://example.com", true, new[] { Guid.NewGuid() }, new[] { Constants.WebhookEvents.ContentPublish }));
         var createdWebhookTwo = await WebhookService.CreateAsync(new Webhook("https://example.com", true, new[] { Guid.NewGuid() }, new[] { Constants.WebhookEvents.ContentDelete }));
         var createdWebhookThree = await WebhookService.CreateAsync(new Webhook("https://example.com", true, new[] { Guid.NewGuid() }, new[] { Constants.WebhookEvents.ContentUnpublish }));
-        var webhooks = await WebhookService.GetAllAsync();
+        var webhooks = await WebhookService.GetAllAsync(0, int.MaxValue);
 
         Assert.Multiple(() =>
         {
-            Assert.IsNotEmpty(webhooks);
-            Assert.IsNotNull(webhooks.FirstOrDefault(x => x.Key == createdWebhookOne.Key));
-            Assert.IsNotNull(webhooks.FirstOrDefault(x => x.Key == createdWebhookTwo.Key));
-            Assert.IsNotNull(webhooks.FirstOrDefault(x => x.Key == createdWebhookThree.Key));
+            Assert.IsNotEmpty(webhooks.Items);
+            Assert.IsNotNull(webhooks.Items.FirstOrDefault(x => x.Key == createdWebhookOne.Key));
+            Assert.IsNotNull(webhooks.Items.FirstOrDefault(x => x.Key == createdWebhookTwo.Key));
+            Assert.IsNotNull(webhooks.Items.FirstOrDefault(x => x.Key == createdWebhookThree.Key));
         });
     }
 
