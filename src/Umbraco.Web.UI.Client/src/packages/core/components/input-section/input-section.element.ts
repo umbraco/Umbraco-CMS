@@ -1,11 +1,11 @@
 import { UmbInputListBaseElement } from '../input-list-base/input-list-base.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_SECTION_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-input-section')
-export class UmbInputPickerSectionElement extends UmbInputListBaseElement {
+export class UmbInputSectionElement extends UmbInputListBaseElement {
 	@state()
 	private _sections: Array<ManifestSection> = [];
 
@@ -47,7 +47,7 @@ export class UmbInputPickerSectionElement extends UmbInputListBaseElement {
 								label="remove"
 								color="danger"></uui-button>
 						</div>
-					`
+					`,
 				)}
 			</div>
 		`;
@@ -85,6 +85,6 @@ export class UmbInputPickerSectionElement extends UmbInputListBaseElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-section': UmbInputPickerSectionElement;
+		'umb-input-section': UmbInputSectionElement;
 	}
 }
