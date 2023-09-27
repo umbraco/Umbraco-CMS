@@ -304,24 +304,26 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 
 		const buttons: TemplateResult[] = [];
 
-		if (this._user.state === UserStateModel.DISABLED) {
-			buttons.push(html`
-				<uui-button
-					@click=${this.#onUserStatusChange}
-					look="secondary"
-					color="positive"
-					label=${this.localize.term('actions_enable')}></uui-button>
-			`);
-		}
+		if (this._user.id !== this._currentUser?.id) {
+			if (this._user.state === UserStateModel.DISABLED) {
+				buttons.push(html`
+					<uui-button
+						@click=${this.#onUserStatusChange}
+						look="secondary"
+						color="positive"
+						label=${this.localize.term('actions_enable')}></uui-button>
+				`);
+			}
 
-		if (this._user.state === UserStateModel.ACTIVE || this._user.state === UserStateModel.INACTIVE) {
-			buttons.push(html`
-				<uui-button
-					@click=${this.#onUserStatusChange}
-					look="secondary"
-					color="warning"
-					label=${this.localize.term('actions_disable')}></uui-button>
-			`);
+			if (this._user.state === UserStateModel.ACTIVE || this._user.state === UserStateModel.INACTIVE) {
+				buttons.push(html`
+					<uui-button
+						@click=${this.#onUserStatusChange}
+						look="secondary"
+						color="warning"
+						label=${this.localize.term('actions_disable')}></uui-button>
+				`);
+			}
 		}
 
 		if (this._currentUser?.id !== this._user?.id) {
