@@ -136,13 +136,16 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 						slot="editor"
 						max="1"
 						.selectedIds=${this._userGroup.documentStartNodeId ? [this._userGroup.documentStartNodeId] : []}
-						@change=${this.#onDocumentStartNodeChange}
-						multiple></umb-input-document>
+						@change=${this.#onDocumentStartNodeChange}></umb-input-document>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout
 					label=${this.localize.term('defaultdialogs_selectMediaStartNode')}
 					description=${this.localize.term('user_mediastartnodehelp')}>
-					<b slot="editor">MEDIA START NODE PICKER NOT IMPLEMENTED YET</b>
+					<umb-input-media
+						slot="editor"
+						max="1"
+						.selectedIds=${this._userGroup.mediaStartNodeId ? [this._userGroup.mediaStartNodeId] : []}
+						@change=${this.#onDocumentStartNodeChange}></umb-input-media>
 				</umb-workspace-property-layout>
 			</uui-box>
 
