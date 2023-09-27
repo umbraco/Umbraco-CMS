@@ -94,9 +94,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		return html`
-			<uui-ref-list>${this._items?.map((item) => this.#renderItem(item))}</uui-ref-list> ${this.#renderButton()}
-		`;
+		return html` ${this._items?.map((item) => this.#renderItem(item))} ${this.#renderButton()} `;
 	}
 
 	#renderButton() {
