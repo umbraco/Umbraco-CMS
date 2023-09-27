@@ -11,6 +11,8 @@ import {
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import { UmbInputSectionElement } from '@umbraco-cms/backoffice/components';
+import { UmbUserInputElement } from '@umbraco-cms/backoffice/users';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 
 import './components/user-group-default-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
@@ -40,11 +42,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		});
 	}
 
-	#onUsersChange(userIds: Array<string>) {
-		this.#workspaceContext?.updateUserKeys(userIds);
-	}
-
-	#onSectionsChange(event: CustomEvent) {
+	#onSectionsChange(event: UmbChangeEvent) {
 		const target = event.target as UmbInputSectionElement;
 		this.#workspaceContext?.updateProperty('sections', target.value);
 	}
@@ -52,6 +50,11 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#onDocumentStartNodeChange(event: CustomEvent) {
 		const target = event.target as UmbInputDocumentElement;
 		this.#workspaceContext?.updateProperty('documentStartNodeId', target.selectedIds[0]);
+	}
+
+	#onUsersChange(event: UmbChangeEvent) {
+		const target = event.target as UmbUserInputElement;
+		this.#workspaceContext?.updateUserKeys(target.selectedIds);
 	}
 
 	async #onDelete() {
@@ -156,10 +159,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#renderRightColumn() {
 		return html`<uui-box>
 				<div slot="headline"><umb-localize key="sections_users"></umb-localize></div>
-				<!-- change any to UmbUserInputElement when package is available -->
-				<umb-user-input
-					@change=${(e: Event) => this.#onUsersChange((e.target as any).selectedIds)}
-					.selectedIds=${this._userKeys ?? []}></umb-user-input>
+				<umb-user-input @change=${this.#onUsersChange} .selectedIds=${this._userKeys ?? []}></umb-user-input>
 			</uui-box>
 			<uui-box>
 				<div slot="headline">
