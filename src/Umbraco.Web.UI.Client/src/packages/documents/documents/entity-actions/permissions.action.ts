@@ -20,19 +20,22 @@ export class UmbDocumentPermissionsEntityAction extends UmbEntityActionBase<UmbD
 	}
 
 	async execute() {
+		alert('WIP Permissions dialog');
 		if (!this.repository) return;
 		if (!this.#modalContext) return;
 
 		// TODO: we don't get "type" as part of the item
-		const { data, error } = await this.repository.requestItems([this.unique]);
+		//const { data, error } = await this.repository.requestItems([this.unique]);
 
+		/*
 		const modalContext = this.#modalContext.open(UMB_ENTITY_USER_PERMISSION_MODAL, {
 			unique: this.unique,
 			entityType: ['document'],
 		});
+		*/
 
-		const { selection } = await modalContext.onSubmit();
-		console.log(selection);
-		//await this.repository?.setPermissions();
+		// const { selection } = await modalContext.onSubmit();
+		// console.log(selection);
+		// await this.repository?.setPermissions();
 	}
 }
