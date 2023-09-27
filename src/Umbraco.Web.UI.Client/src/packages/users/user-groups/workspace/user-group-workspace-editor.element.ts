@@ -123,6 +123,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					description=${this.localize.term('user_startnodehelp')}>
 					<umb-input-document
 						slot="editor"
+						max="1"
 						.selectedIds=${this._userGroup.documentStartNodeId ? [this._userGroup.documentStartNodeId] : []}
 						@change=${(e: any) => this.#onSectionsChange(e.target.value)}
 						multiple></umb-input-document>
