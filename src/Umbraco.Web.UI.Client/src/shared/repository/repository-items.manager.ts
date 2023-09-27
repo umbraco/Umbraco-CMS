@@ -46,8 +46,9 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 
 	setUniques(uniques: string[]) {
 		this.#uniques.next(uniques);
-
 		//TODO: Check if it's safe to call requestItems here.
+		// We don't have to request items if there is no uniques.
+		if (uniques.length === 0) return;
 		this.#requestItems();
 	}
 
@@ -56,8 +57,8 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 	}
 
 	async #requestItems() {
-		await this.#init;
 		if (!this.repository) throw new Error('Repository is not initialized');
+		await this.#init;
 		if (this.itemsObserver) this.itemsObserver.destroy();
 
 		// TODO: Test if its just some items that is gone now, if so then just filter them out. (maybe use code from #removeItem)
