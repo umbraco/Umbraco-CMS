@@ -14,7 +14,10 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 	private _userGroup?: UserGroupResponseModel;
 
 	@state()
-	private _groupedUserPermissionManifests: Record<string, Array<ManifestUserPermission>> = {};
+	private _manifests: Array<ManifestUserPermission> = [];
+
+	@state()
+	private _entityTypes: Array<string> = [];
 
 	#userGroupWorkspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
@@ -31,7 +34,8 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 
 	#observeUserPermissions() {
 		this.observe(umbExtensionsRegistry.extensionsOfType('userPermission'), (userPermissionManifests) => {
-			this._groupedUserPermissionManifests = groupBy(userPermissionManifests, (manifest) => manifest.meta.entityType);
+			this._manifests = userPermissionManifests;
+			this._entityTypes = [...new Set(userPermissionManifests.map((manifest) => manifest.meta.entityType))];
 		});
 	}
 
@@ -48,29 +52,23 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`${this.#renderEntityGroups()}`;
+		return html` ${this._entityTypes.map((entityType) => this.#renderPermissionsForEntityType(entityType))} `;
 	}
 
-	#renderEntityGroups() {
-		const entityGroups = [];
-
-		for (const [key, value] of Object.entries(this._groupedUserPermissionManifests)) {
-			entityGroups.push(
-				html`<h5><umb-localize .key=${`user_permissionsEntityGroup_${key}`}>${key}</umb-localize></h5>
-					${value.map((permission) => this.#renderPermission(permission))}`,
-			);
-		}
-
-		return html`${entityGroups}`;
+	#renderPermissionsForEntityType(entityType: string) {
+		return html` <h4><umb-localize .key=${`user_permissionsEntityGroup_${entityType}`}>${entityType}</umb-localize></h4>
+			${this._manifests
+				.filter((manifest) => manifest.meta.entityType === entityType)
+				.map((manifest) => this.#renderPermission(manifest))}`;
 	}
 
-	#renderPermission(userPermissionManifest: ManifestUserPermission) {
+	#renderPermission(manifest: ManifestUserPermission) {
 		return html` <umb-user-permission-setting
-			label=${userPermissionManifest.meta.label}
-			description=${ifDefined(userPermissionManifest.meta.description)}
-			?allowed=${this.#isAllowed(userPermissionManifest)}
+			label=${manifest.meta.label}
+			description=${ifDefined(manifest.meta.description)}
+			?allowed=${this.#isAllowed(manifest)}
 			@change=${(event: UmbChangeEvent) =>
-				this.#onChangeUserPermission(event, userPermissionManifest)}></umb-user-permission-setting>`;
+				this.#onChangeUserPermission(event, manifest)}></umb-user-permission-setting>`;
 	}
 
 	static styles = [UmbTextStyles];
