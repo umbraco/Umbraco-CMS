@@ -33,8 +33,6 @@ export class UmbDocumentPermissionsEntityAction extends UmbEntityActionBase<UmbD
 
 		const { selection } = await modalContext.onSubmit();
 		console.log(selection);
-		debugger;
-
 		//await this.repository?.setPermissions();
 	}
 }
