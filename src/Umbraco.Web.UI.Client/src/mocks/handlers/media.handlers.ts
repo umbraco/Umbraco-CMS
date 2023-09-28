@@ -1,8 +1,16 @@
 const { rest } = window.MockServiceWorker;
 import { umbMediaData } from '../data/media.data.js';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 // TODO: add schema
 export const handlers = [
+	rest.get(umbracoPath('/media/item'), (req, res, ctx) => {
+		const ids = req.url.searchParams.getAll('id');
+		if (!ids) return;
+		const items = umbMediaData.getItems(ids);
+		return res(ctx.status(200), ctx.json(items));
+	}),
+
 	rest.get('/umbraco/management/api/v1/media/details/:id', (req, res, ctx) => {
 		console.warn('Please move to schema');
 		const id = req.params.id as string;

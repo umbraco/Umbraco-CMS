@@ -151,9 +151,9 @@ export const handlers = [
 		const id = req.params.id as string;
 		if (!id) return;
 
-		const deletedKeys = umbDictionaryData.delete([id]);
+		umbDictionaryData.delete([id]);
 
-		return res(ctx.status(200), ctx.json(deletedKeys));
+		return res(ctx.status(200));
 	}),
 
 	// TODO => handle properly, querystring breaks handler
@@ -165,7 +165,7 @@ export const handlers = [
 		const item = umbDictionaryData.getById(id);
 
 		alert(
-			`Downloads file for dictionary "${item?.name}", ${includeChildren === 'true' ? 'with' : 'without'} children.`
+			`Downloads file for dictionary "${item?.name}", ${includeChildren === 'true' ? 'with' : 'without'} children.`,
 		);
 		return res(ctx.status(200));
 	}),

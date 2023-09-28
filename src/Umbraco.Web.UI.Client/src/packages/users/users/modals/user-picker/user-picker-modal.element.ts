@@ -1,46 +1,34 @@
 import { UmbUserRepository } from '../../repository/user.repository.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbUserPickerModalData, UmbUserPickerModalValue } from '@umbraco-cms/backoffice/modal';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { css, html, customElement, state, ifDefined, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { UmbUserPickerModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
-import { type UmbUserDetail } from '@umbraco-cms/backoffice/users';
+import { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-picker-modal')
 export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPickerModalData, UmbUserPickerModalValue> {
 	@state()
-	private _users: Array<UmbUserDetail> = [];
+	private _users: Array<UserItemResponseModel> = [];
 
 	#selectionManager = new UmbSelectionManagerBase();
-	#userRepository?: UmbUserRepository;
+	#userRepository = new UmbUserRepository(this);
 
-	constructor() {
-		super();
+	connectedCallback(): void {
+		super.connectedCallback();
 
-		// TODO: this code is reused in multiple places, so it should be extracted to a function
-		new UmbObserverController(
-			this,
-			umbExtensionsRegistry.getByTypeAndAlias('repository', 'Umb.Repository.User'),
-			async (repositoryManifest) => {
-				if (!repositoryManifest) return;
-
-				try {
-					const result = await createExtensionClass<UmbUserRepository>(repositoryManifest, [this]);
-					this.#userRepository = result;
-					this.#observeUsers();
-				} catch (error) {
-					throw new Error('Could not create repository with alias: Umb.Repository.User');
-				}
-			},
-		);
+		// TODO: in theory this config could change during the lifetime of the modal, so we could observe it
+		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
+		this.#selectionManager.setSelection(this.data?.selection ?? []);
 	}
 
-	async #observeUsers() {
+	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.firstUpdated(_changedProperties);
+		this.#requestUsers();
+	}
+
+	async #requestUsers() {
 		if (!this.#userRepository) return;
-		// TODO is this the correct end point?
 		const { data } = await this.#userRepository.requestCollection();
 
 		if (data) {
@@ -63,12 +51,12 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 					${this._users.map(
 						(user) => html`
 							<uui-menu-item
-								label=${user.name}
+								label=${ifDefined(user.name)}
 								selectable
 								@selected=${() => this.#selectionManager.select(user.id!)}
 								@deselected=${() => this.#selectionManager.deselect(user.id!)}
 								?selected=${this.#selectionManager.isSelected(user.id!)}>
-								<uui-avatar slot="icon" name=${user.name}></uui-avatar>
+								<uui-avatar slot="icon" name=${ifDefined(user.name)}></uui-avatar>
 							</uui-menu-item>
 						`,
 					)}

@@ -13,7 +13,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	@state()
 	private _currentUser?: UmbLoggedInUser;
 
-	#auth?: typeof UMB_AUTH.TYPE;
+	#authContext?: typeof UMB_AUTH.TYPE;
 
 	#appContext?: typeof UMB_APP.TYPE;
 
@@ -21,7 +21,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_AUTH, (instance) => {
-			this.#auth = instance;
+			this.#authContext = instance;
 			this._observeCurrentUser();
 		});
 
@@ -31,9 +31,9 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	}
 
 	private async _observeCurrentUser() {
-		if (!this.#auth) return;
+		if (!this.#authContext) return;
 
-		this.observe(this.#auth.currentUser, (currentUser) => {
+		this.observe(this.#authContext.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}
@@ -43,9 +43,9 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	}
 
 	private async _logout() {
-		if (!this.#auth) return;
-		this.#auth.performWithFreshTokens;
-		await this.#auth.signOut();
+		if (!this.#authContext) return;
+		this.#authContext.performWithFreshTokens;
+		await this.#authContext.signOut();
 		let newUrl = this.#appContext ? `${this.#appContext.getBackofficePath()}/login` : '/';
 		newUrl = newUrl.replace(/\/\//g, '/');
 		location.href = newUrl;

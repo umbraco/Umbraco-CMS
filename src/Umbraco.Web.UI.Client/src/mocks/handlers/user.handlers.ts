@@ -1,11 +1,28 @@
 const { rest } = window.MockServiceWorker;
 
-import { umbUsersData } from '../data/users.data.js';
+import { umbUsersData } from '../data/user.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 const slug = '/user';
 
 export const handlers = [
+	rest.get(umbracoPath(`${slug}/item`), (req, res, ctx) => {
+		const ids = req.url.searchParams.getAll('id');
+		if (!ids) return;
+		const items = umbUsersData.getItems(ids);
+
+		return res(ctx.status(200), ctx.json(items));
+	}),
+
+	rest.post(umbracoPath(`${slug}/set-user-groups`), async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		umbUsersData.setUserGroups(data);
+
+		return res(ctx.status(200));
+	}),
+
 	rest.get(umbracoPath(`${slug}/filter`), (req, res, ctx) => {
 		//TODO: Implementer filter
 		const response = umbUsersData.getAll();
@@ -23,7 +40,7 @@ export const handlers = [
 			ctx.status(200),
 			ctx.json({
 				sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Settings', 'My.Section.Custom'],
-			})
+			}),
 		);
 	}),
 
