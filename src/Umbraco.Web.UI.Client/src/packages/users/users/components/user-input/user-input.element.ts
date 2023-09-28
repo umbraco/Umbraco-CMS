@@ -1,5 +1,5 @@
 import { UmbUserPickerContext } from './user-input.context.js';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -76,13 +76,13 @@ export class UmbUserInputElement extends FormControlMixin(UmbLitElement) {
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min
+			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.#pickerContext.getSelection().length > this.max
+			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
 		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
@@ -105,7 +105,7 @@ export class UmbUserInputElement extends FormControlMixin(UmbLitElement) {
 	private _renderItem(item: UserItemResponseModel) {
 		if (!item.id) return;
 		return html`
-			<uui-ref-node-user name=${item.name}>
+			<uui-ref-node-user name=${ifDefined(item.name)}>
 				<uui-action-bar slot="actions">
 					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.id!)} label="Remove ${item.name}"
 						>Remove</uui-button

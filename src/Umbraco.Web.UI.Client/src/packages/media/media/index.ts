@@ -1,5 +1,7 @@
 import { ContentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
+export * from './components/index.js';
+
 // Content
 export interface ContentProperty {
 	alias: string;
@@ -21,4 +23,5 @@ export interface MediaDetails extends ContentTreeItemResponseModel {
 	data: Array<ContentPropertyData>;
 	variants: Array<any>; // TODO: define variant data
 	//layout?: any; // TODO: define layout type - make it non-optional
+	icon?: string;
 }

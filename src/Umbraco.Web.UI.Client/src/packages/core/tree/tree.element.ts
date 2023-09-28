@@ -119,7 +119,7 @@ export class UmbTreeElement extends UmbLitElement {
 				this._items,
 				// TODO: use unique here:
 				(item, index) => item.name + '___' + index,
-				(item) => html`<umb-tree-item .item=${item}></umb-tree-item>`
+				(item) => html`<umb-tree-item .item=${item}></umb-tree-item>`,
 			)}
 		`;
 	}

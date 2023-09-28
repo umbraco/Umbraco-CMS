@@ -1,12 +1,12 @@
-import { Observable, map } from '@umbraco-cms/backoffice/external/rxjs';
+import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbPagedData, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { ManifestTree, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { ProblemDetails, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectedEvent } from '@umbraco-cms/backoffice/events';
 
 // TODO: update interface
 export interface UmbTreeContext<TreeItemType extends TreeItemPresentationModel> extends UmbBaseController {
@@ -102,12 +102,12 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 	public select(unique: string | null) {
 		if (!this.getSelectable()) return;
 		this.#selectionManager.select(unique);
-		this._host.getHostElement().dispatchEvent(new CustomEvent('selected'));
+		this._host.getHostElement().dispatchEvent(new UmbSelectedEvent());
 	}
 
 	public deselect(unique: string | null) {
 		this.#selectionManager.deselect(unique);
-		this._host.getHostElement().dispatchEvent(new CustomEvent('selected'));
+		this._host.getHostElement().dispatchEvent(new UmbSelectedEvent());
 	}
 
 	public async requestTreeRoot() {
@@ -144,7 +144,7 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 					if (!treeManifest) return;
 					this.#observeRepository(treeManifest);
 				},
-				'_observeTreeManifest'
+				'_observeTreeManifest',
 			);
 		}
 	}
@@ -166,7 +166,7 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 					throw new Error('Could not create repository with alias: ' + repositoryAlias + '');
 				}
 			},
-			'_observeRepository'
+			'_observeRepository',
 		);
 	}
 }
