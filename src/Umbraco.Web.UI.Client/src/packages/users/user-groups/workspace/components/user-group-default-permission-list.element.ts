@@ -68,7 +68,9 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 		return html`
 			${Object.entries(groupedPermissions).map(
 				([group, manifests]) => html`
-					${group !== 'undefined' ? html` <h5>${group}</h5> ` : nothing}
+					${group !== 'undefined'
+						? html` <h5><umb-localize .key=${`actionCategories_${group}`}>${group}</umb-localize></h5> `
+						: nothing}
 					${manifests.map((manifest) => html` ${this.#renderPermission(manifest)} `)}
 				`,
 			)}
