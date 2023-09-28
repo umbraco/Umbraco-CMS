@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Serialization;
+﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Webhooks;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement;
@@ -15,7 +16,7 @@ public class WebhookFiringService : IWebhookFiringService
         _retryService = retryService;
     }
 
-    public async Task<HttpResponseMessage> Fire(string url, object? requestObject) => await _retryService.RetryAsync(
+    public async Task<HttpResponseMessage> Fire(string url, string eventName, object? requestObject) => await _retryService.RetryAsync(
         async () =>
         {
             using var httpClient = new HttpClient();
@@ -23,6 +24,7 @@ public class WebhookFiringService : IWebhookFiringService
             var myContent = _jsonSerializer.Serialize(requestObject);
             var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
             var byteContent = new ByteArrayContent(buffer);
+            httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Umb-Webhook-Event", eventName);
 
             return await httpClient.PostAsync(url, byteContent);
         },

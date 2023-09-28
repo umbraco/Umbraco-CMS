@@ -2,5 +2,5 @@
 
 public interface IWebhookFiringService
 {
-    Task<HttpResponseMessage> Fire( string url, object? requestObject);
+    Task<HttpResponseMessage> Fire( string url, string eventName, object? requestObject);
 }

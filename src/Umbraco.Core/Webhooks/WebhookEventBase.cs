@@ -35,7 +35,7 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
                     continue;
                 }
 
-                HttpResponseMessage response = await _webhookFiringService.Fire(webhook.Url, entity);
+                HttpResponseMessage response = await _webhookFiringService.Fire(webhook.Url, EventName, entity);
 
                 // TODO: Implement logging depending on response here
                 if (response.IsSuccessStatusCode)
