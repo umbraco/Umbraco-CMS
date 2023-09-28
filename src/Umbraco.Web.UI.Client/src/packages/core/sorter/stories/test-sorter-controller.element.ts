@@ -12,7 +12,7 @@ const verticalConfig: UmbSorterConfig<SortEntryType> = {
 		return element.getAttribute('data-sort-entry-id') === model.id;
 	},
 	querySelectModelToElement: (container: HTMLElement, modelEntry: SortEntryType) => {
-		return container.querySelector('data-sort-entry-id[' + modelEntry.id + ']');
+		return container.querySelector('data-sort-entry-id=[' + modelEntry.id + ']');
 	},
 	identifier: 'test-sorter',
 	itemSelector: 'li',
@@ -74,8 +74,8 @@ export default class UmbTestSorterControllerElement extends UmbLitElement {
 			<ul class="${this.vertical ? 'vertical' : 'horizontal'}">
 				${model.map(
 					(entry) =>
-						html`<li class="item" id="${'sort' + entry.id}" data-sort-entry-id="${entry.id}">
-							<span>${entry.value}</span>
+						html`<li class="item" data-sort-entry-id="${entry.id}">
+							<span><uui-icon name="umb:wand"></uui-icon>${entry.value}</span>
 						</li>`,
 				)}
 			</ul>
@@ -103,45 +103,30 @@ export default class UmbTestSorterControllerElement extends UmbLitElement {
 			}
 
 			li {
+				cursor: grab;
 				position: relative;
 				flex: 1;
+				border-radius: var(--uui-border-radius);
+			}
+
+			li span {
+				display: flex;
+				align-items: center;
+				gap: 5px;
 				padding: 10px;
 				background-color: rgba(0, 255, 0, 0.3);
 			}
 
-			li:hover {
-				background-color: rgba(0, 255, 0, 0.8);
-				cursor: grab;
+			li.--umb-sorter-placeholder span {
+				visibility: hidden;
 			}
 
-			.--umb-sorter-placeholder > span {
-				display: none;
-			}
-
-			ul.vertical li.--umb-sorter-placeholder {
-				padding: 0;
-			}
-
-			ul.vertical .--umb-sorter-placeholder {
-				max-height: 2px;
-			}
-
-			ul.vertical .--umb-sorter-placeholder::after {
-				content: '';
-				display: block;
-				border-top: 2px solid blue;
-			}
-
-			ul.horizontal .--umb-sorter-placeholder {
-				background-color: transparent;
-			}
-
-			ul.horizontal .--umb-sorter-placeholder::before {
+			li.--umb-sorter-placeholder::after {
 				content: '';
 				position: absolute;
-				inset: 0;
-				box-sizing: border-box;
-				border: 2px dashed blue;
+				inset: 0px;
+				border-radius: var(--uui-border-radius);
+				border: 1px dashed var(--uui-color-divider-emphasis);
 			}
 		`,
 	];
