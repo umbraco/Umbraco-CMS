@@ -18,8 +18,7 @@ public class ContentPublishWebhookEvent : WebhookEventBase<ContentPublishedNotif
 
     public override async Task HandleAsync(ContentPublishedNotification notification, CancellationToken cancellationToken)
     {
-        PagedModel<Webhook> all = await _webHookService.GetAllAsync(0, int.MaxValue);
-        IEnumerable<Webhook> webhooks = all.Items.Where(x => x.Events.Contains(EventName));
+        IEnumerable<Webhook> webhooks = await _webHookService.GetByEventNameAsync(EventName);
 
         foreach (Webhook webhook in webhooks)
         {

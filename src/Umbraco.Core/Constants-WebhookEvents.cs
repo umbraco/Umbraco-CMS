@@ -27,6 +27,6 @@ public static partial class Constants
         /// <summary>
         ///     Webhook event name for media save.
         /// </summary>
-        public const string MediaSave = "MediaDelete";
+        public const string MediaSave = "MediaSave";
     }
 }
