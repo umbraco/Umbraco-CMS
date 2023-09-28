@@ -22,12 +22,10 @@ public class WebhookRepository : IWebhookRepository
 
         List<WebhookDto>? webhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<WebhookDto>(sql)!;
 
-        IEnumerable<Webhook>? webhooks = webhookDtos?.Skip(skip).Take(take).Select(DtoToEntity).WhereNotNull();
-
         return new PagedModel<Webhook>
         {
-            Items = webhooks ?? Enumerable.Empty<Webhook>(),
-            Total = webhookDtos?.Count ?? 0,
+            Items = await DtosToEntities(webhookDtos),
+            Total = webhookDtos.Count,
         };
     }
 
@@ -60,7 +58,7 @@ public class WebhookRepository : IWebhookRepository
 
         WebhookDto? webhookDto = await _scopeAccessor.AmbientScope?.Database.FirstOrDefaultAsync<WebhookDto>(sql)!;
 
-        return DtoToEntity(webhookDto);
+        return webhookDto is null ? null : await DtoToEntity(webhookDto);
     }
 
     public async Task<PagedModel<Webhook>> GetByEventNameAsync(string eventName)
@@ -72,14 +70,12 @@ public class WebhookRepository : IWebhookRepository
             .On<WebhookDto, Event2WebhookDto>(left => left.Id, right => right.WebhookId)
             .Where<Event2WebhookDto>(x => x.Event == eventName);
 
-        var webhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<WebhookDto>(sql)!;
-
-        IEnumerable<Webhook>? webhooks = webhookDtos?.Select(DtoToEntity).WhereNotNull();
+        List<WebhookDto>? webhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<WebhookDto>(sql)!;
 
         return new PagedModel<Webhook>
         {
-            Items = webhooks ?? Enumerable.Empty<Webhook>(),
-            Total = webhookDtos?.Count ?? 0,
+            Items = await DtosToEntities(webhookDtos),
+            Total = webhookDtos.Count,
         };
     }
 
@@ -123,15 +119,22 @@ public class WebhookRepository : IWebhookRepository
         _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(buildEvent2WebhookDtos);
     }
 
-    private Webhook? DtoToEntity(WebhookDto? dto)
+    private async Task<IEnumerable<Webhook>> DtosToEntities(IEnumerable<WebhookDto> dtos)
     {
-        if (dto is null)
+        List<Webhook> result = new();
+
+        foreach (WebhookDto webhook in dtos)
         {
-            return null;
+            result.Add(await DtoToEntity(webhook));
         }
 
-        List<EntityKey2WebhookDto>? webhookEntityKeyDtos = _scopeAccessor.AmbientScope?.Database.Fetch<EntityKey2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id });
-        List<Event2WebhookDto>? event2WebhookDtos = _scopeAccessor.AmbientScope?.Database.Fetch<Event2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id });
+        return result;
+    }
+
+    private async Task<Webhook> DtoToEntity(WebhookDto dto)
+    {
+        List<EntityKey2WebhookDto>? webhookEntityKeyDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<EntityKey2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id })!;
+        List<Event2WebhookDto>? event2WebhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<Event2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id })!;
         Webhook entity = WebhookFactory.BuildEntity(dto, webhookEntityKeyDtos, event2WebhookDtos);
 
         // reset dirty initial properties (U4-1946)
