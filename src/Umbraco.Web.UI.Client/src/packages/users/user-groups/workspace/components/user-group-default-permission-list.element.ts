@@ -1,12 +1,12 @@
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context.js';
-import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { ManifestUserPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { type UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/users';
+import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 
 @customElement('umb-user-group-default-permission-list')
 export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
@@ -52,14 +52,27 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 	}
 
 	render() {
-		return html` ${this._entityTypes.map((entityType) => this.#renderPermissionsForEntityType(entityType))} `;
+		return html` ${this._entityTypes.map((entityType) => this.#renderPermissionsByEntityType(entityType))} `;
 	}
 
-	#renderPermissionsForEntityType(entityType: string) {
-		return html` <h4><umb-localize .key=${`user_permissionsEntityGroup_${entityType}`}>${entityType}</umb-localize></h4>
-			${this._manifests
-				.filter((manifest) => manifest.meta.entityType === entityType)
-				.map((manifest) => this.#renderPermission(manifest))}`;
+	#renderPermissionsByEntityType(entityType: string) {
+		const permissionsForEntityType = this._manifests.filter((manifest) => manifest.meta.entityType === entityType);
+		return html`
+			<h4><umb-localize .key=${`user_permissionsEntityGroup_${entityType}`}>${entityType}</umb-localize></h4>
+			${this.#renderGroupedPermissions(permissionsForEntityType)}
+		`;
+	}
+
+	#renderGroupedPermissions(permissions: Array<ManifestUserPermission>) {
+		const groupedPermissions = groupBy(permissions, (manifest) => manifest.meta.group);
+		return html`
+			${Object.entries(groupedPermissions).map(
+				([group, manifests]) => html`
+					${group !== 'undefined' ? html` <h5>${group}</h5> ` : nothing}
+					${manifests.map((manifest) => html` ${this.#renderPermission(manifest)} `)}
+				`,
+			)}
+		`;
 	}
 
 	#renderPermission(manifest: ManifestUserPermission) {
