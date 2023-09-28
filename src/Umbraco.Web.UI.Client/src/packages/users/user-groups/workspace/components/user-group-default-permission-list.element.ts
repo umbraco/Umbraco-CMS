@@ -47,8 +47,8 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 			: this.#userGroupWorkspaceContext?.removePermission(userPermissionManifest.alias);
 	}
 
-	#isAllowed(userPermissionManifest: ManifestUserPermission) {
-		return this._userGroup?.permissions?.includes(userPermissionManifest.alias);
+	#isAllowed(permissionAlias: string) {
+		return this._userGroup?.permissions?.includes(permissionAlias);
 	}
 
 	render() {
@@ -79,9 +79,11 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 
 	#renderPermission(manifest: ManifestUserPermission) {
 		return html` <umb-user-permission-setting
-			label=${manifest.meta.label}
-			description=${ifDefined(manifest.meta.description)}
-			?allowed=${this.#isAllowed(manifest)}
+			label=${ifDefined(manifest.meta.labelKey ? this.localize.term(manifest.meta.labelKey) : manifest.meta.label)}
+			description=${ifDefined(
+				manifest.meta.descriptionKey ? this.localize.term(manifest.meta.descriptionKey) : manifest.meta.description,
+			)}
+			?allowed=${this.#isAllowed(manifest.alias)}
 			@change=${(event: UmbChangeEvent) =>
 				this.#onChangeUserPermission(event, manifest)}></umb-user-permission-setting>`;
 	}
