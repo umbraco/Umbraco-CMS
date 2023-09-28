@@ -1,6 +1,5 @@
 import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as userProfileAppsManifests } from './user-profile-apps/manifests.js';
-import { manifest as userPermissionConditionManifest } from './conditions/user-permission.condition.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const headerApps: Array<ManifestTypes> = [
@@ -24,9 +23,4 @@ export const headerApps: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [
-	...headerApps,
-	...modalManifests,
-	...userProfileAppsManifests,
-	userPermissionConditionManifest,
-];
+export const manifests = [...headerApps, ...modalManifests, ...userProfileAppsManifests];
