@@ -4,38 +4,12 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Webhooks;
 
-public class ContentUnpublishWebhookEvent : WebhookEventBase<ContentUnpublishedNotification>
+public class ContentUnpublishWebhookEvent : WebhookEventBase<ContentUnpublishedNotification, IContent>
 {
-    private readonly IWebHookService _webHookService;
-    private readonly IWebhookFiringService _webhookFiringService;
-    public ContentUnpublishWebhookEvent(IWebHookService webHookService, IWebhookFiringService webhookFiringService)
+    public ContentUnpublishWebhookEvent(IWebhookFiringService webhookFiringService, IWebHookService webHookService, string eventName)
+        : base(webhookFiringService, webHookService, eventName)
     {
-        _webHookService = webHookService;
-        _webhookFiringService = webhookFiringService;
-        EventName = Constants.WebhookEvents.ContentUnpublish;
     }
 
-    public override async Task HandleAsync(ContentUnpublishedNotification notification, CancellationToken cancellationToken)
-    {
-        IEnumerable<Webhook> webhooks = await _webHookService.GetByEventNameAsync(EventName);
-
-        foreach (Webhook webhook in webhooks)
-        {
-            foreach (IContent content in notification.UnpublishedEntities)
-            {
-                if (webhook.EntityKeys.Contains(content.ContentType.Key) is false)
-                {
-                    continue;
-                }
-
-                HttpResponseMessage response = await _webhookFiringService.Fire(webhook.Url, content);
-
-                // TODO: Implement logging depending on response here
-                if (response.IsSuccessStatusCode)
-                {
-
-                }
-            }
-        }
-    }
+    protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentUnpublishedNotification notification) => throw new NotImplementedException();
 }
