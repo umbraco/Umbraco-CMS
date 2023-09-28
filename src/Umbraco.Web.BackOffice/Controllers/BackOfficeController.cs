@@ -585,6 +585,11 @@ public class BackOfficeController : UmbracoController
 
         if (errors.Count > 0)
         {
+            // the external user might actually be signed in at this point, but certain errors (i.e. missing claims)
+            // prevents us from applying said user to a back-office session. make sure the sign-in manager does not
+            // report the user as being signed in for subsequent requests.
+            await _signInManager.SignOutAsync();
+
             ViewData.SetExternalSignInProviderErrors(
                 new BackOfficeExternalLoginProviderErrors(
                     loginInfo.LoginProvider,
