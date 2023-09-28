@@ -107,22 +107,39 @@ export class UmbUserGroupWorkspaceContext
 	}
 
 	/**
-	 * Adds a permission to the user group permission array.
+	 * Sets the user group default permissions.
+	 * @param {Array<string>} permissionAliases
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	setDefaultPermissions(permissionAliases: Array<string>) {
+		this.#data.update({ permissions: permissionAliases });
+	}
+
+	/**
+	 * Gets the user group default permissions.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	getDefaultPermissions() {
+		return this.#data.getValue()?.permissions ?? [];
+	}
+
+	/**
+	 * Allows a default permission on the user group.
 	 * @param {string} permissionAlias
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
-	addPermission(permissionAlias: string) {
+	allowDefaultPermission(permissionAlias: string) {
 		const permissions = this.#data.getValue()?.permissions ?? [];
 		const newValue = [...permissions, permissionAlias];
 		this.#data.update({ permissions: newValue });
 	}
 
 	/**
-	 * Removes a permission from the user group permission array.
+	 * Disallows a default permission on the user group.
 	 * @param {string} permissionAlias
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
-	removePermission(permissionAlias: string) {
+	disallowDefaultPermission(permissionAlias: string) {
 		const permissions = this.#data.getValue()?.permissions ?? [];
 		const newValue = permissions.filter((alias) => alias !== permissionAlias);
 		this.#data.update({ permissions: newValue });

@@ -40,6 +40,9 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {
 		return html`
 			<umb-body-layout headline="Hello">
 				<uui-box>
+					<umb-entity-user-permission-settings
+						entity-type=${this.data?.entityType}></umb-entity-user-permission-settings>
+
 					Render user permissions for ${this.data?.entityType} ${this.data?.unique}
 					${this._userPermissionManifests.map((permission) => this.#renderPermission(permission))}
 

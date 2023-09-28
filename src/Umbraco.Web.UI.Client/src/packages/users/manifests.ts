@@ -6,5 +6,6 @@ import { manifests as currentUserManifests } from './current-user/manifests.js';
 // We need to load any components that are not loaded by the user management bundle to register them in the browser.
 import './user-groups/components/index.js';
 import './users/components/index.js';
+import './user-permission/components/index.js';
 
 export const manifests = [...userGroupManifests, ...userManifests, ...userSectionManifests, ...currentUserManifests];
