@@ -1,6 +1,6 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -59,11 +59,15 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	@state()
 	_hasProperties = false;
 
+	@state()
+	_sortModeActive?: boolean;
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
 			this._groupStructureHelper.setStructureManager((context as UmbDocumentTypeWorkspaceContext).structure);
+			this.observe(context.isSorting, (isSorting) => (this._sortModeActive = isSorting));
 		});
 		this.observe(this._groupStructureHelper.containers, (groups) => {
 			this._groups = groups;

@@ -120,6 +120,7 @@ export class UmbDocumentTypeWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(true);
+		this.setIsSorting(false);
 		//this.#draft.next(data);
 		return { data } || undefined;
 		// TODO: Is this wrong? should we return { data }??
@@ -130,6 +131,7 @@ export class UmbDocumentTypeWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(false);
+		this.setIsSorting(false);
 		//this.#draft.next(data);
 		return { data } || undefined;
 		// TODO: Is this wrong? should we return { data }??

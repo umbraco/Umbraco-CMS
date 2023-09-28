@@ -18,14 +18,13 @@ const SORTER_CONFIG: UmbSorterConfig<DocumentTypePropertyTypeResponseModel> = {
 		return element.getAttribute('data-umb-property-id') === model.id;
 	},
 	querySelectModelToElement: (container: HTMLElement, modelEntry: DocumentTypePropertyTypeResponseModel) => {
-		return container.querySelector('data-umb-property-id[' + modelEntry.id + ']');
+		return container.querySelector('data-umb-property-id=[' + modelEntry.id + ']');
 	},
 	placeholderClass: 'select',
 	identifier: 'content-type-property-sorter',
 	itemSelector: '[data-umb-property-id]',
 	disabledItemSelector: '[inherited]',
 	containerSelector: '#property-list',
-	resolveVerticalDirection: () => false,
 };
 
 @customElement('umb-document-type-workspace-view-edit-properties')
@@ -175,11 +174,11 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				)}
 			</div>
 			<uui-button
-				label=${this.localize.term('contentTypeEditor_addProprety')}
+				label=${this.localize.term('contentTypeEditor_addProperty')}
 				id="add"
 				look="placeholder"
 				href=${ifDefined(this._modalRouteNewProperty)}>
-				<umb-localize key="contentTypeEditor_addProprety">Add property</umb-localize>
+				<umb-localize key="contentTypeEditor_addProperty">Add property</umb-localize>
 			</uui-button> `;
 	}
 

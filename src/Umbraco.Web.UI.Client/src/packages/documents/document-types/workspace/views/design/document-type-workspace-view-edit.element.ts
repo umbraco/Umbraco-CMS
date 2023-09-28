@@ -83,7 +83,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	private _activePath = '';
 
 	@state()
-	private sortModeActive = false;
+	private sortModeActive?: boolean;
 
 	@state()
 	private _buttonDisabled: boolean = false;
@@ -130,11 +130,14 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			},
 			'_observeGroups',
 		);
+
+		this.observe(this._workspaceContext.isSorting, (isSorting) => (this.sortModeActive = isSorting));
 	}
 
 	#changeMode() {
-		this.sortModeActive = !this.sortModeActive;
-		if (!this._tabs || !this.sortModeActive) return;
+		this._workspaceContext?.setIsSorting(!this.sortModeActive);
+
+		if (!this._tabs) return;
 		this.sorter = new UmbSorterController(this, this.config);
 		this.sorter.setModel(this._tabs);
 	}
@@ -381,6 +384,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 							placeholder="Unnamed"
 							label=${tab.name!}
 							value="${tab.name!}"
+							auto-width
 							@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
 							@blur=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
 							@input=${() => (this._buttonDisabled = true)}
@@ -440,21 +444,6 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	static styles = [
 		UmbTextStyles,
 		css`
-			uui-tab .no-edit {
-				pointer-events: none;
-			}
-
-			.no-edit uui-input {
-				pointer-events: auto;
-			}
-
-			.--umb-sorter-placeholder::after {
-				content: '';
-				position: absolute;
-				inset: 2px;
-				border: 1px dashed var(--uui-color-divider-emphasis);
-			}
-
 			#buttons-wrapper {
 				flex: 1;
 				display: flex;
@@ -500,20 +489,12 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				border-right: 1px solid var(--uui-color-border);
 			}
 
-			uui-tab:not(:hover, :focus) .trash {
-				opacity: 0;
-				transition: opacity 120ms;
-			}
-
-			.inherited {
-				vertical-align: sub;
-			}
-
-			uui-input:not(:focus, :hover) {
-				border: 1px solid transparent;
+			.no-edit uui-input {
+				pointer-events: auto;
 			}
 
 			.no-edit {
+				pointer-events: none;
 				display: inline-flex;
 				padding-left: var(--uui-size-space-3);
 				border: 1px solid transparent;
@@ -526,8 +507,28 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				transition: opacity 120ms;
 			}
 
+			uui-tab:not(:hover, :focus) .trash {
+				opacity: 0;
+				transition: opacity 120ms;
+			}
+
+			uui-input:not(:focus, :hover) {
+				border: 1px solid transparent;
+			}
+
+			.inherited {
+				vertical-align: sub;
+			}
+
 			.--umb-sorter-placeholder > * {
 				visibility: hidden;
+			}
+
+			.--umb-sorter-placeholder::after {
+				content: '';
+				position: absolute;
+				inset: 2px;
+				border: 1px dashed var(--uui-color-divider-emphasis);
 			}
 		`,
 	];

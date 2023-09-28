@@ -12,15 +12,6 @@ import { generateAlias } from '@umbraco-cms/backoffice/utils';
 @customElement('umb-document-type-workspace-editor')
 export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	@state()
-	private _icon?: string;
-
-	@state()
-	private _iconColorAlias?: string;
-	// TODO: Color should be using an alias, and look up in some dictionary/key/value) of project-colors.
-
-	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
-
-	@state()
 	private _name?: string;
 
 	@state()
@@ -28,6 +19,15 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 
 	@state()
 	private _aliasLocked = true;
+
+	@state()
+	private _icon?: string;
+
+	@state()
+	private _iconColorAlias?: string;
+	// TODO: Color should be using an alias, and look up in some dictionary/key/value) of project-colors.
+
+	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
 
 	private _modalContext?: UmbModalManagerContext;
 
@@ -59,7 +59,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 				}
 				this.removeControllerByAlias('_observeIsNew');
 			},
-			'_observeIsNew'
+			'_observeIsNew',
 		);
 	}
 
