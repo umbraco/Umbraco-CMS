@@ -89,6 +89,7 @@ public static partial class Constants
             public const string Webhook = TableNamePrefix + "Webhook";
             public const string EntityKey2Webhook = TableNamePrefix + "EntityKey2Webhook";
             public const string Event2Webhook = TableNamePrefix + "Event2Webhook";
+            public const string WebhookLog = TableNamePrefix + "WebhookLog";
         }
     }
 }

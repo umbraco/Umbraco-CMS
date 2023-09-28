@@ -1,6 +1,7 @@
 ﻿using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Webhooks;
@@ -12,11 +13,13 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
 
     private readonly IWebhookFiringService _webhookFiringService;
     private readonly IWebHookService _webHookService;
+    private readonly IWebhookLogRepository _webhookLogRepository;
 
-    protected WebhookEventBase(IWebhookFiringService webhookFiringService, IWebHookService webHookService, string eventName)
+    protected WebhookEventBase(IWebhookFiringService webhookFiringService, IWebHookService webHookService, IWebhookLogRepository webhookLogRepository, string eventName)
     {
         _webhookFiringService = webhookFiringService;
         _webHookService = webHookService;
+        _webhookLogRepository = webhookLogRepository;
         EventName = eventName;
     }
 
@@ -37,11 +40,16 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
 
                 HttpResponseMessage response = await _webhookFiringService.Fire(webhook.Url, EventName, entity);
 
-                // TODO: Implement logging depending on response here
-                if (response.IsSuccessStatusCode)
+                var log = new WebhookLog
                 {
-                    // Handle success
-                }
+                    Date = DateTime.UtcNow,
+                    EventName = EventName,
+                    RequestBody = await response.RequestMessage!.Content!.ReadAsStringAsync(cancellationToken),
+                    ResponseBody = await response.Content.ReadAsStringAsync(cancellationToken),
+                    StatusCode = response.StatusCode.ToString(),
+                    RetryCount = 0,
+                };
+                await _webhookLogRepository.CreateAsync(log);
             }
         }
     }
