@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { umbLocalizationContext } from './localization-context.ts';
+import { umbLocalizationContext } from './localization-context.js';
 
 /**
  * The localize element.

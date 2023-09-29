@@ -58,14 +58,15 @@ export default class UmbLoginPageElement extends LitElement {
 			if (response.twoFactorView) {
 				umbAuthContext.twoFactorView = response.twoFactorView;
 			}
-      		this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'mfa' }}));
-			return;
+
+      this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'mfa' }}));
+      return;
 		}
 
 		if (response.error) {
 			this.dispatchEvent(new CustomEvent('umb-login-failed', { bubbles: true, composed: true, detail: response }));
 			return;
-		};
+		}
 
 		const returnPath = umbAuthContext.returnPath;
 
@@ -174,51 +175,59 @@ export default class UmbLoginPageElement extends LitElement {
 
 	static styles: CSSResultGroup = [
 		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-			}
-			#greeting {
-				text-align: center;
-				margin: 0px;
-				font-weight: 600;
-				font-size: 1.4rem;
-				margin-bottom: var(--uui-size-space-6);
-			}
-			form {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-5);
-			}
-			uui-form-layout-item {
-				margin: 0;
-			}
-			uui-input,
-			uui-input-password {
-				width: 100%;
-				border-radius: var(--uui-border-radius);
-			}
-			#umb-login-button {
-				width: 100%;
-				--uui-button-padding-top-factor: 1.5;
-				--uui-button-padding-bottom-factor: 1.5;
-			}
-			#forgot-password {
-				color: var(--uui-color-interactive);
-				text-decoration: none;
-			}
-			#forgot-password:hover {
-				color: var(--uui-color-interactive-emphasis);
-			}
-			.text-danger {
-				color: var(--uui-color-danger-standalone);
-			}
-			#secondary-actions {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-			}
-		`,
+      :host {
+        display: flex;
+        flex-direction: column;
+      }
+
+      #greeting {
+        text-align: center;
+        font-weight: 600;
+        font-size: 1.4rem;
+        margin: 0 0 var(--uui-size-space-6);
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--uui-size-space-5);
+      }
+
+      uui-form-layout-item {
+        margin: 0;
+      }
+
+      uui-input,
+      uui-input-password {
+        width: 100%;
+        border-radius: var(--uui-border-radius);
+      }
+
+      #umb-login-button {
+        width: 100%;
+        --uui-button-padding-top-factor: 1.5;
+        --uui-button-padding-bottom-factor: 1.5;
+      }
+
+      #forgot-password {
+        color: var(--uui-color-interactive);
+        text-decoration: none;
+      }
+
+      #forgot-password:hover {
+        color: var(--uui-color-interactive-emphasis);
+      }
+
+      .text-danger {
+        color: var(--uui-color-danger-standalone);
+      }
+
+      #secondary-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+    `,
 	];
 }
 
