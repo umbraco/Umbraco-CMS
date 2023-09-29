@@ -24,7 +24,7 @@
 
 <!DOCTYPE html>
 
-<html lang="@CultureInfo.CurrentCulture.Name">
+<html lang="@CultureInfo.CurrentCulture.Name.ToLowerInvariant()">
 <head>
     <base href="@backOfficePath.EnsureEndsWith('/')" />
     <meta charset="utf-8">
