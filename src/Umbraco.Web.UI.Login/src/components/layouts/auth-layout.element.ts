@@ -12,9 +12,9 @@ export class UmbAuthLayoutElement extends LitElement {
 
 	render() {
 		return html`
-			<div id="background" style=${styleMap({ backgroundImage: `url('${this.backgroundImage}')` })}></div>
+			<div id="background" style=${styleMap({ backgroundImage: `url('${this.backgroundImage}')` })} aria-hidden="true"></div>
 
-			${this.logoImage ? html`<div id="logo"><img src=${this.logoImage} alt="Umbraco" /></div>` : nothing}
+			${this.logoImage ? html`<div id="logo" aria-hidden="true"><img src=${this.logoImage} alt="" /></div>` : nothing}
 
 			<div id="container">
 				<div id="box">
