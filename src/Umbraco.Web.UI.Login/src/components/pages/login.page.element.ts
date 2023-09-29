@@ -91,7 +91,7 @@ export default class UmbLoginPageElement extends LitElement {
 	render() {
 		return html`
 			<h1 id="greeting" class="uui-h3">
-				<umb-localize .key=${this.#greetingLocalizationKey}>Welcome to Umbraco</umb-localize>
+				<umb-localize .key=${this.#greetingLocalizationKey}></umb-localize>
 			</h1>
 			<slot name="subheadline"></slot>
 			${this.disableLocalLogin
