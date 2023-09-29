@@ -43,7 +43,7 @@ export class UmbExternalLoginProvidersLayoutElement extends LitElement {
 			#divider {
 				width: 100%;
 				text-align: center;
-				color: #868686; /* TODO: Change to uui color when uui gets a muted text variable */
+				color: var(--uui-color-interactive);
 				position: relative;
 				z-index: 0;
 				margin-bottom: 16px;
