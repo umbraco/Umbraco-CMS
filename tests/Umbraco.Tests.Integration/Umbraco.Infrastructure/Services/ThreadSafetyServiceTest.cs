@@ -9,6 +9,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -101,6 +102,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void Ensure_All_Threads_Execute_Successfully_Content_Service()
         {
             if (Environment.GetEnvironmentVariable("UMBRACO_TMP") != null)
@@ -195,6 +197,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [LongRunning]
         public void Ensure_All_Threads_Execute_Successfully_Media_Service()
         {
             if (Environment.GetEnvironmentVariable("UMBRACO_TMP") != null)

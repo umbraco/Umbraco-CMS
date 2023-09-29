@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 
 namespace Umbraco.Cms.Tests.Integration.TestServerTest.Controllers;
@@ -12,6 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest.Controllers;
 public class EnsureNotAmbiguousActionNameControllerTests : UmbracoTestServerTestBase
 {
     [Test]
+    [LongRunning]
     public void EnsureNotAmbiguousActionName()
     {
         var intId = 0;

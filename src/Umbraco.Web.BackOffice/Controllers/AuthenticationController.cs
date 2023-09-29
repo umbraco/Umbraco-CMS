@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -494,6 +495,8 @@ public class AuthenticationController : UmbracoApiControllerBase
                 _userManager.NotifyForgotPasswordRequested(User, user.Id.ToString());
             }
         }
+
+        await Task.Delay(RandomNumberGenerator.GetInt32(400, 2500));
 
         return Ok();
     }

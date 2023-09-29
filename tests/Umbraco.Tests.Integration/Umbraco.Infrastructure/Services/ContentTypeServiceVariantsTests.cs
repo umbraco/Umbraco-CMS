@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -81,6 +82,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Culture, true)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment, true)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.CultureAndSegment, false)]
+    [LongRunning]
     public void Change_Content_Type_Variation_Clears_Redirects(ContentVariation startingContentTypeVariation,
         ContentVariation changedContentTypeVariation, bool shouldUrlRedirectsBeCleared)
     {

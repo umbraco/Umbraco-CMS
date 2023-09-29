@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure.Runtime;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Runtime;
@@ -76,6 +77,7 @@ internal class FileSystemMainDomLockTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public async Task AcquireLockAsync_WhenTimeoutExceeded_ReturnsFalse()
     {
         await using var lockFile = File.Open(LockFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
@@ -88,6 +90,7 @@ internal class FileSystemMainDomLockTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public async Task ListenAsync_WhenLockReleaseSignalFileFound_DropsLockFileHandle()
     {
         using var sut = FileSystemMainDomLock;
