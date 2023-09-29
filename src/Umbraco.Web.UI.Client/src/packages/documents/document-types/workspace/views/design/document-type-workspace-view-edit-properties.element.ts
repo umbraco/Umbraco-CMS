@@ -188,6 +188,20 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 			#add {
 				width: 100%;
 			}
+			document-type-workspace-view-edit-property {
+				position: relative;
+			}
+
+			.select {
+				visibility: hidden;
+			}
+
+			.select {
+				position: absolute;
+				inset: 0;
+				content: '';
+				border: 2px solid red;
+			}
 		`,
 	];
 }

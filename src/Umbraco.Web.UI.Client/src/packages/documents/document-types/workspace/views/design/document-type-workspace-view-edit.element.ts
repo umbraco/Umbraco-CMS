@@ -328,29 +328,16 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	renderTabsNavigation() {
 		if (!this._tabs) return;
 
-		if (this.sortModeActive) {
-			return html`<div id="tabs-group" class="flex">
-				<uui-tab-group>
-					${this.renderRootTab()}
-					${repeat(
-						this._tabs,
-						(tab) => tab.id! + tab.name,
-						(tab) => this.renderTabInSortMode(tab),
-					)}
-				</uui-tab-group>
-			</div>`;
-		} else {
-			return html`<div class="flex">
-				<uui-tab-group>
-					${this.renderRootTab()}
-					${repeat(
-						this._tabs,
-						(tab) => tab.id! + tab.name,
-						(tab) => this.renderTabInDefaultMode(tab),
-					)}
-				</uui-tab-group>
-			</div>`;
-		}
+		return html`<div id="tabs-group" class="flex">
+			<uui-tab-group>
+				${this.renderRootTab()}
+				${repeat(
+					this._tabs,
+					(tab) => tab.id! + tab.name,
+					(tab) => this.renderTab(tab),
+				)}
+			</uui-tab-group>
+		</div>`;
 	}
 
 	renderRootTab() {
@@ -365,7 +352,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		</uui-tab>`;
 	}
 
-	renderTabInDefaultMode(tab: PropertyTypeContainerModelBaseModel) {
+	renderTab(tab: PropertyTypeContainerModelBaseModel) {
 		const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
 		const tabActive = path === this._activePath;
 		const tabInherited = !this._tabsStructureHelper.isOwnerContainer(tab.id!);
@@ -374,47 +361,14 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			label=${tab.name ?? 'unnamed'}
 			.active=${tabActive}
 			href=${path}
-			?data-umb-tabs-inherited=${tabInherited}>
-			<div class="tab">
-				${tabInherited ? html`<uui-icon class="inherited" name="umb:merge"></uui-icon> ` : nothing}
-				${tabActive && !tabInherited
-					? html`<uui-input
-							id="input"
-							look="placeholder"
-							placeholder="Unnamed"
-							label=${tab.name!}
-							value="${tab.name!}"
-							auto-width
-							@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-							@blur=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-							@input=${() => (this._buttonDisabled = true)}
-							@focus=${(e: UUIInputEvent) => (e.target.value ? nothing : (this._buttonDisabled = true))}>
-							${this.renderDeleteFor(tab)}
-					  </uui-input>`
-					: html`<div class="no-edit">
-							${tab.name!} ${this._tabsStructureHelper.isOwnerContainer(tab.id!) ? this.renderDeleteFor(tab) : nothing}
-					  </div>`}
-			</div>
+			data-umb-tabs-id=${ifDefined(tab.id)}>
+			${this.renderTabInner(tab, tabActive, tabInherited)}
 		</uui-tab>`;
 	}
 
-	#changeOrder(tab: PropertyTypeContainerModelBaseModel, e: UUIInputEvent) {
-		if (!e.target.value || !tab.id) return;
-		const sortOrder = Number(e.target.value);
-		this._tabsStructureHelper.partialUpdateContainer(tab.id, { sortOrder });
-		console.log('d');
-	}
-
-	renderTabInSortMode(tab: PropertyTypeContainerModelBaseModel) {
-		const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
-		const tabActive = path === this._activePath;
-
-		return html`<uui-tab
-			label=${tab.name ?? 'unnamed'}
-			.active=${tabActive}
-			href=${path}
-			data-umb-tabs-id=${ifDefined(tab.id)}>
-			<div class="no-edit">
+	renderTabInner(tab: PropertyTypeContainerModelBaseModel, tabActive: boolean, tabInherited: boolean) {
+		if (this.sortModeActive) {
+			return html`<div class="no-edit">
 				<uui-icon name="umb:navigation" class="drag-${tab.id}"> </uui-icon>
 				${!this._tabsStructureHelper.isOwnerContainer(tab.id!)
 					? html`<uui-icon class="external" name="umb:merge"></uui-icon>${tab.name!}`
@@ -424,9 +378,39 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 								type="number"
 								value=${ifDefined(tab.sortOrder)}
 								style="width:50px"
-								@keypress=${(e: UUIInputEvent) => this.#changeOrder(tab, e)}></uui-input>`}
-			</div>
-		</uui-tab>`;
+								@keypress=${(e: UUIInputEvent) => this.#changeOrderNumber(tab, e)}></uui-input>`}
+			</div>`;
+		}
+
+		if (tabActive && !tabInherited) {
+			return html`<div class="tab">
+				<uui-input
+					id="input"
+					look="placeholder"
+					placeholder="Unnamed"
+					label=${tab.name!}
+					value="${tab.name!}"
+					auto-width
+					@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
+					@blur=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
+					@input=${() => (this._buttonDisabled = true)}
+					@focus=${(e: UUIInputEvent) => (e.target.value ? nothing : (this._buttonDisabled = true))}>
+					${this.renderDeleteFor(tab)}
+				</uui-input>
+			</div>`;
+		}
+
+		if (tabInherited) {
+			return html`<div class="no-edit"><uui-icon name="umb:merge"></uui-icon>${tab.name!}</div>`;
+		} else {
+			return html`<div class="no-edit">${tab.name!} ${this.renderDeleteFor(tab)}</div>`;
+		}
+	}
+
+	#changeOrderNumber(tab: PropertyTypeContainerModelBaseModel, e: UUIInputEvent) {
+		if (!e.target.value || !tab.id) return;
+		const sortOrder = Number(e.target.value);
+		this._tabsStructureHelper.partialUpdateContainer(tab.id, { sortOrder });
 	}
 
 	renderDeleteFor(tab: PropertyTypeContainerModelBaseModel) {
