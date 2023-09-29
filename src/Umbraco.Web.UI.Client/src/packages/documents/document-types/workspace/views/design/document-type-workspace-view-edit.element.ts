@@ -62,9 +62,6 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 
 			return true;
 		},
-		performItemRemove: () => {
-			return true;
-		},
 	};
 
 	//private _hasRootProperties = false;
@@ -96,6 +93,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 
 	constructor() {
 		super();
+		this.sorter = new UmbSorterController(this, this.config);
 
 		//TODO: We need to differentiate between local and composition tabs (and hybrids)
 
@@ -111,6 +109,11 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._workspaceContext = workspaceContext as UmbDocumentTypeWorkspaceContext;
 			this._tabsStructureHelper.setStructureManager((workspaceContext as UmbDocumentTypeWorkspaceContext).structure);
+			this.observe(
+				this._workspaceContext.isSorting,
+				(isSorting) => (this.sortModeActive = isSorting),
+				'_observeIsSorting',
+			);
 			this._observeRootGroups();
 		});
 
@@ -130,16 +133,16 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			},
 			'_observeGroups',
 		);
-
-		this.observe(this._workspaceContext.isSorting, (isSorting) => (this.sortModeActive = isSorting));
 	}
 
 	#changeMode() {
 		this._workspaceContext?.setIsSorting(!this.sortModeActive);
 
-		if (!this._tabs) return;
-		this.sorter = new UmbSorterController(this, this.config);
-		this.sorter.setModel(this._tabs);
+		if (this.sortModeActive && this._tabs) {
+			this.sorter?.setModel(this._tabs);
+		} else {
+			this.sorter?.setModel([]);
+		}
 	}
 
 	private _createRoutes() {
@@ -303,7 +306,6 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			: this.localize.term('general_reorder');
 
 		return html`<div class="tab-actions">
-			${this.renderHiddenActions()}
 			<uui-button look="outline" label=${this.localize.term('contentTypeEditor_compositions')} compact>
 				<uui-icon name="umb:merge"></uui-icon>
 				${this.localize.term('contentTypeEditor_compositions')}
@@ -313,16 +315,6 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				${sortButtonText}
 			</uui-button>
 		</div>`;
-	}
-
-	renderHiddenActions() {
-		//TODO: If currently dragging a container of type "group", show this button
-		if (this.sortModeActive && this._activePath == 'dummy text to force false for now') {
-			return html`<uui-button look="placeholder" label=${this.localize.term('contentTypeEditor_convertToTab')}>
-				${this.localize.term('contentTypeEditor_convertToTab')}
-			</uui-button>`;
-		}
-		return;
 	}
 
 	renderTabsNavigation() {
@@ -369,10 +361,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	renderTabInner(tab: PropertyTypeContainerModelBaseModel, tabActive: boolean, tabInherited: boolean) {
 		if (this.sortModeActive) {
 			return html`<div class="no-edit">
-				<uui-icon name="umb:navigation" class="drag-${tab.id}"> </uui-icon>
-				${!this._tabsStructureHelper.isOwnerContainer(tab.id!)
+				${tabInherited
 					? html`<uui-icon class="external" name="umb:merge"></uui-icon>${tab.name!}`
-					: html`${tab.name!}
+					: html`<uui-icon name="umb:navigation" class="drag-${tab.id}"> </uui-icon>${tab.name!}
 							<uui-input
 								label="sort order"
 								type="number"

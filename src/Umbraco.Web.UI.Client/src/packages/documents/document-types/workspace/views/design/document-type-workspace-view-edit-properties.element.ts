@@ -20,7 +20,6 @@ const SORTER_CONFIG: UmbSorterConfig<DocumentTypePropertyTypeResponseModel> = {
 	querySelectModelToElement: (container: HTMLElement, modelEntry: DocumentTypePropertyTypeResponseModel) => {
 		return container.querySelector('data-umb-property-id=[' + modelEntry.id + ']');
 	},
-	placeholderClass: 'select',
 	identifier: 'content-type-property-sorter',
 	itemSelector: '[data-umb-property-id]',
 	disabledItemSelector: '[inherited]',
@@ -35,19 +34,15 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 			let sortOrder = 0;
 			if (this._propertyStructure.length > 0) {
 				if (args.newIndex === 0) {
-					// TODO: Remove 'as any' when sortOrder is added to the model:
-					sortOrder = ((this._propertyStructure[0] as any).sortOrder ?? 0) - 1;
+					sortOrder = (this._propertyStructure[0].sortOrder ?? 0) - 1;
 				} else {
 					sortOrder =
-						((this._propertyStructure[Math.min(args.newIndex, this._propertyStructure.length - 1)] as any).sortOrder ??
-							0) + 1;
+						(this._propertyStructure[Math.min(args.newIndex, this._propertyStructure.length - 1)].sortOrder ?? 0) + 1;
 				}
 			}
-			console.log('perform insert', sortOrder, args.item.id);
 			return this._propertyStructureHelper.insertProperty(args.item, sortOrder);
 		},
 		performItemRemove: (args) => {
-			console.log('perform remove');
 			return this._propertyStructureHelper.removeProperty(args.item.id!);
 		},
 	});
@@ -92,6 +87,9 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	@state()
 	protected _modalRouteNewProperty?: string;
 
+	@state()
+	_sortModeActive?: boolean;
+
 	constructor() {
 		super();
 
@@ -99,10 +97,17 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 			this._propertyStructureHelper.setStructureManager(
 				(workspaceContext as UmbDocumentTypeWorkspaceContext).structure,
 			);
+			this.observe(
+				workspaceContext.isSorting,
+				(isSorting) => {
+					this._sortModeActive = isSorting;
+					this.#setModel(isSorting);
+				},
+				'_observeIsSorting',
+			);
 		});
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._propertyStructure = propertyStructure;
-			this.#propertySorter.setModel(this._propertyStructure);
 		});
 
 		// Note: Route for adding a new property
@@ -123,6 +128,14 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRouteNewProperty = routeBuilder(null);
 			});
+	}
+
+	#setModel(isSorting?: boolean) {
+		if (isSorting) {
+			this.#propertySorter.setModel(this._propertyStructure);
+		} else {
+			this.#propertySorter.setModel([]);
+		}
 	}
 
 	connectedCallback(): void {
@@ -149,7 +162,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		return html`<div id="property-list">
 				${repeat(
 					this._propertyStructure,
-					(property) => property.id ?? '' + property.containerId ?? '' + (property as any).sortOrder ?? '',
+					(property) => property.id ?? '' + property.containerId ?? '' + property.sortOrder ?? '',
 					(property) => {
 						// Note: This piece might be moved into the property component
 						const inheritedFromDocument = this._ownerDocumentTypes?.find(
@@ -157,11 +170,11 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 						);
 
 						return html`<document-type-workspace-view-edit-property
-							class="property"
 							data-umb-property-id=${ifDefined(property.id)}
 							owner-document-type-id=${ifDefined(inheritedFromDocument?.id)}
 							owner-document-type-name=${ifDefined(inheritedFromDocument?.name)}
 							?inherited=${property.containerId !== this.containerId}
+							?sort-mode-active=${this._sortModeActive}
 							.property=${property}
 							@partial-property-update=${(event: CustomEvent) => {
 								this._propertyStructureHelper.partialUpdateProperty(property.id, event.detail);
@@ -173,13 +186,15 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 					},
 				)}
 			</div>
-			<uui-button
-				label=${this.localize.term('contentTypeEditor_addProperty')}
-				id="add"
-				look="placeholder"
-				href=${ifDefined(this._modalRouteNewProperty)}>
-				<umb-localize key="contentTypeEditor_addProperty">Add property</umb-localize>
-			</uui-button> `;
+			${!this._sortModeActive
+				? html`<uui-button
+						label=${this.localize.term('contentTypeEditor_addProperty')}
+						id="add"
+						look="placeholder"
+						href=${ifDefined(this._modalRouteNewProperty)}>
+						<umb-localize key="contentTypeEditor_addProperty">Add property</umb-localize>
+				  </uui-button> `
+				: ''} `;
 	}
 
 	static styles = [
@@ -187,20 +202,6 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		css`
 			#add {
 				width: 100%;
-			}
-			document-type-workspace-view-edit-property {
-				position: relative;
-			}
-
-			.select {
-				visibility: hidden;
-			}
-
-			.select {
-				position: absolute;
-				inset: 0;
-				content: '';
-				border: 2px solid red;
 			}
 		`,
 	];
