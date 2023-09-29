@@ -17,4 +17,17 @@ internal static class WebhookLogFactory
             Key = log.Key,
             Id = log.Id,
         };
+
+    public static WebhookLog DtoToEntity(WebhookLogDto dto) =>
+        new()
+        {
+            Date = dto.Date,
+            EventName = dto.EventName,
+            RequestBody = dto.RequestBody,
+            ResponseBody = dto.ResponseBody,
+            RetryCount = dto.RetryCount,
+            StatusCode = dto.StatusCode,
+            Key = dto.Key,
+            Id = dto.Id,
+        };
 }

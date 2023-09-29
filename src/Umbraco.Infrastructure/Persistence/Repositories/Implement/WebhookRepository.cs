@@ -24,7 +24,7 @@ public class WebhookRepository : IWebhookRepository
 
         return new PagedModel<Webhook>
         {
-            Items = await DtosToEntities(webhookDtos),
+            Items = await DtosToEntities(webhookDtos.Skip(skip).Take(take)),
             Total = webhookDtos.Count,
         };
     }

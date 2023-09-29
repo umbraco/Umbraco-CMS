@@ -1,9 +1,12 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using NPoco;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
@@ -21,5 +24,20 @@ public class WebhookLogRepository : IWebhookLogRepository
         log.Id = id;
     }
 
-    public Task<PagedModel<WebhookLog>> GetPagedAsync(int skip, int take) => throw new NotImplementedException();
+    public async Task<PagedModel<WebhookLog>> GetPagedAsync(int skip, int take)
+    {
+        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+            .Select<WebhookLogDto>()
+            .From<WebhookLogDto>();
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        Page<WebhookLogDto>? page = await _scopeAccessor.AmbientScope?.Database.PageAsync<WebhookLogDto>(pageNumber, pageSize, sql)!;
+
+        return new PagedModel<WebhookLog>
+        {
+            Total = page.TotalItems,
+            Items = page.Items.Select(WebhookLogFactory.DtoToEntity),
+        };
+    }
 }
