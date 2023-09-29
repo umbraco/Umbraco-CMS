@@ -1,4 +1,4 @@
-import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, css, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbEntityUserPermissionSettingsModalData,
@@ -39,9 +39,10 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {
 	render() {
 		return html`
 			<umb-body-layout headline="Hello">
+				debugger
 				<uui-box>
 					<umb-entity-user-permission-settings
-						entity-type=${this.data?.entityType}></umb-entity-user-permission-settings>
+						.entityType=${this.data?.entityType}></umb-entity-user-permission-settings>
 
 					Render user permissions for ${this.data?.entityType} ${this.data?.unique}
 					${this._userPermissionManifests.map((permission) => this.#renderPermission(permission))}
@@ -73,7 +74,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {
 		return html`<div
 			style="display: flex; align-items:center; border-bottom: 1px solid var(--uui-color-divider); padding: 9px 0 12px 0;">
 			<uui-toggle
-				label=${userPermissionManifest.meta.label}
+				label=${ifDefined(userPermissionManifest.meta.label)}
 				?checked=${this.#isAllowed(userPermissionManifest)}
 				@change=${(event: UUIBooleanInputEvent) => this.#onChangeUserPermission(event, userPermissionManifest)}>
 				<div class="permission-meta">
