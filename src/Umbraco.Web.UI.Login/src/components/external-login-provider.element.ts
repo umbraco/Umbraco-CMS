@@ -116,7 +116,7 @@ export class UmbExternalLoginProviderElement extends LitElement {
 					label="Continue with ${this.displayName}"
 					.look=${this.buttonLook}
 					.color=${this.buttonColor}>
-          ${this.displayName ? html`<div><uui-icon name=${this.icon}></uui-icon> Continue with ${this.displayName}</div>` : nothing}
+          ${this.displayName ? html`<div><uui-icon name=${this.icon} aria-hidden="true"></uui-icon> Continue with ${this.displayName}</div>` : nothing}
           <slot></slot>
 				</uui-button>
 			</form>
