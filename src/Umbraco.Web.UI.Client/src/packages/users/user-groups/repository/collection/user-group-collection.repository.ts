@@ -1,6 +1,6 @@
 import { UmbUserGroupCollectionFilterModel } from '../../types.js';
-import { UmbUserGroupCollectionServerDataSource } from '../sources/user-group-collection.server.data.js';
 import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN, UmbUserGroupStore } from '../user-group.store.js';
+import { UmbUserGroupCollectionServerDataSource } from './user-group-collection.server.data.js';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbCollectionDataSource, UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
