@@ -6,8 +6,7 @@ import { UmbCollectionDataSource, UmbCollectionRepository } from '@umbraco-cms/b
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-// TODO: implement
-export class UmbUserGroupRepository implements UmbCollectionRepository {
+export class UmbUserGroupCollectionRepository implements UmbCollectionRepository {
 	#host: UmbControllerHostElement;
 	#init;
 
