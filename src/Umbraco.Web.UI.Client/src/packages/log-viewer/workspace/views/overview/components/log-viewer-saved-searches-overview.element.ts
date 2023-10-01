@@ -3,12 +3,25 @@ import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {debounceTime, Subject, tap} from "@umbraco-cms/backoffice/external/rxjs";
+import {path, query as getQuery, toQueryString} from "@umbraco-cms/backoffice/external/router-slot";
 
 //TODO: implement the saved searches pagination when the API total bug is fixed
 @customElement('umb-log-viewer-saved-searches-overview')
 export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 	@state()
 	private _savedSearches: SavedLogSearchResponseModel[] = [];
+	@state()
+	private _inputQuery = '';
+
+	@state()
+	private _showLoader = false;
+
+	@state()
+	private _isQuerySaved = false;
+
+	private inputQuery$ = new Subject<string>();
+
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
@@ -19,13 +32,46 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 			this.#logViewerContext?.getSavedSearches();
 			this.#observeStuff();
 		});
+		this.inputQuery$
+			.pipe(
+				tap(() => (this._showLoader = true)),
+				debounceTime(250)
+			)
+			.subscribe((query) => {
+				this.#logViewerContext?.setFilterExpression(query);
+				this.#persist(query);
+				this._isQuerySaved = this._savedSearches.some((search) => search.query === query);
+				this._showLoader = false;
+			});
 	}
 
 	#observeStuff() {
 		if (!this.#logViewerContext) return;
 		this.observe(this.#logViewerContext.savedSearches, (savedSearches) => {
 			this._savedSearches = savedSearches ?? [];
+			this._isQuerySaved = this._savedSearches.some((search) => search.query === this._inputQuery);
 		});
+
+		this.observe(this.#logViewerContext.filterExpression, (query) => {
+			this._inputQuery = query;
+			this._isQuerySaved = this._savedSearches.some((search) => search.query === query);
+		});
+	}
+
+	#persist(filter: string) {
+		let query = getQuery();
+
+		query = {
+			...query,
+			lq: filter,
+		};
+		const newPath = path().replace('/overview', '/search');
+
+		window.history.pushState({}, '', `${newPath}?${toQueryString(query)}`);
+	}
+
+	#setQueryFromSavedSearch(query: string) {
+		this.inputQuery$.next(query);
 	}
 
 	#renderSearchItem = (searchListItem: SavedLogSearchResponseModel) => {
@@ -33,7 +79,7 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 			<uui-menu-item
 				label="${searchListItem.name ?? ''}"
 				title="${searchListItem.name ?? ''}"
-				href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(searchListItem.query ?? '')}`}>
+				@click=${() => this.#setQueryFromSavedSearch(searchListItem.query ?? '')}>
 				<uui-icon slot="icon" name="umb:search"></uui-icon>${searchListItem.name}
 			</uui-menu-item>
 		</li>`;
