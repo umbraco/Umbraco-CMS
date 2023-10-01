@@ -1,4 +1,4 @@
-import { UmbUserGroupCollectionContext } from './user-group-collection.context.js';
+import { UmbUserGroupCollectionContext } from '../user-group-collection.context.js';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
@@ -26,8 +26,15 @@ export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-button @click=${this.#onCreate} label=${this.localize.term('actions_createGroup')} look="outline"></uui-button>
-			<uui-input @input=${this.#onSearch} label=${this.localize.term('general_search')} placeholder=${this.localize.term('visuallyHiddenTexts_userGroupSearchLabel')} id="input-search"></uui-input>
+			<uui-button
+				@click=${this.#onCreate}
+				label=${this.localize.term('actions_createGroup')}
+				look="outline"></uui-button>
+			<uui-input
+				@input=${this.#onSearch}
+				label=${this.localize.term('general_search')}
+				placeholder=${this.localize.term('visuallyHiddenTexts_userGroupSearchLabel')}
+				id="input-search"></uui-input>
 		`;
 	}
 	static styles = [
