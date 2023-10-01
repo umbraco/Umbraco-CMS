@@ -183,7 +183,7 @@
 		"rollup": "^3.27.2",
 		"rollup-plugin-dts": "^5.3.1",
 		"rollup-plugin-esbuild": "^5.0.0",
-		"rollup-plugin-import-css": "^3.3.1",
+		"rollup-plugin-import-css": "^3.3.4",
 		"rollup-plugin-web-worker-loader": "^1.6.1",
 		"storybook": "7.2.1",
 		"tiny-glob": "^0.2.9",
