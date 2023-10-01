@@ -1,4 +1,4 @@
-import { USER_GROUP_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { USER_GROUP_COLLECTION_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import type { UmbUserGroupCollectionFilterModel } from '../types.js';
 import { UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -9,6 +9,6 @@ export class UmbUserGroupCollectionContext extends UmbCollectionContext<
 	UmbUserGroupCollectionFilterModel
 > {
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'user-group', USER_GROUP_REPOSITORY_ALIAS);
+		super(host, 'user-group', USER_GROUP_COLLECTION_REPOSITORY_ALIAS);
 	}
 }
