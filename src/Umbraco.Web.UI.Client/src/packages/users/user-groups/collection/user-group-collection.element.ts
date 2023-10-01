@@ -4,7 +4,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './user-group-collection-view.element.js';
+import './views/user-group-collection-view.element.js';
 import './components/user-group-collection-header.element.js';
 
 @customElement('umb-user-group-collection')

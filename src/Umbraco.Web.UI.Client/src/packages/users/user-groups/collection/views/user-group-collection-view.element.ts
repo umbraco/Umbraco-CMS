@@ -1,12 +1,12 @@
-import { UmbUserGroupCollectionContext } from './user-group-collection.context.js';
+import { UmbUserGroupCollectionContext } from '../user-group-collection.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-import './components/user-group-table-name-column-layout.element.js';
-import './components/user-group-table-sections-column-layout.element.js';
+import '../components/user-group-table-name-column-layout.element.js';
+import '../components/user-group-table-sections-column-layout.element.js';
 import {
 	UmbTableColumn,
 	UmbTableConfig,
