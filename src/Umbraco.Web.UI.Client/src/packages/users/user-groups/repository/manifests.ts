@@ -1,24 +1,15 @@
 import { UmbUserGroupRepository } from '../repository/user-group.repository.js';
-import { UmbUserGroupCollectionRepository } from './collection/user-group-collection.repository.js';
 import { UmbUserGroupItemStore } from './user-group-item.store.js';
 import { UmbUserGroupStore } from './user-group.store.js';
 import type { ManifestStore, ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
 
 export const USER_GROUP_REPOSITORY_ALIAS = 'Umb.Repository.UserGroup';
-export const USER_GROUP_COLLECTION_REPOSITORY_ALIAS = 'Umb.Repository.UserGroupCollection';
 
 const repository: ManifestRepository = {
 	type: 'repository',
 	alias: USER_GROUP_REPOSITORY_ALIAS,
 	name: 'User Group Repository',
 	class: UmbUserGroupRepository,
-};
-
-const collectionRepository: ManifestRepository = {
-	type: 'repository',
-	alias: USER_GROUP_COLLECTION_REPOSITORY_ALIAS,
-	name: 'User Group Collection Repository',
-	class: UmbUserGroupCollectionRepository,
 };
 
 const store: ManifestStore = {
@@ -35,4 +26,4 @@ const itemStore: ManifestItemStore = {
 	class: UmbUserGroupItemStore,
 };
 
-export const manifests = [repository, collectionRepository, store, itemStore];
+export const manifests = [repository, store, itemStore];
