@@ -20,7 +20,7 @@ export class UmbUserCollectionElement extends UmbLitElement {
 		return html`
 			<umb-body-layout header-transparent>
 				<umb-user-group-collection-header slot="header"></umb-user-group-collection-header>
-				<umb-user-group-collection-view></umb-user-group-collection-view>
+				<umb-user-group-collection-table-view></umb-user-group-collection-table-view>
 				<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>
 			</umb-body-layout>
 		`;

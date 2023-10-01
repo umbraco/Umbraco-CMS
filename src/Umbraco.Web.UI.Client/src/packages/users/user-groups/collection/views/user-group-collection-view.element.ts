@@ -16,8 +16,8 @@ import {
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
 
-@customElement('umb-user-group-collection-view')
-export class UmbUserGroupCollectionViewElement extends UmbLitElement {
+@customElement('umb-user-group-collection-table-view')
+export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	@state()
 	private _tableConfig: UmbTableConfig = {
 		allowSelection: true,
@@ -134,10 +134,10 @@ export class UmbUserGroupCollectionViewElement extends UmbLitElement {
 	];
 }
 
-export default UmbUserGroupCollectionViewElement;
+export default UmbUserGroupCollectionTableViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-group-collection-view': UmbUserGroupCollectionViewElement;
+		'umb-user-group-collection-table-view': UmbUserGroupCollectionTableViewElement;
 	}
 }
