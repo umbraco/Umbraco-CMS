@@ -1,6 +1,5 @@
-import { UmbUserGroupCollectionFilterModel, UmbUserGroupDetailDataSource } from '../types.js';
+import { UmbUserGroupDetailDataSource } from '../types.js';
 import { UmbUserGroupServerDataSource } from './sources/user-group.server.data.js';
-import { UmbUserGroupCollectionServerDataSource } from './sources/user-group-collection.server.data.js';
 import { UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, UmbUserGroupItemStore } from './user-group-item.store.js';
 import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN, UmbUserGroupStore } from './user-group.store.js';
 import { UmbUserGroupItemServerDataSource } from './sources/user-group-item.server.data.js';
@@ -13,8 +12,6 @@ import {
 	UserGroupResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import {
-	UmbCollectionDataSource,
-	UmbCollectionRepository,
 	UmbDetailRepository,
 	UmbItemDataSource,
 	UmbItemRepository,
@@ -29,7 +26,6 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 export class UmbUserGroupRepository
 	implements
 		UmbDetailRepository<CreateUserGroupRequestModel, any, UpdateUserGroupRequestModel, UserGroupResponseModel>,
-		UmbCollectionRepository,
 		UmbItemRepository<UserGroupItemResponseModel>
 {
 	#host: UmbControllerHostElement;
@@ -37,8 +33,6 @@ export class UmbUserGroupRepository
 
 	#detailSource: UmbUserGroupDetailDataSource;
 	#detailStore?: UmbUserGroupStore;
-
-	#collectionSource: UmbCollectionDataSource<UserGroupResponseModel>;
 
 	#itemSource: UmbItemDataSource<UserGroupItemResponseModel>;
 	#itemStore?: UmbUserGroupItemStore;
@@ -49,7 +43,6 @@ export class UmbUserGroupRepository
 		this.#host = host;
 		this.#detailSource = new UmbUserGroupServerDataSource(this.#host);
 		this.#itemSource = new UmbUserGroupItemServerDataSource(this.#host);
-		this.#collectionSource = new UmbUserGroupCollectionServerDataSource(this.#host);
 
 		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 			this.#notificationContext = instance;
@@ -69,14 +62,9 @@ export class UmbUserGroupRepository
 			}).asPromise(),
 		]);
 	}
+
 	createScaffold(parentId: string | null): Promise<DataSourceResponse<UserGroupBaseModel>> {
 		return this.#detailSource.createScaffold(parentId);
-	}
-
-	// COLLECTION
-	async requestCollection(filter: UmbUserGroupCollectionFilterModel = { skip: 0, take: 100 }) {
-		//TODO: missing observable
-		return this.#collectionSource.filterCollection(filter);
 	}
 
 	// ITEMS:
