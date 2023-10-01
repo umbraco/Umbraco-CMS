@@ -144,7 +144,7 @@
 		"@playwright/test": "^1.37.1",
 		"@rollup/plugin-commonjs": "^25.0.3",
 		"@rollup/plugin-json": "^6.0.0",
-		"@rollup/plugin-node-resolve": "^15.1.0",
+		"@rollup/plugin-node-resolve": "^15.2.1",
 		"@storybook/addon-a11y": "7.2.1",
 		"@storybook/addon-actions": "7.2.1",
 		"@storybook/addon-essentials": "7.2.1",
