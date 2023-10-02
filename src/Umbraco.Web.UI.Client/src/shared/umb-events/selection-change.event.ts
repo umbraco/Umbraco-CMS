@@ -3,6 +3,6 @@ export class UmbSelectionChangeEvent extends Event {
 
 	public constructor() {
 		// mimics the native change event
-		super('selection-change', { bubbles: true, composed: false, cancelable: false });
+		super(UmbSelectionChangeEvent.TYPE, { bubbles: true, composed: false, cancelable: false });
 	}
 }
