@@ -1,4 +1,5 @@
 const { rest } = window.MockServiceWorker;
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { umbDictionaryData } from '../data/dictionary.data.js';
 import {
 	ImportDictionaryRequestModel,
@@ -106,7 +107,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
-	rest.put('/umbraco/management/api/v1/dictionary/:id', async (req, res, ctx) => {
+	rest.put(umbracoPath('/dictionary/:id'), async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 
