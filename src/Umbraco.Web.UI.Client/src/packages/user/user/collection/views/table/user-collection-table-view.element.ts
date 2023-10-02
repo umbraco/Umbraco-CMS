@@ -1,3 +1,4 @@
+import type { UserGroupEntity } from '@umbraco-cms/backoffice/user-group';
 import { UmbUserCollectionContext } from '../../user-collection.context.js';
 import {
 	UmbUserGroupStore,
@@ -15,7 +16,6 @@ import {
 	UmbTableConfig,
 	UmbTableOrderedEvent,
 } from '@umbraco-cms/backoffice/components';
-import type { UserGroupEntity } from 'src/packages/user/user-group/index.js';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
