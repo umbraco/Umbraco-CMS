@@ -34,3 +34,4 @@ export * from './workspace-modal.token.js';
 export * from './data-type-picker-flow-modal.token.js';
 export * from './data-type-picker-flow-data-type-picker-modal.token.js';
 export * from './entity-user-permission-settings-modal.token.js';
+export * from './permissions-modal.token.js';

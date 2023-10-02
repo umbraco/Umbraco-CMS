@@ -1,4 +1,13 @@
-import { html, customElement, property, state, css, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import {
+	html,
+	customElement,
+	property,
+	state,
+	css,
+	ifDefined,
+	nothing,
+	PropertyValueMap,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbEntityUserPermissionSettingsModalData,
@@ -8,6 +17,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestUserPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbSelectedEvent } from '@umbraco-cms/backoffice/events';
 
 @customElement('umb-entity-user-permission-settings-modal')
 export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {
@@ -18,7 +28,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {
 	data?: UmbEntityUserPermissionSettingsModalData;
 
 	@state()
-	private _userPermissionManifests: Array<ManifestUserPermission> = [];
+	private _currentUserPermissionsForEntity: Array<string> = [];
 
 	private _handleConfirm() {
 		this.modalContext?.submit();
@@ -28,61 +38,34 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {
 		this.modalContext?.reject();
 	}
 
-	constructor() {
-		super();
-		this.observe(
-			umbExtensionsRegistry.extensionsOfType('userPermission'),
-			(userPermissionManifests) => (this._userPermissionManifests = userPermissionManifests),
-		);
+	#onSelectedUserPermission(event: UmbSelectedEvent) {
+		const target = event.target as any;
+		const selection = target.selectedPermissions;
 	}
 
 	render() {
 		return html`
-			<umb-body-layout headline="Hello">
-				debugger
+			<umb-body-layout headline="Permissions">
 				<uui-box>
-					<umb-entity-user-permission-settings
-						.entityType=${this.data?.entityType}></umb-entity-user-permission-settings>
-
-					Render user permissions for ${this.data?.entityType} ${this.data?.unique}
-					${this._userPermissionManifests.map((permission) => this.#renderPermission(permission))}
-
-					<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._handleCancel}">Cancel</uui-button>
-					<uui-button
-						slot="actions"
-						id="confirm"
-						color="positive"
-						look="primary"
-						label="Confirm"
-						@click=${this._handleConfirm}></uui-button>
+					Permissions for ${this.data?.entityType} + Render name here
+					${this.data?.entityType
+						? html` <umb-entity-user-permission-settings-list
+								.entityType=${this.data?.entityType}
+								.selectedPermissions=${this._currentUserPermissionsForEntity || []}
+								@selected=${this.#onSelectedUserPermission}></umb-entity-user-permission-settings-list>`
+						: nothing}
 				</uui-box>
+
+				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._handleCancel}">Cancel</uui-button>
+				<uui-button
+					slot="actions"
+					id="confirm"
+					color="positive"
+					look="primary"
+					label="Confirm"
+					@click=${this._handleConfirm}></uui-button>
 			</umb-body-layout>
 		`;
-	}
-
-	#onChangeUserPermission(event: UUIBooleanInputEvent, userPermissionManifest: ManifestUserPermission) {
-		console.log(userPermissionManifest);
-		console.log(event.target.checked);
-	}
-
-	#isAllowed(userPermissionManifest: ManifestUserPermission) {
-		return true;
-		//return this._userGroup?.permissions?.includes(userPermissionManifest.alias);
-	}
-
-	#renderPermission(userPermissionManifest: ManifestUserPermission) {
-		return html`<div
-			style="display: flex; align-items:center; border-bottom: 1px solid var(--uui-color-divider); padding: 9px 0 12px 0;">
-			<uui-toggle
-				label=${ifDefined(userPermissionManifest.meta.label)}
-				?checked=${this.#isAllowed(userPermissionManifest)}
-				@change=${(event: UUIBooleanInputEvent) => this.#onChangeUserPermission(event, userPermissionManifest)}>
-				<div class="permission-meta">
-					<div class="permission-name">${userPermissionManifest.meta.label}</div>
-					<small>${userPermissionManifest.meta.description}</small>
-				</div>
-			</uui-toggle>
-		</div>`;
 	}
 
 	static styles = [

@@ -4,10 +4,10 @@ import { UmbPublishDocumentEntityAction } from './publish.action.js';
 import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action.js';
 import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action.js';
 import { UmbDocumentPublicAccessEntityAction } from './public-access.action.js';
-import { UmbDocumentPermissionsEntityAction } from './permissions.action.js';
 import { UmbUnpublishDocumentEntityAction } from './unpublish.action.js';
 import { UmbRollbackDocumentEntityAction } from './rollback.action.js';
 import { manifests as createManifests } from './create/manifests.js';
+import { manifests as permissionManifests } from './permissions/manifests.js';
 import {
 	UmbCopyEntityAction,
 	UmbMoveEntityAction,
@@ -17,6 +17,7 @@ import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	...createManifests,
+	...permissionManifests,
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.CreateBlueprint',
@@ -79,18 +80,6 @@ const entityActions: Array<ManifestTypes> = [
 			label: 'Culture And Hostnames (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbDocumentCultureAndHostnamesEntityAction,
-			entityTypes: [DOCUMENT_ENTITY_TYPE],
-		},
-	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.Permissions',
-		name: 'Document Permissions Entity Action',
-		meta: {
-			icon: 'umb:vcard',
-			label: 'Permissions (TBD)',
-			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
-			api: UmbDocumentPermissionsEntityAction,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
