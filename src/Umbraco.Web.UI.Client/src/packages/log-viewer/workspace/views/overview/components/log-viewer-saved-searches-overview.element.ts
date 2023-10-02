@@ -33,7 +33,7 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 			<uui-menu-item
 				label="${searchListItem.name ?? ''}"
 				title="${searchListItem.name ?? ''}"
-				href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(searchListItem.query ?? '')}`}>
+				href=${`section/settings/workspace/logviewer/view/search/?lq=${encodeURIComponent(searchListItem.query ?? '')}`}>
 				<uui-icon slot="icon" name="umb:search"></uui-icon>${searchListItem.name}
 			</uui-menu-item>
 		</li>`;
