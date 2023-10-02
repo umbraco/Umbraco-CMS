@@ -111,8 +111,9 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 	}
 
 	#filter(e: { target: HTMLInputElement }) {
-		this._tableItemsFiltered = e.target.value
-			? this.#tableItems.filter((t) => t.id.toLocaleLowerCase().includes(e.target.value.toLocaleLowerCase()))
+		const searchValue = e.target.value.toLocaleLowerCase();
+		this._tableItemsFiltered = searchValue
+			? this.#tableItems.filter((t) => t.id.toLocaleLowerCase().includes(searchValue))
 			: this.#tableItems;
 	}
 
