@@ -2,7 +2,7 @@ import type { SectionAliasConditionConfig } from './section-alias.condition.js';
 import type { SwitchConditionConfig } from './switch.condition.js';
 import type { WorkspaceAliasConditionConfig } from '@umbraco-cms/backoffice/workspace';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
-import type { UserPermissionConditionConfig } from 'src/packages/user/current-user/index.js';
+import type { UserPermissionConditionConfig } from '@umbraco-cms/backoffice/current-user';
 
 /* TODO: in theory should't the core package import from other packages.
 Are there any other way we can do this? */
