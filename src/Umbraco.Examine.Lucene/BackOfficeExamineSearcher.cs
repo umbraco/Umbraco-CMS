@@ -71,12 +71,12 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 
         // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
         // manipulation for things like start paths, member types, etc...
-        //if (Examine.ExamineExtensions.TryParseLuceneQuery(query))
+        // if (Examine.ExamineExtensions.TryParseLuceneQuery(query))
         //{
 
         //}
 
-        //special GUID check since if a user searches on one specifically we need to escape it
+        // special GUID check since if a user searches on one specifically we need to escape it
         if (Guid.TryParse(query, out Guid g))
         {
             query = "\"" + g + "\"";
@@ -115,7 +115,8 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                 var allMediaStartNodes = currentUser != null
                     ? currentUser.CalculateMediaStartNodeIds(_entityService, _appCaches)
                     : Array.Empty<int>();
-                AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
+                AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes,
+                    _entityService);
                 break;
             case UmbracoEntityTypes.Document:
                 type = "content";
@@ -128,7 +129,8 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                 var allContentStartNodes = currentUser != null
                     ? currentUser.CalculateContentStartNodeIds(_entityService, _appCaches)
                     : Array.Empty<int>();
-                AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
+                AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes,
+                    _entityService);
                 break;
             default:
                 throw new NotSupportedException("The " + typeof(BackOfficeExamineSearcher) +
@@ -151,7 +153,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
             .CreateQuery()
             .NativeQuery(sb.ToString())
             .SelectFields(fieldsToLoad)
-            //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
+            // only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
             .Execute(QueryOptions.SkipTake(Convert.ToInt32(pageSize * pageIndex), pageSize));
 
         totalFound = result.TotalItemCount;
@@ -161,135 +163,133 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 
     private bool BuildQuery(StringBuilder sb, string query, string? searchFrom, List<string> fields, string type)
     {
-        //build a lucene query:
-        // the nodeName will be boosted 10x without wildcards
-        // then nodeName will be matched normally with wildcards
-        // the rest will be normal without wildcards
+        var allLanguages = _languageService
+            .GetAllLanguages()
+            .Select(language => language.IsoCode.ToLowerInvariant())
+            .ToList();
 
-        var allLangs = _languageService.GetAllLanguages().Select(x => x.IsoCode.ToLowerInvariant()).ToList();
+        query = CleanUpQuery(query);
 
-        // the chars [*-_] in the query will mess everything up so let's remove those
-        // However we cannot just remove - and _  since these signify a space, so we instead replace them with that.
-        query = Regex.Replace(query, "[\\*]", string.Empty);
-        query = Regex.Replace(query, "[\\-_]", " ");
-
-
-        //check if text is surrounded by single or double quotes, if so, then exact match
-        var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
-                                 || Regex.IsMatch(query, "^\'.*?\'$");
-
-        if (surroundedByQuotes)
+        if (IsSurroundedByQuotes(query))
         {
-            //strip quotes, escape string, the replace again
-            query = query.Trim(Constants.CharArrays.DoubleQuoteSingleQuote);
-
-            query = QueryParserBase.Escape(query);
-
-            //nothing to search
-            if (searchFrom.IsNullOrWhiteSpace() && query.IsNullOrWhiteSpace())
-            {
-                return false;
-            }
-
-            //update the query with the query term
-            if (query.IsNullOrWhiteSpace() == false)
-            {
-                //add back the surrounding quotes
-                query = string.Format("{0}{1}{0}", "\"", query);
-
-                sb.Append("+(");
-
-                AppendNodeNamePhraseWithBoost(sb, query, allLangs);
-
-                foreach (var f in fields)
-                {
-                    //additional fields normally
-                    sb.Append(f);
-                    sb.Append(": (");
-                    sb.Append(query);
-                    sb.Append(") ");
-                }
-
-                sb.Append(") ");
-            }
+            query = ProcessQuotedQuery(allLanguages, fields, query, sb);
+            if (query == string.Empty) return false;
         }
         else
         {
-            var trimmed = query.Trim(Constants.CharArrays.DoubleQuoteSingleQuote);
-
-            //nothing to search
-            if (searchFrom.IsNullOrWhiteSpace() && trimmed.IsNullOrWhiteSpace())
-            {
-                return false;
-            }
-
-            //update the query with the query term
-            if (trimmed.IsNullOrWhiteSpace() == false)
-            {
-                query = QueryParserBase.Escape(query);
-
-                var querywords = query.Split(Constants.CharArrays.Space, StringSplitOptions.RemoveEmptyEntries);
-
-                sb.Append("+(");
-
-                AppendNodeNameExactWithBoost(sb, query, allLangs);
-
-                AppendNodeNameWithWildcards(sb, querywords, allLangs);
-
-                foreach (var f in fields)
-                {
-                    var queryWordsReplaced = new string[querywords.Length];
-
-                    // when searching file names containing hyphens we need to replace the hyphens with spaces
-                    if (f.Equals(UmbracoExamineFieldNames.UmbracoFileFieldName))
-                    {
-                        for (var index = 0; index < querywords.Length; index++)
-                        {
-                            queryWordsReplaced[index] =
-                                querywords[index].Replace("\\-", " ").Replace("_", " ").Trim(" ");
-                        }
-                    }
-                    else
-                    {
-                        queryWordsReplaced = querywords;
-                    }
-
-                    //additional fields normally
-                    sb.Append(f);
-                    sb.Append(":");
-                    sb.Append("(");
-                    foreach (var w in queryWordsReplaced)
-                    {
-                        sb.Append(w.ToLower());
-                        sb.Append("* ");
-                    }
-
-                    sb.Append(")");
-                    sb.Append(" ");
-                }
-
-                sb.Append(") ");
-            }
+            query = ProcessUnquotedQuery(allLanguages, fields, query, sb);
+            if (query == string.Empty) return false;
         }
 
-        //must match index type
+        AppendIndexType(sb, type);
+        return true;
+    }
+
+    private string CleanUpQuery(string query)
+    {
+        query = Regex.Replace(query, "[\\*]", string.Empty);
+        query = Regex.Replace(query, "[\\-_]", " ");
+        return query;
+    }
+
+    private bool IsSurroundedByQuotes(string query) => Regex.IsMatch(query, "^\".*?\"$") || Regex.IsMatch(query, "^\'.*?\'$");
+
+    private string ProcessQuotedQuery(List<string> allLanguages, List<string> fields, string query, StringBuilder sb)
+    {
+        query = query.Trim(Constants.CharArrays.DoubleQuoteSingleQuote);
+
+        query = QueryParserBase.Escape(query);
+
+        if (query.IsNullOrWhiteSpace()) return string.Empty;
+
+        query = string.Format("{0}{1}{0}", "\"", query);
+        sb.Append("+(");
+        AppendNodeNamePhraseWithBoost(sb, query, allLanguages);
+
+        foreach (var field in fields)
+        {
+            AppendNormalField(sb, field, query);
+        }
+
+        sb.Append(") ");
+
+        return query;
+    }
+
+    private string ProcessUnquotedQuery(List<string> allLanguages, List<string> fields, string query, StringBuilder sb)
+    {
+        var trimmed = query.Trim(Constants.CharArrays.DoubleQuoteSingleQuote);
+
+        if (trimmed.IsNullOrWhiteSpace()) return string.Empty;
+
+        query = QueryParserBase.Escape(trimmed);
+
+        var queryWords = query.Split(Constants.CharArrays.Space, StringSplitOptions.RemoveEmptyEntries);
+
+        sb.Append("+(");
+        AppendNodeNameExactWithBoost(sb, query, allLanguages);
+        AppendNodeNameWithWildcards(sb, queryWords, allLanguages);
+
+        foreach (var field in fields)
+        {
+            var replacedQueryWords = ReplaceFileNameHyphens(field, queryWords);
+            AppendNormalField(sb, field, replacedQueryWords);
+        }
+
+        sb.Append(") ");
+
+        return query;
+    }
+
+    private string[] ReplaceFileNameHyphens(string field, string[] queryWords)
+    {
+        if (field.Equals(UmbracoExamineFieldNames.UmbracoFileFieldName) == false)
+        {
+            return queryWords;
+        }
+
+        return queryWords.Select(word => word.Replace("\\-", " ").Replace("_", " ").Trim(" "))
+            .ToArray();
+    }
+
+    private void AppendNormalField(StringBuilder sb, string field, string query)
+    {
+        sb.Append(field);
+        sb.Append(": (");
+        sb.Append(query);
+        sb.Append(") ");
+    }
+
+    private void AppendNormalField(StringBuilder sb, string field, string[] queryWords)
+    {
+        sb.Append(field);
+        sb.Append(": (");
+        foreach (var word in queryWords)
+        {
+            sb.Append(word.ToLower());
+            sb.Append("* ");
+        }
+
+        sb.Append(") ");
+    }
+
+    private void AppendIndexType(StringBuilder sb, string type)
+    {
         sb.Append("+__IndexType:");
         sb.Append(type);
-
-        return true;
     }
 
     private void AppendNodeNamePhraseWithBoost(StringBuilder sb, string query, IEnumerable<string> allLangs)
     {
-        //node name exactly boost x 10
+        // node name exactly boost x 10
         sb.Append("nodeName: (");
         sb.Append(query.ToLower());
         sb.Append(")^10.0 ");
 
-        //also search on all variant node names
+        // also search on all variant node names
         foreach (var lang in allLangs)
         {
-            //node name exactly boost x 10
+            // node name exactly boost x 10
             sb.Append($"nodeName_{lang}: (");
             sb.Append(query.ToLower());
             sb.Append(")^10.0 ");
@@ -298,16 +298,16 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 
     private void AppendNodeNameExactWithBoost(StringBuilder sb, string query, IEnumerable<string> allLangs)
     {
-        //node name exactly boost x 10
+        // node name exactly boost x 10
         sb.Append("nodeName:");
         sb.Append("\"");
         sb.Append(query.ToLower());
         sb.Append("\"");
         sb.Append("^10.0 ");
-        //also search on all variant node names
+        // also search on all variant node names
         foreach (var lang in allLangs)
         {
-            //node name exactly boost x 10
+            // node name exactly boost x 10
             sb.Append($"nodeName_{lang}:");
             sb.Append("\"");
             sb.Append(query.ToLower());
@@ -318,9 +318,9 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 
     private void AppendNodeNameWithWildcards(StringBuilder sb, string[] querywords, IEnumerable<string> allLangs)
     {
-        //node name normally with wildcards
+        // node name normally with wildcards
         sb.Append("nodeName:");
-        sb.Append("(");
+        sb.Append('(');
         foreach (var w in querywords)
         {
             sb.Append(w.ToLower());
@@ -328,12 +328,12 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         }
 
         sb.Append(") ");
-        //also search on all variant node names
+        // also search on all variant node names
         foreach (var lang in allLangs)
         {
-            //node name normally with wildcards
+            // node name normally with wildcards
             sb.Append($"nodeName_{lang}:");
-            sb.Append("(");
+            sb.Append('(');
             foreach (var w in querywords)
             {
                 sb.Append(w.ToLower());
@@ -344,7 +344,8 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         }
     }
 
-    private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[]? startNodeIds, string? searchFrom, bool ignoreUserStartNodes, IEntityService entityService)
+    private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[]? startNodeIds, string? searchFrom,
+        bool ignoreUserStartNodes, IEntityService entityService)
     {
         if (sb == null)
         {
@@ -369,7 +370,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
             // find... only what's underneath
             sb.Append("+__Path:");
             AppendPath(sb, entityPath.Path, false);
-            sb.Append(" ");
+            sb.Append(' ');
         }
         else if (startNodeIds?.Length == 0)
         {
@@ -392,7 +393,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                 }
                 else
                 {
-                    sb.Append(" ");
+                    sb.Append(' ');
                 }
 
                 AppendPath(sb, ep.Path, true);
@@ -408,7 +409,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         if (includeThisNode)
         {
             sb.Append(path);
-            sb.Append(" ");
+            sb.Append(' ');
         }
 
         sb.Append(path);

@@ -63,7 +63,7 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
         // We don't want to re-enumerate this list, but we need to split it into 2x enumerables: invalid and valid items.
         // The Invalid items will be deleted, these are items that have invalid paths (i.e. moved to the recycle bin, etc...)
         // Then we'll index the Value group all together.
-        var invalidOrValid = values.GroupBy(v =>
+        IGrouping<ValueSetValidationStatus, ValueSet>[] invalidOrValid = values.GroupBy(v =>
         {
             if (!v.Values.TryGetValue("path", out IReadOnlyList<object>? paths) || paths.Count <= 0 || paths[0] == null)
             {

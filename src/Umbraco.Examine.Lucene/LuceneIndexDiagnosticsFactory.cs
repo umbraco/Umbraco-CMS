@@ -28,7 +28,7 @@ public class LuceneIndexDiagnosticsFactory : IndexDiagnosticsFactory
 
     public override IIndexDiagnostics Create(IIndex index)
     {
-        if (!(index is IIndexDiagnostics indexDiag))
+        if (index is not IIndexDiagnostics indexDiag)
         {
             if (index is LuceneIndex luceneIndex)
             {

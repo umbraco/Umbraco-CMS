@@ -21,6 +21,6 @@ public class NoPrefixSimpleFsLockFactory : SimpleFSLockFactory
     public override string LockPrefix
     {
         get => base.LockPrefix;
-        set => base.LockPrefix = null; //always set to null
+        set => base.LockPrefix = null; // always set to null
     }
 }
