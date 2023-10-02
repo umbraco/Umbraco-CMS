@@ -1,12 +1,11 @@
+import { type UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/user';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context.js';
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { ManifestUserPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
-import { type UmbUserPermissionSettingElement } from 'src/packages/user/user/index.js';
 
 @customElement('umb-user-group-default-permission-list')
 export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {

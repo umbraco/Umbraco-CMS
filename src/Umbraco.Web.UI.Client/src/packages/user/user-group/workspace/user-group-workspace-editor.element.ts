@@ -1,3 +1,4 @@
+import { UmbUserInputElement } from '@umbraco-cms/backoffice/user';
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../index.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -7,7 +8,6 @@ import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import { UmbInputSectionElement } from '@umbraco-cms/backoffice/components';
-import { UmbUserInputElement } from 'src/packages/user/user/index.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 
