@@ -54,18 +54,18 @@ jobs:
       - run: npm ci
       - run: npm run build:for:npm
       - name: Calculate version
-        id: calculate_version
         run: |
           if [ -z "${{inputs.version}}" ]; then
             echo "No version input, calculating version from package.json"
             SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-8)
             VERSION=$(node -p "require('./package.json').version")-$SHA_SHORT
             echo "Version: $VERSION"
-            echo "::set-output name=version::$VERSION"
+            echo "BACKOFFICE_VERSION=$VERSION" >> "$GITHUB_ENV"
           else
             echo "Version input found, using ${{inputs.version}}"
-            echo "::set-output name=version::${{inputs.version}}"
+            echo "BACKOFFICE_VERSION=${{inputs.version}}" >> "$GITHUB_ENV"
           fi
+          echo "Resulting version: $BACKOFFICE_VERSION" >> $GITHUB_STEP_SUMMARY
       - name: Publish
         run: |
           npm whoami
@@ -73,5 +73,4 @@ jobs:
           npm publish --tag $BACKOFFICE_NPM_TAG --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-          BACKOFFICE_VERSION: ${{ steps.calculate_version.outputs.version }}
           BACKOFFICE_NPM_TAG: ${{ inputs.tag || 'next' }}
