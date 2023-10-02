@@ -65,12 +65,14 @@ jobs:
             echo "Version input found, using ${{inputs.version}}"
             echo "BACKOFFICE_VERSION=${{inputs.version}}" >> "$GITHUB_ENV"
           fi
-          echo "Resulting version: $BACKOFFICE_VERSION" >> $GITHUB_STEP_SUMMARY
       - name: Publish
         run: |
           npm whoami
           npm version $BACKOFFICE_VERSION --allow-same-version --no-git-tag-version
           npm publish --tag $BACKOFFICE_NPM_TAG --access public
+          echo "### Published new version of @umbraco-cms/backoffice to npm! :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: $BACKOFFICE_VERSION" >> $GITHUB_STEP_SUMMARY
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
           BACKOFFICE_NPM_TAG: ${{ inputs.tag || 'next' }}
