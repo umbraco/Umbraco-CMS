@@ -13,7 +13,7 @@ import type { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHostElement, UmbController } from '@umbraco-cms/backoffice/controller-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextProvider, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
@@ -64,7 +64,8 @@ export class UmbModalContextClass<ModalPreset extends object = object, ModalValu
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
 
-	#value?: ModalValue;
+	#value = new UmbObjectState<ModalValue | undefined>(undefined);
+	public readonly value = this.#value.asObservable();
 
 	public get controllerAlias() {
 		return 'umbModalContext:' + this.key;
@@ -241,7 +242,7 @@ export class UmbModalContextClass<ModalPreset extends object = object, ModalValu
 	 * @memberof UmbModalContext
 	 */
 	public getValue() {
-		return this.#value;
+		return this.#value.getValue();
 	}
 
 	/**
@@ -250,7 +251,16 @@ export class UmbModalContextClass<ModalPreset extends object = object, ModalValu
 	 * @memberof UmbModalContext
 	 */
 	public setValue(value: ModalValue) {
-		this.#value = value;
+		this.#value.update(value);
+	}
+
+	/**
+	 * Updates the current value of this modal.
+	 * @public
+	 * @memberof UmbModalContext
+	 */
+	public updateValue(partialValue: Partial<ModalValue>) {
+		this.#value.update(partialValue);
 	}
 
 	destroy(): void {
