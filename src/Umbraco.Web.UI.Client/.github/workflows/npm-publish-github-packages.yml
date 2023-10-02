@@ -73,6 +73,10 @@ jobs:
           echo "### Published new version of @umbraco-cms/backoffice to npm! :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- Version: $BACKOFFICE_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "- Tag: $BACKOFFICE_NPM_TAG" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: $GITHUB_SHA" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit message: $GITHUB_SHA_MESSAGE" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit date: $GITHUB_SHA_DATE" >> $GITHUB_STEP_SUMMARY
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
           BACKOFFICE_NPM_TAG: ${{ inputs.tag || 'next' }}
