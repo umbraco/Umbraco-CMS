@@ -19,6 +19,7 @@
 		"baseUrl": ".",
 		"incremental": true,
 		"paths": {
+			// TODO: can we combine these of multiple tsconfigs so each package can hold their own?
 			// APPS
 			"@umbraco-cms/backoffice/app": ["src/apps/app"],
 
@@ -79,34 +80,42 @@
 			"@umbraco-cms/backoffice/workspace": ["src/packages/core/workspace"],
 			"@umbraco-cms/backoffice/culture": ["src/packages/core/culture"],
 
-			"@umbraco-cms/backoffice/dictionary": ["./src/packages/dictionary/dictionary/index.ts"],
-
-			"@umbraco-cms/backoffice/document": ["./src/packages/documents/documents/index.ts"],
-			"@umbraco-cms/backoffice/document-blueprint": ["./src/packages/documents/document-blueprints/index.ts"],
-			"@umbraco-cms/backoffice/document-type": ["./src/packages/documents/document-types/index.ts"],
-			"@umbraco-cms/backoffice/media": ["./src/packages/media/media/index.ts"],
-			"@umbraco-cms/backoffice/media-type": ["./src/packages/media/media-types/index.ts"],
-			"@umbraco-cms/backoffice/member": ["./src/packages/members/members/index.ts"],
-			"@umbraco-cms/backoffice/member-group": ["./src/packages/members/member-groups/index.ts"],
-			"@umbraco-cms/backoffice/member-type": ["./src/packages/members/member-types/index.ts"],
-			"@umbraco-cms/backoffice/package": ["./src/packages/packages/package/index.ts"],
-
 			"@umbraco-cms/backoffice/data-type": ["./src/packages/settings/data-types/index.ts"],
 			"@umbraco-cms/backoffice/language": ["./src/packages/settings/languages/index.ts"],
 			"@umbraco-cms/backoffice/logviewer": ["src/packages/log-viewer/index.ts"],
 			"@umbraco-cms/backoffice/relation-type": ["./src/packages/settings/relation-types/index.ts"],
 			"@umbraco-cms/backoffice/tags": ["./src/packages/tags/index.ts"],
-			"@umbraco-cms/backoffice/partial-view": ["./src/packages/templating/partial-views/index.ts"],
-			"@umbraco-cms/backoffice/stylesheet": ["./src/packages/templating/stylesheets/index.ts"],
-			"@umbraco-cms/backoffice/template": ["./src/packages/templating/templates/index.ts"],
 
-			// USERS
+			"@umbraco-cms/backoffice/dictionary": ["./src/packages/dictionary/dictionary/index.ts"],
+
+			// DOCUMENT MANAGEMENT
+			"@umbraco-cms/backoffice/document": ["./src/packages/documents/documents/index.ts"],
+			"@umbraco-cms/backoffice/document-blueprint": ["./src/packages/documents/document-blueprints/index.ts"],
+			"@umbraco-cms/backoffice/document-type": ["./src/packages/documents/document-types/index.ts"],
+
+			// MEDIA MANAGEMENT
+			"@umbraco-cms/backoffice/media": ["./src/packages/media/media/index.ts"],
+			"@umbraco-cms/backoffice/media-type": ["./src/packages/media/media-types/index.ts"],
+
+			// MEMBER MANAGEMENT
+			"@umbraco-cms/backoffice/member": ["./src/packages/members/members/index.ts"],
+			"@umbraco-cms/backoffice/member-group": ["./src/packages/members/member-groups/index.ts"],
+			"@umbraco-cms/backoffice/member-type": ["./src/packages/members/member-types/index.ts"],
+
+			// PACKAGE MANAGEMENT
+			"@umbraco-cms/backoffice/package": ["./src/packages/packages/package/index.ts"],
+
+			// USER MANAGEMENT
 			"@umbraco-cms/backoffice/user-group": ["src/packages/users/user-groups"],
 			"@umbraco-cms/backoffice/current-user": ["src/packages/users/current-user"],
 			"@umbraco-cms/backoffice/users": ["src/packages/users/users"],
+			"@umbraco-cms/backoffice/user-permission": ["src/packages/users/user-permission"],
 
 			// TEMPLATING
 			"@umbraco-cms/backoffice/code-editor": ["src/packages/templating/code-editor"],
+			"@umbraco-cms/backoffice/partial-view": ["./src/packages/templating/partial-views/index.ts"],
+			"@umbraco-cms/backoffice/stylesheet": ["./src/packages/templating/stylesheets/index.ts"],
+			"@umbraco-cms/backoffice/template": ["./src/packages/templating/templates/index.ts"],
 
 			"@umbraco-cms/backoffice/css": ["src/shared/css/custom-properties.css"],
 

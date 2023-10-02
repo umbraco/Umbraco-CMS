@@ -104,6 +104,7 @@ export default {
 						'@umbraco-cms/backoffice/user-group': './src/packages/users/user-groups/index.ts',
 						'@umbraco-cms/backoffice/current-user': './src/packages/users/current-user/index.ts',
 						'@umbraco-cms/backoffice/users': './src/packages/users/users/index.ts',
+						'@umbraco-cms/backoffice/user-permission': './src/packages/users/user-permission/index.ts',
 
 						'@umbraco-cms/backoffice/code-editor': './src/packages/templating/code-editor/index.ts',
 
