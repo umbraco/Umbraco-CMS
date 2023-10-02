@@ -18,11 +18,15 @@ export class UmbPropertyEditorUITextBoxElement extends UmbLitElement implements 
 	private _type: UuiInputTypeType = this.#defaultType;
 
 	@state()
+	private _inputMode?: string;
+
+	@state()
 	private _maxChars?: number;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._type = config?.getValueByAlias<UuiInputTypeType>('inputType') ?? this.#defaultType;
+		this._inputMode = config?.getValueByAlias('inputMode');
 		this._maxChars = config?.getValueByAlias('maxChars');
 	}
 
@@ -35,6 +39,7 @@ export class UmbPropertyEditorUITextBoxElement extends UmbLitElement implements 
 		return html`<uui-input
 			.value=${this.value ?? ''}
 			.type=${this._type}
+			inputMode=${ifDefined(this._inputMode)}
 			maxlength=${ifDefined(this._maxChars)}
 			@change=${this.onChange}></uui-input>`;
 	}
