@@ -30,7 +30,6 @@ on:
         options:
           - 'next'
           - 'latest'
-          - 'preview'
 
 env:
   NODE_OPTIONS: --max-old-space-size=16384
