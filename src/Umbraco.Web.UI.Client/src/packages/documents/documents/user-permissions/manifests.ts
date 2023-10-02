@@ -27,8 +27,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Read Document User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Read',
-			description: 'Allow access to browse documents',
+			labelKey: 'actions_browse',
+			descriptionKey: 'actionDescriptions_browse',
 		},
 	},
 	{
@@ -37,8 +37,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Create Document Blueprint User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Create Content Template',
-			description: 'Allow access to create a Content Template',
+			labelKey: 'actions_createblueprint',
+			descriptionKey: 'actionDescriptions_createblueprint',
 		},
 	},
 	{
@@ -47,8 +47,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Delete Document User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Delete',
-			description: 'Allow access to delete a document',
+			labelKey: 'actions_delete',
+			descriptionKey: 'actionDescriptions_delete',
 		},
 	},
 	{
@@ -57,8 +57,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Create Document User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Create',
-			description: 'Allow access to create a document',
+			labelKey: 'actions_create',
+			descriptionKey: 'actionDescriptions_create',
 		},
 	},
 	{
@@ -67,8 +67,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Document Notifications User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Notifications',
-			description: 'Allow access to setup notifications for documents',
+			labelKey: 'actions_notify',
+			descriptionKey: 'actionDescriptions_notify',
 		},
 	},
 	{
@@ -77,8 +77,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Publish Document User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Publish',
-			description: 'Allow access to publish a document',
+			labelKey: 'actions_publish',
+			descriptionKey: 'actionDescriptions_publish',
 		},
 	},
 	{
@@ -87,8 +87,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Document Permissions User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Permissions',
-			description: 'Allow access to change permissions for a document',
+			labelKey: 'actions_setPermissions',
+			descriptionKey: 'actionDescriptions_rights',
 		},
 	},
 	{
@@ -97,8 +97,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Send Document For Approval User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Send For Approval',
-			description: 'Allow access to send a document for approval before publishing',
+			labelKey: 'actions_sendtopublish',
+			descriptionKey: 'actionDescriptions_sendtopublish',
 		},
 	},
 	{
@@ -107,8 +107,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Unpublish Document User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Unpublish',
-			description: 'Allow access to unpublish a document',
+			labelKey: 'actions_unpublish',
+			descriptionKey: 'actionDescriptions_unpublish',
 		},
 	},
 	{
@@ -117,8 +117,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Update Document User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Update',
-			description: 'Allow access to save a document',
+			labelKey: 'actions_update',
+			descriptionKey: 'actionDescriptions_update',
 		},
 	},
 	{
@@ -127,8 +127,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Copy Document User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Copy',
-			description: 'Allow access to copy a document',
+			labelKey: 'actions_copy',
+			descriptionKey: 'actionDescriptions_copy',
 			group: 'structure',
 		},
 	},
@@ -138,8 +138,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Move Document User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Move',
-			description: 'Allow access to move a document',
+			labelKey: 'actions_move',
+			descriptionKey: 'actionDescriptions_move',
 			group: 'structure',
 		},
 	},
@@ -149,8 +149,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Sort Document User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Sort',
-			description: 'Allow access to sort documents',
+			labelKey: 'actions_sort',
+			descriptionKey: 'actionDescriptions_sort',
 			group: 'structure',
 		},
 	},
@@ -160,8 +160,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Document Culture And Hostnames User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Culture And Hostnames',
-			description: 'Allow access to set culture and hostnames for documents',
+			labelKey: 'actions_assigndomain',
+			descriptionKey: 'actionDescriptions_assignDomain',
 			group: 'administration',
 		},
 	},
@@ -171,8 +171,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Document Public Access User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Public Access',
-			description: 'Allow access to set and change access restrictions for a document',
+			labelKey: 'actions_protect',
+			descriptionKey: 'actionDescriptions_protect',
 			group: 'administration',
 		},
 	},
@@ -182,8 +182,8 @@ const permissions: Array<ManifestUserPermission> = [
 		name: 'Document Rollback User Permission',
 		meta: {
 			entityType: 'document',
-			label: 'Rollback',
-			description: 'Allow access to roll back a document to a previous state',
+			labelKey: 'actions_rollback',
+			descriptionKey: 'actionDescriptions_rollback',
 			group: 'administration',
 		},
 	},
