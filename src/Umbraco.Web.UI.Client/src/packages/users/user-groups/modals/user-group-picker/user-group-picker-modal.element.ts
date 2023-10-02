@@ -4,6 +4,8 @@ import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoff
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/events';
 
 @customElement('umb-user-group-picker-modal')
 export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any> {
@@ -23,10 +25,30 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 		this.observe(asObservable(), (items) => (this._userGroups = items));
 	}
 
+	#onSelected(event: UUIMenuItemEvent, item: UserGroupResponseModel) {
+		if (!item.id) throw new Error('User group id is required');
+		event.stopPropagation();
+		this.#selectionManager.select(item.id);
+		this.#updateSelectionValue();
+		this.requestUpdate();
+		this.modalContext?.dispatchEvent(new UmbSelectedEvent(item.id));
+	}
+
+	#onDeselected(event: UUIMenuItemEvent, item: UserGroupResponseModel) {
+		if (!item.id) throw new Error('User group id is required');
+		event.stopPropagation();
+		this.#selectionManager.deselect(item.id);
+		this.#updateSelectionValue();
+		this.requestUpdate();
+		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(item.id));
+	}
+
+	#updateSelectionValue() {
+		this.modalContext?.updateValue({ selection: this.#selectionManager.getSelection() });
+	}
+
 	#submit() {
-		this.modalContext?.submit({
-			selection: this.#selectionManager.getSelection(),
-		});
+		this.modalContext?.submit(this._value);
 	}
 
 	#close() {
@@ -42,8 +64,8 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 							<uui-menu-item
 								label=${ifDefined(item.name)}
 								selectable
-								@selected=${() => this.#selectionManager.select(item.id!)}
-								@deselected=${() => this.#selectionManager.deselect(item.id!)}
+								@selected=${(event: UUIMenuItemEvent) => this.#onSelected(event, item)}
+								@deselected=${(event: UUIMenuItemEvent) => this.#onDeselected(event, item)}
 								?selected=${this.#selectionManager.isSelected(item.id!)}>
 								<uui-icon .name=${item.icon || null} slot="icon"></uui-icon>
 							</uui-menu-item>
