@@ -16,6 +16,18 @@ on:
       - 'staticwebapp.config.json'
       - 'README.md'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish'
+        required: false
+      tag:
+        description: 'Tag to publish'
+        required: false
+        type: choice
+        options:
+          - 'next'
+          - 'latest'
+          - 'preview'
 
 env:
   NODE_OPTIONS: --max-old-space-size=16384
@@ -37,11 +49,25 @@ jobs:
           scope: '@umbraco-cms'
       - run: npm ci
       - run: npm run build:for:npm
-      - name: Version and publish
+      - name: Calculate version
+        id: calculate_version
         run: |
-          SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-8)
+          if [ -z "${{inputs.version}}" ]; then
+            echo "No version input, calculating version from package.json"
+            SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-8)
+            VERSION=$(node -p "require('./package.json').version")-$SHA_SHORT
+            echo "Version: $VERSION"
+            echo "::set-output name=version::$VERSION"
+          else
+            echo "Version input found, using ${{inputs.version}}"
+            echo "::set-output name=version::${{inputs.version}}"
+          fi
+      - name: Publish
+        run: |
           npm whoami
-          npm version 14.0.0-$SHA_SHORT --allow-same-version --no-git-tag-version
-          npm publish --tag next --access public
+          npm version $VERSION --allow-same-version --no-git-tag-version
+          npm publish --tag $BACKOFFICE_NPM_TAG --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          BACKOFFICE_VERSION: ${{ steps.calculate_version.outputs.version }}
+          BACKOFFICE_NPM_TAG: ${{ inputs.tag || 'next' }}
