@@ -7,7 +7,7 @@ export interface UmbLinkPickerModalData {
 	config: UmbLinkPickerConfig;
 }
 
-export type UmbLinkPickerModalResult = { index: number | null; link: UmbLinkPickerLink };
+export type UmbLinkPickerModalValue = { index: number | null; link: UmbLinkPickerLink };
 
 export interface UmbLinkPickerLink {
 	icon?: string | null;
@@ -27,10 +27,10 @@ export interface UmbLinkPickerConfig {
 	overlaySize?: UUIModalSidebarSize;
 }
 
-export const UMB_LINK_PICKER_MODAL = new UmbModalToken<UmbLinkPickerModalData, UmbLinkPickerModalResult>(
+export const UMB_LINK_PICKER_MODAL = new UmbModalToken<UmbLinkPickerModalData, UmbLinkPickerModalValue>(
 	'Umb.Modal.LinkPicker',
 	{
 		type: 'sidebar',
 		size: 'small',
-	}
+	},
 );

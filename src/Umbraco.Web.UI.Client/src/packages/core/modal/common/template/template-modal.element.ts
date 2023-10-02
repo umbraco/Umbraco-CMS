@@ -1,7 +1,7 @@
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { css, html, ifDefined, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbTemplateModalData, UmbTemplateModalResult } from '@umbraco-cms/backoffice/modal';
+import { UmbTemplateModalData, UmbTemplateModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbInputEvent } from '@umbraco-cms/backoffice/events';
 import { TemplateResource, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
@@ -10,7 +10,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 //TODO: make a default tree-picker that can be used across multiple pickers
 // TODO: make use of UmbPickerLayoutBase
 @customElement('umb-template-modal')
-export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModalData, UmbTemplateModalResult> {
+export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModalData, UmbTemplateModalValue> {
 	@state()
 	_id = '';
 
@@ -41,7 +41,7 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 	async #saveTemplate() {
 		const { error } = await tryExecuteAndNotify(
 			this,
-			TemplateResource.putTemplateById({ id: this._id, requestBody: this._template })
+			TemplateResource.putTemplateById({ id: this._id, requestBody: this._template }),
 		);
 		if (!error) {
 			console.log(`template (${this._id}) saved successfully`);

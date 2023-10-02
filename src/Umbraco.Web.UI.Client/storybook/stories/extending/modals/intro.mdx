@@ -28,7 +28,7 @@ import { Meta } from '@storybook/addon-docs';
 ### Modal Token
 
 For type safety we recommend that you make a Modal Token, Its posible to go without.
-The Modal Token binds the Modal Type to the Modal Data Type and Modal Result Type.
+The Modal Token binds the Modal Type to the Modal Data Type and Modal Value Type.
 
 ``
 
@@ -39,16 +39,16 @@ export type OurSomethingPickerModalData = {
 	key: string | null;
 };
 
-export type OurSomethingPickerModalResult = {
+export type OurSomethingPickerModalValue = {
 	key: string;
 };
 
-export const MY_SOMETHING_PICKER_MODAL = new UmbModalToken<UmbLinkPickerModalData, UmbLinkPickerModalResult>(
+export const MY_SOMETHING_PICKER_MODAL = new UmbModalToken<UmbLinkPickerModalData, UmbLinkPickerModalValue>(
 	'Our.Modal.SomethingPicker',
 	{
 		type: 'sidebar',
 		size: 'small',
-	}
+	},
 );
 ```
 

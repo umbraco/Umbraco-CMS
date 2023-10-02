@@ -6,14 +6,14 @@ export interface UmbCreateDictionaryModalData {
 	parentName?: Observable<string | undefined>;
 }
 
-export interface UmbCreateDictionaryModalResult {
+export interface UmbCreateDictionaryModalValue {
 	name: string;
 	parentId: string | null;
 }
 
 export const UMB_CREATE_DICTIONARY_MODAL = new UmbModalToken<
 	UmbCreateDictionaryModalData,
-	UmbCreateDictionaryModalResult
+	UmbCreateDictionaryModalValue
 >('Umb.Modal.CreateDictionary', {
 	type: 'sidebar',
 	size: 'small',

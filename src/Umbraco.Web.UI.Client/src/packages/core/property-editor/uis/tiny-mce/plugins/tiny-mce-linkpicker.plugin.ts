@@ -1,6 +1,6 @@
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import {
-	UmbLinkPickerModalResult,
+	UmbLinkPickerModalValue,
 	UMB_LINK_PICKER_MODAL,
 	UmbLinkPickerLink,
 	UmbModalManagerContext,
@@ -19,7 +19,7 @@ type AnchorElementAttributes = {
 export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 	#modalContext?: UmbModalManagerContext;
 
-	#linkPickerData?: UmbLinkPickerModalResult;
+	#linkPickerData?: UmbLinkPickerModalValue;
 
 	#anchorElement?: HTMLAnchorElement;
 

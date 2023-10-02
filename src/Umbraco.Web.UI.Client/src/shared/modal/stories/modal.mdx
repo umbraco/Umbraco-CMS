@@ -228,11 +228,11 @@ interface MyModalData = {
 	content: string;
 }
 
-interface MyModalResult = {
+interface MyModalValue = {
 	myReturnData: string;
 }
 
-const MY_MODAL_TOKEN = new ModalToken<MyModalData, MyModalResult>('My.Modal', {
+const MY_MODAL_TOKEN = new ModalToken<MyModalData, MyModalValue>('My.Modal', {
 	type: 'sidebar',
 	size: 'small'
 });
@@ -248,7 +248,7 @@ import type { UmbModalHandler } from '@umbraco-cms/modal';
 class MyDialog extends UmbElementMixin(LitElement) {
 	// the modal handler will be injected into the element when the modal is opened.
 	@property({ attribute: false })
-	modalContext?: UmbModalHandler<MyModalData, MyModalResult>;
+	modalContext?: UmbModalHandler<MyModalData, MyModalValue>;
 
 	private _handleCancel() {
 		this.modalContext?.close();

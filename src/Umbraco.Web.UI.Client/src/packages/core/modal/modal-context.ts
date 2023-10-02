@@ -19,11 +19,11 @@ import { UmbContextProvider, UmbContextToken } from '@umbraco-cms/backoffice/con
 /**
  * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.
  */
-export type UmbModalContext<ModalData extends object = object, ModalResult = any> = Omit<
-	UmbModalContextClass<ModalData, ModalResult>,
+export type UmbModalContext<ModalData extends object = object, ModalValue = any> = Omit<
+	UmbModalContextClass<ModalData, ModalValue>,
 	'submit'
 > &
-	OptionalSubmitArgumentIfUndefined<ModalResult>;
+	OptionalSubmitArgumentIfUndefined<ModalValue>;
 
 // If Type is undefined we don't accept an argument,
 // If type is unknown, we accept an option argument.
@@ -41,11 +41,14 @@ type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
 	  };
 
 // TODO: consider splitting this into two separate handlers
-export class UmbModalContextClass<ModalData extends object = object, ModalResult = unknown> implements UmbController {
+export class UmbModalContextClass<ModalPreset extends object = object, ModalValue = unknown>
+	extends EventTarget
+	implements UmbController
+{
 	#host: UmbControllerHostElement;
 
-	#submitPromise: Promise<ModalResult>;
-	#submitResolver?: (value: ModalResult) => void;
+	#submitPromise: Promise<ModalValue>;
+	#submitResolver?: (value: ModalValue) => void;
 	#submitRejecter?: () => void;
 
 	private _modalExtensionObserver?: UmbObserverController<ManifestModal | undefined>;
@@ -57,9 +60,11 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	public readonly innerElement = this.#innerElement.asObservable();
 
 	public readonly key: string;
-	public readonly data: ModalData;
+	public readonly data: ModalPreset;
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
+
+	#value?: ModalValue;
 
 	public get controllerAlias() {
 		return 'umbModalContext:' + this.key;
@@ -68,10 +73,11 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	constructor(
 		host: UmbControllerHostElement,
 		router: IRouterSlot | null,
-		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
-		data?: ModalData,
-		config?: UmbModalConfig
+		modalAlias: string | UmbModalToken<ModalPreset, ModalValue>,
+		data?: ModalPreset,
+		config?: UmbModalConfig,
 	) {
+		super();
 		this.#host = host;
 		this.key = config?.key || UmbId.new();
 
@@ -84,7 +90,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 		this.size = config?.size || this.size;
 
 		const defaultData = modalAlias instanceof UmbModalToken ? modalAlias.getDefaultData() : undefined;
-		this.data = Object.freeze({ ...defaultData, ...data } as ModalData);
+		this.data = Object.freeze({ ...defaultData, ...data } as ModalPreset);
 
 		// TODO: Consider if its right to use Promises, or use another event based system? Would we need to be able to cancel an event, to then prevent the closing..?
 		this.#submitPromise = new Promise((resolve, reject) => {
@@ -120,7 +126,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 			UMB_MODAL_CONTEXT_TOKEN,
 
 			// Note, We are doing the Typing dance here because of the way we are correcting the submit method attribute type.
-			this as unknown as UmbModalContext<ModalData, ModalResult>
+			this as unknown as UmbModalContext<ModalPreset, ModalValue>,
 		);
 
 		this.#host.addController(this);
@@ -129,6 +135,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	hostConnected(): void {
 		this.#modalContextProvider.hostConnected();
 	}
+
 	hostDisconnected(): void {
 		this.#modalContextProvider.hostDisconnected();
 	}
@@ -168,7 +175,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 							this.#appendInnerElement(innerElement);
 						}
 					}
-				}
+				},
 			);
 		}
 	}
@@ -201,12 +208,12 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 
 	// note, this methods is private  argument is not defined correctly here, but requires to be fix by appending the OptionalSubmitArgumentIfUndefined type when newing up this class.
 	/**
-	 * Submits this modal, returning with a result to the initiator of the modal.
+	 * Submits this modal, returning with a value to the initiator of the modal.
 	 * @public
 	 * @memberof UmbModalContext
 	 */
-	private submit(result?: ModalResult) {
-		this.#submitResolver?.(result as ModalResult);
+	private submit(value?: ModalValue) {
+		this.#submitResolver?.(value as ModalValue);
 		this.modalElement.close();
 	}
 
@@ -224,8 +231,26 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	 * @public
 	 * @memberof UmbModalContext
 	 */
-	public onSubmit(): Promise<ModalResult> {
+	public onSubmit(): Promise<ModalValue> {
 		return this.#submitPromise;
+	}
+
+	/**
+	 * Gives the current value of this modal.
+	 * @public
+	 * @memberof UmbModalContext
+	 */
+	public getValue() {
+		return this.#value;
+	}
+
+	/**
+	 * Sets the current value of this modal.
+	 * @public
+	 * @memberof UmbModalContext
+	 */
+	public setValue(value: ModalValue) {
+		this.#value = value;
 	}
 
 	destroy(): void {

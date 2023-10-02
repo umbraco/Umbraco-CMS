@@ -1,18 +1,18 @@
 import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS } from '../../modals/manifests.js';
 import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils.js';
-import { ChooseInsertTypeModalResult, CodeSnippetType } from '../../modals/insert-choose-type-sidebar.element.js';
+import { UmbChooseInsertTypeModalValue, CodeSnippetType } from '../../modals/insert-choose-type-sidebar.element.js';
 import { UmbDictionaryRepository } from '@umbraco-cms/backoffice/dictionary';
 import { customElement, property, css, html } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UMB_DICTIONARY_ITEM_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
-	UmbDictionaryItemPickerModalResult,
+	UmbDictionaryItemPickerModalValue,
 	UmbModalManagerContext,
 	UmbModalContext,
 	UmbModalToken,
-	UmbPartialViewPickerModalResult,
+	UmbPartialViewPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -21,7 +21,7 @@ export const UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL = new UmbModa
 	{
 		type: 'sidebar',
 		size: 'small',
-	}
+	},
 );
 
 @customElement('umb-templating-insert-menu')
@@ -42,16 +42,16 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		});
 	}
 
-	async determineInsertValue(modalResult: ChooseInsertTypeModalResult) {
-		const { type, value } = modalResult;
+	async determineInsertValue(modalValue: UmbChooseInsertTypeModalValue) {
+		const { type, value } = modalValue;
 
 		switch (type) {
 			case CodeSnippetType.partialView: {
-				this.#getPartialViewSnippet(value as UmbPartialViewPickerModalResult);
+				this.#getPartialViewSnippet(value as UmbPartialViewPickerModalValue);
 				break;
 			}
 			case CodeSnippetType.dictionaryItem: {
-				await this.#getDictionaryItemSnippet(value as UmbDictionaryItemPickerModalResult);
+				await this.#getDictionaryItemSnippet(value as UmbDictionaryItemPickerModalValue);
 				this.#dispatchInsertEvent();
 
 				break;
@@ -62,22 +62,22 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		}
 	}
 
-	#getDictionaryItemSnippet = async (modalResult: UmbDictionaryItemPickerModalResult) => {
-		const id = modalResult.selection[0];
+	#getDictionaryItemSnippet = async (modalValue: UmbDictionaryItemPickerModalValue) => {
+		const id = modalValue.selection[0];
 		if (id === null) return;
 		const { data } = await this.#dictionaryRepository.requestById(id);
 		this.value = getInsertDictionarySnippet(data?.name ?? '');
 	};
 
-	#getPartialViewSnippet = async (modalResult: UmbPartialViewPickerModalResult) => {
-		this.value = getInsertPartialSnippet(modalResult.selection?.[0] ?? '');
+	#getPartialViewSnippet = async (modalValue: UmbPartialViewPickerModalValue) => {
+		this.value = getInsertPartialSnippet(modalValue.selection?.[0] ?? '');
 	};
 
 	#openChooseTypeModal = () => {
 		this.#openModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL, {
 			hidePartialView: this.hidePartialView,
 		});
-		this.#openModal?.onSubmit().then((closedModal: ChooseInsertTypeModalResult) => {
+		this.#openModal?.onSubmit().then((closedModal: UmbChooseInsertTypeModalValue) => {
 			this.determineInsertValue(closedModal);
 		});
 	};

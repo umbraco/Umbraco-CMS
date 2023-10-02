@@ -5,13 +5,13 @@ export interface UmbPropertyEditorUIPickerModalData {
 	submitLabel?: string;
 }
 
-export type UmbPropertyEditorUIPickerModalResult = {
+export type UmbPropertyEditorUIPickerModalValue = {
 	selection: Array<string>;
 };
 
 export const UMB_PROPERTY_EDITOR_UI_PICKER_MODAL = new UmbModalToken<
 	UmbPropertyEditorUIPickerModalData,
-	UmbPropertyEditorUIPickerModalResult
+	UmbPropertyEditorUIPickerModalValue
 >('Umb.Modal.PropertyEditorUiPicker', {
 	type: 'sidebar',
 	size: 'small',

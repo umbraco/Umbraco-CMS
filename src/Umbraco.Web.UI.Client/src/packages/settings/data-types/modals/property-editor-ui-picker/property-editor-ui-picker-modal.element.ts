@@ -1,10 +1,10 @@
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbPropertyEditorUIPickerModalData,
-	UmbPropertyEditorUIPickerModalResult,
+	UmbPropertyEditorUIPickerModalValue,
 	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -31,7 +31,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 	private _submitLabel = 'Select';
 
 	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalResult>;
+	modalContext?: UmbModalContext<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalValue>;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -46,9 +46,10 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 		if (!this.data) return;
 
 		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUi'), (propertyEditorUIs) => {
-
 			// Only include Property Editor UIs which has Property Editor Schema Alias
-			this._propertyEditorUIs = propertyEditorUIs.filter((propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias);
+			this._propertyEditorUIs = propertyEditorUIs.filter(
+				(propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias,
+			);
 
 			this._groupedPropertyEditorUIs = groupBy(this._propertyEditorUIs, 'meta.group');
 		});
@@ -111,7 +112,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 		return html` ${Object.entries(this._groupedPropertyEditorUIs).map(
 			([key, value]) =>
 				html` <h4>${key}</h4>
-					${this._renderGroupItems(value)}`
+					${this._renderGroupItems(value)}`,
 		)}`;
 	}
 
@@ -120,12 +121,13 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 			${repeat(
 				groupItems,
 				(propertyEditorUI) => propertyEditorUI.alias,
-				(propertyEditorUI) => html` <li class="item" ?selected=${this._selection.includes(propertyEditorUI.alias)}>
-					<button type="button" @click="${() => this._handleClick(propertyEditorUI)}">
-						<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
-						${propertyEditorUI.meta.label || propertyEditorUI.name}
-					</button>
-				</li>`
+				(propertyEditorUI) =>
+					html` <li class="item" ?selected=${this._selection.includes(propertyEditorUI.alias)}>
+						<button type="button" @click="${() => this._handleClick(propertyEditorUI)}">
+							<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
+							${propertyEditorUI.meta.label || propertyEditorUI.name}
+						</button>
+					</li>`,
 			)}
 		</ul>`;
 	}

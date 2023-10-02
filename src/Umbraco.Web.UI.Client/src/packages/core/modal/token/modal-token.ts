@@ -1,6 +1,6 @@
 import { UmbModalConfig } from '../modal-manager.context.js';
 
-export class UmbModalToken<ModalDataType extends object = object, ModalResultType = unknown> {
+export class UmbModalToken<ModalDataType extends object = object, ModalValueType = unknown> {
 	/**
 	 * Get the data type of the token's data.
 	 *
@@ -16,12 +16,12 @@ export class UmbModalToken<ModalDataType extends object = object, ModalResultTyp
 	 * Get the result type of the token
 	 *
 	 * @public
-	 * @type      {ModalResultType}
+	 * @type      {ModalValueType}
 	 * @memberOf  UmbModalToken
 	 * @example   `typeof MyModal.RESULT`
 	 * @returns   undefined
 	 */
-	readonly RESULT: ModalResultType = undefined as never;
+	readonly RESULT: ModalValueType = undefined as never;
 
 	/**
 	 * @param alias   Unique identifier for the token,
@@ -31,7 +31,7 @@ export class UmbModalToken<ModalDataType extends object = object, ModalResultTyp
 	constructor(
 		protected alias: string,
 		protected defaultConfig?: UmbModalConfig,
-		protected defaultData?: ModalDataType
+		protected defaultData?: ModalDataType,
 	) {}
 
 	/**

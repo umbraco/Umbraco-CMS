@@ -111,8 +111,8 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 	#openInsertSectionModal() {
 		const sectionModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL);
-		sectionModal?.onSubmit().then((insertSectionModalResult) => {
-			if (insertSectionModalResult.value) this._codeEditor?.insert(insertSectionModalResult.value);
+		sectionModal?.onSubmit().then((insertSectionModalValue) => {
+			if (insertSectionModalValue.value) this._codeEditor?.insert(insertSectionModalValue.value);
 		});
 	}
 
@@ -137,8 +137,8 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	#openQueryBuilder() {
 		const queryBuilderModal = this._modalContext?.open(UMB_TEMPLATE_QUERY_BUILDER_MODAL);
 
-		queryBuilderModal?.onSubmit().then((queryBuilderModalResult) => {
-			if (queryBuilderModalResult.value) this._codeEditor?.insert(getQuerySnippet(queryBuilderModalResult.value));
+		queryBuilderModal?.onSubmit().then((queryBuilderModalValue) => {
+			if (queryBuilderModalValue.value) this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
 		});
 	}
 
