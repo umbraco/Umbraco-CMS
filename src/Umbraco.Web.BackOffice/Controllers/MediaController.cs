@@ -830,6 +830,11 @@ public class MediaController : ContentControllerBase
                                 continue;
                             }
 
+                            if (allowedContentTypes.Any(x => x.Alias == mediaTypeItem.Alias) == false)
+                            {
+                                continue;
+                            }
+
                             mediaTypeAlias = mediaTypeItem.Alias;
                             break;
                         }
