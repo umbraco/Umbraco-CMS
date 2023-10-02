@@ -38,18 +38,6 @@ export const manifests: Array<ManifestTypes> = [
 		],
 	},
 	{
-		type: 'headerApp',
-		kind: 'button',
-		alias: 'My.HeaderApp.Wand',
-		name: 'My Header App',
-		weight: 10,
-		meta: {
-			label: 'My Header App',
-			icon: 'wand',
-			href: '/section/content/workspace/document/edit/c05da24d-7740-447b-9cdc-bd8ce2172e38',
-		},
-	},
-	{
 		type: 'modal',
 		alias: 'Umb.Modal.ExamineFieldsSettings',
 		name: 'Examine Field Settings Modal',
