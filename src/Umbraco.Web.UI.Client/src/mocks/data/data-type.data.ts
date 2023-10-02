@@ -267,7 +267,12 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		parentId: null,
 		propertyEditorAlias: 'Umbraco.EmailAddress',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUi.Email',
-		values: [],
+		values: [
+			{
+				alias: 'inputType',
+				value: 'email',
+			},
+		],
 	},
 	{
 		type: 'data-type',
