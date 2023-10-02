@@ -19,4 +19,7 @@ export abstract class UmbModalBaseElement<
 
 	@property({ type: Object, attribute: false })
 	public data?: ModalDataType;
+
+	@property({ type: Object, attribute: false })
+	public value: ModalValueType = null;
 }
