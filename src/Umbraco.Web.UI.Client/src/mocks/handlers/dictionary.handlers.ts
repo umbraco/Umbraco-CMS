@@ -155,9 +155,9 @@ export const handlers = [
 		const id = req.params.id as string;
 		if (!id) return;
 
-		const deletedKeys = umbDictionaryData.delete([id]);
+		umbDictionaryData.delete([id]);
 
-		return res(ctx.status(200), ctx.json(deletedKeys));
+		return res(ctx.status(200));
 	}),
 
 	// TODO => handle properly, querystring breaks handler

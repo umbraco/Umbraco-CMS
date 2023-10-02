@@ -26,21 +26,21 @@ export class UmbUserGroupCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableColumns: Array<UmbTableColumn> = [
 		{
-			name: 'Name',
+			name: this.localize.term('general_name'),
 			alias: 'userGroupName',
 			elementName: 'umb-user-group-table-name-column-layout',
 		},
 		{
-			name: 'Sections',
+			name: this.localize.term('main_sections'),
 			alias: 'userGroupSections',
 			elementName: 'umb-user-group-table-sections-column-layout',
 		},
 		{
-			name: 'Content start node',
+			name: this.localize.term('user_startnode'),
 			alias: 'userGroupContentStartNode',
 		},
 		{
-			name: 'Media start node',
+			name: this.localize.term('user_mediastartnode'),
 			alias: 'userGroupMediaStartNode',
 		},
 	];
@@ -87,11 +87,11 @@ export class UmbUserGroupCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'userGroupContentStartNode',
-						value: userGroup.documentStartNodeId || 'Content root',
+						value: userGroup.documentStartNodeId || this.localize.term('content_contentRoot'),
 					},
 					{
 						columnAlias: 'userGroupMediaStartNode',
-						value: userGroup.mediaStartNodeId || 'Media root',
+						value: userGroup.mediaStartNodeId || this.localize.term('media_mediaRoot'),
 					},
 				],
 			};

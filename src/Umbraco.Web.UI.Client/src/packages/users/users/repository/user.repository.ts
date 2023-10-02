@@ -80,7 +80,7 @@ export class UmbUserRepository
 	}
 
 	// COLLECTION
-	async requestCollection(filter: UmbUserCollectionFilterModel = { skip: 0, take: 100 }) {
+	async requestCollection(filter: UmbUserCollectionFilterModel = { skip: 0, take: 100000 }) {
 		//TODO: missing observable
 		return this.#collectionSource.filterCollection(filter);
 	}
