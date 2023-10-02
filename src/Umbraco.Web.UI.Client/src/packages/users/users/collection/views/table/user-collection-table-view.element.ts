@@ -5,7 +5,7 @@ import {
 } from '../../../../user-groups/repository/user-group.store.js';
 import type { UmbUserDetail } from '../../../types.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbTableElement,
 	UmbTableColumn,
@@ -183,6 +183,6 @@ export default UmbUserCollectionTableViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-users-table': UmbUserCollectionTableViewElement;
+		'umb-user-collection-table-view': UmbUserCollectionTableViewElement;
 	}
 }
