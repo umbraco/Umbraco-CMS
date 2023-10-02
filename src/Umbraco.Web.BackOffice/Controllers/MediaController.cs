@@ -824,8 +824,8 @@ public class MediaController : ContentControllerBase
                                 continue;
                             }
 
-                            List<FileExtensionConfigItem>? fileExtensions = fileExtensionsConfig.FileExtensions;
-                            if (fileExtensions == null || fileExtensions.All(x => x.Value != ext))
+                            List<FileExtensionConfigItem> fileExtensions = fileExtensionsConfig.FileExtensions;
+                            if (fileExtensions.All(x => x.Value != ext))
                             {
                                 continue;
                             }
@@ -844,20 +844,20 @@ public class MediaController : ContentControllerBase
                             _imageUrlGenerator.IsSupportedImageFormat(ext))
                         {
                             if (allowedContentTypes.Any(mt => mt.Alias == Constants.Conventions.MediaTypes.Image))
-                        {
-                            mediaTypeAlias = Constants.Conventions.MediaTypes.Image;
-                        }
-                        else
-                        {
-                            IMediaType? customType = allowedContentTypes.FirstOrDefault(mt =>
-                                mt.CompositionPropertyTypes.Any(pt =>
-                                    pt.PropertyEditorAlias == Constants.PropertyEditors.Aliases.ImageCropper));
-
-                            if (customType is not null)
                             {
-                                mediaTypeAlias = customType.Alias;
+                                mediaTypeAlias = Constants.Conventions.MediaTypes.Image;
                             }
-                        }
+                            else
+                            {
+                                IMediaType? customType = allowedContentTypes.FirstOrDefault(mt =>
+                                    mt.CompositionPropertyTypes.Any(pt =>
+                                        pt.PropertyEditorAlias == Constants.PropertyEditors.Aliases.ImageCropper));
+
+                                if (customType is not null)
+                                {
+                                    mediaTypeAlias = customType.Alias;
+                                }
+                            }
                         }
                     }
                     else
