@@ -80,7 +80,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 						columnAlias: 'name',
 						value: html`<a
 							style="font-weight:bold"
-							href="/section/dictionary/workspace/dictionary-item/edit/${dictionary.id}">
+							href="section/dictionary/workspace/dictionary-item/edit/${dictionary.id}">
 							${dictionary.name}</a
 						> `,
 					},

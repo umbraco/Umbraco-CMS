@@ -38,10 +38,7 @@ export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.Dictionary">
 				<div id="header" slot="header">
-					<uui-button
-						href="/section/dictionary/dashboard"
-						label=${this.localize.term('general_backToOverview')}
-						compact>
+					<uui-button href="section/dictionary/dashboard" label=${this.localize.term('general_backToOverview')} compact>
 						<uui-icon name="umb:arrow-left"></uui-icon>
 					</uui-button>
 					<uui-input
