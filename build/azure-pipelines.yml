@@ -140,6 +140,17 @@ stages:
               buildnumber="$(Build.BuildNumber)_$(Build.BuildId)_$sha"
               echo "##vso[build.updatebuildnumber]$buildnumber"
             displayName: Update build number
+          - script: npm version $(Build.BuildNumber) --allow-same-version --no-git-tag-version
+            displayName: Set version on Backoffice npm package
+            workingDirectory: src/Umbraco.Web.UI.New.Client
+          - script: npm pack
+            displayName: Pack Backoffice npm package
+            workingDirectory: src/Umbraco.Web.UI.New.Client
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Backoffice NPM Artifact
+            inputs:
+              targetPath: src/Umbraco.Web.UI.New.Client/umbraco-cms-backoffice-$(Build.BuildNumber).tgz
+              artifactName: backoffice_npm_pack
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
