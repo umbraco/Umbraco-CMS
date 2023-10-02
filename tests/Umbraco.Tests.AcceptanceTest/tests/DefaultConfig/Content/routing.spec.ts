@@ -105,7 +105,7 @@ test.describe('Routing', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
 
     // Pop-up with what cultures you want to publish shows, click it
-    await page.locator('.btn-success').last().click()
+    await umbracoUi.clickDataElementByElementName('button-overlaySubmit');
 
     // Assert
     await umbracoUi.isSuccessNotificationVisible();
@@ -161,13 +161,13 @@ test.describe('Routing', () => {
     await expect(await page.locator('.umb-list')).toBeVisible();
     await page.locator('.checkbox').last().click();
     // Pop-up with what cultures you want to publish shows, click it
-    await page.locator('.btn-success').last().click()
+    await umbracoUi.clickDataElementByElementName('button-overlaySubmit');
 
     // Assert
-    await expect(await umbracoUi.getSuccessNotification()).toHaveCount(2);
+    await expect(await umbracoUi.getSuccessNotification()).toHaveCount(2, {timeout: 20000});
     await expect(await page.locator('.alert-warning')).toBeVisible();
   });
-  
+
   test('Root node published in language A, Child node published in language A + B, Grandchild published in A + B', async ({page, umbracoApi, umbracoUi}) => {
     const rootDocType = new DocumentTypeBuilder()
       .withName(rootDocTypeName)
@@ -239,7 +239,7 @@ test.describe('Routing', () => {
 
     await expect(await page.locator('.umb-list')).toBeVisible();
     await page.locator('.checkbox').last().click();
-    await page.locator('.btn-success').last().click()
+    await umbracoUi.clickDataElementByElementName('button-overlaySubmit');
 
     await umbracoUi.clickMultiple(page.locator('.alert-success > .close'));
     await umbracoUi.clickElement(umbracoUi.getTreeItem("content", [nodeName, childNodeName, grandChildNodeName]));
@@ -247,8 +247,8 @@ test.describe('Routing', () => {
 
     await expect(await page.locator('.umb-list')).toBeVisible();
     await page.locator('.checkbox').last().click();
-    await page.locator('.btn-success').last().click()
+    await umbracoUi.clickDataElementByElementName('button-overlaySubmit');
     // Assert
-    await expect(await umbracoUi.getSuccessNotification()).toHaveCount(2);
+    await expect(await umbracoUi.getSuccessNotification()).toHaveCount(2, {timeout: 20000});
   })
 });

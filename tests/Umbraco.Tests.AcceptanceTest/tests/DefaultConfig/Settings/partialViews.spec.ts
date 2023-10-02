@@ -37,7 +37,7 @@ test.describe('Partial Views', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
     //Assert
-    await umbracoUi.isSuccessNotificationVisible({timeout: 30000});
+    await umbracoUi.isSuccessNotificationVisible();
 
     //Clean up
     await umbracoApi.partialViews.ensureNameNotExists('', fileName);
@@ -63,7 +63,7 @@ test.describe('Partial Views', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
     // Assert
-    await umbracoUi.isSuccessNotificationVisible({timeout:20000});
+    await umbracoUi.isSuccessNotificationVisible();
 
     // Clean up
     await umbracoApi.partialViews.ensureNameNotExists('', fileName);
@@ -135,7 +135,7 @@ test.describe('Partial Views', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
     // Assert
-    await umbracoUi.isSuccessNotificationVisible({timeout:20000});
+    await umbracoUi.isSuccessNotificationVisible();
 
     // Clean
     await umbracoApi.partialViews.ensureNameNotExists('', fileName);
