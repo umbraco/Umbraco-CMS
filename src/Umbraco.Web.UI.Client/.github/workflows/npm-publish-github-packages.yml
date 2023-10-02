@@ -17,6 +17,9 @@ on:
       - 'README.md'
   workflow_dispatch:
     inputs:
+      ref:
+        description: Branch or tag or SHA to publish
+        required: false
       version:
         description: 'Version to publish'
         required: false
@@ -41,6 +44,8 @@ jobs:
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
       - uses: actions/setup-node@v3
         with:
           node-version: 18
