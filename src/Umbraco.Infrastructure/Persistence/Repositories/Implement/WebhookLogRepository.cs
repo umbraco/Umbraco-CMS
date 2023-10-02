@@ -32,7 +32,7 @@ public class WebhookLogRepository : IWebhookLogRepository
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
-        Page<WebhookLogDto>? page = await _scopeAccessor.AmbientScope?.Database.PageAsync<WebhookLogDto>(pageNumber, pageSize, sql)!;
+        Page<WebhookLogDto>? page = await _scopeAccessor.AmbientScope?.Database.PageAsync<WebhookLogDto>(pageNumber + 1, pageSize, sql)!;
 
         return new PagedModel<WebhookLog>
         {

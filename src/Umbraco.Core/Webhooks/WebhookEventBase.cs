@@ -1,7 +1,6 @@
 ﻿using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 
@@ -14,15 +13,13 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
 
     private readonly IWebhookFiringService _webhookFiringService;
     private readonly IWebHookService _webHookService;
-    private readonly IWebhookLogRepository _webhookLogRepository;
-    private readonly ICoreScopeProvider _coreScopeProvider;
+    private readonly IWebhookLogService _webhookLogService;
 
-    protected WebhookEventBase(IWebhookFiringService webhookFiringService, IWebHookService webHookService, IWebhookLogRepository webhookLogRepository, ICoreScopeProvider coreScopeProvider, string eventName)
+    protected WebhookEventBase(IWebhookFiringService webhookFiringService, IWebHookService webHookService, IWebhookLogService webhookLogService, string eventName)
     {
         _webhookFiringService = webhookFiringService;
         _webHookService = webHookService;
-        _webhookLogRepository = webhookLogRepository;
-        _coreScopeProvider = coreScopeProvider;
+        _webhookLogService = webhookLogService;
         EventName = eventName;
     }
 
@@ -53,9 +50,7 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
                     RetryCount = 0,
                     Key = Guid.NewGuid(),
                 };
-                using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-                await _webhookLogRepository.CreateAsync(log);
-                scope.Complete();
+                await _webhookLogService.CreateAsync(log);
             }
         }
     }

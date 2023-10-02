@@ -72,4 +72,10 @@ public class WebHookController : UmbracoAuthorizedJsonController
         List<WebhookEventViewModel> viewModels = _umbracoMapper.MapEnumerable<IWebhookEvent, WebhookEventViewModel>(_webhookEventCollection.AsEnumerable());
         return Ok(viewModels);
     }
+
+    [HttpGet]
+    public IActionResult GetLogs()
+    {
+        return Ok();
+    }
 }
