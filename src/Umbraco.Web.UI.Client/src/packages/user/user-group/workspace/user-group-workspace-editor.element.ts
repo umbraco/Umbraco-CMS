@@ -7,7 +7,7 @@ import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import { UmbInputSectionElement } from '@umbraco-cms/backoffice/components';
-import { UmbUserInputElement } from '@umbraco-cms/backoffice/users';
+import { UmbUserInputElement } from 'src/packages/user/user/index.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 

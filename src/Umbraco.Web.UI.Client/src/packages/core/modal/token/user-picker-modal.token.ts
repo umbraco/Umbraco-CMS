@@ -1,5 +1,5 @@
 import { UmbModalToken, UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
-import { UmbUserDetail } from '@umbraco-cms/backoffice/users';
+import { UmbUserDetail } from 'src/packages/user/user';
 
 export type UmbUserPickerModalData = UmbPickerModalData<UmbUserDetail>;
 

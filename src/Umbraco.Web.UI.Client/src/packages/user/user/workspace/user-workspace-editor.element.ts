@@ -1,7 +1,7 @@
 import { getDisplayStateFromUserStatus } from '../../utils.js';
 import { type UmbUserDetail } from '../index.js';
 import { UmbUserWorkspaceContext } from './user-workspace.context.js';
-import { UmbUserRepository } from '@umbraco-cms/backoffice/users';
+import { UmbUserRepository } from 'src/packages/user/user/index.js';
 import { UUIInputElement, UUIInputEvent, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
@@ -21,7 +21,7 @@ import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_AUTH, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { type UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
+import { type UmbUserGroupInputElement } from 'src/packages/user/user-group/index.js';
 
 @customElement('umb-user-workspace-editor')
 export class UmbUserWorkspaceEditorElement extends UmbLitElement {

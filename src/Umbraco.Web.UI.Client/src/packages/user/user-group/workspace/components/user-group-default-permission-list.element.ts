@@ -6,7 +6,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { ManifestUserPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
-import { type UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/users';
+import { type UmbUserPermissionSettingElement } from 'src/packages/user/user/index.js';
 
 @customElement('umb-user-group-default-permission-list')
 export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {

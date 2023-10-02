@@ -1,4 +1,4 @@
-import { UmbUserGroupRepository } from '../repository/user-group.repository.js';
+import { UmbUserGroupRepository } from './user-group.repository.js';
 import { UmbUserGroupItemStore } from './user-group-item.store.js';
 import { UmbUserGroupStore } from './user-group.store.js';
 import type { ManifestStore, ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
