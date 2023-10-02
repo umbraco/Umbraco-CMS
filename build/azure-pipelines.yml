@@ -97,6 +97,12 @@ stages:
           - script: npm run build:for:cms
             displayName: Run New Backoffice Build
             workingDirectory: src/Umbraco.Web.UI.New.Client
+          - script: npm run build:for:npm
+            displayName: Run New Backoffice Build (NPM)
+            workingDirectory: src/Umbraco.Web.UI.New.Client
+          - script: zip $(Build.ArtifactStagingDirectory)/Umbraco.Web.UI.New.Client.zip dist-cms/**/* package.json LICENSE README.md
+            displayName: Zip Umbraco.Web.UI.New.Client
+            workingDirectory: src/Umbraco.Web.UI.New.Client
           - script: npm run build
             displayName: Run Login Build
             workingDirectory: src/Umbraco.Web.UI.New.Client/apps/auth
@@ -144,6 +150,11 @@ stages:
             inputs:
               targetPath: $(Build.SourcesDirectory)
               artifactName: build_output
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Backoffice Artifacts
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/Umbraco.Web.UI.New.Client.zip
+              artifactName: backoffice_build_output
 
   - stage: Build_Docs
     condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.buildApiDocs}}))
