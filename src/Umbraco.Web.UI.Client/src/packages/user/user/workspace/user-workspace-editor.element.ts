@@ -1,8 +1,8 @@
-import { UmbUserRepository } from '@umbraco-cms/backoffice/user';
-import { type UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import { getDisplayStateFromUserStatus } from '../../utils.js';
 import { type UmbUserDetail } from '../index.js';
 import { UmbUserWorkspaceContext } from './user-workspace.context.js';
+import { type UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
+import { UmbUserRepository } from '@umbraco-cms/backoffice/user';
 import { UUIInputElement, UUIInputEvent, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,

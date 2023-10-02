@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { UmbScriptsWorkspaceContext } from './scripts-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
@@ -6,7 +7,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import _ from 'lodash';
 
 @customElement('umb-scripts-workspace-edit')
 export class UmbScriptsWorkspaceEditElement extends UmbLitElement {

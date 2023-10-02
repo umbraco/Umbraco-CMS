@@ -1,6 +1,6 @@
-import type { UmbInputCultureSelectElement } from '@umbraco-cms/backoffice/culture';
 import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from '../../language-workspace.context.js';
 import type { UmbInputLanguagePickerElement } from '../../../../components/input-language-picker/input-language-picker.element.js';
+import type { UmbInputCultureSelectElement } from '@umbraco-cms/backoffice/culture';
 import { UUIBooleanInputEvent, UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';

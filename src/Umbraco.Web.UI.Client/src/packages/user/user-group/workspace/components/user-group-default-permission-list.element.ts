@@ -1,5 +1,5 @@
-import { type UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/user';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context.js';
+import { type UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/user';
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
