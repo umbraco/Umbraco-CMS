@@ -138,7 +138,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 			<b>Choose where to import dictionary items (optional)</b>
 			<umb-tree
 				alias="Umb.Tree.Dictionary"
-				@selected=${this.#handleSelectionChange}
+				@selection-change=${this.#handleSelectionChange}
 				.selection=${this._selection}
 				selectable></umb-tree>
 

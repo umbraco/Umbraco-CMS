@@ -1,6 +1,8 @@
-export class UmbSelectedEvent extends Event {
+export class UmbSelectionChangeEvent extends Event {
+	public static readonly TYPE = 'selection-change';
+
 	public constructor() {
 		// mimics the native change event
-		super('selected', { bubbles: true, composed: false, cancelable: false });
+		super('selection-change', { bubbles: true, composed: false, cancelable: false });
 	}
 }

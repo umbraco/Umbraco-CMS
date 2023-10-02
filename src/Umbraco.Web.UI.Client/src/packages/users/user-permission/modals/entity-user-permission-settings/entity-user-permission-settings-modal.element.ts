@@ -17,7 +17,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestUserPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbSelectedEvent } from '@umbraco-cms/backoffice/events';
+import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/events';
 
 @customElement('umb-entity-user-permission-settings-modal')
 export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {
@@ -38,7 +38,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {
 		this.modalContext?.reject();
 	}
 
-	#onSelectedUserPermission(event: UmbSelectedEvent) {
+	#onSelectedUserPermission(event: UmbSelectionChangeEvent) {
 		const target = event.target as any;
 		const selection = target.selectedPermissions;
 	}
@@ -52,7 +52,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {
 						? html` <umb-entity-user-permission-settings-list
 								.entityType=${this.data?.entityType}
 								.selectedPermissions=${this._currentUserPermissionsForEntity || []}
-								@selected=${this.#onSelectedUserPermission}></umb-entity-user-permission-settings-list>`
+								@selection-change=${this.#onSelectedUserPermission}></umb-entity-user-permission-settings-list>`
 						: nothing}
 				</uui-box>
 

@@ -1,4 +1,4 @@
-import { UmbChangeEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/events';
+import { UmbChangeEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/events';
 import {
 	ManifestEntityAction,
 	ManifestUserPermission,
@@ -54,12 +54,12 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 
 	#addUserPermission(permissionAlias: string) {
 		this.selectedPermissions = [...this.selectedPermissions, permissionAlias];
-		this.dispatchEvent(new UmbSelectedEvent());
+		this.dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
 	#removeUserPermission(permissionAlias: string) {
 		this.selectedPermissions = this.selectedPermissions.filter((alias) => alias !== permissionAlias);
-		this.dispatchEvent(new UmbSelectedEvent());
+		this.dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
 	render() {
