@@ -125,7 +125,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 						type="button"
 						look="outline"
 						label=${this.localize.term('dictionary_createNew')}
-						href="/section/dictionary/workspace/dictionary-item/create/null">
+						href="section/dictionary/workspace/dictionary-item/create/null">
 						${this.localize.term('dictionary_createNew')}
 					</uui-button>
 					<uui-input
