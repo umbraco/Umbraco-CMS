@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -29,7 +31,6 @@ internal sealed class MemberSaveValidationAttribute : TypeFilterAttribute
         private readonly IShortStringHelper _shortStringHelper;
         private readonly SecuritySettings _securitySettings;
 
-
         public MemberSaveValidationFilter(
             ILoggerFactory loggerFactory,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
@@ -48,6 +49,25 @@ internal sealed class MemberSaveValidationAttribute : TypeFilterAttribute
             _propertyValidationService = propertyValidationService ??
                                          throw new ArgumentNullException(nameof(propertyValidationService));
             _securitySettings = securitySettings.Value;
+        }
+
+        public MemberSaveValidationFilter(
+            ILoggerFactory loggerFactory,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            IMemberTypeService memberTypeService,
+            IMemberService memberService,
+            IShortStringHelper shortStringHelper,
+            IPropertyValidationService propertyValidationService)
+        {
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ??
+                                          throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
+            _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
+            _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
+            _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+            _propertyValidationService = propertyValidationService ??
+                                         throw new ArgumentNullException(nameof(propertyValidationService));
+            _securitySettings = StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>().Value;
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
