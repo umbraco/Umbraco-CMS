@@ -52,14 +52,17 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 		});
 	}
 
+	#renderModal(key: string) {
+		const element = this._modalElementMap.get(key);
+		if (!element) return;
+		return html`${element.render()}`;
+	}
+
 	render() {
 		return html`
 			<uui-modal-container>
 				${this._modalHandlers.length > 0
-					? repeat(
-							this._modalHandlers,
-							(modalHandler) => html`${this._modalElementMap.get(modalHandler.key)?.modalElement}`,
-					  )
+					? repeat(this._modalHandlers, (modalHandler) => this.#renderModal(modalHandler.key))
 					: ''}
 			</uui-modal-container>
 		`;
