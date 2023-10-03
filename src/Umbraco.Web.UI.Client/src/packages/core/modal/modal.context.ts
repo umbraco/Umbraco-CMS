@@ -5,6 +5,7 @@ import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.
@@ -137,3 +138,5 @@ export class UmbModalContextClass<ModalPreset extends object = object, ModalValu
 		this.#value.update(partialValue);
 	}
 }
+
+export const UMB_MODAL_CONTEXT_TOKEN = new UmbContextToken<UmbModalContext>('UmbModalContext');

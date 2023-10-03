@@ -8,7 +8,7 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UUIDialogElement, UUIModalDialogElement, UUIModalSidebarElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { UmbContextProvider, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-modal')
 export class UmbModalElement extends UmbLitElement {
@@ -151,5 +151,3 @@ declare global {
 		'umb-modal': UmbModalElement;
 	}
 }
-
-export const UMB_MODAL_CONTEXT_TOKEN = new UmbContextToken<UmbModalContext>('UmbModalContext');
