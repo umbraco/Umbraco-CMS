@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -170,7 +171,11 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         // This can occur if someone else is dynamically routing and in which case we don't want to overwrite
         // the routing work being done there.
         UmbracoRouteValues? umbracoRouteValues = httpContext.Features.Get<UmbracoRouteValues>();
-        if (umbracoRouteValues != null)
+
+        // Check whether an exception occured in the current request.
+        // If this is the case we do want dynamic routing since it might be an Umbraco content page which is used as an error page.
+        IExceptionHandlerFeature? exceptionHandlerFeature = httpContext.Features.Get<IExceptionHandlerFeature>();
+        if (umbracoRouteValues != null && exceptionHandlerFeature == null)
         {
             return null!;
         }
