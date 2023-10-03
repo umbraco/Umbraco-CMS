@@ -9,7 +9,7 @@ import { setCustomElements } from '@storybook/web-components';
 
 import { startMockServiceWorker } from '../src/mocks';
 
-import { UMB_MODAL_CONTEXT_TOKEN, UmbModalManagerContext } from '../src/packages/core/modal';
+import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '../src/packages/core/modal';
 import { UmbDataTypeStore } from '../src/packages/settings/data-types/repository/data-type.store.ts';
 import { UmbDocumentStore } from '../src/packages/documents/documents/repository/document.store.ts';
 import { UmbDocumentTreeStore } from '../src/packages/documents/documents/repository/document.tree.store.ts';
@@ -37,7 +37,7 @@ class UmbStoryBookElement extends UmbLitElement {
 		super();
 		this._umbIconRegistry.attach(this);
 		this._registerExtensions(documentManifests);
-		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalManagerContext(this));
+		this.provideContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, new UmbModalManagerContext(this));
 
 		this._registerExtensions(localizationManifests);
 		umbLocalizationRegistry.loadLanguage('en-us'); // register default language

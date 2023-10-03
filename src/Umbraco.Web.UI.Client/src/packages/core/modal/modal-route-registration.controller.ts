@@ -105,7 +105,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	setUniquePathValue(identifier: string, value: string | undefined) {
 		if (!this.#uniquePaths.has(identifier)) {
 			throw new Error(
-				`Identifier ${identifier} was not registered at the construction of the modal registration controller, it has to be.`
+				`Identifier ${identifier} was not registered at the construction of the modal registration controller, it has to be.`,
 			);
 		}
 		const oldValue = this.#uniquePaths.get(identifier);

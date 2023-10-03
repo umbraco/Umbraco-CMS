@@ -41,15 +41,10 @@ export class UmbModalManagerContext {
 		config?: UmbModalConfig,
 		router: IRouterSlot | null = null,
 	) {
-		const modalContext = new UmbModalContextClass(
-			this.host,
-			router,
-			modalAlias,
-			data,
-			config,
-		) as unknown as UmbModalContext<ModalData, ModalValue>;
-
-		modalContext.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalContext));
+		const modalContext = new UmbModalContextClass(router, modalAlias, data, config) as unknown as UmbModalContext<
+			ModalData,
+			ModalValue
+		>;
 
 		this.#modals.next(
 			appendToFrozenArray(this.#modals.getValue(), modalContext, (entry) => entry.key === modalContext.key),
@@ -70,19 +65,8 @@ export class UmbModalManagerContext {
 		}
 	}
 
-	#remove(key: string) {
+	public remove(key: string) {
 		this.#modals.next(this.#modals.getValue().filter((modal) => modal.key !== key));
-	}
-
-	/**
-	 * Handles the close-end event
-	 * @private
-	 * @param {UmbModalContext} modalContext
-	 * @memberof UmbModalManagerContext
-	 */
-	#onCloseEnd(modalContext: UmbModalContext<any, any>) {
-		modalContext.modalElement.removeEventListener('close-end', () => this.#onCloseEnd(modalContext));
-		this.#remove(modalContext.key);
 	}
 }
 
