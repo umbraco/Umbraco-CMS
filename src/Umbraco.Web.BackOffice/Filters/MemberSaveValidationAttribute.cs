@@ -37,26 +37,6 @@ internal sealed class MemberSaveValidationAttribute : TypeFilterAttribute
             IMemberTypeService memberTypeService,
             IMemberService memberService,
             IShortStringHelper shortStringHelper,
-            IPropertyValidationService propertyValidationService,
-            IOptions<SecuritySettings> securitySettings)
-        {
-            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-            _backofficeSecurityAccessor = backofficeSecurityAccessor ??
-                                          throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
-            _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
-            _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
-            _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
-            _propertyValidationService = propertyValidationService ??
-                                         throw new ArgumentNullException(nameof(propertyValidationService));
-            _securitySettings = securitySettings.Value;
-        }
-
-        public MemberSaveValidationFilter(
-            ILoggerFactory loggerFactory,
-            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            IMemberTypeService memberTypeService,
-            IMemberService memberService,
-            IShortStringHelper shortStringHelper,
             IPropertyValidationService propertyValidationService)
         {
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));

@@ -60,7 +60,7 @@ internal class
         _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
         _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
         _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
-        _securitySettings = StaticServiceProvider.Instance.GetRequiredService<SecuritySettings>();
+        _securitySettings = StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>().Value;
     }
 
     public override bool ValidatePropertiesData(
