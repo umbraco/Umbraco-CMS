@@ -18,7 +18,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	#onSubmitCallback?: (data: UmbModalTokenResult) => void;
 	#onRejectCallback?: () => void;
 
-	#modalContext: UmbModalContext<UmbModalTokenData, UmbModalTokenResult> | undefined;
+	#modalManagerContext: UmbModalContext<UmbModalTokenData, UmbModalTokenResult> | undefined;
 	#routeBuilder?: UmbModalRouteBuilder;
 	#urlBuilderCallback: ((urlBuilder: UmbModalRouteBuilder) => void) | undefined;
 
@@ -26,7 +26,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	constructor(
 		modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenResult> | string,
 		path: string | null = null,
-		modalConfig?: UmbModalConfig
+		modalConfig?: UmbModalConfig,
 	) {
 		this.#key = modalConfig?.key || UmbId.new();
 		this.#modalAlias = modalAlias;
@@ -62,7 +62,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	 * Returns true if the modal is currently active.
 	 */
 	public get active() {
-		return !!this.#modalContext;
+		return !!this.#modalManagerContext;
 	}
 
 	public open(params: { [key: string]: string | number }, prepend?: string) {
@@ -75,7 +75,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	 * Returns the modal handler if the modal is currently active. Otherwise its undefined.
 	 */
 	public get modalContext() {
-		return this.#modalContext;
+		return this.#modalManagerContext;
 	}
 
 	public observeRouteBuilder(callback: (urlBuilder: UmbModalRouteBuilder) => void) {
@@ -102,22 +102,22 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 
 	#onSubmit = (data: UmbModalTokenResult) => {
 		this.#onSubmitCallback?.(data);
-		this.#modalContext = undefined;
+		this.#modalManagerContext = undefined;
 	};
 	#onReject = () => {
 		this.#onRejectCallback?.();
-		this.#modalContext = undefined;
+		this.#modalManagerContext = undefined;
 	};
 
-	async routeSetup(router: IRouterSlot, modalContext: UmbModalManagerContext, params: Params) {
+	async routeSetup(router: IRouterSlot, modalManagerContext: UmbModalManagerContext, params: Params) {
 		// If already open, don't do anything:
 		if (this.active) return;
 
 		const modalData = this.#onSetupCallback ? await this.#onSetupCallback(params) : undefined;
 		if (modalData !== false) {
-			this.#modalContext = modalContext.open(this.#modalAlias, modalData, this.modalConfig, router);
-			this.#modalContext.onSubmit().then(this.#onSubmit, this.#onReject);
-			return this.#modalContext;
+			this.#modalManagerContext = modalManagerContext.open(this.#modalAlias, modalData, this.modalConfig, router);
+			this.#modalManagerContext.onSubmit().then(this.#onSubmit, this.#onReject);
+			return this.#modalManagerContext;
 		}
 		return null;
 	}
