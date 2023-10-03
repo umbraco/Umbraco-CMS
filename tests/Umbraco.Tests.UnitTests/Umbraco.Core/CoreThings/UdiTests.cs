@@ -205,8 +205,6 @@ public class UdiTests
         Assert.Throws<ArgumentException>(() => new UdiRange(guidUdi, "x"));
     }
 
-
-
     [Test]
     public void TryParseTest()
     {
