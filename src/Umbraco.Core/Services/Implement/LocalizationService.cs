@@ -231,7 +231,8 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                if (scope.Events.DispatchCancelable(SavingDictionaryItem, this, new SaveEventArgs<IDictionaryItem>(dictionaryItem)))
+                var saveEventArgs = new SaveEventArgs<IDictionaryItem>(dictionaryItem);
+                if (scope.Events.DispatchCancelable(SavingDictionaryItem, this, saveEventArgs))
                 {
                     scope.Complete();
                     return;
@@ -243,7 +244,10 @@ namespace Umbraco.Core.Services.Implement
                 // ensure the lazy Language callback is assigned
 
                 EnsureDictionaryItemLanguageCallback(dictionaryItem);
-                scope.Events.Dispatch(SavedDictionaryItem, this, new SaveEventArgs<IDictionaryItem>(dictionaryItem, false));
+                scope.Events.Dispatch(SavedDictionaryItem, this, new SaveEventArgs<IDictionaryItem>(dictionaryItem, false)
+                {
+                    EventState = saveEventArgs.EventState
+                });
 
                 Audit(AuditType.Save, "Save DictionaryItem", userId, dictionaryItem.Id, "DictionaryItem");
                 scope.Complete();
