@@ -226,7 +226,10 @@ public interface IMemberService : IMembershipMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember> GetMembersByEmail(string email);
+    IEnumerable<IMember> GetMembersByEmail(string email)
+    {
+        return Enumerable.Empty<IMember>();
+    }
 
     /// <summary>
     ///     Gets all Members for the MemberType id
