@@ -13,12 +13,14 @@ public class WebHookController : UmbracoAuthorizedJsonController
     private readonly IWebHookService _webHookService;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly WebhookEventCollection _webhookEventCollection;
+    private readonly IWebhookLogService _webhookLogService;
 
-    public WebHookController(IWebHookService webHookService, IUmbracoMapper umbracoMapper, WebhookEventCollection webhookEventCollection)
+    public WebHookController(IWebHookService webHookService, IUmbracoMapper umbracoMapper, WebhookEventCollection webhookEventCollection, IWebhookLogService webhookLogService)
     {
         _webHookService = webHookService;
         _umbracoMapper = umbracoMapper;
         _webhookEventCollection = webhookEventCollection;
+        _webhookLogService = webhookLogService;
     }
 
     [HttpGet]
@@ -74,8 +76,13 @@ public class WebHookController : UmbracoAuthorizedJsonController
     }
 
     [HttpGet]
-    public IActionResult GetLogs()
+    public async Task<IActionResult> GetLogs(int skip = 0, int take = int.MaxValue)
     {
-        return Ok();
+        PagedModel<WebhookLog> logs = await _webhookLogService.Get(skip, take);
+        List<WebhookLogViewModel> mappedLogs = _umbracoMapper.MapEnumerable<WebhookLog, WebhookLogViewModel>(logs.Items);
+        return Ok(new PagedResult<WebhookLogViewModel>(logs.Total, 0, 0)
+        {
+            Items = mappedLogs,
+        });
     }
 }

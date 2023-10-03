@@ -12,6 +12,7 @@ public class WebhookMapDefinition : IMapDefinition
         mapper.Define<WebhookViewModel, Webhook>((_, _) => new Webhook(string.Empty), Map);
         mapper.Define<Webhook, WebhookViewModel>((_, _) => new WebhookViewModel(), Map);
         mapper.Define<IWebhookEvent, WebhookEventViewModel>((_, _) => new WebhookEventViewModel(), Map);
+        mapper.Define<WebhookLog, WebhookLogViewModel>((_, _) => new WebhookLogViewModel(), Map);
     }
 
     // Umbraco.Code.MapAll -CreateDate -DeleteDate -Id -Key -UpdateDate
@@ -36,4 +37,16 @@ public class WebhookMapDefinition : IMapDefinition
 
     // Umbraco.Code.MapAll
     private void Map(IWebhookEvent source, WebhookEventViewModel target, MapperContext context) => target.EventName = source.EventName;
+
+    // Umbraco.Code.MapAll
+    private void Map(WebhookLog source, WebhookLogViewModel target, MapperContext context)
+    {
+        target.Date = source.Date;
+        target.EventName = source.EventName;
+        target.Key = source.Key;
+        target.RequestBody = source.RequestBody;
+        target.ResponseBody = source.ResponseBody;
+        target.RetryCount = source.RetryCount;
+        target.StatusCode = source.StatusCode;
+    }
 }
