@@ -3585,6 +3585,7 @@ public class ContentService : RepositoryService, IContentService
             Audit(AuditType.Save, Constants.Security.SuperUserId, content.Id, $"Saved content template: {content.Name}");
 
             scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, evtMsgs));
+            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
 
             scope.Complete();
         }
@@ -3599,6 +3600,7 @@ public class ContentService : RepositoryService, IContentService
             scope.WriteLock(Constants.Locks.ContentTree);
             _documentBlueprintRepository.Delete(content);
             scope.Notifications.Publish(new ContentDeletedBlueprintNotification(content, evtMsgs));
+            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.Remove, evtMsgs));
             scope.Complete();
         }
     }
@@ -3699,6 +3701,7 @@ public class ContentService : RepositoryService, IContentService
                 }
 
                 scope.Notifications.Publish(new ContentDeletedBlueprintNotification(blueprints, evtMsgs));
+                scope.Notifications.Publish(new ContentTreeChangeNotification(blueprints, TreeChangeTypes.Remove, evtMsgs));
                 scope.Complete();
             }
         }
