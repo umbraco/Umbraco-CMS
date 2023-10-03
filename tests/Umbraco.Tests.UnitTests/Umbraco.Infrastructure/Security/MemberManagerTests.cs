@@ -42,6 +42,7 @@ public class MemberManagerTests
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IEntityService>(),
                 new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings()),
+                new TestOptionsSnapshot<SecuritySettings>(new SecuritySettings()),
                 AppCaches.Disabled,
                 Mock.Of<ITwoFactorLoginService>())
         };
