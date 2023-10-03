@@ -27,7 +27,7 @@ export class UmbModalElement extends UmbLitElement {
 		this.#createModalElement();
 	}
 
-	public modalElement?: UUIModalDialogElement | UUIModalSidebarElement;
+	public element?: UUIModalDialogElement | UUIModalSidebarElement;
 
 	#innerElement = new BehaviorSubject<HTMLElement | undefined>(undefined);
 
@@ -37,14 +37,14 @@ export class UmbModalElement extends UmbLitElement {
 	#createModalElement() {
 		if (!this.#modalContext) return;
 
-		this.modalElement = this.#createContainerElement();
+		this.element = this.#createContainerElement();
 
 		this.#modalContext.onSubmit().then(
 			() => {
-				this.modalElement?.close();
+				this.element?.close();
 			},
 			() => {
-				this.modalElement?.close();
+				this.element?.close();
 			},
 		);
 
@@ -63,10 +63,10 @@ export class UmbModalElement extends UmbLitElement {
 			this.#modalRouterElement.parent = this.#modalContext.router;
 		}
 
-		this.modalElement.appendChild(this.#modalRouterElement);
+		this.element.appendChild(this.#modalRouterElement);
 		this.#observeModal(this.#modalContext.alias.toString());
 
-		const provider = new UmbContextProvider(this.modalElement, UMB_MODAL_CONTEXT_TOKEN, this.#modalContext);
+		const provider = new UmbContextProvider(this.element, UMB_MODAL_CONTEXT_TOKEN, this.#modalContext);
 		provider.hostConnected();
 	}
 
@@ -129,7 +129,7 @@ export class UmbModalElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`${this.modalElement}`;
+		return html`${this.element}`;
 	}
 
 	#destroy() {

@@ -48,14 +48,19 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 			const modalElement = new UmbModalElement();
 			modalElement.modalContext = modal;
 
+			// TODO: We need to change this to the close-end event, when it is added to UUI again.
+			// This solution solves the memory leak issue where the modal contexts where not removed from the manager when they are closed.
+			// It breaks the modal animation though, so we need to wait for the close-end so we are sure the animation is done.
+			modalElement.element?.addEventListener('close', () => this._modalManagerContext?.remove(modal.key));
+
 			this._modalElementMap.set(modal.key, modalElement);
 		});
 	}
 
 	#renderModal(key: string) {
-		const element = this._modalElementMap.get(key);
-		if (!element) return;
-		return html`${element.render()}`;
+		const modalElement = this._modalElementMap.get(key);
+		if (!modalElement) return;
+		return html`${modalElement.render()}`;
 	}
 
 	render() {
