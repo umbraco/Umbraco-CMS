@@ -135,12 +135,6 @@ namespace Umbraco.Web.Cache
             Bind(() => ContentService.EmptiedRecycleBin += ContentService_EmptiedRecycleBin,
                 () => ContentService.EmptiedRecycleBin -= ContentService_EmptiedRecycleBin);
 
-            // TreeChanged should also deal with this
-            //Bind(() => ContentService.SavedBlueprint += ContentService_SavedBlueprint,
-            //    () => ContentService.SavedBlueprint -= ContentService_SavedBlueprint);
-            //Bind(() => ContentService.DeletedBlueprint += ContentService_DeletedBlueprint,
-            //    () => ContentService.DeletedBlueprint -= ContentService_DeletedBlueprint);
-
             // bind to public access events
             Bind(() => PublicAccessService.Saved += PublicAccessService_Saved,
                 () => PublicAccessService.Saved -= PublicAccessService_Saved);
