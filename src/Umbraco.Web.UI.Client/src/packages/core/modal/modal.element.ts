@@ -1,4 +1,4 @@
-import { UmbModalContext } from './modal-context.js';
+import { UmbModalContext } from './modal.context.js';
 import { ManifestModal, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { CSSResultGroup, html, customElement } from '@umbraco-cms/backoffice/external/lit';
