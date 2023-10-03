@@ -12,12 +12,12 @@ import { UmbContextProvider, UmbContextToken } from '@umbraco-cms/backoffice/con
 
 @customElement('umb-modal')
 export class UmbModalElement extends UmbLitElement {
-	#modalHandler: UmbModalContext | undefined;
-	public get modalHandler(): UmbModalContext | undefined {
-		return this.#modalHandler;
+	#modalContext: UmbModalContext | undefined;
+	public get modalContext(): UmbModalContext | undefined {
+		return this.#modalContext;
 	}
-	public set modalHandler(value: UmbModalContext) {
-		this.#modalHandler = value;
+	public set modalContext(value: UmbModalContext) {
+		this.#modalContext = value;
 
 		if (!value) {
 			this.#destroy();
@@ -35,11 +35,11 @@ export class UmbModalElement extends UmbLitElement {
 	#modalRouterElement: UmbRouterSlotElement = document.createElement('umb-router-slot');
 
 	#createModalElement() {
-		if (!this.#modalHandler) return;
+		if (!this.#modalContext) return;
 
 		this.modalElement = this.#createContainerElement();
 
-		this.#modalHandler.onSubmit().then(
+		this.#modalContext.onSubmit().then(
 			() => {
 				this.modalElement?.close();
 			},
@@ -53,30 +53,30 @@ export class UmbModalElement extends UmbLitElement {
 		 * Maybe we could just get a Modal Router Slot. But it needs to have the ability to actually inject via slot. so the modal inner element can be within.
 		 *
 		 */
-		if (this.#modalHandler.router) {
+		if (this.#modalContext.router) {
 			this.#modalRouterElement.routes = [
 				{
 					path: '',
 					component: document.createElement('slot'),
 				},
 			];
-			this.#modalRouterElement.parent = this.#modalHandler.router;
+			this.#modalRouterElement.parent = this.#modalContext.router;
 		}
 
 		this.modalElement.appendChild(this.#modalRouterElement);
-		this.#observeModal(this.#modalHandler.alias.toString());
+		this.#observeModal(this.#modalContext.alias.toString());
 
-		const provider = new UmbContextProvider(this.modalElement, UMB_MODAL_CONTEXT_TOKEN, this.#modalHandler);
+		const provider = new UmbContextProvider(this.modalElement, UMB_MODAL_CONTEXT_TOKEN, this.#modalContext);
 		provider.hostConnected();
 	}
 
 	#createContainerElement() {
-		return this.#modalHandler!.type === 'sidebar' ? this.#createSidebarElement() : this.#createDialogElement();
+		return this.#modalContext!.type === 'sidebar' ? this.#createSidebarElement() : this.#createDialogElement();
 	}
 
 	#createSidebarElement() {
 		const sidebarElement = document.createElement('uui-modal-sidebar');
-		sidebarElement.size = this.#modalHandler!.size;
+		sidebarElement.size = this.#modalContext!.size;
 		return sidebarElement;
 	}
 
@@ -107,8 +107,8 @@ export class UmbModalElement extends UmbLitElement {
 		const innerElement = (await createExtensionElement(manifest)) as any;
 
 		if (innerElement) {
-			innerElement.data = this.#modalHandler!.data;
-			innerElement.modalContext = this.#modalHandler;
+			innerElement.data = this.#modalContext!.data;
+			innerElement.modalContext = this.#modalContext;
 			innerElement.manifest = manifest;
 		}
 

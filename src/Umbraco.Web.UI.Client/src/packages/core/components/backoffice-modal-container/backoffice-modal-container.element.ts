@@ -14,7 +14,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 	private _modalElementMap: Map<string, UmbModalElement> = new Map();
 
 	@state()
-	_modalHandlers: Array<UmbModalContext> = [];
+	_modals: Array<UmbModalContext> = [];
 
 	private _modalManagerContext?: UmbModalManagerContext;
 
@@ -29,26 +29,26 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 
 	private _observeModals() {
 		if (!this._modalManagerContext) return;
-		this.observe(this._modalManagerContext.modals, (modalHandlers) => this.#createModalElements(modalHandlers));
+		this.observe(this._modalManagerContext.modals, (modals) => this.#createModalElements(modals));
 	}
 
 	/** We cannot render the umb-modal element directly in the uui-modal-container because it wont get reconised by UUI.
 	 * We therefore have a helper class which creates the uui-modal element and returns it. */
-	#createModalElements(modalHandlers: Array<UmbModalContext>) {
-		this._modalHandlers = modalHandlers;
+	#createModalElements(modals: Array<UmbModalContext>) {
+		this._modals = modals;
 
-		if (this._modalHandlers.length === 0) {
+		if (this._modals.length === 0) {
 			this._modalElementMap.clear();
 			return;
 		}
 
-		this._modalHandlers.forEach((modalHandler) => {
-			if (this._modalElementMap.has(modalHandler.key)) return;
+		this._modals.forEach((modal) => {
+			if (this._modalElementMap.has(modal.key)) return;
 
 			const modalElement = new UmbModalElement();
-			modalElement.modalHandler = modalHandler;
+			modalElement.modalContext = modal;
 
-			this._modalElementMap.set(modalHandler.key, modalElement);
+			this._modalElementMap.set(modal.key, modalElement);
 		});
 	}
 
@@ -61,9 +61,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-modal-container>
-				${this._modalHandlers.length > 0
-					? repeat(this._modalHandlers, (modalHandler) => this.#renderModal(modalHandler.key))
-					: ''}
+				${this._modals.length > 0 ? repeat(this._modals, (modal) => this.#renderModal(modal.key)) : ''}
 			</uui-modal-container>
 		`;
 	}
