@@ -12,11 +12,11 @@ import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-modal')
 export class UmbModalElement extends UmbLitElement {
-	#modalContext: UmbModalContext | undefined;
+	#modalContext?: UmbModalContext;
 	public get modalContext(): UmbModalContext | undefined {
 		return this.#modalContext;
 	}
-	public set modalContext(value: UmbModalContext) {
+	public set modalContext(value: UmbModalContext | undefined) {
 		this.#modalContext = value;
 
 		if (!value) {
