@@ -2400,8 +2400,10 @@ public class ContentController : ContentControllerBase
         }
 
         // Validate permissions on node
-        EntityPermission? permission = _userService.GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, node.Path);
-        if (permission?.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
+        var permissions = _userService.GetAllPermissions(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, node.Path);
+
+        if (permissions.Any(x =>
+                x.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) && x.EntityId == node.Id) == false)
         {
             HttpContext.SetReasonPhrase("Permission Denied.");
             return BadRequest("You do not have permission to assign domains on that node.");
