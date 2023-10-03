@@ -3,14 +3,14 @@ import { html, customElement, property, state, ifDefined } from '@umbraco-cms/ba
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-property-editor-ui-tags
  */
 @customElement('umb-property-editor-ui-tags')
-export class UmbPropertyEditorUITagsElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+export class UmbPropertyEditorUITagsElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	private _value: Array<string> = [];
 
 	@property({ type: Array })

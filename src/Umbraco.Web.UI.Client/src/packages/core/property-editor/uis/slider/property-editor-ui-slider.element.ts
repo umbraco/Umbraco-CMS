@@ -1,7 +1,7 @@
 import { UmbInputSliderElement } from '../../../components/input-slider/input-slider.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
@@ -9,7 +9,7 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
  * @element umb-property-editor-ui-slider
  */
 @customElement('umb-property-editor-ui-slider')
-export class UmbPropertyEditorUISliderElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+export class UmbPropertyEditorUISliderElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Object })
 	value:
 		| {

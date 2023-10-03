@@ -1,6 +1,6 @@
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
@@ -8,7 +8,7 @@ import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/prope
  * @element umb-property-editor-ui-tree-picker
  */
 @customElement('umb-property-editor-ui-tree-picker')
-export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property()
 	value = '';
 

@@ -1,7 +1,7 @@
 import type { UmbInputNumberRangeElement } from '../../../components/input-number-range/input-number-range.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
@@ -16,7 +16,7 @@ type ValueType = {
  * @element umb-property-editor-ui-number-range
  */
 @customElement('umb-property-editor-ui-number-range')
-export class UmbPropertyEditorUINumberRangeElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+export class UmbPropertyEditorUINumberRangeElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Object })
 	private _value: ValueType = { min: undefined, max: undefined };
 	public get value() {

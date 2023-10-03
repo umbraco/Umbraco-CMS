@@ -1,6 +1,6 @@
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
@@ -8,7 +8,7 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
  * @element umb-property-editor-ui-image-cropper
  */
 @customElement('umb-property-editor-ui-image-cropper')
-export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property()
 	value = '';
 
