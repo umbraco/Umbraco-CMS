@@ -2,7 +2,6 @@ import { UmbModalConfig, UmbModalType } from './modal-manager.context.js';
 import { UmbModalToken } from './token/modal-token.js';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -33,8 +32,6 @@ type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
 
 // TODO: consider splitting this into two separate handlers
 export class UmbModalContextClass<ModalPreset extends object = object, ModalValue = unknown> extends EventTarget {
-	#host: UmbControllerHostElement;
-
 	#submitPromise: Promise<ModalValue>;
 	#submitResolver?: (value: ModalValue) => void;
 	#submitRejecter?: () => void;
@@ -49,12 +46,7 @@ export class UmbModalContextClass<ModalPreset extends object = object, ModalValu
 	#value = new UmbObjectState<ModalValue | undefined>(undefined);
 	public readonly value = this.#value.asObservable();
 
-	public get controllerAlias() {
-		return 'umbModalContext:' + this.key;
-	}
-
 	constructor(
-		host: UmbControllerHostElement,
 		router: IRouterSlot | null,
 		modalAlias: string | UmbModalToken<ModalPreset, ModalValue>,
 		data?: ModalPreset,

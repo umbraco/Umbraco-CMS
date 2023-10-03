@@ -41,13 +41,10 @@ export class UmbModalManagerContext {
 		config?: UmbModalConfig,
 		router: IRouterSlot | null = null,
 	) {
-		const modalContext = new UmbModalContextClass(
-			this.host,
-			router,
-			modalAlias,
-			data,
-			config,
-		) as unknown as UmbModalContext<ModalData, ModalValue>;
+		const modalContext = new UmbModalContextClass(router, modalAlias, data, config) as unknown as UmbModalContext<
+			ModalData,
+			ModalValue
+		>;
 
 		this.#modals.next(
 			appendToFrozenArray(this.#modals.getValue(), modalContext, (entry) => entry.key === modalContext.key),
