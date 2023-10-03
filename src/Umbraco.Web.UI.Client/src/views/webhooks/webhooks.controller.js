@@ -20,8 +20,6 @@
       return webhooksResource.getAllEvents()
         .then((data) => {
           vm.events = data.map(item => item.eventName);
-          console.log("logging vm.events")
-          console.log(vm.events)
         });
     }
 
@@ -108,7 +106,6 @@
           if(isCreating){
             webhooksResource.create(model.webhook)
               .then(() => {
-                console.log("Loading freaking webhooks")
                 loadWebhooks()
                 notificationsService.success('Webhook saved.');
                 editorService.close();

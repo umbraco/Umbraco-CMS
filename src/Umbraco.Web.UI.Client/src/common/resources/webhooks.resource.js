@@ -35,7 +35,13 @@
         $http.get(umbRequestHelper.getApiUrl('webhooksApiBaseUrl', 'GetEvents')),
         'Failed to get events'
       );
-    }
+    },
+    getLogs(skip, take) {
+      return umbRequestHelper.resourcePromise(
+        $http.get(umbRequestHelper.getApiUrl('webhooksApiBaseUrl', 'GetLogs', {skip, take})),
+        'Failed to get logs'
+      );
+    },
   };
 }
 angular.module('umbraco.resources').factory('webhooksResource', webhooksResource);
