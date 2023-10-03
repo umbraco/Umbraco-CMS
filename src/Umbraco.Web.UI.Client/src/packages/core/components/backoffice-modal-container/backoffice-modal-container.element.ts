@@ -66,7 +66,13 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-modal-container>
-				${this._modals.length > 0 ? repeat(this._modals, (modal) => this.#renderModal(modal.key)) : ''}
+				${this._modals.length > 0
+					? repeat(
+							this._modals,
+							(modal) => modal.key,
+							(modal) => this.#renderModal(modal.key),
+					  )
+					: ''}
 			</uui-modal-container>
 		`;
 	}
