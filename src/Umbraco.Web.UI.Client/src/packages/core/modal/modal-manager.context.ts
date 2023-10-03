@@ -49,8 +49,6 @@ export class UmbModalManagerContext {
 			config,
 		) as unknown as UmbModalContext<ModalData, ModalValue>;
 
-		modalContext.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalContext));
-
 		this.#modals.next(
 			appendToFrozenArray(this.#modals.getValue(), modalContext, (entry) => entry.key === modalContext.key),
 		);
@@ -70,19 +68,8 @@ export class UmbModalManagerContext {
 		}
 	}
 
-	#remove(key: string) {
+	public remove(key: string) {
 		this.#modals.next(this.#modals.getValue().filter((modal) => modal.key !== key));
-	}
-
-	/**
-	 * Handles the close-end event
-	 * @private
-	 * @param {UmbModalContext} modalContext
-	 * @memberof UmbModalManagerContext
-	 */
-	#onCloseEnd(modalContext: UmbModalContext<any, any>) {
-		modalContext.modalElement.removeEventListener('close-end', () => this.#onCloseEnd(modalContext));
-		this.#remove(modalContext.key);
 	}
 }
 
