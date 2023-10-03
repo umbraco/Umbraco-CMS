@@ -64,10 +64,13 @@
 
         function onInit() {
             vm.controlLabelTitle = null;
+            vm.controlAriaLabel = null;
             if (Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
                 userService.getCurrentUser().then(function (u) {
                     if (u.allowedSections.indexOf("settings") !== -1 ? true : false) {
                         vm.controlLabelTitle = vm.property.alias;
+                        // capitalize first letter of the alias for screen readers
+                        vm.controlAriaLabel = vm.property.alias.charAt(0).toUpperCase() + vm.property.alias.slice(1);
                     }
                 });
             }
