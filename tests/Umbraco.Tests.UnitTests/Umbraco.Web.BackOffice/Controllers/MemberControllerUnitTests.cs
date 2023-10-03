@@ -639,8 +639,7 @@ public class MemberControllerUnitTests
             new ConfigurationEditorJsonSerializer(),
             passwordChanger,
             scopeProvider,
-            twoFactorLoginService,
-            securitySettings);
+            twoFactorLoginService);
     }
 
     /// <summary>

@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.ContentApps;
@@ -78,7 +77,6 @@ public class MemberController : ContentControllerBase
     /// <param name="passwordChanger">The password changer</param>
     /// <param name="scopeProvider">The core scope provider</param>
     /// <param name="twoFactorLoginService">The two factor login service</param>
-    /// <param name="securitySettings"></param>
     [ActivatorUtilitiesConstructor]
     public MemberController(
         ICultureDictionary cultureDictionary,
@@ -96,8 +94,7 @@ public class MemberController : ContentControllerBase
         IJsonSerializer jsonSerializer,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         ICoreScopeProvider scopeProvider,
-        ITwoFactorLoginService twoFactorLoginService,
-        IOptions<SecuritySettings> securitySettings)
+        ITwoFactorLoginService twoFactorLoginService)
         : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, jsonSerializer)
     {
         _propertyEditors = propertyEditors;
@@ -113,7 +110,6 @@ public class MemberController : ContentControllerBase
         _passwordChanger = passwordChanger;
         _scopeProvider = scopeProvider;
         _twoFactorLoginService = twoFactorLoginService;
-        _securitySettings = securitySettings?.Value;
     }
 
     [Obsolete("Use constructor that also takes an ITwoFactorLoginService. Scheduled for removal in V13")]
@@ -149,8 +145,7 @@ public class MemberController : ContentControllerBase
               jsonSerializer,
               passwordChanger,
               scopeProvider,
-              StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>(),
-              StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+              StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
     {
     }
 
