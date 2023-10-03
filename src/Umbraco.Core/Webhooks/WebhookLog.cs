@@ -3,7 +3,11 @@
 public class WebhookLog
 {
     public int Id { get; set; }
+
     public Guid Key { get; set; }
+
+    public string Url { get; set; } = string.Empty;
+
     public string StatusCode { get; set; } = string.Empty;
 
     public DateTime Date { get; set; }

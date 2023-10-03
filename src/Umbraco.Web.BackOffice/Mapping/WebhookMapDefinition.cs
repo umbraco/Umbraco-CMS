@@ -48,5 +48,6 @@ public class WebhookMapDefinition : IMapDefinition
         target.ResponseBody = source.ResponseBody;
         target.RetryCount = source.RetryCount;
         target.StatusCode = source.StatusCode;
+        target.Url = source.Url;
     }
 }

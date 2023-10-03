@@ -16,6 +16,7 @@ internal static class WebhookLogFactory
             StatusCode = log.StatusCode,
             Key = log.Key,
             Id = log.Id,
+            Url = log.Url,
         };
 
     public static WebhookLog DtoToEntity(WebhookLogDto dto) =>
@@ -29,5 +30,6 @@ internal static class WebhookLogFactory
             StatusCode = dto.StatusCode,
             Key = dto.Key,
             Id = dto.Id,
+            Url = dto.Url
         };
 }

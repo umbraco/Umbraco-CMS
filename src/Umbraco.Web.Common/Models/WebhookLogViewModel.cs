@@ -17,6 +17,9 @@ public class WebhookLogViewModel
     [DataMember(Name = "eventName")]
     public string EventName { get; set; } = string.Empty;
 
+    [DataMember(Name = "url")]
+    public string Url { get; set; } = string.Empty;
+
     [DataMember(Name = "retryCount")]
     public int RetryCount { get; set; }
 

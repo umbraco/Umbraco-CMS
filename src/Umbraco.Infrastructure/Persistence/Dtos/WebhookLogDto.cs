@@ -25,6 +25,10 @@ internal class WebhookLogDto
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public DateTime Date { get; set; }
 
+    [Column(Name = "url")]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    public string Url { get; set; } = string.Empty;
+
     [Column(Name = "eventName")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string EventName { get; set; } = string.Empty;
