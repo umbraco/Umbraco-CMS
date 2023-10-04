@@ -139,7 +139,7 @@ stages:
 
               echo "Full version: $fullVersion"
 
-              echo "##vso[task.setvariable variable=fullVersion;itOutput=true]$fullVersion"
+              echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$fullVersion"
             displayName: Set major version
             name: determineMajorVersion
           - script: dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
