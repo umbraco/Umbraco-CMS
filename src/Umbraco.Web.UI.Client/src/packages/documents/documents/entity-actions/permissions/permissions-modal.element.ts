@@ -1,4 +1,5 @@
 import { UmbDocumentPermissionRepository } from '../../user-permissions/index.js';
+import { UmbDocumentRepository } from '../../repository/index.js';
 import { UmbUserGroupRepository } from '@umbraco-cms/backoffice/user-group';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -30,11 +31,15 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 	data?: UmbEntityUserPermissionSettingsModalData;
 
 	@state()
+	_entityItem?: any;
+
+	@state()
 	_userGroupRefs: Array<UmbUserGroupRefData> = [];
 
 	#userPermissions: Array<any> = [];
 	#userGroupRepository = new UmbUserGroupRepository(this);
 	#documentPermissionRepository = new UmbDocumentPermissionRepository(this);
+	#documentRepository = new UmbDocumentRepository(this);
 	#modalManagerContext?: UmbModalManagerContext;
 	#userGroupPickerModal?: UmbModalContext;
 
@@ -56,7 +61,18 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 
 	protected async firstUpdated(): Promise<void> {
 		if (!this.data?.unique) throw new Error('Could not load permissions, no unique was provided');
-		const { data } = await this.#documentPermissionRepository.requestPermissions(this.data.unique);
+		this.#getEntityItem(this.data.unique);
+		this.#getEntityPermissions(this.data.unique);
+	}
+
+	async #getEntityItem(unique: string) {
+		const { data } = await this.#documentRepository.requestItems([unique]);
+		if (!data) throw new Error('Could not load item');
+		this._entityItem = data[0];
+	}
+
+	async #getEntityPermissions(unique: string) {
+		const { data } = await this.#documentPermissionRepository.requestPermissions(unique);
 		if (data) {
 			this.#userPermissions = data;
 			this.#mapToUserGroupRefs();
@@ -105,7 +121,7 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-body-layout headline="Permissions">
+			<umb-body-layout headline="Permissions for ${this._entityItem?.name}">
 				<uui-box>
 					<uui-ref-list>
 						${this._userGroupRefs.map(
