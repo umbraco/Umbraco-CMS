@@ -138,7 +138,7 @@ stages:
               if [[ "$(Build.SourceBranch)" == "refs/heads/release/"* ]]; then
                   fullVersion="$(jq .version $(Build.SourcesDirectory)/version.json)"
               else
-                  fullVersion=${version//+/.}
+                  fullVersion=${version//+/.g}
               fi
 
               echo "Full version: $fullVersion"
