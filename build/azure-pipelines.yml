@@ -47,7 +47,7 @@ parameters:
     default: ' '
 
 variables:
-  nodeVersion: 18.16.0
+  nodeVersion: 18.18.0
   dotnetVersion: 8.x
   dotnetIncludePreviewVersions: true
   solution: umbraco.sln
