@@ -654,7 +654,7 @@ stages:
             inputs:
               versionSpec: $(nodeVersion)
           - task: npmAuthenticate@0
-            with:
+            inputs:
               workingFile: .npmrc
               customEndpoint: 'NPM - Umbraco Backoffice'
           - script: |
