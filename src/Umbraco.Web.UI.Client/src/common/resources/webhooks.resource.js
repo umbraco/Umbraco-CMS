@@ -41,7 +41,7 @@
         $http.get(umbRequestHelper.getApiUrl('webhooksApiBaseUrl', 'GetLogs', {skip, take})),
         'Failed to get logs'
       );
-    },
+    }
   };
 }
 angular.module('umbraco.resources').factory('webhooksResource', webhooksResource);
