@@ -8,7 +8,7 @@ public class WebhookFiringService : IWebhookFiringService
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IRetryService _retryService;
-    private readonly int _maxRetries = 3;
+    private readonly int _maxRetries = 5;
 
     public WebhookFiringService(IJsonSerializer jsonSerializer, IRetryService retryService)
     {
@@ -16,17 +16,18 @@ public class WebhookFiringService : IWebhookFiringService
         _retryService = retryService;
     }
 
-    public async Task<HttpResponseMessage> Fire(string url, string eventName, object? requestObject) => await _retryService.RetryAsync(
-        async () =>
-        {
-            using var httpClient = new HttpClient();
+    public async Task<WebhookResponseModel> Fire(string url, string eventName, object? requestObject) =>
+        await _retryService.RetryAsync(
+            async () =>
+            {
+                using var httpClient = new HttpClient();
 
-            var myContent = _jsonSerializer.Serialize(requestObject);
-            var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
-            var byteContent = new ByteArrayContent(buffer);
-            httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Umb-Webhook-Event", eventName);
+                var myContent = _jsonSerializer.Serialize(requestObject);
+                var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                var byteContent = new ByteArrayContent(buffer);
+                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Umb-Webhook-Event", eventName);
 
-            return await httpClient.PostAsync(url, byteContent);
-        },
-        _maxRetries);
+                return await httpClient.PostAsync(url, byteContent);
+            },
+            _maxRetries);
 }

@@ -1,16 +1,22 @@
-﻿using Umbraco.Cms.Core.Webhooks;
+﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Webhooks;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement;
 
 public class RetryService : IRetryService
 {
-    public async Task<HttpResponseMessage> RetryAsync(Func<Task<HttpResponseMessage>> action, int maxRetries = 3, TimeSpan? retryDelay = null)
+    public async Task<WebhookResponseModel> RetryAsync(Func<Task<HttpResponseMessage>> action, int maxRetries = 5, TimeSpan? retryDelay = null)
     {
         for (int retry = 0; retry < maxRetries; retry++)
         {
             try
             {
-                return await action();
+                HttpResponseMessage response = await action();
+                return new WebhookResponseModel
+                {
+                    RetryCount = retry,
+                    HttpResponseMessage = response,
+                };
             }
             catch (Exception ex)
             {
@@ -22,7 +28,11 @@ public class RetryService : IRetryService
             }
         }
 
-        return null!;
+        return new WebhookResponseModel
+        {
+            RetryCount = maxRetries,
+            HttpResponseMessage = null!,
+        };
         // TODO: Every retry failed, should we log some errors here, maybe the error in the catch?
     }
 }

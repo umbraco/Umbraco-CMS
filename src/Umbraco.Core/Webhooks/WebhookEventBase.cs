@@ -38,20 +38,20 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
                     continue;
                 }
 
-                HttpResponseMessage response = await _webhookFiringService.Fire(webhook.Url, EventName, entity);
+                WebhookResponseModel response = await _webhookFiringService.Fire(webhook.Url, EventName, entity);
 
                 var log = new WebhookLog
                 {
                     Date = DateTime.UtcNow,
                     EventName = EventName,
-                    RequestBody = await response.RequestMessage!.Content!.ReadAsStringAsync(cancellationToken),
-                    ResponseBody = await response.Content.ReadAsStringAsync(cancellationToken),
-                    StatusCode = response.StatusCode.ToString(),
-                    RetryCount = 0,
+                    RequestBody = await response.HttpResponseMessage.RequestMessage!.Content!.ReadAsStringAsync(cancellationToken),
+                    ResponseBody = await response.HttpResponseMessage.Content.ReadAsStringAsync(cancellationToken),
+                    StatusCode = response.HttpResponseMessage.StatusCode.ToString(),
+                    RetryCount = response.RetryCount,
                     Key = Guid.NewGuid(),
                     Url = webhook.Url,
-                    ResponseHeaders = response.Headers.ToString(),
-                    RequestHeaders = response.RequestMessage.Headers.ToString(),
+                    ResponseHeaders = response.HttpResponseMessage.Headers.ToString(),
+                    RequestHeaders = response.HttpResponseMessage.RequestMessage.Headers.ToString(),
                 };
                 await _webhookLogService.CreateAsync(log);
             }
