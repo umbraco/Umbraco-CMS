@@ -667,7 +667,7 @@ stages:
 
               echo "Publishing Backoffice package with tag $npmTag"
 
-              npm publish --tag $npmTag umbraco-cms-backoffice-latest.tgz
+              npm publish --tag $npmTag --access public umbraco-cms-backoffice-latest.tgz
             displayName: Publish Backoffice npm package
 
   - stage: Upload_API_Docs
