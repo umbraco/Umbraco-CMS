@@ -653,7 +653,7 @@ stages:
             displayName: Use Node.js $(nodeVersion)
             inputs:
               versionSpec: $(nodeVersion)
-          - use: npmAuthenticate@0
+          - task: npmAuthenticate@0
             with:
               workingFile: .npmrc
               customEndpoint: 'NPM - Umbraco Backoffice'
