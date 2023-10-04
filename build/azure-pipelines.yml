@@ -650,6 +650,7 @@ stages:
             displayName: Use Node.js $(nodeVersion)
             inputs:
               versionSpec: $(nodeVersion)
+          - script: touch $(Pipeline.Workspace)/backoffice_npm_pack/.npmrc
           - task: npmAuthenticate@0
             inputs:
               workingFile: $(Pipeline.Workspace)/backoffice_npm_pack/.npmrc
