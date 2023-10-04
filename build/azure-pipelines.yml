@@ -13,6 +13,10 @@ parameters:
     displayName: Deploy to NuGet
     type: boolean
     default: false
+  - name: npmDeploy
+    displayName: Deploy to Npm
+    type: boolean
+    default: false
   - name: buildApiDocs
     displayName: Build API docs
     type: boolean
