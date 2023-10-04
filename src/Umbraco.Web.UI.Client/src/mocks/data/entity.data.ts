@@ -8,6 +8,10 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 		super(data);
 	}
 
+	getAll() {
+		return this.data;
+	}
+
 	getList(skip: number, take: number) {
 		return this.data.slice(skip, skip + take);
 	}

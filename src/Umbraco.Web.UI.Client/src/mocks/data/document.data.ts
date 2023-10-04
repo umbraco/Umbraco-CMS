@@ -1,4 +1,5 @@
 import { umbDocumentTypeData } from './document-type.data.js';
+import { umbUserPermissionData } from './user-permission.data.js';
 import { UmbEntityData } from './entity.data.js';
 import { createDocumentTreeItem } from './utils.js';
 import {
@@ -10,6 +11,7 @@ import {
 	PagedDocumentTypeResponseModel,
 	PagedRecycleBinItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 
 export const data: Array<DocumentResponseModel> = [
 	{
@@ -672,6 +674,16 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 		const treeItems = items.map((item) => item);
 		const total = items.length;
 		return { items: treeItems, total };
+	}
+
+	// permissions
+
+	getUserPermissionsForDocument(id: string): Array<any> {
+		return umbUserPermissionData
+			.getAll()
+			.filter(
+				(permission) => permission.target.entityType === DOCUMENT_ENTITY_TYPE && permission.target.documentId === id,
+			);
 	}
 }
 
