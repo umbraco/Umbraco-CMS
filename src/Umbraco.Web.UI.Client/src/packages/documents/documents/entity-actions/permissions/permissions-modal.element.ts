@@ -30,15 +30,12 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 	data?: UmbEntityUserPermissionSettingsModalData;
 
 	@state()
-	_userGroups: Array<UmbUserGroupRefData> = [];
+	_userGroupRefs: Array<UmbUserGroupRefData> = [];
 
-	@state()
-	_userPermissions: Array<any> = [];
-
+	#userPermissions: Array<any> = [];
 	#userGroupRepository = new UmbUserGroupRepository(this);
 	#documentPermissionRepository = new UmbDocumentPermissionRepository(this);
 	#modalManagerContext?: UmbModalManagerContext;
-
 	#userGroupPickerModal?: UmbModalContext;
 
 	private _handleConfirm() {
@@ -61,19 +58,18 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 		if (!this.data?.unique) throw new Error('Could not load permissions, no unique was provided');
 		const { data } = await this.#documentPermissionRepository.requestPermissions(this.data.unique);
 		if (data) {
-			this._userPermissions = data;
+			this.#userPermissions = data;
+			this.#mapToUserGroupRefs();
 		}
 	}
 
-	async connectedCallback(): Promise<void> {
-		super.connectedCallback();
-
-		const userGroupIds = [...new Set(this._userPermissions.map((permission) => permission.target.userGroupId))];
+	async #mapToUserGroupRefs() {
+		const userGroupIds = [...new Set(this.#userPermissions.map((permission) => permission.target.userGroupId))];
 		const { data } = await this.#userGroupRepository.requestItems(userGroupIds);
 
 		const userGroups = data ?? [];
 
-		this._userGroups = this._userPermissions.map((entry) => {
+		this._userGroupRefs = this.#userPermissions.map((entry) => {
 			const userGroup = userGroups.find((userGroup) => userGroup.id == entry.target.userGroupId);
 			return {
 				id: entry.target.userGroupId,
@@ -112,7 +108,7 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 			<umb-body-layout headline="Permissions">
 				<uui-box>
 					<uui-ref-list>
-						${this._userGroups.map(
+						${this._userGroupRefs.map(
 							(userGroup) =>
 								html`<umb-user-group-ref
 									name=${ifDefined(userGroup.name)}
