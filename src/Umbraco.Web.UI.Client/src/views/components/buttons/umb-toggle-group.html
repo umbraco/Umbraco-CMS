@@ -4,10 +4,11 @@
                     checked="item.checked"
                     disabled="item.disabled"
                     input-id="{{item.inputId}}"
+                    aria-labelledby="{{item.labelId}}"
                     on-click="change(item)">
         </umb-toggle>
         <div class="umb-toggle-group-item__content" ng-click="change(item)">
-            <div><label for="{{item.inputId}}">{{ item.name }}</label> </div>
+            <div><label id="{{item.labelId}}" for="{{item.inputId}}">{{ item.name }}</label> </div>
             <div class="umb-toggle-group-item__description">{{ item.description }}</div>
         </div>
     </div>
