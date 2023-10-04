@@ -1830,7 +1830,9 @@ export default {
 		languagesHelp: 'Limit the languages users have access to edit',
 		allowAccessToAllLanguages: 'Allow access to all languages',
 		sectionsHelp: 'Add sections to give users access',
-		selectUserGroups: 'Select user groups',
+		selectUserGroup: (multiple: boolean) => {
+			return multiple ? 'Select User Groups' : 'Select User Group';
+		},
 		noStartNode: 'No start node selected',
 		noStartNodes: 'No start nodes selected',
 		startnode: 'Content start node',
