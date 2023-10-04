@@ -644,18 +644,15 @@ stages:
       - job:
         displayName: Push to NPM
         steps:
-          - checkout: none
-          - task: DownloadPipelineArtifact@2
-            displayName: Download Backoffice build artifacts
-            inputs:
-              artifact: backoffice_npm_pack
+          - download: current
+            artifact: backoffice_npm_pack
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
             inputs:
               versionSpec: $(nodeVersion)
           - task: npmAuthenticate@0
             inputs:
-              workingFile: .npmrc
+              workingFile: $(Pipeline.Workspace)/backoffice_npm_pack/.npmrc
               customEndpoint: 'NPM - Umbraco Backoffice'
           - script: |
               # Calculate npm tag based on SourceBranch
@@ -669,6 +666,7 @@ stages:
 
               npm publish --tag $npmTag --access public umbraco-cms-backoffice-latest.tgz
             displayName: Publish Backoffice npm package
+            workingDirectory: $(Pipeline.Workspace)/backoffice_npm_pack
 
   - stage: Upload_API_Docs
     pool:
