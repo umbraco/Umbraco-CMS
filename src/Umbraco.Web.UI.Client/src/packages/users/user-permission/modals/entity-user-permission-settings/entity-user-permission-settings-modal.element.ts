@@ -1,4 +1,4 @@
-import { html, customElement, property, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbEntityUserPermissionSettingsModalData,
@@ -13,14 +13,29 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {
 	@property({ attribute: false })
 	modalContext?: UmbModalContext<UmbEntityUserPermissionSettingsModalData, UmbEntityUserPermissionSettingsModalValue>;
 
+	#data?: UmbEntityUserPermissionSettingsModalData;
+
 	@property({ type: Object })
-	data?: UmbEntityUserPermissionSettingsModalData;
+	get data(): UmbEntityUserPermissionSettingsModalData | undefined {
+		return this.#data;
+	}
+	set data(data: UmbEntityUserPermissionSettingsModalData | undefined) {
+		this._entityType = data?.entityType;
+		this._allowedPermissions = data?.allowedPermissions ?? [];
+		this._headline = data?.headline ?? this._headline;
+	}
 
 	@state()
-	private _currentUserPermissionsForEntity: Array<string> = [];
+	_headline: string = 'Set permissions';
+
+	@state()
+	_entityType?: string;
+
+	@state()
+	_allowedPermissions: Array<string> = [];
 
 	private _handleConfirm() {
-		this.modalContext?.submit();
+		this.modalContext?.submit({ allowedPermissions: this._allowedPermissions });
 	}
 
 	private _handleCancel() {
@@ -29,18 +44,17 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {
 
 	#onSelectedUserPermission(event: UmbSelectionChangeEvent) {
 		const target = event.target as any;
-		const selection = target.selectedPermissions;
+		this._allowedPermissions = target.selectedPermissions;
 	}
 
 	render() {
 		return html`
-			<umb-body-layout headline="Permissions">
+			<umb-body-layout headline=${this._headline}>
 				<uui-box>
-					Permissions for ${this.data?.entityType} + Render name here
-					${this.data?.entityType
+					${this._entityType
 						? html` <umb-entity-user-permission-settings-list
-								.entityType=${this.data?.entityType}
-								.selectedPermissions=${this._currentUserPermissionsForEntity || []}
+								.entityType=${this._entityType}
+								.selectedPermissions=${this._allowedPermissions}
 								@selection-change=${this.#onSelectedUserPermission}></umb-entity-user-permission-settings-list>`
 						: nothing}
 				</uui-box>

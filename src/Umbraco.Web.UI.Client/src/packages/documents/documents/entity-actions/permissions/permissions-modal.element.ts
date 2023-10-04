@@ -110,9 +110,13 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 		if (!id) throw new Error('Could not open permissions modal, no id was provided');
 		if (!this.data?.entityType) throw new Error('Could not open permissions modal, no entity type was provided');
 
+		const userGroupRef = this._userGroupRefs.find((userGroup) => userGroup.id == id);
+
 		const modalContext = this.#modalManagerContext?.open(UMB_ENTITY_USER_PERMISSION_MODAL, {
 			unique: id,
 			entityType: this.data.entityType,
+			allowedPermissions: userGroupRef?.permissions || [],
+			headline: `Permissions for ${userGroupRef?.name}`,
 		});
 
 		modalContext?.onSubmit().then((value) => {
@@ -124,6 +128,7 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 		return html`
 			<umb-body-layout headline="Permissions for ${this._entityItem?.name}">
 				<uui-box>
+					Permissions set for User Groups for document: ${this.data?.entityType}:
 					<uui-ref-list>
 						${this._userGroupRefs.map(
 							(userGroup) =>
