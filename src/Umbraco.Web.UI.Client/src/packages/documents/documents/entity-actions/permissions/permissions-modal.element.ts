@@ -1,32 +1,79 @@
-import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbUserGroupRepository } from '@umbraco-cms/backoffice/user-group';
+import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UMB_ENTITY_USER_PERMISSION_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_USER_GROUP_PICKER_MODAL,
 	UmbEntityUserPermissionSettingsModalData,
-	UmbEntityUserPermissionSettingsModalResult,
+	UmbEntityUserPermissionSettingsModalValue,
 	UmbModalContext,
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UserGroupItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSelectedEvent } from '@umbraco-cms/backoffice/events';
+import { UmbId } from '@umbraco-cms/backoffice/id';
+import {
+	UMB_USER_PERMISSION_DOCUMENT_CREATE,
+	UMB_USER_PERMISSION_DOCUMENT_READ,
+} from '@umbraco-cms/backoffice/document';
+
+type UserPermissionModel<PermissionTargetType> = {
+	id: string;
+	target: PermissionTargetType;
+	permissions: Array<string>;
+};
+
+type DocumentGranularPermission = {
+	entityType: 'document';
+	documentId: string;
+	userGroupId: string;
+};
+
+type UmbUserGroupRefData = {
+	id: string;
+	name?: string;
+	icon?: string | null;
+	permissions: Array<string>;
+};
 
 @customElement('umb-permissions-modal')
 export class UmbPermissionsModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbEntityUserPermissionSettingsModalData, UmbEntityUserPermissionSettingsModalResult>;
+	modalContext?: UmbModalContext<UmbEntityUserPermissionSettingsModalData, UmbEntityUserPermissionSettingsModalValue>;
 
 	@property({ type: Object })
 	data?: UmbEntityUserPermissionSettingsModalData;
 
 	@state()
-	_userGroups: Array<UserGroupItemResponseModel> = [];
+	_userGroups: Array<UmbUserGroupRefData> = [];
 
-	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
+	@state()
+	_permissions: Array<UserPermissionModel<DocumentGranularPermission>> = [
+		{
+			id: new UmbId().toString(),
+			target: {
+				entityType: 'document',
+				documentId: '1234-1234-1234',
+				userGroupId: '9d24dc47-a4bf-427f-8a4a-b900f03b8a12',
+			},
+			permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE],
+		},
+		{
+			id: new UmbId().toString(),
+			target: {
+				entityType: 'document',
+				documentId: '1234-1234-1234',
+				userGroupId: 'f4626511-b0d7-4ab1-aebc-a87871a5dcfa',
+			},
+			permissions: [UMB_USER_PERMISSION_DOCUMENT_READ],
+		},
+	];
+
+	#userGroupRepository = new UmbUserGroupRepository(this);
 	#modalManagerContext?: UmbModalManagerContext;
+
+	#userGroupPickerModal?: UmbModalContext;
 
 	private _handleConfirm() {
 		this.modalContext?.submit();
@@ -44,20 +91,33 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 		});
 	}
 
+	async connectedCallback(): Promise<void> {
+		super.connectedCallback();
+
+		const userGroupIds = [...new Set(this._permissions.map((permission) => permission.target.userGroupId))];
+		const { data } = await this.#userGroupRepository.requestItems(userGroupIds);
+
+		const userGroups = data ?? [];
+
+		this._userGroups = this._permissions.map((entry) => {
+			const userGroup = userGroups.find((userGroup) => userGroup.id == entry.target.userGroupId);
+			return {
+				id: entry.target.userGroupId,
+				name: userGroup?.name,
+				icon: userGroup?.icon,
+				permissions: entry.permissions,
+			};
+		});
+	}
+
 	#openUserGroupPickerModal() {
 		if (!this.#modalManagerContext) return;
 
-		const modalContext = this.#modalManagerContext.open(UMB_USER_GROUP_PICKER_MODAL);
+		this.#userGroupPickerModal = this.#modalManagerContext.open(UMB_USER_GROUP_PICKER_MODAL);
 
-		modalContext.addEventListener(UmbSelectedEvent.TYPE, (event) => {
-			const selectedEvent = event as UmbSelectedEvent;
-			this.#openUserPermissionsModal(selectedEvent.unique);
-		});
-
-		modalContext?.onSubmit().then((result) => {
-			console.log(result);
-			debugger;
-		});
+		this.#userGroupPickerModal.addEventListener(UmbSelectedEvent.TYPE, (event) =>
+			this.#openUserPermissionsModal((event as UmbSelectedEvent).unique),
+		);
 	}
 
 	#openUserPermissionsModal(id: string) {
@@ -65,33 +125,31 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 
 		const modalContext = this.#modalManagerContext?.open(UMB_ENTITY_USER_PERMISSION_MODAL, {
 			unique: id,
-			entityType: ['user-group'],
+			entityType: ['document'],
 		});
 
-		modalContext?.onSubmit().then((result) => {
-			console.log(result);
-			debugger;
+		modalContext?.onSubmit().then((value) => {
+			console.log(value);
 		});
-	}
-
-	async firstUpdated() {
-		const { data } = await this.#userGroupCollectionRepository.requestCollection();
-
-		if (data) {
-			this._userGroups = data.items;
-		}
 	}
 
 	render() {
 		return html`
 			<umb-body-layout headline="Permissions">
 				<uui-box>
-					<uui-button @click=${this.#openUserGroupPickerModal} look="placeholder">Open</uui-button>
+					<uui-ref-list>
+						${this._userGroups.map(
+							(userGroup) =>
+								html`<umb-user-group-ref
+									name=${ifDefined(userGroup.name)}
+									.userPermissionAliases=${userGroup.permissions}
+									border>
+									<uui-icon slot="icon" .icon=${userGroup.icon}></uui-icon>
+								</umb-user-group-ref>`,
+						)}
+					</uui-ref-list>
+					<uui-button style="width: 100%;" @click=${this.#openUserGroupPickerModal} look="placeholder">Open</uui-button>
 				</uui-box>
-
-				<ul>
-					${this._userGroups.map((group) => html`<li>${group}</li>`)}
-				</ul>
 
 				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._handleCancel}">Cancel</uui-button>
 				<uui-button
