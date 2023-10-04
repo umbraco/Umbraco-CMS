@@ -50,6 +50,8 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
                     RetryCount = 0,
                     Key = Guid.NewGuid(),
                     Url = webhook.Url,
+                    ResponseHeaders = response.Headers.ToString(),
+                    RequestHeaders = response.RequestMessage.Headers.ToString(),
                 };
                 await _webhookLogService.CreateAsync(log);
             }

@@ -1,0 +1,39 @@
+﻿<div class="headless-webhook-log-entry-details-overlay" style="margin-top: 20px;">
+  <div class="control-group">
+    <div class="flex items-center">
+      <div class="flx-g0 flx-s0" style="flex-basis: 40px;">
+        <umb-checkmark checked="true" size="m" style="cursor: default"></umb-checkmark>
+        <i class="icon-wrong umb-checkmark umb-checkmark--m" style="cursor: default;" ng-if="model.webhookLogEntry.response.isSuccess === false"></i>
+      </div>
+      <div class="flx-g1 flx-s1 flx-b2" ng-if="model.webhookLogEntry.responseStatus.description || model.webhookLogEntry.response.statusCode">{{model.webhookLogEntry.response.statusDescription}} ({{model.webhookLogEntry.response.statusCode}})</div>
+    </div>
+  </div>
+  <div class="control-group">
+    <span class="bold">Date</span>
+    <div class="controls controls-row">{{model.log.date}}</div>
+  </div>
+  <div class="control-group">
+    <span class="bold">Url</span>
+    <div class="controls controls-row">{{model.log.url}}</div>
+  </div>
+  <div class="control-group">
+    <span class="bold">Event</span>
+    <div class="controls controls-row">{{model.log.eventName}}</div>
+  </div>
+  <div class="control-group">
+    <span class="bold">Retry count</span>
+    <div class="controls controls-row">{{model.log.retryCount}}</div>
+  </div>
+  <div class="control-group">
+    <span class="bold">Request</span>
+    <pre>{{model.log.requestHeaders}}
+---
+{{model.log.requestBody}}</pre>
+  </div>
+  <div class="control-group">
+    <span class="bold">Response</span>
+    <pre>{{model.log.responseHeaders}}
+---
+{{model.log.responseBody}}</pre>
+  </div>
+</div>

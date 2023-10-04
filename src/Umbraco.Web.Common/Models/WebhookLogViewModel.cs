@@ -23,8 +23,14 @@ public class WebhookLogViewModel
     [DataMember(Name = "retryCount")]
     public int RetryCount { get; set; }
 
+    [DataMember(Name = "requestHeaders")]
+    public string RequestHeaders { get; set; } = string.Empty;
+
     [DataMember(Name = "requestBody")]
     public string RequestBody { get; set; } = string.Empty;
+
+    [DataMember(Name = "responseHeaders")]
+    public string ResponseHeaders { get; set; } = string.Empty;
 
     [DataMember(Name = "responseBody")]
     public string ResponseBody { get; set; } = string.Empty;

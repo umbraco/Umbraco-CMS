@@ -16,7 +16,11 @@ public class WebhookLog
 
     public int RetryCount { get; set; }
 
+    public string RequestHeaders { get; set; } = string.Empty;
+
     public string RequestBody { get; set; } = string.Empty;
+
+    public string ResponseHeaders { get; set; } = string.Empty;
 
     public string ResponseBody { get; set; } = string.Empty;
 }

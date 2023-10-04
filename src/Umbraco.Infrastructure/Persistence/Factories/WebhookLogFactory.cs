@@ -17,6 +17,8 @@ internal static class WebhookLogFactory
             Key = log.Key,
             Id = log.Id,
             Url = log.Url,
+            RequestHeaders = log.RequestHeaders,
+            ResponseHeaders = log.ResponseHeaders,
         };
 
     public static WebhookLog DtoToEntity(WebhookLogDto dto) =>
@@ -30,6 +32,8 @@ internal static class WebhookLogFactory
             StatusCode = dto.StatusCode,
             Key = dto.Key,
             Id = dto.Id,
-            Url = dto.Url
+            Url = dto.Url,
+            RequestHeaders = dto.RequestHeaders,
+            ResponseHeaders = dto.ResponseHeaders,
         };
 }

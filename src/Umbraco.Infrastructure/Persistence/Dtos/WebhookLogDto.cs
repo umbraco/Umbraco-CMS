@@ -37,9 +37,17 @@ internal class WebhookLogDto
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public int RetryCount { get; set; }
 
+    [Column(Name = "requestHeaders")]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    public string RequestHeaders { get; set; } = string.Empty;
+
     [Column(Name = "requestBody")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string RequestBody { get; set; } = string.Empty;
+
+    [Column(Name = "responseHeaders")]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    public string ResponseHeaders { get; set; } = string.Empty;
 
     [Column(Name = "responseBody")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
