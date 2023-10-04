@@ -2,7 +2,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbEntityUserPermissionSettingsModalData {
 	unique: string;
-	entityType: Array<string>;
+	entityType: string;
 }
 
 export type UmbEntityUserPermissionSettingsModalValue = undefined;

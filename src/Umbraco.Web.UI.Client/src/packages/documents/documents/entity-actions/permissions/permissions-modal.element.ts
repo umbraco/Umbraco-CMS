@@ -108,10 +108,11 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 
 	#openUserPermissionsModal(id: string) {
 		if (!id) throw new Error('Could not open permissions modal, no id was provided');
+		if (!this.data?.entityType) throw new Error('Could not open permissions modal, no entity type was provided');
 
 		const modalContext = this.#modalManagerContext?.open(UMB_ENTITY_USER_PERMISSION_MODAL, {
 			unique: id,
-			entityType: ['document'],
+			entityType: this.data.entityType,
 		});
 
 		modalContext?.onSubmit().then((value) => {

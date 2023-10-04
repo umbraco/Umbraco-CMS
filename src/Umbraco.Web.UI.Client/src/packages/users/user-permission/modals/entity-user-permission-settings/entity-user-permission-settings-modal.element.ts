@@ -1,13 +1,4 @@
-import {
-	html,
-	customElement,
-	property,
-	state,
-	css,
-	ifDefined,
-	nothing,
-	PropertyValueMap,
-} from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbEntityUserPermissionSettingsModalData,
@@ -15,8 +6,6 @@ import {
 	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { ManifestUserPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/events';
 
 @customElement('umb-entity-user-permission-settings-modal')
