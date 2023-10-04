@@ -130,11 +130,11 @@ stages:
 
               # Get the full version without the build metadata
               # If the branch is a release branch, the version will be lifted from the version.json file
-              # or else it will be the build number minus the build metadata
+              # or else it will be the build number converted to proper characters
               if [[ "$(Build.SourceBranch)" == "refs/heads/release/"* ]]; then
                   fullVersion="$(jq .version $(Build.SourcesDirectory)/version.json)"
               else
-                  fullVersion="$(echo $version | cut -d '+' -f 1)"
+                  fullVersion=${version//+/.}
               fi
 
               echo "Full version: $fullVersion"
