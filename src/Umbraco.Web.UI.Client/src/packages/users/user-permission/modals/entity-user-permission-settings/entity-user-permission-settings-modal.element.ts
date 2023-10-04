@@ -11,7 +11,7 @@ import {
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbEntityUserPermissionSettingsModalData,
-	UmbEntityUserPermissionSettingsModalResult,
+	UmbEntityUserPermissionSettingsModalValue,
 	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -22,7 +22,7 @@ import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/events';
 @customElement('umb-entity-user-permission-settings-modal')
 export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbEntityUserPermissionSettingsModalData, UmbEntityUserPermissionSettingsModalResult>;
+	modalContext?: UmbModalContext<UmbEntityUserPermissionSettingsModalData, UmbEntityUserPermissionSettingsModalValue>;
 
 	@property({ type: Object })
 	data?: UmbEntityUserPermissionSettingsModalData;

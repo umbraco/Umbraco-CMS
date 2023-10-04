@@ -5,9 +5,9 @@ export interface UmbPermissionsModalData {
 	entityType: string;
 }
 
-export type UmbPermissionsModalResult = undefined;
+export type UmbPermissionsModalValue = undefined;
 
-export const UMB_PERMISSIONS_MODAL = new UmbModalToken<UmbPermissionsModalData, UmbPermissionsModalResult>(
+export const UMB_PERMISSIONS_MODAL = new UmbModalToken<UmbPermissionsModalData, UmbPermissionsModalValue>(
 	'Umb.Modal.Permissions',
 	{
 		type: 'sidebar',

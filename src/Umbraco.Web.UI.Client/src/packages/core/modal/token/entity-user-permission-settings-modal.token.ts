@@ -5,11 +5,11 @@ export interface UmbEntityUserPermissionSettingsModalData {
 	entityType: Array<string>;
 }
 
-export type UmbEntityUserPermissionSettingsModalResult = undefined;
+export type UmbEntityUserPermissionSettingsModalValue = undefined;
 
 export const UMB_ENTITY_USER_PERMISSION_MODAL = new UmbModalToken<
 	UmbEntityUserPermissionSettingsModalData,
-	UmbEntityUserPermissionSettingsModalResult
+	UmbEntityUserPermissionSettingsModalValue
 >('Umb.Modal.EntityUserPermissionSettings', {
 	type: 'sidebar',
 });
