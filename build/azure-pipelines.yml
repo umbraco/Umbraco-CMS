@@ -157,12 +157,13 @@ stages:
           - script: |
               npm version $(determineMajorVersion.fullVersion) --allow-same-version --no-git-tag-version
               npm pack
+              mv umbraco-cms-backoffice-$(determineMajorVersion.fullVersion).tgz umbraco-cms-backoffice-latest.tgz
             displayName: Set version on Backoffice npm package
             workingDirectory: src/Umbraco.Web.UI.New.Client
           - task: PublishPipelineArtifact@1
             displayName: Publish Backoffice NPM Artifact
             inputs:
-              targetPath: src/Umbraco.Web.UI.New.Client/umbraco-cms-backoffice-$(determineMajorVersion.fullVersion).tgz
+              targetPath: src/Umbraco.Web.UI.New.Client/umbraco-cms-backoffice-latest.tgz
               artifactName: backoffice_npm_pack
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
