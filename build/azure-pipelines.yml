@@ -646,6 +646,7 @@ stages:
       - job:
         displayName: Push to NPM
         steps:
+          - checkout: none
           - download: current
             artifact: backoffice_npm_pack
           - task: NodeTool@0
