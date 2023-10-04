@@ -157,13 +157,15 @@ stages:
           - script: |
               npm version $(determineMajorVersion.fullVersion) --allow-same-version --no-git-tag-version
               npm pack
-              mv umbraco-cms-backoffice-$(determineMajorVersion.fullVersion).tgz umbraco-cms-backoffice-latest.tgz
+              mkdir publish
+              mv umbraco-cms-backoffice-$(determineMajorVersion.fullVersion).tgz publish/umbraco-cms-backoffice-latest.tgz
+              mv .npmrc publish/
             displayName: Set version on Backoffice npm package
             workingDirectory: src/Umbraco.Web.UI.New.Client
           - task: PublishPipelineArtifact@1
             displayName: Publish Backoffice NPM Artifact
             inputs:
-              targetPath: src/Umbraco.Web.UI.New.Client/umbraco-cms-backoffice-latest.tgz
+              targetPath: src/Umbraco.Web.UI.New.Client/publish
               artifactName: backoffice_npm_pack
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
@@ -650,7 +652,6 @@ stages:
             displayName: Use Node.js $(nodeVersion)
             inputs:
               versionSpec: $(nodeVersion)
-          - script: touch $(Pipeline.Workspace)/backoffice_npm_pack/.npmrc
           - task: npmAuthenticate@0
             inputs:
               workingFile: $(Pipeline.Workspace)/backoffice_npm_pack/.npmrc
@@ -663,7 +664,7 @@ stages:
                   npmTag=next
               fi
 
-              echo "Publishing Backoffice package with tag $npmTag"
+              echo "Publishing Backoffice package with tag '$npmTag'"
 
               npm publish --tag $npmTag --access public umbraco-cms-backoffice-latest.tgz
             displayName: Publish Backoffice npm package
