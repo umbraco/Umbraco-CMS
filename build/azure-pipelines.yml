@@ -96,7 +96,7 @@ stages:
               targets: coreBuild
               workingDirectory: src/Umbraco.Web.UI.Client
           - script: npm ci --no-fund --no-audit --prefer-offline
-            workingDirectory:  src/Umbraco.Web.UI.New.Client
+            workingDirectory: src/Umbraco.Web.UI.New.Client
             displayName: Run npm ci
           - script: npm run build:for:cms
             displayName: Run New Backoffice Build
