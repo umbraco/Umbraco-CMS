@@ -86,15 +86,15 @@ stages:
                 "npm_client" | "$(Agent.OS)"
                 "npm_client"
               path: $(npm_config_cache)
-#          - script: npm ci --no-fund --no-audit --prefer-offline
-#            workingDirectory:  src/Umbraco.Web.UI.Client
-#            displayName: Run npm ci
-#          - task: gulp@0
-#            displayName: Run gulp build
-#            inputs:
-#              gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
-#              targets: coreBuild
-#              workingDirectory: src/Umbraco.Web.UI.Client
+          - script: npm ci --no-fund --no-audit --prefer-offline
+            workingDirectory:  src/Umbraco.Web.UI.Client
+            displayName: Run npm ci
+          - task: gulp@0
+            displayName: Run gulp build
+            inputs:
+              gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
+              targets: coreBuild
+              workingDirectory: src/Umbraco.Web.UI.Client
           - script: npm ci --no-fund --no-audit --prefer-offline
             workingDirectory: src/Umbraco.Web.UI.New.Client
             displayName: Run npm ci
