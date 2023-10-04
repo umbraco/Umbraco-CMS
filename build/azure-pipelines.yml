@@ -127,6 +127,19 @@ stages:
               echo "Major version: $major"
 
               echo "##vso[task.setvariable variable=majorVersion;isOutput=true]$major"
+
+              # Get the full version without the build metadata
+              # If the branch is a release branch, the version will be lifted from the version.json file
+              # or else it will be the build number minus the build metadata
+              if [[ "$(Build.SourceBranch)" == "refs/heads/release/"* ]]; then
+                  fullVersion="$(jq .version $(Build.SourcesDirectory)/version.json)"
+              else
+                  fullVersion="$(echo $version | cut -d '+' -f 1)"
+              fi
+
+              echo "Full version: $fullVersion"
+
+              echo "##vso[task.setvariable variable=fullVersion;itOutput=true]$fullVersion"
             displayName: Set major version
             name: determineMajorVersion
           - script: dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
@@ -138,14 +151,14 @@ stages:
               echo "##vso[build.updatebuildnumber]$buildnumber"
             displayName: Update build number
           - script: |
-              npm version $(Build.BuildNumber) --allow-same-version --no-git-tag-version
+              npm version $(determineMajorVersion.fullVersion) --allow-same-version --no-git-tag-version
               npm pack
             displayName: Set version on Backoffice npm package
             workingDirectory: src/Umbraco.Web.UI.New.Client
           - task: PublishPipelineArtifact@1
             displayName: Publish Backoffice NPM Artifact
             inputs:
-              targetPath: src/Umbraco.Web.UI.New.Client/umbraco-cms-backoffice-$(Build.BuildNumber).tgz
+              targetPath: src/Umbraco.Web.UI.New.Client/umbraco-cms-backoffice-$(determineMajorVersion.fullVersion).tgz
               artifactName: backoffice_npm_pack
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
