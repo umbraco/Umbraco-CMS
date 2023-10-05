@@ -638,9 +638,8 @@ stages:
   - stage: Deploy_Npm
     displayName: NPM release
     dependsOn:
-      - Build
-      # - Deploy_MyGet
-      # - Build_Docs
+      - Deploy_MyGet
+      - Build_Docs
     condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.npmDeploy}}))
     jobs:
       - job:
