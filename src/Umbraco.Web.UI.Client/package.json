@@ -90,7 +90,7 @@
     "less": "4.1.3",
     "lodash": "4.17.21",
     "merge-stream": "2.0.0",
-    "postcss": "8.4.24",
+    "postcss": "8.4.31",
     "run-sequence": "2.2.1"
   }
 }
