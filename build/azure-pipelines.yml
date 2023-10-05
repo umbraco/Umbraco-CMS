@@ -167,16 +167,16 @@ stages:
             inputs:
               targetPath: src/Umbraco.Web.UI.New.Client/publish
               artifactName: backoffice_npm_pack
-          # - task: PublishPipelineArtifact@1
-          #   displayName: Publish nupkg
-          #   inputs:
-          #     targetPath: $(Build.ArtifactStagingDirectory)/nupkg
-          #     artifactName: nupkg
-          # - task: PublishPipelineArtifact@1
-          #   displayName: Publish build artifacts
-          #   inputs:
-          #     targetPath: $(Build.SourcesDirectory)
-          #     artifactName: build_output
+          - task: PublishPipelineArtifact@1
+            displayName: Publish nupkg
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/nupkg
+              artifactName: nupkg
+          - task: PublishPipelineArtifact@1
+            displayName: Publish build artifacts
+            inputs:
+              targetPath: $(Build.SourcesDirectory)
+              artifactName: build_output
 
   - stage: Build_Docs
     condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.buildApiDocs}}))
