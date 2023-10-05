@@ -29,7 +29,7 @@
             }
         });
 
-    function MediaPicker3Controller($scope, $element, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs, umbRequestHelper, $injector, uploadTracker, editorState) {
+    function MediaPicker3Controller($scope, $element, $timeout, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs, umbRequestHelper, $injector, uploadTracker, editorState) {
 
         const mediaUploader = $injector.instantiate(Utilities.MediaUploader);
         let uploadInProgress = false;
@@ -179,8 +179,10 @@
                 vm.allowAdd = hasAccessToMedia;
 
                 mediaUploader.init(uploaderOptions).then(() => {
-                    vm.loading = false;
-                });
+                    $timeout(function () {
+                      vm.loading = false;
+                    });
+                 });
             });
         };
 
