@@ -653,10 +653,6 @@ stages:
             displayName: Use Node.js $(nodeVersion)
             inputs:
               versionSpec: $(nodeVersion)
-          - task: npmAuthenticate@0
-            inputs:
-              workingFile: $(Pipeline.Workspace)/backoffice_npm_pack/.npmrc
-              customEndpoint: 'NPM - Umbraco Backoffice'
           - script: |
               # Calculate npm tag based on SourceBranch
               if [[ "$(Build.SourceBranch)" == "refs/heads/release/"* ]]; then
@@ -667,9 +663,14 @@ stages:
 
               echo "Publishing Backoffice package with tag '$npmTag'"
 
-              npm publish --tag $npmTag --access public umbraco-cms-backoffice-latest.tgz
-            displayName: Publish Backoffice npm package
-            workingDirectory: $(Pipeline.Workspace)/backoffice_npm_pack
+              echo "##vso[task.setvariable variable=npmTag]$npmTag"
+            displayName: Set npm tag
+          - task: Npm@1
+            inputs:
+              command: 'custom'
+              customCommand: 'publish --tag $(npmTag) --access public umbraco-cms-backoffice-latest.tgz'
+              workingDir: $(Pipeline.Workspace)/backoffice_npm_pack
+              publishEndpoint: 'NPM - Umbraco Backoffice'
 
   - stage: Upload_API_Docs
     pool:
