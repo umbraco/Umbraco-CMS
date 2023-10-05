@@ -668,7 +668,6 @@ stages:
               echo "Testing npm is authenticated"
               npm whoami
             displayName: npm whoami
-            failOnStderr: true
             workingDirectory: $(Pipeline.Workspace)/backoffice_npm_pack
           - script: |
               # Calculate npm tag based on SourceBranch
@@ -682,7 +681,6 @@ stages:
 
               npm publish --tag $npmTag umbraco-cms-backoffice-latest.tgz
             displayName: Publish npm
-            failOnStderr: true
             workingDirectory: $(Pipeline.Workspace)/backoffice_npm_pack
 
   - stage: Upload_API_Docs
