@@ -86,43 +86,43 @@ stages:
                 "npm_client" | "$(Agent.OS)"
                 "npm_client"
               path: $(npm_config_cache)
-          - script: npm ci --no-fund --no-audit --prefer-offline
-            workingDirectory:  src/Umbraco.Web.UI.Client
-            displayName: Run npm ci
-          - task: gulp@0
-            displayName: Run gulp build
-            inputs:
-              gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
-              targets: coreBuild
-              workingDirectory: src/Umbraco.Web.UI.Client
+          # - script: npm ci --no-fund --no-audit --prefer-offline
+          #   workingDirectory:  src/Umbraco.Web.UI.Client
+          #   displayName: Run npm ci
+          # - task: gulp@0
+          #   displayName: Run gulp build
+          #   inputs:
+          #     gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
+          #     targets: coreBuild
+          #     workingDirectory: src/Umbraco.Web.UI.Client
           - script: npm ci --no-fund --no-audit --prefer-offline
             workingDirectory: src/Umbraco.Web.UI.New.Client
             displayName: Run npm ci
-          - script: npm run build:for:cms
-            displayName: Run New Backoffice Build
-            workingDirectory: src/Umbraco.Web.UI.New.Client
+          # - script: npm run build:for:cms
+          #   displayName: Run New Backoffice Build
+          #   workingDirectory: src/Umbraco.Web.UI.New.Client
           - script: npm run build:for:npm
             displayName: Run New Backoffice Build (NPM)
             workingDirectory: src/Umbraco.Web.UI.New.Client
-          - script: npm run build
-            displayName: Run Login Build
-            workingDirectory: src/Umbraco.Web.UI.New.Client/apps/auth
-          - task: UseDotNet@2
-            displayName: Use .NET $(dotnetVersion)
-            inputs:
-              version: $(dotnetVersion)
-              includePreviewVersions: $(dotnetIncludePreviewVersions)
-          - task: DotNetCoreCLI@2
-            displayName: Run dotnet restore
-            inputs:
-              command: restore
-              projects: $(solution)
-          - task: DotNetCoreCLI@2
-            displayName: Run dotnet build
-            inputs:
-              command: build
-              projects: $(solution)
-              arguments: '--configuration $(buildConfiguration) --no-restore -p:ContinuousIntegrationBuild=true'
+          # - script: npm run build
+          #   displayName: Run Login Build
+          #   workingDirectory: src/Umbraco.Web.UI.New.Client/apps/auth
+          # - task: UseDotNet@2
+          #   displayName: Use .NET $(dotnetVersion)
+          #   inputs:
+          #     version: $(dotnetVersion)
+          #     includePreviewVersions: $(dotnetIncludePreviewVersions)
+          # - task: DotNetCoreCLI@2
+          #   displayName: Run dotnet restore
+          #   inputs:
+          #     command: restore
+          #     projects: $(solution)
+          # - task: DotNetCoreCLI@2
+          #   displayName: Run dotnet build
+          #   inputs:
+          #     command: build
+          #     projects: $(solution)
+          #     arguments: '--configuration $(buildConfiguration) --no-restore -p:ContinuousIntegrationBuild=true'
           - script: |
               version="$(Build.BuildNumber)"
               echo "Version: $version"
@@ -146,8 +146,8 @@ stages:
               echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$fullVersion"
             displayName: Set major version
             name: determineMajorVersion
-          - script: dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
-            displayName: Run dotnet pack
+          # - script: dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
+          #   displayName: Run dotnet pack
           - script: |
               sha="$(Build.SourceVersion)"
               sha=${sha:0:7}
@@ -167,16 +167,16 @@ stages:
             inputs:
               targetPath: src/Umbraco.Web.UI.New.Client/publish
               artifactName: backoffice_npm_pack
-          - task: PublishPipelineArtifact@1
-            displayName: Publish nupkg
-            inputs:
-              targetPath: $(Build.ArtifactStagingDirectory)/nupkg
-              artifactName: nupkg
-          - task: PublishPipelineArtifact@1
-            displayName: Publish build artifacts
-            inputs:
-              targetPath: $(Build.SourcesDirectory)
-              artifactName: build_output
+          # - task: PublishPipelineArtifact@1
+          #   displayName: Publish nupkg
+          #   inputs:
+          #     targetPath: $(Build.ArtifactStagingDirectory)/nupkg
+          #     artifactName: nupkg
+          # - task: PublishPipelineArtifact@1
+          #   displayName: Publish build artifacts
+          #   inputs:
+          #     targetPath: $(Build.SourcesDirectory)
+          #     artifactName: build_output
 
   - stage: Build_Docs
     condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.buildApiDocs}}))
