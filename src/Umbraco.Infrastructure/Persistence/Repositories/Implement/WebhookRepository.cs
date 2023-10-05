@@ -64,7 +64,7 @@ public class WebhookRepository : IWebhookRepository
     public async Task<PagedModel<Webhook>> GetByEventNameAsync(string eventName)
     {
         Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
-            .Select<WebhookDto>()
+            .SelectAll()
             .From<WebhookDto>()
             .InnerJoin<Event2WebhookDto>()
             .On<WebhookDto, Event2WebhookDto>(left => left.Id, right => right.WebhookId)
