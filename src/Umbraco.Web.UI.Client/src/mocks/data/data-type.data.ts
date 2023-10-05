@@ -269,7 +269,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		propertyEditorUiAlias: 'Umb.PropertyEditorUi.Email',
 		values: [
 			{
-				alias: 'inputType',
+				alias: 'inputMode',
 				value: 'email',
 			},
 		],
