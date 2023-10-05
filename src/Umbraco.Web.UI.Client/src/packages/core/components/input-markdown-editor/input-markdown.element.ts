@@ -8,6 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  * @element umb-input-markdown
  * @fires change - when the value of the input changes
  */
+
 @customElement('umb-input-markdown')
 export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	protected getFormElement() {
@@ -31,6 +32,11 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
+			this._codeEditor?.editor?.updateOptions({
+				lineNumbers: false,
+				minimap: false,
+				folding: false,
+			});
 			this.#isCodeEditorReady.next(true);
 		} catch (error) {
 			console.error(error);

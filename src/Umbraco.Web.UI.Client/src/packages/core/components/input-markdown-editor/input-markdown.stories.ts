@@ -10,8 +10,4 @@ const meta: Meta<UmbInputMarkdownElement> = {
 export default meta;
 type Story = StoryObj<UmbInputMarkdownElement>;
 
-export const Overview: Story = {
-	args: {
-		value: 'markdown',
-	},
-};
+export const Overview: Story = {};
