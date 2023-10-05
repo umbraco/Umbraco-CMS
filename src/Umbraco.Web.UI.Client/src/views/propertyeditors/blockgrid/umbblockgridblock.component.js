@@ -29,7 +29,7 @@
         }
     );
 
-    function BlockGridBlockController($scope, $compile, $element, $sce) {
+    function BlockGridBlockController($scope, $compile, $element) {
         var model = this;
 
         model.$onInit = function () {
@@ -45,7 +45,6 @@
             $scope.index = model.index;
             $scope.parentForm = model.parentForm;
             $scope.valFormManager = model.valFormManager;
-            $scope.sce = $sce;
 
             var shadowRoot = $element[0].attachShadow({ mode: 'open' });
             shadowRoot.innerHTML = 
