@@ -658,11 +658,18 @@ stages:
             inputs:
               workingFile: $(Pipeline.Workspace)/backoffice_npm_pack/.npmrc
               customEndpoint: 'NPM - Umbraco Backoffice'
-          - task: PublishPipelineArtifact@1
-            inputs:
-              targetPath: '$(Pipeline.Workspace)/backoffice_npm_pack'
-              artifact: 'npm_published'
-              publishLocation: 'pipeline'
+          - script: |
+              # Setup temp npm project to load in defaults from the local .npmrc
+              npm init -y
+
+              echo "Npm config"
+              npm config ls -l
+
+              echo "Testing npm is authenticated"
+              npm whoami
+            displayName: npm whoami
+            failOnStderr: true
+            workingDirectory: $(Pipeline.Workspace)/backoffice_npm_pack
           - script: |
               # Calculate npm tag based on SourceBranch
               if [[ "$(Build.SourceBranch)" == "refs/heads/release/"* ]]; then
@@ -673,10 +680,9 @@ stages:
 
               echo "Publishing Backoffice package with tag '$npmTag'"
 
-              echo "##vso[task.setvariable variable=npmTag]$npmTag"
-
-              npm publish --tag $npmTag --access public umbraco-cms-backoffice-latest.tgz
+              npm publish --tag $npmTag umbraco-cms-backoffice-latest.tgz
             displayName: Publish npm
+            failOnStderr: true
             workingDirectory: $(Pipeline.Workspace)/backoffice_npm_pack
 
   - stage: Upload_API_Docs
