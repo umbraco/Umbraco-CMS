@@ -114,7 +114,7 @@ export class UmbDictionaryDetailServerDataSource
 		// TODO => parentId will be a guid param once #13786 is merged and API regenerated
 		return await tryExecuteAndNotify(
 			this.#host,
-			DictionaryResource.postDictionaryImport({ requestBody: { temporaryFileId, parentId } })
+			DictionaryResource.postDictionaryImport({ requestBody: { temporaryFileId, parentId } }),
 		);
 	}
 
@@ -129,7 +129,7 @@ export class UmbDictionaryDetailServerDataSource
 			this.#host,
 			DictionaryResource.postDictionaryImport({
 				requestBody: formData,
-			})
+			}),
 		);
 	}
 

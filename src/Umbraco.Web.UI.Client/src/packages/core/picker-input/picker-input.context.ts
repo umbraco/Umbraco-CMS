@@ -37,7 +37,7 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 		host: UmbControllerHostElement,
 		repositoryAlias: string,
 		modalAlias: string | UmbModalToken,
-		getUniqueMethod?: (entry: ItemType) => string | undefined
+		getUniqueMethod?: (entry: ItemType) => string | undefined,
 	) {
 		this.host = host;
 		this.modalAlias = modalAlias;
@@ -83,9 +83,6 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 	}
 
 	async requestRemoveItem(unique: string) {
-		await this.#init;
-		if (!this.repository) throw new Error('Repository is not initialized');
-
 		// TODO: id won't always be available on the model, so we need to get the unique property from somewhere. Maybe the repository?
 		const item = this.#itemManager.getItems().find((item) => this.#getUnique(item) === unique);
 		if (!item) throw new Error('Could not find item with unique: ' + unique);
@@ -104,5 +101,6 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 	#removeItem(unique: string) {
 		const newSelection = this.getSelection().filter((value) => value !== unique);
 		this.setSelection(newSelection);
+		this.host.dispatchEvent(new UmbChangeEvent());
 	}
 }

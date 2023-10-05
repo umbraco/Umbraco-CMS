@@ -76,8 +76,16 @@ export class UmbDictionaryWorkspaceContext
 	async save() {
 		if (!this.#data.value) return;
 		if (!this.#data.value.id) return;
-		await this.repository.save(this.#data.value.id, this.#data.value);
-		this.setIsNew(false);
+
+		if (this.getIsNew()) {
+			await this.repository.create(this.#data.value);
+			this.setIsNew(false);
+		} else {
+			await this.repository.save(this.#data.value.id, this.#data.value);
+		}
+
+		const data = this.getData();
+		if (data) this.saveComplete(data);
 	}
 
 	public destroy(): void {
@@ -85,8 +93,10 @@ export class UmbDictionaryWorkspaceContext
 	}
 }
 
-
-export const UMB_DICTIONARY_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbDictionaryWorkspaceContext>(
+export const UMB_DICTIONARY_WORKSPACE_CONTEXT = new UmbContextToken<
+	UmbSaveableWorkspaceContextInterface,
+	UmbDictionaryWorkspaceContext
+>(
 	'UmbWorkspaceContext',
-	(context): context is UmbDictionaryWorkspaceContext => context.getEntityType?.() === 'dictionary-item'
+	(context): context is UmbDictionaryWorkspaceContext => context.getEntityType?.() === 'dictionary-item',
 );
