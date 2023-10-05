@@ -1,5 +1,6 @@
 const { rest } = window.MockServiceWorker;
 import { umbDictionaryData } from '../data/dictionary.data.js';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import {
 	ImportDictionaryRequestModel,
 	DictionaryOverviewResponseModel,
@@ -48,7 +49,7 @@ const overviewData: Array<DictionaryOverviewResponseModel> = [
 
 // TODO: add schema
 export const handlers = [
-	rest.get('/umbraco/management/api/v1/dictionary/:id', (req, res, ctx) => {
+	rest.get(umbracoPath('/dictionary/:id'), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return;
 
@@ -56,7 +57,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(dictionary));
 	}),
 
-	rest.get('/umbraco/management/api/v1/dictionary', (req, res, ctx) => {
+	rest.get(umbracoPath('/dictionary'), (req, res, ctx) => {
 		const skip = req.url.searchParams.get('skip');
 		const take = req.url.searchParams.get('take');
 		if (!skip || !take) return;
@@ -74,25 +75,16 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.post('/umbraco/management/api/v1/dictionary', async (req, res, ctx) => {
+	rest.post(umbracoPath('/dictionary'), async (req, res, ctx) => {
 		const data = await req.json();
+
 		if (!data) return;
 
 		data.icon = 'umb:book-alt';
 		data.hasChildren = false;
 		data.type = 'dictionary-item';
-		data.translations = [
-			{
-				isoCode: 'en-US',
-				translation: '',
-			},
-			{
-				isoCode: 'fr',
-				translation: '',
-			},
-		];
 
-		const value = umbDictionaryData.save(data.id, data);
+		const value = umbDictionaryData.insert(data);
 
 		const createdResult = {
 			value,
@@ -102,7 +94,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(createdResult));
 	}),
 
-	rest.patch('/umbraco/management/api/v1/dictionary/:id', async (req, res, ctx) => {
+	rest.patch(umbracoPath('/dictionary/:id'), async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 
@@ -115,7 +107,19 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
-	rest.get('/umbraco/management/api/v1/tree/dictionary/root', (req, res, ctx) => {
+	rest.put(umbracoPath('/dictionary/:id'), async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		const id = req.params.id as string;
+		if (!id) return;
+
+		const saved = umbDictionaryData.save(id, data);
+
+		return res(ctx.status(200), ctx.json(saved));
+	}),
+
+	rest.get(umbracoPath('/tree/dictionary/root'), (req, res, ctx) => {
 		const items = umbDictionaryData.getTreeRoot();
 		const response = {
 			total: items.length,
@@ -124,7 +128,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get('/umbraco/management/api/v1/tree/dictionary/children', (req, res, ctx) => {
+	rest.get(umbracoPath('/tree/dictionary/children'), (req, res, ctx) => {
 		const parentId = req.url.searchParams.get('parentId');
 		if (!parentId) return;
 
@@ -138,7 +142,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get('/umbraco/management/api/v1/tree/dictionary/item', (req, res, ctx) => {
+	rest.get(umbracoPath('/tree/dictionary/item'), (req, res, ctx) => {
 		const ids = req.url.searchParams.getAll('id');
 		if (!ids) return;
 
@@ -147,7 +151,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(items));
 	}),
 
-	rest.delete('/umbraco/management/api/v1/dictionary/:id', (req, res, ctx) => {
+	rest.delete(umbracoPath('/dictionary/:id'), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return;
 
@@ -157,7 +161,7 @@ export const handlers = [
 	}),
 
 	// TODO => handle properly, querystring breaks handler
-	rest.get('/umbraco/management/api/v1/dictionary/:id/export', (req, res, ctx) => {
+	rest.get(umbracoPath('/dictionary/:id/export'), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return;
 
@@ -170,13 +174,13 @@ export const handlers = [
 		return res(ctx.status(200));
 	}),
 
-	rest.post('/umbraco/management/api/v1/dictionary/upload', async (req, res, ctx) => {
+	rest.post(umbracoPath('/dictionary/upload'), async (req, res, ctx) => {
 		if (!req.arrayBuffer()) return;
 
 		return res(ctx.status(200), ctx.json(uploadResponse));
 	}),
 
-	rest.post('/umbraco/management/api/v1/dictionary/import', async (req, res, ctx) => {
+	rest.post(umbracoPath('/dictionary/import'), async (req, res, ctx) => {
 		const file = req.url.searchParams.get('file');
 
 		if (!file || !importResponse.id) return;
