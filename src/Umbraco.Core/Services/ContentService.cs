@@ -2105,7 +2105,7 @@ public class ContentService : RepositoryService, IContentService
             }
 
             // deal with the branch root - if it fails, abort
-            PublishResult? result = SaveAndPublishBranchItem(scope, document, shouldPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs);
+            PublishResult? result = SaveAndPublishBranchItem(scope, document, shouldPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out IDictionary<string, object?> notificationState);
             if (result != null)
             {
                 results.Add(result);
@@ -2140,7 +2140,7 @@ public class ContentService : RepositoryService, IContentService
                     }
 
                     // no need to check path here, parent has to be published here
-                    result = SaveAndPublishBranchItem(scope, d, shouldPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs);
+                    result = SaveAndPublishBranchItem(scope, d, shouldPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs, out _);
                     if (result != null)
                     {
                         results.Add(result);
@@ -2164,7 +2164,7 @@ public class ContentService : RepositoryService, IContentService
             // (SaveAndPublishBranchOne does *not* do it)
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(document, TreeChangeTypes.RefreshBranch, eventMessages));
-            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages));
+            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages).WithState(notificationState));
 
             scope.Complete();
         }
@@ -2185,8 +2185,10 @@ public class ContentService : RepositoryService, IContentService
         ICollection<IContent> publishedDocuments,
         EventMessages evtMsgs,
         int userId,
-        IReadOnlyCollection<ILanguage> allLangs)
+        IReadOnlyCollection<ILanguage> allLangs,
+        out IDictionary<string, object?> notificationState)
     {
+        notificationState = new Dictionary<string, object?>();
         HashSet<string>? culturesToPublish = shouldPublish(document);
 
         // null = do not include
@@ -2218,6 +2220,7 @@ public class ContentService : RepositoryService, IContentService
         if (result.Success)
         {
             publishedDocuments.Add(document);
+            notificationState = savingNotification.State;
         }
 
         return result;
