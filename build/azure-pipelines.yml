@@ -80,17 +80,11 @@ stages:
               projects: $(solution)
           - task: DotNetCoreCLI@2
             name: build
-            displayName: Run dotnet build
+            displayName: Run dotnet build and generate NuGet packages
             inputs:
               command: build
               projects: $(solution)
-              arguments: '--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true'
-          - task: DotNetCoreCLI@2
-            displayName: Run dotnet pack
-            inputs:
-              command: pack
-              projects: $(solution)
-              arguments: '--configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg'
+              arguments: '--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg'
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
