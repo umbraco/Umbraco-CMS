@@ -141,11 +141,6 @@ public static partial class Constants
             public const string Label = "Umbraco.Label";
 
             /// <summary>
-            ///     No configuration String.
-            /// </summary>
-            public const string String = "Umbraco.String";
-
-            /// <summary>
             ///     Picker Relations.
             /// </summary>
             public const string PickerRelations = "Umbraco.PickerRelations";
@@ -220,6 +215,36 @@ public static partial class Constants
             ///     Alias for the multi URL picker editor.
             /// </summary>
             public const string MultiUrlPicker = "Umbraco.MultiUrlPicker";
+
+            /// <summary>
+            ///     Configuration-less string.
+            /// </summary>
+            public const string PlainString = "Umbraco.Plain.String";
+
+            /// <summary>
+            ///     Configuration-less JSON.
+            /// </summary>
+            public const string PlainJson = "Umbraco.Plain.Json";
+
+            /// <summary>
+            ///     Configuration-less decimal.
+            /// </summary>
+            public const string PlainDecimal = "Umbraco.Plain.Decimal";
+
+            /// <summary>
+            ///     Configuration-less integer.
+            /// </summary>
+            public const string PlainInteger = "Umbraco.Plain.Integer";
+
+            /// <summary>
+            ///     Configuration-less date/time.
+            /// </summary>
+            public const string PlainDateTime = "Umbraco.Plain.DateTime";
+
+            /// <summary>
+            ///     Configuration-less time.
+            /// </summary>
+            public const string PlainTime = "Umbraco.Plain.Time";
         }
 
         /// <summary>
