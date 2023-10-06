@@ -7,7 +7,7 @@ type SortEntryType = {
 	value: string;
 };
 
-const verticalConfig: UmbSorterConfig<SortEntryType> = {
+const SORTER_CONFIG: UmbSorterConfig<SortEntryType> = {
 	compareElementToModel: (element: HTMLElement, model: SortEntryType) => {
 		return element.getAttribute('data-sort-entry-id') === model.id;
 	},
@@ -18,12 +18,6 @@ const verticalConfig: UmbSorterConfig<SortEntryType> = {
 	itemSelector: 'li',
 	containerSelector: 'ul',
 };
-
-const horizontalConfig: UmbSorterConfig<SortEntryType> = {
-	...verticalConfig,
-	resolveVerticalDirection: () => false,
-};
-
 const model: Array<SortEntryType> = [
 	{
 		id: '0',
@@ -48,27 +42,22 @@ export default class UmbTestSorterControllerElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.sorter = new UmbSorterController(this, verticalConfig);
+		this.sorter = new UmbSorterController(this, {
+			...SORTER_CONFIG,
+			resolveVerticalDirection: () => {
+				this.vertical ? true : false;
+			},
+		});
 		this.sorter.setModel(model);
 	}
 
-	#change() {
-		this.sorter.destroy();
-
-		if (this.vertical) {
-			this.sorter = new UmbSorterController(this, horizontalConfig);
-			this.sorter.setModel(model);
-		} else {
-			this.sorter = new UmbSorterController(this, verticalConfig);
-			this.sorter.setModel(model);
-		}
-
+	#toggle() {
 		this.vertical = !this.vertical;
 	}
 
 	render() {
 		return html`
-			<uui-button label="Change direction" look="outline" color="positive" @click=${this.#change}>
+			<uui-button label="Change direction" look="outline" color="positive" @click=${this.#toggle}>
 				Horizontal/Vertical
 			</uui-button>
 			<ul class="${this.vertical ? 'vertical' : 'horizontal'}">
