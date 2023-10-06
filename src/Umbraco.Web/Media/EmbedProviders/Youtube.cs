@@ -6,14 +6,14 @@ namespace Umbraco.Web.Media.EmbedProviders
     {
         public override string ApiEndpoint => "https://www.youtube.com/oembed";
 
-        public override string[] UrlSchemeRegex => new string[]
+        public override string[] UrlSchemeRegex => new []
         {
             @"youtu.be/.*",
             @"youtube.com/watch.*",
             @"youtube.com/shorts/.*"
         };
 
-        public override Dictionary<string, string> RequestParams => new Dictionary<string, string>()
+        public override Dictionary<string, string> RequestParams => new ()
         {
             //ApiUrl/?format=json
             {"format", "json"}
