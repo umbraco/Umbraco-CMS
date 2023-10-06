@@ -3,6 +3,7 @@ import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UmbInputMarkdownElement } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-markdown-editor
@@ -15,11 +16,24 @@ export class UmbPropertyEditorUIMarkdownEditorElement
 	@property()
 	value = '';
 
+	@state()
+	private _preview?: boolean;
+
 	@property({ attribute: false })
-	public config?: UmbPropertyEditorConfigCollection;
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		this._preview = config?.getValueByAlias('preview');
+	}
+
+	#onChange(e: Event) {
+		this.value = (e.target as UmbInputMarkdownElement).value as string;
+		this.dispatchEvent(new CustomEvent('property-value-change'));
+	}
 
 	render() {
-		return html`<div>umb-property-editor-ui-markdown-editor</div>`;
+		return html`<umb-input-markdown
+			?preview=${this._preview}
+			@change=${this.#onChange}
+			.value=${this.value}></umb-input-markdown>`;
 	}
 
 	static styles = [UmbTextStyles];
