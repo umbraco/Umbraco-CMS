@@ -23,7 +23,7 @@ parameters:
     default: false
 
 variables:
-  nodeVersion: 18.16.0
+  nodeVersion: 18.16.x
   dotnetVersion: 7.x
   dotnetIncludePreviewVersions: true
   solution: umbraco.sln
@@ -161,9 +161,9 @@ stages:
           vmImage: 'ubuntu-latest'
         steps:
           - task: NodeTool@0
-            displayName: Use Node.js 10.15.0
+            displayName: Use Node.js 10.15.x
             inputs:
-              versionSpec: 10.15.0 # Won't work with higher versions
+              versionSpec: 10.15.x # Won't work with higher versions
           - script: |
               npm ci --no-fund --no-audit --prefer-offline
               npx gulp docs
