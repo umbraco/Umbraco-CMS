@@ -79,33 +79,18 @@ stages:
               command: restore
               projects: $(solution)
           - task: DotNetCoreCLI@2
+            name: build
             displayName: Run dotnet build
             inputs:
               command: build
               projects: $(solution)
               arguments: '--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true'
-          - script: |
-              version="$(Build.BuildNumber)"
-              echo "Version: $version"
-
-              major="$(echo $version | cut -d '.' -f 1)"
-              echo "Major version: $major"
-
-              echo "##vso[task.setvariable variable=majorVersion;isOutput=true]$major"
-            displayName: Set major version
-            name: determineMajorVersion
           - task: DotNetCoreCLI@2
             displayName: Run dotnet pack
             inputs:
               command: pack
               projects: $(solution)
               arguments: '--configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg'
-          - script: |
-              sha="$(Build.SourceVersion)"
-              sha=${sha:0:7}
-              buildnumber="$(Build.BuildNumber)_$(Build.BuildId)_$sha"
-              echo "##vso[build.updatebuildnumber]$buildnumber"
-            displayName: Update build number
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
@@ -122,7 +107,7 @@ stages:
     displayName: Prepare API Documentation
     dependsOn: Build
     variables:
-      umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['determineMajorVersion.majorVersion'] ]
+      umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     jobs:
       # C# API Reference
       - job:
@@ -527,7 +512,7 @@ stages:
     pool:
       vmImage: 'windows-latest' # Apparently AzureFileCopy is windows only :(
     variables:
-      umbracoMajorVersion:  $[ stageDependencies.Build.A.outputs['determineMajorVersion.majorVersion'] ]
+      umbracoMajorVersion:  $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     displayName: Upload API Documention
     dependsOn:
       - Build
