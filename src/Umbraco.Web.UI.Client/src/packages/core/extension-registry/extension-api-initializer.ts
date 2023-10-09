@@ -9,6 +9,7 @@ import {
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 /**
+ * @deprecated
  * Initializes a extensions APIs for a host element.
  * The Extension API will be given one argument, the host element.
  *
@@ -17,6 +18,7 @@ import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backof
  * @param extensionAlias The extension alias to target.
  *
  */
+// TODO: Get rid of this, use Extension Controllers instead.
 export class UmbExtensionApiInitializer<
 	ExtensionType extends string = string,
 	ExtensionManifest extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ExtensionType>,

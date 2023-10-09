@@ -3,6 +3,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 /**
+ * @deprecated
  * Initializes multiple extensions APIs for a host element.
  * Extension API will be given one argument, the host element.
  *
@@ -10,6 +11,7 @@ import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backof
  * @param extensionTypes The extension types(strings) to initialize.
  *
  */
+// TODO: Get rid of this, use Extension API Controller instead.
 export class UmbMultiExtensionsApiInitializer extends UmbBaseController {
 	#extensionMap = new Map();
 
