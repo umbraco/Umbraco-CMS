@@ -8,6 +8,7 @@ import type {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = DocumentTypeResponseModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -37,6 +38,9 @@ export class UmbDocumentTypeWorkspaceContext
 
 	readonly structure;
 
+	#isSorting = new UmbBooleanState(undefined);
+	isSorting = this.#isSorting.asObservable();
+
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.DocumentType', new UmbDocumentTypeRepository(host));
 
@@ -59,6 +63,14 @@ export class UmbDocumentTypeWorkspaceContext
 		this.allowedTemplateIds = this.structure.ownerContentTypeObservablePart((data) => data?.allowedTemplateIds);
 		this.defaultTemplateId = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplateId);
 		this.cleanup = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplateId);
+	}
+
+	getIsSorting() {
+		return this.#isSorting.getValue();
+	}
+
+	setIsSorting(isSorting: boolean) {
+		this.#isSorting.next(isSorting);
 	}
 
 	getData() {
@@ -120,6 +132,7 @@ export class UmbDocumentTypeWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(true);
+		this.setIsSorting(false);
 		//this.#draft.next(data);
 		return { data } || undefined;
 		// TODO: Is this wrong? should we return { data }??
@@ -130,6 +143,7 @@ export class UmbDocumentTypeWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(false);
+		this.setIsSorting(false);
 		//this.#draft.next(data);
 		return { data } || undefined;
 		// TODO: Is this wrong? should we return { data }??

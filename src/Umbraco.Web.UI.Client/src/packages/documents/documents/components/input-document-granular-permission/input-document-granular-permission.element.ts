@@ -9,7 +9,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-document-granular-permission')
