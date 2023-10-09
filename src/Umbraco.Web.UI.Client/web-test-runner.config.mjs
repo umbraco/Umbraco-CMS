@@ -77,7 +77,7 @@ export default {
 						'@umbraco-cms/backoffice/variant': './src/packages/core/variant/index.ts',
 						'@umbraco-cms/backoffice/workspace': './src/packages/core/workspace/index.ts',
 						'@umbraco-cms/backoffice/culture': './src/packages/core/culture/index.ts',
-						'@umbraco-cms/backoffice/events': './src/packages/core/umb-events/index.ts',
+						'@umbraco-cms/backoffice/event': './src/packages/core/event/index.ts',
 						'@umbraco-cms/backoffice/repository': './src/packages/core/repository/index.ts',
 
 						'@umbraco-cms/backoffice/dictionary': './src/packages/dictionary/dictionary/index.ts',

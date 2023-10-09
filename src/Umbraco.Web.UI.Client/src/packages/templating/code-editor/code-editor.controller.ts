@@ -11,7 +11,7 @@ import {
 } from './code-editor.model.js';
 import { themes } from './themes/index.js';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
-import { UmbChangeEvent, UmbInputEvent } from '@umbraco-cms/backoffice/events';
+import { UmbChangeEvent, UmbInputEvent } from '@umbraco-cms/backoffice/event';
 
 //TODO - consider firing change event on blur
 

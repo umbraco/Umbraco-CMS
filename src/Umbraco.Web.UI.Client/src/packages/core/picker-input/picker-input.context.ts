@@ -1,3 +1,4 @@
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbItemRepository, UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -9,7 +10,6 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 
 export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> {
 	host: UmbControllerHostElement;
