@@ -9,6 +9,8 @@ import type {
 	DocumentResponseModel,
 	TextFileResponseModelBaseModel,
 	FileItemResponseModelBaseModel,
+	MediaTypeResponseModel,
+	MediaTypeTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => {
@@ -63,6 +65,13 @@ export const createDocumentTypeTreeItem = (item: DocumentTypeResponseModel): Doc
 		...createEntityTreeItem(item),
 		type: 'document-type',
 		isElement: item.isElement,
+	};
+};
+
+export const createMediaTypeTreeItem = (item: MediaTypeResponseModel): MediaTypeTreeItemResponseModel => {
+	return {
+		...createEntityTreeItem(item),
+		type: 'media-type',
 	};
 };
 
