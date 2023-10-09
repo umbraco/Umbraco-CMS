@@ -6,7 +6,7 @@ export async function createExtensionElementOrFallback(
 	fallbackElementName: string
 ): Promise<HTMLElement | undefined> {
 	if (isManifestElementableType(manifest)) {
-		return createExtensionElement(manifest);
+		return createExtensionElement(manifest, fallbackElementName);
 	}
 
 	return Promise.resolve(document.createElement(fallbackElementName));

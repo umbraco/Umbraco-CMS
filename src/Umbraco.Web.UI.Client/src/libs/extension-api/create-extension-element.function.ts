@@ -8,7 +8,6 @@ export async function createExtensionElement<ElementType extends HTMLElement>(
 	//TODO: Write tests for these extension options:
 	const js = await loadExtensionElement(manifest);
 
-	console.log("defaultElement", defaultElement)
 	if (isManifestElementNameType(manifest)) {
 		// created by manifest method providing HTMLElement
 		return document.createElement(manifest.elementName) as ElementType;
