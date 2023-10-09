@@ -1,10 +1,12 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Item;
+﻿using Umbraco.Cms.Api.Management.ViewModels.Abstract;
+using Umbraco.Cms.Api.Management.ViewModels.Item;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 
-public class DocumentItemResponseModel : ItemResponseModelBase
+public class DocumentItemResponseModel : ItemResponseModelBase, ITracksTrashing
 {
     public string? Icon { get; set; }
 
     public Guid ContentTypeId { get; set; }
+    public bool IsTrashed { get; set; }
 }
