@@ -13,6 +13,11 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	@state()
 	private _selectionLength = 0;
 
+	@state()
+	private _extensionProps = {};
+
+	private _selection: Array<string> = [];
+
 	private _collectionContext?: UmbCollectionContext<any, any>;
 
 	constructor() {
@@ -43,6 +48,8 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 
 		this.observe(this._collectionContext.selection, (selection) => {
 			this._selectionLength = selection.length;
+			this._selection = selection;
+			this._extensionProps = {'selection': this._selection};
 		}, 'observeSelection');
 	}
 
@@ -68,7 +75,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 					${this._renderSelectionCount()}
 				</div>
 
-				<umb-extension-slot id="actions" type="entityBulkAction" default-element="umb-entity-bulk-action" @action-executed=${this.#onActionExecuted}>
+				<umb-extension-slot id="actions" type="entityBulkAction" default-element="umb-entity-bulk-action" .props=${this._extensionProps} @action-executed=${this.#onActionExecuted}>
 				</umb-extension-slot>
 			</div>
 		`;

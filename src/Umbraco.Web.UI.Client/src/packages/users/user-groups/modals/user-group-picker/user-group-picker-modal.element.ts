@@ -31,8 +31,8 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 				if (!repositoryManifest) return;
 
 				try {
-					const result = await createExtensionApi<UmbUserGroupRepository>(repositoryManifest, [this]);
-					this.#userGroupRepository = result;
+					const result = await createExtensionApi(repositoryManifest, [this]);
+					this.#userGroupRepository = result as UmbUserGroupRepository;
 					this.#observeUserGroups();
 				} catch (error) {
 					throw new Error('Could not create repository with alias: Umb.Repository.User');

@@ -18,8 +18,8 @@ export class UmbActionBase<RepositoryType> {
 				if (!repositoryManifest) return;
 
 				try {
-					const result = await createExtensionApi<RepositoryType>(repositoryManifest, [this.host]);
-					this.repository = result;
+					const result = await createExtensionApi(repositoryManifest, [this.host]);
+					this.repository = result as RepositoryType;
 				} catch (error) {
 					throw new Error('Could not create repository with alias: ' + repositoryAlias + '');
 				}

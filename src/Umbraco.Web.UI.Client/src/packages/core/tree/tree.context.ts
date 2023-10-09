@@ -159,8 +159,8 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 				if (!repositoryManifest) return;
 
 				try {
-					const result = await createExtensionApi<UmbTreeRepository<TreeItemType>>(repositoryManifest, [this._host]);
-					this.repository = result;
+					const result = await createExtensionApi(repositoryManifest, [this._host]);
+					this.repository = result as UmbTreeRepository<TreeItemType>;
 					this.#checkIfInitialized();
 				} catch (error) {
 					throw new Error('Could not create repository with alias: ' + repositoryAlias + '');

@@ -47,8 +47,8 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 			umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
 			async (repositoryManifest) => {
 				if (repositoryManifest) {
-					const result = await createExtensionApi<UmbCollectionRepository>(repositoryManifest, [this._host]);
-					this.repository = result;
+					const result = await createExtensionApi(repositoryManifest, [this._host]);
+					this.repository = result as UmbCollectionRepository;
 					this._onRepositoryReady();
 				}
 			}
