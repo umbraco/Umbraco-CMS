@@ -43,10 +43,10 @@
 
 			// SHARED
 			"@umbraco-cms/backoffice/auth": ["src/shared/auth"],
-			"@umbraco-cms/backoffice/events": ["src/shared/umb-events"],
+			"@umbraco-cms/backoffice/event": ["src/packages/core/event"],
 			"@umbraco-cms/backoffice/icon": ["src/shared/icon-registry"],
 			"@umbraco-cms/backoffice/models": ["src/shared/models"],
-			"@umbraco-cms/backoffice/repository": ["src/shared/repository"],
+			"@umbraco-cms/backoffice/repository": ["src/packages/core/repository"],
 			"@umbraco-cms/backoffice/resources": ["src/shared/resources"],
 			"@umbraco-cms/backoffice/router": ["src/shared/router"],
 			"@umbraco-cms/backoffice/style": ["src/shared/style"],
@@ -101,9 +101,9 @@
 			"@umbraco-cms/backoffice/template": ["./src/packages/templating/templates/index.ts"],
 
 			// USERS
-			"@umbraco-cms/backoffice/user-group": ["src/packages/users/user-groups"],
-			"@umbraco-cms/backoffice/current-user": ["src/packages/users/current-user"],
-			"@umbraco-cms/backoffice/users": ["src/packages/users/users"],
+			"@umbraco-cms/backoffice/user-group": ["src/packages/user/user-group"],
+			"@umbraco-cms/backoffice/current-user": ["src/packages/user/current-user"],
+			"@umbraco-cms/backoffice/user": ["src/packages/user/user"],
 
 			// TEMPLATING
 			"@umbraco-cms/backoffice/code-editor": ["src/packages/templating/code-editor"],

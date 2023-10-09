@@ -14,10 +14,8 @@
 		"./localization-api": "./dist-cms/libs/localization-api/index.js",
 		"./observable-api": "./dist-cms/libs/observable-api/index.js",
 		"./auth": "./dist-cms/shared/auth/index.js",
-		"./events": "./dist-cms/shared/umb-events/index.js",
 		"./icon": "./dist-cms/shared/icon/index.js",
 		"./models": "./dist-cms/shared/models/index.js",
-		"./repository": "./dist-cms/shared/repository/index.js",
 		"./resources": "./dist-cms/shared/resources/index.js",
 		"./router": "./dist-cms/shared/router/index.js",
 		"./style": "./dist-cms/shared/style/index.js",
@@ -47,6 +45,8 @@
 		"./tree": "./dist-cms/packages/core/tree/index.js",
 		"./variant": "./dist-cms/packages/core/variant/index.js",
 		"./workspace": "./dist-cms/packages/core/workspace/index.js",
+		"./events": "./dist-cms/packages/core/umb-events/index.js",
+		"./repository": "./dist-cms/packages/core/repository/index.js",
 		"./dictionary": "./dist-cms/packages/dictionary/dictionary/index.js",
 		"./document": "./dist-cms/packages/documents/documents/index.js",
 		"./document-blueprint": "./dist-cms/packages/documents/document-blueprints/index.js",
@@ -65,9 +65,9 @@
 		"./partial-view": "./dist-cms/packages/templating/partial-views/index.js",
 		"./stylesheet": "./dist-cms/packages/templating/stylesheets/index.js",
 		"./template": "./dist-cms/packages/templating/templates/index.js",
-		"./user-group": "./dist-cms/packages/users/user-groups/index.js",
-		"./current-user": "./dist-cms/packages/users/current-user/index.js",
-		"./users": "./dist-cms/packages/users/users/index.js",
+		"./user-group": "./dist-cms/packages/user/user-groups/index.js",
+		"./current-user": "./dist-cms/packages/user/current-user/index.js",
+		"./user": "./dist-cms/packages/user/user/index.js",
 		"./code-editor": "./dist-cms/packages/templating/code-editor/index.js",
 		"./external/*": "./dist-cms/external/*/index.js"
 	},
@@ -197,5 +197,9 @@
 	},
 	"msw": {
 		"workerDirectory": "public"
+	},
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
 	}
 }

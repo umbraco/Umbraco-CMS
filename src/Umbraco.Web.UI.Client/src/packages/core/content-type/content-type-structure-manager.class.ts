@@ -186,6 +186,18 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		return container;
 	}
 
+	async insertContainer(contentTypeId: string | null, container: PropertyTypeContainerModelBaseModel) {
+		await this.#init;
+		contentTypeId = contentTypeId ?? this.#ownerContentTypeId!;
+
+		const frozenContainers = this.#contentTypes.getValue().find((x) => x.id === contentTypeId)?.containers ?? [];
+
+		const containers = appendToFrozenArray(frozenContainers, container, (x) => x.id === container.id);
+
+		console.log(frozenContainers, containers);
+		this.#contentTypes.updateOne(contentTypeId, { containers });
+	}
+
 	makeContainerNameUniqueForOwnerContentType(
 		newName: string,
 		containerType: PropertyContainerTypes = 'Tab',

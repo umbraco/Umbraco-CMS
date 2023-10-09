@@ -1,6 +1,6 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
@@ -8,7 +8,7 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
  * @element umb-property-editor-ui-eye-dropper
  */
 @customElement('umb-property-editor-ui-eye-dropper')
-export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	#defaultOpacity = false;
 
 	@property()

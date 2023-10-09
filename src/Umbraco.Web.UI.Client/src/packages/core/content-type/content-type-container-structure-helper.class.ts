@@ -198,6 +198,16 @@ export class UmbContentTypeContainerStructureHelper {
 
 	/** Manipulate methods: */
 
+	async insertContainer(container: PropertyTypeContainerModelBaseModel, sortOrder = 0) {
+		await this.#init;
+		if (!this.#structure) return false;
+
+		const newContainer = { ...container, sortOrder };
+
+		await this.#structure.insertContainer(null, newContainer);
+		return true;
+	}
+
 	async addContainer(parentContainerId?: string | null, sortOrder?: number) {
 		if (!this.#structure) return;
 
@@ -206,9 +216,10 @@ export class UmbContentTypeContainerStructureHelper {
 
 	async removeContainer(groupId: string) {
 		await this.#init;
-		if (!this.#structure) return;
+		if (!this.#structure) return false;
 
-		return await this.#structure.removeContainer(null, groupId);
+		await this.#structure.removeContainer(null, groupId);
+		return true;
 	}
 
 	async partialUpdateContainer(containerId: string, partialUpdate: Partial<PropertyTypeContainerModelBaseModel>) {
