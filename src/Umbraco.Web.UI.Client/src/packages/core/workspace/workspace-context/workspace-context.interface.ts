@@ -15,8 +15,4 @@ export interface UmbWorkspaceContextInterface<DataType = unknown> {
 	isNew: Observable<boolean | undefined>;
 	getIsNew(): boolean | undefined;
 	setIsNew(value: boolean): void;
-
-	isSorting: Observable<boolean | undefined>;
-	getIsSorting(): boolean | undefined;
-	setIsSorting(value: boolean): void;
 }

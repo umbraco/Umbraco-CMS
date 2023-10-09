@@ -24,9 +24,6 @@ export abstract class UmbWorkspaceContext<RepositoryType, EntityType extends Umb
 	#isNew = new UmbBooleanState(undefined);
 	isNew = this.#isNew.asObservable();
 
-	#isSorting = new UmbBooleanState(undefined);
-	isSorting = this.#isSorting.asObservable();
-
 	constructor(host: UmbControllerHostElement, workspaceAlias: string, repository: RepositoryType) {
 		super(host);
 		this.host = host;
@@ -44,14 +41,6 @@ export abstract class UmbWorkspaceContext<RepositoryType, EntityType extends Umb
 
 	setIsNew(isNew: boolean) {
 		this.#isNew.next(isNew);
-	}
-
-	getIsSorting() {
-		return this.#isSorting.getValue();
-	}
-
-	setIsSorting(isSorting: boolean) {
-		this.#isSorting.next(isSorting);
 	}
 
 	protected saveComplete(data: EntityType) {
