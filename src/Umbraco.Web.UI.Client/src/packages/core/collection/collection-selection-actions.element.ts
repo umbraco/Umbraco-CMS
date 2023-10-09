@@ -1,10 +1,10 @@
+import { UmbExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_COLLECTION_CONTEXT_TOKEN, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { ManifestEntityBulkAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 
 @customElement('umb-collection-selection-actions')
 export class UmbCollectionSelectionActionsElement extends UmbLitElement {
@@ -49,14 +49,22 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		if (!this._collectionContext) return;
 
 		// TODO: Make sure it only updates on length change.
-		this.observe(this._collectionContext.items, (mediaItems) => {
-			this._nodesLength = mediaItems.length;
-		}, 'observeItem');
+		this.observe(
+			this._collectionContext.items,
+			(mediaItems) => {
+				this._nodesLength = mediaItems.length;
+			},
+			'observeItem',
+		);
 
-		this.observe(this._collectionContext.selection, (selection) => {
-			this._selectionLength = selection.length;
-			this._selection = selection;
-		}, 'observeSelection');
+		this.observe(
+			this._collectionContext.selection,
+			(selection) => {
+				this._selectionLength = selection.length;
+				this._selection = selection;
+			},
+			'observeSelection',
+		);
 	}
 
 	private _renderSelectionCount() {
@@ -69,12 +77,12 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 			umbExtensionsRegistry.extensionsOfType('entityBulkAction').pipe(
 				map((extensions) => {
 					return extensions.filter((extension) => extension.conditions.entityType === this.#entityType);
-				})
+				}),
 			),
 			(bulkActions) => {
 				this._entityBulkActions = bulkActions;
-			}
-			, 'observeEntityBulkActions'
+			},
+			'observeEntityBulkActions',
 		);
 	}
 
@@ -103,7 +111,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 							html`<umb-entity-bulk-action
 								@executed=${this.#onActionExecuted}
 								.selection=${this._selection}
-								.manifest=${manifest}></umb-entity-bulk-action>`
+								.manifest=${manifest}></umb-entity-bulk-action>`,
 					)}
 				</div>
 			</div>

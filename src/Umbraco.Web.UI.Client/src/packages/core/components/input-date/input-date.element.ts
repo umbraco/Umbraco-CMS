@@ -1,4 +1,4 @@
-import { UmbConfigRepository } from '../../repositories/config/config.repository.js';
+import { UmbConfigRepository } from '../../repository/config/config.repository.js';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -98,7 +98,7 @@ export class UmbInputDateElement extends FormControlMixin(UmbLitElement) {
 		if (this.type === 'time') {
 			const newDate = new Date(`${new Date().toJSON().slice(0, 10)} ${d}`);
 			const dateOffset = new Date(
-				newDate.setTime(newDate.getTime() + (utc ? this._offsetValue * -1 : this._offsetValue) * 60 * 1000)
+				newDate.setTime(newDate.getTime() + (utc ? this._offsetValue * -1 : this._offsetValue) * 60 * 1000),
 			);
 			const time = dateOffset
 				.toLocaleTimeString(undefined, {
@@ -109,7 +109,7 @@ export class UmbInputDateElement extends FormControlMixin(UmbLitElement) {
 		} else {
 			const newDate = new Date(d.replace('Z', ''));
 			const dateOffset = new Date(
-				newDate.setTime(newDate.getTime() + (utc ? this._offsetValue * -1 : this._offsetValue) * 60 * 1000)
+				newDate.setTime(newDate.getTime() + (utc ? this._offsetValue * -1 : this._offsetValue) * 60 * 1000),
 			);
 			return this.type === 'datetime-local'
 				? this.#dateToString(dateOffset)

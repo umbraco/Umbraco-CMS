@@ -8,7 +8,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import { UmbInputSectionElement } from '@umbraco-cms/backoffice/components';
 import { UmbUserInputElement } from '@umbraco-cms/backoffice/users';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 
 import './components/user-group-default-permission-list.element.js';

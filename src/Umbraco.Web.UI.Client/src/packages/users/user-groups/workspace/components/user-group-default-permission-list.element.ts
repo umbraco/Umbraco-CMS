@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { ManifestUserPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { type UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/users';
 import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 
