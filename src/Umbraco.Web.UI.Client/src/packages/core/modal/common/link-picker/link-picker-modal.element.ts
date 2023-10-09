@@ -153,6 +153,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		return html`<uui-label for="search-input">Link to page</uui-label>
 			<uui-input id="search-input" placeholder="Type to search" label="Type to search"></uui-input>
 			<umb-tree
+				?multiple=${false}
 				alias="Umb.Tree.Documents"
 				@selected=${(event: CustomEvent) => this._handleSelectionChange(event, 'document')}
 				.selection=${[this._selectedKey ?? '']}
@@ -163,6 +164,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			<uui-label>Link to media</uui-label>
 
 			<umb-tree
+				?multiple=${false}
 				alias="Umb.Tree.Media"
 				@selected=${(event: CustomEvent) => this._handleSelectionChange(event, 'media')}
 				.selection=${[this._selectedKey ?? '']}

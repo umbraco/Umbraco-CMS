@@ -1,10 +1,15 @@
 import { KeyCode, KeyMod } from 'monaco-editor';
-import { UmbMediaPickerContext } from '../../../media/media/components/input-media/input-media.context.js';
 import { UmbCodeEditorController, UmbCodeEditorElement, loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { css, html, customElement, query, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, query, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import {
+	UMB_LINK_PICKER_MODAL,
+	UMB_MEDIA_TREE_PICKER_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UmbModalManagerContext,
+} from '@umbraco-cms/backoffice/modal';
 
 /**
  * @element umb-input-markdown
@@ -26,11 +31,17 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	@query('umb-code-editor')
 	_codeEditor?: UmbCodeEditorElement;
 
-	#mediaPicker = new UmbMediaPickerContext(this);
+	private _modalContext?: UmbModalManagerContext;
+
+	@state()
+	tabSize = 4;
 
 	constructor() {
 		super();
 		this.#loadCodeEditor();
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
+		});
 	}
 
 	async #loadCodeEditor() {
@@ -45,6 +56,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 				minimap: false,
 				folding: false,
 			});
+			this.tabSize = this.#editor?.monacoModel?.getOptions().tabSize ?? 4;
 			this.#loadActions();
 		} catch (error) {
 			console.error(error);
@@ -52,8 +64,8 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	async #loadActions() {
-		// Going to base the keybindings of a Markdown Shortcut plugin https://marketplace.visualstudio.com/items?itemName=robole.markdown-shortcuts#shortcuts
 		// TODO: Find a way to have "double" keybindings (ctrl+m+ctrl+c for `code`, rather than simple ctrl+c as its taken by OS to copy things)
+		// Going with the keybindings of a Markdown Shortcut plugin https://marketplace.visualstudio.com/items?itemName=robole.markdown-shortcuts#shortcuts or perhaps there are keybindings that would make more sense.
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H1',
 			id: 'h1',
@@ -106,7 +118,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 			label: 'Add Quote',
 			id: 'q',
 			keybindings: [KeyMod.CtrlCmd | KeyCode.KeyQ],
-			run: () => this._insertAtCurrentLine('> '),
+			run: () => this._insertQuote(),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Ordered List',
@@ -136,20 +148,20 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 			label: 'Add Line',
 			id: 'line',
 			//keybindings: [KeyMod.CtrlCmd | KeyCode.KeyM | KeyMod.CtrlCmd | KeyCode.KeyC],
-			run: () => this._insertAtCurrentLine('---\n'),
+			run: () => this._insertLine(),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Link',
 			id: 'link',
 			//keybindings: [KeyMod.CtrlCmd | KeyCode.KeyM | KeyMod.CtrlCmd | KeyCode.KeyC],
-			run: () => this._insertBetweenSelection('[', '](https://example.com)', 'title'),
+			run: () => this._insertLink(),
 			// TODO: Open in modal
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Image',
 			id: 'image',
 			//keybindings: [KeyMod.CtrlCmd | KeyCode.KeyM | KeyMod.CtrlCmd | KeyCode.KeyC],
-			run: () => this._insertBetweenSelection('![', '](example.png)', 'alt text'),
+			run: () => this._insertMedia(),
 			// TODO: Open in modal
 		});
 	}
@@ -157,6 +169,100 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	private _focusEditor(): void {
 		// If we press one of the action buttons manually (which is outside the editor), we need to focus the editor again.
 		this.#editor?.monacoEditor?.focus();
+	}
+
+	private _insertLink() {
+		const selection = this.#editor?.getSelections()[0];
+		if (!selection) return;
+
+		const selectedValue = this.#editor?.getValueInRange(selection);
+
+		this._focusEditor(); // Focus before opening modal
+		const modalContext = this._modalContext?.open(UMB_LINK_PICKER_MODAL, {
+			index: null,
+			link: { name: selectedValue },
+			config: {},
+		});
+
+		modalContext
+			?.onSubmit()
+			.then((data) => {
+				const name = this.localize.term('general_name');
+				const url = this.localize.term('general_url');
+
+				this.#editor?.monacoEditor?.executeEdits('', [
+					{ range: selection, text: `[${data.link.name || name}](${data.link.url || url})` },
+				]);
+
+				if (!data.link.name) {
+					this.#editor?.select({
+						startColumn: selection.startColumn + 1,
+						endColumn: selection.startColumn + 1 + name.length,
+						endLineNumber: selection.startLineNumber,
+						startLineNumber: selection.startLineNumber,
+					});
+				} else if (!data.link.url) {
+					this.#editor?.select({
+						startColumn: selection.startColumn + 3 + data.link.name.length,
+						endColumn: selection.startColumn + 3 + data.link.name.length + url.length,
+						endLineNumber: selection.startLineNumber,
+						startLineNumber: selection.startLineNumber,
+					});
+				}
+			})
+			.catch(() => undefined)
+			.finally(() => this._focusEditor());
+	}
+
+	private _insertMedia() {
+		const selection = this.#editor?.getSelections()[0];
+		if (!selection) return;
+
+		const alt = this.#editor?.getValueInRange(selection);
+
+		this._focusEditor(); // Focus before opening modal
+		const modalContext = this._modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL, {});
+
+		modalContext
+			?.onSubmit()
+			.then((data) => {
+				const imgUrl = data.selection[0];
+				this.#editor?.monacoEditor?.executeEdits('', [
+					//TODO: media url
+					{ range: selection, text: `[${alt || 'alt text'}](TODO: id-${imgUrl || this.localize.term('general_url')})` },
+				]);
+
+				if (!alt?.length) {
+					this.#editor?.select({
+						startColumn: selection.startColumn + 1,
+						endColumn: selection.startColumn + 9,
+						endLineNumber: selection.startLineNumber,
+						startLineNumber: selection.startLineNumber,
+					});
+				}
+			})
+			.catch(() => undefined)
+			.finally(() => this._focusEditor());
+	}
+
+	private _insertLine() {
+		const selection = this.#editor?.getSelections()[0];
+		if (!selection) return;
+
+		const endColumn = this.#editor?.monacoModel?.getLineMaxColumn(selection.endLineNumber) ?? 1;
+
+		if (endColumn === 1) {
+			this.#editor?.insertAtPosition('---\n', {
+				lineNumber: selection.endLineNumber,
+				column: 1,
+			});
+		} else {
+			this.#editor?.insertAtPosition('\n---\n', {
+				lineNumber: selection.endLineNumber,
+				column: endColumn,
+			});
+		}
+		this._focusEditor();
 	}
 
 	private _insertBetweenSelection(startValue: string, endValue: string, placeholder?: string) {
@@ -170,7 +276,12 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 			startColumn: selection.startColumn - startValue.length,
 			endColumn: selection.endColumn + endValue.length,
 		});
-		if (selectedValue?.startsWith(startValue) && selectedValue.endsWith(endValue)) {
+
+		if (
+			selectedValue?.startsWith(startValue) &&
+			selectedValue.endsWith(endValue) &&
+			selectedValue.length > startValue.length + endValue.length
+		) {
 			//Cancel previous insert
 			this.#editor?.select({ ...selection, startColumn: selection.startColumn + startValue.length });
 			this.#editor?.monacoEditor?.executeEdits('', [
@@ -203,6 +314,13 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 				lineNumber: selection.endLineNumber,
 				column: selection.endColumn + startValue.length,
 			});
+
+			this.#editor?.select({
+				startLineNumber: selection.startLineNumber,
+				endLineNumber: selection.endLineNumber,
+				startColumn: selection.startColumn + startValue.length,
+				endColumn: selection.endColumn + startValue.length,
+			});
 		}
 
 		// if no text were selected when action fired
@@ -213,6 +331,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 					column: selection.startColumn + startValue.length,
 				});
 			}
+
 			this.#editor?.select({
 				startLineNumber: selection.startLineNumber,
 				endLineNumber: selection.endLineNumber,
@@ -261,6 +380,28 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 				column: 1,
 			});
 		}
+	}
+
+	private _insertQuote() {
+		const selection = this.#editor?.getSelections()[0];
+		if (!selection) return;
+
+		let index = selection.startLineNumber;
+		for (index; index <= selection.endLineNumber; index++) {
+			const line = this.#editor?.getValueInRange({
+				startLineNumber: index,
+				endLineNumber: index,
+				startColumn: 1,
+				endColumn: 3,
+			});
+			if (!line?.startsWith('> ')) {
+				this.#editor?.insertAtPosition('> ', {
+					lineNumber: index,
+					column: 1,
+				});
+			}
+		}
+		this._focusEditor();
 	}
 
 	private _renderBasicActions() {
@@ -365,27 +506,31 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	onKeyPress(e: KeyboardEvent) {
-		if (e.key !== 'Enter' && e.key !== 'Tab') return;
+		if (e.key !== 'Enter') return;
+		//TODO: Tab does not seem to trigger keyboard events. We need to make some logic for ordered and unordered lists when tab is being used.
 
 		const selection = this.#editor?.getSelections()[0];
 		if (!selection) return;
 
-		const lineValue = this.#editor?.getValueInRange({ ...selection, startColumn: 1 });
+		const lineValue = this.#editor?.getValueInRange({ ...selection, startColumn: 1 }).trimStart();
 		if (!lineValue) return;
 
-		if (e.key === 'Enter') {
-			if (lineValue.startsWith('- ') && lineValue.length > 3) {
-				requestAnimationFrame(() => this.#editor?.insert('- '));
-			} else if (lineValue.match(/^[1-9]\d*\.\s.*/) && lineValue.length) {
-				const previousNumber = parseInt(lineValue, 10);
-				requestAnimationFrame(() => this.#editor?.insert(`${previousNumber + 1}. `));
-			}
+		if (lineValue.startsWith('- ') && lineValue.length > 2) {
+			requestAnimationFrame(() => this.#editor?.insert('- '));
+		} else if (lineValue.match(/^[1-9]\d*\.\s.*/) && lineValue.length > 3) {
+			const previousNumber = parseInt(lineValue, 10);
+			requestAnimationFrame(() => this.#editor?.insert(`${previousNumber + 1}. `));
 		}
 	}
 
 	render() {
+		//TODO: Why is the theme dark in Backoffice, but light in Storybook?
 		return html` <div id="actions">${this._renderBasicActions()}</div>
-			<umb-code-editor language="markdown" .code=${this.value as string} @keypress=${this.onKeyPress}></umb-code-editor>
+			<umb-code-editor
+				language="markdown"
+				.code=${this.value as string}
+				@keypress=${this.onKeyPress}
+				theme="umb-light"></umb-code-editor>
 			${this.renderPreview()}`;
 	}
 
