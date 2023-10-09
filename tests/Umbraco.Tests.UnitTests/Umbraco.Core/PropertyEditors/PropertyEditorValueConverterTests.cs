@@ -1,11 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -116,18 +112,12 @@ public class PropertyEditorValueConverterTests
     }
 
     [TestCase("1", 1)]
-    [TestCase("1", 1)]
-    [TestCase("0", 0)]
     [TestCase("0", 0)]
     [TestCase(null, 0)]
-    [TestCase(null, 0)]
-    [TestCase("-1", -1)]
     [TestCase("-1", -1)]
     [TestCase("1.65", 1.65)]
-    [TestCase("1.65", 1.65)]
     [TestCase("-1.65", -1.65)]
-    [TestCase("-1.65", -1.65)]
-    public void CanConvertDecimalAliasPropertyEditor(object value, double expected)
+    public void CanConvertDecimalAliasPropertyEditor(object value, decimal expected)
     {
         var converter = new DecimalValueConverter();
         var inter = converter.ConvertSourceToIntermediate(null, null, value, false);
@@ -136,18 +126,19 @@ public class PropertyEditorValueConverterTests
         Assert.AreEqual(expected, result);
     }
 
-    [Test]
-    public void CanConvertManifestBasedPropertyWithValueTypeJson()
+    [TestCase("100", 100)]
+    [TestCase("0", 0)]
+    [TestCase(null, 0)]
+    [TestCase("-100", -100)]
+    [TestCase("1.65", 2)]
+    [TestCase("-1.65", -2)]
+    [TestCase("something something", 0)]
+    public void CanConvertIntegerAliasPropertyEditor(object value, int expected)
     {
-        var valueEditor = Mock.Of<IDataValueEditor>(x => x.ValueType == ValueTypes.Json);
-        var dataEditor = Mock.Of<IDataEditor>(x => x.GetValueEditor() == valueEditor);
-        var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => new[] { dataEditor }));
-        var propertyType = Mock.Of<IPublishedPropertyType>(x => x.EditorAlias == "My.Custom.Json");
+        var converter = new IntegerValueConverter();
+        var inter = converter.ConvertSourceToIntermediate(null, null, value, false);
+        var result = converter.ConvertIntermediateToObject(null, null, PropertyCacheLevel.Unknown, inter, false);
 
-        var valueConverter = new JsonValueConverter(propertyEditors, Mock.Of<ILogger<JsonValueConverter>>());
-        var inter = valueConverter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), propertyType, "{\"message\": \"Hello, JSON\"}", false);
-        var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), propertyType, PropertyCacheLevel.Element, inter, false) as JObject;
-        Assert.IsNotNull(result);
-        Assert.AreEqual("Hello, JSON", result["message"]!.Value<string>());
+        Assert.AreEqual(expected, result);
     }
 }
