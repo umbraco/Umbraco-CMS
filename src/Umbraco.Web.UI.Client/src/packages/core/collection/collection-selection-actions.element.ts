@@ -1,8 +1,8 @@
+import { UmbExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_COLLECTION_CONTEXT, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 
 @customElement('umb-collection-selection-actions')
 export class UmbCollectionSelectionActionsElement extends UmbLitElement {
@@ -42,20 +42,29 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		if (!this._collectionContext) return;
 
 		// TODO: Make sure it only updates on length change.
-		this.observe(this._collectionContext.items, (mediaItems) => {
-			this._nodesLength = mediaItems.length;
-		}, 'observeItem');
+		this.observe(
+			this._collectionContext.items,
+			(mediaItems) => {
+				this._nodesLength = mediaItems.length;
+			},
+			'observeItem',
+		);
 
-		this.observe(this._collectionContext.selection, (selection) => {
-			this._selectionLength = selection.length;
-			this._selection = selection;
-			this._extensionProps = {'selection': this._selection};
-		}, 'observeSelection');
+		this.observe(
+			this._collectionContext.selection,
+			(selection) => {
+				this._selectionLength = selection.length;
+				this._selection = selection;
+				this._extensionProps = {'selection': this._selection};
+			},
+			'observeSelection',
+		);
 	}
 
 	private _renderSelectionCount() {
 		return html`<div>${this._selectionLength} of ${this._nodesLength} selected</div>`;
 	}
+
 	#onActionExecuted(event: UmbExecutedEvent) {
 		event.stopPropagation();
 		this._collectionContext?.clearSelection();

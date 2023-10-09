@@ -6,7 +6,7 @@ import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backof
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { ProblemDetails, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
-import { UmbSelectedEvent } from '@umbraco-cms/backoffice/events';
+import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
 // TODO: update interface
 export interface UmbTreeContext<TreeItemType extends TreeItemPresentationModel> extends UmbBaseController {

@@ -25,7 +25,7 @@ export abstract class UmbWorkspaceContext<RepositoryType, EntityType extends Umb
 	isNew = this.#isNew.asObservable();
 
 	constructor(host: UmbControllerHostElement, workspaceAlias: string, repository: RepositoryType) {
-		super(host)
+		super(host);
 		this.host = host;
 		this.workspaceAlias = workspaceAlias;
 		this.repository = repository;
@@ -60,5 +60,4 @@ export abstract class UmbWorkspaceContext<RepositoryType, EntityType extends Umb
 	abstract getEntityType(): string; // TODO: consider of this should be on the repository because a repo is responsible for one entity type
 	abstract getData(): EntityType | undefined;
 	abstract save(): Promise<void>;
-
 }

@@ -1,3 +1,4 @@
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbPropertyValueChangeEvent } from '../../index.js';
 import {
 	UmbInputMultipleTextStringElement,
@@ -6,7 +7,6 @@ import {
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**

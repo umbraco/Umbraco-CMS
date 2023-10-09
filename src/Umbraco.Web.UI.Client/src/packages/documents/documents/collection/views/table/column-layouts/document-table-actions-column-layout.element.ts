@@ -9,7 +9,7 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
-import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
+import { UmbExecutedEvent } from '@umbraco-cms/backoffice/event';
 
 // TODO: this could be done more generic, but for now we just need it for the document table
 @customElement('umb-document-table-actions-column-layout')

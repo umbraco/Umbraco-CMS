@@ -1,5 +1,4 @@
 export interface UmbRepository<EntityType = unknown> {
-
 	/**
 	 * Get the type of the entity
 	 *
@@ -8,5 +7,4 @@ export interface UmbRepository<EntityType = unknown> {
 	 * @returns   undefined
 	 */
 	readonly ENTITY_TYPE: EntityType;
-
 }
