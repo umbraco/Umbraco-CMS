@@ -1,8 +1,8 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import './input-section.element.js';
-import type { UmbInputPickerSectionElement } from './input-section.element.js';
+import type { UmbInputSectionElement } from './input-section.element.js';
 
-const meta: Meta<UmbInputPickerSectionElement> = {
+const meta: Meta<UmbInputSectionElement> = {
 	title: 'Components/Inputs/Section',
 	component: 'umb-input-section',
 	argTypes: {
@@ -22,7 +22,7 @@ const meta: Meta<UmbInputPickerSectionElement> = {
 };
 
 export default meta;
-type Story = StoryObj<UmbInputPickerSectionElement>;
+type Story = StoryObj<UmbInputSectionElement>;
 
 export const Overview: Story = {
 	args: {

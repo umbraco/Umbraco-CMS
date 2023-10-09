@@ -26,8 +26,8 @@ export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-button @click=${this.#onCreate} label="Create group" look="outline"></uui-button>
-			<uui-input @input=${this.#onSearch} label="search" id="input-search"></uui-input>
+			<uui-button @click=${this.#onCreate} label=${this.localize.term('actions_createGroup')} look="outline"></uui-button>
+			<uui-input @input=${this.#onSearch} label=${this.localize.term('general_search')} placeholder=${this.localize.term('visuallyHiddenTexts_userGroupSearchLabel')} id="input-search"></uui-input>
 		`;
 	}
 	static styles = [

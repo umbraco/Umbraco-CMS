@@ -46,7 +46,7 @@
 			"@umbraco-cms/backoffice/events": ["src/packages/core/umb-events"],
 			"@umbraco-cms/backoffice/icon": ["src/shared/icon-registry"],
 			"@umbraco-cms/backoffice/models": ["src/shared/models"],
-			"@umbraco-cms/backoffice/repository": ["src/shared/repository"],
+			"@umbraco-cms/backoffice/repository": ["src/packages/core/repository"],
 			"@umbraco-cms/backoffice/resources": ["src/shared/resources"],
 			"@umbraco-cms/backoffice/router": ["src/shared/router"],
 			"@umbraco-cms/backoffice/style": ["src/shared/style"],

@@ -1,17 +1,18 @@
+import { UMB_USER_GROUP_ENTITY_TYPE } from '../index.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-// TODO: import from package when available
-//import { UmbUserInputElement } from '../../users/components/user-input/user-input.element.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import {
-	UMB_CONFIRM_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UmbModalManagerContext,
-} from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
+import { UmbInputSectionElement } from '@umbraco-cms/backoffice/components';
+import { UmbUserInputElement } from '@umbraco-cms/backoffice/users';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
+import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
+
+import './components/user-group-default-permission-list.element.js';
+import './components/user-group-granular-permission-list.element.js';
 
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
@@ -22,7 +23,6 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	private _userKeys?: Array<string>;
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
-	#modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
@@ -32,38 +32,30 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup));
 			this.observe(this.#workspaceContext.userIds, (userKeys) => (this._userKeys = userKeys));
 		});
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
-			this.#modalContext = instance;
-		});
 	}
 
-	#onUsersChange(userIds: Array<string>) {
-		this.#workspaceContext?.updateUserKeys(userIds);
+	#onSectionsChange(event: UmbChangeEvent) {
+		event.stopPropagation();
+		const target = event.target as UmbInputSectionElement;
+		this.#workspaceContext?.updateProperty('sections', target.value);
 	}
 
-	#onSectionsChange(value: string[]) {
-		this.#workspaceContext?.updateProperty('sections', value);
+	#onDocumentStartNodeChange(event: CustomEvent) {
+		event.stopPropagation();
+		const target = event.target as UmbInputDocumentElement;
+		this.#workspaceContext?.updateProperty('documentStartNodeId', target.selectedIds[0]);
 	}
 
-	async #onDelete() {
-		if (!this.#modalContext || !this.#workspaceContext) return;
+	#onMediaStartNodeChange(event: CustomEvent) {
+		event.stopPropagation();
+		const target = event.target as UmbInputMediaElement;
+		this.#workspaceContext?.updateProperty('mediaStartNodeId', target.selectedIds[0]);
+	}
 
-		const modalContext = this.#modalContext.open(UMB_CONFIRM_MODAL, {
-			color: 'danger',
-			headline: `Delete user group ${this._userGroup?.name}?`,
-			content: html`Are you sure you want to delete <b>${this._userGroup?.name}</b> user group?`,
-			confirmLabel: 'Delete',
-		});
-
-		await modalContext.onSubmit();
-
-		if (!this._userGroup || !this._userGroup.id) return;
-
-		await this.#workspaceContext.delete(this._userGroup?.id);
-		//TODO: should we check if it actually succeeded in deleting the user group?
-
-		history.pushState(null, '', 'section/users/view/user-groups');
+	#onUsersChange(event: UmbChangeEvent) {
+		event.stopPropagation();
+		const target = event.target as UmbUserInputElement;
+		this.#workspaceContext?.updateUserKeys(target.selectedIds);
 	}
 
 	#onNameChange(event: UUIInputEvent) {
@@ -98,7 +90,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 				</a>
 				<uui-input
 					id="name"
-					label="name"
+					label=${this.localize.term('general_name')}
 					.value=${this._userGroup?.name ?? ''}
 					@input="${this.#onNameChange}"></uui-input>
 			</div>
@@ -108,54 +100,61 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#renderLeftColumn() {
 		if (!this._userGroup) return nothing;
 
-		return html` <uui-box>
-				<div slot="headline">Assign access</div>
-				<umb-workspace-property-layout label="Sections" description="Add sections to give users access">
+		return html`
+			<uui-box>
+				<div slot="headline"><umb-localize key="user_assignAccess"></umb-localize></div>
+				<umb-workspace-property-layout
+					label=${this.localize.term('main_sections')}
+					description=${this.localize.term('user_sectionsHelp')}>
 					<umb-input-section
 						slot="editor"
 						.value=${this._userGroup.sections ?? []}
-						@change=${(e: any) => this.#onSectionsChange(e.target.value)}></umb-input-section>
+						@change=${this.#onSectionsChange}></umb-input-section>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout
-					label="Content start node"
-					description="Limit the content tree to a specific start node">
-					<b slot="editor">CONTENT START NODE PICKER NOT IMPLEMENTED YET</b>
+					label=${this.localize.term('defaultdialogs_selectContentStartNode')}
+					description=${this.localize.term('user_startnodehelp')}>
+					<umb-input-document
+						slot="editor"
+						max="1"
+						.selectedIds=${this._userGroup.documentStartNodeId ? [this._userGroup.documentStartNodeId] : []}
+						@change=${this.#onDocumentStartNodeChange}></umb-input-document>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout
-					label="Media start node"
-					description="Limit the media library to a specific start node">
-					<b slot="editor">MEDIA START NODE PICKER NOT IMPLEMENTED YET</b>
+					label=${this.localize.term('defaultdialogs_selectMediaStartNode')}
+					description=${this.localize.term('user_mediastartnodehelp')}>
+					<umb-input-media
+						slot="editor"
+						max="1"
+						.selectedIds=${this._userGroup.mediaStartNodeId ? [this._userGroup.mediaStartNodeId] : []}
+						@change=${this.#onMediaStartNodeChange}></umb-input-media>
 				</umb-workspace-property-layout>
 			</uui-box>
 
 			<uui-box>
-				<div slot="headline">Default Permissions</div>
-				<b>PERMISSIONS NOT IMPLEMENTED YET</b>
+				<div slot="headline"><umb-localize key="user_permissionsDefault"></umb-localize></div>
+				<umb-user-group-default-permission-list></umb-user-group-default-permission-list>
 			</uui-box>
 
+			<!-- Temp disabled because it is work in progress
 			<uui-box>
-				<div slot="headline">Granular permissions</div>
-				<b>PERMISSIONS NOT IMPLEMENTED YET</b>
-			</uui-box>`;
+				<div slot="headline"><umb-localize key="user_permissionsGranular"></umb-localize></div>
+				<umb-user-group-granular-permission-list></umb-user-group-granular-permission-list>
+			</uui-box>
+	-->
+		`;
 	}
 
 	#renderRightColumn() {
 		return html`<uui-box>
-				<div slot="headline">Users</div>
-				<!-- change any to UmbUserInputElement when package is available -->
-				<umb-user-input
-					@change=${(e: Event) => this.#onUsersChange((e.target as any).selectedIds)}
-					.selectedIds=${this._userKeys ?? []}></umb-user-input>
+				<div slot="headline"><umb-localize key="sections_users"></umb-localize></div>
+				<umb-user-input @change=${this.#onUsersChange} .selectedIds=${this._userKeys ?? []}></umb-user-input>
 			</uui-box>
-			<uui-box>
-				<div slot="headline">Delete user group</div>
-				<uui-button
-					@click=${this.#onDelete}
-					style="width: 100%"
-					color="danger"
-					look="secondary"
-					label="Delete"></uui-button>
-			</uui-box>`;
+			<uui-box headline="Actions">
+				<umb-entity-action-list
+					.entityType=${UMB_USER_GROUP_ENTITY_TYPE}
+					.unique=${this._userGroup?.id}></umb-entity-action-list
+			></uui-box>`;
 	}
 
 	static styles = [

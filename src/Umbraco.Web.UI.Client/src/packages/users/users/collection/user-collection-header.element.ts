@@ -117,20 +117,21 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		return html`
 			<uui-button
 				@click=${this._showInviteOrCreate}
-				label=${this._isCloud ? 'Invite' : 'Create' + ' user'}
+				label=${this.localize.term(this._isCloud ? 'user_inviteUser' : 'user_createUser')}
 				look="outline"></uui-button>
-			<uui-input @input=${this._updateSearch} label="search" id="input-search"></uui-input>
+			<uui-input @input=${this._updateSearch} label=${this.localize.term('visuallyHiddenTexts_userSearchLabel')} placeholder=${this.localize.term('visuallyHiddenTexts_userSearchLabel')} id="input-search"></uui-input>
 			<div>
 				<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
 				<umb-dropdown margin="8">
 					<uui-button @click=${this.#onDropdownClick} slot="trigger" label="status">
-						State: ${this._stateFilterSelection}
+						<umb-localize key="general_status"></umb-localize>: 
+						<umb-localize key=${'user_state'+this._stateFilterSelection}></umb-localize>
 					</uui-button>
 					<div slot="dropdown" class="filter-dropdown">
 						${this._stateFilterOptions.map(
 							(option) =>
 								html`<uui-checkbox
-									label=${option}
+									label=${this.localize.term('user_state'+option)}
 									@change=${this.#onStateFilterChange}
 									name="state"
 									value=${option}></uui-checkbox>`
@@ -140,19 +141,25 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 				<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
 				<umb-dropdown margin="8">
-					<uui-button @click=${this.#onDropdownClick} slot="trigger" label="order by"> Group: </uui-button>
+					<uui-button @click=${this.#onDropdownClick} slot="trigger" label=${this.localize.term('general_groups')}>
+						<umb-localize key="general_groups"></umb-localize>:
+						<!-- TODO: show the value here -->
+					</uui-button>
 					<div slot="dropdown" class="filter-dropdown">
-						<uui-checkbox label="Active"></uui-checkbox>
-						<uui-checkbox label="Inactive"></uui-checkbox>
-						<uui-checkbox label="Invited"></uui-checkbox>
-						<uui-checkbox label="Disabled"></uui-checkbox>
+						<!-- TODO: GET THESE FROM SERVER (not localized) -->
+						<uui-checkbox label="Administrators"></uui-checkbox>
+						<uui-checkbox label="Editors"></uui-checkbox>
+						<uui-checkbox label="Sensitive Data"></uui-checkbox>
+						<uui-checkbox label="Translators"></uui-checkbox>
+						<uui-checkbox label="Writers"></uui-checkbox>
 					</div>
 				</umb-dropdown>
 
 				<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
 				<umb-dropdown margin="8">
-					<uui-button @click=${this.#onDropdownClick} slot="trigger" label="Order By">
-						Order By: <b>${this._orderBy}</b>
+					<uui-button @click=${this.#onDropdownClick} slot="trigger" label=${this.localize.term('general_orderBy')}>
+						<umb-localize key="general_orderBy"></umb-localize>:
+						<b>${this._orderBy}</b>
 					</uui-button>
 					<div slot="dropdown" class="filter-dropdown" name="orderBy">
 						<uui-radio-group name="radioGroup" @change=${this.#onOrderByChange}>

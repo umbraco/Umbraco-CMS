@@ -1,9 +1,10 @@
 import type { UmbTreeElement } from '../../../tree/tree.element.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTreePickerModalData, UmbPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbSelectedEvent } from '@umbraco-cms/backoffice/events';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentationModel> extends UmbModalBaseElement<
@@ -27,6 +28,7 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
 		this._selection = element.selection;
+		this.dispatchEvent(new UmbSelectedEvent());
 	}
 
 	#submit() {
@@ -57,7 +59,7 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 		`;
 	}
 
-	static styles = [UmbTextStyles, css``];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbTreePickerModalElement;

@@ -61,7 +61,7 @@ export class UmbInputListBaseElement extends UmbLitElement {
 
 	protected renderButton() {
 		return html`<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">
-			Add
+			${this.localize.term('general_add')}
 		</uui-button>`;
 	}
 	protected renderContent() {

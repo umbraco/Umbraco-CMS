@@ -88,8 +88,7 @@ export class UmbAuthFlow {
 	readonly #storageBackend: LocalStorageBackend;
 
 	// state
-	#configuration: AuthorizationServiceConfiguration | undefined;
-	readonly #openIdConnectUrl: string;
+	readonly #configuration: AuthorizationServiceConfiguration;
 	readonly #redirectUri: string;
 	readonly #clientId: string;
 	readonly #scope: string;
@@ -104,10 +103,16 @@ export class UmbAuthFlow {
 		clientId = 'umbraco-back-office',
 		scope = 'offline_access',
 	) {
-		this.#openIdConnectUrl = openIdConnectUrl;
 		this.#redirectUri = redirectUri;
 		this.#clientId = clientId;
 		this.#scope = scope;
+
+		this.#configuration = new AuthorizationServiceConfiguration({
+			authorization_endpoint: `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/authorize`,
+			token_endpoint: `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/token`,
+			revocation_endpoint: `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/revoke`,
+			end_session_endpoint: `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/signout`,
+		});
 
 		this.#notifier = new AuthorizationNotifier();
 		this.#tokenHandler = new BaseTokenRequestHandler(requestor);
@@ -155,11 +160,6 @@ export class UmbAuthFlow {
 	 * - If there is no new authorization to be made, do nothing
 	 */
 	async setInitialState() {
-		// Ensure there is a connection to the server
-		if (!this.#configuration) {
-			await this.fetchServiceConfiguration();
-		}
-
 		const tokenResponseJson = await this.#storageBackend.getItem(TOKEN_RESPONSE_NAME);
 		if (tokenResponseJson) {
 			const response = new TokenResponse(JSON.parse(tokenResponseJson));
@@ -184,24 +184,11 @@ export class UmbAuthFlow {
 	}
 
 	/**
-	 * This method will query the server for the service configuration usually found at /.well-known/openid-configuration.
-	 */
-	async fetchServiceConfiguration(): Promise<void> {
-		const response = await AuthorizationServiceConfiguration.fetchFromIssuer(this.#openIdConnectUrl, requestor);
-		this.#configuration = response;
-	}
-
-	/**
 	 * This method will make an authorization request to the server.
 	 *
 	 * @param username The username to use for the authorization request. It will be provided to the OpenID server as a hint.
 	 */
 	makeAuthorizationRequest(username?: string): void {
-		if (!this.#configuration) {
-			console.log('Unknown service configuration');
-			throw new Error('Unknown service configuration');
-		}
-
 		const extras: StringMap = { prompt: 'consent', access_type: 'offline' };
 
 		if (username) {
@@ -252,11 +239,6 @@ export class UmbAuthFlow {
 	 * @returns The access token for the user.
 	 */
 	async performWithFreshTokens(): Promise<string> {
-		if (!this.#configuration) {
-			console.log('Unknown service configuration');
-			return Promise.reject('Unknown service configuration');
-		}
-
 		if (!this.#refreshToken) {
 			console.log('Missing refreshToken.');
 			return Promise.resolve('Missing refreshToken.');
@@ -294,11 +276,6 @@ export class UmbAuthFlow {
 	 * This method will make a token request to the server using the authorization code.
 	 */
 	async #makeRefreshTokenRequest(code: string, codeVerifier: string | undefined): Promise<void> {
-		if (!this.#configuration) {
-			console.log('Unknown service configuration');
-			return Promise.reject();
-		}
-
 		const extras: StringMap = {};
 
 		if (codeVerifier) {
