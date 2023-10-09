@@ -54,7 +54,7 @@ export class UmbDocumentTableActionColumnLayoutElement extends LitElement {
 			<div id="action-menu-dropdown" slot="popover">
 				<uui-scroll-container>
 					<umb-entity-action-list
-						@executed=${this.#onActionExecuted}
+						@action-executed=${this.#onActionExecuted}
 						entity-type=${ifDefined(this.value.entityType)}
 						unique=${ifDefined(this.item.id)}></umb-entity-action-list>
 				</uui-scroll-container>

@@ -16,7 +16,7 @@ import {
 	UmbTableOrderedEvent,
 } from '@umbraco-cms/backoffice/components';
 import type { UserGroupEntity } from '@umbraco-cms/backoffice/user-group';
-import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './column-layouts/name/user-table-name-column-layout.element.js';
@@ -75,7 +75,7 @@ export class UmbUserCollectionTableViewElement extends UmbLitElement {
 			this._observeUserGroups();
 		});
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
 			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection));
 			this.observe(this.#collectionContext.items, (items) => (this._users = items));

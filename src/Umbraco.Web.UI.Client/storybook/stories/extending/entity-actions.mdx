@@ -184,9 +184,10 @@ const manifest = {
 		label: 'My Entity Bulk Action',
 		repositoryAlias: 'My.Repository',
 	},
-	conditions: {
-		entityType: 'my-entity',
-	},
+	conditions: [{
+		alias: 'Umb.Condition.CollectionEntityType',
+		match: 'my-entity-type',
+	}],
 };
 
 extensionRegistry.register(manifest);

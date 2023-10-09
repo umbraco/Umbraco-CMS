@@ -1,7 +1,7 @@
 import { UmbUserGroupCollectionContext } from './user-group-collection.context.js';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-user-group-collection-header')
@@ -11,7 +11,7 @@ export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserGroupCollectionContext;
 		});
 	}

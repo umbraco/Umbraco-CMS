@@ -56,7 +56,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				<div id="action-menu-dropdown" slot="popover">
 					<uui-scroll-container>
 						<umb-entity-action-list
-							@executed=${this.#onActionExecuted}
+							@action-executed=${this.#onActionExecuted}
 							.entityType=${this._entityType}
 							.unique=${this._entityId}>
 						</umb-entity-action-list>

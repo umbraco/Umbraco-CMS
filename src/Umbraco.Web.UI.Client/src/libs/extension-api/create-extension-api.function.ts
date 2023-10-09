@@ -4,7 +4,7 @@ import { loadExtensionApi } from './load-extension-api.function.js';
 
 //TODO: Write tests for this method:
 export async function createExtensionApi<ApiType = unknown>(
-	manifest: ManifestApi | ManifestElementAndApi,
+	manifest: ManifestApi<ApiType> | ManifestElementAndApi<any, ApiType>,
 	constructorArguments: unknown[]
 ): Promise<ApiType | undefined> {
 	const js = await loadExtensionApi(manifest);

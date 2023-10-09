@@ -69,13 +69,15 @@ export class UmbExtensionElementController<
 	protected async _conditionsAreGood() {
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
+		console.log("---defaultElement", this._defaultElement)
 		if (isManifestElementableType(manifest)) {
-			const newComponent = await createExtensionElement(manifest);
+			const newComponent = await createExtensionElement(manifest, this._defaultElement);
 			if (!this._positive) {
 				// We are not positive anymore, so we will back out of this creation.
 				return false;
 			}
 			this._component = newComponent;
+
 		} else if (this._defaultElement) {
 			this._component = document.createElement(this._defaultElement);
 		} else {

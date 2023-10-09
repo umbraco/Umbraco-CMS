@@ -18,9 +18,10 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 			label: 'SetGroup',
 			repositoryAlias: USER_REPOSITORY_ALIAS,
 		},
-		conditions: {
-			entityType,
-		},
+		conditions: [{
+			alias: 'Umb.Condition.CollectionEntityType',
+			match: entityType,
+		}],
 	},
 	{
 		type: 'entityBulkAction',
@@ -32,9 +33,10 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 			label: 'Enable',
 			repositoryAlias: USER_REPOSITORY_ALIAS,
 		},
-		conditions: {
-			entityType,
-		},
+		conditions: [{
+			alias: 'Umb.Condition.CollectionEntityType',
+			match: entityType,
+		}],
 	},
 	{
 		type: 'entityBulkAction',
@@ -46,9 +48,10 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 			label: 'Unlock',
 			repositoryAlias: USER_REPOSITORY_ALIAS,
 		},
-		conditions: {
-			entityType,
-		},
+		conditions: [{
+			alias: 'Umb.Condition.CollectionEntityType',
+			match: entityType,
+		}],
 	},
 	{
 		type: 'entityBulkAction',
@@ -60,9 +63,10 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 			label: 'Disable',
 			repositoryAlias: USER_REPOSITORY_ALIAS,
 		},
-		conditions: {
-			entityType,
-		},
+		conditions: [{
+			alias: 'Umb.Condition.CollectionEntityType',
+			match: entityType,
+		}],
 	},
 ];
 

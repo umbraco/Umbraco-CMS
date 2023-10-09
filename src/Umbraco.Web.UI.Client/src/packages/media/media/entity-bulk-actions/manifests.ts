@@ -17,9 +17,10 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 			label: 'Move',
 			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
 		},
-		conditions: {
-			entityType,
-		},
+		conditions: [{
+			alias: 'Umb.Condition.CollectionEntityType',
+			match: entityType,
+		}],
 	},
 	{
 		type: 'entityBulkAction',
@@ -31,9 +32,10 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 			label: 'Copy',
 			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
 		},
-		conditions: {
-			entityType,
-		},
+		conditions: [{
+			alias: 'Umb.Condition.CollectionEntityType',
+			match: entityType,
+		}],
 	},
 	{
 		type: 'entityBulkAction',
@@ -45,9 +47,10 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 			label: 'Trash',
 			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
 		},
-		conditions: {
-			entityType,
-		},
+		conditions: [{
+			alias: 'Umb.Condition.CollectionEntityType',
+			match: entityType,
+		}],
 	},
 ];
 

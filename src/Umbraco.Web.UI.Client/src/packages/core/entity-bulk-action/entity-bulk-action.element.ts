@@ -36,8 +36,9 @@ export class UmbEntityBulkActionElement extends UmbLitElement {
 	}
 
 	async #createApi() {
-		if (!this._manifest?.meta.api) return;
-		this.#api = await createExtensionApi(this._manifest, [this._manifest.meta.repositoryAlias, this._selection]);
+		if (!this._manifest) return;
+
+		this.#api = await createExtensionApi(this._manifest, [this, this._manifest.meta.repositoryAlias, this._selection]);
 	}
 
 	#api?: UmbEntityBulkAction;

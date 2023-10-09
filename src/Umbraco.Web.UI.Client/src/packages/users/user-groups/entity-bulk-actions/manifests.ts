@@ -15,9 +15,10 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 			label: 'Delete',
 			repositoryAlias: USER_GROUP_REPOSITORY_ALIAS,
 		},
-		conditions: {
-			entityType,
-		},
+		conditions: [{
+			alias: 'Umb.Condition.CollectionEntityType',
+			match: entityType,
+		}],
 	},
 ];
 

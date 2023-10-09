@@ -1,3 +1,4 @@
+import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import {
@@ -8,13 +9,12 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 
 // TODO: Clean up the need for store as Media has switched to use Repositories(repository).
 export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectionFilterModel> {
 	private _host: UmbControllerHostElement;
-	private _entityType: string | null;
+	private _entityType: string;
 
 	protected _dataObserver?: UmbObserverController<ItemType[]>;
 
@@ -38,7 +38,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	public readonly search = this._search.asObservable();
 	*/
 
-	constructor(host: UmbControllerHostElement, entityType: string | null, repositoryAlias: string) {
+	constructor(host: UmbControllerHostElement, entityType: string, repositoryAlias: string) {
 		this._entityType = entityType;
 		this._host = host;
 
@@ -62,6 +62,9 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	public setSelection(value: Array<string>) {
 		if (!value) return;
 		this.#selection.next(value);
+	}
+	public getSelection() {
+		this.#selection.getValue();
 	}
 
 	public clearSelection() {
@@ -147,4 +150,4 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	}
 }
 
-export const UMB_COLLECTION_CONTEXT_TOKEN = new UmbContextToken<UmbCollectionContext<any, any>>('UmbCollectionContext');
+export const UMB_COLLECTION_CONTEXT = new UmbContextToken<UmbCollectionContext<any, any>>('UmbCollectionContext');

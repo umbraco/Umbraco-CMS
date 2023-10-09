@@ -1,14 +1,11 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { UMB_COLLECTION_CONTEXT_TOKEN, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { ManifestEntityBulkAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_COLLECTION_CONTEXT, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 
 @customElement('umb-collection-selection-actions')
 export class UmbCollectionSelectionActionsElement extends UmbLitElement {
-	#entityType?: string;
 
 	@state()
 	private _nodesLength = 0;
@@ -16,22 +13,13 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	@state()
 	private _selectionLength = 0;
 
-	@state()
-	private _entityBulkActions: Array<ManifestEntityBulkAction> = [];
-
 	private _collectionContext?: UmbCollectionContext<any, any>;
-	private _selection: Array<string> = [];
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this._collectionContext = instance;
 			this._observeCollectionContext();
-
-			if (instance.getEntityType()) {
-				this.#entityType = instance.getEntityType() ?? undefined;
-				this.#observeEntityBulkActions();
-			}
 		});
 	}
 
@@ -55,29 +43,12 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 
 		this.observe(this._collectionContext.selection, (selection) => {
 			this._selectionLength = selection.length;
-			this._selection = selection;
 		}, 'observeSelection');
 	}
 
 	private _renderSelectionCount() {
 		return html`<div>${this._selectionLength} of ${this._nodesLength} selected</div>`;
 	}
-
-	// TODO: find a solution to use extension slot
-	#observeEntityBulkActions() {
-		this.observe(
-			umbExtensionsRegistry.extensionsOfType('entityBulkAction').pipe(
-				map((extensions) => {
-					return extensions.filter((extension) => extension.conditions.entityType === this.#entityType);
-				})
-			),
-			(bulkActions) => {
-				this._entityBulkActions = bulkActions;
-			}
-			, 'observeEntityBulkActions'
-		);
-	}
-
 	#onActionExecuted(event: UmbExecutedEvent) {
 		event.stopPropagation();
 		this._collectionContext?.clearSelection();
@@ -97,15 +68,8 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 					${this._renderSelectionCount()}
 				</div>
 
-				<div id="actions">
-					${this._entityBulkActions?.map(
-						(manifest) =>
-							html`<umb-entity-bulk-action
-								@executed=${this.#onActionExecuted}
-								.selection=${this._selection}
-								.manifest=${manifest}></umb-entity-bulk-action>`
-					)}
-				</div>
+				<umb-extension-slot id="actions" type="entityBulkAction" default-element="umb-entity-bulk-action" @action-executed=${this.#onActionExecuted}>
+				</umb-extension-slot>
 			</div>
 		`;
 	}

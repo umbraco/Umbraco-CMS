@@ -1,6 +1,6 @@
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -19,7 +19,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		document.addEventListener('dragenter', this._handleDragEnter.bind(this));
 		document.addEventListener('dragleave', this._handleDragLeave.bind(this));
 		document.addEventListener('drop', this._handleDrop.bind(this));
-		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this._collectionContext = instance;
 			this._observeCollectionContext();
 		});
