@@ -3,6 +3,7 @@ import { html, ifDefined, customElement, property } from '@umbraco-cms/backoffic
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-entity-bulk-action')
 export class UmbEntityBulkActionElement extends UmbLitElement {
@@ -34,9 +35,9 @@ export class UmbEntityBulkActionElement extends UmbLitElement {
 		}
 	}
 
-	#createApi() {
+	async #createApi() {
 		if (!this._manifest?.meta.api) return;
-		this.#api = new this._manifest.meta.api(this, this._manifest.meta.repositoryAlias, this._selection);
+		this.#api = await createExtensionApi(this._manifest, [this._manifest.meta.repositoryAlias, this._selection]);
 	}
 
 	#api?: UmbEntityBulkAction;

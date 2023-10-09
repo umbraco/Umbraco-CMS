@@ -10,10 +10,10 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		alias: 'Umb.EntityBulkAction.UserGroup.Delete',
 		name: 'Delete User Group Entity Bulk Action',
 		weight: 400,
+		api: UmbDeleteUserGroupEntityBulkAction,
 		meta: {
 			label: 'Delete',
 			repositoryAlias: USER_GROUP_REPOSITORY_ALIAS,
-			api: UmbDeleteUserGroupEntityBulkAction,
 		},
 		conditions: {
 			entityType,
