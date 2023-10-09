@@ -9,11 +9,11 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.UserGroup.Delete',
 		name: 'Delete User Group Entity Action',
 		weight: 900,
+		api: UmbDeleteEntityAction,
 		meta: {
 			icon: 'umb:trash',
 			label: 'Delete...',
 			repositoryAlias: USER_GROUP_REPOSITORY_ALIAS,
-			api: UmbDeleteEntityAction,
 			entityTypes: [UMB_USER_GROUP_ENTITY_TYPE],
 		},
 	},
