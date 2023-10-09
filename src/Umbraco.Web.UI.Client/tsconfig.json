@@ -101,9 +101,9 @@
 			"@umbraco-cms/backoffice/template": ["./src/packages/templating/templates/index.ts"],
 
 			// USERS
-			"@umbraco-cms/backoffice/user-group": ["src/packages/users/user-groups"],
-			"@umbraco-cms/backoffice/current-user": ["src/packages/users/current-user"],
-			"@umbraco-cms/backoffice/users": ["src/packages/users/users"],
+			"@umbraco-cms/backoffice/user-group": ["src/packages/user/user-group"],
+			"@umbraco-cms/backoffice/current-user": ["src/packages/user/current-user"],
+			"@umbraco-cms/backoffice/user": ["src/packages/user/user"],
 
 			// TEMPLATING
 			"@umbraco-cms/backoffice/code-editor": ["src/packages/templating/code-editor"],
