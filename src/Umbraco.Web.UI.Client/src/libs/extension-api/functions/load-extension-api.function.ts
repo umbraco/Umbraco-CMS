@@ -1,5 +1,5 @@
-import { isManifestApiJSType, isManifestJSType, isManifestLoaderType } from './type-guards/index.js';
-import type { ManifestWithLoader } from './types.js';
+import { isManifestApiJSType, isManifestJSType, isManifestLoaderType } from '../type-guards/index.js';
+import type { ManifestWithLoader } from '../types.js';
 
 export async function loadExtensionApi<T = unknown>(manifest: ManifestWithLoader<T>): Promise<T | null> {
 	try {

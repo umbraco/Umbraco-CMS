@@ -6,7 +6,7 @@ import {
 	ManifestSection,
 	ManifestSectionSidebarApp,
 	ManifestSectionSidebarAppMenuKind,
-	UmbSectionExtensionElement,
+	UmbSectionElement,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
@@ -19,7 +19,7 @@ import { UmbExtensionElementController, UmbExtensionsElementController } from '@
  * @description - Element hosting sections and section navigation.
  */
 @customElement('umb-section-default')
-export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectionExtensionElement {
+export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectionElement {
 	private _manifest?: ManifestSection | undefined;
 
 	@property({ type: Object, attribute: false })

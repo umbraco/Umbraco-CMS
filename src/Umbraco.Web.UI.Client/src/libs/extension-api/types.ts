@@ -1,5 +1,5 @@
 import type { UmbExtensionCondition } from './condition/index.js';
-import type { UmbEntryPointModule } from './entry-point.interface.js';
+import type { UmbEntryPointModule } from './models/index.js';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
@@ -156,7 +156,7 @@ export interface ManifestWithLoaderIncludingElementExport<ElementType extends HT
  elementJs?: string;
 }
 export interface ManifestWithLoaderOptionalApiOrElementExport<
-	ElementType extends HTMLElement = HTMLElement, 
+	ElementType extends HTMLElement = HTMLElement,
 	ApiType = unknown,
 	ClassType = { element: ElementType } | { api: ApiType } | { element: ElementType, api: ApiType } | Omit<Omit<object, 'element'>, 'api'>
 >

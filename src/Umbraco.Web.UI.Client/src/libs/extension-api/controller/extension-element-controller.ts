@@ -1,4 +1,4 @@
-import { createExtensionElement } from '../create-extension-element.function.js';
+import { createExtensionElement } from '../functions/create-extension-element.function.js';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { isManifestElementableType } from '../type-guards/is-manifest-elementable-type.function.js';
 import { ManifestCondition, ManifestWithDynamicConditions } from '../types.js';
