@@ -1,4 +1,4 @@
-import { KeyCode, KeyMod } from 'monaco-editor';
+import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import { UmbCodeEditorController, UmbCodeEditorElement, loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { css, html, customElement, query, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
@@ -65,67 +65,67 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H1',
 			id: 'h1',
-			keybindings: [KeyMod.CtrlCmd | KeyCode.Digit1],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit1],
 			run: () => this._insertAtCurrentLine('#'),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H2',
 			id: 'h2',
-			keybindings: [KeyMod.CtrlCmd | KeyCode.Digit2],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit2],
 			run: () => this._insertAtCurrentLine('##'),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H3',
 			id: 'h3',
-			keybindings: [KeyMod.CtrlCmd | KeyCode.Digit3],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit3],
 			run: () => this._insertAtCurrentLine('###'),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H4',
 			id: 'h4',
-			keybindings: [KeyMod.CtrlCmd | KeyCode.Digit4],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit4],
 			run: () => this._insertAtCurrentLine('####'),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H5',
 			id: 'h5',
-			keybindings: [KeyMod.CtrlCmd | KeyCode.Digit5],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit5],
 			run: () => this._insertAtCurrentLine('#####'),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H6',
 			id: 'h6',
-			keybindings: [KeyMod.CtrlCmd | KeyCode.Digit6],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit6],
 			run: () => this._insertAtCurrentLine('######'),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Bold Text',
 			id: 'b',
-			keybindings: [KeyMod.CtrlCmd | KeyCode.KeyB],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyB],
 			run: () => this._insertBetweenSelection('**', '**', 'Your Bold Text'),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Italic Text',
 			id: 'i',
-			keybindings: [KeyMod.CtrlCmd | KeyCode.KeyI],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyI],
 			run: () => this._insertBetweenSelection('*', '*', 'Your Italic Text'),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Quote',
 			id: 'q',
-			keybindings: [KeyMod.CtrlCmd | KeyCode.KeyQ],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyQ],
 			run: () => this._insertQuote(),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Ordered List',
 			id: 'ol',
-			keybindings: [KeyMod.CtrlCmd | KeyCode.KeyO],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyO],
 			run: () => this._insertAtCurrentLine('1. '),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Unordered List',
 			id: 'ul',
-			keybindings: [KeyMod.CtrlCmd | KeyCode.KeyU],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyU],
 			run: () => this._insertAtCurrentLine('- '),
 		});
 		this.#editor?.monacoEditor?.addAction({
