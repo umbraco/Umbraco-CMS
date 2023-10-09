@@ -45,7 +45,6 @@ export default {
 						'@umbraco-cms/backoffice/events': './src/shared/umb-events/index.ts',
 						'@umbraco-cms/backoffice/icon': './src/shared/icon-registry/index.ts',
 						'@umbraco-cms/backoffice/models': './src/shared/models/index.ts',
-						'@umbraco-cms/backoffice/repository': './src/shared/repository/index.ts',
 						'@umbraco-cms/backoffice/resources': './src/shared/resources/index.ts',
 						'@umbraco-cms/backoffice/router': './src/shared/router/index.ts',
 						'@umbraco-cms/backoffice/style': './src/shared/style/index.ts',
@@ -79,6 +78,7 @@ export default {
 						'@umbraco-cms/backoffice/variant': './src/packages/core/variant/index.ts',
 						'@umbraco-cms/backoffice/workspace': './src/packages/core/workspace/index.ts',
 						'@umbraco-cms/backoffice/culture': './src/packages/core/culture/index.ts',
+						'@umbraco-cms/backoffice/repository': './src/packages/core/repository/index.ts',
 
 						'@umbraco-cms/backoffice/dictionary': './src/packages/dictionary/dictionary/index.ts',
 
