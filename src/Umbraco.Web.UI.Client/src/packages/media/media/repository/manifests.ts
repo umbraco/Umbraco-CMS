@@ -40,7 +40,7 @@ const itemStore: ManifestItemStore = {
 	type: 'itemStore',
 	alias: MEDIA_ITEM_STORE_ALIAS,
 	name: 'Media Item Store',
-	class: UmbMediaItemStore,
+	api: UmbMediaItemStore,
 };
 
 export const manifests = [store, treeStore, itemStore, repository];

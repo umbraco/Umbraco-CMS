@@ -40,7 +40,7 @@ const itemStore: ManifestItemStore = {
 	type: 'itemStore',
 	alias: DOCUMENT_ITEM_STORE_ALIAS,
 	name: 'Document Item Store',
-	class: UmbDocumentItemStore,
+	api: UmbDocumentItemStore,
 };
 
 export const manifests = [repository, store, treeStore, itemStore];
