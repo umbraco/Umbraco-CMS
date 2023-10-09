@@ -12146,63 +12146,6 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/security/back-office/authorize": {
-      "get": {
-        "tags": [
-          "Security"
-        ],
-        "operationId": "GetSecurityBackOfficeAuthorize",
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/security/back-office/login": {
-      "post": {
-        "tags": [
-          "Security"
-        ],
-        "operationId": "PostSecurityBackOfficeLogin",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/LoginRequestModel"
-                  }
-                ]
-              }
-            },
-            "text/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/LoginRequestModel"
-                  }
-                ]
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/LoginRequestModel"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
     "/umbraco/management/api/v1/security/forgot-password": {
       "post": {
         "tags": [
@@ -19679,18 +19622,6 @@
         },
         "additionalProperties": false
       },
-      "LoginRequestModel": {
-        "type": "object",
-        "properties": {
-          "username": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "MediaItemResponseModel": {
         "type": "object",
         "allOf": [
@@ -23182,8 +23113,8 @@
         "description": "Umbraco Authentication",
         "flows": {
           "authorizationCode": {
-            "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
-            "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token",
+            "authorizationUrl": "/umbraco/management/api/v1/security/back-office/authorize",
+            "tokenUrl": "/umbraco/management/api/v1/security/back-office/token",
             "scopes": { }
           }
         }

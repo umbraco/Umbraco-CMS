@@ -1,18 +1,17 @@
-﻿using System.Reflection;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Filters;
 
-internal abstract class SwaggerDocumentationFilterBase<TBaseController> : IOperationFilter, IParameterFilter
+internal abstract class SwaggerDocumentationFilterBase<TBaseController>
+    : SwaggerFilterBase<TBaseController>, IOperationFilter, IParameterFilter
     where TBaseController : Controller
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        if (CanApply(context.MethodInfo))
+        if (CanApply(context))
         {
             ApplyOperation(operation, context);
         }
@@ -20,7 +19,7 @@ internal abstract class SwaggerDocumentationFilterBase<TBaseController> : IOpera
 
     public void Apply(OpenApiParameter parameter, ParameterFilterContext context)
     {
-        if (CanApply(context.ParameterInfo.Member))
+        if (CanApply(context))
         {
             ApplyParameter(parameter, context);
         }
@@ -76,7 +75,4 @@ internal abstract class SwaggerDocumentationFilterBase<TBaseController> : IOpera
 
     private string QueryParameterDescription(string description)
         => $"{description}. Refer to [the documentation]({DocumentationLink}#query-parameters) for more details on this.";
-
-    private bool CanApply(MemberInfo member)
-        => member.DeclaringType?.Implements<TBaseController>() is true;
 }

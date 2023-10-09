@@ -89,6 +89,9 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public string EditorAlias => DataType.EditorAlias;
 
         /// <inheritdoc />
+        public string EditorUiAlias => DataType.EditorUiAlias;
+
+        /// <inheritdoc />
         public bool IsUserProperty { get; }
 
         /// <inheritdoc />
