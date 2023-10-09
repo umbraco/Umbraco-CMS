@@ -1,7 +1,9 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping.Content;
+using Umbraco.Cms.Api.Management.ViewModels.Abstract;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Media;
@@ -17,6 +19,7 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueModel, 
         => mapper.Define<IMedia, MediaResponseModel>((_, _) => new MediaResponseModel(), Map);
 
     // Umbraco.Code.MapAll -Urls
+    // Umbraco.Code.MapAll -IsTrashed
     private void Map(IMedia source, MediaResponseModel target, MapperContext context)
     {
         target.Id = source.Key;

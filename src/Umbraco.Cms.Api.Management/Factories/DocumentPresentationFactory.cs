@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Document;
+﻿using Umbraco.Cms.Api.Management.ViewModels.Abstract;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
 using Umbraco.Cms.Core;
@@ -32,6 +33,7 @@ public class DocumentPresentationFactory : IDocumentPresentationFactory
     public async Task<DocumentResponseModel> CreateResponseModelAsync(IContent content)
     {
         DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
+        _umbracoMapper.Map<ITreeEntity,ITracksTrashing>(content, responseModel);
 
         responseModel.Urls = await _contentUrlFactory.GetUrlsAsync(content);
 
@@ -50,6 +52,7 @@ public class DocumentPresentationFactory : IDocumentPresentationFactory
             Id = entity.Key,
             Icon = entity.ContentTypeIcon,
         };
+        _umbracoMapper.Map<ITreeEntity,ITracksTrashing>(entity, responseModel);
 
         IContentType? contentType = _contentTypeService.Get(entity.ContentTypeAlias);
         responseModel.ContentTypeId = contentType?.Key ?? Guid.Empty;

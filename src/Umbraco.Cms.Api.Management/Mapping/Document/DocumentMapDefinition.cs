@@ -1,8 +1,10 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping.Content;
+using Umbraco.Cms.Api.Management.ViewModels.Abstract;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Document;
@@ -18,6 +20,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         => mapper.Define<IContent, DocumentResponseModel>((_, _) => new DocumentResponseModel(), Map);
 
     // Umbraco.Code.MapAll -Urls -TemplateId
+    // Umbraco.Code.MapAll -IsTrashed
     private void Map(IContent source, DocumentResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -32,6 +35,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
                     ? source.PublishDate
                     : source.GetPublishDate(culture);
             });
+        context.Map<ITreeEntity,ITracksTrashing>(source, target);
     }
 
     private ContentState GetSavedState(IContent content, string? culture)

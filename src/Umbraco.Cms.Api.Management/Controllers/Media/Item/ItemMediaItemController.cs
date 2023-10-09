@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Core.Mapping;
@@ -18,13 +19,15 @@ public class ItemMediaItemController : MediaItemControllerBase
     private readonly IDataTypeService _dataTypeService;
     private readonly IUserStartNodeEntitiesService _userStartNodeEntitiesService;
     private readonly IUmbracoMapper _mapper;
+    private readonly IMediaPresentationModelFactory _mediaPresentationModelFactory;
 
-    public ItemMediaItemController(IEntityService entityService, IDataTypeService dataTypeService, IUserStartNodeEntitiesService userStartNodeEntitiesService, IUmbracoMapper mapper)
+    public ItemMediaItemController(IEntityService entityService, IDataTypeService dataTypeService, IUserStartNodeEntitiesService userStartNodeEntitiesService, IUmbracoMapper mapper, IMediaPresentationModelFactory mediaPresentationModelFactory)
     {
         _entityService = entityService;
         _dataTypeService = dataTypeService;
         _userStartNodeEntitiesService = userStartNodeEntitiesService;
         _mapper = mapper;
+        _mediaPresentationModelFactory = mediaPresentationModelFactory;
     }
 
     [HttpGet("item")]
@@ -43,7 +46,7 @@ public class ItemMediaItemController : MediaItemControllerBase
             }
         }
 
-        List<MediaItemResponseModel> responseModels = _mapper.MapEnumerable<IMediaEntitySlim, MediaItemResponseModel>(media);
+        var responseModels = media.Select(entity => _mediaPresentationModelFactory.CreateItemResponseModel(entity)).ToList();
 
         return Ok(responseModels);
     }
