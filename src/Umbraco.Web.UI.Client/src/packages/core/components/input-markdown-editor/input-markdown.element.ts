@@ -33,9 +33,6 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 
 	private _modalContext?: UmbModalManagerContext;
 
-	@state()
-	tabSize = 4;
-
 	constructor() {
 		super();
 		this.#loadCodeEditor();
@@ -56,7 +53,6 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 				minimap: false,
 				folding: false,
 			});
-			this.tabSize = this.#editor?.monacoModel?.getOptions().tabSize ?? 4;
 			this.#loadActions();
 		} catch (error) {
 			console.error(error);
