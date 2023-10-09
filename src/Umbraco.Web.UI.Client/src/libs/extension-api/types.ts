@@ -101,7 +101,7 @@ export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
  * The type of extension such as dashboard etc...
  */
 export interface ManifestApi<ApiType = unknown>
-	extends ManifestWithLoader<{ default: ClassConstructor<ApiType> }> {
+	extends ManifestWithLoader<{ default: ClassConstructor<ApiType> } | { api: ClassConstructor<ApiType> }> {
 	/**
 	 * @TJS-ignore
 	 */
@@ -125,7 +125,7 @@ export interface ManifestApi<ApiType = unknown>
 }
 
 export interface ManifestWithLoaderIncludingDefaultExport<T = unknown>
-	extends ManifestWithLoader<{ default: T } | Omit<object, 'default'>> {
+	extends ManifestWithLoader<{ default: T } | { element: T } | Omit<object, 'default'>> {
 	/**
 	 * The file location of the javascript file to load
 	 */

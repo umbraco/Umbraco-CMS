@@ -60,6 +60,8 @@ const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 ];
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
+
+	// TODO: replace this with a Extension Controller:
 	new UmbMultiExtensionsApiInitializer(host, ['globalContext', 'store', 'treeStore', 'itemStore']);
 
 	extensionRegistry.registerMany(manifests);

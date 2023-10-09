@@ -22,7 +22,7 @@ export async function createExtensionApi<ApiType = unknown>(
 		}
 
 		console.error(
-			'-- Extension did not succeed creating an api class instance, missing a default export of the served JavaScript file',
+			`-- Extension of alias "${manifest.alias}" did not succeed creating an api class instance, missing a 'api' or 'default' export of the served JavaScript file`,
 			manifest
 		);
 
@@ -30,7 +30,7 @@ export async function createExtensionApi<ApiType = unknown>(
 	}
 
 	console.error(
-		'-- Extension did not succeed creating an api class instance, missing a default export or `api` in the manifest.',
+		`-- Extension of alias "${manifest.alias}" did not succeed creating an api class instance, missing a JavaScript file via the 'apiJs' or 'js' property or a ClassConstructor in 'api' in the manifest.`,
 		manifest
 	);
 	return undefined;
