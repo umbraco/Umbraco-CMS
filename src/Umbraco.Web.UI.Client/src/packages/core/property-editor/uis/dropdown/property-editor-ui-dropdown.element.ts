@@ -1,15 +1,15 @@
-import { UUISelectEvent } from '@umbraco-ui/uui';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-property-editor-ui-dropdown
  */
 @customElement('umb-property-editor-ui-dropdown')
-export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	#value = '';
 	@property({ type: String })
 	public get value(): string {

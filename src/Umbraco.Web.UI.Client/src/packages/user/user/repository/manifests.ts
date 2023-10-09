@@ -1,4 +1,4 @@
-import { UmbUserRepository } from '../repository/user.repository.js';
+import { UmbUserRepository } from './user.repository.js';
 import { UmbUserItemStore } from './user-item.store.js';
 import { UmbUserStore } from './user.store.js';
 import type { ManifestStore, ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';

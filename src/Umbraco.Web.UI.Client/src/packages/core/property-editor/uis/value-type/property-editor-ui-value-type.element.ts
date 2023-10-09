@@ -1,7 +1,7 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
@@ -10,7 +10,7 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
  */
 
 @customElement('umb-property-editor-ui-value-type')
-export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	private _value: string | undefined = undefined;
 	@property()
 	public get value(): string | undefined {

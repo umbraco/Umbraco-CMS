@@ -2,7 +2,7 @@ export * from './dashboard-extension-element.interface.js';
 export * from './external-login-provider-extension-element.interface.js';
 export * from './menu-item-extension-element.interface.js';
 export * from './modal-extension-element.interface.js';
-export * from './property-editor-ui-extension-element.interface.js';
+export * from './property-editor-ui-element.interface.js';
 export * from './section-extension-element.interface.js';
 export * from './section-sidebar-app-extension-element.interface.js';
 export * from './section-view-extension-element.interface.js';

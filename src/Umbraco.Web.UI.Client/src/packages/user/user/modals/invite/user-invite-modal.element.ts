@@ -1,43 +1,22 @@
-import { UmbUserGroupInputElement } from '../../../user-groups/components/input-user-group/user-group-input.element.js';
+import { UmbUserGroupInputElement } from '../../../user-group/components/input-user-group/user-group-input.element.js';
 import { UmbUserRepository } from '../../repository/user.repository.js';
-import { UmbUserDetail } from '../../types.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
-// TODO: we need to import this from the user group module when it is ready
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
-import {
-	UmbNotificationDefaultData,
-	UmbNotificationContext,
-	UMB_NOTIFICATION_CONTEXT_TOKEN,
-} from '@umbraco-cms/backoffice/notification';
 
 export type UsersViewType = 'list' | 'grid';
-@customElement('umb-user-create-modal')
-export class UmbUserCreateModalElement extends UmbModalBaseElement {
+@customElement('umb-user-invite-modal')
+export class UmbUserInviteModalElement extends UmbModalBaseElement {
 	@query('#form')
 	private _form!: HTMLFormElement;
 
 	@state()
-	private _createdUser?: UmbUserDetail;
-
-	@state()
-	private _createdUserInitialPassword?: string | null;
-
-	#notificationContext?: UmbNotificationContext;
+	private _invitedUser?: any;
 
 	// TODO: get from extension registry
 	#userRepository = new UmbUserRepository(this);
 
-	connectedCallback(): void {
-		super.connectedCallback();
-
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (_instance) => {
-			this.#notificationContext = _instance;
-		});
-	}
-
-	async #onSubmit(e: SubmitEvent) {
+	private async _handleSubmit(e: Event) {
 		e.preventDefault();
 
 		const form = e.target as HTMLFormElement;
@@ -53,29 +32,23 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 
 		//TODO: How should we handle pickers forms?
 		const userGroupPicker = form.querySelector('#userGroups') as UmbUserGroupInputElement;
-		const userGroups = userGroupPicker?.selectedIds;
+		const userGroupIds = userGroupPicker?.selectedIds;
+
+		const message = formData.get('message') as string;
 
 		// TODO: figure out when to use email or username
-		const { data } = await this.#userRepository.create({
+		// TODO: invite request gives 500 error.
+		const { data } = await this.#userRepository.invite({
 			name,
 			email,
 			userName: email,
-			userGroupIds: userGroups,
+			message,
+			userGroupIds,
 		});
 
 		if (data) {
-			this._createdUser = data.user;
-			this._createdUserInitialPassword = data.createData.initialPassword;
+			this._invitedUser = data;
 		}
-	}
-
-	#copyPassword() {
-		const passwordInput = this.shadowRoot?.querySelector('#password') as UUIInputPasswordElement;
-		if (!passwordInput || typeof passwordInput.value !== 'string') return;
-
-		navigator.clipboard.writeText(passwordInput.value);
-		const data: UmbNotificationDefaultData = { message: 'Password copied' };
-		this.#notificationContext?.peek('positive', { data });
 	}
 
 	private _submitForm() {
@@ -87,24 +60,24 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 	}
 
 	private _resetForm() {
-		this._createdUser = undefined;
+		this._invitedUser = undefined;
 	}
 
 	private _goToProfile() {
-		if (!this._createdUser) return;
+		if (!this._invitedUser) return;
 
 		this._closeModal();
-		history.pushState(null, '', 'section/users/view/users/user/' + this._createdUser?.id); //TODO: URL Should be dynamic
+		history.pushState(null, '', 'section/users/view/users/user/' + this._invitedUser?.id); //TODO: URL Should be dynamic
 	}
 
 	private _renderForm() {
-		return html` <h1>Create user</h1>
+		return html` <h1>Invite user</h1>
 			<p style="margin-top: 0">
-				Create new users to give them access to Umbraco. When a user is created a password will be generated that you
-				can share with the user.
+				Invite new users to give them access to Umbraco. An invite email will be sent to the user with information on
+				how to log in to Umbraco. Invites last for 72 hours.
 			</p>
 			<uui-form>
-				<form id="form" name="form" @submit="${this.#onSubmit}">
+				<form id="form" name="form" @submit="${this._handleSubmit}">
 					<uui-form-layout-item>
 						<uui-label id="nameLabel" slot="label" for="name" required>Name</uui-label>
 						<uui-input id="name" label="name" type="text" name="name" required></uui-input>
@@ -118,34 +91,27 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 						<span slot="description">Add groups to assign access and permissions</span>
 						<umb-user-group-input id="userGroups" name="userGroups"></umb-user-group-input>
 					</uui-form-layout-item>
+					<uui-form-layout-item>
+						<uui-label id="messageLabel" slot="label" for="message" required>Message</uui-label>
+						<uui-textarea id="message" label="message" name="message" required></uui-textarea>
+					</uui-form-layout-item>
 				</form>
 			</uui-form>`;
 	}
 
-	private _renderPostCreate() {
-		if (!this._createdUser) return nothing;
+	private _renderPostInvite() {
+		if (!this._invitedUser) return nothing;
 
-		return html`<div class="uui-text">
-			<h1><b style="color: var(--uui-color-interactive-emphasis)">${this._createdUser.name}</b> has been created</h1>
-			<p>The new user has successfully been created. To log in to Umbraco use the password below</p>
-
-			<uui-label for="password">Password</uui-label>
-			<uui-input-password
-				id="password"
-				label="password"
-				name="password"
-				value="${this._createdUserInitialPassword ?? ''}"
-				readonly>
-				<!-- The button should be placed in the append part of the input, but that doesn't work with password inputs for now. -->
-				<uui-button slot="prepend" compact label="copy" @click=${this.#copyPassword}></uui-button>
-			</uui-input-password>
+		return html`<div>
+			<h1><b style="color: var(--uui-color-interactive-emphasis)">${this._invitedUser.name}</b> has been invited</h1>
+			<p>An invitation has been sent to the new user with details about how to log in to Umbraco.</p>
 		</div>`;
 	}
 
 	render() {
 		return html`<uui-dialog-layout>
-			${this._createdUser ? this._renderPostCreate() : this._renderForm()}
-			${this._createdUser
+			${this._invitedUser ? this._renderPostInvite() : this._renderForm()}
+			${this._invitedUser
 				? html`
 						<uui-button
 							@click=${this._closeModal}
@@ -156,7 +122,7 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 						<uui-button
 							@click=${this._resetForm}
 							slot="actions"
-							label="Create another user"
+							label="Invite another user"
 							look="secondary"></uui-button>
 						<uui-button @click=${this._goToProfile} slot="actions" label="Go to profile" look="primary"></uui-button>
 				  `
@@ -171,7 +137,7 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 							@click="${this._submitForm}"
 							slot="actions"
 							type="submit"
-							label="Create user"
+							label="Send invite"
 							look="primary"></uui-button>
 				  `}
 		</uui-dialog-layout>`;
@@ -194,8 +160,7 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 				display: flex;
 				flex-direction: column;
 			}
-			uui-input,
-			uui-input-password {
+			uui-input {
 				width: 100%;
 			}
 			form {
@@ -217,10 +182,10 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 	];
 }
 
-export default UmbUserCreateModalElement;
+export default UmbUserInviteModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-create-modal': UmbUserCreateModalElement;
+		'umb-user-invite-modal': UmbUserInviteModalElement;
 	}
 }

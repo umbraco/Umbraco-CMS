@@ -1,14 +1,14 @@
 import { UmbInputMediaElement } from '../../../../media/media/components/input-media/input-media.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-property-editor-ui-media-picker
  */
 @customElement('umb-property-editor-ui-media-picker')
-export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	private _value: Array<string> = [];
 
 	@property({ type: Array })

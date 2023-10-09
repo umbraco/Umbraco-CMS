@@ -6,17 +6,14 @@ import {
 } from './input-multiple-text-string/input-multiple-text-string.element.js';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-property-editor-ui-multiple-text-string
  */
 @customElement('umb-property-editor-ui-multiple-text-string')
-export class UmbPropertyEditorUIMultipleTextStringElement
-	extends UmbLitElement
-	implements UmbPropertyEditorExtensionElement
-{
+export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Array })
 	public value: MultipleTextStringValue = [];
 
