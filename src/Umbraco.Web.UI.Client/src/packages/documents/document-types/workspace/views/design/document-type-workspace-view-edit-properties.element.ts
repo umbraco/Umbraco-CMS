@@ -98,7 +98,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				(workspaceContext as UmbDocumentTypeWorkspaceContext).structure,
 			);
 			this.observe(
-				workspaceContext.isSorting,
+				(workspaceContext as UmbDocumentTypeWorkspaceContext).isSorting,
 				(isSorting) => {
 					this._sortModeActive = isSorting;
 					this.#setModel(isSorting);

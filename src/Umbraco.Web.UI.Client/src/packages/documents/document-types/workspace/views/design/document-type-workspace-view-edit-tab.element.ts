@@ -111,7 +111,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
 			this._groupStructureHelper.setStructureManager((context as UmbDocumentTypeWorkspaceContext).structure);
 			this.observe(
-				context.isSorting,
+				(context as UmbDocumentTypeWorkspaceContext).isSorting,
 				(isSorting) => {
 					this._sortModeActive = isSorting;
 					if (isSorting) {
