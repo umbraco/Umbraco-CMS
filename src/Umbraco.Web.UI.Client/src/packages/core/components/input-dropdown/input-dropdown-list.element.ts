@@ -1,4 +1,4 @@
-import { css, html, nothing, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -28,11 +28,10 @@ export class UmbInputDropdownListElement extends FormControlMixin(UmbLitElement)
 	}
 
 	render() {
-		if (!this.options) return nothing;
 		return html`<uui-select
 			label=${this.localize.term('formProviderFieldTypes_dropdownName')}
 			.placeholder=${this.placeholder ?? ''}
-			.options=${this.options}
+			.options=${this.options ?? []}
 			@change=${this.#onChange}></uui-select>`;
 	}
 

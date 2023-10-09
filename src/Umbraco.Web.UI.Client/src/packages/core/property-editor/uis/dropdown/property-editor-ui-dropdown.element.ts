@@ -3,7 +3,6 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
-import '../../../components/input-dropdown/input-dropdown-list.element.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
