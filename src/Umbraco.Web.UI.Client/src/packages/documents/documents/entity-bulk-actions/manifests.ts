@@ -11,28 +11,30 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		alias: 'Umb.EntityBulkAction.Document.Move',
 		name: 'Move Document Entity Bulk Action',
 		weight: 10,
+		api: UmbDocumentMoveEntityBulkAction,
 		meta: {
 			label: 'Move',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
-			api: UmbDocumentMoveEntityBulkAction,
 		},
-		conditions: {
-			entityType,
-		},
+		conditions: [{
+			alias: 'Umb.Condition.CollectionEntityType',
+			match: entityType,
+		}],
 	},
 	{
 		type: 'entityBulkAction',
 		alias: 'Umb.EntityBulkAction.Document.Copy',
 		name: 'Copy Document Entity Bulk Action',
 		weight: 9,
+		api: UmbDocumentCopyEntityBulkAction,
 		meta: {
 			label: 'Copy',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
-			api: UmbDocumentCopyEntityBulkAction,
 		},
-		conditions: {
-			entityType,
-		},
+		conditions: [{
+			alias: 'Umb.Condition.CollectionEntityType',
+			match: entityType,
+		}],
 	},
 ];
 

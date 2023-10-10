@@ -1,7 +1,7 @@
 import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbExtensionClassInitializer } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-registry';
 import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseModel> {
@@ -34,7 +34,7 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 		this.host = host;
 		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
 
-		this.#init = new UmbExtensionClassInitializer(host, 'repository', repositoryAlias, (repository) => {
+		this.#init = new UmbExtensionApiInitializer(host, 'repository', repositoryAlias, (repository) => {
 			// TODO: Some test that this repository is a items repository?
 			this.repository = repository as UmbItemRepository<ItemType>;
 		}).asPromise();

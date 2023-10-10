@@ -2,10 +2,10 @@ import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffic
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import type { UmbRoute, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
-import type { ManifestSection, UmbSectionExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestSection, UmbSectionElement } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbExtensionManifestController,
-	createExtensionElementOrFallback,
+	createExtensionElement,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -48,18 +48,17 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 		const oldValue = this._routes;
 
 		// TODO: Refactor this for re-use across the app where the routes are re-generated at any time.
-		// TODO: remove section-routes that does not exist anymore.
-		this._routes = this._sections.map((section) => {
+		this._routes = this._sections.filter(x => x.manifest).map((section) => {
 			const existingRoute = this._routes.find((r) => r.alias === section.alias);
 			if (existingRoute) {
 				return existingRoute;
 			} else {
 				return {
 					alias: section.alias,
-					path: this._routePrefix + (section.manifest as any).meta.pathname,
-					component: () => createExtensionElementOrFallback(section.manifest, 'umb-section-default'),
+					path: this._routePrefix + (section.manifest as ManifestSection).meta.pathname,
+					component: () => createExtensionElement((section.manifest as ManifestSection), 'umb-section-default'),
 					setup: (component) => {
-						(component as UmbSectionExtensionElement).manifest = section.manifest as any;
+						(component as UmbSectionElement).manifest = section.manifest as ManifestSection;
 					},
 				};
 			}
@@ -104,7 +103,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 			:host {
 				background-color: var(--uui-color-background);
 				display: block;
-				height: calc(100% - 60px); // 60 => top header height
+				height: calc(100% - 60px); // 60 => top header height, TODO: Make sure this comes from somewhere so it is maintainable and eventually responsive.
 			}
 		`,
 	];

@@ -8,7 +8,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: PACKAGE_REPOSITORY_ALIAS,
 	name: 'Package Repository',
-	class: UmbPackageRepository,
+	api: UmbPackageRepository,
 };
 
 export const PACKAGE_STORE_ALIAS = 'Umb.Store.Package';
@@ -17,7 +17,7 @@ const store: ManifestStore = {
 	type: 'store',
 	alias: PACKAGE_STORE_ALIAS,
 	name: 'Package Store',
-	class: UmbPackageStore,
+	api: UmbPackageStore,
 };
 
 export const manifests = [store, repository];
