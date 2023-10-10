@@ -7,6 +7,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -14,6 +15,8 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Diagnostics;
+using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
@@ -24,6 +27,8 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Extensions;
@@ -76,6 +81,61 @@ public abstract class TestHelperBase
 
     public IShortStringHelper ShortStringHelper { get; } =
         new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+    public IScopeProvider ScopeProvider
+    {
+        get
+        {
+            var loggerFactory = NullLoggerFactory.Instance;
+            var fileSystems = new FileSystems(
+                loggerFactory,
+                Mock.Of<IIOHelper>(),
+                Mock.Of<IOptions<GlobalSettings>>(),
+                Mock.Of<IHostingEnvironment>());
+            var mediaFileManager = new MediaFileManager(
+                Mock.Of<IFileSystem>(),
+                Mock.Of<IMediaPathScheme>(),
+                loggerFactory.CreateLogger<MediaFileManager>(),
+                Mock.Of<IShortStringHelper>(),
+                Mock.Of<IServiceProvider>(),
+                Options.Create(new ContentSettings()));
+            var databaseFactory = new Mock<IUmbracoDatabaseFactory>();
+            var database = new Mock<IUmbracoDatabase>();
+            var sqlContext = new Mock<ISqlContext>();
+
+            var lockingMechanism = new Mock<IDistributedLockingMechanism>();
+            lockingMechanism.Setup(x => x.ReadLock(It.IsAny<int>(), It.IsAny<TimeSpan?>()))
+                .Returns(Mock.Of<IDistributedLock>());
+            lockingMechanism.Setup(x => x.WriteLock(It.IsAny<int>(), It.IsAny<TimeSpan?>()))
+                .Returns(Mock.Of<IDistributedLock>());
+
+            var lockingMechanismFactory = new Mock<IDistributedLockingMechanismFactory>();
+            lockingMechanismFactory.Setup(x => x.DistributedLockingMechanism)
+                .Returns(lockingMechanism.Object);
+
+            // Setup mock of database factory to return mock of database.
+            databaseFactory.Setup(x => x.CreateDatabase()).Returns(database.Object);
+            databaseFactory.Setup(x => x.SqlContext).Returns(sqlContext.Object);
+
+            // Setup mock of database to return mock of sql SqlContext
+            database.Setup(x => x.SqlContext).Returns(sqlContext.Object);
+
+            var syntaxProviderMock = new Mock<ISqlSyntaxProvider>();
+
+            // Setup mock of ISqlContext to return syntaxProviderMock
+            sqlContext.Setup(x => x.SqlSyntax).Returns(syntaxProviderMock.Object);
+
+            return new ScopeProvider(
+                new AmbientScopeStack(),
+                new AmbientScopeContextStack(),
+                lockingMechanismFactory.Object,
+                databaseFactory.Object,
+                fileSystems,
+                new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
+                mediaFileManager,
+                loggerFactory,
+                Mock.Of<IEventAggregator>());
+        }
+    }
 
     public IJsonSerializer JsonSerializer { get; } = new JsonNetSerializer();
 
