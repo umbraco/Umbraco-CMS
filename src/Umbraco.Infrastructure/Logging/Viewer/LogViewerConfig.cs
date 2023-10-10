@@ -12,8 +12,17 @@ public class LogViewerConfig : ILogViewerConfig
     private readonly ILogViewerQueryRepository _logViewerQueryRepository;
     private readonly IScopeProvider _scopeProvider;
 
+    [Obsolete("Use non-obsolete ctor. This will be removed in Umbraco 14.")]
     public LogViewerConfig(ILogViewerQueryRepository logViewerQueryRepository, Umbraco.Cms.Core.Scoping.IScopeProvider scopeProvider)
         : this(logViewerQueryRepository, StaticServiceProvider.Instance.GetRequiredService<IScopeProvider>())
+    {
+
+    }
+
+    //Temp ctor used by MSDI (Greedy)
+    [Obsolete("Use non-obsolete ctor. This will be removed in Umbraco 14.")]
+    public LogViewerConfig(ILogViewerQueryRepository logViewerQueryRepository, Umbraco.Cms.Core.Scoping.IScopeProvider coreScopeProvider, IScopeProvider scopeProvider)
+        : this(logViewerQueryRepository, scopeProvider)
     {
 
     }
