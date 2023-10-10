@@ -680,7 +680,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         [Obsolete("Please use GetReferencesAsync. Will be deleted in V15.")]
         public IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             return _dataTypeRepository.FindUsages(id);
         }
 
