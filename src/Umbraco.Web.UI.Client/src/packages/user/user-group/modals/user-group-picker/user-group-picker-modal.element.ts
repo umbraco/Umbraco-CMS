@@ -6,7 +6,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-user-group-picker-modal')
 export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any> {
@@ -31,8 +31,8 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 				if (!repositoryManifest) return;
 
 				try {
-					const result = await createExtensionClass<UmbUserGroupRepository>(repositoryManifest, [this]);
-					this.#userGroupRepository = result;
+					const result = await createExtensionApi(repositoryManifest, [this]);
+					this.#userGroupRepository = result as UmbUserGroupRepository;
 					this.#observeUserGroups();
 				} catch (error) {
 					throw new Error('Could not create repository with alias: Umb.Repository.User');

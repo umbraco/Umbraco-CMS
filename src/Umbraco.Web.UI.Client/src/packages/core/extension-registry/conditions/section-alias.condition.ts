@@ -39,5 +39,5 @@ export const manifest: ManifestCondition = {
 	type: 'condition',
 	name: 'Section Alias Condition',
 	alias: 'Umb.Condition.SectionAlias',
-	class: UmbSectionAliasCondition,
+	api: UmbSectionAliasCondition,
 };

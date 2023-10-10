@@ -40,5 +40,5 @@ export const manifest: ManifestCondition = {
 	type: 'condition',
 	name: 'User Permission Condition',
 	alias: 'Umb.Condition.UserPermission',
-	class: UmbUserPermissionCondition,
+	api: UmbUserPermissionCondition,
 };

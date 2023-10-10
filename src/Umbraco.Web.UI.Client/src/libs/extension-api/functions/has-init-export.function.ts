@@ -1,4 +1,4 @@
-import type { UmbEntryPointModule } from './entry-point.interface.js';
+import type { UmbEntryPointModule } from '../models/entry-point.interface.js';
 
 /**
  * Validate if an ESModule exports a known init function called 'onInit'

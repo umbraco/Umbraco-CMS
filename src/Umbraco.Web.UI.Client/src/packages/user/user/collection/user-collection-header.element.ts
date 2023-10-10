@@ -8,7 +8,7 @@ import {
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
-import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import {
 	UMB_CREATE_USER_MODAL,
 	UMB_INVITE_USER_MODAL,
@@ -46,7 +46,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 			this.#modalContext = instance;
 		});
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
 		});
 	}
@@ -124,7 +124,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 				<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
 				<umb-dropdown margin="8">
 					<uui-button @click=${this.#onDropdownClick} slot="trigger" label="status">
-						<umb-localize key="general_status"></umb-localize>: 
+						<umb-localize key="general_status"></umb-localize>:
 						<umb-localize key=${'user_state'+this._stateFilterSelection}></umb-localize>
 					</uui-button>
 					<div slot="dropdown" class="filter-dropdown">

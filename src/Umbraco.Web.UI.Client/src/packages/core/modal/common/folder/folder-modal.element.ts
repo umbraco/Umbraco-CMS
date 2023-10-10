@@ -3,7 +3,7 @@ import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbFolderModalData, UmbFolderModalResult, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
-import { createExtensionClass, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionApi, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { FolderResponseModel, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -50,7 +50,7 @@ export class UmbFolderModalElement extends UmbLitElement {
 				if (!repositoryManifest) return;
 
 				try {
-					const result = await createExtensionClass<UmbFolderRepository>(repositoryManifest, [this]);
+					const result = await createExtensionApi<UmbFolderRepository>(repositoryManifest, [this]);
 					this.#repository = result;
 					this.#init();
 				} catch (error) {

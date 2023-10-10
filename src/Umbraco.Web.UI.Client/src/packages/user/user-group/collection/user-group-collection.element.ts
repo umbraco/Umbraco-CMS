@@ -1,7 +1,7 @@
 import { UmbUserGroupCollectionContext } from './user-group-collection.context.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './user-group-collection-view.element.js';
@@ -13,7 +13,7 @@ export class UmbUserCollectionElement extends UmbLitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this.provideContext(UMB_COLLECTION_CONTEXT_TOKEN, this.#collectionContext);
+		this.provideContext(UMB_COLLECTION_CONTEXT, this.#collectionContext);
 	}
 
 	render() {
