@@ -187,15 +187,41 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
     private ExamineIndexModel CreateModel(IIndex index)
     {
         var indexName = index.Name;
-
         IIndexDiagnostics indexDiag = _indexDiagnosticsFactory.Create(index);
-
         Attempt<string?> isHealth = indexDiag.IsHealthy();
+        var healthResult = isHealth.Result;
+
+        long documentCount;
+        int fieldCount;
+
+        try
+        {
+            // This will throw if the index is corrupted - i.e. a file in the index folder cannot be found
+            // Which will break the UI and not give the possibility to rebuild the index
+            documentCount = indexDiag.GetDocumentCount();
+            fieldCount = indexDiag.GetFieldNames().Count();
+        }
+        catch (FileNotFoundException ex)
+        {
+            // Safe catch that will allow to rebuild a corrupted index
+            documentCount = 0;
+            fieldCount = 0;
+
+            _logger.LogWarning(ex, "{name} is corrupted.", indexName);
+
+            if (!string.IsNullOrWhiteSpace(healthResult))
+            {
+                healthResult += " ";
+            }
+
+            // Provide a useful message in the Examine dashboard
+            healthResult += $"It may not be possible to rebuild the index. Please try deleting the entire {indexName} folder and then attempt to rebuild it again.";
+        }
 
         var properties = new Dictionary<string, object?>
         {
-            ["DocumentCount"] = indexDiag.GetDocumentCount(),
-            ["FieldCount"] = indexDiag.GetFieldNames().Count()
+            ["DocumentCount"] = documentCount,
+            ["FieldCount"] = fieldCount
         };
 
         foreach (KeyValuePair<string, object?> p in indexDiag.Metadata)
@@ -206,7 +232,7 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
         var indexerModel = new ExamineIndexModel
         {
             Name = indexName,
-            HealthStatus = isHealth.Success ? isHealth.Result ?? "Healthy" : isHealth.Result ?? "Unhealthy",
+            HealthStatus = isHealth.Success ? healthResult ?? "Healthy" : healthResult ?? "Unhealthy",
             ProviderProperties = properties,
             CanRebuild = _indexRebuilder.CanRebuild(index.Name)
         };

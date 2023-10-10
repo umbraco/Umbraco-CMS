@@ -6,26 +6,26 @@ import {expect} from "@playwright/test";
 test.describe('BlockGridEditorAreasContent', () => {
   const documentName = 'DocumentTest';
   const blockGridName = 'BlockGridTest';
-  const elementTitleName = 'ElementTitle'; 
+  const elementTitleName = 'ElementTitle';
   const titleText = 'ElementTitle';
   const titleArea = 'AreaTitle';
   const elementBodyName = 'ElementBody';
   const bodyText = 'Lorem ipsum dolor sit amet';
-  
+
   const elementBodyAlias = AliasHelper.toAlias(elementBodyName);
   const documentAlias = AliasHelper.toAlias(documentName);
   const blockGridAlias = AliasHelper.toAlias(blockGridName);
   const elementTitleAlias = AliasHelper.toAlias(elementTitleName);
-  
+
   async function createContentWithABlockInAnotherBlock(umbracoApi,elementParent, elementChild, dataType?, document?) {
 
     if (dataType == null) {
-      dataType = await umbracoApi.dataTypes.createBlockGridDataTypeWithArea(umbracoApi, elementParent, elementChild, blockGridName, titleArea);
+      dataType = await umbracoApi.dataTypes.createBlockGridDataTypeWithArea(elementParent, elementChild, blockGridName, titleArea);
     }
     if (document == null) {
-      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, elementParent, dataType);
+      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(elementParent, dataType);
     }
-    
+
     const rootContentNode = new ContentBuilder()
       .withContentTypeAlias(documentAlias)
       .withAction(ConstantHelper.actions.save)
@@ -58,7 +58,7 @@ test.describe('BlockGridEditorAreasContent', () => {
       .build();
    return await umbracoApi.content.save(rootContentNode);
   }
-  
+
   test.beforeEach(async ({page, umbracoApi, umbracoUi}, testInfo) => {
     await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
@@ -80,12 +80,12 @@ test.describe('BlockGridEditorAreasContent', () => {
       const element = await umbracoApi.documentTypes.createDefaultElementType(elementTitleName, elementTitleAlias);
       const elementBody = await umbracoApi.documentTypes.createDefaultElementType(elementBodyName, elementBodyAlias);
 
-      const dataType = await umbracoApi.dataTypes.createBlockGridDataTypeWithArea(umbracoApi, element, elementBody, blockGridName, titleArea);
-      
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, element, dataType, null);
+      const dataType = await umbracoApi.dataTypes.createBlockGridDataTypeWithArea(element, elementBody, blockGridName, titleArea);
+
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
-      
+
       // Adds a body to the area
       await page.locator('[data-content-element-type-key="' + element['key'] + '"] >> [data-area-alias="' + titleArea + '"]').click();
       await page.locator('[name="infiniteEditorForm"]').locator('[data-element="editor-container"]').getByRole('button', {name: elementBodyName}).click();
@@ -166,9 +166,9 @@ test.describe('BlockGridEditorAreasContent', () => {
         .done()
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
-      
+
       await createContentWithABlockInAnotherBlock(umbracoApi, element, elementBody, dataType);
-      
+
       await umbracoUi.navigateToContent(blockGridName);
 
       // Adds another body to the area
@@ -204,7 +204,7 @@ test.describe('BlockGridEditorAreasContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, element, dataType, null);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
 
@@ -212,12 +212,12 @@ test.describe('BlockGridEditorAreasContent', () => {
       // Checks if the area in content has the value that is defined in the block grid editor
       await expect(page.locator('[data-content-element-type-key="' + element['key'] + '"]').locator('[data-area-alias="' + titleArea + '"]')).toHaveAttribute('data-area-col-span', '6');
     });
-    
+
     test('can add two different blocks in a area with different grid columns', async ({page, umbracoApi, umbracoUi}) => {
       const secondArea = 'AreaFour';
       const columnSpanEight = "8";
       const columnSpanFour = "4";
-      
+
       const element = await umbracoApi.documentTypes.createDefaultElementType(elementTitleName, elementTitleAlias);
       const elementBody = await umbracoApi.documentTypes.createDefaultElementType(elementBodyName, elementBodyAlias);
 
@@ -239,8 +239,8 @@ test.describe('BlockGridEditorAreasContent', () => {
         .done()
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
-      
-      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, element, dataType);
+
+      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(element, dataType);
 
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
@@ -275,14 +275,14 @@ test.describe('BlockGridEditorAreasContent', () => {
       await umbracoApi.content.save(rootContentNode);
 
       await umbracoUi.navigateToContent(blockGridName);
-      
+
       // Adds a block to the area with a different column span
       await page.locator('[data-content-element-type-key="' + element['key'] + '"]').locator('[data-area-alias="' + secondArea + '"]').getByRole('button', {name: 'Add content'}).click();
       await page.locator('[name="infiniteEditorForm"]').locator('[data-element="editor-container"]').getByRole('button', {name: elementBodyName}).click();
       await page.locator('[id="sub-view-0"]').locator('[id="title"]').fill('BodyTwoText');
       await page.locator('[label="Create"]').click();
       await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
-      
+
       // Assert
       await umbracoUi.isSuccessNotificationVisible();
       // Checks if there are two block in the ElementTitle Area
@@ -311,14 +311,14 @@ test.describe('BlockGridEditorAreasContent', () => {
         .done()
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
-      
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, element, dataType, false);
+
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
 
       // Checks if the button has the correct row span
       await expect(page.locator('[data-content-element-type-key="' + element['key'] + '"]').locator('[data-area-row-span="3"]').getByRole('button', {name: 'Add content'})).toBeVisible();
-      
+
       // Adds a block to the area
       await page.locator('[data-content-element-type-key="' + element['key'] + '"]').locator('[data-area-alias="' + titleArea + '"]').getByRole('button', {name: 'Add content'}).click();
       await page.locator('[name="infiniteEditorForm"]').locator('[data-element="editor-container"]').getByRole('button', {name: elementBodyName}).click();
@@ -336,7 +336,7 @@ test.describe('BlockGridEditorAreasContent', () => {
       await expect(page.locator('[data-content-element-type-key="' + element['key'] + '"]').locator('[data-content-element-type-alias="' + elementBodyAlias + '"]')).toHaveAttribute('data-row-span', '3');
     });
   });
-  
+
   test.describe('Create Button Label', () => {
     test('can add a create button label for an area in block grid editor', async ({page, umbracoApi, umbracoUi}) => {
       const newButtonLabel = 'NewAreaBlock';
@@ -358,9 +358,9 @@ test.describe('BlockGridEditorAreasContent', () => {
         .done()
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
-      
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, element, dataType, false);
-      
+
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
+
       await umbracoUi.navigateToContent(blockGridName);
 
       // Assert
@@ -371,7 +371,7 @@ test.describe('BlockGridEditorAreasContent', () => {
       await createButtonLocator.click();
     });
   });
- 
+
   test.describe('Number of blocks', () => {
     test('can add a minimum number of blocks for a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
       const element = await umbracoApi.documentTypes.createDefaultElementType(elementTitleName, elementTitleAlias);
@@ -418,7 +418,7 @@ test.describe('BlockGridEditorAreasContent', () => {
 
     test('can add a maximum number of blocks for a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
       const bodyTextTwo = 'AnotherBody';
-      
+
       const element = await umbracoApi.documentTypes.createDefaultElementType(elementTitleName, elementTitleAlias);
       const elementBody = await umbracoApi.documentTypes.createDefaultElementType(elementBodyName, elementBodyAlias);
 
@@ -437,7 +437,7 @@ test.describe('BlockGridEditorAreasContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, element, dataType);
+      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(element, dataType);
 
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
@@ -522,7 +522,7 @@ test.describe('BlockGridEditorAreasContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, element, dataType);
+      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(element, dataType);
 
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
@@ -551,7 +551,7 @@ test.describe('BlockGridEditorAreasContent', () => {
       await umbracoApi.content.save(rootContentNode);
 
       await umbracoUi.navigateToContent(blockGridName);
-      
+
       // Adds a ElementBody
       await page.locator('[data-content-element-type-key="' + element['key'] + '"]').locator('[data-area-alias="' + titleArea + '"]').click();
       // Since the ElementBody is added as the only Specified Allowance for the area of the Element, then we should be instantly directed to it, instead of having to pick it.
@@ -586,7 +586,7 @@ test.describe('BlockGridEditorAreasContent', () => {
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
       await createContentWithABlockInAnotherBlock(umbracoApi, element, elementBody, dataType, null);
-      
+
       await umbracoUi.navigateToContent(blockGridName);
 
       // Checks if a validation error is visible
@@ -630,7 +630,7 @@ test.describe('BlockGridEditorAreasContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, element, dataType);
+      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(element, dataType);
 
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
@@ -736,7 +736,7 @@ test.describe('BlockGridEditorAreasContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, element, dataType);
+      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(element, dataType);
 
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
@@ -778,7 +778,7 @@ test.describe('BlockGridEditorAreasContent', () => {
       await umbracoApi.content.save(rootContentNode);
 
       await umbracoUi.navigateToContent(blockGridName);
-      
+
       // Checks if there is validation error for both blocks
       await expect(page.locator('[key="blockEditor_areaValidationEntriesExceed"]', {hasText: elementBodyName})).toBeVisible();
       await expect(page.locator('[key="blockEditor_areaValidationEntriesShort"]', {hasText: elementFooterName})).toBeVisible();
@@ -808,7 +808,7 @@ test.describe('BlockGridEditorAreasContent', () => {
       await expect(page.locator('[data-content-element-type-key="' + element['key'] + '"]').locator('[data-content-element-type-alias="' + elementBodyAlias + '"]')).toHaveCount(1);
       await expect(page.locator('[data-content-element-type-key="' + element['key'] + '"]').locator('[data-content-element-type-alias="' + elementFooterAlias + '"]')).toHaveCount(1);
 
-      // Clean 
+      // Clean
       await umbracoApi.documentTypes.ensureNameNotExists(elementFooterName);
     });
   });
@@ -818,9 +818,9 @@ test.describe('BlockGridEditorAreasContent', () => {
       const element = await umbracoApi.documentTypes.createDefaultElementType(elementTitleName, elementTitleAlias);
       const elementBody = await umbracoApi.documentTypes.createDefaultElementType(elementBodyName, elementBodyAlias);
 
-      const dataType = await umbracoApi.dataTypes.createBlockGridDataTypeWithArea(umbracoApi, element, elementBody, blockGridName, titleArea);
+      const dataType = await umbracoApi.dataTypes.createBlockGridDataTypeWithArea(element, elementBody, blockGridName, titleArea);
 
-      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, element, dataType);
+      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(element, dataType);
 
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
@@ -869,9 +869,9 @@ test.describe('BlockGridEditorAreasContent', () => {
       const element = await umbracoApi.documentTypes.createDefaultElementType(elementTitleName, elementTitleAlias);
       const elementBody = await umbracoApi.documentTypes.createDefaultElementType(elementBodyName, elementBodyAlias);
 
-      const dataType = await umbracoApi.dataTypes.createBlockGridDataTypeWithArea(umbracoApi, element, elementBody, blockGridName, titleArea);
+      const dataType = await umbracoApi.dataTypes.createBlockGridDataTypeWithArea(element, elementBody, blockGridName, titleArea);
 
-      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, element, dataType);
+      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(element, dataType);
 
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
@@ -935,9 +935,9 @@ test.describe('BlockGridEditorAreasContent', () => {
       const element = await umbracoApi.documentTypes.createDefaultElementType(elementTitleName, elementTitleAlias);
       const elementBody = await umbracoApi.documentTypes.createDefaultElementType(elementBodyName, elementBodyAlias);
 
-      const dataType = await umbracoApi.dataTypes.createBlockGridDataTypeWithArea(umbracoApi, element, elementBody, blockGridName, titleArea);
+      const dataType = await umbracoApi.dataTypes.createBlockGridDataTypeWithArea(element, elementBody, blockGridName, titleArea);
 
-      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, element, dataType);
+      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(element, dataType);
 
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
@@ -1002,9 +1002,9 @@ test.describe('BlockGridEditorAreasContent', () => {
       const element = await umbracoApi.documentTypes.createDefaultElementType(elementTitleName, elementTitleAlias);
       const elementBody = await umbracoApi.documentTypes.createDefaultElementType(elementBodyName, elementBodyAlias);
 
-      const dataType = await umbracoApi.dataTypes.createBlockGridDataTypeWithArea(umbracoApi, element, elementBody, blockGridName, titleArea);
+      const dataType = await umbracoApi.dataTypes.createBlockGridDataTypeWithArea(element, elementBody, blockGridName, titleArea);
 
-      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, element, dataType);
+      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(element, dataType);
 
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
@@ -1041,12 +1041,12 @@ test.describe('BlockGridEditorAreasContent', () => {
       const blockParentUdi = rootContentNode.variants[0].properties[0].value.contentData[1].udi;
 
       await umbracoUi.navigateToContent(blockGridName);
-      
+
       // Copies and pastes the block into another block
       await page.locator('[data-element-udi="' + blockParentUdi + '"]').getByRole('button', {name: 'Copy'}).nth(1).click();
       await page.locator('[data-element="property-' + blockGridAlias + '"]').getByRole('button', {name: 'Clipboard'}).click();
       await page.locator('[data-element="editor-container"]').locator('umb-block-card', {hasText: elementTitleName}).click();
-      
+
       // Checks if the blocks were copied
       await expect(page.locator('[data-content-element-type-alias="' + elementTitleAlias + '"]')).toHaveCount(2);
     });

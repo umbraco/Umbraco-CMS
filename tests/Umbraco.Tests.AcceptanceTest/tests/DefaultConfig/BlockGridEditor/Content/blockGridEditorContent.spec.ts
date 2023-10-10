@@ -27,8 +27,8 @@ test.describe('BlockGridEditorContent', () => {
   });
 
   test('can create content with a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
-    await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, null, null);
-    
+    await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(null, null);
+
     const rootContentNode = new ContentBuilder()
       .withContentTypeAlias(documentAlias)
       .withAction(ConstantHelper.actions.save)
@@ -58,11 +58,11 @@ test.describe('BlockGridEditorContent', () => {
     const newContentValue = 'UpdatedTitle';
     const newSettingValue = 'UpdatedSetting';
 
-    const element = await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, null, null, null);
+    const element = await umbracoApi.content.createDefaultContentWithABlockGridEditor(null, null, null);
 
     await umbracoUi.navigateToContent(blockGridName);
 
-    // Updates the already created content text 
+    // Updates the already created content text
     await page.locator('[data-content-element-type-key="' + element['key'] + '"]', {hasText: elementName}).click();
     await page.locator('[id="sub-view-0"]').locator('[id="title"]').fill(newContentValue);
     await umbracoUi.clickDataElementByElementName('sub-view-settings');
@@ -71,7 +71,7 @@ test.describe('BlockGridEditorContent', () => {
     await page.locator('[label="Submit"]').click();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
 
-    // Assert 
+    // Assert
     await umbracoUi.isSuccessNotificationVisible();
     // Checks if the Content and Setting were updated after it was saved
     await page.locator('[data-content-element-type-key="' + element['key'] + '"]', {hasText: elementName}).click();
@@ -81,13 +81,13 @@ test.describe('BlockGridEditorContent', () => {
   });
 
   test('can delete a block grid editor in content', async ({page, umbracoApi, umbracoUi}) => {
-    const element = await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, null, null, null);
+    const element = await umbracoApi.content.createDefaultContentWithABlockGridEditor(null, null, null);
 
     await umbracoUi.navigateToContent(blockGridName);
 
     // Deletes the block grid editor inside of the content
     await page.getByTitle("Delete").click();
-                               
+
     // Can't use our constant helper because the action for delete does not contain an s. The correct way is 'action-delete'
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey('actions_delete'));
 
@@ -101,7 +101,7 @@ test.describe('BlockGridEditorContent', () => {
   });
 
   test('can copy block grid content and paste it', async ({page, umbracoApi, umbracoUi}) => {
-    await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, null, null, null);
+    await umbracoApi.content.createDefaultContentWithABlockGridEditor(null, null, null);
 
     await umbracoUi.navigateToContent(blockGridName);
     // Checks to make sure that there is only one item
@@ -134,7 +134,7 @@ test.describe('BlockGridEditorContent', () => {
 
     const element = await umbracoApi.documentTypes.createDefaultElementType(elementName, elementAlias);
 
-    const dataType = await umbracoApi.dataTypes.createDefaultBlockGrid(umbracoApi, blockGridName, element);
+    const dataType = await umbracoApi.dataTypes.createDefaultBlockGrid(blockGridName, element);
 
     const docType = new DocumentTypeBuilder()
       .withName(documentName)
@@ -157,7 +157,7 @@ test.describe('BlockGridEditorContent', () => {
       .build();
     await umbracoApi.documentTypes.save(docType);
 
-    await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, element, dataType, true);
+    await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, true);
 
     await umbracoUi.navigateToContent(blockGridName);
 
@@ -192,9 +192,9 @@ test.describe('BlockGridEditorContent', () => {
       const element = await umbracoApi.documentTypes.createDefaultElementType(elementName, elementAlias);
 
       // We give the dataType a label so we can differentiate between the top and bottom block in the content editor.
-      const dataType = await umbracoApi.dataTypes.createDefaultBlockGrid(umbracoApi, blockGridName, element, '{{' + element.groups[0].properties[0].alias + '}}');
+      const dataType = await umbracoApi.dataTypes.createDefaultBlockGrid(blockGridName, element, '{{' + element.groups[0].properties[0].alias + '}}');
 
-      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, element, dataType);
+      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(element, dataType);
 
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
@@ -226,7 +226,7 @@ test.describe('BlockGridEditorContent', () => {
       await umbracoApi.content.save(rootContentNode);
 
       await umbracoUi.navigateToContent(blockGridName);
-      
+
       // Drag and Drop
       const dragFromLocator = await page.locator('[data-content-element-type-key="' + element['key'] + '"]', {hasText: bottomBlock});
       const dragToLocator = await page.locator('[data-content-element-type-key="' + element['key'] + '"]', {hasText: topBlock});
@@ -253,7 +253,7 @@ test.describe('BlockGridEditorContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, element, dataType);
+      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(element, dataType);
 
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
@@ -319,7 +319,7 @@ test.describe('BlockGridEditorContent', () => {
 
     await umbracoApi.media.createDefaultImage(imageName);
 
-    await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, element, null);
+    await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(element, null);
 
     const rootContentNode = new ContentBuilder()
       .withContentTypeAlias(documentAlias)
@@ -346,7 +346,7 @@ test.describe('BlockGridEditorContent', () => {
 
     // Selects the created image for the block
     await page.locator('[data-content-element-type-key="' + element['key'] + '"]').click();
-    await page.locator('[data-element="property-image"]').locator('[key="' + ConstantHelper.buttons.add + '"]').click();
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
     await page.locator('[data-element="media-grid"] >> [title="' + imageName + '"]').click();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.select));
     await page.locator('[label="Submit"]').click();
@@ -374,7 +374,7 @@ test.describe('BlockGridEditorContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, element, dataType, false);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
       // Checks if there is validation for needing 2 entries or more
@@ -408,7 +408,7 @@ test.describe('BlockGridEditorContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(umbracoApi, element, dataType);
+      await umbracoApi.documentTypes.createDefaultDocumentWithBlockGridEditor(element, dataType);
 
       const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(documentAlias)
@@ -470,7 +470,7 @@ test.describe('BlockGridEditorContent', () => {
   test.describe('Live editing mode', () => {
     test('can use live editing mode in content with a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
       const newText = 'LiveUpdatedContent';
-      
+
       const element = await umbracoApi.documentTypes.createDefaultElementType(elementName, elementAlias);
 
       const dataTypeBlockGrid = new BlockGridDataTypeBuilder()
@@ -485,17 +485,17 @@ test.describe('BlockGridEditorContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, element, dataType, false);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
 
       // Checks if the block contains the correct text before being edited
       await expect(page.locator('[data-content-element-type-alias="'+elementAlias +'"]')).toContainText('aliasTest');
-      
+
       // Updates the text without saving the changes.
       await page.locator('[data-content-element-type-key="' + element['key'] + '"]').click();
       await page.locator('[id="sub-view-0"]').locator('[id="title"]').fill(newText);
-      
+
       // Checks if the block is being live updated as the content is being updated.
       await expect(page.locator('[data-content-element-type-alias="'+elementAlias +'"]')).toContainText(newText);
     });
@@ -515,7 +515,7 @@ test.describe('BlockGridEditorContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, element, dataType, false);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
 
@@ -540,7 +540,7 @@ test.describe('BlockGridEditorContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, element, dataType, false);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
 
@@ -571,8 +571,8 @@ test.describe('BlockGridEditorContent', () => {
         .withLayoutStylesheet(stylesheetDataPath)
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
-      
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, element, dataType, null);
+
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, null);
 
       await umbracoUi.navigateToContent(blockGridName);
 
@@ -600,7 +600,7 @@ test.describe('BlockGridEditorContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, element, dataType, false);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       // Goes to the created Content
       await umbracoUi.goToSection(ConstantHelper.sections.content);

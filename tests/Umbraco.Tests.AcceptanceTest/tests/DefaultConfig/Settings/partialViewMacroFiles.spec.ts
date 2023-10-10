@@ -31,18 +31,18 @@ test.describe('Partial View Macro Files', () => {
 
         await page.locator('.menu-label localize[key="create_newPartialViewMacro"]').click();
 
-        //Type name
+        // Type name
         await umbracoUi.setEditorHeaderName(name);
 
-        //Save
+        // Save
         await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
         //Assert
-        await umbracoUi.isSuccessNotificationVisible({timeout:10000});
+        await umbracoUi.isSuccessNotificationVisible();
 
         //Clean up
         await cleanup(umbracoApi, name);
-    });    
+    });
 
     test('Create new partial view macro without macro', async ({page, umbracoApi, umbracoUi}) => {
         const name = "TestPartialMacrolessMacro";
@@ -55,16 +55,16 @@ test.describe('Partial View Macro Files', () => {
 
         // Type name
         await umbracoUi.setEditorHeaderName(name);
-        
+
         // Save
         await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
         // Assert
-        await umbracoUi.isSuccessNotificationVisible({timeout:10000});
+        await umbracoUi.isSuccessNotificationVisible();
 
         // Clean
         await cleanup(umbracoApi, name);
-    });    
+    });
 
     test('Create new partial view macro from snippet', async ({page, umbracoApi, umbracoUi}) => {
         const name = "TestPartialFromSnippet";
@@ -85,11 +85,11 @@ test.describe('Partial View Macro Files', () => {
         await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
         // Assert
-        await umbracoUi.isSuccessNotificationVisible({timeout:10000});
+        await umbracoUi.isSuccessNotificationVisible();
 
         // Clean
         await cleanup(umbracoApi, name);
-    });    
+    });
 
     test('Delete partial view macro', async ({page, umbracoApi, umbracoUi}) => {
         const name = "TestDeletePartialViewMacro";
@@ -118,7 +118,7 @@ test.describe('Partial View Macro Files', () => {
 
         // Clean
         await cleanup(umbracoApi, name);
-    });    
+    });
 
     test('Edit partial view macro', async ({page, umbracoApi, umbracoUi}) => {
         const name = "TestPartialViewMacroEditable";
@@ -140,12 +140,12 @@ test.describe('Partial View Macro Files', () => {
 
         // Type an edit
         await page.locator('.ace_text-input').type(" // test" );
-        
+
         // Save
         await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
         // Assert
-        await umbracoUi.isSuccessNotificationVisible({timeout:10000});
+        await umbracoUi.isSuccessNotificationVisible();
 
         await cleanup(umbracoApi, name);
     });
