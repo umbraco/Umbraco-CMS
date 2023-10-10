@@ -1,7 +1,7 @@
 import UmbInputMultipleTextStringItemElement from '../input-multiple-text-string-item/input-multiple-text-string-item.element.js';
 import { css, html, nothing, repeat, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbInputEvent, UmbChangeEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/events';
+import { UmbInputEvent, UmbChangeEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 export type MultipleTextStringValue = Array<MultipleTextStringValueItem>;
@@ -86,12 +86,12 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this._items.length < this.min
+			() => !!this.min && this._items.length < this.min,
 		);
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this._items.length > this.max
+			() => !!this.max && this._items.length > this.max,
 		);
 	}
 
@@ -138,7 +138,7 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	async #focusNewItem() {
 		await this.updateComplete;
 		const items = this.shadowRoot?.querySelectorAll(
-			'umb-input-multiple-text-string-item'
+			'umb-input-multiple-text-string-item',
 		) as NodeListOf<UmbInputMultipleTextStringItemElement>;
 		const newItem = items[items.length - 1];
 		newItem.focus();
@@ -173,7 +173,7 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 						?disabled=${this.disabled}
 						?readonly=${this.readonly}
 						required
-						required-message="Item ${index + 1} is missing a value"></umb-input-multiple-text-string-item>`
+						required-message="Item ${index + 1} is missing a value"></umb-input-multiple-text-string-item>`,
 			)}
 		`;
 	}

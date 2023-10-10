@@ -1,6 +1,6 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
+import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-workspace-action-menu')
@@ -39,7 +39,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 		this._actionMenuIsOpen = true;
 	}
 
-	#onActionExecuted(event: UmbExecutedEvent) {
+	#onActionExecuted(event: UmbActionExecutedEvent) {
 		event.stopPropagation();
 		this.#close();
 	}
@@ -56,7 +56,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				<div id="action-menu-dropdown" slot="popover">
 					<uui-scroll-container>
 						<umb-entity-action-list
-							@executed=${this.#onActionExecuted}
+							@action-executed=${this.#onActionExecuted}
 							.entityType=${this._entityType}
 							.unique=${this._entityId}>
 						</umb-entity-action-list>

@@ -7,7 +7,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: CULTURE_REPOSITORY_ALIAS,
 	name: 'Cultures Repository',
-	class: UmbCultureRepository,
+	api: UmbCultureRepository,
 };
 
 export const manifests = [repository];

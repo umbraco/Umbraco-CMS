@@ -1,10 +1,11 @@
-import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * An action to perform on an entity
  * For example for content you may wish to create a new document etc
  */
-export interface ManifestEntityAction extends ManifestElement, ManifestWithDynamicConditions {
+// TODO: create interface for API
+export interface ManifestEntityAction extends ManifestElementAndApi, ManifestWithDynamicConditions {
 	type: 'entityAction';
 	meta: MetaEntityAction;
 }
@@ -31,17 +32,13 @@ export interface MetaEntityAction {
 	label: string;
 
 	/**
-	 * @TJS-ignore
-	 */
-	api: any; // TODO: create interface
-
-	/**
-	 * The alias for the repsoitory of the entity type this action is for
+	 * The alias for the repository of the entity type this action is for
 	 * such as 'Umb.Repository.Documents'
 	 * @examples [
 	 *   "Umb.Repository.Documents"
 	 * ]
 	 */
+	// TODO: Could we find the repository based on entityTypes?
 	repositoryAlias: string;
 
 	/**

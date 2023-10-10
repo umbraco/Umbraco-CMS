@@ -1,10 +1,12 @@
-import type { ManifestElement, ManifestWithConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { ConditionTypes } from '../conditions/types.js';
+import type { UmbEntityBulkAction } from '@umbraco-cms/backoffice/entity-bulk-action';
+import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * An action to perform on multiple entities
  * For example for content you may wish to move one or more documents in bulk
  */
-export interface ManifestEntityBulkAction extends ManifestElement, ManifestWithConditions<ConditionsEntityBulkAction> {
+export interface ManifestEntityBulkAction extends ManifestElementAndApi<HTMLElement, UmbEntityBulkAction>, ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'entityBulkAction';
 	meta: MetaEntityBulkAction;
 }
@@ -16,11 +18,6 @@ export interface MetaEntityBulkAction {
 	label: string;
 
 	/**
-	 * @TJS-ignore
-	 */
-	api: any; // create interface
-
-	/**
 	 * The alias for the repsoitory of the entity type this action is for
 	 * such as 'Umb.Repository.Documents'
 	 *
@@ -29,18 +26,4 @@ export interface MetaEntityBulkAction {
 	 * ]
 	 */
 	repositoryAlias: string;
-}
-
-export interface ConditionsEntityBulkAction {
-	/**
-	 * The entity type this action is for
-	 *
-	 * @examples [
-	 * "document",
-	 * "media",
-	 * "user",
-	 * "user-group"
-	 * ]
-	 */
-	entityType: string;
 }

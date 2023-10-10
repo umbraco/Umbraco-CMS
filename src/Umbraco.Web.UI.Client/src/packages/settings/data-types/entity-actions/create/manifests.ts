@@ -9,11 +9,11 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.DataType.Create',
 		name: 'Create Data Type Entity Action',
 		weight: 1000,
+		api: UmbCreateDataTypeEntityAction,
 		meta: {
 			icon: 'umb:add',
 			label: 'Create...',
 			repositoryAlias: DATA_TYPE_REPOSITORY_ALIAS,
-			api: UmbCreateDataTypeEntityAction,
 			entityTypes: [DATA_TYPE_ENTITY_TYPE, DATA_TYPE_ROOT_ENTITY_TYPE, DATA_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},

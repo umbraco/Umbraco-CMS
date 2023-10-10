@@ -1,22 +1,69 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
-import { css, html, customElement, state, repeat, nothing, query } from '@umbraco-cms/backoffice/external/lit';
-import { UUIInputElement, UUIInputEvent, UUITabElement } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state, repeat, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { encodeFolderName, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	DocumentTypePropertyTypeContainerResponseModel,
+	PropertyTypeContainerModelBaseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+
+const SORTER_CONFIG: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
+	compareElementToModel: (element: HTMLElement, model: DocumentTypePropertyTypeContainerResponseModel) => {
+		return element.getAttribute('data-umb-tabs-id') === model.id;
+	},
+	querySelectModelToElement: (container: HTMLElement, modelEntry: PropertyTypeContainerModelBaseModel) => {
+		return container.querySelector(`[data-umb-tabs-id='` + modelEntry.id + `']`);
+	},
+	identifier: 'content-type-tabs-sorter',
+	itemSelector: '[data-umb-tabs-id]',
+	containerSelector: '#tabs-group',
+	disabledItemSelector: '[inherited]',
+	resolveVerticalDirection: () => {
+		return false;
+	},
+};
 
 @customElement('umb-document-type-workspace-view-edit')
 export class UmbDocumentTypeWorkspaceViewEditElement
 	extends UmbLitElement
 	implements UmbWorkspaceEditorViewExtensionElement
 {
+	public sorter?: UmbSorterController<PropertyTypeContainerModelBaseModel>;
+
+	config: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
+		...SORTER_CONFIG,
+		performItemInsert: async (args) => {
+			if (!this._tabs) return false;
+			const oldIndex = this._tabs.findIndex((tab) => tab.id! === args.item.id);
+			if (args.newIndex === oldIndex) return true;
+
+			let sortOrder = 0;
+			//TODO the sortOrder set is not correct
+			if (this._tabs.length > 0) {
+				if (args.newIndex === 0) {
+					sortOrder = (this._tabs[0].sortOrder ?? 0) - 1;
+				} else {
+					sortOrder = (this._tabs[Math.min(args.newIndex, this._tabs.length - 1)].sortOrder ?? 0) + 1;
+				}
+
+				if (sortOrder !== args.item.sortOrder) {
+					await this._tabsStructureHelper.partialUpdateContainer(args.item.id!, { sortOrder });
+				}
+			}
+
+			return true;
+		},
+	};
+
 	//private _hasRootProperties = false;
 	private _hasRootGroups = false;
 
@@ -33,6 +80,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	private _activePath = '';
 
 	@state()
+	private sortModeActive?: boolean;
+
+	@state()
 	private _buttonDisabled: boolean = false;
 
 	private _workspaceContext?: UmbDocumentTypeWorkspaceContext;
@@ -41,11 +91,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 
 	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
 
-	@query('uui-tab')
-	private _tabElements!: UUITabElement[];
-
 	constructor() {
 		super();
+		this.sorter = new UmbSorterController(this, this.config);
 
 		//TODO: We need to differentiate between local and composition tabs (and hybrids)
 
@@ -61,6 +109,11 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._workspaceContext = workspaceContext as UmbDocumentTypeWorkspaceContext;
 			this._tabsStructureHelper.setStructureManager((workspaceContext as UmbDocumentTypeWorkspaceContext).structure);
+			this.observe(
+				this._workspaceContext.isSorting,
+				(isSorting) => (this.sortModeActive = isSorting),
+				'_observeIsSorting',
+			);
 			this._observeRootGroups();
 		});
 
@@ -80,6 +133,16 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			},
 			'_observeGroups',
 		);
+	}
+
+	#changeMode() {
+		this._workspaceContext?.setIsSorting(!this.sortModeActive);
+
+		if (this.sortModeActive && this._tabs) {
+			this.sorter?.setModel(this._tabs);
+		} else {
+			this.sorter?.setModel([]);
+		}
 	}
 
 	private _createRoutes() {
@@ -128,13 +191,13 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	#requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
 		const Message: UmbConfirmModalData = {
 			headline: 'Delete tab',
-			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tab?.name ?? tab?.id]}
-					>Are you sure you want to delete the tab <strong>${tab?.name ?? tab?.id}</strong></umb-localize
-				>
+			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tab?.name ?? tab?.id]}>
+					Are you sure you want to delete the tab <strong>${tab?.name ?? tab?.id}</strong>
+				</umb-localize>
 				<div style="color:var(--uui-color-danger-emphasis)">
-					<umb-localize key="contentTypeEditor_confirmDeleteTabNotice"
-						>This will delete all items that doesn't belong to a composition.</umb-localize
-					>
+					<umb-localize key="contentTypeEditor_confirmDeleteTabNotice">
+						This will delete all items that doesn't belong to a composition.
+					</umb-localize>
 				</div>`,
 			confirmLabel: this.localize.term('actions_delete'),
 			color: 'danger',
@@ -207,93 +270,13 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		window.history.replaceState(null, '', this._routerPath + '/tab/' + encodeFolderName(newName));
 	}
 
-	renderTabsNavigation() {
-		if (!this._tabs) return;
-		const rootTabPath = this._routerPath + '/root';
-		const rootTabActive = rootTabPath === this._activePath;
-		return html`<uui-tab-group>
-				<uui-tab
-					class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
-					label="Content"
-					.active=${rootTabActive}
-					href=${rootTabPath}>
-					<umb-localize key="general_content">Content</umb-localize>
-				</uui-tab>
-				${repeat(
-					this._tabs,
-					(tab) => tab.id! + tab.name,
-					(tab) => {
-						const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
-						const tabActive = path === this._activePath;
-						return html`<uui-tab label=${tab.name ?? 'unnamed'} .active=${tabActive} href=${path}>
-							<div class="tab">
-								${!this._tabsStructureHelper.isOwnerContainer(tab.id!)
-									? html`<uui-icon class="external" name="umb:merge"></uui-icon> `
-									: nothing}
-								${tabActive && this._tabsStructureHelper.isOwnerContainer(tab.id!)
-									? html`<uui-input
-											id="input"
-											label="Tab name"
-											look="placeholder"
-											value="${tab.name!}"
-											placeholder="Unnamed"
-											@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-											@blur=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-											@input=${() => (this._buttonDisabled = true)}
-											@focus=${(e: UUIInputEvent) => (e.target.value ? nothing : (this._buttonDisabled = true))}
-											auto-width>
-											<uui-button
-												label="Remove tab"
-												class="trash"
-												slot="append"
-												?disabled=${this._buttonDisabled}
-												@click=${() => this.#requestRemoveTab(tab)}
-												compact>
-												<uui-icon name="umb:trash"></uui-icon>
-											</uui-button>
-									  </uui-input>`
-									: html`<div class="no-edit">
-											${tab.name!}
-											${this._tabsStructureHelper.isOwnerContainer(tab.id!)
-												? html`<uui-button
-														label="Remove tab"
-														class="trash"
-														slot="append"
-														@click=${() => this.#requestRemoveTab(tab)}
-														compact>
-														<uui-icon name="umb:trash"></uui-icon>
-												  </uui-button> `
-												: nothing}
-									  </div>`}
-							</div>
-						</uui-tab>`;
-					},
-				)}
-			</uui-tab-group>
-			<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab" compact>
-				<uui-icon name="umb:add"></uui-icon>
-				Add tab
-			</uui-button>`;
-	}
-
-	renderActions() {
-		return html`<div class="tab-actions">
-			<uui-button label="Compositions" compact>
-				<uui-icon name="umb:merge"></uui-icon>
-				Compositions
-			</uui-button>
-			<uui-button label=${this.localize.term('general_reorder')} compact>
-				<uui-icon name="umb:navigation"></uui-icon>
-				<umb-localize key="general_reorder">Reorder</umb-localize>
-			</uui-button>
-		</div>`;
-	}
-
 	render() {
 		return html`
 			<umb-body-layout header-fit-height>
 				<div id="header" slot="header">
-					<div id="tabs-wrapper">${this._routerPath ? this.renderTabsNavigation() : ''}</div>
+					<div id="tabs-wrapper" class="flex">
+						${this._routerPath ? this.renderTabsNavigation() : ''} ${this.renderAddButton()}
+					</div>
 					${this.renderActions()}
 				</div>
 				<umb-router-slot
@@ -309,9 +292,141 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		`;
 	}
 
+	renderAddButton() {
+		if (this.sortModeActive) return;
+		return html`<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab" compact>
+			<uui-icon name="umb:add"></uui-icon>
+			Add tab
+		</uui-button>`;
+	}
+
+	renderActions() {
+		const sortButtonText = this.sortModeActive
+			? this.localize.term('general_reorderDone')
+			: this.localize.term('general_reorder');
+
+		return html`<div class="tab-actions">
+			<uui-button look="outline" label=${this.localize.term('contentTypeEditor_compositions')} compact>
+				<uui-icon name="umb:merge"></uui-icon>
+				${this.localize.term('contentTypeEditor_compositions')}
+			</uui-button>
+			<uui-button look="outline" label=${sortButtonText} compact @click=${this.#changeMode}>
+				<uui-icon name="umb:navigation"></uui-icon>
+				${sortButtonText}
+			</uui-button>
+		</div>`;
+	}
+
+	renderTabsNavigation() {
+		if (!this._tabs) return;
+
+		return html`<div id="tabs-group" class="flex">
+			<uui-tab-group>
+				${this.renderRootTab()}
+				${repeat(
+					this._tabs,
+					(tab) => tab.id! + tab.name,
+					(tab) => this.renderTab(tab),
+				)}
+			</uui-tab-group>
+		</div>`;
+	}
+
+	renderRootTab() {
+		const rootTabPath = this._routerPath + '/root';
+		const rootTabActive = rootTabPath === this._activePath;
+		return html`<uui-tab
+			class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
+			label=${this.localize.term('general_content')}
+			.active=${rootTabActive}
+			href=${rootTabPath}>
+			${this.localize.term('general_content')}
+		</uui-tab>`;
+	}
+
+	renderTab(tab: PropertyTypeContainerModelBaseModel) {
+		const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
+		const tabActive = path === this._activePath;
+		const tabInherited = !this._tabsStructureHelper.isOwnerContainer(tab.id!);
+
+		return html`<uui-tab
+			label=${tab.name ?? 'unnamed'}
+			.active=${tabActive}
+			href=${path}
+			data-umb-tabs-id=${ifDefined(tab.id)}>
+			${this.renderTabInner(tab, tabActive, tabInherited)}
+		</uui-tab>`;
+	}
+
+	renderTabInner(tab: PropertyTypeContainerModelBaseModel, tabActive: boolean, tabInherited: boolean) {
+		if (this.sortModeActive) {
+			return html`<div class="no-edit">
+				${tabInherited
+					? html`<uui-icon class="external" name="umb:merge"></uui-icon>${tab.name!}`
+					: html`<uui-icon name="umb:navigation" class="drag-${tab.id}"> </uui-icon>${tab.name!}
+							<uui-input
+								label="sort order"
+								type="number"
+								value=${ifDefined(tab.sortOrder)}
+								style="width:50px"
+								@keypress=${(e: UUIInputEvent) => this.#changeOrderNumber(tab, e)}></uui-input>`}
+			</div>`;
+		}
+
+		if (tabActive && !tabInherited) {
+			return html`<div class="tab">
+				<uui-input
+					id="input"
+					look="placeholder"
+					placeholder="Unnamed"
+					label=${tab.name!}
+					value="${tab.name!}"
+					auto-width
+					@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
+					@blur=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
+					@input=${() => (this._buttonDisabled = true)}
+					@focus=${(e: UUIInputEvent) => (e.target.value ? nothing : (this._buttonDisabled = true))}>
+					${this.renderDeleteFor(tab)}
+				</uui-input>
+			</div>`;
+		}
+
+		if (tabInherited) {
+			return html`<div class="no-edit"><uui-icon name="umb:merge"></uui-icon>${tab.name!}</div>`;
+		} else {
+			return html`<div class="no-edit">${tab.name!} ${this.renderDeleteFor(tab)}</div>`;
+		}
+	}
+
+	#changeOrderNumber(tab: PropertyTypeContainerModelBaseModel, e: UUIInputEvent) {
+		if (!e.target.value || !tab.id) return;
+		const sortOrder = Number(e.target.value);
+		this._tabsStructureHelper.partialUpdateContainer(tab.id, { sortOrder });
+	}
+
+	renderDeleteFor(tab: PropertyTypeContainerModelBaseModel) {
+		return html`<uui-button
+			label=${this.localize.term('actions_remove')}
+			class="trash"
+			slot="append"
+			?disabled=${this._buttonDisabled}
+			@click=${() => this.#requestRemoveTab(tab)}
+			compact>
+			<uui-icon name="umb:trash"></uui-icon>
+		</uui-button>`;
+	}
+
 	static styles = [
 		UmbTextStyles,
 		css`
+			#buttons-wrapper {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				align-items: stretch;
+			}
+
 			:host {
 				position: relative;
 				display: flex;
@@ -329,8 +444,11 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				flex-wrap: nowrap;
 			}
 
-			#tabs-wrapper {
+			.flex {
 				display: flex;
+			}
+			uui-tab-group {
+				flex-wrap: nowrap;
 			}
 
 			.content-tab-is-empty {
@@ -341,28 +459,17 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			}
 
 			uui-tab {
-				border-left: 1px solid transparent;
+				position: relative;
+				border-left: 1px hidden transparent;
 				border-right: 1px solid var(--uui-color-border);
 			}
 
-			uui-tab:not(:hover, :focus) .trash {
-				opacity: 0;
-				transition: opacity 120ms;
-			}
-
-			.tab {
-				position: relative;
-			}
-
-			.external {
-				vertical-align: sub;
-			}
-
-			uui-input:not(:focus, :hover) {
-				border: 1px solid transparent;
+			.no-edit uui-input {
+				pointer-events: auto;
 			}
 
 			.no-edit {
+				pointer-events: none;
 				display: inline-flex;
 				padding-left: var(--uui-size-space-3);
 				border: 1px solid transparent;
@@ -373,6 +480,30 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			.trash {
 				opacity: 1;
 				transition: opacity 120ms;
+			}
+
+			uui-tab:not(:hover, :focus) .trash {
+				opacity: 0;
+				transition: opacity 120ms;
+			}
+
+			uui-input:not(:focus, :hover) {
+				border: 1px solid transparent;
+			}
+
+			.inherited {
+				vertical-align: sub;
+			}
+
+			.--umb-sorter-placeholder > * {
+				visibility: hidden;
+			}
+
+			.--umb-sorter-placeholder::after {
+				content: '';
+				position: absolute;
+				inset: 2px;
+				border: 1px dashed var(--uui-color-divider-emphasis);
 			}
 		`,
 	];

@@ -50,6 +50,9 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	@property({ type: Boolean })
 	public inherited?: boolean;
 
+	@property({ type: Boolean, reflect: true, attribute: 'sort-mode-active' })
+	public sortModeActive = false;
+
 	#dataTypeRepository = new UmbDataTypeRepository(this);
 
 	#modalRegistration;
@@ -82,15 +85,14 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 
 	constructor() {
 		super();
-
 		this.#modalRegistration = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
 			.addUniquePaths(['propertyId'])
 			.onSetup(() => {
 				const documentTypeId = this.ownerDocumentTypeId;
-				if(documentTypeId === undefined) return false;
+				if (documentTypeId === undefined) return false;
 				const propertyData = this.property;
-				if(propertyData === undefined) return false;
-				return {propertyData, documentTypeId};
+				if (propertyData === undefined) return false;
+				return { propertyData, documentTypeId };
 			})
 			.onSubmit((result) => {
 				this._partialUpdate(result);
@@ -181,68 +183,91 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 		}
 	}
 
+	renderSortableProperty() {
+		if (!this.property) return;
+		return html`
+			<div class="sortable">
+				<uui-icon name="${this.inherited ? 'umb:merge' : 'umb:navigation'}"></uui-icon>
+				${this.property.name} <span style="color: var(--uui-color-disabled-contrast)">(${this.property.alias})</span>
+			</div>
+			<uui-input
+				type="number"
+				?readonly=${this.inherited}
+				label="sort order"
+				.value=${this.property.sortOrder ?? 0}></uui-input>
+		`;
+	}
+
 	renderEditableProperty() {
-		return this.property
-			? html`
-					<div id="header">
-						<uui-input
-							name="label"
-							id="label-input"
-							placeholder=${this.localize.term('placeholders_label')}
-							label="label"
-							.value=${this.property.name}
-							@input=${this.#onNameChange}></uui-input>
-						${this.renderPropertyAlias()}
-						<slot name="property-action-menu"></slot>
-						<p>
-							<uui-textarea
-								label="description"
-								name="description"
-								id="description-input"
-								placeholder=${this.localize.term('placeholders_enterDescription')}
-								.value=${this.property.description}
-								@input=${(e: CustomEvent) => {
-									if (e.target) this._singleValueUpdate('description', (e.target as HTMLInputElement).value);
-								}}></uui-textarea>
-						</p>
-					</div>
-					<uui-button
-						id="editor"
-						label=${this.localize.term('contentTypeEditor_editorSettings')}
-						href=${ifDefined(this._modalRoute)}>
-						${this.renderPropertyTags()}
-						<uui-action-bar>
-							<uui-button label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
-								<uui-icon name="delete"></uui-icon>
-							</uui-button>
-						</uui-action-bar>
-					</uui-button>
-			  `
-			: '';
+		if (!this.property) return;
+
+		if (this.sortModeActive) {
+			return this.renderSortableProperty();
+		} else {
+			return html`
+				<div id="header">
+					<uui-input
+						name="label"
+						id="label-input"
+						placeholder=${this.localize.term('placeholders_label')}
+						label="label"
+						.value=${this.property.name}
+						@input=${this.#onNameChange}></uui-input>
+					${this.renderPropertyAlias()}
+					<slot name="property-action-menu"></slot>
+					<p>
+						<uui-textarea
+							label="description"
+							name="description"
+							id="description-input"
+							placeholder=${this.localize.term('placeholders_enterDescription')}
+							.value=${this.property.description}
+							@input=${(e: CustomEvent) => {
+								if (e.target) this._singleValueUpdate('description', (e.target as HTMLInputElement).value);
+							}}></uui-textarea>
+					</p>
+				</div>
+				<uui-button
+					id="editor"
+					label=${this.localize.term('contentTypeEditor_editorSettings')}
+					href=${ifDefined(this._modalRoute)}>
+					${this.renderPropertyTags()}
+					<uui-action-bar>
+						<uui-button label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
+							<uui-icon name="delete"></uui-icon>
+						</uui-button>
+					</uui-action-bar>
+				</uui-button>
+			`;
+		}
 	}
 
 	renderInheritedProperty() {
-		return this.property
-			? html`
-					<div id="header">
-						<b>${this.property.name}</b>
-						<i>${this.property.alias}</i>
-						<p>${this.property.description}</p>
-					</div>
-					<div id="editor">
-						${this.renderPropertyTags()}
-						<uui-tag look="default" class="inherited">
-							<uui-icon name="umb:merge"></uui-icon>
-							<span class="uui-text">
-								${this.localize.term('contentTypeEditor_inheritedFrom')}
-								<a href=${this._editDocumentTypePath + 'edit/' + this.ownerDocumentTypeId}>
-									${this.ownerDocumentTypeName ?? '??'}
-								</a>
-							</span>
-						</uui-tag>
-					</div>
-			  `
-			: '';
+		if (!this.property) return;
+
+		if (this.sortModeActive) {
+			return this.renderSortableProperty();
+		} else {
+			return html`
+				<div id="header">
+					<b>${this.property.name}</b>
+					<i>${this.property.alias}</i>
+					<p>${this.property.description}</p>
+				</div>
+				<div id="editor">
+					${this.renderPropertyTags()}
+					<uui-tag look="default" class="inherited">
+						<uui-icon name="umb:merge"></uui-icon>
+						<span
+							>${this.localize.term('contentTypeEditor_inheritedFrom')}
+							<a href=${this._editDocumentTypePath + 'edit/' + this.ownerDocumentTypeId}>
+								${this.ownerDocumentTypeName ?? '??'}
+							</a>
+						</span>
+					</uui-tag>
+				</div>
+			`;
+		}
 	}
 
 	renderPropertyAlias() {
@@ -292,7 +317,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	static styles = [
 		UmbTextStyles,
 		css`
-			:host {
+			:host(:not([sort-mode-active])) {
 				display: grid;
 				grid-template-columns: 200px auto;
 				column-gap: var(--uui-size-layout-2);
@@ -311,32 +336,52 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 				}
 			}
 
+			:host(:first-of-type) {
+				padding-top: 0;
+			}
 			:host(:last-of-type) {
 				border-bottom: none;
 			}
 
-			:host(:first-of-type) {
-				padding-top: 0;
+			:host([sort-mode-active]) {
+				position: relative;
+				display: flex;
+				padding: 0;
+				margin-bottom: var(--uui-size-3);
 			}
-			:host([draggable='true']) {
+
+			:host([sort-mode-active]:last-of-type) {
+				margin-bottom: 0;
+			}
+
+			:host([sort-mode-active]:not([inherited])) {
 				cursor: grab;
 			}
 
+			:host([sort-mode-active]) .sortable {
+				flex: 1;
+				display: flex;
+				background-color: var(--uui-color-divider);
+				align-items: center;
+				padding: 0 var(--uui-size-3);
+				gap: var(--uui-size-3);
+			}
+
+			:host([sort-mode-active]) uui-input {
+				max-width: 75px;
+			}
+
 			/* Placeholder style, used when property is being dragged.*/
-			:host(.--umb-sorter-placeholder) {
-				height: 2px;
+			:host(.--umb-sorter-placeholder) > * {
+				visibility: hidden;
 			}
-			:host(.--umb-sorter-placeholder) > div,
-			:host(.--umb-sorter-placeholder) > uui-button {
-				display: none;
-			}
+
 			:host(.--umb-sorter-placeholder)::after {
 				content: '';
-				grid-column: span 2;
-				width: 100%;
-				border-top: 2px solid blue;
-				border-radius: 1px;
-				/* TODO: Make use of same highlight color as UUI and the same Animation. Consider making this a component/(available style) in UUI? */
+				inset: 0;
+				position: absolute;
+				border: 1px dashed var(--uui-color-divider-emphasis);
+				border-radius: var(--uui-border-radius);
 			}
 
 			p {

@@ -1,6 +1,6 @@
 import { css, html, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extension-registry';
@@ -34,7 +34,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 			const manifestMeta = this.manifest.meta;
 
 			this._collectionContext = new UmbCollectionContext(this, entityType, manifestMeta.repositoryAlias);
-			this.provideContext(UMB_COLLECTION_CONTEXT_TOKEN, this._collectionContext);
+			this.provideContext(UMB_COLLECTION_CONTEXT, this._collectionContext);
 		}
 	}
 

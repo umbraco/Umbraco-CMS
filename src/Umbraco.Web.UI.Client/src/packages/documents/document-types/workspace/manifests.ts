@@ -95,11 +95,11 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.DocumentType.Save',
 		name: 'Save Document Type Workspace Action',
+		api: UmbSaveWorkspaceAction,
 		meta: {
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
-			api: UmbSaveWorkspaceAction,
 		},
 		conditions: [
 			{

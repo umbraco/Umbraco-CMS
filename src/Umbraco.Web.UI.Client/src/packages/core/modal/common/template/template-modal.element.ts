@@ -1,8 +1,8 @@
+import { UmbInputEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { css, html, ifDefined, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTemplateModalData, UmbTemplateModalValue } from '@umbraco-cms/backoffice/modal';
-import { UmbInputEvent } from '@umbraco-cms/backoffice/events';
 import { TemplateResource, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

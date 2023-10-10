@@ -9,11 +9,11 @@ const entityActions: Array<ManifestEntityAction> = [
 		alias: 'Umb.EntityAction.Document.Create',
 		name: 'Create Document Entity Action',
 		weight: 1000,
+		api: UmbCreateDocumentEntityAction,
 		meta: {
 			icon: 'umb:add',
 			label: 'Create',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
-			api: UmbCreateDocumentEntityAction,
 			entityTypes: [DOCUMENT_ROOT_ENTITY_TYPE, DOCUMENT_ENTITY_TYPE],
 		},
 		conditions: [

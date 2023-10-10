@@ -15,7 +15,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: MEDIA_REPOSITORY_ALIAS,
 	name: 'Media Repository',
-	class: UmbMediaRepository,
+	api: UmbMediaRepository,
 };
 
 export const MEDIA_STORE_ALIAS = 'Umb.Store.Media';
@@ -26,21 +26,21 @@ const store: ManifestStore = {
 	type: 'store',
 	alias: MEDIA_STORE_ALIAS,
 	name: 'Media Store',
-	class: UmbMediaStore,
+	api: UmbMediaStore,
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: MEDIA_TREE_STORE_ALIAS,
 	name: 'Media Tree Store',
-	class: UmbMediaTreeStore,
+	api: UmbMediaTreeStore,
 };
 
 const itemStore: ManifestItemStore = {
 	type: 'itemStore',
 	alias: MEDIA_ITEM_STORE_ALIAS,
 	name: 'Media Item Store',
-	class: UmbMediaItemStore,
+	api: UmbMediaItemStore,
 };
 
 export const manifests = [store, treeStore, itemStore, repository];

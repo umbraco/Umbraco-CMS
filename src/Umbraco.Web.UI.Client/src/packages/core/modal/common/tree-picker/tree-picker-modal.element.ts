@@ -4,7 +4,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTreePickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/events';
+import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentationModel> extends UmbModalBaseElement<
