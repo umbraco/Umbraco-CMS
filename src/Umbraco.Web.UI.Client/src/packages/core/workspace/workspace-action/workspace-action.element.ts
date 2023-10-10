@@ -1,4 +1,4 @@
-import { UmbExecutedEvent } from '@umbraco-cms/backoffice/event';
+import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbWorkspaceAction } from './index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -45,7 +45,7 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 			this._buttonState = 'failed';
 		}
 
-		this.dispatchEvent(new UmbExecutedEvent());
+		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
 	render() {

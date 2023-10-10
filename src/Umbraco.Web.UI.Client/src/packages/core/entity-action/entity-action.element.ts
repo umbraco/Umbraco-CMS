@@ -1,4 +1,4 @@
-import { UmbExecutedEvent } from '@umbraco-cms/backoffice/event';
+import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -56,7 +56,7 @@ export class UmbEntityActionElement extends UmbLitElement {
 			event.stopPropagation();
 			await this.#api.execute();
 		}
-		this.dispatchEvent(new UmbExecutedEvent());
+		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
 	// TODO: we need to stop the regular click event from bubbling up to the table so it doesn't select the row.

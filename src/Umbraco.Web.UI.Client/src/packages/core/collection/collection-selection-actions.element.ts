@@ -1,4 +1,4 @@
-import { UmbExecutedEvent } from '@umbraco-cms/backoffice/event';
+import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_COLLECTION_CONTEXT, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
@@ -6,7 +6,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-collection-selection-actions')
 export class UmbCollectionSelectionActionsElement extends UmbLitElement {
-
 	@state()
 	private _nodesLength = 0;
 
@@ -55,7 +54,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 			(selection) => {
 				this._selectionLength = selection.length;
 				this._selection = selection;
-				this._extensionProps = {'selection': this._selection};
+				this._extensionProps = { selection: this._selection };
 			},
 			'observeSelection',
 		);
@@ -65,7 +64,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		return html`<div>${this._selectionLength} of ${this._nodesLength} selected</div>`;
 	}
 
-	#onActionExecuted(event: UmbExecutedEvent) {
+	#onActionExecuted(event: UmbActionExecutedEvent) {
 		event.stopPropagation();
 		this._collectionContext?.clearSelection();
 	}
@@ -84,7 +83,12 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 					${this._renderSelectionCount()}
 				</div>
 
-				<umb-extension-slot id="actions" type="entityBulkAction" default-element="umb-entity-bulk-action" .props=${this._extensionProps} @action-executed=${this.#onActionExecuted}>
+				<umb-extension-slot
+					id="actions"
+					type="entityBulkAction"
+					default-element="umb-entity-bulk-action"
+					.props=${this._extensionProps}
+					@action-executed=${this.#onActionExecuted}>
 				</umb-extension-slot>
 			</div>
 		`;

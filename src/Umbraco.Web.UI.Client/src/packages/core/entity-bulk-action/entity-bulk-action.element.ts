@@ -1,4 +1,4 @@
-import { UmbExecutedEvent } from '@umbraco-cms/backoffice/event';
+import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbEntityBulkAction } from './entity-bulk-action.js';
 import { html, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
@@ -47,7 +47,7 @@ export class UmbEntityBulkActionElement extends UmbLitElement {
 		if (!this.#api) return;
 		event.stopPropagation();
 		await this.#api.execute();
-		this.dispatchEvent(new UmbExecutedEvent());
+		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
 	render() {
