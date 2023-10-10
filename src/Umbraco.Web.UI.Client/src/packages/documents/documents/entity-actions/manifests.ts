@@ -85,18 +85,6 @@ const entityActions: Array<ManifestTypes> = [
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.Permissions',
-		name: 'Document Permissions Entity Action',
-		api: UmbDocumentPermissionsEntityAction,
-		meta: {
-			icon: 'umb:vcard',
-			label: 'Permissions (TBD)',
-			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
-			entityTypes: [DOCUMENT_ENTITY_TYPE],
-		},
-	},
-	{
-		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.PublicAccess',
 		name: 'Document Permissions Entity Action',
 		api: UmbDocumentPublicAccessEntityAction,

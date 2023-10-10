@@ -1,4 +1,4 @@
-import { UmbChangeEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/events';
+import { UmbChangeEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import {
 	ManifestEntityAction,
 	ManifestUserPermission,
@@ -7,7 +7,7 @@ import {
 import { css, html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/users';
+import { UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/user';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-entity-user-permission-settings-list')

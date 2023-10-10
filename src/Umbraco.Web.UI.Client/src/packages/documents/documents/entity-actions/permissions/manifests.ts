@@ -8,11 +8,11 @@ const entityActions: Array<ManifestEntityAction> = [
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.Permissions',
 		name: 'Document Permissions Entity Action',
+		api: UmbDocumentPermissionsEntityAction,
 		meta: {
 			icon: 'umb:vcard',
 			label: 'Permissions (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
-			api: UmbDocumentPermissionsEntityAction,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},

@@ -6,7 +6,7 @@ import {
 	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/events';
+import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-entity-user-permission-settings-modal')
 export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {

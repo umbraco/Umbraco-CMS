@@ -7,7 +7,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_DOCUMENT_PERMISSION_REPOSITORY_ALIAS,
 	name: 'Document Permission Repository',
-	class: UmbDocumentPermissionRepository,
+	api: UmbDocumentPermissionRepository,
 };
 
 export const manifests = [repository];

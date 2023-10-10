@@ -13,7 +13,7 @@ import {
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbSelectedEvent } from '@umbraco-cms/backoffice/events';
+import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
 type UmbUserGroupRefData = {
 	id: string;
