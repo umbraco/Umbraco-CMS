@@ -1,6 +1,9 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.TextFiles;
+﻿using Umbraco.Cms.Core;
 
-public class TextFileResponseModelBase : TextFileViewModelBase
+namespace Umbraco.Cms.Api.Management.ViewModels.TextFiles;
+
+public abstract class TextFileResponseModelBase : TextFileViewModelBase, IResponseModel
 {
     public string Path { get; set; } = string.Empty;
+    public abstract string Type { get; }
 }

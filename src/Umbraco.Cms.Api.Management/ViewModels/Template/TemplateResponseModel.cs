@@ -1,8 +1,11 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Template;
+﻿using Umbraco.Cms.Core;
 
-public class TemplateResponseModel : TemplateModelBase, INamedEntityPresentationModel
+namespace Umbraco.Cms.Api.Management.ViewModels.Template;
+
+public class TemplateResponseModel : TemplateModelBase, INamedEntityPresentationModel, IResponseModel
 {
     public Guid Id { get; set; }
 
     public Guid? MasterTemplateId { get; set; }
+    public string Type => Constants.UdiEntityType.Template;
 }

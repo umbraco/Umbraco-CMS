@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel;
 using System.Text.Json.Serialization;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Relation;
 
-public class RelationResponseModel
+public class RelationResponseModel : IResponseModel
 {
     /// <summary>
     ///     Gets or sets the Parent Id of the Relation (Source).
@@ -40,4 +41,6 @@ public class RelationResponseModel
     /// </summary>
     [ReadOnly(true)]
     public string? Comment { get; set; }
+
+    public string Type => Constants.UdiEntityType.Relation;
 }

@@ -1,6 +1,8 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Tag;
+﻿using Umbraco.Cms.Core;
 
-public class TagResponseModel
+namespace Umbraco.Cms.Api.Management.ViewModels.Tag;
+
+public class TagResponseModel : IResponseModel
 {
     public Guid Id { get; set; }
 
@@ -9,4 +11,5 @@ public class TagResponseModel
     public string? Group { get; set; }
 
     public int NodeCount { get; set; }
+    public string Type => Constants.UdiEntityType.Tag;
 }

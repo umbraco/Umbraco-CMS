@@ -1,6 +1,8 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
+﻿using Umbraco.Cms.Core;
 
-public class RelationItemResponseModel
+namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
+
+public class RelationItemResponseModel : IResponseModel
 {
     public Guid NodeId { get; set; }
 
@@ -22,4 +24,5 @@ public class RelationItemResponseModel
 
     public bool RelationTypeIsDependency { get; set; }
 
+    public string Type => Constants.UdiEntityType.Relation;
 }

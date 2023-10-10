@@ -1,6 +1,8 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.RelationType;
+﻿using Umbraco.Cms.Core;
 
-public class RelationTypeResponseModel : RelationTypeBaseModel
+namespace Umbraco.Cms.Api.Management.ViewModels.RelationType;
+
+public class RelationTypeResponseModel : RelationTypeBaseModel, IResponseModel
 {
     public Guid Id { get; set; }
 
@@ -19,4 +21,6 @@ public class RelationTypeResponseModel : RelationTypeBaseModel
     ///     Gets or sets the Child's object type name.
     /// </summary>
     public string? ChildObjectTypeName { get; set; }
+
+    public string Type => Constants.UdiEntityType.RelationType;
 }

@@ -1,6 +1,8 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
+﻿using Umbraco.Cms.Core;
 
-public class RedirectUrlResponseModel
+namespace Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
+
+public class RedirectUrlResponseModel : IResponseModel
 {
     public Guid Id { get; set; }
 
@@ -13,4 +15,5 @@ public class RedirectUrlResponseModel
     public Guid ContentId { get; set; }
 
     public string? Culture { get; set; }
+    public string Type => Constants.UdiEntityType.RedirectUrl;
 }
