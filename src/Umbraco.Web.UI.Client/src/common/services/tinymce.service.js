@@ -13,7 +13,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
   //These are absolutely required in order for the macros to render inline
   //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
-  var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption";
+  var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption,umb-rte-block[data-udi]";
   var fallbackStyles = [
     {
       title: 'Headers', items: [
@@ -669,6 +669,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         }
       });
     },
+
     /**
      * @ngdoc method
      * @name umbraco.services.tinyMceService#insetMediaInEditor
@@ -735,6 +736,62 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           }
 
         });
+
+      }
+    },
+
+
+
+    /**
+     * @ngdoc method
+     * @name umbraco.services.tinyMceService#createBlockPicker
+     * @methodOf umbraco.services.tinyMceService
+     *
+     * @description
+     * Creates the umbraco insert block tinymce plugin
+     *
+     * @param {Object} editor the TinyMCE editor instance
+     */
+    createBlockPicker: function (editor, callback) {
+      editor.ui.registry.addButton('umbblockpicker', {
+        icon: 'document',
+        tooltip: 'Block Picker',
+        stateSelector: 'umb-rte-block[data-udi]',
+        onAction: function () {
+
+          var blockEl = editor.selection.getNode();
+          var blockUdi;
+
+          if (blockEl.nodeName === 'UMB-RTE-BLOCK') {
+            blockUdi = blockEl.getAttribute("data-udi") ?? undefined;
+          }
+
+          if (callback) {
+            angularHelper.safeApply($rootScope, function () {
+              callback(blockUdi);
+            });
+          }
+        }
+      });
+    },
+
+    /**
+     * @ngdoc method
+     * @name umbraco.services.tinyMceService#insetBlockInEditor
+     * @methodOf umbraco.services.tinyMceService
+     *
+     * @description
+     * Inserts the block element in tinymce plugin
+     *
+     * @param {Object} blockUdi UDI of Block to insert
+     */
+    insertBlockInEditor: function (editor, blockUdi) {
+      if (blockUdi) {
+        var data = {
+          "data-udi": blockUdi
+        };
+        const blockEl = editor.dom.createHTML('umb-rte-block', data);
+        editor.selection.setContent(blockEl, { format: 'raw' });
 
       }
     },
@@ -1581,6 +1638,28 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           }
         };
         editorService.mediaPicker(mediaPicker);
+      });
+
+
+      //Create the insert block plugin
+      self.createBlockPicker(args.editor, function (currentTarget, userData, imgDomElement) {
+
+        console.log("callback block picker")
+
+        self.insertBlockInEditor(args.editor, "1234");
+        /*
+        var mediaPicker = {
+          submit: function (model) {
+            console.log("block picker submit")
+            //self.insertMediaInEditor(args.editor, model.selection[0], imgDomElement);
+            editorService.close();
+          },
+          close: function () {
+            editorService.close();
+          }
+        };
+        editorService.mediaPicker(mediaPicker);
+        */
       });
 
       //Create the embedded plugin
