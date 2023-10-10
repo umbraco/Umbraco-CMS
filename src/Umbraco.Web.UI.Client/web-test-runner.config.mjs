@@ -101,7 +101,7 @@ export default {
 						'@umbraco-cms/backoffice/stylesheet': './src/packages/templating/stylesheets/index.ts',
 						'@umbraco-cms/backoffice/template': './src/packages/templating/templates/index.ts',
 
-						'@umbraco-cms/backoffice/user-group': './src/packages/user/user-groups/index.ts',
+						'@umbraco-cms/backoffice/user-group': './src/packages/user/user-group/index.ts',
 						'@umbraco-cms/backoffice/current-user': './src/packages/user/current-user/index.ts',
 						'@umbraco-cms/backoffice/user': './src/packages/user/user/index.ts',
 
