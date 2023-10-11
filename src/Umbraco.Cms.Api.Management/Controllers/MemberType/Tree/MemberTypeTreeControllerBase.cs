@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MemberType}")]
 [ApiExplorerSettings(GroupName = "Member Type")]
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessMemberTypes)]
-public class MemberTypeTreeControllerBase : EntityTreeControllerBase<EntityTreeItemResponseModel>
+public class MemberTypeTreeControllerBase : EntityTreeControllerBase<MemberTypeTreeItemResponseModel>
 {
     public MemberTypeTreeControllerBase(IEntityService entityService)
         : base(entityService)
@@ -24,9 +24,9 @@ public class MemberTypeTreeControllerBase : EntityTreeControllerBase<EntityTreeI
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.MemberType;
 
-    protected override EntityTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
+    protected override MemberTypeTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
-        EntityTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
+        MemberTypeTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
         return responseModel;
     }
 }

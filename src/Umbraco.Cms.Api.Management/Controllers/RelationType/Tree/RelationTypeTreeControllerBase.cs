@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Tree;
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessRelationTypes)]
 // NOTE: at the moment relation types aren't supported by EntityService, so we have little use of the
 // tree controller base. We'll keep it though, in the hope that we can mend EntityService.
-public class RelationTypeTreeControllerBase : EntityTreeControllerBase<EntityTreeItemResponseModel>
+public class RelationTypeTreeControllerBase : EntityTreeControllerBase<RelationTypeTreeItemResponseModel>
 {
     public RelationTypeTreeControllerBase(IEntityService entityService)
         : base(entityService)
@@ -25,12 +25,11 @@ public class RelationTypeTreeControllerBase : EntityTreeControllerBase<EntityTre
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.RelationType;
 
-    protected EntityTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IRelationType[] relationTypes)
-        => relationTypes.Select(relationType => new EntityTreeItemResponseModel
+    protected RelationTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IRelationType[] relationTypes)
+        => relationTypes.Select(relationType => new RelationTypeTreeItemResponseModel
         {
             Name = relationType.Name!,
             Id = relationType.Key,
-            Type = Constants.UdiEntityType.RelationType,
             HasChildren = false,
             IsContainer = false,
             ParentId = parentKey

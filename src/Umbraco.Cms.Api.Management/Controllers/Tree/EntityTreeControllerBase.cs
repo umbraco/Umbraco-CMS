@@ -13,14 +13,10 @@ namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerBase
     where TItem : EntityTreeItemResponseModel, new()
 {
-    private readonly string _itemUdiType;
 
     protected EntityTreeControllerBase(IEntityService entityService)
     {
         EntityService = entityService;
-
-        // ReSharper disable once VirtualMemberCallInConstructor
-        _itemUdiType = ItemObjectType.GetUdiType();
     }
 
     protected IEntityService EntityService { get; }
@@ -117,7 +113,6 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         {
             Name = entity.Name!,
             Id = entity.Key,
-            Type = _itemUdiType,
             HasChildren = entity.HasChildren,
             IsContainer = entity.IsContainer,
             ParentId = parentKey

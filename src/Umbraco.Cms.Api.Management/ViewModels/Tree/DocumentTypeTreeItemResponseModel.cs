@@ -1,8 +1,11 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
+﻿using Umbraco.Cms.Core;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
 
 public class DocumentTypeTreeItemResponseModel : FolderTreeItemResponseModel
 {
     public bool IsElement { get; set; }
 
     public string Icon { get; set; } = string.Empty;
+    public override string Type => Constants.UdiEntityType.DocumentType;
 }

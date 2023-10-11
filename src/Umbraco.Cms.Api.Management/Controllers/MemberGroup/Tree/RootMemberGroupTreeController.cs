@@ -17,7 +17,7 @@ public class RootMemberGroupTreeController : MemberGroupTreeControllerBase
 
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<EntityTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<EntityTreeItemResponseModel>>> Root(int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<MemberGroupTreeItemResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<MemberGroupTreeItemResponseModel>>> Root(int skip = 0, int take = 100)
         => await GetRoot(skip, take);
 }

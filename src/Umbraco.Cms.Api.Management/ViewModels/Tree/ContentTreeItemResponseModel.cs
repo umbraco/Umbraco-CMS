@@ -1,6 +1,8 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
+﻿using Umbraco.Cms.Core;
 
-public class ContentTreeItemResponseModel : EntityTreeItemResponseModel
+namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
+
+public abstract class ContentTreeItemResponseModel : EntityTreeItemResponseModel
 {
     public bool NoAccess { get; set; }
 

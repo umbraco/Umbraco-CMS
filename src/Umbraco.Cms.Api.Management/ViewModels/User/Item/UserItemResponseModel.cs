@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Api.Management.ViewModels.User.Item;
 
 public class UserItemResponseModel : ItemResponseModelBase
 {
-    public override string Type => UdiEntityType.User;
+    public override string Type => Constants.UdiEntityType.User;
 }

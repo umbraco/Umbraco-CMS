@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
+﻿using Umbraco.Cms.Core;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
 
 public class DocumentBlueprintTreeItemResponseModel : EntityTreeItemResponseModel
 {
@@ -7,4 +9,5 @@ public class DocumentBlueprintTreeItemResponseModel : EntityTreeItemResponseMode
     public string DocumentTypeAlias { get; set; } = string.Empty;
 
     public string? DocumentTypeName { get; set; } = string.Empty;
+    public override string Type => Constants.UdiEntityType.DocumentBlueprint;
 }

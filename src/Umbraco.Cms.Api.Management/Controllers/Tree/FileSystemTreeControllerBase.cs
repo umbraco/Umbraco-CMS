@@ -7,41 +7,39 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
-public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
+public abstract class FileSystemTreeControllerBase<TFileTreeItemModel> : ManagementApiControllerBase where TFileTreeItemModel : FileSystemTreeItemPresentationModel, new()
 {
     protected abstract IFileSystem FileSystem { get; }
 
-    protected abstract string ItemType(string path);
-
-    protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> GetRoot(int skip, int take)
+    protected async Task<ActionResult<PagedViewModel<TFileTreeItemModel>>> GetRoot(int skip, int take)
     {
         if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
         {
             return BadRequest(error);
         }
 
-        FileSystemTreeItemPresentationModel[] viewModels = GetPathViewModels(string.Empty, pageNumber, pageSize, out var totalItems);
+        TFileTreeItemModel[] viewModels = GetPathViewModels(string.Empty, pageNumber, pageSize, out var totalItems);
 
-        PagedViewModel<FileSystemTreeItemPresentationModel> result = PagedViewModel(viewModels, totalItems);
+        PagedViewModel<TFileTreeItemModel> result = PagedViewModel(viewModels, totalItems);
         return await Task.FromResult(Ok(result));
     }
 
-    protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> GetChildren(string path, int skip, int take)
+    protected async Task<ActionResult<PagedViewModel<TFileTreeItemModel>>> GetChildren(string path, int skip, int take)
     {
         if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
         {
             return BadRequest(error);
         }
 
-        FileSystemTreeItemPresentationModel[] viewModels = GetPathViewModels(path, pageNumber, pageSize, out var totalItems);
+        TFileTreeItemModel[] viewModels = GetPathViewModels(path, pageNumber, pageSize, out var totalItems);
 
-        PagedViewModel<FileSystemTreeItemPresentationModel> result = PagedViewModel(viewModels, totalItems);
+        PagedViewModel<TFileTreeItemModel> result = PagedViewModel(viewModels, totalItems);
         return await Task.FromResult(Ok(result));
     }
 
-    protected async Task<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>> GetItems(string[] paths)
+    protected async Task<ActionResult<IEnumerable<TFileTreeItemModel>>> GetItems(string[] paths)
     {
-        FileSystemTreeItemPresentationModel[] viewModels = paths
+        TFileTreeItemModel[] viewModels = paths
             .Where(FileSystem.FileExists)
             .Select(path =>
             {
@@ -69,7 +67,7 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
     protected virtual bool DirectoryHasChildren(string path)
         => FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any();
 
-    private FileSystemTreeItemPresentationModel[] GetPathViewModels(string path, long pageNumber, int pageSize, out long totalItems)
+    private TFileTreeItemModel[] GetPathViewModels(string path, long pageNumber, int pageSize, out long totalItems)
     {
         var allItems = GetDirectories(path)
             .Select(directory => new { Path = directory, IsFolder = true })
@@ -78,7 +76,7 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 
         totalItems = allItems.Length;
 
-        FileSystemTreeItemPresentationModel ViewModel(string itemPath, bool isFolder)
+        TFileTreeItemModel ViewModel(string itemPath, bool isFolder)
             => MapViewModel(
                 itemPath,
                 isFolder ? Path.GetFileName(itemPath) : FileSystem.GetFileName(itemPath),
@@ -91,16 +89,15 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
             .ToArray();
     }
 
-    private PagedViewModel<FileSystemTreeItemPresentationModel> PagedViewModel(IEnumerable<FileSystemTreeItemPresentationModel> viewModels, long totalItems)
+    private PagedViewModel<TFileTreeItemModel> PagedViewModel(IEnumerable<TFileTreeItemModel> viewModels, long totalItems)
         => new() { Total = totalItems, Items = viewModels };
 
-    private FileSystemTreeItemPresentationModel MapViewModel(string path, string name, bool isFolder)
+    private TFileTreeItemModel MapViewModel(string path, string name, bool isFolder)
         => new()
         {
             Path = path,
             Name = name,
             HasChildren = isFolder && DirectoryHasChildren(path),
-            Type = ItemType(path),
             IsFolder = isFolder
         };
 }

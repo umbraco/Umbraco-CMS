@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Template}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Template))]
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessTemplates)]
-public class TemplateTreeControllerBase : EntityTreeControllerBase<EntityTreeItemResponseModel>
+public class TemplateTreeControllerBase : EntityTreeControllerBase<TemplateTreeItemResponseModel>
 {
     public TemplateTreeControllerBase(IEntityService entityService)
         : base(entityService)
@@ -24,9 +24,9 @@ public class TemplateTreeControllerBase : EntityTreeControllerBase<EntityTreeIte
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Template;
 
-    protected override EntityTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
+    protected override TemplateTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
-        EntityTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
+        TemplateTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
         return responseModel;
     }
 }

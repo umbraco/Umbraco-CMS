@@ -19,8 +19,8 @@ public class ChildrenDictionaryTreeController : DictionaryTreeControllerBase
 
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<EntityTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<EntityTreeItemResponseModel>>> Children(Guid parentId, int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<DictionaryTreeItemResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<DictionaryTreeItemResponseModel>>> Children(Guid parentId, int skip = 0, int take = 100)
     {
         if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
         {
@@ -33,9 +33,9 @@ public class ChildrenDictionaryTreeController : DictionaryTreeControllerBase
             await DictionaryItemService.GetChildrenAsync(parentId),
             out var totalItems);
 
-        EntityTreeItemResponseModel[] viewModels = await MapTreeItemViewModels(parentId, dictionaryItems);
+        DictionaryTreeItemResponseModel[] viewModels = await MapTreeItemViewModels(parentId, dictionaryItems);
 
-        PagedViewModel<EntityTreeItemResponseModel> result = PagedViewModel(viewModels, totalItems);
+        PagedViewModel<DictionaryTreeItemResponseModel> result = PagedViewModel(viewModels, totalItems);
         return await Task.FromResult(Ok(result));
     }
 }

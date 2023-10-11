@@ -17,7 +17,7 @@ public class ChildrenStylesheetTreeController : StylesheetTreeControllerBase
 
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<FileSystemTreeItemPresentationModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> Children(string path, int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<StyleSheetTreeItemResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<StyleSheetTreeItemResponseModel>>> Children(string path, int skip = 0, int take = 100)
         => await GetChildren(path, skip, take);
 }
