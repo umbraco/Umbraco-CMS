@@ -13,8 +13,8 @@ import {
 	UmbImageCropperPropertyEditorValue,
 } from './index.js';
 
-@customElement('umb-image-cropper-property-editor')
-export class UmbImageCropperPropertyEditorElement extends LitElement {
+@customElement('umb-input-image-cropper')
+export class UmbInputImageCropperElement extends LitElement {
 	@property({ attribute: false })
 	get value() {
 		return this.#value;
@@ -150,6 +150,6 @@ export class UmbImageCropperPropertyEditorElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-image-cropper-property-editor': UmbImageCropperPropertyEditorElement;
+		'umb-input-image-cropper': UmbInputImageCropperElement;
 	}
 }
