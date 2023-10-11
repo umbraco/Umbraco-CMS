@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Folder;
+﻿using Umbraco.Cms.Core;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.Folder;
 
 public class FolderResponseModel : FolderModelBase, INamedEntityPresentationModel
 {
