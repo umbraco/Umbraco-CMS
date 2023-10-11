@@ -1,6 +1,11 @@
-import { DISABLE_USER_REPOSITORY_ALIAS, USER_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import {
+	DISABLE_USER_REPOSITORY_ALIAS,
+	ENABLE_USER_REPOSITORY_ALIAS,
+	USER_REPOSITORY_ALIAS,
+} from '../repository/manifests.js';
 import { UMB_USER_ENTITY_TYPE } from '../index.js';
 import { UmbDisableUserEntityAction } from './disable/disable-user.action.js';
+import { UmbEnableUserEntityAction } from './enable/enable-user.action.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -20,9 +25,22 @@ const entityActions: Array<ManifestTypes> = [
 	},
 	{
 		type: 'entityAction',
+		alias: 'Umb.EntityAction.User.Enable',
+		name: 'Enable User Entity Action',
+		weight: 800,
+		api: UmbEnableUserEntityAction,
+		meta: {
+			icon: 'umb:trash',
+			label: 'Enable',
+			repositoryAlias: ENABLE_USER_REPOSITORY_ALIAS,
+			entityTypes: [UMB_USER_ENTITY_TYPE],
+		},
+	},
+	{
+		type: 'entityAction',
 		alias: 'Umb.EntityAction.User.Disable',
 		name: 'Disable User Entity Action',
-		weight: 900,
+		weight: 700,
 		api: UmbDisableUserEntityAction,
 		meta: {
 			icon: 'umb:trash',
@@ -31,21 +49,6 @@ const entityActions: Array<ManifestTypes> = [
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 	},
-	/*
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.User.Disable',
-		name: 'Disable User Entity Action',
-		weight: 900,
-		api: UmbChangeUserPasswordEntityAction,
-		meta: {
-			icon: 'umb:trash',
-			label: 'Change Password',
-			repositoryAlias: USER_REPOSITORY_ALIAS,
-			entityTypes: [UMB_USER_ENTITY_TYPE],
-		},
-	},
-  */
 ];
 
 export const manifests = [...entityActions];
