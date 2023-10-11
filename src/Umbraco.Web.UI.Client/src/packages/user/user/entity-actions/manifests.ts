@@ -1,4 +1,4 @@
-import { USER_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { DISABLE_USER_REPOSITORY_ALIAS, USER_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UMB_USER_ENTITY_TYPE } from '../index.js';
 import { UmbDisableUserEntityAction } from './disable/disable-user.action.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
@@ -27,7 +27,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'umb:trash',
 			label: 'Disable',
-			repositoryAlias: USER_REPOSITORY_ALIAS,
+			repositoryAlias: DISABLE_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 	},
