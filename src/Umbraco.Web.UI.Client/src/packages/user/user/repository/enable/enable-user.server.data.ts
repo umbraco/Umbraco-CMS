@@ -6,25 +6,25 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for Data Type items that fetches data from the server
  * @export
- * @class UmbUserEnableServerDataSource
+ * @class enable
  */
-export class UmbUserEnableServerDataSource implements UmbUserEnableDataSource {
+export class UmbEnableUserServerDataSource implements UmbUserEnableDataSource {
 	#host: UmbControllerHostElement;
 
 	/**
-	 * Creates an instance of UmbUserEnableServerDataSource.
+	 * Creates an instance of UmbEnableUserServerDataSource.
 	 * @param {UmbControllerHostElement} host
-	 * @memberof UmbUserEnableServerDataSource
+	 * @memberof UmbEnableUserServerDataSource
 	 */
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
 	/**
-	 * Set groups for users
-	 * @param {Array<string>} id
-	 * @return {*}
-	 * @memberof UmbUserEnableServerDataSource
+	 * Enables the specified user ids
+	 * @param {string[]} userIds
+	 * @returns {Promise<void>}
+	 * @memberof UmbEnableUserServerDataSource
 	 */
 	async enable(userIds: string[]) {
 		if (!userIds) throw new Error('User ids are missing');
@@ -35,7 +35,7 @@ export class UmbUserEnableServerDataSource implements UmbUserEnableDataSource {
 				requestBody: {
 					userIds,
 				},
-			})
+			}),
 		);
 	}
 }

@@ -12,8 +12,6 @@ import { UmbUserCollectionServerDataSource } from './sources/user-collection.ser
 import { UmbUserItemServerDataSource } from './sources/user-item.server.data.js';
 import { UMB_USER_ITEM_STORE_CONTEXT_TOKEN, UmbUserItemStore } from './user-item.store.js';
 import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data.js';
-import { UmbUserEnableServerDataSource } from './sources/user-enable.server.data.js';
-import { UmbUserDisableServerDataSource } from './sources/user-disable.server.data.js';
 import { UmbUserUnlockServerDataSource } from './sources/user-unlock.server.data.js';
 
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -45,8 +43,6 @@ export class UmbUserRepository
 	#setUserGroupsSource: UmbUserSetGroupDataSource;
 
 	//ACTIONS
-	#enableSource: UmbUserEnableServerDataSource;
-	#disableSource: UmbUserDisableServerDataSource;
 	#unlockSource: UmbUserUnlockServerDataSource;
 
 	#collectionSource: UmbCollectionDataSource<UmbUserDetail>;
@@ -58,8 +54,6 @@ export class UmbUserRepository
 
 		this.#detailSource = new UmbUserServerDataSource(this.#host);
 		this.#collectionSource = new UmbUserCollectionServerDataSource(this.#host);
-		this.#enableSource = new UmbUserEnableServerDataSource(this.#host);
-		this.#disableSource = new UmbUserDisableServerDataSource(this.#host);
 		this.#unlockSource = new UmbUserUnlockServerDataSource(this.#host);
 		this.#itemSource = new UmbUserItemServerDataSource(this.#host);
 		this.#setUserGroupsSource = new UmbUserSetGroupsServerDataSource(this.#host);
@@ -211,30 +205,6 @@ export class UmbUserRepository
 		}
 
 		return { error };
-	}
-
-	async enable(ids: Array<string>) {
-		if (ids.length === 0) throw new Error('User ids are missing');
-
-		const { error } = await this.#enableSource.enable(ids);
-
-		if (!error) {
-			//TODO: UPDATE STORE
-			const notification = { data: { message: `${ids.length > 1 ? 'Users' : 'User'} enabled` } };
-			this.#notificationContext?.peek('positive', notification);
-		}
-	}
-
-	async disable(ids: Array<string>) {
-		if (ids.length === 0) throw new Error('User ids are missing');
-
-		const { error } = await this.#disableSource.disable(ids);
-
-		if (!error) {
-			//TODO: UPDATE STORE
-			const notification = { data: { message: `${ids.length > 1 ? 'Users' : 'User'} disabled` } };
-			this.#notificationContext?.peek('positive', notification);
-		}
 	}
 
 	async unlock(ids: Array<string>) {
