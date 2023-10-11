@@ -20,7 +20,7 @@ public class ItemMediaItemController : MediaItemControllerBase
     private readonly IUserStartNodeEntitiesService _userStartNodeEntitiesService;
     private readonly IUmbracoMapper _mapper;
 
-    public ItemMediaItemController(IEntityService entityService, IDataTypeService dataTypeService, IUserStartNodeEntitiesService userStartNodeEntitiesService, IUmbracoMapper mapper, IMediaPresentationModelFactory mediaPresentationModelFactory)
+    public ItemMediaItemController(IEntityService entityService, IDataTypeService dataTypeService, IUserStartNodeEntitiesService userStartNodeEntitiesService, IUmbracoMapper mapper)
     {
         _entityService = entityService;
         _dataTypeService = dataTypeService;
