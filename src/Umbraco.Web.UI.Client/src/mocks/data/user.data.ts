@@ -21,11 +21,22 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 		super(data);
 	}
 
+	/**
+	 * Get user items
+	 * @param {Array<string>} ids
+	 * @return {*}  {Array<UserItemResponseModel>}
+	 * @memberof UmbUserData
+	 */
 	getItems(ids: Array<string>): Array<UserItemResponseModel> {
 		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => createUserItem(item));
 	}
 
+	/**
+	 * Set user groups
+	 * @param {UpdateUserGroupsOnUserRequestModel} data
+	 * @memberof UmbUserData
+	 */
 	setUserGroups(data: UpdateUserGroupsOnUserRequestModel): void {
 		const users = this.data.filter((user) => data.userIds?.includes(user.id ?? ''));
 		users.forEach((user) => {
@@ -33,6 +44,11 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 		});
 	}
 
+	/**
+	 * Get current user
+	 * @return {*}  {UmbLoggedInUser}
+	 * @memberof UmbUserData
+	 */
 	getCurrentUser(): UmbLoggedInUser {
 		const firstUser = this.data[0];
 		const permissions = firstUser.userGroupIds?.length ? umbUserGroupData.getPermissions(firstUser.userGroupIds) : [];
@@ -50,6 +66,30 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 			mediaStartNodeIds: firstUser.mediaStartNodeIds,
 			permissions,
 		};
+	}
+
+	/**
+	 * Disable users
+	 * @param {Array<string>} ids
+	 * @memberof UmbUserData
+	 */
+	disable(ids: Array<string>): void {
+		const users = this.data.filter((user) => ids.includes(user.id ?? ''));
+		users.forEach((user) => {
+			user.state = UserStateModel.DISABLED;
+		});
+	}
+
+	/**
+	 * Enable users
+	 * @param {Array<string>} ids
+	 * @memberof UmbUserData
+	 */
+	enable(ids: Array<string>): void {
+		const users = this.data.filter((user) => ids.includes(user.id ?? ''));
+		users.forEach((user) => {
+			user.state = UserStateModel.ACTIVE;
+		});
 	}
 }
 
