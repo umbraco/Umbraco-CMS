@@ -13,7 +13,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
   //These are absolutely required in order for the macros to render inline
   //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
-  var extendedValidElements = "@[id|class|style],umb-rte-block[data-udi],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption";
+  var extendedValidElements = "umb-rte-block[!data-udi],@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption";
   var fallbackStyles = [
     {
       title: 'Headers', items: [
@@ -24,7 +24,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     },
     {
       title: 'Blocks', items: [
-        { title: "Normal", block: "p" }
+        { title: "Normal", block: "p" },
+        { title: "Umbraco Block", block: "umb-rte-block" }
       ]
     },
     {
@@ -481,7 +482,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           Utilities.extend(config, tinyMceConfig.customConfig);
         }
 
-        if(!config.style_formats || !config.style_formats.length){
+        if(!config.style_formats || !config.style_formats.length) {
           // if we have no style_formats at this point we'll revert to using the default ones (fallbackStyles)
           config.style_formats = fallbackStyles;
         }
