@@ -793,6 +793,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         const blockEl = editor.dom.createHTML('umb-rte-block', data);
         // TODO: Compile here.
         editor.selection.setContent(blockEl, { format: 'raw' });
+        editor.dispatch('Change');
 
       }
     },
@@ -1331,9 +1332,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       if (!args.scope) {
         args.scope = $rootScope;
       }
-      //if (!args.model.value) {
-      //    throw "args.model.value is required";
-      //}
+      if (args.getValue && !args.setValue) {
+         throw "args.setValue is required when getValue is set";
+      }
+      if (args.setValue && !args.getValue) {
+        throw "args.getValue is required when setValue is set";
+     }
 
       // force TinyMCE to load plugins/themes from minified files (see http://archive.tinymce.com/wiki.php/api4:property.tinymce.suffix.static)
       args.editor.suffix = ".min";
@@ -1343,10 +1347,17 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       var unwatch = null;
 
+      const getPropertyValue = args.getValue ? args.getValue : function () {
+        return args.model.value
+      }
+      const setPropertyValue = args.setValue ? args.setValue : function (newVal) {
+        args.model.value = newVal;
+      }
+
       //Starts a watch on the model value so that we can update TinyMCE if the model changes behind the scenes or from the server
       function startWatch() {
 
-        unwatch = args.scope.$watch(() => args.model.value, function (newVal, oldVal) {
+        unwatch = args.scope.$watch(() => getPropertyValue(), function (newVal, oldVal) {
           if (newVal !== oldVal) {
             //update the display val again if it has changed from the server;
             //uses an empty string in the editor when the value is null
@@ -1370,7 +1381,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       function syncContent() {
 
-        if (args.model.value === args.editor.getContent()) {
+        if (getPropertyValue() === args.editor.getContent()) {
           return;
         }
 
@@ -1380,7 +1391,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
           initBlocks();
 
-          args.model.value = args.editor.getContent();
+          setPropertyValue(args.editor.getContent())
 
           //make the form dirty manually so that the track changes works, setting our model doesn't trigger
           // the angular bits because tinymce replaces the textarea.
@@ -1405,7 +1416,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             blockEl.removeAttribute('contenteditable');
             $compile(blockEl)(args.scope);
             blockEl.setAttribute('contenteditable', 'false');
-            console.log(blockEl._isInitializedUmbBlock, blockEl)
           }
         }
         // TODO: Check if this is necessary?.
@@ -1500,8 +1510,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       args.editor.on('init', function () {
 
-        if (args.model.value) {
-          args.editor.setContent(args.model.value);
+        const currentValue = getPropertyValue();
+        if (currentValue) {
+          args.editor.setContent(currentValue);
         }
 
         //enable browser based spell checking
@@ -1612,7 +1623,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       //create link picker
       self.createLinkPicker(args.editor, function (currentTarget, anchorElement) {
 
-        entityResource.getAnchors(args.model.value).then(anchorValues => {
+        entityResource.getAnchors(getPropertyValue()).then(anchorValues => {
 
           const linkPicker = {
             currentTarget: currentTarget,
@@ -1676,6 +1687,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         console.log("callback block picker")
 
         self.insertBlockInEditor(args.editor, "1234");
+
         /*
         var mediaPicker = {
           submit: function (model) {
