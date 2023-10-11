@@ -35,8 +35,7 @@ public class ManagementApiComposer : IComposer
                 .AddLanguages()
                 .AddDictionary()
                 .AddHealthChecks()
-                .AddAbstractMappers())
-            .AddRedirectUrl()
+                .AddRedirectUrl()
             .AddTags()
             .AddTrackedReferences()
             .AddTemporaryFiles()
@@ -53,7 +52,7 @@ public class ManagementApiComposer : IComposer
             .AddScripts()
             .AddPartialViews()
             .AddStylesheets()
-            .AddBackOfficeAuthentication();
+            .AddBackOfficeAuthentication());
 
         services
             .ConfigureOptions<ConfigureApiBehaviorOptions>()

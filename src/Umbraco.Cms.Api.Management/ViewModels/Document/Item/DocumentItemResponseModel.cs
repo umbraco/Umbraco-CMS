@@ -1,9 +1,8 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Abstract;
-using Umbraco.Cms.Api.Management.ViewModels.Item;
+﻿using Umbraco.Cms.Api.Management.ViewModels.Item;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 
-public class DocumentItemResponseModel : ItemResponseModelBase, ITracksTrashing
+public class DocumentItemResponseModel : ItemResponseModelBase
 {
     public string? Icon { get; set; }
 

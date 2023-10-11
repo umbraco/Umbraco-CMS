@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using Umbraco.Cms.Api.Management.ViewModels.Abstract;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
@@ -28,7 +27,6 @@ public class MediaPresentationModelFactory : IMediaPresentationModelFactory
     public Task<MediaResponseModel> CreateResponseModelAsync(IMedia media)
     {
         MediaResponseModel responseModel = _umbracoMapper.Map<MediaResponseModel>(media)!;
-        _umbracoMapper.Map<ITreeEntity,ITracksTrashing>(media, responseModel);
 
         responseModel.Urls = media
             .GetUrls(_contentSettings, _mediaUrlGenerators)
@@ -46,7 +44,6 @@ public class MediaPresentationModelFactory : IMediaPresentationModelFactory
     public MediaItemResponseModel CreateItemResponseModel(IMediaEntitySlim entity)
     {
         var responseModel = _umbracoMapper.Map<IMediaEntitySlim, MediaItemResponseModel>(entity)!;
-        _umbracoMapper.Map<ITreeEntity, ITracksTrashing>(entity, responseModel);
         return responseModel;
     }
 }

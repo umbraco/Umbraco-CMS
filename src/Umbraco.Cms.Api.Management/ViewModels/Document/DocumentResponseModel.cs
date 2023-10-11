@@ -1,10 +1,8 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Abstract;
-using Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
-public class DocumentResponseModel : ContentResponseModelBase<DocumentValueModel, DocumentVariantResponseModel>,
-    ITracksTrashing
+public class DocumentResponseModel : ContentResponseModelBase<DocumentValueModel, DocumentVariantResponseModel>
 {
     public IEnumerable<ContentUrlInfo> Urls { get; set; } = Array.Empty<ContentUrlInfo>();
 
