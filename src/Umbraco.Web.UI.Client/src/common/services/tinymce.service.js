@@ -1328,6 +1328,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       if (!args.editor) {
         throw "args.editor is required";
       }
+      if (!args.scope) {
+        throw "args.scope is required";
+      }
       //if (!args.model.value) {
       //    throw "args.model.value is required";
       //}

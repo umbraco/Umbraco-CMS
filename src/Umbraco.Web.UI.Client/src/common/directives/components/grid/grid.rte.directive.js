@@ -17,7 +17,7 @@ angular.module("umbraco.directives")
                 scope.isLoading = true;
 
                 var promises = [];
-                
+
                 //To id the html textarea we need to use the datetime ticks because we can have multiple rte's per a single property alias
                 // because now we have to support having 2x (maybe more at some stage) content editors being displayed at once. This is because
                 // we have this mini content editor panel that can be launched with MNTP.
@@ -71,6 +71,7 @@ angular.module("umbraco.directives")
 
                         //initialize the standard editor functionality for Umbraco
                         tinyMceService.initializeEditor({
+                            scope: scope,
                             editor: editor,
                             toolbar: editorConfig.toolbar,
                             model: scope,
@@ -125,7 +126,7 @@ angular.module("umbraco.directives")
                         }
 
                     });
-                    
+
                     //when the element is disposed we need to unsubscribe!
                     // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom
                     // element might still be there even after the modal has been hidden.
