@@ -9,7 +9,10 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 	}
 
 	getAll() {
-		return this.data;
+		return {
+			total: this.data.length,
+			items: this.data,
+		};
 	}
 
 	getList(skip: number, take: number) {

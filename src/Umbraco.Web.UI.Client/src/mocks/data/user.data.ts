@@ -2,7 +2,6 @@ import { UmbEntityData } from './entity.data.js';
 import { umbUserGroupData } from './user-group.data.js';
 import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import {
-	PagedUserResponseModel,
 	UpdateUserGroupsOnUserRequestModel,
 	UserItemResponseModel,
 	UserResponseModel,
@@ -20,13 +19,6 @@ const createUserItem = (item: UserResponseModel): UserItemResponseModel => {
 class UmbUserData extends UmbEntityData<UserResponseModel> {
 	constructor(data: UserResponseModel[]) {
 		super(data);
-	}
-
-	getAll(): PagedUserResponseModel {
-		return {
-			total: this.data.length,
-			items: this.data,
-		};
 	}
 
 	getItems(ids: Array<string>): Array<UserItemResponseModel> {

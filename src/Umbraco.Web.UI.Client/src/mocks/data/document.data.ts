@@ -656,10 +656,7 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 	}
 
 	getAllowedDocumentTypesAtRoot(): PagedDocumentTypeResponseModel {
-		const items = umbDocumentTypeData.getAll(); //.filter((docType) => docType.allowedAsRoot);
-
-		const total = items?.length;
-		return { items, total };
+		return umbDocumentTypeData.getAll(); //.filter((docType) => docType.allowedAsRoot);
 	}
 
 	getRecycleBinRoot(): PagedRecycleBinItemResponseModel {
@@ -681,8 +678,9 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 	getUserPermissionsForDocument(id: string): Array<any> {
 		return umbUserPermissionData
 			.getAll()
-			.filter(
-				(permission) => permission.target.entityType === DOCUMENT_ENTITY_TYPE && permission.target.documentId === id,
+			.items.filter(
+				(permission: any) =>
+					permission.target.entityType === DOCUMENT_ENTITY_TYPE && permission.target.documentId === id,
 			);
 	}
 }
