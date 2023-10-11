@@ -9,15 +9,12 @@
 
       var unsubscribe = [];
 
-      var vm = this;
+      var model = this;
 
-      vm.$onDestroy = onDestroy;
-      vm.$onInit = onInit;
-      vm.$onChanges = onChanges;
+      model.$onDestroy = onDestroy;
+      model.$onInit = onInit;
+      model.$onChanges = onChanges;
 
-      vm.stylesheet = "";
-      vm.blockStyle = "@import \""+vm.stylesheet+"\"";
-      vm.view = false;
 
       function onDestroy() {
         $element[0]._isInitializedUmbBlock = false;
@@ -25,17 +22,24 @@
 
       function onInit() {
         $element[0]._isInitializedUmbBlock = true;
-        vm.block = $element[0].$block;
-        console.log("vm.block", vm.block)
+        $scope.block = $element[0].$block;
+        $scope.api = $element[0].$api;
+        $scope.index = $element[0].$index;
+
+        //$scope.api = model.api;
+        //$scope.index = model.index;
+
+        const stylesheet = $scope.block.config.stylesheet + `?umb__rnd=${Umbraco.Sys.ServerVariables.application.cacheBuster}`;
+        console.log("$scope.block", $scope.block)
+        console.log("$scope.block stylesheet", stylesheet)
 
         var shadowRoot = $element[0].attachShadow({ mode: 'open' });
         shadowRoot.innerHTML =
+        (stylesheet ? `<style>
+          @import "${stylesheet}"
+        </style>` : '') +
         `
-            <style ng-if="vm.blockStyle">
-              {{vm.blockStyle}}
-            </style>
-            <div class="umb-block-rte--view" ng-if="vm.view" ng-include="vm.view"></div>
-            <div class="umb-block-rte__block--view" ng-if="!vm.view">Hello World</div>
+            <div class="umb-block-rte--view" ng-include="block.view"></div>
         `;
         $compile(shadowRoot)($scope);
 
@@ -49,12 +53,11 @@
   }
 
   var umbRteBlockComponent = {
-      //templateUrl: 'views/propertyeditors/rte/blocks/umb-rte-block.html',
       bindings: {
           dataUdi: "<"
       },
-      controllerAs: 'vm',
-      controller: umbRteBlockController
+      controller: umbRteBlockController,
+      controllerAs: "model"
   };
 
   angular.module('umbraco.directives').component('umbRteBlock', umbRteBlockComponent);

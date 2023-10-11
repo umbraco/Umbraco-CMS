@@ -1,7 +1,6 @@
 (function () {
   "use strict";
 
-
   /**
    * @ngdoc directive
    * @name umbraco.directives.directive:umbBlockListPropertyEditor
@@ -110,10 +109,8 @@
           // once the data is submitted. If so we need to re-initialize
           vm.model.onValueChanged = onServerValueChanged;
 
-          inlineEditing = vm.model.config.useInlineEditingAsDefault;
-          liveEditing = vm.model.config.useLiveEditing;
-
-          vm.validationLimit = vm.model.config.validationLimit;
+          //inlineEditing = vm.model.config.useInlineEditingAsDefault;
+          //liveEditing = vm.model.config.useLiveEditing;
 
           vm.listWrapperStyles = {};
 
@@ -376,14 +373,12 @@
       function getDefaultViewForBlock(block) {
 
         // TODO: new paths:
-          var defaultViewFolderPath = "views/propertyeditors/blocklist/blocklistentryeditors/";
+          var defaultViewFolderPath = "views/propertyeditors/rte/blocks/blockrteentryeditors/";
 
           if (block.config.unsupported === true)
               return defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
 
-          if (inlineEditing === true)
-              return defaultViewFolderPath + "inlineblock/inlineblock.editor.html";
-          return defaultViewFolderPath + "labelblock/labelblock.editor.html";
+          return defaultViewFolderPath + "labelblock/rtelabelblock.editor.html";
       }
 
       /**

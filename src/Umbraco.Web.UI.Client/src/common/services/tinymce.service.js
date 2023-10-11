@@ -1447,9 +1447,16 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             const blockContentUdi = blockEl.getAttribute('data-content-udi');
             if(blockContentUdi) {
               const block = args.blockEditorApi.getBlockByContentUdi(blockContentUdi);
-              blockEl.$block = block;
-              $compile(blockEl)(args.scope);
-              blockEl.setAttribute('contenteditable', 'false');
+              if(block) {
+                blockEl.$index = block.index;
+                blockEl.$block = block;
+                blockEl.$api = args.blockEditorApi;
+                $compile(blockEl)(args.scope);
+                blockEl.setAttribute('contenteditable', 'false');
+              } else {
+                // Remove this block by removing the data-udi (as this will trigger TinyMCE format clean-up)
+                blockEl.removeAttribute('data-content-udi');
+              }
             }
           }
         }
