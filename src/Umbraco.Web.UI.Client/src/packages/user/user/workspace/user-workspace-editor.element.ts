@@ -114,6 +114,11 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.updateProperty('userGroupIds', userGroupIds);
 	}
 
+	#onDocumentStartNodeChange(event: UmbChangeEvent) {
+		const target = event.target as UmbInputDocumentElement;
+		this.#workspaceContext?.updateProperty('contentStartNodeIds', target.selectedIds);
+	}
+
 	#onUserDelete() {
 		if (!this._user || !this._user.id) return;
 
@@ -216,6 +221,11 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 							@property-value-change=${(e: any) =>
 								this.#workspaceContext?.updateProperty('contentStartNodeIds', e.target.value)}
 							slot="editor"></umb-property-editor-ui-document-picker>
+
+						<umb-input-document
+							.selectedIds=${this._user.contentStartNodeIds ?? []}
+							@change=${this.#onDocumentStartNodeChange}
+							slot="editor"></umb-input-document>
 					</umb-workspace-property-layout>
 					<umb-workspace-property-layout
 						label=${this.localize.term('user_mediastartnodes')}
