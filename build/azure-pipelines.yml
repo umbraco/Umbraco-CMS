@@ -149,8 +149,9 @@ stages:
               npm version $NBGV_NPMPackageVersion --allow-same-version --no-git-tag-version
               echo "##[command]Running npm pack"
               echo "##[debug]Output directory: $(Build.ArtifactStagingDirectory)"
+              mkdir $(Build.ArtifactStagingDirectory)/npm
               npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm
-              mv .npmrc $(Build.ArtifactStagingDirectory)/npm
+              mv .npmrc $(Build.ArtifactStagingDirectory)/npm/
               echo "##[endgroup]"
             displayName: Prepare Backoffice npm package
             workingDirectory: src/Umbraco.Web.UI.New.Client
