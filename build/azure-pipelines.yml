@@ -118,6 +118,7 @@ stages:
               command: restore
               projects: $(solution)
           - task: DotNetCoreCLI@2
+            name: dotnetBuild
             displayName: Run dotnet build
             inputs:
               command: build
@@ -131,19 +132,6 @@ stages:
               echo "Major version: $major"
 
               echo "##vso[task.setvariable variable=majorVersion;isOutput=true]$major"
-
-              # Get the full version without the build metadata
-              # If the branch is a release branch, the version will be lifted from the version.json file
-              # or else it will be the build number converted to proper characters
-              if [[ "$(Build.SourceBranch)" == "refs/heads/release/"* ]]; then
-                  fullVersion="$(jq .version $(Build.SourcesDirectory)/version.json)"
-              else
-                  fullVersion=${version//+/.g}
-              fi
-
-              echo "Full version: $fullVersion"
-
-              echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$fullVersion"
             displayName: Set major version
             name: determineMajorVersion
           - script: dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
@@ -154,19 +142,23 @@ stages:
               buildnumber="$(Build.BuildNumber)_$(Build.BuildId)_$sha"
               echo "##vso[build.updatebuildnumber]$buildnumber"
             displayName: Update build number
-          - script: |
-              npm version $(determineMajorVersion.fullVersion) --allow-same-version --no-git-tag-version
-              npm pack
-              mkdir publish
-              mv umbraco-cms-backoffice-$(determineMajorVersion.fullVersion).tgz publish/umbraco-cms-backoffice-latest.tgz
-              mv .npmrc publish/
-            displayName: Set version on Backoffice npm package
+          - bash: |
+              echo "##[group]npm pack details"
+              echo "##[command]Running npm version"
+              echo "##[debug]Version: $NBGV_NPMPackageVersion"
+              npm version $NBGV_NPMPackageVersion --allow-same-version --no-git-tag-version
+              echo "##[command]Running npm pack"
+              echo "##[debug]Output directory: $(Build.ArtifactStagingDirectory)"
+              npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm
+              mv .npmrc $(Build.ArtifactStagingDirectory)/npm
+              echo "##[endgroup]"
+            displayName: Prepare Backoffice npm package
             workingDirectory: src/Umbraco.Web.UI.New.Client
           - task: PublishPipelineArtifact@1
             displayName: Publish Backoffice NPM Artifact
             inputs:
-              targetPath: src/Umbraco.Web.UI.New.Client/publish
-              artifactName: backoffice_npm_pack
+              targetPath: $(Build.ArtifactStagingDirectory)/npm
+              artifactName: npm
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
@@ -638,8 +630,9 @@ stages:
   - stage: Deploy_Npm
     displayName: NPM release
     dependsOn:
-      - Deploy_MyGet
-      - Build_Docs
+      - Build
+      #- Deploy_MyGet
+      #- Build_Docs
     condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.npmDeploy}}))
     jobs:
       - job:
@@ -647,7 +640,7 @@ stages:
         steps:
           - checkout: none
           - download: current
-            artifact: backoffice_npm_pack
+            artifact: npm
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
             inputs:
@@ -655,7 +648,7 @@ stages:
           - task: npmAuthenticate@0
             displayName: Authenticate with npm
             inputs:
-              workingFile: $(Pipeline.Workspace)/backoffice_npm_pack/.npmrc
+              workingFile: $(Pipeline.Workspace)/npm/.npmrc
               customEndpoint: 'NPM - Umbraco Backoffice'
           - script: |
               # Setup temp npm project to load in defaults from the local .npmrc
@@ -667,20 +660,24 @@ stages:
               echo "Testing npm is authenticated"
               npm whoami
             displayName: npm whoami
-            workingDirectory: $(Pipeline.Workspace)/backoffice_npm_pack
+            workingDirectory: $(Pipeline.Workspace)/npm
           - script: |
-              # Calculate npm tag based on SourceBranch
-              if [[ "$(Build.SourceBranch)" == "refs/heads/release/"* ]]; then
+              # Calculate npm tag based on the PublicRelease variable
+              if [[ "$PUBLIC_RELEASE" = true ]]; then
                   npmTag=latest
               else
                   npmTag=next
               fi
 
-              echo "Publishing Backoffice package with tag '$npmTag'"
+              echo "##[debug]Publishing Backoffice package with version '$NPM_VERSION'"
+              echo "##[debug]Publishing Backoffice package with tag '$npmTag'"
 
-              npm publish --tag $npmTag umbraco-cms-backoffice-latest.tgz
+              npm publish --tag $npmTag $NPM_VERSION.tgz
             displayName: Publish npm
-            workingDirectory: $(Pipeline.Workspace)/backoffice_npm_pack
+            env:
+              PUBLIC_RELEASE: $[ stageDependencies.Build.A.outputs['dotnetBuild.PublicRelease'] ]
+              NPM_VERSION: $[ stageDependencies.Build.A.outputs['dotnetBuild.NPMPackageVersion'] ]
+            workingDirectory: $(Pipeline.Workspace)/npm
 
   - stage: Upload_API_Docs
     pool:
