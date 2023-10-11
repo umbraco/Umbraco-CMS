@@ -5,10 +5,7 @@ import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { renderEditor, type tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
-import {
-	TinyMcePluginArguments,
-	UmbTinyMcePluginBase,
-} from '@umbraco-cms/backoffice/components';
+import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
@@ -210,11 +207,11 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 		// define keyboard shortcuts
 		editor.addShortcut('Ctrl+S', '', () =>
-			this.dispatchEvent(new CustomEvent('rte.shortcut.save', { composed: true, bubbles: true }))
+			this.dispatchEvent(new CustomEvent('rte.shortcut.save', { composed: true, bubbles: true })),
 		);
 
 		editor.addShortcut('Ctrl+P', '', () =>
-			this.dispatchEvent(new CustomEvent('rte.shortcut.saveAndPublish', { composed: true, bubbles: true }))
+			this.dispatchEvent(new CustomEvent('rte.shortcut.saveAndPublish', { composed: true, bubbles: true })),
 		);
 
 		// bind editor events
