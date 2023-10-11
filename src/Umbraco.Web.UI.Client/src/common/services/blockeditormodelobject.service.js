@@ -300,7 +300,7 @@
             this.value.settingsData = this.value.settingsData || [];
 
             this.propertyEditorAlias = propertyEditorAlias;
-            this.blockConfigurations = blockConfigurations;
+            this.blockConfigurations = blockConfigurations ?? [];
 
             this.blockConfigurations.forEach(blockConfiguration => {
                 if (blockConfiguration.view != null && blockConfiguration.view !== "") {
@@ -396,18 +396,20 @@
                 // removing duplicates.
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
-                tasks.push(contentResource.getScaffoldByKeys(-20, scaffoldKeys).then(scaffolds => {
-                    Object.values(scaffolds).forEach(scaffold => {
-                        // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
-                        if (self.scaffolds) {
-                            self.scaffolds.push(formatScaffoldData(scaffold));
-                        }
-                    });
-                }).catch(
-                    () => {
-                        // Do nothing if we get an error.
-                    }
-                ));
+                if(scaffoldKeys.length > 0) {
+                  tasks.push(contentResource.getScaffoldByKeys(-20, scaffoldKeys).then(scaffolds => {
+                      Object.values(scaffolds).forEach(scaffold => {
+                          // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
+                          if (self.scaffolds) {
+                              self.scaffolds.push(formatScaffoldData(scaffold));
+                          }
+                      });
+                  }).catch(
+                      () => {
+                          // Do nothing if we get an error.
+                      }
+                  ));
+                }
 
                 return $q.all(tasks);
             },
@@ -641,7 +643,7 @@
                 };
                 // first time instant update of label.
               blockObject.label = blockObject.content?.contentTypeName || "";
-                blockObject.index = 0; 
+                blockObject.index = 0;
 
                 if (blockObject.config.label && blockObject.config.label !== "" && blockObject.config.unsupported !== true) {
 
