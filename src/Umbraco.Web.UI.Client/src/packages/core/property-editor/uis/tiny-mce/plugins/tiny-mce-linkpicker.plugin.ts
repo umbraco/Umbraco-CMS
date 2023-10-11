@@ -70,13 +70,13 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 		}
 
 		if (!this.#anchorElement) {
-			this.#openLinkPicker();
+			this.#openLinkPicker({ name: this.editor.selection.getContent() });
 			return;
 		}
 
 		//if we already have a link selected, we want to pass that data over to the dialog
 		const currentTarget: UmbLinkPickerLink = {
-			name: this.#anchorElement.title,
+			name: this.#anchorElement.textContent,
 			url: this.#anchorElement.getAttribute('href') ?? '',
 			target: this.#anchorElement.target,
 		};
@@ -107,7 +107,7 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 
 		if (!modalHandler) return;
 
-		const linkPickerData = await modalHandler.onSubmit();
+		const linkPickerData = await modalHandler.onSubmit().catch(() => undefined);
 		if (!linkPickerData) return;
 
 		this.#linkPickerData = linkPickerData;
