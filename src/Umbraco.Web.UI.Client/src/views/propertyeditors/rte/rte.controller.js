@@ -118,9 +118,7 @@ angular.module("umbraco")
                 //listen for formSubmitting event (the result is callback used to remove the event subscription)
                 unsubscribe.push($scope.$on("formSubmitting", function () {
                     if (tinyMceEditor !== undefined && tinyMceEditor != null && !$scope.isLoading) {
-                        $scope.model.value = {
-                          markup: tinyMceEditor.getContent()
-                        };
+                        $scope.model.value.markup = tinyMceEditor.getContent();
                     }
                 }));
 
