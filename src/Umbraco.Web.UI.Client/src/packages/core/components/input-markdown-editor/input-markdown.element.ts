@@ -26,7 +26,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	// TODO: Make actions be able to handle multiple selection
 
 	@property({ type: Boolean })
-	preview?: boolean = false;
+	preview: boolean = false;
 
 	@property()
 	overlaySize?: UUIModalSidebarSize;
