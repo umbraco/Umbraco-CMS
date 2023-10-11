@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Runtime.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
@@ -138,6 +139,7 @@ public class RichTextPropertyEditor : DataEditor
         private readonly HtmlLocalLinkParser _localLinkParser;
         private readonly IHtmlMacroParameterParser _macroParameterParser;
         private readonly RichTextEditorPastedImages _pastedImages;
+        private readonly IJsonSerializer _jsonSerializer;
 
         public RichTextPropertyValueEditor(
             DataEditorAttribute attribute,
@@ -161,6 +163,7 @@ public class RichTextPropertyEditor : DataEditor
             _imageUrlGenerator = imageUrlGenerator;
             _htmlSanitizer = htmlSanitizer;
             _macroParameterParser = macroParameterParser;
+            _jsonSerializer = jsonSerializer;
         }
 
         [Obsolete("Use the constructor which takes an HtmlMacroParameterParser instead")]
@@ -255,17 +258,23 @@ public class RichTextPropertyEditor : DataEditor
         /// <param name="segment"></param>
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
-            var val = property.GetValue(culture, segment);
-            if (val == null)
+            if (property.GetValue(culture, segment) is not string propertyValue)
             {
                 return null;
             }
 
-            var propertyValueWithMediaResolved = _imageSourceParser.EnsureImageSources(val.ToString()!);
+            RichTextEditorValue? richTextEditorValue = TryParseValue(propertyValue);
+            if (richTextEditorValue is null)
+            {
+                return null;
+            }
+
+            var propertyValueWithMediaResolved = _imageSourceParser.EnsureImageSources(richTextEditorValue.Markup);
             var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(
                 propertyValueWithMediaResolved,
                 new Dictionary<string, string>());
-            return parsed;
+            richTextEditorValue.Markup = parsed;
+            return richTextEditorValue;
         }
 
         /// <summary>
@@ -276,7 +285,8 @@ public class RichTextPropertyEditor : DataEditor
         /// <returns></returns>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            if (editorValue.Value == null)
+            RichTextEditorValue? richTextEditorValue = TryParseValue(editorValue.Value?.ToString() ?? string.Empty);
+            if (richTextEditorValue is null)
             {
                 return null;
             }
@@ -288,20 +298,34 @@ public class RichTextPropertyEditor : DataEditor
             GuidUdi? mediaParent = config?.MediaParentId;
             Guid mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
 
-            if (string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
+            if (string.IsNullOrWhiteSpace(richTextEditorValue.Markup))
             {
                 return null;
             }
 
             var parseAndSaveBase64Images = _pastedImages.FindAndPersistEmbeddedImages(
-                editorValue.Value.ToString()!, mediaParentId, userId);
+                richTextEditorValue.Markup, mediaParentId, userId);
             var parseAndSavedTempImages =
                 _pastedImages.FindAndPersistPastedTempImages(parseAndSaveBase64Images, mediaParentId, userId);
             var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
             var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
             var sanitized = _htmlSanitizer.Sanitize(parsed);
 
-            return sanitized.NullOrWhiteSpaceAsNull();
+            richTextEditorValue.Markup = sanitized.NullOrWhiteSpaceAsNull() ?? string.Empty;
+            return _jsonSerializer.Serialize(richTextEditorValue);
+        }
+
+        private RichTextEditorValue? TryParseValue(string value)
+        {
+            try
+            {
+                return _jsonSerializer.Deserialize<RichTextEditorValue>(value);
+            }
+            catch(Exception exception)
+            {
+                // TODO: log this?
+                return null;
+            }
         }
     }
 
@@ -329,5 +353,17 @@ public class RichTextPropertyEditor : DataEditor
         [Obsolete("Use the overload with the 'availableCultures' parameter instead, scheduled for removal in v14")]
         public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
             => GetIndexValues(property, culture, segment, published, Enumerable.Empty<string>());
+    }
+
+    // TODO: this is only a temporary thing for handling editor values. we must:
+    // - add blocks to the value
+    // - make the class public and move it somewhere reasonable
+    // - make the property value editor handle this value type (including rendering views like for macros)
+    // - ...probably loads more
+    [DataContract]
+    private class RichTextEditorValue
+    {
+        [DataMember(Name = "markup")]
+        public required string Markup { get; set; }
     }
 }

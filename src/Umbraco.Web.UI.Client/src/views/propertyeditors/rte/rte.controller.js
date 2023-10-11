@@ -83,11 +83,22 @@ angular.module("umbraco")
                     });
 
                     //initialize the standard editor functionality for Umbraco
+                    // TODO: sanity check this!
+                    // tinyMceService is built to expect $scope.model to be passed in as args.model for initializeEditor().
+                    // the service then assumes that the RTE markup value is found in $scope.model.value.
+                    // since we've moved the RTE markup value to $scope.model.value.markup, we can't pass $scope.model to the
+                    // service and expect it to work. instead we construct and pass an intermediate value that reflects what
+                    // tinyMceService expects from the model.
+                    const tinyMceModel = {
+                        value: $scope.model.value.markup,
+                        config: $scope.model.config,
+                        dataTypeKey: $scope.model.dataTypeKey
+                    };
                     tinyMceService.initializeEditor({
                         scope: $scope,
                         editor: editor,
                         toolbar: editorConfig.toolbar,
-                        model: $scope.model,
+                        model: tinyMceModel,
                         currentFormInput: $scope.rteForm.modelValue
                     });
 
@@ -107,7 +118,9 @@ angular.module("umbraco")
                 //listen for formSubmitting event (the result is callback used to remove the event subscription)
                 unsubscribe.push($scope.$on("formSubmitting", function () {
                     if (tinyMceEditor !== undefined && tinyMceEditor != null && !$scope.isLoading) {
-                        $scope.model.value = tinyMceEditor.getContent();
+                        $scope.model.value = {
+                          markup: tinyMceEditor.getContent()
+                        };
                     }
                 }));
 
