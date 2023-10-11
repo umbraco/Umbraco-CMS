@@ -9,6 +9,7 @@ public class Webhook : EntityBase
     private string[] _events;
     private Guid[] _entityKeys;
     private bool _enabled;
+    private Dictionary<string, string> _headers;
 
     // Custom comparer for enumerable guids
     private static readonly DelegateEqualityComparer<IEnumerable<Guid>> _guidEnumerableComparer =
@@ -22,9 +23,21 @@ public class Webhook : EntityBase
             (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
             enum1 => enum1.GetHashCode());
 
-    public Webhook(string url, bool? enabled = null, Guid[]? entityKeys = null, string[]? events = null)
+    // Custom comparer for enumerable webhook events
+    private static readonly DelegateEqualityComparer<Dictionary<string, string>> _dictionaryEnumerableComparer =
+        new(
+            (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
+            enum1 => enum1.GetHashCode());
+
+    public Webhook(string url, bool? enabled = null, Guid[]? entityKeys = null, string[]? events = null, Dictionary<string, string>? headers = null)
     {
         _url = url;
+        _headers = headers ?? new Dictionary<string, string>
+        {
+            {"HeaderOne", "HeaderOneValue"},
+            {"HeaderTwo", "HeaderTwoValue"},
+            {"HeaderThree", "HeaderThreeValue"},
+        };
         _events = events ?? Array.Empty<string>();
         _entityKeys = entityKeys ?? Array.Empty<Guid>();
         _enabled = enabled ?? false;
@@ -52,5 +65,11 @@ public class Webhook : EntityBase
     {
         get => _enabled;
         set => SetPropertyValueAndDetectChanges(value, ref _enabled, nameof(Enabled));
+    }
+
+    public Dictionary<string, string> Headers
+    {
+        get => _headers;
+        set => SetPropertyValueAndDetectChanges(value, ref _headers!, nameof(Headers), _dictionaryEnumerableComparer);
     }
 }

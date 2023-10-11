@@ -13,7 +13,8 @@
           <umb-box-content>
             <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
             <div ng-hide="vm.loading" style="margin-top: 20px;">
-              <umb-control-group label="Url" description="The url to call when the webhook is triggered." alias="webhookUrl" required="true">
+              <umb-control-group label="Url" description="The url to call when the webhook is triggered."
+                                 alias="webhookUrl" required="true">
                 <input type="url"
                        data-element="webhook-url"
                        name="webhookUrl"
@@ -23,10 +24,11 @@
                        focus-on-filled="true"
                        placeholder="https://example.com/api/webhook"
                        umb-auto-focus
-                       required />
+                       required/>
               </umb-control-group>
 
-              <umb-control-group label="Event" description="The events for which the webhook should be triggered." alias="webhookEvents" required="true">
+              <umb-control-group label="Event" description="The events for which the webhook should be triggered."
+                                 alias="webhookEvents" required="true">
                 <umb-node-preview
                   ng-repeat="event in model.webhook.events"
                   ng-show="event"
@@ -46,9 +48,11 @@
                 </a>
               </umb-control-group>
 
-              <umb-control-group label="Content Type" description="Only trigger the webhook for a specific content type." alias="webhookContentType">
-                 <umb-node-preview
-                   ng-repeat="contentType in model.contentTypes"
+              <umb-control-group label="Content Type"
+                                 description="Only trigger the webhook for a specific content type."
+                                 alias="webhookContentType">
+                <umb-node-preview
+                  ng-repeat="contentType in model.contentTypes"
                   ng-show="contentType"
                   icon="contentType.icon"
                   name="contentType.name"
@@ -73,6 +77,41 @@
                   checked="model.webhook.enabled"
                   on-click="model.webhook.enabled = !model.webhook.enabled">
                 </umb-toggle>
+              </umb-control-group>
+              <umb-control-group label="Headers" description="Custom headers to include in the webhook request."
+                                 alias="webhookHeaders">
+                <table class="table table-hover" ng-if="!vm.loading">
+                  <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr ng-repeat="(key, value) in model.webhook.headers">
+                    <td>
+                      {{ key }}
+                    </td>
+                    <td>
+                      {{ value }}
+                    </td>
+                    <td style="text-align: right;">
+                      <umb-button
+                        type="button"
+                        button-style="danger"
+                        label-key="general_delete" ,
+                        size="xxs"
+                        action="vm.removeHeader(key)">
+                      </umb-button>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+                <umb-button type="button"
+                            action="vm.openCreateHeader()"
+                            button-style="outline"
+                            label-key="webhooks_addWebhook">
+                </umb-button>
               </umb-control-group>
             </div>
           </umb-box-content>

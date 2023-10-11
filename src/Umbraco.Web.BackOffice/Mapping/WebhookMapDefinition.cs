@@ -23,6 +23,7 @@ public class WebhookMapDefinition : IMapDefinition
         target.Url = source.Url;
         target.Enabled = source.Enabled;
         target.Key = source.Key ?? Guid.NewGuid();
+        target.Headers = source.Headers;
     }
 
     // Umbraco.Code.MapAll
@@ -33,6 +34,7 @@ public class WebhookMapDefinition : IMapDefinition
         target.Url = source.Url;
         target.Enabled = source.Enabled;
         target.Key = source.Key;
+        target.Headers = source.Headers;
     }
 
     // Umbraco.Code.MapAll

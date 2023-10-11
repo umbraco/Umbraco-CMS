@@ -84,13 +84,7 @@
         view: "views/webhooks/overlays/edit.html",
         events: vm.events,
         contentTypes : webhook ? getEntities(webhook) : null,
-        webhook: webhook ? {
-          entityKeys: webhook.entityKeys,
-          enabled: webhook.enabled,
-          events: webhook.events,
-          key: webhook.key,
-          url: webhook.url
-        } : {enabled: true},
+        webhook: webhook ? webhook : {enabled: true},
         submit: (model) => {
           model.disableSubmitButton = true;
           model.submitButtonState = 'busy';

@@ -20,4 +20,12 @@ public class WebhookViewModel
 
     [DataMember(Name = "enabled")]
     public bool Enabled { get; set; }
+
+    [DataMember(Name = "headers")]
+    public Dictionary<string, string> Headers { get; set; } = new()
+    {
+        {"HeaderOne", "HeaderOneValue"},
+        {"HeaderTwo", "HeaderTwoValue"},
+        {"HeaderThree", "HeaderThreeValue"},
+    };
 }

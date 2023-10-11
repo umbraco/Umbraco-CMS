@@ -4,6 +4,8 @@
     var vm = this;
     vm.clearContentType = clearContentType;
     vm.clearEvent = clearEvent;
+    vm.removeHeader = removeHeader;
+    vm.openCreateHeader = openCreateHeader;
     this.openEventPicker = () => {
       editorService.eventPicker({
         title: "Select event",
@@ -33,6 +35,22 @@
         }
       });
     };
+
+    function openCreateHeader() {
+      editorService.open({
+        title: "Create header",
+        view: "views/webhooks/overlays/header.html",
+        size: 'small',
+        position: 'right',
+        submit(model) {
+          $scope.model.webhook.headers[model.key] = model.value;
+          editorService.close();
+        },
+        close() {
+          editorService.close();
+        }
+      });
+    }
 
     function getEntities(selection, isContent) {
       const resource = isContent ? contentTypeResource : mediaTypeResource;
@@ -65,6 +83,11 @@
         $scope.model.events = $scope.model.events.filter(x => x.key !== event);
       }
     }
+
+    function removeHeader(key) {
+      delete $scope.model.webhook.headers[key];
+    }
+
 
     this.close = () => {
       if ($scope.model.close) {

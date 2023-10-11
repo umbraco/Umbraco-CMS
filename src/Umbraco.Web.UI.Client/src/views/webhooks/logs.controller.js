@@ -23,7 +23,7 @@
         currentUser: this.currentUser,
         close: () => {
           overlayService.close();
-        },
+        }
       });
     }
 
