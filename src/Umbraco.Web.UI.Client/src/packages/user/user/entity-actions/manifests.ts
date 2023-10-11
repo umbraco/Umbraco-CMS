@@ -30,7 +30,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 800,
 		api: UmbEnableUserEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'umb:check',
 			label: 'Enable',
 			repositoryAlias: ENABLE_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
@@ -43,7 +43,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 700,
 		api: UmbDisableUserEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'umb:block',
 			label: 'Disable',
 			repositoryAlias: DISABLE_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
