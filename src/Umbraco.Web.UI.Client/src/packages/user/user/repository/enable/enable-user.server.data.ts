@@ -1,4 +1,4 @@
-import { UmbUserEnableDataSource } from '../../types.js';
+import { UmbEnableUserDataSource } from '../../types.js';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -8,7 +8,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @export
  * @class enable
  */
-export class UmbEnableUserServerDataSource implements UmbUserEnableDataSource {
+export class UmbEnableUserServerDataSource implements UmbEnableUserDataSource {
 	#host: UmbControllerHostElement;
 
 	/**

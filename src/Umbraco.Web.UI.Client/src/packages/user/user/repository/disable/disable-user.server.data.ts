@@ -1,4 +1,4 @@
-import { UmbUserDisableDataSource } from '../../types.js';
+import { UmbDisableUserDataSource } from '../../types.js';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -6,25 +6,25 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for Data Type items that fetches data from the server
  * @export
- * @class UmbUserDisableServerDataSource
+ * @class UmbDisableUserServerDataSource
  */
-export class UmbUserDisableServerDataSource implements UmbUserDisableDataSource {
+export class UmbDisableUserServerDataSource implements UmbDisableUserDataSource {
 	#host: UmbControllerHostElement;
 
 	/**
-	 * Creates an instance of UmbUserDisableServerDataSource.
+	 * Creates an instance of UmbDisableUserServerDataSource.
 	 * @param {UmbControllerHostElement} host
-	 * @memberof UmbUserDisableServerDataSource
+	 * @memberof UmbDisableUserServerDataSource
 	 */
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
 	/**
-	 * Set groups for users
-	 * @param {Array<string>} id
-	 * @return {*}
-	 * @memberof UmbUserDisableServerDataSource
+	 * Disables the specified user ids
+	 * @param {string[]} userIds
+	 * @returns {Promise<void>}
+	 * @memberof UmbDisableUserServerDataSource
 	 */
 	async disable(userIds: string[]) {
 		if (!userIds) throw new Error('User ids are missing');
@@ -35,7 +35,7 @@ export class UmbUserDisableServerDataSource implements UmbUserDisableDataSource 
 				requestBody: {
 					userIds,
 				},
-			})
+			}),
 		);
 	}
 }

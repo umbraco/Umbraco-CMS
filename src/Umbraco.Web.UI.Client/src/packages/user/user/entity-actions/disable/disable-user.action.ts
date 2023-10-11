@@ -1,4 +1,4 @@
-import { type UmbDisableUserRepository } from '../../repository/disable-user.repository.js';
+import { type UmbDisableUserRepository } from '../../repository/disable/disable-user.repository.js';
 import { UmbUserRepository } from '../../repository/user.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
