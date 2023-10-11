@@ -86,7 +86,7 @@ export const data: Array<UserResponseModel & { type: string }> = [
 	{
 		id: '82e11d3d-b91d-43c9-9071-34d28e62e81d',
 		type: 'user',
-		contentStartNodeIds: [],
+		contentStartNodeIds: ['simple-document-id'],
 		mediaStartNodeIds: [],
 		name: 'Amelie Walker',
 		email: 'awalker1@domain.com',
