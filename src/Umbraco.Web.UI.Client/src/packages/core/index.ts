@@ -4,6 +4,7 @@ import { manifests as localizationManifests } from './localization/manifests.js'
 import { manifests as propertyActionManifests } from './property-action/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
 import { manifests as tinyMcePluginManifests } from './property-editor/uis/tiny-mce/plugins/manifests.js';
+import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as modalManifests } from './modal/common/manifests.js';
 import { manifests as themeManifests } from './themes/manifests.js';
@@ -17,12 +18,11 @@ import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api'
 import {
 	ManifestTypes,
 	UmbBackofficeManifestKind,
-	UmbMultiExtensionsClassInitializer,
+	UmbMultiExtensionsApiInitializer,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 export * from './localization/index.js';
 export * from './action/index.js';
-export * from './collection/index.js';
 export * from './components/index.js';
 export * from './content-type/index.js';
 export * from './debug/index.js';
@@ -52,6 +52,7 @@ const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...propertyActionManifests,
 	...propertyEditorManifests,
 	...tinyMcePluginManifests,
+	...collectionManifests,
 	...workspaceManifests,
 	...modalManifests,
 	...themeManifests,
@@ -59,7 +60,9 @@ const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 ];
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
-	new UmbMultiExtensionsClassInitializer(host, ['globalContext', 'store', 'treeStore', 'itemStore']);
+
+	// TODO: replace this with a Extension Controller:
+	new UmbMultiExtensionsApiInitializer(host, ['globalContext', 'store', 'treeStore', 'itemStore']);
 
 	extensionRegistry.registerMany(manifests);
 

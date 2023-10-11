@@ -8,21 +8,21 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: SCRIPTS_REPOSITORY_ALIAS,
 	name: 'Scripts Repository',
-	class: UmbScriptsRepository,
+	api: UmbScriptsRepository,
 };
 
 const store: ManifestStore = {
 	type: 'store',
 	alias: SCRIPTS_STORE_ALIAS,
 	name: 'Scripts Store',
-	class: UmbScriptsStore,
+	api: UmbScriptsStore,
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: SCRIPTS_TREE_STORE_ALIAS,
 	name: 'Scripts Tree Store',
-	class: UmbScriptsTreeStore,
+	api: UmbScriptsTreeStore,
 };
 
 export const manifests = [repository, store, treeStore];

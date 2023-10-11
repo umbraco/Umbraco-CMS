@@ -21,11 +21,11 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.User.Save',
 		name: 'Save User Workspace Action',
+		api: UmbSaveWorkspaceAction,
 		meta: {
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
-			api: UmbSaveWorkspaceAction,
 		},
 		conditions: [
 			{

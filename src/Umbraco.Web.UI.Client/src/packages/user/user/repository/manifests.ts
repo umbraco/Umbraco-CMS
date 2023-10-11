@@ -9,21 +9,21 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: USER_REPOSITORY_ALIAS,
 	name: 'User Repository',
-	class: UmbUserRepository,
+	api: UmbUserRepository,
 };
 
 const store: ManifestStore = {
 	type: 'store',
 	alias: 'Umb.Store.User',
 	name: 'User Store',
-	class: UmbUserStore,
+	api: UmbUserStore,
 };
 
 const itemStore: ManifestItemStore = {
 	type: 'itemStore',
 	alias: 'Umb.ItemStore.User',
 	name: 'User Store',
-	class: UmbUserItemStore,
+	api: UmbUserItemStore,
 };
 
 export const manifests = [repository, store, itemStore];

@@ -46,7 +46,7 @@ export const manifest: ManifestCondition = {
 	type: 'condition',
 	name: 'Switch Condition',
 	alias: 'Umb.Condition.Switch',
-	class: UmbSwitchCondition,
+	api: UmbSwitchCondition,
 };
 
 export type SwitchConditionConfig = UmbConditionConfigBase & {

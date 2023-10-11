@@ -9,11 +9,11 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.DataType.Move',
 		name: 'Move Data Type Entity Action',
 		weight: 900,
+		api: UmbMoveDataTypeEntityAction,
 		meta: {
 			icon: 'umb:enter',
 			label: 'Move to...',
 			repositoryAlias: DATA_TYPE_REPOSITORY_ALIAS,
-			api: UmbMoveDataTypeEntityAction,
 			entityTypes: [DATA_TYPE_ENTITY_TYPE],
 		},
 	},

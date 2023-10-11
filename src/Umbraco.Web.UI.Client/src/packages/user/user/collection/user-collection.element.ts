@@ -1,7 +1,7 @@
 import { UmbUserCollectionContext } from './user-collection.context.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
@@ -30,7 +30,7 @@ export class UmbUserCollectionElement extends UmbLitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this.provideContext(UMB_COLLECTION_CONTEXT_TOKEN, this.#collectionContext);
+		this.provideContext(UMB_COLLECTION_CONTEXT, this.#collectionContext);
 	}
 
 	render() {
