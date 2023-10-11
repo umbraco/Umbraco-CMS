@@ -9,5 +9,4 @@ public class TemporaryFileResponseModel
     public DateTime? AvailableUntil { get; set; }
 
     public string FileName { get; set; } = string.Empty;
-    public string Type => Constants.UdiEntityType.Temporaryfile;
 }

@@ -69,14 +69,8 @@ public static partial class Constants
         public const string UserData = "user-data";
         public const string UserPermissions = "user-permissions";
         public const string Relation = "relation";
-        public const string UserTourStatuses = "user-tour-statuses";
-        public const string Textfile = "text-file";
-        public const string Temporaryfile = "temp-file";
         public const string TemplateScaffold = "template-scaffold";
-        public const string Telemetry = "telemetry";
         public const string Tag = "tag";
         public const string StaticFile = "static-file";
-        public const string RedirectUrl = "redirect-url";
-        public const string RedirectUrlStatus = "redirect-url-status";
     }
 }

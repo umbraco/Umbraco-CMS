@@ -15,5 +15,4 @@ public class RedirectUrlResponseModel
     public Guid ContentId { get; set; }
 
     public string? Culture { get; set; }
-    public string Type => Constants.UdiEntityType.RedirectUrl;
 }

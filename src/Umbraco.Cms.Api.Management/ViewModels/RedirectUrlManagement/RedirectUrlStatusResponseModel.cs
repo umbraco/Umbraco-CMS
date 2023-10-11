@@ -8,5 +8,4 @@ public class RedirectUrlStatusResponseModel
     public RedirectStatus Status { get; set; }
 
     public bool UserIsAdmin { get; set; }
-    public string Type => Constants.UdiEntityType.RedirectUrlStatus;
 }
