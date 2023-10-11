@@ -13,6 +13,7 @@
     "^refs/heads/release/"
   ],
   "cloudBuild": {
+    "setAllVariables": true,
     "buildNumber": {
       "enabled": true
     }
