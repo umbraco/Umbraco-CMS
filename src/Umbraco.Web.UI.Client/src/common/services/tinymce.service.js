@@ -13,7 +13,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
   //These are absolutely required in order for the macros to render inline
   //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
-  var extendedValidElements = "umb-rte-block[!data-udi],@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption";
+  var extendedValidElements = "#umb-rte-block[!data-content-udi],@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption";
   var fallbackStyles = [
     {
       title: 'Headers', items: [
@@ -24,8 +24,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     },
     {
       title: 'Blocks', items: [
-        { title: "Normal", block: "p" },
-        { title: "Umbraco Block", block: "umb-rte-block" }
+        { title: "Normal", block: "p" }
       ]
     },
     {
@@ -754,17 +753,35 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
      * @param {Object} editor the TinyMCE editor instance
      */
     createBlockPicker: function (editor, callback) {
+
+      editor.on('preInit', function (args) {
+        editor.serializer.addRules('umb-rte-block');
+
+        /** This checks if the div is a macro container, if so, checks if its wrapped in a p tag and then unwraps it (removes p tag)*/
+        editor.serializer.addNodeFilter('umb-rte-block', function (nodes, name) {
+          for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].parent && nodes[i].parent.name.toUpperCase() === "P") {
+              nodes[i].parent.unwrap();
+            }
+          }
+        });
+      });
+
       editor.ui.registry.addButton('umbblockpicker', {
         icon: 'document',
         tooltip: 'Block Picker',
-        stateSelector: 'umb-rte-block[data-udi]',
+        stateSelector: 'umb-rte-block[data-content-udi]',
         onAction: function () {
 
           var blockEl = editor.selection.getNode();
           var blockUdi;
 
           if (blockEl.nodeName === 'UMB-RTE-BLOCK') {
-            blockUdi = blockEl.getAttribute("data-udi") ?? undefined;
+            blockUdi = blockEl.getAttribute("data-content-udi") ?? undefined;
+
+            // Because we have focus on a block we should edit it.
+            console.log("edit block", blockUdi);
+            return;
           }
 
           if (callback) {
@@ -786,27 +803,23 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
      *
      * @param {Object} blockUdi UDI of Block to insert
      */
-    insertBlockInEditor: function (editor, blockUdi) {
-      if (blockUdi) {
+    insertBlockInEditor: function (editor, blockContentUdi) {
+      if (blockContentUdi) {
+        /*
         var data = {
           "data-udi": blockUdi
         };
-        console.log("insert block", blockUdi, editor)
-        const blockEl = editor.dom.createHTML('umb-rte-block', data);
-        // TODO: Compile here.
+        */
+        //const blockEl = editor.dom.createHTML('umb-rte-block', data);
         //editor.selection.setContent(blockEl, { format: 'raw' });
-        editor.selection.setContent('<umb-rte-block data-udi="'+blockUdi+'"></umb-rte-block>\n');
+        editor.selection.setContent('<umb-rte-block data-content-udi="'+blockContentUdi+'"><!--Umbraco-Block--></umb-rte-block>');
 
         // TODO: investigate what is needed here..
         //editor.selection.setContent('Hello!!');
         //editor.selection.setNode(blockEl);
-        console.log("editor content:",
-          editor.getContent());
 
 
         angularHelper.safeApply($rootScope, function () {
-          console.log("safeApply — call change",
-          editor.getContent());
           editor.dispatch("Change");
         });
 
@@ -1431,8 +1444,13 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         for (const blockEl of blockEls) {
           if(!blockEl._isInitializedUmbBlock) {
             blockEl.removeAttribute('contenteditable');
-            $compile(blockEl)(args.scope);
-            blockEl.setAttribute('contenteditable', 'false');
+            const blockContentUdi = blockEl.getAttribute('data-content-udi');
+            if(blockContentUdi) {
+              const block = args.blockEditorApi.getBlockByContentUdi(blockContentUdi);
+              blockEl.$block = block;
+              $compile(blockEl)(args.scope);
+              blockEl.setAttribute('contenteditable', 'false');
+            }
           }
         }
         // TODO: Check if this is necessary?.

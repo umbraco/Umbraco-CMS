@@ -25,7 +25,8 @@
 
       function onInit() {
         $element[0]._isInitializedUmbBlock = true;
-        console.log($element[0])
+        vm.block = $element[0].$block;
+        console.log("vm.block", vm.block)
 
         var shadowRoot = $element[0].attachShadow({ mode: 'open' });
         shadowRoot.innerHTML =

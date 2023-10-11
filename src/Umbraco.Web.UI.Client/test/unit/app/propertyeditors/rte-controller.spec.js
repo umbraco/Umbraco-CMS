@@ -1,4 +1,4 @@
-describe('RTE controller tests', function () {
+/*describe('RTE controller tests', function () {
     var scope, controllerFactory, element;
 
     //mock tinymce globals
@@ -27,8 +27,6 @@ describe('RTE controller tests', function () {
     }));
 
 
-    /*
-    Not relevant anymore as the controller has been replaced with a component.
     describe('initialization', function () {
 
         it('should define the default properties on construction', function () {
@@ -40,6 +38,6 @@ describe('RTE controller tests', function () {
         });
 
     });
-    */
-});
 
+});
+*/

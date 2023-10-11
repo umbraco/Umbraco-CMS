@@ -232,7 +232,6 @@
                   });
 
                   //initialize the standard editor functionality for Umbraco
-                  console.log("propertyEditor::init TINYC... ONLY DO THIS ONES!!!!")
                   tinyMceService.initializeEditor({
                       //scope: $scope,
                       editor: editor,
@@ -242,7 +241,6 @@
                         return vm.model.value.markup;
                       },
                       setValue: function (newVal) {
-                        console.log("propertyEditor::setValue", newVal)
                         vm.model.value.markup = newVal;
                         $scope.$evalAsync();
                       },
@@ -818,7 +816,18 @@
           editBlock(block, true, blockIndex, parentForm);
       }
 
+      function getBlockByContentUdi(blockContentUdi) {
+
+        var layoutIndex = vm.layout.findIndex(entry => entry.contentUdi === blockContentUdi);
+        if (layoutIndex === -1) {
+          return undefined;
+        }
+
+        return vm.layout[layoutIndex].$block;
+    }
+
       vm.blockEditorApi = {
+          getBlockByContentUdi: getBlockByContentUdi,
           showCreateDialog: showCreateDialog,
           activateBlock: activateBlock,
           editBlock: editBlock,
