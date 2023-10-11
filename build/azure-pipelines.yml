@@ -146,13 +146,13 @@ stages:
               echo "##[group]npm pack details"
               echo "##[command]Running npm version"
               echo "##[debug]Version: $NBGV_NPMPackageVersion"
-              npm version $NBGV_NPMPackageVersion --allow-same-version --no-git-tag-version
               echo "##[command]Running npm pack"
               echo "##[debug]Output directory: $(Build.ArtifactStagingDirectory)"
+              echo "##[endgroup]"
+              npm version $NBGV_NPMPackageVersion --allow-same-version --no-git-tag-version
               mkdir $(Build.ArtifactStagingDirectory)/npm
               npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm
               mv .npmrc $(Build.ArtifactStagingDirectory)/npm/
-              echo "##[endgroup]"
             displayName: Prepare Backoffice npm package
             workingDirectory: src/Umbraco.Web.UI.New.Client
           - task: PublishPipelineArtifact@1
