@@ -7,5 +7,6 @@ public class DocumentItemResponseModel : ItemResponseModelBase
     public string? Icon { get; set; }
 
     public Guid ContentTypeId { get; set; }
+
     public bool IsTrashed { get; set; }
 }

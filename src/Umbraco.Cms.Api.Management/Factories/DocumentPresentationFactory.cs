@@ -31,6 +31,7 @@ public class DocumentPresentationFactory : IDocumentPresentationFactory
     public async Task<DocumentResponseModel> CreateResponseModelAsync(IContent content)
     {
         DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
+
         responseModel.Urls = await _contentUrlFactory.GetUrlsAsync(content);
 
         responseModel.TemplateId = content.TemplateId.HasValue
