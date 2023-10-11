@@ -3,7 +3,7 @@ import { type UmbUserDetail } from '../index.js';
 import { UmbUserWorkspaceContext } from './user-workspace.context.js';
 import { type UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import { UmbUserRepository } from '@umbraco-cms/backoffice/user';
-import { UUIInputElement, UUIInputEvent, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
 	html,
@@ -14,14 +14,19 @@ import {
 	ifDefined,
 	repeat,
 } from '@umbraco-cms/backoffice/external/lit';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_CHANGE_PASSWORD_MODAL, type UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_AUTH, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
+import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
+
+// Import of local components that should only be used here
+import './components/user-workspace-profile-settings/user-workspace-profile-settings.element.js';
+import './components/user-workspace-access-settings/user-workspace-access-settings.element.js';
 
 @customElement('umb-user-workspace-editor')
 export class UmbUserWorkspaceEditorElement extends UmbLitElement {
@@ -31,10 +36,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _user?: UmbUserDetail;
 
-	@state()
-	private languages: Array<{ name: string; value: string; selected: boolean }> = [];
-
-	#auth?: typeof UMB_AUTH.TYPE;
 	#modalContext?: UmbModalManagerContext;
 	#workspaceContext?: UmbUserWorkspaceContext;
 
@@ -42,11 +43,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_AUTH, (instance) => {
-			this.#auth = instance;
-			this.#observeCurrentUser();
-		});
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext as UmbUserWorkspaceContext;
@@ -59,45 +55,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		this.observe(this.#workspaceContext.data, (user) => (this._user = user));
 	}
 
-	#observeCurrentUser() {
-		if (!this.#auth) return;
-		this.observe(this.#auth.currentUser, async (currentUser) => {
-			this._currentUser = currentUser;
-
-			if (!currentUser) {
-				return;
-			}
-
-			// Find all translations and make a unique list of iso codes
-			const translations = await firstValueFrom(umbExtensionsRegistry.extensionsOfType('localization'));
-
-			this.languages = translations
-				.filter((isoCode) => isoCode !== undefined)
-				.map((translation) => ({
-					value: translation.meta.culture.toLowerCase(),
-					name: translation.name,
-					selected: false,
-				}));
-
-			const currentUserLanguageCode = currentUser.languageIsoCode?.toLowerCase();
-
-			// Set the current user's language as selected
-			const currentUserLanguage = this.languages.find((language) => language.value === currentUserLanguageCode);
-
-			if (currentUserLanguage) {
-				currentUserLanguage.selected = true;
-			} else {
-				// If users language code did not fit any of the options. We will create an option that fits, named unknown.
-				// In this way the user can keep their choice though a given language was not present at this time.
-				this.languages.push({
-					value: currentUserLanguageCode ?? 'en-us',
-					name: currentUserLanguageCode ? `${currentUserLanguageCode} (unknown)` : 'Unknown',
-					selected: true,
-				});
-			}
-		});
-	}
-
 	#onUserStatusChange() {
 		if (!this._user || !this._user.id) return;
 
@@ -108,20 +65,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		if (this._user.state === UserStateModel.DISABLED) {
 			this.#userRepository?.enable([this._user.id]);
 		}
-	}
-
-	#onUserGroupsChange(userGroupIds: Array<string>) {
-		this.#workspaceContext?.updateProperty('userGroupIds', userGroupIds);
-	}
-
-	#onDocumentStartNodeChange(event: UmbChangeEvent) {
-		const target = event.target as UmbInputDocumentElement;
-		this.#workspaceContext?.updateProperty('contentStartNodeIds', target.selectedIds);
-	}
-
-	#onMediaStartNodeChange(event: UmbChangeEvent) {
-		const target = event.target as UmbInputMediaElement;
-		this.#workspaceContext?.updateProperty('mediaStartNodeIds', target.selectedIds);
 	}
 
 	#onUserDelete() {
@@ -138,14 +81,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 			if (typeof target?.value === 'string') {
 				this.#workspaceContext?.updateProperty('name', target.value);
 			}
-		}
-	}
-
-	#onLanguageChange(event: Event) {
-		const target = event.composedPath()[0] as UUISelectElement;
-
-		if (typeof target?.value === 'string') {
-			this.#workspaceContext?.updateProperty('languageIsoCode', target.value);
 		}
 	}
 
@@ -184,79 +119,10 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	#renderLeftColumn() {
 		if (!this._user) return nothing;
 
-		return html` <uui-box>
-				<div slot="headline"><umb-localize key="user_profile">Profile</umb-localize></div>
-				<umb-workspace-property-layout label="${this.localize.term('general_email')}">
-					<uui-input
-						slot="editor"
-						name="email"
-						label="${this.localize.term('general_email')}"
-						readonly
-						value=${ifDefined(this._user.email)}></uui-input>
-				</umb-workspace-property-layout>
-				<umb-workspace-property-layout
-					label="${this.localize.term('user_language')}"
-					description=${this.localize.term('user_languageHelp')}>
-					<uui-select
-						slot="editor"
-						name="language"
-						label="${this.localize.term('user_language')}"
-						.options=${this.languages}
-						@change="${this.#onLanguageChange}">
-					</uui-select>
-				</umb-workspace-property-layout>
-			</uui-box>
-			<uui-box>
-				<div slot="headline"><umb-localize key="user_assignAccess">Assign Access</umb-localize></div>
-				<div id="assign-access">
-					<umb-workspace-property-layout
-						label="${this.localize.term('general_groups')}"
-						description="${this.localize.term('user_groupsHelp')}">
-						<umb-user-group-input
-							slot="editor"
-							.selectedIds=${this._user.userGroupIds ?? []}
-							@change=${(e: Event) =>
-								this.#onUserGroupsChange((e.target as UmbUserGroupInputElement).selectedIds)}></umb-user-group-input>
-					</umb-workspace-property-layout>
-					<umb-workspace-property-layout
-						label=${this.localize.term('user_startnodes')}
-						description=${this.localize.term('user_startnodeshelp')}>
-						<umb-property-editor-ui-document-picker
-							.value=${this._user.contentStartNodeIds ?? []}
-							@property-value-change=${(e: any) =>
-								this.#workspaceContext?.updateProperty('contentStartNodeIds', e.target.value)}
-							slot="editor"></umb-property-editor-ui-document-picker>
-
-						<umb-input-document
-							.selectedIds=${this._user.contentStartNodeIds ?? []}
-							@change=${this.#onDocumentStartNodeChange}
-							slot="editor"></umb-input-document>
-					</umb-workspace-property-layout>
-					<umb-workspace-property-layout
-						label=${this.localize.term('user_mediastartnodes')}
-						description=${this.localize.term('user_mediastartnodeshelp')}>
-						<umb-input-media
-							.selectedIds=${this._user.mediaStartNodeIds ?? []}
-							@change=${this.#onMediaStartNodeChange}
-							slot="editor"></umb-input-media>
-					</umb-workspace-property-layout>
-				</div>
-			</uui-box>
-			<uui-box headline=${this.localize.term('user_access')}>
-				<div slot="header" class="faded-text">
-					<umb-localize key="user_accessHelp"
-						>Based on the assigned groups and start nodes, the user has access to the following nodes</umb-localize
-					>
-				</div>
-
-				<b><umb-localize key="sections_content">Content</umb-localize></b>
-				${this.#renderContentStartNodes()}
-				<hr />
-				<b><umb-localize key="sections_media">Media</umb-localize></b>
-				<uui-ref-node name="Media Root">
-					<uui-icon slot="icon" name="folder"></uui-icon>
-				</uui-ref-node>
-			</uui-box>`;
+		return html`
+			<umb-user-workspace-profile-settings></umb-user-workspace-profile-settings
+			><umb-user-workspace-access-settings></umb-user-workspace-access-settings>
+		`;
 	}
 
 	#renderRightColumn() {
@@ -366,30 +232,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		return buttons;
 	}
 
-	#renderContentStartNodes() {
-		if (!this._user || !this._user.contentStartNodeIds) return;
-
-		if (this._user.contentStartNodeIds.length < 1)
-			return html`
-				<uui-ref-node name="Content Root">
-					<uui-icon slot="icon" name="folder"></uui-icon>
-				</uui-ref-node>
-			`;
-
-		//TODO Render the name of the content start node instead of it's id.
-		return repeat(
-			this._user.contentStartNodeIds,
-			(node) => node,
-			(node) => {
-				return html`
-					<uui-ref-node name=${node}>
-						<uui-icon slot="icon" name="folder"></uui-icon>
-					</uui-ref-node>
-				`;
-			},
-		);
-	}
-
 	static styles = [
 		UmbTextStyles,
 		css`
@@ -425,18 +267,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 				font-size: var(--uui-size-16);
 				place-self: center;
 			}
-			hr {
-				border: none;
-				border-bottom: 1px solid var(--uui-color-divider);
-				width: 100%;
-			}
-			uui-input {
-				width: 100%;
-			}
-			.faded-text {
-				color: var(--uui-color-text-alt);
-				font-size: 0.8rem;
-			}
+
 			uui-tag {
 				width: fit-content;
 			}
@@ -445,10 +276,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 				gap: var(--uui-size-space-6);
 			}
 			#user-info > div {
-				display: flex;
-				flex-direction: column;
-			}
-			#assign-access {
 				display: flex;
 				flex-direction: column;
 			}

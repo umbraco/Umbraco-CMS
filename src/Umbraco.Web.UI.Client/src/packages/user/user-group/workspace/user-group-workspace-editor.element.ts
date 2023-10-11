@@ -186,11 +186,6 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 				flex-direction: column;
 				gap: var(--uui-size-space-2);
 			}
-			hr {
-				border: none;
-				border-bottom: 1px solid var(--uui-color-divider);
-				width: 100%;
-			}
 			uui-input {
 				width: 100%;
 			}
