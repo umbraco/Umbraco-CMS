@@ -119,6 +119,11 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.updateProperty('contentStartNodeIds', target.selectedIds);
 	}
 
+	#onMediaStartNodeChange(event: UmbChangeEvent) {
+		const target = event.target as UmbInputMediaElement;
+		this.#workspaceContext?.updateProperty('mediaStartNodeIds', target.selectedIds);
+	}
+
 	#onUserDelete() {
 		if (!this._user || !this._user.id) return;
 
@@ -230,7 +235,10 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 					<umb-workspace-property-layout
 						label=${this.localize.term('user_mediastartnodes')}
 						description=${this.localize.term('user_mediastartnodeshelp')}>
-						<b slot="editor">NEED MEDIA PICKER</b>
+						<umb-input-media
+							.selectedIds=${this._user.mediaStartNodeIds ?? []}
+							@change=${this.#onMediaStartNodeChange}
+							slot="editor"></umb-input-media>
 					</umb-workspace-property-layout>
 				</div>
 			</uui-box>
