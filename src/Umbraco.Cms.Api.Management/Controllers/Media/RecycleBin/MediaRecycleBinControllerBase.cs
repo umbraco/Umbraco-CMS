@@ -9,6 +9,7 @@ using Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
@@ -19,7 +20,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
 [Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessMedia)]
-public class MediaRecycleBinControllerBase : RecycleBinControllerBase<RecycleBinItemResponseModel>
+public class MediaRecycleBinControllerBase : RecycleBinControllerBase<MediaRecycleBinItemResponseModel>
 {
     public MediaRecycleBinControllerBase(IEntityService entityService)
         : base(entityService)
@@ -30,9 +31,9 @@ public class MediaRecycleBinControllerBase : RecycleBinControllerBase<RecycleBin
 
     protected override int RecycleBinRootId => Constants.System.RecycleBinMedia;
 
-    protected override RecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentKey, IEntitySlim entity)
+    protected override MediaRecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentKey, IEntitySlim entity)
     {
-        RecycleBinItemResponseModel responseModel = base.MapRecycleBinViewModel(parentKey, entity);
+        MediaRecycleBinItemResponseModel responseModel = base.MapRecycleBinViewModel(parentKey, entity);
 
         if (entity is IMediaEntitySlim mediaEntitySlim)
         {

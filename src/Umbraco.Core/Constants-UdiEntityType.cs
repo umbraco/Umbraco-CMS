@@ -72,5 +72,7 @@ public static partial class Constants
         public const string TemplateScaffold = "template-scaffold";
         public const string Tag = "tag";
         public const string StaticFile = "static-file";
+        public const string DocumentInRecycleBin = "document-recyclebin";
+        public const string MediaInRecycleBin = "media-recyclebin";
     }
 }

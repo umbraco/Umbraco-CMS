@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Services.Paging;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 
@@ -65,13 +66,11 @@ public abstract class RecycleBinControllerBase<TItem> : ManagementApiControllerB
 
         var viewModel = new TItem
         {
-            Icon = _itemUdiType,
             Name = entity.Name!,
             Id = entity.Key,
-            Type = _itemUdiType,
             HasChildren = entity.HasChildren,
             IsContainer = entity.IsContainer,
-            ParentId = parentKey
+            ParentId = parentKey,
         };
 
         return viewModel;

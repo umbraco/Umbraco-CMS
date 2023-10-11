@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 
@@ -17,7 +18,7 @@ public class RootDocumentRecycleBinController : DocumentRecycleBinControllerBase
 
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<RecycleBinItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<RecycleBinItemResponseModel>>> Root(int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<DocumentRecycleBinItemResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<DocumentRecycleBinItemResponseModel>>> Root(int skip = 0, int take = 100)
         => await GetRoot(skip, take);
 }
