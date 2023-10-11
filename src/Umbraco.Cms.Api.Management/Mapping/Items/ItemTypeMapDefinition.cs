@@ -106,7 +106,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Name = source.Name ?? string.Empty;
     }
 
-    // Umbraco.Code.MapAll -IsTrashed
+    // Umbraco.Code.MapAll
     private static void Map(IMediaEntitySlim source, MediaItemResponseModel target, MapperContext context)
     {
         target.Icon = source.ContentTypeIcon;

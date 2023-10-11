@@ -19,7 +19,6 @@ public class ItemMediaItemController : MediaItemControllerBase
     private readonly IDataTypeService _dataTypeService;
     private readonly IUserStartNodeEntitiesService _userStartNodeEntitiesService;
     private readonly IUmbracoMapper _mapper;
-    private readonly IMediaPresentationModelFactory _mediaPresentationModelFactory;
 
     public ItemMediaItemController(IEntityService entityService, IDataTypeService dataTypeService, IUserStartNodeEntitiesService userStartNodeEntitiesService, IUmbracoMapper mapper, IMediaPresentationModelFactory mediaPresentationModelFactory)
     {
@@ -27,7 +26,6 @@ public class ItemMediaItemController : MediaItemControllerBase
         _dataTypeService = dataTypeService;
         _userStartNodeEntitiesService = userStartNodeEntitiesService;
         _mapper = mapper;
-        _mediaPresentationModelFactory = mediaPresentationModelFactory;
     }
 
     [HttpGet("item")]
@@ -46,7 +44,7 @@ public class ItemMediaItemController : MediaItemControllerBase
             }
         }
 
-        var responseModels = media.Select(entity => _mediaPresentationModelFactory.CreateItemResponseModel(entity)).ToList();
+        List<MediaItemResponseModel> responseModels = _mapper.MapEnumerable<IMediaEntitySlim, MediaItemResponseModel>(media);
 
         return Ok(responseModels);
     }

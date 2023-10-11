@@ -1,11 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
-using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
 
@@ -39,11 +37,5 @@ public class MediaPresentationModelFactory : IMediaPresentationModelFactory
             .ToArray();
 
         return Task.FromResult(responseModel);
-    }
-
-    public MediaItemResponseModel CreateItemResponseModel(IMediaEntitySlim entity)
-    {
-        var responseModel = _umbracoMapper.Map<IMediaEntitySlim, MediaItemResponseModel>(entity)!;
-        return responseModel;
     }
 }

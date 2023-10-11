@@ -17,7 +17,6 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueModel, 
         => mapper.Define<IMedia, MediaResponseModel>((_, _) => new MediaResponseModel(), Map);
 
     // Umbraco.Code.MapAll -Urls
-    // Umbraco.Code.MapAll -IsTrashed
     private void Map(IMedia source, MediaResponseModel target, MapperContext context)
     {
         target.Id = source.Key;

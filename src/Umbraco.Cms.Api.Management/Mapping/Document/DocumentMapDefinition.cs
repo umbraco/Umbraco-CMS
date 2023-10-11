@@ -18,7 +18,6 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         => mapper.Define<IContent, DocumentResponseModel>((_, _) => new DocumentResponseModel(), Map);
 
     // Umbraco.Code.MapAll -Urls -TemplateId
-    // Umbraco.Code.MapAll -IsTrashed
     private void Map(IContent source, DocumentResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
