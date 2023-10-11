@@ -27,16 +27,19 @@ describe('RTE controller tests', function () {
     }));
 
 
+    /*
+    Not relevant anymore as the controller has been replaced with a component.
     describe('initialization', function () {
 
-        it('should define the default properties on construction', function () {     
+        it('should define the default properties on construction', function () {
             controllerFactory('Umbraco.PropertyEditors.RTEController', {
                 $scope: scope,
                 $routeParams: routeParams,
                 $element: element
             });
         });
-        
+
     });
+    */
 });
 
