@@ -32,7 +32,7 @@
 
         var unsubscribe = [];
         var modelObject;
-        
+
         // Property actions:
         let copyAllBlocksAction = null;
         let deleteAllBlocksAction = null;
@@ -113,7 +113,7 @@
                 vm.model.config.validationLimit.max == 1 &&
                 vm.model.config.blocks.length == 1 &&
                 vm.model.config.useSingleBlockMode;
-            
+
             vm.blockEditorApi.singleBlockMode = vm.singleBlockMode;
 
             vm.validationLimit = vm.model.config.validationLimit;
@@ -151,7 +151,7 @@
                     setDirty();
                 }
             };
-            
+
             copyAllBlocksAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
                 labelTokens: [vm.model.label],
@@ -537,7 +537,7 @@
         }
 
         vm.requestShowCreate = requestShowCreate;
-        
+
         function requestShowCreate(createIndex, mouseEvent) {
 
             if (vm.blockTypePicker) {
@@ -558,15 +558,15 @@
             }
 
         }
-        
+
         vm.requestShowClipboard = requestShowClipboard;
-        
+
         function requestShowClipboard(createIndex) {
             showCreateDialog(createIndex, true);
         }
 
         vm.showCreateDialog = showCreateDialog;
-        
+
         function showCreateDialog(createIndex, openClipboard) {
 
             if (vm.blockTypePicker) {
@@ -808,7 +808,7 @@
 
         function requestDeleteBlock(block) {
             if (vm.readonly) return;
-            
+
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "contentTypeEditor_yesDelete"]).then(function (data) {
                 const overlay = {
                     title: data[0],
@@ -864,7 +864,7 @@
             if (copyAllBlocksAction) {
                 copyAllBlocksAction.isDisabled = vm.layout.length === 0;
             }
-            
+
             if (deleteAllBlocksAction) {
                 deleteAllBlocksAction.isDisabled = vm.layout.length === 0 || vm.readonly;
             }

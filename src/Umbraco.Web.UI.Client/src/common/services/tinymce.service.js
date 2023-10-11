@@ -13,7 +13,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
   //These are absolutely required in order for the macros to render inline
   //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
-  var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption,umb-rte-block[data-udi]";
+  var extendedValidElements = "@[id|class|style],umb-rte-block[data-udi],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption";
   var fallbackStyles = [
     {
       title: 'Headers', items: [
@@ -790,10 +790,24 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         var data = {
           "data-udi": blockUdi
         };
+        console.log("insert block", blockUdi, editor)
         const blockEl = editor.dom.createHTML('umb-rte-block', data);
         // TODO: Compile here.
-        editor.selection.setContent(blockEl, { format: 'raw' });
-        editor.dispatch('Change');
+        //editor.selection.setContent(blockEl, { format: 'raw' });
+        editor.selection.setContent('<umb-rte-block data-udi="'+blockUdi+'"></umb-rte-block>\n');
+
+        // TODO: investigate what is needed here..
+        //editor.selection.setContent('Hello!!');
+        //editor.selection.setNode(blockEl);
+        console.log("editor content:",
+          editor.getContent());
+
+
+        angularHelper.safeApply($rootScope, function () {
+          console.log("safeApply — call change",
+          editor.getContent());
+          editor.dispatch("Change");
+        });
 
       }
     },
@@ -1381,6 +1395,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       function syncContent() {
 
+        console.log("syncContext")
         if (getPropertyValue() === args.editor.getContent()) {
           return;
         }
@@ -1388,6 +1403,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         //stop watching before we update the value
         stopWatch();
         angularHelper.safeApply($rootScope, function () {
+          console.log("syncContext does have a change!!")
 
           initBlocks();
 
@@ -1683,24 +1699,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       //Create the insert block plugin
       self.createBlockPicker(args.editor, function (currentTarget, userData, imgDomElement) {
-
-        console.log("callback block picker")
-
-        self.insertBlockInEditor(args.editor, "1234");
-
-        /*
-        var mediaPicker = {
-          submit: function (model) {
-            console.log("block picker submit")
-            //self.insertMediaInEditor(args.editor, model.selection[0], imgDomElement);
-            editorService.close();
-          },
-          close: function () {
-            editorService.close();
-          }
-        };
-        editorService.mediaPicker(mediaPicker);
-        */
+        args.blockEditorApi.showCreateDialog(0, false, (newBlock) => {
+          self.insertBlockInEditor(args.editor, newBlock.layout.contentUdi);
+        });
       });
 
       //Create the embedded plugin

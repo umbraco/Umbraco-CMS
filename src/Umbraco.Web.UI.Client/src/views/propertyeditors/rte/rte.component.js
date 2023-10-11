@@ -232,8 +232,9 @@
                   });
 
                   //initialize the standard editor functionality for Umbraco
+                  console.log("propertyEditor::init TINYC... ONLY DO THIS ONES!!!!")
                   tinyMceService.initializeEditor({
-                      scope: $scope,
+                      //scope: $scope,
                       editor: editor,
                       toolbar: editorConfig.toolbar,
                       model: vm.model,
@@ -241,8 +242,11 @@
                         return vm.model.value.markup;
                       },
                       setValue: function (newVal) {
+                        console.log("propertyEditor::setValue", newVal)
                         vm.model.value.markup = newVal;
+                        $scope.$evalAsync();
                       },
+                      blockEditorApi: vm.blockEditorApi,
                       currentFormInput: $scope.rteForm.modelValue
                   });
 
@@ -650,7 +654,7 @@
       }
 
       vm.showCreateDialog = showCreateDialog;
-      function showCreateDialog(createIndex, openClipboard) {
+      function showCreateDialog(createIndex, openClipboard, addedCallback) {
 
           if (vm.blockTypePicker) {
               return;
@@ -658,6 +662,10 @@
 
           if (vm.availableBlockTypes.length === 0) {
               return;
+          }
+
+          if(createIndex === undefined) {
+            createIndex = vm.layout.length - 1;
           }
 
           var amountOfAvailableTypes = vm.availableBlockTypes.length;
@@ -690,6 +698,10 @@
                   var wasAdded = false;
                   if (blockPickerModel && blockPickerModel.selectedItem) {
                       wasAdded = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
+                      if(wasAdded && vm.layout[createIndex]) {
+                        const newBlock = vm.layout[createIndex].$block;
+                        addedCallback(newBlock);
+                      }
                   }
 
                   if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
@@ -807,6 +819,7 @@
       }
 
       vm.blockEditorApi = {
+          showCreateDialog: showCreateDialog,
           activateBlock: activateBlock,
           editBlock: editBlock,
           copyBlock: copyBlock,
