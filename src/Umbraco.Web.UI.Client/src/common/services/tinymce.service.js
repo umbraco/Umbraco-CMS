@@ -9,7 +9,7 @@
  * @doc https://www.tiny.cloud/docs/tinymce/6/
  */
 function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
-  $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService, mediaHelper, fileManager) {
+  $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService, mediaHelper, fileManager, $compile) {
 
   //These are absolutely required in order for the macros to render inline
   //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
@@ -791,6 +791,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           "data-udi": blockUdi
         };
         const blockEl = editor.dom.createHTML('umb-rte-block', data);
+        // TODO: Compile here.
         editor.selection.setContent(blockEl, { format: 'raw' });
 
       }
@@ -1341,13 +1342,16 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       //Starts a watch on the model value so that we can update TinyMCE if the model changes behind the scenes or from the server
       function startWatch() {
-        unwatch = $rootScope.$watch(() => args.model.value, function (newVal, oldVal) {
+
+        unwatch = args.scope.$watch(() => args.model.value, function (newVal, oldVal) {
           if (newVal !== oldVal) {
             //update the display val again if it has changed from the server;
             //uses an empty string in the editor when the value is null
             args.editor.setContent(newVal || "", { format: 'raw' });
 
-            //we need to manually dispatch this event since it is only ever dispatchd based on loading from the DOM, this
+            initBlocks();
+
+            // we need to manually dispatch this event since it is only ever dispatched based on loading from the DOM, this
             // is required for our plugins listening to this event to execute
             args.editor.dispatch('LoadContent', null);
           }
@@ -1370,6 +1374,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         //stop watching before we update the value
         stopWatch();
         angularHelper.safeApply($rootScope, function () {
+
+          initBlocks();
+
           args.model.value = args.editor.getContent();
 
           //make the form dirty manually so that the track changes works, setting our model doesn't trigger
@@ -1385,6 +1392,22 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         //re-watch the value
         startWatch();
+      }
+
+      function initBlocks() {
+
+        const blockEls = args.editor.contentDocument.querySelectorAll('umb-rte-block');
+        for (const blockEl of blockEls) {
+          if(!blockEl._isInitializedUmbBlock) {
+            blockEl.removeAttribute('contenteditable');
+            $compile(blockEl)(args.scope);
+            blockEl.setAttribute('contenteditable', 'false');
+            console.log(blockEl._isInitializedUmbBlock, blockEl)
+          }
+        }
+        // TODO: Check if this is necessary?.
+        //args.scope.$digest();
+
       }
 
       // If we can not find the insert image/media toolbar button
@@ -1533,6 +1556,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
           });
         }
+
+        // Init blocks:
+        initBlocks();
 
         //start watching the value
         startWatch();

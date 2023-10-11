@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-        function ($scope, $q, assetsService, $timeout, tinyMceService, angularHelper, tinyMceAssets, $element) {
+        function ($scope, $q, assetsService, $timeout, tinyMceService, tinyMceAssets, $element, blockEditorService) {
 
             // TODO: A lot of the code below should be shared between the grid rte and the normal rte
 
@@ -29,6 +29,7 @@ angular.module("umbraco")
             // we need to make sure that the element is initialized before we can init TinyMCE, because we find the placeholder by ID, so it needs to be appended to document before.
             var initPromise = $q((resolve, reject) => {
                 this.$onInit = resolve;
+                initBlockEditor();
             });
 
             promises.push(initPromise);
@@ -83,6 +84,7 @@ angular.module("umbraco")
 
                     //initialize the standard editor functionality for Umbraco
                     tinyMceService.initializeEditor({
+                        scope: $scope,
                         editor: editor,
                         toolbar: editorConfig.toolbar,
                         model: $scope.model,
@@ -90,7 +92,7 @@ angular.module("umbraco")
                     });
 
                 };
-              
+
                 Utilities.extend(baseLineConfigObj, standardConfig);
 
                 // Readonly mode
@@ -129,5 +131,44 @@ angular.module("umbraco")
                 });
 
             });
+
+
+
+
+            var modelObject;
+
+            function initBlockEditor() {
+
+              const vm = this;
+
+              $scope.model.onValueChanged = onServerValueChanged;
+
+              var scopeOfExistence = $scope;
+              if (vm.umbVariantContentEditors && vm.umbVariantContentEditors.getScope) {
+                  scopeOfExistence = vm.umbVariantContentEditors.getScope();
+              } else if(vm.umbElementEditorContent && vm.umbElementEditorContent.getScope) {
+                  scopeOfExistence = vm.umbElementEditorContent.getScope();
+              }
+
+
+              // Create Model Object, to manage our data for this Block Editor.
+              modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, scopeOfExistence, $scope);
+              //modelObject.load().then(onLoaded);
+
+            }
+
+            // Called when we save the value, the server may return an updated data and our value is re-synced
+            // we need to deal with that here so that our model values are all in sync so we basically re-initialize.
+            function onServerValueChanged(newVal, oldVal) {
+
+                // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
+                if (typeof newVal !== 'object' || newVal === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
+                    $scope.model.value = newVal = {};
+                }
+
+                modelObject.update($scope.model.value, $scope);
+                //onLoaded();
+            }
+
 
         });
