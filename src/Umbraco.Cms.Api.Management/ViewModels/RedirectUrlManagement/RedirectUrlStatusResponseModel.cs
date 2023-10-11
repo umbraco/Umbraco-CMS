@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.RedirectUrlManagement;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
 
-public class RedirectUrlStatusResponseModel : IResponseModel
+public class RedirectUrlStatusResponseModel
 {
     public RedirectStatus Status { get; set; }
 

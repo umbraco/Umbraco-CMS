@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.User;
 
-public class UserResponseModel : UserPresentationBase, INamedEntityPresentationModel, IResponseModel
+public class UserResponseModel : UserPresentationBase, INamedEntityPresentationModel
 {
     public Guid Id { get; set; }
 
@@ -28,5 +28,5 @@ public class UserResponseModel : UserPresentationBase, INamedEntityPresentationM
     public DateTime? LastLockoutDate { get; set; }
 
     public DateTime? LastPasswordChangeDate { get; set; }
-    public string Type => UdiEntityType.User;
+    public string Type => Constants.UdiEntityType.User;
 }

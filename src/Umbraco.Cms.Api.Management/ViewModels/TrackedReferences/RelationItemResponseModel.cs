@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 
-public class RelationItemResponseModel : IResponseModel
+public class RelationItemResponseModel
 {
     public Guid NodeId { get; set; }
 

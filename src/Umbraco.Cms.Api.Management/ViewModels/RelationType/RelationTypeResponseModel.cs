@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.RelationType;
 
-public class RelationTypeResponseModel : RelationTypeBaseModel, IResponseModel
+public class RelationTypeResponseModel : RelationTypeBaseModel
 {
     public Guid Id { get; set; }
 

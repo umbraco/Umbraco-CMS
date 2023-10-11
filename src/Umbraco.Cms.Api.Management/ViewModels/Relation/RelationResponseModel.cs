@@ -4,7 +4,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Relation;
 
-public class RelationResponseModel : IResponseModel
+public class RelationResponseModel
 {
     /// <summary>
     ///     Gets or sets the Parent Id of the Relation (Source).

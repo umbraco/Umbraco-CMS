@@ -2,7 +2,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.User.Current;
 
-public class CurrentUserResponseModel : INamedEntityPresentationModel, IResponseModel
+public class CurrentUserResponseModel : INamedEntityPresentationModel
 {
     public required Guid Id { get; init; }
 
@@ -25,5 +25,5 @@ public class CurrentUserResponseModel : INamedEntityPresentationModel, IResponse
     public required bool HasAccessToAllLanguages { get; init; }
 
     public required ISet<string> Permissions { get; init; }
-    public string Type => UdiEntityType.User;
+    public string Type => Constants.UdiEntityType.User;
 }

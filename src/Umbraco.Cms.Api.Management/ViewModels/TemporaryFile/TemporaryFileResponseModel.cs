@@ -2,7 +2,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.TemporaryFile;
 
-public class TemporaryFileResponseModel: IResponseModel
+public class TemporaryFileResponseModel
 {
     public Guid Id { get; set; }
 

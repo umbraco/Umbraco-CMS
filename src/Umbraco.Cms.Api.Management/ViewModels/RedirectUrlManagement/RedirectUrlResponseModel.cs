@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
 
-public class RedirectUrlResponseModel : IResponseModel
+public class RedirectUrlResponseModel
 {
     public Guid Id { get; set; }
 

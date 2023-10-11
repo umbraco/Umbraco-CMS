@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Item;
 
-public abstract class FileItemResponseModelBase : IResponseModel
+public abstract class FileItemResponseModelBase
 {
     public string Name { get; set; } = string.Empty;
 

@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Tag;
 
-public class TagResponseModel : IResponseModel
+public class TagResponseModel
 {
     public Guid Id { get; set; }
 
