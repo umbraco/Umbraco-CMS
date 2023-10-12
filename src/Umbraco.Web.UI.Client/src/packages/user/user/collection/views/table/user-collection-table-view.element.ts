@@ -6,7 +6,7 @@ import {
 } from '../../../../user-group/repository/user-group.store.js';
 import type { UmbUserDetail } from '../../../types.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbTableElement,
 	UmbTableColumn,
@@ -26,7 +26,7 @@ import './column-layouts/status/user-table-status-column-layout.element.js';
 export class UmbUserCollectionTableViewElement extends UmbLitElement {
 	@state()
 	private _tableConfig: UmbTableConfig = {
-		allowSelection: true,
+		allowSelection: false,
 	};
 
 	@state()
