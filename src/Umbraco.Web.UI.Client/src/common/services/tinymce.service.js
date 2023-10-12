@@ -1409,7 +1409,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       function syncContent() {
 
-        console.log("syncContext")
         if (getPropertyValue() === args.editor.getContent()) {
           return;
         }
