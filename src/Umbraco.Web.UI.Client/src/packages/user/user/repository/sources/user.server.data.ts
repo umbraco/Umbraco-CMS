@@ -53,7 +53,7 @@ export class UmbUserServerDataSource implements UmbUserDetailDataSource {
 			UserResource.putUserById({
 				id,
 				requestBody: data,
-			})
+			}),
 		);
 	}
 
