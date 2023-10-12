@@ -1,4 +1,5 @@
-import { manifest as userIsDisabledManifest } from './user-allow-enable-action.condition.js';
-import { manifest as userIsActiveManifest } from './user-allow-disable-action.condition.js';
+import { manifest as userAllowDisableActionManifest } from './user-allow-disable-action.condition.js';
+import { manifest as userAllowEnableActionManifest } from './user-allow-enable-action.condition.js';
+import { manifest as userAllowUnlockActionManifest } from './user-allow-unlock-action.condition.js';
 
-export const manifests = [userIsDisabledManifest, userIsActiveManifest];
+export const manifests = [userAllowDisableActionManifest, userAllowEnableActionManifest, userAllowUnlockActionManifest];
