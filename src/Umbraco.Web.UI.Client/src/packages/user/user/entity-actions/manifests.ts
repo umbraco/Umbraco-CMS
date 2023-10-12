@@ -2,6 +2,7 @@ import {
 	CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
 	DISABLE_USER_REPOSITORY_ALIAS,
 	ENABLE_USER_REPOSITORY_ALIAS,
+	UNLOCK_USER_REPOSITORY_ALIAS,
 	USER_REPOSITORY_ALIAS,
 } from '../repository/manifests.js';
 import { UMB_USER_ENTITY_TYPE } from '../index.js';
@@ -84,9 +85,14 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'umb:unlocked',
 			label: 'Unlock',
-			repositoryAlias: CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
+			repositoryAlias: UNLOCK_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.User.AllowUnlockAction',
+			},
+		],
 	},
 ];
 
