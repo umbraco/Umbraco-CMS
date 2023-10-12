@@ -198,7 +198,7 @@ export class UmbUserRepository
 		const { error } = await this.#detailSource.delete(id);
 
 		if (!error) {
-			this.#detailStore?.remove([id]);
+			this.#detailStore?.removeItem(id);
 
 			const notification = { data: { message: `User deleted` } };
 			this.#notificationContext?.peek('positive', notification);
