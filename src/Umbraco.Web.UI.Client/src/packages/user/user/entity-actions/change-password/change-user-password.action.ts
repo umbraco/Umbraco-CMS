@@ -1,8 +1,12 @@
+import { UmbChangeUserPasswordRepository } from '../../repository/change-password/change-user-password.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { type UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
-import { UmbChangeUserPasswordRepository } from '../../repository/change-password/change-user-password.repository.js';
+import {
+	type UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_CHANGE_PASSWORD_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 
 export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<UmbChangeUserPasswordRepository> {
 	#modalManager?: UmbModalManagerContext;
@@ -16,7 +20,14 @@ export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<UmbCh
 	}
 
 	async execute() {
-		alert('change password');
 		if (!this.repository || !this.#modalManager) return;
+
+		const modalContext = this.#modalManager.open(UMB_CHANGE_PASSWORD_MODAL, {
+			userId: this.unique,
+		});
+
+		modalContext.onSubmit().then((data) => {
+			this.repository?.changePassword(this.unique, data.newPassword);
+		});
 	}
 }
