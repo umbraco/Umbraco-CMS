@@ -18,6 +18,6 @@ internal abstract class DeliveryApiContentIndexDeferredBase
         }
 
         // NOTE: the delivery api index implementation takes care of deleting descendants, so we don't have to do that here
-        index.DeleteFromIndex(ids.Select(id => id.ToString()));
+        index.DeleteFromIndex(ids);
     }
 }
