@@ -12,7 +12,7 @@ import {
 	state,
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_CHANGE_PASSWORD_MODAL, type UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { type UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
@@ -47,7 +47,10 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 
 	#observeUser() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.data, (user) => (this._user = user));
+		this.observe(this.#workspaceContext.data, (user) => {
+			this._user = user;
+			console.log('user', user);
+		});
 	}
 
 	#onUserStatusChange() {
@@ -77,13 +80,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 				this.#workspaceContext?.updateProperty('name', target.value);
 			}
 		}
-	}
-
-	#onPasswordChange() {
-		// TODO: check if current user is admin
-		this.#modalContext?.open(UMB_CHANGE_PASSWORD_MODAL, {
-			requireOldPassword: false,
-		});
 	}
 
 	render() {
@@ -222,13 +218,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 
 			buttons.push(button);
 		}
-
-		buttons.push(
-			html`<uui-button
-				@click=${this.#onPasswordChange}
-				look="secondary"
-				label=${this.localize.term('general_changePassword')}></uui-button>`,
-		);
 
 		return buttons;
 	}
