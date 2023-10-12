@@ -1,4 +1,4 @@
-import { type UmbEnableUserRepository } from '../../repository/enable-user.repository.js';
+import { type UmbEnableUserRepository } from '../../repository/enable/enable-user.repository.js';
 import { UmbUserRepository } from '../../repository/user.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
