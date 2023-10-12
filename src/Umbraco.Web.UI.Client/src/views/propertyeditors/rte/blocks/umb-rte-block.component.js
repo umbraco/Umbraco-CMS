@@ -36,36 +36,78 @@
         var shadowRoot = $element[0].attachShadow({ mode: 'open' });
           shadowRoot.innerHTML =
           `
-              <style>@import "assets/css/icons.css?umb__rnd=${Umbraco.Sys.ServerVariables.application.cacheBuster}"</style>
               <style>
+                @import "assets/css/icons.css?umb__rnd=${Umbraco.Sys.ServerVariables.application.cacheBuster}";
+                @import "assets/css/blockrteui.css?umb__rnd=${Umbraco.Sys.ServerVariables.application.cacheBuster}";
+                ${ stylesheet ? `@import "${stylesheet}?umb__rnd=${Umbraco.Sys.ServerVariables.application.cacheBuster}";` : ''}
+
                 :host {
+                  position: relative;
                   user-select: none;
                 }
-                .umb-block-rte--view {
-                  position: relative;
+
+                .umb-block-rte__block--actions {
+                  opacity: 0;
+                  transition: opacity 120ms;
                 }
-                .umb-block-rte--view::after {
-                  position:absolute;
-                  content: '';
-                  inset: 0;
-                  border-style: solid;
-                  border-color: #6ab4f0;
-                  border-color: -webkit-focus-ring-color;
-                  border-width: calc(var(--umb-rte-block--selected, 0) * 2px);
-                  border-radius:3px;
-                  pointer-events:none;
+
+                :host(:focus) .umb-block-rte__block--actions,
+                :host(:focus-within) .umb-block-rte__block--actions,
+                :host(:hover) .umb-block-rte__block--actions {
+                  opacity: 1;
                 }
+
               </style>
 
-              ${ stylesheet ? `
-                  <style>@import "${stylesheet}?umb__rnd=${Umbraco.Sys.ServerVariables.application.cacheBuster}"</style>`
-                  : ''
-              }
+              <div class="umb-block-rte__block">
+                <ng-form name="model.blockForm" val-server-match="{ 'contains' : { 'valServerMatchContent': block.content.key, 'valServerMatchSettings': block.settings.key } }">
 
-              <div
-                  class="umb-block-rte--view"
-                  ng-class="{'show-validation': api.internal.showValidation}" ng-include="block.view">
-              </div>
+                  <div
+                      class="umb-block-rte--view"
+                      ng-class="{'show-validation': api.internal.showValidation}" ng-include="block.view">
+                  </div>
+
+                  <div class="umb-block-rte__block--actions">
+
+                    <button type="button" class="btn-reset action --content" localize="title" title="actions_editContent"
+                            ng-click="api.editBlock(block, false, index, model.blockForm);"
+                            ng-class="{ '--error': model.blockForm.$error.valServerMatchContent }">
+                        <umb-icon icon="icon-edit" class="icon"></umb-icon>
+                        <span class="sr-only">
+                            <localize key="general_content">Content</localize>
+                        </span>
+                        <div class="__error-badge">!</div>
+                    </button>
+
+                    <button type="button" class="btn-reset action --settings" localize="title" title="actions_editSettings"
+                            ng-click="api.openSettingsForBlock(block, vm.index, model.blockForm);"
+                            ng-class="{ '--error': model.blockForm.$error.valServerMatchSettings }"
+                            ng-if="block.showSettings === true">
+                        <umb-icon icon="icon-settings" class="icon"></umb-icon>
+                        <span class="sr-only">
+                            <localize key="general_settings">Settings</localize>
+                        </span>
+                        <div class="__error-badge">!</div>
+                    </button>
+                    <button type="button" class="btn-reset action --copy" localize="title" title="actions_copy"
+                            ng-click="api.copyBlock(block);"
+                            ng-if="block.showCopy === true">
+                        <umb-icon icon="icon-documents" class="icon"></umb-icon>
+                        <span class="sr-only">
+                            <localize key="general_copy">Copy</localize>
+                        </span>
+                    </button>
+                    <button ng-if="!api.readonly"
+                            type="button" class="btn-reset action --delete" localize="title" title="actions_delete"
+                            ng-click="api.requestDeleteBlock(block);">
+                        <umb-icon icon="icon-trash" class="icon"></umb-icon>
+                        <span class="sr-only">
+                            <localize key="general_delete">Delete</localize>
+                        </span>
+                    </button>
+                  </div>
+              </ng-form>
+            </div>
           `;
         $compile(shadowRoot)($scope);
 
