@@ -44,7 +44,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
     #region Value Editor
 
     protected override IDataValueEditor CreateValueEditor() =>
-        DataValueEditorFactory.Create<BlockListEditorPropertyValueEditor>(Attribute!);
+        DataValueEditorFactory.Create<BlockListEditorPropertyValueEditor>(Attribute!, CreateBlockEditorDataConverter());
 
     internal class BlockListEditorPropertyValueEditor : BlockEditorPropertyValueEditor
     {

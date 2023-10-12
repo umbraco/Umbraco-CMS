@@ -1,8 +1,9 @@
-﻿using System.Linq;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -34,9 +35,10 @@ public class DataValueEditorReuseTests
 
         _dataValueEditorFactoryMock
             .Setup(m =>
-                m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>()))
+                m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter>()))
             .Returns(() => new BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor(
                 new DataEditorAttribute("a", "b", "c"),
+                new BlockListEditorDataConverter(),
                 _propertyEditorCollection,
                 Mock.Of<IDataTypeService>(),
                 Mock.Of<IContentTypeService>(),
