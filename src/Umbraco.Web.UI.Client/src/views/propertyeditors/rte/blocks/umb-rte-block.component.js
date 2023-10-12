@@ -38,6 +38,9 @@
           `
               <style>@import "assets/css/icons.css?umb__rnd=${Umbraco.Sys.ServerVariables.application.cacheBuster}"</style>
               <style>
+                :host {
+                  user-select: none;
+                }
                 .umb-block-rte--view {
                   position: relative;
                 }
@@ -49,6 +52,8 @@
                   border-color: #6ab4f0;
                   border-color: -webkit-focus-ring-color;
                   border-width: calc(var(--umb-rte-block--selected, 0) * 2px);
+                  border-radius:3px;
+                  pointer-events:none;
                 }
               </style>
 
