@@ -26,7 +26,7 @@ import './column-layouts/status/user-table-status-column-layout.element.js';
 export class UmbUserCollectionTableViewElement extends UmbLitElement {
 	@state()
 	private _tableConfig: UmbTableConfig = {
-		allowSelection: false,
+		allowSelection: true,
 	};
 
 	@state()
