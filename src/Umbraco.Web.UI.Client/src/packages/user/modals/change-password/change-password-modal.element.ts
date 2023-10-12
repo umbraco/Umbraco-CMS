@@ -50,7 +50,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChange
 		return html`
 			<uui-dialog-layout class="uui-text" headline=${this._headline}>
 				<uui-form>
-					<form id="LoginForm" name="login" @submit="${this.#onSubmit}">
+					<form id="ChangePasswordForm" @submit="${this.#onSubmit}">
 						${this.data?.requireOldPassword ? this.#renderOldPasswordInput() : nothing}
 						<uui-form-layout-item>
 							<uui-label id="newPasswordLabel" for="newPassword" slot="label" required>New password</uui-label>
@@ -70,13 +70,17 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChange
 								required
 								required-message="Confirm password is required"></uui-input-password>
 						</uui-form-layout-item>
-
-						<div id="actions">
-							<uui-button @click=${this.#onClose} label="Cancel"></uui-button>
-							<uui-button type="submit" label="Confirm" look="primary" color="positive"></uui-button>
-						</div>
 					</form>
 				</uui-form>
+
+				<uui-button slot="actions" @click=${this.#onClose} label="Cancel"></uui-button>
+				<uui-button
+					slot="actions"
+					type="submit"
+					label="Confirm"
+					look="primary"
+					color="positive"
+					form="ChangePasswordForm"></uui-button>
 			</uui-dialog-layout>
 		`;
 	}
@@ -97,17 +101,8 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChange
 	static styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
-			:host {
-				display: block;
-				width: 400px;
-			}
 			uui-input-password {
 				width: 100%;
-			}
-			#actions {
-				display: flex;
-				justify-content: flex-end;
-				margin-top: var(--uui-size-layout-2);
 			}
 		`,
 	];
