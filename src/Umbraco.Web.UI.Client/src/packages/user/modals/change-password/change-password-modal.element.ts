@@ -1,10 +1,19 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, CSSResultGroup, html, nothing, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, CSSResultGroup, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangePasswordModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbUserRepository } from '@umbraco-cms/backoffice/user';
 
 @customElement('umb-change-password-modal')
 export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChangePasswordModalData> {
+	@state()
+	private _userName: string = '';
+
+	@state()
+	private _headline: string = 'Change password';
+
+	#repository = new UmbUserRepository(this);
+
 	#onClose() {
 		this.modalContext?.reject();
 	}
@@ -27,9 +36,19 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChange
 		this.modalContext?.submit({ oldPassword, newPassword, confirmPassword });
 	}
 
+	protected async firstUpdated(): Promise<void> {
+		if (!this.data?.userId) return;
+		const { data } = await this.#repository.requestItems([this.data.userId]);
+
+		if (data) {
+			const userName = data[0].name;
+			this._headline = `Change password for ${userName}`;
+		}
+	}
+
 	render() {
 		return html`
-			<uui-dialog-layout class="uui-text" headline="Change password">
+			<uui-dialog-layout class="uui-text" headline=${this._headline}>
 				<uui-form>
 					<form id="LoginForm" name="login" @submit="${this.#onSubmit}">
 						${this.data?.requireOldPassword ? this.#renderOldPasswordInput() : nothing}
