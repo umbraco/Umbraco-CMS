@@ -8,12 +8,8 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_CONFIRM_MODAL,
 } from '@umbraco-cms/backoffice/modal';
-import { type UmbItemRepository } from '@umbraco-cms/backoffice/repository';
-import { type UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbEnableUserEntityAction<
-	RepositoryType extends UmbEnableUserRepository & UmbItemRepository<UserItemResponseModel>,
-> extends UmbEntityActionBase<RepositoryType> {
+export class UmbEnableUserEntityAction extends UmbEntityActionBase<UmbEnableUserRepository> {
 	#modalManager?: UmbModalManagerContext;
 	#itemRepository: UmbUserRepository;
 
