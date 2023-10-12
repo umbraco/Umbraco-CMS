@@ -82,8 +82,8 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 600,
 		api: UmbUnlockUserEntityAction,
 		meta: {
-			icon: 'umb:key',
-			label: 'Change Password',
+			icon: 'umb:unlocked',
+			label: 'Unlock',
 			repositoryAlias: CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
