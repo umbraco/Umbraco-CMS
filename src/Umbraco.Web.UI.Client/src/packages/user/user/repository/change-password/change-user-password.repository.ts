@@ -12,8 +12,8 @@ export class UmbChangeUserPasswordRepository {
 	}
 
 	async changePassword(id: string, newPassword: string) {
-		if (id) throw new Error('User id is missing');
-		if (newPassword) throw new Error('New password is missing');
+		if (!id) throw new Error('User id is missing');
+		if (!newPassword) throw new Error('New password is missing');
 
 		return this.#changePasswordSource.changePassword(id, newPassword);
 	}
