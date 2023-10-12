@@ -3,7 +3,7 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
- * A data source for Data Type items that fetches data from the server
+ * A server data source for changing the password of a user
  * @export
  * @class UmbChangeUserPasswordServerDataSource
  */
@@ -22,12 +22,11 @@ export class UmbChangeUserPasswordServerDataSource {
 	/**
 	 * Change the password of a user
 	 * @param {string} id
-	 * @param {string} oldPassword
 	 * @param {string} newPassword
 	 * @return {*}
 	 * @memberof UmbChangeUserPasswordServerDataSource
 	 */
-	async changePassword(id: string, oldPassword: string, newPassword: string) {
+	async changePassword(id: string, newPassword: string) {
 		if (!id) throw new Error('User Id is missing');
 
 		return tryExecuteAndNotify(
@@ -35,7 +34,6 @@ export class UmbChangeUserPasswordServerDataSource {
 			UserResource.postUserChangePasswordById({
 				id,
 				requestBody: {
-					oldPassword,
 					newPassword,
 				},
 			}),

@@ -11,10 +11,10 @@ export class UmbChangeUserPasswordRepository {
 		this.#changePasswordSource = new UmbChangeUserPasswordServerDataSource(this.#host);
 	}
 
-	async changePassword(id: string, oldPassword: string, newPassword: string) {
-		debugger;
+	async changePassword(id: string, newPassword: string) {
 		if (id) throw new Error('User id is missing');
+		if (newPassword) throw new Error('New password is missing');
 
-		const { error } = await this.#changePasswordSource.changePassword(id, oldPassword, newPassword);
+		return this.#changePasswordSource.changePassword(id, newPassword);
 	}
 }
