@@ -35,13 +35,13 @@ public abstract class BlockListPropertyEditorBase : DataEditor
 
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
 
-    /// <summary>
-    /// Creates a new instance of the BlockEditorDataConverter.
-    /// </summary>
-    /// <returns>An instance of BlockListEditorDataConverter.</returns>
-    protected virtual BlockEditorDataConverter CreateBlockEditorDataConverter() => new BlockListEditorDataConverter();
-
     #region Value Editor
+
+    /// <summary>
+    /// Instantiates a new <see cref="BlockEditorDataConverter"/> for use with the block list editor property value editor.
+    /// </summary>
+    /// <returns>A new instance of <see cref="BlockListEditorDataConverter"/>.</returns>
+    protected virtual BlockEditorDataConverter CreateBlockEditorDataConverter() => new BlockListEditorDataConverter();
 
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<BlockListEditorPropertyValueEditor>(Attribute!, CreateBlockEditorDataConverter());
