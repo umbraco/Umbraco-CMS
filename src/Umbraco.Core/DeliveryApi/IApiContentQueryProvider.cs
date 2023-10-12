@@ -38,7 +38,7 @@ public interface IApiContentQueryProvider
         ProtectedAccess protectedAccess,
         bool preview,
         int skip,
-        int take);
+        int take) => new();
 
     /// <summary>
     ///     Returns a selector option that can be applied to fetch "all content" (i.e. if a selector option is not present when performing a search).
