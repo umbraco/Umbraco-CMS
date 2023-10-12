@@ -43,6 +43,9 @@
         size: 'small',
         position: 'right',
         submit(model) {
+          if(!$scope.model.webhook.headers){
+            $scope.model.webhook.headers = {};
+          }
           $scope.model.webhook.headers[model.key] = model.value;
           editorService.close();
         },

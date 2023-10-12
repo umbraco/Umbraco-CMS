@@ -32,12 +32,7 @@ public class Webhook : EntityBase
     public Webhook(string url, bool? enabled = null, Guid[]? entityKeys = null, string[]? events = null, Dictionary<string, string>? headers = null)
     {
         _url = url;
-        _headers = headers ?? new Dictionary<string, string>
-        {
-            {"HeaderOne", "HeaderOneValue"},
-            {"HeaderTwo", "HeaderTwoValue"},
-            {"HeaderThree", "HeaderThreeValue"},
-        };
+        _headers = headers ?? new Dictionary<string, string>();
         _events = events ?? Array.Empty<string>();
         _entityKeys = entityKeys ?? Array.Empty<Guid>();
         _enabled = enabled ?? false;

@@ -33,6 +33,8 @@ internal class WebhookDto
     [Reference(ReferenceType.Many, ReferenceMemberName = nameof(EntityKey2WebhookDto.WebhookId))]
     public List<EntityKey2WebhookDto> EntityKey2WebhookDtos { get; set; } = new();
 
-
+    [ResultColumn]
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(Headers2WebhookDto.WebhookId))]
+    public List<EntityKey2WebhookDto> Headers2WebhookDtos { get; set; } = new();
 }
 

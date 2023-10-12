@@ -4,5 +4,5 @@ namespace Umbraco.Cms.Core.Webhooks;
 
 public interface IWebhookFiringService
 {
-    Task<WebhookResponseModel> Fire( string url, string eventName, object? requestObject);
+    Task<WebhookResponseModel> Fire(Webhook webhook, string eventName, object? requestObject);
 }

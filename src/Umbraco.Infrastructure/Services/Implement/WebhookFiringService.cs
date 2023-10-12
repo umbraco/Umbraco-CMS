@@ -16,7 +16,7 @@ public class WebhookFiringService : IWebhookFiringService
         _retryService = retryService;
     }
 
-    public async Task<WebhookResponseModel> Fire(string url, string eventName, object? requestObject) =>
+    public async Task<WebhookResponseModel> Fire(Webhook webhook, string eventName, object? requestObject) =>
         await _retryService.RetryAsync(
             async () =>
             {
@@ -26,8 +26,12 @@ public class WebhookFiringService : IWebhookFiringService
                 var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
                 var byteContent = new ByteArrayContent(buffer);
                 httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Umb-Webhook-Event", eventName);
+                foreach (KeyValuePair<string, string> header in webhook.Headers)
+                {
+                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
+                }
 
-                return await httpClient.PostAsync(url, byteContent);
+                return await httpClient.PostAsync(webhook.Url, byteContent);
             },
             _maxRetries);
 }

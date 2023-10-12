@@ -57,7 +57,7 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
                     continue;
                 }
 
-                WebhookResponseModel response = await _webhookFiringService.Fire(webhook.Url, EventName, entity);
+                WebhookResponseModel response = await _webhookFiringService.Fire(webhook, EventName, entity);
 
                 var log = new WebhookLog
                 {

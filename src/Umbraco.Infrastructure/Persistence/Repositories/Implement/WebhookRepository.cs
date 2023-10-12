@@ -40,9 +40,9 @@ public class WebhookRepository : IWebhookRepository
         var id = Convert.ToInt32(result);
         webhook.Id = id;
 
-        IEnumerable<Event2WebhookDto> entityKeys = WebhookFactory.BuildEvent2WebhookDto(webhook);
-        await _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(entityKeys)!;
+        await _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(WebhookFactory.BuildEvent2WebhookDto(webhook))!;
         await _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(WebhookFactory.BuildEntityKey2WebhookDto(webhook))!;
+        await _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(WebhookFactory.BuildHeaders2WebhookDtos(webhook))!;
 
         webhook.ResetDirtyProperties();
 
@@ -108,15 +108,18 @@ public class WebhookRepository : IWebhookRepository
     {
         _scopeAccessor.AmbientScope?.Database.Delete<EntityKey2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId });
         _scopeAccessor.AmbientScope?.Database.Delete<Event2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId });
+        _scopeAccessor.AmbientScope?.Database.Delete<Headers2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId });
     }
 
     private void InsertManyToOneReferences(Webhook webhook)
     {
         IEnumerable<EntityKey2WebhookDto> buildEntityKey2WebhookDtos = WebhookFactory.BuildEntityKey2WebhookDto(webhook);
         IEnumerable<Event2WebhookDto> buildEvent2WebhookDtos = WebhookFactory.BuildEvent2WebhookDto(webhook);
+        IEnumerable<Headers2WebhookDto> header2WebhookDtos = WebhookFactory.BuildHeaders2WebhookDtos(webhook);
 
         _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(buildEntityKey2WebhookDtos);
         _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(buildEvent2WebhookDtos);
+        _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(header2WebhookDtos);
     }
 
     private async Task<IEnumerable<Webhook>> DtosToEntities(IEnumerable<WebhookDto> dtos)
@@ -135,7 +138,8 @@ public class WebhookRepository : IWebhookRepository
     {
         List<EntityKey2WebhookDto>? webhookEntityKeyDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<EntityKey2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id })!;
         List<Event2WebhookDto>? event2WebhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<Event2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id })!;
-        Webhook entity = WebhookFactory.BuildEntity(dto, webhookEntityKeyDtos, event2WebhookDtos);
+        List<Headers2WebhookDto>? headersWebhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<Headers2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id })!;
+        Webhook entity = WebhookFactory.BuildEntity(dto, webhookEntityKeyDtos, event2WebhookDtos, headersWebhookDtos);
 
         // reset dirty initial properties (U4-1946)
         entity.ResetDirtyProperties(false);

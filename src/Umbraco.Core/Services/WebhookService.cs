@@ -41,6 +41,7 @@ public class WebhookService : IWebHookService
         currentWebhook.EntityKeys = updateModel.EntityKeys;
         currentWebhook.Events = updateModel.Events;
         currentWebhook.Url = updateModel.Url;
+        currentWebhook.Headers = updateModel.Headers;
 
         await _webhookRepository.UpdateAsync(currentWebhook);
         scope.Complete();
