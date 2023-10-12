@@ -107,7 +107,7 @@ public class DataValueEditorReuseTests
         Assert.NotNull(dataValueEditor2);
         Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
         _dataValueEditorFactoryMock.Verify(
-            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>()),
+            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter>()),
             Times.Exactly(2));
     }
 
@@ -130,7 +130,7 @@ public class DataValueEditorReuseTests
         Assert.AreEqual("config", ((DataValueEditor)dataValueEditor2).Configuration);
         Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
         _dataValueEditorFactoryMock.Verify(
-            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>()),
+            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter>()),
             Times.Exactly(2));
     }
 }
