@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core;
-
-namespace Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
 
 public class RedirectUrlResponseModel
 {

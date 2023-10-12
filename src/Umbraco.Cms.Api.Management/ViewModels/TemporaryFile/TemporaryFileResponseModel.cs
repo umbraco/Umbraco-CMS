@@ -1,5 +1,3 @@
-using Umbraco.Cms.Core;
-
 namespace Umbraco.Cms.Api.Management.ViewModels.TemporaryFile;
 
 public class TemporaryFileResponseModel
