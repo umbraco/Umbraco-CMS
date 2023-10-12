@@ -10,6 +10,9 @@ export interface UmbChangePasswordModalValue {
 	oldPassword?: string;
 }
 
-export const UMB_CHANGE_PASSWORD_MODAL = new UmbModalToken<UmbChangePasswordModalData>('Umb.Modal.ChangePassword', {
-	type: 'dialog',
-});
+export const UMB_CHANGE_PASSWORD_MODAL = new UmbModalToken<UmbChangePasswordModalData, UmbChangePasswordModalValue>(
+	'Umb.Modal.ChangePassword',
+	{
+		type: 'dialog',
+	},
+);
