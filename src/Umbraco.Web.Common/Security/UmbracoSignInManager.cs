@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Web.Common.Security;
 
 /// <summary>
-///     Abstract sign in manager implementation allowing modifying all defeault authentication schemes
+///     Abstract sign in manager implementation allowing modifying all default authentication schemes.
 /// </summary>
 /// <typeparam name="TUser"></typeparam>
 public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
