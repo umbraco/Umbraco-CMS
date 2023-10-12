@@ -1,10 +1,7 @@
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
-import './column-layouts/crops-table-input-column.element.js';
 
 /**
  * @element umb-property-editor-ui-image-crops-configuration
@@ -14,82 +11,61 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
+	//TODO MAKE TYPE
 	@property()
-	value = '';
-
-	@property({ attribute: false })
-	public config?: UmbPropertyEditorConfigCollection;
-
-	@state()
-	private _tableConfig: UmbTableConfig = {
-		allowSelection: false,
-	};
-
-	@state()
-	private _tableColumns: Array<UmbTableColumn> = [
-		{
-			name: 'Alias',
-			alias: 'cropAlias',
-			elementName: 'umb-crops-table-input-column',
-		},
-		{
-			name: 'Width',
-			alias: 'cropWidth',
-			elementName: 'umb-crops-table-input-column',
-		},
-		{
-			name: 'Height',
-			alias: 'cropHeight',
-			elementName: 'umb-crops-table-input-column',
-		},
-		{
-			name: 'Actions',
-			alias: 'cropActions',
-		},
-	];
-
-	@state()
-	private _tableItems: Array<UmbTableItem> = [
-		{
-			id: '1',
-			icon: 'icon-image',
-			entityType: 'Image',
-			data: [
-				{
-					columnAlias: 'cropAlias',
-					value: {
-						value: 'test',
-					},
-				},
-				{
-					columnAlias: 'cropWidth',
-					value: {
-						value: 'test',
-						append: 'px',
-					},
-				},
-				{
-					columnAlias: 'cropHeight',
-					value: {
-						value: 'test',
-						append: 'px',
-					},
-				},
-				{
-					columnAlias: 'cropActions',
-					value: 'test',
-				},
-			],
-		},
-	];
+	value: {
+		alias: string;
+		width: number;
+		height: number;
+	}[] = [];
 
 	render() {
 		return html`
-			<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
+			<div class="inputs">
+				<div class="input">
+					<uui-label for="alias">Aliasss</uui-label>
+					<uui-input id="alias" type="text" autocomplete="false" value=""></uui-input>
+				</div>
+				<div class="input">
+					<uui-label for="width">Width</uui-label>
+					<uui-input id="width" type="number" autocomplete="false" value="">
+						<span class="append" slot="append">px</span>
+					</uui-input>
+				</div>
+				<div class="input">
+					<uui-label for="height">Height</uui-label>
+					<uui-input id="height" type="number" autocomplete="false" value="">
+						<span class="append" slot="append">px</span>
+					</uui-input>
+				</div>
+				<uui-button look="secondary">Add</uui-button>
+			</div>
+			<div></div>
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static styles = [
+		UmbTextStyles,
+		css`
+			.inputs {
+				display: flex;
+				gap: var(--uui-size-space-2);
+			}
+			.input {
+				display: flex;
+				flex-direction: column;
+			}
+			.append {
+				padding-inline: var(--uui-size-space-4);
+				background: var(--uui-color-disabled);
+				border-left: 1px solid var(--uui-color-border);
+				color: var(--uui-color-disabled-contrast);
+				font-size: 0.8em;
+				display: flex;
+				align-items: center;
+			}
+		`,
+	];
 }
 
 export default UmbPropertyEditorUIImageCropsConfigurationElement;

@@ -462,7 +462,23 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		parentId: null,
 		propertyEditorAlias: 'Umbraco.ImageCropper',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUi.ImageCropper',
-		values: [],
+		values: [
+			{
+				alias: 'imageCropperValue',
+				value: [
+					{
+						alias: 'Square',
+						height: 1000,
+						width: 1000,
+					},
+					{
+						alias: 'Square',
+						height: 1000,
+						width: 1000,
+					},
+				],
+			},
+		],
 	},
 	{
 		type: 'data-type',
