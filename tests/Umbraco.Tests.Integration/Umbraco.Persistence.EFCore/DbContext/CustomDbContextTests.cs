@@ -1,19 +1,13 @@
-using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 
 [TestFixture]
-[Timeout(60000)]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 public class CustomDbContextUmbracoProviderTests : UmbracoIntegrationTest
 {
@@ -26,7 +20,7 @@ public class CustomDbContextUmbracoProviderTests : UmbracoIntegrationTest
         Assert.IsNotEmpty(dbContext.Database.GetConnectionString());
     }
 
-    protected override void ConfigureUmbracoTestServices(IUmbracoBuilder builder)
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.Services.AddUmbracoDbContext<CustomDbContext>((serviceProvider, options) =>
         {
@@ -45,7 +39,6 @@ public class CustomDbContextUmbracoProviderTests : UmbracoIntegrationTest
 
 
 [TestFixture]
-[Timeout(60000)]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 public class CustomDbContextCustomSqliteProviderTests : UmbracoIntegrationTest
 {
@@ -58,7 +51,7 @@ public class CustomDbContextCustomSqliteProviderTests : UmbracoIntegrationTest
         Assert.IsNotEmpty(dbContext.Database.GetConnectionString());
     }
 
-    protected override void ConfigureUmbracoTestServices(IUmbracoBuilder builder)
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.Services.AddUmbracoDbContext<CustomDbContext>((serviceProvider, options) =>
         {
@@ -77,7 +70,6 @@ public class CustomDbContextCustomSqliteProviderTests : UmbracoIntegrationTest
 
 [Obsolete]
 [TestFixture]
-[Timeout(60000)]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 public class CustomDbContextLegacyExtensionProviderTests : UmbracoIntegrationTest
 {
@@ -90,7 +82,7 @@ public class CustomDbContextLegacyExtensionProviderTests : UmbracoIntegrationTes
         Assert.IsNotEmpty(dbContext.Database.GetConnectionString());
     }
 
-    protected override void ConfigureUmbracoTestServices(IUmbracoBuilder builder)
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.Services.AddUmbracoEFCoreContext<CustomDbContext>("Data Source=:memory:;Version=3;New=True;", "Microsoft.Data.Sqlite", (options, connectionString, providerName) =>
         {

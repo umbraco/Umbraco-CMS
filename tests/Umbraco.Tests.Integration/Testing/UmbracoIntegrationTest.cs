@@ -155,8 +155,6 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
             .AddUmbracoSqliteSupport()
             .AddTestServices(TestHelper);
 
-        ConfigureUmbracoTestServices(builder);
-
         if (TestOptions.Mapper)
         {
             // TODO: Should these just be called from within AddUmbracoCore/AddWebComponents?
@@ -187,13 +185,6 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     ///     Hook for registering test doubles.
     /// </summary>
     protected virtual void ConfigureTestServices(IServiceCollection services)
-    {
-    }
-
-    /// <summary>
-    ///     Hook for registering umbraco test doubles.
-    /// </summary>
-    protected virtual void ConfigureUmbracoTestServices(IUmbracoBuilder builder)
     {
     }
 
