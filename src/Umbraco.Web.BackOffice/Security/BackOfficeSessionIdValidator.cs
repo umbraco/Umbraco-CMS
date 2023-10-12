@@ -35,15 +35,15 @@ public class BackOfficeSessionIdValidator
 {
     public const string CookieName = "UMB_UCONTEXT_C";
     private readonly GlobalSettings _globalSettings;
-    private readonly ISystemClock _systemClock;
+    private readonly TimeProvider _timeProvider;
     private readonly IBackOfficeUserManager _userManager;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="BackOfficeSessionIdValidator" /> class.
     /// </summary>
-    public BackOfficeSessionIdValidator(ISystemClock systemClock, IOptionsSnapshot<GlobalSettings> globalSettings, IBackOfficeUserManager userManager)
+    public BackOfficeSessionIdValidator(TimeProvider timeProvider, IOptionsSnapshot<GlobalSettings> globalSettings, IBackOfficeUserManager userManager)
     {
-        _systemClock = systemClock;
+        _timeProvider = timeProvider;
         _globalSettings = globalSettings.Value;
         _userManager = userManager;
     }
@@ -55,7 +55,7 @@ public class BackOfficeSessionIdValidator
             return;
         }
 
-        var valid = await ValidateSessionAsync(validateInterval, context.HttpContext, context.Options.CookieManager, _systemClock, context.Properties.IssuedUtc, context.Principal?.Identity as ClaimsIdentity);
+        var valid = await ValidateSessionAsync(validateInterval, context.HttpContext, context.Options.CookieManager, _timeProvider, context.Properties.IssuedUtc, context.Principal?.Identity as ClaimsIdentity);
 
         if (valid == false)
         {
@@ -68,7 +68,7 @@ public class BackOfficeSessionIdValidator
         TimeSpan validateInterval,
         HttpContext httpContext,
         ICookieManager cookieManager,
-        ISystemClock systemClock,
+        TimeProvider timeProvider,
         DateTimeOffset? authTicketIssueDate,
         ClaimsIdentity? currentIdentity)
     {
@@ -82,9 +82,9 @@ public class BackOfficeSessionIdValidator
             throw new ArgumentNullException(nameof(cookieManager));
         }
 
-        if (systemClock == null)
+        if (timeProvider == null)
         {
-            throw new ArgumentNullException(nameof(systemClock));
+            throw new ArgumentNullException(nameof(timeProvider));
         }
 
         if (currentIdentity == null)
@@ -93,7 +93,7 @@ public class BackOfficeSessionIdValidator
         }
 
         DateTimeOffset? issuedUtc = null;
-        DateTimeOffset currentUtc = systemClock.UtcNow;
+        DateTimeOffset currentUtc = timeProvider.GetUtcNow();
 
         // read the last checked time from a custom cookie
         var lastCheckedCookie = cookieManager.GetRequestCookie(httpContext, CookieName);

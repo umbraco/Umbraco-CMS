@@ -31,7 +31,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
     private readonly IRuntimeState _runtimeState;
     private readonly SecuritySettings _securitySettings;
     private readonly IServiceProvider _serviceProvider;
-    private readonly ISystemClock _systemClock;
+    private readonly TimeProvider _timeProvider;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly UmbracoRequestPaths _umbracoRequestPaths;
     private readonly IUserService _userService;
@@ -48,7 +48,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
     /// <param name="dataProtection">The <see cref="IDataProtectionProvider" /></param>
     /// <param name="userService">The <see cref="IUserService" /></param>
     /// <param name="ipResolver">The <see cref="IIpResolver" /></param>
-    /// <param name="systemClock">The <see cref="ISystemClock" /></param>
+    /// <param name="timeProvider">The <see cref="TimeProvider" /></param>
     /// <param name="umbracoRequestPaths">The <see cref="UmbracoRequestPaths"/></param>
     /// <param name="basicAuthService">The <see cref="IBasicAuthService"/></param>
     public ConfigureBackOfficeCookieOptions(
@@ -61,7 +61,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
         IDataProtectionProvider dataProtection,
         IUserService userService,
         IIpResolver ipResolver,
-        ISystemClock systemClock,
+        TimeProvider timeProvider,
         UmbracoRequestPaths umbracoRequestPaths,
         IBasicAuthService basicAuthService)
     {
@@ -74,7 +74,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
         _dataProtection = dataProtection;
         _userService = userService;
         _ipResolver = ipResolver;
-        _systemClock = systemClock;
+        _timeProvider = timeProvider;
         _umbracoRequestPaths = umbracoRequestPaths;
         _basicAuthService = basicAuthService;
     }
@@ -187,8 +187,8 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                 // When we then try and renew, the difference of issued and expires effectively becomes the new ExpireTimeSpan
                 // meaning we effectively lose 30 minutes of our ExpireTimeSpan for EVERY principal refresh if we don't
                 // https://github.com/dotnet/aspnetcore/blob/main/src/Security/Authentication/Cookies/src/CookieAuthenticationHandler.cs#L115
-                ctx.Properties.IssuedUtc = _systemClock.UtcNow;
-                ctx.Properties.ExpiresUtc = _systemClock.UtcNow.Add(_globalSettings.TimeOut);
+                ctx.Properties.IssuedUtc = _timeProvider.GetUtcNow();
+                ctx.Properties.ExpiresUtc = _timeProvider.GetUtcNow().Add(_globalSettings.TimeOut);
                 ctx.ShouldRenew = true;
             },
             OnSigningIn = ctx =>
@@ -296,7 +296,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             return;
         }
 
-        DateTimeOffset currentUtc = _systemClock.UtcNow;
+        DateTimeOffset currentUtc = _timeProvider.GetUtcNow();
         DateTimeOffset? issuedUtc = context.Properties.IssuedUtc;
         DateTimeOffset? expiresUtc = context.Properties.ExpiresUtc;
 
