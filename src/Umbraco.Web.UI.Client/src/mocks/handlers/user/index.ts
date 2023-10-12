@@ -4,6 +4,7 @@ import { handlers as currentHandlers } from './current.handlers.js';
 import { handlers as setUserGroupsHandlers } from './set-user-groups.handlers.js';
 import { handlers as enableHandlers } from './enable.handlers.js';
 import { handlers as disableHandlers } from './disable.handlers.js';
+import { handlers as changePasswordHandler } from './change-password.handlers.js';
 
 export const handlers = [
 	...itemHandlers,
@@ -11,5 +12,6 @@ export const handlers = [
 	...enableHandlers,
 	...disableHandlers,
 	...setUserGroupsHandlers,
+	...changePasswordHandler,
 	...detailHandlers,
 ];

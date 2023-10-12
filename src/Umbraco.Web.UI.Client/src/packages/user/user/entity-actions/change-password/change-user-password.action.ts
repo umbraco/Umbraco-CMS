@@ -26,8 +26,7 @@ export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<UmbCh
 			userId: this.unique,
 		});
 
-		modalContext.onSubmit().then((data) => {
-			this.repository?.changePassword(this.unique, data.newPassword);
-		});
+		const data = await modalContext.onSubmit();
+		await this.repository?.changePassword(this.unique, data.newPassword);
 	}
 }
