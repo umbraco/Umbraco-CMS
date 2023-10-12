@@ -3,11 +3,13 @@ import { UmbUserItemStore } from './user-item.store.js';
 import { UmbUserStore } from './user.store.js';
 import { UmbDisableUserRepository } from './disable/disable-user.repository.js';
 import { UmbEnableUserRepository } from './enable/enable-user.repository.js';
+import { UmbChangeUserPasswordRepository } from './change-password/change-user-password.repository.js';
 import type { ManifestStore, ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
 
 export const USER_REPOSITORY_ALIAS = 'Umb.Repository.User';
 export const DISABLE_USER_REPOSITORY_ALIAS = 'Umb.Repository.User.Disable';
 export const ENABLE_USER_REPOSITORY_ALIAS = 'Umb.Repository.User.Enable';
+export const CHANGE_USER_PASSWORD_REPOSITORY_ALIAS = 'Umb.Repository.User.ChangePassword';
 
 const repository: ManifestRepository = {
 	type: 'repository',
@@ -30,6 +32,13 @@ const enableRepository: ManifestRepository = {
 	api: UmbEnableUserRepository,
 };
 
+const changePasswordRepository: ManifestRepository = {
+	type: 'repository',
+	alias: CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
+	name: 'Change User Password Repository',
+	api: UmbChangeUserPasswordRepository,
+};
+
 const store: ManifestStore = {
 	type: 'store',
 	alias: 'Umb.Store.User',
@@ -44,4 +53,4 @@ const itemStore: ManifestItemStore = {
 	api: UmbUserItemStore,
 };
 
-export const manifests = [repository, disableRepository, enableRepository, store, itemStore];
+export const manifests = [repository, disableRepository, enableRepository, changePasswordRepository, store, itemStore];

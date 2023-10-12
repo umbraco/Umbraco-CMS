@@ -1,4 +1,5 @@
 import {
+	CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
 	DISABLE_USER_REPOSITORY_ALIAS,
 	ENABLE_USER_REPOSITORY_ALIAS,
 	USER_REPOSITORY_ALIAS,
@@ -6,6 +7,7 @@ import {
 import { UMB_USER_ENTITY_TYPE } from '../index.js';
 import { UmbDisableUserEntityAction } from './disable/disable-user.action.js';
 import { UmbEnableUserEntityAction } from './enable/enable-user.action.js';
+import { UmbChangeUserPasswordEntityAction } from './change-password/change-user-password.action.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -46,6 +48,19 @@ const entityActions: Array<ManifestTypes> = [
 			icon: 'umb:block',
 			label: 'Disable',
 			repositoryAlias: DISABLE_USER_REPOSITORY_ALIAS,
+			entityTypes: [UMB_USER_ENTITY_TYPE],
+		},
+	},
+	{
+		type: 'entityAction',
+		alias: 'Umb.EntityAction.User.ChangePassword',
+		name: 'Change User Password Entity Action',
+		weight: 600,
+		api: UmbChangeUserPasswordEntityAction,
+		meta: {
+			icon: 'umb:key',
+			label: 'Change Password',
+			repositoryAlias: CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 	},
