@@ -37,6 +37,11 @@ const entityActions: Array<ManifestTypes> = [
 			repositoryAlias: ENABLE_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.User.AllowEnableAction',
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -50,6 +55,11 @@ const entityActions: Array<ManifestTypes> = [
 			repositoryAlias: DISABLE_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.User.AllowDisableAction',
+			},
+		],
 	},
 	{
 		type: 'entityAction',

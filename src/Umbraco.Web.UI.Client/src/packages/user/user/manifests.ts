@@ -4,6 +4,7 @@ import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as sectionViewManifests } from './section-view/manifests.js';
 import { manifests as entityActionsManifests } from './entity-actions/manifests.js';
 import { manifests as entityBulkActionManifests } from './entity-bulk-actions/manifests.js';
+import { manifests as conditionsManifests } from './conditions/manifests.js';
 
 export const manifests = [
 	...repositoryManifests,
@@ -12,4 +13,5 @@ export const manifests = [
 	...sectionViewManifests,
 	...entityActionsManifests,
 	...entityBulkActionManifests,
+	...conditionsManifests,
 ];
