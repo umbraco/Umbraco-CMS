@@ -91,6 +91,19 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 			user.state = UserStateModel.ACTIVE;
 		});
 	}
+
+	/**
+	 * Unlock users
+	 * @param {Array<string>} ids
+	 * @memberof UmbUserData
+	 */
+	unlock(ids: Array<string>): void {
+		const users = this.data.filter((user) => ids.includes(user.id ?? ''));
+		users.forEach((user) => {
+			user.failedLoginAttempts = 0;
+			user.state = UserStateModel.ACTIVE;
+		});
+	}
 }
 
 export const data: Array<UserResponseModel & { type: string }> = [
