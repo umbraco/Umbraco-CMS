@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Services.Paging;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
-using Umbraco.Cms.Api.Management.ViewModels.Tree;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 

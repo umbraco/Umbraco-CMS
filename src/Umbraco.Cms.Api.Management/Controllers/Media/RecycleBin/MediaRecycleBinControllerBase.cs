@@ -9,7 +9,6 @@ using Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;

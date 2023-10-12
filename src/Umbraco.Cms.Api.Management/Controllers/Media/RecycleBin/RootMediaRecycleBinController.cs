@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
