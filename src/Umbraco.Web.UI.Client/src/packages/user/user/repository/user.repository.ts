@@ -110,14 +110,15 @@ export class UmbUserRepository
 
 	async requestById(id: string) {
 		if (!id) throw new Error('Id is missing');
+		await this.#init;
 
 		const { data, error } = await this.#detailSource.get(id);
 
 		if (data) {
-			this.#detailStore?.append(data);
+			this.#detailStore!.append(data);
 		}
 
-		return { data, error };
+		return { data, error, asObservable: () => this.#detailStore!.byId(id) };
 	}
 
 	async setUserGroups(userIds: Array<string>, userGroupIds: Array<string>) {
