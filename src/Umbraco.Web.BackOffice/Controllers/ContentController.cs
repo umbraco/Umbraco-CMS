@@ -1962,7 +1962,7 @@ public class ContentController : ContentControllerBase
     /// <param name="localizationArea"></param>
     /// <param name="localizationAlias"></param>
     /// <param name="cultureToken">
-    ///     The culture used in the localization message, null by default which means <see cref="culture" /> will be used.
+    ///     The culture used in the localization message, null by default which means <paramref name="culture"/> will be used.
     /// </param>
     private void AddVariantValidationError(string? culture, string? segment, string localizationArea, string localizationAlias, string? cultureToken = null)
     {

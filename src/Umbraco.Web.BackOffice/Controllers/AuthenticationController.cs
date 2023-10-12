@@ -650,7 +650,6 @@ public class AuthenticationController : UmbracoApiControllerBase
     ///     Return the <see cref="UserDetail" /> for the given <see cref="IUser" />
     /// </summary>
     /// <param name="user"></param>
-    /// <param name="principal"></param>
     /// <returns></returns>
     private UserDetail? GetUserDetail(IUser? user)
     {

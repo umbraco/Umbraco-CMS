@@ -20,14 +20,18 @@
                 ng-click="vm.openBlockOverlay(block)"
                 data-content-element-type-key="{{block.contentElementTypeKey}}">
                 <div class="__actions" ng-click="$event.stopPropagation()" tabindex="-1">
-                    <button type="button" ng-if="block.areas.length > 0" class="btn-reset __action umb-outline" ng-click="vm.openBlockOverlay(block, true); $event.stopPropagation();">
-                        <umb-icon icon="icon-layout" class="icon"></umb-icon>
-                        <localize key="blockEditor_tabAreas" class="sr-only">Areas</localize>
-                    </button>
-                    <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($index, $event)">
-                        <umb-icon icon="icon-trash" class="icon"></umb-icon>
-                        <localize key="general_delete" class="sr-only">Delete</localize>
-                    </button>
+                    <div ng-if="block.areas.length > 0">
+                        <button type="button" class="btn-reset __action umb-outline" ng-click="vm.openBlockOverlay(block, true); $event.stopPropagation();">
+                            <umb-icon icon="icon-layout" class="icon"></umb-icon>
+                            <localize key="blockEditor_tabAreas" class="sr-only">Areas</localize>
+                        </button>
+                    </div>
+                    <div>
+                        <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($index, $event)">
+                            <umb-icon icon="icon-trash" class="icon"></umb-icon>
+                            <localize key="general_delete" class="sr-only">Delete</localize>
+                        </button>
+                    </div>
                 </div>
             </umb-block-card>
 
@@ -79,14 +83,18 @@
                     ng-click="vm.openBlockOverlay(block)"
                     data-content-element-type-key="{{block.contentElementTypeKey}}">
                     <div class="__actions" ng-click="$event.stopPropagation()" tabindex="-1">
-                        <button type="button" ng-if="block.areas.length > 0" class="btn-reset __action umb-outline" ng-click="vm.openBlockOverlay(block, true); $event.stopPropagation();">
-                            <umb-icon icon="icon-layout" class="icon"></umb-icon>
-                            <localize key="blockEditor_tabAreas" class="sr-only">Areas</localize>
-                        </button>
-                        <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($index, $event)">
-                            <umb-icon icon="icon-trash" class="icon"></umb-icon>
-                            <localize key="general_delete" class="sr-only">Delete</localize>
-                        </button>
+                        <div ng-if="block.areas.length > 0">
+                            <button type="button" class="btn-reset __action umb-outline" ng-click="vm.openBlockOverlay(block, true); $event.stopPropagation();">
+                                <umb-icon icon="icon-layout" class="icon"></umb-icon>
+                                <localize key="blockEditor_tabAreas" class="sr-only">Areas</localize>
+                            </button>
+                        </div>
+                        <div>
+                            <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($index, $event)">
+                                <umb-icon icon="icon-trash" class="icon"></umb-icon>
+                                <localize key="general_delete" class="sr-only">Delete</localize>
+                            </button>
+                        </div>
                     </div>
                 </umb-block-card>
 

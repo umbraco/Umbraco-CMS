@@ -6,6 +6,7 @@ public interface ILockingMechanism : IDisposable
     ///     Read-locks some lock objects lazily.
     /// </summary>
     /// <param name="instanceId">Instance id of the scope who is requesting the lock</param>
+    /// <param name="timeout">Timeout for the lock</param>
     /// <param name="lockIds">Array of lock object identifiers.</param>
     void ReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds);
 
@@ -15,6 +16,7 @@ public interface ILockingMechanism : IDisposable
     ///     Write-locks some lock objects lazily.
     /// </summary>
     /// <param name="instanceId">Instance id of the scope who is requesting the lock</param>
+    /// <param name="timeout">Timeout for the lock</param>
     /// <param name="lockIds">Array of object identifiers.</param>
     void WriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds);
 
@@ -24,6 +26,7 @@ public interface ILockingMechanism : IDisposable
     /// Eagerly acquires a read-lock
     /// </summary>
     /// <param name="instanceId"></param>
+    /// <param name="timeout">Timeout for the lock</param>
     /// <param name="lockIds"></param>
     void EagerReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds);
 
@@ -33,6 +36,7 @@ public interface ILockingMechanism : IDisposable
     /// Eagerly acquires a write-lock
     /// </summary>
     /// <param name="instanceId"></param>
+    /// <param name="timeout">Timeout for the lock</param>
     /// <param name="lockIds"></param>
     void EagerWriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds);
 

@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 public class UnattendedSettings
 {
     private const bool StaticInstallUnattended = false;
-    private const bool StaticUpgradeUnattended = true;
+    private const bool StaticUpgradeUnattended = false;
 
     /// <summary>
     ///     Gets or sets a value indicating whether unattended installs are enabled.

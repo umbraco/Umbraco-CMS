@@ -1,11 +1,10 @@
-angular.module("umbraco").controller("Umbraco.PrevalueEditors.CheckboxListController",
+angular.module("umbraco").controller("Umbraco.PrevalueEditors.RadiobuttonListController",
     function ($scope) {
         
         const vm = this;
 
         vm.configItems = [];
         vm.viewItems = [];
-        vm.change = change;
 
         function init() {
 
@@ -27,48 +26,24 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CheckboxListContro
 
                 items.push({ value: item.value, label: item.label });
             }
-
+            
             vm.configItems = items;
 
-            if ($scope.model.value === null || $scope.model.value === undefined) {
-                $scope.model.value = [];
-            }
-
             // update view model.
-            generateViewModel($scope.model.value);
+            generateViewModel();
         }
 
-        function generateViewModel(newVal) {
+        function generateViewModel() {
 
             vm.viewItems = [];
 
             let iConfigItem;
             for (let i = 0; i < vm.configItems.length; i++) {
                 iConfigItem = vm.configItems[i];
-                const isChecked = _.contains(newVal, iConfigItem.value);
                 vm.viewItems.push({
-                    checked: isChecked,
                     value: iConfigItem.value,
                     label: iConfigItem.label
                 });
-            }
-
-        }
-
-        function change(model, value) {
-
-            const index = $scope.model.value.indexOf(value);
-
-            if (model === true) {
-                //if it doesn't exist in the model, then add it
-                if (index < 0) {
-                    $scope.model.value.push(value);
-                }
-            } else {
-                //if it exists in the model, then remove it
-                if (index >= 0) {
-                    $scope.model.value.splice(index, 1);
-                }
             }
 
         }

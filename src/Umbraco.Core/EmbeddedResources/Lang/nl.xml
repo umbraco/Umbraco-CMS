@@ -537,6 +537,7 @@
   </area>
   <area alias="dictionary">
     <key alias="noItems">Er zijn geen woordenboekitems.</key>
+    <key alias="noItemsFound">Er zijn geen woordenboekitems gevonden.</key>
     <key alias="createNew">Woordenboekitem aanmaken</key>
   </area>
   <area alias="dictionaryItem">
@@ -738,7 +739,7 @@
     <key alias="history">Geschiedenis</key>
     <key alias="icon">Icoon</key>
     <key alias="id">Id</key>
-    <key alias="import">Import</key>
+    <key alias="import">Importeren</key>
     <key alias="excludeFromSubFolders">Alleen in deze map zoeken</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Binnenste marge</key>
