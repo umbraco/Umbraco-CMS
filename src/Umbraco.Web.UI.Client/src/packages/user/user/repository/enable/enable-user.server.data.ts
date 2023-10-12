@@ -4,9 +4,9 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
- * A data source for Data Type items that fetches data from the server
+ * A server data source for enabling users
  * @export
- * @class enable
+ * @class UmbEnableUserServerDataSource
  */
 export class UmbEnableUserServerDataSource implements UmbEnableUserDataSource {
 	#host: UmbControllerHostElement;
