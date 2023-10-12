@@ -35,6 +35,11 @@ public abstract class BlockListPropertyEditorBase : DataEditor
 
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
 
+    /// <summary>
+    /// Creates a new instance of the BlockEditorDataConverter.
+    /// </summary>
+    /// <returns>An instance of BlockListEditorDataConverter.</returns>
+    protected virtual BlockEditorDataConverter CreateBlockEditorDataConverter() => new BlockListEditorDataConverter();
 
     #region Value Editor
 
@@ -45,6 +50,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
     {
         public BlockListEditorPropertyValueEditor(
             DataEditorAttribute attribute,
+            BlockEditorDataConverter blockEditorDataConverter,
             PropertyEditorCollection propertyEditors,
             IDataTypeService dataTypeService,
             IContentTypeService contentTypeService,
@@ -56,7 +62,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             IPropertyValidationService propertyValidationService) :
             base(attribute, propertyEditors, dataTypeService, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
         {
-            BlockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypeService, logger);
+            BlockEditorValues = new BlockEditorValues(blockEditorDataConverter, contentTypeService, logger);
             Validators.Add(new BlockEditorValidator(propertyValidationService, BlockEditorValues, contentTypeService));
             Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
         }
