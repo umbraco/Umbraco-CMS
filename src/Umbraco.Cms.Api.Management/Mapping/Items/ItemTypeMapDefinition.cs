@@ -112,6 +112,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Icon = source.ContentTypeIcon;
         target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
+        target.IsTrashed = source.Trashed;
     }
 
     // Umbraco.Code.MapAll
