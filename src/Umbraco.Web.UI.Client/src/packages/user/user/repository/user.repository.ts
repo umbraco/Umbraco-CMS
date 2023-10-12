@@ -207,16 +207,4 @@ export class UmbUserRepository
 
 		return { error };
 	}
-
-	async unlock(ids: Array<string>) {
-		if (ids.length === 0) throw new Error('User ids are missing');
-
-		const { error } = await this.#unlockSource.unlock(ids);
-
-		if (!error) {
-			//TODO: UPDATE STORE
-			const notification = { data: { message: `${ids.length > 1 ? 'Users' : 'User'} unlocked` } };
-			this.#notificationContext?.peek('positive', notification);
-		}
-	}
 }
