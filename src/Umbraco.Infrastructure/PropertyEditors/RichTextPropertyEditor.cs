@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
@@ -365,5 +366,8 @@ public class RichTextPropertyEditor : DataEditor
     {
         [DataMember(Name = "markup")]
         public required string Markup { get; set; }
+
+        [DataMember(Name = "blocks")]
+        public required BlockValue? Blocks { get; set; }
     }
 }
