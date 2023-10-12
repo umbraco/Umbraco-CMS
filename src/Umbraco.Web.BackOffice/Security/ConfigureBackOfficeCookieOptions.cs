@@ -11,9 +11,11 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Security;
@@ -221,6 +223,20 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                         Constants.Security.BackOfficeAuthenticationType,
                         Constants.Security.BackOfficeAuthenticationType,
                         backOfficeIdentity));
+
+                    // Update the security stamp when sign-in is successful
+                    var userManager = ctx.HttpContext.RequestServices.GetRequiredService<BackOfficeUserManager>();
+
+                    // TODO: check if securitySettings.AllowConcurrentLogins is not allowed
+                    if (ctx.Principal != null)
+                    {
+                        BackOfficeIdentityUser? user = userManager.GetUserAsync(ctx.Principal).GetAwaiter().GetResult();
+
+                        if (user is not null)
+                        {
+                            userManager.UpdateSecurityStampAsync(user).GetAwaiter().GetResult();
+                        }
+                    }
                 }
 
                 return Task.CompletedTask;
