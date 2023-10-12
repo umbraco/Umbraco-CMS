@@ -29,6 +29,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChange
 
 		const formData = new FormData(form);
 
+		// TODO: validate that the new password and confirm password match
 		const oldPassword = formData.get('oldPassword') as string;
 		const newPassword = formData.get('newPassword') as string;
 		const confirmPassword = formData.get('confirmPassword') as string;
