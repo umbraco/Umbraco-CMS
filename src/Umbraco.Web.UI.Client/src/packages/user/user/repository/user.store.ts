@@ -16,4 +16,13 @@ export class UmbUserStore extends UmbStoreBase {
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_USER_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<UmbUserDetail>([], (x) => x.id));
 	}
+
+	/**
+	 * Get a user by id
+	 * @param {id} string id.
+	 * @memberof UmbUserStore
+	 */
+	byId(id: UmbUserDetail['id']) {
+		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
+	}
 }
