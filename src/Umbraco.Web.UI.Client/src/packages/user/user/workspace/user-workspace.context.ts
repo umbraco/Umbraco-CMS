@@ -41,6 +41,7 @@ export class UmbUserWorkspaceContext
 		There might be a less manual way to do this.
 	*/
 	onUserStoreChanges(user: UmbUserDetail) {
+		if (!user) return;
 		this.#data.update({ state: user.state });
 	}
 
