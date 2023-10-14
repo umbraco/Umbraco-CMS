@@ -1,5 +1,7 @@
 using Examine;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -27,6 +29,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
     private readonly IUserService _userService;
     private readonly ILocalizationService _localizationService;
+    private readonly ILogger<ContentValueSetBuilder> _logger;
 
     public ContentValueSetBuilder(
         PropertyEditorCollection propertyEditors,
@@ -35,7 +38,8 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         IShortStringHelper shortStringHelper,
         IScopeProvider scopeProvider,
         bool publishedValuesOnly,
-        ILocalizationService localizationService)
+        ILocalizationService localizationService,
+        ILogger<ContentValueSetBuilder> logger)
         : base(propertyEditors, publishedValuesOnly)
     {
         _urlSegmentProviders = urlSegmentProviders;
@@ -43,9 +47,31 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         _shortStringHelper = shortStringHelper;
         _scopeProvider = scopeProvider;
         _localizationService = localizationService;
+        _logger = logger;
     }
 
-    [Obsolete("Use the constructor that takes an ILocalizationService, scheduled for removal in v14")]
+    [Obsolete("Use the constructor that takes an  ILogger<ContentValueSetBuilder>, scheduled for removal in v14")]
+    public ContentValueSetBuilder(
+         PropertyEditorCollection propertyEditors,
+        UrlSegmentProviderCollection urlSegmentProviders,
+        IUserService userService,
+        IShortStringHelper shortStringHelper,
+        IScopeProvider scopeProvider,
+        bool publishedValuesOnly,
+        ILocalizationService localizationService)
+        : this(
+            propertyEditors,
+            urlSegmentProviders,
+            userService,
+            shortStringHelper,
+            scopeProvider,
+            publishedValuesOnly,
+            localizationService,
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<ContentValueSetBuilder>>())
+    {
+    }
+
+    [Obsolete("Use the constructor that takes an ILocalizationService and  ILogger<ContentValueSetBuilder>, scheduled for removal in v14")]
     public ContentValueSetBuilder(
         PropertyEditorCollection propertyEditors,
         UrlSegmentProviderCollection urlSegmentProviders,
@@ -60,7 +86,8 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
             shortStringHelper,
             scopeProvider,
             publishedValuesOnly,
-            StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
+            StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<ContentValueSetBuilder>>())
     {
     }
 
@@ -162,13 +189,34 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
             {
                 if (!property.PropertyType.VariesByCulture())
                 {
-                    AddPropertyValue(property, null, null, values, availableCultures);
+                    try
+                    {
+                        AddPropertyValue(property, null, null, values, availableCultures);
+                    }
+                    catch (JsonSerializationException ex)
+                    {
+                        _logger.LogError(ex, "Failed to add property '{PropertyAlias}' to index for content {ContentId}", property.Alias, c.Id);
+                        throw;
+                    }
                 }
                 else
                 {
                     foreach (var culture in c.AvailableCultures)
                     {
-                        AddPropertyValue(property, culture.ToLowerInvariant(), null, values, availableCultures);
+                        try
+                        {
+                            AddPropertyValue(property, culture.ToLowerInvariant(), null, values, availableCultures);
+                        }
+                        catch (JsonSerializationException ex)
+                        {
+                            _logger.LogError(
+                                ex,
+                                "Failed to add property '{PropertyAlias}' to index for content {ContentId} in culture {Culture}",
+                                property.Alias,
+                                c.Id,
+                                culture);
+                            throw;
+                        }
                     }
                 }
             }
