@@ -58,6 +58,7 @@
     <key alias="resendInvite">Ail-anfon Gwahoddiad</key>
     <key alias="editContent">Golygu cynnwys</key>
     <key alias="chooseWhereToImport">Dewiswch ble i fewnforio</key>
+    <key alias="toggleHideUnavailable">Cuddio opsiynau nad ydynt ar gael</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Cynnwys</key>
@@ -93,7 +94,8 @@
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Dim hawl.</key>
-    <key alias="addNew">Ychwanegu Parth newydd</key>
+    <key alias="addNew">Ychwanegu parth newydd</key>
+    <key alias="addCurrent">Ychwanegu parth cyfredol</key>
     <key alias="remove">dileu</key>
     <key alias="invalidNode">Nod annilys.</key>
     <key alias="invalidDomain">Fformat parth annilys.</key>
@@ -104,7 +106,7 @@
     <key alias="domainDeleted">Parth '%0%' wedi dileu</key>
     <key alias="domainExists">Parth '%0%' wedi neilltuo eisoes</key>
     <key alias="domainUpdated">Parth '%0%' wedi diweddaru</key>
-    <key alias="orEdit">Golygu Parthau Presennol</key>
+    <key alias="orEdit">Golygu Parthau Cyfredol</key>
     <key alias="domainHelpWithVariants">
       <![CDATA[Parthau dilys yw: "enghraifft.com", "www.enghraifft.com", "enghraifft.com:8080" neu "https://www.enghraifft.com/".
             Mae llwybrau un-lefel mewn parthau wedi'u cefnogi, e.e. "enghraifft.com/cy" neu "/cy".]]>
@@ -358,6 +360,7 @@
     <key alias="uploadNotAllowed">Ni chaniateir llwytho i fyny yn y lleoliad hwn.</key>
     <key alias="disallowedMediaType">Ni ellir lanlwytho'r ffeil yma, ni chaniateir y math cyfrwng gydag alias '%0%' yma</key>
     <key alias="invalidFileName">Ni ellir lanlwytho'r ffeil yma, nid oes ganddi enw ffeil dilys</key>
+    <key alias="fileSecurityValidationFailure">Mae un neu fwy o ddilysiadau diogelwch ffeil wedi methu</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Creu aelod newydd</key>
@@ -368,6 +371,7 @@
     <key alias="memberHasPassword">Mae gan yr aelod gyfrinair yn barod</key>
     <key alias="memberLockoutNotEnabled">Nid yw cloi allan wedi'i alluogi ar gyfer yr aelod hwn</key>
     <key alias="memberNotInGroup">Nid yw'r aelod yn y grŵp '%0%'</key>
+    <key alias="2fa">Prawf Dilysu Dau Gam</key>
   </area>
   <area alias="contentType">
     <key alias="copyFailed">Wedi methu copïo'r fath cynnwys</key>
@@ -628,6 +632,11 @@
     <key alias="processIsTakingLonger">Mae'r broses yn cymryd mwy o amser na'r disgwyl, gwiriwch y log Umbraco i weld os mae wedi bod unrhyw wall yn ystod y gweithrediad hwn</key>
     <key alias="indexCannotRebuild">Ni ellir ailadeiladu'r mynegai hwn oherwydd nad yw wedi'i aseinio</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
+
+    
+    <key alias="contentInIndex">Cynnwys yn y mynegai</key>
+    <key alias="noResults">Ni ddarganfuwyd unrhyw ganlyniadau</key>
+    <key alias="searchResultsFound">Dangos %0% - %1% o %2% canlyniad(au) - Tudalen %3% o %4%</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Darparwch eich enw defnyddiwr</key>
@@ -915,6 +924,10 @@
     <key alias="header">Pennawd</key>
     <key alias="systemField">maes system</key>
     <key alias="lastUpdated">Diweddarwyd Diwethaf</key>
+    <key alias="change">Newid</key>
+    <key alias="umbracoInfo">Gwybodaeth Umbraco</key>
+    <key alias="skipToMenu">Neidio i'r dewislen</key>
+    <key alias="skipToContent">Neidio i'r cynnwys</key>
   </area>
   <area alias="colors">
     <key alias="black">Du</key>
@@ -1238,6 +1251,8 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="2faCodeInput">Cod dilysu</key>
     <key alias="2faCodeInputHelp">Rhowch y cod dilysu os gwelwch yn dda</key>
     <key alias="2faInvalidCode">Cod annilys wedi'i nodi</key>
+    <key alias="mfaSecurityCodeSubject">Umbraco: Cod Diogelwch</key>
+    <key alias="mfaSecurityCodeMessage">Eich cod diogelwch yw: %0%</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashfwrdd</key>
@@ -1595,11 +1610,13 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="rollbackTo">Rolio yn ôl at</key>
     <key alias="selectVersion">Dewis fersiwn</key>
     <key alias="view">Gwedd</key>
-
     <key alias="pagination">Yn dangos fersiwn %0% i %1% o %2% fersiynau.</key>
     <key alias="versions">Fersiynau</key>
     <key alias="currentDraftVersion">Fersiwn drafft cyfredol</key>
     <key alias="currentPublishedVersion">Fersiwn cyhoeddedig cyfredol</key>
+    <key alias="created">Wedi creu</key>
+    <key alias="currentVersion">Fersiwn gyfredol</key>
+    <key alias="noDiff">Nid oes unrhyw wahaniaethau rhwng y fersiwn (drafft) gyfredol a'r fersiwn a ddewiswyd</key>
   </area>
   <area alias="scripts">
     <key alias="editscript">Golygu ffeil sgript</key>
@@ -1621,6 +1638,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="translation">Cyfieithiad</key>
     <key alias="users">Defnyddwyr</key>
     <key alias="analytics">Dadansoddeg</key>
+    <key alias="marketplace">Marchnad</key>
   </area>
   <area alias="help">
     <key alias="goTo">ewch i</key>
@@ -2450,6 +2468,8 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="2faProviderIsDisabledMsg">Mae'r darparwr dau-ffactor hwn bellach wedi'i analluogi</key>
     <key alias="2faProviderIsNotDisabledMsg">Aeth rhywbeth o'i le wrth geisio analluogi'r darparwr dau ffactor hwn</key>
     <key alias="2faDisableForUser">Ydych chi am analluogi'r darparwr dau ffactor hwn ar gyfer y defnyddiwr hwn?</key>
+    <key alias="emailRequired">Angenrheidiol - rhowch gyfeiriad e-bost ar gyfer y defnyddiwr hwn</key>
+    <key alias="nameRequired">Angenrheidiol - rhowch enw ar gyfer y defnyddiwr hwn</key>
   </area>
   <area alias="validation">
     <key alias="validation">Dilysiad</key>
@@ -2576,6 +2596,12 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="hSTSCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>Strict-Transport-Security</strong> wedi'i ganfod.]]></key>
     <key alias="hSTSSetHeaderInConfigDescription">Ychwanegu'r peniad 'Strict-Transport-Security' gyda'r gwerth 'max-age=10886400; preload' i'r adran httpProtocol/customHeaders o'r ffeil web.config. Defnyddiwch y trwsiad hyn dim ond os bydd gennych chi eich parthau yn rhedeg gyda https am yr 18 wythnos nesaf (o leiaf).</key>
     <key alias="hSTSSetHeaderInConfigSuccess">Mae'r peniad HSTS wedi'i ychwanegu at y ffeil web.config.</key>
+    <key alias="hSTSCheckHeaderFoundOnLocalhost">
+      <![CDATA[Darganfuwyd y pennyn <strong>Strict-Transport-Security</strong>, a elwir hefyd yn HSTS-header. <strong>Ni ddylai'r pennyn hwn fod yn bresennol ar localhost.</strong>]]>
+    </key>
+    <key alias="hSTSCheckHeaderNotFoundOnLocalhost">
+      <![CDATA[Ni ddaethpwyd o hyd i'r pennyn <strong>Strict-Transport-Security</strong>. Ni ddylai'r pennyn hwn fod yn bresennol ar localhost.]]>
+    </key>
     <key alias="xssProtectionCheckHeaderFound"><![CDATA[Mae'r peniad <strong>X-XSS-Protection</strong> wedi'i ganfod.]]></key>
     <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>X-XSS-Protection</strong> wedi'i ganfod.]]></key>
     <key alias="xssProtectionSetHeaderInConfigDescription">Ychwanegu'r peniad 'X-XSS-Protection' gyda'r gwerth '1; mode=block' at yr adran httpProtocol/customHeaders yn y ffeil web.config. </key>
@@ -2728,6 +2754,8 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="addImageCaption">Ychwanegu capsiwn am y llun</key>
     <key alias="searchContentTree">Chwilio'r coeden cynnwys</key>
     <key alias="maxAmount">Uchafswm</key>
+    <key alias="expandChildItems">Ehangu eitemau plentyn ar gyfer</key>
+    <key alias="openContextNode">Agor nod cyd-destun ar gyfer</key>
   </area>
   <area alias="references">
     <key alias="tabName">Cyfeiriadau</key>
@@ -2887,6 +2915,11 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
                 <P>Eisiau meistroli Umbraco? Treuliwch gwpl o funudau yn dysgu rhai o'r arferion gorau gan wylio un o'r fideos hyn am sut i ddefnyddio Umbraco. Ac ymweld â <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> am fwy o fideos am Umbraco</p>
             ]]>
     </key>
+    <key alias="learningBaseDescription">
+      <![CDATA[
+        <p>Eisiau meistroli Umbraco? Treuliwch ychydig funudau yn dysgu rhai arferion gorau trwy ymweld â <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">sianel Youtube Umbraco Learning Base</a>. Yma gallwch ddod o hyd i ddeunydd fideo sy'n cwmpasu sawl agwedd ar Umbraco.</p>
+      ]]>
+    </key>
     <key alias="getStarted">I roi cychwyn i chi</key>
   </area>
   <area alias="settingsDashboard">
@@ -3035,6 +3068,15 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="getSampleHeadline">Gosod Cyfluniad Sampl</key>
     <key alias="getSampleDescription">Bydd hyn yn ychwanegu Blociau sylfaenol ac yn eich helpu i ddechrau gyda'r Golygydd Grid Bloc. Fe gewch Blociau ar gyfer Pennawd, Testun Cyfoethog, Delwedd, yn ogystal â Chynllun Dwy Golofn.</key>
     <key alias="getSampleButton">Gosod</key>
+    <key alias="girdInlineEditing">Golygu mewnol</key>
+    <key alias="girdInlineEditingHelp">Yn galluogi golygu mewnol ar gyfer yr Eiddo cyntaf. Gellir golygu priodweddau ychwanegol yn y droshaen.</key>
+    <key alias="areaAllowedBlocksEmpty">Yn ddiofyn, caniateir pob math bloc mewn Ardal, Defnyddiwch yr opsiwn hwn i ganiatáu mathau dethol yn unig.</key>
+    <key alias="actionEnterSortMode">Modd trefnu</key>
+    <key alias="actionExitSortMode">Gadael modd trefnu</key>
+    <key alias="areaAliasIsNotUnique">Rhaid i'r Enw Arall, yr Ardal hwn, fod yn unigryw i gymharu ag Ardaloedd eraill yn y Bloc hwn.</key>
+    <key alias="configureArea">Ffurfweddu ardal</key>
+    <key alias="deleteArea">Dileu ardal</key>
+    <key alias="addColumnSpanOption">Ychwanegu opsiwn rhychwantu %0% colofn</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Beth yw Templedi Gynnwys</key>
