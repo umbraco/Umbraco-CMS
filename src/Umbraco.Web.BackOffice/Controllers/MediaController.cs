@@ -64,6 +64,7 @@ public class MediaController : ContentControllerBase
     private readonly ILogger<MediaController> _logger;
     private readonly IMediaService _mediaService;
     private readonly IMediaTypeService _mediaTypeService;
+    private readonly IRelationService _relationService;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ISqlContext _sqlContext;
     private readonly IUmbracoMapper _umbracoMapper;
@@ -84,6 +85,7 @@ public class MediaController : ContentControllerBase
         IDataTypeService dataTypeService,
         ISqlContext sqlContext,
         IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+        IRelationService relationService,
         PropertyEditorCollection propertyEditors,
         MediaFileManager mediaFileManager,
         MediaUrlGeneratorCollection mediaUrlGenerators,
@@ -106,6 +108,7 @@ public class MediaController : ContentControllerBase
         _localizedTextService = localizedTextService;
         _sqlContext = sqlContext;
         _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+        _relationService = relationService;
         _propertyEditors = propertyEditors;
         _mediaFileManager = mediaFileManager;
         _mediaUrlGenerators = mediaUrlGenerators;
@@ -155,6 +158,7 @@ public class MediaController : ContentControllerBase
         _localizedTextService = localizedTextService;
         _sqlContext = sqlContext;
         _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+        _relationService = relationService;
         _propertyEditors = propertyEditors;
         _mediaFileManager = mediaFileManager;
         _mediaUrlGenerators = mediaUrlGenerators;
