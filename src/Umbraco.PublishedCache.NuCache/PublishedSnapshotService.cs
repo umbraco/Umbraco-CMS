@@ -59,10 +59,11 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
     private SnapDictionary<int, Domain> _domainStore = null!;
     private IAppCache? _elementsCache;
 
-    private bool _mainDomRegistered;
     private bool _isReadSet;
     private bool _isReady;
     private object? _isReadyLock;
+
+    private bool _mainDomRegistered;
 
     private BPlusTree<int, ContentNodeKit>? _localContentDb;
     private bool _localContentDbExists;
@@ -495,7 +496,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
 
                 if (!_options.IgnoreLocalDb)
                 {
-                    if (Volatile.Read(ref _mainDomRegistered) == false)
+                    if (!_mainDomRegistered)
                     {
                         _mainDom.Register(MainDomRegister, MainDomRelease);
                     }
