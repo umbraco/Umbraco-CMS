@@ -442,7 +442,7 @@ public class MediaController : ContentControllerBase
         // Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
         // To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
         // uploaded files to being *only* the actual file name (as it should be).
-        if (contentItem.UploadedFiles.Any())
+        if (contentItem.UploadedFiles != null && contentItem.UploadedFiles.Any())
         {
             foreach (ContentPropertyFile file in contentItem.UploadedFiles)
             {
@@ -458,7 +458,7 @@ public class MediaController : ContentControllerBase
         // * Permissions are valid
 
         // Don't update the name if it is empty
-        if (contentItem.Name.IsNullOrWhiteSpace() == false)
+        if (contentItem.Name.IsNullOrWhiteSpace() == false && contentItem.PersistedContent is not null)
         {
             contentItem.PersistedContent.Name = contentItem.Name;
         }
@@ -482,6 +482,11 @@ public class MediaController : ContentControllerBase
                 MediaItemDisplay? forDisplay = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
                 return ValidationProblem(forDisplay, ModelState);
             }
+        }
+
+        if (contentItem.PersistedContent is null)
+        {
+            return null;
         }
 
         // save the item
@@ -547,6 +552,11 @@ public class MediaController : ContentControllerBase
     /// <returns></returns>
     public async Task<IActionResult> PostSort(ContentSortOrder sorted)
     {
+        if (sorted == null)
+        {
+            return NotFound();
+        }
+
         // if there's nothing to sort just return ok
         if (sorted.IdSortOrder?.Length == 0)
         {
@@ -629,7 +639,7 @@ public class MediaController : ContentControllerBase
             Directory.CreateDirectory(root);
 
             // must have a file
-            if (file.Count == 0)
+            if (file is null || file.Count == 0)
             {
                 _postAddFileSemaphore.Release();
                 return NotFound("No file was uploaded");
@@ -815,8 +825,8 @@ public class MediaController : ContentControllerBase
                                 continue;
                             }
 
-                            List<FileExtensionConfigItem> fileExtensions = fileExtensionsConfig.FileExtensions;
-                            if (fileExtensions.All(x => x.Value != ext))
+                            List<FileExtensionConfigItem>? fileExtensions = fileExtensionsConfig.FileExtensions;
+                            if (fileExtensions == null || fileExtensions.All(x => x.Value != ext))
                             {
                                 continue;
                             }
@@ -1021,6 +1031,12 @@ public class MediaController : ContentControllerBase
     /// <returns></returns>
     private ActionResult<IMedia> ValidateMoveOrCopy(MoveOrCopy model)
     {
+        if (model == null)
+        {
+            return NotFound();
+        }
+
+
         IMedia? toMove = _mediaService.GetById(model.Id);
         if (toMove == null)
         {
@@ -1070,6 +1086,8 @@ public class MediaController : ContentControllerBase
 
         return new ActionResult<IMedia>(toMove);
     }
+
+    #region GetChildren
 
     private int[]? _userStartNodes;
     private readonly PropertyEditorCollection _propertyEditors;
@@ -1232,4 +1250,6 @@ public class MediaController : ContentControllerBase
 
         return NotFound();
     }
+
+    #endregion
 }
