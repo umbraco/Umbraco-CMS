@@ -83,7 +83,8 @@ public class IndexInitializer
             _shortStringHelper,
             _scopeProvider,
             publishedValuesOnly,
-            _localizationService);
+            _localizationService,
+             _loggerFactory.CreateLogger<ContentValueSetBuilder>());
 
         return contentValueSetBuilder;
     }
