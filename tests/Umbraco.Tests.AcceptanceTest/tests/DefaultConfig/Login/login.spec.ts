@@ -67,7 +67,7 @@ test.describe('Login', () => {
     await expect(passwordField).toBeVisible();
   });
 
-  test.only('Ensure show/hide password button works', async ({page}) => {
+  test('Ensure show/hide password button works', async ({page}) => {
 
     // Precondition
     let error = page.locator('.text-error');
