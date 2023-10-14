@@ -896,7 +896,7 @@
     <key alias="databaseHeader">Ffurfwedd gronfa ddata</key>
     <key alias="licenseText">Trwy glicio ar y botwm nesaf (neu addasu'r umbracoConfigurationStatus yn web.config), rydych chi'n derbyn y drwydded ar gyfer y feddalwedd hon fel y nodir yn y blwch isod. Sylwch fod y dosbarthiad Umbraco hwn yn cynnwys dwy drwydded wahanol, y drwydded MIT ffynhonnell agored ar gyfer y fframwaith a thrwydded radwedd Umbraco sy'n cwmpasu'r UI.</key>
     <key alias="theEndInstallFailed">To finish the installation, you'll need to manually edit the
-     &lt;strong&gt;/web.config file&lt;/strong&gt; a diweddaru'r allwedd AppSetting &lt;strong&gt;UmbracoConfigurationStatus&lt;/strong&gt; yn y gwaelod i'r werth &lt;strong&gt;'%0%'&lt;/strong&gt;.
+     <strong>/web.config file</strong> a diweddaru'r allwedd AppSetting <strong>UmbracoConfigurationStatus</strong> yn y gwaelod i'r werth <strong>'%0%'</strong>.
     </key>
     <key alias="databaseInstall">
       <![CDATA[
@@ -1728,7 +1728,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="ascending">esgynnol</key>
     <key alias="descending">disgynnol</key>
     <key alias="template">Templed</key>
-    <key alias="runtimeModeProduction">Nid oes modd golygu cynnwys wrth ddefnyddio modd amser rhedeg &lt;code&gt;Production&lt;/code&gt;.</key>
+    <key alias="runtimeModeProduction">Nid oes modd golygu cynnwys wrth ddefnyddio modd amser rhedeg <code>Production</code>.</key>
   </area>
   <area alias="grid">
     <key alias="media">Llun</key>
@@ -1773,7 +1773,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="warning">Rhybudd</key>
     <key alias="youAreDeleting">Rydych chi'n dileu'r ffurfwedd rhes</key>
     <key alias="deletingARow">Bydd dileu enw ffurfwedd rhes yn arwain at golli data ar gyfer unrhyw gynnwys cynfodol sy'n seiliedig ar ffurfwedd hwn.</key>
-    <key alias="warningText">&lt;p&gt;Bydd addasu enw cyfluniad rhes yn arwain at golli data ar gyfer unrhyw gynnwys presennol sy'n seiliedig ar y ffurfweddiad hwn.&lt;/p&gt; &lt;p&gt;&lt;strong&gt;Ni fydd addasu'r label yn unig yn arwain at golli data.&lt;/strong&gt;&lt;/p&gt;</key>
+    <key alias="warningText"><p>Bydd addasu enw cyfluniad rhes yn arwain at golli data ar gyfer unrhyw gynnwys presennol sy'n seiliedig ar y ffurfweddiad hwn.</p> <p><strong>Ni fydd addasu'r label yn unig yn arwain at golli data.</strong></p></key>
     <key alias="deleteLayout">Rydych chi'n dileu'r gosodiad</key>
     <key alias="deletingALayout">Bydd addasu cynllun yn arwain at golli data ar gyfer unrhyw gynnwys presennol sy'n seiliedig ar y ffurfweddiad hwn.</key>
   </area>
@@ -1847,9 +1847,9 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="propertyHasChanges">Rydych wedi gwneud newidiadau i'r eiddo hwn. Ydych chi'n siŵr eich bod chi am eu taflu?</key>
     <key alias="displaySettingsHeadline">Ymddangosiad</key>
     <key alias="displaySettingsLabelOnTop">Label uwchben (lled-llawn)</key>
-    <key alias="confirmDeleteTabMessage">Ydych chi'n siŵr eich bod chi am ddileu'r tab &lt;strong&gt;%0%&lt;/strong&gt;?</key>
-    <key alias="confirmDeleteGroupMessage">Ydych chi'n siŵr eich bod chi am ddileu'r tab grŵp &lt;strong&gt;%0%&lt;/strong&gt;?</key>
-    <key alias="confirmDeletePropertyMessage">Ydych chi'n siŵr eich bod chi am ddileu'r eiddo &lt;strong&gt;%0%&lt;/strong&gt;?</key>
+    <key alias="confirmDeleteTabMessage">Ydych chi'n siŵr eich bod chi am ddileu'r tab <strong>%0%</strong>?</key>
+    <key alias="confirmDeleteGroupMessage">Ydych chi'n siŵr eich bod chi am ddileu'r tab grŵp <strong>%0%</strong>?</key>
+    <key alias="confirmDeletePropertyMessage">Ydych chi'n siŵr eich bod chi am ddileu'r eiddo <strong>%0%</strong>?</key>
     <key alias="confirmDeleteTabNotice">Bydd hyn hefyd yn dileu'r holl eitemau o dan y tab hwn.</key>
     <key alias="confirmDeleteGroupNotice">Bydd hyn hefyd yn dileu'r holl eitemau o dan y grŵp hwn.</key>
     <key alias="addTab">Ychwanegu tab</key>
@@ -1864,7 +1864,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="historyCleanupKeepLatestVersionPerDayForDays">Cadwch y fersiwn diweddaraf y dydd am ddyddiau</key>
     <key alias="historyCleanupPreventCleanup">Atal glanhau</key>
     <key alias="historyCleanupEnableCleanup">Galluogi glanhau</key>
-    <key alias="historyCleanupGloballyDisabled">&lt;strong&gt;NODYN!&lt;/strong&gt; Mae glanhau fersiynau cynnwys hanesyddol wedi'u hanalluogi'n fyd-eang. Ni fydd y gosodiadau hyn yn dod i rym cyn iddo gael ei alluogi.</key>
+    <key alias="historyCleanupGloballyDisabled"><strong>NODYN!</strong> Mae glanhau fersiynau cynnwys hanesyddol wedi'u hanalluogi'n fyd-eang. Ni fydd y gosodiadau hyn yn dod i rym cyn iddo gael ei alluogi.</key>
     <key alias="changeDataTypeHelpText">Mae newid math o ddata gyda gwerthoedd storio wedi'i analluogi. I ganiatáu hyn gallwch newid y gosodiad Umbraco:CMS:DataTypes:CanBeChanged yn appssettings.json.</key>
   </area>
   <area alias="languages">
@@ -1880,9 +1880,9 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="fallbackLanguage">Iaith cwympo yn ôl</key>
     <key alias="none">dim</key>
     <key alias="culture">Cod ISO</key>
-    <key alias="invariantPropertyUnlockHelp">&lt;strong&gt;%0%&lt;/strong&gt; yn cael ei rannu ar draws ieithoedd a segmentau.</key>
-    <key alias="invariantCulturePropertyUnlockHelp">&lt;strong&gt;%0%&lt;/strong&gt; yn cael ei rannu ar draws pob iaith.</key>
-    <key alias="invariantSegmentPropertyUnlockHelp">&lt;strong&gt;%0%&lt;/strong&gt; yn cael ei rannu ar draws pob segment.</key>
+    <key alias="invariantPropertyUnlockHelp"><strong>%0%</strong> yn cael ei rannu ar draws ieithoedd a segmentau.</key>
+    <key alias="invariantCulturePropertyUnlockHelp"><strong>%0%</strong> yn cael ei rannu ar draws pob iaith.</key>
+    <key alias="invariantSegmentPropertyUnlockHelp"><strong>%0%</strong> yn cael ei rannu ar draws pob segment.</key>
     <key alias="invariantLanguageProperty">Wedi'i rannu: Ieithoedd</key>
     <key alias="invariantSegmentProperty">Wedi'i rannu: Segments</key>
   </area>
@@ -2340,7 +2340,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     </key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">Mae gosodiad ap 'Umbraco:CMS:Global:UseHttps' wedi'i osod i 'false' yn eich ffeil appSettings.json. Unwaith y byddwch yn cyrchu'r wefan hon gan ddefnyddio'r cynllun HTTPS, dylid gosod hwnnw i 'true'.</key>
     <key alias="httpsCheckConfigurationCheckResult">Mae'r gosodiad ap 'Umbraco:CMS:Global:UseHttps' wedi'i osod i '%0%' yn eich ffeil appSettings.json, mae eich cwcis %1% wedi'u marcio'n ddiogel.</key>
-    <key alias="umbracoApplicationUrlCheckResultTrue">Mae gosodiad yr ap 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' wedi'i osod i &lt;strong&gt;%0%&lt;/strong&gt;.</key>
+    <key alias="umbracoApplicationUrlCheckResultTrue">Mae gosodiad yr ap 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' wedi'i osod i <strong>%0%</strong>.</key>
     <key alias="umbracoApplicationUrlCheckResultFalse">Nid yw gosodiad ap 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' wedi'i osod.</key>
     <key alias="smtpMailSettingsNotFound">Nid oedd modd dod o hyd i'r ffurfweddiad 'Umbraco:CMS:Global:Smtp'.</key>
     <key alias="smtpMailSettingsHostNotConfigured">Nid oedd modd dod o hyd i'r ffurfweddiad 'Umbraco:CMS:Global:Smtp:Host'.</key>
@@ -2595,7 +2595,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="reminderDescription">
       <![CDATA[
             <p>
-                Ni ddylech chi fyth adael i safle cynhyrchu redeg yn y modd dadfygio. Mae'r modd dadfygio yn gallu cael ei diffodd trwy ychwanegu'r gosodiad <strong>debug="false"</strong> ar yr elfen <strong>&lt;grynhoi /&gt;</strong> yn web.config.
+                Ni ddylech chi fyth adael i safle cynhyrchu redeg yn y modd dadfygio. Mae'r modd dadfygio yn gallu cael ei diffodd trwy ychwanegu'r gosodiad <strong>debug="false"</strong> ar yr elfen <strong>grynhoi</strong> yn web.config.
             </p>
         ]]>
     </key>
@@ -2605,7 +2605,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
                 Mae Umbraco ddim yn rhedeg mewn modd dadfygio ar hyn o bryd, felly nid allwch chi ddefnyddio'r proffiliwer adeiledig. Dyma sut y dylai fod ar gyfer safle cynhyrchu.
             </p>
             <p>
-                Mae'r modd dadfygio yn gallu cael ei throi arno gan ychwanegu'r gosodiad <strong>debug="true"</strong> ar yr elfen <strong>&lt;grynhoi /&gt;</strong> yn web.config.
+                Mae'r modd dadfygio yn gallu cael ei throi arno gan ychwanegu'r gosodiad <strong>debug="true"</strong> ar yr elfen <strong>grynhoi</strong> yn web.config.
             </p>
         ]]>
     </key>
@@ -2699,15 +2699,15 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="addBlock">Ychwanegu cynnwys</key>
     <key alias="addThis">Ychwanegu %0%</key>
     <key alias="propertyEditorNotSupported">Priodwedd '%0%' yn defnyddio'r golygydd '%1%' sydd ddim yn cael ei gefnogi mewn blociau.</key>
-    <key alias="confirmDeleteBlockGroupMessage">Ydych chi'n siŵr eich bod am ddileu grŵp &lt;strong&gt;%0%&lt;/strong&gt; and all the Block configurations of this?</key>
+    <key alias="confirmDeleteBlockGroupMessage">Ydych chi'n siŵr eich bod am ddileu grŵp <strong>%0%</strong> and all the Block configurations of this?</key>
     <key alias="confirmDeleteBlockGroupNotice">Bydd cynnwys y Blociau hyn yn dal i fod yn bresennol, ni fydd golygu'r cynnwys hwn ar gael mwyach a bydd yn cael ei ddangos fel cynnwys heb ei gefnogi.</key>
     <key alias="elementTypeDoesNotExist">Nid oes modd ei olygu oherwydd nad yw ElementType yn bodoli.</key>
     <key alias="forceHideContentEditorHelp">Cuddiwch y botwm golygu cynnwys a'r golygydd cynnwys rhag troshaen y Golygydd Bloc</key>
     <key alias="focusParentBlock">Gosod ffocws ar y bloc cynhwysydd</key>
     <key alias="areaIdentification">Adnabyddiaeth</key>
     <key alias="areaValidation">Dilysiad</key>
-    <key alias="areaValidationEntriesShort">&lt;strong&gt;%0%&lt;/strong&gt; rhaid bod yn bresennol o leiaf &lt;strong&gt;%2%&lt;/strong&gt; time(s).</key>
-    <key alias="areaValidationEntriesExceed">&lt;strong&gt;%0%&lt;/strong&gt; rhaid i'r uchafswm fod yn bresennol &lt;strong&gt;%3%&lt;/strong&gt; time(s).</key>
+    <key alias="areaValidationEntriesShort"><strong>%0%</strong> rhaid bod yn bresennol o leiaf <strong>%2%</strong> time(s).</key>
+    <key alias="areaValidationEntriesExceed"><strong>%0%</strong> rhaid i'r uchafswm fod yn bresennol <strong>%3%</strong> time(s).</key>
     <key alias="areaNumberOfBlocks">Nifer y blociau</key>
     <key alias="areaDisallowAllBlocks">Dim ond yn caniatáu mathau penodol o flociau</key>
     <key alias="areaAllowedBlocks">Mathau o flociau a ganiateir</key>
@@ -2731,7 +2731,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="areasLayoutColumnsHelp">Diffiniwch faint o golofnau fydd ar gael ar gyfer ardaloedd. Os na chaiff ei ddiffinio, bydd nifer y colofnau a ddiffinnir ar gyfer y cynllun cyfan yn cael eu defnyddio.</key>
     <key alias="areasConfigurations">Ardaloedd</key>
     <key alias="areasConfigurationsHelp">Er mwyn galluogi blociau i nythu o fewn y bloc hwn, diffiniwch un neu fwy o ardaloedd ar gyfer blociau i nythu ynddynt. Ardaloedd yn dilyn eu cynllun eu hunain gwrach ei ddiffinio gan y Colofnau Grid ar gyfer Ardaloedd. Gellir addasu rhychwant pob colofn Ardal a rhychwant rhes trwy ddefnyddio'r teclyn trin graddfa yn y gornel dde isaf.</key>
-    <key alias="invalidDropPosition">&lt;strong&gt;%0%&lt;/strong&gt; ni chaniateir yn y fan hon.</key>
+    <key alias="invalidDropPosition"><strong>%0%</strong> ni chaniateir yn y fan hon.</key>
     <key alias="defaultLayoutStylesheet">Taflen arddull gosodiad diofyn</key>
     <key alias="confirmPasteDisallowedNestedBlockHeadline">Gwrthodwyd cynnwys a wrthodwyd</key>
     <key alias="confirmPasteDisallowedNestedBlockMessage">Roedd y cynnwys a fewnosodwyd yn cynnwys cynnwys na caniateir, nad yw wedi'i greu. Hoffech chi gadw gweddill y cynnwys hwn beth bynnag?</key>
@@ -2810,24 +2810,24 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="analyticsLevelSavedSuccess">Lefel telemetreg wedi'i chadw!</key>
     <key alias="analyticsDescription">
       Er mwyn gwella Umbraco ac ychwanegu swyddogaethau newydd yn seiliedig ar wybodaeth mor berthnasol â phosibl,
-          &lt;br&gt;hoffem gasglu gwybodaeth system a defnydd o'ch gosodiad.
-          &lt;br&gt;Bydd data cyfanredol yn cael ei rannu'n rheolaidd yn ogystal â'r hyn a ddysgir o'r metrigau hyn.
-          &lt;br&gt;Gobeithio y byddwch yn ein helpu i gasglu rhywfaint o ddata gwerthfawr.
-          &lt;br&gt;
-          &lt;br&gt;&lt;strong&gt;NI FYDDWN&lt;/strong&gt; yn casglu unrhyw ddata personol megis cynnwys, cod, gwybodaeth defnyddiwr, a bydd yr holl ddata yn gwbl ddienw.
+          <br />hoffem gasglu gwybodaeth system a defnydd o'ch gosodiad.
+          <br />Bydd data cyfanredol yn cael ei rannu'n rheolaidd yn ogystal â'r hyn a ddysgir o'r metrigau hyn.
+          <br />Gobeithio y byddwch yn ein helpu i gasglu rhywfaint o ddata gwerthfawr.
+          <br />
+          <br /><strong>NI FYDDWN</strong> yn casglu unrhyw ddata personol megis cynnwys, cod, gwybodaeth defnyddiwr, a bydd yr holl ddata yn gwbl ddienw.
        </key>
     <key alias="minimalLevelDescription">Byddwn ond yn anfon ID safle dienw i roi gwybod i ni bod y wefan yn bodoli.</key>
     <key alias="basicLevelDescription">Byddwn yn anfon ID safle dienw, fersiwn Umbraco, a phecynnau wedi'u gosod</key>
     <key alias="detailedLevelDescription">
           Byddwn yn anfon:
-          &lt;ul&gt;
-            &lt;li&gt;ID safle dienw, fersiwn Umbraco, a phecynnau wedi'u gosod.&lt;/li&gt;
-            &lt;li&gt;Nifer o: Nodau gwraidd, Nodau Cynnwys, Macros, Cyfryngau, Mathau o Ddogfen, Templedi, Ieithoedd, Parthau, Grŵp Defnyddwyr, Defnyddwyr, Aelodau, a Golygyddion Eiddo a ddefnyddir.&lt;/li&gt;
-            &lt;li&gt;Gwybodaeth system: Webserver, gweinydd OS, fframwaith gweinydd, iaith gweinyddwr OS, a darparwr cronfa ddata.&lt;/li&gt;
-            &lt;li&gt;Gosodiadau cyfluniad: Modd Modelsbuilder, os oes llwybr Umbraco arferol yn bodoli, amgylchedd ASP, ac os ydych chi yn y modd dadfygio.&lt;/li&gt;
-          &lt;/ul&gt;
-          &lt;em&gt;Efallai y byddwn yn newid yr hyn a anfonwn ar y lefel Fanwl yn y dyfodol. Os felly, fe'i rhestrir uchod.
-          &lt;br&gt;Drwy ddewis "Manwl" rydych yn cytuno i wybodaeth ddienw yn awr ac yn y dyfodol gael ei chasglu.&lt;/em&gt;
+          <ul>
+            <li>ID safle dienw, fersiwn Umbraco, a phecynnau wedi'u gosod.</li>
+            <li>Nifer o: Nodau gwraidd, Nodau Cynnwys, Macros, Cyfryngau, Mathau o Ddogfen, Templedi, Ieithoedd, Parthau, Grŵp Defnyddwyr, Defnyddwyr, Aelodau, a Golygyddion Eiddo a ddefnyddir.</li>
+            <li>Gwybodaeth system: Webserver, gweinydd OS, fframwaith gweinydd, iaith gweinyddwr OS, a darparwr cronfa ddata.</li>
+            <li>Gosodiadau cyfluniad: Modd Modelsbuilder, os oes llwybr Umbraco arferol yn bodoli, amgylchedd ASP, ac os ydych chi yn y modd dadfygio.</li>
+          </ul>
+          <em>Efallai y byddwn yn newid yr hyn a anfonwn ar y lefel Fanwl yn y dyfodol. Os felly, fe'i rhestrir uchod.
+          <br />Drwy ddewis "Manwl" rydych yn cytuno i wybodaeth ddienw yn awr ac yn y dyfodol gael ei chasglu.</em>
        </key>
   </area>
 </language>
