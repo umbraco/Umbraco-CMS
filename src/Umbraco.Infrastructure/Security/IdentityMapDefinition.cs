@@ -113,7 +113,7 @@ public class IdentityMapDefinition : IMapDefinition
         target.IsApproved = source.IsApproved;
         target.SecurityStamp = source.SecurityStamp;
         DateTime? lockedOutUntil = source.LastLockoutDate?.AddMinutes(_securitySettings.UserDefaultLockoutTimeInMinutes);
-        target.LockoutEnd = source.IsLockedOut ? source.LastLockoutDate.HasValue ? lockedOutUntil?.ToUniversalTime() : DateTime.MaxValue.ToUniversalTime() : null;
+        target.LockoutEnd = source.IsLockedOut ? (lockedOutUntil ?? DateTime.MaxValue).ToUniversalTime() : null;
     }
 
     // Umbraco.Code.MapAll -Id -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -ConcurrencyStamp -NormalizedEmail -NormalizedUserName -Roles
@@ -131,7 +131,7 @@ public class IdentityMapDefinition : IMapDefinition
         target.IsApproved = source.IsApproved;
         target.SecurityStamp = source.SecurityStamp;
         DateTime? lockedOutUntil = source.LastLockoutDate?.AddMinutes(_securitySettings.UserDefaultLockoutTimeInMinutes);
-        target.LockoutEnd = source.IsLockedOut ? source.LastLockoutDate.HasValue ? lockedOutUntil?.ToUniversalTime() : DateTime.MaxValue.ToUniversalTime() : null;
+        target.LockoutEnd = source.IsLockedOut ? (lockedOutUntil ?? DateTime.MaxValue).ToUniversalTime() : null;
         target.Comments = source.Comments;
         target.LastLockoutDateUtc = source.LastLockoutDate == DateTime.MinValue
             ? null
