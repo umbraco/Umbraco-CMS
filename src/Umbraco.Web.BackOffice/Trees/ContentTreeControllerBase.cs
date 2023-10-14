@@ -429,6 +429,24 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
             return nodes ?? new TreeNodeCollection();
         }
 
+        // if we're rendering the root and people don't have access to the root still grant them access to the recycle bin
+        else if (id == Constants.System.RootString && !UserStartNodes.Contains(Constants.System.Root))
+        {
+            var nodes = new TreeNodeCollection();
+
+            nodes?.Add(CreateTreeNode(
+                    RecycleBinId.ToInvariantString(),
+                    id,
+                    queryStrings,
+                    LocalizedTextService.Localize("general", "recycleBin"),
+                    "icon-trash",
+                    RecycleBinSmells,
+                    queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') +
+                    "/recyclebin"));
+
+            return nodes ?? new TreeNodeCollection();
+        }
+
         return GetTreeNodesInternal(id, queryStrings);
     }
 
