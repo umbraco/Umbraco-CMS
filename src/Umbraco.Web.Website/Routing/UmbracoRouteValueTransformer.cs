@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -166,11 +167,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
             return null!;
         }
 
-        // Don't execute if there are already UmbracoRouteValues assigned.
-        // This can occur if someone else is dynamically routing and in which case we don't want to overwrite
-        // the routing work being done there.
-        UmbracoRouteValues? umbracoRouteValues = httpContext.Features.Get<UmbracoRouteValues>();
-        if (umbracoRouteValues != null)
+        if (CheckActiveDynamicRoutingAndNoException(httpContext))
         {
             return null!;
         }
@@ -198,7 +195,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
 
         IPublishedRequest publishedRequest = await RouteRequestAsync(umbracoContext);
 
-        umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);
+        UmbracoRouteValues? umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);
 
         // now we need to do some public access checks
         umbracoRouteValues =
@@ -241,6 +238,30 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         }
 
         return newValues;
+    }
+
+    /// <summary>
+    ///     Check whether dynamic routing is currently active in an request where no exception has occured.
+    /// </summary>
+    /// <returns>[true] if dynamic routing is active, [false] if inactive or an exception has occured.</returns>
+    private static bool CheckActiveDynamicRoutingAndNoException(HttpContext httpContext)
+    {
+        // Don't execute if there are already UmbracoRouteValues assigned.
+        // This can occur if someone else is dynamically routing and in which case we don't want to overwrite
+        // the routing work being done there.
+        UmbracoRouteValues? umbracoRouteValues = httpContext.Features.Get<UmbracoRouteValues>();
+
+        // No dynamic routing is active currently.
+        if (umbracoRouteValues == null)
+        {
+            return false;
+        }
+
+        // There is dynamic routing active so we have to check whether an exception occured in the current request.
+        // If this is the case we do want dynamic routing since it might be an Umbraco content page which is used as an error page.
+        IExceptionHandlerFeature? exceptionHandlerFeature = httpContext.Features.Get<IExceptionHandlerFeature>();
+
+        return exceptionHandlerFeature == null;
     }
 
     private async Task<IPublishedRequest> RouteRequestAsync(IUmbracoContext umbracoContext)
