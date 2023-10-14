@@ -1,7 +1,7 @@
 <div id="leftcolumn" ng-controller="Umbraco.NavigationController" ng-mouseleave="leaveTree($event)" ng-mouseenter="enterTree($event)" on-outside-click="onOutsideClick()">
 
     <!-- navigation container -->
-    <div id="navigation" ng-show="showNavigation" class="fill umb-modalcolumn" ng-animate="'slide'" nav-resize
+    <nav role="navigation" id="navigation" ng-show="showNavigation" class="fill umb-modalcolumn" ng-animate="'slide'" nav-resize
     ng-class="{'--notInFront': infiniteMode}">
 
         <div class="navigation-inner-container">
@@ -64,6 +64,6 @@
 
         <div class="umb-editor__overlay"></div>
 
-    </div>
+    </nav>
 
 </div>
