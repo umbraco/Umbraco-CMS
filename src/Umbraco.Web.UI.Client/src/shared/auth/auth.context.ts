@@ -5,7 +5,7 @@ import { UserResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { ReplaySubject } from '@umbraco-cms/backoffice/external/rxjs';
+import { ReplaySubject, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbAuthContext implements IUmbAuth {
 	#currentUser = new UmbObjectState<UmbLoggedInUser | undefined>(undefined);
@@ -45,5 +45,10 @@ export class UmbAuthContext implements IUmbAuth {
 
 	signOut(): Promise<void> {
 		return this.#authFlow.signOut();
+	}
+
+	async isUserCurrentUser(userId: string): Promise<boolean> {
+		const currentUser = await firstValueFrom(this.currentUser);
+		return currentUser?.id === userId;
 	}
 }

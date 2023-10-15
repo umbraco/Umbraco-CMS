@@ -37,4 +37,9 @@ export interface IUmbAuth {
 	 * Sign out the current user.
 	 */
 	signOut(): Promise<void>;
+
+	/**
+	 * Check if the given user is the current user.
+	 */
+	isUserCurrentUser(userId: string): Promise<boolean>;
 }
