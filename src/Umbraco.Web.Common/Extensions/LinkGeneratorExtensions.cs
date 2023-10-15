@@ -68,7 +68,20 @@ public static class LinkGeneratorExtensions
                                              " or the result ");
         }
 
-        return linkGenerator.GetUmbracoApiService<T>(method.Name)?.TrimEnd(method.Name);
+        var url = linkGenerator.GetUmbracoApiService<T>(method.Name)?.TrimEnd(method.Name);
+
+        // if there's a Route attribute on the action method, strip its value too
+        var routeAttr = method
+            .GetCustomAttributes(typeof(RouteAttribute), false)
+            .OfType<RouteAttribute>()
+            .FirstOrDefault();
+
+        if (routeAttr != null)
+        {
+            url = url?.TrimEnd(routeAttr.Template);
+        }
+
+        return url;
     }
 
     /// <summary>
