@@ -2,8 +2,7 @@ import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeElement } from '../../../tree/tree.element.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbTreePickerModalData, UmbPickerModalResult } from '@umbraco-cms/backoffice/modal';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbTreePickerModalData, UmbPickerModalResult, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-tree-picker-modal')

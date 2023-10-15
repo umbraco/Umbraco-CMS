@@ -1,8 +1,8 @@
 import type { UmbUserGroupRepository } from '../../repository/user-group.repository.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -37,7 +37,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 				} catch (error) {
 					throw new Error('Could not create repository with alias: Umb.Repository.User');
 				}
-			}
+			},
 		);
 	}
 
@@ -75,7 +75,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 								?selected=${this.#selectionManager.isSelected(item.id!)}>
 								<uui-icon .name=${item.icon} slot="icon"></uui-icon>
 							</uui-menu-item>
-						`
+						`,
 					)}
 				</uui-box>
 				<div slot="actions">

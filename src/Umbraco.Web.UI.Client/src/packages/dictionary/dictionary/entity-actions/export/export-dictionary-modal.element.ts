@@ -1,7 +1,10 @@
 import { html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { UmbExportDictionaryModalData, UmbExportDictionaryModalResult } from '@umbraco-cms/backoffice/modal';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import {
+	UmbExportDictionaryModalData,
+	UmbExportDictionaryModalResult,
+	UmbModalBaseElement,
+} from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-export-dictionary-modal')
 export class UmbExportDictionaryModalElement extends UmbModalBaseElement<

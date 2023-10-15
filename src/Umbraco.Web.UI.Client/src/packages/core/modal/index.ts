@@ -4,3 +4,4 @@ export * from './modal-route-registration.js';
 export * from './modal-route-registration.controller.js';
 export * from './token/index.js';
 export * from './modal.interfaces.js';
+export * from './modal-element.element.js';

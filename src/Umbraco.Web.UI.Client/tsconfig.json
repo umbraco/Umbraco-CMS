@@ -111,7 +111,6 @@
 			"@umbraco-cms/backoffice/css": ["src/shared/css/custom-properties.css"],
 
 			"@umbraco-cms/internal/lit-element": ["src/shared/lit-element"],
-			"@umbraco-cms/internal/modal": ["src/shared/modal"],
 			"@umbraco-cms/internal/test-utils": ["utils/test-utils.ts"]
 		}
 	},
