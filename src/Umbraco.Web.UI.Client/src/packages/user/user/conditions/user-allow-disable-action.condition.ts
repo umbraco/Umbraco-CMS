@@ -9,6 +9,7 @@ import {
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { isCurrentUser } from '@umbraco-cms/backoffice/current-user';
 
 export class UmbUserAllowDisableActionCondition extends UmbBaseController implements UmbExtensionCondition {
 	config: UmbConditionConfigBase;
@@ -26,7 +27,14 @@ export class UmbUserAllowDisableActionCondition extends UmbBaseController implem
 		});
 	}
 
-	onUserDataChange(user: UmbUserDetail | undefined) {
+	async onUserDataChange(user: UmbUserDetail | undefined) {
+		// don't allow the current user to disable themselves
+		if (!user || !user.id || (await isCurrentUser(this._host, user.id))) {
+			this.permitted = false;
+			this.#onChange();
+			return;
+		}
+
 		this.permitted = user?.state !== UserStateModel.DISABLED;
 		this.#onChange();
 	}

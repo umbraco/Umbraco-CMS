@@ -2,6 +2,7 @@ import { UmbUserDetail } from '../types.js';
 import { UmbUserWorkspaceContext } from '../workspace/user-workspace.context.js';
 import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/controller-api';
+import { isCurrentUser } from '@umbraco-cms/backoffice/current-user';
 import {
 	ManifestCondition,
 	UmbConditionConfigBase,
@@ -26,7 +27,14 @@ export class UmbUserAllowEnableActionCondition extends UmbBaseController impleme
 		});
 	}
 
-	onUserDataChange(user: UmbUserDetail | undefined) {
+	async onUserDataChange(user: UmbUserDetail | undefined) {
+		// don't allow the current user to enable themselves
+		if (!user || !user.id || (await isCurrentUser(this._host, user.id))) {
+			this.permitted = false;
+			this.#onChange();
+			return;
+		}
+
 		this.permitted = user?.state === UserStateModel.DISABLED;
 		this.#onChange();
 	}
