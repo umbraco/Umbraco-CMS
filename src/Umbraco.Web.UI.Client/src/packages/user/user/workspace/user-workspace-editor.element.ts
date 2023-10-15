@@ -1,22 +1,11 @@
 import { getDisplayStateFromUserStatus } from '../../utils.js';
 import { UMB_USER_ENTITY_TYPE, type UmbUserDetail } from '../index.js';
 import { UmbUserWorkspaceContext } from './user-workspace.context.js';
-import { UmbUserRepository } from '@umbraco-cms/backoffice/user';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import {
-	css,
-	html,
-	nothing,
-	TemplateResult,
-	customElement,
-	state,
-	ifDefined,
-} from '@umbraco-cms/backoffice/external/lit';
-import { type UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
-import { type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 // Import of local components that should only be used here
@@ -26,15 +15,9 @@ import './components/user-workspace-access-settings/user-workspace-access-settin
 @customElement('umb-user-workspace-editor')
 export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	@state()
-	private _currentUser?: UmbLoggedInUser;
-
-	@state()
 	private _user?: UmbUserDetail;
 
-	#modalContext?: UmbModalManagerContext;
 	#workspaceContext?: UmbUserWorkspaceContext;
-
-	#userRepository = new UmbUserRepository(this);
 
 	constructor() {
 		super();
@@ -47,28 +30,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 
 	#observeUser() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.data, (user) => {
-			this._user = user;
-			console.log('user', user);
-		});
-	}
-
-	#onUserStatusChange() {
-		if (!this._user || !this._user.id) return;
-
-		if (this._user.state === UserStateModel.ACTIVE || this._user.state === UserStateModel.INACTIVE) {
-			this.#userRepository?.disable([this._user.id]);
-		}
-
-		if (this._user.state === UserStateModel.DISABLED) {
-			this.#userRepository?.enable([this._user.id]);
-		}
-	}
-
-	#onUserDelete() {
-		if (!this._user || !this._user.id) return;
-
-		this.#userRepository?.delete(this._user.id);
+		this.observe(this.#workspaceContext.data, (user) => (this._user = user));
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
@@ -127,7 +89,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 					<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
 					<uui-button label=${this.localize.term('user_changePhoto')}></uui-button>
 					<hr />
-					${this.#renderActionButtons()}
 
 					<div>
 						<b><umb-localize key="general_status">Status</umb-localize>:</b>
@@ -175,51 +136,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 				<span>${value}</span>
 			</div>
 		`;
-	}
-
-	#renderActionButtons() {
-		if (!this._user) return nothing;
-
-		//TODO: Find out if the current user is an admin. If not, show no buttons.
-		// if (this._currentUserStore?.isAdmin === false) return nothing;
-
-		const buttons: TemplateResult[] = [];
-
-		if (this._user.id !== this._currentUser?.id) {
-			if (this._user.state === UserStateModel.DISABLED) {
-				buttons.push(html`
-					<uui-button
-						@click=${this.#onUserStatusChange}
-						look="secondary"
-						color="positive"
-						label=${this.localize.term('actions_enable')}></uui-button>
-				`);
-			}
-
-			if (this._user.state === UserStateModel.ACTIVE || this._user.state === UserStateModel.INACTIVE) {
-				buttons.push(html`
-					<uui-button
-						@click=${this.#onUserStatusChange}
-						look="secondary"
-						color="warning"
-						label=${this.localize.term('actions_disable')}></uui-button>
-				`);
-			}
-		}
-
-		if (this._currentUser?.id !== this._user?.id) {
-			const button = html`
-				<uui-button
-					@click=${this.#onUserDelete}
-					look="secondary"
-					color="danger"
-					label=${this.localize.term('user_deleteUser')}></uui-button>
-			`;
-
-			buttons.push(button);
-		}
-
-		return buttons;
 	}
 
 	static styles = [
