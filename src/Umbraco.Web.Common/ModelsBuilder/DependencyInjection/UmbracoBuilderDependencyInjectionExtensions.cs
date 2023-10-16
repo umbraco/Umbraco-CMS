@@ -114,8 +114,6 @@ public static class UmbracoBuilderDependencyInjectionExtensions
             builder.AddInMemoryModelsRazorEngine();
 
             builder.AddNotificationHandler<ModelBindingErrorNotification, ModelsBuilderNotificationHandler>();
-            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, OutOfDateModelsStatus>();
-            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
         }
 
         if (builder.Config.GetRuntimeMode() != RuntimeMode.Production)
@@ -137,6 +135,7 @@ public static class UmbracoBuilderDependencyInjectionExtensions
 
         // Register required services for ModelsBuilderDashboardController
         builder.Services.AddSingleton<IModelsGenerator, ModelsGenerator>();
+        
         // TODO: Remove in v13 - this is only here in case someone is already using this generator directly
         builder.Services.AddSingleton<ModelsGenerator>();
         builder.Services.AddSingleton<OutOfDateModelsStatus>();
@@ -166,6 +165,7 @@ public static class UmbracoBuilderDependencyInjectionExtensions
 
         // This is what the community MB would replace, all of the above services are fine to be registered
         builder.Services.AddSingleton<IPublishedModelFactory>(factory => factory.CreateDefaultPublishedModelFactory());
+        
         return builder;
     }
 }
