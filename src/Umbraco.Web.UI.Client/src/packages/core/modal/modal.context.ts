@@ -38,7 +38,7 @@ export interface UmbModalRejectReason {
 export class UmbModalContextClass<ModalPreset extends object = object, ModalValue = unknown> extends EventTarget {
 	#submitPromise: Promise<ModalValue>;
 	#submitResolver?: (value: ModalValue) => void;
-	#submitRejecter?: (reason: UmbModalRejectReason) => void;
+	#submitRejecter?: (reason?: UmbModalRejectReason) => void;
 
 	public readonly key: string;
 	public readonly data: ModalPreset;
