@@ -120,6 +120,10 @@ public abstract class UserControllerBase : ManagementApiControllerBase
                 .WithTitle("Content node not found")
                 .WithDetail("The specified content node was not found.")
                 .Build()),
+            UserOperationStatus.InvalidState => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid user state")
+                .WithDetail("The user is in an invalid state to perform the requested action.")
+                .Build()),
             UserOperationStatus.Forbidden => Forbid(),
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                     .WithTitle("Unknown user operation status.")

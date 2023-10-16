@@ -31,5 +31,6 @@ public enum UserOperationStatus
     ContentNodeNotFound,
     MediaNodeNotFound,
     UnknownFailure,
-    CannotPasswordReset
+    CannotPasswordReset,
+    InvalidState
 }

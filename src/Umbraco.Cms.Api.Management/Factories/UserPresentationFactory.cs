@@ -85,6 +85,17 @@ public class UserPresentationFactory : IUserPresentationFactory
         return inviteModel;
     }
 
+    public async Task<UserResendInviteModel> CreateResendInviteModel(ResendInviteUserRequestModel requestModel)
+    {
+        var inviteModel = new UserResendInviteModel
+        {
+            InvitedUserKey = requestModel.UserId,
+            Message = requestModel.Message,
+        };
+
+        return await Task.FromResult(inviteModel);
+    }
+
     public async Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel)
     {
         var model = new UserUpdateModel
