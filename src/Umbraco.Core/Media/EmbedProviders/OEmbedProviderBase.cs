@@ -55,11 +55,12 @@ public abstract class OEmbedProviderBase : IEmbedProvider
         if (_httpClient == null)
         {
             _httpClient = new HttpClient();
+            _httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("Umbraco-CMS");
         }
 
         using (var request = new HttpRequestMessage(HttpMethod.Get, url))
         {
-            HttpResponseMessage response = _httpClient.SendAsync(request).Result;
+            HttpResponseMessage response = _httpClient.SendAsync(request).GetAwaiter().GetResult();
             return response.Content.ReadAsStringAsync().Result;
         }
     }

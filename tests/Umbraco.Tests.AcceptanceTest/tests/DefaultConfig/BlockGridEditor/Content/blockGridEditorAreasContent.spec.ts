@@ -82,7 +82,7 @@ test.describe('BlockGridEditorAreasContent', () => {
 
       const dataType = await umbracoApi.dataTypes.createBlockGridDataTypeWithArea(element, elementBody, blockGridName, titleArea);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, null);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
 
@@ -204,7 +204,7 @@ test.describe('BlockGridEditorAreasContent', () => {
         .build();
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, null);
+      await umbracoApi.content.createDefaultContentWithABlockGridEditor(element, dataType, false);
 
       await umbracoUi.navigateToContent(blockGridName);
 
@@ -360,7 +360,6 @@ test.describe('BlockGridEditorAreasContent', () => {
       const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
 
       await umbracoApi.content.createDefaultContentWithABlockGridEditor( element, dataType, false);
-
       await umbracoUi.navigateToContent(blockGridName);
 
       // Assert
