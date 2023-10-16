@@ -51,17 +51,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		});
 	}
 
-	// TODO: we need to render collection view extension
-	private _toggleViewType() {
-		/*
-		const isList = window.location.pathname.split('/').pop() === 'list';
-
-		isList
-			? history.pushState(null, '', 'section/users/view/users/overview/grid')
-			: history.pushState(null, '', 'section/users/view/users/overview/list');
-			*/
-	}
-
 	#onDropdownClick(event: PointerEvent) {
 		const composedPath = event.composedPath();
 
@@ -78,16 +67,12 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		this.#inputTimer = setTimeout(() => this.#collectionContext?.setFilter({ filter }), this.#inputTimerAmount);
 	}
 
-	private _showInviteOrCreate() {
-		let token = undefined;
-		// TODO: we need to find a better way to determine if we should create or invite
-		if (this._isCloud) {
-			token = UMB_INVITE_USER_MODAL;
-		} else {
-			token = UMB_CREATE_USER_MODAL;
-		}
+	#onCreateUserClick() {
+		this.#modalContext?.open(UMB_CREATE_USER_MODAL);
+	}
 
-		this.#modalContext?.open(token);
+	#onInviteUserClick() {
+		this.#modalContext?.open(UMB_INVITE_USER_MODAL);
 	}
 
 	#onStateFilterChange(event: UUIBooleanInputEvent) {
@@ -115,26 +100,50 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-button
-				@click=${this._showInviteOrCreate}
-				label=${this.localize.term(this._isCloud ? 'user_inviteUser' : 'user_createUser')}
+			${this.#renderCollectionActions()} ${this.#renderSearch()} ${this.#renderFilters()}
+			${this.#renderCollectionViews()}
+		`;
+	}
+
+	#renderCollectionActions() {
+		return html` <uui-button
+				@click=${this.#onCreateUserClick}
+				label=${this.localize.term('user_createUser')}
 				look="outline"></uui-button>
-			<uui-input @input=${this._updateSearch} label=${this.localize.term('visuallyHiddenTexts_userSearchLabel')} placeholder=${this.localize.term('visuallyHiddenTexts_userSearchLabel')} id="input-search"></uui-input>
+
+			<uui-button
+				@click=${this.#onInviteUserClick}
+				label=${this.localize.term('user_inviteUser')}
+				look="outline"></uui-button>`;
+	}
+
+	#renderSearch() {
+		return html`
+			<uui-input
+				@input=${this._updateSearch}
+				label=${this.localize.term('visuallyHiddenTexts_userSearchLabel')}
+				placeholder=${this.localize.term('visuallyHiddenTexts_userSearchLabel')}
+				id="input-search"></uui-input>
+		`;
+	}
+
+	#renderFilters() {
+		return html`
 			<div>
 				<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
 				<umb-dropdown margin="8">
 					<uui-button @click=${this.#onDropdownClick} slot="trigger" label="status">
 						<umb-localize key="general_status"></umb-localize>:
-						<umb-localize key=${'user_state'+this._stateFilterSelection}></umb-localize>
+						<umb-localize key=${'user_state' + this._stateFilterSelection}></umb-localize>
 					</uui-button>
 					<div slot="dropdown" class="filter-dropdown">
 						${this._stateFilterOptions.map(
 							(option) =>
 								html`<uui-checkbox
-									label=${this.localize.term('user_state'+option)}
+									label=${this.localize.term('user_state' + option)}
 									@change=${this.#onStateFilterChange}
 									name="state"
-									value=${option}></uui-checkbox>`
+									value=${option}></uui-checkbox>`,
 						)}
 					</div>
 				</umb-dropdown>
@@ -167,13 +176,18 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 						</uui-radio-group>
 					</div>
 				</umb-dropdown>
-
-				<uui-button label="view toggle" @click=${this._toggleViewType} compact look="outline">
-					<uui-icon name="settings"></uui-icon>
-				</uui-button>
 			</div>
 		`;
 	}
+
+	#renderCollectionViews() {
+		return html`
+			<uui-button label="view toggle" compact look="outline">
+				<uui-icon name="settings"></uui-icon>
+			</uui-button>
+		`;
+	}
+
 	static styles = [
 		css`
 			:host {
