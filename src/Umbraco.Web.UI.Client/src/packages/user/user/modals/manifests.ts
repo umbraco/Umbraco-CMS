@@ -9,6 +9,12 @@ const modals: Array<ManifestModal> = [
 	},
 	{
 		type: 'modal',
+		alias: 'Umb.Modal.User.CreateSuccess',
+		name: 'Create Success User Modal',
+		loader: () => import('./create/user-create-success-modal.element.js'),
+	},
+	{
+		type: 'modal',
 		alias: 'Umb.Modal.User.Invite',
 		name: 'Invite User Modal',
 		loader: () => import('./invite/user-invite-modal.element.js'),

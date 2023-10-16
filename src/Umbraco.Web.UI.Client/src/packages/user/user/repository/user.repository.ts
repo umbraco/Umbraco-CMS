@@ -23,7 +23,6 @@ import {
 } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateUserRequestModel,
-	InviteUserRequestModel,
 	UpdateUserRequestModel,
 	UserItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -146,7 +145,7 @@ export class UmbUserRepository
 		const { data: createdData, error } = await this.#detailSource.insert(userRequestData);
 
 		if (createdData && createdData.userId) {
-			const { data: user, error } = await this.#detailSource.get(createdData?.userId);
+			const { data: user, error } = await this.#detailSource.get(createdData.userId);
 
 			if (user) {
 				this.#detailStore?.append(user);
@@ -154,12 +153,12 @@ export class UmbUserRepository
 				const notification = { data: { message: `User created` } };
 				this.#notificationContext?.peek('positive', notification);
 
-				const hello = {
+				const response = {
 					user,
-					createData: createdData,
+					initialPassword: createdData.initialPassword,
 				};
 
-				return { data: hello, error };
+				return { data: response, error };
 			}
 		}
 

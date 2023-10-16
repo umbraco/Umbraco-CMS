@@ -2,19 +2,13 @@ import type {
 	CreateUserRequestModel,
 	CreateUserResponseModel,
 	DirectionModel,
-	InviteUserRequestModel,
 	UpdateUserRequestModel,
 	UserOrderModel,
 	UserResponseModel,
 	UserStateModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-import {
-	DataSourceResponse,
-	UmbDataSource,
-	UmbDataSourceErrorResponse,
-	UmbDetailRepository,
-} from '@umbraco-cms/backoffice/repository';
+import { UmbDataSource, UmbDataSourceErrorResponse, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 
 export type UmbUserDetail = UserResponseModel & {
 	entityType: 'user';
@@ -22,7 +16,7 @@ export type UmbUserDetail = UserResponseModel & {
 
 export interface UmbCreateUserResponseModel {
 	user: UserResponseModel;
-	createData: CreateUserResponseModel;
+	initialPassword: CreateUserResponseModel['initialPassword'];
 }
 
 export interface UmbUserCollectionFilterModel {

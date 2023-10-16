@@ -1,0 +1,101 @@
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import {
+	UmbNotificationDefaultData,
+	UmbNotificationContext,
+	UMB_NOTIFICATION_CONTEXT_TOKEN,
+} from '@umbraco-cms/backoffice/notification';
+import { UmbCreateUserSuccessModalData, UmbCreateUserSuccessModalValue } from '@umbraco-cms/backoffice/modal';
+
+@customElement('umb-user-create-success-modal')
+export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
+	UmbCreateUserSuccessModalData,
+	UmbCreateUserSuccessModalValue
+> {
+	@state()
+	private _createdUserInitialPassword?: string | null;
+
+	#notificationContext?: UmbNotificationContext;
+
+	connectedCallback(): void {
+		super.connectedCallback();
+
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (_instance) => {
+			this.#notificationContext = _instance;
+		});
+	}
+
+	#copyPassword() {
+		const passwordInput = this.shadowRoot?.querySelector('#password') as UUIInputPasswordElement;
+		if (!passwordInput || typeof passwordInput.value !== 'string') return;
+
+		navigator.clipboard.writeText(passwordInput.value);
+		const data: UmbNotificationDefaultData = { message: 'Password copied' };
+		this.#notificationContext?.peek('positive', { data });
+	}
+
+	#onCloseModal(event: Event) {
+		event.stopPropagation();
+		this.modalContext?.reject();
+	}
+
+	#onCreateAnotherUser(event: Event) {
+		event.stopPropagation();
+		this.modalContext?.reject({ type: 'createAnotherUser' });
+	}
+
+	#onGoToProfile(event: Event) {
+		event.stopPropagation();
+		history.pushState(null, '', 'section/users/view/users/user/' + this.id); //TODO: URL Should be dynamic
+		this.modalContext?.submit();
+	}
+
+	render() {
+		return html`<uui-dialog-layout headline="Insert name has been created">
+			<p>The new user has successfully been created. To log in to Umbraco use the password below</p>
+
+			<uui-label for="password">Password</uui-label>
+			<uui-input-password
+				id="password"
+				label="password"
+				name="password"
+				value="${this.data?.initialPassword ?? ''}"
+				readonly>
+				<!-- The button should be placed in the append part of the input, but that doesn't work with password inputs for now. -->
+				<uui-button slot="prepend" compact label="copy" @click=${this.#copyPassword}></uui-button>
+			</uui-input-password>
+
+			<uui-button @click=${this.#onCloseModal} slot="actions" label="Close" look="secondary"></uui-button>
+			<uui-button
+				@click=${this.#onCreateAnotherUser}
+				slot="actions"
+				label="Create another user"
+				look="secondary"></uui-button>
+			<uui-button
+				@click=${this.#onGoToProfile}
+				slot="actions"
+				label="Go to profile"
+				look="primary"
+				color="positive"></uui-button>
+		</uui-dialog-layout>`;
+	}
+
+	static styles = [
+		UmbTextStyles,
+		css`
+			p {
+				width: 580px;
+			}
+		`,
+	];
+}
+
+export default UmbUserCreateSuccessModalElement;
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-user-create-success-modal': UmbUserCreateSuccessModalElement;
+	}
+}
