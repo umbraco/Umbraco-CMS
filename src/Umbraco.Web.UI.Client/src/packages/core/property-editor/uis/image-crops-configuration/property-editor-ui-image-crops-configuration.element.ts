@@ -26,6 +26,7 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 
 	#onRemove(alias: string) {
 		this.value = [...this.value.filter((item) => item.alias !== alias)];
+		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	#onEdit(crop: UmbCrop) {
