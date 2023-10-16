@@ -20,9 +20,6 @@ import { UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-
 @customElement('umb-user-collection-header')
 export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	@state()
-	private _isCloud = false; //NOTE: Used to show either invite or create user buttons and views.
-
-	@state()
 	private _stateFilterOptions: Array<UserStateModel> = Object.values(UserStateModel);
 
 	@state()
