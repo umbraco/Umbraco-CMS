@@ -464,7 +464,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		propertyEditorUiAlias: 'Umb.PropertyEditorUi.ImageCropper',
 		values: [
 			{
-				alias: 'imageCropperValue',
+				alias: 'crops',
 				value: [
 					{
 						alias: 'Square',
