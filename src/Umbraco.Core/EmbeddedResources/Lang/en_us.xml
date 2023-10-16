@@ -1195,6 +1195,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
 </body>
 </html>
 	]]>    </key>
+    <key alias="mfaSecurityCodeSubject">Umbraco: Security Code</key>
+    <key alias="mfaSecurityCodeMessage">Your security code is: %0%</key>
     <key alias="2faTitle">One last step</key>
     <key alias="2faText">You have enabled 2-factor authentication and must verify your identity.</key>
     <key alias="2faMultipleText">Please choose a 2-factor provider</key>
@@ -2624,6 +2626,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="addImageCaption">Add image caption</key>
     <key alias="searchContentTree">Search content tree</key>
     <key alias="maxAmount">Maximum amount</key>
+    <key alias="expandChildItems">Expand child items for</key>
+    <key alias="openContextNode">Open context node for</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>

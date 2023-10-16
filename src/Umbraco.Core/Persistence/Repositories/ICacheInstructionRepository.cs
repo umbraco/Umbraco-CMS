@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
 /// <summary>
-///     Represents a repository for <see cref="ICacheInstruction" /> entities.
+///     Represents a repository for <see cref="CacheInstruction" /> entities.
 /// </summary>
 public interface ICacheInstructionRepository : IRepository
 {

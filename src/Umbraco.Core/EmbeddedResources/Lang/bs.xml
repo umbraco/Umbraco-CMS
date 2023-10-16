@@ -2653,7 +2653,7 @@ Da upravljate svojom web lokacijom, jednostavno otvorite Umbraco backoffice i po
     </key>
     <key alias="learningBaseDescription">
       <![CDATA[
-        <p>Želite savladati Umbraco? Provedite nekoliko minuta učeći neke najbolje prakse gledajući jedan od ovih videozapisa o korištenju Umbraco-a <a href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener"> Umbraco Learning Base Youtube kanal</a>. Ovdje možete pronaći gomilu video materijala koji pokriva mnoge aspekte Umbraco-a.</p>
+        <p>Želite savladati Umbraco? Provedite nekoliko minuta učeći neke najbolje prakse gledajući jedan od ovih videozapisa o korištenju Umbraco-a <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener"> Umbraco Learning Base Youtube kanal</a>. Ovdje možete pronaći gomilu video materijala koji pokriva mnoge aspekte Umbraco-a.</p>
       ]]>
     </key>
     <key alias="getStarted">Za početak</key>
