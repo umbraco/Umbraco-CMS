@@ -4,6 +4,7 @@ import { umbUserGroupData } from './user-group.data.js';
 import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import {
 	CreateUserRequestModel,
+	CreateUserResponseModel,
 	InviteUserRequestModel,
 	UpdateUserGroupsOnUserRequestModel,
 	UserItemResponseModel,
@@ -29,9 +30,12 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 	 * @param {CreateUserRequestModel} data
 	 * @memberof UmbUserData
 	 */
-	createUser = (data: CreateUserRequestModel) => {
+	createUser = (data: CreateUserRequestModel): CreateUserResponseModel => {
+		const userId = UmbId.new();
+		const initialPassword = 'mocked-initial-password';
+
 		const user: UserResponseModel = {
-			id: UmbId.new(),
+			id: userId,
 			languageIsoCode: null,
 			contentStartNodeIds: [],
 			mediaStartNodeIds: [],
@@ -47,6 +51,8 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 		};
 
 		this.insert(user);
+
+		return { userId, initialPassword };
 	};
 
 	/**
