@@ -24,13 +24,15 @@ public class UserGroupBuilder<TParent>
         IWithIdBuilder,
         IWithIconBuilder,
         IWithAliasBuilder,
-        IWithNameBuilder
+        IWithNameBuilder,
+        IWithDescriptionBuilder
 {
     private string _alias;
     private IEnumerable<string> _allowedSections = Enumerable.Empty<string>();
     private string _icon;
     private int? _id;
     private string _name;
+    private string _description;
     private IEnumerable<string> _permissions = Enumerable.Empty<string>();
     private int? _startContentId;
     private int? _startMediaId;
@@ -64,6 +66,12 @@ public class UserGroupBuilder<TParent>
     {
         get => _name;
         set => _name = value;
+    }
+
+    string IWithDescriptionBuilder.Description
+    {
+        get => _description;
+        set => _description = value;
     }
 
     /// <summary>
@@ -122,13 +130,15 @@ public class UserGroupBuilder<TParent>
             x.StartContentId == userGroup.StartContentId &&
             x.StartMediaId == userGroup.StartMediaId &&
             x.AllowedSections == userGroup.AllowedSections &&
-            x.Id == userGroup.Id);
+            x.Id == userGroup.Id &&
+            x.Description == userGroup.Description);
 
     public override IUserGroup Build()
     {
         var id = _id ?? 0;
         var name = _name ?? "TestUserGroup" + _suffix;
         var alias = _alias ?? "testUserGroup" + _suffix;
+        var description = _description ?? "Test User Group Description " + _suffix;
         var userCount = _userCount ?? 0;
         var startContentId = _startContentId ?? -1;
         var startMediaId = _startMediaId ?? -1;
@@ -140,7 +150,9 @@ public class UserGroupBuilder<TParent>
         {
             Id = id,
             StartContentId = startContentId,
-            StartMediaId = startMediaId
+            StartMediaId = startMediaId,
+            Description = description
+
         };
 
         foreach (var section in _allowedSections)
@@ -154,12 +166,14 @@ public class UserGroupBuilder<TParent>
     public static UserGroup CreateUserGroup(
         string alias = "testGroup",
         string name = "Test Group",
+        string description = "Test Group Description",
         string suffix = "",
         string[] permissions = null,
         string[] allowedSections = null) =>
         (UserGroup)new UserGroupBuilder()
             .WithAlias(alias + suffix)
             .WithName(name + suffix)
+            .WithDescription(description)
             .WithPermissions(permissions ?? new[] { "A", "B", "C" })
             .WithAllowedSections(allowedSections ?? new[] { "content", "media" })
             .Build();

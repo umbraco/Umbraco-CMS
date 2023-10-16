@@ -18,6 +18,7 @@ public class UserGroupBuilderTests
         const int testId = 10;
         const string testAlias = "test";
         const string testName = "Test";
+        const string testDescription = "Test description";
         const int testUserCount = 11;
         const string testIcon = "icon";
         const string testPermissions = "abc";
@@ -31,6 +32,7 @@ public class UserGroupBuilderTests
             .WithId(testId)
             .WithAlias(testAlias)
             .WithName(testName)
+            .WithDescription(testDescription)
             .WithUserCount(testUserCount)
             .WithIcon(testIcon)
             .WithPermissions(testPermissions)
@@ -42,6 +44,7 @@ public class UserGroupBuilderTests
         Assert.AreEqual(testId, userGroup.Id);
         Assert.AreEqual(testAlias, userGroup.Alias);
         Assert.AreEqual(testName, userGroup.Name);
+        Assert.AreEqual(testDescription, userGroup.Description);
         Assert.AreEqual(testUserCount, userGroup.UserCount);
         Assert.AreEqual(testIcon, userGroup.Icon);
         Assert.AreEqual(testPermissions.Length, userGroup.Permissions.Count());
