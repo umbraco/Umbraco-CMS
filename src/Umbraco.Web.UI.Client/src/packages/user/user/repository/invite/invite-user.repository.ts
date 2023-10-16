@@ -1,10 +1,9 @@
-import { UMB_USER_STORE_CONTEXT_TOKEN, UmbUserStore } from '../user.store.js';
 import { type UmbInviteUserDataSource } from './types.js';
 import { UmbInviteUserServerDataSource } from './invite-user.server.data.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
-import { InviteUserRequestModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { InviteUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbInviteUserRepository {
 	#host: UmbControllerHostElement;
@@ -12,38 +11,57 @@ export class UmbInviteUserRepository {
 
 	#inviteSource: UmbInviteUserDataSource;
 	#notificationContext?: UmbNotificationContext;
-	#detailStore?: UmbUserStore;
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 		this.#inviteSource = new UmbInviteUserServerDataSource(this.#host);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_USER_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#detailStore = instance;
-			}).asPromise(),
-
 			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
 			}).asPromise(),
 		]);
 	}
 
-	async invite(data: InviteUserRequestModel) {
-		if (!data) throw new Error('data is missing');
+	/**
+	 * Invites a user
+	 * @param {InviteUserRequestModel} requestModel
+	 * @return {*}
+	 * @memberof UmbInviteUserRepository
+	 */
+	async invite(requestModel: InviteUserRequestModel) {
+		if (!requestModel) throw new Error('data is missing');
 		await this.#init;
 
-		const { error } = await this.#inviteSource.invite(ids);
+		const { error } = await this.#inviteSource.invite(requestModel);
 
 		if (!error) {
-			ids.forEach((id) => {
-				this.#detailStore?.updateItem(id, { state: UserStateModel.DISABLED });
-			});
-
-			const notification = { data: { message: `User disabled` } };
+			const notification = { data: { message: `Invite sent to user` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 
-		return { data, error };
+		return { error };
+	}
+
+	/**
+	 * Resend an invite to a user
+	 * @param {string} userId
+	 * @param {InviteUserRequestModel} requestModel
+	 * @return {*}
+	 * @memberof UmbInviteUserRepository
+	 */
+	async resendInvite(userId: string, requestModel: any) {
+		if (!userId) throw new Error('User id is missing');
+		if (!requestModel) throw new Error('data is missing');
+		await this.#init;
+
+		const { error } = await this.#inviteSource.resendInvite(userId, requestModel);
+
+		if (!error) {
+			const notification = { data: { message: `Invite resent to user` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
+
+		return { error };
 	}
 }
