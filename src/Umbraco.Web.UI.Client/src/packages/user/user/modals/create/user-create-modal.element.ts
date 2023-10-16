@@ -63,7 +63,7 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 		});
 
 		modalContext?.onSubmit().catch((reason) => {
-			if (reason.type === 'createAnotherUser') {
+			if (reason?.type === 'createAnotherUser') {
 				this._form?.reset();
 			} else {
 				this.#closeModal();
