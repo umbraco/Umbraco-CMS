@@ -527,6 +527,8 @@
           });
 
           modelObject.removeDataAndDestroyModel(block);
+
+          // TODO: Update RTE.
       }
 
       function deleteAllBlocks() {
