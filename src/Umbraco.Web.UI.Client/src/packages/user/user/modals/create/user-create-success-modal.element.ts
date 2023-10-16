@@ -14,9 +14,6 @@ export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 	UmbCreateUserSuccessModalData,
 	UmbCreateUserSuccessModalValue
 > {
-	@state()
-	private _createdUserInitialPassword?: string | null;
-
 	#notificationContext?: UmbNotificationContext;
 
 	connectedCallback(): void {
