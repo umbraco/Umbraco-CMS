@@ -68,12 +68,12 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 
 		return html`
 			<uui-box id="user-info">
-				<div id="user-avatar-settings">
+				<div id="user-avatar-settings" class="user-info-item">
 					<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
 					<uui-button label=${this.localize.term('user_changePhoto')}></uui-button>
 				</div>
 
-				<div id="user-status-info">
+				<div id="user-status-info" class="user-info-item">
 					<b><umb-localize key="general_status">Status</umb-localize>:</b>
 					<uui-tag look="${ifDefined(displayState?.look)}" color="${ifDefined(displayState?.color)}">
 						${this.localize.term('user_' + displayState.key)}
@@ -111,13 +111,13 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 			}
 
 			#user-info {
-				display: flex;
-				gap: var(--uui-size-space-6);
+				margin-bottom: var(--uui-size-space-4);
 			}
 
 			#user-info > .user-info-item {
 				display: flex;
 				flex-direction: column;
+				margin-bottom: var(--uui-size-space-3);
 			}
 
 			#user-avatar-settings {
