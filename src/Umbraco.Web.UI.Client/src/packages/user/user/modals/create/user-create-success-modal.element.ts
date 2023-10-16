@@ -1,3 +1,4 @@
+import { UmbUserRepository } from '../../repository/user.repository.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
@@ -8,20 +9,32 @@ import {
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/notification';
 import { UmbCreateUserSuccessModalData, UmbCreateUserSuccessModalValue } from '@umbraco-cms/backoffice/modal';
+import { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-create-success-modal')
 export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 	UmbCreateUserSuccessModalData,
 	UmbCreateUserSuccessModalValue
 > {
+	@state()
+	_userItem?: UserItemResponseModel;
+
+	#userRepository = new UmbUserRepository(this);
 	#notificationContext?: UmbNotificationContext;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (_instance) => {
-			this.#notificationContext = _instance;
-		});
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => (this.#notificationContext = instance));
+	}
+
+	protected async firstUpdated(): Promise<void> {
+		if (!this.data?.userId) throw new Error('No userId provided');
+
+		const { data } = await this.#userRepository.requestItems([this.data?.userId]);
+		if (data) {
+			this._userItem = data[0];
+		}
 	}
 
 	#copyPassword() {
@@ -50,7 +63,7 @@ export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 	}
 
 	render() {
-		return html`<uui-dialog-layout headline="Insert name has been created">
+		return html`<uui-dialog-layout headline="${this._userItem?.name} has been created">
 			<p>The new user has successfully been created. To log in to Umbraco use the password below</p>
 
 			<uui-label for="password">Password</uui-label>
