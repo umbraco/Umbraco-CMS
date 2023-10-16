@@ -2,7 +2,6 @@ import {
 	UmbUserCollectionFilterModel,
 	UmbUserDetail,
 	UmbUserDetailDataSource,
-	UmbUserDetailRepository,
 	UmbUserSetGroupDataSource,
 } from '../types.js';
 
@@ -12,22 +11,31 @@ import { UmbUserCollectionServerDataSource } from './sources/user-collection.ser
 import { UmbUserItemServerDataSource } from './sources/user-item.server.data.js';
 import { UMB_USER_ITEM_STORE_CONTEXT_TOKEN, UmbUserItemStore } from './user-item.store.js';
 import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data.js';
-import { UmbUserUnlockServerDataSource } from './sources/user-unlock.server.data.js';
 
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbCollectionDataSource,
 	UmbCollectionRepository,
+	UmbDetailRepository,
 	UmbItemDataSource,
 	UmbItemRepository,
 } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateUserRequestModel,
+	CreateUserResponseModel,
 	UpdateUserRequestModel,
 	UserItemResponseModel,
+	UserResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+
+export type UmbUserDetailRepository = UmbDetailRepository<
+	CreateUserRequestModel,
+	CreateUserResponseModel,
+	UpdateUserRequestModel,
+	UserResponseModel
+>;
 
 export class UmbUserRepository
 	implements UmbUserDetailRepository, UmbCollectionRepository, UmbItemRepository<UserItemResponseModel>
@@ -41,9 +49,6 @@ export class UmbUserRepository
 	#itemStore?: UmbUserItemStore;
 	#setUserGroupsSource: UmbUserSetGroupDataSource;
 
-	//ACTIONS
-	#unlockSource: UmbUserUnlockServerDataSource;
-
 	#collectionSource: UmbCollectionDataSource<UmbUserDetail>;
 
 	#notificationContext?: UmbNotificationContext;
@@ -53,7 +58,6 @@ export class UmbUserRepository
 
 		this.#detailSource = new UmbUserServerDataSource(this.#host);
 		this.#collectionSource = new UmbUserCollectionServerDataSource(this.#host);
-		this.#unlockSource = new UmbUserUnlockServerDataSource(this.#host);
 		this.#itemSource = new UmbUserItemServerDataSource(this.#host);
 		this.#setUserGroupsSource = new UmbUserSetGroupsServerDataSource(this.#host);
 
@@ -142,27 +146,16 @@ export class UmbUserRepository
 	async create(userRequestData: CreateUserRequestModel) {
 		if (!userRequestData) throw new Error('Data is missing');
 
-		const { data: createdData, error } = await this.#detailSource.insert(userRequestData);
+		const { data, error } = await this.#detailSource.insert(userRequestData);
 
-		if (createdData && createdData.userId) {
-			const { data: user, error } = await this.#detailSource.get(createdData.userId);
+		if (data) {
+			this.#detailStore?.append(data);
 
-			if (user) {
-				this.#detailStore?.append(user);
-
-				const notification = { data: { message: `User created` } };
-				this.#notificationContext?.peek('positive', notification);
-
-				const response = {
-					user,
-					initialPassword: createdData.initialPassword,
-				};
-
-				return { data: response, error };
-			}
+			const notification = { data: { message: `User created` } };
+			this.#notificationContext?.peek('positive', notification);
 		}
 
-		return { error };
+		return { data, error };
 	}
 
 	async save(id: string, user: UpdateUserRequestModel) {

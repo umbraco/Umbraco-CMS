@@ -39,7 +39,6 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 		const name = formData.get('name') as string;
 		const email = formData.get('email') as string;
 
-		//TODO: How should we handle pickers forms?
 		const userGroupPicker = form.querySelector('#userGroups') as UmbUserGroupInputElement;
 		const userGroups = userGroupPicker?.selectedIds;
 
@@ -51,8 +50,8 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 			userGroupIds: userGroups,
 		});
 
-		if (data && data.user.id && data.initialPassword) {
-			this.#openSuccessModal(data.user.id, data.initialPassword);
+		if (data && data.userId && data.initialPassword) {
+			this.#openSuccessModal(data.userId, data.initialPassword);
 		}
 	}
 
