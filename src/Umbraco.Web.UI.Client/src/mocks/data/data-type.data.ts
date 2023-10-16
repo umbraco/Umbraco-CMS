@@ -472,9 +472,14 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 						width: 1000,
 					},
 					{
-						alias: 'Square',
-						height: 1000,
-						width: 1000,
+						alias: 'Banner',
+						height: 600,
+						width: 1200,
+					},
+					{
+						alias: 'Mobile',
+						height: 1200,
+						width: 800,
 					},
 				],
 			},
