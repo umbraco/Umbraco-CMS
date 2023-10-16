@@ -1178,6 +1178,7 @@ internal class DatabaseDataCreator
                 UpdateDate = DateTime.Now,
                 Icon = "icon-medal",
                 HasAccessToAllLanguages = true,
+                Description= "Can do anything when editing nodes in the content section.",
             });
         _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
             new UserGroupDto
@@ -1192,6 +1193,7 @@ internal class DatabaseDataCreator
                 UpdateDate = DateTime.Now,
                 Icon = "icon-edit",
                 HasAccessToAllLanguages = true,
+                Description = "Allowed to browse nodes, create nodes, and request for publication of items. Not allowed to publish directly without someone elses approval like an Editor.",
             });
         _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
             new UserGroupDto
@@ -1206,6 +1208,7 @@ internal class DatabaseDataCreator
                 UpdateDate = DateTime.Now,
                 Icon = "icon-tools",
                 HasAccessToAllLanguages = true,
+                Description= "Allowed to create and publish content items or nodes on the website without approval from others or restrictions.",
             });
         _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
             new UserGroupDto
@@ -1220,6 +1223,7 @@ internal class DatabaseDataCreator
                 UpdateDate = DateTime.Now,
                 Icon = "icon-globe",
                 HasAccessToAllLanguages = true,
+                Description= "Are used for translating your website. Translators are allowed to browse and update nodes as well as grant dashboard access. Translations of site pages must be reviewed by others before publication.",
             });
         _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
             new UserGroupDto
@@ -1232,6 +1236,7 @@ internal class DatabaseDataCreator
                 UpdateDate = DateTime.Now,
                 Icon = "icon-lock",
                 HasAccessToAllLanguages = false,
+                Description= "Any users added to this User group will have access to view any data marked as sensitive.",
             });
     }
 
