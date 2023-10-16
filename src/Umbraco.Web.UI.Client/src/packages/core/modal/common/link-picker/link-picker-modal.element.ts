@@ -114,22 +114,22 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				<uui-box>
 					<div class="url-link">${this._renderLinkUrlInput()} ${this._renderAnchorInput()}</div>
 
-					<uui-label for="link-title-input">Link Title</uui-label>
+					<uui-label for="link-title-input">${this.localize.term('defaultdialogs_nodeNameLinkPicker')}</uui-label>
 					<uui-input
 						id="link-title-input"
-						placeholder="Enter a title"
-						label="link title"
+						placeholder=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}
+						label=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}
 						@input=${() => (this._link.name = this._linkTitleInput.value as string)}
 						.value="${this._link.name ?? ''}"></uui-input>
 
-					<uui-label>Target</uui-label>
+					<uui-label>${this.localize.term('content_target')}</uui-label>
 					<uui-toggle
 						id="#target-toggle"
-						label="Toggle if link should open in a new tab"
+						label=${this.localize.term('defaultdialogs_openInNewWindow')}
 						.checked="${this._link.target === '_blank' ? true : false}"
 						@change="${(e: UUIBooleanInputEvent) =>
 							e.target.checked ? (this._link.target = '_blank') : (this._link.target = '')}">
-						Open the link in a new tab
+						${this.localize.term('defaultdialogs_openInNewWindow')}
 					</uui-toggle>
 
 					<hr />
@@ -137,8 +137,12 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					${this._renderTrees()}
 				</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this._close}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
+					<uui-button label=${this.localize.term('general_close')} @click=${this._close}></uui-button>
+					<uui-button
+						label=${this.localize.term('general_submit')}
+						look="primary"
+						color="positive"
+						@click=${this._submit}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
@@ -146,11 +150,11 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 	private _renderLinkUrlInput() {
 		return html`<span>
-			<uui-label for="link-input">Link</uui-label>
+			<uui-label for="link-input">${this.localize.term('defaultdialogs_link')}</uui-label>
 			<uui-input
 				id="link-input"
-				placeholder="URL"
-				label="URL"
+				placeholder=${this.localize.term('general_url')}
+				label=${this.localize.term('general_url')}
 				.value="${this._link.udi ?? this._link.url ?? ''}"
 				@input=${() => (this._link.url = this._linkInput.value as string)}
 				?disabled="${this._link.udi ? true : false}"></uui-input>
@@ -163,8 +167,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			<uui-label for="anchor-input">${this.localize.term('defaultdialogs_anchorLinkPicker')}</uui-label>
 			<uui-input
 				id="anchor-input"
-				placeholder="#value or ?key=value"
-				label="#value or ?key=value"
+				placeholder=${this.localize.term('placeholders_anchor')}
+				label=${this.localize.term('placeholders_anchor')}
 				@input=${this._handleQueryString}
 				.value="${this._link.queryString ?? ''}"></uui-input>
 		</span>`;
