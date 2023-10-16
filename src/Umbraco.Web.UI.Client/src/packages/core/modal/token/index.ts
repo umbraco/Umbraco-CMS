@@ -35,3 +35,4 @@ export * from './data-type-picker-flow-modal.token.js';
 export * from './data-type-picker-flow-data-type-picker-modal.token.js';
 export * from './entity-user-permission-settings-modal.token.js';
 export * from './permissions-modal.token.js';
+export * from './resend-invite-to-user-modal.token.js';
