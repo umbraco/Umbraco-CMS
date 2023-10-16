@@ -22,6 +22,9 @@ public class UserGroupSave : EntityBasic, IValidatableObject
     [Required]
     public override string Alias { get; set; } = string.Empty;
 
+    [DataMember(Name = "description")]
+    public string Description { get; set; } = string.Empty;
+
     [DataMember(Name = "sections")]
     public IEnumerable<string>? Sections { get; set; }
 

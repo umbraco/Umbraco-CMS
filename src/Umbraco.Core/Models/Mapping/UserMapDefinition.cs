@@ -132,6 +132,7 @@ public class UserMapDefinition : IMapDefinition
         target.Icon = source.Icon;
         target.Alias = source.Alias;
         target.Name = source.Name;
+        target.Description = source.Description;
         target.Permissions = source.DefaultPermissions;
         target.Key = source.Key;
         target.HasAccessToAllLanguages = source.HasAccessToAllLanguages;
@@ -262,6 +263,7 @@ public class UserMapDefinition : IMapDefinition
         target.Icon = source.Icon;
         target.Id = source.Id;
         target.Name = source.Name;
+        target.Description = source.Description;
         target.ParentId = -1;
         target.Path = "-1," + source.Id;
         target.IsSystemUserGroup = source.IsSystemUserGroup();
@@ -279,6 +281,7 @@ public class UserMapDefinition : IMapDefinition
         target.Id = source.Id;
         target.Key = source.Key;
         target.Name = source.Name;
+        target.Description = source.Description;
         target.ParentId = -1;
         target.Path = "-1," + source.Id;
         target.UserCount = source.UserCount;
@@ -317,6 +320,7 @@ public class UserMapDefinition : IMapDefinition
         target.Id = source.Id;
         target.Key = source.Key;
         target.Name = source.Name;
+        target.Description = source.Description;
         target.ParentId = -1;
         target.Path = "-1," + source.Id;
         target.UserCount = source.UserCount;

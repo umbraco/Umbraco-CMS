@@ -63,6 +63,11 @@ public class UserGroupDto
     [ForeignKey(typeof(NodeDto), Name = "FK_startMediaId_umbracoNode_id")]
     public int? StartMediaId { get; set; }
 
+    [Column("description")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    [Length(1500)]
+    public string? Description { get; set; }
+
     [ResultColumn]
     [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
     public List<UserGroup2AppDto> UserGroup2AppDtos { get; set; }

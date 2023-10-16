@@ -21,6 +21,7 @@ public sealed class UserGroupMapper : BaseMapper
         DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.Id), nameof(UserGroupDto.Id));
         DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.Alias), nameof(UserGroupDto.Alias));
         DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.Name), nameof(UserGroupDto.Name));
+        DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.Description), nameof(UserGroupDto.Description));
         DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.Icon), nameof(UserGroupDto.Icon));
         DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.StartContentId), nameof(UserGroupDto.StartContentId));
         DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.StartMediaId), nameof(UserGroupDto.StartMediaId));

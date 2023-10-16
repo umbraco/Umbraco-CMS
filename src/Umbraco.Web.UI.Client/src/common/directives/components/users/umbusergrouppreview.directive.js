@@ -14,6 +14,7 @@ Use this directive to render a user group preview, where you can see the permiss
             ng-repeat="userGroup in vm.user.userGroups"
             icon="userGroup.icon"
             name="userGroup.name"
+            description="userGroup.description"
             sections="userGroup.sections"
             content-start-node="userGroup.contentStartNode"
             media-start-node="userGroup.mediaStartNode"
@@ -25,6 +26,7 @@ Use this directive to render a user group preview, where you can see the permiss
 
 @param {string} icon (<code>binding</code>): The user group icon.
 @param {string} name (<code>binding</code>): The user group name.
+@param {string} description (<code>binding</code>): The user group description.
 @param {array} sections (<code>binding</code>) Lists out the sections where the user has authority to edit.
 @param {string} contentStartNode (<code>binding</code>)
 <ul>
@@ -62,6 +64,7 @@ Use this directive to render a user group preview, where you can see the permiss
             scope: {
                 icon: "=?",
                 name: "=",
+                description: "=?",
                 sections: "=?",
                 contentStartNode: "=?", 
                 hideContentStartNode: "@?",

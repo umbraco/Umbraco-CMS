@@ -12,6 +12,9 @@ public class UserGroupBasic : EntityBasic, INotificationModel
         Sections = Enumerable.Empty<Section>();
     }
 
+    [DataMember(Name = "description")]
+    public string? Description { get; set; }
+
     [DataMember(Name = "languages")]
     public IEnumerable<Language> Languages { get; set; }
 

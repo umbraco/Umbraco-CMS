@@ -1,4 +1,4 @@
-﻿<div ng-controller="Umbraco.Editors.Users.DetailsController as vm" class="umb-user-details-details">
+<div ng-controller="Umbraco.Editors.Users.DetailsController as vm" class="umb-user-details-details">
 
     <div class="umb-user-details-details__main-content">
 
@@ -77,6 +77,7 @@
                     <umb-user-group-preview ng-repeat="userGroup in model.user.userGroups"
                                             icon="userGroup.icon"
                                             name="userGroup.name"
+                                            description="userGroup.description"
                                             sections="userGroup.sections"
                                             content-start-node="userGroup.contentStartNode"
                                             media-start-node="userGroup.mediaStartNode"

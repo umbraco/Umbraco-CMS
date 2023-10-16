@@ -5,6 +5,8 @@
     <div class="umb-user-group-preview__content">
         <div class="umb-user-group-preview__name">{{ name }}</div>
 
+        <div class="umb-user-group-preview__description" ng-if="description">{{ description }}</div> 
+
         <div class="umb-user-group-preview__permissions" ng-if="sections">
             <span>
                 <span class="bold"><localize key="main_sections">Sections</localize>:</span>

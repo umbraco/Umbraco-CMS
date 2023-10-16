@@ -22,6 +22,7 @@ internal static class UserGroupFactory
         {
             userGroup.DisableChangeTracking();
             userGroup.Id = dto.Id;
+            userGroup.Description = dto.Description;
             userGroup.CreateDate = dto.CreateDate;
             userGroup.UpdateDate = dto.UpdateDate;
             userGroup.StartContentId = dto.StartContentId;
@@ -56,6 +57,7 @@ internal static class UserGroupFactory
             Alias = entity.Alias,
             DefaultPermissions = entity.Permissions == null ? string.Empty : string.Join(string.Empty, entity.Permissions),
             Name = entity.Name,
+            Description = entity.Description,
             UserGroup2AppDtos = new List<UserGroup2AppDto>(),
             CreateDate = entity.CreateDate,
             UpdateDate = entity.UpdateDate,

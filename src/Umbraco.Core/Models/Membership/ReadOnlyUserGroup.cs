@@ -13,7 +13,8 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         IEnumerable<int> allowedLanguages,
         IEnumerable<string> allowedSections,
         IEnumerable<string>? permissions,
-        bool hasAccessToAllLanguages)
+        bool hasAccessToAllLanguages,
+        string? description)
     {
         Name = name ?? string.Empty;
         Icon = icon;
@@ -22,6 +23,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         AllowedLanguages = allowedLanguages.ToArray();
         AllowedSections = allowedSections.ToArray();
         Permissions = permissions?.ToArray();
+        Description = description ?? string.Empty;
 
         // Zero is invalid and will be treated as Null
         StartContentId = startContentId == 0 ? null : startContentId;
@@ -70,6 +72,23 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     {
     }
 
+    [Obsolete("please use ctor that takes a description instead, scheduled for removal in v13")]
+    public ReadOnlyUserGroup(
+      int id,
+      Guid key, // This is not used for anything now, but will be in v13
+      string? name,
+      string? icon,
+      int? startContentId,
+      int? startMediaId,
+      string? alias,
+      IEnumerable<int> allowedLanguages,
+      IEnumerable<string> allowedSections,
+      IEnumerable<string>? permissions,
+      bool hasAccessToAllLanguages)
+    : this(id, key, name, icon, startContentId, startMediaId, alias, allowedLanguages, allowedSections, permissions, hasAccessToAllLanguages, string.Empty)
+    {
+    }
+
     public int Id { get; }
 
     public bool Equals(ReadOnlyUserGroup? other)
@@ -96,6 +115,8 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     public int? StartMediaId { get; }
 
     public string Alias { get; }
+
+    public string? Description { get; }
 
     public bool HasAccessToAllLanguages { get; set; }
 

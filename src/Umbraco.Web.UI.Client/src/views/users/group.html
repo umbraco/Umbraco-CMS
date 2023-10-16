@@ -6,9 +6,15 @@
 
     <umb-editor-view ng-if="!vm.loading">
 
-      <umb-editor-header name="vm.userGroup.name" alias="vm.userGroup.alias"
-        alias-locked="vm.userGroup.isSystemUserGroup" icon="vm.userGroup.icon" hide-description="true"
-        on-back="vm.goToPage(vm.breadcrumbs[0])" show-back-button="vm.showBackButton">
+      <umb-editor-header
+        name="vm.userGroup.name"
+        alias="vm.userGroup.alias"
+        description="vm.userGroup.description"
+        alias-locked="vm.userGroup.isSystemUserGroup"
+        icon="vm.userGroup.icon"
+        on-back="vm.goToPage(vm.breadcrumbs[0])"
+        show-back-button="vm.showBackButton">
+     
       </umb-editor-header>
 
       <umb-editor-container>

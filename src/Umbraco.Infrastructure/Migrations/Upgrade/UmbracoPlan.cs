@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_7_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -94,5 +95,8 @@ public class UmbracoPlan : MigrationPlan
 
         // And once more for 12
         To<MigrateTagsFromNVarcharToNText>("{2D4C9FBD-08B3-472D-A76C-6ED467A0CD20}");
+
+        //To 13.0.0
+        To<AddUserGroupDescription>("{1206DE97-9716-412A-ACC0-5D0252D0061E}");
     }
 }

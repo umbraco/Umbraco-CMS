@@ -6,6 +6,11 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
 {
     string Alias { get; set; }
 
+    /// <summary>
+    ///     Gets or Sets the Description for the User Group
+    /// </summary>
+    string? Description { get; set; }
+            
     int? StartContentId { get; set; }
 
     int? StartMediaId { get; set; }
