@@ -88,8 +88,8 @@
           createFlow: false
       };
 
-      localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function (data) {
-          vm.labels.grid_addElement = data[0];
+      localizationService.localizeMany(["blockEditor_insertBlock", "content_createEmpty"]).then(function (data) {
+          vm.labels.blockEditor_insertBlock = data[0];
           vm.labels.content_createEmpty = data[1];
       });
 
@@ -666,7 +666,7 @@
               $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
               $parentForm: vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
               availableItems: vm.availableBlockTypes,
-              title: vm.labels.grid_addElement,
+              title: vm.labels.blockEditor_insertBlock,
               openClipboard: openClipboard,
               orderBy: "$index",
               view: "views/common/infiniteeditors/blockpicker/blockpicker.html",
@@ -674,14 +674,25 @@
               filter: (amountOfAvailableTypes > 8),
               clickPasteItem: function(item, mouseEvent) {
                   if (Array.isArray(item.pasteData)) {
+                      const BlocksThatGotPasted = [];
                       var indexIncrementor = 0;
                       item.pasteData.forEach(function (entry) {
-                          if (requestPasteFromClipboard(createIndex + indexIncrementor, entry, item.type)) {
-                              indexIncrementor++;
+                          const wasAdded = requestPasteFromClipboard(createIndex + indexIncrementor, entry, item.type)
+                          if (wasAdded) {
+                            const newBlock = vm.layout[createIndex + indexIncrementor].$block;
+                            BlocksThatGotPasted.push(newBlock);
+                            indexIncrementor++;
                           }
                       });
+                      if(BlocksThatGotPasted.length > 0) {
+                        addedCallback(BlocksThatGotPasted);
+                      }
                   } else {
-                      requestPasteFromClipboard(createIndex, item.pasteData, item.type);
+                      const wasAdded = requestPasteFromClipboard(createIndex, item.pasteData, item.type);
+                      if(wasAdded && vm.layout[createIndex]) {
+                        const newBlock = vm.layout[createIndex].$block;
+                        addedCallback(newBlock);
+                      }
                   }
                   if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                       blockPickerModel.close();
@@ -740,7 +751,53 @@
       }
 
       function updateClipboard(firstTime) {
-        // nothing to retrieve or no paste feature yet.
+
+        var oldAmount = vm.clipboardItems.length;
+
+        vm.clipboardItems = [];
+
+        var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
+        entriesForPaste.forEach(function (entry) {
+            var pasteEntry = {
+                type: clipboardService.TYPES.ELEMENT_TYPE,
+                date: entry.date,
+                pasteData: entry.data,
+                elementTypeModel: {
+                    name: entry.label,
+                    icon: entry.icon
+                }
+            }
+            if(Array.isArray(entry.data) === false) {
+                var scaffold = modelObject.getScaffoldFromAlias(entry.alias);
+                if(scaffold) {
+                    pasteEntry.blockConfigModel = modelObject.getBlockConfiguration(scaffold.contentTypeKey);
+                }
+            }
+            vm.clipboardItems.push(pasteEntry);
+        });
+
+        entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
+        entriesForPaste.forEach(function (entry) {
+            var pasteEntry = {
+                type: clipboardService.TYPES.BLOCK,
+                date: entry.date,
+                pasteData: entry.data,
+                elementTypeModel: {
+                    name: entry.label,
+                    icon: entry.icon
+                }
+            }
+            if(Array.isArray(entry.data) === false) {
+                pasteEntry.blockConfigModel = modelObject.getBlockConfiguration(entry.data.data.contentTypeKey);
+            }
+            vm.clipboardItems.push(pasteEntry);
+        });
+
+        vm.clipboardItems.sort( (a, b) => {
+            return b.date - a.date
+        });
+
+        //pasteSingleBlockAction.isDisabled = vm.clipboardItems.length === 0;
       }
 
       function copyBlock(block) {

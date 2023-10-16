@@ -768,8 +768,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       });
 
       editor.ui.registry.addButton('umbblockpicker', {
-        icon: 'document',
-        tooltip: 'Block Picker',
+        icon: 'visualblocks',
+        tooltip: 'Insert Block',
         stateSelector: 'umb-rte-block[data-content-udi]',
         onAction: function () {
 
@@ -1725,7 +1725,14 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       //Create the insert block plugin
       self.createBlockPicker(args.editor, function (currentTarget, userData, imgDomElement) {
         args.blockEditorApi.showCreateDialog(0, false, (newBlock) => {
-          self.insertBlockInEditor(args.editor, newBlock.layout.contentUdi);
+          // TODO: Handle if its an array:
+          if(Utilities.isArray(newBlock)) {
+            newBlock.forEach(block => {
+              self.insertBlockInEditor(args.editor, block.layout.contentUdi);
+            });
+          } else {
+            self.insertBlockInEditor(args.editor, newBlock.layout.contentUdi);
+          }
         });
       });
 
