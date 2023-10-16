@@ -125,25 +125,27 @@ export class UmbInputImageCropperElement extends LitElement {
 	static styles = css`
 		:host {
 			display: flex;
-			height: 100%;
 			width: 100%;
 			box-sizing: border-box;
 			gap: 8px;
-		}
-		#main,
-		#side {
-			height: 100%;
+			height: 400px;
 		}
 		#main {
-			width: 600px;
-			height: 600px;
-			flex-shrink: 0;
+			max-width: 500px;
+			min-width: 300px;
+			width: 100%;
+			aspect-ratio: 1;
+			height: fit-content;
+			max-height: 100%;
 		}
 		#side {
 			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+			grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
 			gap: 8px;
 			flex-grow: 1;
+			overflow-y: auto;
+			height: fit-content;
+			max-height: 100%;
 		}
 	`;
 }
