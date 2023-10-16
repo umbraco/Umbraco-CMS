@@ -6,6 +6,7 @@ import { handlers as enableHandlers } from './enable.handlers.js';
 import { handlers as disableHandlers } from './disable.handlers.js';
 import { handlers as changePasswordHandlers } from './change-password.handlers.js';
 import { handlers as unlockHandlers } from './unlock.handlers.js';
+import { handlers as inviteHandlers } from './invite.handlers.js';
 
 export const handlers = [
 	...itemHandlers,
@@ -16,4 +17,5 @@ export const handlers = [
 	...changePasswordHandlers,
 	...unlockHandlers,
 	...detailHandlers,
+	...inviteHandlers,
 ];
