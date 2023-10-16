@@ -27,14 +27,13 @@ public class ResendInviteUserController : UserControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [AllowAnonymous]
     [HttpPost("invite/resend")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ResendInvite(ResendInviteUserRequestModel model)
     {
-        UserResendInviteModel resendInviteModel = _userPresentationFactory.CreateResendInviteModel(model);
+        UserResendInviteModel resendInviteModel = await _userPresentationFactory.CreateResendInviteModel(model);
 
         Attempt<UserInvitationResult, UserOperationStatus> result =
             await _userService.ResendInvitationAsync(CurrentUserKey(_backOfficeSecurityAccessor), resendInviteModel);
