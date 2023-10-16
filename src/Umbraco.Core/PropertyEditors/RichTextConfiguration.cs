@@ -10,7 +10,7 @@ public class RichTextConfiguration : IIgnoreUserStartNodesConfig
     public object? Editor { get; set; }
 
     // TODO: update descriptions + consider moving BlockListConfiguration.BlockConfiguration to its own class instead of being nested under BlockListConfiguration
-    [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.html", Description = "Define the available blocks.")]
+    [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/rte/blocks/prevalue/blockrte.blockconfiguration.html", Description = "Define the available blocks.")]
     public BlockListConfiguration.BlockConfiguration[] Blocks { get; set; } = null!;
 
     [ConfigurationField("overlaySize", "Overlay Size", "overlaysize", Description = "Select the width of the overlay (link picker).")]

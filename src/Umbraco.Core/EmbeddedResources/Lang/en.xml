@@ -2840,6 +2840,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="deleteArea">Delete area</key>
     <key alias="addColumnSpanOption">Add spanning %0% columns option</key>
     <key alias="insertBlock">Insert Block</key>
+    <key alias="labelInlineMode">Display inline with text</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>
