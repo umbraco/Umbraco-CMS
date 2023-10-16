@@ -752,17 +752,26 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
      *
      * @param {Object} editor the TinyMCE editor instance
      */
-    createBlockPicker: function (editor, callback) {
+    createBlockPicker: function (editor, blockEditorApi, callback) {
 
       editor.on('preInit', function (args) {
         editor.serializer.addRules('umb-rte-block');
 
-        /** This checks if the div is a macro container, if so, checks if its wrapped in a p tag and then unwraps it (removes p tag)*/
+        /** This checks if the div is a block element*/
         editor.serializer.addNodeFilter('umb-rte-block', function (nodes, name) {
           for (var i = 0; i < nodes.length; i++) {
-            if (nodes[i].parent && nodes[i].parent.name.toUpperCase() === "P") {
-              nodes[i].parent.unwrap();
+
+            const blockEl = nodes[i];
+            const block = blockEditorApi.getBlockByContentUdi(blockEl.attr("data-content-udi"));
+            if(block) {
+              const displayInline = block.config.displayInline !== true;
+
+              /* if the block is set to display inline, checks if its wrapped in a p tag and then unwraps it (removes p tag) */
+              if (displayInline && blockEl.parent && blockEl.parent.name.toUpperCase() === "P") {
+                blockEl.parent.unwrap();
+              }
             }
+
           }
         });
       });
@@ -778,10 +787,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
           if (blockEl.nodeName === 'UMB-RTE-BLOCK') {
             blockUdi = blockEl.getAttribute("data-content-udi") ?? undefined;
-
-            // Because we have focus on a block we should edit it.
-            console.log("edit block", blockUdi);
-            return;
           }
 
           if (callback) {
@@ -1452,6 +1457,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 blockEl.$api = args.blockEditorApi;
                 $compile(blockEl)(args.scope);
                 blockEl.setAttribute('contenteditable', 'false');
+                if(block.config.displayInline) {
+                  blockEl.setAttribute('style', 'display:inline-block;');
+                } else {
+                  blockEl.setAttribute('style', '');
+                }
               } else {
                 // Remove this block by removing the data-udi (as this will trigger TinyMCE format clean-up)
                 blockEl.removeAttribute('data-content-udi');
@@ -1723,7 +1733,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
 
       //Create the insert block plugin
-      self.createBlockPicker(args.editor, function (currentTarget, userData, imgDomElement) {
+      self.createBlockPicker(args.editor, args.blockEditorApi, function (currentTarget, userData, imgDomElement) {
         args.blockEditorApi.showCreateDialog(0, false, (newBlock) => {
           // TODO: Handle if its an array:
           if(Utilities.isArray(newBlock)) {

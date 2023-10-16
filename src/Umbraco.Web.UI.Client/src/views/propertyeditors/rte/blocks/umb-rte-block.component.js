@@ -13,7 +13,6 @@
 
       model.$onDestroy = onDestroy;
       model.$onInit = onInit;
-      model.$onChanges = onChanges;
 
 
       function onDestroy() {
@@ -30,8 +29,6 @@
         //$scope.index = model.index;
 
         const stylesheet = $scope.block.config.stylesheet;
-        console.log("$scope.block", $scope.block)
-        console.log("$scope.block stylesheet", stylesheet)
 
         var shadowRoot = $element[0].attachShadow({ mode: 'open' });
           shadowRoot.innerHTML =
@@ -114,10 +111,13 @@
       }
 
 
+      /*
+      model.$onChanges = onChanges;
       function onChanges(simpleChanges) {
         console.log("block gets change", simpleChanges);
         // TODO Make sure to fire something to update/reset $block on data-udi change.
       }
+      */
 
   }
 

@@ -40,9 +40,14 @@
     }
 
 
+    .blockelement-rteblock-editor.--inline {
+        width: 240px;
+    }
+
+
 </style>
 
-<div class="blockelement-rteblock-editor" ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">
+<div class="blockelement-rteblock-editor" ng-class="{ '--active': block.active, '--inline': block.config.displayInline, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">
     <button type="button"
         ng-click="block.edit()"
         ng-focus="block.focus"
