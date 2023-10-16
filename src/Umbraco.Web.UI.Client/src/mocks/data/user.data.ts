@@ -1,7 +1,10 @@
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbEntityData } from './entity.data.js';
 import { umbUserGroupData } from './user-group.data.js';
 import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import {
+	CreateUserRequestModel,
+	InviteUserRequestModel,
 	UpdateUserGroupsOnUserRequestModel,
 	UserItemResponseModel,
 	UserResponseModel,
@@ -20,6 +23,31 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 	constructor(data: UserResponseModel[]) {
 		super(data);
 	}
+
+	/**
+	 * Create user
+	 * @param {CreateUserRequestModel} data
+	 * @memberof UmbUserData
+	 */
+	createUser = (data: CreateUserRequestModel) => {
+		const user: UserResponseModel = {
+			id: UmbId.new(),
+			languageIsoCode: null,
+			contentStartNodeIds: [],
+			mediaStartNodeIds: [],
+			avatarUrls: [],
+			state: UserStateModel.INACTIVE,
+			failedLoginAttempts: 0,
+			createDate: new Date().toUTCString(),
+			updateDate: new Date().toUTCString(),
+			lastLoginDate: null,
+			lastLockoutDate: null,
+			lastPasswordChangeDate: null,
+			...data,
+		};
+
+		this.insert(user);
+	};
 
 	/**
 	 * Get user items
@@ -103,6 +131,15 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 			user.failedLoginAttempts = 0;
 			user.state = UserStateModel.ACTIVE;
 		});
+	}
+
+	invite(data: InviteUserRequestModel): void {
+		const invitedUser = {
+			status: UserStateModel.INVITED,
+			...data,
+		};
+
+		this.createUser(invitedUser);
 	}
 }
 
