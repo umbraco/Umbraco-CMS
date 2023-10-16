@@ -28,6 +28,11 @@ const entityActions: Array<ManifestTypes> = [
 			repositoryAlias: USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.User.AllowDeleteAction',
+			},
+		],
 	},
 	{
 		type: 'entityAction',
