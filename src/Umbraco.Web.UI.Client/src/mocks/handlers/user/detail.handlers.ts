@@ -8,9 +8,9 @@ export const handlers = [
 		const data = await req.json();
 		if (!data) return;
 
-		umbUsersData.insert(data);
+		const response = umbUsersData.createUser(data);
 
-		return res(ctx.status(200));
+		return res(ctx.status(200), ctx.json(response));
 	}),
 
 	rest.get(umbracoPath(`${slug}`), (req, res, ctx) => {
