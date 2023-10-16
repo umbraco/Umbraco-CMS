@@ -65,17 +65,19 @@ export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 	render() {
 		return html`<uui-dialog-layout headline="${this._userItem?.name} has been created">
 			<p>The new user has successfully been created. To log in to Umbraco use the password below</p>
-
-			<uui-label for="password">Password</uui-label>
-			<uui-input-password
-				id="password"
-				label="password"
-				name="password"
-				value="${this.data?.initialPassword ?? ''}"
-				readonly>
-				<!-- The button should be placed in the append part of the input, but that doesn't work with password inputs for now. -->
-				<uui-button slot="prepend" compact label="copy" @click=${this.#copyPassword}></uui-button>
-			</uui-input-password>
+			<uui-form-layout-item>
+				<uui-label slot="label" for="password">Password</uui-label>
+				<div id="password-control">
+					<uui-input-password
+						id="password"
+						label="password"
+						name="password"
+						value="${this.data?.initialPassword ?? ''}"
+						readonly>
+					</uui-input-password>
+					<uui-button compact label="Copy" @click=${this.#copyPassword} look="outline"></uui-button>
+				</div>
+			</uui-form-layout-item>
 
 			<uui-button @click=${this.#onCloseModal} slot="actions" label="Close" look="secondary"></uui-button>
 			<uui-button
@@ -97,6 +99,16 @@ export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 		css`
 			p {
 				width: 580px;
+			}
+
+			#password {
+				width: 100%;
+			}
+
+			#password-control {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-3);
 			}
 		`,
 	];
