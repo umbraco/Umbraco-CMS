@@ -136,13 +136,3 @@ declare global {
 		'umb-user-workspace-info': UmbUserWorkspaceInfoElement;
 	}
 }
-
-/*
-					${this._user?.state === UserStateModel.INVITED
-						? html`
-								<uui-textarea placeholder=${this.localize.term('placeholders_enterMessage')}></uui-textarea>
-								<uui-button look="primary" label=${this.localize.term('actions_resendInvite')}></uui-button>
-						  `
-						: nothing}
-
-*/
