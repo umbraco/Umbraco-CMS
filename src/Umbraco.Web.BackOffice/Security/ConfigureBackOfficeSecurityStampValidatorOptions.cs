@@ -11,9 +11,10 @@ public class ConfigureBackOfficeSecurityStampValidatorOptions : IConfigureOption
 {
     private readonly SecuritySettings _securitySettings;
 
-    public ConfigureBackOfficeSecurityStampValidatorOptions(IOptionsMonitor<SecuritySettings> securitySettings)
-        => _securitySettings = securitySettings.CurrentValue;
+    public ConfigureBackOfficeSecurityStampValidatorOptions(IOptions<SecuritySettings> securitySettings)
+        => _securitySettings = securitySettings.Value;
 
+    /// <inheritdoc />
     public void Configure(BackOfficeSecurityStampValidatorOptions options)
         => ConfigureSecurityStampOptions.ConfigureOptions(options, _securitySettings);
 }

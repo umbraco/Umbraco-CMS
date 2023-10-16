@@ -60,10 +60,8 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
             confirmation,
             StaticServiceProvider.Instance.GetRequiredService<IMemberExternalLoginProviders>(),
             StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>(),
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>()
-            )
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
     {
-
     }
 
     [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V14.")]

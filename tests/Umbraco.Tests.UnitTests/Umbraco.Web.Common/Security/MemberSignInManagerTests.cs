@@ -71,8 +71,7 @@ public class MemberSignInManagerTests
             Mock.Of<IUserConfirmation<MemberIdentityUser>>(),
             Mock.Of<IMemberExternalLoginProviders>(),
             Mock.Of<IEventAggregator>(),
-            Mock.Of<IOptions<SecuritySettings>>(x=>x.Value == new SecuritySettings())
-            );
+            Mock.Of<IOptions<SecuritySettings>>(x => x.Value == new SecuritySettings()));
     }
 
     private static Mock<MemberManager> MockMemberManager()

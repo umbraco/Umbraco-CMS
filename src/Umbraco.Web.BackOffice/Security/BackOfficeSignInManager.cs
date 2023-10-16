@@ -58,9 +58,19 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         IAuthenticationSchemeProvider schemes,
         IUserConfirmation<BackOfficeIdentityUser> confirmation,
         IEventAggregator eventAggregator)
-        : this(userManager, contextAccessor, externalLogins, claimsFactory, optionsAccessor, globalSettings, logger, schemes, confirmation, eventAggregator,StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+        : this(
+            userManager,
+            contextAccessor,
+            externalLogins,
+            claimsFactory,
+            optionsAccessor,
+            globalSettings,
+            logger,
+            schemes,
+            confirmation,
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
     {
-
     }
 
     [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V14.")]
@@ -74,7 +84,18 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         ILogger<SignInManager<BackOfficeIdentityUser>> logger,
         IAuthenticationSchemeProvider schemes,
         IUserConfirmation<BackOfficeIdentityUser> confirmation)
-        : this(userManager, contextAccessor, externalLogins, claimsFactory, optionsAccessor, globalSettings, logger, schemes, confirmation, StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>(),StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+        : this(
+            userManager,
+            contextAccessor,
+            externalLogins,
+            claimsFactory,
+            optionsAccessor,
+            globalSettings,
+            logger,
+            schemes,
+            confirmation,
+            StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
     {
     }
 

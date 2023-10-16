@@ -36,7 +36,15 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         ILogger<SignInManager<TUser>> logger,
         IAuthenticationSchemeProvider schemes,
         IUserConfirmation<TUser> confirmation)
-        : this(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation, StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+        : this(
+            userManager,
+            contextAccessor,
+            claimsFactory,
+            optionsAccessor,
+            logger,
+            schemes,
+            confirmation,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
     {
     }
 
@@ -357,7 +365,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
                 // we have successfully logged in, reset the AccessFailedCount
                 user.AccessFailedCount = 0;
             }
-
 
             await UserManager.UpdateAsync(user);
 
