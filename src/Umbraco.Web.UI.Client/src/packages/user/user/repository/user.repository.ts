@@ -166,13 +166,6 @@ export class UmbUserRepository
 		return { error };
 	}
 
-	async invite(inviteRequestData: InviteUserRequestModel) {
-		if (!inviteRequestData) throw new Error('Data is missing');
-		const { data, error } = await this.#detailSource.invite(inviteRequestData);
-
-		return { data, error };
-	}
-
 	async save(id: string, user: UpdateUserRequestModel) {
 		if (!id) throw new Error('User id is missing');
 		if (!user) throw new Error('User update data is missing');

@@ -1,7 +1,7 @@
 import { UmbUserGroupInputElement } from '../../../user-group/components/input-user-group/user-group-input.element.js';
-import { UmbUserRepository } from '../../repository/user.repository.js';
+import { UmbUserInviteRepository } from '../../repository/invite/invite-user.repository.js';
 import { css, html, nothing, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 export type UsersViewType = 'list' | 'grid';
@@ -13,8 +13,7 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 	@state()
 	private _invitedUser?: any;
 
-	// TODO: get from extension registry
-	#userRepository = new UmbUserRepository(this);
+	#userRepository = new UmbUserInviteRepository(this);
 
 	private async _handleSubmit(e: Event) {
 		e.preventDefault();

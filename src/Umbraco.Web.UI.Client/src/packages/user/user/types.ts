@@ -36,9 +36,7 @@ export interface UmbUserCollectionFilterModel {
 }
 
 export interface UmbUserDetailDataSource
-	extends UmbDataSource<CreateUserRequestModel, CreateUserResponseModel, UpdateUserRequestModel, UmbUserDetail> {
-	invite(data: InviteUserRequestModel): Promise<DataSourceResponse<any>>;
-}
+	extends UmbDataSource<CreateUserRequestModel, CreateUserResponseModel, UpdateUserRequestModel, UmbUserDetail> {}
 
 export interface UmbUserSetGroupDataSource {
 	setGroups(userIds: string[], userGroupIds: string[]): Promise<UmbDataSourceErrorResponse>;
@@ -54,6 +52,4 @@ export interface UmbUserDetailRepository
 		UmbCreateUserResponseModel,
 		UpdateUserRequestModel,
 		UserResponseModel
-	> {
-	invite(data: InviteUserRequestModel): Promise<any>;
-}
+	> {}

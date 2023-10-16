@@ -2,6 +2,7 @@ import {
 	CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
 	DISABLE_USER_REPOSITORY_ALIAS,
 	ENABLE_USER_REPOSITORY_ALIAS,
+	INVITE_USER_REPOSITORY_ALIAS,
 	UNLOCK_USER_REPOSITORY_ALIAS,
 	USER_REPOSITORY_ALIAS,
 } from '../repository/manifests.js';
@@ -10,6 +11,7 @@ import { UmbDisableUserEntityAction } from './disable/disable-user.action.js';
 import { UmbEnableUserEntityAction } from './enable/enable-user.action.js';
 import { UmbChangeUserPasswordEntityAction } from './change-password/change-user-password.action.js';
 import { UmbUnlockUserEntityAction } from './unlock/unlock-user.action.js';
+import { UmbResendInviteToUserEntityAction } from './resend-invite/resend-invite-to-user.action.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -93,6 +95,19 @@ const entityActions: Array<ManifestTypes> = [
 				alias: 'Umb.Condition.User.AllowUnlockAction',
 			},
 		],
+	},
+	{
+		type: 'entityAction',
+		alias: 'Umb.EntityAction.User.ResendInvite',
+		name: 'Resend Invite User Entity Action',
+		weight: 500,
+		api: UmbResendInviteToUserEntityAction,
+		meta: {
+			icon: 'umb:message',
+			label: 'Resend Invite',
+			repositoryAlias: INVITE_USER_REPOSITORY_ALIAS,
+			entityTypes: [UMB_USER_ENTITY_TYPE],
+		},
 	},
 ];
 

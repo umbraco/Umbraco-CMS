@@ -5,6 +5,7 @@ import { UmbDisableUserRepository } from './disable/disable-user.repository.js';
 import { UmbEnableUserRepository } from './enable/enable-user.repository.js';
 import { UmbChangeUserPasswordRepository } from './change-password/change-user-password.repository.js';
 import { UmbUnlockUserRepository } from './unlock/unlock-user.repository.js';
+import { UmbInviteUserRepository } from './invite/invite-user.repository.js';
 import type { ManifestStore, ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
 
 export const USER_REPOSITORY_ALIAS = 'Umb.Repository.User';
@@ -47,6 +48,14 @@ const unlockRepository: ManifestRepository = {
 	api: UmbUnlockUserRepository,
 };
 
+export const INVITE_USER_REPOSITORY_ALIAS = 'Umb.Repository.User.Invite';
+const inviteRepository: ManifestRepository = {
+	type: 'repository',
+	alias: INVITE_USER_REPOSITORY_ALIAS,
+	name: 'Invite User Repository',
+	api: UmbInviteUserRepository,
+};
+
 const store: ManifestStore = {
 	type: 'store',
 	alias: 'Umb.Store.User',
@@ -67,6 +76,7 @@ export const manifests = [
 	enableRepository,
 	changePasswordRepository,
 	unlockRepository,
+	inviteRepository,
 	store,
 	itemStore,
 ];
