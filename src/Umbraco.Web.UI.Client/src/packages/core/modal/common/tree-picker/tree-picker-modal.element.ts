@@ -1,10 +1,10 @@
 import { type UmbTreeElement } from '../../../tree/tree.element.js';
-import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTreePickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentationModel> extends UmbModalBaseElement<
@@ -28,7 +28,7 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
 		this._selection = element.selection;
-		this.dispatchEvent(new UmbSelectedEvent());
+		this.dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
 	#submit() {
@@ -45,7 +45,7 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 				<uui-box>
 					<umb-tree
 						alias=${this.data?.treeAlias}
-						@selected=${this.#onSelectionChange}
+						@selection-change=${this.#onSelectionChange}
 						.selection=${this._selection}
 						selectable
 						.selectableFilter=${this.data?.pickableFilter}

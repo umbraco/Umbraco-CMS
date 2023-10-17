@@ -1,6 +1,10 @@
 export class UmbSelectedEvent extends Event {
-	public constructor() {
+	public static readonly TYPE = 'selected';
+	public unique: string;
+
+	public constructor(unique: string) {
 		// mimics the native change event
-		super('selected', { bubbles: true, composed: false, cancelable: false });
+		super(UmbSelectedEvent.TYPE, { bubbles: true, composed: false, cancelable: false });
+		this.unique = unique;
 	}
 }

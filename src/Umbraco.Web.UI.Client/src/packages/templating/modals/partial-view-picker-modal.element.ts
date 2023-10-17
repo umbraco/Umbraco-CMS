@@ -43,7 +43,7 @@ export default class UmbPartialViewPickerModalElement extends UmbModalBaseElemen
 					<uui-box>
 						<umb-tree
 							alias="Umb.Tree.PartialViews"
-							@selected=${this._handleSelectionChange}
+							@selection-change=${this._handleSelectionChange}
 							.selection=${this._selection}
 							selectable></umb-tree>
 					</uui-box>
