@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Common.Serialization;
-using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.OpenApi;
 
@@ -48,8 +47,8 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
                      AuthorizationCode = new OpenApiOAuthFlow
                      {
                          AuthorizationUrl =
-                             new Uri(Paths.BackOfficeApiAuthorizationEndpoint, UriKind.Relative),
-                         TokenUrl = new Uri(Paths.BackOfficeApiTokenEndpoint, UriKind.Relative)
+                             new Uri(Common.Security.Paths.BackOfficeApi.AuthorizationEndpoint, UriKind.Relative),
+                         TokenUrl = new Uri(Common.Security.Paths.BackOfficeApi.TokenEndpoint, UriKind.Relative)
                      }
                  }
              });

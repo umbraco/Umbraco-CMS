@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -28,6 +29,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
     [TestCase(1)] // publish w/ culture: content.AvailableCultures.ToArray()
     [TestCase(2)] // publish w/ cultures: new [] { "*" }
     [TestCase(3)] // publish w/ cultures: Array.Empty<string>()
+    [LongRunning]
     public void Can_Publish_Invariant_Branch(int method)
     {
         CreateTypes(out var iContentType, out _);

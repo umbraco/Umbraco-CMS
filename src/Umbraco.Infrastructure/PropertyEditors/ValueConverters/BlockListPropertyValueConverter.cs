@@ -121,7 +121,7 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
 
     /// <inheritdoc />
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
-        => typeof(IEnumerable<ApiBlockListModel>);
+        => typeof(ApiBlockListModel);
 
     /// <inheritdoc />
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)

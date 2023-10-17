@@ -150,13 +150,25 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             return Task.FromResult(Attempt.FailWithStatus<PagedModel<IContentType>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotFound, null));
         }
 
-        IContentType[] allowedChildren = GetAll(parent.AllowedContentTypes.Select(x => x.Key)).ToArray();
-
-        var result = new PagedModel<IContentType>
+        PagedModel<IContentType> result;
+        if (parent.AllowedContentTypes.Any() is false)
         {
-            Items = allowedChildren.Take(take).Skip(skip),
-            Total = allowedChildren.Length,
-        };
+            // no content types allowed under parent
+            result = new PagedModel<IContentType>
+            {
+                Items = Array.Empty<IContentType>(),
+                Total = 0,
+            };
+        }
+        else
+        {
+            IContentType[] allowedChildren = GetAll(parent.AllowedContentTypes.Select(x => x.Key)).ToArray();
+            result = new PagedModel<IContentType>
+            {
+                Items = allowedChildren.Take(take).Skip(skip),
+                Total = allowedChildren.Length,
+            };
+        }
 
         return Task.FromResult(Attempt.SucceedWithStatus<PagedModel<IContentType>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, result));
     }

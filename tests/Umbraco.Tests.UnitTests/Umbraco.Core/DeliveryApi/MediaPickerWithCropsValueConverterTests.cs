@@ -43,7 +43,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var serializer = new JsonNetSerializer();
 
         var valueConverter = MediaPickerWithCropsValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<ApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
+        Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
 
         var inter = serializer.Serialize(new[]
         {
@@ -63,7 +63,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
             }
         });
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiMediaWithCrops>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMediaWithCrops>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var first = result.Single();
@@ -87,7 +87,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var serializer = new JsonNetSerializer();
 
         var valueConverter = MediaPickerWithCropsValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<ApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
+        Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
 
         var inter = serializer.Serialize(new[]
         {
@@ -121,7 +121,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
             }
         });
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiMediaWithCrops>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMediaWithCrops>;
         Assert.NotNull(result);
         Assert.AreEqual(2, result.Count());
         var first = result.First();
@@ -169,7 +169,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var serializer = new JsonNetSerializer();
 
         var valueConverter = MediaPickerWithCropsValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<ApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
+        Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
 
         var inter = serializer.Serialize(new[]
         {
@@ -188,7 +188,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
             }
         });
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiMediaWithCrops>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMediaWithCrops>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var mediaWithCrops = result.Single();
@@ -205,7 +205,6 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         ValidateCrop(mediaWithCrops.Crops.First(), "one", 200, 100, 1m, 2m, 10m, 20m);
         ValidateCrop(mediaWithCrops.Crops.Last(), "mediaOne", 111, 222, 2m, 4m, 20m, 40m);
     }
-
 
     [Test]
     public void MediaPickerWithCropsValueConverter_LocalCropsAndFocalPointTakesPrecedenceOverMediaCropsAndFocalPoint()
@@ -230,7 +229,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var serializer = new JsonNetSerializer();
 
         var valueConverter = MediaPickerWithCropsValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<ApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
+        Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
 
         var inter = serializer.Serialize(new[]
         {
@@ -250,7 +249,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
             }
         });
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiMediaWithCrops>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMediaWithCrops>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var mediaWithCrops = result.Single();
@@ -277,7 +276,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
         var valueConverter = MediaPickerWithCropsValueConverter();
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiMediaWithCrops>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMediaWithCrops>;
         Assert.NotNull(result);
         Assert.IsEmpty(result);
     }
@@ -292,11 +291,10 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
         var valueConverter = MediaPickerWithCropsValueConverter();
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiMediaWithCrops>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMediaWithCrops>;
         Assert.NotNull(result);
         Assert.IsEmpty(result);
     }
-
 
     private IPublishedPropertyType SetupMediaPropertyType(bool multiSelect)
     {
@@ -361,7 +359,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     }
 
     private void ValidateMedia(
-        ApiMediaWithCrops actual,
+        IApiMediaWithCrops actual,
         string expectedName,
         string expectedUrl,
         string expectedExtension,
@@ -378,7 +376,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
     }
 
-    private void ValidateFocalPoint(ImageCropperValue.ImageCropperFocalPoint? actual, decimal expectedLeft, decimal expectedTop)
+    private void ValidateFocalPoint(ImageFocalPoint? actual, decimal expectedLeft, decimal expectedTop)
     {
         Assert.NotNull(actual);
         Assert.AreEqual(expectedLeft, actual.Left);
@@ -386,7 +384,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     }
 
     private void ValidateCrop(
-        ImageCropperValue.ImageCropperCrop actual,
+        ImageCrop actual,
         string expectedAlias,
         int expectedWidth,
         int expectedHeight,

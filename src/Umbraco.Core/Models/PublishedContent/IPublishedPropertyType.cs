@@ -32,6 +32,11 @@ public interface IPublishedPropertyType
     string EditorAlias { get; }
 
     /// <summary>
+    ///     Gets the property editor UI alias.
+    /// </summary>
+    string EditorUiAlias { get; }
+
+    /// <summary>
     ///     Gets a value indicating whether the property is a user content property.
     /// </summary>
     /// <remarks>

@@ -8,6 +8,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
@@ -26,6 +27,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     ///     Returns 404 if the content wasn't found based on the ID specified
     /// </summary>
     [Test]
+    [LongRunning]
     public async Task PostSave_Validate_Existing_Content()
     {
         var languageService = GetRequiredService<ILanguageService>();
@@ -85,6 +87,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task PostSave_Validate_At_Least_One_Variant_Flagged_For_Saving()
     {
         var languageService = GetRequiredService<ILanguageService>();
@@ -156,6 +159,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     ///     Returns 404 if any of the posted properties dont actually exist
     /// </summary>
     [Test]
+    [LongRunning]
     public async Task PostSave_Validate_Properties_Exist()
     {
         var languageService = GetRequiredService<ILanguageService>();
@@ -222,6 +226,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task PostSave_Simple_Invariant()
     {
         var languageService = GetRequiredService<ILanguageService>();
@@ -284,6 +289,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task PostSave_Validate_Empty_Name()
     {
         var languageService = GetRequiredService<ILanguageService>();
@@ -349,6 +355,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task PostSave_Validate_Variants_Empty_Name()
     {
         var languageService = GetRequiredService<ILanguageService>();
@@ -414,6 +421,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task PostSave_Validates_Domains_Exist()
     {
         var languageService = GetRequiredService<ILanguageService>();
@@ -463,6 +471,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task PostSave_Validates_All_Ancestor_Cultures_Are_Considered()
     {
         var sweIso = "sv-SE";
@@ -566,6 +575,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task PostSave_Validates_All_Cultures_Has_Domains()
     {
         var languageService = GetRequiredService<ILanguageService>();
@@ -629,6 +639,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task PostSave_Checks_Ancestors_For_Domains()
     {
         var languageService = GetRequiredService<ILanguageService>();
@@ -731,6 +742,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     // [TestCase(
     //     @"<p><img alt src=""data:image/notallowedextension;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7""></p>",
     //     true)]
+    // [LongRunning]
     // public async Task PostSave_Simple_RichText_With_Base64(string html, bool shouldHaveDataUri)
     // {
     //     var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));

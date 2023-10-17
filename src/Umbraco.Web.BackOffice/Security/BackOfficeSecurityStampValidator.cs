@@ -13,8 +13,8 @@ public class BackOfficeSecurityStampValidator : SecurityStampValidator<BackOffic
 {
     public BackOfficeSecurityStampValidator(
         IOptions<BackOfficeSecurityStampValidatorOptions> options,
-        BackOfficeSignInManager signInManager, ISystemClock clock, ILoggerFactory logger)
-        : base(options, signInManager, clock, logger)
+        BackOfficeSignInManager signInManager, ILoggerFactory logger)
+        : base(options, signInManager, logger)
     {
     }
 }

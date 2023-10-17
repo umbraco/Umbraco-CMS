@@ -49,4 +49,8 @@ public class ContentCreatingService : IContentCreatingService
 
         return Attempt.SucceedWithStatus(ContentCreatingOperationStatus.Success, contentTypeAttempt.Result);
     }
+
+    // this is just a convenience, so consumers do not need dependencies on IContentTypeService
+    public async Task<PagedModel<IContentType>> GetAllowedChildrenContentTypesAtRootAsync(int skip, int take)
+        => await _contentTypeService.GetAllAllowedAsRootAsync(skip, take);
 }
