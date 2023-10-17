@@ -95,7 +95,6 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 							`,
 						)}
 					</uui-color-swatches>
-
 					<hr />
 					<uui-scroll-container id="icon-selection">${this.renderIconSelection()}</uui-scroll-container>
 				</div>
@@ -129,7 +128,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					label="${icon}"
 					id="${icon}"
 					@click="${this._changeIcon}"
-					@keyup="${this._changeIcon}"></uui-icon>
+					@keyup="${this._changeIcon}">
+				</uui-icon>
 			`;
 		})}`;
 	}
@@ -168,7 +168,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 			#icon-selection {
 				line-height: 0;
 				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(40px, calc(100% / 8)));
+				grid-template-columns: repeat(auto-fit, minmax(40px, calc((100% / 12) - 10px)));
+				gap: 10px;
 				overflow-y: scroll;
 				max-height: 100%;
 				min-height: 0;
@@ -182,6 +183,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 				height: 100%;
 				padding: var(--uui-size-space-3);
 				box-sizing: border-box;
+				cursor: pointer;
 			}
 
 			#icon-selection .icon-container {
@@ -199,7 +201,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 			}
 
 			uui-color-swatches {
-				margin: -0.75rem;
+				margin: 0;
 			}
 		`,
 	];
