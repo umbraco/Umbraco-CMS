@@ -53,17 +53,22 @@ export class UmbDataTypeWorkspaceContext
 
 		this.observe(this.propertyEditorSchemaAlias, async (propertyEditorSchemaAlias) => {
 			await this.#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias || UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT);
+			this.#observePropertyEditorUIAlias();
+		});
+	}
 
-			this.observe(this.propertyEditorUiAlias, async (propertyEditorUiAlias) => {
-				if (propertyEditorUiAlias === undefined || !this._propertyEditorSchemaConfigDefaultUIAlias) return;
+	#observePropertyEditorUIAlias() {
+		this.observe(this.propertyEditorUiAlias, async (propertyEditorUiAlias) => {
+			// we only want to react on the change if the alias is set or null. When it is undefined something is still loading
+			if (propertyEditorUiAlias === undefined || !this._propertyEditorSchemaConfigDefaultUIAlias) return;
 
-				const alias =
-					propertyEditorUiAlias === null ? this._propertyEditorSchemaConfigDefaultUIAlias : propertyEditorUiAlias;
+			// if the property editor ui alias is not set, we use the default alias from the schema
+			const alias =
+				propertyEditorUiAlias === null ? this._propertyEditorSchemaConfigDefaultUIAlias : propertyEditorUiAlias;
 
-				await this.#setPropertyEditorUIConfig(alias);
-				this._mergeConfigProperties();
-				this._mergeConfigDefaultData();
-			});
+			await this.#setPropertyEditorUIConfig(alias);
+			this._mergeConfigProperties();
+			this._mergeConfigDefaultData();
 		});
 	}
 
