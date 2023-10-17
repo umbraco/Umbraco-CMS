@@ -78,7 +78,7 @@ export class UmbDataTypeWorkspaceContext
 			} else {
 				await this.#setPropertyEditorUIConfig(propertyEditorUiAlias);
 				this.setPropertyEditorSchemaAlias(this._propertyEditorUISettingsSchemaAlias!);
-				await this.#setPropertyEditorSchemaConfig(this._propertyEditorUISettingsSchemaAlias!);
+				await this.#observePropertyEditorSchemaAlias();
 			}
 
 			this._mergeConfigProperties();
