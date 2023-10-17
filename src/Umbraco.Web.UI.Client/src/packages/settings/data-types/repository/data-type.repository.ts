@@ -226,7 +226,7 @@ export class UmbDataTypeRepository
 			// Consider to look up the data before fetching from the server
 			// Consider notify a workspace if a template is updated in the store while someone is editing it.
 			// TODO: would be nice to align the stores on methods/methodNames.
-			// this.#detailStore?.append(dataType);
+			this.#detailStore?.updateItem(id, updatedDataType);
 			// TODO: This is parsing on the full models to the tree and item store. Those should only contain the data they need. I don't know, at this point, if thats a repository or store responsibility.
 			this.#treeStore?.updateItem(id, updatedDataType);
 			this.#itemStore?.updateItem(id, updatedDataType);
