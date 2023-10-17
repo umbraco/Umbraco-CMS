@@ -1,10 +1,10 @@
 import { UmbDataTypeRepository } from '../../repository/data-type.repository.js';
 import { css, html, customElement, property, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbModalContext,
 	UmbDataTypePickerFlowDataTypePickerModalData,
-	UmbDataTypePickerFlowDataTypePickerModalResult,
+	UmbDataTypePickerFlowDataTypePickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -47,7 +47,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 					return dataTypeRepository.requestById(item.id);
 				}
 				return Promise.resolve();
-			})
+			}),
 		);
 
 		// TODO: Use the asObservable from above onces end-point has been made.
@@ -74,7 +74,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 	@property({ attribute: false })
 	modalContext?: UmbModalContext<
 		UmbDataTypePickerFlowDataTypePickerModalData,
-		UmbDataTypePickerFlowDataTypePickerModalResult
+		UmbDataTypePickerFlowDataTypePickerModalValue
 	>;
 
 	render() {
@@ -110,10 +110,10 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 													</div>
 												</uui-button>
 										  </li>`
-										: ''
+										: '',
 						  )
 						: ''}
-				</ul>`
+				</ul>`,
 		);
 	}
 	private _renderCreate() {

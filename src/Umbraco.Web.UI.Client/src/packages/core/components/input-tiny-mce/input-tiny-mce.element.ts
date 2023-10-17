@@ -18,7 +18,6 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -32,7 +31,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	@state()
 	private _tinyConfig: tinymce.RawEditorOptions = {};
 
-	modalContext!: UmbModalContext;
 	#mediaHelper = new UmbMediaHelper();
 	#currentUser?: UmbLoggedInUser;
 	#auth?: typeof UMB_AUTH.TYPE;
@@ -48,10 +46,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (modalContext) => {
-			this.modalContext = modalContext;
-		});
 
 		// TODO => this breaks tests, removing for now will ignore user language
 		// and fall back to tinymce default language

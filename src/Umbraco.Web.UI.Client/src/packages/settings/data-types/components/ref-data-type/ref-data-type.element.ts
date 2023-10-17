@@ -32,7 +32,7 @@ export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
 						this.propertyEditorSchemaAlias = dataType.propertyEditorAlias ?? '';
 					}
 				},
-				'dataType'
+				'dataType',
 			);
 		} else {
 			this.removeControllerByAlias('dataType');
