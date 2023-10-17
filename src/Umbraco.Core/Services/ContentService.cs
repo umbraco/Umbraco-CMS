@@ -2165,7 +2165,6 @@ public class ContentService : RepositoryService, IContentService
         if (result.Success)
         {
             publishedDocuments.Add(document);
-            notificationState = savingNotification.State;
         }
 
         return result;
