@@ -21,7 +21,7 @@ export interface TemplateQueryBuilderModalData {
 	hidePartialViews?: boolean;
 }
 
-export interface TemplateQueryBuilderModalResult {
+export interface UmbTemplateQueryBuilderModalValue {
 	value: string;
 }
 
@@ -33,7 +33,7 @@ enum SortOrder {
 @customElement('umb-templating-query-builder-modal')
 export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement<
 	TemplateQueryBuilderModalData,
-	TemplateQueryBuilderModalResult
+	UmbTemplateQueryBuilderModalValue
 > {
 	@query('#content-type-dropdown')
 	private _contentTypeDropdown?: UmbButtonWithDropdownElement;

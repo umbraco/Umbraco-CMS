@@ -1,10 +1,10 @@
-import type { UserGroupEntity } from '@umbraco-cms/backoffice/user-group';
 import { UmbUserCollectionContext } from '../../user-collection.context.js';
 import {
 	UmbUserGroupStore,
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
 } from '../../../../user-group/repository/user-group.store.js';
 import type { UmbUserDetail } from '../../../types.js';
+import type { UserGroupEntity } from '@umbraco-cms/backoffice/user-group';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import {

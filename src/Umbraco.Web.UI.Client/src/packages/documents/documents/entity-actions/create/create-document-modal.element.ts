@@ -2,7 +2,7 @@ import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/bac
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbCreateDocumentModalData,
-	UmbCreateDocumentModalResult,
+	UmbCreateDocumentModalValue,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -11,7 +11,7 @@ import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
 @customElement('umb-create-document-modal')
 export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 	UmbCreateDocumentModalData,
-	UmbCreateDocumentModalResult
+	UmbCreateDocumentModalValue
 > {
 	#documentRepository = new UmbDocumentRepository(this);
 

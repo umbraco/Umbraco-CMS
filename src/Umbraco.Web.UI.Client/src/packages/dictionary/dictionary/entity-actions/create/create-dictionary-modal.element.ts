@@ -2,14 +2,14 @@ import { html, customElement, query, when } from '@umbraco-cms/backoffice/extern
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbCreateDictionaryModalData,
-	UmbCreateDictionaryModalResult,
+	UmbCreateDictionaryModalValue,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-create-dictionary-modal')
 export class UmbCreateDictionaryModalElement extends UmbModalBaseElement<
 	UmbCreateDictionaryModalData,
-	UmbCreateDictionaryModalResult
+	UmbCreateDictionaryModalValue
 > {
 	@query('#form')
 	private _form!: HTMLFormElement;

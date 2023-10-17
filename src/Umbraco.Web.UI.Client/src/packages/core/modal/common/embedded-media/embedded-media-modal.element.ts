@@ -4,7 +4,7 @@ import {
 	OEmbedResult,
 	OEmbedStatus,
 	UmbEmbeddedMediaModalData,
-	UmbEmbeddedMediaModalResult,
+	UmbEmbeddedMediaModalValue,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -23,7 +23,7 @@ interface UmbEmbeddedMediaModalModel {
 @customElement('umb-embedded-media-modal')
 export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	UmbEmbeddedMediaModalData,
-	UmbEmbeddedMediaModalResult
+	UmbEmbeddedMediaModalValue
 > {
 	#loading = false;
 	#embedResult!: OEmbedResult;

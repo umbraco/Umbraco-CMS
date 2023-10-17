@@ -5,13 +5,13 @@ import {
 	UmbLinkPickerConfig,
 	UmbLinkPickerLink,
 	UmbLinkPickerModalData,
-	UmbLinkPickerModalResult,
+	UmbLinkPickerModalValue,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-link-picker-modal')
-export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalResult> {
+export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalValue> {
 	@state()
 	_selectedKey?: string;
 

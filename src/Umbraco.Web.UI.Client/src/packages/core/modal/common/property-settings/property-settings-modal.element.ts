@@ -2,7 +2,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { PropertyValueMap, css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import {
-	UmbPropertySettingsModalResult,
+	UmbPropertySettingsModalValue,
 	UmbPropertySettingsModalData,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
@@ -13,7 +13,7 @@ import { UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/d
 @customElement('umb-property-settings-modal')
 export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	UmbPropertySettingsModalData,
-	UmbPropertySettingsModalResult
+	UmbPropertySettingsModalValue
 > {
 	//TODO: Should these options come from the server?
 	// TODO: Or should they come from a extension point?
@@ -44,10 +44,10 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	@state() private _aliasLocked = true;
 
 	@state()
-	protected _ownerDocumentType?: UmbPropertySettingsModalResult;
+	protected _ownerDocumentType?: UmbPropertySettingsModalValue;
 
 	@state()
-	protected _returnData!: UmbPropertySettingsModalResult;
+	protected _returnData!: UmbPropertySettingsModalValue;
 
 	connectedCallback(): void {
 		super.connectedCallback();

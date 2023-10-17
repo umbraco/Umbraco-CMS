@@ -4,14 +4,14 @@ import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 import { ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbSectionPickerModalData,
-	UmbSectionPickerModalResult,
+	UmbSectionPickerModalValue,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-section-picker-modal')
 export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 	UmbSectionPickerModalData,
-	UmbSectionPickerModalResult
+	UmbSectionPickerModalValue
 > {
 	@state()
 	private _sections: Array<ManifestSection> = [];

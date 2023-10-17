@@ -3,7 +3,7 @@ import { css, html, customElement, query, state, when } from '@umbraco-cms/backo
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbImportDictionaryModalData,
-	UmbImportDictionaryModalResult,
+	UmbImportDictionaryModalValue,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { ImportDictionaryRequestModel } from '@umbraco-cms/backoffice/backend-api';
@@ -11,7 +11,7 @@ import { ImportDictionaryRequestModel } from '@umbraco-cms/backoffice/backend-ap
 @customElement('umb-import-dictionary-modal')
 export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	UmbImportDictionaryModalData,
-	UmbImportDictionaryModalResult
+	UmbImportDictionaryModalValue
 > {
 	static styles = [
 		UmbTextStyles,

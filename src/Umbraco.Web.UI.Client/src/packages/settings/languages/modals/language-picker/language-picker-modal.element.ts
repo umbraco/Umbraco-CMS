@@ -4,7 +4,7 @@ import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 import {
-	UmbLanguagePickerModalResult,
+	UmbLanguagePickerModalValue,
 	UmbLanguagePickerModalData,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
@@ -12,7 +12,7 @@ import {
 @customElement('umb-language-picker-modal')
 export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	UmbLanguagePickerModalData,
-	UmbLanguagePickerModalResult
+	UmbLanguagePickerModalValue
 > {
 	@state()
 	private _languages: Array<LanguageResponseModel> = [];
