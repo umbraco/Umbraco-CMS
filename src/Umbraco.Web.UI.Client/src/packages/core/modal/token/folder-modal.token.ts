@@ -7,11 +7,11 @@ export interface UmbFolderModalData {
 	parentUnique?: string | null;
 }
 
-export interface UmbFolderModalResult {
+export interface UmbFolderModalValue {
 	folder: FolderResponseModel;
 }
 
-export const UMB_FOLDER_MODAL = new UmbModalToken<UmbFolderModalData, UmbFolderModalResult>('Umb.Modal.Folder', {
+export const UMB_FOLDER_MODAL = new UmbModalToken<UmbFolderModalData, UmbFolderModalValue>('Umb.Modal.Folder', {
 	type: 'sidebar',
 	size: 'small',
 });
