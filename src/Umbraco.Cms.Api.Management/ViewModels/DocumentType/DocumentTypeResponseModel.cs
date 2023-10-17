@@ -1,5 +1,4 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.ContentType;
-using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 
@@ -11,5 +10,5 @@ public class DocumentTypeResponseModel : ContentTypeResponseModelBase<DocumentTy
 
     public ContentTypeCleanup Cleanup { get; set; } = new();
 
-    public string Type => Constants.UdiEntityType.DocumentType;
+    public string Type => Constants.ResourceObjectTypes.DocumentType;
 }

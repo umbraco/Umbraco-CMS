@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core;
-
-namespace Umbraco.Cms.Api.Management.ViewModels.DataType;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.DataType;
 
 public class DataTypeResponseModel : DataTypeModelBase, INamedEntityPresentationModel
 {
@@ -8,5 +6,5 @@ public class DataTypeResponseModel : DataTypeModelBase, INamedEntityPresentation
 
     public Guid? ParentId { get; set; }
 
-    public string Type => Constants.UdiEntityType.DataType;
+    public string Type => Constants.ResourceObjectTypes.DataType;
 }

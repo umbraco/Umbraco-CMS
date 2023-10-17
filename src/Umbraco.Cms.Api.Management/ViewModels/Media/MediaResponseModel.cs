@@ -1,5 +1,4 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
-using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Media;
 
@@ -7,5 +6,5 @@ public class MediaResponseModel : ContentResponseModelBase<MediaValueModel, Medi
 {
     public IEnumerable<ContentUrlInfo> Urls { get; set; } = Array.Empty<ContentUrlInfo>();
 
-    public string Type => Constants.UdiEntityType.Media;
+    public string Type => Constants.ResourceObjectTypes.Media;
 }

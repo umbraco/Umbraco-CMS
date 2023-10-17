@@ -1,5 +1,4 @@
-﻿using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models.Membership;
+﻿using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.User;
 
@@ -29,5 +28,5 @@ public class UserResponseModel : UserPresentationBase, INamedEntityPresentationM
 
     public DateTime? LastPasswordChangeDate { get; set; }
 
-    public string Type => Constants.UdiEntityType.User;
+    public string Type => Constants.ResourceObjectTypes.User;
 }

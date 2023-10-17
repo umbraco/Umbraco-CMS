@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Text.Json.Serialization;
-using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Relation;
 
@@ -42,5 +40,5 @@ public class RelationResponseModel
     [ReadOnly(true)]
     public string? Comment { get; set; }
 
-    public string Type => Constants.UdiEntityType.Relation;
+    public string Type => Constants.ResourceObjectTypes.Relation;
 }

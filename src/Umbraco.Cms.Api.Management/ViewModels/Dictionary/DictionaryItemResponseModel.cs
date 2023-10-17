@@ -1,10 +1,8 @@
-﻿using Umbraco.Cms.Core;
-
-namespace Umbraco.Cms.Api.Management.ViewModels.Dictionary;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 
 public class DictionaryItemResponseModel : DictionaryItemModelBase, INamedEntityPresentationModel
 {
     public Guid Id { get; set; }
 
-    public string Type => Constants.UdiEntityType.DictionaryItem;
+    public string Type => Constants.ResourceObjectTypes.DictionaryItem;
 }

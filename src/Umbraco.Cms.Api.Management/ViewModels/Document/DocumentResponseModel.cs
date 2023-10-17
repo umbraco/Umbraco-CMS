@@ -1,5 +1,4 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
-using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
@@ -9,5 +8,5 @@ public class DocumentResponseModel : ContentResponseModelBase<DocumentValueModel
 
     public Guid? TemplateId { get; set; }
 
-    public string Type => Constants.UdiEntityType.Document;
+    public string Type => Constants.ResourceObjectTypes.Document;
 }

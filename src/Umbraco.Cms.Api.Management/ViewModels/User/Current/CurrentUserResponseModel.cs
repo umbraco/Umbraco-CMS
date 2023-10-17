@@ -1,5 +1,3 @@
-using Umbraco.Cms.Core;
-
 namespace Umbraco.Cms.Api.Management.ViewModels.User.Current;
 
 public class CurrentUserResponseModel : INamedEntityPresentationModel
@@ -26,5 +24,5 @@ public class CurrentUserResponseModel : INamedEntityPresentationModel
 
     public required ISet<string> Permissions { get; init; }
 
-    public string Type => Constants.UdiEntityType.User;
+    public string Type => Constants.ResourceObjectTypes.User;
 }

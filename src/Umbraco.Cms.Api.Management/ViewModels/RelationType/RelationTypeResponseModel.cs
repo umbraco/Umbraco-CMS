@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core;
-
-namespace Umbraco.Cms.Api.Management.ViewModels.RelationType;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.RelationType;
 
 public class RelationTypeResponseModel : RelationTypeBaseModel
 {
@@ -22,5 +20,5 @@ public class RelationTypeResponseModel : RelationTypeBaseModel
     /// </summary>
     public string? ChildObjectTypeName { get; set; }
 
-    public string Type => Constants.UdiEntityType.RelationType;
+    public string Type => Constants.ResourceObjectTypes.RelationType;
 }

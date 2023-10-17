@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core;
-
-namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 
 public class UserGroupResponseModel : UserGroupBase, INamedEntityPresentationModel
 {
@@ -9,5 +7,5 @@ public class UserGroupResponseModel : UserGroupBase, INamedEntityPresentationMod
     /// </summary>
     public required Guid Id { get; init; }
 
-    public string Type => Constants.UdiEntityType.UserGroup;
+    public string Type => Constants.ResourceObjectTypes.UserGroup;
 }

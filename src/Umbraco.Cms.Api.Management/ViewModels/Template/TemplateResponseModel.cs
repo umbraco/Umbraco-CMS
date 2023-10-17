@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core;
-
-namespace Umbraco.Cms.Api.Management.ViewModels.Template;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.Template;
 
 public class TemplateResponseModel : TemplateModelBase, INamedEntityPresentationModel
 {
@@ -8,5 +6,5 @@ public class TemplateResponseModel : TemplateModelBase, INamedEntityPresentation
 
     public Guid? MasterTemplateId { get; set; }
 
-    public string Type => Constants.UdiEntityType.Template;
+    public string Type => Constants.ResourceObjectTypes.Template;
 }

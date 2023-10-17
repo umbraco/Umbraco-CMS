@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core;
-
-namespace Umbraco.Cms.Api.Management.ViewModels.Tag;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.Tag;
 
 public class TagResponseModel
 {
@@ -12,5 +10,5 @@ public class TagResponseModel
 
     public int NodeCount { get; set; }
 
-    public string Type => Constants.UdiEntityType.Tag;
+    public string Type => Constants.ResourceObjectTypes.Tag;
 }

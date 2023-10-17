@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core;
-
-namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 
 public class RelationItemResponseModel
 {
@@ -24,5 +22,5 @@ public class RelationItemResponseModel
 
     public bool RelationTypeIsDependency { get; set; }
 
-    public string Type => Constants.UdiEntityType.Relation;
+    public string Type => Constants.ResourceObjectTypes.Relation;
 }

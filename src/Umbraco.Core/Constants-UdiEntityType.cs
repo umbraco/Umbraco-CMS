@@ -62,17 +62,5 @@ public static partial class Constants
         public const string Stylesheet = "stylesheet";
         public const string PartialView = "partial-view";
         public const string PartialViewMacro = "partial-view-macro";
-
-        // Added by management api
-        public const string User = "user";
-        public const string UserGroup = "user-group";
-        public const string UserData = "user-data";
-        public const string UserPermissions = "user-permissions";
-        public const string Relation = "relation";
-        public const string TemplateScaffold = "template-scaffold";
-        public const string Tag = "tag";
-        public const string StaticFile = "static-file";
-        public const string DocumentInRecycleBin = "document-recyclebin";
-        public const string MediaInRecycleBin = "media-recyclebin";
     }
 }

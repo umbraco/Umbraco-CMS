@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core;
-
-namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
 
 public class DocumentTreeItemResponseModel : ContentTreeItemResponseModel
 {
@@ -16,5 +14,5 @@ public class DocumentTreeItemResponseModel : ContentTreeItemResponseModel
 
     public string Icon { get; set; } = string.Empty;
 
-    public override string Type => Constants.UdiEntityType.Document;
+    public override string Type => Constants.ResourceObjectTypes.Document;
 }
