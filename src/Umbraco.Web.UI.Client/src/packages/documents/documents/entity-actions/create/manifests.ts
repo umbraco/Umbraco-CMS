@@ -16,6 +16,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			entityTypes: [DOCUMENT_ROOT_ENTITY_TYPE, DOCUMENT_ENTITY_TYPE],
 		},
+		/* removed until we have permissions in place
 		conditions: [
 			{
 				alias: 'Umb.Condition.UserPermission',
@@ -25,6 +26,7 @@ const entityActions: Array<ManifestEntityAction> = [
 				match: 'Umb.UserPermission.Document.Create',
 			},
 		],
+		*/
 	},
 ];
 
