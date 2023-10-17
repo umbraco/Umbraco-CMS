@@ -5,7 +5,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
 // TODO: we need to import this from the user group module when it is ready
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import {
 	UmbNotificationDefaultData,
 	UmbNotificationContext,

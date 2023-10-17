@@ -1,7 +1,10 @@
 import { html, css, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbExamineFieldsSettingsModalValue, UmbExamineFieldsSettingsModalData } from '@umbraco-cms/backoffice/modal';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import {
+	UmbExamineFieldsSettingsModalValue,
+	UmbExamineFieldsSettingsModalData,
+	UmbModalBaseElement,
+} from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-examine-fields-settings-modal')
 export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<

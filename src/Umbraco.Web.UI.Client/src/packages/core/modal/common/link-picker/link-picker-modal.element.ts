@@ -6,8 +6,8 @@ import {
 	UmbLinkPickerLink,
 	UmbLinkPickerModalData,
 	UmbLinkPickerModalValue,
+	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-link-picker-modal')

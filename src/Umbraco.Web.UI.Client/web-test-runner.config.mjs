@@ -52,7 +52,6 @@ export default {
 						'@umbraco-cms/backoffice/utils': './src/shared/utils/index.ts',
 
 						'@umbraco-cms/internal/lit-element': './src/shared/lit-element/index.ts',
-						'@umbraco-cms/internal/modal': './src/shared/modal/index.ts',
 
 						'@umbraco-cms/backoffice/action': './src/packages/core/action/index.ts',
 						'@umbraco-cms/backoffice/collection': './src/packages/core/collection/index.ts',

@@ -1,6 +1,6 @@
 import { html, css, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { SavedLogSearchPresenationBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-log-viewer-save-search-modal')
