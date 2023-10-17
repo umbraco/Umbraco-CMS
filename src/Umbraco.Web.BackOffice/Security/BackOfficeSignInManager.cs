@@ -36,8 +36,9 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         ILogger<SignInManager<BackOfficeIdentityUser>> logger,
         IAuthenticationSchemeProvider schemes,
         IUserConfirmation<BackOfficeIdentityUser> confirmation,
-        IEventAggregator eventAggregator)
-        : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
+        IEventAggregator eventAggregator,
+        IOptions<SecuritySettings> securitySettings)
+        : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation, securitySettings)
     {
         _userManager = userManager;
         _externalLogins = externalLogins;
@@ -45,7 +46,34 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         _globalSettings = globalSettings.Value;
     }
 
-    [Obsolete("Use ctor with all params")]
+    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V14.")]
+    public BackOfficeSignInManager(
+        BackOfficeUserManager userManager,
+        IHttpContextAccessor contextAccessor,
+        IBackOfficeExternalLoginProviders externalLogins,
+        IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsFactory,
+        IOptions<IdentityOptions> optionsAccessor,
+        IOptions<GlobalSettings> globalSettings,
+        ILogger<SignInManager<BackOfficeIdentityUser>> logger,
+        IAuthenticationSchemeProvider schemes,
+        IUserConfirmation<BackOfficeIdentityUser> confirmation,
+        IEventAggregator eventAggregator)
+        : this(
+            userManager,
+            contextAccessor,
+            externalLogins,
+            claimsFactory,
+            optionsAccessor,
+            globalSettings,
+            logger,
+            schemes,
+            confirmation,
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+    {
+    }
+
+    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V14.")]
     public BackOfficeSignInManager(
         BackOfficeUserManager userManager,
         IHttpContextAccessor contextAccessor,
@@ -56,7 +84,18 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         ILogger<SignInManager<BackOfficeIdentityUser>> logger,
         IAuthenticationSchemeProvider schemes,
         IUserConfirmation<BackOfficeIdentityUser> confirmation)
-        : this(userManager, contextAccessor, externalLogins, claimsFactory, optionsAccessor, globalSettings, logger, schemes, confirmation, StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
+        : this(
+            userManager,
+            contextAccessor,
+            externalLogins,
+            claimsFactory,
+            optionsAccessor,
+            globalSettings,
+            logger,
+            schemes,
+            confirmation,
+            StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
     {
     }
 
