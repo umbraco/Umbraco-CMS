@@ -4,6 +4,7 @@ import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-re
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbInputMarkdownElement } from '@umbraco-cms/backoffice/components';
+import { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-property-editor-ui-markdown-editor
@@ -16,9 +17,13 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 	@state()
 	private _preview?: boolean;
 
+	@state()
+	private _overlaySize?: UUIModalSidebarSize;
+
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._preview = config?.getValueByAlias('preview');
+		this._overlaySize = config?.getValueByAlias('overlaySize') ?? undefined;
 	}
 
 	#onChange(e: Event) {
@@ -29,6 +34,7 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 	render() {
 		return html`<umb-input-markdown
 			?preview=${this._preview}
+			.overlaySize=${this._overlaySize}
 			@change=${this.#onChange}
 			.value=${this.value}></umb-input-markdown>`;
 	}

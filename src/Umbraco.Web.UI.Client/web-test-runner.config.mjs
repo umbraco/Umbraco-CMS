@@ -31,6 +31,8 @@ export default {
 						'@umbraco-cms/backoffice/external/tinymce': './src/external/tinymce/index.ts',
 						'@umbraco-cms/backoffice/external/uui': './src/external/uui/index.ts',
 						'@umbraco-cms/backoffice/external/uuid': './src/external/uuid/index.ts',
+						'@umbraco-cms/backoffice/external/sanitize-html': './src/external/sanitize-html/index.ts',
+						'@umbraco-cms/backoffice/external/marked': 'src/external/marked/index.ts',
 
 						'@umbraco-cms/backoffice/backend-api': './src/external/backend-api/index.ts',
 						'@umbraco-cms/backoffice/class-api': './src/libs/class-api/index.ts',
@@ -104,6 +106,7 @@ export default {
 						'@umbraco-cms/backoffice/user-group': './src/packages/user/user-group/index.ts',
 						'@umbraco-cms/backoffice/current-user': './src/packages/user/current-user/index.ts',
 						'@umbraco-cms/backoffice/user': './src/packages/user/user/index.ts',
+						'@umbraco-cms/backoffice/user-permission': './src/packages/user/user-permission/index.ts',
 
 						'@umbraco-cms/backoffice/code-editor': './src/packages/templating/code-editor/index.ts',
 

@@ -1,3 +1,4 @@
+import { manifests as repositoryManifests } from './repository/manifests.js';
 import type {
 	ManifestUserGranularPermission,
 	ManifestUserPermission,
@@ -202,4 +203,4 @@ export const granularPermissions: Array<ManifestUserGranularPermission> = [
 	},
 ];
 
-export const manifests = [...permissions, ...granularPermissions];
+export const manifests = [...repositoryManifests, ...permissions, ...granularPermissions];
