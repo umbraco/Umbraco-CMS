@@ -73,13 +73,7 @@ public interface IFileSource
     /// </summary>
     /// <param name="udis">The udis of the files to get.</param>
     /// <param name="fileTypes">A collection of file types which can store the files.</param>
+    /// <param name="continueOnFileNotFound">A flag indicating whether to continue if a file isn't found or to stop and throw a FileNotFoundException.</param>
     /// <param name="token">A cancellation token.</param>
-    Task GetFilesAsync(IEnumerable<StringUdi> udis, IFileTypeCollection fileTypes, CancellationToken token);
-
-    ///// <summary>
-    ///// Gets the content of a file as a bytes array.
-    ///// </summary>
-    ///// <param name="Udi">A file entity identifier.</param>
-    ///// <returns>A byte array containing the file content.</returns>
-    // byte[] GetFileBytes(StringUdi Udi);
+    Task GetFilesAsync(IEnumerable<StringUdi> udis, IFileTypeCollection fileTypes, bool continueOnFileNotFound, CancellationToken token);
 }
