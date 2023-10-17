@@ -160,6 +160,12 @@
     <key alias="morePublishingOptions">More publishing options</key>
     <key alias="submitChanges">Submit</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media deleted</key>
+    <key alias="move">Media moved</key>
+    <key alias="copy">Media copied</key>
+    <key alias="save">Media saved</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
     <key alias="delete">Content deleted</key>
