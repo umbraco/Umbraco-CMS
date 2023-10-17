@@ -1,15 +1,15 @@
 import { UmbLanguageRepository } from '../../repository/language.repository.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
-import { UmbLanguagePickerModalResult, UmbLanguagePickerModalData } from '@umbraco-cms/backoffice/modal';
+import { UmbLanguagePickerModalValue, UmbLanguagePickerModalData } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-language-picker-modal')
 export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	UmbLanguagePickerModalData,
-	UmbLanguagePickerModalResult
+	UmbLanguagePickerModalValue
 > {
 	@state()
 	private _languages: Array<LanguageResponseModel> = [];
@@ -59,7 +59,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 							?selected=${this.#selectionManager.isSelected(item.isoCode!)}>
 							<uui-icon slot="icon" name="umb:globe"></uui-icon>
 						</uui-menu-item>
-					`
+					`,
 				)}
 			</uui-box>
 			<div slot="actions">

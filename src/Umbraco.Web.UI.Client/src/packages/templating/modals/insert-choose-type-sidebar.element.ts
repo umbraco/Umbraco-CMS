@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import {
@@ -7,7 +7,7 @@ import {
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
 	UmbModalContext,
 	UMB_DICTIONARY_ITEM_PICKER_MODAL,
-	UmbDictionaryItemPickerModalResult,
+	UmbDictionaryItemPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
 
 export interface ChooseInsertTypeModalData {
@@ -19,15 +19,15 @@ export enum CodeSnippetType {
 	dictionaryItem = 'dictionaryItem',
 	macro = 'macro',
 }
-export interface ChooseInsertTypeModalResult {
-	value: string | UmbDictionaryItemPickerModalResult;
+export interface UmbChooseInsertTypeModalValue {
+	value: string | UmbDictionaryItemPickerModalValue;
 	type: CodeSnippetType;
 }
 
 @customElement('umb-templating-choose-insert-type-modal')
 export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement<
 	ChooseInsertTypeModalData,
-	ChooseInsertTypeModalResult
+	UmbChooseInsertTypeModalValue
 > {
 	private _close() {
 		this.modalContext?.reject();
@@ -46,11 +46,11 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	#openInsertPartialViewSidebar() {
 		this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
-		this.#openModal?.onSubmit().then((partialViewPickerModalResult) => {
-			if (partialViewPickerModalResult)
+		this.#openModal?.onSubmit().then((partialViewPickerModalValue) => {
+			if (partialViewPickerModalValue)
 				this.modalContext?.submit({
 					type: CodeSnippetType.partialView,
-					value: partialViewPickerModalResult.selection[0],
+					value: partialViewPickerModalValue.selection[0],
 				});
 		});
 	}
@@ -59,9 +59,9 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {
 			pickableFilter: (item) => item.id !== null,
 		});
-		this.#openModal?.onSubmit().then((dictionaryItemPickerModalResult) => {
-			if (dictionaryItemPickerModalResult)
-				this.modalContext?.submit({ value: dictionaryItemPickerModalResult, type: CodeSnippetType.dictionaryItem });
+		this.#openModal?.onSubmit().then((dictionaryItemPickerModalValue) => {
+			if (dictionaryItemPickerModalValue)
+				this.modalContext?.submit({ value: dictionaryItemPickerModalValue, type: CodeSnippetType.dictionaryItem });
 		});
 	}
 
