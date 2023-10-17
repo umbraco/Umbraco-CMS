@@ -191,7 +191,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					?hide-tree-root=${true}
 					?multiple=${false}
 					alias="Umb.Tree.Documents"
-					@selected=${(event: CustomEvent) => this._handleSelectionChange(event, 'document')}
+					@selection-change=${(event: CustomEvent) => this._handleSelectionChange(event, 'document')}
 					.selection=${[this._selectedKey ?? '']}
 					selectable></umb-tree>
 			</div>
@@ -206,7 +206,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					?hide-tree-root=${true}
 					?multiple=${false}
 					alias="Umb.Tree.Media"
-					@selected=${(event: CustomEvent) => this._handleSelectionChange(event, 'media')}
+					@selection-change=${(event: CustomEvent) => this._handleSelectionChange(event, 'media')}
 					.selection=${[this._selectedKey ?? '']}
 					selectable></umb-tree>
 			</div>
