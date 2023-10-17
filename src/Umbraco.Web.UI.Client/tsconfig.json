@@ -32,6 +32,8 @@
 			"@umbraco-cms/backoffice/external/tinymce": ["src/external/tinymce"],
 			"@umbraco-cms/backoffice/external/uui": ["src/external/uui"],
 			"@umbraco-cms/backoffice/external/uuid": ["src/external/uuid"],
+			"@umbraco-cms/backoffice/external/sanitize-html": ["src/external/sanitize-html"],
+			"@umbraco-cms/backoffice/external/marked": ["src/external/marked"],
 
 			"@umbraco-cms/backoffice/backend-api": ["src/external/backend-api"],
 			"@umbraco-cms/backoffice/class-api": ["src/libs/class-api"],

@@ -1,5 +1,6 @@
 import { UmbUserCollectionContext } from '../../user-collection.context.js';
 import type { UmbUserDetail } from '../../../types.js';
+import type { UserGroupEntity } from '@umbraco-cms/backoffice/user-group';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
