@@ -1829,7 +1829,9 @@ export default {
 		searchAllChildren: "Søg alle 'børn'",
 		languagesHelp: 'Tilføj sprog for at give brugerne adgang til at redigere',
 		sectionsHelp: 'Tilføj sektioner for at give brugerne adgang',
-		selectUserGroups: 'Vælg brugergrupper',
+		selectUserGroup: (multiple: boolean) => {
+			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';
+		},
 		noStartNode: 'Ingen startnode valgt',
 		noStartNodes: 'Ingen startnoder valgt',
 		startnode: 'Indhold startnode',

@@ -63,4 +63,12 @@ export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType
 	removeItems(uniques: Array<string>) {
 		this._data.remove(uniques);
 	}
+
+	/**
+	 * Returns an observable of the entire store
+	 * @memberof UmbStoreBase
+	 */
+	all() {
+		return this._data.asObservable();
+	}
 }

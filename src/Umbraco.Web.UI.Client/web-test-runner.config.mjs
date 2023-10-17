@@ -52,7 +52,6 @@ export default {
 						'@umbraco-cms/backoffice/utils': './src/shared/utils/index.ts',
 
 						'@umbraco-cms/internal/lit-element': './src/shared/lit-element/index.ts',
-						'@umbraco-cms/internal/modal': './src/shared/modal/index.ts',
 
 						'@umbraco-cms/backoffice/action': './src/packages/core/action/index.ts',
 						'@umbraco-cms/backoffice/collection': './src/packages/core/collection/index.ts',
@@ -106,6 +105,7 @@ export default {
 						'@umbraco-cms/backoffice/user-group': './src/packages/user/user-group/index.ts',
 						'@umbraco-cms/backoffice/current-user': './src/packages/user/current-user/index.ts',
 						'@umbraco-cms/backoffice/user': './src/packages/user/user/index.ts',
+						'@umbraco-cms/backoffice/user-permission': './src/packages/user/user-permission/index.ts',
 
 						'@umbraco-cms/backoffice/code-editor': './src/packages/templating/code-editor/index.ts',
 

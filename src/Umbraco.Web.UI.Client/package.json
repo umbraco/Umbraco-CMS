@@ -68,6 +68,7 @@
 		"./user-group": "./dist-cms/packages/user/user-group/index.js",
 		"./current-user": "./dist-cms/packages/user/current-user/index.js",
 		"./user": "./dist-cms/packages/user/user/index.js",
+		"./user-permission": "./dist-cms/packages/user/user-permission/index.js",
 		"./code-editor": "./dist-cms/packages/templating/code-editor/index.js",
 		"./external/*": "./dist-cms/external/*/index.js"
 	},
