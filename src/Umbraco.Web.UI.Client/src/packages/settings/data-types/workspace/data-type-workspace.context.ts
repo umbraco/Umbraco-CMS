@@ -6,7 +6,12 @@ import {
 	UmbWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { appendToFrozenArray, UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	appendToFrozenArray,
+	UmbArrayState,
+	UmbObjectState,
+	UmbStringState,
+} from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { Observable, combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
@@ -48,11 +53,22 @@ export class UmbDataTypeWorkspaceContext
 	#defaults = new UmbArrayState<PropertyEditorConfigDefaultData>([], (entry) => entry.alias);
 	defaults = this.#defaults.asObservable();
 
+	#propertyEditorUiIcon = new UmbStringState<string | null>(null);
+	propertyEditorUiIcon = this.#propertyEditorUiIcon.asObservable();
+
+	#propertyEditorUiName = new UmbStringState<string | null>(null);
+	propertyEditorUiName = this.#propertyEditorUiName.asObservable();
+
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.DataType', new UmbDataTypeRepository(host));
 
 		this.observe(this.propertyEditorSchemaAlias, async (propertyEditorSchemaAlias) => {
-			await this.#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias || UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT);
+			if (!propertyEditorSchemaAlias) {
+				this.setPropertyEditorSchemaAlias(UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT);
+				return;
+			}
+
+			await this.#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias);
 			this.#observePropertyEditorUIAlias();
 		});
 	}
@@ -63,10 +79,12 @@ export class UmbDataTypeWorkspaceContext
 			if (propertyEditorUiAlias === undefined || !this._propertyEditorSchemaConfigDefaultUIAlias) return;
 
 			// if the property editor ui alias is not set, we use the default alias from the schema
-			const alias =
-				propertyEditorUiAlias === null ? this._propertyEditorSchemaConfigDefaultUIAlias : propertyEditorUiAlias;
+			if (propertyEditorUiAlias === null) {
+				this.setPropertyEditorUiAlias(this._propertyEditorSchemaConfigDefaultUIAlias);
+				return;
+			}
 
-			await this.#setPropertyEditorUIConfig(alias);
+			await this.#setPropertyEditorUIConfig(propertyEditorUiAlias);
 			this._mergeConfigProperties();
 			this._mergeConfigDefaultData();
 		});
@@ -87,6 +105,9 @@ export class UmbDataTypeWorkspaceContext
 		return this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', propertyEditorUIAlias),
 			(manifest) => {
+				this.#propertyEditorUiIcon.next(manifest?.meta.icon || null);
+				this.#propertyEditorUiName.next(manifest?.name || null);
+
 				this._propertyEditorUISettingsProperties = manifest?.meta.settings?.properties || [];
 				this._propertyEditorUISettingsDefaultData = manifest?.meta.settings?.defaultData || [];
 			},
