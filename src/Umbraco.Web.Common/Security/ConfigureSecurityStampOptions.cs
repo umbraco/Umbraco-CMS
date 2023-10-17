@@ -12,6 +12,11 @@ public class ConfigureSecurityStampOptions : IConfigureOptions<SecurityStampVali
 {
     private readonly SecuritySettings _securitySettings;
 
+    public ConfigureSecurityStampOptions()
+        : this(StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+    {
+    }
+
     public ConfigureSecurityStampOptions(IOptions<SecuritySettings> securitySettings)
         => _securitySettings = securitySettings.Value;
 
