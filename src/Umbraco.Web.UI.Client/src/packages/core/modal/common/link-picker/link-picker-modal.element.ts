@@ -5,13 +5,13 @@ import {
 	UmbLinkPickerConfig,
 	UmbLinkPickerLink,
 	UmbLinkPickerModalData,
-	UmbLinkPickerModalResult,
+	UmbLinkPickerModalValue,
+	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-link-picker-modal')
-export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalResult> {
+export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalValue> {
 	@state()
 	_selectedKey?: string;
 
@@ -195,7 +195,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					.selection=${[this._selectedKey ?? '']}
 					selectable></umb-tree>
 			</div>
-
 			<hr />
 			<uui-symbol-expand
 				id="media-expand"

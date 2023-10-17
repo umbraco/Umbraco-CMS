@@ -73,7 +73,6 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 				column-gap: var(--uui-size-layout-2);
 				border-bottom: 1px solid var(--uui-color-divider);
 				padding: var(--uui-size-layout-1) 0;
-				container-type: inline-size;
 			}
 
 			:host(:last-of-type) {
@@ -92,7 +91,6 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 			#headerColumn {
 				position: relative;
 				height: min-content;
-				z-index: 2;
 			}
 			@container (width > 600px) {
 				#headerColumn {

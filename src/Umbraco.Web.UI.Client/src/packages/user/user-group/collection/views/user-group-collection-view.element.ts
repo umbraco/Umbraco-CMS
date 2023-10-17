@@ -1,12 +1,12 @@
-import { UmbUserGroupCollectionContext } from './user-group-collection.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbUserGroupCollectionContext } from '../user-group-collection.context.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-import './user-group-table-name-column-layout.element.js';
-import './user-group-table-sections-column-layout.element.js';
+import '../components/user-group-table-name-column-layout.element.js';
+import '../components/user-group-table-sections-column-layout.element.js';
 import {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -16,8 +16,8 @@ import {
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
 
-@customElement('umb-user-group-collection-view')
-export class UmbUserGroupCollectionViewElement extends UmbLitElement {
+@customElement('umb-user-group-collection-table-view')
+export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	@state()
 	private _tableConfig: UmbTableConfig = {
 		allowSelection: true,
@@ -134,10 +134,10 @@ export class UmbUserGroupCollectionViewElement extends UmbLitElement {
 	];
 }
 
-export default UmbUserGroupCollectionViewElement;
+export default UmbUserGroupCollectionTableViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-group-collection-view': UmbUserGroupCollectionViewElement;
+		'umb-user-group-collection-table-view': UmbUserGroupCollectionTableViewElement;
 	}
 }

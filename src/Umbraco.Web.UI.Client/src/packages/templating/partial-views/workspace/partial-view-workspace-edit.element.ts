@@ -91,8 +91,8 @@ export class UmbPartialViewWorkspaceEditElement extends UmbLitElement {
 	#openQueryBuilder() {
 		const queryBuilderModal = this._modalContext?.open(UMB_TEMPLATE_QUERY_BUILDER_MODAL);
 
-		queryBuilderModal?.onSubmit().then((queryBuilderModalResult) => {
-			if (queryBuilderModalResult.value) this._codeEditor?.insert(getQuerySnippet(queryBuilderModalResult.value));
+		queryBuilderModal?.onSubmit().then((queryBuilderModalValue) => {
+			if (queryBuilderModalValue.value) this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
 		});
 	}
 
