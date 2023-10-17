@@ -6,7 +6,7 @@ import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backof
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { ProblemDetails, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
-import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
+import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 // TODO: update interface
 export interface UmbTreeContext<TreeItemType extends TreeItemPresentationModel> extends UmbBaseController {
@@ -102,12 +102,12 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 	public select(unique: string | null) {
 		if (!this.getSelectable()) return;
 		this.#selectionManager.select(unique);
-		this._host.getHostElement().dispatchEvent(new UmbSelectedEvent());
+		this._host.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
 	public deselect(unique: string | null) {
 		this.#selectionManager.deselect(unique);
-		this._host.getHostElement().dispatchEvent(new UmbSelectedEvent());
+		this._host.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
 	public async requestTreeRoot() {

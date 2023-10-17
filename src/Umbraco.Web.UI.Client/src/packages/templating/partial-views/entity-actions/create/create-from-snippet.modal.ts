@@ -1,7 +1,7 @@
 import { UmbCreateFromSnippetPartialViewModalData } from './create-from-snippet.action.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { SnippetItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-partial-view-create-from-snippet-modal')
@@ -34,7 +34,7 @@ export default class UmbPartialViewCreateFromSnippetModalElement extends UmbModa
 							(snippet) =>
 								html`<uui-menu-item label="${snippet.name ?? ''}" @click-label=${() => this._submit(snippet.name ?? '')}
 									><uui-icon name="umb:article" slot="icon"></uui-icon
-								></uui-menu-item>`
+								></uui-menu-item>`,
 						)}
 					</uui-box>
 				</div>
