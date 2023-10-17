@@ -15,6 +15,7 @@ public abstract class RecycleBinItemResponseModel : INamedEntityPresentationMode
     public bool IsContainer { get; set; }
 
     public Guid? ParentId { get; set; }
+
     public bool IsTrashed => true;
 }
 

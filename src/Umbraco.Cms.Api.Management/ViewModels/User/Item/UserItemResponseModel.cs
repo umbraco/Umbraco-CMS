@@ -1,5 +1,5 @@
-﻿using Umbraco.Cms.Core;
-using Umbraco.Cms.Api.Management.ViewModels.Item;
+﻿using Umbraco.Cms.Api.Management.ViewModels.Item;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.User.Item;
 

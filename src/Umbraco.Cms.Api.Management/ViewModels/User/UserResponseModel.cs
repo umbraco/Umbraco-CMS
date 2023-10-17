@@ -28,5 +28,6 @@ public class UserResponseModel : UserPresentationBase, INamedEntityPresentationM
     public DateTime? LastLockoutDate { get; set; }
 
     public DateTime? LastPasswordChangeDate { get; set; }
+
     public string Type => Constants.UdiEntityType.User;
 }

@@ -8,5 +8,6 @@ public class DocumentResponseModel : ContentResponseModelBase<DocumentValueModel
     public IEnumerable<ContentUrlInfo> Urls { get; set; } = Array.Empty<ContentUrlInfo>();
 
     public Guid? TemplateId { get; set; }
+
     public string Type => Constants.UdiEntityType.Document;
 }

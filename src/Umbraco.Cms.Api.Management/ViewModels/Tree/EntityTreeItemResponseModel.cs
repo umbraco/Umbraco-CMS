@@ -7,5 +7,6 @@ public abstract class EntityTreeItemResponseModel : TreeItemPresentationModel, I
     public bool IsContainer { get; set; }
 
     public Guid? ParentId { get; set; }
+
     public abstract string Type { get; }
 }

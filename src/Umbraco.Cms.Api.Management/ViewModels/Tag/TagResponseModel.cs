@@ -11,5 +11,6 @@ public class TagResponseModel
     public string? Group { get; set; }
 
     public int NodeCount { get; set; }
+
     public string Type => Constants.UdiEntityType.Tag;
 }

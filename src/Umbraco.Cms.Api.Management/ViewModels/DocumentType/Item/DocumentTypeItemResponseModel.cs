@@ -8,5 +8,6 @@ public class DocumentTypeItemResponseModel : ItemResponseModelBase
     public bool IsElement { get; set; }
 
     public string? Icon { get; set; }
+
     public override string Type => Constants.UdiEntityType.DocumentType;
 }

@@ -7,5 +7,6 @@ public class TemplateResponseModel : TemplateModelBase, INamedEntityPresentation
     public Guid Id { get; set; }
 
     public Guid? MasterTemplateId { get; set; }
+
     public string Type => Constants.UdiEntityType.Template;
 }

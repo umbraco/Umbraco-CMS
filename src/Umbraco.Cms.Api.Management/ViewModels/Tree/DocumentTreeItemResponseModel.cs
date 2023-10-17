@@ -15,5 +15,6 @@ public class DocumentTreeItemResponseModel : ContentTreeItemResponseModel
     public IEnumerable<VariantTreeItemViewModel> Variants { get; set; } = Enumerable.Empty<VariantTreeItemViewModel>();
 
     public string Icon { get; set; } = string.Empty;
+
     public override string Type => Constants.UdiEntityType.Document;
 }

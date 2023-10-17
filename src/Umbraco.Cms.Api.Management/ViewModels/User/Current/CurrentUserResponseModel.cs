@@ -25,5 +25,6 @@ public class CurrentUserResponseModel : INamedEntityPresentationModel
     public required bool HasAccessToAllLanguages { get; init; }
 
     public required ISet<string> Permissions { get; init; }
+
     public string Type => Constants.UdiEntityType.User;
 }

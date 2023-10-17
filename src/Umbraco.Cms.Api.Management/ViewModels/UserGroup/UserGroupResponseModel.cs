@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Core;
+
 namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 
 public class UserGroupResponseModel : UserGroupBase, INamedEntityPresentationModel
