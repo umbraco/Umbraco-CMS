@@ -134,7 +134,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                 leftColumn.classList.remove(aboveClass);
             }
 
-            returnFocusToTriggerElement()
+            returnFocusToTriggerElement();
         }
     }
 
