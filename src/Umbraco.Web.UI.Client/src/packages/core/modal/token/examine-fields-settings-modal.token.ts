@@ -5,13 +5,13 @@ export type UmbExamineFieldsSettingsModalData = Array<{
 	exposed: boolean;
 }>;
 
-export interface UmbCreateDocumentModalResultData {
+export interface UmbExamineFieldsSettingsModalValue {
 	fields?: UmbExamineFieldsSettingsModalData;
 }
 
 export const UMB_EXAMINE_FIELDS_SETTINGS_MODAL = new UmbModalToken<
 	UmbExamineFieldsSettingsModalData,
-	UmbCreateDocumentModalResultData
+	UmbExamineFieldsSettingsModalValue
 >('Umb.Modal.ExamineFieldsSettings', {
 	type: 'sidebar',
 	size: 'small',

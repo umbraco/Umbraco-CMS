@@ -267,7 +267,12 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		parentId: null,
 		propertyEditorAlias: 'Umbraco.EmailAddress',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUi.Email',
-		values: [],
+		values: [
+			{
+				alias: 'inputMode',
+				value: 'email',
+			},
+		],
 	},
 	{
 		type: 'data-type',
@@ -294,7 +299,20 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		parentId: null,
 		propertyEditorAlias: 'Umbraco.DropDown.Flexible',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
-		values: [],
+		values: [
+			{
+				alias: 'multiple',
+				value: false,
+			},
+			{
+				alias: 'items',
+				value: {
+					0: { sortOrder: 1, value: 'First Option' },
+					1: { sortOrder: 2, value: 'Second Option' },
+					2: { sortOrder: 3, value: 'I Am the third Option' },
+				},
+			},
+		],
 	},
 	{
 		type: 'data-type',

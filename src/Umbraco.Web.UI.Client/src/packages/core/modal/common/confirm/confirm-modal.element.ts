@@ -1,12 +1,12 @@
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { UmbConfirmModalData, UmbConfirmModalResult, UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbConfirmModalData, UmbConfirmModalValue, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-confirm-modal')
 export class UmbConfirmModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbConfirmModalData, UmbConfirmModalResult>;
+	modalContext?: UmbModalContext<UmbConfirmModalData, UmbConfirmModalValue>;
 
 	@property({ type: Object })
 	data?: UmbConfirmModalData;

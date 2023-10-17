@@ -75,7 +75,7 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 			? html`<div id="action-modal">
 					<h3>${this._headline}</h3>
 					<umb-entity-action-list
-						@executed=${this.#onActionExecuted}
+						@action-executed=${this.#onActionExecuted}
 						.entityType=${this._entityType}
 						.unique=${this._unique}></umb-entity-action-list>
 			  </div>`

@@ -6,6 +6,7 @@ export * from './body-layout/body-layout.element.js';
 export * from './button-with-dropdown/button-with-dropdown.element.js'; // TODO: delete this and change usage to umb-dropdown
 export * from './code-block/index.js';
 export * from './input-date/index.js';
+export * from './input-dropdown/index.js';
 export * from './dropdown/index.js';
 export * from './empty-state/index.js';
 export * from './entity-actions-bundle/index.js';
@@ -17,6 +18,7 @@ export * from './input-checkbox-list/index.js';
 export * from './input-color/index.js';
 export * from './input-eye-dropper/index.js';
 export * from './input-list-base/index.js';
+export * from './input-markdown-editor/index.js';
 export * from './input-multi-url/index.js';
 export * from './input-tiny-mce/index.js';
 export * from './input-number-range/index.js';

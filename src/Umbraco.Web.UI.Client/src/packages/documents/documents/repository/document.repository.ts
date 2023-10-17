@@ -46,19 +46,19 @@ export class UmbDocumentRepository
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
-			}),
+			}).asPromise(),
 
 			new UmbContextConsumerController(this.#host, UMB_DOCUMENT_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#store = instance;
-			}),
+			}).asPromise(),
 
 			new UmbContextConsumerController(this.#host, UMB_DOCUMENT_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#itemStore = instance;
-			}),
+			}).asPromise(),
 
 			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
-			}),
+			}).asPromise(),
 		]);
 	}
 

@@ -5,7 +5,7 @@ import {
 	UmbModalToken,
 	UmbModalType,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UmbPickerModalResult,
+	UmbPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -42,7 +42,7 @@ export class UmbInputListBaseElement extends UmbLitElement {
 			selection: this.value,
 		});
 
-		modalContext?.onSubmit().then((data: UmbPickerModalResult) => {
+		modalContext?.onSubmit().then((data: UmbPickerModalValue) => {
 			if (data) {
 				this.value = data.selection?.filter((id) => id !== null && id !== undefined) as Array<string>;
 				this.selectionUpdated();
@@ -61,7 +61,7 @@ export class UmbInputListBaseElement extends UmbLitElement {
 
 	protected renderButton() {
 		return html`<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">
-			Add
+			${this.localize.term('general_add')}
 		</uui-button>`;
 	}
 	protected renderContent() {

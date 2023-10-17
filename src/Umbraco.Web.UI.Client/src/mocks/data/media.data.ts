@@ -2,7 +2,11 @@ import type { MediaDetails } from '../../packages/media/media/index.js';
 import { UmbEntityTreeData } from './entity-tree.data.js';
 import { UmbEntityData } from './entity.data.js';
 import { createContentTreeItem } from './utils.js';
-import { ContentTreeItemResponseModel, PagedMediaTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	ContentTreeItemResponseModel,
+	MediaItemResponseModel,
+	PagedMediaTreeItemResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<MediaDetails> = [
 	{
@@ -183,6 +187,14 @@ export const data: Array<MediaDetails> = [
 	},
 ];
 
+const createMediaItem = (item: MediaDetails): MediaItemResponseModel => {
+	return {
+		id: item.id,
+		name: item.name,
+		icon: item.icon,
+	};
+};
+
 // Temp mocked database
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -192,6 +204,11 @@ class UmbMediaData extends UmbEntityData<MediaDetails> {
 
 	constructor() {
 		super(data);
+	}
+
+	getItems(ids: Array<string>): Array<MediaItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
+		return items.map((item) => createMediaItem(item));
 	}
 
 	getTreeRoot(): PagedMediaTreeItemResponseModel {

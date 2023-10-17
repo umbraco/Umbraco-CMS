@@ -41,11 +41,11 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.MemberGroup.Save',
 		name: 'Save Member Group Workspace Action',
+		api: UmbSaveWorkspaceAction,
 		meta: {
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
-			api: UmbSaveWorkspaceAction,
 		},
 		conditions: [
 			{

@@ -1,5 +1,5 @@
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_COLLECTION_CONTEXT_TOKEN, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { ManifestDashboardCollection } from '@umbraco-cms/backoffice/extension-registry';
 import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -23,7 +23,7 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 			const repositoryAlias = this.manifest.meta.repositoryAlias;
 			this._entityType = this.manifest.conditions.entityType;
 			this._collectionContext = new UmbCollectionContext(this, this._entityType, repositoryAlias);
-			this.provideContext(UMB_COLLECTION_CONTEXT_TOKEN, this._collectionContext);
+			this.provideContext(UMB_COLLECTION_CONTEXT, this._collectionContext);
 		}
 	}
 

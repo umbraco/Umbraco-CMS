@@ -75,19 +75,10 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 	}
 
 	delete(ids: Array<string>) {
-		const deletedKeys = this.data
-			.filter((item) => {
-				if (!item.id) throw new Error('Item has no id');
-				ids.includes(item.id);
-			})
-			.map((item) => item.id);
-
 		this.data = this.data.filter((item) => {
 			if (!item.id) throw new Error('Item has no id');
-			ids.indexOf(item.id) === -1;
+			return !ids.includes(item.id);
 		});
-
-		return deletedKeys;
 	}
 
 	updateData(updateItem: T) {

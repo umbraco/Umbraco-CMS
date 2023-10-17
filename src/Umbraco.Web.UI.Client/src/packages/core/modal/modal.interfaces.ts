@@ -4,7 +4,7 @@ export interface UmbPickerModalData<ItemType> {
 	filter?: (item: ItemType) => boolean;
 	pickableFilter?: (item: ItemType) => boolean;
 }
-export interface UmbPickerModalResult {
+export interface UmbPickerModalValue {
 	selection: Array<string | null>;
 }
 

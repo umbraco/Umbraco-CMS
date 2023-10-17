@@ -35,24 +35,19 @@ export class UmbModalManagerContext {
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalManagerContext
 	 */
-	public open<ModalData extends object = object, ModalResult = unknown>(
-		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
+	public open<ModalData extends object = object, ModalValue = unknown>(
+		modalAlias: string | UmbModalToken<ModalData, ModalValue>,
 		data?: ModalData,
 		config?: UmbModalConfig,
-		router: IRouterSlot | null = null
+		router: IRouterSlot | null = null,
 	) {
-		const modalContext = new UmbModalContextClass(
-			this.host,
-			router,
-			modalAlias,
-			data,
-			config
-		) as unknown as UmbModalContext<ModalData, ModalResult>;
-
-		modalContext.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalContext));
+		const modalContext = new UmbModalContextClass(router, modalAlias, data, config) as unknown as UmbModalContext<
+			ModalData,
+			ModalValue
+		>;
 
 		this.#modals.next(
-			appendToFrozenArray(this.#modals.getValue(), modalContext, (entry) => entry.key === modalContext.key)
+			appendToFrozenArray(this.#modals.getValue(), modalContext, (entry) => entry.key === modalContext.key),
 		);
 		return modalContext;
 	}
@@ -70,19 +65,8 @@ export class UmbModalManagerContext {
 		}
 	}
 
-	#remove(key: string) {
+	public remove(key: string) {
 		this.#modals.next(this.#modals.getValue().filter((modal) => modal.key !== key));
-	}
-
-	/**
-	 * Handles the close-end event
-	 * @private
-	 * @param {UmbModalContext} modalContext
-	 * @memberof UmbModalManagerContext
-	 */
-	#onCloseEnd(modalContext: UmbModalContext<any, any>) {
-		modalContext.modalElement.removeEventListener('close-end', () => this.#onCloseEnd(modalContext));
-		this.#remove(modalContext.key);
 	}
 }
 

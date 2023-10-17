@@ -8,7 +8,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: STYLESHEET_REPOSITORY_ALIAS,
 	name: 'Stylesheet Repository',
-	class: UmbStylesheetRepository,
+	api: UmbStylesheetRepository,
 };
 
 
@@ -16,7 +16,7 @@ const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: STYLESHEET_TREE_STORE_ALIAS,
 	name: 'Stylesheet Tree Store',
-	class: UmbStylesheetTreeStore,
+	api: UmbStylesheetTreeStore,
 };
 
 export const manifests = [treeStore, repository];

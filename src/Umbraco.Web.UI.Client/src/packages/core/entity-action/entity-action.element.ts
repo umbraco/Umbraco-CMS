@@ -1,8 +1,9 @@
+import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-entity-action')
 export class UmbEntityActionElement extends UmbLitElement {
@@ -36,10 +37,10 @@ export class UmbEntityActionElement extends UmbLitElement {
 	}
 
 	async #createApi() {
-		if (!this._manifest?.meta.api) return;
+		if (!this._manifest) return;
 		if (this._unique === undefined) return;
-		// TODO: Could we provide the manifest to the api constructor? instead, to enable more flexibility. Mainly cause some actions knows their repository. some does not need a repository?
-		this.#api = new this._manifest.meta.api(this, this._manifest.meta.repositoryAlias, this.unique);
+
+		this.#api = await createExtensionApi(this._manifest, [this, this._manifest.meta.repositoryAlias, this.unique]);
 
 		// TODO: Fix so when we use a HREF it does not refresh the page?
 		this._href = await this.#api.getHref?.();
@@ -55,7 +56,7 @@ export class UmbEntityActionElement extends UmbLitElement {
 			event.stopPropagation();
 			await this.#api.execute();
 		}
-		this.dispatchEvent(new UmbExecutedEvent());
+		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
 	// TODO: we need to stop the regular click event from bubbling up to the table so it doesn't select the row.
@@ -68,7 +69,7 @@ export class UmbEntityActionElement extends UmbLitElement {
 		return html`
 			<uui-menu-item
 				label=${ifDefined(this._manifest?.meta.label)}
-				href=${this._href}
+				href=${ifDefined(this._href)}
 				@click-label=${this.#onClickLabel}
 				@click=${this.#onClick}>
 				${this._manifest?.meta.icon

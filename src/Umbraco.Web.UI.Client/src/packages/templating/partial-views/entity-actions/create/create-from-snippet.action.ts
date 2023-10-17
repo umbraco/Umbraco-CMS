@@ -9,17 +9,17 @@ export interface UmbCreateFromSnippetPartialViewModalData {
 	snippets: SnippetItemResponseModel[];
 }
 
-export type UmbConfirmModalResult = undefined;
+export type UmbConfirmModalValue = undefined;
 
 export const UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL = new UmbModalToken<UmbCreateFromSnippetPartialViewModalData, string>(
 	'Umb.Modal.CreateFromSnippetPartialView',
 	{
 		type: 'sidebar',
-	}
+	},
 );
 
 export class UmbCreateFromSnippetPartialViewAction<
-	T extends { copy(): Promise<void> }
+	T extends { copy(): Promise<void> },
 > extends UmbEntityActionBase<UmbPartialViewsRepository> {
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
@@ -42,7 +42,7 @@ export class UmbCreateFromSnippetPartialViewAction<
 			history.pushState(
 				null,
 				'',
-				`section/settings/workspace/partial-view/create/${this.unique ?? 'null'}/${snippetName}`
+				`section/settings/workspace/partial-view/create/${this.unique ?? 'null'}/${snippetName}`,
 			);
 		});
 	}

@@ -114,10 +114,6 @@ export class UmbAppElement extends UmbLitElement {
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
-			if (this.bypassAuth === false) {
-				await this.#authFlow.fetchServiceConfiguration();
-			}
-
 			// Get the current runtime level
 			await this.#setInitStatus();
 

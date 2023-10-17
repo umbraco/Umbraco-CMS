@@ -8,7 +8,7 @@ import * as serverHandlers from './handlers/server.handlers.js';
 import { handlers as upgradeHandlers } from './handlers/upgrade.handlers.js';
 import { handlers as userHandlers } from './handlers/user.handlers.js';
 import { handlers as telemetryHandlers } from './handlers/telemetry.handlers.js';
-import { handlers as userGroupsHandlers } from './handlers/user-group.handlers.js';
+import { handlers as userGroupsHandlers } from './handlers/user-group/index.js';
 import { handlers as examineManagementHandlers } from './handlers/examine-management.handlers.js';
 import { handlers as modelsBuilderHandlers } from './handlers/modelsbuilder.handlers.js';
 import { handlers as healthCheckHandlers } from './handlers/health-check.handlers.js';

@@ -3,13 +3,13 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export type UmbPropertySettingsModalData = {
 	documentTypeId: string;
-	propertyData: PropertyTypeModelBaseModel
+	propertyData: PropertyTypeModelBaseModel;
 };
-export type UmbPropertySettingsModalResult = PropertyTypeModelBaseModel;
+export type UmbPropertySettingsModalValue = PropertyTypeModelBaseModel;
 
 export const UMB_PROPERTY_SETTINGS_MODAL = new UmbModalToken<
 	UmbPropertySettingsModalData,
-	UmbPropertySettingsModalResult
+	UmbPropertySettingsModalValue
 >('Umb.Modal.PropertySettings', {
 	type: 'sidebar',
 	size: 'small',

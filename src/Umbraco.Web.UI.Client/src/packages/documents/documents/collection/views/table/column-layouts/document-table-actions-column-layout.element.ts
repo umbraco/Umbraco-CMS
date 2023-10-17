@@ -9,7 +9,7 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
-import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
+import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 
 // TODO: this could be done more generic, but for now we just need it for the document table
 @customElement('umb-document-table-actions-column-layout')
@@ -35,7 +35,7 @@ export class UmbDocumentTableActionColumnLayoutElement extends LitElement {
 		this._actionMenuIsOpen = true;
 	}
 
-	#onActionExecuted(event: UmbExecutedEvent) {
+	#onActionExecuted(event: UmbActionExecutedEvent) {
 		event.stopPropagation();
 		this.#close();
 	}
@@ -54,7 +54,7 @@ export class UmbDocumentTableActionColumnLayoutElement extends LitElement {
 			<div id="action-menu-dropdown" slot="popover">
 				<uui-scroll-container>
 					<umb-entity-action-list
-						@executed=${this.#onActionExecuted}
+						@action-executed=${this.#onActionExecuted}
 						entity-type=${ifDefined(this.value.entityType)}
 						unique=${ifDefined(this.item.id)}></umb-entity-action-list>
 				</uui-scroll-container>

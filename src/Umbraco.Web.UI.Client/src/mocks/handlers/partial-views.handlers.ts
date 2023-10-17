@@ -45,16 +45,17 @@ const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 	rest.delete(umbracoPath('/partial-view'), (req, res, ctx) => {
 		const path = req.url.searchParams.get('path');
 		if (!path) return res(ctx.status(400));
-		const response = umbPartialViewsData.delete([path]);
-		return res(ctx.status(200), ctx.json(response));
+		umbPartialViewsData.delete([path]);
+		return res(ctx.status(200));
 	}),
+
 	rest.put(umbracoPath('/partial-view'), (req, res, ctx) => {
 		const requestBody = req.json() as CreateTextFileViewModelBaseModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		const response = umbPartialViewsData.updateData(requestBody);
+		umbPartialViewsData.updateData(requestBody);
 		return res(ctx.status(200));
 	}),
 ];
 const folderHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [];
 
-export const handlers = [...treeHandlers, ...detailHandlers, ...folderHandlers]
+export const handlers = [...treeHandlers, ...detailHandlers, ...folderHandlers];

@@ -11,14 +11,14 @@ const store: ManifestStore = {
 	type: 'store',
 	alias: DOCUMENT_BLUEPRINT_STORE_ALIAS,
 	name: 'Document Blueprint Store',
-	class: UmbDocumentBlueprintStore,
+	api: UmbDocumentBlueprintStore,
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: DOCUMENT_BLUEPRINT_TREE_STORE_ALIAS,
 	name: 'Document Blueprint Tree Store',
-	class: UmbDocumentBlueprintTreeStore,
+	api: UmbDocumentBlueprintTreeStore,
 };
 
 export const manifests = [store, treeStore, ...menuItemManifests, ...workspaceManifests];
