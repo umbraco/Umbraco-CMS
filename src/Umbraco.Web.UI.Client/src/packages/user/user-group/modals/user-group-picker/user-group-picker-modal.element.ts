@@ -1,12 +1,11 @@
-import type { UmbUserGroupRepository } from '../../repository/user-group.repository.js';
+import { UmbUserGroupCollectionRepository } from '../../collection/repository/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-user-group-picker-modal')
 export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any> {
@@ -14,7 +13,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 	private _userGroups: Array<UserGroupResponseModel> = [];
 
 	#selectionManager = new UmbSelectionManagerBase();
-	#userGroupRepository?: UmbUserGroupRepository;
+	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -22,39 +21,42 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 		// TODO: in theory this config could change during the lifetime of the modal, so we could observe it
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
 		this.#selectionManager.setSelection(this.data?.selection ?? []);
+	}
 
-		// TODO: this code is reused in multiple places, so it should be extracted to a function
-		new UmbObserverController(
-			this,
-			umbExtensionsRegistry.getByTypeAndAlias('repository', 'Umb.Repository.UserGroup'),
-			async (repositoryManifest) => {
-				if (!repositoryManifest) return;
-
-				try {
-					const result = await createExtensionApi(repositoryManifest, [this]);
-					this.#userGroupRepository = result as UmbUserGroupRepository;
-					this.#observeUserGroups();
-				} catch (error) {
-					throw new Error('Could not create repository with alias: Umb.Repository.User');
-				}
-			},
-		);
+	protected firstUpdated(): void {
+		this.#observeUserGroups();
 	}
 
 	async #observeUserGroups() {
-		if (!this.#userGroupRepository) return;
-		// TODO is this the correct end point?
-		const { data } = await this.#userGroupRepository.requestCollection();
+		const { error, asObservable } = await this.#userGroupCollectionRepository.requestCollection();
+		if (error) return;
+		this.observe(asObservable(), (items) => (this._userGroups = items));
+	}
 
-		if (data) {
-			this._userGroups = data.items;
-		}
+	#onSelected(event: UUIMenuItemEvent, item: UserGroupResponseModel) {
+		if (!item.id) throw new Error('User group id is required');
+		event.stopPropagation();
+		this.#selectionManager.select(item.id);
+		this.#updateSelectionValue();
+		this.requestUpdate();
+		this.modalContext?.dispatchEvent(new UmbSelectedEvent(item.id));
+	}
+
+	#onDeselected(event: UUIMenuItemEvent, item: UserGroupResponseModel) {
+		if (!item.id) throw new Error('User group id is required');
+		event.stopPropagation();
+		this.#selectionManager.deselect(item.id);
+		this.#updateSelectionValue();
+		this.requestUpdate();
+		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(item.id));
+	}
+
+	#updateSelectionValue() {
+		this.modalContext?.updateValue({ selection: this.#selectionManager.getSelection() });
 	}
 
 	#submit() {
-		this.modalContext?.submit({
-			selection: this.#selectionManager.getSelection(),
-		});
+		this.modalContext?.submit(this._value);
 	}
 
 	#close() {
@@ -63,17 +65,17 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 
 	render() {
 		return html`
-			<umb-body-layout headline="Select user groups">
+			<umb-body-layout headline=${this.localize.term('user_selectUserGroup', false)}>
 				<uui-box>
 					${this._userGroups.map(
 						(item) => html`
 							<uui-menu-item
-								label=${item.name}
+								label=${ifDefined(item.name)}
 								selectable
-								@selected=${() => this.#selectionManager.select(item.id!)}
-								@deselected=${() => this.#selectionManager.deselect(item.id!)}
+								@selected=${(event: UUIMenuItemEvent) => this.#onSelected(event, item)}
+								@deselected=${(event: UUIMenuItemEvent) => this.#onDeselected(event, item)}
 								?selected=${this.#selectionManager.isSelected(item.id!)}>
-								<uui-icon .name=${item.icon} slot="icon"></uui-icon>
+								<uui-icon .name=${item.icon || null} slot="icon"></uui-icon>
 							</uui-menu-item>
 						`,
 					)}
