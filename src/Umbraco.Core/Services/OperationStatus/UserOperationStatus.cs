@@ -1,5 +1,8 @@
 ﻿namespace Umbraco.Cms.Core.Services.OperationStatus;
 
+/// <summary>
+/// Used to signal a user operation succeeded or an atomic failure reason
+/// </summary>
 public enum UserOperationStatus
 {
     Success,
@@ -32,5 +35,5 @@ public enum UserOperationStatus
     MediaNodeNotFound,
     UnknownFailure,
     CannotPasswordReset,
-    InvalidState
+    NotInInviteState
 }

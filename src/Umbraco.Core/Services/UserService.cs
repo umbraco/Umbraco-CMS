@@ -815,16 +815,21 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new UserInvitationResult());
         }
 
-        IUser? invitedUser = await GetAsync(model.InvitedUserKey);
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+        IUser? invitedUser = await userStore.GetAsync(model.InvitedUserKey);
         if (invitedUser == null)
         {
-            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new UserInvitationResult());
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, new UserInvitationResult());
         }
 
         if (invitedUser.UserState != UserState.Invited)
         {
-            return Attempt.FailWithStatus(UserOperationStatus.InvalidState, new UserInvitationResult());
+            return Attempt.FailWithStatus(UserOperationStatus.NotInInviteState, new UserInvitationResult());
         }
+
+        // re-inviting so update invite date
+        invitedUser.InvitedDate = DateTime.Now;
+        await userStore.SaveAsync(invitedUser);
 
         Attempt<UserInvitationResult, UserOperationStatus> invitationAttempt = await SendInvitationAsync(performingUser, serviceScope, invitedUser, model.Message);
         scope.Complete();
