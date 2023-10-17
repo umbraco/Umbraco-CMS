@@ -1,7 +1,9 @@
+import { sanitizeHtml } from '@umbraco-cms/backoffice/external/sanitize-html';
+import { marked } from '@umbraco-cms/backoffice/external/marked';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import { UmbCodeEditorController, UmbCodeEditorElement, loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { css, html, customElement, query, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, query, property, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { FormControlMixin, UUIModalSidebarSize, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
@@ -21,9 +23,13 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	protected getFormElement() {
 		return this._codeEditor;
 	}
+	// TODO: Make actions be able to handle multiple selection
 
 	@property({ type: Boolean })
-	preview?: boolean;
+	preview: boolean = false;
+
+	@property()
+	overlaySize?: UUIModalSidebarSize;
 
 	#isCodeEditorReady = new UmbBooleanState(false);
 	#editor?: UmbCodeEditorController;
@@ -44,7 +50,6 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
-			this.#isCodeEditorReady.next(true);
 
 			this.#editor = this._codeEditor?.editor;
 
@@ -52,7 +57,9 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 				lineNumbers: false,
 				minimap: false,
 				folding: false,
-			});
+			}); // Prefer to update options before showing the editor, to avoid seeing the changes in the UI.
+
+			this.#isCodeEditorReady.next(true);
 			this.#loadActions();
 		} catch (error) {
 			console.error(error);
@@ -66,37 +73,37 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 			label: 'Add Heading H1',
 			id: 'h1',
 			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit1],
-			run: () => this._insertAtCurrentLine('#'),
+			run: () => this._insertAtCurrentLine('# '),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H2',
 			id: 'h2',
 			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit2],
-			run: () => this._insertAtCurrentLine('##'),
+			run: () => this._insertAtCurrentLine('## '),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H3',
 			id: 'h3',
 			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit3],
-			run: () => this._insertAtCurrentLine('###'),
+			run: () => this._insertAtCurrentLine('### '),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H4',
 			id: 'h4',
 			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit4],
-			run: () => this._insertAtCurrentLine('####'),
+			run: () => this._insertAtCurrentLine('#### '),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H5',
 			id: 'h5',
 			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit5],
-			run: () => this._insertAtCurrentLine('#####'),
+			run: () => this._insertAtCurrentLine('##### '),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H6',
 			id: 'h6',
 			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit6],
-			run: () => this._insertAtCurrentLine('######'),
+			run: () => this._insertAtCurrentLine('###### '),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Bold Text',
@@ -177,7 +184,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 		const modalContext = this._modalContext?.open(UMB_LINK_PICKER_MODAL, {
 			index: null,
 			link: { name: selectedValue },
-			config: {},
+			config: { overlaySize: this.overlaySize },
 		});
 
 		modalContext
@@ -216,7 +223,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 
 		const alt = this.#editor?.getValueInRange(selection);
 
-		this._focusEditor(); // Focus before opening modal
+		this._focusEditor(); // Focus before opening modal, otherwise cannot regain focus back after modal
 		const modalContext = this._modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL, {});
 
 		modalContext
@@ -253,7 +260,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 				column: 1,
 			});
 		} else {
-			this.#editor?.insertAtPosition('\n---\n', {
+			this.#editor?.insertAtPosition('\n\n---\n', {
 				lineNumber: selection.endLineNumber,
 				column: endColumn,
 			});
@@ -519,6 +526,12 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 		}
 	}
 
+	#onInput(e: CustomEvent) {
+		e.stopPropagation();
+		this.value = this.#editor?.monacoEditor?.getValue() ?? '';
+		this.dispatchEvent(new CustomEvent('change'));
+	}
+
 	render() {
 		//TODO: Why is the theme dark in Backoffice, but light in Storybook?
 		return html` <div id="actions">${this._renderBasicActions()}</div>
@@ -526,16 +539,20 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 				language="markdown"
 				.code=${this.value as string}
 				@keypress=${this.onKeyPress}
+				@input=${this.#onInput}
 				theme="umb-light"></umb-code-editor>
 			${this.renderPreview()}`;
 	}
 
 	renderPreview() {
 		if (!this.preview) return;
-		return html`<div>TODO Preview</div>`;
+		return html`<uui-scroll-container id="preview">
+			${unsafeHTML(sanitizeHtml(marked.parse(this.value as string)))}
+		</uui-scroll-container>`;
 	}
 
 	static styles = [
+		UUITextStyles,
 		css`
 			:host {
 				display: flex;
@@ -545,6 +562,10 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 				background-color: var(--uui-color-background-alt);
 				display: flex;
 				gap: var(--uui-size-6);
+			}
+
+			#preview {
+				max-height: 400px;
 			}
 
 			#actions div {
@@ -565,9 +586,16 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 			uui-button {
 				width: 50px;
 			}
+
+			blockquote {
+				border-left: 2px solid var(--uui-color-default-emphasis);
+				margin-inline: 0;
+				padding-inline: var(--uui-size-3);
+			}
 		`,
 	];
 }
+export default UmbInputMarkdownElement;
 
 declare global {
 	interface HTMLElementTagNameMap {

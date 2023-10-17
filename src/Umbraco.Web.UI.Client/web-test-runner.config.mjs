@@ -31,6 +31,8 @@ export default {
 						'@umbraco-cms/backoffice/external/tinymce': './src/external/tinymce/index.ts',
 						'@umbraco-cms/backoffice/external/uui': './src/external/uui/index.ts',
 						'@umbraco-cms/backoffice/external/uuid': './src/external/uuid/index.ts',
+						'@umbraco-cms/backoffice/external/sanitize-html': './src/external/sanitize-html/index.ts',
+						'@umbraco-cms/backoffice/external/marked': 'src/external/marked/index.ts',
 
 						'@umbraco-cms/backoffice/backend-api': './src/external/backend-api/index.ts',
 						'@umbraco-cms/backoffice/class-api': './src/libs/class-api/index.ts',
