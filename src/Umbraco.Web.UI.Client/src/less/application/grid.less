@@ -76,7 +76,7 @@ body.umb-drawer-is-visible #mainwrapper{
 
 #leftcolumn {
   height: 100%;
-  z-index: 0;
+  z-index: 1100;
   float: left;
   position: absolute;
   top: 0;
@@ -84,6 +84,12 @@ body.umb-drawer-is-visible #mainwrapper{
   &.above-backdrop{
       z-index: 7501;
   }
+
+  // force behind TinyMCE when it's in fullscreen mode
+  .tox-fullscreen & {
+    z-index: 0;
+  }
+
 }
 
 #navigation {
