@@ -33,9 +33,9 @@
       var modelObject;
 
       // Property actions:
-      let copyAllBlocksAction = null;
-      let deleteAllBlocksAction = null;
-      let pasteSingleBlockAction = null;
+      //let copyAllBlocksAction = null;
+      //let deleteAllBlocksAction = null;
+      //let pasteSingleBlockAction = null;
 
       var inlineEditing = false;
       var liveEditing = true;
@@ -43,15 +43,16 @@
       var vm = this;
 
       vm.readonly = false;
+      vm.tinyMceEditor = null;
 
       $attrs.$observe('readonly', (value) => {
           vm.readonly = value !== undefined;
 
           vm.blockEditorApi.readonly = vm.readonly;
 
-          if (deleteAllBlocksAction) {
+          /*if (deleteAllBlocksAction) {
               deleteAllBlocksAction.isDisabled = vm.readonly;
-          }
+          }*/
       });
 
       vm.loading = true;
@@ -184,9 +185,6 @@
               promises.push(assetsService.loadJs(tinyJsAsset, $scope));
           });
 
-          //stores a reference to the editor
-          var tinyMceEditor = null;
-
           promises.push(tinyMceService.getTinyMceEditorConfig({
               htmlId: vm.textAreaHtmlId,
               stylesheets: editorConfig.stylesheets,
@@ -213,18 +211,18 @@
               baseLineConfigObj.setup = function (editor) {
 
                   //set the reference
-                  tinyMceEditor = editor;
+                  vm.tinyMceEditor = editor;
 
-                  tinyMceEditor.on('init', function (e) {
+                  vm.tinyMceEditor.on('init', function (e) {
                       $timeout(function () {
                           vm.rteLoading = false;
                           vm.updateLoading();
                       });
                   });
-                  tinyMceEditor.on("focus", function () {
+                  vm.tinyMceEditor.on("focus", function () {
                       $element[0].dispatchEvent(new CustomEvent('umb-rte-focus', {composed: true, bubbles: true}));
                   });
-                  tinyMceEditor.on("blur", function () {
+                  vm.tinyMceEditor.on("blur", function () {
                       $element[0].dispatchEvent(new CustomEvent('umb-rte-blur', {composed: true, bubbles: true}));
                   });
 
@@ -261,24 +259,26 @@
               //listen for formSubmitting event (the result is callback used to remove the event subscription)
               unsubscribe.push($scope.$on("formSubmitting", function () {
                 // TODO: Check if we need to include blocksLoading in this, turn it into loading..
-                  if (tinyMceEditor !== undefined && tinyMceEditor != null && !vm.rteLoading) {
-                      vm.model.value.markup = tinyMceEditor.getContent();
+                  if (vm.tinyMceEditor != null && !vm.rteLoading) {
+                    // TODO: Re-evaluate BLOCK ELEMENTS:
+                    vm.model.value.markup = vm.tinyMceEditor.getContent();
                   }
               }));
 
               vm.focusRTE = function () {
-                  tinyMceEditor.focus();
+                vm.tinyMceEditor.focus();
               }
 
               //when the element is disposed we need to unsubscribe!
               // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom
               // element might still be there even after the modal has been hidden.
               $scope.$on('$destroy', function () {
-                  if (tinyMceEditor !== undefined && tinyMceEditor != null) {
-                      if($element) {
-                          $element[0]?.dispatchEvent(new CustomEvent('blur', {composed: true, bubbles: true}));
-                      }
-                      tinyMceEditor.destroy()
+                  if (vm.tinyMceEditor != null) {
+                    if($element) {
+                        $element[0]?.dispatchEvent(new CustomEvent('blur', {composed: true, bubbles: true}));
+                    }
+                    vm.tinyMceEditor.destroy();
+                    vm.tinyMceEditor = null;
                   }
               });
 
@@ -512,6 +512,8 @@
           if (layoutIndex === -1) {
               throw new Error("Could not find layout entry of block with udi: "+block.layout.contentUdi)
           }
+
+          console.log("deleteBlock", vm.tinyMceEditor)
 
           setDirty();
 
