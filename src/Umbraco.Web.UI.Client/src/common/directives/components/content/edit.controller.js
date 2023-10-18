@@ -346,7 +346,7 @@
                 labelKey: "buttons_saveAndPreview"
             };
 
-            const activeVariant = content.variants?.find((variant) => variant.compositeId === compositeId);
+            const activeVariant = content.variants?.find((variant) => content.documentType?.variations === "Nothing" || variant.compositeId === compositeId);
 
             $scope.previewSubButtons = activeVariant?.additionalPreviewUrls?.map((additionalPreviewUrl) => {
                 return {
