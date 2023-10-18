@@ -59,7 +59,6 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 	#onSetFocalPoint(event: MouseEvent) {
 		event.preventDefault();
 
-		const viewport = this.getBoundingClientRect();
 		const image = this.imageElement.getBoundingClientRect();
 
 		const x = clamp(event.clientX - image.left, 0, image.width);
@@ -68,8 +67,8 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 		const left = clamp(x / image.width, 0, 1);
 		const top = clamp(y / image.height, 0, 1);
 
-		this.focalPointElement.style.left = `${x + image.left - viewport.left - this.#DOT_RADIUS}px`;
-		this.focalPointElement.style.top = `${y + image.top - viewport.top - this.#DOT_RADIUS}px`;
+		this.focalPointElement.style.left = `calc(${left * 100}% - ${this.#DOT_RADIUS}px)`;
+		this.focalPointElement.style.top = `calc(${top * 100}% - ${this.#DOT_RADIUS}px)`;
 
 		this.dispatchEvent(
 			new CustomEvent('change', {
@@ -84,8 +83,10 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 		if (!this.src) return nothing;
 
 		return html`
-			<img id="image" @click=${this.#onSetFocalPoint} @keydown=${() => nothing} src=${this.src} alt="" />
-			<div id="focal-point"></div>
+			<div id="wrapper">
+				<img id="image" @click=${this.#onSetFocalPoint} @keydown=${() => nothing} src=${this.src} alt="" />
+				<div id="focal-point"></div>
+			</div>
 		`;
 	}
 	static styles = css`
@@ -97,6 +98,14 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 			user-select: none;
 			background-color: white;
 			outline: 1px solid lightgrey;
+		}
+		/* Wrapper is used to make the focal point position responsive to the image size */
+		#wrapper {
+			width: fit-content;
+			height: fit-content;
+			position: relative;
+			display: flex;
+			margin: auto;
 		}
 		#image {
 			max-width: 100%;
