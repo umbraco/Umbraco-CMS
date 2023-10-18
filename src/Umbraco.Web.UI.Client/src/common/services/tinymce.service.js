@@ -1421,7 +1421,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         //stop watching before we update the value
         stopWatch();
         angularHelper.safeApply($rootScope, function () {
-          console.log("syncContext does have a change!!")
 
           initBlocks();
 
@@ -1444,6 +1443,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       function initBlocks() {
 
+        console.log("initBlocks");
+
         const blockEls = args.editor.contentDocument.querySelectorAll('umb-rte-block');
         for (const blockEl of blockEls) {
           if(!blockEl._isInitializedUmbBlock) {
@@ -1463,9 +1464,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                   blockEl.setAttribute('style', '');
                 }
               } else {
-                // Remove this block by removing the data-udi (as this will trigger TinyMCE format clean-up)
                 blockEl.removeAttribute('data-content-udi');
+                args.editor.dom.remove(blockEl);
               }
+            } else {
+              args.editor.dom.remove(blockEl);
             }
           }
         }
@@ -1556,6 +1559,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             }
           });
         }
+
+        initBlocks();
 
       });
 
