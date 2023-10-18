@@ -1,7 +1,9 @@
 import type { UUIButtonState, UUIInputPasswordElement } from '@umbraco-ui/uui';
 import { CSSResultGroup, LitElement, css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
+import { until } from 'lit/directives/until.js';
 import { umbAuthContext } from '../../context/auth.context';
+import { umbLocalizationContext } from '../../external/localization/localization-context.ts';
 
 @customElement('umb-new-password-layout')
 export default class UmbNewPasswordLayoutElement extends LitElement {
@@ -18,7 +20,7 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 	error: string = '';
 
 	@property()
-	userId = '';
+	user: any;
 
 	@state()
 	passwordConfig?: {
@@ -30,11 +32,11 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 	protected async firstUpdated(_changedProperties: any) {
 		super.firstUpdated(_changedProperties);
 
-		const response = await umbAuthContext.getPasswordConfig(this.userId);
+		const response = await umbAuthContext.getPasswordConfig(this.user.id);
 		this.passwordConfig = response.data;
 	}
 
-	#onSubmit(event: Event) {
+	async #onSubmit(event: Event) {
 		event.preventDefault();
 		if (!this.passwordConfig) return;
 		const form = event.target as HTMLFormElement;
@@ -49,27 +51,28 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 		const password = formData.get('password') as string;
 		const passwordConfirm = formData.get('confirmPassword') as string;
 
-		if (this.passwordConfig.minPasswordLength > 0) {
-			if (password.length < this.passwordConfig?.minPasswordLength) {
-				this.passwordElement.setCustomValidity(
-					`Password must be at least ${this.passwordConfig?.minPasswordLength} characters long`
-				);
-				return;
-			}
+		let passwordIsInvalid = false;
+
+		if (this.passwordConfig.minPasswordLength > 0 && password.length < this.passwordConfig.minPasswordLength) {
+			passwordIsInvalid = true;
 		}
 
 		if (this.passwordConfig.minNonAlphaNumericChars > 0) {
 			const nonAlphaNumericChars = password.replace(/[a-zA-Z0-9]/g, '').length; //TODO: How should we check for non-alphanumeric chars?
 			if (nonAlphaNumericChars < this.passwordConfig?.minNonAlphaNumericChars) {
-				this.passwordElement.setCustomValidity(
-					`Password must contain at least ${this.passwordConfig?.minNonAlphaNumericChars} non-alphanumeric characters`
-				);
-				return;
+				passwordIsInvalid = true;
 			}
 		}
 
+		if (passwordIsInvalid) {
+			const passwordValidityText = await umbLocalizationContext.localize('errorHandling_errorInPasswordFormat', [this.passwordConfig.minPasswordLength, this.passwordConfig.minNonAlphaNumericChars], "The password doesn't meet the minimum requirements!");
+			this.passwordElement.setCustomValidity(passwordValidityText);
+			return;
+		}
+
 		if (password !== passwordConfirm) {
-			this.confirmPasswordElement.setCustomValidity('Passwords do not match');
+			const passwordValidityText = await umbLocalizationContext.localize('user_passwordMismatch', undefined, "The confirmed password doesn't match the new password!");
+			this.confirmPasswordElement.setCustomValidity(passwordValidityText);
 			return;
 		}
 
@@ -81,29 +84,33 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 			<uui-form>
 				<form id="LoginForm" name="login" @submit=${this.#onSubmit}>
 					<div id="header">
-						<h2>Create new password</h2>
-						<span> Enter a new password for your account. </span>
+						<h2>Hi, ${this.user.name}</h2>
+            			<umb-localize key="user_userinviteWelcomeMessage">Welcome to Umbraco! Just need to get your password setup and then you're good to go</umb-localize>
 					</div>
 					<uui-form-layout-item>
-						<uui-label id="passwordLabel" for="password" slot="label" required>Password</uui-label>
+						<uui-label id="passwordLabel" for="password" slot="label" required>
+						  <umb-localize key="user_newPassword">New password</umb-localize>
+						</uui-label>
 						<uui-input-password
 							type="password"
 							id="password"
 							name="password"
 							label="Password"
 							required
-							required-message="Password is required"></uui-input-password>
+							required-message=${until(umbLocalizationContext.localize('user_passwordIsBlank', undefined, 'Your new password cannot be blank!'))}></uui-input-password>
 					</uui-form-layout-item>
 
 					<uui-form-layout-item>
 						<uui-label id="confirmPasswordLabel" for="confirmPassword" slot="label" required>
-							Confirm password
+              				<umb-localize key="user_confirmNewPassword">Confirm new password</umb-localize>
 						</uui-label>
 						<uui-input-password
 							type="password"
 							id="confirmPassword"
 							name="confirmPassword"
-							label="ConfirmPassword"></uui-input-password>
+							label="ConfirmPassword"
+              				required
+              				required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input-password>
 					</uui-form-layout-item>
 
 					${this.#renderErrorMessage()}

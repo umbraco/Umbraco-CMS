@@ -13,19 +13,20 @@ export default class UmbInvitePageElement extends LitElement {
 	error = '';
 
 	@state()
-	userId?: string;
+	invitedUser?: any;
 
 	protected async firstUpdated(_changedProperties: any) {
 		super.firstUpdated(_changedProperties);
 
 		const response = await umbAuthContext.getInvitedUser();
-		this.userId = response.user?.id;
 
-		if (!this.userId) {
-			// The login page should already have redirected the user to an error page. They should never get here.
-			UmbRouter.redirect('login');
-			return;
-		}
+    if (!response.user?.id) {
+      // The login page should already have redirected the user to an error page. They should never get here.
+      UmbRouter.redirect('login');
+      return;
+    }
+
+		this.invitedUser = response.user;
 	}
 
 	async #onSubmit(event: CustomEvent) {
@@ -48,10 +49,10 @@ export default class UmbInvitePageElement extends LitElement {
 	}
 
 	render() {
-		return this.userId
+		return this.invitedUser
 			? html`<umb-new-password-layout
 					@submit=${this.#onSubmit}
-					.userId=${this.userId}
+					.user=${this.invitedUser}
 					.state=${this.state}
 					.error=${this.error}></umb-new-password-layout>`
 			: nothing;
