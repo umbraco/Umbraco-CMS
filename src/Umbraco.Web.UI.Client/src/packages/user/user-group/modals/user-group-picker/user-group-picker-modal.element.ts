@@ -2,7 +2,7 @@ import { UmbUserGroupCollectionRepository } from '../../collection/repository/in
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
