@@ -25,7 +25,7 @@ export default class UmbBackToLoginButtonElement extends LitElement {
 			}
 			a {
 				height: 1rem;
-				color: #868686; /* TODO Change to uui color when uui gets a muted text variable */
+				color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
 				font-size: 14px;
 				gap: var(--uui-size-space-1);
 				align-self: center;

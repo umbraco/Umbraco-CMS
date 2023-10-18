@@ -33,11 +33,11 @@ export default class UmbErrorLayoutElement extends LitElement {
 				gap: var(--uui-size-space-5);
 			}
 			#header span {
-				color: #868686; /* TODO Change to uui color when uui gets a muted text variable */
+				color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
 				font-size: 14px;
 			}
 			#header h2 {
-				margin: 0px;
+				margin: 0;
 				font-weight: bold;
 				font-size: 1.4rem;
 			}
