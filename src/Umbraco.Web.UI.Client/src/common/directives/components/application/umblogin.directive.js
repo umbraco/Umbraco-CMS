@@ -13,7 +13,7 @@
             }
         });
 
-    function UmbLoginController($location, externalLoginInfoService) {
+    function UmbLoginController($location, externalLoginInfoService, userService) {
 
         const vm = this;
         vm.onLoginSuccess = loginSuccess;
@@ -39,9 +39,12 @@
          * @access private
          */
         function loginSuccess() {
-            if (vm.onLogin) {
-                vm.onLogin();
-            }
+            userService.refreshCurrentUser().then(function () {
+                userService._retryRequestQueue(true);
+                if (vm.onLogin) {
+                    vm.onLogin();
+                }
+            });
         }
     }
 
