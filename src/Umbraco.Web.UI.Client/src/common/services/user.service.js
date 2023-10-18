@@ -248,8 +248,6 @@ angular.module('umbraco.services')
                 authResource.getCurrentUser()
                     .then(function (data) {
 
-                        var result = { user: data, authenticated: true, lastUserId: lastUserId, loginType: "implicit" };
-
                         setCurrentUser(data);
 
                         deferred.resolve(currentUser);
