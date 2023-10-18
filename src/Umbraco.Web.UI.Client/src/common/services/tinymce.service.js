@@ -764,10 +764,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             const blockEl = nodes[i];
             const block = blockEditorApi.getBlockByContentUdi(blockEl.attr("data-content-udi"));
             if(block) {
-              const displayInline = block.config.displayInline !== true;
+              const displayAsBlock = block.config.displayInline !== true;
 
               /* if the block is set to display inline, checks if its wrapped in a p tag and then unwraps it (removes p tag) */
-              if (displayInline && blockEl.parent && blockEl.parent.name.toUpperCase() === "P") {
+              if (displayAsBlock && blockEl.parent && blockEl.parent.name.toUpperCase() === "P") {
                 blockEl.parent.unwrap();
               }
             }
