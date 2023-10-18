@@ -810,19 +810,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
      */
     insertBlockInEditor: function (editor, blockContentUdi) {
       if (blockContentUdi) {
-        /*
-        var data = {
-          "data-udi": blockUdi
-        };
-        */
-        //const blockEl = editor.dom.createHTML('umb-rte-block', data);
-        //editor.selection.setContent(blockEl, { format: 'raw' });
         editor.selection.setContent('<umb-rte-block data-content-udi="'+blockContentUdi+'"><!--Umbraco-Block--></umb-rte-block>');
-
-        // TODO: investigate what is needed here..
-        //editor.selection.setContent('Hello!!');
-        //editor.selection.setNode(blockEl);
-
 
         angularHelper.safeApply($rootScope, function () {
           editor.dispatch("Change");
@@ -1472,9 +1460,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             }
           }
         }
-        // TODO: Check if this is necessary?.
-        //args.scope.$digest();
-
       }
 
       // If we can not find the insert image/media toolbar button
