@@ -6,6 +6,7 @@ import { UmbImageCropperFocalPoint } from './index.js';
 @customElement('umb-image-cropper-focus-setter')
 export class UmbImageCropperFocusSetterElement extends LitElement {
 	@query('#image') imageElement!: HTMLImageElement;
+	@query('#wrapper') wrapperElement!: HTMLImageElement;
 	@query('#focal-point') focalPointElement!: HTMLImageElement;
 
 	@property({ type: String }) src?: string;
@@ -25,9 +26,26 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
+
 		this.style.setProperty('--dot-radius', `${this.#DOT_RADIUS}px`);
 		this.focalPointElement.style.left = `calc(${this.focalPoint.left * 100}% - ${this.#DOT_RADIUS}px)`;
 		this.focalPointElement.style.top = `calc(${this.focalPoint.top * 100}% - ${this.#DOT_RADIUS}px)`;
+
+		this.imageElement.onload = () => {
+			const imageAspectRatio = this.imageElement.naturalWidth / this.imageElement.naturalHeight;
+			console.log(imageAspectRatio);
+
+			if (imageAspectRatio > 1) {
+				this.imageElement.style.width = '100%';
+				this.wrapperElement.style.width = '100%';
+			} else {
+				this.imageElement.style.height = '100%';
+				this.wrapperElement.style.height = '100%';
+			}
+
+			this.imageElement.style.aspectRatio = `${imageAspectRatio}`;
+			this.wrapperElement.style.aspectRatio = `${imageAspectRatio}`;
+		};
 	}
 
 	async #addEventListeners() {
@@ -101,15 +119,13 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 		}
 		/* Wrapper is used to make the focal point position responsive to the image size */
 		#wrapper {
-			width: fit-content;
-			height: fit-content;
 			position: relative;
 			display: flex;
 			margin: auto;
-		}
-		#image {
 			max-width: 100%;
 			max-height: 100%;
+		}
+		#image {
 			margin: auto;
 			position: relative;
 		}

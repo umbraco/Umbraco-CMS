@@ -134,9 +134,7 @@ export class UmbInputImageCropperElement extends LitElement {
 			max-width: 500px;
 			min-width: 300px;
 			width: 100%;
-			aspect-ratio: 1;
-			height: fit-content;
-			max-height: 100%;
+			height: 100%;
 		}
 		#side {
 			display: grid;

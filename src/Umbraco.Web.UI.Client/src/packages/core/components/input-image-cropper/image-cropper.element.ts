@@ -27,7 +27,7 @@ export class UmbImageCropperElement extends LitElement {
 
 	@state() _zoom = 0;
 
-	#VIEWPORT_PADDING = 100 as const;
+	#VIEWPORT_PADDING = 50 as const;
 	#MAX_SCALE_FACTOR = 4 as const;
 	#SCROLL_ZOOM_SPEED = 0.001 as const;
 
