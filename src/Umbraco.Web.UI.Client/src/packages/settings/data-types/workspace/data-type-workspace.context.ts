@@ -1,12 +1,25 @@
 import { UmbDataTypeRepository } from '../repository/data-type.repository.js';
 import { UmbDataTypeVariantContext } from '../variant-context/data-type-variant-context.js';
-import { UmbInvariantableWorkspaceContextInterface, UmbWorkspaceContext, UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbInvariantableWorkspaceContextInterface,
+	UmbWorkspaceContext,
+	UmbWorkspaceContextInterface,
+} from '@umbraco-cms/backoffice/workspace';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { appendToFrozenArray, UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	appendToFrozenArray,
+	UmbArrayState,
+	UmbObjectState,
+	UmbStringState,
+} from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { Observable, combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
-import { PropertyEditorConfigDefaultData, PropertyEditorConfigProperty, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	PropertyEditorConfigDefaultData,
+	PropertyEditorConfigProperty,
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbDataTypeWorkspaceContext
@@ -30,64 +43,99 @@ export class UmbDataTypeWorkspaceContext
 	private _propertyEditorSchemaConfigDefaultData: Array<PropertyEditorConfigDefaultData> = [];
 	private _propertyEditorUISettingsDefaultData: Array<PropertyEditorConfigDefaultData> = [];
 
-	private _propertyEditorSchemaConfigProperties?: Array<PropertyEditorConfigProperty>;
-	private _propertyEditorUISettingsProperties?: Array<PropertyEditorConfigProperty>;
+	private _propertyEditorSchemaConfigProperties: Array<PropertyEditorConfigProperty> = [];
+	private _propertyEditorUISettingsProperties: Array<PropertyEditorConfigProperty> = [];
+
+	private _propertyEditorSchemaConfigDefaultUIAlias: string | null = null;
 
 	private _configDefaultData?: Array<PropertyEditorConfigDefaultData>;
+
+	private _propertyEditorUISettingsSchemaAlias?: string;
 
 	#defaults = new UmbArrayState<PropertyEditorConfigDefaultData>([], (entry) => entry.alias);
 	defaults = this.#defaults.asObservable();
 
+	#propertyEditorUiIcon = new UmbStringState<string | null>(null);
+	propertyEditorUiIcon = this.#propertyEditorUiIcon.asObservable();
+
+	#propertyEditorUiName = new UmbStringState<string | null>(null);
+	propertyEditorUiName = this.#propertyEditorUiName.asObservable();
+
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.DataType', new UmbDataTypeRepository(host));
+		this.#observePropertyEditorUIAlias();
+	}
 
-		this.observe(this.propertyEditorUiAlias, (propertyEditorUiAlias) => {
-			if (!propertyEditorUiAlias) {
-				// No property editor ui alias, so we clean up and reset the properties.
-				this.removeControllerByAlias('propertyEditorUiAlias');
-				this._propertyEditorUISettingsProperties = [];
-				this._propertyEditorUISettingsDefaultData = [];
-				this._mergeConfigProperties();
-				this._mergeConfigDefaultData();
-				return;
+	#observePropertyEditorUIAlias() {
+		this.observe(this.propertyEditorUiAlias, async (propertyEditorUiAlias) => {
+			// we only want to react on the change if the alias is set or null. When it is undefined something is still loading
+			if (propertyEditorUiAlias === undefined) return;
+
+			// if the property editor ui alias is not set, we use the default alias from the schema
+			if (propertyEditorUiAlias === null) {
+				await this.#observePropertyEditorSchemaAlias();
+				this.setPropertyEditorUiAlias(this._propertyEditorSchemaConfigDefaultUIAlias!);
+			} else {
+				await this.#setPropertyEditorUIConfig(propertyEditorUiAlias);
+				this.setPropertyEditorSchemaAlias(this._propertyEditorUISettingsSchemaAlias!);
+				await this.#observePropertyEditorSchemaAlias();
 			}
 
-			this.observe(
-				umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', propertyEditorUiAlias),
-				(manifest) => {
-					this._observePropertyEditorSchemaConfig(
-						manifest?.meta.propertyEditorSchemaAlias || UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT
-					);
-					this._propertyEditorUISettingsProperties = manifest?.meta.settings?.properties || [];
-					this._propertyEditorUISettingsDefaultData = manifest?.meta.settings?.defaultData || [];
-					this._mergeConfigProperties();
-					this._mergeConfigDefaultData();
-				}
-				, 'observePropertyEditorUiAlias'
-			);
+			this._mergeConfigProperties();
+			this._mergeConfigDefaultData();
 		});
 	}
 
-	private _observePropertyEditorSchemaConfig(propertyEditorSchemaAlias: string) {
-		this.observe(
+	#observePropertyEditorSchemaAlias() {
+		return this.observe(this.propertyEditorSchemaAlias, async (propertyEditorSchemaAlias) => {
+			if (!propertyEditorSchemaAlias) {
+				this.setPropertyEditorSchemaAlias(UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT);
+				return;
+			}
+
+			await this.#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias);
+		}).asPromise();
+	}
+
+	#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias: string) {
+		return this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorSchema', propertyEditorSchemaAlias),
 			(manifest) => {
 				this._propertyEditorSchemaConfigProperties = manifest?.meta.settings?.properties || [];
 				this._propertyEditorSchemaConfigDefaultData = manifest?.meta.settings?.defaultData || [];
-				this._mergeConfigProperties();
-				this._mergeConfigDefaultData();
-			}
-		);
+				this._propertyEditorSchemaConfigDefaultUIAlias = manifest?.meta.defaultPropertyEditorUiAlias || null;
+			},
+		).asPromise();
+	}
+
+	#setPropertyEditorUIConfig(propertyEditorUIAlias: string) {
+		return this.observe(
+			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', propertyEditorUIAlias),
+			(manifest) => {
+				this.#propertyEditorUiIcon.next(manifest?.meta.icon || null);
+				this.#propertyEditorUiName.next(manifest?.name || null);
+
+				this._propertyEditorUISettingsSchemaAlias = manifest?.meta.propertyEditorSchemaAlias;
+				this._propertyEditorUISettingsProperties = manifest?.meta.settings?.properties || [];
+				this._propertyEditorUISettingsDefaultData = manifest?.meta.settings?.defaultData || [];
+			},
+		).asPromise();
 	}
 
 	private _mergeConfigProperties() {
-		if(this._propertyEditorSchemaConfigProperties && this._propertyEditorUISettingsProperties) {
-			this.#properties.next([...this._propertyEditorSchemaConfigProperties, ...this._propertyEditorUISettingsProperties]);
+		console.log('schema properties', this._propertyEditorSchemaConfigProperties);
+		console.log('ui properties', this._propertyEditorUISettingsProperties);
+
+		if (this._propertyEditorSchemaConfigProperties && this._propertyEditorUISettingsProperties) {
+			this.#properties.next([
+				...this._propertyEditorSchemaConfigProperties,
+				...this._propertyEditorUISettingsProperties,
+			]);
 		}
 	}
 
 	private _mergeConfigDefaultData() {
-		if(!this._propertyEditorSchemaConfigDefaultData || !this._propertyEditorUISettingsDefaultData) return;
+		if (!this._propertyEditorSchemaConfigDefaultData || !this._propertyEditorUISettingsDefaultData) return;
 
 		this._configDefaultData = [
 			...this._propertyEditorSchemaConfigDefaultData,
@@ -159,17 +207,22 @@ export class UmbDataTypeWorkspaceContext
 
 		return combineLatest([
 			this.#data.asObservablePart((data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType),
-			this.#defaults.asObservablePart((defaults) => defaults?.find((x) => x.alias === propertyAlias)?.value as ReturnType),
+			this.#defaults.asObservablePart(
+				(defaults) => defaults?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
+			),
 		]).pipe(
 			map(([value, defaultValue]) => {
-				return (value ?? defaultValue);
-			})
+				return value ?? defaultValue;
+			}),
 		);
 		//return this.#data.asObservablePart((data) => data?.values?.find((x) => x.alias === propertyAlias)?.value ?? this.getPropertyDefaultValue(propertyAlias) as ReturnType);
 	}
 
 	getPropertyValue<ReturnType = unknown>(propertyAlias: string) {
-		return this.#data.getValue()?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType ?? this.getPropertyDefaultValue(propertyAlias) as ReturnType;
+		return (
+			(this.#data.getValue()?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType) ??
+			(this.getPropertyDefaultValue(propertyAlias) as ReturnType)
+		);
 	}
 
 	// TODO: its not called a property in the model, but we do consider this way in our front-end
@@ -207,7 +260,10 @@ export class UmbDataTypeWorkspaceContext
 	}
 }
 
-export const UMB_DATA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<UmbWorkspaceContextInterface, UmbDataTypeWorkspaceContext>(
+export const UMB_DATA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
+	UmbWorkspaceContextInterface,
+	UmbDataTypeWorkspaceContext
+>(
 	'UmbWorkspaceContext',
-	(context): context is UmbDataTypeWorkspaceContext => context.getEntityType?.() === 'data-type'
+	(context): context is UmbDataTypeWorkspaceContext => context.getEntityType?.() === 'data-type',
 );
