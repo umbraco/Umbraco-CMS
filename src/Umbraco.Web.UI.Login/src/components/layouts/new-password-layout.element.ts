@@ -2,8 +2,9 @@ import type { UUIButtonState, UUIInputPasswordElement } from '@umbraco-ui/uui';
 import { CSSResultGroup, LitElement, css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
-import { umbAuthContext } from '../../context/auth.context';
-import { umbLocalizationContext } from '../../external/localization/localization-context.ts';
+
+import { umbAuthContext } from '../../context/auth.context.js';
+import { umbLocalizationContext } from '../../external/localization/localization-context.js';
 
 @customElement('umb-new-password-layout')
 export default class UmbNewPasswordLayoutElement extends LitElement {
@@ -95,7 +96,7 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 							type="password"
 							id="password"
 							name="password"
-							label="Password"
+							label=${until(umbLocalizationContext.localize('user_newPassword'), 'New password')}
 							required
 							required-message=${until(umbLocalizationContext.localize('user_passwordIsBlank', undefined, 'Your new password cannot be blank!'))}></uui-input-password>
 					</uui-form-layout-item>
@@ -108,14 +109,14 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 							type="password"
 							id="confirmPassword"
 							name="confirmPassword"
-							label="ConfirmPassword"
+							label=${until(umbLocalizationContext.localize('user_confirmNewPassword'), 'Confirm new password')}
               				required
               				required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input-password>
 					</uui-form-layout-item>
 
 					${this.#renderErrorMessage()}
 
-					<uui-button type="submit" label="Continue" look="primary" color="default" .state=${this.state}></uui-button>
+					<uui-button type="submit" label=${until(umbLocalizationContext.localize('general_continue'), 'Continue')} look="primary" color="default" .state=${this.state}></uui-button>
 				</form>
 			</uui-form>
 

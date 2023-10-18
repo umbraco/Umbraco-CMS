@@ -1,8 +1,11 @@
 import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { until } from 'lit/directives/until.js';
+
 import { umbAuthContext } from './context/auth.context.js';
 import UmbRouter from './utils/umb-router.js';
+import { umbLocalizationContext } from './external/localization/localization-context.js';
 
 @customElement('umb-auth')
 export default class UmbAuthElement extends LitElement {
@@ -72,24 +75,16 @@ export default class UmbAuthElement extends LitElement {
 
 					if (status === 'resetCodeExpired') {
 						return html` <umb-error-layout
-							header="Reset code expired"
-							message="Password reset links are only valid for a limited time for security reasons. To reset your password, please
-						request a new reset link.">
-							<uui-button
-								type="submit"
-								label="Request new link"
-								look="primary"
-								color="default"
-								href="login/reset"></uui-button>
-
+							header="Hi there"
+							message=${until(umbLocalizationContext.localize('login_resetCodeExpired'), 'The link you have clicked on is invalid or has expired')}>
 							<umb-back-to-login-button></umb-back-to-login-button>
 						</umb-error-layout>`;
 					}
 
 					if (flow === 'invite-user' && status === 'false') {
 						return html` <umb-error-layout
-							header="Invite link expired"
-							message="This invite link has expired or been cancelled. Please reach out to the administrator to request a new invitation">
+							header="Hi there"
+							message=${until(umbLocalizationContext.localize('user_userinviteExpiredMessage'), 'Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.')}>
               				<umb-back-to-login-button></umb-back-to-login-button>
 						</umb-error-layout>`;
 					}

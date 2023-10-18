@@ -1,8 +1,11 @@
 import type { UUIButtonState, UUIInputPasswordElement } from '@umbraco-ui/uui';
 import { LitElement, html, nothing } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
+import { until } from 'lit/directives/until.js';
+
 import { umbAuthContext } from '../../context/auth.context.js';
 import UmbRouter from '../../utils/umb-router.js';
+import { umbLocalizationContext } from '../../external/localization/localization-context.js';
 
 @customElement('umb-new-password-page')
 export default class UmbNewPasswordPageElement extends LitElement {
@@ -64,8 +67,9 @@ export default class UmbNewPasswordPageElement extends LitElement {
 					.error=${this.error}></umb-new-password-layout>`;
 			case 'done':
 				return html`<umb-confirmation-layout
-					header="Success!"
-					message="Your password has been successfully updated"></umb-confirmation-layout>`;
+					header=${until(umbLocalizationContext.localize('general_success', undefined, 'Success')) + '!'}
+					message=${until(umbLocalizationContext.localize('login_setPasswordConfirmation', undefined, 'Your new password has been set and you may now use it to log in.'))}>
+				</umb-confirmation-layout>`;
 		}
 	}
 

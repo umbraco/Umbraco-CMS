@@ -1,7 +1,10 @@
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { CSSResultGroup, LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { until } from 'lit/directives/until.js';
+
 import { umbAuthContext } from '../../context/auth.context.js';
+import { umbLocalizationContext } from '../../external/localization/localization-context.js';
 
 @customElement('umb-reset-password-page')
 export default class UmbResetPasswordPageElement extends LitElement {
@@ -32,21 +35,23 @@ export default class UmbResetPasswordPageElement extends LitElement {
 			<uui-form>
 				<form id="LoginForm" name="login" @submit="${this.#handleResetSubmit}">
 					<div id="header">
-						<h2>Forgot your password?</h2>
+						<h2><umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize></h2>
 						<span>
-							Enter the email address associated with your account and we'll send you the reset instructions.
+							<umb-localize key="login_forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</umb-localize>
 						</span>
 					</div>
 
 					<uui-form-layout-item>
-						<uui-label for="email" slot="label" required>Email</uui-label>
+						<uui-label for="email" slot="label" required>
+							<umb-localize key="general_email">Email</umb-localize>
+						</uui-label>
 						<uui-input
 							type="email"
 							id="email"
 							name="email"
-							label="Email"
+							label=${until(umbLocalizationContext.localize('general_email', undefined, 'Email'))}
 							required
-							required-message="Email is required"></uui-input>
+							required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Email'))}></uui-input>
 					</uui-form-layout-item>
 
 					${this.#renderErrorMessage()}
@@ -73,12 +78,8 @@ export default class UmbResetPasswordPageElement extends LitElement {
 	#renderConfirmationPage() {
 		return html`
 			<umb-confirmation-layout
-				header="Email has been sent!"
-				message="Check your inbox and click the received link to reset your password.">
-				<span id="resend">
-					Didn't receive the email?
-					<a @click=${() => (this.resetCallState = undefined)} href="login/reset" compact>Resend</a>
-				</span>
+				header=${until(umbLocalizationContext.localize('login_forgottenPassword', undefined, 'Forgotten password?'))}
+				message=${until(umbLocalizationContext.localize('login_requestPasswordResetConfirmation', undefined, 'An email with password reset instructions will be sent to the specified address if it matched our records'))}>
 			</umb-confirmation-layout>
 		`;
 	}

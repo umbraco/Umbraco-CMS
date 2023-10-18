@@ -16,7 +16,7 @@ export default class UmbConfirmationLayoutElement extends LitElement {
 				<span>${this.message}</span>
 			</div>
 
-			<uui-button type="submit" label="Login" look="primary" color="default" href="login"></uui-button>
+			<umb-back-to-login-button></umb-back-to-login-button>
 
 			<slot></slot>
 		`;

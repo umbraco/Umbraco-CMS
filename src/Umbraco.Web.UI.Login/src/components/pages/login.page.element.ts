@@ -114,7 +114,7 @@ export default class UmbLoginPageElement extends LitElement {
 											? until(umbLocalizationContext.localize('general_email', undefined, 'Email'))
 											: until(umbLocalizationContext.localize('user_username', undefined, 'Username'))}
 										required
-										required-message="Email is required"></uui-input>
+										required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input>
 								</uui-form-layout-item>
 
 								<uui-form-layout-item>
@@ -124,16 +124,16 @@ export default class UmbLoginPageElement extends LitElement {
 									<uui-input-password
 										id="umb-password"
 										name="password"
-										label=${until(umbLocalizationContext.localize('user_password'), 'Password')}
+										label=${until(umbLocalizationContext.localize('user_password', undefined, 'Password'))}
 										required
-										required-message="Password is required"></uui-input-password>
+										required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input-password>
 								</uui-form-layout-item>
 
 								<div id="secondary-actions">
 									${when(
 										umbAuthContext.supportsPersistLogin,
 										() => html`<uui-form-layout-item>
-											<uui-checkbox name="persist" label="Remember me">
+											<uui-checkbox name="persist" label=${until(umbLocalizationContext.localize('user_rememberMe', undefined, 'Remember me'))}>
 												<umb-localize key="user_rememberMe">Remember me</umb-localize>
 											</uui-checkbox>
 										</uui-form-layout-item>`
