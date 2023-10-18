@@ -161,12 +161,14 @@ export default class UmbMfaPageElement extends LitElement {
 							inputmode="numeric"
 							autocomplete="one-time-code"
 							placeholder=${until(
-								umbLocalizationContext.localize('login_2faCodeInputHelp', 'Please enter the verification code')
+								umbLocalizationContext.localize('login_2faCodeInputHelp'),
+								'Please enter the verification code'
 							)}
 							aria-required="true"
 							required
 							required-message=${until(
-								umbLocalizationContext.localize('login_2faCodeInputHelp', 'Please enter the verification code')
+								umbLocalizationContext.localize('login_2faCodeInputHelp'),
+								'Please enter the verification code'
 							)}
 							style="width:100%;">
 						</uui-input>
@@ -178,10 +180,10 @@ export default class UmbMfaPageElement extends LitElement {
 							button-style="success"
 							look="primary"
 							color="default"
-							label=${until(umbLocalizationContext.localize('general_validate', 'Validate'))}
+							label=${until(umbLocalizationContext.localize('general_validate'), 'Validate')}
 							type="submit"></uui-button>
 						<uui-button
-							label=${until(umbLocalizationContext.localize('general_back', 'Back'))}
+							label=${until(umbLocalizationContext.localize('general_back'), 'Back')}
 							@click="${this.onGoBack}"></uui-button>
 					</div>
 					${this.error ? html` <span class="text-danger">${this.error}</span> ` : nothing}

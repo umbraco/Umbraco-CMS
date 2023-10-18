@@ -34,7 +34,7 @@ export class UmbLocalizeElement extends LitElement {
 	}
 
 	async localize(key: string, fallback?: string): Promise<string> {
-		return umbLocalizationContext.localize(key, fallback);
+		return umbLocalizationContext.localize(key, undefined, fallback);
 	}
 
 	render() {

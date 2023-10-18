@@ -111,8 +111,8 @@ export default class UmbLoginPageElement extends LitElement {
 										id="umb-username"
 										name="email"
 										label=${this.usernameIsEmail
-											? until(umbLocalizationContext.localize('general_email', 'Email'))
-											: until(umbLocalizationContext.localize('user_username', 'Username'))}
+											? until(umbLocalizationContext.localize('general_email', undefined, 'Email'))
+											: until(umbLocalizationContext.localize('user_username', undefined, 'Username'))}
 										required
 										required-message="Email is required"></uui-input>
 								</uui-form-layout-item>
@@ -142,7 +142,7 @@ export default class UmbLoginPageElement extends LitElement {
 										this.allowPasswordReset,
 										() =>
 											html`<a id="forgot-password" href="login/reset">
-												<umb-localize key="user_forgotPassword">Forgot password?</umb-localize>
+												<umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
 											</a>`
 									)}
 								</div>
