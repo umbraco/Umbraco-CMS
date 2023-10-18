@@ -88,12 +88,14 @@ export class UmbImageCropperPreviewElement extends LitElement {
 			this.imageElement.style.left = `${imageLeft}%`;
 		} else {
 			// Set the image size to fill the imageContainer while preserving aspect ratio
-			if (cropAspectRatio > 1) {
-				imageWidth = imageContainerWidth;
-				imageHeight = imageWidth / imageAspectRatio;
-			} else {
+			if (imageAspectRatio > cropAspectRatio) {
+				// image is wider than crop
 				imageHeight = imageContainerHeight;
 				imageWidth = imageHeight * imageAspectRatio;
+			} else {
+				// image is taller than crop
+				imageWidth = imageContainerWidth;
+				imageHeight = imageWidth / imageAspectRatio;
 			}
 
 			this.#onFocalPointUpdated(imageWidth, imageHeight, imageContainerWidth, imageContainerHeight);
