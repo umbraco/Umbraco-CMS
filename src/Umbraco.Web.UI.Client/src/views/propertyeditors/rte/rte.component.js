@@ -252,16 +252,27 @@
               baseLineConfigObj.readonly = vm.readonly ? 1 : baseLineConfigObj.readonly;
 
               // We need to wait for DOM to have rendered before we can find the element by ID.
-              $timeout(function () {
-                  tinymce.init(baseLineConfigObj);
-              }, 150);
+              if(tinymce) {
+                tinymce.init(baseLineConfigObj);
+              } else {
+                $timeout(function () {
+                    tinymce.init(baseLineConfigObj);
+                }, 150);
+              }
 
               //listen for formSubmitting event (the result is callback used to remove the event subscription)
               unsubscribe.push($scope.$on("formSubmitting", function () {
-                // TODO: Check if we need to include blocksLoading in this, turn it into loading..
                   if (vm.tinyMceEditor != null && !vm.rteLoading) {
-                    // TODO: Re-evaluate BLOCK ELEMENTS:
-                    vm.model.value.markup = vm.tinyMceEditor.getContent();
+
+                    // Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
+                    var blockElements = vm.tinyMceEditor.dom.select(`umb-rte-block`);
+                    const usedContentUdis = blockElements.map(blockElement => blockElement.getAttribute('data-content-udi'));
+
+                    const unusedBlocks = vm.layout.filter(x => usedContentUdis.indexOf(x.contentUdi) === -1);
+                    unusedBlocks.forEach(blockLayout => {
+                      deleteBlock(blockLayout.$block);
+                    });
+
                   }
               }));
 
@@ -382,9 +393,9 @@
       }
 
       /**
-       * Ensure that the containing content variant languag and current property culture is transfered along
+       * Ensure that the containing content variant language and current property culture is transferred along
        * to the scaffolded content object representing this block.
-       * This is required for validation along with ensuring that the umb-property inheritance is constently maintained.
+       * This is required for validation along with ensuring that the umb-property inheritance is constantly maintained.
        * @param {any} content
        */
       function ensureCultureData(content) {
@@ -426,7 +437,7 @@
           // If we have content, otherwise it doesn't make sense to copy.
           block.showCopy = vm.supportCopy && block.config.contentElementTypeKey != null;
 
-          // Index is set by umbblocklistblock component and kept up to date by it.
+          // Index is not begin updated in RTE Blocks, the order of element and Blocks of layout is not synced, meaning the index could be incorrect depending on the perspective.
           block.index = 0;
           block.setParentForm = function (parentForm) {
               this._parentForm = parentForm;
@@ -497,7 +508,7 @@
           // Add the Block Object to our layout entry.
           layoutEntry.$block = blockObject;
 
-          // add layout entry at the decired location in layout.
+          // add layout entry at the desired location in layout.
           vm.layout.splice(index, 0, layoutEntry);
 
           // lets move focus to this new block.
@@ -513,31 +524,33 @@
               throw new Error("Could not find layout entry of block with udi: "+block.layout.contentUdi)
           }
 
-          console.log("deleteBlock", vm.tinyMceEditor)
-
           setDirty();
 
           var removed = vm.layout.splice(layoutIndex, 1);
           removed.forEach(x => {
-              // remove any server validation errors associated
-              var guids = [udiService.getKey(x.contentUdi), (x.settingsUdi ? udiService.getKey(x.settingsUdi) : null)];
-              guids.forEach(guid => {
-                  if (guid) {
-                      serverValidationManager.removePropertyError(guid, vm.umbProperty.property.culture, vm.umbProperty.property.segment, "", { matchType: "contains" });
-                  }
-              })
+
+            var blockElementsOfThisUdi = vm.tinyMceEditor.dom.select(`umb-rte-block[data-content-udi='${x.contentUdi}']`);
+            blockElementsOfThisUdi.forEach(blockElement => {
+              vm.tinyMceEditor.dom.remove(blockElement);
+            });
+
+            // remove any server validation errors associated
+            var guids = [udiService.getKey(x.contentUdi), (x.settingsUdi ? udiService.getKey(x.settingsUdi) : null)];
+            guids.forEach(guid => {
+                if (guid) {
+                    serverValidationManager.removePropertyError(guid, vm.umbProperty.property.culture, vm.umbProperty.property.segment, "", { matchType: "contains" });
+                }
+            })
           });
 
           modelObject.removeDataAndDestroyModel(block);
-
-          // TODO: Update RTE.
       }
 
-      function deleteAllBlocks() {
+      /*function deleteAllBlocks() {
           while(vm.layout.length) {
               deleteBlock(vm.layout[0].$block);
           };
-      }
+      }*/
 
       function activateBlock(blockObject) {
           blockObject.active = true;
@@ -554,7 +567,7 @@
 
           var wasNotActiveBefore = blockObject.active !== true;
 
-        // dont open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
+          // don't open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
           if (openSettings !== true && blockObject.hideContentInOverlay === true) {
               return;
           }
@@ -720,7 +733,7 @@
                   }
               },
               close: function() {
-                  // if opned by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
+                  // If opened by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
                   if (createIndex < vm.layout.length) {
                       vm.setBlockFocus(vm.layout[Math.max(createIndex-1, 0)].$block);
                   }
@@ -756,7 +769,7 @@
 
       function updateClipboard(firstTime) {
 
-        var oldAmount = vm.clipboardItems.length;
+        //var oldAmount = vm.clipboardItems.length;
 
         vm.clipboardItems = [];
 
@@ -832,14 +845,14 @@
           // make block model
           var blockObject = getBlockObject(layoutEntry);
           if (blockObject === null) {
-              // Initalization of the Block Object didnt go well, therefor we will fail the paste action.
+              // Initialization of the Block Object didn't go well, therefor we will fail the paste action.
               return false;
           }
 
           // set the BlockObject on our layout entry.
           layoutEntry.$block = blockObject;
 
-          // insert layout entry at the decired location in layout.
+          // insert layout entry at the desired location in layout.
           vm.layout.splice(index, 0, layoutEntry);
 
           vm.currentBlockInFocus = blockObject;
