@@ -37,7 +37,6 @@
       //let deleteAllBlocksAction = null;
       //let pasteSingleBlockAction = null;
 
-      var inlineEditing = false;
       var liveEditing = true;
 
       var vm = this;
@@ -109,9 +108,7 @@
           // set the onValueChanged callback, this will tell us if the block list model changed on the server
           // once the data is submitted. If so we need to re-initialize
           vm.model.onValueChanged = onServerValueChanged;
-
-          //inlineEditing = vm.model.config.useInlineEditingAsDefault;
-          //liveEditing = vm.model.config.useLiveEditing;
+          liveEditing = vm.model.config.useLiveEditing;
 
           vm.listWrapperStyles = {};
 
@@ -280,7 +277,7 @@
                 vm.tinyMceEditor.focus();
               }
 
-              //when the element is disposed we need to unsubscribe!
+              // When the element is disposed we need to unsubscribe!
               // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom
               // element might still be there even after the modal has been hidden.
               $scope.$on('$destroy', function () {
@@ -431,7 +428,7 @@
           block.view = (block.config.view ? block.config.view : getDefaultViewForBlock(block));
           block.showValidation = block.config.view ? true : false;
 
-          block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
+          block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true;
           block.showSettings = block.config.settingsElementTypeKey != null;
 
           // If we have content, otherwise it doesn't make sense to copy.
@@ -757,9 +754,7 @@
       function userFlowWhenBlockWasCreated(createIndex) {
           if (vm.layout.length > createIndex) {
               var blockObject = vm.layout[createIndex].$block;
-              if (inlineEditing === true) {
-                  blockObject.activate();
-              } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true && blockObject.content.variants[0].tabs.find(tab => tab.properties.length > 0) !== undefined) {
+              if (blockObject.hideContentInOverlay !== true && blockObject.content.variants[0].tabs.find(tab => tab.properties.length > 0) !== undefined) {
                   vm.options.createFlow = true;
                   blockObject.edit();
                   vm.options.createFlow = false;

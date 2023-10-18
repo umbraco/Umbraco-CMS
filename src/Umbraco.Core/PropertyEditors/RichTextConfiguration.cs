@@ -13,7 +13,10 @@ public class RichTextConfiguration : IIgnoreUserStartNodesConfig
     [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/rte/blocks/prevalue/blockrte.blockconfiguration.html", Description = "Define the available blocks.")]
     public BlockListConfiguration.BlockConfiguration[] Blocks { get; set; } = null!;
 
-    [ConfigurationField("overlaySize", "Overlay Size", "overlaysize", Description = "Select the width of the overlay (link picker).")]
+    [ConfigurationField("useLiveEditing", "Blocks Live editing mode", "boolean", Description = "Live updated Block Elements when they are edited.")]
+    public bool UseLiveEditing { get; set; }
+
+    [ConfigurationField("overlaySize", "Overlay Size", "overlaysize", Description = "Select the width of the link picker overlay.")]
     public string? OverlaySize { get; set; }
 
     [ConfigurationField("hideLabel", "Hide Label", "boolean")]
