@@ -1,10 +1,10 @@
 import { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbModalToken, UmbTreePickerModalData, UmbPickerModalResult } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken, UmbTreePickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
 export type UmbDataTypePickerModalData = UmbTreePickerModalData<FolderTreeItemResponseModel>;
-export type UmbDataTypePickerModalResult = UmbPickerModalResult;
+export type UmbDataTypePickerModalValue = UmbPickerModalValue;
 
-export const UMB_DATA_TYPE_PICKER_MODAL = new UmbModalToken<UmbDataTypePickerModalData, UmbDataTypePickerModalResult>(
+export const UMB_DATA_TYPE_PICKER_MODAL = new UmbModalToken<UmbDataTypePickerModalData, UmbDataTypePickerModalValue>(
 	'Umb.Modal.TreePicker',
 	{
 		type: 'sidebar',
@@ -12,5 +12,5 @@ export const UMB_DATA_TYPE_PICKER_MODAL = new UmbModalToken<UmbDataTypePickerMod
 	},
 	{
 		treeAlias: 'Umb.Tree.DataTypes',
-	}
+	},
 );

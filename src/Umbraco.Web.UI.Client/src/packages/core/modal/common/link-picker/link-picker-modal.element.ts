@@ -5,13 +5,13 @@ import {
 	UmbLinkPickerConfig,
 	UmbLinkPickerLink,
 	UmbLinkPickerModalData,
-	UmbLinkPickerModalResult,
+	UmbLinkPickerModalValue,
+	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-link-picker-modal')
-export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalResult> {
+export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalValue> {
 	@state()
 	_selectedKey?: string;
 
@@ -155,7 +155,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			<umb-tree
 				?multiple=${false}
 				alias="Umb.Tree.Documents"
-				@selected=${(event: CustomEvent) => this._handleSelectionChange(event, 'document')}
+				@selection-change=${(event: CustomEvent) => this._handleSelectionChange(event, 'document')}
 				.selection=${[this._selectedKey ?? '']}
 				selectable></umb-tree>
 
@@ -166,7 +166,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			<umb-tree
 				?multiple=${false}
 				alias="Umb.Tree.Media"
-				@selected=${(event: CustomEvent) => this._handleSelectionChange(event, 'media')}
+				@selection-change=${(event: CustomEvent) => this._handleSelectionChange(event, 'media')}
 				.selection=${[this._selectedKey ?? '']}
 				selectable></umb-tree>`;
 	}

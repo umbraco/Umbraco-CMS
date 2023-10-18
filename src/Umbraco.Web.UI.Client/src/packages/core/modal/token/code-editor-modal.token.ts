@@ -11,14 +11,14 @@ export interface UmbCodeEditorModalData {
 	confirmLabel?: string;
 }
 
-export interface UmbCodeEditorModalResult {
+export interface UmbCodeEditorModalValue {
 	content: string;
 }
 
-export const UMB_CODE_EDITOR_MODAL = new UmbModalToken<UmbCodeEditorModalData, UmbCodeEditorModalResult>(
+export const UMB_CODE_EDITOR_MODAL = new UmbModalToken<UmbCodeEditorModalData, UmbCodeEditorModalValue>(
 	'Umb.Modal.CodeEditor',
 	{
 		type: 'sidebar',
 		size: 'large',
-	}
+	},
 );

@@ -5,7 +5,7 @@ import { RichTextRuleModelSortable, UmbStylesheetWorkspaceContext } from '../../
 import { UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR } from '../../manifests.js';
 import {
 	StylesheetRichTextEditorStyleModalData,
-	StylesheetRichTextEditorStyleModalResult,
+	UmbStylesheetRichTextEditorStyleModalValue,
 } from './stylesheet-workspace-view-rich-text-editor-style-sidebar.element.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -18,7 +18,7 @@ import './stylesheet-workspace-view-rich-text-editor-rule.element.js';
 
 export const UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR_MODAL = new UmbModalToken<
 	StylesheetRichTextEditorStyleModalData,
-	StylesheetRichTextEditorStyleModalResult
+	UmbStylesheetRichTextEditorStyleModalValue
 >(UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR, {
 	type: 'sidebar',
 	size: 'medium',
