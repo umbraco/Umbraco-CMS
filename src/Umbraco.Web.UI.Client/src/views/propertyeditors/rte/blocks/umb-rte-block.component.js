@@ -7,8 +7,6 @@
 
   function umbRteBlockController($scope, $compile, $element) {
 
-      var unsubscribe = [];
-
       var model = this;
 
       model.$onDestroy = onDestroy;
@@ -57,7 +55,8 @@
               </style>
 
               <div class="umb-block-rte__block">
-                <ng-form name="model.blockForm" val-server-match="{ 'contains' : { 'valServerMatchContent': block.content.key, 'valServerMatchSettings': block.settings.key } }">
+                <!-- val-server-match="{ 'contains' : { 'valServerMatchContent': block.content.key, 'valServerMatchSettings': block.settings.key } }" -->
+                <ng-form name="model.blockForm">
 
                   <div
                       class="umb-block-rte--view"
