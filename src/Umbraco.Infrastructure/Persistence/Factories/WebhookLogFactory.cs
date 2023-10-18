@@ -10,7 +10,7 @@ internal static class WebhookLogFactory
         {
             Date = log.Date,
             EventName = log.EventName,
-            RequestBody = log.RequestBody,
+            RequestBody = log.RequestBody ?? string.Empty,
             ResponseBody = log.ResponseBody,
             RetryCount = log.RetryCount,
             StatusCode = log.StatusCode,

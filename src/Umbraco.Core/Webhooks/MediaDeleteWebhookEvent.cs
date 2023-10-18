@@ -8,8 +8,8 @@ namespace Umbraco.Cms.Core.Webhooks;
 
 public class MediaDeleteWebhookEvent : WebhookEventBase<MediaDeletedNotification, IMedia>
 {
-    public MediaDeleteWebhookEvent(IWebhookFiringService webhookFiringService, IWebHookService webHookService, IWebhookLogService webhookLogService, IOptionsMonitor<WebhookSettings> webhookSettings)
-        : base(webhookFiringService, webHookService, webhookLogService, webhookSettings, Constants.WebhookEvents.MediaDelete)
+    public MediaDeleteWebhookEvent(IWebhookFiringService webhookFiringService, IWebHookService webHookService, IWebhookLogService webhookLogService, IOptionsMonitor<WebhookSettings> webhookSettings, IWebhookLogFactory webhookLogFactory)
+        : base(webhookFiringService, webHookService, webhookLogService, webhookSettings, webhookLogFactory, Constants.WebhookEvents.MediaDelete)
     {
     }
 

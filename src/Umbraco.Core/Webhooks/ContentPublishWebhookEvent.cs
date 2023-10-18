@@ -8,8 +8,8 @@ namespace Umbraco.Cms.Core.Webhooks;
 
 public class ContentPublishWebhookEvent : WebhookEventBase<ContentPublishedNotification, IContent>
 {
-    public ContentPublishWebhookEvent(IWebhookFiringService webhookFiringService, IWebHookService webHookService, IWebhookLogService webhookLogService, IOptionsMonitor<WebhookSettings> webhookSettings)
-        : base(webhookFiringService, webHookService, webhookLogService, webhookSettings, Constants.WebhookEvents.ContentPublish)
+    public ContentPublishWebhookEvent(IWebhookFiringService webhookFiringService, IWebHookService webHookService, IWebhookLogService webhookLogService, IOptionsMonitor<WebhookSettings> webhookSettings, IWebhookLogFactory webhookLogFactory)
+        : base(webhookFiringService, webHookService, webhookLogService, webhookSettings, webhookLogFactory, Constants.WebhookEvents.ContentPublish)
     {
     }
 

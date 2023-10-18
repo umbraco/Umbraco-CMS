@@ -15,6 +15,7 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
     private readonly IWebhookFiringService _webhookFiringService;
     private readonly IWebHookService _webHookService;
     private readonly IWebhookLogService _webhookLogService;
+    private readonly IWebhookLogFactory _webhookLogFactory;
     private WebhookSettings _webhookSettings;
 
     protected WebhookEventBase(
@@ -22,11 +23,13 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
         IWebHookService webHookService,
         IWebhookLogService webhookLogService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
+        IWebhookLogFactory webhookLogFactory,
         string eventName)
     {
         _webhookFiringService = webhookFiringService;
         _webHookService = webHookService;
         _webhookLogService = webhookLogService;
+        _webhookLogFactory = webhookLogFactory;
         EventName = eventName;
         _webhookSettings = webhookSettings.CurrentValue;
         webhookSettings.OnChange(x => _webhookSettings = x);
@@ -59,19 +62,7 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
 
                 WebhookResponseModel response = await _webhookFiringService.Fire(webhook, EventName, entity);
 
-                var log = new WebhookLog
-                {
-                    Date = DateTime.UtcNow,
-                    EventName = EventName,
-                    RequestBody = await response.HttpResponseMessage.RequestMessage!.Content!.ReadAsStringAsync(cancellationToken),
-                    ResponseBody = await response.HttpResponseMessage.Content.ReadAsStringAsync(cancellationToken),
-                    StatusCode = response.HttpResponseMessage.StatusCode.ToString(),
-                    RetryCount = response.RetryCount,
-                    Key = Guid.NewGuid(),
-                    Url = webhook.Url,
-                    ResponseHeaders = response.HttpResponseMessage.Headers.ToString(),
-                    RequestHeaders = response.HttpResponseMessage.RequestMessage.Headers.ToString(),
-                };
+                WebhookLog log = await _webhookLogFactory.CreateAsync(EventName, response, webhook, cancellationToken);
                 await _webhookLogService.CreateAsync(log);
             }
         }

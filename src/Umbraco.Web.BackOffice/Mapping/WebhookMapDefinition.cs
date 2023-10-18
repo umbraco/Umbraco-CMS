@@ -46,7 +46,7 @@ public class WebhookMapDefinition : IMapDefinition
         target.Date = source.Date;
         target.EventName = source.EventName;
         target.Key = source.Key;
-        target.RequestBody = source.RequestBody;
+        target.RequestBody = source.RequestBody ?? string.Empty;
         target.ResponseBody = source.ResponseBody;
         target.RetryCount = source.RetryCount;
         target.StatusCode = source.StatusCode;

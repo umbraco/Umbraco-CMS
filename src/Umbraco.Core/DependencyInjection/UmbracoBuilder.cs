@@ -329,6 +329,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ITemporaryMediaService, TemporaryMediaService>();
             Services.AddUnique<IWebHookService, WebhookService>();
             Services.AddUnique<IWebhookLogService, WebhookLogService>();
+            Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
             Services.AddNotificationAsyncHandler<ContentPublishedNotification, ContentPublishWebhookEvent>();
             Services.AddNotificationAsyncHandler<ContentUnpublishedNotification, ContentUnpublishWebhookEvent>();
             Services.AddNotificationAsyncHandler<ContentDeletedNotification, ContentDeleteWebhookEvent>();

@@ -18,7 +18,7 @@ public class WebhookLog
 
     public string RequestHeaders { get; set; } = string.Empty;
 
-    public string RequestBody { get; set; } = string.Empty;
+    public string? RequestBody { get; set; } = string.Empty;
 
     public string ResponseHeaders { get; set; } = string.Empty;
 

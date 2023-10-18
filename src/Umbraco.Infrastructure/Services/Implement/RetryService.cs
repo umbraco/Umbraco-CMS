@@ -12,11 +12,21 @@ public class RetryService : IRetryService
             try
             {
                 HttpResponseMessage response = await action();
-                return new WebhookResponseModel
+
+                if (response.IsSuccessStatusCode)
                 {
-                    RetryCount = retry,
-                    HttpResponseMessage = response,
-                };
+                    return new WebhookResponseModel
+                    {
+                        RetryCount = retry,
+                        HttpResponseMessage = response,
+                    };
+                }
+
+                // Retry after a delay, if specified
+                if (retryDelay is not null)
+                {
+                    await Task.Delay(retryDelay.Value);
+                }
             }
             catch (Exception ex)
             {
@@ -31,8 +41,7 @@ public class RetryService : IRetryService
         return new WebhookResponseModel
         {
             RetryCount = maxRetries,
-            HttpResponseMessage = null!,
+            HttpResponseMessage = null,
         };
-        // TODO: Every retry failed, should we log some errors here, maybe the error in the catch?
     }
 }

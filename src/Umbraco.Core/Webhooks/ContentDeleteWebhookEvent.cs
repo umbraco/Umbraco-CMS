@@ -8,8 +8,8 @@ namespace Umbraco.Cms.Core.Webhooks;
 
 public class ContentDeleteWebhookEvent : WebhookEventBase<ContentDeletedNotification, IContent>
 {
-    public ContentDeleteWebhookEvent(IWebhookFiringService webhookFiringService, IWebHookService webHookService, IWebhookLogService webhookLogService, IOptionsMonitor<WebhookSettings> webhookSettings)
-        : base(webhookFiringService, webHookService, webhookLogService, webhookSettings, Constants.WebhookEvents.ContentDelete)
+    public ContentDeleteWebhookEvent(IWebhookFiringService webhookFiringService, IWebHookService webHookService, IWebhookLogService webhookLogService, IOptionsMonitor<WebhookSettings> webhookSettings, IWebhookLogFactory webhookLogFactory)
+        : base(webhookFiringService, webHookService, webhookLogService, webhookSettings, webhookLogFactory, Constants.WebhookEvents.ContentDelete)
     {
     }
 
