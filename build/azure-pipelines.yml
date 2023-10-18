@@ -245,6 +245,8 @@ stages:
   - stage: Integration
     displayName: Integration Tests
     dependsOn: Build
+    variables:
+      releaseTestFilter: eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True')
     jobs:
       # Integration Tests (SQLite)
       - job:
@@ -277,7 +279,7 @@ stages:
               command: test
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
-              ${{ if or( parameters.forceReleaseTestFilter, eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True')) }}:
+              ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
               ${{ else }}:
                 arguments: '--configuration $(buildConfiguration) ${{parameters.integrationNonReleaseTestFilter}}'
@@ -291,7 +293,7 @@ stages:
               command: test
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
-              ${{ if or( parameters.forceReleaseTestFilter, eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True')) }}:
+              ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
               ${{ else }}:
                 arguments: '--configuration $(buildConfiguration) ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
@@ -342,7 +344,7 @@ stages:
               command: test
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
-              ${{ if or( parameters.forceReleaseTestFilter, eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True')) }}:
+              ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
               ${{ else }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
@@ -357,7 +359,7 @@ stages:
               command: test
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
-              ${{ if or( parameters.forceReleaseTestFilter, eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True')) }}:
+              ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
               ${{ else }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
