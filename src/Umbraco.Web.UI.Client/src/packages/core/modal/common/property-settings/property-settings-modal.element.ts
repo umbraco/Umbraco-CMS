@@ -1,8 +1,11 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { PropertyValueMap, css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
-import { UmbPropertySettingsModalValue, UmbPropertySettingsModalData } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbPropertySettingsModalValue,
+	UmbPropertySettingsModalData,
+	UmbModalBaseElement,
+} from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/document-type';
 // TODO: Could base take a token to get its types?.

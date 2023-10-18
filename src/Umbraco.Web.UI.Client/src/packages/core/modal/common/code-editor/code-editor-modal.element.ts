@@ -1,8 +1,6 @@
 import { css, html, ifDefined, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { loadCodeEditor, type UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
-import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbCodeEditorModalData, UmbCodeEditorModalValue } from '@umbraco-cms/backoffice/modal';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbCodeEditorModalData, UmbCodeEditorModalValue, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-code-editor-modal')
@@ -15,12 +13,11 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 
 	constructor() {
 		super();
-
 		this.#loadCodeEditor();
 	}
 
 	#handleConfirm() {
-		this.modalContext?.submit({ content: this.data?.content ?? '' });
+		this.modalContext?.submit({ content: this._codeEditor?.editor?.monacoEditor?.getValue() ?? '' });
 	}
 
 	#handleCancel() {
@@ -36,21 +33,10 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 		}
 	}
 
-	// TODO => debounce?
-	#onCodeEditorInput(e: UUIInputEvent) {
-		e.preventDefault();
-		if (!this.data) {
-			return;
-		}
-
-		this.data.content = this._codeEditor?.code ?? '';
-	}
-
 	#renderCodeEditor() {
 		return html`<umb-code-editor
 			language=${ifDefined(this.data?.language)}
-			.code=${this.data?.content ?? ''}
-			@input=${this.#onCodeEditorInput}></umb-code-editor>`;
+			.code=${this.data?.content ?? ''}></umb-code-editor>`;
 	}
 
 	#renderLoading() {

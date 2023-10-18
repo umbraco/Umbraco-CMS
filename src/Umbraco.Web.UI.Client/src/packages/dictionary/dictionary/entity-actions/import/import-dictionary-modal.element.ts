@@ -1,9 +1,12 @@
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
 import { css, html, customElement, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbImportDictionaryModalData, UmbImportDictionaryModalValue } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbImportDictionaryModalData,
+	UmbImportDictionaryModalValue,
+	UmbModalBaseElement,
+} from '@umbraco-cms/backoffice/modal';
 import { ImportDictionaryRequestModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-import-dictionary-modal')
 export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
@@ -138,7 +141,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 			<b>Choose where to import dictionary items (optional)</b>
 			<umb-tree
 				alias="Umb.Tree.Dictionary"
-				@selected=${this.#handleSelectionChange}
+				@selection-change=${this.#handleSelectionChange}
 				.selection=${this._selection}
 				selectable></umb-tree>
 

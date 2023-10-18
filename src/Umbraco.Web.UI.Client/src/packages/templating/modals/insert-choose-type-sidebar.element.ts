@@ -1,6 +1,5 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UmbModalManagerContext,
@@ -8,6 +7,7 @@ import {
 	UmbModalContext,
 	UMB_DICTIONARY_ITEM_PICKER_MODAL,
 	UmbDictionaryItemPickerModalValue,
+	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 
 export interface ChooseInsertTypeModalData {
