@@ -90,7 +90,7 @@ export default class UmbAuthElement extends LitElement {
 						return html` <umb-error-layout
 							header="Invite link expired"
 							message="This invite link has expired or been cancelled. Please reach out to the administrator to request a new invitation">
-							<uui-button type="submit" label="Back to login" look="primary" color="default" href="login"></uui-button>
+              				<umb-back-to-login-button></umb-back-to-login-button>
 						</umb-error-layout>`;
 					}
 
