@@ -19,4 +19,11 @@ public class DateTimeConfiguration
         "boolean",
         Description = "When enabled the time displayed will be offset with the server's timezone, this is useful for scenarios like scheduled publishing when an editor is in a different timezone than the hosted server")]
     public bool OffsetTime { get; set; }
+
+    [ConfigurationField(
+        "firstDayOfWeekIsMonday",
+        "Use Monday as first day of the week",
+        "boolean",
+        Description = "When enabled the first day of week in the calendar will be Monday")]
+    public bool FirstDayOfWeekIsMonday { get; set; }
 }

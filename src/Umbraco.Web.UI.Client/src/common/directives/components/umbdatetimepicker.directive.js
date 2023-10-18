@@ -140,6 +140,17 @@ Use this directive to render a date time picker
                 ctrl.options.locale = userLocale;
             }
 
+            if (ctrl.options.firstDayOfWeek) {
+              // convert locale to object, if its a string
+              if (typeof ctrl.options.locale === "string") {
+                ctrl.options.locale = {
+                  locale: ctrl.options.locale
+                }
+              }
+
+              ctrl.options.locale.firstDayOfWeek = ctrl.options.firstDayOfWeek;
+            }
+
             // handle special keydown events
             ctrl.options.onKeyDown = function (selectedDates, dateStr, instance, event) {
                 var code = event.keyCode || event.which;

@@ -54,6 +54,10 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
       clickOpens: !$scope.readonly
     };
 
+    if (Object.toBoolean($scope.model.config.firstDayOfWeekIsMonday)) {
+      $scope.datePickerConfig.firstDayOfWeek = 1;
+    }
+
     // Don't show calendar if date format has been set to only time
     const timeFormat = $scope.model.config.format.toLowerCase();
     const timeFormatPattern = /^h{1,2}:m{1,2}(:s{1,2})?\s?a?$/gmi;
