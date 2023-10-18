@@ -1,10 +1,11 @@
 import { UmbWorkspaceAction } from './index.js';
-import { css, html, customElement, property, state, query } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import type { UUIButtonElement, UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
-import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
+import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-workspace-action')
 export class UmbWorkspaceActionElement extends UmbLitElement {
@@ -26,9 +27,9 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 		}
 	}
 
-	#createApi() {
-		if (!this._manifest?.meta.api) return;
-		this.#api = new this._manifest.meta.api(this);
+	async #createApi() {
+		if (!this._manifest) return;
+		this.#api = await createExtensionApi(this._manifest, [this]);
 	}
 
 	#api?: UmbWorkspaceAction;
@@ -44,7 +45,7 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 			this._buttonState = 'failed';
 		}
 
-		this.dispatchEvent(new UmbExecutedEvent());
+		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
 	render() {

@@ -1,24 +1,23 @@
 import { UmbSorterConfig, UmbSorterController } from '../sorter.controller.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 
 type SortEntryType = {
 	id: string;
 	value: string;
 };
 
-const sorterConfig: UmbSorterConfig<SortEntryType> = {
+const SORTER_CONFIG: UmbSorterConfig<SortEntryType> = {
 	compareElementToModel: (element: HTMLElement, model: SortEntryType) => {
 		return element.getAttribute('data-sort-entry-id') === model.id;
 	},
 	querySelectModelToElement: (container: HTMLElement, modelEntry: SortEntryType) => {
-		return container.querySelector('data-sort-entry-id[' + modelEntry.id + ']');
+		return container.querySelector('data-sort-entry-id=[' + modelEntry.id + ']');
 	},
 	identifier: 'test-sorter',
 	itemSelector: 'li',
 	containerSelector: 'ul',
 };
-
 const model: Array<SortEntryType> = [
 	{
 		id: '0',
@@ -38,18 +37,35 @@ const model: Array<SortEntryType> = [
 export default class UmbTestSorterControllerElement extends UmbLitElement {
 	public sorter;
 
+	@state()
+	private vertical = true;
+
 	constructor() {
 		super();
-
-		this.sorter = new UmbSorterController(this, sorterConfig);
+		this.sorter = new UmbSorterController(this, {
+			...SORTER_CONFIG,
+			resolveVerticalDirection: () => {
+				this.vertical ? true : false;
+			},
+		});
 		this.sorter.setModel(model);
+	}
+
+	#toggle() {
+		this.vertical = !this.vertical;
 	}
 
 	render() {
 		return html`
-			<ul>
+			<uui-button label="Change direction" look="outline" color="positive" @click=${this.#toggle}>
+				Horizontal/Vertical
+			</uui-button>
+			<ul class="${this.vertical ? 'vertical' : 'horizontal'}">
 				${model.map(
-					(entry) => html`<li id="${'sort' + entry.id}" data-sort-entry-id="${entry.id}">${entry.value}</li>`
+					(entry) =>
+						html`<li class="item" data-sort-entry-id="${entry.id}">
+							<span><uui-icon name="umb:wand"></uui-icon>${entry.value}</span>
+						</li>`,
 				)}
 			</ul>
 		`;
@@ -59,39 +75,47 @@ export default class UmbTestSorterControllerElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
+				box-sizing: border-box;
 			}
 
 			ul {
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
 				list-style: none;
 				padding: 0;
-				margin: 0;
+				margin: 10px 0;
+			}
+
+			ul.horizontal {
+				flex-direction: row;
 			}
 
 			li {
+				cursor: grab;
+				position: relative;
+				flex: 1;
+				border-radius: var(--uui-border-radius);
+			}
+
+			li span {
+				display: flex;
+				align-items: center;
+				gap: 5px;
 				padding: 10px;
-				margin: 5px;
-				background: #eee;
+				background-color: rgba(0, 255, 0, 0.3);
 			}
 
-			li:hover {
-				background: #ddd !important;
-				cursor: move;
+			li.--umb-sorter-placeholder span {
+				visibility: hidden;
 			}
 
-			li:active {
-				background: #ccc;
-			}
-
-			#sort0 {
-				background: #f00;
-			}
-
-			#sort1 {
-				background: #0f0;
-			}
-
-			#sort2 {
-				background: #c9da10;
+			li.--umb-sorter-placeholder::after {
+				content: '';
+				position: absolute;
+				inset: 0px;
+				border-radius: var(--uui-border-radius);
+				border: 1px dashed var(--uui-color-divider-emphasis);
 			}
 		`,
 	];

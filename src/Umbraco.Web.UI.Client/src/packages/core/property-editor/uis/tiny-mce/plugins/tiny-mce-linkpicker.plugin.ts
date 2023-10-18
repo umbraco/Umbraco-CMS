@@ -1,6 +1,6 @@
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import {
-	UmbLinkPickerModalResult,
+	UmbLinkPickerModalValue,
 	UMB_LINK_PICKER_MODAL,
 	UmbLinkPickerLink,
 	UmbModalManagerContext,
@@ -19,7 +19,7 @@ type AnchorElementAttributes = {
 export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 	#modalContext?: UmbModalManagerContext;
 
-	#linkPickerData?: UmbLinkPickerModalResult;
+	#linkPickerData?: UmbLinkPickerModalValue;
 
 	#anchorElement?: HTMLAnchorElement;
 
@@ -70,32 +70,28 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 		}
 
 		if (!this.#anchorElement) {
-			this.#openLinkPicker();
+			this.#openLinkPicker({ name: this.editor.selection.getContent() });
 			return;
 		}
 
 		//if we already have a link selected, we want to pass that data over to the dialog
 		const currentTarget: UmbLinkPickerLink = {
-			name: this.#anchorElement.title,
-			url: this.#anchorElement.getAttribute('href') ?? '',
+			name: this.#anchorElement.title || this.#anchorElement.textContent,
 			target: this.#anchorElement.target,
+			queryString: `${this.#anchorElement.search}${this.#anchorElement.hash}`,
 		};
 
-		// drop the lead char from the anchor text, if it has a value
-		const anchorVal = this.#anchorElement.dataset.anchor;
-		if (anchorVal) {
-			currentTarget.queryString = anchorVal.substring(1);
-		}
-
-		if (currentTarget.url?.includes('localLink:')) {
-			currentTarget.udi =
-				currentTarget.url?.substring(currentTarget.url.indexOf(':') + 1, currentTarget.url.lastIndexOf('}')) ?? '';
+		if (this.#anchorElement.href.includes('localLink:')) {
+			const href = this.#anchorElement.getAttribute('href')!;
+			currentTarget.udi = href.split('localLink:')[1].slice(0, -1);
+		} else if (this.#anchorElement.host.length) {
+			currentTarget.url = this.#anchorElement.protocol ? this.#anchorElement.protocol + '//' : undefined;
+			currentTarget.url += this.#anchorElement.host + this.#anchorElement.pathname;
 		}
 
 		this.#openLinkPicker(currentTarget);
 	}
 
-	// TODO => get anchors to provide to link picker?
 	async #openLinkPicker(currentTarget?: UmbLinkPickerLink) {
 		const modalHandler = this.#modalContext?.open(UMB_LINK_PICKER_MODAL, {
 			config: {
@@ -107,7 +103,7 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 
 		if (!modalHandler) return;
 
-		const linkPickerData = await modalHandler.onSubmit();
+		const linkPickerData = await modalHandler.onSubmit().catch(() => undefined);
 		if (!linkPickerData) return;
 
 		this.#linkPickerData = linkPickerData;
@@ -117,12 +113,18 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 	//Create a json obj used to create the attributes for the tag
 	// TODO => where has rel gone?
 	#createElemAttributes() {
-		const a: AnchorElementAttributes = Object.assign({}, this.#linkPickerData?.link, { 'data-anchor': null });
+		// Attribute 'name' because of linkPickerData. It should be 'title' .
+		const { name, ...linkPickerData } = this.#linkPickerData!.link;
+		const a: AnchorElementAttributes = Object.assign({}, linkPickerData);
 
 		// always need to map back to href for tinymce to render correctly
 		// do this first as checking querystring below may modify the href property
 		if (this.#linkPickerData?.link.url) {
 			a.href = this.#linkPickerData.link.url;
+		}
+
+		if (this.#linkPickerData?.link.name) {
+			a.title = name;
 		}
 
 		if (this.#linkPickerData?.link.queryString?.startsWith('#')) {
@@ -185,7 +187,7 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 			}
 		}
 
-		if (!this.#linkPickerData?.link.url && !this.#linkPickerData?.link.queryString) {
+		if (!this.#linkPickerData?.link.url && !this.#linkPickerData?.link.queryString && !this.#linkPickerData?.link.udi) {
 			this.editor.execCommand('unlink');
 			return;
 		}

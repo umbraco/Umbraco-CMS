@@ -15,7 +15,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: DOCUMENT_TYPE_REPOSITORY_ALIAS,
 	name: 'Document Types Repository',
-	class: UmbDocumentTypeRepository,
+	api: UmbDocumentTypeRepository,
 };
 
 export const DOCUMENT_TYPE_STORE_ALIAS = 'Umb.Store.DocumentType';
@@ -26,21 +26,21 @@ const store: ManifestStore = {
 	type: 'store',
 	alias: DOCUMENT_TYPE_STORE_ALIAS,
 	name: 'Document Type Store',
-	class: UmbDocumentTypeStore,
+	api: UmbDocumentTypeStore,
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: DOCUMENT_TYPE_TREE_STORE_ALIAS,
 	name: 'Document Type Tree Store',
-	class: UmbDocumentTypeTreeStore,
+	api: UmbDocumentTypeTreeStore,
 };
 
 const itemStore: ManifestItemStore = {
 	type: 'itemStore',
 	alias: DOCUMENT_TYPE_ITEM_STORE_ALIAS,
 	name: 'Document Type Item Store',
-	class: UmbDocumentTypeItemStore,
+	api: UmbDocumentTypeItemStore,
 };
 
 export const manifests = [repository, store, treeStore, itemStore];

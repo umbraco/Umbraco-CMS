@@ -5,14 +5,14 @@ export interface UmbSectionPickerModalData {
 	selection: Array<string | null>;
 }
 
-export interface UmbSectionPickerModalResult {
+export interface UmbSectionPickerModalValue {
 	selection: Array<string | null>;
 }
 
-export const UMB_SECTION_PICKER_MODAL = new UmbModalToken<UmbSectionPickerModalData, UmbSectionPickerModalResult>(
+export const UMB_SECTION_PICKER_MODAL = new UmbModalToken<UmbSectionPickerModalData, UmbSectionPickerModalValue>(
 	'Umb.Modal.SectionPicker',
 	{
 		type: 'sidebar',
 		size: 'small',
-	}
+	},
 );

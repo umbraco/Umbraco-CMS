@@ -9,7 +9,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: DICTIONARY_REPOSITORY_ALIAS,
 	name: 'Dictionary Repository',
-	class: UmbDictionaryRepository,
+	api: UmbDictionaryRepository,
 };
 
 export const DICTIONARY_STORE_ALIAS = 'Umb.Store.Dictionary';
@@ -19,14 +19,14 @@ const store: ManifestStore = {
 	type: 'store',
 	alias: DICTIONARY_STORE_ALIAS,
 	name: 'Dictionary Store',
-	class: UmbDictionaryStore,
+	api: UmbDictionaryStore,
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: DICTIONARY_TREE_STORE_ALIAS,
 	name: 'Dictionary Tree Store',
-	class: UmbDictionaryTreeStore,
+	api: UmbDictionaryTreeStore,
 };
 
 export const manifests = [repository, store, treeStore];

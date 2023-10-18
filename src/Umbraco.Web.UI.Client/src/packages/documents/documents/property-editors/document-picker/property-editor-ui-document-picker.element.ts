@@ -1,13 +1,13 @@
 import type { UmbInputDocumentElement } from '../../components/input-document/input-document.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-property-editor-ui-document-picker')
 export class UmbPropertyEditorUIContentPickerElement
 	extends UmbLitElement
-	implements UmbPropertyEditorExtensionElement
+	implements UmbPropertyEditorUiElement
 {
 	private _value: Array<string> = [];
 

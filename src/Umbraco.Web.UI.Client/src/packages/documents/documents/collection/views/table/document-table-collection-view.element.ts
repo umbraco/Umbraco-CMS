@@ -10,7 +10,7 @@ import {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import { UMB_COLLECTION_CONTEXT_TOKEN, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -54,7 +54,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this._collectionContext = instance;
 			this._observeCollectionContext();
 		});

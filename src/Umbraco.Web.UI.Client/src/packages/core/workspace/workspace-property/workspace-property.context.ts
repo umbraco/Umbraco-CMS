@@ -1,4 +1,4 @@
-import { UmbPropertyEditorExtensionElement } from '../../extension-registry/interfaces/property-editor-ui-extension-element.interface.js';
+import { UmbPropertyEditorUiElement } from '../../extension-registry/interfaces/property-editor-ui-element.interface.js';
 import { type WorkspacePropertyData } from '../types/workspace-property-data.type.js';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -31,9 +31,9 @@ export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseControl
 	#configCollection = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
 	public readonly config = this.#configCollection.asObservable();
 
-	private _editor = new UmbBasicState<UmbPropertyEditorExtensionElement | undefined>(undefined);
+	private _editor = new UmbBasicState<UmbPropertyEditorUiElement | undefined>(undefined);
 	public readonly editor = this._editor.asObservable();
-	setEditor(editor: UmbPropertyEditorExtensionElement | undefined) {
+	setEditor(editor: UmbPropertyEditorUiElement | undefined) {
 		this._editor.next(editor ?? undefined);
 	}
 	getEditor() {

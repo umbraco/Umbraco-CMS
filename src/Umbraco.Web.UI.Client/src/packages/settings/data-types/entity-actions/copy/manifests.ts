@@ -9,11 +9,11 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.DataType.Copy',
 		name: 'Copy Data Type Entity Action',
 		weight: 900,
+		api: UmbCopyDataTypeEntityAction,
 		meta: {
 			icon: 'umb:documents',
 			label: 'Copy to...',
 			repositoryAlias: DATA_TYPE_REPOSITORY_ALIAS,
-			api: UmbCopyDataTypeEntityAction,
 			entityTypes: [DATA_TYPE_ENTITY_TYPE],
 		},
 	},
