@@ -2337,11 +2337,11 @@ public class ContentController : ContentControllerBase
             return NotFound("There is no content node with id {model.NodeId}.");
         }
 
-        EntityPermission? permission =
-            _userService.GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, node.Path);
+        // Validate permissions on node
+        var permissions = _userService.GetAllPermissions(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, node.Path);
 
-
-        if (permission?.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
+        if (permissions.Any(x =>
+                x.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) && x.EntityId == node.Id) == false)
         {
             HttpContext.SetReasonPhrase("Permission Denied.");
             return BadRequest("You do not have permission to assign domains on that node.");
