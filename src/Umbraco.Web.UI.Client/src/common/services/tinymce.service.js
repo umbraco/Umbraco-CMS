@@ -764,10 +764,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             const blockEl = nodes[i];
             const block = blockEditorApi.getBlockByContentUdi(blockEl.attr("data-content-udi"));
             if(block) {
-              const displayInline = block.config.displayInline !== true;
+              const displayAsBlock = block.config.displayInline !== true;
 
               /* if the block is set to display inline, checks if its wrapped in a p tag and then unwraps it (removes p tag) */
-              if (displayInline && blockEl.parent && blockEl.parent.name.toUpperCase() === "P") {
+              if (displayAsBlock && blockEl.parent && blockEl.parent.name.toUpperCase() === "P") {
                 blockEl.parent.unwrap();
               }
             }
@@ -810,19 +810,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
      */
     insertBlockInEditor: function (editor, blockContentUdi) {
       if (blockContentUdi) {
-        /*
-        var data = {
-          "data-udi": blockUdi
-        };
-        */
-        //const blockEl = editor.dom.createHTML('umb-rte-block', data);
-        //editor.selection.setContent(blockEl, { format: 'raw' });
         editor.selection.setContent('<umb-rte-block data-content-udi="'+blockContentUdi+'"><!--Umbraco-Block--></umb-rte-block>');
-
-        // TODO: investigate what is needed here..
-        //editor.selection.setContent('Hello!!');
-        //editor.selection.setNode(blockEl);
-
 
         angularHelper.safeApply($rootScope, function () {
           editor.dispatch("Change");
@@ -1421,7 +1409,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         //stop watching before we update the value
         stopWatch();
         angularHelper.safeApply($rootScope, function () {
-          console.log("syncContext does have a change!!")
 
           initBlocks();
 
@@ -1444,6 +1431,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       function initBlocks() {
 
+        // TODO: Check if this can be optimized.
+        console.log("initBlocks");
+
         const blockEls = args.editor.contentDocument.querySelectorAll('umb-rte-block');
         for (const blockEl of blockEls) {
           if(!blockEl._isInitializedUmbBlock) {
@@ -1463,15 +1453,14 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                   blockEl.setAttribute('style', '');
                 }
               } else {
-                // Remove this block by removing the data-udi (as this will trigger TinyMCE format clean-up)
                 blockEl.removeAttribute('data-content-udi');
+                args.editor.dom.remove(blockEl);
               }
+            } else {
+              args.editor.dom.remove(blockEl);
             }
           }
         }
-        // TODO: Check if this is necessary?.
-        //args.scope.$digest();
-
       }
 
       // If we can not find the insert image/media toolbar button
@@ -1556,6 +1545,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             }
           });
         }
+
+        initBlocks();
 
       });
 

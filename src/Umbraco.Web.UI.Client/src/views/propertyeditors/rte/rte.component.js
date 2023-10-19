@@ -33,25 +33,25 @@
       var modelObject;
 
       // Property actions:
-      let copyAllBlocksAction = null;
-      let deleteAllBlocksAction = null;
-      let pasteSingleBlockAction = null;
+      //let copyAllBlocksAction = null;
+      //let deleteAllBlocksAction = null;
+      //let pasteSingleBlockAction = null;
 
-      var inlineEditing = false;
       var liveEditing = true;
 
       var vm = this;
 
       vm.readonly = false;
+      vm.tinyMceEditor = null;
 
       $attrs.$observe('readonly', (value) => {
           vm.readonly = value !== undefined;
 
           vm.blockEditorApi.readonly = vm.readonly;
 
-          if (deleteAllBlocksAction) {
+          /*if (deleteAllBlocksAction) {
               deleteAllBlocksAction.isDisabled = vm.readonly;
-          }
+          }*/
       });
 
       vm.loading = true;
@@ -108,9 +108,7 @@
           // set the onValueChanged callback, this will tell us if the block list model changed on the server
           // once the data is submitted. If so we need to re-initialize
           vm.model.onValueChanged = onServerValueChanged;
-
-          //inlineEditing = vm.model.config.useInlineEditingAsDefault;
-          //liveEditing = vm.model.config.useLiveEditing;
+          liveEditing = vm.model.config.useLiveEditing;
 
           vm.listWrapperStyles = {};
 
@@ -184,9 +182,6 @@
               promises.push(assetsService.loadJs(tinyJsAsset, $scope));
           });
 
-          //stores a reference to the editor
-          var tinyMceEditor = null;
-
           promises.push(tinyMceService.getTinyMceEditorConfig({
               htmlId: vm.textAreaHtmlId,
               stylesheets: editorConfig.stylesheets,
@@ -213,18 +208,18 @@
               baseLineConfigObj.setup = function (editor) {
 
                   //set the reference
-                  tinyMceEditor = editor;
+                  vm.tinyMceEditor = editor;
 
-                  tinyMceEditor.on('init', function (e) {
+                  vm.tinyMceEditor.on('init', function (e) {
                       $timeout(function () {
                           vm.rteLoading = false;
                           vm.updateLoading();
                       });
                   });
-                  tinyMceEditor.on("focus", function () {
+                  vm.tinyMceEditor.on("focus", function () {
                       $element[0].dispatchEvent(new CustomEvent('umb-rte-focus', {composed: true, bubbles: true}));
                   });
-                  tinyMceEditor.on("blur", function () {
+                  vm.tinyMceEditor.on("blur", function () {
                       $element[0].dispatchEvent(new CustomEvent('umb-rte-blur', {composed: true, bubbles: true}));
                   });
 
@@ -254,31 +249,44 @@
               baseLineConfigObj.readonly = vm.readonly ? 1 : baseLineConfigObj.readonly;
 
               // We need to wait for DOM to have rendered before we can find the element by ID.
-              $timeout(function () {
-                  tinymce.init(baseLineConfigObj);
-              }, 150);
+              if(tinymce) {
+                tinymce.init(baseLineConfigObj);
+              } else {
+                $timeout(function () {
+                    tinymce.init(baseLineConfigObj);
+                }, 150);
+              }
 
               //listen for formSubmitting event (the result is callback used to remove the event subscription)
               unsubscribe.push($scope.$on("formSubmitting", function () {
-                // TODO: Check if we need to include blocksLoading in this, turn it into loading..
-                  if (tinyMceEditor !== undefined && tinyMceEditor != null && !vm.rteLoading) {
-                      vm.model.value.markup = tinyMceEditor.getContent();
+                  if (vm.tinyMceEditor != null && !vm.rteLoading) {
+
+                    // Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
+                    var blockElements = vm.tinyMceEditor.dom.select(`umb-rte-block`);
+                    const usedContentUdis = blockElements.map(blockElement => blockElement.getAttribute('data-content-udi'));
+
+                    const unusedBlocks = vm.layout.filter(x => usedContentUdis.indexOf(x.contentUdi) === -1);
+                    unusedBlocks.forEach(blockLayout => {
+                      deleteBlock(blockLayout.$block);
+                    });
+
                   }
               }));
 
               vm.focusRTE = function () {
-                  tinyMceEditor.focus();
+                vm.tinyMceEditor.focus();
               }
 
-              //when the element is disposed we need to unsubscribe!
+              // When the element is disposed we need to unsubscribe!
               // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom
               // element might still be there even after the modal has been hidden.
               $scope.$on('$destroy', function () {
-                  if (tinyMceEditor !== undefined && tinyMceEditor != null) {
-                      if($element) {
-                          $element[0]?.dispatchEvent(new CustomEvent('blur', {composed: true, bubbles: true}));
-                      }
-                      tinyMceEditor.destroy()
+                  if (vm.tinyMceEditor != null) {
+                    if($element) {
+                        $element[0]?.dispatchEvent(new CustomEvent('blur', {composed: true, bubbles: true}));
+                    }
+                    vm.tinyMceEditor.destroy();
+                    vm.tinyMceEditor = null;
                   }
               });
 
@@ -382,9 +390,9 @@
       }
 
       /**
-       * Ensure that the containing content variant languag and current property culture is transfered along
+       * Ensure that the containing content variant language and current property culture is transferred along
        * to the scaffolded content object representing this block.
-       * This is required for validation along with ensuring that the umb-property inheritance is constently maintained.
+       * This is required for validation along with ensuring that the umb-property inheritance is constantly maintained.
        * @param {any} content
        */
       function ensureCultureData(content) {
@@ -420,13 +428,13 @@
           block.view = (block.config.view ? block.config.view : getDefaultViewForBlock(block));
           block.showValidation = block.config.view ? true : false;
 
-          block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
+          block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true;
           block.showSettings = block.config.settingsElementTypeKey != null;
 
           // If we have content, otherwise it doesn't make sense to copy.
           block.showCopy = vm.supportCopy && block.config.contentElementTypeKey != null;
 
-          // Index is set by umbblocklistblock component and kept up to date by it.
+          // Index is not begin updated in RTE Blocks, the order of element and Blocks of layout is not synced, meaning the index could be incorrect depending on the perspective.
           block.index = 0;
           block.setParentForm = function (parentForm) {
               this._parentForm = parentForm;
@@ -497,7 +505,7 @@
           // Add the Block Object to our layout entry.
           layoutEntry.$block = blockObject;
 
-          // add layout entry at the decired location in layout.
+          // add layout entry at the desired location in layout.
           vm.layout.splice(index, 0, layoutEntry);
 
           // lets move focus to this new block.
@@ -517,25 +525,29 @@
 
           var removed = vm.layout.splice(layoutIndex, 1);
           removed.forEach(x => {
-              // remove any server validation errors associated
-              var guids = [udiService.getKey(x.contentUdi), (x.settingsUdi ? udiService.getKey(x.settingsUdi) : null)];
-              guids.forEach(guid => {
-                  if (guid) {
-                      serverValidationManager.removePropertyError(guid, vm.umbProperty.property.culture, vm.umbProperty.property.segment, "", { matchType: "contains" });
-                  }
-              })
+
+            var blockElementsOfThisUdi = vm.tinyMceEditor.dom.select(`umb-rte-block[data-content-udi='${x.contentUdi}']`);
+            blockElementsOfThisUdi.forEach(blockElement => {
+              vm.tinyMceEditor.dom.remove(blockElement);
+            });
+
+            // remove any server validation errors associated
+            var guids = [udiService.getKey(x.contentUdi), (x.settingsUdi ? udiService.getKey(x.settingsUdi) : null)];
+            guids.forEach(guid => {
+                if (guid) {
+                    serverValidationManager.removePropertyError(guid, vm.umbProperty.property.culture, vm.umbProperty.property.segment, "", { matchType: "contains" });
+                }
+            })
           });
 
           modelObject.removeDataAndDestroyModel(block);
-
-          // TODO: Update RTE.
       }
 
-      function deleteAllBlocks() {
+      /*function deleteAllBlocks() {
           while(vm.layout.length) {
               deleteBlock(vm.layout[0].$block);
           };
-      }
+      }*/
 
       function activateBlock(blockObject) {
           blockObject.active = true;
@@ -552,7 +564,7 @@
 
           var wasNotActiveBefore = blockObject.active !== true;
 
-        // dont open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
+          // don't open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
           if (openSettings !== true && blockObject.hideContentInOverlay === true) {
               return;
           }
@@ -718,7 +730,7 @@
                   }
               },
               close: function() {
-                  // if opned by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
+                  // If opened by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
                   if (createIndex < vm.layout.length) {
                       vm.setBlockFocus(vm.layout[Math.max(createIndex-1, 0)].$block);
                   }
@@ -742,9 +754,7 @@
       function userFlowWhenBlockWasCreated(createIndex) {
           if (vm.layout.length > createIndex) {
               var blockObject = vm.layout[createIndex].$block;
-              if (inlineEditing === true) {
-                  blockObject.activate();
-              } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true && blockObject.content.variants[0].tabs.find(tab => tab.properties.length > 0) !== undefined) {
+              if (blockObject.hideContentInOverlay !== true && blockObject.content.variants[0].tabs.find(tab => tab.properties.length > 0) !== undefined) {
                   vm.options.createFlow = true;
                   blockObject.edit();
                   vm.options.createFlow = false;
@@ -754,7 +764,7 @@
 
       function updateClipboard(firstTime) {
 
-        var oldAmount = vm.clipboardItems.length;
+        //var oldAmount = vm.clipboardItems.length;
 
         vm.clipboardItems = [];
 
@@ -830,14 +840,14 @@
           // make block model
           var blockObject = getBlockObject(layoutEntry);
           if (blockObject === null) {
-              // Initalization of the Block Object didnt go well, therefor we will fail the paste action.
+              // Initialization of the Block Object didn't go well, therefor we will fail the paste action.
               return false;
           }
 
           // set the BlockObject on our layout entry.
           layoutEntry.$block = blockObject;
 
-          // insert layout entry at the decired location in layout.
+          // insert layout entry at the desired location in layout.
           vm.layout.splice(index, 0, layoutEntry);
 
           vm.currentBlockInFocus = blockObject;

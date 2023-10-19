@@ -618,7 +618,7 @@
                     }
                 },
                 close: function() {
-                    // if opned by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
+                    // If opened by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
                     if (createIndex < vm.layout.length) {
                         vm.setBlockFocus(vm.layout[Math.max(createIndex-1, 0)].$block);
                     }
@@ -791,14 +791,14 @@
             // make block model
             var blockObject = getBlockObject(layoutEntry);
             if (blockObject === null) {
-                // Initalization of the Block Object didnt go well, therefor we will fail the paste action.
+                // Initialization of the Block Object didn't go well, therefor we will fail the paste action.
                 return false;
             }
 
             // set the BlockObject on our layout entry.
             layoutEntry.$block = blockObject;
 
-            // insert layout entry at the decired location in layout.
+            // insert layout entry at the desired location in layout.
             vm.layout.splice(index, 0, layoutEntry);
 
             vm.currentBlockInFocus = blockObject;
