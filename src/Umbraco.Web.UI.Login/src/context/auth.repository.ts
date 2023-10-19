@@ -5,6 +5,7 @@ import type {
 	ResetPasswordResponse,
 	ValidatePasswordResetCodeResponse,
 } from '../types.js';
+import { umbLocalizationContext } from '../external/localization/localization-context.js';
 
 export class UmbAuthRepository {
 	readonly #authURL = 'backoffice/umbracoapi/authentication/postlogin';
@@ -29,7 +30,7 @@ export class UmbAuthRepository {
 
 			return {
 				status: response.status,
-				error: response.ok ? undefined : this.#getErrorText(response),
+				error: response.ok ? undefined : await this.#getErrorText(response),
 				twoFactorView: responseData?.twoFactorView,
 			};
 		} catch (error) {
@@ -54,7 +55,7 @@ export class UmbAuthRepository {
 
 		return {
 			status: response.status,
-			error: response.ok ? undefined : this.#getErrorText(response),
+			error: response.ok ? undefined : await this.#getErrorText(response),
 		};
 	}
 
@@ -73,7 +74,7 @@ export class UmbAuthRepository {
 
 		return {
 			status: response.status,
-			error: response.ok ? undefined : this.#getErrorText(response),
+			error: response.ok ? undefined : await this.#getErrorText(response),
 		};
 	}
 
@@ -93,7 +94,7 @@ export class UmbAuthRepository {
 
 		return {
 			status: response.status,
-			error: response.ok ? undefined : this.#getErrorText(response),
+			error: response.ok ? undefined : await this.#getErrorText(response),
 		};
 	}
 
@@ -111,7 +112,7 @@ export class UmbAuthRepository {
 
 		return {
 			status: response.status,
-			error: response.ok ? undefined : this.#getErrorText(response),
+			error: response.ok ? undefined : await this.#getErrorText(response),
 		};
 	}
 
@@ -194,7 +195,7 @@ export class UmbAuthRepository {
 
 		return {
 			status: response.status,
-			error: this.#getErrorText(response),
+			error: await this.#getErrorText(response),
 			providers: [],
 		};
 	}
@@ -230,22 +231,20 @@ export class UmbAuthRepository {
 		};
 	}
 
-	#getErrorText(response: Response) {
+	async #getErrorText(response: Response): Promise<string> {
 		switch (response.status) {
 			case 400:
-				return 'Oops! It seems like your login credentials are invalid or expired. Please double-check your username and password and try again.';
-
 			case 401:
-				return 'Oops! It seems like your login credentials are invalid or expired. Please double-check your username and password and try again.';
+				return umbLocalizationContext.localize('login_userFailedLogin', undefined, "Oops! We couldn't log you in. Please check your credentials and try again.");
 
 			case 402:
-				return 'You are required to authenticate with multi-factor authentication.';
+				return umbLocalizationContext.localize('login_2faText', undefined, 'You have enabled 2-factor authentication and must verify your identity.');
 
 			case 500:
-				return "We're sorry, but the server encountered an unexpected error. Please refresh the page or try again later..";
+				return umbLocalizationContext.localize('errors_receivedErrorFromServer', undefined, 'Received error from server');
 
 			default:
-				return response.statusText;
+				return response.statusText ?? await umbLocalizationContext.localize('errors_receivedErrorFromServer', undefined, 'Received error from server')
 		}
 	}
 
