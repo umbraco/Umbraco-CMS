@@ -13,21 +13,29 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 	@property()
 	value: any = undefined;
 
-	@property({ attribute: false })
-	public config?: UmbPropertyEditorConfigCollection;
+	#crops = [];
 
-	render() {
-		if (!this.config) return nothing;
+	@property({ attribute: false })
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		this.#crops = config?.getValueByAlias('crops') ?? [];
 
 		if (!this.value) {
+			//TODO: How should we combine the crops from the value with the configuration?
 			this.value = {
-				crops: this.config[0].value,
+				crops: this.#crops,
 				focalPoint: { left: 0.5, top: 0.5 },
 				src: 'https://picsum.photos/seed/picsum/2000/3000',
 			};
 		}
+	}
 
-		return html`<umb-input-image-cropper .value=${this.value}></umb-input-image-cropper>`;
+	#onChange(e: Event) {
+		this.value = (e.target as HTMLInputElement).value;
+		this.dispatchEvent(new CustomEvent('property-value-change'));
+	}
+
+	render() {
+		return html`<umb-input-image-cropper @change=${this.#onChange} .value=${this.value}></umb-input-image-cropper>`;
 	}
 
 	static styles = [UmbTextStyles];

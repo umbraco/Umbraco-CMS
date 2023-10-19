@@ -69,28 +69,27 @@ export class UmbInputImageCropperElement extends LitElement {
 
 		this.crops[index] = value;
 		this.currentCrop = undefined;
+		this.#updateValue();
 	}
 
 	#onFocalPointChange(event: CustomEvent) {
 		this.focalPoint = event.detail;
+		this.#updateValue();
 	}
 
-	#onSave() {
-		this.value = {
+	#updateValue() {
+		this.#value = {
+			crops: [...this.crops],
 			focalPoint: this.focalPoint,
 			src: this.src,
-			crops: this.crops,
 		};
+
+		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
 	render() {
 		return html`
-			<div id="main">
-				${this.#renderMain()}
-				<div id="actions">
-					<button @click=${this.#onSave} style="margin-top: 8px">Save editor</button>
-				</div>
-			</div>
+			<div id="main">${this.#renderMain()}</div>
 			<div id="side">${this.#renderSide()}</div>
 		`;
 	}
