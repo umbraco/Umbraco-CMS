@@ -96,7 +96,8 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 							type="password"
 							id="password"
 							name="password"
-							label=${until(umbLocalizationContext.localize('user_newPassword'), 'New password')}
+							autocomplete="new-password"
+							.label=${until(umbLocalizationContext.localize('user_newPassword'), 'New password')}
 							required
 							required-message=${until(umbLocalizationContext.localize('user_passwordIsBlank', undefined, 'Your new password cannot be blank!'))}></uui-input-password>
 					</uui-form-layout-item>
@@ -109,7 +110,8 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 							type="password"
 							id="confirmPassword"
 							name="confirmPassword"
-							label=${until(umbLocalizationContext.localize('user_confirmNewPassword'), 'Confirm new password')}
+							autocomplete="new-password"
+							.label=${until(umbLocalizationContext.localize('user_confirmNewPassword'), 'Confirm new password')}
               				required
               				required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input-password>
 					</uui-form-layout-item>
