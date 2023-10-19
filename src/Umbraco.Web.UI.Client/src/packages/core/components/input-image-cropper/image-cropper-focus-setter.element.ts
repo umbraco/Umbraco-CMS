@@ -24,6 +24,15 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 		this.#removeEventListeners();
 	}
 
+	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.updated(_changedProperties);
+
+		if (_changedProperties.has('focalPoint')) {
+			this.focalPointElement.style.left = `calc(${this.focalPoint.left * 100}% - ${this.#DOT_RADIUS}px)`;
+			this.focalPointElement.style.top = `calc(${this.focalPoint.top * 100}% - ${this.#DOT_RADIUS}px)`;
+		}
+	}
+
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 

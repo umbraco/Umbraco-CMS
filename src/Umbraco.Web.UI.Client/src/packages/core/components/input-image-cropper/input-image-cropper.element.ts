@@ -27,7 +27,8 @@ export class UmbInputImageCropperElement extends LitElement {
 			this.#value = undefined;
 		} else {
 			this.crops = [...value.crops];
-			this.focalPoint = value.focalPoint;
+			// TODO: This is a temporary solution to make sure we have a focal point
+			this.focalPoint = value.focalPoint || { left: 0.5, top: 0.5 };
 			this.src = value.src;
 			this.#value = value;
 		}
@@ -87,6 +88,11 @@ export class UmbInputImageCropperElement extends LitElement {
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
+	#onResetFocalPoint() {
+		this.focalPoint = { left: 0.5, top: 0.5 };
+		this.#updateValue();
+	}
+
 	render() {
 		return html`
 			<div id="main">${this.#renderMain()}</div>
@@ -107,7 +113,7 @@ export class UmbInputImageCropperElement extends LitElement {
 						.src=${this.src}></umb-image-cropper-focus-setter>
 					<div id="actions">
 						<uui-button>Remove files (NOT IMPLEMENTED YET)</uui-button>
-						<uui-button>Reset focal point</uui-button>
+						<uui-button @click=${this.#onResetFocalPoint}>Reset focal point</uui-button>
 					</div> `;
 	}
 
