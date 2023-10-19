@@ -150,7 +150,8 @@
 
           // Create Model Object, to manage our data for this Block Editor.
           modelObject = blockEditorService.createModelObject(vm.model.value.blocks, vm.model.editor, vm.model.config.blocks, scopeOfExistence, $scope);
-          modelObject.load().then(onLoaded);
+          const blockModelObjectLoading = modelObject.load()
+          blockModelObjectLoading.then(onLoaded);
 
 
           // ******************** //
@@ -175,7 +176,7 @@
           vm.containerHeight = "auto";
           vm.containerOverflow = "inherit";
 
-          var promises = [];
+          var promises = [blockModelObjectLoading];
 
           //queue file loading
           tinyMceAssets.forEach(function (tinyJsAsset) {
