@@ -84,7 +84,6 @@ class UmbLocalizationContext {
         //if no area specified, add general_
         if (alias && underscoreIndex < 0) {
             alias = "general_" + alias;
-            underscoreIndex = alias.indexOf("_");
         }
 
         const valueEntry = dictionary.get(alias);
