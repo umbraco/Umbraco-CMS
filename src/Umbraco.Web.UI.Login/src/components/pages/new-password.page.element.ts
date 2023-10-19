@@ -4,7 +4,6 @@ import { customElement, query, state } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
 
 import { umbAuthContext } from '../../context/auth.context.js';
-import UmbRouter from '../../utils/umb-router.js';
 import { umbLocalizationContext } from '../../external/localization/localization-context.js';
 
 @customElement('umb-new-password-page')
@@ -16,7 +15,7 @@ export default class UmbNewPasswordPageElement extends LitElement {
 	state: UUIButtonState = undefined;
 
 	@state()
-	page: 'new' | 'done' = 'new';
+	page: 'new' | 'done' | 'error' = 'new';
 
 	@state()
 	error = '';
@@ -27,17 +26,15 @@ export default class UmbNewPasswordPageElement extends LitElement {
 	@state()
 	resetCode: string | null = null;
 
-	protected async firstUpdated(_changedProperties: any) {
-		super.firstUpdated(_changedProperties);
+	constructor() {
+		super();
 
 		const urlParams = new URLSearchParams(window.location.search);
 		this.resetCode = urlParams.get('resetCode');
 		this.userId = urlParams.get('userId');
 
 		if (!this.userId || !this.resetCode) {
-			// The login page should already have redirected the user to an error page. They should never get here.
-			UmbRouter.redirect('login');
-			return;
+			this.page = 'error';
 		}
 	}
 
@@ -65,6 +62,11 @@ export default class UmbNewPasswordPageElement extends LitElement {
 					.userId=${this.userId!}
 					.state=${this.state}
 					.error=${this.error}></umb-new-password-layout>`;
+			case 'error':
+				return html`<umb-error-layout
+					header=${until(umbLocalizationContext.localize('general_error', undefined, 'Error'))}
+					message=${until(umbLocalizationContext.localize('errors_defaultError', undefined, 'An unknown failure has occured'))}>
+				</umb-error-layout>`;
 			case 'done':
 				return html`<umb-confirmation-layout
 					header=${until(umbLocalizationContext.localize('general_success', undefined, 'Success')) + '!'}
