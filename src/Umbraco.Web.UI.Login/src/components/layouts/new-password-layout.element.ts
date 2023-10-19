@@ -21,7 +21,10 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 	error: string = '';
 
 	@property()
-	user: any;
+	userId: any;
+
+	@property()
+	userName?: string;
 
 	@state()
 	passwordConfig?: {
@@ -33,7 +36,7 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 	protected async firstUpdated(_changedProperties: any) {
 		super.firstUpdated(_changedProperties);
 
-		const response = await umbAuthContext.getPasswordConfig(this.user.id);
+		const response = await umbAuthContext.getPasswordConfig(this.userId);
 		this.passwordConfig = response.data;
 	}
 
@@ -80,14 +83,25 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 		this.dispatchEvent(new CustomEvent('submit', { detail: { password } }));
 	}
 
+	renderHeader() {
+		if (this.userName) {
+			return html`
+				<h2>Hi, ${this.userName}</h2>
+				<umb-localize key="user_userinviteWelcomeMessage">Welcome to Umbraco! Just need to get your password setup and then you're good to go</umb-localize>
+			`;
+		} else {
+			return html`
+				<h2><umb-localize key="user_newPassword">New password</umb-localize></h2>
+				<umb-localize key="login_setPasswordInstruction">Please provide a new password.</umb-localize>
+			`;
+		}
+	}
+
 	render() {
 		return html`
 			<uui-form>
 				<form id="LoginForm" name="login" @submit=${this.#onSubmit}>
-					<div id="header">
-						<h2>Hi, ${this.user.name}</h2>
-            			<umb-localize key="user_userinviteWelcomeMessage">Welcome to Umbraco! Just need to get your password setup and then you're good to go</umb-localize>
-					</div>
+					<div id="header">${this.renderHeader()}</div>
 					<uui-form-layout-item>
 						<uui-label id="passwordLabel" for="password" slot="label" required>
 						  <umb-localize key="user_newPassword">New password</umb-localize>
@@ -97,7 +111,7 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 							id="password"
 							name="password"
 							autocomplete="new-password"
-							.label=${until(umbLocalizationContext.localize('user_newPassword'), 'New password')}
+							.label=${until(umbLocalizationContext.localize('user_newPassword', undefined, 'New password'))}
 							required
 							required-message=${until(umbLocalizationContext.localize('user_passwordIsBlank', undefined, 'Your new password cannot be blank!'))}></uui-input-password>
 					</uui-form-layout-item>
@@ -111,14 +125,14 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 							id="confirmPassword"
 							name="confirmPassword"
 							autocomplete="new-password"
-							.label=${until(umbLocalizationContext.localize('user_confirmNewPassword'), 'Confirm new password')}
+							.label=${until(umbLocalizationContext.localize('user_confirmNewPassword', undefined, 'Confirm new password'))}
               				required
               				required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input-password>
 					</uui-form-layout-item>
 
 					${this.#renderErrorMessage()}
 
-					<uui-button type="submit" label=${until(umbLocalizationContext.localize('general_continue'), 'Continue')} look="primary" color="default" .state=${this.state}></uui-button>
+					<uui-button type="submit" label=${until(umbLocalizationContext.localize('general_continue', undefined, 'Continue'))} look="primary" color="default" .state=${this.state}></uui-button>
 				</form>
 			</uui-form>
 

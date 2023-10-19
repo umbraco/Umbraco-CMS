@@ -52,7 +52,8 @@ export default class UmbInvitePageElement extends LitElement {
 		return this.invitedUser
 			? html`<umb-new-password-layout
 					@submit=${this.#onSubmit}
-					.user=${this.invitedUser}
+					.userId=${this.invitedUser.id}
+					.userName=${this.invitedUser.name}
 					.state=${this.state}
 					.error=${this.error}></umb-new-password-layout>`
 			: nothing;
