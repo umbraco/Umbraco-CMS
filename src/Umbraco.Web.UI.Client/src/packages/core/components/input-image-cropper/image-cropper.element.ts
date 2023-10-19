@@ -332,9 +332,9 @@ export class UmbImageCropperElement extends LitElement {
 				value="0"
 				step="0.001"></uui-slider>
 			<div id="actions">
-				<uui-button @click=${this.#onReset}>Reset crop</uui-button>
-				<uui-button look="secondary" @click=${this.#onCancel}>Cancel</uui-button>
-				<uui-button look="primary" color="positive" @click=${this.#onSave}>Save Crop</uui-button>
+				<uui-button @click=${this.#onReset} label="Reset"></uui-button>
+				<uui-button look="secondary" @click=${this.#onCancel} label="Cancel"></uui-button>
+				<uui-button look="primary" color="positive" @click=${this.#onSave} label="Save"></uui-button>
 			</div>
 		`;
 	}
@@ -363,6 +363,7 @@ export class UmbImageCropperElement extends LitElement {
 		#actions {
 			display: flex;
 			justify-content: flex-end;
+			gap: var(--uui-size-space-1);
 		}
 
 		#mask {

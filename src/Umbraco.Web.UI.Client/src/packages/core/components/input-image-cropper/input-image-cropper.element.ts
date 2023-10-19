@@ -89,13 +89,7 @@ export class UmbInputImageCropperElement extends LitElement {
 
 	render() {
 		return html`
-			<div id="main">
-				${this.#renderMain()}
-				<div id="actions">
-					<uui-button>Remove files (NOT IMPLEMENTED YET)</uui-button>
-					<uui-button>Reset focal point</uui-button>
-				</div>
-			</div>
+			<div id="main">${this.#renderMain()}</div>
 			<div id="side">${this.#renderSide()}</div>
 		`;
 	}
@@ -108,9 +102,13 @@ export class UmbInputImageCropperElement extends LitElement {
 					.focalPoint=${this.focalPoint}
 					.value=${this.currentCrop}></umb-image-cropper>`
 			: html`<umb-image-cropper-focus-setter
-					@change=${this.#onFocalPointChange}
-					.focalPoint=${this.focalPoint}
-					.src=${this.src}></umb-image-cropper-focus-setter>`;
+						@change=${this.#onFocalPointChange}
+						.focalPoint=${this.focalPoint}
+						.src=${this.src}></umb-image-cropper-focus-setter>
+					<div id="actions">
+						<uui-button>Remove files (NOT IMPLEMENTED YET)</uui-button>
+						<uui-button>Reset focal point</uui-button>
+					</div> `;
 	}
 
 	#renderSide() {
