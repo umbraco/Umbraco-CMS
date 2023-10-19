@@ -1,3 +1,5 @@
+using System.Runtime.Serialization;
+
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
@@ -9,9 +11,8 @@ public class RichTextConfiguration : IIgnoreUserStartNodesConfig
     [ConfigurationField("editor", "Editor", "views/propertyeditors/rte/rte.prevalues.html", HideLabel = true)]
     public object? Editor { get; set; }
 
-    // TODO: update descriptions + consider moving BlockListConfiguration.BlockConfiguration to its own class instead of being nested under BlockListConfiguration
     [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/rte/blocks/prevalue/blockrte.blockconfiguration.html", Description = "Define the available blocks.")]
-    public BlockListConfiguration.BlockConfiguration[] Blocks { get; set; } = null!;
+    public RichTextBlockConfiguration[]? Blocks { get; set; } = null!;
 
     [ConfigurationField("overlaySize", "Overlay Size", "overlaysize", Description = "Select the width of the overlay (link picker).")]
     public string? OverlaySize { get; set; }
@@ -28,4 +29,41 @@ public class RichTextConfiguration : IIgnoreUserStartNodesConfig
         "boolean",
         Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
     public bool IgnoreUserStartNodes { get; set; }
+
+    [DataContract]
+    public class RichTextBlockConfiguration : IBlockConfiguration
+    {
+        [DataMember(Name = "backgroundColor")]
+        public string? BackgroundColor { get; set; }
+
+        [DataMember(Name = "iconColor")]
+        public string? IconColor { get; set; }
+
+        [DataMember(Name = "thumbnail")]
+        public string? Thumbnail { get; set; }
+
+        [DataMember(Name = "contentElementTypeKey")]
+        public Guid ContentElementTypeKey { get; set; }
+
+        [DataMember(Name = "settingsElementTypeKey")]
+        public Guid? SettingsElementTypeKey { get; set; }
+
+        [DataMember(Name = "view")]
+        public string? View { get; set; }
+
+        [DataMember(Name = "stylesheet")]
+        public string? Stylesheet { get; set; }
+
+        [DataMember(Name = "label")]
+        public string? Label { get; set; }
+
+        [DataMember(Name = "editorSize")]
+        public string? EditorSize { get; set; }
+
+        [DataMember(Name = "forceHideContentEditorInOverlay")]
+        public bool ForceHideContentEditorInOverlay { get; set; }
+
+        [DataMember(Name = "displayInline")]
+        public bool DisplayInline { get; set; }
+    }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Reflection;
@@ -8,8 +8,8 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-[Obsolete("Please use implementations of BlockPropertyValueCreatorBase instead of this. See BlockListPropertyValueConverter for inspiration.. Will be removed in V15.")]
-public abstract class BlockPropertyValueConverterBase<TBlockModel, TBlockItemModel, TBlockLayoutItem, TBlockConfiguration> : PropertyValueConverterBase
+internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemModel, TBlockLayoutItem, TBlockConfiguration>
+    where TBlockModel : BlockModelCollection<TBlockItemModel>
     where TBlockItemModel : class, IBlockReference<IPublishedElement, IPublishedElement>
     where TBlockLayoutItem : IBlockLayoutItem
     where TBlockConfiguration : IBlockConfiguration
@@ -33,11 +33,11 @@ public abstract class BlockPropertyValueConverterBase<TBlockModel, TBlockItemMod
     protected delegate TBlockModel CreateEmptyBlockModel();
 
     /// <summary>
-    /// Creates a block model for a list of unwrapped block items.
+    /// Creates a block model for a list of block items.
     /// </summary>
-    /// <param name="blockItems">The unwrapped block items to base the block model on.</param>
+    /// <param name="blockItems">The block items to base the block model on.</param>
     /// <returns></returns>
-    protected delegate TBlockModel CreateBlockModel(IList<TBlockItemModel> blockItems);
+    protected delegate TBlockModel CreateBlockModelFromItems(IList<TBlockItemModel> blockItems);
 
     /// <summary>
     /// Creates a block item from a block layout item.
@@ -56,41 +56,53 @@ public abstract class BlockPropertyValueConverterBase<TBlockModel, TBlockItemMod
     /// <returns></returns>
     protected delegate TBlockItemModel? EnrichBlockItemModelFromConfiguration(TBlockItemModel item, TBlockLayoutItem layoutItem, TBlockConfiguration configuration, CreateBlockItemModelFromLayout blockItemModelCreator);
 
-    protected BlockPropertyValueConverterBase(BlockEditorConverter blockBlockEditorConverter) => BlockEditorConverter = blockBlockEditorConverter;
+    protected BlockPropertyValueCreatorBase(BlockEditorConverter blockEditorConverter) => BlockEditorConverter = blockEditorConverter;
 
     protected BlockEditorConverter BlockEditorConverter { get; }
 
-    /// <inheritdoc />
-    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview) => source?.ToString();
-
-    /// <inheritdoc />
-    public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof(TBlockModel);
-
-    /// <inheritdoc />
-    public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
-        => PropertyCacheLevel.Element;
-
-    protected TBlockModel UnwrapBlockModel(
-              PropertyCacheLevel referenceCacheLevel,
-              object? inter,
-              bool preview,
-              IEnumerable<TBlockConfiguration> blockConfigurations,
-              CreateEmptyBlockModel createEmptyModel,
-              CreateBlockModel createModel,
-              EnrichBlockItemModelFromConfiguration? enrichBlockItem = null)
+    protected TBlockModel CreateBlockModel(
+        PropertyCacheLevel referenceCacheLevel,
+        string intermediateBlockModelValue,
+        bool preview,
+        IEnumerable<TBlockConfiguration> blockConfigurations,
+        CreateEmptyBlockModel createEmptyModel,
+        CreateBlockModelFromItems createModelFromItems,
+        EnrichBlockItemModelFromConfiguration? enrichBlockItem = null)
     {
-        // NOTE: The intermediate object is just a json string, we don't actually convert from source -> intermediate since source is always just a json string
-
-        var value = (string?)inter;
-
         // Short-circuit on empty values
-        if (string.IsNullOrWhiteSpace(value))
+        if (intermediateBlockModelValue.IsNullOrWhiteSpace())
         {
             return createEmptyModel();
         }
 
         BlockEditorDataConverter blockEditorDataConverter = CreateBlockEditorDataConverter();
-        BlockEditorData converted = blockEditorDataConverter.Deserialize(value);
+        BlockEditorData converted = blockEditorDataConverter.Deserialize(intermediateBlockModelValue);
+        return CreateBlockModel(referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
+    }
+
+    protected TBlockModel CreateBlockModel(
+        PropertyCacheLevel referenceCacheLevel,
+        BlockValue blockValue,
+        bool preview,
+        IEnumerable<TBlockConfiguration> blockConfigurations,
+        CreateEmptyBlockModel createEmptyModel,
+        CreateBlockModelFromItems createModelFromItems,
+        EnrichBlockItemModelFromConfiguration? enrichBlockItem = null)
+    {
+        BlockEditorDataConverter blockEditorDataConverter = CreateBlockEditorDataConverter();
+        BlockEditorData converted = blockEditorDataConverter.Convert(blockValue);
+        return CreateBlockModel(referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
+    }
+
+    private TBlockModel CreateBlockModel(
+        PropertyCacheLevel referenceCacheLevel,
+        BlockEditorData converted,
+        bool preview,
+        IEnumerable<TBlockConfiguration> blockConfigurations,
+        CreateEmptyBlockModel createEmptyModel,
+        CreateBlockModelFromItems createModelFromItems,
+        EnrichBlockItemModelFromConfiguration? enrichBlockItem = null)
+    {
         if (converted.BlockValue.ContentData.Count == 0)
         {
             return createEmptyModel();
@@ -199,7 +211,7 @@ public abstract class BlockPropertyValueConverterBase<TBlockModel, TBlockItemMod
         }
 
         var blockItems = layout.Select(CreateBlockItem).WhereNotNull().ToList();
-        return createModel(blockItems);
+        return createModelFromItems(blockItems);
     }
 
     // Cache constructors locally (it's tied to the current IPublishedSnapshot and IPublishedModelFactory)
