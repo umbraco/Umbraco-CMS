@@ -127,7 +127,7 @@ export class UmbInputImageCropperElement extends LitElement {
 			display: flex;
 			width: 100%;
 			box-sizing: border-box;
-			gap: 8px;
+			gap: var(--uui-size-space-3);
 			height: 400px;
 		}
 		#main {
@@ -139,7 +139,7 @@ export class UmbInputImageCropperElement extends LitElement {
 		#side {
 			display: grid;
 			grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-			gap: 8px;
+			gap: var(--uui-size-space-3);
 			flex-grow: 1;
 			overflow-y: auto;
 			height: fit-content;

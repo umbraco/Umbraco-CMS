@@ -114,8 +114,8 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 			height: 100%;
 			position: relative;
 			user-select: none;
-			background-color: white;
-			outline: 1px solid lightgrey;
+			background-color: var(--uui-color-surface);
+			outline: 1px solid var(--uui-color-border);
 		}
 		/* Wrapper is used to make the focal point position responsive to the image size */
 		#wrapper {

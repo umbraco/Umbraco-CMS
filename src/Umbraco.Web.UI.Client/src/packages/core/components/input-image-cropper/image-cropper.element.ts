@@ -342,7 +342,7 @@ export class UmbImageCropperElement extends LitElement {
 		:host {
 			display: grid;
 			grid-template-rows: 1fr auto;
-			gap: 8px;
+			gap: var(--uui-size-space-3);
 			height: 100%;
 			width: 100%;
 		}
@@ -356,8 +356,8 @@ export class UmbImageCropperElement extends LitElement {
 			position: relative;
 			width: 100%;
 			height: 100%;
-			outline: 1px solid lightgrey;
-			border-radius: 4px;
+			outline: 1px solid var(--uui-color-border);
+			border-radius: var(--uui-border-radius);
 		}
 
 		#mask {

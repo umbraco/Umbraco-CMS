@@ -161,10 +161,13 @@ export class UmbImageCropperPreviewElement extends LitElement {
 		:host {
 			display: flex;
 			flex-direction: column;
-			outline: 1px solid lightgrey;
-			padding: 12px;
-			border-radius: 4px;
-			background-color: white;
+			padding: var(--uui-size-space-4);
+			border-radius: var(--uui-border-radius);
+			background-color: var(--uui-color-surface);
+			cursor: pointer;
+		}
+		:host(:hover) {
+			background-color: var(--uui-color-surface-alt);
 		}
 		#container {
 			display: flex;
@@ -180,9 +183,10 @@ export class UmbImageCropperPreviewElement extends LitElement {
 		}
 		#alias {
 			font-weight: bold;
-			margin-top: 8px;
+			margin-top: var(--uui-size-space-3);
 		}
-		#dimensions {
+		#dimensions,
+		#user-defined {
 			font-size: 0.8em;
 		}
 		#image {
