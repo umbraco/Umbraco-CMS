@@ -271,6 +271,34 @@
                       deleteBlock(blockLayout.$block);
                     });
 
+
+                    // Remove Angular Classes from markup:
+                    var parser = new DOMParser();
+                    var doc = parser.parseFromString(vm.model.value.markup, 'text/html');
+
+                    // Get all elements in the parsed document
+                    var elements = doc.querySelectorAll('*[class]');
+                    elements.forEach(element => {
+                      var classAttribute = element.getAttribute("class");
+                      if (classAttribute) {
+                        // Split the class attribute by spaces and remove "ng-scope" and "ng-isolate-scope"
+                        var classes = classAttribute.split(" ");
+                        var newClasses = classes.filter(function (className) {
+                          return className !== "ng-scope" && className !== "ng-isolate-scope";
+                        });
+
+                        // Update the class attribute with the remaining classes
+                        if (newClasses.length > 0) {
+                          element.setAttribute('class', newClasses.join(' '));
+                        } else {
+                          // If no remaining classes, remove the class attribute
+                          element.removeAttribute('class');
+                        }
+                      }
+                    });
+
+                    vm.model.value.markup = new XMLSerializer().serializeToString(doc);
+
                   }
               }));
 

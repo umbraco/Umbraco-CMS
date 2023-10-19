@@ -1410,21 +1410,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         stopWatch();
         angularHelper.safeApply($rootScope, function () {
 
-          // Remove Angular Classes:
-          var elementWithClassAttr = args.editor.dom.select("*[class]");
-          elementWithClassAttr.forEach(element => {
-            var classAttribute = args.editor.dom.getAttrib(element, "class");
-            if (classAttribute) {
-              // Split the class attribute by spaces and remove "ng-scope" and "ng-isolate-scope"
-              var classes = classAttribute.split(" ");
-              var newClasses = classes.filter(function (className) {
-                return className !== "ng-scope" && className !== "ng-isolate-scope";
-              });
-
-              // Update the class attribute with the remaining classes
-              args.editor.dom.setAttrib(element, "class", newClasses.join(" "));
-            }
-          });
           setPropertyValue(args.editor.getContent());
 
           //make the form dirty manually so that the track changes works, setting our model doesn't trigger
