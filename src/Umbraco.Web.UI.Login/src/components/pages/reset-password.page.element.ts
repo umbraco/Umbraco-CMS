@@ -35,7 +35,9 @@ export default class UmbResetPasswordPageElement extends LitElement {
 			<uui-form>
 				<form id="LoginForm" name="login" @submit="${this.#handleResetSubmit}">
 					<div id="header">
-						<h2><umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize></h2>
+						<h2>
+							<umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
+						</h2>
 						<span>
 							<umb-localize key="login_forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</umb-localize>
 						</span>
@@ -49,7 +51,7 @@ export default class UmbResetPasswordPageElement extends LitElement {
 							type="email"
 							id="email"
 							name="email"
-							label=${until(umbLocalizationContext.localize('general_email', undefined, 'Email'))}
+							.label=${until(umbLocalizationContext.localize('general_email', undefined, 'Email'))}
 							required
 							required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Email'))}></uui-input>
 					</uui-form-layout-item>
@@ -58,7 +60,7 @@ export default class UmbResetPasswordPageElement extends LitElement {
 
 					<uui-button
 						type="submit"
-						label="Reset password"
+						.label=${until(umbLocalizationContext.localize('general_submit', undefined, 'Submit'))}
 						look="primary"
 						color="default"
 						.state=${this.resetCallState}></uui-button>

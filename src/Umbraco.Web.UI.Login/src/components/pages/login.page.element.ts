@@ -110,7 +110,7 @@ export default class UmbLoginPageElement extends LitElement {
 										type=${this.usernameIsEmail ? 'email' : 'text'}
 										id="umb-username"
 										name="email"
-										label=${this.usernameIsEmail
+										.label=${this.usernameIsEmail
 											? until(umbLocalizationContext.localize('general_email', undefined, 'Email'))
 											: until(umbLocalizationContext.localize('user_username', undefined, 'Username'))}
 										required
@@ -124,7 +124,7 @@ export default class UmbLoginPageElement extends LitElement {
 									<uui-input-password
 										id="umb-password"
 										name="password"
-										label=${until(umbLocalizationContext.localize('user_password', undefined, 'Password'))}
+										.label=${until(umbLocalizationContext.localize('user_password', undefined, 'Password'))}
 										required
 										required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input-password>
 								</uui-form-layout-item>
@@ -133,7 +133,7 @@ export default class UmbLoginPageElement extends LitElement {
 									${when(
 										umbAuthContext.supportsPersistLogin,
 										() => html`<uui-form-layout-item>
-											<uui-checkbox name="persist" label=${until(umbLocalizationContext.localize('user_rememberMe', undefined, 'Remember me'))}>
+											<uui-checkbox name="persist" .label=${until(umbLocalizationContext.localize('user_rememberMe', undefined, 'Remember me'))}>
 												<umb-localize key="user_rememberMe">Remember me</umb-localize>
 											</uui-checkbox>
 										</uui-form-layout-item>`
@@ -141,9 +141,9 @@ export default class UmbLoginPageElement extends LitElement {
 									${when(
 										this.allowPasswordReset,
 										() =>
-											html`<a id="forgot-password" href="login/reset">
+											html`<button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
 												<umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
-											</a>`
+											</button>`
 									)}
 								</div>
 
@@ -153,11 +153,9 @@ export default class UmbLoginPageElement extends LitElement {
 									type="submit"
 									id="umb-login-button"
 									look="primary"
-									label="Login"
+									.label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'))}
 									color="default"
-									.state=${this._loginState}>
-									<umb-localize key="general_login">Login</umb-localize>
-								</uui-button>
+									.state=${this._loginState}></uui-button>
 							</form>
 						</uui-form>
 				  `}

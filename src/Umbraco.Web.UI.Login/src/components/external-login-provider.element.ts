@@ -2,7 +2,9 @@ import type { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
+
 import { loadCustomView, renderCustomView } from '../utils/load-custom-view.function.js';
+import { umbLocalizationContext } from '../external/localization/localization-context.js';
 
 type ExternalLoginCustomViewElement = HTMLElement & {
 	displayName: string;
@@ -113,11 +115,20 @@ export class UmbExternalLoginProviderElement extends LitElement {
 					type="submit"
 					name="provider"
 					.value=${this.providerName}
-					label="Continue with ${this.displayName}"
+					title=${`Login using your ${this.displayName} account`}
+					.label=${until(umbLocalizationContext.localize('login_signInWith', undefined, 'Sign in with')) + ' ' + this.displayName}
 					.look=${this.buttonLook}
 					.color=${this.buttonColor}>
-          ${this.displayName ? html`<div><uui-icon name=${this.icon} aria-hidden="true"></uui-icon> Continue with ${this.displayName}</div>` : nothing}
-          <slot></slot>
+          ${this.displayName
+			  ? html`
+				  <div>
+					  <uui-icon name=${this.icon} aria-hidden="true"></uui-icon>
+					  <umb-localize key="login_signInWith">Sign in with</umb-localize>
+					  ${this.displayName}
+				  </div>
+			  `
+			  : nothing}
+          			<slot></slot>
 				</uui-button>
 			</form>
 		`;
