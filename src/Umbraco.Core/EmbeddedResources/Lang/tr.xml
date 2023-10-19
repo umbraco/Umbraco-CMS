@@ -665,7 +665,7 @@
     <key alias="hide">Gizle</key>
     <key alias="history">Geçmiş</key>
     <key alias="icon">Simge</key>
-    <key alias="id">Numara</key>
+    <key alias="id">Belirleyici Numara</key>
     <key alias="import">İçe Aktar</key>
     <key alias="excludeFromSubFolders">Yalnızca bu klasörü ara</key>
     <key alias="info">Bilgi</key>
@@ -898,11 +898,11 @@
       ]]>
     </key>
     <key alias="runwayWhatIsRunway">Runway Nedir</key>
-    <key alias="step1">Adım 1/5 Lisansı kabulu</key>
+    <key alias="step1">Adım 1/5 Lisansın kabulü</key>
     <key alias="step2">Adım 2/5: Veritabanı yapılandırması</key>
     <key alias="step3">Adım 3/5: Dosya izinlerini doğrulama</key>
-    <key alias="step4">Adım 4/5: Umbraco güvenliğini kontrolü</key>
-    <key alias="step5">Adım 5/5: Umbraco üzerinde çalışmaya başlamanız için hazır</key>
+    <key alias="step4">Adım 4/5: Umbraco güvenliğinin kontrolü</key>
+    <key alias="step5">Adım 5/5: Umbraco, üzerinde çalışmaya başlamanız için hazır</key>
     <key alias="thankYou">Umbraco'yu seçtiğiniz için teşekkürler</key>
     <key alias="theEndBrowseSite">
       <![CDATA[<h3> Yeni sitenize göz atın </h3>
@@ -1061,12 +1061,12 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
   <area alias="moveOrCopy">
     <key alias="choose">Yukarıdaki sayfayı seçin ...</key>
     <key alias="copyDone">%0%,%1% konumuna kopyalandı</key>
-    <key alias="copyTo">%0% belgesinin kopyalanacağı yeri aşağıda seçin</key>
+    <key alias="copyTo">%0% belgesinin kopyalanacağı yeri aşağıdan seçin</key>
     <key alias="moveDone">%0%,%1% konumuna taşındı</key>
-    <key alias="moveTo">%0% belgesinin taşınacağı yeri aşağıda seçin</key>
+    <key alias="moveTo">%0% belgesinin taşınacağı yeri aşağıdan seçin</key>
     <key alias="nodeSelected">, yeni içeriğinizin kökü olarak seçildi, aşağıdaki 'tamam'ı tıklayın.</key>
     <key alias="noNodeSelected">Henüz düğüm seçilmedi, lütfen 'tamam'ı tıklamadan önce yukarıdaki listeden bir düğüm seçin</key>
-    <key alias="notAllowedByContentType">Geçerli düğüme türü nedeniyle seçilen düğüm altında izin verilmiyor</key>
+    <key alias="notAllowedByContentType">Geçerli düğüme, türü nedeniyle, seçilen düğüm altında izin verilmiyor</key>
     <key alias="notAllowedByPath">Geçerli düğüm, alt sayfalarından birine taşınamaz</key>
     <key alias="notAllowedAtRoot">Geçerli düğüm kök düğüm seviyesinde bulunamaz</key>
     <key alias="notValid">1 veya daha fazla alt belge üzerinde yetersiz izniniz olduğundan işleme izin verilmiyor.</key>
