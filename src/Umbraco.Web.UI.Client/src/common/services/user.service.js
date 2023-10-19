@@ -216,6 +216,8 @@ angular.module('umbraco.services')
                 //when it's successful, return the user data
                 setCurrentUser(data);
 
+                this._retryRequestQueue(true);
+
                 var result = { user: data, authenticated: true, lastUserId: lastUserId, loginType: "credentials" };
 
                 //broadcast a global event
