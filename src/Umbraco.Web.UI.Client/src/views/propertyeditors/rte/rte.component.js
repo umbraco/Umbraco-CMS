@@ -23,7 +23,8 @@
               umbProperty: "?^umbProperty",
               umbVariantContent: '?^^umbVariantContent',
               umbVariantContentEditors: '?^^umbVariantContentEditors',
-              umbElementEditorContent: '?^^umbElementEditorContent'
+              umbElementEditorContent: '?^^umbElementEditorContent',
+              valFormManager: "^^valFormManager"
           }
       });
 
@@ -237,7 +238,11 @@
                         vm.model.value.markup = newVal;
                         $scope.$evalAsync();
                       },
+                      culture: vm.umbProperty.culture,
+                      segment: vm.umbProperty.segment,
                       blockEditorApi: vm.blockEditorApi,
+                      parentForm: vm.propertyForm,
+                      valFormManager: vm.valFormManager,
                       currentFormInput: $scope.rteForm.modelValue
                   });
 
@@ -906,6 +911,7 @@
       }
 
       function openSettingsForBlock(block, blockIndex, parentForm) {
+        console.log("openSettingsForBlock")
           editBlock(block, true, blockIndex, parentForm);
       }
 

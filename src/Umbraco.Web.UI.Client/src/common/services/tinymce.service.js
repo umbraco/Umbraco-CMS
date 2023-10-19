@@ -1440,6 +1440,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 blockEl.$index = block.index;
                 blockEl.$block = block;
                 blockEl.$api = args.blockEditorApi;
+                blockEl.$culture = args.culture;
+                blockEl.$segment = args.segment;
+                blockEl.$parentForm = args.parentForm;
+                blockEl.$valFormManager = args.valFormManager;
                 $compile(blockEl)(args.scope);
                 blockEl.setAttribute('contenteditable', 'false');
                 if(block.config.displayInline) {

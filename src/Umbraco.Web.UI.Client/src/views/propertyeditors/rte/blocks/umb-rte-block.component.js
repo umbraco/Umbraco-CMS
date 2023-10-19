@@ -22,6 +22,10 @@
         $scope.block = $element[0].$block;
         $scope.api = $element[0].$api;
         $scope.index = $element[0].$index;
+        $scope.culture = $element[0].$culture || null;
+        $scope.segment = $element[0].$segment || null;
+        $scope.parentForm = $element[0].$parentForm;
+        $scope.valFormManager = $element[0].$valFormManager;
 
         //$scope.api = model.api;
         //$scope.index = model.index;
@@ -55,13 +59,14 @@
               </style>
 
               <div class="umb-block-rte__block">
-                <!-- val-server-match="{ 'contains' : { 'valServerMatchContent': block.content.key, 'valServerMatchSettings': block.settings.key } }" -->
-                <ng-form name="model.blockForm">
+                <ng-form name="model.blockForm" val-server-match="{ 'contains' : { 'valServerMatchContent': block.content.key, 'valServerMatchSettings': block.settings.key }, 'culture': culture, 'segment': segment, }">
 
                   <div
                       class="umb-block-rte--view"
                       ng-class="{'show-validation': api.internal.showValidation}" ng-include="block.view">
                   </div>
+
+                  <div class="umb-block-rte__block--validation-border"></div>
 
                   <div class="umb-block-rte__block--actions">
 
@@ -76,7 +81,7 @@
                     </button>
 
                     <button type="button" class="btn-reset action --settings" localize="title" title="actions_editSettings"
-                            ng-click="api.openSettingsForBlock(block, vm.index, model.blockForm);"
+                            ng-click="api.openSettingsForBlock(block, index, model.blockForm);"
                             ng-class="{ '--error': model.blockForm.$error.valServerMatchSettings }"
                             ng-if="block.showSettings === true">
                         <umb-icon icon="icon-settings" class="icon"></umb-icon>
