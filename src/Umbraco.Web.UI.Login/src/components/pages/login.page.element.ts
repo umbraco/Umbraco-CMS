@@ -59,8 +59,8 @@ export default class UmbLoginPageElement extends LitElement {
 				umbAuthContext.twoFactorView = response.twoFactorView;
 			}
 
-      this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'mfa' }}));
-      return;
+		    this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'mfa' }}));
+		    return;
 		}
 
 		if (response.error) {
@@ -171,6 +171,10 @@ export default class UmbLoginPageElement extends LitElement {
 		return html`<span class="text-error text-danger">${this._loginError}</span>`;
 	}
 
+	#handleForgottenPassword() {
+		this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'reset' }}));
+	}
+
 	static styles: CSSResultGroup = [
 		css`
       :host {
@@ -208,8 +212,18 @@ export default class UmbLoginPageElement extends LitElement {
       }
 
       #forgot-password {
-        color: var(--uui-color-interactive);
-        text-decoration: none;
+		  cursor: pointer;
+		  background: none;
+		  border: 0;
+		  height: 1rem;
+		  color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
+		  gap: var(--uui-size-space-1);
+		  align-self: center;
+		  text-decoration: none;
+		  display: inline-flex;
+		  line-height: 1;
+		  font-size: 14px;
+		  font-family: var(--uui-font-family);
       }
 
       #forgot-password:hover {

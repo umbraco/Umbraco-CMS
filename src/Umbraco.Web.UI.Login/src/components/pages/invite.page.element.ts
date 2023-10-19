@@ -1,8 +1,8 @@
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { LitElement, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+
 import { umbAuthContext } from '../../context/auth.context.js';
-import UmbRouter from '../../utils/umb-router.js';
 
 @customElement('umb-invite-page')
 export default class UmbInvitePageElement extends LitElement {
@@ -20,11 +20,11 @@ export default class UmbInvitePageElement extends LitElement {
 
 		const response = await umbAuthContext.getInvitedUser();
 
-    if (!response.user?.id) {
-      // The login page should already have redirected the user to an error page. They should never get here.
-      UmbRouter.redirect('login');
-      return;
-    }
+		if (!response.user?.id) {
+		  // The login page should already have redirected the user to an error page. They should never get here.
+		  this.error = 'No invited user found';
+		  return;
+		}
 
 		this.invitedUser = response.user;
 	}

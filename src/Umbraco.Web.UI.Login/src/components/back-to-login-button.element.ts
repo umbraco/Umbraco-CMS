@@ -5,15 +5,19 @@ import { customElement } from 'lit/decorators.js';
 export default class UmbBackToLoginButtonElement extends LitElement {
 	render() {
 		return html`
-			<a href="login">
+			<button type="button" @click=${this.#handleClick}>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 					<path
 						fill="currentColor"
 						d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"></path>
 				</svg>
 				<span><umb-localize key="login_returnToLogin">Return to login form</umb-localize></span>
-			</a>
+			</button>
 		`;
+	}
+
+	#handleClick() {
+		this.dispatchEvent(new CustomEvent('umb-login-flow', {composed: true, detail: {flow: 'login'}}));
 	}
 
 	static styles: CSSResultGroup = [
@@ -23,21 +27,24 @@ export default class UmbBackToLoginButtonElement extends LitElement {
 				align-items: center;
 				justify-content: center;
 			}
-			a {
+			button {
+				cursor: pointer;
+				background: none;
+				border: 0;
 				height: 1rem;
 				color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
-				font-size: 14px;
 				gap: var(--uui-size-space-1);
 				align-self: center;
 				text-decoration: none;
 				display: inline-flex;
 				line-height: 1;
-				font-weight: 600;
+				font-size: 14px;
+				font-family: var(--uui-font-family);
 			}
-			a svg {
+			button svg {
 				width: 1rem;
 			}
-			a:hover {
+			button:hover {
 				color: var(--uui-color-interactive-emphasis);
 			}
 		`,
