@@ -110,6 +110,9 @@ export default class UmbLoginPageElement extends LitElement {
 										type=${this.usernameIsEmail ? 'email' : 'text'}
 										id="umb-username"
 										name="email"
+										autocomplete=${this.usernameIsEmail
+											? 'username'
+											: 'email'}
 										.label=${this.usernameIsEmail
 											? until(umbLocalizationContext.localize('general_email', undefined, 'Email'))
 											: until(umbLocalizationContext.localize('user_username', undefined, 'Username'))}
@@ -124,6 +127,7 @@ export default class UmbLoginPageElement extends LitElement {
 									<uui-input-password
 										id="umb-password"
 										name="password"
+										autocomplete="current-password"
 										.label=${until(umbLocalizationContext.localize('user_password', undefined, 'Password'))}
 										required
 										required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input-password>
