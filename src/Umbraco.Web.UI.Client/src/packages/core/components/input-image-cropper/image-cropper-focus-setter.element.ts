@@ -58,12 +58,12 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 
 	async #addEventListeners() {
 		await this.updateComplete; // Wait for the @query to be resolved
-		this.imageElement.addEventListener('mousedown', this.#onStartDrag);
+		this.imageElement?.addEventListener('mousedown', this.#onStartDrag);
 		window.addEventListener('mouseup', this.#onEndDrag);
 	}
 
 	#removeEventListeners() {
-		this.imageElement.removeEventListener('mousedown', this.#onStartDrag);
+		this.imageElement?.removeEventListener('mousedown', this.#onStartDrag);
 		window.removeEventListener('mouseup', this.#onEndDrag);
 	}
 
