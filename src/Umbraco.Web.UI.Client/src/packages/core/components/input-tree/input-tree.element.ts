@@ -1,8 +1,9 @@
-import { NodeType, UmbNodePickerContext } from './input-tree.context.js';
+import { NodeType, StartNode, UmbNodeTreePickerContext } from './input-tree.context.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-input-tree')
 export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
@@ -16,12 +17,13 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	 * @attr
 	 * @default 0
 	 */
-	@property({ type: Number })
 	public get min(): number {
-		return this.#pickerContext.min;
+		return this.#pickerContext?.min || 0;
 	}
 	public set min(value: number) {
-		this.#pickerContext.min = value;
+		if (this.#pickerContext) {
+			this.#pickerContext.min = value;
+		}
 	}
 
 	/**
@@ -39,12 +41,13 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	 * @attr
 	 * @default Infinity
 	 */
-	@property({ type: Number })
 	public get max(): number {
-		return this.#pickerContext.max;
+		return this.#pickerContext?.max || 0;
 	}
 	public set max(value: number) {
-		this.#pickerContext.max = value;
+		if (this.#pickerContext) {
+			this.#pickerContext.max = value;
+		}
 	}
 
 	/**
@@ -57,10 +60,14 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public get selectedIds(): Array<string> {
-		return this.#pickerContext.getSelection();
+		return this.#pickerContext?.getSelection() ?? [];
 	}
 	public set selectedIds(ids: Array<string>) {
-		this.#pickerContext.setSelection(ids);
+		this.#pickerContext?.setSelection(ids);
+	}
+
+	public get type(): NodeType | undefined {
+		return this.#pickerContext?.getType();
 	}
 
 	@property()
@@ -69,22 +76,33 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 		this.selectedIds = idsString.split(/[ ,]+/);
 	}
 
-	@property()
-	public set type(value: NodeType) {
-		this.#pickerContext.setNodeType(value);
-	}
-	public get type(): NodeType {
-		return this.#pickerContext.nodeType;
+	@property({ attribute: false })
+	public set configuration(value: UmbPropertyEditorConfigCollection | undefined) {
+		const config: Record<string, any> = {
+			...(value ? value.toObject() : {}),
+		};
+
+		this.#setup(config.startNode.type);
+		this.min = config.minNumber;
+		this.max = config.maxNumber;
 	}
 
 	@state()
 	private _items?: Array<ItemResponseModelBaseModel>;
 
-	#pickerContext: UmbNodePickerContext;
+	#pickerContext?: UmbNodeTreePickerContext;
+
+	#setup(type: NodeType = 'content') {
+		this.#pickerContext = new UmbNodeTreePickerContext(this, type);
+		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+	}
 
 	constructor() {
 		super();
 
+		/*
+		TODO => only if pickrecontext exists
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
@@ -96,11 +114,12 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 			() => this.maxMessage,
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
+		*/
 
-		this.#pickerContext = new UmbNodePickerContext(this);
+		//this.#pickerContext = new UmbNodePickerContext(this, this.type);
 
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+		//this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
+		//this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
 	render() {
@@ -110,10 +129,11 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	#renderButton() {
 		if (this._items && this.max && this._items.length >= this.max) return;
 		return html`
+			items: ${this._items?.length} - max: ${this.max}
 			<uui-button
 				id="add-button"
 				look="placeholder"
-				@click=${() => this.#pickerContext.openPicker()}
+				@click=${() => this.#pickerContext?.openPicker()}
 				label=${this.localize.term('general_add')}>
 				${this.localize.term('general_add')}
 			</uui-button>

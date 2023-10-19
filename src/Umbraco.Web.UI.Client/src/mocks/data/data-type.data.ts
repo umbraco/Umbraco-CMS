@@ -204,18 +204,18 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 			{
 				alias: 'startNode',
 				value: {
-					type: 'media',
+					type: 'content',
 					query: '',
 					id: null,
 				},
 			},
 			{
 				alias: 'minNumber',
-				value: 1,
+				value: 0,
 			},
 			{
 				alias: 'maxNumber',
-				value: 10,
+				value: 3,
 			},
 			{
 				alias: 'ignoreUserStartNodes',

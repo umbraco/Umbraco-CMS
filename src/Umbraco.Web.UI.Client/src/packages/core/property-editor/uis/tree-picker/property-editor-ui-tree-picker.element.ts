@@ -1,5 +1,5 @@
 import { StartNode } from '../../../components/input-tree/input-tree.context.js';
-import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -33,8 +33,12 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	@state()
 	maxNumber?: number;
 
+	#configuration?: UmbPropertyEditorConfigCollection;
+
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		this.#configuration = config;
+
 		this.startNode = config?.getValueByAlias('startNode');
 
 		this.filter = config?.getValueByAlias('filter');
@@ -51,14 +55,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	}
 
 	render() {
-		return html`<umb-input-tree
-			type=${ifDefined(this.startNode?.type)}
-			.filter=${this.filter}
-			.min=${this.minNumber ?? 0}
-			.max=${this.maxNumber ?? 0}
-			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
-			?showOpenButton=${this.showOpenButton}
-			@change=${this.#onChange}></umb-input-tree>`;
+		return html`<umb-input-tree .configuration=${this.#configuration} @change=${this.#onChange}></umb-input-tree>`;
 	}
 
 	static styles = [UmbTextStyles];
