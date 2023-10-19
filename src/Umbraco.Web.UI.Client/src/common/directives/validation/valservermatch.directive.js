@@ -86,9 +86,13 @@ function valServerMatch(serverValidationManager) {
 
             if (Utilities.isObject(scope.valServerMatch)) {
                 var allowedKeys = ["contains", "prefix", "suffix"];
-                Object.keys(scope.valServerMatch).forEach(matchType => {
+                const objectKeys = Object.keys(scope.valServerMatch);
+                if(objectKeys.find(x => allowedKeys.x)) {
+                  throw "valServerMatch dictionary keys must be one of " + allowedKeys.join();
+                }
+                objectKeys.forEach(matchType => {
                     if (allowedKeys.indexOf(matchType) === -1) {
-                        throw "valServerMatch dictionary keys must be one of " + allowedKeys.join();
+                      return;
                     }
 
                     var matchVal = scope.valServerMatch[matchType];
