@@ -204,7 +204,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 			{
 				alias: 'startNode',
 				value: {
-					type: 'member',
+					type: 'media',
 					query: '',
 					id: null,
 				},

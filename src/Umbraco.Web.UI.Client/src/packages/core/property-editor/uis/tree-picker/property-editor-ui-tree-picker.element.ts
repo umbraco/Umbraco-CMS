@@ -1,4 +1,5 @@
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { StartNode } from '../../../components/input-tree/input-tree.context.js';
+import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -8,12 +9,6 @@ import { UmbInputTreeElement } from '@umbraco-cms/backoffice/components';
 /**
  * @element umb-property-editor-ui-tree-picker
  */
-
-interface StartNode {
-	type: 'content' | 'member' | 'media';
-	query: string | null;
-	id: string | null;
-}
 
 @customElement('umb-property-editor-ui-tree-picker')
 export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -57,7 +52,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 
 	render() {
 		return html`<umb-input-tree
-			.startNode=${this.startNode}
+			type=${ifDefined(this.startNode?.type)}
 			.filter=${this.filter}
 			.min=${this.minNumber ?? 0}
 			.max=${this.maxNumber ?? 0}

@@ -2,7 +2,7 @@ import { NodeType, UmbNodePickerContext } from './input-tree.context.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { ItemResponseModelBaseModel, MediaItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-input-tree')
 export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
@@ -115,7 +115,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 				look="placeholder"
 				@click=${() => this.#pickerContext.openPicker()}
 				label=${this.localize.term('general_add')}>
-				Add
+				${this.localize.term('general_add')}
 			</uui-button>
 		`;
 	}
