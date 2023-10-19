@@ -1461,6 +1461,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             }
           }
         }
+
+        args.editor.execCommand("mceAutoResize", false, null, null);
       }
 
       // If we can not find the insert image/media toolbar button
