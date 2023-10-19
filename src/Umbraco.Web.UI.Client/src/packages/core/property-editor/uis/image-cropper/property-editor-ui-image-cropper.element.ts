@@ -24,7 +24,7 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 			this.value = {
 				crops: this.#crops,
 				focalPoint: { left: 0.5, top: 0.5 },
-				src: 'https://picsum.photos/seed/picsum/2000/3000',
+				src: 'https://picsum.photos/seed/picsum/1920/1080',
 			};
 		}
 	}
