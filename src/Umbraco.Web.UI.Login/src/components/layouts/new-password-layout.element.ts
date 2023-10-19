@@ -36,8 +36,10 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 	protected async firstUpdated(_changedProperties: any) {
 		super.firstUpdated(_changedProperties);
 
-		const response = await umbAuthContext.getPasswordConfig(this.userId);
-		this.passwordConfig = response.data;
+		if (this.userId) {
+			const response = await umbAuthContext.getPasswordConfig(this.userId);
+			this.passwordConfig = response.data;
+		}
 	}
 
 	async #onSubmit(event: Event) {
