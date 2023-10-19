@@ -1098,6 +1098,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="instruction">Log in below</key>
     <key alias="signInWith">Sign in with</key>
     <key alias="timeout">Session timed out</key>
+    <key alias="userFailedLogin">Oops! We couldn't log you in. Please check your credentials and try again.</key>
     <key alias="bottomText">
       <![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Forgotten password?</key>
