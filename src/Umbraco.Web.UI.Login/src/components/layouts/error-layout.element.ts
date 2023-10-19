@@ -16,6 +16,7 @@ export default class UmbErrorLayoutElement extends LitElement {
 				<span>${this.message}</span>
 			</div>
 			<slot></slot>
+			<umb-back-to-login-button></umb-back-to-login-button>
 		`;
 	}
 

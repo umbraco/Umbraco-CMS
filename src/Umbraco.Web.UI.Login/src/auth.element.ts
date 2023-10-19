@@ -57,7 +57,7 @@ export default class UmbAuthElement extends LitElement {
 
 		(this as unknown as EventTarget).addEventListener('umb-login-flow', (e) => {
 			if (e instanceof CustomEvent) {
-				this.flow = e.detail.flow || undefined
+				this.flow = e.detail.flow || undefined;
 			}
 			this.requestUpdate();
 		});
@@ -80,7 +80,6 @@ export default class UmbAuthElement extends LitElement {
 			return html` <umb-error-layout
 							header="Hi there"
 							message=${until(umbLocalizationContext.localize('login_resetCodeExpired'), 'The link you have clicked on is invalid or has expired')}>
-							<umb-back-to-login-button></umb-back-to-login-button>
 						</umb-error-layout>`;
 		}
 
@@ -88,7 +87,6 @@ export default class UmbAuthElement extends LitElement {
 			return html` <umb-error-layout
 							header="Hi there"
 							message=${until(umbLocalizationContext.localize('user_userinviteExpiredMessage'), 'Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.')}>
-              				<umb-back-to-login-button></umb-back-to-login-button>
 						</umb-error-layout>`;
 		}
 
