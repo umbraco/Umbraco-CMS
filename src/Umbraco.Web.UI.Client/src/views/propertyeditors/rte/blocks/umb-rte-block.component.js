@@ -27,9 +27,6 @@
         $scope.parentForm = $element[0].$parentForm;
         $scope.valFormManager = $element[0].$valFormManager;
 
-        //$scope.api = model.api;
-        //$scope.index = model.index;
-
         const stylesheet = $scope.block.config.stylesheet;
 
         var shadowRoot = $element[0].attachShadow({ mode: 'open' });
