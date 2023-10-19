@@ -1,8 +1,10 @@
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { LitElement, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { until } from 'lit/directives/until.js';
 
 import { umbAuthContext } from '../../context/auth.context.js';
+import { umbLocalizationContext } from '../../external/localization/localization-context.js';
 
 @customElement('umb-invite-page')
 export default class UmbInvitePageElement extends LitElement {
@@ -56,7 +58,9 @@ export default class UmbInvitePageElement extends LitElement {
 					.userName=${this.invitedUser.name}
 					.state=${this.state}
 					.error=${this.error}></umb-new-password-layout>`
-			: nothing;
+			: this.error
+				? html`<umb-error-layout .header=${until(umbLocalizationContext.localize('general_error', undefined, 'Error'))} .message=${this.error}></umb-error-layout>`
+				: nothing;
 	}
 }
 
