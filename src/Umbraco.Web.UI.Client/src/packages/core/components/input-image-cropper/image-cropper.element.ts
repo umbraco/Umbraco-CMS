@@ -321,19 +321,20 @@ export class UmbImageCropperElement extends LitElement {
 				<img id="image" src=${this.src} alt="" />
 				<div id="mask"></div>
 			</div>
-			<input
+			<uui-slider
 				@input=${this.#onSliderUpdate}
 				.value=${this._zoom.toString()}
+				hide-step-values
 				id="slider"
 				type="range"
 				min="0"
 				max="1"
 				value="0"
-				step="0.001" />
+				step="0.001"></uui-slider>
 			<div id="actions">
-				<button @click=${this.#onReset}>Reset crop</button>
-				<button @click=${this.#onCancel}>Cancel</button>
-				<button @click=${this.#onSave}>Save Crop</button>
+				<uui-button @click=${this.#onReset}>Reset crop</uui-button>
+				<uui-button look="secondary" @click=${this.#onCancel}>Cancel</uui-button>
+				<uui-button look="primary" color="positive" @click=${this.#onSave}>Save Crop</uui-button>
 			</div>
 		`;
 	}
@@ -341,7 +342,7 @@ export class UmbImageCropperElement extends LitElement {
 	static styles = css`
 		:host {
 			display: grid;
-			grid-template-rows: 1fr auto;
+			grid-template-rows: 1fr auto auto;
 			gap: var(--uui-size-space-3);
 			height: 100%;
 			width: 100%;
@@ -359,6 +360,10 @@ export class UmbImageCropperElement extends LitElement {
 			outline: 1px solid var(--uui-color-border);
 			border-radius: var(--uui-border-radius);
 		}
+		#actions {
+			display: flex;
+			justify-content: flex-end;
+		}
 
 		#mask {
 			display: block;
@@ -374,6 +379,8 @@ export class UmbImageCropperElement extends LitElement {
 
 		#slider {
 			width: 100%;
+			height: 0px; /* TODO: FIX - This is needed to prevent the slider from taking up more space than needed */
+			min-height: 22px; /* TODO: FIX - This is needed to prevent the slider from taking up more space than needed */
 		}
 	`;
 }

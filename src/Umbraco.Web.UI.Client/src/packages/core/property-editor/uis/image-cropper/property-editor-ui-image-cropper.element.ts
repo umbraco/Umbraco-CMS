@@ -27,8 +27,6 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 			};
 		}
 
-		console.log('this.value', this.value);
-
 		return html`<umb-input-image-cropper .value=${this.value}></umb-input-image-cropper>`;
 	}
 
