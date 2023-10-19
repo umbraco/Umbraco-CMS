@@ -1444,9 +1444,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       function initBlocks() {
 
-        // TODO: Check if this can be optimized.
-        console.log("initBlocks");
-
         const blockEls = args.editor.contentDocument.querySelectorAll('umb-rte-block');
         for (const blockEl of blockEls) {
           if(!blockEl._isInitializedUmbBlock) {
@@ -1627,9 +1624,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
           });
         }
-
-        // Init blocks:
-        initBlocks();
 
         //start watching the value
         startWatch();
