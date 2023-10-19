@@ -462,7 +462,12 @@ export const data: Array<DocumentResponseModel> = [
 		],
 	},
 	{
-		urls: [],
+		urls: [
+			{
+				culture: 'en-US',
+				url: '/',
+			},
+		],
 		templateId: null,
 		id: 'simple-document-id',
 		contentTypeId: 'simple-document-type-id',
@@ -475,6 +480,14 @@ export const data: Array<DocumentResponseModel> = [
 				name: 'Simple Document',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+			},
+		],
+		values: [
+			{
+				alias: 'multiNodeTreePicker',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 		],
 	},
