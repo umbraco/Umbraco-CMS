@@ -828,6 +828,7 @@
     <key alias="sort">Sortér</key>
     <key alias="status">Status</key>
     <key alias="submit">Indsend</key>
+    <key alias="success">Succes</key>
     <key alias="type">Type</key>
     <key alias="typeToSearch">Skriv for at søge...</key>
     <key alias="under">under</key>
