@@ -7,7 +7,7 @@
             ng-attr-allow-password-reset="{{ ::vm.allowPasswordReset || undefined }}"
             ng-attr-disable-local-login="{{ ::vm.disableLocalLogin || undefined }}"
             return-url=""
-            ng-on-umb-login-success="vm.onLoginSuccess()"
+            ng-on-umb-login-success="vm.onLoginSuccess($event)"
         >
             <p ng-if="vm.isTimedOut" slot="subheadline">
                 <localize key="login_timeout">Log in below</localize>.

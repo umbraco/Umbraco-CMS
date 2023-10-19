@@ -74,7 +74,7 @@ export default class UmbLoginPageElement extends LitElement {
 			location.href = returnPath;
 		}
 
-		this.dispatchEvent(new CustomEvent('umb-login-success', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('umb-login-success', { bubbles: true, composed: true, detail: response.data }));
 	};
 
 	get #greetingLocalizationKey() {

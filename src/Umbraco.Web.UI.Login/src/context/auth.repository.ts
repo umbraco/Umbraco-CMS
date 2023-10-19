@@ -31,6 +31,7 @@ export class UmbAuthRepository {
 			return {
 				status: response.status,
 				error: response.ok ? undefined : await this.#getErrorText(response),
+				data: responseData,
 				twoFactorView: responseData?.twoFactorView,
 			};
 		} catch (error) {

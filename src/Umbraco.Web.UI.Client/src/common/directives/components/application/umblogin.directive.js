@@ -38,13 +38,18 @@
          * by the login screen sending out the event "umb-login-success"
          * @access private
          */
-        function loginSuccess() {
-            userService.refreshCurrentUser().then(function () {
-                userService._retryRequestQueue(true);
-                if (vm.onLogin) {
-                    vm.onLogin();
-                }
-            });
+        function loginSuccess(evt) {
+            const user = evt?.originalEvent?.detail;
+
+            if (user) {
+                userService.setAuthenticationSuccessful(user);
+            } else {
+                console.error("No user was returned from the login event");
+            }
+
+            if (vm.onLogin) {
+                vm.onLogin();
+            }
         }
     }
 
