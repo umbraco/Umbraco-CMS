@@ -33,7 +33,6 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 
 		this.imageElement.onload = () => {
 			const imageAspectRatio = this.imageElement.naturalWidth / this.imageElement.naturalHeight;
-			console.log(imageAspectRatio);
 
 			if (imageAspectRatio > 1) {
 				this.imageElement.style.width = '100%';

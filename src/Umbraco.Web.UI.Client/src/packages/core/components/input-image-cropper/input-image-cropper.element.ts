@@ -89,7 +89,13 @@ export class UmbInputImageCropperElement extends LitElement {
 
 	render() {
 		return html`
-			<div id="main">${this.#renderMain()}</div>
+			<div id="main">
+				${this.#renderMain()}
+				<div id="actions">
+					<uui-button>Remove files (NOT IMPLEMENTED YET)</uui-button>
+					<uui-button>Reset focal point</uui-button>
+				</div>
+			</div>
 			<div id="side">${this.#renderSide()}</div>
 		`;
 	}
@@ -134,6 +140,16 @@ export class UmbInputImageCropperElement extends LitElement {
 			min-width: 300px;
 			width: 100%;
 			height: 100%;
+			display: flex;
+			gap: var(--uui-size-space-1);
+			flex-direction: column;
+		}
+		#actions {
+			display: flex;
+			justify-content: space-between;
+		}
+		umb-image-cropper-focus-setter {
+			height: calc(100% - 33px - var(--uui-size-space-1)); /* Temp solution to make room for actions */
 		}
 		#side {
 			display: grid;
