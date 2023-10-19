@@ -911,7 +911,6 @@
       }
 
       function openSettingsForBlock(block, blockIndex, parentForm) {
-        console.log("openSettingsForBlock")
           editBlock(block, true, blockIndex, parentForm);
       }
 
