@@ -112,15 +112,6 @@
 
       }
 
-
-      /*
-      model.$onChanges = onChanges;
-      function onChanges(simpleChanges) {
-        console.log("block gets change", simpleChanges);
-        // TODO Make sure to fire something to update/reset $block on data-udi change.
-      }
-      */
-
   }
 
   var umbRteBlockComponent = {
