@@ -45,6 +45,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
     private readonly BlockEditorConverter _blockEditorConverter;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<RteMacroRenderingValueConverter> _logger;
+    private readonly IApiElementBuilder _apiElementBuilder;
     private DeliveryApiSettings _deliveryApiSettings;
 
     [Obsolete("Please use the constructor that takes all arguments. Will be removed in V14.")]
@@ -77,6 +78,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
             StaticServiceProvider.Instance.GetRequiredService<IPartialViewBlockEngine>(),
             StaticServiceProvider.Instance.GetRequiredService<BlockEditorConverter>(),
             StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>(),
+            StaticServiceProvider.Instance.GetRequiredService<IApiElementBuilder>(),
             StaticServiceProvider.Instance.GetRequiredService<ILogger<RteMacroRenderingValueConverter>>(),
             deliveryApiSettingsMonitor
         )
@@ -87,7 +89,8 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser,
         IApiRichTextElementParser apiRichTextElementParser, IApiRichTextMarkupParser apiRichTextMarkupParser,
         IPartialViewBlockEngine partialViewBlockEngine, BlockEditorConverter blockEditorConverter, IJsonSerializer jsonSerializer,
-        ILogger<RteMacroRenderingValueConverter> logger, IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
+        IApiElementBuilder apiElementBuilder, ILogger<RteMacroRenderingValueConverter> logger,
+        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
     {
         _umbracoContextAccessor = umbracoContextAccessor;
         _macroRenderer = macroRenderer;
@@ -99,6 +102,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         _partialViewBlockEngine = partialViewBlockEngine;
         _blockEditorConverter = blockEditorConverter;
         _jsonSerializer = jsonSerializer;
+        _apiElementBuilder = apiElementBuilder;
         _logger = logger;
         _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
         deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
@@ -148,18 +152,18 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
 
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
-        var sourceString = inter?.ToString();
-        if (sourceString.IsNullOrWhiteSpace())
+        if (inter is not RichTextEditorIntermediateValue richTextEditorIntermediateValue
+            || richTextEditorIntermediateValue.Markup.IsNullOrWhiteSpace())
         {
             // different return types for the JSON configuration forces us to have different return values for empty properties
             return _deliveryApiSettings.RichTextOutputAsJson is false
-                ? new RichTextModel { Markup = string.Empty }
+                ? RichTextModel.Empty()
                 : null;
         }
 
         return _deliveryApiSettings.RichTextOutputAsJson is false
-            ? new RichTextModel { Markup = _apiRichTextMarkupParser.Parse(sourceString) }
-            : _apiRichTextElementParser.Parse(sourceString);
+            ? CreateRichTextModel(richTextEditorIntermediateValue)
+            : _apiRichTextElementParser.Parse(richTextEditorIntermediateValue.Markup, richTextEditorIntermediateValue.RichTextBlockModel);
     }
 
     // NOT thread-safe over a request because it modifies the
@@ -281,6 +285,23 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
                 : string.Empty;
 
         return RichTextParsingRegexes.BlockRegex().Replace(source, RenderBlock);
+    }
+
+    private RichTextModel CreateRichTextModel(RichTextEditorIntermediateValue richTextEditorIntermediateValue)
+    {
+        var markup = _apiRichTextMarkupParser.Parse(richTextEditorIntermediateValue.Markup);
+
+        ApiBlockItem[] blocks = richTextEditorIntermediateValue.RichTextBlockModel is not null
+            ? richTextEditorIntermediateValue.RichTextBlockModel
+                .Select(item => item.CreateApiBlockItem(_apiElementBuilder))
+                .ToArray()
+            : Array.Empty<ApiBlockItem>();
+
+        return new RichTextModel
+        {
+            Markup = markup,
+            Blocks = blocks
+        };
     }
 
     private class RichTextEditorIntermediateValue

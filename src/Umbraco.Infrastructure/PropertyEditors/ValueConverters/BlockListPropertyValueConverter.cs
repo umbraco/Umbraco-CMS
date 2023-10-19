@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Extensions;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
@@ -121,11 +122,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
 
         return new ApiBlockListModel(
             model != null
-                ? model
-                    .Select(item => new ApiBlockItem(
-                        _apiElementBuilder.Build(item.Content),
-                        item.Settings != null ? _apiElementBuilder.Build(item.Settings) : null))
-                    .ToArray()
+                ? model.Select(item => item.CreateApiBlockItem(_apiElementBuilder)).ToArray()
                 : Array.Empty<ApiBlockItem>());
     }
 
