@@ -6,24 +6,6 @@
 
 @umb-block-rte__item_minimum_height: 48px;
 
-.umb-block-rte__block--validation-border {
-    display:none;
-}
-
-ng-form.ng-invalid-val-server-match-settings > .umb-block-rte__block:not(.--active) > .umb-block-rte__block--validation-border, 
-ng-form.ng-invalid-val-server-match-content > .umb-block-rte__block:not(.--active) > .umb-block-rte__block--validation-border {
-    display: block;
-    position: absolute;
-    inset: 0;
-    border-radius: 3px;
-    border: 1px solid @formErrorText;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, .7), inset 0 0 0 1px rgba(255, 255, 255, .7);
-    .show-validation-type-warning & {
-        border-color: @formWarningText;
-    }
-    pointer-events: none;
-}
-
 
 .umb-block-rte__block {
   position: relative;

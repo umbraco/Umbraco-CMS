@@ -66,8 +66,6 @@
                       ng-class="{'show-validation': api.internal.showValidation}" ng-include="block.view">
                   </div>
 
-                  <div class="umb-block-rte__block--validation-border"></div>
-
                   <div class="umb-block-rte__block--actions">
 
                     <button type="button" class="btn-reset action --content" localize="title" title="actions_editContent"
