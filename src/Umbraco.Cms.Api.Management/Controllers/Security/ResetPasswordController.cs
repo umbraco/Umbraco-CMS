@@ -31,7 +31,7 @@ public class ResetPasswordController : SecurityControllerBase
 
         // If this feature is switched off in configuration, the UI will be amended to not make the request to reset password available.
         // So this is just a server-side secondary check.
-        // No matter what other status it will just return Ok, so you can't use this endpoint to determine whether the email exists in the system.
+        // Regardless of other status values, it will just return Ok, so you can't use this endpoint to determine whether the email exists in the system.
         return result.Result == UserOperationStatus.CannotPasswordReset
             ? BadRequest()
             : Ok();
