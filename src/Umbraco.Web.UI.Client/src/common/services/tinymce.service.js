@@ -1402,7 +1402,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       function syncContent() {
 
-        if (getPropertyValue() === args.editor.getContent()) {
+        const content = args.editor.getContent()
+
+        if (getPropertyValue() === content) {
           return;
         }
 
@@ -1410,7 +1412,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         stopWatch();
         angularHelper.safeApply($rootScope, function () {
 
-          setPropertyValue(args.editor.getContent());
+          setPropertyValue(content);
 
           //make the form dirty manually so that the track changes works, setting our model doesn't trigger
           // the angular bits because tinymce replaces the textarea.
@@ -1432,11 +1434,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         const blockEls = args.editor.contentDocument.querySelectorAll('umb-rte-block');
         for (const blockEl of blockEls) {
           if(!blockEl._isInitializedUmbBlock) {
-            blockEl.removeAttribute('contenteditable');
             const blockContentUdi = blockEl.getAttribute('data-content-udi');
-            if(blockContentUdi) {
+            if(blockContentUdi && !blockEl.$block) {
               const block = args.blockEditorApi.getBlockByContentUdi(blockContentUdi);
               if(block) {
+                blockEl.removeAttribute('contenteditable');
                 blockEl.$index = block.index;
                 blockEl.$block = block;
                 blockEl.$api = args.blockEditorApi;
