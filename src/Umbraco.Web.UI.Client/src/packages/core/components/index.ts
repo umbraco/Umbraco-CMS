@@ -25,6 +25,7 @@ export * from './input-number-range/index.js';
 export * from './input-radio-button-list/index.js';
 export * from './input-section/index.js';
 export * from './input-slider/index.js';
+export * from './input-start-node/index.js';
 export * from './input-toggle/index.js';
 export * from './input-tree/index.js';
 export * from './input-upload-field/index.js';
