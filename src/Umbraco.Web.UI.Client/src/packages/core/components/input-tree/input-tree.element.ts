@@ -3,8 +3,7 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 
-export type NodeType = 'content' | 'member' | 'media';
-
+type NodeType = 'content' | 'member' | 'media';
 export type StartNode = {
 	type?: NodeType;
 	query?: string | null;
@@ -17,8 +16,16 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 		return undefined;
 	}
 
+	private _type: StartNode['type'] = undefined;
 	@property()
-	type?: StartNode['type'];
+	public set type(newType: StartNode['type']) {
+		if (newType !== this._type) {
+			this._type = newType?.toLowerCase() as StartNode['type'];
+		}
+	}
+	public get type(): StartNode['type'] {
+		return this._type;
+	}
 
 	@property()
 	query?: string;
@@ -49,17 +56,18 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 
 	@property()
 	public set value(newValue: string) {
+		super.value = newValue;
 		if (newValue) {
-			super.value = newValue;
-			this.items = newValue.split(',');
+			this.selectedIds = newValue.split(',');
+		} else {
+			this.selectedIds = [];
 		}
 	}
 	public get value(): string {
 		return super.value as string;
 	}
 
-	@state()
-	items: Array<string> = [];
+	selectedIds: Array<string> = [];
 
 	#onChange(event: CustomEvent) {
 		this.value = (event.target as UmbInputDocumentElement).selectedIds.join(',');
@@ -71,36 +79,10 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		return html`${this.#renderElement()}
-			<p>${this.#renderTip()}</p>`;
-	}
-
-	#renderTip() {
-		if (this.items.length && this.items.length !== this.max) {
-			if (this.items.length > this.max) {
-				return `You can only have up to ${this.max} item(s) selected`;
-			}
-			if (this.min === this.max && this.min !== 0) {
-				return `Add ${this.min - this.items.length} more item(s)`;
-			}
-			if (this.min === 0 && this.max) {
-				return `Add up to ${this.max} items`;
-			}
-			if (this.min > 0 && this.max > 0) {
-				return `Add between ${this.min} and ${this.max} item(s)`;
-			}
-			if (this.items.length < this.min) {
-				return `You need to add at least ${this.min} items`;
-			}
-		}
-		return '';
-	}
-
-	#renderElement() {
 		switch (this.type) {
 			case 'content':
 				return html`<umb-input-document
-					.selectedIds=${this.items}
+					.selectedIds=${this.selectedIds}
 					.query=${this.query}
 					.startNodeId=${this.startNodeId}
 					.filter=${this.filter}
@@ -111,7 +93,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 					@change=${this.#onChange}></umb-input-document>`;
 			case 'media':
 				return html`<umb-input-media
-					.selectedIds=${this.items}
+					.selectedIds=${this.selectedIds}
 					.startNodeId=${this.startNodeId}
 					.filter=${this.filter}
 					.min=${this.min}
@@ -121,7 +103,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 					@change=${this.#onChange}></umb-input-media>`;
 			case 'member':
 				return html`<umb-input-member
-					.selectedIds=${this.items}
+					.selectedIds=${this.selectedIds}
 					.filter=${this.filter}
 					.min=${this.min}
 					.max=${this.max}

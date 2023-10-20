@@ -56,22 +56,22 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	}
 
 	#onChange(e: CustomEvent) {
-		this.value = (e.target as UmbInputTreeElement).items.join(',');
+		this.value = (e.target as UmbInputTreeElement).value as string;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	render() {
-		return html`<umb-input-tree
-			.value=${this.value}
-			.type=${this.type}
-			.query=${this.query ?? ''}
-			.startNodeId=${this.startNodeId ?? ''}
-			.min=${this.min}
-			.max=${this.max}
-			.filter=${this.filter ?? ''}
-			?showOpenButton=${this.showOpenButton}
-			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
-			@change=${this.#onChange}></umb-input-tree>`;
+		return html`${this.value}<umb-input-tree
+				.value=${this.value}
+				.type=${this.type}
+				.query=${this.query ?? ''}
+				.startNodeId=${this.startNodeId ?? ''}
+				.min=${this.min}
+				.max=${this.max}
+				.filter=${this.filter ?? ''}
+				?showOpenButton=${this.showOpenButton}
+				?ignoreUserStartNodes=${this.ignoreUserStartNodes}
+				@change=${this.#onChange}></umb-input-tree>`;
 	}
 	static styles = [UmbTextStyles];
 }
