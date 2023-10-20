@@ -6,32 +6,15 @@
 
 @umb-block-rte__item_minimum_height: 48px;
 
-.umb-block-grid__block--validation-border {
-    display:none;
-}
-/*
-ng-form.ng-invalid-val-server-match-settings > .umb-block-rte__block:not(.--active) > .umb-block-rte__block--validation-border, 
-ng-form.ng-invalid-val-server-match-content > .umb-block-rte__block:not(.--active) > .umb-block-rte__block--validation-border {
-    display: block;
-    position: absolute;
-    inset: 0;
-    border-radius: 3px;
-    border: 1px solid @formErrorText;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, .7), inset 0 0 0 1px rgba(255, 255, 255, .7);
-    .show-validation-type-warning & {
-        border-color: @formWarningText;
-    }
-    pointer-events: none;
-}
-*/
 
 .umb-block-rte__block {
   position: relative;
 }
 
-ng-form.ng-invalid .umb-block-grid__block--actions {
+ng-form.ng-invalid .umb-block-rte__block--actions {
     opacity: 1;
 }
+
 
 .umb-block-rte--view {
   position: relative;
@@ -56,9 +39,9 @@ ng-form.ng-invalid .umb-block-grid__block--actions {
     right: 10px;
 
     /*
-    If child block, it can be hidden if a parents sets: --umb-block-grid--block-ui-display: none;
+    If child block, it can be hidden if a parents sets: --umb-block-rte--block-ui-display: none;
     */
-    display: var(--umb-block-grid--block-ui-display, flex);
+    display: flex;
     opacity: 1;
     z-index:3;
     
@@ -115,9 +98,9 @@ ng-form.ng-invalid .umb-block-grid__block--actions {
 
             animation-duration: 1.4s;
             animation-iteration-count: infinite;
-            animation-name: umb-block-grid__action--badge-bounce;
+            animation-name: umb-block-rte__action--badge-bounce;
             animation-timing-function: ease;
-            @keyframes umb-block-grid__action--badge-bounce {
+            @keyframes umb-block-rte__action--badge-bounce {
                 0%   { transform: translateY(0); }
                 20%  { transform: translateY(-4px); }
                 40%  { transform: translateY(0); }

@@ -1410,9 +1410,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         stopWatch();
         angularHelper.safeApply($rootScope, function () {
 
-          initBlocks();
-
-          setPropertyValue(args.editor.getContent())
+          setPropertyValue(args.editor.getContent());
 
           //make the form dirty manually so that the track changes works, setting our model doesn't trigger
           // the angular bits because tinymce replaces the textarea.
@@ -1431,9 +1429,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       function initBlocks() {
 
-        // TODO: Check if this can be optimized.
-        console.log("initBlocks");
-
         const blockEls = args.editor.contentDocument.querySelectorAll('umb-rte-block');
         for (const blockEl of blockEls) {
           if(!blockEl._isInitializedUmbBlock) {
@@ -1445,6 +1440,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 blockEl.$index = block.index;
                 blockEl.$block = block;
                 blockEl.$api = args.blockEditorApi;
+                blockEl.$culture = args.culture;
+                blockEl.$segment = args.segment;
+                blockEl.$parentForm = args.parentForm;
+                blockEl.$valFormManager = args.valFormManager;
                 $compile(blockEl)(args.scope);
                 blockEl.setAttribute('contenteditable', 'false');
                 if(block.config.displayInline) {
@@ -1614,9 +1613,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
           });
         }
-
-        // Init blocks:
-        initBlocks();
 
         //start watching the value
         startWatch();
