@@ -1,9 +1,9 @@
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbInputTreeElement } from '@umbraco-cms/backoffice/components';
+import { StartNode, UmbInputTreeElement } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-tree-picker
@@ -14,11 +14,45 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	@property()
 	value = '';
 
-	#configuration?: UmbPropertyEditorConfigCollection;
+	@state()
+	type?: StartNode['type'];
+
+	@state()
+	query?: string | null;
+
+	@state()
+	startNodeId?: string | null;
+
+	@state()
+	min = 0;
+
+	@state()
+	max = 0;
+
+	@state()
+	filter?: string | null;
+
+	@state()
+	showOpenButton?: boolean;
+
+	@state()
+	ignoreUserStartNodes?: boolean;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this.#configuration = config;
+		const startNode: StartNode | undefined = config?.getValueByAlias('startNode');
+		if (startNode) {
+			this.type = startNode.type;
+			this.query = startNode.query;
+			this.startNodeId = startNode.id;
+		}
+
+		this.min = config?.getValueByAlias('minNumber') || 0;
+		this.max = config?.getValueByAlias('maxNumber') || 0;
+
+		this.filter = config?.getValueByAlias('filter');
+		this.showOpenButton = config?.getValueByAlias('showOpenButton');
+		this.ignoreUserStartNodes = config?.getValueByAlias('ignoreUserStartNodes');
 	}
 
 	#onChange(e: CustomEvent) {
@@ -27,11 +61,18 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	}
 
 	render() {
-		return html`${this.value}<umb-input-tree
-				.configuration=${this.#configuration}
-				@change=${this.#onChange}></umb-input-tree>`;
+		return html`<umb-input-tree
+			.value=${this.value}
+			.type=${this.type}
+			.query=${this.query ?? ''}
+			.startNodeId=${this.startNodeId ?? ''}
+			.min=${this.min}
+			.max=${this.max}
+			.filter=${this.filter ?? ''}
+			?showOpenButton=${this.showOpenButton}
+			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
+			@change=${this.#onChange}></umb-input-tree>`;
 	}
-
 	static styles = [UmbTextStyles];
 }
 

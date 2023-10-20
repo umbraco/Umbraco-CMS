@@ -1,7 +1,6 @@
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 
 export type NodeType = 'content' | 'member' | 'media';
@@ -18,54 +17,44 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 		return undefined;
 	}
 
-	@state()
+	@property()
 	type?: StartNode['type'];
 
-	@state()
+	@property()
 	query?: string;
 
-	@state()
-	startId?: string;
+	@property({ type: String })
+	startNodeId?: string;
 
-	@state()
+	@property({ type: Number })
 	min = 0;
 
-	@state()
+	@property({ type: Number })
 	max = 0;
 
-	@state()
-	filter?: string;
+	private _filter: Array<string> = [];
+	@property()
+	public set filter(value: string) {
+		this._filter = value.split(',');
+	}
+	public get filter(): string {
+		return this._filter.join(',');
+	}
 
-	@state()
+	@property({ type: Boolean })
 	showOpenButton?: boolean;
 
-	@state()
+	@property({ type: Boolean })
 	ignoreUserStartNodes?: boolean;
 
-	@property({ attribute: false })
-	public set configuration(value: UmbPropertyEditorConfigCollection | undefined) {
-		const config: Record<string, any> = {
-			...(value ? value.toObject() : {}),
-		};
-
-		this.type = config.startNode.type.toLowerCase() as StartNode['type'];
-		this.query = config.query;
-		this.startId = config.startNode.id;
-
-		this.min = config.minNumber;
-		this.max = config.maxNumber;
-
-		this.filter = config.filter;
-		this.showOpenButton = config.showOpenButton;
-		this.ignoreUserStartNodes = config.ignoreUserStartNodes;
-	}
-
 	@property()
-	set value(newValue: string | string[]) {
-		super.value = newValue;
-		this.items = newValue.split(',');
+	public set value(newValue: string) {
+		if (newValue) {
+			super.value = newValue;
+			this.items = newValue.split(',');
+		}
 	}
-	get value(): string {
+	public get value(): string {
 		return super.value as string;
 	}
 
@@ -73,7 +62,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	items: Array<string> = [];
 
 	#onChange(event: CustomEvent) {
-		this.items = (event.target as UmbInputDocumentElement).selectedIds;
+		this.value = (event.target as UmbInputDocumentElement).selectedIds.join(',');
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
@@ -113,22 +102,22 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 				return html`<umb-input-document
 					.selectedIds=${this.items}
 					.query=${this.query}
-					.node-start-id=${this.startId}
+					.startNodeId=${this.startNodeId}
 					.filter=${this.filter}
 					.min=${this.min}
 					.max=${this.max}
-					?show-open-button=${this.showOpenButton}
-					?ignore-user-start-nodes=${this.ignoreUserStartNodes}
+					?showOpenButton=${this.showOpenButton}
+					?ignoreUserStartNodes=${this.ignoreUserStartNodes}
 					@change=${this.#onChange}></umb-input-document>`;
 			case 'media':
 				return html`<umb-input-media
 					.selectedIds=${this.items}
-					.node-start-id=${this.startId}
+					.startNodeId=${this.startNodeId}
 					.filter=${this.filter}
 					.min=${this.min}
 					.max=${this.max}
-					?show-open-button=${this.showOpenButton}
-					?ignore-user-start-nodes=${this.ignoreUserStartNodes}
+					?showOpenButton=${this.showOpenButton}
+					?ignoreUserStartNodes=${this.ignoreUserStartNodes}
 					@change=${this.#onChange}></umb-input-media>`;
 			case 'member':
 				return html`<umb-input-member
@@ -136,12 +125,12 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 					.filter=${this.filter}
 					.min=${this.min}
 					.max=${this.max}
-					?show-open-button=${this.showOpenButton}
-					?ignore-user-start-nodes=${this.ignoreUserStartNodes}
+					?showOpenButton=${this.showOpenButton}
+					?ignoreUserStartNodes=${this.ignoreUserStartNodes}
 					@change=${this.#onChange}>
 				</umb-input-member>`;
 			default:
-				return html`Type not found`;
+				return html`Node type could not be found`;
 		}
 	}
 
