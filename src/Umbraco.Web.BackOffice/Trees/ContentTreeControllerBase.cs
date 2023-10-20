@@ -384,8 +384,8 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
     /// </remarks>
     protected sealed override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
     {
-        //check if we're rendering the root
-        if (id == Constants.System.RootString && UserStartNodes.Contains(Constants.System.Root))
+        // check if we're rendering the root
+        if (id == Constants.System.RootString)
         {
             var altStartId = string.Empty;
 
@@ -394,7 +394,7 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
                 altStartId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
             }
 
-            //check if a request has been made to render from a specific start node
+            // check if a request has been made to render from a specific start node
             if (string.IsNullOrEmpty(altStartId) == false && altStartId != "undefined" &&
                 altStartId != Constants.System.RootString)
             {
@@ -402,16 +402,17 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
             }
 
             ActionResult<TreeNodeCollection> nodesResult = GetTreeNodesInternal(id, queryStrings);
-            if (!(nodesResult.Result is null))
+
+            if (nodesResult.Result is not null)
             {
                 return nodesResult.Result;
             }
 
             TreeNodeCollection? nodes = nodesResult.Value;
 
-            //only render the recycle bin if we are not in dialog and the start id is still the root
-            //we need to check for the "application" key in the queryString because its value is required here,
-            //and for some reason when there are no dashboards, this parameter is missing
+            // only render the recycle bin if we are not in dialog and the start id is still the root
+            // we need to check for the "application" key in the queryString because its value is required here,
+            // and for some reason when there are no dashboards, this parameter is missing
             if (IsDialog(queryStrings) == false && id == Constants.System.RootString &&
                 queryStrings.HasKey("application"))
             {
@@ -425,24 +426,6 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
                     queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') +
                     "/recyclebin"));
             }
-
-            return nodes ?? new TreeNodeCollection();
-        }
-
-        // if we're rendering the root and people don't have access to the root still grant them access to the recycle bin
-        else if (id == Constants.System.RootString && !UserStartNodes.Contains(Constants.System.Root))
-        {
-            var nodes = new TreeNodeCollection();
-
-            nodes?.Add(CreateTreeNode(
-                    RecycleBinId.ToInvariantString(),
-                    id,
-                    queryStrings,
-                    LocalizedTextService.Localize("general", "recycleBin"),
-                    "icon-trash",
-                    RecycleBinSmells,
-                    queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') +
-                    "/recyclebin"));
 
             return nodes ?? new TreeNodeCollection();
         }
