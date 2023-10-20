@@ -2,7 +2,7 @@ import { UmbTemplateRepository } from '../../repository/template.repository.js';
 import type { UmbQueryBuilderFilterElement } from './query-builder-filter.element.js';
 import { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, query, queryAll } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_DOCUMENT_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
@@ -21,7 +21,7 @@ export interface TemplateQueryBuilderModalData {
 	hidePartialViews?: boolean;
 }
 
-export interface TemplateQueryBuilderModalResult {
+export interface UmbTemplateQueryBuilderModalValue {
 	value: string;
 }
 
@@ -33,7 +33,7 @@ enum SortOrder {
 @customElement('umb-templating-query-builder-modal')
 export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement<
 	TemplateQueryBuilderModalData,
-	TemplateQueryBuilderModalResult
+	UmbTemplateQueryBuilderModalValue
 > {
 	@query('#content-type-dropdown')
 	private _contentTypeDropdown?: UmbButtonWithDropdownElement;

@@ -22,12 +22,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Template.Save',
 		name: 'Save Template',
+		api: UmbSaveWorkspaceAction,
 		weight: 70,
 		meta: {
 			look: 'primary',
 			color: 'positive',
 			label: 'Save',
-			api: UmbSaveWorkspaceAction,
 		},
 		conditions: [
 			{

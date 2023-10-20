@@ -35,7 +35,7 @@ export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement
 				</uui-button>
 				<umb-entity-action-list
 					slot="dropdown"
-					@executed=${this.#onActionExecuted}
+					@action-executed=${this.#onActionExecuted}
 					entity-type="language"
 					unique=${ifDefined(this.value.isoCode)}></umb-entity-action-list>
 			</umb-dropdown>

@@ -1,13 +1,13 @@
 import { UmbDataTypeRepository } from '../../repository/data-type.repository.js';
 import { css, html, repeat, customElement, property, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL,
 	UMB_WORKSPACE_MODAL,
 	UmbDataTypePickerFlowModalData,
-	UmbDataTypePickerFlowModalResult,
+	UmbDataTypePickerFlowModalValue,
 	UmbModalContext,
 	UmbModalRouteBuilder,
 	UmbModalRouteRegistrationController,
@@ -22,7 +22,7 @@ interface GroupedItems<T> {
 @customElement('umb-data-type-picker-flow-modal')
 export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbDataTypePickerFlowModalData, UmbDataTypePickerFlowModalResult>;
+	modalContext?: UmbModalContext<UmbDataTypePickerFlowModalData, UmbDataTypePickerFlowModalValue>;
 
 	@property({ type: Object })
 	public get data(): UmbDataTypePickerFlowModalData | undefined {
@@ -108,13 +108,14 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				this.#dataTypes = items;
 				this._performFiltering();
 			},
-			'_repositoryItemsObserver'
+			'_repositoryItemsObserver',
 		);
 
 		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUi'), (propertyEditorUIs) => {
-
 			// Only include Property Editor UIs which has Property Editor Schema Alias
-			this.#propertyEditorUIs = propertyEditorUIs.filter((propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias);
+			this.#propertyEditorUIs = propertyEditorUIs.filter(
+				(propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias,
+			);
 
 			this._performFiltering();
 		});
@@ -142,7 +143,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				this.#dataTypes.filter((dataType) => {
 					return dataType.name?.toLowerCase().includes(this.#currentFilterQuery);
 				}),
-				'meta.group'
+				'meta.group',
 			);
 		} else {
 			this._groupedDataTypes = undefined;
@@ -208,13 +209,15 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		return html`
 			${when(
 				dataTypesEntries.length > 0,
-				() => html` <h5 class="choice-type-headline">Available configurations</h5>
-					${this._renderDataTypes()}`
+				() =>
+					html` <h5 class="choice-type-headline">Available configurations</h5>
+						${this._renderDataTypes()}`,
 			)}
 			${when(
 				editorUIEntries.length > 0,
-				() => html` <h5 class="choice-type-headline">Create a new configuration</h5>
-					${this._renderUIs()}`
+				() =>
+					html` <h5 class="choice-type-headline">Create a new configuration</h5>
+						${this._renderUIs()}`,
 			)}
 		`;
 	}
@@ -228,7 +231,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		return entries.map(
 			([key, value]) =>
 				html` <h5 class="category-name">${key === 'undefined' ? 'Uncategorized' : key}</h5>
-					${this._renderGroupDataTypes(value)}`
+					${this._renderGroupDataTypes(value)}`,
 		);
 	}
 
@@ -240,7 +243,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		return entries.map(
 			([key, value]) =>
 				html` <h5 class="category-name">${key === 'undefined' ? 'Uncategorized' : key}</h5>
-					${this._renderGroupUIs(value)}`
+					${this._renderGroupUIs(value)}`,
 		);
 	}
 
@@ -250,17 +253,18 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				? repeat(
 						uis,
 						(propertyEditorUI) => propertyEditorUI.alias,
-						(propertyEditorUI) => html` <li class="item">
-							<uui-button
-								type="button"
-								label="${propertyEditorUI.meta.label || propertyEditorUI.name}"
-								href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
-								<div class="item-content">
-									<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
-									${propertyEditorUI.meta.label || propertyEditorUI.name}
-								</div>
-							</uui-button>
-						</li>`
+						(propertyEditorUI) =>
+							html` <li class="item">
+								<uui-button
+									type="button"
+									label="${propertyEditorUI.meta.label || propertyEditorUI.name}"
+									href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
+									<div class="item-content">
+										<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
+										${propertyEditorUI.meta.label || propertyEditorUI.name}
+									</div>
+								</uui-button>
+							</li>`,
 				  )
 				: ''}
 		</ul>`;
@@ -271,14 +275,15 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 			${repeat(
 				dataTypes,
 				(dataType) => dataType.id,
-				(dataType) => html`<li class="item" ?selected=${this._selection.includes(dataType.id!)}>
-					<uui-button .label=${dataType.name} type="button" @click="${() => this._handleDataTypeClick(dataType)}">
-						<div class="item-content">
-							<uui-icon name="${'umb:bug'}" class="icon"></uui-icon>
-							${dataType.name}
-						</div>
-					</uui-button>
-				</li>`
+				(dataType) =>
+					html`<li class="item" ?selected=${this._selection.includes(dataType.id!)}>
+						<uui-button .label=${dataType.name} type="button" @click="${() => this._handleDataTypeClick(dataType)}">
+							<div class="item-content">
+								<uui-icon name="${'umb:bug'}" class="icon"></uui-icon>
+								${dataType.name}
+							</div>
+						</uui-button>
+					</li>`,
 			)}
 		</ul>`;
 	}

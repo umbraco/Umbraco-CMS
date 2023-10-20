@@ -116,7 +116,7 @@ describe('UmbExtensionElementController', () => {
 				type: 'condition',
 				name: 'test-condition-delay',
 				alias: 'Umb.Test.Condition.Delay',
-				class: UmbSwitchCondition,
+				api: UmbSwitchCondition,
 			};
 
 			extensionRegistry.register(manifest);

@@ -1,5 +1,5 @@
 import type { UmbExtensionCondition } from './condition/index.js';
-import type { UmbEntryPointModule } from './entry-point.interface.js';
+import type { UmbEntryPointModule } from './models/index.js';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
@@ -100,12 +100,12 @@ export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
 /**
  * The type of extension such as dashboard etc...
  */
-export interface ManifestClass<ClassType = unknown>
-	extends ManifestWithLoader<{ default: ClassConstructor<ClassType> }> {
+export interface ManifestApi<ApiType = unknown>
+	extends ManifestWithLoader<{ default: ClassConstructor<ApiType> } | { api: ClassConstructor<ApiType> }> {
 	/**
 	 * @TJS-ignore
 	 */
-	readonly CLASS_TYPE?: ClassType;
+	readonly API_TYPE?: ApiType;
 
 	/**
 	 * The file location of the javascript file to load
@@ -116,24 +116,63 @@ export interface ManifestClass<ClassType = unknown>
 	/**
 	 * @TJS-ignore
 	 */
-	className?: string;
+	apiName?: string;
 
 	/**
 	 * @TJS-ignore
 	 */
-	class?: ClassConstructor<ClassType>;
-}
-
-export interface ManifestClassWithClassConstructor<T = unknown> extends ManifestClass<T> {
-	class: ClassConstructor<T>;
+	api?: ClassConstructor<ApiType>;
 }
 
 export interface ManifestWithLoaderIncludingDefaultExport<T = unknown>
-	extends ManifestWithLoader<{ default: T } | Omit<object, 'default'>> {
+	extends ManifestWithLoader<{ default: T } | { element: T } | Omit<object, 'default'>> {
 	/**
 	 * The file location of the javascript file to load
 	 */
 	js?: string;
+}
+
+export interface ManifestWithLoaderIncludingApiExport<ApiType = unknown>
+	extends ManifestWithLoader<{ api: ApiType } | Omit<object, 'api'>> {
+	/**
+	 * The file location of the javascript file to load
+	 */
+	js?: string;
+	/**
+	* The file location of the API javascript file to load
+	*/
+	apiJs?: string;
+}
+
+export interface ManifestWithLoaderIncludingElementExport<ElementType extends HTMLElement = HTMLElement>
+	extends ManifestWithLoader<{ element: ElementType } | Omit<object, 'element'>> {
+	/**
+	 * The file location of the javascript file to load
+	 */
+	js?: string;
+	/**
+	* The file location of the element javascript file to load
+	*/
+ elementJs?: string;
+}
+export interface ManifestWithLoaderOptionalApiOrElementExport<
+	ElementType extends HTMLElement = HTMLElement,
+	ApiType = unknown,
+	ClassType = { element: ElementType } | { api: ApiType } | { element: ElementType, api: ApiType } | Omit<Omit<object, 'element'>, 'api'>
+>
+extends ManifestWithLoader<ClassType> {
+	/**
+	 * The file location of the javascript file to load
+	 */
+	js?: string;
+	/**
+	* The file location of the element javascript file to load
+	*/
+	elementJs?: string;
+	/**
+	 * The file location of the API javascript file to load
+	 */
+	apiJs?: string;
 }
 
 export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
@@ -152,7 +191,7 @@ export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
 
 	/**
 	 * The HTML web component name to use such as 'my-dashboard'
-	 * Note it is NOT <my-dashboard></my-dashboard> but just the name
+	 * Note it is NOT <my-dashboard></my-dashboard>, just the element name.
 	 */
 	elementName?: string;
 
@@ -160,6 +199,35 @@ export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
 	 * This contains properties specific to the type of extension
 	 */
 	meta?: unknown;
+}
+
+export interface ManifestElementAndApi<ElementType extends HTMLElement = HTMLElement, ApiType = unknown>
+	extends ManifestWithLoaderOptionalApiOrElementExport<ElementType, ApiType> {
+	/**
+	 * @TJS-ignore
+	 */
+	readonly API_TYPE?: ApiType;
+	/**
+	 * @TJS-ignore
+	 */
+	readonly ELEMENT_TYPE?: ElementType;
+
+
+	/**
+	 * @TJS-ignore
+	 */
+	apiName?: string;
+
+	/**
+	 * @TJS-ignore
+	 */
+	api?: ClassConstructor<ApiType>;
+
+	/**
+	 * The HTML web component name to use such as 'my-dashboard'
+	 * Note it is NOT <my-dashboard></my-dashboard>, just the element name.
+	 */
+	elementName?: string;
 }
 
 export interface ManifestWithView<ElementType extends HTMLElement = HTMLElement> extends ManifestElement<ElementType> {
@@ -216,7 +284,7 @@ export interface ManifestBundle<UmbManifestTypes extends ManifestBase = Manifest
 /**
  * This type of extension takes a JS module and registers all exported manifests from the pointed JS file.
  */
-export interface ManifestCondition extends ManifestClass<UmbExtensionCondition> {
+export interface ManifestCondition extends ManifestApi<UmbExtensionCondition> {
 	type: 'condition';
 
 	/**

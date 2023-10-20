@@ -4,7 +4,7 @@ import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbInputMultiUrlElement } from '@umbraco-cms/backoffice/components';
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
 import { UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
@@ -14,7 +14,7 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 @customElement('umb-property-editor-ui-multi-url-picker')
 export class UmbPropertyEditorUIMultiUrlPickerElement
 	extends UmbLitElement
-	implements UmbPropertyEditorExtensionElement
+	implements UmbPropertyEditorUiElement
 {
 	@property({ type: Array })
 	value: UmbLinkPickerLink[] = [];

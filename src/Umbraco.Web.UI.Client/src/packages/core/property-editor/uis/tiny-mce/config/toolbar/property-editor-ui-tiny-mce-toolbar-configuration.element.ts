@@ -1,7 +1,7 @@
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { customElement, css, html, property, map, state, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbPropertyEditorExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyEditorUiElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
@@ -21,7 +21,7 @@ type ToolbarConfig = {
 @customElement('umb-property-editor-ui-tiny-mce-toolbar-configuration')
 export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 	extends UmbLitElement
-	implements UmbPropertyEditorExtensionElement
+	implements UmbPropertyEditorUiElement
 {
 	@property()
 	set value(value: string | string[] | null) {

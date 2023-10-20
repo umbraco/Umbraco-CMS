@@ -92,7 +92,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	#props?: Record<string, unknown> = {};
 
 	@property({ type: String, attribute: 'default-element' })
-	public defaultElement = '';
+	public defaultElement?:string;
 
 	@property()
 	public renderMethod?: (extension: UmbExtensionElementController) => TemplateResult | HTMLElement | null | undefined;

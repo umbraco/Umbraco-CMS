@@ -63,11 +63,11 @@ const manifest = {
 	alias: 'My.EntityAction',
 	name: 'My Entity Action',
 	weight: 10,
+	api: MyEntityAction,
 	meta: {
 		icon: 'umb:add',
 		label: 'My Entity Action',
 		repositoryAlias: 'My.Repository',
-		api: MyEntityAction,
 		entityTypes: ['my-entity'],
 	},
 };
@@ -178,15 +178,16 @@ const manifest = {
 	alias: 'My.EntityBulkAction',
 	name: 'My Entity Bulk Action',
 	weight: 10,
+	api: MyEntityBulkAction,
 	meta: {
 		icon: 'umb:add',
 		label: 'My Entity Bulk Action',
 		repositoryAlias: 'My.Repository',
-		api: MyEntityBulkAction,
 	},
-	conditions: {
-		entityType: 'my-entity',
-	},
+	conditions: [{
+		alias: 'Umb.Condition.CollectionEntityType',
+		match: 'my-entity-type',
+	}],
 };
 
 extensionRegistry.register(manifest);

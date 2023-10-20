@@ -18,7 +18,7 @@ const CORE_PACKAGES = [
 	import('../../packages/media/umbraco-package.js'),
 	import('../../packages/members/umbraco-package.js'),
 	import('../../packages/dictionary/umbraco-package.js'),
-	import('../../packages/users/umbraco-package.js'),
+	import('../../packages/user/umbraco-package.js'),
 	import('../../packages/packages/umbraco-package.js'),
 	import('../../packages/search/umbraco-package.js'),
 	import('../../packages/templating/umbraco-package.js'),

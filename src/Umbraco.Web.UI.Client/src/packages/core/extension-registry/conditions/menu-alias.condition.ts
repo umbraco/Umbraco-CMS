@@ -33,5 +33,5 @@ export const manifest: ManifestCondition = {
 	type: 'condition',
 	name: 'Menu Alias Condition',
 	alias: 'Umb.Condition.MenuAlias',
-	class: UmbMenuAliasCondition,
+	api: UmbMenuAliasCondition,
 };

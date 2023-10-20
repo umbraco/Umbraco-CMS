@@ -1,7 +1,7 @@
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import {
 	UmbCodeEditorModalData,
-	UmbCodeEditorModalResult,
+	UmbCodeEditorModalValue,
 	UMB_CODE_EDITOR_MODAL,
 	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
@@ -25,13 +25,13 @@ export default class UmbTinyMceCodeEditorPlugin extends UmbTinyMcePluginBase {
 	}
 
 	async #showCodeEditor() {
-		const modalHandler = this.#modalContext?.open<UmbCodeEditorModalData, UmbCodeEditorModalResult>(
+		const modalHandler = this.#modalContext?.open<UmbCodeEditorModalData, UmbCodeEditorModalValue>(
 			UMB_CODE_EDITOR_MODAL,
 			{
 				headline: 'Edit source code',
 				content: this.editor.getContent() ?? '',
 				language: 'html',
-			}
+			},
 		);
 
 		if (!modalHandler) return;
