@@ -95,6 +95,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         {
             using (!_proflog.IsEnabled(LogLevel.Debug) ? null : _proflog.DebugDuration<BlockGridPropertyValueConverter>($"ConvertPropertyToBlockGrid ({propertyType.DataType.Id})"))
             {
+                // NOTE: this is to retain backwards compatability
+                if (inter is null)
+                {
+                    return BlockGridModel.Empty;
+                }
+
                 // NOTE: The intermediate object is just a JSON string, we don't actually convert from source -> intermediate since source is always just a JSON string
                 if (inter is not string intermediateBlockModelValue)
                 {
