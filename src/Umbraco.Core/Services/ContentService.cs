@@ -1194,7 +1194,7 @@ public class ContentService : RepositoryService, IContentService
                 content.PublishCulture(impact);
             }
 
-            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId);
+            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
             scope.Complete();
             return result;
         }
@@ -1257,7 +1257,7 @@ public class ContentService : RepositoryService, IContentService
                 // because we don't want to actually unpublish every culture and then the document, we just want everything
                 // to be non-routable so that when it's re-published all variants were as they were.
                 content.PublishedState = PublishedState.Unpublishing;
-                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId);
+                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
                 scope.Complete();
                 return result;
             }
@@ -1271,7 +1271,7 @@ public class ContentService : RepositoryService, IContentService
                 var removed = content.UnpublishCulture(culture);
 
                 // Save and publish any changes
-                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId);
+                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
 
                 scope.Complete();
 
@@ -1324,7 +1324,7 @@ public class ContentService : RepositoryService, IContentService
 
             var allLangs = _languageRepository.GetMany().ToList();
 
-            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId);
+            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
             scope.Complete();
             return result;
         }
@@ -1355,6 +1355,7 @@ public class ContentService : RepositoryService, IContentService
         EventMessages eventMessages,
         IReadOnlyCollection<ILanguage> allLangs,
         int userId,
+        out IDictionary<string, object?>? initialNotificationState,
         bool branchOne = false,
         bool branchRoot = false)
     {
@@ -1416,7 +1417,7 @@ public class ContentService : RepositoryService, IContentService
             _documentRepository.Save(c);
         }
 
-        IDictionary<string, object?>? initialNotificationState = null;
+        initialNotificationState = null;
         if (publishing)
         {
             // Determine cultures publishing/unpublishing which will be based on previous calls to content.PublishCulture and ClearPublishInfo
@@ -1715,7 +1716,7 @@ public class ContentService : RepositoryService, IContentService
                     }
 
                     _documentRepository.PersistContentSchedule(d, contentSchedule);
-                    PublishResult result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, d.WriterId);
+                    PublishResult result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, d.WriterId, out _);
                     if (result.Success == false)
                     {
                         _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1814,7 +1815,7 @@ public class ContentService : RepositoryService, IContentService
                     else
                     {
                         _documentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, d.WriterId);
+                        result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, d.WriterId, out _);
                     }
 
                     if (result.Success == false)
@@ -2032,6 +2033,7 @@ public class ContentService : RepositoryService, IContentService
         var results = new List<PublishResult>();
         var publishedDocuments = new List<IContent>();
 
+        IDictionary<string, object?>? initialNotificationState = null;
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.WriteLock(Constants.Locks.ContentTree);
@@ -2050,7 +2052,7 @@ public class ContentService : RepositoryService, IContentService
             }
 
             // deal with the branch root - if it fails, abort
-            PublishResult? result = PublishBranchItem(scope, document, shouldPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out IDictionary<string, object?> notificationState);
+            PublishResult? result = PublishBranchItem(scope, document, shouldPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out initialNotificationState);
             if (result != null)
             {
                 results.Add(result);
@@ -2109,7 +2111,7 @@ public class ContentService : RepositoryService, IContentService
             // (SaveAndPublishBranchOne does *not* do it)
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(document, TreeChangeTypes.RefreshBranch, eventMessages));
-            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages).WithState(notificationState));
+            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages, true).WithState(initialNotificationState));
 
             scope.Complete();
         }
@@ -2131,10 +2133,11 @@ public class ContentService : RepositoryService, IContentService
         EventMessages evtMsgs,
         int userId,
         IReadOnlyCollection<ILanguage> allLangs,
-        out IDictionary<string, object?> notificationState)
+        out IDictionary<string, object?>? initialNotificationState)
     {
-        notificationState = new Dictionary<string, object?>();
         HashSet<string>? culturesToPublish = shouldPublish(document);
+
+        initialNotificationState = null;
 
         // we need to guard against unsaved changes before proceeding; the document will be saved, but we're not firing any saved notifications
         if (HasUnsavedChanges(document))
@@ -2161,7 +2164,7 @@ public class ContentService : RepositoryService, IContentService
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
         }
 
-        PublishResult result = CommitDocumentChangesInternal(scope, document, evtMsgs, allLangs, userId, true, isRoot);
+        PublishResult result = CommitDocumentChangesInternal(scope, document, evtMsgs, allLangs, userId, out initialNotificationState, true, isRoot);
         if (result.Success)
         {
             publishedDocuments.Add(document);
