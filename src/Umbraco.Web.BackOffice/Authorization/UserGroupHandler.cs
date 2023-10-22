@@ -36,6 +36,7 @@ public class UserGroupHandler : MustSatisfyRequirementAuthorizationHandler<UserG
     /// <param name="mediaService">Service for media related operations.</param>
     /// <param name="entityService">Service for entity related operations.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back-office security.</param>
+    /// <param name="appCaches">App caches.</param>
     public UserGroupHandler(
         IHttpContextAccessor httpContextAccessor,
         IUserService userService,

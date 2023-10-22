@@ -1,9 +1,9 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
-///     Tag service to query for tags in the tags db table. The tags returned are only relevant for published content &
+///     Tag service to query for tags in the tags db table. The tags returned are only relevant for published content &amp;
 ///     saved media or members
 /// </summary>
 /// <remarks>
