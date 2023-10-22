@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
@@ -119,6 +120,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                 var published = true;
                 var trashed = false;
                 var url = dto.Url;
+                IPublishedContent? content = null;
 
                 if (dto.Udi != null)
                 {
@@ -138,6 +140,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                         udi = new GuidUdi(Constants.UdiEntityType.Document, documentEntity.Key);
                         url = publishedSnapshot.Content?.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
                         trashed = documentEntity.Trashed;
+                        content = publishedSnapshot.Content?.GetById(entity.Key);
                     }
                     else if (entity is IContentEntitySlim contentEntity)
                     {
@@ -146,6 +149,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                         udi = new GuidUdi(Constants.UdiEntityType.Media, contentEntity.Key);
                         url = publishedSnapshot.Media?.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
                         trashed = contentEntity.Trashed;
+                        content = publishedSnapshot.Media?.GetById(entity.Key);
                     }
                     else
                     {
@@ -154,10 +158,12 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                     }
                 }
 
+
                 result.Add(new LinkDisplay
                 {
                     Icon = icon,
                     Name = dto.Name,
+                    NodeName = content?.Name,
                     Target = dto.Target,
                     Trashed = trashed,
                     Published = published,

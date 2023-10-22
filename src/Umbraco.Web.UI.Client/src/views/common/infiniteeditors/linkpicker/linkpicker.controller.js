@@ -21,6 +21,10 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
         });
     }
 
+    localizationService.localize("placeholders_entername").then(function (value) {
+      $scope.placeholders_entername = value;
+    });
+
     $scope.customTreeParams = dialogOptions.dataTypeKey ? "dataTypeKey=" + dialogOptions.dataTypeKey : "";
     $scope.dialogTreeApi = {};
     $scope.model.target = {};
@@ -127,19 +131,9 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
       eventsService.emit("dialogs.linkPicker.select", args);
 
-      // Capture this before we update the current node.
-      // This is so that later we only update the name field if the current
-      // value of the name field is equal to the node we are changing from.
-      // This means if the user has already filled in the field we don't delete it.
-      var currentNameIsNodeName = $scope.currentNode && $scope.currentNode.name === $scope.model.target.name;
-
       if ($scope.currentNode) {
         if ($scope.currentNode.id == args.node.id && $scope.currentNode.selected) {
-          var currentName = $scope.model.target.name;
           $scope.model.target = {};
-          // Replace the name if we're deselecting
-          // and the name isn't the deselected node's name
-          $scope.model.target.name = currentNameIsNodeName ? "" : currentName;
           $scope.currentNode.selected = false;
 
           return;
@@ -153,10 +147,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
       $scope.currentNode.selected = true;
       $scope.model.target.id = args.node.id;
       $scope.model.target.udi = args.node.udi;
-
-      if (currentNameIsNodeName || !$scope.model.target.name) {
-        $scope.model.target.name = args.node.name;
-      }
+      $scope.model.target[$scope.model.useNodeName ? 'nodeName' : 'name'] = args.node.name;
 
       if (args.node.id < 0) {
         $scope.model.target.url = "/";
@@ -204,8 +195,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
             $scope.model.target.id = media.id;
             $scope.model.target.udi = media.udi;
             $scope.model.target.isMedia = true;
-            // Don't replace a name that is already there
-            $scope.model.target.name = $scope.model.target.name ? $scope.model.target.name : media.name;
+            $scope.model.target[$scope.model.useNodeName ? 'nodeName' : 'name'] = args.node.name;
             $scope.model.target.url = media.image;
 
             editorService.close();
