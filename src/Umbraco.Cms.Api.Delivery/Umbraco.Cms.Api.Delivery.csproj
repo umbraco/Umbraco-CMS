@@ -3,6 +3,12 @@
     <Title>Umbraco CMS - Delivery API</Title>
     <Description>Contains the presentation layer for the Umbraco CMS Delivery API.</Description>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />
