@@ -159,6 +159,12 @@
     <key alias="morePublishingOptions">More publishing options</key>
     <key alias="submitChanges">Submit</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media deleted</key>
+    <key alias="move">Media moved</key>
+    <key alias="copy">Media copied</key>
+    <key alias="save">Media saved</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
     <key alias="delete">Content deleted</key>
@@ -2521,6 +2527,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="addImageCaption">Add image caption</key>
     <key alias="searchContentTree">Search content tree</key>
     <key alias="maxAmount">Maximum amount</key>
+    <key alias="expandChildItems">Expand child items for</key>
+    <key alias="openContextNode">Open context node for</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2673,7 +2681,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     </key>
     <key alias="learningBaseDescription">
       <![CDATA[
-        <p>Want to master Umbraco? Spend a few minutes learning some best practices by visiting <a href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">the Umbraco Learning Base Youtube channel</a>. Here you can find a bunch of video material covering many aspects of Umbraco.</p>
+        <p>Want to master Umbraco? Spend a few minutes learning some best practices by visiting <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">the Umbraco Learning Base Youtube channel</a>. Here you can find a bunch of video material covering many aspects of Umbraco.</p>
       ]]>
     </key>
     <key alias="getStarted">To get you started</key>

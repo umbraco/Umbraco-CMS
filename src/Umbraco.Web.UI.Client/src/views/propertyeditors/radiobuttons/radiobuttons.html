@@ -1,7 +1,7 @@
-﻿<div class="umb-property-editor umb-radiobuttons" ng-controller="Umbraco.PropertyEditors.RadioButtonsController as vm">
+<div class="umb-property-editor umb-radiobuttons" ng-controller="Umbraco.PropertyEditors.RadioButtonsController as vm">
     <ng-form name="radioButtonsFieldForm">
 
-        <ul class="unstyled">
+        <ul class="unstyled" ng-if="vm.viewItems.length">
             <li ng-repeat="item in vm.viewItems track by item.key">
                 <umb-radiobutton 
                     name="{{model.alias}}_{{vm.uniqueId}}"

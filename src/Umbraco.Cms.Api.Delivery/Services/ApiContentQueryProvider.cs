@@ -3,9 +3,12 @@ using Examine.Lucene.Providers;
 using Examine.Lucene.Search;
 using Examine.Search;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 
@@ -18,6 +21,7 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
 {
     private const string ItemIdFieldName = "itemId";
     private readonly IExamineManager _examineManager;
+    private readonly DeliveryApiSettings _deliveryApiSettings;
     private readonly ILogger<ApiContentQueryProvider> _logger;
     private readonly string _fallbackGuidValue;
     private readonly Dictionary<string, FieldType> _fieldTypes;
@@ -25,9 +29,11 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
     public ApiContentQueryProvider(
         IExamineManager examineManager,
         ContentIndexHandlerCollection indexHandlers,
+        IOptions<DeliveryApiSettings> deliveryApiSettings,
         ILogger<ApiContentQueryProvider> logger)
     {
         _examineManager = examineManager;
+        _deliveryApiSettings = deliveryApiSettings.Value;
         _logger = logger;
 
         // A fallback value is needed for Examine queries in case we don't have a value - we can't pass null or empty string
@@ -41,7 +47,27 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             .ToDictionary(field => field.FieldName, field => field.FieldType, StringComparer.InvariantCultureIgnoreCase);
     }
 
-    public PagedModel<Guid> ExecuteQuery(SelectorOption selectorOption, IList<FilterOption> filterOptions, IList<SortOption> sortOptions, string culture, bool preview, int skip, int take)
+    [Obsolete($"Use the {nameof(ExecuteQuery)} method that accepts {nameof(ProtectedAccess)}. Will be removed in V14.")]
+    public PagedModel<Guid> ExecuteQuery(
+        SelectorOption selectorOption,
+        IList<FilterOption> filterOptions,
+        IList<SortOption> sortOptions,
+        string culture,
+        bool preview,
+        int skip,
+        int take)
+        => ExecuteQuery(selectorOption, filterOptions, sortOptions, culture, ProtectedAccess.None, preview, skip, take);
+
+    /// <inheritdoc/>
+    public PagedModel<Guid> ExecuteQuery(
+        SelectorOption selectorOption,
+        IList<FilterOption> filterOptions,
+        IList<SortOption> sortOptions,
+        string culture,
+        ProtectedAccess protectedAccess,
+        bool preview,
+        int skip,
+        int take)
     {
         if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.DeliveryApiContentIndexName, out IIndex? index))
         {
@@ -49,7 +75,7 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             return new PagedModel<Guid>();
         }
 
-        IBooleanOperation queryOperation = BuildSelectorOperation(selectorOption, index, culture, preview);
+        IBooleanOperation queryOperation = BuildSelectorOperation(selectorOption, index, culture, protectedAccess, preview);
 
         ApplyFiltering(filterOptions, queryOperation);
         ApplySorting(sortOptions, queryOperation);
@@ -77,7 +103,7 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
         FieldName = UmbracoExamineFieldNames.CategoryFieldName, Values = new[] { "content" }
     };
 
-    private IBooleanOperation BuildSelectorOperation(SelectorOption selectorOption, IIndex index, string culture, bool preview)
+    private IBooleanOperation BuildSelectorOperation(SelectorOption selectorOption, IIndex index, string culture, ProtectedAccess protectedAccess, bool preview)
     {
         // Needed for enabling leading wildcards searches
         BaseLuceneSearcher searcher = index.Searcher as BaseLuceneSearcher ?? throw new InvalidOperationException($"Index searcher must be of type {nameof(BaseLuceneSearcher)}.");
@@ -92,8 +118,12 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             ? query.Field(selectorOption.FieldName, selectorOption.Values.First())
             : query.GroupedOr(new[] { selectorOption.FieldName }, selectorOption.Values);
 
-        // Item culture must be either the requested culture or "none"
-        selectorOperation.And().GroupedOr(new[] { UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture }, culture.ToLowerInvariant().IfNullOrWhiteSpace(_fallbackGuidValue), "none");
+        AddCultureQuery(culture, selectorOperation);
+
+        if (_deliveryApiSettings.MemberAuthorizationIsEnabled())
+        {
+            AddProtectedAccessQuery(protectedAccess, selectorOperation);
+        }
 
         // when not fetching for preview, make sure the "published" field is "y"
         if (preview is false)
@@ -102,6 +132,45 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
         }
 
         return selectorOperation;
+    }
+
+    private void AddCultureQuery(string culture, IBooleanOperation selectorOperation) =>
+        selectorOperation
+            .And()
+            .GroupedOr(
+                // Item culture must be either the requested culture or "none"
+                new[] { UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture },
+                culture.ToLowerInvariant().IfNullOrWhiteSpace(_fallbackGuidValue),
+                "none");
+
+    private void AddProtectedAccessQuery(ProtectedAccess protectedAccess, IBooleanOperation selectorOperation)
+    {
+        var protectedAccessValues = new List<string>();
+        if (protectedAccess.MemberKey is not null)
+        {
+            protectedAccessValues.Add($"u:{protectedAccess.MemberKey}");
+        }
+
+        if (protectedAccess.MemberRoles?.Any() is true)
+        {
+            protectedAccessValues.AddRange(protectedAccess.MemberRoles.Select(r => $"r:{r}"));
+        }
+
+        if (protectedAccessValues.Any())
+        {
+            selectorOperation.And(
+                inner => inner
+                    .Field(UmbracoExamineFieldNames.DeliveryApiContentIndex.Protected, "n")
+                    .Or(protectedAccessInner => protectedAccessInner
+                        .GroupedOr(
+                            new[] { UmbracoExamineFieldNames.DeliveryApiContentIndex.ProtectedAccess },
+                            protectedAccessValues.ToArray())),
+                BooleanOperation.Or);
+        }
+        else
+        {
+            selectorOperation.And().Field(UmbracoExamineFieldNames.DeliveryApiContentIndex.Protected, "n");
+        }
     }
 
     private void ApplyFiltering(IList<FilterOption> filterOptions, IBooleanOperation queryOperation)
