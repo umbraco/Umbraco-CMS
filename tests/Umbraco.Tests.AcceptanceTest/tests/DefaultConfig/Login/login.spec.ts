@@ -4,25 +4,28 @@ test.describe('Login', () => {
 
   test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
     await umbracoApi.report.report(testInfo);
-    await page.goto(process.env.URL + '/umbraco');
+    await page.goto(process.env.URL + '/umbraco/login');
   });
+
+  test('Login page is shown when not logged in', async ({page}) => {
+    await page.goto(process.env.URL + '/umbraco');
+    await page.waitForURL(process.env.URL + '/umbraco/login');
+  });
+
   test('Login with correct username and password', async ({page}) => {
 
     let error = page.locator('.text-error');
     await expect(error).toBeHidden();
 
     // Action
-    await page.fill('#umb-username', process.env.UMBRACO_USER_LOGIN);
-    await page.fill('#umb-passwordTwo', process.env.UMBRACO_USER_PASSWORD);
-    await page.locator('[label-key="general_login"]').click();
-    await page.waitForNavigation();
+    await page.fill('#umb-username input', process.env.UMBRACO_USER_LOGIN);
+    await page.fill('#umb-password input', process.env.UMBRACO_USER_PASSWORD);
+    await page.locator('#umb-login-button').click();
+    await page.waitForURL(process.env.URL + '/umbraco#/content');
 
     // Assert
-    await expect(page).toHaveURL(process.env.URL + '/umbraco#/content');
-    let usernameField = await page.locator('#umb-username');
-    let passwordField = await page.locator('#umb-passwordTwo');
-    await expect(usernameField).toHaveCount(0);
-    await expect(passwordField).toHaveCount(0);
+    let authApp = await page.locator('umb-auth');
+    await expect(authApp).toHaveCount(0);
   });
 
   test('Login with correct username but wrong password', async ({page}) => {
@@ -34,20 +37,20 @@ test.describe('Login', () => {
     await expect(error).toBeHidden();
 
     // Action
-    await page.fill('#umb-username', username);
-    await page.fill('#umb-passwordTwo', password);
-    await page.locator('[label-key="general_login"]').click();
+    await page.fill('#umb-username input', username);
+    await page.fill('#umb-password input', password);
+    await page.locator('#umb-login-button').click();
 
     // Assert
     let usernameField = await page.locator('#umb-username');
-    let passwordField = await page.locator('#umb-passwordTwo');
+    let passwordField = await page.locator('#umb-password');
     await expect(error).toBeVisible();
     await expect(usernameField).toBeVisible();
     await expect(passwordField).toBeVisible();
   });
 
   test('Login with wrong username and wrong password', async ({page}) => {
-    const username = 'wrong-username';
+    const username = 'wrong-username@example.com';
     const password = 'wrong';
 
     // Precondition
@@ -55,13 +58,13 @@ test.describe('Login', () => {
     await expect(error).toBeHidden();
 
     // Action
-    await page.fill('#umb-username', username);
-    await page.fill('#umb-passwordTwo', password);
-    await page.locator('[label-key="general_login"]').click();
+    await page.fill('#umb-username input', username);
+    await page.fill('#umb-password input', password);
+    await page.locator('#umb-login-button').click();
 
     // Assert
     let usernameField = await page.locator('#umb-username');
-    let passwordField = await page.locator('#umb-passwordTwo');
+    let passwordField = await page.locator('#umb-password');
     await expect(error).toBeVisible();
     await expect(usernameField).toBeVisible();
     await expect(passwordField).toBeVisible();
