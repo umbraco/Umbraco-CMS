@@ -69,6 +69,7 @@ stages:
         steps:
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
+            retryCountOnTaskFailure: 3
             inputs:
               versionSpec: $(nodeVersion)
           - task: Cache@2
@@ -190,6 +191,7 @@ stages:
         steps:
           - task: NodeTool@0
             displayName: Use Node.js 10.15.x
+            retryCountOnTaskFailure: 3
             inputs:
               versionSpec: 10.15.x # Won't work with higher versions
           - script: |
@@ -430,6 +432,7 @@ stages:
               path: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/misc/nupkg
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
+            retryCountOnTaskFailure: 3
             inputs:
               versionSpec: $(nodeVersion)
           - task: Cache@2
