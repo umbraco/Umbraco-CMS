@@ -32,12 +32,6 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 
 	repository?: UmbCollectionRepository;
 
-	/*
-	TODO:
-	private _search = new StringState('');
-	public readonly search = this._search.asObservable();
-	*/
-
 	constructor(host: UmbControllerHostElement, entityType: string, repositoryAlias: string) {
 		this._entityType = entityType;
 		this._host = host;
@@ -51,7 +45,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 					this.repository = result as UmbCollectionRepository;
 					this._onRepositoryReady();
 				}
-			}
+			},
 		);
 	}
 
@@ -79,52 +73,9 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		this.#selection.filter((k) => k !== id);
 	}
 
-	// TODO: how can we make sure to call this.
-	public destroy(): void {
-		this.#items.unsubscribe();
-	}
-
 	public getEntityType() {
 		return this._entityType;
 	}
-
-	/*
-	public getData() {
-		return this.#data.getValue();
-	}
-	*/
-
-	/*
-	public update(data: Partial<DataType>) {
-		this._data.next({ ...this.getData(), ...data });
-	}
-	*/
-
-	// protected _onStoreSubscription(): void {
-	// 	if (!this._store) {
-	// 		return;
-	// 	}
-
-	// 	this._dataObserver?.destroy();
-
-	// 	if (this._entityId) {
-	// 		this._dataObserver = new UmbObserverController(
-	// 			this._host,
-	// 			this._store.getTreeItemChildren(this._entityId),
-	// 			(nodes) => {
-	// 				if (nodes) {
-	// 					this.#data.next(nodes);
-	// 				}
-	// 			}
-	// 		);
-	// 	} else {
-	// 		this._dataObserver = new UmbObserverController(this._host, this._store.getTreeRoot(), (nodes) => {
-	// 			if (nodes) {
-	// 				this.#data.next(nodes);
-	// 			}
-	// 		});
-	// 	}
-	// }
 
 	protected async _onRepositoryReady() {
 		if (!this.repository) return;
@@ -143,10 +94,14 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		}
 	}
 
-	// TODO: find better name
 	setFilter(filter: Partial<FilterModelType>) {
 		this.#filter.next({ ...this.#filter.getValue(), ...filter });
 		this.requestCollection();
+	}
+
+	// TODO: how can we make sure to call this.
+	public destroy(): void {
+		this.#items.unsubscribe();
 	}
 }
 
