@@ -38,7 +38,7 @@
                 ${ stylesheet ? `@import "${stylesheet}?umb__rnd=${Umbraco.Sys.ServerVariables.application.cacheBuster}";` : ''}
 
                 :host {
-                  display: block;
+                  display: ${$element[0].nodeName.toLowerCase() === 'umb-rte-block-inline' ? 'inline-block' : 'block'};
                   user-select:none;
                   user-drag:auto;
                 }
@@ -121,5 +121,6 @@
   };
 
   angular.module('umbraco.directives').component('umbRteBlock', umbRteBlockComponent);
+  angular.module('umbraco.directives').component('umbRteBlockInline', umbRteBlockComponent);
 
 })();
