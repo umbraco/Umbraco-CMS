@@ -2,10 +2,11 @@ import { getDisplayStateFromUserStatus } from '../../../../utils.js';
 import { UmbUserCollectionContext } from '../../user-collection.context.js';
 import { type UmbUserDetail } from '../../../types.js';
 import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UserGroupResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 
 @customElement('umb-user-collection-grid-view')
 export class UmbUserCollectionGridViewElement extends UmbLitElement {
@@ -15,18 +16,31 @@ export class UmbUserCollectionGridViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
+	@state()
+	private _loading = false;
+
+	#userGroups: Array<UserGroupResponseModel> = [];
 	#collectionContext?: UmbUserCollectionContext;
+	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
 
 	constructor() {
 		super();
-
-		//TODO: Get user group names
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
 			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection));
 			this.observe(this.#collectionContext.items, (items) => (this._users = items));
 		});
+
+		this.#requestUserGroups();
+	}
+
+	async #requestUserGroups() {
+		this._loading = true;
+
+		const { data } = await this.#userGroupCollectionRepository.requestCollection();
+		this.#userGroups = data?.items ?? [];
+		this._loading = false;
 	}
 
 	//TODO How should we handle url stuff?
@@ -43,6 +57,19 @@ export class UmbUserCollectionGridViewElement extends UmbLitElement {
 		this.#collectionContext?.deselect(user.id ?? '');
 	}
 
+	render() {
+		if (this._loading) nothing;
+		return html`
+			<div id="user-grid">
+				${repeat(
+					this._users,
+					(user) => user.id,
+					(user) => this.#renderUserCard(user),
+				)}
+			</div>
+		`;
+	}
+
 	#renderUserCard(user: UmbUserDetail) {
 		return html`
 			<uui-card-user
@@ -53,7 +80,7 @@ export class UmbUserCollectionGridViewElement extends UmbLitElement {
 				@open=${() => this._handleOpenCard(user.id ?? '')}
 				@selected=${() => this.#onSelect(user)}
 				@deselected=${() => this.#onDeselect(user)}>
-				${this.#renderUserTag(user)} ${this.#renderUserLoginDate(user)}
+				${this.#renderUserTag(user)} ${this.#renderUserGroupNames(user)} ${this.#renderUserLoginDate(user)}
 			</uui-card-user>
 		`;
 	}
@@ -69,8 +96,17 @@ export class UmbUserCollectionGridViewElement extends UmbLitElement {
 			size="s"
 			look="${ifDefined(statusLook?.look)}"
 			color="${ifDefined(statusLook?.color)}">
-			<umb-localize key=${'user_'+statusLook.key}></umb-localize>
+			<umb-localize key=${'user_' + statusLook.key}></umb-localize>
 		</uui-tag>`;
+	}
+
+	#renderUserGroupNames(user: UmbUserDetail) {
+		const userGroupNames = this.#userGroups
+			.filter((userGroup) => user.userGroupIds?.includes(userGroup.id!))
+			.map((userGroup) => userGroup.name)
+			.join(', ');
+
+		return html`<div>${userGroupNames}</div>`;
 	}
 
 	#renderUserLoginDate(user: UmbUserDetail) {
@@ -79,21 +115,9 @@ export class UmbUserCollectionGridViewElement extends UmbLitElement {
 		}
 
 		return html`<div class="user-login-time">
-			<umb-localize key="user_lastLogin"></umb-localize><br/>
+			<umb-localize key="user_lastLogin"></umb-localize><br />
 			${this.localize.date(user.lastLoginDate)}
 		</div>`;
-	}
-
-	render() {
-		return html`
-			<div id="user-grid">
-				${repeat(
-					this._users,
-					(user) => user.id,
-					(user) => this.#renderUserCard(user)
-				)}
-			</div>
-		`;
 	}
 
 	static styles = [
