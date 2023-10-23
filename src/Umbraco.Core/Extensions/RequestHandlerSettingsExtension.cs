@@ -28,7 +28,7 @@ public static class RequestHandlerSettingsExtension
             return RequestHandlerSettings.DefaultCharCollection;
         }
 
-    ///     Merges CharCollection and UserDefinedCharCollection, prioritizing UserDefinedCharCollection.
+        // Merges CharCollection and UserDefinedCharCollection, prioritizing UserDefinedCharCollection.
         return MergeUnique(requestHandlerSettings.UserDefinedCharCollection, RequestHandlerSettings.DefaultCharCollection);
     }
 

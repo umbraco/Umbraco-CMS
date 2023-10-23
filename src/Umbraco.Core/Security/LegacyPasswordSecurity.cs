@@ -218,10 +218,9 @@ public class LegacyPasswordSecurity
     }
 
     /// <summary>
-    ///     Return the hash algorithm to use based on the <see cref="IPasswordConfiguration" />
+    ///     Return the hash algorithm to use based on the provided <paramref name="algorithm"/>.
     /// </summary>
     /// <param name="algorithm">The hashing algorithm name.</param>
-    /// <param name="password"></param>
     /// <returns></returns>
     private HashAlgorithm GetHashAlgorithm(string algorithm)
     {

@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Collections;
 namespace Umbraco.Cms.Infrastructure.Examine;
 
 /// <summary>
-///     An <see cref="IIndexPopulator" /> that is automatically associated to any index of type <see cref="TIndex" />
+///     An <see cref="IIndexPopulator" /> that is automatically associated to any index of type <typeparamref name="TIndex"/>
 /// </summary>
 /// <typeparam name="TIndex"></typeparam>
 public abstract class IndexPopulator<TIndex> : IndexPopulator

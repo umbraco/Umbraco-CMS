@@ -183,7 +183,7 @@ internal class UserService : RepositoryService, IUserService
     /// <summary>
     ///     Gets a User by its integer id
     /// </summary>
-    /// <param name="id"><see cref="System.int" /> Id</param>
+    /// <param name="id"><see cref="int" /> Id</param>
     /// <returns>
     ///     <see cref="IUser" />
     /// </returns>
@@ -529,7 +529,7 @@ internal class UserService : RepositoryService, IUserService
     ///     but that is how MS have made theirs so we'll follow that principal.
     /// </remarks>
     /// <param name="countType"><see cref="MemberCountType" /> to count by</param>
-    /// <returns><see cref="System.int" /> with number of Users for passed in type</returns>
+    /// <returns><see cref="int" /> with number of Users for passed in type</returns>
     public int GetCount(MemberCountType countType)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -1882,9 +1882,9 @@ internal class UserService : RepositoryService, IUserService
     }
 
     /// <summary>
-    ///     Saves a UserGroup
+    ///     Saves a UserGroup.
     /// </summary>
-    /// <param name="userGroup">UserGroup to save</param>
+    /// <param name="userGroup">UserGroup to save.</param>
     /// <param name="userIds">
     ///     If null than no changes are made to the users who are assigned to this group, however if a value is passed in
     ///     than all users will be removed from this group and only these users will be added
