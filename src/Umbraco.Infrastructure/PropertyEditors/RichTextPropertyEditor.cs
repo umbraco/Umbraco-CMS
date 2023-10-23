@@ -15,7 +15,6 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Extensions;
 using Umbraco.Cms.Infrastructure.Macros;
 using Umbraco.Cms.Infrastructure.Templates;
@@ -37,16 +36,11 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueEditorIsReusable = true)]
 public class RichTextPropertyEditor : DataEditor
 {
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IEditorConfigurationParser _editorConfigurationParser;
-    private readonly HtmlImageSourceParser _imageSourceParser;
-    private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly IIOHelper _ioHelper;
-    private readonly HtmlLocalLinkParser _localLinkParser;
-    private readonly IHtmlMacroParameterParser _macroParameterParser;
-    private readonly RichTextEditorPastedImages _pastedImages;
+    private readonly IRichTextPropertyIndexValueFactory _richTextPropertyIndexValueFactory;
 
-    [Obsolete("Use the constructor which takes an IHtmlMacroParameterParser instead")]
+    [Obsolete("Use the constructor which takes an IHtmlMacroParameterParser instead. Will be removed in V15.")]
     public RichTextPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -69,7 +63,7 @@ public class RichTextPropertyEditor : DataEditor
     {
     }
 
-    [Obsolete("Use the constructor which takes an IHtmlMacroParameterParser instead")]
+    [Obsolete("Use the constructor which takes an IHtmlMacroParameterParser instead. Will be removed in V15.")]
     public RichTextPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -91,9 +85,7 @@ public class RichTextPropertyEditor : DataEditor
     {
     }
 
-    /// <summary>
-    ///     The constructor will setup the property editor based on the attribute if one is found.
-    /// </summary>
+    [Obsolete($"Use the constructor which accepts an {nameof(IRichTextPropertyIndexValueFactory)} parameter. Will be removed in V15.")]
     public RichTextPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -104,20 +96,57 @@ public class RichTextPropertyEditor : DataEditor
         IImageUrlGenerator imageUrlGenerator,
         IHtmlMacroParameterParser macroParameterParser,
         IEditorConfigurationParser editorConfigurationParser)
+        : this(
+            dataValueEditorFactory,
+            backOfficeSecurityAccessor,
+            imageSourceParser,
+            localLinkParser,
+            pastedImages,
+            ioHelper,
+            imageUrlGenerator,
+            macroParameterParser,
+            editorConfigurationParser,
+            StaticServiceProvider.Instance.GetRequiredService<IRichTextPropertyIndexValueFactory>())
+    {
+    }
+
+    [Obsolete($"Use the non-obsolete constructor. Will be removed in V15.")]
+    public RichTextPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        HtmlImageSourceParser imageSourceParser,
+        HtmlLocalLinkParser localLinkParser,
+        RichTextEditorPastedImages pastedImages,
+        IIOHelper ioHelper,
+        IImageUrlGenerator imageUrlGenerator,
+        IHtmlMacroParameterParser macroParameterParser,
+        IEditorConfigurationParser editorConfigurationParser,
+        IRichTextPropertyIndexValueFactory richTextPropertyIndexValueFactory)
+        : this(
+            dataValueEditorFactory,
+            editorConfigurationParser,
+            ioHelper,
+            richTextPropertyIndexValueFactory)
+    {
+    }
+
+    /// <summary>
+    ///     The constructor will setup the property editor based on the attribute if one is found.
+    /// </summary>
+    public RichTextPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        IEditorConfigurationParser editorConfigurationParser,
+        IIOHelper ioHelper,
+        IRichTextPropertyIndexValueFactory richTextPropertyIndexValueFactory)
         : base(dataValueEditorFactory)
     {
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _imageSourceParser = imageSourceParser;
-        _localLinkParser = localLinkParser;
-        _pastedImages = pastedImages;
         _ioHelper = ioHelper;
-        _imageUrlGenerator = imageUrlGenerator;
-        _macroParameterParser = macroParameterParser;
+        _richTextPropertyIndexValueFactory = richTextPropertyIndexValueFactory;
         _editorConfigurationParser = editorConfigurationParser;
         SupportsReadOnly = true;
     }
 
-    public override IPropertyIndexValueFactory PropertyIndexValueFactory => new RichTextPropertyIndexValueFactory();
+    public override IPropertyIndexValueFactory PropertyIndexValueFactory => _richTextPropertyIndexValueFactory;
 
     /// <summary>
     ///     Create a custom value editor
@@ -356,31 +385,5 @@ public class RichTextPropertyEditor : DataEditor
 
         private BlockEditorValues CreateBlockEditorValues()
             => new(new RichTextEditorBlockDataConverter(), _contentTypeService, _logger);
-    }
-
-    internal class RichTextPropertyIndexValueFactory : IPropertyIndexValueFactory
-    {
-        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published, IEnumerable<string> availableCultures)
-        {
-            var val = property.GetValue(culture, segment, published);
-
-            if (!(val is string strVal))
-            {
-                yield break;
-            }
-
-            // index the stripped HTML values
-            yield return new KeyValuePair<string, IEnumerable<object?>>(
-                property.Alias,
-                new object[] { strVal.StripHtml() });
-
-            // store the raw value
-            yield return new KeyValuePair<string, IEnumerable<object?>>(
-                $"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new object[] { strVal });
-        }
-
-        [Obsolete("Use the overload with the 'availableCultures' parameter instead, scheduled for removal in v14")]
-        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
-            => GetIndexValues(property, culture, segment, published, Enumerable.Empty<string>());
     }
 }
