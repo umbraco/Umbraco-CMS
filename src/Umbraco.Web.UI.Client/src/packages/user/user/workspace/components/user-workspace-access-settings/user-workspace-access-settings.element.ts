@@ -77,38 +77,20 @@ export class UmbUserWorkspaceAccessSettingsElement extends UmbLitElement {
 					>
 				</div>
 
-				<b><umb-localize key="sections_content">Content</umb-localize></b>
 				${this.#renderDocumentStartNodes()}
 				<hr />
-				<b><umb-localize key="sections_media">Media</umb-localize></b>
-				<uui-ref-node name="Media Root">
-					<uui-icon slot="icon" name="folder"></uui-icon>
-				</uui-ref-node>
+				${this.#renderMediaStartNodes()}
 			</uui-box>`;
 	}
 
 	#renderDocumentStartNodes() {
-		if (!this._user || !this._user.contentStartNodeIds) return;
+		return html` <b><umb-localize key="sections_content">Content</umb-localize></b>
+			<umb-user-document-start-node .ids=${this._user?.contentStartNodeIds || []}></umb-user-document-start-node>`;
+	}
 
-		if (this._user.contentStartNodeIds.length < 1)
-			return html`
-				<uui-ref-node name="Content Root">
-					<uui-icon slot="icon" name="folder"></uui-icon>
-				</uui-ref-node>
-			`;
-
-		//TODO Render the name of the content start node instead of it's id.
-		return repeat(
-			this._user.contentStartNodeIds,
-			(node) => node,
-			(node) => {
-				return html`
-					<uui-ref-node name=${node}>
-						<uui-icon slot="icon" name="folder"></uui-icon>
-					</uui-ref-node>
-				`;
-			},
-		);
+	#renderMediaStartNodes() {
+		return html` <b><umb-localize key="sections_media">Media</umb-localize></b>
+			<umb-user-media-start-node .ids=${this._user?.mediaStartNodeIds || []}></umb-user-media-start-node>`;
 	}
 
 	static styles = [
