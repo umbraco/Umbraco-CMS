@@ -16,4 +16,8 @@ export class UmbUserCollectionContext extends UmbCollectionContext<UmbUserDetail
 	setOrderByFilter(orderBy: UserOrderModel) {
 		this.setFilter({ orderBy });
 	}
+
+	setUserGroupFilter(selection: Array<string>) {
+		this.setFilter({ userGroupIds: selection });
+	}
 }

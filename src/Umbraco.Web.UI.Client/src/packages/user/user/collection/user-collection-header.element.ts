@@ -5,7 +5,7 @@ import {
 	UUIRadioGroupElement,
 	UUIRadioGroupEvent,
 } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
@@ -15,7 +15,8 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
-import { UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UserGroupResponseModel, UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 
 @customElement('umb-user-collection-header')
 export class UmbUserCollectionHeaderElement extends UmbLitElement {
@@ -31,10 +32,18 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	@state()
 	private _orderBy?: UserOrderModel;
 
+	@state()
+	private _userGroups: Array<UserGroupResponseModel> = [];
+
+	@state()
+	private _userGroupFilterSelection: Array<UserGroupResponseModel> = [];
+
 	#modalContext?: UmbModalManagerContext;
 	#collectionContext?: UmbUserCollectionContext;
 	#inputTimer?: NodeJS.Timeout;
 	#inputTimerAmount = 500;
+
+	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
 
 	constructor() {
 		super();
@@ -46,6 +55,18 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
 		});
+	}
+
+	protected firstUpdated() {
+		this.#requestUserGroups();
+	}
+
+	async #requestUserGroups() {
+		const { data } = await this.#userGroupCollectionRepository.requestCollection();
+
+		if (data) {
+			this._userGroups = data.items;
+		}
 	}
 
 	#onDropdownClick(event: PointerEvent) {
@@ -124,15 +145,37 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		`;
 	}
 
+	#onUserGroupFilterChange(event: UUIBooleanInputEvent) {
+		const target = event.currentTarget as UUICheckboxElement;
+		const item = this._userGroups.find((group) => group.id === target.value);
+
+		if (!item) return;
+
+		if (target.checked) {
+			this._userGroupFilterSelection = [...this._userGroupFilterSelection, item];
+		} else {
+			this._userGroupFilterSelection = this._userGroupFilterSelection.filter((group) => group.id !== item.id);
+		}
+
+		const ids = this._userGroupFilterSelection.map((group) => group.id!);
+		this.#collectionContext?.setUserGroupFilter(ids);
+	}
+
+	#getUserGroupFilerLabel() {
+		return this._userGroupFilterSelection.length === 0
+			? this.localize.term('general_all')
+			: this._userGroupFilterSelection.map((group) => group.name).join(', ');
+	}
+
 	#renderFilters() {
 		return html`
 			<div>
-				<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
-				<umb-dropdown margin="8">
+				<umb-dropdown class="filter">
 					<uui-button @click=${this.#onDropdownClick} slot="trigger" label="status">
 						<umb-localize key="general_status"></umb-localize>:
 						<umb-localize key=${'user_state' + this._stateFilterSelection}></umb-localize>
 					</uui-button>
+
 					<div slot="dropdown" class="filter-dropdown">
 						${this._stateFilterOptions.map(
 							(option) =>
@@ -145,32 +188,21 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 					</div>
 				</umb-dropdown>
 
-				<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
-				<umb-dropdown margin="8">
+				<umb-dropdown class="filter">
 					<uui-button @click=${this.#onDropdownClick} slot="trigger" label=${this.localize.term('general_groups')}>
-						<umb-localize key="general_groups"></umb-localize>:
-						<!-- TODO: show the value here -->
+						<umb-localize key="general_groups"></umb-localize>: ${this.#getUserGroupFilerLabel()}
 					</uui-button>
 					<div slot="dropdown" class="filter-dropdown">
-						<!-- TODO: GET THESE FROM SERVER (not localized) -->
-						<uui-checkbox label="Administrators"></uui-checkbox>
-						<uui-checkbox label="Editors"></uui-checkbox>
-						<uui-checkbox label="Sensitive Data"></uui-checkbox>
-						<uui-checkbox label="Translators"></uui-checkbox>
-						<uui-checkbox label="Writers"></uui-checkbox>
-					</div>
-				</umb-dropdown>
-
-				<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
-				<umb-dropdown margin="8">
-					<uui-button @click=${this.#onDropdownClick} slot="trigger" label=${this.localize.term('general_orderBy')}>
-						<umb-localize key="general_orderBy"></umb-localize>:
-						<b>${this._orderBy}</b>
-					</uui-button>
-					<div slot="dropdown" class="filter-dropdown" name="orderBy">
-						<uui-radio-group name="radioGroup" @change=${this.#onOrderByChange}>
-							${this._orderByOptions.map((option) => html`<uui-radio label=${option} value=${option}></uui-radio>`)}
-						</uui-radio-group>
+						${repeat(
+							this._userGroups,
+							(group) => group.id,
+							(group) => html`
+								<uui-checkbox
+									label=${ifDefined(group.name)}
+									value=${ifDefined(group.id)}
+									@change=${this.#onUserGroupFilterChange}></uui-checkbox>
+							`,
+						)}
 					</div>
 				</umb-dropdown>
 			</div>
@@ -199,6 +231,10 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 			#input-search {
 				width: 100%;
+			}
+
+			.filter {
+				max-width: 200px;
 			}
 
 			.filter-dropdown {
