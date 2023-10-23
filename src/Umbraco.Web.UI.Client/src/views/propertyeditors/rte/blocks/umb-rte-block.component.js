@@ -38,8 +38,9 @@
                 ${ stylesheet ? `@import "${stylesheet}?umb__rnd=${Umbraco.Sys.ServerVariables.application.cacheBuster}";` : ''}
 
                 :host {
-                  position: relative;
-                  user-select: none;
+                  display: block;
+                  user-select:none;
+                  user-drag:auto;
                 }
 
                 .umb-block-rte__block--actions {

@@ -13,7 +13,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
   //These are absolutely required in order for the macros to render inline
   //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
-  var extendedValidElements = "#umb-rte-block[!data-content-udi],@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption";
+  var extendedValidElements = "@[id|class|style],#umb-rte-block[!data-content-udi|!data-not-inline],-umb-rte-block[!data-content-udi|!data-inline],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption";
   var fallbackStyles = [
     {
       title: 'Headers', items: [
@@ -389,6 +389,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         var config = {
           inline: modeInline,
           plugins: plugins,
+          custom_elements: 'umb-rte-block,~umb-rte-block',
           valid_elements: tinyMceConfig.validElements,
           invalid_elements: tinyMceConfig.inValidElements,
           extended_valid_elements: extendedValidElements,
@@ -765,6 +766,16 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             const block = blockEditorApi.getBlockByContentUdi(blockEl.attr("data-content-udi"));
             if(block) {
               const displayAsBlock = block.config.displayInline !== true;
+
+              console.log("displayAsBlock", displayAsBlock)
+
+              if(displayAsBlock) {
+                editor.dom.setAttrib(blockEl, 'data-inline', '');
+                editor.dom.setAttrib(blockEl, 'data-not-inline', null);
+              } else {
+                editor.dom.setAttrib(blockEl, 'data-inline', null);
+                editor.dom.setAttrib(blockEl, 'data-not-inline', '');
+              }
 
               /* if the block is set to display inline, checks if its wrapped in a p tag and then unwraps it (removes p tag) */
               if (displayAsBlock && blockEl.parent && blockEl.parent.name.toUpperCase() === "P") {
@@ -1449,8 +1460,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 blockEl.setAttribute('contenteditable', 'false');
                 if(block.config.displayInline) {
                   blockEl.setAttribute('style', 'display:inline-block;');
+                  blockEl.removeAttribute('data-not-inline');
+                  blockEl.setAttribute('data-inline', '');
                 } else {
-                  blockEl.setAttribute('style', '');
+                  blockEl.removeAttribute('style');
+                  blockEl.removeAttribute('data-inline');
+                  blockEl.setAttribute('data-not-inline', '');
                 }
               } else {
                 blockEl.removeAttribute('data-content-udi');
