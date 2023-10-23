@@ -2,13 +2,16 @@ import { UmbUserRepository } from '../../repository/user.repository.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import {
 	UmbNotificationDefaultData,
 	UmbNotificationContext,
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/notification';
-import { UmbCreateUserSuccessModalData, UmbCreateUserSuccessModalValue } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbCreateUserSuccessModalData,
+	UmbCreateUserSuccessModalValue,
+	UmbModalBaseElement,
+} from '@umbraco-cms/backoffice/modal';
 import { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-create-success-modal')

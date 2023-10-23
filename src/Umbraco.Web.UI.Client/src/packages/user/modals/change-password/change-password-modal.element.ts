@@ -1,7 +1,6 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, CSSResultGroup, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbChangePasswordModalData } from '@umbraco-cms/backoffice/modal';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbChangePasswordModalData, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbUserRepository } from '@umbraco-cms/backoffice/user';
 
 @customElement('umb-change-password-modal')

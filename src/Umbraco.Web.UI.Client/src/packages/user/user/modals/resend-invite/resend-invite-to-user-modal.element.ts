@@ -1,7 +1,7 @@
 import { UmbInviteUserRepository } from '../../repository/invite/invite-user.repository.js';
-import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-resend-invite-to-user-modal')
 export class UmbResendInviteToUserModalElement extends UmbModalBaseElement {
