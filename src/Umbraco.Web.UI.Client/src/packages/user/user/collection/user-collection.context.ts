@@ -9,14 +9,29 @@ export class UmbUserCollectionContext extends UmbCollectionContext<UmbUserDetail
 		super(host, 'user', USER_REPOSITORY_ALIAS);
 	}
 
+	/**
+	 * Sets the state filter for the collection and refreshes the collection.
+	 * @param {Array<UserStateModel>} selection
+	 * @memberof UmbUserCollectionContext
+	 */
 	setStateFilter(selection: Array<UserStateModel>) {
 		this.setFilter({ userStates: selection });
 	}
 
+	/**
+	 * Sets the order by filter for the collection and refreshes the collection.
+	 * @param {UserOrderModel} orderBy
+	 * @memberof UmbUserCollectionContext
+	 */
 	setOrderByFilter(orderBy: UserOrderModel) {
 		this.setFilter({ orderBy });
 	}
 
+	/**
+	 * Sets the user group filter for the collection and refreshes the collection.
+	 * @param {Array<string>} selection
+	 * @memberof UmbUserCollectionContext
+	 */
 	setUserGroupFilter(selection: Array<string>) {
 		this.setFilter({ userGroupIds: selection });
 	}
