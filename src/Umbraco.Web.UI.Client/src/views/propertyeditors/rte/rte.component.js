@@ -574,6 +574,11 @@
             })
           });
 
+          if(removed.length > 0) {
+            vm.model.value.markup = vm.tinyMceEditor.getContent();
+            $scope.$evalAsync();
+          }
+
           modelObject.removeDataAndDestroyModel(block);
       }
 

@@ -1383,7 +1383,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             //update the display val again if it has changed from the server;
             //uses an empty string in the editor when the value is null
             args.editor.setContent(newVal || "", { format: 'raw' });
-
             initBlocks();
 
             // we need to manually dispatch this event since it is only ever dispatched based on loading from the DOM, this
@@ -1462,8 +1461,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             }
           }
         }
-
-        args.editor.execCommand("mceAutoResize", false, null, null);
       }
 
       // If we can not find the insert image/media toolbar button
