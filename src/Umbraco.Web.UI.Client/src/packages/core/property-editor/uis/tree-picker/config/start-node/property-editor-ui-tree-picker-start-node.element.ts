@@ -1,5 +1,5 @@
 import { StartNode, UmbInputStartNodeElement } from '@umbraco-cms/backoffice/components';
-import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -39,7 +39,6 @@ export class UmbPropertyEditorUITreePickerStartNodeElement extends UmbLitElement
 		this.value = {
 			type: target.startNodeType,
 			id: target.startNodeId,
-			query: target.startNodeQuery,
 		};
 
 		this.dispatchEvent(new CustomEvent('property-value-change'));

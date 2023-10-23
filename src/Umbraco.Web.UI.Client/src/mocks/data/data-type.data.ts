@@ -205,7 +205,6 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 				alias: 'startNode',
 				value: {
 					type: 'content',
-					query: '',
 					id: null,
 				},
 			},

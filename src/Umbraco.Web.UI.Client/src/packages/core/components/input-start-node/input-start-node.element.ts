@@ -1,6 +1,6 @@
 import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
-import { html, customElement, property, state, css, ifDefined, query } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin, UUIInputElement, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
+import { FormControlMixin, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import { StartNode } from '@umbraco-cms/backoffice/components';
@@ -10,10 +10,6 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 	protected getFormElement() {
 		return undefined;
 	}
-	private _startNodeQuery = '';
-
-	@state()
-	private queryTyping?: boolean;
 
 	@property()
 	startNodeType?: StartNode['type'];
@@ -21,26 +17,13 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 	@property({ attribute: 'start-node-id' })
 	startNodeId?: string;
 
-	@property()
-	public get startNodeQuery(): string {
-		return this._startNodeQuery;
-	}
-	public set startNodeQuery(query: string) {
-		this._startNodeQuery = query;
-		query ? (this.queryTyping = true) : (this.queryTyping = false);
-	}
-
 	@property({ type: Array })
 	options: Array<Option> = [];
-
-	@query('#query')
-	queryInput!: UUIInputElement;
 
 	#onTypeChange(event: UUISelectEvent) {
 		this.startNodeType = event.target.value as StartNode['type'];
 
 		// Clear others
-		this.startNodeQuery = '';
 		this.startNodeId = '';
 		this.dispatchEvent(new CustomEvent('change'));
 	}
@@ -48,20 +31,6 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 	#onIdChange(event: CustomEvent) {
 		this.startNodeId = (event.target as UmbInputDocumentElement | UmbInputMediaElement).selectedIds.join('');
 		this.dispatchEvent(new CustomEvent('change'));
-	}
-
-	#onQueryChange(event: UUIInputEvent) {
-		this.startNodeQuery = event.target.value as string;
-		this.dispatchEvent(new CustomEvent('change'));
-	}
-
-	#onQueryCancel() {
-		this.queryTyping = false;
-		this.queryInput.value = '';
-		if (this.startNodeQuery) {
-			this.startNodeQuery = '';
-			this.dispatchEvent(new CustomEvent('change'));
-		}
 	}
 
 	render() {
@@ -86,40 +55,9 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 
 	renderTypeContent() {
 		const startNodeId = this.startNodeId ? [this.startNodeId] : [];
-
-		if (this.startNodeQuery || this.queryTyping) {
-			return html`<uui-input
-					id="query"
-					label="query"
-					placeholder="Enter XPath query"
-					@change=${this.#onQueryChange}
-					value=${ifDefined(this.startNodeQuery)}>
-				</uui-input>
-				<uui-button label="Show XPath query help">
-					<uui-icon name="umb:info" title="Show XPath query help"></uui-icon>Show XPath query help
-				</uui-button>
-				<uui-button label="Cancel and clear query" @click=${this.#onQueryCancel}>
-					<uui-icon name="umb:backspace"></uui-icon>
-					Clear & Cancel
-				</uui-button>`;
-		}
-
 		return html`
-			<umb-input-document
-				@change=${this.#onIdChange}
-				.selectedIds=${startNodeId}
-				.query=${this.startNodeQuery}
-				max="1"></umb-input-document>
-			${!startNodeId.length ? this.renderQueryButton() : ''}
+			<umb-input-document @change=${this.#onIdChange} .selectedIds=${startNodeId} max="1"></umb-input-document>
 		`;
-	}
-
-	renderQueryButton() {
-		return html`<uui-button
-			label="Query for root node with XPath"
-			@click=${() => (this.queryTyping = !this.queryTyping)}>
-			<uui-icon name="umb:search"></uui-icon>Query for root node with XPath
-		</uui-button>`;
 	}
 
 	renderTypeMedia() {

@@ -6,7 +6,6 @@ import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 type NodeType = 'content' | 'member' | 'media';
 export type StartNode = {
 	type?: NodeType;
-	query?: string | null;
 	id?: string | null;
 };
 
@@ -19,16 +18,13 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	private _type: StartNode['type'] = undefined;
 	@property()
 	public set type(newType: StartNode['type']) {
-		if (newType !== this._type) {
+		if (newType?.toLowerCase() !== this._type) {
 			this._type = newType?.toLowerCase() as StartNode['type'];
 		}
 	}
 	public get type(): StartNode['type'] {
 		return this._type;
 	}
-
-	@property()
-	query?: string;
 
 	@property({ type: String })
 	startNodeId?: string;
@@ -83,7 +79,6 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 			case 'content':
 				return html`<umb-input-document
 					.selectedIds=${this.selectedIds}
-					.query=${this.query}
 					.startNodeId=${this.startNodeId}
 					.filter=${this.filter}
 					.min=${this.min}

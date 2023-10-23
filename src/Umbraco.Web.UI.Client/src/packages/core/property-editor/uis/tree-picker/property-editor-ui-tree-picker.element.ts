@@ -18,9 +18,6 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	type?: StartNode['type'];
 
 	@state()
-	query?: string | null;
-
-	@state()
 	startNodeId?: string | null;
 
 	@state()
@@ -43,7 +40,6 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 		const startNode: StartNode | undefined = config?.getValueByAlias('startNode');
 		if (startNode) {
 			this.type = startNode.type;
-			this.query = startNode.query;
 			this.startNodeId = startNode.id;
 		}
 
@@ -64,7 +60,6 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 		return html`${this.value}<umb-input-tree
 				.value=${this.value}
 				.type=${this.type}
-				.query=${this.query ?? ''}
 				.startNodeId=${this.startNodeId ?? ''}
 				.min=${this.min}
 				.max=${this.max}
