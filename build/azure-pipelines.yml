@@ -81,22 +81,22 @@ stages:
               path: $(npm_config_cache)
           - script: npm ci --no-fund --no-audit --prefer-offline
             workingDirectory:  src/Umbraco.Web.UI.Client
-            displayName: Run npm ci
+            displayName: Run npm ci (Backoffice)
           - task: gulp@0
-            displayName: Run gulp build
+            displayName: Run gulp build (Backoffice)
             inputs:
               gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
               targets: coreBuild
               workingDirectory: src/Umbraco.Web.UI.Client
           - task: npm@1
-            displayName: Run npm ci
+            displayName: Run npm ci (Login)
             inputs:
               command: custom
               workingDir: src/Umbraco.Web.UI.Login
               verbose: false
               customCommand: ci
           - task: npm@1
-            displayName: Run npm build
+            displayName: Run npm build (Login)
             inputs:
               command: custom
               workingDir: src/Umbraco.Web.UI.Login
