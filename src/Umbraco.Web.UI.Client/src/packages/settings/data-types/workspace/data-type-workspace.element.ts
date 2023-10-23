@@ -1,5 +1,5 @@
 import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -24,7 +24,7 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 				new UmbWorkspaceIsNewRedirectController(
 					this,
 					this.#workspaceContext,
-					this.shadowRoot!.querySelector('umb-router-slot')!
+					this.shadowRoot!.querySelector('umb-router-slot')!,
 				);
 			},
 		},

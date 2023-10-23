@@ -2,7 +2,7 @@ import { UmbUserRepository } from '../../repository/user.repository.js';
 import { type UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_CREATE_USER_SUCCESS_MODAL,

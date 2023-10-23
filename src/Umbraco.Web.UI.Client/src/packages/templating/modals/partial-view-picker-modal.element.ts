@@ -1,7 +1,10 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbPartialViewPickerModalData, UmbPartialViewPickerModalValue } from '@umbraco-cms/backoffice/modal';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import {
+	UmbPartialViewPickerModalData,
+	UmbPartialViewPickerModalValue,
+	UmbModalBaseElement,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-partial-view-picker-modal')

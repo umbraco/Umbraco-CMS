@@ -5,9 +5,9 @@ import {
 	OEmbedStatus,
 	UmbEmbeddedMediaModalData,
 	UmbEmbeddedMediaModalValue,
+	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 interface UmbEmbeddedMediaModalModel {
 	url?: string;

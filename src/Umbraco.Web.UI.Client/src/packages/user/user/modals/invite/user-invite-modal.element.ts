@@ -2,7 +2,7 @@ import { UmbUserGroupInputElement } from '../../../user-group/components/input-u
 import { UmbInviteUserRepository } from '../../repository/invite/invite-user.repository.js';
 import { css, html, nothing, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-user-invite-modal')

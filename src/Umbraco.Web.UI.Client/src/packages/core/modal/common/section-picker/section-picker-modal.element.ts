@@ -1,9 +1,12 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbSectionPickerModalData, UmbSectionPickerModalValue } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbSectionPickerModalData,
+	UmbSectionPickerModalValue,
+	UmbModalBaseElement,
+} from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-section-picker-modal')
 export class UmbSectionPickerModalElement extends UmbModalBaseElement<
