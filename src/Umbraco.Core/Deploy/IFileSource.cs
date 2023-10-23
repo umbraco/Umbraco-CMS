@@ -68,6 +68,17 @@ public interface IFileSource
     /// <param name="fileTypes">A collection of file types which can store the files.</param>
     void GetFiles(IEnumerable<StringUdi> udis, IFileTypeCollection fileTypes);
 
+    // TODO (V14): Remove obsolete method and default implementation for GetFilesAsync overloads.
+
+    /// <summary>
+    ///     Gets files and store them using a file store.
+    /// </summary>
+    /// <param name="udis">The udis of the files to get.</param>
+    /// <param name="fileTypes">A collection of file types which can store the files.</param>
+    /// <param name="token">A cancellation token.</param>
+    [Obsolete("Please use the method overload taking all parameters. This method overload will be removed in Umbraco 14.")]
+    Task GetFilesAsync(IEnumerable<StringUdi> udis, IFileTypeCollection fileTypes, CancellationToken token);
+
     /// <summary>
     ///     Gets files and store them using a file store.
     /// </summary>
@@ -75,5 +86,6 @@ public interface IFileSource
     /// <param name="fileTypes">A collection of file types which can store the files.</param>
     /// <param name="continueOnFileNotFound">A flag indicating whether to continue if a file isn't found or to stop and throw a FileNotFoundException.</param>
     /// <param name="token">A cancellation token.</param>
-    Task GetFilesAsync(IEnumerable<StringUdi> udis, IFileTypeCollection fileTypes, bool continueOnFileNotFound, CancellationToken token);
+    Task GetFilesAsync(IEnumerable<StringUdi> udis, IFileTypeCollection fileTypes, bool continueOnFileNotFound, CancellationToken token)
+        => GetFilesAsync(udis, fileTypes, token);
 }
