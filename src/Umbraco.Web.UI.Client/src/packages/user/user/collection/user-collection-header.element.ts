@@ -161,51 +161,57 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		this.#collectionContext?.setUserGroupFilter(ids);
 	}
 
-	#getUserGroupFilerLabel() {
+	#getUserGroupFilterLabel() {
 		return this._userGroupFilterSelection.length === 0
 			? this.localize.term('general_all')
 			: this._userGroupFilterSelection.map((group) => group.name).join(', ');
 	}
 
 	#renderFilters() {
+		return html` ${this.#renderStatusFilter()} ${this.#renderUserGroupFilter()} `;
+	}
+
+	#renderStatusFilter() {
 		return html`
-			<div>
-				<umb-dropdown class="filter">
-					<uui-button @click=${this.#onDropdownClick} slot="trigger" label="status">
-						<umb-localize key="general_status"></umb-localize>:
-						<umb-localize key=${'user_state' + this._stateFilterSelection}></umb-localize>
-					</uui-button>
+			<umb-dropdown class="filter">
+				<uui-button @click=${this.#onDropdownClick} slot="trigger" label="status">
+					<umb-localize key="general_status"></umb-localize>:
+					<umb-localize key=${'user_state' + this._stateFilterSelection}></umb-localize>
+				</uui-button>
 
-					<div slot="dropdown" class="filter-dropdown">
-						${this._stateFilterOptions.map(
-							(option) =>
-								html`<uui-checkbox
-									label=${this.localize.term('user_state' + option)}
-									@change=${this.#onStateFilterChange}
-									name="state"
-									value=${option}></uui-checkbox>`,
-						)}
-					</div>
-				</umb-dropdown>
+				<div slot="dropdown" class="filter-dropdown">
+					${this._stateFilterOptions.map(
+						(option) =>
+							html`<uui-checkbox
+								label=${this.localize.term('user_state' + option)}
+								@change=${this.#onStateFilterChange}
+								name="state"
+								value=${option}></uui-checkbox>`,
+					)}
+				</div>
+			</umb-dropdown>
+		`;
+	}
 
-				<umb-dropdown class="filter">
-					<uui-button @click=${this.#onDropdownClick} slot="trigger" label=${this.localize.term('general_groups')}>
-						<umb-localize key="general_groups"></umb-localize>: ${this.#getUserGroupFilerLabel()}
-					</uui-button>
-					<div slot="dropdown" class="filter-dropdown">
-						${repeat(
-							this._userGroups,
-							(group) => group.id,
-							(group) => html`
-								<uui-checkbox
-									label=${ifDefined(group.name)}
-									value=${ifDefined(group.id)}
-									@change=${this.#onUserGroupFilterChange}></uui-checkbox>
-							`,
-						)}
-					</div>
-				</umb-dropdown>
-			</div>
+	#renderUserGroupFilter() {
+		return html`
+			<umb-dropdown class="filter">
+				<uui-button @click=${this.#onDropdownClick} slot="trigger" label=${this.localize.term('general_groups')}>
+					<umb-localize key="general_groups"></umb-localize>: ${this.#getUserGroupFilterLabel()}
+				</uui-button>
+				<div slot="dropdown" class="filter-dropdown">
+					${repeat(
+						this._userGroups,
+						(group) => group.id,
+						(group) => html`
+							<uui-checkbox
+								label=${ifDefined(group.name)}
+								value=${ifDefined(group.id)}
+								@change=${this.#onUserGroupFilterChange}></uui-checkbox>
+						`,
+					)}
+				</div>
+			</umb-dropdown>
 		`;
 	}
 
