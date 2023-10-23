@@ -481,8 +481,8 @@
       Pour importer un élément de dictionnaire, trouvez le fichier ".udt" sur votre ordinateur en cliquant sur le bouton "Importer" (une confirmation vous sera demandée dans l'écran suivant)
     </key>
     <key alias="itemDoesNotExists">L'élément de dictionnaire n'existe pas.</key>
-    <key alias="parentDoesNotExists">L'éléménet parent n'existe pas.</key>
-    <key alias="noItems">Il n'y a pas d'élément dans le dictionnaire..</key>
+    <key alias="parentDoesNotExists">L'élément parent n'existe pas.</key>
+    <key alias="noItems">Il n'y a pas d'élément dans le dictionnaire.</key>
     <key alias="noItemsInFile">Il n'y a pas d'élément de dictionnaire dans ce fichier.</key>
     <key alias="createNew">Créer un élément de dictionnaire</key>
   </area>
@@ -1604,10 +1604,10 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="historyCleanupHeading">Nettoyer l'historique</key>
     <key alias="historyCleanupDescription">Autoriser le remplacement des paramètres globaux de nettoyage de l'historique.</key>
     <key alias="historyCleanupKeepAllVersionsNewerThanDays">Garder toutes les versions plus récentes que jours</key>
-    <key alias="historyCleanupKeepLatestVersionPerDayForDays">Garder la dernière version quotidienne pendantt jours</key>
+    <key alias="historyCleanupKeepLatestVersionPerDayForDays">Garder la dernière version quotidienne pendant jours</key>
     <key alias="historyCleanupPreventCleanup">Empêcher le nettoyage</key>
     <key alias="historyCleanupEnableCleanup">Activer le nettoyage</key>
-    <key alias="historyCleanupGloballyDisabled"><![CDATA[<strong>REMARQUE!</strong> Le nettoyage de l'historique des versions de contenu est désactvé globallement. Ces paramètre ne prendront pas effet avant qu'il ne soit axtivé.]]></key>
+    <key alias="historyCleanupGloballyDisabled"><![CDATA[<strong>REMARQUE!</strong> Le nettoyage de l'historique des versions de contenu est désactvé globalement. Ces paramètres ne prendront pas effet avant qu'il ne soit activé.]]></key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Ajouter une langue</key>
@@ -2117,7 +2117,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="newMember">Membre</key>
     <key alias="searchContentTree">Chercher dans l'arborescence de contenu</key>
     <key alias="maxAmount">Quantité maximum</key>
-    <key alias="expandChildItems">Afficher les ékéments enfant pour</key>
+    <key alias="expandChildItems">Afficher les éléments enfant pour</key>
     <key alias="openContextNode">Ouvrir le noeud de contexte pour</key>
   </area>
   <area alias="references">
