@@ -88,8 +88,7 @@ export class UmbAppElement extends UmbLitElement {
 		// This way we can ensure that the document language is always loaded first and subsequently registered as the fallback language.
 		umbLocalizationRegistry.isDefaultLoaded.subscribe((isDefaultLoaded) => {
 			if (!this.#authContext) {
-				console.error('[Fatal] AuthContext requested before it was initialised');
-				return;
+				throw new Error('[Fatal] AuthContext requested before it was initialised');
 			}
 
 			if (!isDefaultLoaded) return;
@@ -185,12 +184,11 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	async #setAuthStatus() {
-		if (!this.#authContext) {
-			console.error('[Fatal] AuthContext requested before it was initialised');
-			return;
-		}
-
 		if (this.bypassAuth === false) {
+			if (!this.#authContext) {
+				throw new Error('[Fatal] AuthContext requested before it was initialised');
+			}
+
 			// Get service configuration from authentication server
 			await this.#authContext.setInitialState();
 
