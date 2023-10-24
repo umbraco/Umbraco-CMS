@@ -1,4 +1,6 @@
+using System.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -32,31 +34,23 @@ public static class UmbracoBuilderAuthExtensions
                 // FIXME: swap paths here so member API is first (see comment above)
                 options
                     .SetAuthorizationEndpointUris(
-                        Paths.BackOfficeApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
-                        Paths.MemberApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
+                        Paths.MemberApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.BackOfficeApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
                     .SetTokenEndpointUris(
-                        Paths.BackOfficeApi.TokenEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
-                        Paths.MemberApi.TokenEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
+                        Paths.MemberApi.TokenEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.BackOfficeApi.TokenEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
                     .SetLogoutEndpointUris(
-                        Paths.BackOfficeApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
-                        Paths.MemberApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
+                        Paths.MemberApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.BackOfficeApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
                     .SetRevocationEndpointUris(
-                        Paths.BackOfficeApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
-                        Paths.MemberApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash));
+                        Paths.MemberApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.BackOfficeApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash));
 
                 // Enable authorization code flow with PKCE
                 options
                     .AllowAuthorizationCodeFlow()
                     .RequireProofKeyForCodeExchange()
                     .AllowRefreshTokenFlow();
-
-                // Register the encryption and signing credentials.
-                // - see https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html
-                options
-                    // TODO: use actual certificates here, see docs above
-                    .AddDevelopmentEncryptionCertificate()
-                    .AddDevelopmentSigningCertificate()
-                    .DisableAccessTokenEncryption();
 
                 // Register the ASP.NET Core host and configure for custom authentication endpoint.
                 options
@@ -79,6 +73,19 @@ public static class UmbracoBuilderAuthExtensions
                 // and https://learn.microsoft.com/en-us/aspnet/core/security/data-protection/configuration/overview?view=aspnetcore-7.0
                 // for more information
                 options.UseDataProtection();
+
+                // Register encryption and signing credentials to protect tokens.
+                // Note that for tokens generated/validated using ASP.NET Core Data Protection,
+                // a separate key ring is used, distinct from the credentials discussed in
+                // https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html
+                // More details can be found here: https://github.com/openiddict/openiddict-core/issues/1892#issuecomment-1737308506
+                // "When using ASP.NET Core Data Protection to generate opaque tokens, the signing and encryption credentials
+                // registered via Add*Key/Certificate() are not used". But since OpenIddict requires the registration of such,
+                // we can generate random keys per instance without them taking effect.
+                // - see also https://github.com/openiddict/openiddict-core/issues/1231
+                options
+                    .AddEncryptionKey(new SymmetricSecurityKey(RandomNumberGenerator.GetBytes(32))) // generate a cryptographically secure random 256-bits key
+                    .AddSigningKey(new RsaSecurityKey(RSA.Create(keySizeInBits: 2048))); // generate RSA key with recommended size of 2048-bits
             })
 
             // Register the OpenIddict validation components.

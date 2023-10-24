@@ -92,7 +92,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
         AssertPublishResults(
             r,
             x => x.Result,
-            PublishResultType.SuccessPublish, // During branch publishing, the change detection of the root branch runs AFTER the check to process the branchItem => root is always saved&Published as the intent requires it.
+            PublishResultType.SuccessPublishAlready,
             PublishResultType.SuccessPublishAlready,
             PublishResultType.SuccessPublishAlready);
 
@@ -139,7 +139,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
         AssertPublishResults(
             r,
             x => x.Result,
-            PublishResultType.SuccessPublish, // During branch publishing, the change detection of the root branch runs AFTER the check to process the branchItem => root is always saved&Published as the intent requires it.
+            PublishResultType.SuccessPublishAlready,
             PublishResultType.SuccessPublishAlready,
             PublishResultType.SuccessPublishAlready,
             PublishResultType.SuccessPublish,
@@ -184,7 +184,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
 
         var r = ContentService.SaveAndPublishBranch(vRoot, false)
             .ToArray(); // no culture specified so "*" is used, so all cultures
-        Assert.AreEqual(PublishResultType.SuccessPublishCulture, r[0].Result); // During branch publishing, the change detection of the root branch runs AFTER the check to process the branchItem => root is always saved&Published as the intent requires it.
+        Assert.AreEqual(PublishResultType.SuccessPublishAlready, r[0].Result);
         Assert.AreEqual(PublishResultType.SuccessPublishCulture, r[1].Result);
     }
 
@@ -220,7 +220,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
         var saveResult = ContentService.Save(iv1);
 
         var r = ContentService.SaveAndPublishBranch(vRoot, false, "de").ToArray();
-        Assert.AreEqual(PublishResultType.SuccessPublishCulture, r[0].Result); // During branch publishing, the change detection of the root branch runs AFTER the check to process the branchItem => root is always saved&Published as the intent requires it.
+        Assert.AreEqual(PublishResultType.SuccessPublishAlready, r[0].Result);
         Assert.AreEqual(PublishResultType.SuccessPublishCulture, r[1].Result);
     }
 
@@ -380,7 +380,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
         AssertPublishResults(
             r,
             x => x.Result,
-            PublishResultType.SuccessPublish, // During branch publishing, the change detection of the root branch runs AFTER the check to process the branchItem => root is always saved&Published as the intent requires it.
+            PublishResultType.SuccessPublishAlready,
             PublishResultType.SuccessPublish,
             PublishResultType.SuccessPublishCulture);
 
@@ -406,7 +406,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
         AssertPublishResults(
             r,
             x => x.Result,
-            PublishResultType.SuccessPublish, // During branch publishing, the change detection of the root branch runs AFTER the check to process the branchItem => root is always saved&Published as the intent requires it.
+            PublishResultType.SuccessPublishAlready,
             PublishResultType.SuccessPublish,
             PublishResultType.SuccessPublishCulture);
 
