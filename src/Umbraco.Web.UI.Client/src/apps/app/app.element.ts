@@ -201,7 +201,11 @@ export class UmbAppElement extends UmbLitElement {
 
 		this.#listenForLanguageChange();
 
-		this.#authContext!.isLoggedIn.next(true);
+		if (this.#authContext?.isAuthorized()) {
+			this.#authContext.isLoggedIn.next(true);
+		} else {
+			this.#authContext?.isLoggedIn.next(false);
+		}
 	}
 
 	#redirect() {
