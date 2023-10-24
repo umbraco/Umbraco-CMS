@@ -519,17 +519,7 @@
                     }
                 };
 
-                switch (scope.contentType) {
-                    case "documentType":
-                        editorService.documentTypeEditor(editor);
-                        break;
-                    case "mediaType":
-                        editorService.mediaTypeEditor(editor);
-                        break;
-                    case "memberType":
-                        editorService.memberTypeEditor(editor);
-                        break;
-                }
+                editorService.contentTypeEditor(editor, scope.contentType);
             };
 
             /* ---------- TABS ---------- */

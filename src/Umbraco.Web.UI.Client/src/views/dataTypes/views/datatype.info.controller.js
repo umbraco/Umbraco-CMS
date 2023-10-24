@@ -71,17 +71,7 @@ function DataTypeInfoController($scope, $routeParams, dataTypeResource, $timeout
             }
         };
 
-        switch (type) {
-            case "documentType":
-                editorService.documentTypeEditor(editor);
-                break;
-            case "mediaType":
-                editorService.mediaTypeEditor(editor);
-                break;
-            case "memberType":
-                editorService.memberTypeEditor(editor);
-                break;
-        }
+        editorService.contentTypeEditor(editor, type);
     }
 
     loadRelations();
