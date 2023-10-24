@@ -3560,29 +3560,33 @@ public static class Utf8ToAsciiConverter
                     output[opos++] = 'a';
                     break;
 
+
                 // BEGIN EXTRA
-                /*
-            case '£':
-                output[opos++] = 'G';
-                output[opos++] = 'B';
-                output[opos++] = 'P';
-                break;
+                case '£':
+                    output[opos++] = 'G';
+                    output[opos++] = 'B';
+                    output[opos++] = 'P';
+                    break;
 
-            case '€':
-                output[opos++] = 'E';
-                output[opos++] = 'U';
-                output[opos++] = 'R';
-                break;
+                case '€':
+                    output[opos++] = 'E';
+                    output[opos++] = 'U';
+                    output[opos++] = 'R';
+                    break;
 
-            case '©':
-                output[opos++] = '(';
-                output[opos++] = 'C';
-                output[opos++] = ')';
-                break;
-                */
+                case '©':
+                    output[opos++] = '(';
+                    output[opos++] = 'C';
+                    output[opos++] = ')';
+                    break;
+
+                case '™':
+                    output[opos++] = 'T';
+                    output[opos++] = 'M';
+                    break;
+
+
                 default:
-                    // if (ToMoreAscii(input, ipos, output, ref opos))
-                    //    break;
 
                     // if (!char.IsLetterOrDigit(c)) // that would not catch eg 汉 unfortunately
                     //    output[opos++] = '?';
@@ -3596,35 +3600,4 @@ public static class Utf8ToAsciiConverter
             }
         }
     }
-
-    // private static bool ToMoreAscii(char[] input, int ipos, char[] output, ref int opos)
-    // {
-    //    var c = input[ipos];
-
-    // switch (c)
-    //    {
-    //        case '£':
-    //            output[opos++] = 'G';
-    //            output[opos++] = 'B';
-    //            output[opos++] = 'P';
-    //            break;
-
-    // case '€':
-    //            output[opos++] = 'E';
-    //            output[opos++] = 'U';
-    //            output[opos++] = 'R';
-    //            break;
-
-    // case '©':
-    //            output[opos++] = '(';
-    //            output[opos++] = 'C';
-    //            output[opos++] = ')';
-    //            break;
-
-    // default:
-    //            return false;
-    //    }
-
-    // return true;
-    // }
 }
