@@ -49,8 +49,8 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
-		this.consumeContext(UMB_APP, (something) => {
-			this.serverUrl = something.getServerUrl();
+		this.consumeContext(UMB_APP, (instance) => {
+			this.serverUrl = instance.getServerUrl();
 		});
 	}
 
