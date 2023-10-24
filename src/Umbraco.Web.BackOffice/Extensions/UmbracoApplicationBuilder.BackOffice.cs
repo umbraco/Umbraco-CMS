@@ -53,4 +53,35 @@ public static partial class UmbracoApplicationBuilderExtensions
 
         return app;
     }
+
+    /// <summary>
+    ///     Adds CORS middleware to the pipeline for the BackOffice.
+    ///     This is useful if you are running the BackOffice on a different port than the backend server.
+    /// </summary>
+    /// <param name="app"></param>
+    /// <param name="origins">
+    ///     A list of allowed fully-qualified hostnames that should be whitelisted.
+    ///     If this is omitted, all origins will be allowed, which will not work with credentials.
+    /// </param>
+    /// <returns></returns>
+    public static IApplicationBuilder UseBackOfficeCors(
+        this IApplicationBuilder app, params string[] origins)
+    {
+        app.UseCors(u =>
+        {
+            u.AllowCredentials();
+            u.AllowAnyMethod();
+            u.AllowAnyHeader();
+            u.WithExposedHeaders("Location");
+            if (origins.Length > 0)
+            {
+                u.WithOrigins(origins);
+            }
+            else
+            {
+                u.AllowAnyOrigin();
+            }
+        });
+        return app;
+    }
 }
