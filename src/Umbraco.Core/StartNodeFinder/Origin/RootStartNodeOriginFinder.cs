@@ -13,22 +13,24 @@ public class RootStartNodeOriginFinder : IStartNodeOriginFinder
         _entityService = entityService;
     }
 
+    private ISet<Guid> _allowedObjectTypes = new HashSet<Guid>(new[]
+    {
+        Constants.ObjectTypes.Document, Constants.ObjectTypes.SystemRoot
+    });
+
     protected virtual string SupportedOriginType { get; set; } = "Root";
     public virtual Guid? FindOriginKey(StartNodeSelector selector)
     {
-        if (selector.OriginAlias != SupportedOriginType || selector.Context.CurrentKey.HasValue is false)
+        if (selector.OriginAlias != SupportedOriginType)
         {
             return null;
         }
-        var entity = _entityService.Get(selector.Context.CurrentKey.Value);
+        var entity = _entityService.Get(selector.Context.ParentKey);
 
-        if (entity is null
-            || entity.NodeObjectType != Constants.ObjectTypes.Document
-           )
+        if (entity is null || _allowedObjectTypes.Contains(entity.NodeObjectType) is false)
         {
             return null;
         }
-
 
         var path = entity.Path.Split(",");
         if (path.Length < 2)

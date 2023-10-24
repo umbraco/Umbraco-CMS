@@ -31,7 +31,7 @@ public class StartNodeFilterRepository: IStartNodeFilterRepository
             .Append($"ORDER BY n.level DESC"),
             1);
 
-        return Database.Single<Guid>(query);
+        return Database.SingleOrDefault<Guid?>(query);
     }
 
     public Guid? FarthestAncestorOrSelf(IEnumerable<Guid> origins, StartNodeFilter filter) {
@@ -40,7 +40,7 @@ public class StartNodeFilterRepository: IStartNodeFilterRepository
                 .Append($"ORDER BY n.level ASC"),
             1);
 
-        return Database.Single<Guid>(query);
+        return Database.SingleOrDefault<Guid?>(query);
     }
 
     private Sql<ISqlContext> GetAncestorOrSelfBaseQuery(IEnumerable<Guid> origins, StartNodeFilter filter) =>
@@ -59,7 +59,7 @@ public class StartNodeFilterRepository: IStartNodeFilterRepository
     public IEnumerable<Guid> NearestDescendantOrSelf(IEnumerable<Guid> origins, StartNodeFilter filter)
     {
         Sql<ISqlContext> query = GetDescendantOrSelfBaseQuery(origins, filter)
-            .Append($"GROUP BY n.level HAVING MIN(n.level) = n.level");
+            .Append($"GROUP BY n.uniqueId HAVING MIN(n.level) = n.level");
 
         return Database.Fetch<Guid>(query);
     }
@@ -68,7 +68,7 @@ public class StartNodeFilterRepository: IStartNodeFilterRepository
 
     public IEnumerable<Guid> FarthestDescendantOrSelf(IEnumerable<Guid> origins, StartNodeFilter filter)    {
         Sql<ISqlContext> query = GetDescendantOrSelfBaseQuery(origins, filter)
-            .Append($"GROUP BY n.level HAVING MAX(n.level) = n.level");
+            .Append($"GROUP BY n.uniqueId HAVING MAX(n.level) = n.level");
 
         return Database.Fetch<Guid>(query);
     }

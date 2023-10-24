@@ -586,6 +586,8 @@ public class EntityController : UmbracoAuthorizedJsonController
     {
         public string OriginAlias { get; set; } = string.Empty;
         public JsonFilterFilterViewModel[] Filter { get; set; } = Array.Empty<JsonFilterFilterViewModel>();
+
+        public Guid? OriginKey { get; set; }
     }
 
     public class JsonFilterFilterViewModel
@@ -613,7 +615,7 @@ public class EntityController : UmbracoAuthorizedJsonController
                 CurrentKey = currentKey,
                 ParentKey = parentKey.Value
             },
-            OriginKey = currentKey,
+            OriginKey = model.OriginKey,
             OriginAlias = model.OriginAlias,
             Filter = model.Filter.Select(x=>new StartNodeFilter()
             {
