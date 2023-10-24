@@ -18,6 +18,32 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
 {
+    public enum StartNodeSelectorOrigin
+    {
+        Root,
+        Parent,
+        Current,
+        Site,
+        ByKey
+    }
+
+    public enum StartNodeSelectorDirection
+    {
+        NearestAncestorOrSelf,
+        FarthestAncestorOrSelf,
+        NearestDescendantOrSelf,
+        FarthestDescendantOrSelf,
+
+        Parent,
+        NearestAncestor,
+        FarthestAncestor,
+        Child,
+        NearestDescendants,
+        FarthestDescendants,
+
+    }
+
+
     private StartNodeFinder StartNodeFinder => GetRequiredService<IStartNodeFinder>() as StartNodeFinder;
     private IDomainService DomainService => GetRequiredService<IDomainService>();
 
@@ -27,7 +53,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
         // Arrange
         var startNodeSelector = new StartNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Parent.ToString(),
+            OriginAlias = StartNodeSelectorOrigin.Current.ToString(),
             OriginKey = null,
             Context = new StartNodeSelectorContext()
             {
@@ -51,7 +77,41 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            CollectionAssert.Contains(result, startNodeSelector.Context.ParentKey);
+            CollectionAssert.Contains(result, startNodeSelector.Context.CurrentKey.Value);
+        });
+    }
+
+    [Test]
+    public void GetDynamicStartNodes__With_NearestDescendantOrSelf_and_filter_of_own_doc_type_should_return_self()
+    {
+        // Arrange
+        var startNodeSelector = new StartNodeSelector()
+        {
+            OriginAlias = StartNodeSelectorOrigin.Current.ToString(),
+            OriginKey = null,
+            Context = new StartNodeSelectorContext()
+            {
+                CurrentKey = Subpage2.Key,
+                ParentKey = Textpage.Key
+            },
+            Filter = new StartNodeFilter[]
+            {
+                new StartNodeFilter()
+                {
+                    DirectionAlias = StartNodeSelectorDirection.NearestDescendantOrSelf.ToString(),
+                    AnyOfDocTypeAlias = new []{ContentType.Alias}
+                }
+            }
+        };
+
+        // Act
+        var result = StartNodeFinder.GetDynamicStartNodes(startNodeSelector);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, result.Count());
+            CollectionAssert.Contains(result, startNodeSelector.Context.CurrentKey.Value);
         });
     }
 
@@ -104,6 +164,50 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
 
         // Assert
         Assert.AreEqual(selector.Context.ParentKey, result);
+    }
+
+    [Test]
+    public void CalculateOriginKey__Current_should_just_return_the_current_key_when_it_exists()
+    {
+        // Arrange
+        var selector = new StartNodeSelector()
+        {
+            OriginAlias = StartNodeSelectorOrigin.Current.ToString(),
+            OriginKey = null,
+            Context = new StartNodeSelectorContext()
+            {
+                CurrentKey = Subpage2.Key,
+                ParentKey = Textpage.Key
+            }
+        };
+
+        // Act
+        var result = StartNodeFinder.CalculateOriginKey(selector);
+
+        // Assert
+        Assert.AreEqual(selector.Context.CurrentKey, result);
+    }
+
+    [Test]
+    public void CalculateOriginKey__Current_should_just_return_null_when_it_do_not_exists()
+    {
+        // Arrange
+        var selector = new StartNodeSelector()
+        {
+            OriginAlias = StartNodeSelectorOrigin.Current.ToString(),
+            OriginKey = null,
+            Context = new StartNodeSelectorContext()
+            {
+                CurrentKey = Guid.NewGuid(),
+                ParentKey = Textpage.Key
+            }
+        };
+
+        // Act
+        var result = StartNodeFinder.CalculateOriginKey(selector);
+
+        // Assert
+        Assert.IsNull(result);
     }
 
     [Test]
@@ -205,6 +309,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
     [TestCase(StartNodeSelectorOrigin.Parent)]
     [TestCase(StartNodeSelectorOrigin.Root)]
     [TestCase(StartNodeSelectorOrigin.Site)]
+    [TestCase(StartNodeSelectorOrigin.Site)]
     public void CalculateOriginKey__with_a_random_key_should_return_null(StartNodeSelectorOrigin origin)
     {
         // Arrange
@@ -228,6 +333,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
     [TestCase(StartNodeSelectorOrigin.Parent)]
     [TestCase(StartNodeSelectorOrigin.Root)]
     [TestCase(StartNodeSelectorOrigin.Site)]
+    [TestCase(StartNodeSelectorOrigin.Current)]
     public void CalculateOriginKey__with_a_trashed_key_should_still_be_allowed(StartNodeSelectorOrigin origin)
     {
         // Arrange
@@ -251,6 +357,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
     [TestCase(StartNodeSelectorOrigin.Parent)]
     [TestCase(StartNodeSelectorOrigin.Root)]
     [TestCase(StartNodeSelectorOrigin.Site)]
+    [TestCase(StartNodeSelectorOrigin.Current)]
     public void CalculateOriginKey__with_a_ContentType_key_should_return_null(StartNodeSelectorOrigin origin)
     {
         // Arrange

@@ -621,15 +621,15 @@ public class EntityController : UmbracoAuthorizedJsonController
                 AnyOfDocTypeAlias = x.AnyOfDocTypeAlias
             })
         };
-        var startNodes = _startNodeFinder.GetDynamicStartNodes(startNodeSelector);
+        var startNodes = _startNodeFinder.GetDynamicStartNodes(startNodeSelector).ToArray();
 
-        Guid? first = startNodes.FirstOrDefault();
+        Guid? first = startNodes.Any() ? startNodes.First() : null;
         if (first.HasValue)
         {
             return GetById(first.Value, UmbracoEntityTypes.Document);
         }
 
-        return NotFound();
+        return Ok();
     }
 
     /// <summary>

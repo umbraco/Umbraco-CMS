@@ -84,11 +84,15 @@ public static partial class UmbracoBuilderExtensions
         builder.StartNodeOriginFinders()
             .Append<ByKeyStartNodeOriginFinder>()
             .Append<ParentStartNodeOriginFinder>()
+            .Append<CurrentStartNodeOriginFinder>()
             .Append<SiteStartNodeOriginFinder>()
             .Append<RootStartNodeOriginFinder>();
 
         builder.StartNodeSelectorFilters()
-            .Append<NearestAncestorOrSelfStartNodeSelectorFilter>();
+            .Append<NearestAncestorOrSelfStartNodeSelectorFilter>()
+            .Append<FarthestAncestorOrSelfStartNodeSelectorFilter>()
+            .Append<NearestDescendantOrSelfStartNodeSelectorFilter>()
+            .Append<FarthestDescendantOrSelfStartNodeSelectorFilter>();
 
         builder.Components();
         // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
