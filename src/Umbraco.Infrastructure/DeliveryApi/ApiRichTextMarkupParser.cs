@@ -97,7 +97,7 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
 
     private void CleanUpBlocks(HtmlDocument doc)
     {
-        HtmlNode[] blocks = doc.DocumentNode.SelectNodes("//umb-rte-block")?.ToArray() ?? Array.Empty<HtmlNode>();
+        HtmlNode[] blocks = doc.DocumentNode.SelectNodes("//*[starts-with(local-name(),'umb-rte-block')]")?.ToArray() ?? Array.Empty<HtmlNode>();
         foreach (HtmlNode block in blocks)
         {
             var dataUdi = block.GetAttributeValue("data-content-udi", string.Empty);

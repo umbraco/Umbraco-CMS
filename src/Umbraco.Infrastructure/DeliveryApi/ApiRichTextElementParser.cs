@@ -175,7 +175,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
 
     private void CleanUpBlocks(string tag, Dictionary<string, object> attributes)
     {
-        if (tag is not "umb-rte-block" || attributes.ContainsKey("data-content-udi") is false || attributes["data-content-udi"] is not string dataUdi)
+        if (tag.StartsWith("umb-rte-block") is false || attributes.ContainsKey("data-content-udi") is false || attributes["data-content-udi"] is not string dataUdi)
         {
             return;
         }
