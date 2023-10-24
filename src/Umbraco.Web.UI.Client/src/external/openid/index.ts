@@ -4,6 +4,7 @@ export {
 	FetchRequestor,
 	LocalStorageBackend,
 	RedirectRequestHandler,
+	RevokeTokenRequest,
 } from '@openid/appauth';
 export { AuthorizationRequest } from '@openid/appauth/built/authorization_request';
 export { AuthorizationNotifier } from '@openid/appauth/built/authorization_request_handler';
