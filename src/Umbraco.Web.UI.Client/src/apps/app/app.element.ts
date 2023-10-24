@@ -247,7 +247,7 @@ export class UmbAppElement extends UmbLitElement {
 
 	#isAuthorized(): boolean {
 		if (!this.#authContext) return false;
-		return this.bypassAuth ? true : this.#authContext.isLoggedIn.value;
+		return this.bypassAuth ? true : this.#authContext.isAuthorized();
 	}
 
 	#isAuthorizedGuard(): Guard {
