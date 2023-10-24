@@ -58,6 +58,9 @@ export class UmbAuthContext implements IUmbAuth {
 		return this.#authFlow.performWithFreshTokens();
 	}
 
+	/**
+	 * Signs the user out by removing any tokens from the browser.
+	 */
 	signOut(): Promise<void> {
 		return this.#authFlow.signOut();
 	}
