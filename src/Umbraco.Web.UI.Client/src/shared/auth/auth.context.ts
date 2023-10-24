@@ -34,6 +34,10 @@ export class UmbAuthContext implements IUmbAuth {
 		return this.#authFlow.makeAuthorizationRequest();
 	}
 
+	isAuthorized() {
+		return this.#authFlow.isAuthorized();
+	}
+
 	setInitialState(): Promise<void> {
 		return this.#authFlow.setInitialState();
 	}

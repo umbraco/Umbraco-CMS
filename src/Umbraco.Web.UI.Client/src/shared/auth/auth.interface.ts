@@ -13,6 +13,11 @@ export interface IUmbAuth {
 	setInitialState(): Promise<void>;
 
 	/**
+	 * Checks if there is a token and it is still valid.
+	 */
+	isAuthorized(): boolean;
+
+	/**
 	 * Gets the latest token from the Management API.
 	 * If the token is expired, it will be refreshed.
 	 *

@@ -219,7 +219,7 @@ export class UmbAuthFlow {
 	 *
 	 * @returns true if the user is logged in, false otherwise.
 	 */
-	loggedIn(): boolean {
+	isAuthorized(): boolean {
 		return !!this.#accessTokenResponse && this.#accessTokenResponse.isValid();
 	}
 
