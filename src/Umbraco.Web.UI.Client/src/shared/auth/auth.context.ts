@@ -5,26 +5,33 @@ import { UserResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { ReplaySubject } from '@umbraco-cms/backoffice/external/rxjs';
+import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbAuthContext implements IUmbAuth {
 	#currentUser = new UmbObjectState<UmbLoggedInUser | undefined>(undefined);
 	readonly currentUser = this.#currentUser.asObservable();
-	readonly isLoggedIn = new ReplaySubject<boolean>(1);
+	readonly isLoggedIn = new BehaviorSubject<boolean>(false);
 	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode ?? 'en-us');
 
 	#host;
 	#authFlow;
 
-	constructor(host: UmbControllerHostElement, authFlow: UmbAuthFlow) {
+	constructor(host: UmbControllerHostElement, serverUrl: string, redirectUrl: string) {
 		this.#host = host;
-		this.#authFlow = authFlow;
+		this.#authFlow = new UmbAuthFlow(serverUrl, redirectUrl);
 
 		this.isLoggedIn.subscribe((isLoggedIn) => {
 			if (isLoggedIn) {
 				this.fetchCurrentUser();
 			}
 		});
+	}
+
+	/**
+	 * Initiates the login flow.
+	 */
+	login(): void {
+		return this.#authFlow.makeAuthorizationRequest();
 	}
 
 	setInitialState(): Promise<void> {
