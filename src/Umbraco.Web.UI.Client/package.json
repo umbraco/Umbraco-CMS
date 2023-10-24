@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@microsoft/signalr": "7.0.12",
-    "ace-builds": "1.30.0",
+    "ace-builds": "1.31.0",
     "angular": "1.8.3",
     "angular-animate": "1.8.3",
     "angular-aria": "1.8.3",
