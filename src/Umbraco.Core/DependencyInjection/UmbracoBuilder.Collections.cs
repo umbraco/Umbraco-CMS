@@ -83,7 +83,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.StartNodeOriginFinders()
             .Append<ByKeyStartNodeOriginFinder>()
-            .Append<CurrentStartNodeOriginFinder>()
+            .Append<ParentStartNodeOriginFinder>()
             .Append<SiteStartNodeOriginFinder>()
             .Append<RootStartNodeOriginFinder>();
 

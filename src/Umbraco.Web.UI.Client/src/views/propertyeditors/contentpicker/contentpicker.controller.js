@@ -98,6 +98,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         minNumber: 0,
         startNode: {
             query: "",
+            queryFilter: "",
             type: "content",
             id: $scope.model.config.startNodeId ? $scope.model.config.startNodeId : -1 // get start node for simple Content Picker
         }
@@ -125,7 +126,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         if ($scope.model.validation && $scope.model.validation.mandatory && !$scope.model.config.minNumber) {
             $scope.model.config.minNumber = 1;
         }
-        
+
         if ($scope.model.config.multiPicker === true && $scope.umbProperty) {
             var propertyActions = [
                 removeAllEntriesAction
@@ -165,7 +166,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         : $scope.model.config.startNode.type === "media"
             ? "Media"
             : "Document";
-    
+
     $scope.allowOpenButton = false;
     $scope.allowEditButton = entityType === "Document" && !$scope.readonly;
     $scope.allowRemove = !$scope.readonly;
@@ -255,6 +256,17 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
         });
     }
+    else if ($scope.model.config.startNode.queryFilter) {
+        entityResource.getByJsonFilter(
+            $scope.model.config.startNode.queryFilter,
+            editorState.current.id,
+            editorState.current.parentId,
+            "Document"
+        ).then(function (ent) {
+            dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
+        });
+    }
+
     else {
         dialogOptions.startNodeId = $scope.model.config.startNode.id;
     }
@@ -351,7 +363,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
                 var node = entityType === "Member" ? model.memberNode :
                            entityType === "Media" ? model.mediaNode :
                                                     model.contentNode;
-                
+
                 // update the node
                 item.name = node.name;
 
@@ -556,7 +568,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     }
 
     function init() {
-        
+
         userService.getCurrentUser().then(function (user) {
             switch (entityType) {
                 case "Document":

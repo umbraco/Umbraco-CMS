@@ -27,7 +27,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
         // Arrange
         var startNodeSelector = new StartNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Current.ToString(),
+            OriginAlias = StartNodeSelectorOrigin.Parent.ToString(),
             OriginKey = null,
             Context = new StartNodeSelectorContext()
             {
@@ -51,18 +51,18 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            CollectionAssert.Contains(result, startNodeSelector.Context.CurrentKey.Value);
+            CollectionAssert.Contains(result, startNodeSelector.Context.ParentKey);
         });
     }
 
 
     [Test]
-    public void GetDynamicStartNodes__With_no_filters_shold_return_what_origin_finds()
+    public void GetDynamicStartNodes__With_no_filters_should_return_what_origin_finds()
     {
         // Arrange
         var startNodeSelector = new StartNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Current.ToString(),
+            OriginAlias = StartNodeSelectorOrigin.Parent.ToString(),
             OriginKey = null,
             Context = new StartNodeSelectorContext()
             {
@@ -79,18 +79,18 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            CollectionAssert.Contains(result, startNodeSelector.Context.CurrentKey.Value);
+            CollectionAssert.Contains(result, startNodeSelector.Context.ParentKey);
         });
     }
 
 
     [Test]
-    public void CalculateOriginKey__Current_should_just_return_the_origin_key()
+    public void CalculateOriginKey__Parent_should_just_return_the_parent_key()
     {
         // Arrange
         var selector = new StartNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Current.ToString(),
+            OriginAlias = StartNodeSelectorOrigin.Parent.ToString(),
             OriginKey = null,
             Context = new StartNodeSelectorContext()
             {
@@ -103,7 +103,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
         var result = StartNodeFinder.CalculateOriginKey(selector);
 
         // Assert
-        Assert.AreEqual(selector.Context.CurrentKey, result);
+        Assert.AreEqual(selector.Context.ParentKey, result);
     }
 
     [Test]
@@ -202,7 +202,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [TestCase(StartNodeSelectorOrigin.ByKey)]
-    [TestCase(StartNodeSelectorOrigin.Current)]
+    [TestCase(StartNodeSelectorOrigin.Parent)]
     [TestCase(StartNodeSelectorOrigin.Root)]
     [TestCase(StartNodeSelectorOrigin.Site)]
     public void CalculateOriginKey__with_a_random_key_should_return_null(StartNodeSelectorOrigin origin)
@@ -225,7 +225,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [TestCase(StartNodeSelectorOrigin.ByKey)]
-    [TestCase(StartNodeSelectorOrigin.Current)]
+    [TestCase(StartNodeSelectorOrigin.Parent)]
     [TestCase(StartNodeSelectorOrigin.Root)]
     [TestCase(StartNodeSelectorOrigin.Site)]
     public void CalculateOriginKey__with_a_trashed_key_should_still_be_allowed(StartNodeSelectorOrigin origin)
@@ -236,7 +236,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
         {
             OriginAlias = origin.ToString(),
             OriginKey = trashedKey,
-            Context = new StartNodeSelectorContext() { CurrentKey = trashedKey, ParentKey = Guid.NewGuid() }
+            Context = new StartNodeSelectorContext() { CurrentKey = trashedKey, ParentKey = trashedKey }
         };
 
         // Act
@@ -248,7 +248,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [TestCase(StartNodeSelectorOrigin.ByKey)]
-    [TestCase(StartNodeSelectorOrigin.Current)]
+    [TestCase(StartNodeSelectorOrigin.Parent)]
     [TestCase(StartNodeSelectorOrigin.Root)]
     [TestCase(StartNodeSelectorOrigin.Site)]
     public void CalculateOriginKey__with_a_ContentType_key_should_return_null(StartNodeSelectorOrigin origin)
@@ -259,7 +259,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTestWithContent
         {
             OriginAlias = origin.ToString(),
             OriginKey = contentTypeKey,
-            Context = new StartNodeSelectorContext() { CurrentKey = contentTypeKey, ParentKey = Guid.NewGuid() }
+            Context = new StartNodeSelectorContext() { CurrentKey = contentTypeKey, ParentKey = contentTypeKey }
         };
         // Act
         var result = StartNodeFinder.CalculateOriginKey(selector);

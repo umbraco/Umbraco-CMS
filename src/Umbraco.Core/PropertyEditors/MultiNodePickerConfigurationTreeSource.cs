@@ -14,6 +14,9 @@ public class MultiNodePickerConfigurationTreeSource
     [DataMember(Name = "query")]
     public string? StartNodeQuery { get; set; }
 
+    [DataMember(Name = "queryFilter")]
+    public string? StartNodeQueryFilter { get; set; }
+
     [DataMember(Name = "id")]
     public Udi? StartNodeId { get; set; }
 }

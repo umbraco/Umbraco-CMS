@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.StartNodeFinder;
+using Umbraco.Cms.Core.StartNodeFinder.Filters;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Extensions;
@@ -66,8 +68,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<ILogViewerQueryRepository, LogViewerQueryRepository>();
         builder.Services.AddUnique<INodeCountRepository, NodeCountRepository>();
         builder.Services.AddUnique<IIdKeyMapRepository, IdKeyMapRepository>();
-            builder.Services.AddUnique<IPropertyTypeUsageRepository, PropertyTypeUsageRepository>();
-            builder.Services.AddUnique<IDataTypeUsageRepository, DataTypeUsageRepository>();
+        builder.Services.AddUnique<IPropertyTypeUsageRepository, PropertyTypeUsageRepository>();
+        builder.Services.AddUnique<IDataTypeUsageRepository, DataTypeUsageRepository>();
+        builder.Services.AddUnique<IStartNodeFilterRepository, StartNodeFilterRepository>();
 
         return builder;
     }

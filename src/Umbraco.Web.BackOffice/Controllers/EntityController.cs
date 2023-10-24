@@ -9,8 +9,11 @@ using Examine.Search;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -22,6 +25,8 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.StartNodeFinder;
+using Umbraco.Cms.Core.StartNodeFinder.Filters;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Xml;
@@ -62,6 +67,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     private static readonly string[] _postFilterSplitStrings = { "=", "==", "!=", "<>", ">", "<", ">=", "<=" };
 
     private readonly AppCaches _appCaches;
+    private readonly IStartNodeFinder _startNodeFinder;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly IContentService _contentService;
     private readonly IContentTypeService _contentTypeService;
@@ -82,6 +88,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IUserService _userService;
 
+    [ActivatorUtilitiesConstructor]
     public EntityController(
         ITreeService treeService,
         UmbracoTreeSearcher treeSearcher,
@@ -102,7 +109,8 @@ public class EntityController : UmbracoAuthorizedJsonController
         IMacroService macroService,
         IUserService userService,
         ILocalizationService localizationService,
-        AppCaches appCaches)
+        AppCaches appCaches,
+        IStartNodeFinder startNodeFinder)
     {
         _treeService = treeService ?? throw new ArgumentNullException(nameof(treeService));
         _treeSearcher = treeSearcher ?? throw new ArgumentNullException(nameof(treeSearcher));
@@ -129,6 +137,54 @@ public class EntityController : UmbracoAuthorizedJsonController
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
+        _startNodeFinder = startNodeFinder;
+    }
+
+    [Obsolete("Use non-obsolete ctor. This will be removed in Umbraco 14.")]
+    public EntityController(
+        ITreeService treeService,
+        UmbracoTreeSearcher treeSearcher,
+        SearchableTreeCollection searchableTreeCollection,
+        IPublishedContentQuery publishedContentQuery,
+        IShortStringHelper shortStringHelper,
+        IEntityService entityService,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IPublishedUrlProvider publishedUrlProvider,
+        IContentService contentService,
+        IUmbracoMapper umbracoMapper,
+        IDataTypeService dataTypeService,
+        ISqlContext sqlContext,
+        ILocalizedTextService localizedTextService,
+        IFileService fileService,
+        IContentTypeService contentTypeService,
+        IMediaTypeService mediaTypeService,
+        IMacroService macroService,
+        IUserService userService,
+        ILocalizationService localizationService,
+        AppCaches appCaches): this(
+        treeService,
+        treeSearcher,
+        searchableTreeCollection,
+        publishedContentQuery,
+        shortStringHelper,
+        entityService,
+        backofficeSecurityAccessor,
+        publishedUrlProvider,
+        contentService,
+        umbracoMapper,
+        dataTypeService,
+        sqlContext,
+        localizedTextService,
+        fileService,
+        contentTypeService,
+        mediaTypeService,
+        macroService,
+        userService,
+        localizationService,
+        appCaches,
+        StaticServiceProvider.Instance.GetRequiredService<IStartNodeFinder>())
+    {
+
     }
 
 
@@ -524,6 +580,57 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// <returns></returns>
     [Obsolete("This will be removed in Umbraco 13. Use GetByXPath instead")]
     public ActionResult<EntityBasic?>? GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type) => GetByXPath(query, nodeContextId, null, type);
+
+
+    public class JsonFilterViewModel
+    {
+        public string OriginAlias { get; set; } = string.Empty;
+        public JsonFilterFilterViewModel[] Filter { get; set; } = Array.Empty<JsonFilterFilterViewModel>();
+    }
+
+    public class JsonFilterFilterViewModel
+    {
+        public string DirectionAlias { get; set; } = string.Empty;
+        public IEnumerable<string> AnyOfDocTypeAlias { get; set; } = Array.Empty<string>();
+    }
+    public ActionResult<EntityBasic?> GetByJsonFilter(string query, int nodeContextId, int parentId)
+    {
+
+        var currentKey = nodeContextId == 0 ? null : _entityService.Get(nodeContextId)?.Key;
+        var parentKey = parentId == 0 ? null : _entityService.Get(parentId)?.Key;
+
+        if (parentKey is null)
+        {
+            throw new ArgumentException("Invalid parentId", nameof(parentId));
+        }
+
+        var model = JsonConvert.DeserializeObject<JsonFilterViewModel>(query)!;
+
+        var startNodeSelector = new StartNodeSelector()
+        {
+            Context = new StartNodeSelectorContext()
+            {
+                CurrentKey = currentKey,
+                ParentKey = parentKey.Value
+            },
+            OriginKey = currentKey,
+            OriginAlias = model.OriginAlias,
+            Filter = model.Filter.Select(x=>new StartNodeFilter()
+            {
+                DirectionAlias = x.DirectionAlias,
+                AnyOfDocTypeAlias = x.AnyOfDocTypeAlias
+            })
+        };
+        var startNodes = _startNodeFinder.GetDynamicStartNodes(startNodeSelector);
+
+        Guid? first = startNodes.FirstOrDefault();
+        if (first.HasValue)
+        {
+            return GetById(first.Value, UmbracoEntityTypes.Document);
+        }
+
+        return NotFound();
+    }
 
     /// <summary>
     ///     Gets an entity by a xpath query
@@ -1630,3 +1737,5 @@ public class EntityController : UmbracoAuthorizedJsonController
 
     #endregion
 }
+
+

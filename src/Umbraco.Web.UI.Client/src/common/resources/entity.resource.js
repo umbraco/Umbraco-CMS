@@ -366,6 +366,16 @@ function entityResource($q, $http, umbRequestHelper) {
                'Failed to retrieve entity data for query ' + query);
         },
 
+      getByJsonFilter: function (query, nodeContextId, parentId, type) {
+        return umbRequestHelper.resourcePromise(
+          $http.get(
+            umbRequestHelper.getApiUrl(
+              "entityApiBaseUrl",
+              "GetByJsonFilter",
+              [{ query: query }, { nodeContextId: nodeContextId }, { parentId: parentId }, { type: type }])),
+          'Failed to retrieve entity data for query ' + query);
+      },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#getAll

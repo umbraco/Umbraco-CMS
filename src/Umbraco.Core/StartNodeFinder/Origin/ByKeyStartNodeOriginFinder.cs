@@ -8,6 +8,11 @@ public class ByKeyStartNodeOriginFinder : IStartNodeOriginFinder
     protected virtual string SupportedOriginType { get; set; } = "ByKey";
     private readonly IEntityService _entityService;
 
+    private ISet<Guid> _allowedObjectTypes = new HashSet<Guid>(new[]
+    {
+        Constants.ObjectTypes.Document, Constants.ObjectTypes.SystemRoot
+    });
+
     public ByKeyStartNodeOriginFinder(IEntityService entityService)
     {
         _entityService = entityService;
@@ -22,9 +27,7 @@ public class ByKeyStartNodeOriginFinder : IStartNodeOriginFinder
 
         IEntitySlim? entity = _entityService.Get(selector.OriginKey.Value);
 
-        if (entity is null
-            || entity.NodeObjectType != Constants.ObjectTypes.Document
-           )
+        if (entity is null || _allowedObjectTypes.Contains(entity.NodeObjectType) is false)
         {
             return null;
         }

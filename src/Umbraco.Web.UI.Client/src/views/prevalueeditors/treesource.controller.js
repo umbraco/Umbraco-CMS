@@ -2,7 +2,7 @@
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco')
 .controller("Umbraco.PrevalueEditors.TreeSourceController",
-	
+
 	function($scope, $timeout, entityResource, iconHelper, editorService, eventsService){
 
 	    if (!$scope.model) {
@@ -63,6 +63,7 @@ angular.module('umbraco')
 			$scope.model.value.id = null;
             $scope.node = null;
             $scope.model.value.query = null;
+            $scope.model.value.queryFilter = null;
 
 		    treeSourceChanged();
 		};
@@ -76,6 +77,7 @@ angular.module('umbraco')
 	    	if($scope.model.value.type === "member"){
 	    		$scope.model.value.id = null;
 	    		$scope.model.value.query = "";
+	    		$scope.model.value.queryFilter = "";
 	    	}
 	    });
 

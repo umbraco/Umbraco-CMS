@@ -35,7 +35,7 @@ public class StartNodeFinder : IStartNodeFinder
             filtered = ExcuteFilters(filtered, startNodeSelectorFilter);
         }
 
-        return Array.Empty<Guid>();
+        return filtered;
     }
 
     internal IEnumerable<Guid> ExcuteFilters(IEnumerable<Guid> origin, StartNodeFilter startNodeFilter)

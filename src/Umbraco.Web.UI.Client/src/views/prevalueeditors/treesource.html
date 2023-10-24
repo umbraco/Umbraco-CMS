@@ -20,15 +20,19 @@
 	</umb-node-preview>
 
     <div ng-if="!node && model.value.type !== 'member'" class="mt2">
-        <div ng-hide="showSearch || model.value.query">
+        <div ng-hide="showSearch || model.value.query ">
             <button type="button" class="umb-node-preview-add"
                     ng-click="openContentPicker()">
                 <localize key="general_choose">Choose a root node</localize>
             </button>
-            <div class="mt2" ng-show="model.value.type == 'content'">
-                <umb-icon icon="icon-search" class="icon"></umb-icon>
-                <button type="button" class="btn-link" ng-click="showSearch = true">Query for root node with XPath</button>
-            </div>
+          <div class="mt2" ng-show="model.value.type == 'content'">
+            <umb-icon icon="icon-search" class="icon"></umb-icon>
+            <button type="button" class="btn-link" ng-click="showSearch = true; showFilter = false;">Query for root node with XPath</button>
+          </div>
+          <div class="mt2" ng-show="model.value.type == 'content'">
+            <umb-icon icon="icon-search" class="icon"></umb-icon>
+            <button type="button" class="btn-link" ng-click="showSearch = false; showFilter = true;">Query for root node with UI</button>
+          </div>
         </div>
 
         <div ng-show="showSearch || model.value.query">
@@ -51,9 +55,9 @@
                         <p>
                             A placeholder finds the nearest published ID and runs its query from there, so for instance:
                         </p>
-                        
+
                         <pre>$parent/newsArticle</pre>
-                        
+
                         <p>
                             Will try to get the parent if available, but will then fall back to the nearest ancestor and query for all news article children there.
                         </p>
@@ -76,6 +80,20 @@
                 </li>
             </ul>
         </div>
+      <div ng-show="showFilter || model.value.queryFilter">
+
+        <textarea type="text"
+               ng-model="model.value.queryFilter"
+               class="umb-property-editor umb-textarea"
+                  placeholder="Enter query"></textarea>
+
+        <ul class="unstyled list-icons mt3">
+          <li>
+            <umb-icon icon="icon-delete" class="icon red"></umb-icon>
+            <button type="button" class="btn-link" ng-click="showFilter = false; model.value.queryFilter = ''"> Cancel and clear query</button>
+          </li>
+        </ul>
+      </div>
     </div>
 
 </div>

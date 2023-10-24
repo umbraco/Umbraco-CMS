@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.StartNodeFinder;
 public enum StartNodeSelectorOrigin
 {
     Root,
-    Current,
+    Parent,
     Site,
     ByKey
 }
