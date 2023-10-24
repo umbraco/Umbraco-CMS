@@ -228,22 +228,33 @@ export class UmbAuthFlow {
 	 */
 	async signOut() {
 		// forget all cached token state
-		if (!this.#accessTokenResponse) {
-			return;
+		await this.#storageBackend.removeItem(TOKEN_RESPONSE_NAME);
+
+		if (this.#accessTokenResponse) {
+			// TODO: Enable this when the server supports it
+			// const tokenRevokeRequest = new RevokeTokenRequest({
+			// 	token: this.#accessTokenResponse.accessToken,
+			// 	client_id: this.#clientId,
+			// 	token_type_hint: 'access_token',
+			// });
+
+			// await this.#tokenHandler.performRevokeTokenRequest(this.#configuration, tokenRevokeRequest);
+
+			this.#accessTokenResponse = undefined;
 		}
 
-		// TODO: Enable this when the server supports it
-		// const tokenRevokeRequest = new RevokeTokenRequest({
-		// 	token: this.#accessTokenResponse.accessToken,
-		// 	client_id: this.#clientId,
-		// 	token_type_hint: 'access_token',
-		// });
+		if (this.#refreshToken) {
+			// TODO: Enable this when the server supports it
+			// const tokenRevokeRequest = new RevokeTokenRequest({
+			// 	token: this.#refreshToken,
+			// 	client_id: this.#clientId,
+			// 	token_type_hint: 'refresh_token',
+			// });
 
-		// await this.#tokenHandler.performRevokeTokenRequest(this.#configuration, tokenRevokeRequest);
+			// await this.#tokenHandler.performRevokeTokenRequest(this.#configuration, tokenRevokeRequest);
 
-		this.#accessTokenResponse = undefined;
-		this.#refreshToken = undefined;
-		await this.#storageBackend.removeItem(TOKEN_RESPONSE_NAME);
+			this.#refreshToken = undefined;
+		}
 	}
 
 	/**
