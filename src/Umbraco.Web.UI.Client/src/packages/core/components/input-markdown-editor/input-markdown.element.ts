@@ -224,7 +224,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 		const selection = this.#editor?.getSelections()[0];
 		if (!selection) return;
 
-		const alt = this.#editor?.getValueInRange(selection);
+		const alt = this.#editor?.getValueInRange(selection) || 'alt text';
 
 		this._focusEditor(); // Focus before opening modal, otherwise cannot regain focus back after modal
 		const modalContext = this._modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL, {});
@@ -234,21 +234,18 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 			.then((data) => {
 				const imgUrl = data.selection[0];
 				this.#editor?.monacoEditor?.executeEdits('', [
-					//TODO: media url
+					//TODO: Get the correct media URL
 					{
 						range: selection,
-						text: `![${alt || 'alt text'}](${imgUrl ? this.serverUrl + '/media/' + imgUrl : 'URL'})`,
+						text: `![${alt}](${imgUrl ? `${this.serverUrl}'/media/'${imgUrl}` : 'URL'})`,
 					},
 				]);
-
-				if (!alt?.length) {
-					this.#editor?.select({
-						startColumn: selection.startColumn + 1,
-						endColumn: selection.startColumn + 10,
-						endLineNumber: selection.startLineNumber,
-						startLineNumber: selection.startLineNumber,
-					});
-				}
+				this.#editor?.select({
+					startColumn: selection.startColumn + 2,
+					endColumn: selection.startColumn + alt.length + 2, // +2 because of ![
+					endLineNumber: selection.startLineNumber,
+					startLineNumber: selection.startLineNumber,
+				});
 			})
 			.catch(() => undefined)
 			.finally(() => this._focusEditor());
@@ -550,7 +547,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	renderPreview() {
-		if (this.preview) return;
+		if (!this.preview) return;
 		return html`<uui-scroll-container id="preview">
 			${unsafeHTML(
 				sanitizeHtml(marked.parse((this.value as string) || ''), {
