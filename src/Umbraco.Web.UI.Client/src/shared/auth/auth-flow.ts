@@ -24,6 +24,7 @@ import {
 	AuthorizationServiceConfiguration,
 	GRANT_TYPE_AUTHORIZATION_CODE,
 	GRANT_TYPE_REFRESH_TOKEN,
+	RevokeTokenRequest,
 	TokenRequest,
 	TokenResponse,
 	LocationLike,
@@ -227,6 +228,17 @@ export class UmbAuthFlow {
 	 */
 	async signOut() {
 		// forget all cached token state
+		if (!this.#accessTokenResponse) {
+			return;
+		}
+
+		const tokenRevokeRequest = new RevokeTokenRequest({
+			token: this.#accessTokenResponse.accessToken,
+			client_id: this.#clientId,
+			token_type_hint: 'access_token',
+		});
+
+		await this.#tokenHandler.performRevokeTokenRequest(this.#configuration, tokenRevokeRequest);
 		this.#accessTokenResponse = undefined;
 		this.#refreshToken = undefined;
 		await this.#storageBackend.removeItem(TOKEN_RESPONSE_NAME);
