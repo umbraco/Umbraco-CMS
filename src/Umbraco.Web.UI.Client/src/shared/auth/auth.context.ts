@@ -46,7 +46,15 @@ export class UmbAuthContext implements IUmbAuth {
 		return data;
 	}
 
-	performWithFreshTokens(): Promise<string> {
+	/**
+	 * Gets the latest token from the Management API.
+	 * If the token is expired, it will be refreshed.
+	 *
+	 * NB! The user may experience being redirected to the login screen if the token is expired.
+	 *
+	 * @returns The latest token from the Management API
+	 */
+	getLatestToken(): Promise<string> {
 		return this.#authFlow.performWithFreshTokens();
 	}
 
