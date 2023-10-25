@@ -157,6 +157,12 @@
     <key alias="morePublishingOptions">Flere publiseringsmuligheder</key>
     <key alias="submitChanges">Indsæt</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Brugeren har slettet medie</key>
+    <key alias="move">Brugeren har flyttet medie</key>
+    <key alias="copy">Brugeren har kopieret medie</key>
+    <key alias="save">Brugeren har gemt medie</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">For</key>
     <key alias="delete">Brugeren har slettet indholdet</key>
@@ -828,6 +834,7 @@
     <key alias="sort">Sortér</key>
     <key alias="status">Status</key>
     <key alias="submit">Indsend</key>
+    <key alias="success">Succes</key>
     <key alias="type">Type</key>
     <key alias="typeToSearch">Skriv for at søge...</key>
     <key alias="under">under</key>
@@ -1016,6 +1023,7 @@
     <key alias="instruction">Log ind nedenfor</key>
     <key alias="signInWith">Log ind med</key>
     <key alias="timeout">Din session er udløbet</key>
+    <key alias="userFailedLogin">Ups! Vi kunne ikke logge dig ind. Tjek at dit brugernavn og adgangskode er korrekt og prøv igen.</key>
     <key alias="bottomText">
       <![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Glemt adgangskode?</key>
