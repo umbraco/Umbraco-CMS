@@ -20,7 +20,7 @@
 	</umb-node-preview>
 
     <div ng-if="!node && model.value.type !== 'member'" class="mt2">
-        <div ng-hide="(showXPath || model.value.query) || (showDynamicStartNode || model.value.queryFilter)" class="flex">
+        <div ng-hide="(showXPath || model.value.query) || (showDynamicStartNode || model.value.dynamicRoot)" class="flex">
           <button
             type="button"
             class="umb-node-preview-add"
@@ -86,7 +86,7 @@
                 </li>
             </ul>
         </div>
-      <div ng-show="showDynamicStartNode || model.value.queryFilter">
+      <div ng-show="showDynamicStartNode || model.value.dynamicRoot">
 
         <!--
         <textarea type="text"
@@ -99,12 +99,12 @@
         <umb-button
           type="button"
           action="openDynamicRootOriginPicker()"
-          label="dynamicRoot_origin{{model.value.queryFilter.originAlias}}Title">
+          label="dynamicRoot_origin{{model.value.dynamicRoot.originAlias}}Title">
         </umb-button>
 
         <!-- list of filters -->
         <ul class="umb-tree">
-          <li class="umb-tree-item" ng-repeat="filter in model.value.queryFilter.filter">
+          <li class="umb-tree-item" ng-repeat="filter in model.value.dynamicRoot.queryStep">
             <div class="umb-tree-item__inner" style="padding: 5px 10px;">
               <button type="button" class="btn-reset text-left flex-auto" ng-click="">
                 <umb-icon icon="{{'icon-globe'}}" class="icon umb-tree-icon">
