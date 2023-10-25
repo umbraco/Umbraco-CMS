@@ -1,4 +1,4 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 @customElement('umb-auth-layout')
@@ -8,6 +8,16 @@ export class UmbAuthLayoutElement extends LitElement {
 
 	@property({ attribute: 'logo-image' })
 	logoImage?: string; //TODO: Implement
+
+	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.updated(_changedProperties);
+		if (_changedProperties.has('backgroundImage')) {
+			this.style.setProperty('--background-image', `url(${this.backgroundImage})`);
+		}
+		if (_changedProperties.has('logoImage')) {
+			this.style.setProperty('--logo-image', `url(${this.logoImage})`);
+		}
+	}
 
 	render() {
 		return html`
@@ -49,7 +59,7 @@ export class UmbAuthLayoutElement extends LitElement {
 			}
 			#logo {
 				position: fixed;
-				background-image: url('umbraco_logo_blue_horizontal.svg');
+				background-image: var(--logo-image);
 				background-repeat: no-repeat;
 				z-index: 1;
 				width: 80px;
@@ -73,7 +83,7 @@ export class UmbAuthLayoutElement extends LitElement {
 				background-position: 50%;
 				background-repeat: no-repeat;
 				background-size: cover;
-				background-image: url('loginImage.jpg');
+				background-image: var(--background-image);
 				width: 100%;
 				height: 100%;
 				transform: scaleX(-1);
@@ -96,7 +106,7 @@ export class UmbAuthLayoutElement extends LitElement {
 					width: 300px;
 				}
 				#logo {
-					background-image: url('umbraco_logo_white_horizontal.svg');
+					background-image: var(--logo-image);
 					top: 48px;
 					left: 48px;
 					width: 140px;
