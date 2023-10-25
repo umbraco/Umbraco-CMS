@@ -260,7 +260,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         var id = Guid.NewGuid();
 
         var tagName = $"umb-rte-block{(inlineBlock ? "-inline" : string.Empty)}";
-        var element = parser.Parse($"<p><{tagName} data-content-udi=\"umb://element/{id:N}\"><!-- Umbraco Block --></{tagName}></p>") as RichTextRootElement;
+        var element = parser.Parse($"<p><{tagName} data-content-udi=\"umb://element/{id:N}\"><!--Umbraco-Block--></{tagName}></p>") as RichTextRootElement;
         Assert.IsNotNull(element);
         var paragraph = element.Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(paragraph);
@@ -297,7 +297,7 @@ public class RichTextParserTests : PropertyValueConverterTests
             });
 
         var tagName = $"umb-rte-block{(inlineBlock ? "-inline" : string.Empty)}";
-        var element = parser.Parse($"<p><{tagName} data-content-udi=\"umb://element/{block1ContentId:N}\"><!-- Umbraco Block --></{tagName}><{tagName} data-content-udi=\"umb://element/{block2ContentId:N}\"><!-- Umbraco Block --></{tagName}></p>", richTextBlockModel) as RichTextRootElement;
+        var element = parser.Parse($"<p><{tagName} data-content-udi=\"umb://element/{block1ContentId:N}\"><!--Umbraco-Block--></{tagName}><{tagName} data-content-udi=\"umb://element/{block2ContentId:N}\"><!--Umbraco-Block--></{tagName}></p>", richTextBlockModel) as RichTextRootElement;
         Assert.IsNotNull(element);
         var paragraph = element.Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(paragraph);
@@ -334,7 +334,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         var id1 = Guid.NewGuid();
         var id2 = Guid.NewGuid();
 
-        var element = parser.Parse($"<p><umb-rte-block-inline data-content-udi=\"umb://element/{id1:N}\"></umb-rte-block-inline></p><umb-rte-block data-content-udi=\"umb://element/{id2:N}\"></umb-rte-block>") as RichTextRootElement;
+        var element = parser.Parse($"<p><umb-rte-block-inline data-content-udi=\"umb://element/{id1:N}\"><!--Umbraco-Block--></umb-rte-block-inline></p><umb-rte-block data-content-udi=\"umb://element/{id2:N}\"><!--Umbraco-Block--></umb-rte-block>") as RichTextRootElement;
         Assert.IsNotNull(element);
         Assert.AreEqual(2, element.Elements.Count());
 
@@ -436,7 +436,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         var id = Guid.NewGuid();
 
         var tagName = $"umb-rte-block{(inlineBlock ? "-inline" : string.Empty)}";
-        var result = parser.Parse($"<p><{tagName} data-content-udi=\"umb://element/{id:N}\"></{tagName}></p>");
+        var result = parser.Parse($"<p><{tagName} data-content-udi=\"umb://element/{id:N}\"><!--Umbraco-Block--></{tagName}></p>");
         Assert.AreEqual($"<p><{tagName} data-content-id=\"{id:D}\"></{tagName}></p>", result);
     }
 
@@ -447,7 +447,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         var id1 = Guid.NewGuid();
         var id2 = Guid.NewGuid();
 
-        var result = parser.Parse($"<p><umb-rte-block-inline data-content-udi=\"umb://element/{id1:N}\"></umb-rte-block-inline></p><umb-rte-block data-content-udi=\"umb://element/{id2:N}\"></umb-rte-block>");
+        var result = parser.Parse($"<p><umb-rte-block-inline data-content-udi=\"umb://element/{id1:N}\"><!--Umbraco-Block--></umb-rte-block-inline></p><umb-rte-block data-content-udi=\"umb://element/{id2:N}\"><!--Umbraco-Block--></umb-rte-block>");
         Assert.AreEqual($"<p><umb-rte-block-inline data-content-id=\"{id1:D}\"></umb-rte-block-inline></p><umb-rte-block data-content-id=\"{id2:D}\"></umb-rte-block>", result);
     }
 
