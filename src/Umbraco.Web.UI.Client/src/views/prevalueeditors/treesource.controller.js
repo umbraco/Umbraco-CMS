@@ -121,6 +121,38 @@ angular.module('umbraco')
 
     // Dynamic Root specific:
 
+    $scope.dynamicRootOriginIcon = null;
+    $scope.$watch("model.value.dynamicRoot.originAlias", function (newVal, oldVal) {
+      $scope.dynamicRootOriginIcon = getIconForOriginAlias(newVal);
+    })
+    function getIconForOriginAlias(originAlias) {
+      switch (originAlias) {
+        case "Root":
+          return "icon-home";
+        case "Parent":
+          return "icon-page-up";
+        case "Current":
+          return "icon-document";
+        case "Site":
+          return "icon-home";
+        case "ByKey":
+          return "icon-wand";
+      }
+    }
+    $scope.getIconForQueryStepAlias = getIconForQueryStepAlias;
+    function getIconForQueryStepAlias(originAlias) {
+      switch (originAlias) {
+        case "NearestAncestorOrSelf":
+          return "icon-chevron-up";
+        case "FurthestAncestorOrSelf":
+          return "icon-chevron-up";
+        case "NearestDescendantOrSelf":
+          return "icon-chevron-down";
+        case "FurthestDescendantOrSelf":
+          return "icon-chevron-down";
+      }
+    }
+
     $scope.sortableOptionsForQuerySteps = {
       axis: "y",
       containment: "parent",
@@ -129,7 +161,14 @@ angular.module('umbraco')
       tolerance: "pointer",
       scroll: true,
       zIndex: 6000
-  };
+    };
+
+    $scope.removeQueryStep = function (queryStep) {
+      var index = $scope.model.value.dynamicRoot.querySteps.indexOf(queryStep);
+      if(index !== -1) {
+        $scope.model.value.dynamicRoot.querySteps.splice(index, 1);
+      }
+    }
 
     $scope.openDynamicRootOriginPicker = function() {
 			var originPicker = {

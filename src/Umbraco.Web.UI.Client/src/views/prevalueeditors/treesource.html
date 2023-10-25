@@ -101,14 +101,17 @@
 
         <!-- origin -->
         <div class="umb-node-preview" single>
-          <div class="umb-node-preview__content">
-            <div class="umb-node-preview__name">
-              <!-- ng-repeat is used here to enforce re-rendering when originAlias is changed: -->
-              <localize ng-repeat="originAlias in [model.value.dynamicRoot.originAlias]" key="dynamicRoot_origin{{model.value.dynamicRoot.originAlias}}Title"></localize>
-            </div>
-            <div class="umb-node-preview__description" ng-if="model.value.dynamicRoot.originKey">
-              <!-- todo: get the name to display here. -->
-              {{model.value.dynamicRoot.originKey}}
+          <div class="flex">
+            <umb-icon class="umb-node-preview__icon" icon="{{dynamicRootOriginIcon}}"></umb-icon>
+            <div class="umb-node-preview__content">
+              <div class="umb-node-preview__name">
+                <!-- ng-repeat is used here to enforce re-rendering when originAlias is changed: -->
+                <localize ng-repeat="originAlias in [model.value.dynamicRoot.originAlias]" key="dynamicRoot_origin{{model.value.dynamicRoot.originAlias}}Title"></localize>
+              </div>
+              <div class="umb-node-preview__description" ng-if="model.value.dynamicRoot.originKey">
+                <!-- todo: get the name to display here. -->
+                {{model.value.dynamicRoot.originKey}}
+              </div>
             </div>
           </div>
           <div class="umb-node-preview__actions">
@@ -118,19 +121,22 @@
 
         <!-- list of query steps -->
         <div ui-sortable="sortableOptionsForQuerySteps" ng-model="model.value.dynamicRoot.querySteps">
-          <div class="umb-node-preview" single ng-repeat="queryStep in model.value.dynamicRoot.querySteps">
-            <div class="umb-node-preview__content">
-              <div class="umb-node-preview__name">
-                <localize key="dynamicRoot_origin{{queryStep.alias}}Title"></localize>
-              </div>
-              <div class="umb-node-preview__description" ng-if="queryStep.anyOfDocTypeAlias">
-                <!-- todo: Maybe get the name to display here. -->
-                <localize key="dynamicRoot_queryStepTypes">of type: </localize>
-                <span ng-repeat="alias in queryStep.anyOfDocTypeAlias">{{alias}}</span>
+          <div class="umb-node-preview" single ng-repeat="queryStep in model.value.dynamicRoot.querySteps track by $index">
+            <div class="flex">
+              <umb-icon class="umb-node-preview__icon" icon="{{getIconForQueryStepAlias(queryStep.alias)}}"></umb-icon>
+              <div class="umb-node-preview__content">
+                <div class="umb-node-preview__name">
+                  <localize key="dynamicRoot_queryStep{{queryStep.alias}}Title"></localize>
+                </div>
+                <div class="umb-node-preview__description" ng-if="queryStep.anyOfDocTypeAlias">
+                  <!-- todo: Maybe get the name to display here. -->
+                  <localize key="dynamicRoot_queryStepTypes">of type: </localize>
+                  <span ng-repeat="alias in queryStep.anyOfDocTypeAlias track by $index">{{alias}}</span>
+                </div>
               </div>
             </div>
             <div class="umb-node-preview__actions">
-              <button type="button" class="umb-node-preview__action" ng-click="openDynamicRootOriginPicker()"><localize key="general_remove">Remove</localize></button>
+              <button type="button" class="umb-node-preview__action" ng-click="removeQueryStep(queryStep)"><localize key="general_remove">Remove</localize></button>
             </div>
           </div>
         </div>
