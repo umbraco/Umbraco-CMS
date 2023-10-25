@@ -60,7 +60,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	#renderHeader() {
 		return html`
 			<div id="header" slot="header">
-				<a href="/section/users">
+				<a href="section/user-management">
 					<uui-icon name="umb:arrow-left"></uui-icon>
 				</a>
 				<uui-input id="name" .value=${this._user?.name ?? ''} @input="${this.#onNameChange}"></uui-input>

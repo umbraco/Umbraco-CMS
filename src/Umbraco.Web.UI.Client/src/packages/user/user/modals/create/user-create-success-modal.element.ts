@@ -61,7 +61,7 @@ export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 
 	#onGoToProfile(event: Event) {
 		event.stopPropagation();
-		history.pushState(null, '', 'section/users/view/users/user/' + this.id); //TODO: URL Should be dynamic
+		history.pushState(null, '', 'section/user-management/view/users/user/' + this.id); //TODO: URL Should be dynamic
 		this.modalContext?.submit();
 	}
 
