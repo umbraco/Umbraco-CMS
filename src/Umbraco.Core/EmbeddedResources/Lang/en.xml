@@ -1449,6 +1449,16 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="originSiteDesc">Find nearest node with a hostname</key>
     <key alias="originByKeyTitle">Specific Node</key>
     <key alias="originByKeyDesc">Pick a specific Node as the origin for this query</key>
+    <key alias="pickDynamicRootQueryStepTitle">Append step to query</key>
+    <key alias="pickDynamicRootQueryStepDesc">Define the next step of your Dynamic Root Query</key>
+    <key alias="queryStepNearestAncestorOrSelfTitle">Nearest Ancestor Or Self</key>
+    <key alias="queryStepNearestAncestorOrSelfDesc">Query the nearest ancestor or self that fits with one of the configured types</key>
+    <key alias="queryStepFurthestAncestorOrSelfTitle">Furthest Ancestor Or Self</key>
+    <key alias="queryStepFurthestAncestorOrSelfDesc">Query the Furthest ancestor or self that fits with one of the configured types</key>
+    <key alias="queryStepNearestDescendantOrSelfTitle">Nearest Descendant Or Self</key>
+    <key alias="queryStepNearestDescendantOrSelfDesc">Query the nearest descendant or self that fits with one of the configured types</key>
+    <key alias="queryStepFurthestDescendantOrSelfTitle">Furthest Descendant Or Self</key>
+    <key alias="queryStepFurthestDescendantOrSelfDesc">Query the Furthest descendant or self that fits with one of the configured types</key>
   </area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Deleted item</key>

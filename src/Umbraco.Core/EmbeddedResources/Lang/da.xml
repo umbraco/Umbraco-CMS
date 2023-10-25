@@ -1233,6 +1233,16 @@ Mange hilsner fra Umbraco robotten
     <key alias="originSiteDesc">Nærmeste node med et domæne</key>
     <key alias="originByKeyTitle">Specifik Node</key>
     <key alias="originByKeyDesc">Vælg en specifik Node</key>
+    <key alias="pickDynamicRootQueryStepTitle">Tilføj skridt til forespørgsel</key>
+    <key alias="pickDynamicRootQueryStepDesc">Specificer næste skridt i din dynamisk udgangspounkts forespørgsel</key>
+    <key alias="queryStepNearestAncestorOrSelfTitle">Nærmeste forældre eller selv</key>
+    <key alias="queryStepNearestAncestorOrSelfDesc">Forespørg the nærmeste forældre eller selv der passer på en af de givne typer</key>
+    <key alias="queryStepFurthestAncestorOrSelfTitle">Fjerneste forældre eller selv</key>
+    <key alias="queryStepFurthestAncestorOrSelfDesc">Forespørg fjerneste forældre eller selv der passer på en af de givne typer</key>
+    <key alias="queryStepNearestDescendantOrSelfTitle">Nærmeste barn eller selv</key>
+    <key alias="queryStepNearestDescendantOrSelfDesc">Forespørg nærmeste barn eller selv der passer på en af de givne typer</key>
+    <key alias="queryStepFurthestDescendantOrSelfTitle">Fjerneste barn eller selv</key>
+    <key alias="queryStepFurthestDescendantOrSelfDesc">Forespørg fjerneste barn eller selv der passer på en af de givne typer</key>
   </area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Slettet medie</key>

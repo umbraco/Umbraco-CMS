@@ -146,7 +146,9 @@ angular.module('umbraco')
         size: "small",
 				multiPicker: false,
 				submit: function(model) {
-          $scope.model.value.dynamicRoot.querySteps = $scope.model.value.dynamicRoot.querySteps ?? [];
+          if(!$scope.model.value.dynamicRoot.querySteps) {
+            $scope.model.value.dynamicRoot.querySteps = [];
+          }
           $scope.model.value.dynamicRoot.querySteps.push(model.value);
 					editorService.close();
 				},
@@ -156,8 +158,4 @@ angular.module('umbraco')
 			};
 			editorService.open(queryStepPicker);
 		};
-
-    $scope.appendDynamicQueryStep = function () {
-
-    }
 });
