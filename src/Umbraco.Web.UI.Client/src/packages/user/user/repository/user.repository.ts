@@ -1,10 +1,10 @@
 import { UmbUserDetailDataSource, UmbUserSetGroupDataSource } from '../types.js';
-import { UMB_USER_STORE_CONTEXT_TOKEN, UmbUserStore } from './user.store.js';
 import { UmbUserServerDataSource } from './sources/user.server.data.js';
 import { UmbUserItemServerDataSource } from './sources/user-item.server.data.js';
-import { UMB_USER_ITEM_STORE_CONTEXT_TOKEN, UmbUserItemStore } from './user-item.store.js';
+import { UmbUserItemStore } from './user-item.store.js';
 import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data.js';
 
+import { UmbUserRepositoryBase } from './user-repository-base.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailRepository, UmbItemDataSource, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import {
@@ -14,8 +14,7 @@ import {
 	UserItemResponseModel,
 	UserResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 
 export type UmbUserDetailRepository = UmbDetailRepository<
 	CreateUserRequestModel,
@@ -24,12 +23,11 @@ export type UmbUserDetailRepository = UmbDetailRepository<
 	UserResponseModel
 >;
 
-export class UmbUserRepository implements UmbUserDetailRepository, UmbItemRepository<UserItemResponseModel> {
-	#host: UmbControllerHostElement;
-	#init;
-
+export class UmbUserRepository
+	extends UmbUserRepositoryBase
+	implements UmbUserDetailRepository, UmbItemRepository<UserItemResponseModel>
+{
 	#detailSource: UmbUserDetailDataSource;
-	#detailStore?: UmbUserStore;
 	#itemSource: UmbItemDataSource<UserItemResponseModel>;
 	#itemStore?: UmbUserItemStore;
 	#setUserGroupsSource: UmbUserSetGroupDataSource;
@@ -37,31 +35,17 @@ export class UmbUserRepository implements UmbUserDetailRepository, UmbItemReposi
 	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+		super(host);
 
-		this.#detailSource = new UmbUserServerDataSource(this.#host);
-		this.#itemSource = new UmbUserItemServerDataSource(this.#host);
-		this.#setUserGroupsSource = new UmbUserSetGroupsServerDataSource(this.#host);
-
-		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_USER_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#detailStore = instance;
-			}).asPromise(),
-
-			new UmbContextConsumerController(this.#host, UMB_USER_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#itemStore = instance;
-			}).asPromise(),
-
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
-				this.#notificationContext = instance;
-			}).asPromise(),
-		]);
+		this.#detailSource = new UmbUserServerDataSource(this.host);
+		this.#itemSource = new UmbUserItemServerDataSource(this.host);
+		this.#setUserGroupsSource = new UmbUserSetGroupsServerDataSource(this.host);
 	}
 
 	// ITEMS:
 	async requestItems(ids: Array<string>) {
 		if (!ids) throw new Error('Ids are missing');
-		await this.#init;
+		await this.init;
 
 		const { data, error } = await this.#itemSource.getItems(ids);
 
@@ -73,7 +57,7 @@ export class UmbUserRepository implements UmbUserDetailRepository, UmbItemReposi
 	}
 
 	async items(ids: Array<string>) {
-		await this.#init;
+		await this.init;
 		return this.#itemStore!.items(ids);
 	}
 
@@ -85,15 +69,15 @@ export class UmbUserRepository implements UmbUserDetailRepository, UmbItemReposi
 
 	async requestById(id: string) {
 		if (!id) throw new Error('Id is missing');
-		await this.#init;
+		await this.init;
 
 		const { data, error } = await this.#detailSource.get(id);
 
 		if (data) {
-			this.#detailStore!.append(data);
+			this.detailStore!.append(data);
 		}
 
-		return { data, error, asObservable: () => this.#detailStore!.byId(id) };
+		return { data, error, asObservable: () => this.detailStore!.byId(id) };
 	}
 
 	async setUserGroups(userIds: Array<string>, userGroupIds: Array<string>) {
@@ -111,8 +95,8 @@ export class UmbUserRepository implements UmbUserDetailRepository, UmbItemReposi
 
 	async byId(id: string) {
 		if (!id) throw new Error('Key is missing');
-		await this.#init;
-		return this.#detailStore!.byId(id);
+		await this.init;
+		return this.detailStore!.byId(id);
 	}
 
 	async create(userRequestData: CreateUserRequestModel) {
@@ -121,7 +105,7 @@ export class UmbUserRepository implements UmbUserDetailRepository, UmbItemReposi
 		const { data, error } = await this.#detailSource.insert(userRequestData);
 
 		if (data) {
-			this.#detailStore?.append(data);
+			this.detailStore?.append(data);
 
 			const notification = { data: { message: `User created` } };
 			this.#notificationContext?.peek('positive', notification);
@@ -137,12 +121,12 @@ export class UmbUserRepository implements UmbUserDetailRepository, UmbItemReposi
 		const { data, error } = await this.#detailSource.update(id, user);
 
 		if (data) {
-			this.#detailStore?.append(data);
+			this.detailStore?.append(data);
 		}
 
 		if (!error) {
 			const notification = {
-				data: { message: this.#host.localize?.term('speechBubbles_editUserSaved') ?? 'User saved' },
+				data: { message: this.host.localize?.term('speechBubbles_editUserSaved') ?? 'User saved' },
 			};
 			this.#notificationContext?.peek('positive', notification);
 		}
@@ -156,7 +140,7 @@ export class UmbUserRepository implements UmbUserDetailRepository, UmbItemReposi
 		const { error } = await this.#detailSource.delete(id);
 
 		if (!error) {
-			this.#detailStore?.removeItem(id);
+			this.detailStore?.removeItem(id);
 
 			const notification = { data: { message: `User deleted` } };
 			this.#notificationContext?.peek('positive', notification);
