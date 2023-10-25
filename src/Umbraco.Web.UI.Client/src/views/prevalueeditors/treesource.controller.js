@@ -6,7 +6,6 @@ angular.module('umbraco')
 	function($scope, $timeout, entityResource, iconHelper, editorService, eventsService){
 
     $scope.showXPath = false;
-    $scope.showDynamicStartNode = false;
 
     if (!$scope.model) {
         $scope.model = {};
@@ -43,7 +42,7 @@ angular.module('umbraco')
       return ent;
     }
 
-		$scope.openContentPicker =function(){
+		$scope.openContentPicker = function() {
 			var treePicker = {
         idType: $scope.model.config.idType,
 				section: $scope.model.value.type,
@@ -60,58 +59,83 @@ angular.module('umbraco')
 			};
 			editorService.treePicker(treePicker);
 		};
+
 		$scope.chooseXPath = function() {
 			$scope.showXPath = true;
-			$scope.showDynamicStartNode = false;
+      $scope.model.value.queryFilter = null;
 		};
 		$scope.chooseDynamicStartNode = function() {
 			$scope.showXPath = false;
-			$scope.showDynamicStartNode = true;
+      $scope.model.value.queryFilter = {
+        originAlias: "Parent",
+        filter: []
+      };
 		};
+
 		$scope.clearXPath = function() {
-      $scope.model.value.query = '';
+      $scope.model.value.query = null;
 			$scope.showXPath = false;
 		};
 		$scope.clearDynamicStartNode = function() {
-      $scope.model.value.queryFilter = '';
+      $scope.model.value.queryFilter = null;
 			$scope.showDynamicStartNode = false;
 		};
 
 		$scope.clear = function() {
 			$scope.model.value.id = null;
-            $scope.node = null;
-            $scope.model.value.query = null;
-            $scope.model.value.queryFilter = null;
-
-		    treeSourceChanged();
+      $scope.node = null;
+      $scope.model.value.query = null;
+      $scope.model.value.queryFilter = null;
+      treeSourceChanged();
 		};
 
-        function treeSourceChanged() {
-            eventsService.emit("treeSourceChanged", { value: $scope.model.value.type });
-        }
+    function treeSourceChanged() {
+      eventsService.emit("treeSourceChanged", { value: $scope.model.value.type });
+    }
 
 		//we always need to ensure we dont submit anything broken
-	    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
-	    	if($scope.model.value.type === "member"){
-	    		$scope.model.value.id = null;
-	    		$scope.model.value.query = "";
-	    		$scope.model.value.queryFilter = "";
-	    	}
-	    });
+    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+      if($scope.model.value.type === "member"){
+        $scope.model.value.id = null;
+        $scope.model.value.query = "";
+        $scope.model.value.queryFilter = null;
+      }
+    });
 
-	    //when the scope is destroyed we need to unsubscribe
-	    $scope.$on('$destroy', function () {
-	        unsubscribe();
-	    });
+    //when the scope is destroyed we need to unsubscribe
+    $scope.$on('$destroy', function () {
+      unsubscribe();
+    });
 
-		function populate(item){
+		function populate(item) {
 			$scope.clear();
 			item.icon = iconHelper.convertFromLegacyIcon(item.icon);
 			$scope.node = item;
-            $scope.node.path = "";
-            $scope.model.value.id = $scope.model.config.idType === "udi" ? item.udi : item.id;
-            entityResource.getUrl(item.id, entityType()).then(function (data) {
-                $scope.node.path = data;
-            });
+      $scope.node.path = "";
+      $scope.model.value.id = $scope.model.config.idType === "udi" ? item.udi : item.id;
+      entityResource.getUrl(item.id, entityType()).then(function (data) {
+          $scope.node.path = data;
+      });
 		}
+
+
+    // Dynamic Root specific:
+
+    $scope.openDynamicRootOriginPicker = function() {
+			var originPicker = {
+        view: "views/common/infiniteeditors/pickdynamicrootorigin/pickdynamicrootorigin.html",
+        contentType: $scope.model.value.type,
+        size: "small",
+        value: {...$scope.model.value.queryFilter},
+				multiPicker: false,
+				submit: function(model) {
+					$scope.model.value.queryFilter = model.value;
+					editorService.close();
+				},
+				close: function() {
+					editorService.close();
+				}
+			};
+			editorService.open(originPicker);
+		};
 });
