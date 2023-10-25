@@ -3562,6 +3562,7 @@ public static class Utf8ToAsciiConverter
 
 
                 // BEGIN EXTRA
+                //Currencies: https://cloford.com/resources/charcodes/utf-8_currency.htm
                 case '£':
                     output[opos++] = 'G';
                     output[opos++] = 'B';
@@ -3573,7 +3574,29 @@ public static class Utf8ToAsciiConverter
                     output[opos++] = 'U';
                     output[opos++] = 'R';
                     break;
+                case '$':
+                    output[opos++] = 'U';
+                    output[opos++] = 'S';
+                    output[opos++] = 'D';
+                    break;
+                case '¥':
+                    output[opos++] = 'J';
+                    output[opos++] = 'P';
+                    output[opos++] = 'Y';
+                    break;
+                //Rupee
+                case '\u20A8':
+                    output[opos++] = 'R';
+                    output[opos++] = 'S';
+                    break;
+                //indian ruppee
+                case '\u20B9':
+                    output[opos++] = 'I';
+                    output[opos++] = 'N';
+                    output[opos++] = 'R';
+                    break;
 
+                //Special symbols
                 case '©':
                     output[opos++] = '(';
                     output[opos++] = 'C';
@@ -3584,7 +3607,6 @@ public static class Utf8ToAsciiConverter
                     output[opos++] = 'T';
                     output[opos++] = 'M';
                     break;
-
 
                 default:
 
