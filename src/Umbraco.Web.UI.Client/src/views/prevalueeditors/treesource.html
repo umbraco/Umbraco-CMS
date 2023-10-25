@@ -41,7 +41,7 @@
           </button>
         </div>
 
-        <div ng-show="showXPath || model.value.query">
+        <umb-box ng-if="showXPath || model.value.query">
 
             <input type="text"
                    ng-model="model.value.query"
@@ -85,26 +85,26 @@
                     <button type="button" class="btn-link" ng-click="clearXPath()">Cancel and clear query</button>
                 </li>
             </ul>
-        </div>
-      <div ng-show="showDynamicStartNode || model.value.dynamicRoot">
+        </umb-box>
+      <umb-box ng-if="showDynamicStartNode || model.value.dynamicRoot">
 
         <!--
         <textarea type="text"
-               ng-model="model.value.queryFilter"
-               class="umb-property-editor umb-textarea"
-                  placeholder="Enter query"></textarea>
+          ng-model="model.value.queryFilter"
+          class="umb-property-editor umb-textarea"
+          placeholder="Enter query"></textarea>
         -->
 
         <!-- origin -->
         <umb-button
           type="button"
           action="openDynamicRootOriginPicker()"
-          label="dynamicRoot_origin{{model.value.dynamicRoot.originAlias}}Title">
+          label-key="dynamicRoot_origin{{model.value.dynamicRoot.originAlias}}Title">
         </umb-button>
 
         <!-- list of filters -->
         <ul class="umb-tree">
-          <li class="umb-tree-item" ng-repeat="filter in model.value.dynamicRoot.queryStep">
+          <li class="umb-tree-item" ng-repeat="filter in model.value.dynamicRoot.querySteps">
             <div class="umb-tree-item__inner" style="padding: 5px 10px;">
               <button type="button" class="btn-reset text-left flex-auto" ng-click="">
                 <umb-icon icon="{{'icon-globe'}}" class="icon umb-tree-icon">
@@ -129,7 +129,7 @@
             <button type="button" class="btn-link" ng-click="clearDynamicStartNode()">Cancel and clear query</button>
           </li>
         </ul>
-      </div>
+      </umb-box>
     </div>
 
 </div>

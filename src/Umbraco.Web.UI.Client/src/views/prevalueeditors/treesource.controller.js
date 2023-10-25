@@ -95,7 +95,7 @@ angular.module('umbraco')
 
 		//we always need to ensure we dont submit anything broken
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
-      if($scope.model.value.type === "member"){
+      if($scope.model.value.type === "member") {
         $scope.model.value.id = null;
         $scope.model.value.query = "";
         $scope.model.value.dynamicRoot = null;
@@ -139,12 +139,25 @@ angular.module('umbraco')
 			editorService.open(originPicker);
 		};
 
+    $scope.appendDynamicQueryStep = function() {
+			var queryStepPicker = {
+        view: "views/common/infiniteeditors/pickdynamicrootquerystep/pickdynamicrootquerystep.html",
+        contentType: $scope.model.value.type,
+        size: "small",
+				multiPicker: false,
+				submit: function(model) {
+          $scope.model.value.dynamicRoot.querySteps = $scope.model.value.dynamicRoot.querySteps ?? [];
+          $scope.model.value.dynamicRoot.querySteps.push(model.value);
+					editorService.close();
+				},
+				close: function() {
+					editorService.close();
+				}
+			};
+			editorService.open(queryStepPicker);
+		};
+
     $scope.appendDynamicQueryStep = function () {
-      $scope.model.value.queryFilter.querySteps.push({
-        alias: "NearestDescendantOrSelf",
-        anyOfDocTypeAlias:[
-          "stages"
-        ]
-      });
+
     }
 });
