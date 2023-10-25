@@ -590,7 +590,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     }
 
     [HttpPost]
-    public ActionResult<EntityBasic?> GetByJsonFilter([FromBody]DynamicRootViewModel model)
+    public ActionResult<EntityBasic?> GetDynamicRoot([FromBody]DynamicRootViewModel model)
     {
         var currentKey = model.CurrentId == 0 ? null : _entityService.Get(model.CurrentId)?.Key;
         var parentKey = model.ParentId == 0 ? null : _entityService.Get(model.ParentId)?.Key;

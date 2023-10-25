@@ -257,7 +257,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         });
     }
     else if ($scope.model.config.startNode.queryFilter) {
-        entityResource.getByJsonFilter(
+        entityResource.getDynamicRoot(
             $scope.model.config.startNode.queryFilter,
             editorState.current.id,
             editorState.current.parentId,
