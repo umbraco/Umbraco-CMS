@@ -5,45 +5,47 @@ angular.module('umbraco')
 
 	function($scope, $timeout, entityResource, iconHelper, editorService, eventsService){
 
-	    if (!$scope.model) {
-	        $scope.model = {};
-	    }
-	    if (!$scope.model.value) {
-	        $scope.model.value = {
-	            type: "content"
-	        };
-        }
-        if (!$scope.model.config) {
-            $scope.model.config = {
-                idType: "udi"
-            };
-        }
+    $scope.showXPath = false;
+    $scope.showDynamicStartNode = false;
 
-        if($scope.model.value.id && $scope.model.value.type !== "member"){
-            entityResource.getById($scope.model.value.id, entityType()).then(function(item){
-                populate(item);
-            });
-        }
-        else {
-            $timeout(function () {
-                treeSourceChanged();
-            }, 100);
-        }
+    if (!$scope.model) {
+        $scope.model = {};
+    }
+    if (!$scope.model.value) {
+      $scope.model.value = {
+          type: "content"
+      };
+    }
+    if (!$scope.model.config) {
+      $scope.model.config = {
+          idType: "udi"
+      };
+    }
 
-        function entityType() {
-			var ent = "Document";
-            if($scope.model.value.type === "media"){
-                ent = "Media";
-            }
-            else if ($scope.model.value.type === "member") {
-                ent = "Member";
-            }
-            return ent;
-        }
+    if($scope.model.value.id && $scope.model.value.type !== "member"){
+      entityResource.getById($scope.model.value.id, entityType()).then(function(item){
+          populate(item);
+      });
+    } else {
+      $timeout(function () {
+          treeSourceChanged();
+      }, 100);
+    }
+
+    function entityType() {
+      var ent = "Document";
+      if($scope.model.value.type === "media"){
+          ent = "Media";
+      }
+      else if ($scope.model.value.type === "member") {
+          ent = "Member";
+      }
+      return ent;
+    }
 
 		$scope.openContentPicker =function(){
 			var treePicker = {
-                idType: $scope.model.config.idType,
+        idType: $scope.model.config.idType,
 				section: $scope.model.value.type,
 				treeAlias: $scope.model.value.type,
 				multiPicker: false,
@@ -57,6 +59,22 @@ angular.module('umbraco')
 				}
 			};
 			editorService.treePicker(treePicker);
+		};
+		$scope.chooseXPath = function() {
+			$scope.showXPath = true;
+			$scope.showDynamicStartNode = false;
+		};
+		$scope.chooseDynamicStartNode = function() {
+			$scope.showXPath = false;
+			$scope.showDynamicStartNode = true;
+		};
+		$scope.clearXPath = function() {
+      $scope.model.value.query = '';
+			$scope.showXPath = false;
+		};
+		$scope.clearDynamicStartNode = function() {
+      $scope.model.value.queryFilter = '';
+			$scope.showDynamicStartNode = false;
 		};
 
 		$scope.clear = function() {

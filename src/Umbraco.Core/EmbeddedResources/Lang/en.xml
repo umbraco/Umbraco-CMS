@@ -1431,6 +1431,10 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="allowedItemTypes">You can only select items of type(s): %0%</key>
     <key alias="pickedTrashedItem">You have picked a content item currently deleted or in the recycle bin</key>
     <key alias="pickedTrashedItems">You have picked content items currently deleted or in the recycle bin</key>
+    <key alias="specifyPickerRootTitle">Specify root</key>
+    <key alias="defineRootNode">Pick root node</key>
+    <key alias="defineXPathOrigin">Specify via XPath</key>
+    <key alias="defineDynamicRoot">Specify a dynamic root</key>
   </area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Deleted item</key>
