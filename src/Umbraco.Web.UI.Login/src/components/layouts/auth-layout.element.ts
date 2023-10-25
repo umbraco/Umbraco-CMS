@@ -4,10 +4,10 @@ import { customElement, property } from 'lit/decorators.js';
 @customElement('umb-auth-layout')
 export class UmbAuthLayoutElement extends LitElement {
 	@property({ attribute: 'background-image' })
-	backgroundImage?: string; //TODO: Implement
+	backgroundImage?: string;
 
 	@property({ attribute: 'logo-image' })
-	logoImage?: string; //TODO: Implement
+	logoImage?: string; //TODO: For the current design we need two logos. One for on top of the image and one for smaller screens where the image is gone and the logo is in the top left corner on white background.
 
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
@@ -59,7 +59,7 @@ export class UmbAuthLayoutElement extends LitElement {
 			}
 			#logo {
 				position: fixed;
-				background-image: var(--logo-image);
+				background-image: var(--logo-image); /* should use a dark logo here */
 				background-repeat: no-repeat;
 				z-index: 1;
 				width: 80px;
