@@ -88,9 +88,9 @@ export class UmbAuthLayoutElement extends LitElement {
 				height: 100%;
 				transform: scaleX(-1);
 				border-radius: 40px;
-				border: 1px solid white;
+				/* border: 1px solid white; */
 				box-sizing: border-box;
-				box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 48px;
+				/* box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 48px; */
 			}
 			#auth-box {
 				max-width: 300px;
