@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.StartNodeFinder.Filters;
@@ -14,14 +15,17 @@ public class FarthestDescendantOrSelfStartNodeSelectorFilter : IStartNodeSelecto
     }
 
     protected virtual string SupportedDirectionAlias { get; set; } = "FarthestDescendantOrSelf";
-    public IEnumerable<Guid>? Filter(IEnumerable<Guid> origins, StartNodeFilter filter)
+    public bool Filter(IEnumerable<Guid> origins, StartNodeFilter filter, [MaybeNullWhen(false)] out IEnumerable<Guid> result)
     {
         if (filter.DirectionAlias != SupportedDirectionAlias || origins.Any() is false)
         {
-            return null;
+            result = null;
+            return false;
         }
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        return _nodeFilterRepository.FarthestDescendantOrSelf(origins, filter);
+        result = _nodeFilterRepository.FarthestDescendantOrSelf(origins, filter);
+
+        return true;
     }
 }

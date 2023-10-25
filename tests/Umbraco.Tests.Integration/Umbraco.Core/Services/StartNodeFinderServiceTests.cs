@@ -138,7 +138,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
         ContentActs2022.Key = new Guid("6FD7F030-269D-45BE-BEB4-030FF8764B6D");
         ContentService.Save(ContentActs2022, -1);
 
-        ContentAct2022RanD = ContentBuilder.CreateSimpleContent(ContentTypeAct, "Acts", ContentActs2022.Id);
+        ContentAct2022RanD = ContentBuilder.CreateSimpleContent(ContentTypeAct, "Ran-D", ContentActs2022.Id);
         ContentAct2022RanD.Key = new Guid("9BE4C615-240E-4616-BB65-C1F2DE9C3873");
         ContentService.Save(ContentAct2022RanD, -1);
 
@@ -199,6 +199,135 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
         {
             Assert.AreEqual(1, result.Count());
             CollectionAssert.Contains(result, startNodeSelector.Context.CurrentKey.Value);
+        });
+    }
+
+    [Test]
+    public void GetDynamicStartNodes__With_NearestAncestorOrSelf_and_origin_root_should_return_empty_list()
+    {
+        // Arrange
+        var startNodeSelector = new StartNodeSelector()
+        {
+            OriginAlias = StartNodeSelectorOrigin.Root.ToString(),
+            OriginKey = null,
+            Context = new StartNodeSelectorContext()
+            {
+                CurrentKey = ContentAct2022RanD.Key,
+                ParentKey = ContentActs2022.Key
+            },
+            Filter = new StartNodeFilter[]
+            {
+                new StartNodeFilter()
+                {
+                    DirectionAlias = StartNodeSelectorDirection.NearestAncestorOrSelf.ToString(),
+                    AnyOfDocTypeAlias = new []{ContentAct2022RanD.ContentType.Alias}
+                }
+            }
+        };
+
+        // Act
+        var result = StartNodeFinder.GetDynamicStartNodes(startNodeSelector);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(0, result.Count());
+        });
+    }
+
+    [Test]
+    public void GetDynamicStartNodes__NearestDescendantOrSelf__has_to_find_only_the_nearest()
+    {
+        // Arrange
+
+        //Allow atc to add acts
+        ContentTypeAct.AllowedContentTypes = ContentTypeAct.AllowedContentTypes.Union(new ContentTypeSort[] { new ContentTypeSort(ContentTypeActs.Id, 0) });
+        ContentTypeService.Save(ContentTypeAct);
+
+        var contentNewActs = ContentBuilder.CreateSimpleContent(ContentTypeActs, "new Acts", ContentAct2022RanD.Id);
+        contentNewActs.Key = new Guid("EA309F8C-8F1A-4C19-9613-2F950CDDCB8D");
+        ContentService.Save(contentNewActs, -1);
+
+        var contentNewAct = ContentBuilder.CreateSimpleContent(ContentTypeAct, "new act under new atcs", contentNewActs.Id);
+        contentNewAct.Key = new Guid("7E14BA13-C998-46DE-92AE-8E1C18CCEE02");
+        ContentService.Save(contentNewAct, -1);
+
+
+        var startNodeSelector = new StartNodeSelector()
+        {
+            OriginAlias = StartNodeSelectorOrigin.Root.ToString(),
+            OriginKey = null,
+            Context = new StartNodeSelectorContext()
+            {
+                CurrentKey = contentNewAct.Key,
+                ParentKey = contentNewActs.Key
+            },
+            Filter = new []
+            {
+                new StartNodeFilter()
+                {
+                    DirectionAlias = StartNodeSelectorDirection.NearestDescendantOrSelf.ToString(),
+                    AnyOfDocTypeAlias = new []{ContentTypeActs.Alias}
+                }
+            }
+        };
+
+        // Act
+        var result = StartNodeFinder.GetDynamicStartNodes(startNodeSelector);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, result.Count());
+            CollectionAssert.Contains(result, ContentActs2022.Key);
+        });
+    }
+
+    [Test]
+    public void GetDynamicStartNodes__FarthestDescendantOrSelf__has_to_find_only_the_farthest()
+    {
+        // Arrange
+
+        //Allow atc to add acts
+        ContentTypeAct.AllowedContentTypes = ContentTypeAct.AllowedContentTypes.Union(new [] { new ContentTypeSort(ContentTypeActs.Id, 0) });
+        ContentTypeService.Save(ContentTypeAct);
+
+        var contentNewActs = ContentBuilder.CreateSimpleContent(ContentTypeActs, "new Acts", ContentAct2022RanD.Id);
+        contentNewActs.Key = new Guid("EA309F8C-8F1A-4C19-9613-2F950CDDCB8D");
+        ContentService.Save(contentNewActs, -1);
+
+        var contentNewAct = ContentBuilder.CreateSimpleContent(ContentTypeAct, "new act under new atcs", contentNewActs.Id);
+        contentNewAct.Key = new Guid("7E14BA13-C998-46DE-92AE-8E1C18CCEE02");
+        ContentService.Save(contentNewAct, -1);
+
+
+        var startNodeSelector = new StartNodeSelector()
+        {
+            OriginAlias = StartNodeSelectorOrigin.Root.ToString(),
+            OriginKey = null,
+            Context = new StartNodeSelectorContext()
+            {
+                CurrentKey = contentNewAct.Key,
+                ParentKey = contentNewActs.Key
+            },
+            Filter = new []
+            {
+                new StartNodeFilter()
+                {
+                    DirectionAlias = StartNodeSelectorDirection.FarthestDescendantOrSelf.ToString(),
+                    AnyOfDocTypeAlias = new []{ContentTypeActs.Alias}
+                }
+            }
+        };
+
+        // Act
+        var result = StartNodeFinder.GetDynamicStartNodes(startNodeSelector);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, result.Count());
+            CollectionAssert.Contains(result, contentNewActs.Key);
         });
     }
 

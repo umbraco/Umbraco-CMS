@@ -1,6 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Umbraco.Cms.Core.StartNodeFinder.Filters;
 
 public interface IStartNodeSelectorFilter
 {
-    IEnumerable<Guid>? Filter(IEnumerable<Guid> origins, StartNodeFilter filter);
+    bool Filter(IEnumerable<Guid> origins, StartNodeFilter filter, [MaybeNullWhen(false)]out IEnumerable<Guid> result);
 }

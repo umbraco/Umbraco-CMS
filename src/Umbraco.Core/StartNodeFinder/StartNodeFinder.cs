@@ -42,9 +42,7 @@ public class StartNodeFinder : IStartNodeFinder
     {
         foreach (IStartNodeSelectorFilter startNodeSelectorFilter in _startNodeSelectorFilterCollection)
         {
-            IEnumerable<Guid>? filtered = startNodeSelectorFilter.Filter(origin, startNodeFilter);
-
-            if (filtered is not null)
+            if (startNodeSelectorFilter.Filter(origin, startNodeFilter, out var filtered))
             {
                 return filtered;
             }
