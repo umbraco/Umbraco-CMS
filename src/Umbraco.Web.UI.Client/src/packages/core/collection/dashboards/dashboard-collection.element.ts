@@ -28,7 +28,7 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-collection entity-type=${ifDefined(this._entityType)}></umb-collection>`;
+		return html`<umb-collection></umb-collection>`;
 	}
 
 	static styles = [

@@ -216,11 +216,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	}
 
 	#renderCollectionViews() {
-		return html`
-			<uui-button label="view toggle" compact look="outline">
-				<uui-icon name="settings"></uui-icon>
-			</uui-button>
-		`;
+		return html` <umb-collection-view-bundle></umb-collection-view-bundle> `;
 	}
 
 	static styles = [
