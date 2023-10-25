@@ -15,31 +15,31 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	@state()
 	private _isOpen = false;
 
+	@state()
+	private _collectionRootPathname = '';
+
 	#collectionContext?: UmbCollectionContext<any, any>;
-	#collectionRootPath = '';
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
 			this.#collectionContext = context;
+			if (!this.#collectionContext) return;
+			this._collectionRootPathname = this.#collectionContext.collectionRootPathname;
 			this.#observeViews();
 			this.#observeCurrentView();
 		});
 	}
 
 	#observeCurrentView() {
-		if (!this.#collectionContext) return;
-
-		this.observe(this.#collectionContext?.currentView, (view) => {
+		this.observe(this.#collectionContext!.currentView, (view) => {
 			this._currentView = view;
 		});
 	}
 
 	#observeViews() {
-		if (!this.#collectionContext) return;
-
-		this.observe(this.#collectionContext?.views, (views) => {
+		this.observe(this.#collectionContext!.views, (views) => {
 			this._views = views;
 		});
 	}
@@ -67,8 +67,8 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 		</umb-dropdown>`;
 	}
 
-	#renderItem(view: ManifestCollectionView) {		
-		return html`<a href="${view.meta.pathName}">${this.#renderItemDisplay(view)}</a>`;
+	#renderItem(view: ManifestCollectionView) {
+		return html`<a href="${this._collectionRootPathname}/${view.meta.pathName}">${this.#renderItemDisplay(view)}</a>`;
 	}
 
 	#renderItemDisplay(view: ManifestCollectionView) {
@@ -81,7 +81,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 			.item {
 			}
 
-			a { 
+			a {
 				display: block;
 			}
 		`,

@@ -36,10 +36,14 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	public readonly currentView = this.#currentView.asObservable();
 
 	repository?: UmbCollectionRepository;
+	collectionRootPathname: string;
 
 	constructor(host: UmbControllerHostElement, entityType: string, repositoryAlias: string) {
 		this.entityType = entityType;
 		this.host = host;
+
+		const currentUrl = new URL(window.location.href);
+		this.collectionRootPathname = currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/'));
 
 		this.init = Promise.all([
 			new UmbObserverController(
@@ -63,12 +67,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 				),
 				(views) => {
 					this.#views.next(views);
-
-					if (!this.getCurrentView()) {
-						/* TODO: Find a way to figure out which layout it starts with and set _currentLayout to that instead of [0]. eg. '/table'
-						For document,media and members this will come as part of a data type configuration, but in other cases "users" we should find another way. */
-						this.setCurrentView(views[0]);
-					}
+					this.#setCurrentView();
 				},
 			).asPromise(),
 		]);
@@ -160,7 +159,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	 * @param {Partial<FilterModelType>} filter
 	 * @memberof UmbCollectionContext
 	 */
-	setFilter(filter: Partial<FilterModelType>) {
+	public setFilter(filter: Partial<FilterModelType>) {
 		this.#filter.next({ ...this.#filter.getValue(), ...filter });
 		this.requestCollection();
 	}
@@ -182,6 +181,20 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	 */
 	public getCurrentView() {
 		return this.#currentView.getValue();
+	}
+
+	#setCurrentView() {
+		const currentUrl = new URL(window.location.href);
+		const lastPathSegment = currentUrl.pathname.split('/').pop();
+		const views = this.#views.getValue();
+		const viewMatch = views.find((view) => view.meta.pathName === lastPathSegment);
+
+		/* TODO: Find a way to figure out which layout it starts with and set _currentLayout to that instead of [0]. eg. '/table'
+			For document, media and members this will come as part of a data type configuration, but in other cases "users" we should find another way. 
+			This should only happen if the current layout is not set in the URL.
+		*/
+		const currentView = viewMatch || views[0];
+		this.setCurrentView(currentView);
 	}
 }
 
