@@ -56,15 +56,6 @@
 
     @await Html.BareMinimumServerVariablesScriptAsync(backOfficeServerVariables)
 
-    <script type="text/javascript">
-    document.angularReady = function (app) {
-
-        @await Html.AngularValueExternalLoginInfoScriptAsync(externalLogins, ViewData.GetExternalSignInProviderErrors()!)
-        @Html.AngularValueResetPasswordCodeInfoScript(ViewData[ViewDataExtensions.TokenPasswordResetCode]!)
-
-    }
-    </script>
-
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/lazyload-js/LazyLoad.min.js"></script>
     <script src="@Url.GetUrlWithCacheBust("Application", "BackOffice", null!, hostingEnvironment, umbracoVersion, runtimeMinifier)"></script>
