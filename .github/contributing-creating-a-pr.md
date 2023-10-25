@@ -14,7 +14,7 @@ Please note: we are no longer accepting features for v8 and below but will conti
 ## The review process
 [review process]: #the-review-process
 
-You've sent us your first contribution - congratulations! Now what?
+You've sent us your contribution - congratulations! Now what?
 
 The [Core Collaborators team][Core collabs] can now start reviewing your proposed changes and give you feedback on them. If it's not perfect, we'll either fix up what we need or we can request that you make some additional changes.
 

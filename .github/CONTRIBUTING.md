@@ -27,15 +27,15 @@ The following steps are a quick-start guide:
 
 4. **Build**
 
-    Build your fork of Umbraco locally as described in the build documentation: you can [build with any IDE that support dotnet or the command line](BUILD.md).
+    Build your fork of Umbraco locally as described in the build documentation, you can [build with any IDE that support dotnet or the command line](BUILD.md).
 
 5. **Branch**
 
-    Create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case issue number `12345`.  Don't commit to `contrib`, create a new branch first.
+    Create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp/12345`. This means it's a temporary branch for the particular issue you're working on, in this case issue number `12345`.  Don't commit to `contrib`, create a new branch first.
 
 6. **Change**
 
-    Make your changes, experiment, have fun, explore and learn, and don't be afraid. We welcome all contributions and will [happily give feedback][questions].
+    Make your changes, experiment, have fun, explore and learn, and don't be afraid. We welcome all contributions and will [happily give feedback](contributing-first-issue.md#questions).
 
 7. **Commit and push**
 
@@ -47,9 +47,12 @@ The following steps are a quick-start guide:
 
     On GitHub, in your forked repository (`https://github.com/[YourUsername]/Umbraco-CMS`) you will see a banner saying that you pushed a new branch and a button to make a pull request. Tap the button and follow the instuctions.
 
+    Want to read further? [Creating a pull request and what happens next](contributing-creating-a-pr.md).
+
 ## Further contribution guides
 
-- contributing-before-you-start.md
+- [Before you start](contributing-before-you-start.md)
+- [Finding your first issue: Up for grabs](contributing-before-you-start.md)
+- [Contributing to the new backoffice](https://github.com/umbraco/Umbraco-CMS/blob/v14/dev/.github/New%20BackOffice%20-%20README.md)
+- [Other ways to contribute](contributing-other-ways-to-contribute.md)
 
-
-[questions]: contributing-first-issue.md#questions
