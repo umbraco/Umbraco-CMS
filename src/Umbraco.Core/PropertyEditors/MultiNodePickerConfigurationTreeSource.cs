@@ -21,6 +21,7 @@ public class MultiNodePickerConfigurationTreeSource
     public Udi? StartNodeId { get; set; }
 }
 
+[DataContract]
 public class MultiNodePickerConfigurationQueryFilter
 {
     [DataMember(Name = "originAlias")]
@@ -33,6 +34,7 @@ public class MultiNodePickerConfigurationQueryFilter
     public MultiNodePickerConfigurationQueryFilterStep[] Filter { get; set; } = Array.Empty<MultiNodePickerConfigurationQueryFilterStep>();
 }
 
+[DataContract]
 public class MultiNodePickerConfigurationQueryFilterStep
 {
     [DataMember(Name = "directionAlias")]
