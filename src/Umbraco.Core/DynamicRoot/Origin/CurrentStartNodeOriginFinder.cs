@@ -1,6 +1,6 @@
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Core.StartNodeFinder.Origin;
+namespace Umbraco.Cms.Core.DynamicRoot.Origin;
 
 public class CurrentStartNodeOriginFinder : ByKeyStartNodeOriginFinder
 {
@@ -9,7 +9,7 @@ public class CurrentStartNodeOriginFinder : ByKeyStartNodeOriginFinder
     }
 
     protected override string SupportedOriginType { get; set; } = "Current";
-    public override Guid? FindOriginKey(StartNodeSelector selector)
+    public override Guid? FindOriginKey(DynamicRootNodeSelector selector)
     {
         selector.OriginKey = selector.Context.CurrentKey;
         var baseResult = base.FindOriginKey(selector);

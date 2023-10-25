@@ -15,14 +15,14 @@ public class MultiNodePickerConfigurationTreeSource
     public string? StartNodeQuery { get; set; }
 
     [DataMember(Name = "dynamicRoot")]
-    public MultiNodePickerConfigurationQueryFilter? StartNodeQueryFilter { get; set; }
+    public DynamicRoot? DynamicRoot { get; set; }
 
     [DataMember(Name = "id")]
     public Udi? StartNodeId { get; set; }
 }
 
 [DataContract]
-public class MultiNodePickerConfigurationQueryFilter
+public class DynamicRoot
 {
     [DataMember(Name = "originAlias")]
     public string OriginAlias { get; set; } = string.Empty;
@@ -31,14 +31,14 @@ public class MultiNodePickerConfigurationQueryFilter
     public Guid? OriginKey { get; set; }
 
     [DataMember(Name = "querySteps")]
-    public MultiNodePickerConfigurationQueryFilterStep[] Filter { get; set; } = Array.Empty<MultiNodePickerConfigurationQueryFilterStep>();
+    public QueryStep[] QuerySteps { get; set; } = Array.Empty<QueryStep>();
 }
 
 [DataContract]
-public class MultiNodePickerConfigurationQueryFilterStep
+public class QueryStep
 {
     [DataMember(Name = "alias")]
-    public string DirectionAlias { get; set; } = string.Empty;
+    public string Alias { get; set; } = string.Empty;
 
     [DataMember(Name = "anyOfDocTypeAlias")]
     public IEnumerable<string> AnyOfDocTypeAlias { get; set; } = Array.Empty<string>();

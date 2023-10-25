@@ -14,10 +14,9 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Sections;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Snippets;
-using Umbraco.Cms.Core.StartNodeFinder.Filters;
-using Umbraco.Cms.Core.StartNodeFinder.Origin;
+using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
+using Umbraco.Cms.Core.DynamicRoot.Origin;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Tour;
 using Umbraco.Cms.Core.Trees;
@@ -89,10 +88,10 @@ public static partial class UmbracoBuilderExtensions
             .Append<RootStartNodeOriginFinder>();
 
         builder.StartNodeSelectorFilters()
-            .Append<NearestAncestorOrSelfStartNodeSelectorFilter>()
-            .Append<FarthestAncestorOrSelfStartNodeSelectorFilter>()
-            .Append<NearestDescendantOrSelfStartNodeSelectorFilter>()
-            .Append<FarthestDescendantOrSelfStartNodeSelectorFilter>();
+            .Append<NearestAncestorOrSelfDynamicRootQueryStep>()
+            .Append<FarthestAncestorOrSelfDynamicRootQueryStep>()
+            .Append<NearestDescendantOrSelfDynamicRootQueryStep>()
+            .Append<FarthestDescendantOrSelfDynamicRootQueryStep>();
 
         builder.Components();
         // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
@@ -215,8 +214,8 @@ public static partial class UmbracoBuilderExtensions
     public static StartNodeOriginFinderCollectionBuilder StartNodeOriginFinders(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<StartNodeOriginFinderCollectionBuilder>();
 
-    public static StartNodeSelectorFilterCollectionBuilder StartNodeSelectorFilters(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<StartNodeSelectorFilterCollectionBuilder>();
+    public static DynamicRootQueryStepCollectionBuilder StartNodeSelectorFilters(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<DynamicRootQueryStepCollectionBuilder>();
 
     /// <summary>
     /// Gets the components collection builder.

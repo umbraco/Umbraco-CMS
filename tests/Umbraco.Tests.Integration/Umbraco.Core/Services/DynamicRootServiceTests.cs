@@ -4,8 +4,8 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.StartNodeFinder;
-using Umbraco.Cms.Core.StartNodeFinder.Filters;
+using Umbraco.Cms.Core.DynamicRoot;
+using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -17,9 +17,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class StartNodeFinderServiceTests : UmbracoIntegrationTest
+public class DynamicRootServiceTests : UmbracoIntegrationTest
 {
-    public enum StartNodeSelectorOrigin
+    public enum DynamicRootOrigin
     {
         Root,
         Parent,
@@ -28,7 +28,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
         ByKey
     }
 
-    public enum StartNodeSelectorDirection
+    public enum DynamicRootAlias
     {
         NearestAncestorOrSelf,
         FarthestAncestorOrSelf,
@@ -50,7 +50,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
 
     protected ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
 
-    private StartNodeFinder StartNodeFinder => GetRequiredService<IStartNodeFinder>() as StartNodeFinder;
+    private DynamicRootService DynamicRootService => GetRequiredService<IDynamicRootService>() as DynamicRootService;
     private IDomainService DomainService => GetRequiredService<IDomainService>();
 
     private ContentType ContentTypeYears { get; set; }
@@ -169,30 +169,30 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
 
 
     [Test]
-    public void GetDynamicStartNodes__With_NearestAncestorOrSelf_and_filter_of_own_doc_type_should_return_self()
+    public void GetDynamicRoots__With_NearestAncestorOrSelf_and_filter_of_own_doc_type_should_return_self()
     {
         // Arrange
-        var startNodeSelector = new StartNodeSelector()
+        var startNodeSelector = new DynamicRootNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Current.ToString(),
+            OriginAlias = DynamicRootOrigin.Current.ToString(),
             OriginKey = null,
-            Context = new StartNodeSelectorContext()
+            Context = new DynamicRootSelectorContext()
             {
                 CurrentKey = ContentAct2022RanD.Key,
                 ParentKey = ContentActs2022.Key
             },
-            Filter = new StartNodeFilter[]
+            QuerySteps = new DynamicRootQueryStep[]
             {
-                new StartNodeFilter()
+                new DynamicRootQueryStep()
                 {
-                    DirectionAlias = StartNodeSelectorDirection.NearestAncestorOrSelf.ToString(),
+                    Alias = DynamicRootAlias.NearestAncestorOrSelf.ToString(),
                     AnyOfDocTypeAlias = new []{ContentAct2022RanD.ContentType.Alias}
                 }
             }
         };
 
         // Act
-        var result = StartNodeFinder.GetDynamicStartNodes(startNodeSelector);
+        var result = DynamicRootService.GetDynamicRoots(startNodeSelector);
 
         // Assert
         Assert.Multiple(() =>
@@ -203,30 +203,30 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetDynamicStartNodes__With_NearestAncestorOrSelf_and_origin_root_should_return_empty_list()
+    public void GetDynamicRoots__With_NearestAncestorOrSelf_and_origin_root_should_return_empty_list()
     {
         // Arrange
-        var startNodeSelector = new StartNodeSelector()
+        var startNodeSelector = new DynamicRootNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Root.ToString(),
+            OriginAlias = DynamicRootOrigin.Root.ToString(),
             OriginKey = null,
-            Context = new StartNodeSelectorContext()
+            Context = new DynamicRootSelectorContext()
             {
                 CurrentKey = ContentAct2022RanD.Key,
                 ParentKey = ContentActs2022.Key
             },
-            Filter = new StartNodeFilter[]
+            QuerySteps = new DynamicRootQueryStep[]
             {
-                new StartNodeFilter()
+                new DynamicRootQueryStep()
                 {
-                    DirectionAlias = StartNodeSelectorDirection.NearestAncestorOrSelf.ToString(),
+                    Alias = DynamicRootAlias.NearestAncestorOrSelf.ToString(),
                     AnyOfDocTypeAlias = new []{ContentAct2022RanD.ContentType.Alias}
                 }
             }
         };
 
         // Act
-        var result = StartNodeFinder.GetDynamicStartNodes(startNodeSelector);
+        var result = DynamicRootService.GetDynamicRoots(startNodeSelector);
 
         // Assert
         Assert.Multiple(() =>
@@ -236,7 +236,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetDynamicStartNodes__NearestDescendantOrSelf__has_to_find_only_the_nearest()
+    public void GetDynamicRoots__NearestDescendantOrSelf__has_to_find_only_the_nearest()
     {
         // Arrange
 
@@ -253,27 +253,27 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
         ContentService.Save(contentNewAct, -1);
 
 
-        var startNodeSelector = new StartNodeSelector()
+        var startNodeSelector = new DynamicRootNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Root.ToString(),
+            OriginAlias = DynamicRootOrigin.Root.ToString(),
             OriginKey = null,
-            Context = new StartNodeSelectorContext()
+            Context = new DynamicRootSelectorContext()
             {
                 CurrentKey = contentNewAct.Key,
                 ParentKey = contentNewActs.Key
             },
-            Filter = new []
+            QuerySteps = new []
             {
-                new StartNodeFilter()
+                new DynamicRootQueryStep()
                 {
-                    DirectionAlias = StartNodeSelectorDirection.NearestDescendantOrSelf.ToString(),
+                    Alias = DynamicRootAlias.NearestDescendantOrSelf.ToString(),
                     AnyOfDocTypeAlias = new []{ContentTypeActs.Alias}
                 }
             }
         };
 
         // Act
-        var result = StartNodeFinder.GetDynamicStartNodes(startNodeSelector);
+        var result = DynamicRootService.GetDynamicRoots(startNodeSelector);
 
         // Assert
         Assert.Multiple(() =>
@@ -284,7 +284,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetDynamicStartNodes__FarthestDescendantOrSelf__has_to_find_only_the_farthest()
+    public void GetDynamicRoots__FarthestDescendantOrSelf__has_to_find_only_the_farthest()
     {
         // Arrange
 
@@ -301,27 +301,27 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
         ContentService.Save(contentNewAct, -1);
 
 
-        var startNodeSelector = new StartNodeSelector()
+        var startNodeSelector = new DynamicRootNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Root.ToString(),
+            OriginAlias = DynamicRootOrigin.Root.ToString(),
             OriginKey = null,
-            Context = new StartNodeSelectorContext()
+            Context = new DynamicRootSelectorContext()
             {
                 CurrentKey = contentNewAct.Key,
                 ParentKey = contentNewActs.Key
             },
-            Filter = new []
+            QuerySteps = new []
             {
-                new StartNodeFilter()
+                new DynamicRootQueryStep()
                 {
-                    DirectionAlias = StartNodeSelectorDirection.FarthestDescendantOrSelf.ToString(),
+                    Alias = DynamicRootAlias.FarthestDescendantOrSelf.ToString(),
                     AnyOfDocTypeAlias = new []{ContentTypeActs.Alias}
                 }
             }
         };
 
         // Act
-        var result = StartNodeFinder.GetDynamicStartNodes(startNodeSelector);
+        var result = DynamicRootService.GetDynamicRoots(startNodeSelector);
 
         // Assert
         Assert.Multiple(() =>
@@ -332,35 +332,35 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetDynamicStartNodes__With_multiple_filters()
+    public void GetDynamicRoots__With_multiple_filters()
     {
         // Arrange
-        var startNodeSelector = new StartNodeSelector()
+        var startNodeSelector = new DynamicRootNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Current.ToString(),
+            OriginAlias = DynamicRootOrigin.Current.ToString(),
             OriginKey = null,
-            Context = new StartNodeSelectorContext()
+            Context = new DynamicRootSelectorContext()
             {
                 CurrentKey = ContentAct2022RanD.Key,
                 ParentKey = ContentActs2022.Key
             },
-            Filter = new []
+            QuerySteps = new []
             {
-                new StartNodeFilter()
+                new DynamicRootQueryStep()
                 {
-                    DirectionAlias = StartNodeSelectorDirection.NearestAncestorOrSelf.ToString(),
+                    Alias = DynamicRootAlias.NearestAncestorOrSelf.ToString(),
                     AnyOfDocTypeAlias = new []{ContentTypeYear.Alias}
                 },
-                new StartNodeFilter()
+                new DynamicRootQueryStep()
                 {
-                    DirectionAlias = StartNodeSelectorDirection.NearestDescendantOrSelf.ToString(),
+                    Alias = DynamicRootAlias.NearestDescendantOrSelf.ToString(),
                     AnyOfDocTypeAlias = new []{ContentTypeStages.Alias}
                 }
             }
         };
 
         // Act
-        var result = StartNodeFinder.GetDynamicStartNodes(startNodeSelector);
+        var result = DynamicRootService.GetDynamicRoots(startNodeSelector);
 
         // Assert
         Assert.Multiple(() =>
@@ -371,30 +371,30 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetDynamicStartNodes__With_NearestDescendantOrSelf_and_filter_of_own_doc_type_should_return_self()
+    public void GetDynamicRoots__With_NearestDescendantOrSelf_and_filter_of_own_doc_type_should_return_self()
     {
         // Arrange
-        var startNodeSelector = new StartNodeSelector()
+        var startNodeSelector = new DynamicRootNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Current.ToString(),
+            OriginAlias = DynamicRootOrigin.Current.ToString(),
             OriginKey = null,
-            Context = new StartNodeSelectorContext()
+            Context = new DynamicRootSelectorContext()
             {
                 CurrentKey = ContentYear2022.Key,
                 ParentKey = ContentYears.Key
             },
-            Filter = new StartNodeFilter[]
+            QuerySteps = new DynamicRootQueryStep[]
             {
-                new StartNodeFilter()
+                new DynamicRootQueryStep()
                 {
-                    DirectionAlias = StartNodeSelectorDirection.NearestDescendantOrSelf.ToString(),
+                    Alias = DynamicRootAlias.NearestDescendantOrSelf.ToString(),
                     AnyOfDocTypeAlias = new []{ContentYear2022.ContentType.Alias}
                 }
             }
         };
 
         // Act
-        var result = StartNodeFinder.GetDynamicStartNodes(startNodeSelector);
+        var result = DynamicRootService.GetDynamicRoots(startNodeSelector);
 
         // Assert
         Assert.Multiple(() =>
@@ -406,23 +406,23 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
 
 
     [Test]
-    public void GetDynamicStartNodes__With_no_filters_should_return_what_origin_finds()
+    public void GetDynamicRoots__With_no_filters_should_return_what_origin_finds()
     {
         // Arrange
-        var startNodeSelector = new StartNodeSelector()
+        var startNodeSelector = new DynamicRootNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Parent.ToString(),
+            OriginAlias = DynamicRootOrigin.Parent.ToString(),
             OriginKey = null,
-            Context = new StartNodeSelectorContext()
+            Context = new DynamicRootSelectorContext()
             {
                 CurrentKey = ContentYear2022.Key,
                 ParentKey = ContentYears.Key
             },
-            Filter = Array.Empty<StartNodeFilter>()
+            QuerySteps = Array.Empty<DynamicRootQueryStep>()
         };
 
         // Act
-        var result = StartNodeFinder.GetDynamicStartNodes(startNodeSelector);
+        var result = DynamicRootService.GetDynamicRoots(startNodeSelector);
 
         // Assert
         Assert.Multiple(() =>
@@ -437,11 +437,11 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
     public void CalculateOriginKey__Parent_should_just_return_the_parent_key()
     {
         // Arrange
-        var selector = new StartNodeSelector()
+        var selector = new DynamicRootNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Parent.ToString(),
+            OriginAlias = DynamicRootOrigin.Parent.ToString(),
             OriginKey = null,
-            Context = new StartNodeSelectorContext()
+            Context = new DynamicRootSelectorContext()
             {
                 CurrentKey = ContentYear2022.Key,
                 ParentKey = ContentYears.Key
@@ -449,7 +449,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
         };
 
         // Act
-        var result = StartNodeFinder.CalculateOriginKey(selector);
+        var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
         Assert.AreEqual(selector.Context.ParentKey, result);
@@ -459,11 +459,11 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
     public void CalculateOriginKey__Current_should_just_return_the_current_key_when_it_exists()
     {
         // Arrange
-        var selector = new StartNodeSelector()
+        var selector = new DynamicRootNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Current.ToString(),
+            OriginAlias = DynamicRootOrigin.Current.ToString(),
             OriginKey = null,
-            Context = new StartNodeSelectorContext()
+            Context = new DynamicRootSelectorContext()
             {
                 CurrentKey = ContentYear2022.Key,
                 ParentKey = ContentYears.Key
@@ -471,7 +471,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
         };
 
         // Act
-        var result = StartNodeFinder.CalculateOriginKey(selector);
+        var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
         Assert.AreEqual(selector.Context.CurrentKey, result);
@@ -481,11 +481,11 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
     public void CalculateOriginKey__Current_should_just_return_null_when_it_do_not_exists()
     {
         // Arrange
-        var selector = new StartNodeSelector()
+        var selector = new DynamicRootNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Current.ToString(),
+            OriginAlias = DynamicRootOrigin.Current.ToString(),
             OriginKey = null,
-            Context = new StartNodeSelectorContext()
+            Context = new DynamicRootSelectorContext()
             {
                 CurrentKey = Guid.NewGuid(),
                 ParentKey = ContentYears.Key
@@ -493,7 +493,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
         };
 
         // Act
-        var result = StartNodeFinder.CalculateOriginKey(selector);
+        var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
         Assert.IsNull(result);
@@ -503,11 +503,11 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
     public void CalculateOriginKey__Root_should_traverse_the_path_and_take_the_first_level_in_the_root()
     {
         // Arrange
-        var selector = new StartNodeSelector()
+        var selector = new DynamicRootNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Root.ToString(),
+            OriginAlias = DynamicRootOrigin.Root.ToString(),
             OriginKey = null,
-            Context = new StartNodeSelectorContext()
+            Context = new DynamicRootSelectorContext()
             {
                 CurrentKey = ContentAct2022RanD.Key,
                 ParentKey = ContentActs2022.Key
@@ -515,7 +515,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
         };
 
         // Act
-        var result = StartNodeFinder.CalculateOriginKey(selector);
+        var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
         Assert.AreEqual(ContentYears.Key, result);
@@ -526,11 +526,11 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var origin = ContentYear2022;
-        var selector = new StartNodeSelector()
+        var selector = new DynamicRootNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Site.ToString(),
+            OriginAlias = DynamicRootOrigin.Site.ToString(),
             OriginKey =origin.Key,
-            Context = new StartNodeSelectorContext()
+            Context = new DynamicRootSelectorContext()
             {
                 CurrentKey = origin.Key,
                 ParentKey = ContentYears.Key
@@ -540,7 +540,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
         DomainService.Save(new UmbracoDomain("http://test.umbraco.com") { RootContentId = origin.Id, LanguageIsoCode = "en-us"});
 
         // Act
-        var result = StartNodeFinder.CalculateOriginKey(selector);
+        var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
         Assert.AreEqual(origin.Key, result);
@@ -551,11 +551,11 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var origin = ContentAct2022RanD;
-        var selector = new StartNodeSelector()
+        var selector = new DynamicRootNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Site.ToString(),
+            OriginAlias = DynamicRootOrigin.Site.ToString(),
             OriginKey = origin.Key,
-            Context = new StartNodeSelectorContext()
+            Context = new DynamicRootSelectorContext()
             {
                 CurrentKey = origin.Key,
                 ParentKey = ContentActs2022.Key
@@ -565,7 +565,7 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
         DomainService.Save(new UmbracoDomain("http://test.umbraco.com") { RootContentId = ContentYears.Id, LanguageIsoCode = "en-us"});
 
         // Act
-        var result = StartNodeFinder.CalculateOriginKey(selector);
+        var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
         Assert.AreEqual(ContentYears.Key, result);
@@ -575,11 +575,11 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
     public void CalculateOriginKey__Site_should_fallback_to_root_when_no_domain_is_assigned()
     {
         // Arrange
-        var selector = new StartNodeSelector()
+        var selector = new DynamicRootNodeSelector()
         {
-            OriginAlias = StartNodeSelectorOrigin.Site.ToString(),
+            OriginAlias = DynamicRootOrigin.Site.ToString(),
             OriginKey = ContentActs2022.Key,
-            Context = new StartNodeSelectorContext()
+            Context = new DynamicRootSelectorContext()
             {
                 CurrentKey = ContentAct2022RanD.Key,
                 ParentKey = ContentActs2022.Key
@@ -587,78 +587,78 @@ public class StartNodeFinderServiceTests : UmbracoIntegrationTest
         };
 
         // Act
-        var result = StartNodeFinder.CalculateOriginKey(selector);
+        var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
         Assert.AreEqual(ContentYears.Key, result);
     }
 
     [Test]
-    [TestCase(StartNodeSelectorOrigin.ByKey)]
-    [TestCase(StartNodeSelectorOrigin.Parent)]
-    [TestCase(StartNodeSelectorOrigin.Root)]
-    [TestCase(StartNodeSelectorOrigin.Site)]
-    [TestCase(StartNodeSelectorOrigin.Site)]
-    public void CalculateOriginKey__with_a_random_key_should_return_null(StartNodeSelectorOrigin origin)
+    [TestCase(DynamicRootOrigin.ByKey)]
+    [TestCase(DynamicRootOrigin.Parent)]
+    [TestCase(DynamicRootOrigin.Root)]
+    [TestCase(DynamicRootOrigin.Site)]
+    [TestCase(DynamicRootOrigin.Site)]
+    public void CalculateOriginKey__with_a_random_key_should_return_null(DynamicRootOrigin origin)
     {
         // Arrange
         var randomKey = Guid.NewGuid();
-        var selector = new StartNodeSelector()
+        var selector = new DynamicRootNodeSelector()
         {
             OriginAlias = origin.ToString(),
             OriginKey = randomKey,
-            Context = new StartNodeSelectorContext() { CurrentKey = randomKey, ParentKey = Guid.NewGuid() }
+            Context = new DynamicRootSelectorContext() { CurrentKey = randomKey, ParentKey = Guid.NewGuid() }
         };
 
         // Act
-        var result = StartNodeFinder.CalculateOriginKey(selector);
+        var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
         Assert.IsNull(result);
     }
 
     [Test]
-    [TestCase(StartNodeSelectorOrigin.ByKey)]
-    [TestCase(StartNodeSelectorOrigin.Parent)]
-    [TestCase(StartNodeSelectorOrigin.Root)]
-    [TestCase(StartNodeSelectorOrigin.Site)]
-    [TestCase(StartNodeSelectorOrigin.Current)]
-    public void CalculateOriginKey__with_a_trashed_key_should_still_be_allowed(StartNodeSelectorOrigin origin)
+    [TestCase(DynamicRootOrigin.ByKey)]
+    [TestCase(DynamicRootOrigin.Parent)]
+    [TestCase(DynamicRootOrigin.Root)]
+    [TestCase(DynamicRootOrigin.Site)]
+    [TestCase(DynamicRootOrigin.Current)]
+    public void CalculateOriginKey__with_a_trashed_key_should_still_be_allowed(DynamicRootOrigin origin)
     {
         // Arrange
         var trashedKey = Trashed.Key;
-        var selector = new StartNodeSelector()
+        var selector = new DynamicRootNodeSelector()
         {
             OriginAlias = origin.ToString(),
             OriginKey = trashedKey,
-            Context = new StartNodeSelectorContext() { CurrentKey = trashedKey, ParentKey = trashedKey }
+            Context = new DynamicRootSelectorContext() { CurrentKey = trashedKey, ParentKey = trashedKey }
         };
 
         // Act
-        var result = StartNodeFinder.CalculateOriginKey(selector);
+        var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
         Assert.IsNotNull(result);
     }
 
     [Test]
-    [TestCase(StartNodeSelectorOrigin.ByKey)]
-    [TestCase(StartNodeSelectorOrigin.Parent)]
-    [TestCase(StartNodeSelectorOrigin.Root)]
-    [TestCase(StartNodeSelectorOrigin.Site)]
-    [TestCase(StartNodeSelectorOrigin.Current)]
-    public void CalculateOriginKey__with_a_ContentType_key_should_return_null(StartNodeSelectorOrigin origin)
+    [TestCase(DynamicRootOrigin.ByKey)]
+    [TestCase(DynamicRootOrigin.Parent)]
+    [TestCase(DynamicRootOrigin.Root)]
+    [TestCase(DynamicRootOrigin.Site)]
+    [TestCase(DynamicRootOrigin.Current)]
+    public void CalculateOriginKey__with_a_ContentType_key_should_return_null(DynamicRootOrigin origin)
     {
         // Arrange
         var contentTypeKey = ContentTypeYears.Key;
-        var selector = new StartNodeSelector()
+        var selector = new DynamicRootNodeSelector()
         {
             OriginAlias = origin.ToString(),
             OriginKey = contentTypeKey,
-            Context = new StartNodeSelectorContext() { CurrentKey = contentTypeKey, ParentKey = contentTypeKey }
+            Context = new DynamicRootSelectorContext() { CurrentKey = contentTypeKey, ParentKey = contentTypeKey }
         };
         // Act
-        var result = StartNodeFinder.CalculateOriginKey(selector);
+        var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
         Assert.IsNull(result);

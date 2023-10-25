@@ -1,6 +1,6 @@
-namespace Umbraco.Cms.Core.StartNodeFinder;
+namespace Umbraco.Cms.Core.DynamicRoot;
 
-public struct StartNodeSelectorContext
+public struct DynamicRootSelectorContext
 {
     public required Guid? CurrentKey { get; set; }
     public required Guid ParentKey { get; set; }

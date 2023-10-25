@@ -26,8 +26,8 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.StartNodeFinder;
-using Umbraco.Cms.Core.StartNodeFinder.Filters;
+using Umbraco.Cms.Core.DynamicRoot;
+using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Xml;
@@ -68,7 +68,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     private static readonly string[] _postFilterSplitStrings = { "=", "==", "!=", "<>", ">", "<", ">=", "<=" };
 
     private readonly AppCaches _appCaches;
-    private readonly IStartNodeFinder _startNodeFinder;
+    private readonly IDynamicRootService _dynamicRootService;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly IContentService _contentService;
     private readonly IContentTypeService _contentTypeService;
@@ -111,7 +111,7 @@ public class EntityController : UmbracoAuthorizedJsonController
         IUserService userService,
         ILocalizationService localizationService,
         AppCaches appCaches,
-        IStartNodeFinder startNodeFinder)
+        IDynamicRootService dynamicRootService)
     {
         _treeService = treeService ?? throw new ArgumentNullException(nameof(treeService));
         _treeSearcher = treeSearcher ?? throw new ArgumentNullException(nameof(treeSearcher));
@@ -138,7 +138,7 @@ public class EntityController : UmbracoAuthorizedJsonController
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
-        _startNodeFinder = startNodeFinder;
+        _dynamicRootService = dynamicRootService;
     }
 
     [Obsolete("Use non-obsolete ctor. This will be removed in Umbraco 14.")]
@@ -183,7 +183,7 @@ public class EntityController : UmbracoAuthorizedJsonController
         userService,
         localizationService,
         appCaches,
-        StaticServiceProvider.Instance.GetRequiredService<IStartNodeFinder>())
+        StaticServiceProvider.Instance.GetRequiredService<IDynamicRootService>())
     {
 
     }
@@ -582,15 +582,15 @@ public class EntityController : UmbracoAuthorizedJsonController
     [Obsolete("This will be removed in Umbraco 13. Use GetByXPath instead")]
     public ActionResult<EntityBasic?>? GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type) => GetByXPath(query, nodeContextId, null, type);
 
-    public class JsonFilterViewModel
+    public class DynamicRootViewModel
     {
-        public MultiNodePickerConfigurationQueryFilter Query { get; set; } = null!;
+        public DynamicRoot Query { get; set; } = null!;
         public int CurrentId { get; set; }
         public int ParentId { get; set; }
     }
 
     [HttpPost]
-    public ActionResult<EntityBasic?> GetByJsonFilter([FromBody]JsonFilterViewModel model)
+    public ActionResult<EntityBasic?> GetByJsonFilter([FromBody]DynamicRootViewModel model)
     {
         var currentKey = model.CurrentId == 0 ? null : _entityService.Get(model.CurrentId)?.Key;
         var parentKey = model.ParentId == 0 ? null : _entityService.Get(model.ParentId)?.Key;
@@ -600,22 +600,22 @@ public class EntityController : UmbracoAuthorizedJsonController
             throw new ArgumentException("Invalid parentId", nameof(model.ParentId));
         }
 
-        var startNodeSelector = new StartNodeSelector()
+        var startNodeSelector = new DynamicRootNodeSelector()
         {
-            Context = new StartNodeSelectorContext()
+            Context = new DynamicRootSelectorContext()
             {
                 CurrentKey = currentKey,
                 ParentKey = parentKey.Value
             },
             OriginKey = model.Query.OriginKey,
             OriginAlias = model.Query.OriginAlias,
-            Filter = model.Query.Filter.Select(x=>new StartNodeFilter()
+            QuerySteps = model.Query.QuerySteps.Select(x=>new DynamicRootQueryStep()
             {
-                DirectionAlias = x.DirectionAlias,
+                Alias = x.Alias,
                 AnyOfDocTypeAlias = x.AnyOfDocTypeAlias
             })
         };
-        var startNodes = _startNodeFinder.GetDynamicStartNodes(startNodeSelector).ToArray();
+        var startNodes = _dynamicRootService.GetDynamicRoots(startNodeSelector).ToArray();
 
         Guid? first = startNodes.Any() ? startNodes.First() : null;
         if (first.HasValue)

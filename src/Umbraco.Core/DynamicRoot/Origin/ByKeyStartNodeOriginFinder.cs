@@ -1,7 +1,7 @@
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Core.StartNodeFinder.Origin;
+namespace Umbraco.Cms.Core.DynamicRoot.Origin;
 
 public class ByKeyStartNodeOriginFinder : IStartNodeOriginFinder
 {
@@ -18,7 +18,7 @@ public class ByKeyStartNodeOriginFinder : IStartNodeOriginFinder
         _entityService = entityService;
     }
 
-    public virtual Guid? FindOriginKey(StartNodeSelector selector)
+    public virtual Guid? FindOriginKey(DynamicRootNodeSelector selector)
     {
         if (selector.OriginAlias != SupportedOriginType || selector.OriginKey is null)
         {
