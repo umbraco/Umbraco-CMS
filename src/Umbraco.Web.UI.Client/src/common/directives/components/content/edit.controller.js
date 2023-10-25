@@ -352,7 +352,10 @@
                 labelKey: "buttons_saveAndPreview"
             };
 
-            const activeVariant = content.variants?.find((variant) => content.documentType?.variations === "Nothing" || variant.compositeId === compositeId);
+            let activeVariant = content.variants?.find((variant) => content.documentType?.variations === "Nothing" || variant.compositeId === compositeId);
+            /* if we can't find the active variant and there is only one variant available, we will use that.
+            this happens if we have a node that can vary by culture but there is only one language available. */
+            activeVariant = !activeVariant && content.variants.length === 1 ? content.variants[0] : activeVariant;
 
             $scope.previewSubButtons = activeVariant?.additionalPreviewUrls?.map((additionalPreviewUrl) => {
                 return {
