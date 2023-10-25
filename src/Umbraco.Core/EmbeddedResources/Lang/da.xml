@@ -1245,6 +1245,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="queryStepFurthestDescendantOrSelfTitle">Fjerneste barn eller selv</key>
     <key alias="queryStepFurthestDescendantOrSelfDesc">Forespørg fjerneste barn eller selv der passer på en af de givne typer</key>
     <key alias="addQueryStep">Tilføj skridt</key>
+    <key alias="queryStepTypes">der passer med typerne: </key>
   </area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Slettet medie</key>

@@ -1461,6 +1461,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="queryStepFurthestDescendantOrSelfTitle">Furthest Descendant Or Self</key>
     <key alias="queryStepFurthestDescendantOrSelfDesc">Query the Furthest descendant or self that fits with one of the configured types</key>
     <key alias="addQueryStep">Add query step</key>
+    <key alias="queryStepTypes">That matches types: </key>
   </area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Deleted item</key>
