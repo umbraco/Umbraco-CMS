@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 @customElement('umb-auth-layout')
 export class UmbAuthLayoutElement extends LitElement {
 	@property({ attribute: 'background-image' })
-	backgroundImage?: string;
+	backgroundImage?: string; //TODO: Implement
 
 	@property({ attribute: 'logo-image' })
 	logoImage?: string; //TODO: For the current design we need two logos. One for on top of the image and one for smaller screens where the image is gone and the logo is in the top left corner on white background.
@@ -59,7 +59,7 @@ export class UmbAuthLayoutElement extends LitElement {
 			}
 			#logo {
 				position: fixed;
-				background-image: var(--logo-image); /* should use a dark logo here */
+				background-image: url('login/umbraco_logo_blue_horizontal.svg'); /* should use a dark logo here */
 				background-repeat: no-repeat;
 				z-index: 1;
 				width: 80px;
@@ -83,7 +83,7 @@ export class UmbAuthLayoutElement extends LitElement {
 				background-position: 50%;
 				background-repeat: no-repeat;
 				background-size: cover;
-				background-image: var(--background-image);
+				background-image: url('login/loginImage.jpg');
 				width: 100%;
 				height: 100%;
 				transform: scaleX(-1);
@@ -106,7 +106,7 @@ export class UmbAuthLayoutElement extends LitElement {
 					width: 300px;
 				}
 				#logo {
-					background-image: var(--logo-image);
+					background-image: url('login/umbraco_logo_white_horizontal.svg');
 					top: 48px;
 					left: 48px;
 					width: 140px;
