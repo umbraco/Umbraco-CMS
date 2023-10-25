@@ -138,4 +138,8 @@ angular.module('umbraco')
 			};
 			editorService.open(originPicker);
 		};
+
+    $scope.appendDynamicQueryStep = function () {
+      $scope.model.value.queryFilter.
+    }
 });
