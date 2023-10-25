@@ -8,8 +8,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UserGroupResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 
-@customElement('umb-user-collection-grid-view')
-export class UmbUserCollectionGridViewElement extends UmbLitElement {
+@customElement('umb-user-grid-collection-view')
+export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	@state()
 	private _users: Array<UmbUserDetail> = [];
 
@@ -146,10 +146,10 @@ export class UmbUserCollectionGridViewElement extends UmbLitElement {
 	];
 }
 
-export default UmbUserCollectionGridViewElement;
+export default UmbUserGridCollectionViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-collection-grid-view': UmbUserCollectionGridViewElement;
+		'umb-user-grid-collection-view': UmbUserGridCollectionViewElement;
 	}
 }

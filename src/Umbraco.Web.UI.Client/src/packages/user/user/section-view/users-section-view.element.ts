@@ -1,9 +1,9 @@
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
-import '../collection/views/table/user-collection-table-view.element.js';
-import '../collection/views/grid/user-collection-grid-view.element.js';
+import '../collection/views/table/user-table-collection-view.element.js';
+import '../collection/views/grid/user-grid-collection-view.element.js';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

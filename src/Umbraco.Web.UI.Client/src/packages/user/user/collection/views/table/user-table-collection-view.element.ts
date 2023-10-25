@@ -1,6 +1,5 @@
 import { UmbUserCollectionContext } from '../../user-collection.context.js';
 import type { UmbUserDetail } from '../../../types.js';
-import type { UserGroupEntity } from '@umbraco-cms/backoffice/user-group';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
@@ -20,8 +19,8 @@ import './column-layouts/name/user-table-name-column-layout.element.js';
 import './column-layouts/status/user-table-status-column-layout.element.js';
 import { UserGroupItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-@customElement('umb-user-collection-table-view')
-export class UmbUserCollectionTableViewElement extends UmbLitElement {
+@customElement('umb-user-table-collection-view')
+export class UmbUserTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableConfig: UmbTableConfig = {
 		allowSelection: true,
@@ -177,10 +176,10 @@ export class UmbUserCollectionTableViewElement extends UmbLitElement {
 	];
 }
 
-export default UmbUserCollectionTableViewElement;
+export default UmbUserTableCollectionViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-collection-table-view': UmbUserCollectionTableViewElement;
+		'umb-user-table-collection-view': UmbUserTableCollectionViewElement;
 	}
 }

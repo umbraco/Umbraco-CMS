@@ -16,11 +16,11 @@ export class UmbUserCollectionElement extends UmbLitElement {
 	private _routes: UmbRoute[] = [
 		{
 			path: 'grid',
-			component: () => import('./views/grid/user-collection-grid-view.element.js'),
+			component: () => import('./views/grid/user-grid-collection-view.element.js'),
 		},
 		{
 			path: 'list',
-			component: () => import('./views/table/user-collection-table-view.element.js'),
+			component: () => import('./views/table/user-table-collection-view.element.js'),
 		},
 		{
 			path: '',
