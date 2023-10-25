@@ -195,6 +195,7 @@ export default class UmbLoginPageElement extends LitElement {
 				font-weight: 400;
 				font-size: 1.5rem;
 				margin: 0 0 var(--uui-size-layout-2);
+				line-height: 1.2 !important;
 			}
 
 			form {
@@ -253,12 +254,6 @@ export default class UmbLoginPageElement extends LitElement {
 				:host #greeting {
 					font-size: 2rem;
 					margin: 0 0 var(--uui-size-layout-3);
-				}
-			}
-			@media (min-width: 1300px) {
-				:host #greeting {
-					font-size: 2.5rem;
-					margin: 0 0 var(--uui-size-layout-4);
 				}
 			}
 		`,
