@@ -31,6 +31,7 @@ export class UmbAuthLayoutElement extends LitElement {
 			:host {
 				display: block;
 				height: 100dvh;
+				background-color: var(--uui-color-surface);
 			}
 			#layout {
 				display: flex;
@@ -77,7 +78,7 @@ export class UmbAuthLayoutElement extends LitElement {
 				width: 100%;
 				height: 100%;
 				transform: scaleX(-1);
-				border-radius: 26px;
+				border-radius: 40px;
 				border: 1px solid white;
 				box-sizing: border-box;
 				box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 48px;

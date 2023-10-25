@@ -15,7 +15,13 @@ export class UmbExternalLoginProvidersLayoutElement extends LitElement {
 
 	render() {
 		return html`
-			${this.showDivider ? html` <div id="divider" aria-hidden="true"><span><umb-localize key="general_or">Or</umb-localize></span></div> ` : nothing}
+			${this.showDivider
+				? html`
+						<div id="divider" aria-hidden="true">
+							<span><umb-localize key="general_or">Or</umb-localize></span>
+						</div>
+				  `
+				: nothing}
 			<div>
 				<slot></slot>
 			</div>
@@ -50,9 +56,9 @@ export class UmbExternalLoginProvidersLayoutElement extends LitElement {
 			}
 
 			#divider span {
-				background-color: var(--uui-color-surface-alt);
+				background-color: var(--uui-color-surface);
 				padding: 0 9px;
-        text-transform: capitalize;
+				text-transform: capitalize;
 			}
 
 			#divider::before {

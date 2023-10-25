@@ -9,7 +9,6 @@ import { umbLocalizationContext } from '../../external/localization/localization
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends LitElement {
-
 	@property({ type: Boolean, attribute: 'username-is-email' })
 	usernameIsEmail = false;
 
@@ -59,8 +58,8 @@ export default class UmbLoginPageElement extends LitElement {
 				umbAuthContext.twoFactorView = response.twoFactorView;
 			}
 
-		    this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'mfa' }}));
-		    return;
+			this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'mfa' } }));
+			return;
 		}
 
 		if (response.error) {
@@ -110,14 +109,14 @@ export default class UmbLoginPageElement extends LitElement {
 										type=${this.usernameIsEmail ? 'email' : 'text'}
 										id="umb-username"
 										name="email"
-										autocomplete=${this.usernameIsEmail
-											? 'username'
-											: 'email'}
+										autocomplete=${this.usernameIsEmail ? 'username' : 'email'}
 										.label=${this.usernameIsEmail
 											? until(umbLocalizationContext.localize('general_email', undefined, 'Email'))
 											: until(umbLocalizationContext.localize('user_username', undefined, 'Username'))}
 										required
-										required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input>
+										required-message=${until(
+											umbLocalizationContext.localize('general_required', undefined, 'Required')
+										)}></uui-input>
 								</uui-form-layout-item>
 
 								<uui-form-layout-item>
@@ -130,14 +129,18 @@ export default class UmbLoginPageElement extends LitElement {
 										autocomplete="current-password"
 										.label=${until(umbLocalizationContext.localize('user_password', undefined, 'Password'))}
 										required
-										required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input-password>
+										required-message=${until(
+											umbLocalizationContext.localize('general_required', undefined, 'Required')
+										)}></uui-input-password>
 								</uui-form-layout-item>
 
 								<div id="secondary-actions">
 									${when(
 										umbAuthContext.supportsPersistLogin,
 										() => html`<uui-form-layout-item>
-											<uui-checkbox name="persist" .label=${until(umbLocalizationContext.localize('user_rememberMe', undefined, 'Remember me'))}>
+											<uui-checkbox
+												name="persist"
+												.label=${until(umbLocalizationContext.localize('user_rememberMe', undefined, 'Remember me'))}>
 												<umb-localize key="user_rememberMe">Remember me</umb-localize>
 											</uui-checkbox>
 										</uui-form-layout-item>`
@@ -176,74 +179,89 @@ export default class UmbLoginPageElement extends LitElement {
 	}
 
 	#handleForgottenPassword() {
-		this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'reset' }}));
+		this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'reset' } }));
 	}
 
 	static styles: CSSResultGroup = [
 		css`
-      :host {
-        display: flex;
-        flex-direction: column;
-      }
+			:host {
+				display: flex;
+				flex-direction: column;
+			}
 
-      #greeting {
-        text-align: center;
-        font-weight: 600;
-        font-size: 1.4rem;
-        margin: 0 0 var(--uui-size-space-6);
-      }
+			#greeting {
+				color: var(--uui-color-interactive);
+				text-align: center;
+				font-weight: 400;
+				font-size: 1.5rem;
+				margin: 0 0 var(--uui-size-layout-2);
+			}
 
-      form {
-        display: flex;
-        flex-direction: column;
-        gap: var(--uui-size-space-5);
-      }
+			form {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-5);
+			}
 
-      uui-form-layout-item {
-        margin: 0;
-      }
+			uui-form-layout-item {
+				margin: 0;
+			}
 
-      uui-input,
-      uui-input-password {
-        width: 100%;
-        border-radius: var(--uui-border-radius);
-      }
+			uui-input,
+			uui-input-password {
+				width: 100%;
+				height: 38px;
+				border-radius: var(--uui-border-radius);
+			}
 
-      #umb-login-button {
-        width: 100%;
-        --uui-button-padding-top-factor: 1.5;
-        --uui-button-padding-bottom-factor: 1.5;
-      }
+			#umb-login-button {
+				width: 100%;
+				--uui-button-padding-top-factor: 1.5;
+				--uui-button-padding-bottom-factor: 1.5;
+			}
 
-      #forgot-password {
-		  cursor: pointer;
-		  background: none;
-		  border: 0;
-		  height: 1rem;
-		  color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
-		  gap: var(--uui-size-space-1);
-		  align-self: center;
-		  text-decoration: none;
-		  display: inline-flex;
-		  line-height: 1;
-		  font-size: 14px;
-		  font-family: var(--uui-font-family);
-      }
+			#forgot-password {
+				cursor: pointer;
+				background: none;
+				border: 0;
+				height: 1rem;
+				color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
+				gap: var(--uui-size-space-1);
+				align-self: center;
+				text-decoration: none;
+				display: inline-flex;
+				line-height: 1;
+				font-size: 14px;
+				font-family: var(--uui-font-family);
+			}
 
-      #forgot-password:hover {
-        color: var(--uui-color-interactive-emphasis);
-      }
+			#forgot-password:hover {
+				color: var(--uui-color-interactive-emphasis);
+			}
 
-      .text-danger {
-        color: var(--uui-color-danger-standalone);
-      }
+			.text-danger {
+				color: var(--uui-color-danger-standalone);
+			}
 
-      #secondary-actions {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-    `,
+			#secondary-actions {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			@media (min-width: 850px) {
+				:host #greeting {
+					font-size: 2rem;
+					margin: 0 0 var(--uui-size-layout-3);
+				}
+			}
+			@media (min-width: 1300px) {
+				:host #greeting {
+					font-size: 2.5rem;
+					margin: 0 0 var(--uui-size-layout-4);
+				}
+			}
+		`,
 	];
 }
 
