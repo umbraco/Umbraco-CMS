@@ -22,6 +22,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.TemplateQuery;
 using Umbraco.Cms.Core.Persistence;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -581,30 +582,15 @@ public class EntityController : UmbracoAuthorizedJsonController
     [Obsolete("This will be removed in Umbraco 13. Use GetByXPath instead")]
     public ActionResult<EntityBasic?>? GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type) => GetByXPath(query, nodeContextId, null, type);
 
-
     public class JsonFilterViewModel
     {
-        public string OriginAlias { get; set; } = string.Empty;
-        public JsonFilterFilterViewModel[] Filter { get; set; } = Array.Empty<JsonFilterFilterViewModel>();
-
-        public Guid? OriginKey { get; set; }
-    }
-
-    public class JsonFilterFilterViewModel
-    {
-        public string DirectionAlias { get; set; } = string.Empty;
-        public IEnumerable<string> AnyOfDocTypeAlias { get; set; } = Array.Empty<string>();
-    }
-
-    public class JsonFilterFilterXViewModel
-    {
-        public JsonFilterViewModel Query { get; set; } = null!;
+        public MultiNodePickerConfigurationQueryFilter Query { get; set; } = null!;
         public int CurrentId { get; set; }
         public int ParentId { get; set; }
     }
 
     [HttpPost]
-    public ActionResult<EntityBasic?> GetByJsonFilter([FromBody]JsonFilterFilterXViewModel model)
+    public ActionResult<EntityBasic?> GetByJsonFilter([FromBody]JsonFilterViewModel model)
     {
         var currentKey = model.CurrentId == 0 ? null : _entityService.Get(model.CurrentId)?.Key;
         var parentKey = model.ParentId == 0 ? null : _entityService.Get(model.ParentId)?.Key;
