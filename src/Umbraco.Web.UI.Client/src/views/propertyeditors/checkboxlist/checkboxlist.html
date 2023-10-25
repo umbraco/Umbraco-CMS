@@ -1,8 +1,8 @@
-﻿<div class="umb-property-editor umb-checkboxlist" ng-controller="Umbraco.PropertyEditors.CheckboxListController as vm">
+<div class="umb-property-editor umb-checkboxlist" ng-controller="Umbraco.PropertyEditors.CheckboxListController as vm">
 
     <ng-form name="checkboxListFieldForm">
 
-        <ul class="unstyled">
+        <ul class="unstyled" ng-if="vm.viewItems.length">
             <li ng-repeat="item in vm.viewItems track by item.key">
                 <umb-checkbox 
                     name="{{::model.alias}}_{{::vm.uniqueId}}" 

@@ -59,8 +59,6 @@ public class BackOfficeWebAssets
             BundlingOptions.NotOptimizedAndComposite,
             FormatPaths(
                 "assets/css/umbraco.min.css",
-                "lib/umbraco-ui/uui-css/dist/custom-properties.css",
-                "lib/umbraco-ui/uui-css/dist/uui-text.css",
                 "lib/bootstrap-social/bootstrap-social.css",
                 "lib/font-awesome/css/font-awesome.min.css"));
 

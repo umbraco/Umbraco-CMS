@@ -9,14 +9,14 @@ public interface IPackagingService : IService
     /// <summary>
     ///     Returns a <see cref="CompiledPackage" /> result from an umbraco package file (zip)
     /// </summary>
-    /// <param name="packageFile"></param>
+    /// <param name="packageXml"></param>
     /// <returns></returns>
     CompiledPackage GetCompiledPackageInfo(XDocument packageXml);
 
     /// <summary>
     ///     Installs the data, entities, objects contained in an umbraco package file (zip)
     /// </summary>
-    /// <param name="packageFile"></param>
+    /// <param name="packageXmlFile"></param>
     /// <param name="userId"></param>
     InstallationSummary InstallCompiledPackageData(FileInfo packageXmlFile, int userId = Constants.Security.SuperUserId);
 
