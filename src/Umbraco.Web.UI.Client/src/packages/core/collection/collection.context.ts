@@ -49,30 +49,66 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		);
 	}
 
+	/**
+	 * Returns true if the given id is selected.
+	 * @param {string} id
+	 * @return {Boolean}
+	 * @memberof UmbCollectionContext
+	 */
 	public isSelected(id: string) {
 		return this.#selection.getValue().includes(id);
 	}
 
-	public setSelection(value: Array<string>) {
-		if (!value) return;
-		this.#selection.next(value);
+	/**
+	 * Sets the current selection.
+	 * @param {Array<string>} selection
+	 * @memberof UmbCollectionContext
+	 */
+	public setSelection(selection: Array<string>) {
+		if (!selection) return;
+		this.#selection.next(selection);
 	}
+
+	/**
+	 * Returns the current selection.
+	 * @return {Array<string>}
+	 * @memberof UmbCollectionContext
+	 */
 	public getSelection() {
 		this.#selection.getValue();
 	}
 
+	/**
+	 * Clears the current selection.
+	 * @memberof UmbCollectionContext
+	 */
 	public clearSelection() {
 		this.#selection.next([]);
 	}
 
+	/**
+	 * Appends the given id to the current selection.
+	 * @param {string} id
+	 * @memberof UmbCollectionContext
+	 */
 	public select(id: string) {
 		this.#selection.appendOne(id);
 	}
 
+	/**
+	 * Removes the given id from the current selection.
+	 * @param {string} id
+	 * @memberof UmbCollectionContext
+	 */
 	public deselect(id: string) {
 		this.#selection.filter((k) => k !== id);
 	}
 
+	/**
+	 * Returns the collection entity type
+	 * @return {string}
+	 * @memberof UmbCollectionContext
+	 */
 	public getEntityType() {
 		return this._entityType;
 	}
@@ -82,6 +118,11 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		this.requestCollection();
 	}
 
+	/**
+	 * Requests the collection from the repository.
+	 * @return {*}
+	 * @memberof UmbCollectionContext
+	 */
 	public async requestCollection() {
 		if (!this.repository) return;
 
@@ -94,14 +135,14 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		}
 	}
 
+	/**
+	 * Sets the filter for the collection and refreshes the collection.
+	 * @param {Partial<FilterModelType>} filter
+	 * @memberof UmbCollectionContext
+	 */
 	setFilter(filter: Partial<FilterModelType>) {
 		this.#filter.next({ ...this.#filter.getValue(), ...filter });
 		this.requestCollection();
-	}
-
-	// TODO: how can we make sure to call this.
-	public destroy(): void {
-		this.#items.unsubscribe();
 	}
 }
 
