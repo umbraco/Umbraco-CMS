@@ -1218,7 +1218,21 @@ Mange hilsner fra Umbraco robotten
     <key alias="specifyPickerRootTitle">Afgræns udgangspunktet</key>
     <key alias="defineRootNode">Vælg udgangspunkt</key>
     <key alias="defineXPathOrigin">Definer med XPath</key>
-    <key alias="defineDynamicRoot">Definer dynamisk udgangspunkt</key>
+    <key alias="defineDynamicRoot">Definer Dynamisk Udgangspunkt</key>
+  </area>
+  <area alias="dynamicRoot">
+    <key alias="pickDynamicRootOriginTitle">Vælg begyndelsen</key>
+    <key alias="pickDynamicRootOriginDesc">Beskriv begyndelsen for dynamisk udgangspounkts forespørgselen</key>
+    <key alias="originRootTitle">Roden</key>
+    <key alias="originRootDesc">Rod noden for denne kilde</key>
+    <key alias="originParentTitle">Overliggende</key>
+    <key alias="originParentDesc">Den overliggende node af kilden i denne redigerings session</key>
+    <key alias="originCurrentTitle">Nuværende</key>
+    <key alias="originCurrentDesc">Kilde noden for denne redigerings session</key>
+    <key alias="originSiteTitle">Siden</key>
+    <key alias="originSiteDesc">Nærmeste node med et domæne</key>
+    <key alias="originByKeyTitle">Specifik Node</key>
+    <key alias="originByKeyDesc">Vælg en specifik Node</key>
   </area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Slettet medie</key>

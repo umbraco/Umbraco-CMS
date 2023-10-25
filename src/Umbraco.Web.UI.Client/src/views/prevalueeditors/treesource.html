@@ -20,26 +20,27 @@
 	</umb-node-preview>
 
     <div ng-if="!node && model.value.type !== 'member'" class="mt2">
-        <div ng-hide="(showXPath || model.value.query) || (showDynamicStartNode || model.value.queryFilter)">
-          <h5><localize key="contentPicker_specifyPickerRootTitle">Specify root</localize></h5>
-          <umb-button
+        <div ng-hide="(showXPath || model.value.query) || (showDynamicStartNode || model.value.queryFilter)" class="flex">
+          <button
             type="button"
-            label-key="contentPicker_defineRootNode"
-            action="openContentPicker()">
+            class="umb-node-preview-add"
+            ng-click="openContentPicker()">
             <localize key="contentPicker_defineRootNode">Pick root node</localize>
-          </umb-button>
-          <umb-button
+          </button>
+          <button
             type="button"
-            label-key="contentPicker_defineXPathOrigin"
-            action="chooseXPath()">
-            <localize key="contentPicker_defineXPathOrigin">Specify via XPath</localize>
-          </umb-button>
-          <umb-button
+            class="umb-node-preview-add"
+            style="margin-left:-1px;"
+            ng-click="chooseXPath()">
+            <localize key="contentPicker_defineXPathOrigin">Specify root via XPath</localize>
+          </button>
+          <button
             type="button"
-            label-key="contentPicker_defineDynamicRoot"
-            action="chooseDynamicStartNode()">
+            class="umb-node-preview-add"
+            style="margin-left:-1px;"
+            ng-click="chooseDynamicStartNode()">
             <localize key="contentPicker_defineDynamicRoot">Specify a Dynamic Root</localize>
-          </umb-button>
+          </button>
         </div>
 
         <div ng-show="showXPath || model.value.query">
@@ -89,10 +90,33 @@
         </div>
       <div ng-show="showDynamicStartNode || model.value.queryFilter">
 
+        <!--
         <textarea type="text"
                ng-model="model.value.queryFilter"
                class="umb-property-editor umb-textarea"
                   placeholder="Enter query"></textarea>
+        -->
+
+        <!-- origin -->
+        <umb-button
+          type="button"
+          action="openDynamicRootOriginPicker()"
+          label="dynamicRoot_origin{{model.value.queryFilter.OriginAlias}}Title">
+        </umb-button>
+
+        <!-- list of filters -->
+        <ul class="umb-tree">
+          <li class="umb-tree-item" ng-repeat="filter in model.value.queryFilter.Filter">
+            <div class="umb-tree-item__inner" style="padding: 5px 10px;">
+              <button type="button" class="btn-reset text-left flex-auto" ng-click="">
+                <umb-icon icon="{{'icon-globe'}}" class="icon umb-tree-icon">
+                </umb-icon>
+                <span>{{ filter.DirectionAlias }}</span>
+              </button>
+            </div>
+          </li>
+        </ul>
+
 
         <ul class="unstyled list-icons mt3">
           <li>

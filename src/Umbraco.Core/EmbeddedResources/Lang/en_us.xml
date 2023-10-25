@@ -1471,8 +1471,22 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="pickedTrashedItems">You have picked content items currently deleted or in the recycle bin</key>
     <key alias="specifyPickerRootTitle">Specify root</key>
     <key alias="defineRootNode">Pick root node</key>
-    <key alias="defineXPathOrigin">Specify via XPath</key>
-    <key alias="defineDynamicRoot">Specify a dynamic root</key>
+    <key alias="defineXPathOrigin">Specify root via XPath</key>
+    <key alias="defineDynamicRoot">Specify a Dynamic Root</key>
+  </area>
+  <area alias="dynamicRoot">
+    <key alias="pickDynamicRootOriginTitle">Pick origin</key>
+    <key alias="pickDynamicRootOriginDesc">Define the origin for your Dynamic Root Query</key>
+    <key alias="originRootTitle">Root</key>
+    <key alias="originRootDesc">Root node of this editing session</key>
+    <key alias="originParentTitle">Parent</key>
+    <key alias="originParentDesc">The parent node of the source in this editing session</key>
+    <key alias="originCurrentTitle">Current</key>
+    <key alias="originCurrentDesc">The content node that is source for this editing session</key>
+    <key alias="originSiteTitle">Site</key>
+    <key alias="originSiteDesc">Find nearest node with a hostname</key>
+    <key alias="originByKeyTitle">Specific Node</key>
+    <key alias="originByKeyDesc">Pick a specific Node as the origin for this query</key>
   </area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Deleted item</key>
