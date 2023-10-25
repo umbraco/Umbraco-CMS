@@ -595,18 +595,24 @@ public class EntityController : UmbracoAuthorizedJsonController
         public string DirectionAlias { get; set; } = string.Empty;
         public IEnumerable<string> AnyOfDocTypeAlias { get; set; } = Array.Empty<string>();
     }
-    public ActionResult<EntityBasic?> GetByJsonFilter(string query, int nodeContextId, int parentId)
-    {
 
-        var currentKey = nodeContextId == 0 ? null : _entityService.Get(nodeContextId)?.Key;
-        var parentKey = parentId == 0 ? null : _entityService.Get(parentId)?.Key;
+    public class JsonFilterFilterXViewModel
+    {
+        public JsonFilterViewModel Query { get; set; } = null!;
+        public int CurrentId { get; set; }
+        public int ParentId { get; set; }
+    }
+
+    [HttpPost]
+    public ActionResult<EntityBasic?> GetByJsonFilter([FromBody]JsonFilterFilterXViewModel model)
+    {
+        var currentKey = model.CurrentId == 0 ? null : _entityService.Get(model.CurrentId)?.Key;
+        var parentKey = model.ParentId == 0 ? null : _entityService.Get(model.ParentId)?.Key;
 
         if (parentKey is null)
         {
-            throw new ArgumentException("Invalid parentId", nameof(parentId));
+            throw new ArgumentException("Invalid parentId", nameof(model.ParentId));
         }
-
-        var model = JsonConvert.DeserializeObject<JsonFilterViewModel>(query)!;
 
         var startNodeSelector = new StartNodeSelector()
         {
@@ -615,9 +621,9 @@ public class EntityController : UmbracoAuthorizedJsonController
                 CurrentKey = currentKey,
                 ParentKey = parentKey.Value
             },
-            OriginKey = model.OriginKey,
-            OriginAlias = model.OriginAlias,
-            Filter = model.Filter.Select(x=>new StartNodeFilter()
+            OriginKey = model.Query.OriginKey,
+            OriginAlias = model.Query.OriginAlias,
+            Filter = model.Query.Filter.Select(x=>new StartNodeFilter()
             {
                 DirectionAlias = x.DirectionAlias,
                 AnyOfDocTypeAlias = x.AnyOfDocTypeAlias
