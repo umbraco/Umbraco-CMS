@@ -58,31 +58,49 @@ public class StartNodeFilterRepository: IStartNodeFilterRepository
 
     public IEnumerable<Guid> NearestDescendantOrSelf(IEnumerable<Guid> origins, StartNodeFilter filter)
     {
-        Sql<ISqlContext> query = GetDescendantOrSelfBaseQuery(origins, filter)
-            .Append($"GROUP BY n.uniqueId HAVING MIN(n.level) = n.level");
+        var level = Database.Single<int>(Database.SqlContext.Sql()
+            .Select("MIN(n.level)")
+            .DescendantOrSelfBaseQuery(origins, filter));
+
+        Sql<ISqlContext> query =
+            Database.SqlContext.Sql()
+                .Select<NodeDto>("n", n => n.UniqueId)
+                .DescendantOrSelfBaseQuery(origins, filter)
+                .Where<NodeDto>(n => n.Level == level, "n");
 
         return Database.Fetch<Guid>(query);
     }
 
+    public IEnumerable<Guid> FarthestDescendantOrSelf(IEnumerable<Guid> origins, StartNodeFilter filter)
+    {
 
+        var level = Database.Single<int>(Database.SqlContext.Sql()
+            .Select("MAX(n.level)")
+            .DescendantOrSelfBaseQuery(origins, filter));
 
-    public IEnumerable<Guid> FarthestDescendantOrSelf(IEnumerable<Guid> origins, StartNodeFilter filter)    {
-        Sql<ISqlContext> query = GetDescendantOrSelfBaseQuery(origins, filter)
-            .Append($"GROUP BY n.uniqueId HAVING MAX(n.level) = n.level");
+        Sql<ISqlContext> query =
+            Database.SqlContext.Sql()
+                .Select<NodeDto>("n", n => n.UniqueId)
+                .DescendantOrSelfBaseQuery(origins, filter)
+                .Where<NodeDto>(n => n.Level == level, "n");
 
         return Database.Fetch<Guid>(query);
     }
-    private Sql<ISqlContext> GetDescendantOrSelfBaseQuery(IEnumerable<Guid> origins, StartNodeFilter filter) =>
-        Database.SqlContext.Sql()
-            .Select<NodeDto>("n", n => n.UniqueId)
+
+}
+
+internal static class HelperExtensions
+{
+    internal static Sql<ISqlContext> DescendantOrSelfBaseQuery(this Sql<ISqlContext> sql, IEnumerable<Guid> origins, StartNodeFilter filter) =>
+        //sql. Database.SqlContext.Sql().Select<NodeDto>("n", n => n.UniqueId)
+        sql
             .From<NodeDto>("norigin")
             .Append( // TODO hack because npoco do not support this
-                $"INNER JOIN {Database.SqlContext.SqlSyntax.GetQuotedTableName(NodeDto.TableName)} n ON {Database.SqlContext.SqlSyntax.Substring}(N.path, 1, {Database.SqlContext.SqlSyntax.Length}(norigin.path)) = norigin.path")
+                $"INNER JOIN {sql.SqlContext.SqlSyntax.GetQuotedTableName(NodeDto.TableName)} n ON {sql.SqlContext.SqlSyntax.Substring}(N.path, 1, {sql.SqlContext.SqlSyntax.Length}(norigin.path)) = norigin.path")
             .InnerJoin<ContentDto>("c")
             .On<ContentDto, NodeDto>((c, n) => c.NodeId == n.NodeId, "c", "n")
             .InnerJoin<ContentTypeDto>("ct")
             .On<ContentDto, ContentTypeDto>((c, ct) => c.ContentTypeId == ct.NodeId, "c", "ct")
             .Where<ContentTypeDto>(ct => filter.AnyOfDocTypeAlias.Contains(ct.Alias), "ct")
             .Where<NodeDto>(norigin => origins.Contains(norigin.UniqueId), "norigin");
-
 }
