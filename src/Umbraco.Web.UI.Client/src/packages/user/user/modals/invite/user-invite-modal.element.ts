@@ -4,7 +4,6 @@ import { css, html, nothing, customElement, query, state } from '@umbraco-cms/ba
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
-export type UsersViewType = 'list' | 'grid';
 @customElement('umb-user-invite-modal')
 export class UmbUserInviteModalElement extends UmbModalBaseElement {
 	@query('#form')
