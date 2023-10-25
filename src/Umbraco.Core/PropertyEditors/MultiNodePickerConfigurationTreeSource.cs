@@ -14,7 +14,7 @@ public class MultiNodePickerConfigurationTreeSource
     [DataMember(Name = "query")]
     public string? StartNodeQuery { get; set; }
 
-    [DataMember(Name = "queryFilter")]
+    [DataMember(Name = "dynamicRoot")]
     public MultiNodePickerConfigurationQueryFilter? StartNodeQueryFilter { get; set; }
 
     [DataMember(Name = "id")]
@@ -30,14 +30,14 @@ public class MultiNodePickerConfigurationQueryFilter
     [DataMember(Name = "originKey")]
     public Guid? OriginKey { get; set; }
 
-    [DataMember(Name = "filter")]
+    [DataMember(Name = "querySteps")]
     public MultiNodePickerConfigurationQueryFilterStep[] Filter { get; set; } = Array.Empty<MultiNodePickerConfigurationQueryFilterStep>();
 }
 
 [DataContract]
 public class MultiNodePickerConfigurationQueryFilterStep
 {
-    [DataMember(Name = "directionAlias")]
+    [DataMember(Name = "alias")]
     public string DirectionAlias { get; set; } = string.Empty;
 
     [DataMember(Name = "anyOfDocTypeAlias")]

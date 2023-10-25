@@ -62,13 +62,13 @@ angular.module('umbraco')
 
 		$scope.chooseXPath = function() {
 			$scope.showXPath = true;
-      $scope.model.value.queryFilter = null;
+      $scope.model.value.dynamicRoot = null;
 		};
 		$scope.chooseDynamicStartNode = function() {
 			$scope.showXPath = false;
-      $scope.model.value.queryFilter = {
+      $scope.model.value.dynamicRoot = {
         originAlias: "Parent",
-        filter: []
+        querySteps: []
       };
 		};
 
@@ -77,7 +77,7 @@ angular.module('umbraco')
 			$scope.showXPath = false;
 		};
 		$scope.clearDynamicStartNode = function() {
-      $scope.model.value.queryFilter = null;
+      $scope.model.value.dynamicRoot = null;
 			$scope.showDynamicStartNode = false;
 		};
 
@@ -85,7 +85,7 @@ angular.module('umbraco')
 			$scope.model.value.id = null;
       $scope.node = null;
       $scope.model.value.query = null;
-      $scope.model.value.queryFilter = null;
+      $scope.model.value.dynamicRoot = null;
       treeSourceChanged();
 		};
 
@@ -98,7 +98,7 @@ angular.module('umbraco')
       if($scope.model.value.type === "member"){
         $scope.model.value.id = null;
         $scope.model.value.query = "";
-        $scope.model.value.queryFilter = null;
+        $scope.model.value.dynamicRoot = null;
       }
     });
 
@@ -126,10 +126,10 @@ angular.module('umbraco')
         view: "views/common/infiniteeditors/pickdynamicrootorigin/pickdynamicrootorigin.html",
         contentType: $scope.model.value.type,
         size: "small",
-        value: {...$scope.model.value.queryFilter},
+        value: {...$scope.model.value.dynamicRoot},
 				multiPicker: false,
 				submit: function(model) {
-					$scope.model.value.queryFilter = model.value;
+					$scope.model.value.dynamicRoot = model.value;
 					editorService.close();
 				},
 				close: function() {
@@ -140,8 +140,8 @@ angular.module('umbraco')
 		};
 
     $scope.appendDynamicQueryStep = function () {
-      $scope.model.value.queryFilter.push({
-        directionAlias: "NearestDescendantOrSelf",
+      $scope.model.value.queryFilter.querySteps.push({
+        alias: "NearestDescendantOrSelf",
         anyOfDocTypeAlias:[
           "stages"
         ]
