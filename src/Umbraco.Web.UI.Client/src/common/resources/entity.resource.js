@@ -366,13 +366,17 @@ function entityResource($q, $http, umbRequestHelper) {
                'Failed to retrieve entity data for query ' + query);
         },
 
-      getByJsonFilter: function (query, nodeContextId, parentId, type) {
+      getByJsonFilter: function (query, currentId, parentId) {
         return umbRequestHelper.resourcePromise(
-          $http.get(
+          $http.post(
             umbRequestHelper.getApiUrl(
               "entityApiBaseUrl",
-              "GetByJsonFilter",
-              [{ query: query }, { nodeContextId: nodeContextId }, { parentId: parentId }, { type: type }])),
+              "getByJsonFilter"),
+            {
+              query: JSON.parse(query),
+              parentId: parentId,
+              currentId: currentId
+            }),
           'Failed to retrieve entity data for query ' + query);
       },
 
