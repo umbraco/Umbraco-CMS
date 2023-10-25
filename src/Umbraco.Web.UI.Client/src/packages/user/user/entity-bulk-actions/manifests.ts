@@ -1,4 +1,9 @@
-import { USER_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import {
+	DISABLE_USER_REPOSITORY_ALIAS,
+	ENABLE_USER_REPOSITORY_ALIAS,
+	UNLOCK_USER_REPOSITORY_ALIAS,
+	USER_REPOSITORY_ALIAS,
+} from '../repository/manifests.js';
 import { USER_ENTITY_TYPE } from '../types.js';
 import { UmbEnableUserEntityBulkAction } from './enable/enable.action.js';
 import { UmbSetGroupUserEntityBulkAction } from './set-group/set-group.action.js';
@@ -32,7 +37,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbEnableUserEntityBulkAction,
 		meta: {
 			label: 'Enable',
-			repositoryAlias: USER_REPOSITORY_ALIAS,
+			repositoryAlias: ENABLE_USER_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
@@ -49,7 +54,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbUnlockUserEntityBulkAction,
 		meta: {
 			label: 'Unlock',
-			repositoryAlias: USER_REPOSITORY_ALIAS,
+			repositoryAlias: UNLOCK_USER_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
@@ -66,7 +71,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbDisableUserEntityBulkAction,
 		meta: {
 			label: 'Disable',
-			repositoryAlias: USER_REPOSITORY_ALIAS,
+			repositoryAlias: DISABLE_USER_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
