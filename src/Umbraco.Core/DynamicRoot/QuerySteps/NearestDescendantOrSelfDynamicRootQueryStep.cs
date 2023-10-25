@@ -1,23 +1,23 @@
 using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Cms.Core.StartNodeFinder.Filters;
+namespace Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 
-public class NearestDescendantOrSelfStartNodeSelectorFilter : IStartNodeSelectorFilter
+public class NearestDescendantOrSelfDynamicRootQueryStep : IDynamicRootQueryStep
 {
     private readonly ICoreScopeProvider _scopeProvider;
-    private readonly IStartNodeFilterRepository _nodeFilterRepository;
+    private readonly IDynamicRootRepository _nodeFilterRepository;
 
-    public NearestDescendantOrSelfStartNodeSelectorFilter(ICoreScopeProvider scopeProvider, IStartNodeFilterRepository nodeFilterRepository)
+    public NearestDescendantOrSelfDynamicRootQueryStep(ICoreScopeProvider scopeProvider, IDynamicRootRepository nodeFilterRepository)
     {
         _scopeProvider = scopeProvider;
         _nodeFilterRepository = nodeFilterRepository;
     }
 
     protected virtual string SupportedDirectionAlias { get; set; } = "NearestDescendantOrSelf";
-    public bool Filter(IEnumerable<Guid> origins, StartNodeFilter filter, [MaybeNullWhen(false)] out IEnumerable<Guid> result)
+    public bool Execute(IEnumerable<Guid> origins, DynamicRootQueryStep filter, [MaybeNullWhen(false)] out IEnumerable<Guid> result)
     {
-        if (filter.DirectionAlias != SupportedDirectionAlias || origins.Any() is false)
+        if (filter.Alias != SupportedDirectionAlias || origins.Any() is false)
         {
             result = null;
             return false;

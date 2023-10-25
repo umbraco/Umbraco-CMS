@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Core.StartNodeFinder.Origin;
+namespace Umbraco.Cms.Core.DynamicRoot.Origin;
 
 public class SiteStartNodeOriginFinder : RootStartNodeOriginFinder
 {
@@ -18,7 +18,7 @@ public class SiteStartNodeOriginFinder : RootStartNodeOriginFinder
 
     protected override string SupportedOriginType { get; set; } = "Site";
 
-    public override Guid? FindOriginKey(StartNodeSelector selector)
+    public override Guid? FindOriginKey(DynamicRootNodeSelector selector)
     {
         if (selector.OriginAlias != SupportedOriginType || selector.Context.CurrentKey.HasValue is false)
         {

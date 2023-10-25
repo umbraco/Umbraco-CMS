@@ -366,12 +366,12 @@ function entityResource($q, $http, umbRequestHelper) {
                'Failed to retrieve entity data for query ' + query);
         },
 
-      getByJsonFilter: function (query, currentId, parentId) {
+      getDynamicRoot: function (query, currentId, parentId) {
         return umbRequestHelper.resourcePromise(
           $http.post(
             umbRequestHelper.getApiUrl(
               "entityApiBaseUrl",
-              "getByJsonFilter"),
+              "getDynamicRoot"),
             {
               query: JSON.parse(query),
               parentId: parentId,

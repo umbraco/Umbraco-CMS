@@ -2,7 +2,7 @@ using System.Globalization;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Core.StartNodeFinder.Origin;
+namespace Umbraco.Cms.Core.DynamicRoot.Origin;
 
 public class RootStartNodeOriginFinder : IStartNodeOriginFinder
 {
@@ -19,7 +19,7 @@ public class RootStartNodeOriginFinder : IStartNodeOriginFinder
     });
 
     protected virtual string SupportedOriginType { get; set; } = "Root";
-    public virtual Guid? FindOriginKey(StartNodeSelector selector)
+    public virtual Guid? FindOriginKey(DynamicRootNodeSelector selector)
     {
         if (selector.OriginAlias != SupportedOriginType)
         {
