@@ -1,7 +1,7 @@
+import { UmbUserItemRepository } from '../../user/repository/item/user-item.repository.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, CSSResultGroup, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangePasswordModalData, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbUserRepository } from '@umbraco-cms/backoffice/user';
 
 @customElement('umb-change-password-modal')
 export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChangePasswordModalData> {
@@ -11,7 +11,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChange
 	@state()
 	private _headline: string = 'Change password';
 
-	#repository = new UmbUserRepository(this);
+	#userItemRepository = new UmbUserItemRepository(this);
 
 	#onClose() {
 		this.modalContext?.reject();
@@ -38,7 +38,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChange
 
 	protected async firstUpdated(): Promise<void> {
 		if (!this.data?.userId) return;
-		const { data } = await this.#repository.requestItems([this.data.userId]);
+		const { data } = await this.#userItemRepository.requestItems([this.data.userId]);
 
 		if (data) {
 			const userName = data[0].name;

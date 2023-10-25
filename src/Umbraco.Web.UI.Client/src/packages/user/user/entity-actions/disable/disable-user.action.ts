@@ -1,5 +1,5 @@
 import { type UmbDisableUserRepository } from '../../repository/disable/disable-user.repository.js';
-import { UmbUserRepository } from '../../repository/user.repository.js';
+import { UmbUserItemRepository } from '../../repository/item/user-item.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -11,12 +11,12 @@ import {
 
 export class UmbDisableUserEntityAction extends UmbEntityActionBase<UmbDisableUserRepository> {
 	#modalManager?: UmbModalManagerContext;
-	#itemRepository: UmbUserRepository;
+	#itemRepository: UmbUserItemRepository;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 
-		this.#itemRepository = new UmbUserRepository(this.host);
+		this.#itemRepository = new UmbUserItemRepository(this.host);
 
 		new UmbContextConsumerController(this.host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalManager = instance;

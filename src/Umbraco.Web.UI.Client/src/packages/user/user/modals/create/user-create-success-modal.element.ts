@@ -1,4 +1,4 @@
-import { UmbUserRepository } from '../../repository/user.repository.js';
+import { UmbUserItemRepository } from '../../repository/item/user-item.repository.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
@@ -22,7 +22,7 @@ export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 	@state()
 	_userItem?: UserItemResponseModel;
 
-	#userRepository = new UmbUserRepository(this);
+	#userItemRepository = new UmbUserItemRepository(this);
 	#notificationContext?: UmbNotificationContext;
 
 	connectedCallback(): void {
@@ -34,7 +34,7 @@ export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 	protected async firstUpdated(): Promise<void> {
 		if (!this.data?.userId) throw new Error('No userId provided');
 
-		const { data } = await this.#userRepository.requestItems([this.data?.userId]);
+		const { data } = await this.#userItemRepository.requestItems([this.data?.userId]);
 		if (data) {
 			this._userItem = data[0];
 		}

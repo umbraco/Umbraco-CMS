@@ -1,5 +1,5 @@
 import { UmbUserRepository } from './user.repository.js';
-import { UmbUserItemStore } from './user-item.store.js';
+import { UmbUserItemStore } from './item/user-item.store.js';
 import { UmbUserStore } from './user.store.js';
 import { UmbDisableUserRepository } from './disable/disable-user.repository.js';
 import { UmbEnableUserRepository } from './enable/enable-user.repository.js';
