@@ -6,9 +6,10 @@
 		<option value="member">Members</option>
 	</select>
 
-    <umb-node-preview
-		ng-show="node"
-        class="mt1"
+  <h5 ng-if="node"><localize key="contentPicker_configurationStartNodeTitle">Root node</localize></h5>
+  <umb-node-preview
+		ng-if="node"
+    class="mt1"
 		icon="node.icon"
 		name="node.name"
 		published="node.published"
@@ -41,7 +42,9 @@
           </button>
         </div>
 
-        <umb-box ng-if="showXPath || model.value.query">
+        <div ng-if="showXPath || model.value.query">
+
+          <h5><localize key="contentPicker_configurationXPathTitle">XPath Query</localize></h5>
 
             <input type="text"
                    ng-model="model.value.query"
@@ -85,8 +88,8 @@
                     <button type="button" class="btn-link" ng-click="clearXPath()">Cancel and clear query</button>
                 </li>
             </ul>
-        </umb-box>
-      <umb-box ng-if="showDynamicStartNode || model.value.dynamicRoot">
+        </div>
+      <div ng-if="showDynamicStartNode || model.value.dynamicRoot">
 
         <!--
         <textarea type="text"
@@ -94,32 +97,49 @@
           class="umb-property-editor umb-textarea"
           placeholder="Enter query"></textarea>
         -->
+        <h5><localize key="dynamicRoot_configurationTitle">Dynamic Root Query</localize></h5>
 
         <!-- origin -->
-        <umb-button
-          type="button"
-          action="openDynamicRootOriginPicker()"
-          label-key="dynamicRoot_origin{{model.value.dynamicRoot.originAlias}}Title">
-        </umb-button>
-
-        <!-- list of filters -->
-        <ul class="umb-tree">
-          <li class="umb-tree-item" ng-repeat="filter in model.value.dynamicRoot.querySteps">
-            <div class="umb-tree-item__inner" style="padding: 5px 10px;">
-              <button type="button" class="btn-reset text-left flex-auto" ng-click="">
-                <umb-icon icon="{{'icon-globe'}}" class="icon umb-tree-icon">
-                </umb-icon>
-                <span>{{ filter.DirectionAlias }}</span>
-              </button>
+        <div class="umb-node-preview" single>
+          <div class="umb-node-preview__content">
+            <div class="umb-node-preview__name">
+              <!-- ng-repeat is used here to enforce re-rendering when originAlias is changed: -->
+              <localize ng-repeat="originAlias in [model.value.dynamicRoot.originAlias]" key="dynamicRoot_origin{{model.value.dynamicRoot.originAlias}}Title"></localize>
             </div>
-          </li>
-        </ul>
+            <div class="umb-node-preview__description" ng-if="model.value.dynamicRoot.originKey">
+              <!-- todo: get the name to display here. -->
+              {{model.value.dynamicRoot.originKey}}
+            </div>
+          </div>
+          <div class="umb-node-preview__actions">
+            <button type="button" class="umb-node-preview__action" ng-click="openDynamicRootOriginPicker()"><localize key="general_change">Change</localize></button>
+          </div>
+        </div>
+
+        <!-- list of query steps -->
+        <div ui-sortable="sortableOptionsForQuerySteps" ng-model="model.value.dynamicRoot.querySteps">
+          <div class="umb-node-preview" single ng-repeat="queryStep in model.value.dynamicRoot.querySteps">
+            <div class="umb-node-preview__content">
+              <div class="umb-node-preview__name">
+                <localize key="dynamicRoot_origin{{queryStep.alias}}Title"></localize>
+              </div>
+              <div class="umb-node-preview__description" ng-if="queryStep.anyOfDocTypeAlias">
+                <!-- todo: Maybe get the name to display here. -->
+                <span>Of type: </span>
+                <span ng-repeat="alias in queryStep.anyOfDocTypeAlias">{{alias}}</span>
+              </div>
+            </div>
+            <div class="umb-node-preview__actions">
+              <button type="button" class="umb-node-preview__action" ng-click="openDynamicRootOriginPicker()"><localize key="general_remove">Remove</localize></button>
+            </div>
+          </div>
+        </div>
 
         <button
           type="button"
           class="umb-node-preview-add"
           ng-click="appendDynamicQueryStep()">
-          <localize key="dynamicRoot_addQueryStep">Add another query step</localize>
+          <localize key="dynamicRoot_addQueryStep">Add query step</localize>
         </button>
 
 
@@ -129,7 +149,7 @@
             <button type="button" class="btn-link" ng-click="clearDynamicStartNode()">Cancel and clear query</button>
           </li>
         </ul>
-      </umb-box>
+      </div>
     </div>
 
 </div>

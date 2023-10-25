@@ -121,6 +121,16 @@ angular.module('umbraco')
 
     // Dynamic Root specific:
 
+    $scope.sortableOptionsForQuerySteps = {
+      axis: "y",
+      containment: "parent",
+      distance: 10,
+      opacity: 0.7,
+      tolerance: "pointer",
+      scroll: true,
+      zIndex: 6000
+  };
+
     $scope.openDynamicRootOriginPicker = function() {
 			var originPicker = {
         view: "views/common/infiniteeditors/pickdynamicrootorigin/pickdynamicrootorigin.html",

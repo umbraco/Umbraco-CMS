@@ -27,11 +27,10 @@
                 return item.nodeType === "container" || item.metaData.isElement;
             },
             submit: function (model) {
-              console.log("model.selection", model.selection);
-                //var typeAliases = _.map(model.selection, function(selected) { return selected.alias; });
+                var typeAliases = _.map(model.selection, function(selected) { return selected.alias; });
                 $scope.model.value = {
                   alias: queryStepAlias,
-                  anyOfDocTypeAlias: []
+                  anyOfDocTypeAlias: typeAliases
                 }
                 editorService.close();
                 vm.submit($scope.model);
