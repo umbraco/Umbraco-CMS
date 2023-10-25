@@ -268,7 +268,7 @@
                   if (vm.tinyMceEditor != null && !vm.rteLoading) {
 
                     // Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
-                    var blockElements = vm.tinyMceEditor.dom.select(`umb-rte-block`);
+                    var blockElements = vm.tinyMceEditor.dom.select(`umb-rte-block, umb-rte-block-inline`);
                     const usedContentUdis = blockElements.map(blockElement => blockElement.getAttribute('data-content-udi'));
 
                     const unusedBlocks = vm.layout.filter(x => usedContentUdis.indexOf(x.contentUdi) === -1);
@@ -560,7 +560,7 @@
           var removed = vm.layout.splice(layoutIndex, 1);
           removed.forEach(x => {
 
-            var blockElementsOfThisUdi = vm.tinyMceEditor.dom.select(`umb-rte-block[data-content-udi='${x.contentUdi}']`);
+            var blockElementsOfThisUdi = vm.tinyMceEditor.dom.select(`umb-rte-block[data-content-udi='${x.contentUdi}'], umb-rte-block-inline[data-content-udi='${x.contentUdi}']`);
             blockElementsOfThisUdi.forEach(blockElement => {
               vm.tinyMceEditor.dom.remove(blockElement);
             });
