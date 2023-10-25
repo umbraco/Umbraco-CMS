@@ -30,14 +30,12 @@
           <button
             type="button"
             class="umb-node-preview-add"
-            style="margin-left:-1px;"
             ng-click="chooseXPath()">
             <localize key="contentPicker_defineXPathOrigin">Specify root via XPath</localize>
           </button>
           <button
             type="button"
             class="umb-node-preview-add"
-            style="margin-left:-1px;"
             ng-click="chooseDynamicStartNode()">
             <localize key="contentPicker_defineDynamicRoot">Specify a Dynamic Root</localize>
           </button>
@@ -101,12 +99,12 @@
         <umb-button
           type="button"
           action="openDynamicRootOriginPicker()"
-          label="dynamicRoot_origin{{model.value.queryFilter.OriginAlias}}Title">
+          label="dynamicRoot_origin{{model.value.queryFilter.originAlias}}Title">
         </umb-button>
 
         <!-- list of filters -->
         <ul class="umb-tree">
-          <li class="umb-tree-item" ng-repeat="filter in model.value.queryFilter.Filter">
+          <li class="umb-tree-item" ng-repeat="filter in model.value.queryFilter.filter">
             <div class="umb-tree-item__inner" style="padding: 5px 10px;">
               <button type="button" class="btn-reset text-left flex-auto" ng-click="">
                 <umb-icon icon="{{'icon-globe'}}" class="icon umb-tree-icon">
@@ -116,6 +114,13 @@
             </div>
           </li>
         </ul>
+
+        <button
+          type="button"
+          class="umb-node-preview-add"
+          ng-click="appendDynamicQueryStep()">
+          <localize key="dynamicRoot_addQueryStep">Add another query step</localize>
+        </button>
 
 
         <ul class="unstyled list-icons mt3">
