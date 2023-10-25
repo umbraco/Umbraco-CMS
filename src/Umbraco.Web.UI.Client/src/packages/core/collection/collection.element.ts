@@ -1,15 +1,10 @@
+import { UMB_COLLECTION_CONTEXT, UmbCollectionContext } from './collection.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, property } from '@umbraco-cms/backoffice/external/lit';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-
-import './collection-selection-actions.element.js';
-import './collection-toolbar.element.js';
-import { UMB_COLLECTION_CONTEXT, UmbCollectionContext } from './collection.context.js';
 
 @customElement('umb-collection')
 export class UmbCollectionElement extends UmbLitElement {

@@ -1,4 +1,4 @@
-import type { TooltipMenuItem } from '../components/tooltip-menu/index.js';
+import type { TooltipMenuItem } from '../../components/tooltip-menu/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
