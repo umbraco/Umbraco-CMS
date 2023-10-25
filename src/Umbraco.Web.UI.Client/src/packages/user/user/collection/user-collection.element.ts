@@ -1,6 +1,6 @@
 import { UmbUserCollectionContext } from './user-collection.context.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
@@ -40,7 +40,6 @@ export class UmbUserCollectionElement extends UmbLitElement {
 				<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>
 				<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>
 			</umb-body-layout>
-			<!-- This should go in the footer slot -->
 		`;
 	}
 

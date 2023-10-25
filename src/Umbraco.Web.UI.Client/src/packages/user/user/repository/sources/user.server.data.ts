@@ -1,4 +1,4 @@
-import { UmbUserDetail, UmbUserDetailDataSource } from '../../types.js';
+import { USER_ENTITY_TYPE, UmbUserDetail, UmbUserDetailDataSource } from '../../types.js';
 import { DataSourceResponse, extendDataSourceResponseData } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateUserRequestModel,
@@ -37,7 +37,7 @@ export class UmbUserServerDataSource implements UmbUserDetailDataSource {
 		if (!id) throw new Error('Id is missing');
 		const response = await tryExecuteAndNotify(this.#host, UserResource.getUserById({ id }));
 		return extendDataSourceResponseData<UmbUserDetail>(response, {
-			entityType: 'user',
+			entityType: USER_ENTITY_TYPE,
 		});
 	}
 

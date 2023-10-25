@@ -1,11 +1,10 @@
 import { USER_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { USER_ENTITY_TYPE } from '../types.js';
 import { UmbEnableUserEntityBulkAction } from './enable/enable.action.js';
 import { UmbSetGroupUserEntityBulkAction } from './set-group/set-group.action.js';
 import { UmbUnlockUserEntityBulkAction } from './unlock/unlock.action.js';
 import { UmbDisableUserEntityBulkAction } from './disable/disable.action.js';
 import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
-
-const entityType = 'user';
 
 const entityActions: Array<ManifestEntityBulkAction> = [
 	{
@@ -18,10 +17,12 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 			label: 'SetGroup',
 			repositoryAlias: USER_REPOSITORY_ALIAS,
 		},
-		conditions: [{
-			alias: 'Umb.Condition.CollectionEntityType',
-			match: entityType,
-		}],
+		conditions: [
+			{
+				alias: 'Umb.Condition.CollectionEntityType',
+				match: USER_ENTITY_TYPE,
+			},
+		],
 	},
 	{
 		type: 'entityBulkAction',
@@ -33,10 +34,12 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 			label: 'Enable',
 			repositoryAlias: USER_REPOSITORY_ALIAS,
 		},
-		conditions: [{
-			alias: 'Umb.Condition.CollectionEntityType',
-			match: entityType,
-		}],
+		conditions: [
+			{
+				alias: 'Umb.Condition.CollectionEntityType',
+				match: USER_ENTITY_TYPE,
+			},
+		],
 	},
 	{
 		type: 'entityBulkAction',
@@ -48,10 +51,12 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 			label: 'Unlock',
 			repositoryAlias: USER_REPOSITORY_ALIAS,
 		},
-		conditions: [{
-			alias: 'Umb.Condition.CollectionEntityType',
-			match: entityType,
-		}],
+		conditions: [
+			{
+				alias: 'Umb.Condition.CollectionEntityType',
+				match: USER_ENTITY_TYPE,
+			},
+		],
 	},
 	{
 		type: 'entityBulkAction',
@@ -63,10 +68,12 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 			label: 'Disable',
 			repositoryAlias: USER_REPOSITORY_ALIAS,
 		},
-		conditions: [{
-			alias: 'Umb.Condition.CollectionEntityType',
-			match: entityType,
-		}],
+		conditions: [
+			{
+				alias: 'Umb.Condition.CollectionEntityType',
+				match: USER_ENTITY_TYPE,
+			},
+		],
 	},
 ];
 
