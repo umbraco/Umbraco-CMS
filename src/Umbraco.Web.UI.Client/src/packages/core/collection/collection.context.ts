@@ -8,15 +8,14 @@ import {
 	UmbObserverController,
 } from '@umbraco-cms/backoffice/observable-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
 
-// TODO: Clean up the need for store as Media has switched to use Repositories(repository).
 export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectionFilterModel> {
-	private _host: UmbControllerHostElement;
-	private _entityType: string;
-
-	protected _dataObserver?: UmbObserverController<ItemType[]>;
+	protected host: UmbControllerHostElement;
+	protected entityType: string;
+	protected init;
 
 	#items = new UmbArrayState<ItemType>([]);
 	public readonly items = this.#items.asObservable();
@@ -30,23 +29,49 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	#filter = new UmbObjectState<FilterModelType | object>({});
 	public readonly filter = this.#filter.asObservable();
 
+	#views = new UmbArrayState<ManifestCollectionView>([]);
+	public readonly views = this.#views.asObservable();
+
+	#currentView = new UmbObjectState<ManifestCollectionView | undefined>(undefined);
+	public readonly currentView = this.#currentView.asObservable();
+
 	repository?: UmbCollectionRepository;
 
 	constructor(host: UmbControllerHostElement, entityType: string, repositoryAlias: string) {
-		this._entityType = entityType;
-		this._host = host;
+		this.entityType = entityType;
+		this.host = host;
 
-		new UmbObserverController(
-			this._host,
-			umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
-			async (repositoryManifest) => {
-				if (repositoryManifest) {
-					const result = await createExtensionApi(repositoryManifest, [this._host]);
-					this.repository = result as UmbCollectionRepository;
-					this._onRepositoryReady();
-				}
-			},
-		);
+		this.init = Promise.all([
+			new UmbObserverController(
+				this.host,
+				umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
+				async (repositoryManifest) => {
+					if (repositoryManifest) {
+						const result = await createExtensionApi(repositoryManifest, [this.host]);
+						this.repository = result as UmbCollectionRepository;
+						this.requestCollection();
+					}
+				},
+			).asPromise(),
+
+			new UmbObserverController(
+				this.host,
+				umbExtensionsRegistry.extensionsOfType('collectionView').pipe(
+					map((extensions) => {
+						return extensions.filter((extension) => extension.conditions.entityType === this.getEntityType());
+					}),
+				),
+				(views) => {
+					this.#views.next(views);
+
+					if (!this.getCurrentView()) {
+						/* TODO: Find a way to figure out which layout it starts with and set _currentLayout to that instead of [0]. eg. '/table'
+						For document,media and members this will come as part of a data type configuration, but in other cases "users" we should find another way. */
+						this.setCurrentView(views[0]);
+					}
+				},
+			).asPromise(),
+		]);
 	}
 
 	/**
@@ -110,12 +135,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	 * @memberof UmbCollectionContext
 	 */
 	public getEntityType() {
-		return this._entityType;
-	}
-
-	protected async _onRepositoryReady() {
-		if (!this.repository) return;
-		this.requestCollection();
+		return this.entityType;
 	}
 
 	/**
@@ -143,6 +163,25 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	setFilter(filter: Partial<FilterModelType>) {
 		this.#filter.next({ ...this.#filter.getValue(), ...filter });
 		this.requestCollection();
+	}
+
+	// Views
+	/**
+	 * Sets the current view.
+	 * @param {ManifestCollectionView} view
+	 * @memberof UmbCollectionContext
+	 */
+	public setCurrentView(view: ManifestCollectionView) {
+		this.#currentView.next(view);
+	}
+
+	/**
+	 * Returns the current view.
+	 * @return {ManifestCollectionView}
+	 * @memberof UmbCollectionContext
+	 */
+	public getCurrentView() {
+		return this.#currentView.getValue();
 	}
 }
 
