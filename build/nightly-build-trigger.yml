@@ -1,5 +1,6 @@
 name: Nightly_$(TeamProject)_$(Build.DefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 
+pr: none
 trigger: none
 
 schedules:
