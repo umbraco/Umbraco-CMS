@@ -236,6 +236,41 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [TestCase(DynamicRootAlias.NearestDescendantOrSelf)]
+    [TestCase(DynamicRootAlias.FarthestDescendantOrSelf)]
+    public void GetDynamicRoots__DescendantOrSelf_must_handle_when_there_is_not_found_any_and_level_becomes_impossible_to_get(DynamicRootAlias dynamicRootAlias)
+    {
+        // Arrange
+        var startNodeSelector = new DynamicRootNodeSelector()
+        {
+            OriginAlias = DynamicRootOrigin.Current.ToString(),
+            OriginKey = null,
+            Context = new DynamicRootSelectorContext()
+            {
+                CurrentKey = ContentAct2022RanD.Key,
+                ParentKey = ContentActs2022.Key
+            },
+            QuerySteps = new DynamicRootQueryStep[]
+            {
+                new DynamicRootQueryStep()
+                {
+                    Alias = dynamicRootAlias.ToString(),
+                    AnyOfDocTypeKeys = new []{Guid.NewGuid()}
+                }
+            }
+        };
+
+        // Act
+        var result = DynamicRootService.GetDynamicRoots(startNodeSelector);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(0, result.Count());
+        });
+    }
+
+    [Test]
     public void GetDynamicRoots__NearestDescendantOrSelf__has_to_find_only_the_nearest()
     {
         // Arrange
