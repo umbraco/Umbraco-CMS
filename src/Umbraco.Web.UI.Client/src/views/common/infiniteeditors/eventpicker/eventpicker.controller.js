@@ -36,9 +36,17 @@
       // get all events
       webhooksResource.getAllEvents()
         .then((data) => {
+          let selectedEvents = [];
           data.forEach(function (event) {
             let eventObject = { name: event.eventName, selected: false}
             vm.events.push(eventObject);
+            if($scope.model.selectedEvents.includes(eventObject.name)){
+              selectedEvents.push(eventObject);
+            }
+          });
+
+          selectedEvents.forEach(function (event) {
+            selectEvent(event)
           });
         });
     }

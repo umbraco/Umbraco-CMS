@@ -1,16 +1,25 @@
 ﻿(function () {
   "use strict";
+
   function EditController($scope, editorService, contentTypeResource, mediaTypeResource) {
     var vm = this;
     vm.clearContentType = clearContentType;
     vm.clearEvent = clearEvent;
     vm.removeHeader = removeHeader;
     vm.openCreateHeader = openCreateHeader;
-    this.openEventPicker = () => {
+    vm.openEventPicker = openEventPicker;
+    vm.openContentTypePicker = openContentTypePicker;
+    vm.close = close;
+    vm.submit = submit;
+
+
+    function openEventPicker()
+    {
       editorService.eventPicker({
         title: "Select event",
+        selectedEvents: $scope.model.webhook.events,
         submit(model) {
-          $scope.model.webhook.events =  model.selection;
+          $scope.model.webhook.events = model.selection;
           editorService.close();
         },
         close() {
@@ -18,7 +27,9 @@
         }
       });
     }
-    this.openContentTypePicker = () => {
+
+    function openContentTypePicker()
+    {
       const isContent = $scope.model.webhook ? $scope.model.webhook.events[0].toLowerCase().includes("content") : null;
       editorService.treePicker({
         section: 'settings',
@@ -27,14 +38,14 @@
         multiPicker: true,
         submit(model) {
           getEntities(model.selection, isContent);
-          $scope.model.webhook.entityKeys =  model.selection.map((item) => item.key);
+          $scope.model.webhook.entityKeys = model.selection.map((item) => item.key);
           editorService.close();
         },
         close() {
           editorService.close();
         }
       });
-    };
+    }
 
     function openCreateHeader() {
       editorService.open({
@@ -43,7 +54,7 @@
         size: 'small',
         position: 'right',
         submit(model) {
-          if(!$scope.model.webhook.headers){
+          if (!$scope.model.webhook.headers) {
             $scope.model.webhook.headers = {};
           }
           $scope.model.webhook.headers[model.key] = model.value;
@@ -67,8 +78,7 @@
       });
     }
 
-    function clearContentType (contentTypeKey)
-    {
+    function clearContentType(contentTypeKey) {
       if (Array.isArray($scope.model.webhook.entityKeys)) {
         $scope.model.webhook.entityKeys = $scope.model.webhook.entityKeys.filter(x => x !== contentTypeKey);
       }
@@ -92,17 +102,19 @@
     }
 
 
-    this.close = () => {
+    function close()
+    {
       if ($scope.model.close) {
         $scope.model.close();
       }
-    };
+    }
 
-    this.submit = () => {
+    function submit()
+    {
       if ($scope.model.submit) {
         $scope.model.submit($scope.model);
       }
-    };
+    }
   }
 
   angular.module("umbraco").controller("Umbraco.Editors.Webhooks.EditController", EditController);
