@@ -84,7 +84,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         return await Task.FromResult(inviteModel);
     }
 
-    public async Task<UserResendInviteModel> CreateResendInviteModel(ResendInviteUserRequestModel requestModel)
+    public async Task<UserResendInviteModel> CreateResendInviteModelAsync(ResendInviteUserRequestModel requestModel)
     {
         var inviteModel = new UserResendInviteModel
         {

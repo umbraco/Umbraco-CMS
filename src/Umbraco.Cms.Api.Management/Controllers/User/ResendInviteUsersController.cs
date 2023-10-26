@@ -1,5 +1,4 @@
 ﻿using Asp.Versioning;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -33,7 +32,7 @@ public class ResendInviteUserController : UserControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ResendInvite(ResendInviteUserRequestModel model)
     {
-        UserResendInviteModel resendInviteModel = await _userPresentationFactory.CreateResendInviteModel(model);
+        UserResendInviteModel resendInviteModel = await _userPresentationFactory.CreateResendInviteModelAsync(model);
 
         Attempt<UserInvitationResult, UserOperationStatus> result =
             await _userService.ResendInvitationAsync(CurrentUserKey(_backOfficeSecurityAccessor), resendInviteModel);
