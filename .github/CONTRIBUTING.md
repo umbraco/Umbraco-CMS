@@ -54,5 +54,6 @@ The following steps are a quick-start guide:
 - [Before you start](contributing-before-you-start.md)
 - [Finding your first issue: Up for grabs](contributing-before-you-start.md)
 - [Contributing to the new backoffice](https://docs.umbraco.com/umbraco-backoffice/)
+- [Unwanted changes](contributing-unwanted-changes.md)
 - [Other ways to contribute](contributing-other-ways-to-contribute.md)
 
