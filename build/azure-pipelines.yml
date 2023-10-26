@@ -43,7 +43,7 @@ parameters:
     default: ' '
 
 variables:
-  nodeVersion: 18.16.0
+  nodeVersion: 20
   dotnetVersion: 8.x
   dotnetIncludePreviewVersions: true
   solution: umbraco.sln
@@ -72,6 +72,7 @@ stages:
             submodules: true
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
+            retryCountOnTaskFailure: 3
             inputs:
               versionSpec: $(nodeVersion)
           - task: Cache@2
@@ -84,9 +85,9 @@ stages:
               path: $(npm_config_cache)
           - script: npm ci --no-fund --no-audit --prefer-offline
             workingDirectory:  src/Umbraco.Web.UI.Client
-            displayName: Run npm ci
+            displayName: Run npm ci (Backoffice)
           - task: gulp@0
-            displayName: Run gulp build
+            displayName: Run gulp build (Backoffice)
             inputs:
               gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
               targets: coreBuild
@@ -111,29 +112,12 @@ stages:
               command: restore
               projects: $(solution)
           - task: DotNetCoreCLI@2
-            displayName: Run dotnet build
+            name: build
+            displayName: Run dotnet build and generate NuGet packages
             inputs:
               command: build
               projects: $(solution)
-              arguments: '--configuration $(buildConfiguration) --no-restore -p:ContinuousIntegrationBuild=true'
-          - script: |
-              version="$(Build.BuildNumber)"
-              echo "Version: $version"
-
-              major="$(echo $version | cut -d '.' -f 1)"
-              echo "Major version: $major"
-
-              echo "##vso[task.setvariable variable=majorVersion;isOutput=true]$major"
-            displayName: Set major version
-            name: determineMajorVersion
-          - script: dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
-            displayName: Run dotnet pack
-          - script: |
-              sha="$(Build.SourceVersion)"
-              sha=${sha:0:7}
-              buildnumber="$(Build.BuildNumber)_$(Build.BuildId)_$sha"
-              echo "##vso[build.updatebuildnumber]$buildnumber"
-            displayName: Update build number
+              arguments: '--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg'
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
@@ -146,11 +130,11 @@ stages:
               artifactName: build_output
 
   - stage: Build_Docs
-    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.buildApiDocs}}))
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.buildApiDocs}}))
     displayName: Prepare API Documentation
     dependsOn: Build
     variables:
-      umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['determineMajorVersion.majorVersion'] ]
+      umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     jobs:
       # C# API Reference
 #      - job:
@@ -286,6 +270,8 @@ stages:
   - stage: Integration
     displayName: Integration Tests
     dependsOn: Build
+    variables:
+      releaseTestFilter: eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True')
     jobs:
       # Integration Tests (SQLite)
       - job:
@@ -320,7 +306,7 @@ stages:
               command: test
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
-              ${{ if or( parameters.forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
+              ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
               ${{ else }}:
                 arguments: '--configuration $(buildConfiguration) ${{parameters.integrationNonReleaseTestFilter}}'
@@ -334,7 +320,7 @@ stages:
               command: test
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
-              ${{ if or( parameters.forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
+              ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
               ${{ else }}:
                 arguments: '--configuration $(buildConfiguration) ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
@@ -345,7 +331,7 @@ stages:
       # Integration Tests (SQL Server)
       - job:
         timeoutInMinutes: 120
-        condition: or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.sqlServerIntegrationTests}})
+        condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerIntegrationTests}})
         displayName: Integration Tests (SQL Server)
         strategy:
           matrix:
@@ -385,7 +371,7 @@ stages:
               command: test
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
-              ${{ if or( parameters.forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
+              ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
               ${{ else }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
@@ -400,7 +386,7 @@ stages:
               command: test
               projects: '**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
-              ${{ if or( parameters.forceReleaseTestFilter, startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
+              ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
               ${{ else }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
@@ -457,6 +443,7 @@ stages:
 #              path: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/misc/nupkg
 #          - task: NodeTool@0
 #            displayName: Use Node.js $(nodeVersion)
+#            retryCountOnTaskFailure: 3
 #            inputs:
 #              versionSpec: $(nodeVersion)
 #          - task: Cache@2
@@ -561,7 +548,7 @@ stages:
       - Unit
       - Integration
       # - E2E # TODO: Enable when stable.
-    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.myGetDeploy}}))
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     jobs:
       - job:
         displayName: Push to pre-release feed
@@ -584,7 +571,7 @@ stages:
     dependsOn:
       - Deploy_MyGet
       - Build_Docs
-    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.nuGetDeploy}}))
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
     jobs:
       - job:
         displayName: Push to NuGet
@@ -607,12 +594,12 @@ stages:
     pool:
       vmImage: 'windows-latest' # Apparently AzureFileCopy is windows only :(
     variables:
-      umbracoMajorVersion:  $[ stageDependencies.Build.A.outputs['determineMajorVersion.majorVersion'] ]
+      umbracoMajorVersion:  $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     displayName: Upload API Documentation
     dependsOn:
       - Build
       - Deploy_MyGet # Change to "Deploy_Nuget" after release of v14
-    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.uploadApiDocs}}))
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
 #      - job:
 #        displayName: Upload C# Docs

@@ -156,6 +156,12 @@
     <key alias="morePublishingOptions">Daha fazla yayınlama seçeneği</key>
     <key alias="submitChanges">Gönder</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Medya silindi</key>
+    <key alias="move">Medya taşındı</key>
+    <key alias="copy">Medya kopyalandı</key>
+    <key alias="save">Medya kaydedildi</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Görüntüleniyor</key>
     <key alias="delete">İçerik silindi</key>

@@ -35,7 +35,7 @@ public abstract class CacheRefresherBase<TNotification> : ICacheRefresher
     public abstract string Name { get; }
 
     /// <summary>
-    ///     Gets the <see cref="ICacheRefresherNotificationFactory" /> for <see cref="TNotification" />
+    ///     Gets the <see cref="ICacheRefresherNotificationFactory" /> for <typeparamref name="TNotification"/>.
     /// </summary>
     protected ICacheRefresherNotificationFactory NotificationFactory { get; }
 

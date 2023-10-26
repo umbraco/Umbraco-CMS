@@ -121,7 +121,39 @@ public class BackOfficeController : UmbracoController
         // force authentication to occur since this is not an authorized endpoint
         AuthenticateResult result = await this.AuthenticateBackOfficeAsync();
 
+        // if we are not authenticated then we need to redirect to the login page
+        if (!result.Succeeded)
+        {
+            return RedirectToLogin(null);
+        }
+
+        ViewResult defaultView = DefaultView();
+
+        return await RenderDefaultOrProcessExternalLoginAsync(
+            result,
+            () => defaultView,
+            () => defaultView);
+    }
+
+    /// <summary>
+    ///     Returns the default view for the BackOffice
+    /// </summary>
+    /// <returns>The default view currently /umbraco/UmbracoBackOffice/Default.cshtml</returns>
+    public ViewResult DefaultView()
+    {
         var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
+            .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
+        return View(viewPath);
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> Login()
+    {
+        // force authentication to occur since this is not an authorized endpoint
+        AuthenticateResult result = await this.AuthenticateBackOfficeAsync();
+
+        var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeLoginArea, "Index.cshtml")
             .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
 
         return await RenderDefaultOrProcessExternalLoginAsync(
@@ -147,7 +179,7 @@ public class BackOfficeController : UmbracoController
         if (invite == null)
         {
             _logger.LogWarning("VerifyUser endpoint reached with invalid token: NULL");
-            return RedirectToAction(nameof(Default));
+            return RedirectToLogin(new { flow = "invite-user", status = "invalidToken" });
         }
 
         var parts = WebUtility.UrlDecode(invite).Split('|');
@@ -155,7 +187,7 @@ public class BackOfficeController : UmbracoController
         if (parts.Length != 2)
         {
             _logger.LogWarning("VerifyUser endpoint reached with invalid token: {Invite}", invite);
-            return RedirectToAction(nameof(Default));
+            return RedirectToLogin(new { flow = "invite-user", status = "invalidToken" });
         }
 
         var token = parts[1];
@@ -164,7 +196,7 @@ public class BackOfficeController : UmbracoController
         if (decoded.IsNullOrWhiteSpace())
         {
             _logger.LogWarning("VerifyUser endpoint reached with invalid token: {Invite}", invite);
-            return RedirectToAction(nameof(Default));
+            return RedirectToLogin(new { flow = "invite-user", status = "invalidToken" });
         }
 
         var id = parts[0];
@@ -173,7 +205,7 @@ public class BackOfficeController : UmbracoController
         if (identityUser == null)
         {
             _logger.LogWarning("VerifyUser endpoint reached with non existing user: {UserId}", id);
-            return RedirectToAction(nameof(Default));
+            return RedirectToLogin(new { flow = "invite-user", status = "nonExistingUser" });
         }
 
         IdentityResult result = await _userManager.ConfirmEmailAsync(identityUser, decoded!);
@@ -181,17 +213,18 @@ public class BackOfficeController : UmbracoController
         if (result.Succeeded == false)
         {
             _logger.LogWarning("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
-            return new RedirectResult(Url.Action(nameof(Default)) + "#/login/false?invite=3");
+            return RedirectToLogin(new { flow = "invite-user", status = "false", invite = "3" });
         }
 
-        //sign the user in
+        // sign the user in
         DateTime? previousLastLoginDate = identityUser.LastLoginDateUtc;
         await _signInManager.SignInAsync(identityUser, false);
-        //reset the lastlogindate back to previous as the user hasn't actually logged in, to add a flag or similar to BackOfficeSignInManager would be a breaking change
+
+        // reset the lastlogindate back to previous as the user hasn't actually logged in, to add a flag or similar to BackOfficeSignInManager would be a breaking change
         identityUser.LastLoginDateUtc = previousLastLoginDate;
         await _userManager.UpdateAsync(identityUser);
 
-        return new RedirectResult(Url.Action(nameof(Default)) + "#/login/false?invite=1");
+        return RedirectToLogin(new { flow = "invite-user", invite = "1" });
     }
 
     /// <summary>
@@ -354,23 +387,20 @@ public class BackOfficeController : UmbracoController
     public async Task<IActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")] int userId, [Bind(Prefix = "r")] string resetCode)
     {
         BackOfficeIdentityUser? user = await _userManager.FindByIdAsync(userId.ToString(CultureInfo.InvariantCulture));
-        if (user != null)
+        if (user is null)
         {
-            var result = await _userManager.VerifyUserTokenAsync(user, "Default", "ResetPassword", resetCode);
-            if (result)
-            {
-                //Add a flag and redirect for it to be displayed
-                TempData[ViewDataExtensions.TokenPasswordResetCode] =
-                    _jsonSerializer.Serialize(
-                        new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode });
-                return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
-            }
+            return RedirectToLogin(new { flow = "reset-password", status = "userNotFound" });
         }
 
-        //Add error and redirect for it to be displayed
-        TempData[ViewDataExtensions.TokenPasswordResetCode] =
-            new[] { _textService.Localize("login", "resetCodeExpired") };
-        return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
+        var result = await _userManager.VerifyUserTokenAsync(user, "Default", "ResetPassword", resetCode);
+
+        return result ?
+
+            // Redirect to login with userId and resetCode
+            RedirectToLogin(new { flow = "reset-password", userId, resetCode }) :
+
+            // Redirect to login with error code
+            RedirectToLogin(new { flow = "reset-password", status = "resetCodeExpired" });
     }
 
     /// <summary>
@@ -390,8 +420,7 @@ public class BackOfficeController : UmbracoController
         if (user == null)
         {
             // ... this should really not happen
-            TempData[ViewDataExtensions.TokenExternalSignInError] = new[] { "Local user does not exist" };
-            return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
+            return RedirectToLogin(new { flow = "external-login", status = "localUserNotFound" });
         }
 
         ExternalLoginInfo? info =
@@ -399,10 +428,8 @@ public class BackOfficeController : UmbracoController
 
         if (info == null)
         {
-            //Add error and redirect for it to be displayed
-            TempData[ViewDataExtensions.TokenExternalSignInError] =
-                new[] { "An error occurred, could not get external login info" };
-            return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
+            // Add error and redirect for it to be displayed
+            return RedirectToLogin(new { flow = "external-login", status = "externalLoginInfoNotFound" });
         }
 
         IdentityResult addLoginResult = await _userManager.AddLoginAsync(user, info);
@@ -414,9 +441,8 @@ public class BackOfficeController : UmbracoController
             return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
         }
 
-        //Add errors and redirect for it to be displayed
-        TempData[ViewDataExtensions.TokenExternalSignInError] = addLoginResult.Errors;
-        return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
+        // Add errors and redirect for it to be displayed
+        return RedirectToLogin(new { flow = "external-login", status = "failed" });
     }
 
     /// <summary>
@@ -429,19 +455,12 @@ public class BackOfficeController : UmbracoController
         Func<IActionResult> defaultResponse,
         Func<IActionResult> externalSignInResponse)
     {
-        if (defaultResponse is null)
-        {
-            throw new ArgumentNullException(nameof(defaultResponse));
-        }
-
-        if (externalSignInResponse is null)
-        {
-            throw new ArgumentNullException(nameof(externalSignInResponse));
-        }
+        ArgumentNullException.ThrowIfNull(defaultResponse);
+        ArgumentNullException.ThrowIfNull(externalSignInResponse);
 
         ViewData.SetUmbracoPath(_globalSettings.GetUmbracoMvcArea(_hostingEnvironment));
 
-        //check if there is the TempData or cookies with the any token name specified, if so, assign to view bag and render the view
+        // check if there is the TempData or cookies with the any token name specified, if so, assign to view bag and render the view
         if (ViewData.FromBase64CookieData<BackOfficeExternalLoginProviderErrors>(
                 _httpContextAccessor.HttpContext,
                 ViewDataExtensions.TokenExternalSignInError,
@@ -451,7 +470,7 @@ public class BackOfficeController : UmbracoController
             return defaultResponse();
         }
 
-        //First check if there's external login info, if there's not proceed as normal
+        // First check if there's external login info, if there's not proceed as normal
         ExternalLoginInfo? loginInfo = await _signInManager.GetExternalLoginInfoAsync();
 
         if (loginInfo == null || loginInfo.Principal == null)
@@ -469,7 +488,7 @@ public class BackOfficeController : UmbracoController
             return defaultResponse();
         }
 
-        //we're just logging in with an external source, not linking accounts
+        // we're just logging in with an external source, not linking accounts
         return await ExternalSignInAsync(loginInfo, externalSignInResponse);
     }
 
@@ -499,7 +518,7 @@ public class BackOfficeController : UmbracoController
             if (_runtimeState.Level == RuntimeLevel.Upgrade)
             {
                 // redirect to the the installer
-                return Redirect("/");
+                return RedirectToLocal(null);
             }
         }
         else if (result == SignInResult.TwoFactorRequired)
@@ -587,7 +606,7 @@ public class BackOfficeController : UmbracoController
         return response();
     }
 
-    private IActionResult RedirectToLocal(string? returnUrl)
+    private RedirectResult RedirectToLocal(string? returnUrl)
     {
         if (Url.IsLocalUrl(returnUrl))
         {
@@ -595,5 +614,17 @@ public class BackOfficeController : UmbracoController
         }
 
         return Redirect("/");
+    }
+
+    /// <summary>
+    ///     Redirect the user to the login action with the specified path as string and parameter as object
+    /// </summary>
+    /// <param name="values">Object containing route values</param>
+    /// <returns>Redirects the user session to the login page</returns>
+    private LocalRedirectResult RedirectToLogin(object? values)
+    {
+        var url = Url.Action(nameof(Login).ToLower(), this.GetControllerName(), values);
+
+        return new LocalRedirectResult(url ?? "/");
     }
 }

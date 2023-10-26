@@ -1,13 +1,74 @@
 (function () {
     'use strict';
 
-    function MediaNodeInfoDirective($timeout, $location, $q, eventsService, userService, dateHelper, editorService, mediaHelper, mediaResource) {
+  function MediaNodeInfoDirective($timeout, logResource, $location, $q, eventsService, userService, dateHelper, editorService, mediaHelper, mediaResource) {
 
         function link(scope, element, attrs, ctrl) {
 
             var evts = [];
+            var isInfoTab = false;
+            var auditTrailLoaded = false;
 
             scope.allowChangeMediaType = false;
+            scope.historyLabelKey = "general_history";
+            scope.auditTrailOptions = {
+              id: scope.node.id
+            };
+
+            scope.auditTrailPageChange = function (pageNumber) {
+              scope.auditTrailOptions.pageNumber = pageNumber;
+              loadAuditTrail(true);
+            };
+
+            function loadAuditTrail(forceReload) {
+
+              //don't load this if it's already done
+              if (auditTrailLoaded && !forceReload) {
+                return;
+              }
+
+              scope.loadingAuditTrail = true;
+
+              logResource.getPagedEntityLog(scope.auditTrailOptions)
+                .then(data => {
+
+                  // get current backoffice user and format dates
+                  userService.getCurrentUser().then(currentUser => {
+                    data.items.forEach(item => {
+                      item.timestampFormatted = dateHelper.getLocalDate(item.timestamp, currentUser.locale, 'LLL');
+                    });
+                  });
+
+                  scope.auditTrail = data.items;
+                  scope.auditTrailOptions.pageNumber = data.pageNumber;
+                  scope.auditTrailOptions.pageSize = data.pageSize;
+                  scope.auditTrailOptions.totalItems = data.totalItems;
+                  scope.auditTrailOptions.totalPages = data.totalPages;
+
+                  setAuditTrailLogTypeColor(scope.auditTrail);
+
+                  scope.loadingAuditTrail = false;
+
+                  auditTrailLoaded = true;
+                });
+
+            }
+
+            function setAuditTrailLogTypeColor(auditTrail) {
+              auditTrail.forEach(item => {
+
+                switch (item.logType) {
+                  case "Save":
+                    item.logTypeColor = "success";
+                    break;
+                  case "Delete":
+                    item.logTypeColor = "danger";
+                    break;
+                  default:
+                    item.logTypeColor = "gray";
+                }
+              });
+            }
 
             function onInit() {
 
@@ -31,6 +92,12 @@
 
                 // set media file extension initially
                 setMediaExtension();
+
+                var activeApp = scope.node.apps.find(a => a.active);
+                if (activeApp.alias === "umbInfo") {
+                  loadAuditTrail();
+                  isInfoTab = true;
+                }
             }
 
             function formatDatesToLocal() {
@@ -92,6 +159,8 @@
 
                 //Update the media file format
                 setMediaExtension();
+
+                loadAuditTrail(true);
             });
 
             //ensure to unregister from all events!
@@ -100,6 +169,18 @@
                     eventsService.unsubscribe(evts[e]);
                 }
             });
+
+            evts.push(eventsService.on("app.tabChange", function (event, args) {
+              $timeout(function () {
+                if (args.alias === "umbInfo") {
+                  isInfoTab = true;
+                  loadAuditTrail();
+                  formatDatesToLocal();
+                } else {
+                  isInfoTab = false;
+                }
+              });
+            }));
 
             onInit();
         }

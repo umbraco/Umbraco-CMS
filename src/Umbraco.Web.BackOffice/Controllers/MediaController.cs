@@ -183,13 +183,12 @@ public class MediaController : ContentControllerBase
             return NotFound();
         }
 
-        IMedia emptyContent = _mediaService.CreateMedia("", parentId, contentType.Alias,
-            _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        IMedia emptyContent = _mediaService.CreateMedia("", parentId, contentType.Alias, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
         MediaItemDisplay? mapped = _umbracoMapper.Map<MediaItemDisplay>(emptyContent);
 
         if (mapped is not null)
         {
-            //remove the listview app if it exists
+            // remove the listview app if it exists
             mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
         }
 
@@ -204,8 +203,7 @@ public class MediaController : ContentControllerBase
     {
         var apps = new List<ContentApp>
         {
-            ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, "recycleBin", "media",
-            Constants.DataTypes.DefaultMediaListView)
+            ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, "recycleBin", "media", Constants.DataTypes.DefaultMediaListView)
         };
         apps[0].Active = true;
         var display = new MediaItemDisplay
@@ -238,7 +236,8 @@ public class MediaController : ContentControllerBase
         if (foundMedia == null)
         {
             HandleContentNotFound(id);
-            //HandleContentNotFound will throw an exception
+
+            // HandleContentNotFound will throw an exception
             return null;
         }
 
@@ -303,11 +302,10 @@ public class MediaController : ContentControllerBase
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildFolders(int id, int pageNumber = 1,
-        int pageSize = 1000)
+    public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildFolders(int id, int pageNumber = 1, int pageSize = 1000)
     {
-        //Suggested convention for folder mediatypes - we can make this more or less complicated as long as we document it...
-        //if you create a media type, which has an alias that ends with ...Folder then its a folder: ex: "secureFolder", "bannerFolder", "Folder"
+        // Suggested convention for folder mediatypes - we can make this more or less complicated as long as we document it...
+        // if you create a media type, which has an alias that ends with ...Folder then its a folder: ex: "secureFolder", "bannerFolder", "Folder"
         var folderTypes = _mediaTypeService
             .GetAll()
             .Where(x => x.Alias.EndsWith("Folder"))
@@ -320,7 +318,8 @@ public class MediaController : ContentControllerBase
         }
 
         IEnumerable<IMedia> children = _mediaService.GetPagedChildren(id, pageNumber - 1, pageSize, out long total,
-            //lookup these content types
+
+            // lookup these content types
             _sqlContext.Query<IMedia>().Where(x => folderTypes.Contains(x.ContentTypeId)),
             Ordering.By("Name"));
 
@@ -336,6 +335,7 @@ public class MediaController : ContentControllerBase
     /// </summary>
     [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>))]
     public IEnumerable<ContentItemBasic<ContentPropertyBasic>> GetRootMedia() =>
+
         // TODO: Add permissions check!
         _mediaService.GetRootMedia()?
             .Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>).WhereNotNull() ??
@@ -357,7 +357,7 @@ public class MediaController : ContentControllerBase
             return HandleContentNotFound(id);
         }
 
-        //if the current item is in the recycle bin
+        // if the current item is in the recycle bin
         if (foundMedia.Trashed == false)
         {
             Attempt<OperationResult?> moveResult = _mediaService.MoveToRecycleBin(foundMedia,
@@ -389,8 +389,10 @@ public class MediaController : ContentControllerBase
     {
         // Authorize...
         var requirement = new MediaPermissionsResourceRequirement();
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User,
-            new MediaPermissionsResource(_mediaService.GetById(move.Id)), requirement);
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(
+            User,
+            new MediaPermissionsResource(_mediaService.GetById(move.Id)),
+            requirement);
         if (!authorizationResult.Succeeded)
         {
             return Forbid();
@@ -403,18 +405,19 @@ public class MediaController : ContentControllerBase
             return convertToActionResult.Convert();
         }
 
-        var destinationParentID = move.ParentId;
-        var sourceParentID = toMove?.ParentId;
+        var destinationParentId = move.ParentId;
+        var sourceParentId = toMove?.ParentId;
 
         var moveResult = toMove is null
             ? false
-            : _mediaService.Move(toMove, move.ParentId,
-                _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+            : _mediaService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
-        if (sourceParentID == destinationParentID)
+        if (sourceParentId == destinationParentId)
         {
-            return ValidationProblem(new SimpleNotificationModel(new BackOfficeNotification("",
-                _localizedTextService.Localize("media", "moveToSameFolderFailed"), NotificationStyle.Error)));
+            return ValidationProblem(new SimpleNotificationModel(new BackOfficeNotification(
+                string.Empty,
+                _localizedTextService.Localize("media", "moveToSameFolderFailed"),
+                NotificationStyle.Error)));
         }
 
         if (moveResult == false)
@@ -434,14 +437,14 @@ public class MediaController : ContentControllerBase
     public ActionResult<MediaItemDisplay?>? PostSave(
         [ModelBinder(typeof(MediaItemBinder))] MediaItemSave contentItem)
     {
-        //If we've reached here it means:
+        //  If we've reached here it means:
         // * Our model has been bound
         // * and validated
         // * any file attachments have been saved to their temporary location for us to use
         // * we have a reference to the DTO object and the persisted object
         // * Permissions are valid
 
-        //Don't update the name if it is empty
+        // Don't update the name if it is empty
         if (contentItem.Name.IsNullOrWhiteSpace() == false && contentItem.PersistedContent is not null)
         {
             contentItem.PersistedContent.Name = contentItem.Name;
@@ -454,14 +457,14 @@ public class MediaController : ContentControllerBase
             (save, property, v) => property?.SetValue(v), //set prop val
             null); // media are all invariant
 
-        //we will continue to save if model state is invalid, however we cannot save if critical data is missing.
-        //TODO: Allowing media to be saved when it is invalid is odd - media doesn't have a publish phase so suddenly invalid data is allowed to be 'live'
+        // we will continue to save if model state is invalid, however we cannot save if critical data is missing.
+        // TODO: Allowing media to be saved when it is invalid is odd - media doesn't have a publish phase so suddenly invalid data is allowed to be 'live'
         if (!ModelState.IsValid)
         {
-            //check for critical data validation issues, we can't continue saving if this data is invalid
+            // check for critical data validation issues, we can't continue saving if this data is invalid
             if (!RequiredForPersistenceAttribute.HasRequiredValuesForPersistence(contentItem))
             {
-                //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
+                // ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                 // add the model state to the outgoing object and throw validation response
                 MediaItemDisplay? forDisplay = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
                 return ValidationProblem(forDisplay, ModelState);
@@ -473,20 +476,19 @@ public class MediaController : ContentControllerBase
             return null;
         }
 
-        //save the item
-        Attempt<OperationResult?> saveStatus = _mediaService.Save(contentItem.PersistedContent,
-            _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        // save the item
+        Attempt<OperationResult?> saveStatus = _mediaService.Save(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
-        //return the updated model
+        // return the updated model
         MediaItemDisplay? display = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
 
-        //lastly, if it is not valid, add the model state to the outgoing object and throw a 403
+        // lastly, if it is not valid, add the model state to the outgoing object and throw a 403
         if (!ModelState.IsValid)
         {
             return ValidationProblem(display, ModelState, StatusCodes.Status403Forbidden);
         }
 
-        //put the correct msgs in
+        // put the correct msgs in
         switch (contentItem.Action)
         {
             case ContentSaveAction.Save:
@@ -501,7 +503,7 @@ public class MediaController : ContentControllerBase
                 {
                     AddCancelMessage(display);
 
-                    //If the item is new and the operation was cancelled, we need to return a different
+                    // If the item is new and the operation was cancelled, we need to return a different
                     // status code so the UI can handle it since it won't be able to redirect since there
                     // is no Id to redirect to!
                     if (saveStatus.Result?.Result == OperationResultType.FailedCancelledByEvent &&
@@ -542,7 +544,7 @@ public class MediaController : ContentControllerBase
             return NotFound();
         }
 
-        //if there's nothing to sort just return ok
+        // if there's nothing to sort just return ok
         if (sorted.IdSortOrder?.Length == 0)
         {
             return Ok();
@@ -551,8 +553,7 @@ public class MediaController : ContentControllerBase
         // Authorize...
         var requirement = new MediaPermissionsResourceRequirement();
         var resource = new MediaPermissionsResource(sorted.ParentId);
-        AuthorizationResult authorizationResult =
-            await _authorizationService.AuthorizeAsync(User, resource, requirement);
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User, resource, requirement);
         if (!authorizationResult.Succeeded)
         {
             return Forbid();
@@ -583,7 +584,7 @@ public class MediaController : ContentControllerBase
     public async Task<ActionResult<MediaItemDisplay?>> PostAddFolder(PostedFolder folder)
     {
         ActionResult<int?>? parentIdResult = await GetParentIdAsIntAsync(folder.ParentId, true);
-        if (!(parentIdResult?.Result is null))
+        if (parentIdResult?.Result is not null)
         {
             return new ActionResult<MediaItemDisplay?>(parentIdResult.Result);
         }
@@ -638,7 +639,11 @@ public class MediaController : ContentControllerBase
         var total = long.MaxValue;
         while (page * pageSize < total)
         {
-            IEnumerable<IMedia> children = _mediaService.GetPagedChildren(mediaId, page++, pageSize, out total,
+            IEnumerable<IMedia> children = _mediaService.GetPagedChildren(
+                mediaId,
+                page++,
+                pageSize,
+                out total,
                 _sqlContext.Query<IMedia>().Where(x => x.Name == nameToFind));
             IMedia? match = children.FirstOrDefault(c => c.ContentType.Alias == contentTypeAlias);
             if (match != null)
@@ -668,7 +673,7 @@ public class MediaController : ContentControllerBase
             parentId = parentUdi?.Guid.ToString();
         }
 
-        //if it's not an INT then we'll check for GUID
+        // if it's not an INT then we'll check for GUID
         if (int.TryParse(parentId, NumberStyles.Integer, CultureInfo.InvariantCulture, out int intParentId) == false)
         {
             // if a guid then try to look up the entity
@@ -692,7 +697,7 @@ public class MediaController : ContentControllerBase
         }
 
         // Authorize...
-        //ensure the user has access to this folder by parent id!
+        // ensure the user has access to this folder by parent id!
         if (validatePermissions)
         {
             var requirement = new MediaPermissionsResourceRequirement();
@@ -733,14 +738,13 @@ public class MediaController : ContentControllerBase
 
         if (model.ParentId < 0)
         {
-            //cannot move if the content item is not allowed at the root unless there are
-            //none allowed at root (in which case all should be allowed at root)
+            // cannot move if the content item is not allowed at the root unless there are
+            // none allowed at root (in which case all should be allowed at root)
             IMediaTypeService mediaTypeService = _mediaTypeService;
             if (toMove.ContentType.AllowedAsRoot == false && mediaTypeService.GetAll().Any(ct => ct.AllowedAsRoot))
             {
                 var notificationModel = new SimpleNotificationModel();
-                notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy", "notAllowedAtRoot"),
-                    "");
+                notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy", "notAllowedAtRoot"), string.Empty);
                 return ValidationProblem(notificationModel);
             }
         }
@@ -752,7 +756,7 @@ public class MediaController : ContentControllerBase
                 return NotFound();
             }
 
-            //check if the item is allowed under this one
+            // check if the item is allowed under this one
             IMediaType? parentContentType = _mediaTypeService.Get(parent.ContentTypeId);
             if (parentContentType?.AllowedContentTypes?.Select(x => x.Key).ToArray()
                     .Any(x => x == toMove.ContentType.Key) == false)
@@ -764,12 +768,11 @@ public class MediaController : ContentControllerBase
             }
 
             // Check on paths
-            if (string.Format(",{0},", parent.Path)
-                    .IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
+            if ($",{parent.Path},"
+                    .IndexOf($",{toMove.Id},", StringComparison.Ordinal) > -1)
             {
                 var notificationModel = new SimpleNotificationModel();
-                notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"),
-                    "");
+                notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"), string.Empty);
                 return ValidationProblem(notificationModel);
             }
         }
@@ -794,7 +797,8 @@ public class MediaController : ContentControllerBase
     ///     Returns the child media objects - using the entity INT id
     /// </summary>
     [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
-    public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(int id,
+    public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(
+        int id,
         int pageNumber = 0,
         int pageSize = 0,
         string orderBy = "SortOrder",
@@ -802,7 +806,7 @@ public class MediaController : ContentControllerBase
         bool orderBySystemField = true,
         string filter = "")
     {
-        //if a request is made for the root node data but the user's start node is not the default, then
+        // if a request is made for the root node data but the user's start node is not the default, then
         // we need to return their start nodes
         if (id == Constants.System.Root && UserStartNodes.Length > 0 &&
             UserStartNodes.Contains(Constants.System.Root) == false)
@@ -832,7 +836,6 @@ public class MediaController : ContentControllerBase
         }
 
         // else proceed as usual
-
         long totalChildren;
         List<IMedia> children;
         if (pageNumber > 0 && pageSize > 0)
@@ -840,22 +843,27 @@ public class MediaController : ContentControllerBase
             IQuery<IMedia>? queryFilter = null;
             if (filter.IsNullOrWhiteSpace() == false)
             {
-                //add the default text filter
+                int.TryParse(filter, out int filterAsIntId);
+                Guid.TryParse(filter, out Guid filterAsGuid);
+                // add the default text filter
                 queryFilter = _sqlContext.Query<IMedia>()
                     .Where(x => x.Name != null)
-                    .Where(x => x.Name!.Contains(filter));
+                    .Where(x => x.Name!.Contains(filter)
+                      || x.Id == filterAsIntId || x.Key == filterAsGuid);
             }
 
             children = _mediaService
                 .GetPagedChildren(
-                    id, pageNumber - 1, pageSize,
+                    id,
+                    pageNumber - 1,
+                    pageSize,
                     out totalChildren,
                     queryFilter,
                     Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField)).ToList();
         }
         else
         {
-            //better to not use this without paging where possible, currently only the sort dialog does
+            // better to not use this without paging where possible, currently only the sort dialog does
             children = _mediaService.GetPagedChildren(id, 0, int.MaxValue, out var total).ToList();
             totalChildren = children.Count;
         }
@@ -929,8 +937,7 @@ public class MediaController : ContentControllerBase
             IEntitySlim? entity = _entityService.Get(guidUdi.Guid);
             if (entity != null)
             {
-                return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField,
-                    filter);
+                return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
             }
         }
 

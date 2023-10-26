@@ -122,7 +122,6 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : DataVa
     ///     Ensure that sub-editor values are translated through their ToEditor methods
     /// </summary>
     /// <param name="property"></param>
-    /// <param name="dataTypeService"></param>
     /// <param name="culture"></param>
     /// <param name="segment"></param>
     /// <returns></returns>
