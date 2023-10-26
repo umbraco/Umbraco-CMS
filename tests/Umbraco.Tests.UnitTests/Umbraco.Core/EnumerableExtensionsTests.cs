@@ -166,4 +166,41 @@ public class EnumerableExtensionsTests
         iteratorSource = list.DistinctBy(x => x.Item2).ToArray();
         Assert.AreEqual(iteratorSource.Length, iteratorSource.ToList().Count);
     }
+
+    #region IsCollectionEmpty()
+    private static IEnumerable<IEnumerable<object>> IsCollectionEmptyTestCases()
+    {
+        yield return new object[] { null, true };
+        yield return new object[] { new List<int>(), true };
+        yield return new object[] { new List<int>() { 1, 2, 3, 4, 5, 6 }, false };
+    }
+
+    [TestCaseSource(nameof(IsCollectionEmptyTestCases))]
+    public void IsCollectionEmptyTests(IReadOnlyCollection<int>? collection, bool expectedResult)
+    {
+        bool result = collection.IsEnumerableEmpty();
+        Assert.AreEqual(expectedResult, result);
+    }
+    #endregion
+
+    #region IsEnumerableEmpty()
+    private static IEnumerable<IEnumerable<object>> IsEnumerableEmptyTestCases()
+    {
+        List<int> listOfIntegers = new List<int>() { 1, 2, 3, 4, 5, 6 };
+
+        IEnumerable<int> queryAbove6 = listOfIntegers.Where(x => x > 6);
+        IEnumerable<int> queryBelow4 = listOfIntegers.Where(x => x < 4);
+
+        yield return new object[] { null, true };
+        yield return new object[] { queryAbove6, true };
+        yield return new object[] { queryBelow4, false };
+    }
+
+    [TestCaseSource(nameof(IsEnumerableEmptyTestCases))]
+    public void IsEnumerableEmptyTests(IEnumerable<int>? enumerable, bool expectedResult)
+    {
+        bool result = enumerable.IsEnumerableEmpty();
+        Assert.AreEqual(expectedResult, result);
+    }
+    #endregion
 }
