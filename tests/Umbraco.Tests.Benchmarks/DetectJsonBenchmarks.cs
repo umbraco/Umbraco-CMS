@@ -43,8 +43,7 @@ public class DetectJsonBenchmarks
     }
 
 
-    //This is the fastest, however we the check will be less good than before as it'll return true on things
-    //like this: [test or {test]
+    //This is the fastest, however we the check will be less good than before as it'll return true on things like this: [test or {test]
     [Benchmark]
     public bool CharRangeIndexDetectJsonBad()
     {
