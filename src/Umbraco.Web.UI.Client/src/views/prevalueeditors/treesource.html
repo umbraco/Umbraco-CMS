@@ -20,7 +20,7 @@
 		on-edit="openContentPicker()">
 	</umb-node-preview>
 
-    <div ng-if="!node && model.value.type !== 'member'" class="mt2">
+    <div ng-if="!node && model.value.type === 'content'" class="mt2">
         <div ng-hide="(showXPath || model.value.query) || (showDynamicStartNode || model.value.dynamicRoot)" class="flex">
           <button
             type="button"
