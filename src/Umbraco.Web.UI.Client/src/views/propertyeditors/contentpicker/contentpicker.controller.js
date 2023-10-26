@@ -98,7 +98,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         minNumber: 0,
         startNode: {
             query: "",
-            queryFilter: "",
+            dynamicRoot: null,
             type: "content",
             id: $scope.model.config.startNodeId ? $scope.model.config.startNodeId : -1 // get start node for simple Content Picker
         }
@@ -256,9 +256,9 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
         });
     }
-    else if ($scope.model.config.startNode.queryFilter) {
+    else if ($scope.model.config.startNode.dynamicRoot) {
         entityResource.getDynamicRoot(
-            $scope.model.config.startNode.queryFilter,
+          JSON.stringify($scope.model.config.startNode.dynamicRoot),
             editorState.current.id,
             editorState.current.parentId,
             "Document"
