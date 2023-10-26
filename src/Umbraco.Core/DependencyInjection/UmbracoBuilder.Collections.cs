@@ -129,12 +129,7 @@ public static partial class UmbracoBuilderExtensions
         builder.FilterHandlers().Add(() => builder.TypeLoader.GetTypes<IFilterHandler>());
         builder.SortHandlers().Add(() => builder.TypeLoader.GetTypes<ISortHandler>());
         builder.ContentIndexHandlers().Add(() => builder.TypeLoader.GetTypes<IContentIndexHandler>());
-        builder.WebhookEvents()
-            .Append<ContentDeleteWebhookEvent>()
-            .Append<ContentPublishWebhookEvent>()
-            .Append<ContentUnpublishWebhookEvent>()
-            .Append<MediaDeleteWebhookEvent>()
-            .Append<MediaSaveWebhookEvent>();
+        builder.WebhookEvents().AddCoreWebhooks();
     }
 
     /// <summary>
