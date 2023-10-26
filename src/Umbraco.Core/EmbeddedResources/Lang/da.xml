@@ -1221,9 +1221,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="defineDynamicRoot">Definer Dynamisk Udgangspunkt</key>
   </area>
   <area alias="dynamicRoot">
-    <key alias="configurationTitle">Dynamisk udgangspounkts forespørgsel</key>
+    <key alias="configurationTitle">Dynamisk udgangspunkts forespørgsel</key>
     <key alias="pickDynamicRootOriginTitle">Vælg begyndelsen</key>
-    <key alias="pickDynamicRootOriginDesc">Beskriv begyndelsen for dynamisk udgangspounkts forespørgselen</key>
+    <key alias="pickDynamicRootOriginDesc">Beskriv begyndelsen for dynamisk udgangspunkts forespørgselen</key>
     <key alias="originRootTitle">Roden</key>
     <key alias="originRootDesc">Rod noden for denne kilde</key>
     <key alias="originParentTitle">Overliggende</key>
@@ -1235,7 +1235,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="originByKeyTitle">Specifik Node</key>
     <key alias="originByKeyDesc">Vælg en specifik Node</key>
     <key alias="pickDynamicRootQueryStepTitle">Tilføj skridt til forespørgsel</key>
-    <key alias="pickDynamicRootQueryStepDesc">Specificer næste skridt i din dynamisk udgangspounkts forespørgsel</key>
+    <key alias="pickDynamicRootQueryStepDesc">Specificer næste skridt i din dynamisk udgangspunkts forespørgsel</key>
     <key alias="queryStepNearestAncestorOrSelfTitle">Nærmeste forældre eller selv</key>
     <key alias="queryStepNearestAncestorOrSelfDesc">Forespørg the nærmeste forældre eller selv der passer på en af de givne typer</key>
     <key alias="queryStepFurthestAncestorOrSelfTitle">Fjerneste forældre eller selv</key>
@@ -1246,6 +1246,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="queryStepFurthestDescendantOrSelfDesc">Forespørg fjerneste barn eller selv der passer på en af de givne typer</key>
     <key alias="addQueryStep">Tilføj skridt</key>
     <key alias="queryStepTypes">der passer med typerne: </key>
+    <key alias="noValidStartNodeTitle">Intet passende indhold</key>
+    <key alias="noValidStartNodeDesc">Konfigurationen af dette felt passer ikke med noget indhold. Opret det manglende indhold eller kontakt din adminnistrator for at tilpasse Dynamisk Udgangspunkts Forespørgselen for dette felt.</key>
   </area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Slettet medie</key>

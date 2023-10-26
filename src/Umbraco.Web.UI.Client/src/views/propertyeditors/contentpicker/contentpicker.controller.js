@@ -263,7 +263,12 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             editorState.current.parentId,
             "Document"
         ).then(function (ent) {
+          if(ent) {
             dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
+          } else {
+            console.error("The Dynamic Root query did not find any valid results");
+            $scope.invalidStartNode = true;
+          }
         });
     }
 
@@ -273,6 +278,25 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
 
     //dialog
     $scope.openCurrentPicker = function () {
+        if($scope.invalidStartNode) {
+
+          localizationService.localizeMany(["dynamicRoot_noValidStartNodeTitle", "dynamicRoot_noValidStartNodeDesc"]).then(function (data) {
+            overlayService.open({
+              title: data[0],
+              content: data[1],
+              hideSubmitButton: true,
+              close: () => {
+                  overlayService.close();
+              },
+              submit: () => {
+                  // close the confirmation
+                  overlayService.close();
+              }
+            });
+          });
+          return;
+        }
+
         $scope.currentPicker = dialogOptions;
 
         $scope.currentPicker.submit = function (model) {
