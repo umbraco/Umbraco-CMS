@@ -82,22 +82,22 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 			:host > div {
 				grid-column: span 2;
 			}
-			//@container (width > 600px) {
+			/*@container (width > 600px) {*/
 				:host(:not([orientation='vertical'])) > div {
 					grid-column: span 1;
 				}
-			//}
+			/*}*/
 
 			#headerColumn {
 				position: relative;
 				height: min-content;
 			}
-			//@container (width > 600px) {
+			/*@container (width > 600px) {*/
 				#headerColumn {
 					position: sticky;
 					top: calc(var(--uui-size-space-2) * -1);
 				}
-			//}
+			/*}*/
 
 			#description {
 				color: var(--uui-color-text-alt);
@@ -106,11 +106,11 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 			#editorColumn {
 				margin-top: var(--uui-size-space-3);
 			}
-			//@container (width > 600px) {
+			/*@container (width > 600px) {*/
 				#editorColumn {
 					margin-top: 0;
 				}
-			//}
+			/*}*/
 		`,
 	];
 }
