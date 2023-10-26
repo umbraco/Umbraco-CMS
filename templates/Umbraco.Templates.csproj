@@ -52,7 +52,7 @@
   <ItemGroup>
     <Content Update="**\.template.config\template.json" Pack="false" />
   </ItemGroup>
-  <Target Name="GetUpdatedTemplateJsonPackageFiles" BeforeTargets="GenerateNuspec" AfterTargets="GetBuildVersion;GetUmbracoBuildVersion">
+  <Target Name="GetUpdatedTemplateJsonPackageFiles" BeforeTargets="GenerateNuspec" AfterTargets="GetUmbracoBuildVersion">
     <ItemGroup>
       <_TemplateJsonFiles Include="**\.template.config\template.json" Exclude="bin\**;obj\**" />
       <_TemplateJsonFiles>
