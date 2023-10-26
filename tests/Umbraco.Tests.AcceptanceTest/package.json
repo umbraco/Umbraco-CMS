@@ -10,7 +10,9 @@
     "createTest": "node createTest.js"
   },
   "devDependencies": {
-    "@playwright/test": "^1.35",
+    "@playwright/test": "^1.38",
+    "typescript": "^4.8.3",
+    "tslib": "^2.4.0",
     "del": "^6.0.0",
     "ncp": "^2.0.0",
     "prompt": "^1.2.0",

@@ -11,11 +11,6 @@ WebApplication app = builder.Build();
 
 await app.BootUmbracoAsync();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
-
 #if (UseHttpsRedirect)
 app.UseHttpsRedirection();
 #endif

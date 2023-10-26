@@ -75,6 +75,10 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         }
 
         TContent content = New(null, parent?.Id ?? Constants.System.Root, contentType);
+        if (contentCreationModelBase.Key.HasValue)
+        {
+            content.Key = contentCreationModelBase.Key.Value;
+        }
 
         UpdateNames(contentCreationModelBase, content, contentType);
         await UpdateExistingProperties(contentCreationModelBase, content, contentType);
