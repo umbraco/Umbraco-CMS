@@ -40,7 +40,7 @@ public class QueryStep
     [DataMember(Name = "alias")]
     public string Alias { get; set; } = string.Empty;
 
-    [DataMember(Name = "anyOfDocTypeAlias")]
+    [DataMember(Name = "anyOfDocTypeKeys")]
     public IEnumerable<Guid> AnyOfDocTypeKeys { get; set; } = Array.Empty<Guid>();
 }
 

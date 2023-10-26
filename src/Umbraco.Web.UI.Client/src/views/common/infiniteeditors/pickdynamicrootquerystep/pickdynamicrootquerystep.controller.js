@@ -27,10 +27,10 @@
                 return item.nodeType === "container" || item.metaData.isElement;
             },
             submit: function (model) {
-                var typeAliases = _.map(model.selection, function(selected) { return selected.alias; });
+                var typeKeys = _.map(model.selection, function(selected) { return udiParser.parse(selected.udi).value; });
                 $scope.model.value = {
                   alias: queryStepAlias,
-                  anyOfDocTypeAlias: typeAliases
+                  anyOfDocTypeKeys: typeKeys
                 }
                 editorService.close();
                 vm.submit($scope.model);
