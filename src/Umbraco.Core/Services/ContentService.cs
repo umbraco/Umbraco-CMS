@@ -2442,19 +2442,24 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId">Optional Id of the User moving the Content</param>
     public void Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
     {
+        Attempt<OperationResult?> _ = AttemptMove(content, parentId, userId);
+    }
+
+    public Attempt<OperationResult?> AttemptMove(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
         if (content.ParentId == parentId)
         {
-            return;
+            return OperationResult.Attempt.Succeed(eventMessages);
         }
 
         // if moving to the recycle bin then use the proper method
         if (parentId == Constants.System.RecycleBinContent)
         {
             MoveToRecycleBin(content, userId);
-            return;
+            return OperationResult.Attempt.Succeed(eventMessages);
         }
-
-        EventMessages eventMessages = EventMessagesFactory.Get();
 
         var moves = new List<(IContent, string)>();
 
@@ -2474,7 +2479,7 @@ public class ContentService : RepositoryService, IContentService
             if (scope.Notifications.PublishCancelable(movingNotification))
             {
                 scope.Complete();
-                return; // causes rollback
+                return OperationResult.Attempt.Cancel(eventMessages);// causes rollback
             }
 
             // if content was trashed, and since we're not moving to the recycle bin,
@@ -2509,6 +2514,8 @@ public class ContentService : RepositoryService, IContentService
 
             scope.Complete();
         }
+
+        return OperationResult.Attempt.Succeed(eventMessages);
     }
 
     // MUST be called from within WriteLock

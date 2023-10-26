@@ -2233,7 +2233,12 @@ public class ContentController : ContentControllerBase
             return null;
         }
 
-        _contentService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        Attempt<OperationResult?> moveResult = _contentService.AttemptMove(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+
+        if(!moveResult)
+        {
+            return ValidationProblem();
+        }
 
         return Content(toMove.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
     }
