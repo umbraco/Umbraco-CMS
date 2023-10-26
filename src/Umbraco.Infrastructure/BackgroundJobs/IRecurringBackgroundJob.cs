@@ -11,12 +11,12 @@ public interface IRecurringBackgroundJob
     static readonly ServerRole[] DefaultServerRoles = new[] { ServerRole.Single, ServerRole.SchedulingPublisher }; 
 
     /// <param name="period">Timespan representing how often the task should recur.</param>
+    TimeSpan Period { get; }
+
     /// <param name="delay">
     ///     Timespan representing the initial delay after application start-up before the first run of the task
     ///     occurs.
     /// </param>
-    TimeSpan Period { get; }
-
     TimeSpan Delay { get => DefaultDelay; }
 
     ServerRole[] ServerRoles { get => DefaultServerRoles; }
