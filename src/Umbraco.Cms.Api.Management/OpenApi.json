@@ -17930,6 +17930,11 @@
           }
         ],
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
           "parentId": {
             "type": "string",
             "format": "uuid",
@@ -18104,6 +18109,13 @@
             "$ref": "#/components/schemas/PackageModelBaseModel"
           }
         ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "CreatePartialViewRequestModel": {
@@ -18195,6 +18207,13 @@
             "$ref": "#/components/schemas/UserGroupBaseModel"
           }
         ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "CreateUserRequestModel": {
@@ -18204,6 +18223,13 @@
             "$ref": "#/components/schemas/UserPresentationBaseModel"
           }
         ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "CreateUserResponseModel": {

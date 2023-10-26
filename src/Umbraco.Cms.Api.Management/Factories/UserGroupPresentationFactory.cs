@@ -118,6 +118,11 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             PermissionNames = requestModel.Permissions,
         };
 
+        if (requestModel.Id.HasValue)
+        {
+            group.Key = requestModel.Id.Value;
+        }
+
         Attempt<UserGroupOperationStatus> assignmentAttempt = AssignStartNodesToUserGroup(requestModel, group);
         if (assignmentAttempt.Success is false)
         {

@@ -66,6 +66,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Name = requestModel.Name,
             UserName = requestModel.UserName,
             UserGroupKeys = requestModel.UserGroupIds,
+            Key = requestModel.Id,
         };
 
         return createModel;

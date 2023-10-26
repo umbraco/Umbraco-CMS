@@ -1,11 +1,8 @@
 using System.Xml.Linq;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
@@ -34,6 +31,9 @@ public class PackagingService : IPackagingService
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IHostEnvironment _hostEnvironment;
     private readonly IUserService _userService;
+    private readonly IScriptService _scriptService;
+    private readonly IPartialViewService _partialViewService;
+    private readonly IStylesheetService _stylesheetService;
 
     public PackagingService(
         IAuditService auditService,
@@ -45,7 +45,10 @@ public class PackagingService : IPackagingService
         ICoreScopeProvider coreScopeProvider,
         PackageMigrationPlanCollection packageMigrationPlans,
         IHostEnvironment hostEnvironment,
-        IUserService userService)
+        IUserService userService,
+        IScriptService scriptService,
+        IPartialViewService partialViewService,
+        IStylesheetService stylesheetService)
     {
         _auditService = auditService;
         _createdPackages = createdPackages;
@@ -57,6 +60,9 @@ public class PackagingService : IPackagingService
         _coreScopeProvider = coreScopeProvider;
         _hostEnvironment = hostEnvironment;
         _userService = userService;
+        _scriptService = scriptService;
+        _partialViewService = partialViewService;
+        _stylesheetService = stylesheetService;
     }
 
     #region Installation
@@ -181,6 +187,13 @@ public class PackagingService : IPackagingService
     /// <inheritdoc/>
     public async Task<Attempt<PackageDefinition, PackageOperationStatus>> CreateCreatedPackageAsync(PackageDefinition package, Guid userKey)
     {
+        PackageOperationStatus validationResult = await ValidatePackageDefinitionAsync(package);
+
+        if (validationResult != PackageOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(validationResult, package);
+        }
+
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         if (_createdPackages.SavePackage(package) == false)
         {
@@ -197,6 +210,40 @@ public class PackagingService : IPackagingService
         scope.Complete();
         return await Task.FromResult(Attempt.SucceedWithStatus(PackageOperationStatus.Success, package));
 
+    }
+
+    private async Task<PackageOperationStatus> ValidatePackageDefinitionAsync(PackageDefinition package)
+    {
+        if (package.Name.IsNullOrWhiteSpace())
+        {
+            return PackageOperationStatus.InvalidName;
+        }
+
+        foreach (var scriptPath in package.Scripts)
+        {
+            if (await _scriptService.GetAsync(scriptPath) is null)
+            {
+                return PackageOperationStatus.ScriptNotFound;
+            }
+        }
+
+        foreach (var partialViewPath in package.PartialViews)
+        {
+            if (await _partialViewService.GetAsync(partialViewPath) is null)
+            {
+                return PackageOperationStatus.PartialViewNotFound;
+            }
+        }
+
+        foreach (var stylesheetPath in package.Stylesheets)
+        {
+            if (await _stylesheetService.GetAsync(stylesheetPath) is null)
+            {
+                return PackageOperationStatus.StylesheetNotFound;
+            }
+        }
+
+        return PackageOperationStatus.Success;
     }
 
     /// <inheritdoc/>

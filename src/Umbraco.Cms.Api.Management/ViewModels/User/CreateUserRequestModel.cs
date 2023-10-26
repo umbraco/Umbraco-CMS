@@ -2,5 +2,5 @@
 
 public class CreateUserRequestModel : UserPresentationBase
 {
-
+    public Guid? Id { get; set; }
 }

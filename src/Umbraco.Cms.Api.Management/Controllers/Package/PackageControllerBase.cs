@@ -28,6 +28,18 @@ public abstract class PackageControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid package name")
                 .WithDetail("The attempted package name does not represent a valid name for a package.")
                 .Build()),
+            PackageOperationStatus.ScriptNotFound => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("A script was not found")
+                .WithDetail("The script path was not found.")
+                .Build()),
+            PackageOperationStatus.PartialViewNotFound => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("A partial view was not found")
+                .WithDetail("The partial view path was not found.")
+                .Build()),
+            PackageOperationStatus.StylesheetNotFound => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("A stylesheet was not found")
+                .WithDetail("The stylesheet path was not found.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown package operation status.")
                 .Build()),

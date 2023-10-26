@@ -17,6 +17,10 @@ public abstract class DictionaryControllerBase : ManagementApiControllerBase
     protected IActionResult DictionaryItemOperationStatusResult(DictionaryItemOperationStatus status) =>
         status switch
         {
+            DictionaryItemOperationStatus.DuplicateKey => Conflict(new ProblemDetailsBuilder()
+                .WithTitle("Duplicate dictionary item key detected")
+                .WithDetail("Another dictionary item exists with the same key. Dictionary item keys must be unique.")
+                .Build()),
             DictionaryItemOperationStatus.DuplicateItemKey => Conflict(new ProblemDetailsBuilder()
                 .WithTitle("Duplicate dictionary item name detected")
                 .WithDetail("Another dictionary item exists with the same name. Dictionary item names must be unique.")

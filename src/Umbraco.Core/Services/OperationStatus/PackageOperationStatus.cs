@@ -5,5 +5,8 @@ public enum PackageOperationStatus
     Success,
     NotFound,
     DuplicateItemName,
-    InvalidName
+    InvalidName,
+    ScriptNotFound,
+    PartialViewNotFound,
+    StylesheetNotFound
 }

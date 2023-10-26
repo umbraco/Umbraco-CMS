@@ -142,6 +142,11 @@ public class BackOfficeUserStore :
             IsLockedOut = user.IsLockedOut,
         };
 
+        if (user.Key != Guid.Empty)
+        {
+            userEntity.Key = user.Key;
+        }
+
         // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
         var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(BackOfficeIdentityUser.Logins));
         var isTokensPropertyDirty = user.IsPropertyDirty(nameof(BackOfficeIdentityUser.LoginTokens));
