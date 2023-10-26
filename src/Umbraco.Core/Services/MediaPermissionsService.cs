@@ -25,14 +25,21 @@ internal sealed class MediaPermissionsService : IMediaPermissionsService
     /// <inheritdoc/>
     public async Task<MediaAuthorizationStatus> AuthorizeAccessAsync(IUser performingUser, IEnumerable<Guid> mediaKeys)
     {
-        IEnumerable<IMedia> mediaItems = _mediaService.GetByIds(mediaKeys);
+        foreach (Guid mediaKey in mediaKeys)
+        {
+            IMedia? media = _mediaService.GetById(mediaKey);
+            if (media is null)
+            {
+                return MediaAuthorizationStatus.NotFound;
+            }
 
-        // Check if the user has access to all media items
-        var hasAccessToAll = mediaItems.All(mediaItem => performingUser.HasPathAccess(mediaItem, _entityService, _appCaches));
+            if (performingUser.HasPathAccess(media, _entityService, _appCaches) == false)
+            {
+                return MediaAuthorizationStatus.UnauthorizedMissingPathAccess;
+            }
+        }
 
-        return hasAccessToAll
-            ? MediaAuthorizationStatus.Success
-            : MediaAuthorizationStatus.UnauthorizedMissingPathAccess;
+        return MediaAuthorizationStatus.Success;
     }
 
     /// <inheritdoc/>
