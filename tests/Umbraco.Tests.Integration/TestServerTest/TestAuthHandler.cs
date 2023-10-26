@@ -27,11 +27,10 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        ISystemClock clock,
         IBackOfficeSignInManager backOfficeSignInManager,
         IUserService userService,
         IUmbracoMapper umbracoMapper)
-        : base(options, logger, encoder, clock)
+        : base(options, logger, encoder)
     {
         _backOfficeSignInManager = backOfficeSignInManager;
 

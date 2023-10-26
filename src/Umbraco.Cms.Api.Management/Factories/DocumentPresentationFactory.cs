@@ -1,7 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -49,6 +48,7 @@ public class DocumentPresentationFactory : IDocumentPresentationFactory
             Name = entity.Name ?? string.Empty,
             Id = entity.Key,
             Icon = entity.ContentTypeIcon,
+            IsTrashed = entity.Trashed
         };
 
         IContentType? contentType = _contentTypeService.Get(entity.ContentTypeAlias);

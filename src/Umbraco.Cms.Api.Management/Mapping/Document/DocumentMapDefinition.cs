@@ -32,6 +32,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
                     ? source.PublishDate
                     : source.GetPublishDate(culture);
             });
+        target.IsTrashed = source.Trashed;
     }
 
     private ContentState GetSavedState(IContent content, string? culture)

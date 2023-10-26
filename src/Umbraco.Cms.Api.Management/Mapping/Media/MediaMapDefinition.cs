@@ -23,5 +23,6 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueModel, 
         target.ContentTypeId = source.ContentType.Key;
         target.Values = MapValueViewModels(source);
         target.Variants = MapVariantViewModels(source);
+        target.IsTrashed = source.Trashed;
     }
 }
