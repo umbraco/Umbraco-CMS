@@ -26,6 +26,9 @@ angular.module("umbraco.filters").filter("ncNodeName", function (editorState, en
 
     var currentNode = editorState.getCurrent();
 
+    // Enable using keys with dashes:
+    input = input.split('-').join('');
+
     // Ensure a unique cache per editor instance
     var key = "ncNodeName_" + currentNode.key;
     if (ncNodeNameCache.id !== key) {
