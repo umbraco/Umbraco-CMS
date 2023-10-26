@@ -114,7 +114,7 @@
     },
     "DevelopmentDatabaseType": {
       "displayName": "Development database type",
-      "description": "Database type used by Umbraco for development.",
+      "description": "Database type used by Umbraco for development. If a development database type is configured, a unattended user name, email and password is required.",
       "type": "parameter",
       "datatype": "choice",
       "choices": [
@@ -143,12 +143,16 @@
       "parameters": {
         "cases": [
           {
-            "condition": "(DevelopmentDatabaseType == 'SQLite')",
+            "condition": "(DevelopmentDatabaseType == 'SQLite' && UnattendedUserName != '' && UnattendedUserEmail != '' && UnattendedUserPassword != '')",
             "value": "Data Source=|DataDirectory|/Umbraco.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True"
           },
           {
-            "condition": "(DevelopmentDatabaseType == 'LocalDB')",
+            "condition": "(DevelopmentDatabaseType == 'LocalDB' && UnattendedUserName != '' && UnattendedUserEmail != '' && UnattendedUserPassword != '')",
             "value": "Data Source=(localdb)\\\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\\\Umbraco.mdf;Integrated Security=True"
+          },
+          {
+            "condition": "(DevelopmentDatabaseType != 'None' && (UnattendedUserName == '' || UnattendedUserEmail == '' || UnattendedUserPassword == ''))",
+            "value": ""
           }
         ]
       },
@@ -179,6 +183,7 @@
     "UnattendedUserName": {
       "displayName": "Unattended user name",
       "description": "Used to specify the name of the default admin user when using unattended install on development (stored as plain text).",
+      "isRequired": "DevelopmentDatabaseType != 'None'",
       "type": "parameter",
       "datatype": "string",
       "defaultValue": "",
@@ -192,6 +197,7 @@
     "UnattendedUserEmail": {
       "displayName": "Unattended user email",
       "description": "Used to specify the email of the default admin user when using unattended install on development (stored as plain text).",
+      "isRequired": "DevelopmentDatabaseType != 'None'",
       "type": "parameter",
       "datatype": "string",
       "defaultValue": "",
@@ -205,6 +211,7 @@
     "UnattendedUserPassword": {
       "displayName": "Unattended user password",
       "description": "Used to specify the password of the default admin user when using unattended install on development (stored as plain text).",
+      "isRequired": "DevelopmentDatabaseType != 'None'",
       "type": "parameter",
       "datatype": "string",
       "defaultValue": "",
