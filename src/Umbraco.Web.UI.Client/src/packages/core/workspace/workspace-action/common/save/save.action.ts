@@ -1,9 +1,9 @@
-import { UmbWorkspaceContextInterface } from '../../../workspace-context/workspace-context.interface.js';
+import { UmbSaveableWorkspaceContextInterface } from '../../../workspace-context/saveable-workspace-context.interface.js';
 import { UmbWorkspaceActionBase } from '../../workspace-action-base.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 // TODO: add interface for repo/partial repo/save-repo
-export class UmbSaveWorkspaceAction extends UmbWorkspaceActionBase<UmbWorkspaceContextInterface> {
+export class UmbSaveWorkspaceAction extends UmbWorkspaceActionBase<UmbSaveableWorkspaceContextInterface> {
 	constructor(host: UmbControllerHostElement) {
 		super(host);
 
