@@ -612,7 +612,7 @@ public class EntityController : UmbracoAuthorizedJsonController
             QuerySteps = model.Query.QuerySteps.Select(x=>new DynamicRootQueryStep()
             {
                 Alias = x.Alias,
-                AnyOfDocTypeAlias = x.AnyOfDocTypeAlias
+                AnyOfDocTypeKeys = x.AnyOfDocTypeKeys
             })
         };
         var startNodes = _dynamicRootService.GetDynamicRoots(startNodeSelector).ToArray();

@@ -41,6 +41,6 @@ public class QueryStep
     public string Alias { get; set; } = string.Empty;
 
     [DataMember(Name = "anyOfDocTypeAlias")]
-    public IEnumerable<string> AnyOfDocTypeAlias { get; set; } = Array.Empty<string>();
+    public IEnumerable<Guid> AnyOfDocTypeKeys { get; set; } = Array.Empty<Guid>();
 }
 

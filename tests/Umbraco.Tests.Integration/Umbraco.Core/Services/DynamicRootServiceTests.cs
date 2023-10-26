@@ -186,7 +186,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
                 new DynamicRootQueryStep()
                 {
                     Alias = DynamicRootAlias.NearestAncestorOrSelf.ToString(),
-                    AnyOfDocTypeAlias = new []{ContentAct2022RanD.ContentType.Alias}
+                    AnyOfDocTypeKeys = new []{ContentAct2022RanD.ContentType.Key}
                 }
             }
         };
@@ -220,7 +220,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
                 new DynamicRootQueryStep()
                 {
                     Alias = DynamicRootAlias.NearestAncestorOrSelf.ToString(),
-                    AnyOfDocTypeAlias = new []{ContentAct2022RanD.ContentType.Alias}
+                    AnyOfDocTypeKeys = new []{ContentAct2022RanD.ContentType.Key}
                 }
             }
         };
@@ -267,7 +267,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
                 new DynamicRootQueryStep()
                 {
                     Alias = DynamicRootAlias.NearestDescendantOrSelf.ToString(),
-                    AnyOfDocTypeAlias = new []{ContentTypeActs.Alias}
+                    AnyOfDocTypeKeys = new []{ContentTypeActs.Key}
                 }
             }
         };
@@ -315,7 +315,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
                 new DynamicRootQueryStep()
                 {
                     Alias = DynamicRootAlias.FarthestDescendantOrSelf.ToString(),
-                    AnyOfDocTypeAlias = new []{ContentTypeActs.Alias}
+                    AnyOfDocTypeKeys = new []{ContentTypeActs.Key}
                 }
             }
         };
@@ -349,12 +349,12 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
                 new DynamicRootQueryStep()
                 {
                     Alias = DynamicRootAlias.NearestAncestorOrSelf.ToString(),
-                    AnyOfDocTypeAlias = new []{ContentTypeYear.Alias}
+                    AnyOfDocTypeKeys = new []{ContentTypeYear.Key}
                 },
                 new DynamicRootQueryStep()
                 {
                     Alias = DynamicRootAlias.NearestDescendantOrSelf.ToString(),
-                    AnyOfDocTypeAlias = new []{ContentTypeStages.Alias}
+                    AnyOfDocTypeKeys = new []{ContentTypeStages.Key}
                 }
             }
         };
@@ -388,7 +388,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
                 new DynamicRootQueryStep()
                 {
                     Alias = DynamicRootAlias.NearestDescendantOrSelf.ToString(),
-                    AnyOfDocTypeAlias = new []{ContentYear2022.ContentType.Alias}
+                    AnyOfDocTypeKeys = new []{ContentYear2022.ContentType.Key}
                 }
             }
         };

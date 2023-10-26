@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NPoco;
 using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -52,7 +51,9 @@ public class DynamicRootRepository: IDynamicRootRepository
                 .InnerJoin<ContentDto>("c")
                 .On<ContentDto, NodeDto>((c, n) => c.NodeId == n.NodeId, "c", "n")
                 .InnerJoin<ContentTypeDto>("ct").On<ContentDto, ContentTypeDto>((c, ct) => c.ContentTypeId == ct.NodeId, "c", "ct")
-                .Where<ContentTypeDto>(ct => filter.AnyOfDocTypeAlias.Contains(ct.Alias), "ct")
+                .InnerJoin<NodeDto>("ctn")
+                .On<ContentTypeDto, NodeDto>((ct, ctn) => ct.NodeId == ctn.NodeId, "ct", "ctn")
+                .Where<NodeDto>(ctn => filter.AnyOfDocTypeKeys.Contains(ctn.UniqueId), "ctn")
                 .Where<NodeDto>(norigin => origins.Contains(norigin.UniqueId), "norigin");
 
 
@@ -101,6 +102,8 @@ internal static class HelperExtensions
             .On<ContentDto, NodeDto>((c, n) => c.NodeId == n.NodeId, "c", "n")
             .InnerJoin<ContentTypeDto>("ct")
             .On<ContentDto, ContentTypeDto>((c, ct) => c.ContentTypeId == ct.NodeId, "c", "ct")
-            .Where<ContentTypeDto>(ct => filter.AnyOfDocTypeAlias.Contains(ct.Alias), "ct")
+            .InnerJoin<NodeDto>("ctn")
+            .On<ContentTypeDto, NodeDto>((ct, ctn) => ct.NodeId == ctn.NodeId, "ct", "ctn")
+            .Where<NodeDto>(ctn => filter.AnyOfDocTypeKeys.Contains(ctn.UniqueId), "ctn")
             .Where<NodeDto>(norigin => origins.Contains(norigin.UniqueId), "norigin");
 }
