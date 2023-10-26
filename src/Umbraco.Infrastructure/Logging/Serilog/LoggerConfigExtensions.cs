@@ -74,8 +74,7 @@ namespace Umbraco.Extensions
                 rollingInterval: umbracoFileConfiguration.RollingInterval,
                 flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
                 rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
-                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit,
-                retainedFileTimeLimit: umbracoFileConfiguration.RetainedFileTimeLimit);
+                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit);
 
             return logConfig;
         }
@@ -116,8 +115,7 @@ namespace Umbraco.Extensions
                 rollingInterval: umbracoFileConfiguration.RollingInterval,
                 flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
                 rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
-                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit,
-                retainedFileTimeLimit: umbracoFileConfiguration.RetainedFileTimeLimit);
+                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit);
 
             return logConfig;
         }
@@ -128,7 +126,7 @@ namespace Umbraco.Extensions
         /// <param name="logConfig">A Serilog LoggerConfiguration</param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
-        /// 
+        ///
         [Obsolete("Will be removed in Umbraco 13.")]
         public static LoggerConfiguration OutputDefaultTextFile(
             this LoggerConfiguration logConfig,
@@ -188,7 +186,6 @@ namespace Umbraco.Extensions
             RollingInterval rollingInterval = RollingInterval.Day,
             bool rollOnFileSizeLimit = false,
             int? retainedFileCountLimit = 31,
-            TimeSpan? retainedFileTimeLimit = null,
             Encoding? encoding = null)
         {
             formatter ??= new CompactJsonFormatter();
@@ -213,8 +210,7 @@ namespace Umbraco.Extensions
                         rollOnFileSizeLimit,
                         retainedFileCountLimit,
                         encoding,
-                        null,
-                        retainedFileTimeLimit));
+                        null));
         }
 
 
