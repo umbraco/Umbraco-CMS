@@ -59,7 +59,7 @@ public class DynamicRootRepository: IDynamicRootRepository
 
     public IEnumerable<Guid> NearestDescendantOrSelf(IEnumerable<Guid> origins, DynamicRootQueryStep filter)
     {
-        var level = Database.Single<int>(Database.SqlContext.Sql()
+        var level = Database.SingleOrDefault<int>(Database.SqlContext.Sql()
             .Select("MIN(n.level)")
             .DescendantOrSelfBaseQuery(origins, filter));
 
@@ -75,7 +75,7 @@ public class DynamicRootRepository: IDynamicRootRepository
     public IEnumerable<Guid> FarthestDescendantOrSelf(IEnumerable<Guid> origins, DynamicRootQueryStep filter)
     {
 
-        var level = Database.Single<int>(Database.SqlContext.Sql()
+        var level = Database.SingleOrDefault<int>(Database.SqlContext.Sql()
             .Select("MAX(n.level)")
             .DescendantOrSelfBaseQuery(origins, filter));
 
