@@ -21,6 +21,16 @@ public static class EnumerableExtensions
     public static bool IsCollectionEmpty<T>(this IReadOnlyCollection<T>? collection) => collection == null || collection.Count == 0;
 
     /// <summary>
+    /// Determines whether the specified IEnumerable is null or has no elements.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the enumerable.</typeparam>
+    /// <param name="enumerable">The IEnumerable to check.</param>
+    /// <returns>
+    ///   <c>true</c> if the specified enumerable is null or has no elements; otherwise, <c>false</c>.
+    /// </returns>
+    public static bool IsEnumerableEmpty<T>(this IEnumerable<T>? enumerable) => enumerable == null || !enumerable.Any();
+
+    /// <summary>
     ///     Wraps this object instance into an IEnumerable{T} consisting of a single item.
     /// </summary>
     /// <typeparam name="T"> Type of the object. </typeparam>
