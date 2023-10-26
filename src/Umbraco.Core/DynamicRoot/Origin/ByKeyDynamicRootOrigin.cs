@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.DynamicRoot.Origin;
 
-public class ByKeyStartNodeOriginFinder : IStartNodeOriginFinder
+public class ByKeyDynamicRootOrigin : IDynamicRootOrigin
 {
     protected virtual string SupportedOriginType { get; set; } = "ByKey";
     private readonly IEntityService _entityService;
@@ -13,7 +13,7 @@ public class ByKeyStartNodeOriginFinder : IStartNodeOriginFinder
         Constants.ObjectTypes.Document, Constants.ObjectTypes.SystemRoot
     });
 
-    public ByKeyStartNodeOriginFinder(IEntityService entityService)
+    public ByKeyDynamicRootOrigin(IEntityService entityService)
     {
         _entityService = entityService;
     }

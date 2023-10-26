@@ -53,7 +53,7 @@ public class DynamicRootService : IDynamicRootService
 
     internal Guid? FindOriginKey(DynamicRootNodeSelector dynamicRootNodeSelector)
     {
-        foreach (IStartNodeOriginFinder startNodeOriginFinder in _originFinderCollection)
+        foreach (IDynamicRootOrigin startNodeOriginFinder in _originFinderCollection)
         {
             Guid? originKey = startNodeOriginFinder.FindOriginKey(dynamicRootNodeSelector);
 

@@ -5,12 +5,12 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.DynamicRoot.Origin;
 
-public class SiteStartNodeOriginFinder : RootStartNodeOriginFinder
+public class SiteDynamicRootOrigin : RootDynamicRootOrigin
 {
     private readonly IEntityService _entityService;
     private readonly IDomainService _domainService;
 
-    public SiteStartNodeOriginFinder(IEntityService entityService, IDomainService domainService) : base(entityService)
+    public SiteDynamicRootOrigin(IEntityService entityService, IDomainService domainService) : base(entityService)
     {
         _entityService = entityService;
         _domainService = domainService;

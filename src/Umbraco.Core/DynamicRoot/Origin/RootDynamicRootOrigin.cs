@@ -4,11 +4,11 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.DynamicRoot.Origin;
 
-public class RootStartNodeOriginFinder : IStartNodeOriginFinder
+public class RootDynamicRootOrigin : IDynamicRootOrigin
 {
     private readonly IEntityService _entityService;
 
-    public RootStartNodeOriginFinder(IEntityService entityService)
+    public RootDynamicRootOrigin(IEntityService entityService)
     {
         _entityService = entityService;
     }

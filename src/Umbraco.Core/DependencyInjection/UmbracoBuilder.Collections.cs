@@ -80,14 +80,14 @@ public static partial class UmbracoBuilderExtensions
             .Append<FormsSection>()
             .Append<TranslationSection>();
 
-        builder.StartNodeOriginFinders()
-            .Append<ByKeyStartNodeOriginFinder>()
-            .Append<ParentStartNodeOriginFinder>()
-            .Append<CurrentStartNodeOriginFinder>()
-            .Append<SiteStartNodeOriginFinder>()
-            .Append<RootStartNodeOriginFinder>();
+        builder.DynamicRootOrigins()
+            .Append<ByKeyDynamicRootOrigin>()
+            .Append<ParentDynamicRootOrigin>()
+            .Append<CurrentDynamicRootOrigin>()
+            .Append<SiteDynamicRootOrigin>()
+            .Append<RootDynamicRootOrigin>();
 
-        builder.StartNodeSelectorFilters()
+        builder.DynamicRootSteps()
             .Append<NearestAncestorOrSelfDynamicRootQueryStep>()
             .Append<FarthestAncestorOrSelfDynamicRootQueryStep>()
             .Append<NearestDescendantOrSelfDynamicRootQueryStep>()
@@ -211,10 +211,10 @@ public static partial class UmbracoBuilderExtensions
     public static SectionCollectionBuilder Sections(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<SectionCollectionBuilder>();
 
-    public static StartNodeOriginFinderCollectionBuilder StartNodeOriginFinders(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<StartNodeOriginFinderCollectionBuilder>();
+    public static DynamicRootOriginCollectionBuilder DynamicRootOrigins(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<DynamicRootOriginCollectionBuilder>();
 
-    public static DynamicRootQueryStepCollectionBuilder StartNodeSelectorFilters(this IUmbracoBuilder builder)
+    public static DynamicRootQueryStepCollectionBuilder DynamicRootSteps(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<DynamicRootQueryStepCollectionBuilder>();
 
     /// <summary>

@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Core.DynamicRoot.Origin;
 
-public interface IStartNodeOriginFinder
+public interface IDynamicRootOrigin
 {
     Guid? FindOriginKey(DynamicRootNodeSelector dynamicRootNodeSelector);
 }
