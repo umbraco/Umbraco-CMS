@@ -31,7 +31,9 @@ public class DatabaseInstallStep : InstallSetupStep<object>
             _databaseBuilder.CreateDatabase();
         }
 
-        DatabaseBuilder.Result? result = _databaseBuilder.CreateSchemaAndData();
+        // Retry every 500ms for up to 10 times before failing.
+        // Typically, if being ran after CreateDatabase() it can take a few moments for the DB to become available.
+        DatabaseBuilder.Result? result = TryCreateSchemaAndData();
 
         if (result?.Success == false)
         {
@@ -48,4 +50,26 @@ public class DatabaseInstallStep : InstallSetupStep<object>
     }
 
     public override bool RequiresExecution(object model) => true;
+
+    private DatabaseBuilder.Result? TryCreateSchemaAndData()
+    {
+        int maxRetries = 10;
+        int retryCount = 0;
+        DatabaseBuilder.Result? result = null;
+
+        while (retryCount < maxRetries)
+        {
+            result = _databaseBuilder.CreateSchemaAndData();
+
+            if (result?.Success == true)
+            {
+                return result;
+            }
+
+            retryCount++;
+            Thread.Sleep(500); // 0.5 second delay between retries
+        }
+
+        return result;
+    }
 }

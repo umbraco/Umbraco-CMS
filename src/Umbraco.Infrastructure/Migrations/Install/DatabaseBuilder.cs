@@ -195,11 +195,23 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
             var connectionString = providerMeta.GenerateConnectionString(databaseSettings);
             var providerName = databaseSettings.ProviderName ?? providerMeta.ProviderName;
+            var forceCreateDatabase = false;
 
-            if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(providerName) ||
-                (providerMeta.RequiresConnectionTest && !CanConnect(connectionString, providerName)))
+            if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(providerName))
             {
                 return false;
+            }
+
+            if(providerMeta.RequiresConnectionTest && !CanConnect(connectionString, providerName))
+            {
+                if (providerName?.InvariantEquals("Microsoft.Data.SqlClient") == true)
+                {
+                    forceCreateDatabase = true;
+                }
+                else
+                {
+                    return false;
+                }
             }
 
             if (!isTrialRun)
@@ -225,7 +237,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                     throw new InstallException("Didn't retrieve updated connection string within 10 seconds, try manual configuration instead.");
                 }
 
-                Configure(_globalSettings.CurrentValue.InstallMissingDatabase || providerMeta.ForceCreateDatabase);
+                Configure(forceCreateDatabase || _globalSettings.CurrentValue.InstallMissingDatabase || providerMeta.ForceCreateDatabase);
             }
 
             return true;
